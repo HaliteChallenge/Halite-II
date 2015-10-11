@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Classes\main.cpp" />
+    <ClCompile Include="Classes\Agents\Basic\Basic.cpp">
+      <Filter>Agents\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Agents\Still\Still.cpp">
+      <Filter>Agents\Still</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Agents\Random\Random.cpp">
+      <Filter>Agents\Random</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\SecretAgents\Res.h" />
+    <ClInclude Include="Classes\hlt.h" />
+    <ClInclude Include="Classes\Networking.h" />
+    <ClInclude Include="Classes\Agents\Basic\Basic.h">
+      <Filter>Agents\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Agents\Still\Still.h">
+      <Filter>Agents\Still</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Agents\Random\Random.h">
+      <Filter>Agents\Random</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Agents">
+      <UniqueIdentifier>{fcd30693-d38e-405f-9dff-39c85cbf1035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Agents\Basic">
+      <UniqueIdentifier>{2a3677c3-f12e-4d67-813e-56bf5fdd9a1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Agents\Still">
+      <UniqueIdentifier>{311ec33a-72d4-4230-a115-7c10a6203181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Agents\Random">
+      <UniqueIdentifier>{e660f0fb-edba-4dc9-8eb4-debffefeecc4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
