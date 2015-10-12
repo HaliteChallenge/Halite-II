@@ -542,7 +542,7 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 
 	//Generate vertices of centers of squares:
 	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
-	float xLoc = -1.0 + 1.0 / width, yLoc = -1.0 + 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
+	float xLoc = -1.0 + 1.0 / width, yLoc = 1.0 - 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
 	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
 	{
 		vertexLocations[a] = xLoc;
@@ -552,7 +552,7 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 		if(xLoc > 1.0)
 		{
 			xLoc = -1.0 + 1.0 / width;
-			yLoc += dY;
+			yLoc -= dY;
 		}
 	}
 

@@ -27,53 +27,6 @@ int main(int argc, char* args[])
 	std::thread logicThread;
 	unsigned short mapWidth, mapHeight;
 
-	// start GL context and O/S window using the GLFW helper library
-	if(!glfwInit())
-	{
-		fprintf(stderr, "Could not start GLFW3\n");
-		return EXIT_FAILURE;
-	}
-
-	GLFWmonitor* primary = glfwGetPrimaryMonitor();
-	const GLFWvidmode * mode = glfwGetVideoMode(primary);
-	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
-	window = glfwCreateWindow(mode->width * 2 / 3, mode->height * 2 / 3, "Halite", NULL,  NULL);
-	if(!window)
-	{
-		fprintf(stderr, "Could not open window with GLFW3\n");
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-
-	glfwMakeContextCurrent(window);
-
-	/*if(gl3wInit())
-	{
-		fprintf(stderr, "Could not start GL3W\n");
-		return EXIT_FAILURE;
-	}*/
-
-	glewExperimental = GL_TRUE;
-	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
-
-	initShaderHandler(false);
-
-	//Set handlers:
-
-	//Set (presently broken) leopard handler.
-	glfwSetKeyCallback(window, handleKeys);
-	//Set (presently funciotnal) character handler.
-	glfwSetCharCallback(window, handleChars);
-	//Set mouse handler
-	glfwSetMouseButtonCallback(window, handleMouse);
-	//Set error callback handler
-	glfwSetErrorCallback(handleErrors);
-	//Set file drop function
-	glfwSetDropCallback(window, handleDrop);
-	//Set window resize handler
-	glfwSetWindowSizeCallback(window, handleResize);
-
 	std::cout << "Would you like to run a new game or render a past one? Please enter \"New\" or \"Past\": ";
 	while(true)
 	{
@@ -82,8 +35,9 @@ int main(int argc, char* args[])
 		if(in == "p" || in == "past" || in == "n" || in == "new") break;
 		std::cout << "That isn't a valid input. Please enter \"New\" or \"Past\": ";
 	}
+	bool newGame = in == "new" || in == "n";
 
-	if(in == "new" || in == "n")
+	if(newGame)
 	{
 		std::cout << "Please enter the width of the map: ";
 		std::getline(std::cin, in);
@@ -115,7 +69,51 @@ int main(int argc, char* args[])
 				std::getline(std::cin, in);
 			}
 		}
+	}
 
+	// start GL context and O/S window using the GLFW helper library
+	if(!glfwInit())
+	{
+		fprintf(stderr, "Could not start GLFW3\n");
+		return EXIT_FAILURE;
+	}
+
+	GLFWmonitor* primary = glfwGetPrimaryMonitor();
+	const GLFWvidmode * mode = glfwGetVideoMode(primary);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	window = glfwCreateWindow(mode->width * 2 / 3, mode->height * 2 / 3, "Halite", NULL, NULL);
+	if(!window)
+	{
+		fprintf(stderr, "Could not open window with GLFW3\n");
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
+
+	glfwMakeContextCurrent(window);
+
+	glewExperimental = GL_TRUE;
+	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
+
+	initShaderHandler(false);
+
+	//Set handlers:
+
+	//Set (presently broken) leopard handler.
+	glfwSetKeyCallback(window, handleKeys);
+	//Set (presently funciotnal) character handler.
+	glfwSetCharCallback(window, handleChars);
+	//Set mouse handler
+	glfwSetMouseButtonCallback(window, handleMouse);
+	//Set error callback handler
+	glfwSetErrorCallback(handleErrors);
+	//Set file drop function
+	glfwSetDropCallback(window, handleDrop);
+	//Set window resize handler
+	glfwSetWindowSizeCallback(window, handleResize);
+
+	if(newGame)
+	{
 		my_game = Halite(mapWidth, mapHeight);
 
 		my_game.init();
@@ -205,7 +203,7 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	else if(code == '-')
 	{
 		maxFps = maxFps / 1.5 - 1;
-		if(maxFps < 1) maxFps = 100;
+		if(maxFps < 1) maxFps = 1;
 	}
 }
 
