@@ -6,7 +6,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -20,20 +19,20 @@
 
 struct InitPackage
 {
-	unsigned char playerTag;
-	unsigned char ageOfSentient;
-	hlt::Map map;
+    unsigned char playerTag;
+    unsigned char ageOfSentient;
+    hlt::Map map;
 
 private:
-	friend class boost::serialization::access;
+    friend class boost::serialization::access;
 
-	template<class Archive>
-	void serialize(Archive & ar, const unsigned int version)
-	{
-		ar & playerTag;
-		ar & ageOfSentient;
-		ar & map;
-	}
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & playerTag;
+        ar & ageOfSentient;
+        ar & map;
+    }
 };
 
 static void serializeMoveSet(std::set<hlt::Move> &moves, std::string &returnString) {
@@ -54,14 +53,14 @@ static void deserializeMap(std::string &inputString, hlt::Map &map)
     unsigned short y = 0, x = 0;
     unsigned short counter = 0, owner = 0;
     while(y != map.map_height)
-	{
+    {
         iss >> counter >> owner;
         for(int a = 0; a < counter; ++a)
-		{
+        {
             map.contents[y][x].owner = owner;
             ++x;
             if(x == map.map_width)
-			{
+            {
                 x = 0;
                 ++y;
             }
@@ -69,9 +68,9 @@ static void deserializeMap(std::string &inputString, hlt::Map &map)
     }
 
     for (int a = 0; a < map.contents.size(); ++a) 
-	{
+    {
         for (int b = 0; b < map.contents[a].size(); ++b) 
-		{
+        {
             iss >> map.contents[a][b].age;
         }
     }
@@ -85,7 +84,7 @@ static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObjec
     boost::archive::text_oarchive ar( os, boost::archive::archive_flags::no_header);
     ar << sendingObject;
     
-	size_t header = buf.size();
+    size_t header = buf.size();
     
     std::vector<boost::asio::const_buffer> buffers;
     buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
@@ -96,18 +95,21 @@ static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObjec
 template<class type>
 static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
 {
-	size_t header;
-	s->read_some(boost::asio::buffer(&header, sizeof(header)));
+    size_t header;
+    s->read_some(boost::asio::buffer(&header, sizeof(header)));
     
     boost::asio::streambuf buf;
     s->read_some(buf.prepare( header ));
     buf.commit( header );
 
-	std::cout << "header: " << header << "\n";
-
-	std::istream is(&buf);
-	boost::archive::text_iarchive ar(is, boost::archive::archive_flags::no_header);
-	ar >> receivingObject;
+    try {
+        std::istream is(&buf);
+        boost::archive::text_iarchive ar(is, boost::archive::archive_flags::no_header);
+        ar >> receivingObject;
+    }
+    catch (boost::archive::archive_exception e) {
+        std::cout << "ex: " << e.what() << "\n";
+    }
 }
 
 static boost::asio::ip::tcp::socket * connectToGame()
@@ -134,23 +136,23 @@ static boost::asio::ip::tcp::socket * connectToGame()
             }
         }
 
-		boost::asio::io_service *io_service = new boost::asio::io_service();
-		tcp::endpoint endpoint(boost::asio::ip::address::from_string("127.0.0.1"), portNumber);
+        boost::asio::io_service *io_service = new boost::asio::io_service();
+        tcp::endpoint endpoint(boost::asio::ip::address::from_string("127.0.0.1"), portNumber);
 
         tcp::socket *socket = new tcp::socket(*io_service);
         boost::system::error_code error;
-		socket->connect(endpoint, error);
+        socket->connect(endpoint, error);
 
-		boost::asio::socket_base::keep_alive option(true);
-		socket->set_option(option);
-		std::cout << "open " << socket->is_open() << "\n";
-		
+        boost::asio::socket_base::keep_alive option(true);
+        socket->set_option(option);
+        std::cout << "open " << socket->is_open() << "\n";
+        
         if (error)
-		{
+        {
             std::cout << "There was a problem connecting. Let's try again: \n";
         } 
-		else 
-		{
+        else 
+        {
             std::cout << "Successfully established contact with " << socket->remote_endpoint().address().to_string() << ".\n";
             return socket;
         }
@@ -162,7 +164,7 @@ static boost::asio::ip::tcp::socket * connectToGame()
 static void getInit(boost::asio::ip::tcp::socket *s, unsigned char& playerTag, unsigned char& ageOfSentient, hlt::Map& m)
 {
 
-	InitPackage package = {0, 0, hlt::Map()};
+    InitPackage package = {0, 0, hlt::Map()};
     getObject(s, package);
     
     playerTag = package.playerTag;

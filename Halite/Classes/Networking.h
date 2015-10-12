@@ -6,7 +6,6 @@
 #include <set>
 #include <cfloat>
 #include <fstream>
-
 #include <boost/asio.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -19,20 +18,20 @@
 
 struct InitPackage 
 {
-	unsigned char playerTag;
-	unsigned char ageOfSentient;
-	hlt::Map map;
+    unsigned char playerTag;
+    unsigned char ageOfSentient;
+    hlt::Map map;
 
 private:
-	friend class boost::serialization::access;
+    friend class boost::serialization::access;
 
-	template<class Archive>
-	void serialize(Archive & ar, const unsigned int version)
-	{
-		ar & playerTag;
-		ar & ageOfSentient;
-		ar & map;
-	}
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & playerTag;
+        ar & ageOfSentient;
+        ar & map;
+    }
 };
 
 static void serializeMap(hlt::Map &map, std::string &returnString)
@@ -44,15 +43,15 @@ static void serializeMap(hlt::Map &map, std::string &returnString)
     unsigned short currentOwner = map.contents[0][0].owner;
     unsigned short counter = 0;
     for (int a = 0; a < map.contents.size(); ++a)
-	{
+    {
         for (int b = 0; b < map.contents[a].size(); ++b) 
-		{
+        {
             if(map.contents[a][b].owner == currentOwner)
-			{
+            {
                 counter++;
             }
-			else
-			{
+            else
+            {
                 oss << counter << " " << currentOwner << " ";
                 counter = 1;
                 currentOwner = map.contents[a][b].owner;
@@ -64,9 +63,9 @@ static void serializeMap(hlt::Map &map, std::string &returnString)
     
     // Encoding of ages
     for (int a = 0; a < map.contents.size(); ++a)
-	{
+    {
         for (int b = 0; b < map.contents[a].size(); ++b)
-		{
+        {
             oss << map.contents[a][b].age << " ";
         }
     }
@@ -92,9 +91,7 @@ static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObjec
     boost::archive::text_oarchive ar( os, boost::archive::archive_flags::no_header);
     ar << sendingObject;
     
-	size_t header = buf.size();
-
-	std::cout << "header size: " << header << "\n";
+    size_t header = buf.size();
     
     // send header and buffer using scatter
     std::vector<boost::asio::const_buffer> buffers;
@@ -106,7 +103,7 @@ static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObjec
 template<class type>
 static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
 {
-	size_t header;
+    size_t header;
     s->read_some(boost::asio::buffer( &header, sizeof(header) ));
     
     boost::asio::streambuf buf;
@@ -115,14 +112,14 @@ static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
     
     std::istream is( &buf );
     boost::archive::text_iarchive ar( is, boost::archive::archive_flags::no_header);
-	ar >> receivingObject;
+    ar >> receivingObject;
 }
 
 static double handleInitNetworking(boost::asio::ip::tcp::socket *s, unsigned char playerTag, unsigned char ageOfSentient, std::string name, hlt::Map& m)
 {
     using boost::asio::ip::tcp;
     
-    InitPackage package = {playerTag, ageOfSentient, m};
+    InitPackage package = {playerTag, ageOfSentient, hlt::Map(m)};
     sendObject(s, package);
     
     
