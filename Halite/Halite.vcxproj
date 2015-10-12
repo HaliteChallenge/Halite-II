@@ -18,13 +18,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -39,8 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GLEW\glew-1.12.0\include;C:\boost_1_58_0;C:\GLFW\glfw-3.1.1.bin.WIN32\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GLEW\glew-1.12.0\lib\Release\Win32;C:\boost_1_58_0\stage\lib;C:\GLFW\glfw-3.1.1.bin.WIN32\lib-vc2013;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\devtools\glew-1.13.0\include;C:\devtools\boost_1_58_0;C:\devtools\glfw-3.1.1\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\devtools\glew-1.13.0\lib\Release\Win32;C:\devtools\boost_1_58_0\stage\lib;C:\devtools\glfw-3.1.1\src\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost_1_58_0;C:\vsProjects\freeglut\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>
@@ -58,7 +58,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;opengl32.lib;glfw3.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\freeglutMSVC\SFML-2.3.1\lib;C:\freeglutMSVC\lib;C:\freeglutMSVC\boost_1_58_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\devtools\glew-1.13.0\lib\Release\Win32;C:\devtools\boost_1_58_0\stage\lib;C:\devtools\glfw-3.1.1\src\Debug;$(LibraryPath)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

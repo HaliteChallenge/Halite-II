@@ -351,17 +351,17 @@ Halite::Halite()
     player_moves = std::vector< std::set<hlt::Move> >();
     //Init Color Codes:
     color_codes = std::map<unsigned char, hlt::Color>();
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05, 0.05, 0.05 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(1, { 1.0, 0.0, 0.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(2, { 0.0, 1.0, 0.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(3, { 0.0, 0.0, 1.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(4, { 1.0, 1.0, 1.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(5, { 1.0, 0.0, 1.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(6, { 0.0, 1.0, 1.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(7, { 1.0, 1.0, 1.0 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87, .72, .53 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0, .50, .50 }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0, .65, .0 }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05f, 0.05f, 0.05f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(1, { 1.0f, 0.0f, 0.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(2, { 0.0f, 1.0f, 0.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(3, { 0.0f, 0.0f, 1.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(4, { 1.0f, 1.0f, 1.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(5, { 1.0f, 0.0f, 1.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(6, { 0.0f, 1.0f, 1.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(7, { 1.0f, 1.0f, 1.0f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87f, .72f, .53f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0f, .50f, .50f }));
+    color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0f, .65f, .0f }));
 }
 
 Halite::Halite(unsigned short w, unsigned short h)
@@ -373,7 +373,7 @@ Halite::Halite(unsigned short w, unsigned short h)
     
     //Init Color Codes:
 	color_codes = std::map<unsigned char, hlt::Color>();
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05, 0.05, 0.05 }));
+	color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05f, 0.05f, 0.05f }));
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(1, { 1.0, 0.0, 0.0 }));
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(2, { 0.0, 1.0, 0.0 }));
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(3, { 0.0, 0.0, 1.0 }));
@@ -381,9 +381,9 @@ Halite::Halite(unsigned short w, unsigned short h)
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(5, { 1.0, 0.0, 1.0 }));
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(6, { 0.0, 1.0, 1.0 }));
 	color_codes.insert(std::pair<unsigned char, hlt::Color>(7, { 1.0, 1.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87, .72, .53 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0, .50, .50 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0, .65, .0 }));
+	color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87f, .72f, .53f }));
+	color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0f, .50f, .50f }));
+	color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0f, .65f, .0f }));
     turn_number = 0;
     
     //Connect to players
