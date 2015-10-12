@@ -194,5 +194,6 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+#Halite replays
 *.hlt
-Halite/Output_1444666196.hlt
