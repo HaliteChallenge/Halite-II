@@ -265,7 +265,7 @@ void Halite::render(short& turnNumber)
 
 void Halite::output(std::string filename)
 {
-    std::cout << "Beginning to output file from frame #" << last_turn_output << ".\n";
+    std::cout << "Beginning to output file from frame #" << last_turn_output + 1 << ".\n";
 
     std::fstream game_file;
     if(last_turn_output == 0)
@@ -285,7 +285,7 @@ void Halite::output(std::string filename)
         std::cout << "Finished outputting frame " << last_turn_output + 1 << ".\n";
     }
     
-    std::cout << "Output file until frame #" << last_turn_output << ".\n";
+    std::cout << "Output file until frame #" << last_turn_output + 1 << ".\n";
     
     game_file.close();
 }
@@ -333,6 +333,7 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 	setupRendering(full_game[0]->map_width, full_game[0]->map_height);
     
     game_file.close();
+
     return true;
 }
 
@@ -348,14 +349,6 @@ Halite::Halite()
     age_of_sentient = 0;
     player_connections = std::vector<tcp::socket * >();
     player_moves = std::vector< std::set<hlt::Move> >();
-	const GLuint GL_INIT_VALUE = 0;
-	vertex_buffer = GL_INIT_VALUE;
-	color_buffer = GL_INIT_VALUE;
-	vertex_attributes = GL_INIT_VALUE;
-	vertex_shader = GL_INIT_VALUE;
-	geometry_shader = GL_INIT_VALUE;
-	fragment_shader = GL_INIT_VALUE;
-	shader_program = GL_INIT_VALUE;
     //Init Color Codes:
     color_codes = std::map<unsigned char, hlt::Color>();
     color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05, 0.05, 0.05 }));
@@ -495,8 +488,6 @@ Halite::Halite(unsigned short w, unsigned short h)
     //Add it to the full game:
     full_game.push_back(new hlt::Map());
     *full_game.back() = game_map;
-
-	setupRendering(w, h);
 }
 
 void Halite::init()
@@ -510,7 +501,9 @@ void Halite::init()
     for(unsigned char a = 0; a < number_of_players; a++)
     {
         initThreads[a].join();
-    }
+	}
+
+	setupRendering(game_map.map_width, game_map.map_height);
 }
 
 void Halite::getColorCodes()

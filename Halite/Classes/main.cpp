@@ -14,7 +14,6 @@ void handleResize(GLFWwindow * w, int width, int height);
 
 void render();
 void doLogic();
-void renderLoop(int val);
 
 Halite my_game;
 bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed;
@@ -98,7 +97,7 @@ int main(int argc, char* args[])
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
-	initShaderHandler(false);
+	initShaderHandler(true);
 
 	//Set handlers:
 
@@ -168,10 +167,12 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
 	if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
 		leftPressed = true;
+		isPaused = true;
 	}
 	else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 	{
 		rightPressed = true;
+		isPaused = true;
 	}
 	else if(key == GLFW_KEY_LEFT && action == GLFW_RELEASE)
 	{
@@ -211,10 +212,12 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	else if(code == '>' || code == '.')
 	{
 		turn_number++;
+		isPaused = true;
 	}
 	else if(code == '<' || code == ',')
 	{
 		turn_number--;
+		isPaused = true;
 	}
 	else if(code == 'o' || code == 'O')
 	{
