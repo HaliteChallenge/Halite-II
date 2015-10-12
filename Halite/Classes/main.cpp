@@ -21,9 +21,12 @@ bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed;
 signed short turn_number = 0;
 float maxFps = 20;
 
+std::string filename;
+
 int main(int argc, char* args[])
 {
 	std::string in;
+	filename = "Output_" + std::to_string(time(NULL)) + ".hlt";
 	std::thread logicThread;
 	unsigned short mapWidth, mapHeight;
 
@@ -144,7 +147,7 @@ int main(int argc, char* args[])
 
 		//Limit render rate:
 		float delta = 1000.0 * float(clock() - c) / CLOCKS_PER_SEC;
-		std::cout << delta << std::endl;
+		//std::cout << delta << std::endl;
 		if(delta < 1000.0 / maxFps)
 		{
 			Sleep(1000.0 / maxFps - delta);
@@ -152,7 +155,7 @@ int main(int argc, char* args[])
 		c = clock();
 	}
 
-return 0;
+	return 0;
 }
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods)
@@ -204,6 +207,18 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	{
 		maxFps = maxFps / 1.5 - 1;
 		if(maxFps < 1) maxFps = 1;
+	}
+	else if(code == '>' || code == '.')
+	{
+		turn_number++;
+	}
+	else if(code == '<' || code == ',')
+	{
+		turn_number--;
+	}
+	else if(code == 'o' || code == 'O')
+	{
+		my_game.output(filename);
 	}
 }
 

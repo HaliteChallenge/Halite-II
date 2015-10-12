@@ -41,7 +41,7 @@ public:
     std::string runGame();
     void confirmWithinGame(signed short& turnNumber);
     void render(short& turnNumber);
-    void output();
+    void output(std::string filename);
     bool input(std::string filename, unsigned short& width, unsigned short& height);
     void getColorCodes();
 	~Halite();

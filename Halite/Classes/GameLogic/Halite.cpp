@@ -263,11 +263,10 @@ void Halite::render(short& turnNumber)
 	}
 }
 
-void Halite::output()
+void Halite::output(std::string filename)
 {
     std::cout << "Beginning to output file from frame #" << last_turn_output << ".\n";
-    
-    std::string filename = std::to_string(time(NULL)%100000000) + ".hlt";
+
     std::fstream game_file;
     if(last_turn_output == 0)
     {
