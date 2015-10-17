@@ -12,17 +12,17 @@ unsigned char Halite::getNextFrame()
     {
         frameThreads[a] = std::async(handleFrameNetworking, player_connections[a], game_map, &player_moves[a]);
     }
-    
-	//Calculate the number of sentients each player has
+
+	//Find the locations of all of the pieces the players had before they made their moves
 	std::vector<unsigned short> numSentient(number_of_players, 0);
-	std::map<hlt::Location, unsigned char> sentientPieces;
-	for (unsigned short a = 0; a < game_map.map_height; a++) for (unsigned short b = 0; b < game_map.map_width; b++)
+	std::map<hlt::Location, unsigned char> oldPieces;
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		//If sentient
-		if (game_map.contents[a][b].age == age_of_sentient)
+		if(game_map.contents[a][b].owner != 0)
 		{
 			//Add to map of sentient pieces.
-			sentientPieces.insert(std::pair<hlt::Location, unsigned char>({ b, a }, game_map.contents[a][b].owner));
+			oldPieces.insert(std::pair<hlt::Location, unsigned char>({ b, a }, game_map.contents[a][b].owner));
 			//Add to number of sentients controlled by player.
 			numSentient[game_map.contents[a][b].owner - 1]++;
 		}
@@ -41,153 +41,7 @@ unsigned char Halite::getNextFrame()
         permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
     }
 
-	//Create a map of the locations of sentient pieces on the game map. Additionally, age pieces. Something like:
-	for (unsigned short a = 0; a < game_map.map_height; a++) for (unsigned short b = 0; b < game_map.map_width; b++)
-	{
-		//If sentient
-		if (game_map.contents[a][b].age == age_of_sentient)
-		{
-			//Leave blank square behind (for clearing sentients). Assume it has aged.
-			game_map.contents[a][b].age = 0;
-		}
-		else if (game_map.contents[a][b].owner != 0 && permissibleTime[game_map.contents[a][b].owner - 1])
-		{
-			//Age piece
-			game_map.contents[a][b].age++;
-		}
-	}
-    
-    //Create a list of pieces to destroy:
-    std::set<hlt::Location> toDestroy;
-    
-    //Move pieces according to the orders of the players:
-    unsigned short playerNumber = 1;
-    for(auto a = player_moves.begin(); a != player_moves.end(); a++)
-    {
-        for(auto b = a->begin(); b != a->end(); b++)
-        {
-            //Necessary to copy location into its own variable, as it may be modified and items in sets cannot be.
-            hlt::Location l = b->l;
-            
-            //Confirm that there actually is a piece where the player is trying to move from:
-            bool isGood;
-            try
-            {
-                isGood = sentientPieces.at(l) == playerNumber;
-            }
-            catch(std::out_of_range e)
-            {
-                isGood = false;
-            }
-            //If there actually is a piece there:
-            if(isGood)
-            {
-                //Delete it from the list of sentientPieces - that way, we can copy over the un-moved pieces later.
-                sentientPieces.erase(l);
-                
-                //Essentially, rather than rewriting the logic each time, which is a pain, I'm simply changing the location that we're moving from and pretending that they're all still. Same results, less(1 + obfuscated) code.
-                if(b->d == NORTH)
-                {
-                    if(l.y != 0) l.y--;
-                    else l.y = game_map.map_height - 1;
-                }
-                else if(b->d == EAST)
-                {
-                    if(l.x != game_map.map_width - 1) l.x++;
-                    else l.x = 0;
-                }
-                else if(b->d == SOUTH)
-                {
-                    if(l.y != game_map.map_height - 1) l.y++;
-                    else l.y = 0;
-                }
-                else if(b->d == WEST)
-                {
-                    if(l.x != 0) l.x--;
-                    else l.x = game_map.map_width - 1;
-                }
-                
-                //Move as if STILL
-                //Check what's at that square of the game map:
-                hlt::Site atPosition = game_map.contents[l.y][l.x];
-                if(atPosition.age != age_of_sentient)
-                {
-                    //Take over square.
-                    game_map.contents[l.y][l.x] = { static_cast<unsigned char>(playerNumber), static_cast<unsigned char>(age_of_sentient) };
-                }
-                else if(atPosition.owner != playerNumber)
-                {
-                    //Mark square for deletion.
-                    toDestroy.insert(l);
-                }
-            }
-        }
-        playerNumber++;
-    }
-    
-    //Move remaining pieces.
-    for(auto a = sentientPieces.begin(); a != sentientPieces.end(); a++)
-    {
-        //Check what's at that square of the game map:
-        hlt::Site atPosition = game_map.contents[a->first.y][a->first.x];
-        if(atPosition.age != age_of_sentient)
-        {
-            //Take over square.
-            game_map.contents[a->first.y][a->first.x] = { a->second, static_cast<unsigned char>(age_of_sentient) };
-        }
-        else if(atPosition.owner != a->second)
-        {
-            //Mark square for deletion.
-            toDestroy.insert(a->first);
-        }
-    }
-    
-    //Destroy pieces:
-    for(auto a = toDestroy.begin(); a != toDestroy.end(); a++)
-    {
-        game_map.getSite(*a) = { 0, 0 };
-    }
-    
-    //Clear list of pieces to destroy:
-    toDestroy.clear();
-    
-    //Find opposing adjacent sentients.
-    unsigned short a_i = 0;
-    for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++)
-    {
-        unsigned short b_i = 0;
-        for(auto b = a->begin(); b != a->end(); b++)
-        {
-            //Find what to delete
-            hlt::Site thisSite = game_map.contents[a_i][b_i];
-            if(thisSite.age == age_of_sentient)
-            {
-                hlt::Location e = game_map.getEastern({ b_i, a_i }), s = game_map.getSouthern({ b_i, a_i });
-                
-                //Check squares
-                if(game_map.getSite(e).age == age_of_sentient && game_map.getSite(e).owner != thisSite.owner)
-                {
-                    //Mark both for deletion:
-                    toDestroy.insert({ b_i, a_i });
-                    toDestroy.insert(e);
-                }
-                if(game_map.getSite(s).age == age_of_sentient && game_map.getSite(s).owner != thisSite.owner)
-                {
-                    //Mark both for deletion:
-                    toDestroy.insert({ b_i, a_i });
-                    toDestroy.insert(s);
-                }
-            }
-            b_i++;
-        }
-        a_i++;
-    }
-    
-    //Destroy pieces:
-    for(auto a = toDestroy.begin(); a != toDestroy.end(); a++)
-    {
-        game_map.getSite(*a) = { 0, 0 };
-    }
+
     
     //Add game map to full game
     full_game.push_back(new hlt::Map());
@@ -240,9 +94,9 @@ void Halite::render(short& turnNumber)
 			{
 				hlt::Color c = color_codes[b->owner];
 				const double BASE_DIMMING_FACTOR = 0.5;
-				if(b->age != age_of_sentient)
+				if(b->strength != 255)
 				{
-					const double TRUE_DIMMING_FACTOR = 0.15 + 0.85*(BASE_DIMMING_FACTOR*b->age / age_of_sentient);
+					const double TRUE_DIMMING_FACTOR = 0.15 + 0.85*(BASE_DIMMING_FACTOR*b->strength / 255);
 					c.r *= TRUE_DIMMING_FACTOR;
 					c.g *= TRUE_DIMMING_FACTOR;
 					c.b *= TRUE_DIMMING_FACTOR;
@@ -280,7 +134,7 @@ void Halite::output(std::string filename)
     while(last_turn_output < full_game.size())
     {
         game_file  << std::endl;
-        for(auto a = full_game[last_turn_output]->contents.begin(); a != full_game[last_turn_output]->contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file  << short(b->owner) << ' ' << short(b->age) << ' ';
+        for(auto a = full_game[last_turn_output]->contents.begin(); a != full_game[last_turn_output]->contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file  << short(b->owner) << ' ' << short(b->strength) << ' ';
         last_turn_output++;
         std::cout << "Finished outputting frame " << last_turn_output + 1 << ".\n";
     }
@@ -306,7 +160,6 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
     game_file >> width >> height >> number_of_players;
     game_map.map_width = width;
     game_map.map_height = height;
-    age_of_sentient = getAgeOfSentient(width, height);
     std::getline(game_file, in);
     player_names.resize(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
@@ -346,7 +199,6 @@ Halite::Halite()
     turn_number = 0;
     player_names = std::vector<std::string>();
     full_game = std::vector<hlt::Map * >();
-    age_of_sentient = 0;
     player_connections = std::vector<tcp::socket * >();
     player_moves = std::vector< std::set<hlt::Move> >();
     //Init Color Codes:
@@ -367,7 +219,6 @@ Halite::Halite()
 Halite::Halite(unsigned short w, unsigned short h)
 {
     last_turn_output = 0;
-    age_of_sentient = getAgeOfSentient(w, h);
     player_moves = std::vector< std::set<hlt::Move> >();
     full_game = std::vector<hlt::Map * >();
     
@@ -480,7 +331,7 @@ Halite::Halite(unsigned short w, unsigned short h)
     getColorCodes();
     
     //Initialize map:
-    game_map = hlt::Map(w, h, number_of_players, age_of_sentient);
+    game_map = hlt::Map(w, h, number_of_players);
     
     //Initialize player moves vector
     player_moves.resize(number_of_players);
@@ -496,7 +347,7 @@ void Halite::init()
     std::vector<std::thread> initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-        initThreads[a] = std::thread(handleInitNetworking, player_connections[a], a + 1, age_of_sentient, player_names[a], game_map);
+        initThreads[a] = std::thread(handleInitNetworking, player_connections[a], a + 1, player_names[a], game_map);
     }
     for(unsigned char a = 0; a < number_of_players; a++)
     {

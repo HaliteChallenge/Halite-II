@@ -40,7 +40,7 @@ namespace hlt
 
 	struct Site
 	{
-		unsigned char owner, age;
+		unsigned char owner, strength;
 
 		friend class boost::serialization::access;
 
@@ -48,7 +48,7 @@ namespace hlt
 		void serialize(Archive & ar, const unsigned int version)
 		{
 			ar & owner;
-			ar & age;
+			ar & strength;
 		}
 	};
 
@@ -70,7 +70,7 @@ namespace hlt
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
 		}
-		Map(short width, short height, unsigned char numberOfPlayers, unsigned char ageOfSentient)
+		Map(short width, short height, unsigned char numberOfPlayers)
 		{
 			map_width = width;
 			map_height = height;
@@ -102,7 +102,7 @@ namespace hlt
 						minDistance *= 0.85;
 					}
 				}
-				contents[l.y][l.x] = { (unsigned char)a, ageOfSentient };
+				contents[l.y][l.x] = { (unsigned char)a, 0 };
 				takenSpots.push_back(l);
 			}
 		}

@@ -24,7 +24,6 @@ private:
     std::vector<std::string> player_names;
     std::map<unsigned char, hlt::Color> color_codes;
     std::vector<hlt::Map * > full_game;
-    char age_of_sentient;
     std::vector<boost::asio::ip::tcp::socket *> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
     

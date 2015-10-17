@@ -66,7 +66,7 @@ static void serializeMap(hlt::Map &map, std::string &returnString)
     {
         for (int b = 0; b < map.contents[a].size(); ++b)
         {
-            oss << map.contents[a][b].age << " ";
+            oss << map.contents[a][b].strength << " ";
         }
     }
     
