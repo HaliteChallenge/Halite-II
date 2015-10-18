@@ -146,7 +146,7 @@ unsigned char Halite::getNextFrame()
 	{
 		for(auto b = newPieces[a].begin(); b != newPieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { a + 1, b->second };
+			game_map.getSite(b->first, STILL) = { unsigned char(a + 1), b->second };
 		}
 	}
     
