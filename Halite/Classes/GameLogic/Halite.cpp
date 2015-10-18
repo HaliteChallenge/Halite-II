@@ -41,19 +41,19 @@ unsigned char Halite::getNextFrame()
     }
 
 	//For each player, use their moves to create the pieces map.
-	for(unsigned char a = 0; a < number_of_players + 1; a++)
+	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		//Add in pieces according to their moves.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
-			if(pieces[a].count(b->loc))
+			if(pieces[a + 1].count(b->loc))
 			{
-				if(short(pieces[a][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][b->loc] += game_map.getSite(b->loc, STILL).strength;
-				else pieces[a][b->loc] = 255;
+				if(short(pieces[a + 1][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a + 1][b->loc] += game_map.getSite(b->loc, STILL).strength;
+				else pieces[a + 1][b->loc] = 255;
 			}
 			else
 			{
-				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
+				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
 			}
 
 			//Erase from oldPieces.
@@ -83,9 +83,9 @@ unsigned char Halite::getNextFrame()
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players; c++) if(pieces[c].count(l))
+		for(unsigned short c = 0; c < number_of_players + 1; c++) if(pieces[c].count(l))
 		{
-			for(unsigned short d = 0; d < number_of_players; d++) if(d != c)
+			for(unsigned short d = 0; d < number_of_players + 1; d++) if(d != c)
 			{
 				hlt::Location tempLoc = l;
 				//Check 'STILL' square:
@@ -132,7 +132,7 @@ unsigned char Halite::getNextFrame()
 	}
 
 	//Injure and/or delete pieces.
-	for(unsigned char a = 0; a != number_of_players; a++)
+	for(unsigned char a = 0; a < number_of_players + 1; a++)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
@@ -141,12 +141,15 @@ unsigned char Halite::getNextFrame()
 		}
 	}
 
+	//Clear the map (everything to {0, 0})
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b = { 0, 0 };
+
 	//Add pieces back into the map.
-	for(unsigned char a = 0; a != number_of_players; a++)
+	for(unsigned char a = 0; a < number_of_players + 1; a++)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { unsigned char(a + 1), b->second };
+			game_map.getSite(b->first, STILL) = { a, b->second };
 		}
 	}
     
