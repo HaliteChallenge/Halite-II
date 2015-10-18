@@ -15,14 +15,14 @@ unsigned char Halite::getNextFrame()
 
 	//Find the locations of all of the pieces the players had before they made their moves
 	std::vector<unsigned short> numSentient(number_of_players, 0);
-	std::map<hlt::Location, unsigned char> oldPieces;
+	std::map<hlt::Location, hlt::Site> oldPieces;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		//If sentient
 		if(game_map.contents[a][b].owner != 0)
 		{
 			//Add to map of sentient pieces.
-			oldPieces.insert(std::pair<hlt::Location, unsigned char>({ b, a }, game_map.contents[a][b].owner));
+			oldPieces.insert(std::pair<hlt::Location, hlt::Site>({ b, a }, game_map.contents[a][b]));
 			//Add to number of sentients controlled by player.
 			numSentient[game_map.contents[a][b].owner - 1]++;
 		}
@@ -33,6 +33,8 @@ unsigned char Halite::getNextFrame()
     for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
         //For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
         //allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
+
+	std::vector< std::map<hlt::Location, unsigned char> > newPieces(number_of_players);
     
     //Join threads. Figure out if the player responded in an allowable amount of time.
     std::vector<bool> permissibleTime(number_of_players);
@@ -41,7 +43,118 @@ unsigned char Halite::getNextFrame()
         permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
     }
 
+	//Set everything's age to 0 on the map.
+	clearMap();
 
+	//For each player, use their moves to create the newPieces map.
+	for(unsigned short a = 0; a < number_of_players; a++)
+	{
+		//Add in pieces according to their moves.
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(oldPieces[b->loc].owner == a + 1)
+		{
+			if(newPieces[a].count(b->loc))
+			{
+				if(short(newPieces[a][b->loc]) + oldPieces[b->loc].strength <= 255) newPieces[a][b->loc] += oldPieces[b->loc].strength;
+				else newPieces[a][b->loc] = 255;
+			}
+			else
+			{
+				newPieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, oldPieces[b->loc].strength));
+			}
+
+			//Erase from oldPieces.
+			oldPieces.erase(b->loc);
+		}
+	}
+
+	//Add in all of the remaining pieces whose moves weren't specified. 
+	for(auto b = oldPieces.begin(); b != oldPieces.end(); b++)
+	{
+		if(newPieces[b->second.owner - 1].count(b->first))
+		{
+			if(short(newPieces[b->second.owner - 1][b->first]) + b->second.strength <= 255) newPieces[b->second.owner - 1][b->first] += b->second.strength;
+			else newPieces[b->second.owner - 1][b->first] = 255;
+		}
+		else
+		{
+			newPieces[b->second.owner - 1].insert(std::pair<hlt::Location, unsigned char>(b->first, b->second.strength));
+		}
+	}
+
+	oldPieces.clear(); //Take back that memory (although in actuality really insignificant).
+
+	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players); //This is a short so that we don't have to worry about 255 overflows.
+
+	//Sweep through locations and find the correct damage for each piece. accordingly.
+	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+	{
+		hlt::Location l = { b, a };
+		for(unsigned short c = 0; c < number_of_players; c++) if(newPieces[c].count(l))
+		{
+			for(unsigned short d = 0; d < number_of_players; d++) if(d != c)
+			{
+				hlt::Location tempLoc = l;
+				//Check 'STILL' square:
+				if(newPieces[d].count(tempLoc))
+				{
+					//Apply damage:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+				}
+				//Check 'NORTH' square:
+				tempLoc = game_map.getLocation(l, NORTH);
+				if(newPieces[d].count(tempLoc))
+				{
+					//Apply damage:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+				}
+				//Check 'EAST' square:
+				tempLoc = game_map.getLocation(l, EAST);
+				if(newPieces[d].count(tempLoc))
+				{
+					//Apply damage:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+				}
+				//Check 'SOUTH' square:
+				tempLoc = game_map.getLocation(l, SOUTH);
+				if(newPieces[d].count(tempLoc))
+				{
+					//Apply damage:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+				}
+				//Check 'WEST' square:
+				tempLoc = game_map.getLocation(l, WEST);
+				if(newPieces[d].count(tempLoc))
+				{
+					//Apply damage:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+				}
+			}
+		}
+	}
+
+	//Injure and/or delete pieces.
+	for(unsigned char a = 0; a != number_of_players; a++)
+	{
+		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
+		{
+			if(b->second >= newPieces[a][b->first]) newPieces[a].erase(b->first);
+			else newPieces[a][b->first] -= b->second;
+		}
+	}
+
+	//Add pieces back into the map.
+	for(unsigned char a = 0; a != number_of_players; a++)
+	{
+		for(auto b = newPieces[a].begin(); b != newPieces[a].end(); b++)
+		{
+			game_map.getSite(b->first, STILL) = { a + 1, b->second };
+		}
+	}
     
     //Add game map to full game
     full_game.push_back(new hlt::Map());
@@ -446,6 +559,11 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	glDeleteShader(vertex_shader);
 	glDeleteShader(geometry_shader);
 	glDeleteShader(fragment_shader);
+}
+
+void Halite::clearMap()
+{
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) b->strength = 0;
 }
 
 Halite::~Halite()
