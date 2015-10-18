@@ -1,6 +1,6 @@
-# Halite4
+# Halite
 
-Halite4 is a game meant to be played by computers.
+Halite is a game meant to be played by computers.
 
 This repository contains the environment for running Halite games and replays, a C++ starter kit for making your own AIs, and a starter AI (C++).
 
