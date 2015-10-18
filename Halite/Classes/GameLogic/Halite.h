@@ -28,7 +28,6 @@ private:
     std::vector< std::set<hlt::Move> > player_moves;
     
 	GLuint vertex_buffer, color_buffer, vertex_attributes, vertex_shader, geometry_shader, fragment_shader, shader_program;
-	void clearMap();
 	void setupRendering(unsigned short width, unsigned short height);
 	void clearFullGame();
     unsigned char getNextFrame();

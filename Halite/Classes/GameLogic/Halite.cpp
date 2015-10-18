@@ -15,15 +15,12 @@ unsigned char Halite::getNextFrame()
 
 	//Find the locations of all of the pieces the players had before they made their moves
 	std::vector<unsigned short> numSentient(number_of_players, 0);
-	std::map<hlt::Location, hlt::Site> oldPieces;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		//If sentient
 		if(game_map.contents[a][b].owner != 0)
 		{
-			//Add to map of sentient pieces.
-			oldPieces.insert(std::pair<hlt::Location, hlt::Site>({ b, a }, game_map.contents[a][b]));
-			//Add to number of sentients controlled by player.
+			//Add to number of pieces controlled by player.
 			numSentient[game_map.contents[a][b].owner - 1]++;
 		}
 	}
@@ -34,7 +31,7 @@ unsigned char Halite::getNextFrame()
         //For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
         //allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
 
-	std::vector< std::map<hlt::Location, unsigned char> > newPieces(number_of_players);
+	std::vector< std::map<hlt::Location, unsigned char> > newPieces(number_of_players + 1);
     
     //Join threads. Figure out if the player responded in an allowable amount of time.
     std::vector<bool> permissibleTime(number_of_players);
@@ -43,23 +40,20 @@ unsigned char Halite::getNextFrame()
         permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
     }
 
-	//Set everything's age to 0 on the map.
-	clearMap();
-
 	//For each player, use their moves to create the newPieces map.
 	for(unsigned short a = 0; a < number_of_players; a++)
 	{
 		//Add in pieces according to their moves.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(oldPieces.count(b->loc) && oldPieces[b->loc].owner == a + 1)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
 			if(newPieces[a].count(b->loc))
 			{
-				if(short(newPieces[a][b->loc]) + oldPieces[b->loc].strength <= 255) newPieces[a][b->loc] += oldPieces[b->loc].strength;
+				if(short(newPieces[a][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) newPieces[a][b->loc] += game_map.getSite(b->loc, STILL).strength;
 				else newPieces[a][b->loc] = 255;
 			}
 			else
 			{
-				newPieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, oldPieces[b->loc].strength));
+				newPieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
 			}
 
 			//Erase from oldPieces.
@@ -559,11 +553,6 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	glDeleteShader(vertex_shader);
 	glDeleteShader(geometry_shader);
 	glDeleteShader(fragment_shader);
-}
-
-void Halite::clearMap()
-{
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) b->strength = 0;
 }
 
 Halite::~Halite()
