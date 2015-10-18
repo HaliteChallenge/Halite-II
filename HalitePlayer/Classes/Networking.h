@@ -14,11 +14,8 @@
 #include <boost/serialization/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
-#include <chrono>
 
 #include "hlt.h"
-
-static double times = 0;
 
 static void serializeMoveSet(std::set<hlt::Move> &moves, std::string &returnString) {
     std::ostringstream oss;
@@ -87,19 +84,11 @@ static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
     int len = boost::asio::read(*s, buf.prepare( header ));
 	std::cout << "bytes: " << len << "\n";
 
-	using namespace std::chrono;
-	milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-	std::cout << "got time: " << ms.count() << "\n";
     buf.commit( header );
 
-    try {
-        std::istream is(&buf);
-        boost::archive::text_iarchive ar(is, boost::archive::archive_flags::no_header);
-        ar >> receivingObject;
-    }
-    catch (boost::archive::archive_exception e) {
-        std::cout << "ex: " << e.what() << "\n";
-    }
+    std::istream is(&buf);
+    boost::archive::text_iarchive ar(is, boost::archive::archive_flags::no_header);
+    ar >> receivingObject;
 }
 
 static boost::asio::ip::tcp::socket * connectToGame()
@@ -166,19 +155,13 @@ static void sendInitResponse(boost::asio::ip::tcp::socket *s)
 
 static void getFrame(boost::asio::ip::tcp::socket *s, hlt::Map& m)
 {
-	times++;
-	std::cout << "Get frame num: " << times << "\n";
     getObject(s, m);
 }
 
 static void sendFrame(boost::asio::ip::tcp::socket *s, const std::set<hlt::Move>& moves)
 {
 	std::cout << "Send frame\n";
-	std::cout << "moves: " << moves.size() << "\n";
     sendObject(s, moves);
-	using namespace std::chrono;
-	milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-	std::cout << "time: " << ms.count() << "\n";
 }
 
 #endif

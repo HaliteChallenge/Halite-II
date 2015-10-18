@@ -18,11 +18,14 @@ void Random::run()
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
 			{
-				if(float(rand())/RAND_MAX > .20)
+				if (present_map.getSite({b, a}).owner == my_tag)
 				{
-					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
+					if (float(rand()) / RAND_MAX > .20)
+					{
+						moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
+					}
+					else moves.insert({ { b, a }, (unsigned char)(STILL) });
 				}
-				else moves.insert({ { b, a }, (unsigned char)(STILL) });
 			}
 		}
         sendFrame(connection, moves);

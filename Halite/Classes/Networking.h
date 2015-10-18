@@ -13,11 +13,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/asio.hpp>
-#include <chrono>
 
 #include "GameLogic/hlt.h"
-
-static double times = 0;
 
 
 static void serializeMap(hlt::Map & map, std::string & returnString)
@@ -84,7 +81,7 @@ static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObje
     buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
     buffers.push_back( buf.data() );
     int len = boost::asio::write(*s, buffers);
-	std::cout << "len: " << len << "\n";
+	///std::cout << "len: " << len << "\n";
 }
 
 template<class type>
@@ -95,10 +92,6 @@ static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
     
     boost::asio::streambuf buf;
     boost::asio::read(*s, buf.prepare( header ));
-
-	using namespace std::chrono;
-	milliseconds ms = duration_cast< milliseconds >( system_clock::now().time_since_epoch() );
-	std::cout << "got time: " << ms.count() << "\n";
 
     buf.commit( header );
     
@@ -112,13 +105,7 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
     using boost::asio::ip::tcp;
     
     sendObject(s, playerTag);
-	using namespace std::chrono;
-	milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-	std::cout << "send tag: " << ms.count() << "\n";
-	
 	sendObject(s, m);
-	ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-	std::cout << "send map: " << ms.count() << "\n";
     
     std::string str = "Init Message sent to player " + name + "\n";
     std::cout << str;
@@ -138,28 +125,15 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 
 static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	times++;
 	sendObject(s, m);
-	try {
-		moves->clear();
-		clock_t initialTime = clock();
-		getObject(s, *moves);
-		clock_t finalTime = clock() - initialTime;
-		double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 
-		std::cout << "times: " << times << "; Time: " << timeElapsed << "\n";
+	moves->clear();
+	clock_t initialTime = clock();
+	getObject(s, *moves);
+	clock_t finalTime = clock() - initialTime;
+	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 
-		return timeElapsed;
-	}
-	catch (boost::archive::archive_exception e) {
-		std::cout << "ex: " << e.what() << "\n";
-
-		return 0;
-	} catch (std::exception e) {
-		std::cout << "regular exception: " << e.what() << "\n";
-
-		return 0;
-	}
+	return timeElapsed;
 }
 
 #endif
