@@ -18,10 +18,11 @@ void Random::run()
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
 			{
-				//if(present_map.contents[a][b].owner == my_tag)
+				if(float(rand())/RAND_MAX > .95)
 				{
 					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
 				}
+				else moves.insert({ { b, a }, (unsigned char)(STILL) });
 			}
 		}
         sendFrame(connection, moves);

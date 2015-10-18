@@ -43,21 +43,29 @@ unsigned char Halite::getNextFrame()
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		//Add in pieces according to their moves.
+		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
 		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
-			if(pieces[a + 1].count(b->loc))
+			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
+			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
+			if(pieces[a + 1].count(newLoc))
 			{
-				if(short(pieces[a + 1][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a + 1][b->loc] += game_map.getSite(b->loc, STILL).strength;
-				else pieces[a + 1][b->loc] = 255;
+				if(short(pieces[a + 1][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a + 1][newLoc] += game_map.getSite(b->loc, STILL).strength;
+				else pieces[a + 1][newLoc] = 255;
 			}
 			else
 			{
-				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
+				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
 			}
 
-			//Erase from oldPieces.
-			game_map.getSite(b->loc, STILL).strength = 0;
+			//Add in a new piece with a strength of 0 if necessary.
+			if(!pieces[a + 1].count(b->loc))
+			{
+				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
+			}
+
+			//Erase from oldPieces. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
+			game_map.getSite(b->loc, STILL) = { 255, 0 };
 		}
 	}
 
@@ -65,15 +73,19 @@ unsigned char Halite::getNextFrame()
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
+		if(game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength++;
 		hlt::Site s = game_map.getSite(l, STILL);
-		if(pieces[s.owner].count(l))
+		if(s.owner != 255)
 		{
-			if(short(pieces[s.owner][l]) + s.strength <= 255) pieces[s.owner][l] += s.strength;
-			else pieces[s.owner][l] = 255;
-		}
-		else
-		{
-			pieces[s.owner].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
+			if(pieces[s.owner].count(l))
+			{
+				if(short(pieces[s.owner][l]) + s.strength <= 255) pieces[s.owner][l] += s.strength;
+				else pieces[s.owner][l] = 255;
+			}
+			else
+			{
+				pieces[s.owner].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
+			}
 		}
 	}
 
@@ -95,37 +107,41 @@ unsigned char Halite::getNextFrame()
 					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
-				//Check 'NORTH' square:
-				tempLoc = game_map.getLocation(l, NORTH);
-				if(pieces[d].count(tempLoc))
+				//Only resolve adjacent squares if both players involved are not the NULL player.
+				if(c != 0 && d != 0)
 				{
-					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
-				}
-				//Check 'EAST' square:
-				tempLoc = game_map.getLocation(l, EAST);
-				if(pieces[d].count(tempLoc))
-				{
-					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
-				}
-				//Check 'SOUTH' square:
-				tempLoc = game_map.getLocation(l, SOUTH);
-				if(pieces[d].count(tempLoc))
-				{
-					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
-				}
-				//Check 'WEST' square:
-				tempLoc = game_map.getLocation(l, WEST);
-				if(pieces[d].count(tempLoc))
-				{
-					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					//Check 'NORTH' square:
+					tempLoc = game_map.getLocation(l, NORTH);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					}
+					//Check 'EAST' square:
+					tempLoc = game_map.getLocation(l, EAST);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					}
+					//Check 'SOUTH' square:
+					tempLoc = game_map.getLocation(l, SOUTH);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					}
+					//Check 'WEST' square:
+					tempLoc = game_map.getLocation(l, WEST);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					}
 				}
 			}
 		}
@@ -154,8 +170,8 @@ unsigned char Halite::getNextFrame()
 	}
     
     //Add game map to full game
-    full_game.push_back(new hlt::Map());
-    *full_game.back() = game_map;
+	hlt::Map * newMap = new hlt::Map(game_map);
+    full_game.push_back(newMap);
     
     //Increment turn number:
     turn_number++;
@@ -194,6 +210,15 @@ void Halite::render(short& turnNumber)
 	if(!full_game.empty())
 	{
 		hlt::Map * m = full_game[turnNumber];
+
+		/*
+		The problem here involves the getNextFrame function.
+		Specifically, in order to add another map to the 
+		*/
+		if(m->map_width == 0 || m->map_height == 0)
+		{
+
+		}
 
 		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
 
@@ -285,8 +310,9 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
             game_file >> ownerIn >> ageIn;
             game_map.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
         }
-        full_game.push_back(new hlt::Map());
-        *full_game.back() = game_map;
+		//Add game map to full game
+		hlt::Map * newMap = new hlt::Map(game_map);
+		full_game.push_back(newMap);
         std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
     }
     
@@ -447,8 +473,9 @@ Halite::Halite(unsigned short w, unsigned short h)
     player_moves.resize(number_of_players);
     
     //Add it to the full game:
-    full_game.push_back(new hlt::Map());
-    *full_game.back() = game_map;
+	//Add game map to full game
+	hlt::Map * newMap = new hlt::Map(game_map);
+	full_game.push_back(newMap);
 }
 
 void Halite::init()
