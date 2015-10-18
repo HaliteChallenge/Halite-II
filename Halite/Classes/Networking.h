@@ -13,24 +13,12 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/asio.hpp>
+#include <chrono>
 
 #include "GameLogic/hlt.h"
 
-struct InitPackage 
-{
-    unsigned char playerTag;
-    hlt::Map map;
+static double times = 0;
 
-private:
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & playerTag;
-        ar & map;
-    }
-};
 
 static void serializeMap(hlt::Map & map, std::string & returnString)
 {
@@ -95,17 +83,23 @@ static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObje
     std::vector<boost::asio::const_buffer> buffers;
     buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
     buffers.push_back( buf.data() );
-    s->write_some(buffers);
+    int len = boost::asio::write(*s, buffers);
+	std::cout << "len: " << len << "\n";
 }
 
 template<class type>
 static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
 {
     size_t header;
-    s->read_some(boost::asio::buffer( &header, sizeof(header) ));
+	boost::asio::read(*s, boost::asio::buffer(&header, sizeof(header)));
     
     boost::asio::streambuf buf;
-    s->read_some(buf.prepare( header ));
+    boost::asio::read(*s, buf.prepare( header ));
+
+	using namespace std::chrono;
+	milliseconds ms = duration_cast< milliseconds >( system_clock::now().time_since_epoch() );
+	std::cout << "got time: " << ms.count() << "\n";
+
     buf.commit( header );
     
     std::istream is( &buf );
@@ -117,9 +111,14 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 {
     using boost::asio::ip::tcp;
     
-	InitPackage package = { playerTag, hlt::Map(m) };
-    sendObject(s, package);
-    
+    sendObject(s, playerTag);
+	using namespace std::chrono;
+	milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	std::cout << "send tag: " << ms.count() << "\n";
+	
+	sendObject(s, m);
+	ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	std::cout << "send map: " << ms.count() << "\n";
     
     std::string str = "Init Message sent to player " + name + "\n";
     std::cout << str;
@@ -139,19 +138,28 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 
 static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	std::cout << "About to send a message!\n";
-    sendObject(s, m);
-	std::cout << "Sent my message!\n";
-    
-    moves->clear();
-    clock_t initialTime = clock();
-    getObject(s, *moves);
-    clock_t finalTime = clock() - initialTime;
-    double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
+	times++;
+	sendObject(s, m);
+	try {
+		moves->clear();
+		clock_t initialTime = clock();
+		getObject(s, *moves);
+		clock_t finalTime = clock() - initialTime;
+		double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 
-	std::cout << "Received a message!\n";
-    
-    return timeElapsed;
+		std::cout << "times: " << times << "; Time: " << timeElapsed << "\n";
+
+		return timeElapsed;
+	}
+	catch (boost::archive::archive_exception e) {
+		std::cout << "ex: " << e.what() << "\n";
+
+		return 0;
+	} catch (std::exception e) {
+		std::cout << "regular exception: " << e.what() << "\n";
+
+		return 0;
+	}
 }
 
 #endif

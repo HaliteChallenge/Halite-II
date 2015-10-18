@@ -37,7 +37,7 @@ unsigned char Halite::getNextFrame()
     std::vector<bool> permissibleTime(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-        permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
+		permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
     }
 
 	//For each player, use their moves to create the pieces map.
@@ -438,8 +438,6 @@ Halite::Halite(unsigned short w, unsigned short h)
 		tcp::socket &referenceSocket = *socket;
 		acceptor.accept(referenceSocket);
 
-		boost::asio::socket_base::keep_alive option(true);
-		socket->set_option(option);
         player_connections.push_back(socket);
         
         std::cout << "Connected to player " << number_of_players + 1 << " at " << socket->remote_endpoint().address().to_string() << std::endl << "How should I refer to this player? Please enter their name: ";

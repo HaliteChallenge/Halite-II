@@ -18,7 +18,7 @@ void Random::run()
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
 			{
-				if(float(rand())/RAND_MAX > .95)
+				if(float(rand())/RAND_MAX > .20)
 				{
 					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
 				}
