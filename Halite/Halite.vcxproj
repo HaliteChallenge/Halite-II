@@ -40,7 +40,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\GLEW\glew-1.12.0\include;C:\boost_1_58_0;C:\GLFW\glfw-3.1.1.bin.WIN32\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GLEW\glew-1.12.0\lib\Release\Win32;C:\GLFW\glfw-3.1.1.bin.WIN32\lib-vc2013;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\boost_1_58_0\stage\lib;C:\GLEW\glew-1.12.0\lib\Release\Win32;C:\GLFW\glfw-3.1.1.bin.WIN32\lib-vc2013;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost_1_58_0;C:\vsProjects\freeglut\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>

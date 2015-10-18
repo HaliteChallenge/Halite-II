@@ -153,6 +153,16 @@ int main(int argc, char* args[])
 		}
 		c = clock();
 	}
+	
+
+	if(newGame)
+	{
+		std::cout << "I'm still handling logic.\n";
+		logicThread.join();
+		std::cout << "I've finished my logic. If you'd like to save to a file, press the 'o' key. Any other key will exit the program.\n";
+		char keyPressed = getchar();
+		if(keyPressed == 'o' || keyPressed == 'O') my_game.output(filename);
+	}
 
 	return 0;
 }

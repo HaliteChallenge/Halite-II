@@ -4,7 +4,7 @@ Basic::Basic()
 {
     srand(time(NULL));
     connection = connectToGame();
-    getInit(connection, my_tag, age_of_sentient, present_map);
+    getInit(connection, my_tag, present_map);
     sendInitResponse(connection);
 }
 
@@ -14,7 +14,7 @@ void Basic::run()
     {
         moves.clear();
         getFrame(connection, present_map);
-        for(unsigned short a = 0; a < present_map.map_height; a++) for(unsigned short b = 0; b < present_map.map_width; b++) if(present_map.contents[a][b].owner == my_tag && present_map.contents[a][b].age == age_of_sentient)
+        /*for(unsigned short a = 0; a < present_map.map_height; a++) for(unsigned short b = 0; b < present_map.map_width; b++) if(present_map.contents[a][b].owner == my_tag && present_map.contents[a][b].age == age_of_sentient)
         {
             hlt::Site around[4];
             around[0] = present_map.getNorthernSite({ b, a });
@@ -55,7 +55,7 @@ void Basic::run()
                 if(toLookAt == 4) toLookAt = 0;
             }
             moves.insert({ { b, a }, best_direction_yet });
-        }
+        }*/
         sendFrame(connection, moves);
     }
 }

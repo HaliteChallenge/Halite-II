@@ -4,7 +4,7 @@ Random::Random()
 {
     srand(time(NULL));
     connection = connectToGame();
-    getInit(connection, my_tag, age_of_sentient, present_map);
+    getInit(connection, my_tag, present_map);
     sendInitResponse(connection);
 }
 
@@ -18,7 +18,7 @@ void Random::run()
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
 			{
-				if(present_map.contents[a][b].owner == my_tag && present_map.contents[a][b].age == age_of_sentient)
+				//if(present_map.contents[a][b].owner == my_tag)
 				{
 					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
 				}

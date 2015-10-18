@@ -4,7 +4,7 @@ Still::Still()
 {
 	srand(time(NULL));
 	connection = connectToGame();
-	getInit(connection, my_tag, age_of_sentient, present_map);
+	getInit(connection, my_tag, present_map);
 	sendInitResponse(connection);
 }
 

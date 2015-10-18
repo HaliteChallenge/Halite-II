@@ -50,7 +50,7 @@ unsigned char Halite::getNextFrame()
 	for(unsigned short a = 0; a < number_of_players; a++)
 	{
 		//Add in pieces according to their moves.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(oldPieces[b->loc].owner == a + 1)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(oldPieces.count(b->loc) && oldPieces[b->loc].owner == a + 1)
 		{
 			if(newPieces[a].count(b->loc))
 			{
@@ -206,10 +206,10 @@ void Halite::render(short& turnNumber)
 			for(auto b = a->begin(); b != a->end(); b++)
 			{
 				hlt::Color c = color_codes[b->owner];
-				const double BASE_DIMMING_FACTOR = 0.5;
+				//const double BASE_DIMMING_FACTOR = 0.5;
 				if(b->strength != 255)
 				{
-					const double TRUE_DIMMING_FACTOR = 0.15 + 0.85*(BASE_DIMMING_FACTOR*b->strength / 255);
+					const double TRUE_DIMMING_FACTOR = 0.11 + 0.9*pow(b->strength / 255.0, 0.8);
 					c.r *= TRUE_DIMMING_FACTOR;
 					c.g *= TRUE_DIMMING_FACTOR;
 					c.b *= TRUE_DIMMING_FACTOR;

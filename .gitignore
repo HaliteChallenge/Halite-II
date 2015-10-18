@@ -199,5 +199,5 @@ FakesAssemblies/
 *.hlt
 
 #Fuck you, visual studio.
-*.vcxproj
 *.vcxproj.filters
+*.vcxproj

@@ -20,7 +20,6 @@
 struct InitPackage
 {
     unsigned char playerTag;
-    unsigned char ageOfSentient;
     hlt::Map map;
 
 private:
@@ -30,7 +29,6 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & playerTag;
-        ar & ageOfSentient;
         ar & map;
     }
 };
@@ -161,14 +159,12 @@ static boost::asio::ip::tcp::socket * connectToGame()
 }
 
 
-static void getInit(boost::asio::ip::tcp::socket *s, unsigned char& playerTag, unsigned char& ageOfSentient, hlt::Map& m)
+static void getInit(boost::asio::ip::tcp::socket *s, unsigned char& playerTag, hlt::Map& m)
 {
-
-    InitPackage package = {0, 0, hlt::Map()};
+    InitPackage package = {0, hlt::Map()};
     getObject(s, package);
     
     playerTag = package.playerTag;
-    ageOfSentient = package.ageOfSentient;
     m = package.map;
 }
 

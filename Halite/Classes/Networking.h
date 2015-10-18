@@ -19,7 +19,6 @@
 struct InitPackage 
 {
     unsigned char playerTag;
-    unsigned char ageOfSentient;
     hlt::Map map;
 
 private:
@@ -29,12 +28,11 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & playerTag;
-        ar & ageOfSentient;
         ar & map;
     }
 };
 
-static void serializeMap(hlt::Map &map, std::string &returnString)
+static void serializeMap(hlt::Map & map, std::string & returnString)
 {
     std::ostringstream oss;
     oss << map.map_width << " " << map.map_height << " ";
@@ -73,7 +71,7 @@ static void serializeMap(hlt::Map &map, std::string &returnString)
     returnString = oss.str();
 }
 
-static void deserializeMoveSet(std::string &inputString, std::set<hlt::Move> &moves)
+static void deserializeMoveSet(std::string & inputString, std::set<hlt::Move> & moves)
 {
     moves = std::set<hlt::Move>();
     
@@ -84,7 +82,7 @@ static void deserializeMoveSet(std::string &inputString, std::set<hlt::Move> &mo
 }
 
 template<class type>
-static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObject)
+static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObject)
 {
     boost::asio::streambuf buf;
     std::ostream os( &buf );
@@ -115,11 +113,11 @@ static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
     ar >> receivingObject;
 }
 
-static double handleInitNetworking(boost::asio::ip::tcp::socket *s, unsigned char playerTag, unsigned char ageOfSentient, std::string name, hlt::Map& m)
+static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned char playerTag, std::string name, hlt::Map & m)
 {
     using boost::asio::ip::tcp;
     
-    InitPackage package = {playerTag, ageOfSentient, hlt::Map(m)};
+	InitPackage package = { playerTag, hlt::Map(m) };
     sendObject(s, package);
     
     
@@ -139,15 +137,19 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket *s, unsigned cha
     return timeElapsed;
 }
 
-static double handleFrameNetworking(boost::asio::ip::tcp::socket *s, hlt::Map& m, std::set<hlt::Move> * moves)
+static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
+	std::cout << "About to send a message!\n";
     sendObject(s, m);
+	std::cout << "Sent my message!\n";
     
     moves->clear();
     clock_t initialTime = clock();
     getObject(s, *moves);
     clock_t finalTime = clock() - initialTime;
     double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
+
+	std::cout << "Received a message!\n";
     
     return timeElapsed;
 }
