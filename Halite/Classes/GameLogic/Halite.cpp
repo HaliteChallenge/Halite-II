@@ -31,7 +31,7 @@ unsigned char Halite::getNextFrame()
         //For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
         //allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
 
-	std::vector< std::map<hlt::Location, unsigned char> > newPieces(number_of_players + 1);
+	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
     
     //Join threads. Figure out if the player responded in an allowable amount of time.
     std::vector<bool> permissibleTime(number_of_players);
@@ -40,92 +40,92 @@ unsigned char Halite::getNextFrame()
         permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
     }
 
-	//For each player, use their moves to create the newPieces map.
-	for(unsigned short a = 0; a < number_of_players; a++)
+	//For each player, use their moves to create the pieces map.
+	for(unsigned char a = 0; a < number_of_players + 1; a++)
 	{
 		//Add in pieces according to their moves.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a)
 		{
-			if(newPieces[a].count(b->loc))
+			if(pieces[a].count(b->loc))
 			{
-				if(short(newPieces[a][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) newPieces[a][b->loc] += game_map.getSite(b->loc, STILL).strength;
-				else newPieces[a][b->loc] = 255;
+				if(short(pieces[a][b->loc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][b->loc] += game_map.getSite(b->loc, STILL).strength;
+				else pieces[a][b->loc] = 255;
 			}
 			else
 			{
-				newPieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
+				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, game_map.getSite(b->loc, STILL).strength));
 			}
 
 			//Erase from oldPieces.
-			oldPieces.erase(b->loc);
+			game_map.getSite(b->loc, STILL).strength = 0;
 		}
 	}
 
 	//Add in all of the remaining pieces whose moves weren't specified. 
-	for(auto b = oldPieces.begin(); b != oldPieces.end(); b++)
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
-		if(newPieces[b->second.owner - 1].count(b->first))
+		hlt::Location l = { b, a };
+		hlt::Site s = game_map.getSite(l, STILL);
+		if(pieces[s.owner].count(l))
 		{
-			if(short(newPieces[b->second.owner - 1][b->first]) + b->second.strength <= 255) newPieces[b->second.owner - 1][b->first] += b->second.strength;
-			else newPieces[b->second.owner - 1][b->first] = 255;
+			if(short(pieces[s.owner][l]) + s.strength <= 255) pieces[s.owner][l] += s.strength;
+			else pieces[s.owner][l] = 255;
 		}
 		else
 		{
-			newPieces[b->second.owner - 1].insert(std::pair<hlt::Location, unsigned char>(b->first, b->second.strength));
+			pieces[s.owner].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
 		}
 	}
 
-	oldPieces.clear(); //Take back that memory (although in actuality really insignificant).
-
-	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players); //This is a short so that we don't have to worry about 255 overflows.
+	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players + 1); //This is a short so that we don't have to worry about 255 overflows.
 
 	//Sweep through locations and find the correct damage for each piece. accordingly.
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players; c++) if(newPieces[c].count(l))
+		for(unsigned short c = 0; c < number_of_players; c++) if(pieces[c].count(l))
 		{
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c)
 			{
 				hlt::Location tempLoc = l;
 				//Check 'STILL' square:
-				if(newPieces[d].count(tempLoc))
+				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'NORTH' square:
 				tempLoc = game_map.getLocation(l, NORTH);
-				if(newPieces[d].count(tempLoc))
+				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'EAST' square:
 				tempLoc = game_map.getLocation(l, EAST);
-				if(newPieces[d].count(tempLoc))
+				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'SOUTH' square:
 				tempLoc = game_map.getLocation(l, SOUTH);
-				if(newPieces[d].count(tempLoc))
+				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'WEST' square:
 				tempLoc = game_map.getLocation(l, WEST);
-				if(newPieces[d].count(tempLoc))
+				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += newPieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, newPieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 			}
 		}
@@ -136,15 +136,15 @@ unsigned char Halite::getNextFrame()
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
-			if(b->second >= newPieces[a][b->first]) newPieces[a].erase(b->first);
-			else newPieces[a][b->first] -= b->second;
+			if(b->second >= pieces[a][b->first]) pieces[a].erase(b->first);
+			else pieces[a][b->first] -= b->second;
 		}
 	}
 
 	//Add pieces back into the map.
 	for(unsigned char a = 0; a != number_of_players; a++)
 	{
-		for(auto b = newPieces[a].begin(); b != newPieces[a].end(); b++)
+		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
 			game_map.getSite(b->first, STILL) = { unsigned char(a + 1), b->second };
 		}
