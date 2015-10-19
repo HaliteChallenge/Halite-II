@@ -205,46 +205,36 @@ void Halite::confirmWithinGame(signed short& turnNumber)
 
 void Halite::render(short& turnNumber)
 {
-    confirmWithinGame(turnNumber);
+	confirmWithinGame(turnNumber);
 
 	if(!full_game.empty())
 	{
 		hlt::Map * m = full_game[turnNumber];
 
-		/*
-		The problem here involves the getNextFrame function.
-		Specifically, in order to add another map to the 
-		*/
-		if(m->map_width == 0 || m->map_height == 0)
-		{
-
-		}
-
 		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
+		std::vector<unsigned int> strengths(unsigned int(m->map_width) * m->map_height);
 
-		unsigned int colorLocation = 0;
+		unsigned int loc = 0;
+		unsigned int colorLoc = 0;
 		for(auto a = m->contents.begin(); a != m->contents.end(); a++)
 		{
 			for(auto b = a->begin(); b != a->end(); b++)
 			{
 				hlt::Color c = color_codes[b->owner];
-				//const double BASE_DIMMING_FACTOR = 0.5;
-				if(b->strength != 255)
-				{
-					const double TRUE_DIMMING_FACTOR = 0.11 + 0.9*pow(b->strength / 255.0, 0.8);
-					c.r *= TRUE_DIMMING_FACTOR;
-					c.g *= TRUE_DIMMING_FACTOR;
-					c.b *= TRUE_DIMMING_FACTOR;
-				}
-				colors[colorLocation] = c.r;
-				colors[colorLocation + 1] = c.g;
-				colors[colorLocation + 2] = c.b;
-				colorLocation += 3;
+				colors[colorLoc] = c.r;
+				colors[colorLoc + 1] = c.g;
+				colors[colorLoc + 2] = c.b;
+				strengths[loc] = b->strength;
+				colorLoc += 3;
+				loc++;
 			}
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
+
+		glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, strengths.size() * sizeof(unsigned int), strengths.data());
 
 		glUseProgram(shader_program);
 		glBindVertexArray(vertex_attributes);
@@ -512,10 +502,12 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &vertex_buffer);
 	glDeleteBuffers(1, &color_buffer);
+	glDeleteBuffers(1, &strength_buffer);
 	glDeleteVertexArrays(1, &vertex_attributes);
 	//Generate buffers and vaos.
 	glGenBuffers(1, &vertex_buffer);
 	glGenBuffers(1, &color_buffer);
+	glGenBuffers(1, &strength_buffer);
 	glGenVertexArrays(1, &vertex_attributes);
 
 	//Generate vertices of centers of squares:
@@ -543,14 +535,24 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
+
 	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors(unsigned int(width) * height * 3); //r, g, and b components.
+	std::vector<float> colors(unsigned int(width) * height * 3, 0.0); //r, g, and b components.
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
+	std::vector<unsigned int> strengths(unsigned int(width) * height, 0); //r, g, and b components.
+
+	//Setup strength buffer
+	glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
+	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, 0, NULL);
 
 	//Setup shaders:
 	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -576,7 +578,7 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	GLint widthLoc = glGetUniformLocation(shader_program, "width"), heightLoc = glGetUniformLocation(shader_program, "height");
 	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
 	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
-	
+
 	//Cleanup - delete shaders
 	glDeleteShader(vertex_shader);
 	glDeleteShader(geometry_shader);
@@ -591,5 +593,6 @@ Halite::~Halite()
 	glDeleteProgram(shader_program);
 	glDeleteBuffers(1, &vertex_buffer);
 	glDeleteBuffers(1, &color_buffer);
+	glDeleteBuffers(1, &strength_buffer);
 	glDeleteVertexArrays(1, &vertex_attributes);
 }
