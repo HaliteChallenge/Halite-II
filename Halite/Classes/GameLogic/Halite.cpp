@@ -598,6 +598,6 @@ Halite::~Halite()
 	glDeleteVertexArrays(1, &vertex_attributes);
 	
 	//Get rid of dynamically allocated memory:
-	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
+	///for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
 	clearFullGame();
 }
