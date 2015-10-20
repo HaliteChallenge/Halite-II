@@ -198,6 +198,8 @@ FakesAssemblies/
 #Halite replays
 *.hlt
 
+
 #Fuck you, visual studio.
 *.vcxproj.filters
 *.vcxproj
+*.sln
