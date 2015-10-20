@@ -2,6 +2,10 @@
 
 using boost::asio::ip::tcp;
 
+//Consts
+
+const unsigned short DEFAULT_PORT = 2000;
+
 //Private Functions:
 
 void Halite::loadColorCodes()
@@ -364,7 +368,7 @@ Halite::Halite(unsigned short w, unsigned short h)
         }
         
         unsigned short portNumber;
-        if(useDefaultPorts) portNumber = number_of_players + 2000;
+        if(useDefaultPorts) portNumber = number_of_players + DEFAULT_PORT;
         else
         {
             std::cout << "What port would you like to connect player " << number_of_players + 1 << " on? Please enter a valid port number: ";
