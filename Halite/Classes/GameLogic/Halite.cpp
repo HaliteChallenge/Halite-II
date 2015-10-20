@@ -73,7 +73,7 @@ unsigned char Halite::getNextFrame()
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength++;
+		if(game_map.getSite(l, STILL).strength != 255 && game_map.getSite(l, STILL).owner != 0) game_map.getSite(l, STILL).strength++;
 		hlt::Site s = game_map.getSite(l, STILL);
 		if(s.owner != 255)
 		{
@@ -157,8 +157,8 @@ unsigned char Halite::getNextFrame()
 		}
 	}
 
-	//Clear the map (everything to {0, 0})
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b = { 0, 0 };
+	//Clear the map (everything to {0, 1})
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b = { 0, 1 };
 
 	//Add pieces back into the map.
 	for(unsigned char a = 0; a < number_of_players + 1; a++)
@@ -552,7 +552,7 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 	glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
 	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, 0, NULL);
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
 
 	//Setup shaders:
 	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
