@@ -28,20 +28,19 @@ private:
     std::vector< std::set<hlt::Move> > player_moves;
     
 	GLuint vertex_buffer, color_buffer, strength_buffer, vertex_attributes, vertex_shader, geometry_shader, fragment_shader, shader_program;
+	void loadColorCodes();
 	void setupRendering(unsigned short width, unsigned short height);
 	void clearFullGame();
     unsigned char getNextFrame();
-    void connectToPlayers();
-    unsigned char getAgeOfSentient(unsigned short w, unsigned short h) { return pow(int(w)*h, 0.4); }
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
     void init();
     std::string runGame();
     void confirmWithinGame(signed short& turnNumber);
-    void render(short& turnNumber);
+	void render(short& turnNumber);
+	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);
-    bool input(std::string filename, unsigned short& width, unsigned short& height);
     void getColorCodes();
 	~Halite();
 };

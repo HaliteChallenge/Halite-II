@@ -2,16 +2,126 @@
 
 using boost::asio::ip::tcp;
 
+//Private Functions:
+
+void Halite::loadColorCodes()
+{
+	std::fstream colorFile;
+	colorFile.open("ColorCodes.txt", std::ios_base::in);
+	color_codes.clear();
+	int n; float r, g, b;
+	while(!colorFile.eof())
+	{
+		colorFile >> n >> r >> g >> b;
+		color_codes.insert(std::pair<unsigned char, hlt::Color>(unsigned char(n), { r, g, b }));
+	}
+	colorFile.close();
+}
+
+void Halite::setupRendering(unsigned short width, unsigned short height)
+{
+	//Delete buffers and vaos
+	glDeleteBuffers(1, &vertex_buffer);
+	glDeleteBuffers(1, &color_buffer);
+	glDeleteBuffers(1, &strength_buffer);
+	glDeleteVertexArrays(1, &vertex_attributes);
+	//Generate buffers and vaos.
+	glGenBuffers(1, &vertex_buffer);
+	glGenBuffers(1, &color_buffer);
+	glGenBuffers(1, &strength_buffer);
+	glGenVertexArrays(1, &vertex_attributes);
+
+	//Generate vertices of centers of squares:
+	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
+	float xLoc = -1.0 + 1.0 / width, yLoc = 1.0 - 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
+	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
+	{
+		vertexLocations[a] = xLoc;
+		vertexLocations[a + 1] = yLoc;
+
+		xLoc += dX;
+		if(xLoc > 1.0)
+		{
+			xLoc = -1.0 + 1.0 / width;
+			yLoc -= dY;
+		}
+	}
+
+	//Bind vertex attribute object.
+	glBindVertexArray(vertex_attributes);
+
+	//Setup vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, vertexLocations.size() * sizeof(float), vertexLocations.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+
+	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
+	std::vector<float> colors(unsigned int(width) * height * 3, 0.0); //r, g, and b components.
+
+	//Setup color buffer
+	glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
+	std::vector<unsigned int> strengths(unsigned int(width) * height, 0); //r, g, and b components.
+
+	//Setup strength buffer
+	glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
+	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
+
+	//Setup shaders:
+	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	shaderFromFile(vertex_shader, "Classes/shaders/vertexshader.glsl", "vertex_shader");
+	geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+	shaderFromFile(geometry_shader, "Classes/shaders/geometryshader.glsl", "geometry_shader");
+	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	shaderFromFile(fragment_shader, "Classes/shaders/fragmentshader.glsl", "fragment_shader");
+
+	//Setup shader program:
+	shader_program = glCreateProgram();
+	glAttachShader(shader_program, vertex_shader);
+	glAttachShader(shader_program, geometry_shader);
+	glAttachShader(shader_program, fragment_shader);
+	glLinkProgram(shader_program);
+	glDetachShader(shader_program, vertex_shader);
+	glDetachShader(shader_program, geometry_shader);
+	glDetachShader(shader_program, fragment_shader);
+
+	//Set uniform:
+	glUseProgram(shader_program);
+	const float SPACE_FACTOR = 0.6;
+	GLint widthLoc = glGetUniformLocation(shader_program, "width"), heightLoc = glGetUniformLocation(shader_program, "height");
+	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
+	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
+
+	//Cleanup - delete shaders
+	glDeleteShader(vertex_shader);
+	glDeleteShader(geometry_shader);
+	glDeleteShader(fragment_shader);
+}
+
+void Halite::clearFullGame()
+{
+	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
+	full_game.clear();
+}
+
 unsigned char Halite::getNextFrame()
 {
 	if(game_map.map_width == 0 || game_map.map_height == 0) return 255;
 
-    //Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-    std::vector< std::future<double> > frameThreads(number_of_players);
-    for(unsigned char a = 0; a < number_of_players; a++)
-    {
-        frameThreads[a] = std::async(handleFrameNetworking, player_connections[a], game_map, &player_moves[a]);
-    }
+	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
+	std::vector< std::future<double> > frameThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		frameThreads[a] = std::async(handleFrameNetworking, player_connections[a], game_map, &player_moves[a]);
+	}
 
 	//Find the locations of all of the pieces the players had before they made their moves
 	std::vector<unsigned short> numSentient(number_of_players, 0);
@@ -25,20 +135,20 @@ unsigned char Halite::getNextFrame()
 		}
 	}
 
-    //Figure out how long each AI is permitted to respond.
-    std::vector<double> allowableTimesToRespond(number_of_players);
-    for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
-        //For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
-        //allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
+	//Figure out how long each AI is permitted to respond.
+	std::vector<double> allowableTimesToRespond(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
+	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
+	//allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
 
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
-    
-    //Join threads. Figure out if the player responded in an allowable amount of time.
-    std::vector<bool> permissibleTime(number_of_players);
-    for(unsigned char a = 0; a < number_of_players; a++)
-    {
+
+	//Join threads. Figure out if the player responded in an allowable amount of time.
+	std::vector<bool> permissibleTime(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
 		permissibleTime[a] = frameThreads[a].get() <= allowableTimesToRespond[a];
-    }
+	}
 
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++)
@@ -168,153 +278,28 @@ unsigned char Halite::getNextFrame()
 			game_map.getSite(b->first, STILL) = { a, b->second };
 		}
 	}
-    
-    //Add game map to full game
+
+	//Add game map to full game
 	hlt::Map * newMap = new hlt::Map(game_map);
-    full_game.push_back(newMap);
-    
-    //Increment turn number:
-    turn_number++;
-    
-    //Check if the game is over:
-    unsigned char first_found = 0;
-    for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
-    {
-        if(b->owner != first_found && b->owner != 0)
-        {
-            if(first_found == 0) first_found = b->owner;
-            else return 0; //Multiple people still alive
-        }
-    }
-    return first_found; //If returns 0, that means NOBODY is alive. If it returns something else, they are the winner.
-}
+	full_game.push_back(newMap);
 
-std::string Halite::runGame()
-{
-    unsigned short result = 0;
-    while(result == 0) result = getNextFrame();
-	if(result == 255) return "";
-    return player_names[result - 1];
-}
+	//Increment turn number:
+	turn_number++;
 
-void Halite::confirmWithinGame(signed short& turnNumber)
-{
-	if(turnNumber < 0) turnNumber = 0;
-    if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
-}
-
-void Halite::render(short& turnNumber)
-{
-	confirmWithinGame(turnNumber);
-
-	if(!full_game.empty())
+	//Check if the game is over:
+	unsigned char first_found = 0;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
 	{
-		hlt::Map * m = full_game[turnNumber];
-
-		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
-		std::vector<unsigned int> strengths(unsigned int(m->map_width) * m->map_height);
-
-		unsigned int loc = 0;
-		unsigned int colorLoc = 0;
-		for(auto a = m->contents.begin(); a != m->contents.end(); a++)
+		if(b->owner != first_found && b->owner != 0)
 		{
-			for(auto b = a->begin(); b != a->end(); b++)
-			{
-				hlt::Color c = color_codes[b->owner];
-				colors[colorLoc] = c.r;
-				colors[colorLoc + 1] = c.g;
-				colors[colorLoc + 2] = c.b;
-				strengths[loc] = b->strength;
-				colorLoc += 3;
-				loc++;
-			}
+			if(first_found == 0) first_found = b->owner;
+			else return 0; //Multiple people still alive
 		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
-
-		glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, strengths.size() * sizeof(unsigned int), strengths.data());
-
-		glUseProgram(shader_program);
-		glBindVertexArray(vertex_attributes);
-		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
 	}
+	return first_found; //If returns 0, that means NOBODY is alive. If it returns something else, they are the winner.
 }
 
-void Halite::output(std::string filename)
-{
-    std::cout << "Beginning to output file from frame #" << last_turn_output + 1 << ".\n";
-
-    std::fstream game_file;
-    if(last_turn_output == 0)
-    {
-        game_file.open(filename, std::ios_base::out);
-        game_file  << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << "\n";
-        for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file  << *a << "\n";
-        game_file  << *(player_names.end() - 1);
-    }
-    else game_file.open(filename, std::ios_base::app);
-    
-    while(last_turn_output < full_game.size())
-    {
-        game_file  << std::endl;
-        for(auto a = full_game[last_turn_output]->contents.begin(); a != full_game[last_turn_output]->contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file  << short(b->owner) << ' ' << short(b->strength) << ' ';
-        last_turn_output++;
-        std::cout << "Finished outputting frame " << last_turn_output + 1 << ".\n";
-    }
-    
-    std::cout << "Output file until frame #" << last_turn_output + 1 << ".\n";
-    
-    game_file.close();
-}
-
-bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
-{
-    std::fstream game_file;
-    game_file.open(filename, std::ios_base::in);
-    if(!game_file.is_open()) return false;
-
-	std::cout << "Beginning to read in file:\n";
-
-	clearFullGame();
-	game_map.map_width = 0;
-	game_map.map_height = 0;
-    
-    std::string in;
-    game_file >> width >> height >> number_of_players;
-    game_map.map_width = width;
-    game_map.map_height = height;
-    std::getline(game_file, in);
-    player_names.resize(number_of_players);
-    for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
-    
-    game_map.contents.resize(game_map.map_height);
-    for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) a->resize(game_map.map_width);
-    
-    short ownerIn, ageIn;
-    while(!game_file.eof())
-    {
-        for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
-        {
-            game_file >> ownerIn >> ageIn;
-            game_map.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
-        }
-		//Add game map to full game
-		hlt::Map * newMap = new hlt::Map(game_map);
-		full_game.push_back(newMap);
-        std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
-    }
-    
-    delete full_game.back();
-    full_game.pop_back();
-
-	setupRendering(full_game[0]->map_width, full_game[0]->map_height);
-    
-    game_file.close();
-
-    return true;
-}
+//Public Functions:
 
 Halite::Halite()
 {
@@ -328,18 +313,7 @@ Halite::Halite()
     player_connections = std::vector<tcp::socket * >();
     player_moves = std::vector< std::set<hlt::Move> >();
     //Init Color Codes:
-    color_codes = std::map<unsigned char, hlt::Color>();
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05f, 0.05f, 0.05f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(1, { 1.0f, 0.0f, 0.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(2, { 0.0f, 1.0f, 0.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(3, { 0.0f, 0.0f, 1.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(4, { 1.0f, 1.0f, 1.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(5, { 1.0f, 0.0f, 1.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(6, { 0.0f, 1.0f, 1.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(7, { 1.0f, 1.0f, 1.0f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87f, .72f, .53f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0f, .50f, .50f }));
-    color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0f, .65f, .0f }));
+	loadColorCodes();
 }
 
 Halite::Halite(unsigned short w, unsigned short h)
@@ -349,18 +323,8 @@ Halite::Halite(unsigned short w, unsigned short h)
     full_game = std::vector<hlt::Map * >();
     
     //Init Color Codes:
-	color_codes = std::map<unsigned char, hlt::Color>();
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(0, { 0.05f, 0.05f, 0.05f }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(1, { 1.0, 0.0, 0.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(2, { 0.0, 1.0, 0.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(3, { 0.0, 0.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(4, { 1.0, 1.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(5, { 1.0, 0.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(6, { 0.0, 1.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(7, { 1.0, 1.0, 1.0 }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(8, { .87f, .72f, .53f }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(9, { 1.0f, .50f, .50f }));
-	color_codes.insert(std::pair<unsigned char, hlt::Color>(10, { 1.0f, .65f, .0f }));
+	loadColorCodes();
+
     turn_number = 0;
     
     //Connect to players
@@ -482,6 +446,133 @@ void Halite::init()
 	setupRendering(game_map.map_width, game_map.map_height);
 }
 
+void Halite::confirmWithinGame(signed short& turnNumber)
+{
+	if(turnNumber < 0) turnNumber = 0;
+	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
+}
+
+std::string Halite::runGame()
+{
+	unsigned short result = 0;
+	while(result == 0) result = getNextFrame();
+	if(result == 255) return "";
+	return player_names[result - 1];
+}
+
+void Halite::render(short& turnNumber)
+{
+	confirmWithinGame(turnNumber);
+
+	if(!full_game.empty())
+	{
+		hlt::Map * m = full_game[turnNumber];
+
+		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
+		std::vector<unsigned int> strengths(unsigned int(m->map_width) * m->map_height);
+
+		unsigned int loc = 0;
+		unsigned int colorLoc = 0;
+		for(auto a = m->contents.begin(); a != m->contents.end(); a++)
+		{
+			for(auto b = a->begin(); b != a->end(); b++)
+			{
+				hlt::Color c = color_codes[b->owner];
+				colors[colorLoc] = c.r;
+				colors[colorLoc + 1] = c.g;
+				colors[colorLoc + 2] = c.b;
+				strengths[loc] = b->strength;
+				colorLoc += 3;
+				loc++;
+			}
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
+
+		glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, strengths.size() * sizeof(unsigned int), strengths.data());
+
+		glUseProgram(shader_program);
+		glBindVertexArray(vertex_attributes);
+		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
+	}
+}
+
+bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
+{
+	std::fstream game_file;
+	game_file.open(filename, std::ios_base::in);
+	if(!game_file.is_open()) return false;
+
+	std::cout << "Beginning to read in file:\n";
+
+	clearFullGame();
+	game_map.map_width = 0;
+	game_map.map_height = 0;
+
+	std::string in;
+	game_file >> width >> height >> number_of_players;
+	game_map.map_width = width;
+	game_map.map_height = height;
+	std::getline(game_file, in);
+	player_names.resize(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
+
+	game_map.contents.resize(game_map.map_height);
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) a->resize(game_map.map_width);
+
+	short ownerIn, ageIn;
+	while(!game_file.eof())
+	{
+		for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+		{
+			game_file >> ownerIn >> ageIn;
+			game_map.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
+		}
+		//Add game map to full game
+		hlt::Map * newMap = new hlt::Map(game_map);
+		full_game.push_back(newMap);
+		std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
+	}
+
+	delete full_game.back();
+	full_game.pop_back();
+
+	setupRendering(full_game[0]->map_width, full_game[0]->map_height);
+
+	game_file.close();
+
+	return true;
+}
+
+void Halite::output(std::string filename)
+{
+	std::cout << "Beginning to output file from frame #" << last_turn_output + 1 << ".\n";
+
+	std::fstream game_file;
+	if(last_turn_output == 0)
+	{
+		game_file.open(filename, std::ios_base::out);
+		game_file << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << "\n";
+		for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file << *a << "\n";
+		game_file << *(player_names.end() - 1);
+	}
+	else game_file.open(filename, std::ios_base::app);
+
+	while(last_turn_output < full_game.size())
+	{
+		game_file << std::endl;
+		for(auto a = full_game[last_turn_output]->contents.begin(); a != full_game[last_turn_output]->contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
+		last_turn_output++;
+		std::cout << "Finished outputting frame " << last_turn_output + 1 << ".\n";
+	}
+
+	std::cout << "Output file until frame #" << last_turn_output + 1 << ".\n";
+
+	game_file.close();
+}
+
 void Halite::getColorCodes()
 {
     for(unsigned short a = 0; a < number_of_players; a++)
@@ -491,102 +582,9 @@ void Halite::getColorCodes()
     }
 }
 
-void Halite::clearFullGame()
-{
-	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
-	full_game.clear();
-}
-
-void Halite::setupRendering(unsigned short width, unsigned short height)
-{
-	//Delete buffers and vaos
-	glDeleteBuffers(1, &vertex_buffer);
-	glDeleteBuffers(1, &color_buffer);
-	glDeleteBuffers(1, &strength_buffer);
-	glDeleteVertexArrays(1, &vertex_attributes);
-	//Generate buffers and vaos.
-	glGenBuffers(1, &vertex_buffer);
-	glGenBuffers(1, &color_buffer);
-	glGenBuffers(1, &strength_buffer);
-	glGenVertexArrays(1, &vertex_attributes);
-
-	//Generate vertices of centers of squares:
-	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
-	float xLoc = -1.0 + 1.0 / width, yLoc = 1.0 - 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
-	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
-	{
-		vertexLocations[a] = xLoc;
-		vertexLocations[a + 1] = yLoc;
-
-		xLoc += dX;
-		if(xLoc > 1.0)
-		{
-			xLoc = -1.0 + 1.0 / width;
-			yLoc -= dY;
-		}
-	}
-
-	//Bind vertex attribute object.
-	glBindVertexArray(vertex_attributes);
-
-	//Setup vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, vertexLocations.size() * sizeof(float), vertexLocations.data(), GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-
-
-	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors(unsigned int(width) * height * 3, 0.0); //r, g, and b components.
-
-	//Setup color buffer
-	glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<unsigned int> strengths(unsigned int(width) * height, 0); //r, g, and b components.
-
-	//Setup strength buffer
-	glBindBuffer(GL_ARRAY_BUFFER, strength_buffer);
-	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
-
-	//Setup shaders:
-	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	shaderFromFile(vertex_shader, "Classes/shaders/vertexshader.glsl", "vertex_shader");
-	geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-	shaderFromFile(geometry_shader, "Classes/shaders/geometryshader.glsl", "geometry_shader");
-	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	shaderFromFile(fragment_shader, "Classes/shaders/fragmentshader.glsl", "fragment_shader");
-
-	//Setup shader program:
-	shader_program = glCreateProgram();
-	glAttachShader(shader_program, vertex_shader);
-	glAttachShader(shader_program, geometry_shader);
-	glAttachShader(shader_program, fragment_shader);
-	glLinkProgram(shader_program);
-	glDetachShader(shader_program, vertex_shader);
-	glDetachShader(shader_program, geometry_shader);
-	glDetachShader(shader_program, fragment_shader);
-
-	//Set uniform:
-	glUseProgram(shader_program);
-	const float SPACE_FACTOR = 0.6;
-	GLint widthLoc = glGetUniformLocation(shader_program, "width"), heightLoc = glGetUniformLocation(shader_program, "height");
-	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
-	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
-
-	//Cleanup - delete shaders
-	glDeleteShader(vertex_shader);
-	glDeleteShader(geometry_shader);
-	glDeleteShader(fragment_shader);
-}
-
 Halite::~Halite()
 {
+	//Get rid of OpenGL stuff
 	glDeleteShader(vertex_shader);
 	glDeleteShader(geometry_shader);
 	glDeleteShader(fragment_shader);
@@ -595,4 +593,8 @@ Halite::~Halite()
 	glDeleteBuffers(1, &color_buffer);
 	glDeleteBuffers(1, &strength_buffer);
 	glDeleteVertexArrays(1, &vertex_attributes);
+
+	//Get rid of dynamically allocated memory:
+	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
+	clearFullGame();
 }

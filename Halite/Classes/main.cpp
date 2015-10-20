@@ -25,7 +25,7 @@ std::string filename;
 int main(int argc, char* args[])
 {
 	std::string in;
-	filename = "Output_" + std::to_string(time(NULL)) + ".hlt";
+	filename = "Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 	std::thread logicThread;
 	unsigned short mapWidth, mapHeight;
 
