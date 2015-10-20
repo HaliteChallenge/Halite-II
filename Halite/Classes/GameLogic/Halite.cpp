@@ -317,7 +317,7 @@ Halite::Halite()
     player_connections = std::vector<tcp::socket * >();
     player_moves = std::vector< std::set<hlt::Move> >();
     //Init Color Codes:
-	loadColorCodes();
+    loadColorCodes();
 }
 
 Halite::Halite(unsigned short w, unsigned short h)
@@ -327,7 +327,7 @@ Halite::Halite(unsigned short w, unsigned short h)
     full_game = std::vector<hlt::Map * >();
     
     //Init Color Codes:
-	loadColorCodes();
+    loadColorCodes();
 
     turn_number = 0;
     
@@ -399,22 +399,22 @@ Halite::Halite(unsigned short w, unsigned short h)
         player_connections.push_back(socket);
         
         std::cout << "Connected to player " << number_of_players + 1 << " at " << socket->remote_endpoint().address().to_string() << std::endl << "How should I refer to this player? Please enter their name: ";
-		while(true)
+	while(true)
+	{
+		std::getline(std::cin, in);
+		if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
+		else
 		{
-			std::getline(std::cin, in);
-			if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
-			else
+			bool good = true;
+			for(auto a = player_names.begin(); a != player_names.end(); a++) if(*a == in)
 			{
-				bool good = true;
-				for(auto a = player_names.begin(); a != player_names.end(); a++) if(*a == in)
-				{
-					good = false;
-					break;
-				}
-				if(good) break;
-				else std::cout << "That name is already taken. Please enter another name for this player: ";
+				good = false;
+				break;
 			}
+			if(good) break;
+			else std::cout << "That name is already taken. Please enter another name for this player: ";
 		}
+	}
         player_names.push_back(in);
         
         number_of_players++;
@@ -428,10 +428,9 @@ Halite::Halite(unsigned short w, unsigned short h)
     //Initialize player moves vector
     player_moves.resize(number_of_players);
     
-    //Add it to the full game:
-	//Add game map to full game
-	hlt::Map * newMap = new hlt::Map(game_map);
-	full_game.push_back(newMap);
+    //Add game map to full game
+    hlt::Map * newMap = new hlt::Map(game_map);
+    full_game.push_back(newMap);
 }
 
 void Halite::init()
@@ -444,10 +443,10 @@ void Halite::init()
     }
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-        initThreads[a].join();
-	}
-
-	setupRendering(game_map.map_width, game_map.map_height);
+    	initThreads[a].join();
+    }
+    
+    setupRendering(game_map.map_width, game_map.map_height);
 }
 
 void Halite::confirmWithinGame(signed short& turnNumber)
@@ -597,7 +596,7 @@ Halite::~Halite()
 	glDeleteBuffers(1, &color_buffer);
 	glDeleteBuffers(1, &strength_buffer);
 	glDeleteVertexArrays(1, &vertex_attributes);
-
+	
 	//Get rid of dynamically allocated memory:
 	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
 	clearFullGame();
