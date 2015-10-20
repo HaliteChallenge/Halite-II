@@ -284,8 +284,7 @@ unsigned char Halite::getNextFrame()
 	}
 
 	//Add game map to full game
-	hlt::Map * newMap = new hlt::Map(game_map);
-	full_game.push_back(newMap);
+	full_game.push_back(new hlt::Map(game_map));
 
 	//Increment turn number:
 	turn_number++;
@@ -429,8 +428,7 @@ Halite::Halite(unsigned short w, unsigned short h)
     player_moves.resize(number_of_players);
     
     //Add game map to full game
-    hlt::Map * newMap = new hlt::Map(game_map);
-    full_game.push_back(newMap);
+	full_game.push_back(new hlt::Map(game_map));
 }
 
 void Halite::init()
@@ -534,8 +532,7 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 			game_map.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
 		}
 		//Add game map to full game
-		hlt::Map * newMap = new hlt::Map(game_map);
-		full_game.push_back(newMap);
+		full_game.push_back(new hlt::Map(game_map));
 		std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
 	}
 

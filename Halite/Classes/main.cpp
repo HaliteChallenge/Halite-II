@@ -15,7 +15,7 @@ void handleResize(GLFWwindow * w, int width, int height);
 void render();
 void doLogic();
 
-Halite my_game;
+Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed;
 signed short turn_number = 0;
 float maxFps = 20;
@@ -116,15 +116,15 @@ int main(int argc, char* args[])
 
 	if(newGame)
 	{
-		my_game = Halite(mapWidth, mapHeight);
+		my_game = new Halite(mapWidth, mapHeight);
 
-		my_game.init();
+		my_game->init();
 
 		logicThread = std::thread(doLogic);
 	}
 	else
 	{
-		my_game = Halite();
+		my_game = new Halite();
 		std::cout << "Simply drop the file onto the window." << std::endl;
 	}
 
@@ -161,7 +161,7 @@ int main(int argc, char* args[])
 		logicThread.join();
 		std::cout << "I've finished my logic. If you'd like to save to a file, press the 'o' key. Any other key will exit the program.\n";
 		char keyPressed = getchar();
-		if(keyPressed == 'o' || keyPressed == 'O') my_game.output(filename);
+		if(keyPressed == 'o' || keyPressed == 'O') my_game->output(filename);
 	}
 
 	return 0;
@@ -231,14 +231,14 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	}
 	else if(code == 'o' || code == 'O')
 	{
-		my_game.output(filename);
+		my_game->output(filename);
 	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	if(!my_game.input(paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
+	if(!my_game->input(paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
 	isPaused = false;
 	turn_number = 0;
 }
@@ -258,7 +258,7 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	my_game.render(turn_number);
+	my_game->render(turn_number);
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);
@@ -266,6 +266,6 @@ void render()
 
 void doLogic()
 {
-	std::string winner = my_game.runGame();
+	std::string winner = my_game->runGame();
 	if(winner != "") std::cout << "Player " << winner << " has won the game!\n";
 }
