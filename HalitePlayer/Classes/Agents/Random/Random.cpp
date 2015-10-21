@@ -18,7 +18,7 @@ void Random::run()
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
 			{
-				if (present_map.getSite({b, a}).owner == my_tag)
+				if (present_map.getSite({b, a}, STILL).owner == my_tag)
 				{
 					if (float(rand()) / RAND_MAX > .20)
 					{

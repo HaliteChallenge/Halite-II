@@ -17,7 +17,7 @@ void main()
 	vec3 c = color[0];
 	
 	//Declare float which represents dialation factor of inner square:
-	float dialationFactor = 1.1;
+	float dialationFactor = 1.2;
 
 	//Find top left vertices.
 	vec4 tlBPosition = position + vec4(-width, height, 0.0001, 0.0), tlLPosition = position + vec4(-width/dialationFactor, height/dialationFactor, 0.0, 0.0);

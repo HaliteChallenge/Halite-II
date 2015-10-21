@@ -19,7 +19,7 @@
 
 static void serializeMoveSet(std::set<hlt::Move> &moves, std::string &returnString) {
     std::ostringstream oss;
-    for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->l.x << " " << a->l.y << " " << a->d << " ";
+    for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << a->dir << " ";
     
     returnString = oss.str();
 }
@@ -53,7 +53,7 @@ static void deserializeMap(std::string &inputString, hlt::Map &map)
     {
         for (int b = 0; b < map.contents[a].size(); ++b) 
         {
-            iss >> map.contents[a][b].age;
+            iss >> map.contents[a][b].strength;
         }
     }
 }

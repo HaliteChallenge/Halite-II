@@ -11,6 +11,12 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 
+#define STILL 0
+#define NORTH 1
+#define EAST 2
+#define SOUTH 3
+#define WEST 4
+
 namespace hlt
 {
 	struct Location
@@ -33,7 +39,7 @@ namespace hlt
 
 	struct Site
 	{
-		unsigned char owner, age;
+		unsigned char owner, strength;
 
 		friend class boost::serialization::access;
 
@@ -41,7 +47,7 @@ namespace hlt
 		void serialize(Archive & ar, const unsigned int version)
 		{
 			ar & owner;
-			ar & age;
+			ar & strength;
 		}
 	};
 
@@ -63,7 +69,7 @@ namespace hlt
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
 		}
-		Map(short width, short height, unsigned char numberOfPlayers, unsigned char ageOfSentient)
+		Map(short width, short height, unsigned char numberOfPlayers)
 		{
 			map_width = width;
 			map_height = height;
@@ -71,31 +77,31 @@ namespace hlt
 
 			std::list<Location> takenSpots;
 			float minDistance = sqrt(map_height*map_width) / 2;
-			for (int a = 1; a <= numberOfPlayers; a++)
+			for(int a = 1; a <= numberOfPlayers; a++)
 			{
 				bool bad = true;
 				int counter = 0;
 				Location l;
-				while (bad)
+				while(bad)
 				{
 					bad = false;
 					l = { static_cast<unsigned short>(rand() % map_width), static_cast<unsigned short>(rand() % map_height) };
-					for (auto b = takenSpots.begin(); b != takenSpots.end(); b++)
+					for(auto b = takenSpots.begin(); b != takenSpots.end(); b++)
 					{
-						if (getDistance(l, *b) <= minDistance)
+						if(getDistance(l, *b) <= minDistance)
 						{
 							bad = true;
 							break;
 						}
 					}
 					counter++;
-					if (counter > 150)
+					if(counter > 150)
 					{
 						counter = 0;
 						minDistance *= 0.85;
 					}
 				}
-				contents[l.y][l.x] = { (unsigned char)a, ageOfSentient };
+				contents[l.y][l.x] = { unsigned char(a), 255 };
 				takenSpots.push_back(l);
 			}
 		}
@@ -107,70 +113,51 @@ namespace hlt
 		float getDistance(Location l1, Location l2)
 		{
 			short dx = abs(l1.x - l2.x), dy = abs(l1.y - l2.y);
-			if (dx > map_width / 2) dx = map_width - dx;
-			if (dy > map_height / 2) dy = map_height - dy;
+			if(dx > map_width / 2) dx = map_width - dx;
+			if(dy > map_height / 2) dy = map_height - dy;
 			return sqrt((dx*dx) + (dy*dy));
 		}
 		float getAngle(Location l1, Location l2)
 		{
 			short dx = l2.x - l1.x, dy = l2.y - l1.y;
-			if (dx > map_width - dx) dx -= map_width;
-			else if (-dx > map_width + dx) dx += map_width;
-			if (dy > map_height - dy) dy -= map_height;
-			else if (-dy > map_height + dy) dy += map_height;
+			if(dx > map_width - dx) dx -= map_width;
+			else if(-dx > map_width + dx) dx += map_width;
+			if(dy > map_height - dy) dy -= map_height;
+			else if(-dy > map_height + dy) dy += map_height;
 			return atan2(dy, dx);
 		}
-		Site& getSite(Location l)
+
+		Location getLocation(Location l, unsigned char direction)
 		{
-			return contents[l.y][l.x];
-		}
-		Site& getNorthernSite(Location l)
-		{
-			if (l.y != 0) l.y--;
-			else l.y = map_height - 1;
-			return contents[l.y][l.x];
-		}
-		Site& getEasternSite(Location l)
-		{
-			if (l.x != map_width - 1) l.x++;
-			else l.x = 0;
-			return contents[l.y][l.x];
-		}
-		Site& getSouthernSite(Location l)
-		{
-			if (l.y != map_height - 1) l.y++;
-			else l.y = 0;
-			return contents[l.y][l.x];
-		}
-		Site& getWesternSite(Location l)
-		{
-			if (l.x != 0) l.x--;
-			else l.x = map_width - 1;
-			return contents[l.y][l.x];
-		}
-		Location getNorthern(Location l)
-		{
-			if (l.y != 0) l.y--;
-			else l.y = map_height - 1;
+			if(direction != STILL)
+			{
+				if(direction == NORTH)
+				{
+					if(l.y == 0) l.y = map_height - 1;
+					else l.y--;
+				}
+				else if(direction == EAST)
+				{
+					if(l.x == map_width - 1) l.x = 0;
+					else l.x++;
+				}
+				else if(direction == SOUTH)
+				{
+					if(l.y == map_height - 1) l.y = 0;
+					else l.y++;
+				}
+				else if(direction == WEST)
+				{
+					if(l.x == 0) l.x = map_width - 1;
+					else l.x--;
+				}
+			}
 			return l;
 		}
-		Location getEastern(Location l)
+		Site& getSite(Location l, unsigned char direction)
 		{
-			if (l.x != map_width - 1) l.x++;
-			else l.x = 0;
-			return l;
-		}
-		Location getSouthern(Location l)
-		{
-			if (l.y != map_height - 1) l.y++;
-			else l.y = 0;
-			return l;
-		}
-		Location getWestern(Location l)
-		{
-			if (l.x != 0) l.x--;
-			else l.x = map_width - 1;
-			return l;
+			l = getLocation(l, direction);
+			return contents[l.y][l.x];
 		}
 
 	private:
@@ -187,28 +174,22 @@ namespace hlt
 
 	struct Move
 	{
-		Location l; unsigned char d;
+		Location loc; unsigned char dir;
 
 		friend class boost::serialization::access;
 
 		template<class Archive>
 		void serialize(Archive & ar, const unsigned int version)
 		{
-			ar & l;
-			ar & d;
+			ar & loc;
+			ar & dir;
 		}
 	};
 	static bool operator<(const Move& m1, const Move& m2)
 	{
-		unsigned int l1Prod = ((m1.l.x + m1.l.y)*((unsigned int)m1.l.x + m1.l.y + 1) / 2) + m1.l.y, l2Prod = ((m2.l.x + m2.l.y)*((unsigned int)m2.l.x + m2.l.y + 1) / 2) + m2.l.y;
-		return ((l1Prod + m1.d)*(l1Prod + m1.d + 1) / 2) + m1.d < ((l2Prod + m2.d)*(l2Prod + m2.d + 1) / 2) + m2.d;
+		unsigned int l1Prod = ((m1.loc.x + m1.loc.y)*((unsigned int)m1.loc.x + m1.loc.y + 1) / 2) + m1.loc.y, l2Prod = ((m2.loc.x + m2.loc.y)*((unsigned int)m2.loc.x + m2.loc.y + 1) / 2) + m2.loc.y;
+		return ((l1Prod + m1.dir)*(l1Prod + m1.dir + 1) / 2) + m1.dir < ((l2Prod + m2.dir)*(l2Prod + m2.dir + 1) / 2) + m2.dir;
 	}
 }
-
-#define STILL 0
-#define NORTH 1
-#define EAST 2
-#define SOUTH 3
-#define WEST 4
 
 #endif
