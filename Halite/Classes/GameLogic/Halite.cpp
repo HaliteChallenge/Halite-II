@@ -99,7 +99,7 @@ void Halite::setupRendering(unsigned short width, unsigned short height)
 
 	//Set uniform:
 	glUseProgram(shader_program);
-	const float SPACE_FACTOR = 0.6;
+	const float SPACE_FACTOR = 0.7;
 	GLint widthLoc = glGetUniformLocation(shader_program, "width"), heightLoc = glGetUniformLocation(shader_program, "height");
 	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
 	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
@@ -595,6 +595,6 @@ Halite::~Halite()
 	glDeleteVertexArrays(1, &vertex_attributes);
 	
 	//Get rid of dynamically allocated memory:
-	///for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
+	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
 	clearFullGame();
 }

@@ -4,7 +4,7 @@ uniform float width;
 uniform float height;
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 10) out;
+layout(triangle_strip, max_vertices = 16) out;
 
 in vec3 color[];
 in uint strength[];
@@ -17,48 +17,70 @@ void main()
 	vec3 c = color[0];
 	
 	//Declare float which represents dialation factor of inner square:
-	float dialationFactor = 1.2;
+	float dialationFactor = 0.85;
 
 	//Find top left vertices.
-	vec4 tlBPosition = position + vec4(-width, height, 0.0001, 0.0), tlLPosition = position + vec4(-width/dialationFactor, height/dialationFactor, 0.0, 0.0);
+	vec4 tlBPosition = position + vec4(-width, height, 0.0, 0.0), tlMPosition = position + vec4(-width*dialationFactor, height*dialationFactor, 0.0, 0.0);
 
 	//Find bottom left vertices.
-	vec4 blBPosition = position + vec4(-width, -height, 0.0001, 0.0), blLPosition = position + vec4(-width/dialationFactor, -height/dialationFactor, 0.0, 0.0);
+	vec4 blBPosition = position + vec4(-width, -height, 0.0, 0.0), blMPosition = position + vec4(-width*dialationFactor, -height*dialationFactor, 0.0, 0.0);
 
 	//Find top right vertices.
-	vec4 trBPosition = position + vec4(width, height, 0.0001, 0.0), trLPosition = position + vec4(width/dialationFactor, height/dialationFactor, 0.0, 0.0);
+	vec4 trBPosition = position + vec4(width, height, 0.0, 0.0), trMPosition = position + vec4(width*dialationFactor, height*dialationFactor, 0.0, 0.0);
 
 	//Find bottom right vertices.
-	vec4 brBPosition = position + vec4(width, -height, 0.0001, 0.0), brLPosition = position + vec4(width/dialationFactor, -height/dialationFactor, 0.0, 0.0);
+	vec4 brBPosition = position + vec4(width, -height, 0.0, 0.0), brMPosition = position + vec4(width*dialationFactor, -height*dialationFactor, 0.0, 0.0);
 
-	//Set color:
+	//NEW METHOD:
+
+	//Create outer square:
 	fragColor = c;
-
 	gl_Position = brBPosition;
 	EmitVertex();
-	gl_Position = blBPosition;
+	gl_Position = brMPosition;
 	EmitVertex();
 	gl_Position = trBPosition;
 	EmitVertex();
+	gl_Position = trMPosition;
+	EmitVertex();
 	gl_Position = tlBPosition;
 	EmitVertex();
-
-	//Repeat vertex on each side to generate degenerate triangles:
+	gl_Position = tlMPosition;
+	EmitVertex();
+	gl_Position = blBPosition;
+	EmitVertex();
+	gl_Position = blMPosition;
+	EmitVertex();
+	gl_Position = brBPosition;
+	EmitVertex();
+	gl_Position = brMPosition;
 	EmitVertex();
 
-	gl_Position = tlLPosition;
-	EmitVertex();
-	
-	//Find color:
-	float val = .1 + (.9 * sqrt(float(s)/255.0));
-	fragColor = c * val;
+	float newdialationFactor = dialationFactor * sqrt(float(s) / 255.0);
 
+	//Find top left vertices.
+	vec4 tlLPosition = position + vec4(-width*newdialationFactor, height*newdialationFactor, 0.0, 0.0);
+
+	//Find bottom left vertices.
+	vec4 blLPosition = position + vec4(-width*newdialationFactor, -height*newdialationFactor, 0.0, 0.0);
+
+	//Find top right vertices.
+	vec4 trLPosition = position + vec4(width*newdialationFactor, height*newdialationFactor, 0.0, 0.0);
+
+	//Find bottom right vertices.
+	vec4 brLPosition = position + vec4(width*newdialationFactor, -height*newdialationFactor, 0.0, 0.0);
+
+	//Degenerate triangles:
 	EmitVertex();
-	gl_Position = trLPosition;
+	gl_Position = brLPosition;
+	EmitVertex();
+
 	EmitVertex();
 	gl_Position = blLPosition;
 	EmitVertex();
-	gl_Position = brLPosition;
+	gl_Position = trLPosition;
+	EmitVertex();
+	gl_Position = tlLPosition;
 	EmitVertex();
 
 	EndPrimitive();
