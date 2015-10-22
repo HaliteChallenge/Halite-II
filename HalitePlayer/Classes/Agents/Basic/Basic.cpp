@@ -39,7 +39,7 @@ void Basic::run()
             {
                 if(my_tag != around[toLookAt].owner)
                 {
-					moves.insert({ a->first, toLookAt + 1 });
+					moves.insert({ a->first, unsigned char(toLookAt + 1) });
 					if(short(present_map.getSite(a->first, toLookAt + 1).strength) + a->second <= 255) present_map.getSite(a->first, toLookAt + 1).strength += a->second;
 					else present_map.getSite(a->first, toLookAt + 1).strength = 255;
 					blank_found = true;

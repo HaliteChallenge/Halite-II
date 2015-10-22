@@ -17,8 +17,9 @@
 #include "GameLogic/hlt.h"
 
 
-static void serializeMap(hlt::Map & map, std::string & returnString)
+static std::string serializeMap(hlt::Map & map)
 {
+	std::string returnString = "";
     std::ostringstream oss;
     oss << map.map_width << " " << map.map_height << " ";
     
@@ -54,16 +55,20 @@ static void serializeMap(hlt::Map & map, std::string & returnString)
     }
     
     returnString = oss.str();
+
+	return returnString;
 }
 
-static void deserializeMoveSet(std::string & inputString, std::set<hlt::Move> & moves)
+static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 {
-    moves = std::set<hlt::Move>();
+    std::set<hlt::Move> moves = std::set<hlt::Move>();
     
     std::stringstream iss(inputString);
     hlt::Location l;
     unsigned char d;
     while(iss >> l.x >> l.y >> d) moves.insert({l, d});
+
+	return moves;
 }
 
 template<class type>
@@ -125,13 +130,18 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 
 static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	sendObject(s, m);
+	sendObject(s, serializeMap(m));
 
 	moves->clear();
 	clock_t initialTime = clock();
-	getObject(s, *moves);
+	std::string movesString = "";
+	getObject(s, movesString);
+	*moves = deserializeMoveSet(movesString);
+	//getObject(s, *moves);
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
+
+	std::cout << "time: " << timeElapsed << "\n";
 
 	return timeElapsed;
 }

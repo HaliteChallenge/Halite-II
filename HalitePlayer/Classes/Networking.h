@@ -17,16 +17,19 @@
 
 #include "hlt.h"
 
-static void serializeMoveSet(std::set<hlt::Move> &moves, std::string &returnString) {
+static std::string serializeMoveSet(std::set<hlt::Move> &moves) {
+	std::string returnString = "";
     std::ostringstream oss;
     for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << a->dir << " ";
     
     returnString = oss.str();
+
+	return returnString;
 }
 
-static void deserializeMap(std::string &inputString, hlt::Map &map)
+static hlt::Map deserializeMap(std::string &inputString)
 {
-    map = hlt::Map();
+    hlt::Map map = hlt::Map();
     std::stringstream iss(inputString);
     iss >> map.map_width >> map.map_height;
     map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0 }));
@@ -56,6 +59,8 @@ static void deserializeMap(std::string &inputString, hlt::Map &map)
             iss >> map.contents[a][b].strength;
         }
     }
+
+	return map;
 }
 
 template<class type>
@@ -155,13 +160,18 @@ static void sendInitResponse(boost::asio::ip::tcp::socket *s)
 
 static void getFrame(boost::asio::ip::tcp::socket *s, hlt::Map& m)
 {
-    getObject(s, m);
+	std::string mapString = "";
+    getObject(s, mapString);
+	m = deserializeMap(mapString);
 }
 
-static void sendFrame(boost::asio::ip::tcp::socket *s, const std::set<hlt::Move>& moves)
+static void sendFrame(boost::asio::ip::tcp::socket *s, std::set<hlt::Move>& moves)
 {
 	std::cout << "Send frame\n";
-    sendObject(s, moves);
+	std::string movesString = "";
+	
+    sendObject(s, serializeMoveSet(moves));
+	//sendObject(s, moves);
 }
 
 #endif
