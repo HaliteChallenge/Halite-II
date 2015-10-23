@@ -267,6 +267,8 @@ void render()
 
 void doLogic()
 {
-	std::string winner = my_game->runGame();
-	if(winner != "") std::cout << "Player " << winner << " has won the game!\n";
+	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
+	std::string victoryOut{};
+	for (unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player " + rankings[a].first + " with a relative score of " + std::to_string(rankings[a].second) + ".\n";
+	std::cout << victoryOut;
 }

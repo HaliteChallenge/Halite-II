@@ -484,7 +484,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	{
 		relativeScores[a] = std::pair<std::string, float>(player_names[a], round(1000.0 * float(territory_count[a]) / maxValue) / 1000.0);
 	}
-	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<unsigned char, float> & a, const std::pair<unsigned char, float> & b) -> bool { return a.second < b.second; });
+	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<std::string, float> & a, const std::pair<std::string, float> & b) -> bool { return a.second < b.second; });
 	return relativeScores;
 }
 
