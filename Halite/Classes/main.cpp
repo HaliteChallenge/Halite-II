@@ -16,7 +16,7 @@ void render();
 void doLogic();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed;
+bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed = false, newGame = false;
 signed short turn_number = 0;
 float maxFps = 20;
 
@@ -71,6 +71,7 @@ int main(int argc, char* args[])
 				std::getline(std::cin, in);
 			}
 		}
+		newGame = true;
 	}
 
 	// start GL context and O/S window using the GLFW helper library
@@ -101,9 +102,9 @@ int main(int argc, char* args[])
 
 	//Set handlers:
 
-	//Set (presently broken) leopard handler.
+	//Set leopard handler.
 	glfwSetKeyCallback(window, handleKeys);
-	//Set (presently funciotnal) character handler.
+	//Set character handler.
 	glfwSetCharCallback(window, handleChars);
 	//Set mouse handler
 	glfwSetMouseButtonCallback(window, handleMouse);
@@ -229,7 +230,7 @@ void handleChars(GLFWwindow * w, unsigned int code)
 		turn_number--;
 		isPaused = true;
 	}
-	else if(code == 'o' || code == 'O')
+	else if(code == 'o' || code == 'O' && newGame)
 	{
 		my_game->output(filename);
 	}

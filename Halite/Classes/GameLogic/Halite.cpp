@@ -116,7 +116,7 @@ void Halite::clearFullGame()
 	full_game.clear();
 }
 
-unsigned char Halite::getNextFrame()
+unsigned char Halite::getNextFrame(bool requireAnswer)
 {
 	if(game_map.map_width == 0 || game_map.map_height == 0) return 255;
 
@@ -128,14 +128,14 @@ unsigned char Halite::getNextFrame()
 	}
 
 	//Find the locations of all of the pieces the players had before they made their moves
-	std::vector<unsigned short> numSentient(number_of_players, 0);
+	std::vector<unsigned short> numPieces(number_of_players, 0);
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		//If sentient
 		if(game_map.contents[a][b].owner != 0)
 		{
 			//Add to number of pieces controlled by player.
-			numSentient[game_map.contents[a][b].owner - 1]++;
+			numPieces[game_map.contents[a][b].owner - 1]++;
 		}
 	}
 
@@ -143,7 +143,10 @@ unsigned char Halite::getNextFrame()
 	std::vector<double> allowableTimesToRespond(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
 	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
-	//allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numSentient[a]) * numSentient[a] * .0001);
+	//allowableTimesToRespond[a] = 0.01 + (double(game_map.map_height)*game_map.map_width*.00001) + (double(numPieces[a]) * numPieces[a] * .0001);
+
+	//Add on numPieces to territory_count.
+	for(unsigned char a = 0; a < number_of_players; a++) territory_count[a] += numPieces[a];
 
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
 
@@ -187,7 +190,7 @@ unsigned char Halite::getNextFrame()
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).strength != 255 && game_map.getSite(l, STILL).owner != 0) game_map.getSite(l, STILL).strength++;
+		if(game_map.getSite(l, STILL).strength != 255 && !(game_map.getSite(l, STILL).strength == 1 && game_map.getSite(l, STILL).owner == 0)) game_map.getSite(l, STILL).strength++;
 		hlt::Site s = game_map.getSite(l, STILL);
 		if(s.owner != 255)
 		{
@@ -261,12 +264,12 @@ unsigned char Halite::getNextFrame()
 		}
 	}
 
-	//Injure and/or delete pieces.
+	//Injure and/or delete pieces. Note > rather than >= indicates that pieces with a strength of 0 are not killed.
 	for(unsigned char a = 0; a < number_of_players + 1; a++)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
-			if(b->second >= pieces[a][b->first]) pieces[a].erase(b->first);
+			if(b->second > pieces[a][b->first]) pieces[a].erase(b->first);
 			else pieces[a][b->first] -= b->second;
 		}
 	}
@@ -286,20 +289,24 @@ unsigned char Halite::getNextFrame()
 	//Add game map to full game
 	full_game.push_back(new hlt::Map(game_map));
 
-	//Increment turn number:
-	turn_number++;
-
 	//Check if the game is over:
-	unsigned char first_found = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	if(requireAnswer)
 	{
-		if(b->owner != first_found && b->owner != 0)
-		{
-			if(first_found == 0) first_found = b->owner;
-			else return 0; //Multiple people still alive
-		}
+		return 255;
 	}
-	return first_found; //If returns 0, that means NOBODY is alive. If it returns something else, they are the winner.
+	else
+	{
+		unsigned char first_found = 0;
+		for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+		{
+			if(b->owner != first_found && b->owner != 0)
+			{
+				if(first_found == 0) first_found = b->owner;
+				else return 0; //Multiple people still alive
+			}
+		}
+		return first_found; //If returns 0, that means NOBODY is alive. If it returns something else, they are the winner.
+	}
 }
 
 //Public Functions:
@@ -426,6 +433,9 @@ Halite::Halite(unsigned short w, unsigned short h)
     
     //Initialize player moves vector
     player_moves.resize(number_of_players);
+
+	//Initialize player territory_count vector.
+	territory_count = std::vector<unsigned int>(number_of_players, 1);
     
     //Add game map to full game
 	full_game.push_back(new hlt::Map(game_map));
@@ -453,12 +463,29 @@ void Halite::confirmWithinGame(signed short& turnNumber)
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 }
 
-std::string Halite::runGame()
+std::vector< std::pair<std::string, float> > Halite::runGame()
 {
 	unsigned short result = 0;
-	while(result == 0) result = getNextFrame();
-	if(result == 255) return "";
-	return player_names[result - 1];
+	while(result == 0)
+	{
+		//Increment turn number:
+		turn_number++;
+		//Frame logic.
+		getNextFrame(turn_number >= 1000);
+	}
+	if(turn_number < 1000)
+	{
+		//Use result:
+		territory_count[result - 1] += (1000 - turn_number)*game_map.map_width*game_map.map_height;
+	}
+	unsigned int maxValue = *std::max_element(territory_count.begin(), territory_count.end());
+	std::vector< std::pair<std::string, float> > relativeScores(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		relativeScores[a] = std::pair<std::string, float>(player_names[a], round(1000.0 * float(territory_count[a]) / maxValue) / 1000.0);
+	}
+	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<unsigned char, float> & a, const std::pair<unsigned char, float> & b) -> bool { return a.second < b.second; });
+	return relativeScores;
 }
 
 void Halite::render(short& turnNumber)

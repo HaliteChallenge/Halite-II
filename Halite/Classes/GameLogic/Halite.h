@@ -26,17 +26,18 @@ private:
     std::vector<hlt::Map * > full_game;
     std::vector<boost::asio::ip::tcp::socket *> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
+	std::vector<unsigned int> territory_count;
     
 	GLuint vertex_buffer, color_buffer, strength_buffer, vertex_attributes, vertex_shader, geometry_shader, fragment_shader, shader_program;
 	void loadColorCodes();
 	void setupRendering(unsigned short width, unsigned short height);
 	void clearFullGame();
-    unsigned char getNextFrame();
+    unsigned char getNextFrame(bool requireAnswer);
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
     void init();
-    std::string runGame();
+	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
 	void render(short& turnNumber);
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
