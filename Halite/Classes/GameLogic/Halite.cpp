@@ -292,7 +292,7 @@ unsigned char Halite::getNextFrame(bool requireAnswer)
 	//Check if the game is over:
 	if(requireAnswer)
 	{
-		return 255;
+		return 0;
 	}
 	else
 	{
@@ -302,7 +302,7 @@ unsigned char Halite::getNextFrame(bool requireAnswer)
 			if(b->owner != first_found && b->owner != 0)
 			{
 				if(first_found == 0) first_found = b->owner;
-				else return 0; //Multiple people still alive
+				else return 255; //Multiple people still alive
 			}
 		}
 		return first_found; //If returns 0, that means NOBODY is alive. If it returns something else, they are the winner.
@@ -465,13 +465,13 @@ void Halite::confirmWithinGame(signed short& turnNumber)
 
 std::vector< std::pair<std::string, float> > Halite::runGame()
 {
-	unsigned short result = 0;
-	while(result == 0)
+	unsigned short result = 255;
+	while(result == 255)
 	{
 		//Increment turn number:
 		turn_number++;
 		//Frame logic.
-		getNextFrame(turn_number >= 1000);
+		result = getNextFrame(turn_number >= 1000);
 	}
 	if(turn_number < 1000)
 	{
@@ -484,7 +484,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	{
 		relativeScores[a] = std::pair<std::string, float>(player_names[a], round(1000.0 * float(territory_count[a]) / maxValue) / 1000.0);
 	}
-	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<std::string, float> & a, const std::pair<std::string, float> & b) -> bool { return a.second < b.second; });
+	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<std::string, float> & a, const std::pair<std::string, float> & b) -> bool { return a.second > b.second; });
 	return relativeScores;
 }
 
