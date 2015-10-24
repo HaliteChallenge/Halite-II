@@ -26,13 +26,13 @@ private:
     std::vector<hlt::Map * > full_game;
     std::vector<boost::asio::ip::tcp::socket *> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
-	std::vector<unsigned int> territory_count;
+	std::vector<unsigned int> attack_count;
     
 	GLuint vertex_buffer, color_buffer, strength_buffer, vertex_attributes, vertex_shader, geometry_shader, fragment_shader, shader_program;
 	void loadColorCodes();
 	void setupRendering(unsigned short width, unsigned short height);
 	void clearFullGame();
-    unsigned char getNextFrame(bool requireAnswer);
+    std::vector<bool> getNextFrame();
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
