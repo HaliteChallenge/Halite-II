@@ -36,7 +36,7 @@ static std::string serializeMap(hlt::Map & map)
             }
             else
             {
-                oss << counter << " " << currentOwner << " ";
+                oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
                 counter = 1;
                 currentOwner = map.contents[a][b].owner;
             }
@@ -50,7 +50,7 @@ static std::string serializeMap(hlt::Map & map)
     {
         for (int b = 0; b < map.contents[a].size(); ++b)
         {
-            oss << map.contents[a][b].strength << " ";
+            oss << (unsigned short)map.contents[a][b].strength << " ";
         }
     }
     

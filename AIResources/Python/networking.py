@@ -10,7 +10,7 @@ def serializeMoveSet(moves):
 	return returnString
 
 def deserializeMap(inputString):
-	
+	print(inputString)
 	splitString = inputString.split(" ")
 
 	width = int(splitString.pop(0))
@@ -34,7 +34,7 @@ def deserializeMap(inputString):
 
 	for a in range(0, len(m.contents)): 
 		for b in range(0, len(m.contents[a])):
-			m.contents[a][b].strength = ord(splitString.pop(0))
+			m.contents[a][b].strength = int(splitString.pop(0))
 
 	return m
 
@@ -48,7 +48,7 @@ def getString(s):
 	header = int.from_bytes(headerString, byteorder="little")
 	print("Header: %d" % header)
 	received = s.recv(header*128)
-	return received.decode("ISO-8859-1")
+	return received.decode()
 
 def connectToGame():
 	while True:
