@@ -20,7 +20,7 @@
 static std::string serializeMoveSet(std::set<hlt::Move> &moves) {
 	std::string returnString = "";
     std::ostringstream oss;
-    for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << a->dir << " ";
+    for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
     
     returnString = oss.str();
 
@@ -63,37 +63,20 @@ static hlt::Map deserializeMap(std::string &inputString)
 	return map;
 }
 
-template<class type>
-static void sendObject(boost::asio::ip::tcp::socket *s, const type &sendingObject)
-{
-    boost::asio::streambuf buf;
-    std::ostream os( &buf );
-    boost::archive::text_oarchive ar( os, boost::archive::archive_flags::no_header);
-    ar << sendingObject;
-    
-    size_t header = buf.size();
-    
-    std::vector<boost::asio::const_buffer> buffers;
-    buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
-    buffers.push_back( buf.data() );
-    boost::asio::write(*s, buffers);
+static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
+	size_t length = sendString.length();
+	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));
+	boost::asio::write(*s, boost::asio::buffer(sendString));
 }
 
-template<class type>
-static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
-{
-    size_t header;
-    boost::asio::read(*s, boost::asio::buffer(&header, sizeof(header)));
-    
-    boost::asio::streambuf buf;
-    int len = boost::asio::read(*s, buf.prepare( header ));
-	std::cout << "bytes: " << len << "\n";
+static std::string getString(boost::asio::ip::tcp::socket * s) {
+	size_t numChars;
+	boost::asio::read(*s, boost::asio::buffer(&numChars, sizeof(numChars)));
 
-    buf.commit( header );
+	std::vector<char> stringVector(numChars);
+	boost::asio::read(*s, boost::asio::buffer(stringVector));
 
-    std::istream is(&buf);
-    boost::archive::text_iarchive ar(is, boost::archive::archive_flags::no_header);
-    ar >> receivingObject;
+	return std::string(stringVector.begin(), stringVector.end());
 }
 
 static boost::asio::ip::tcp::socket * connectToGame()
@@ -147,22 +130,20 @@ static void getInit(boost::asio::ip::tcp::socket *s, unsigned char& playerTag, h
 {
 	std::cout << "Get init\n";
     
-    getObject(s, playerTag);
-	getObject(s, m);
+    playerTag = (unsigned char)std::stoi(getString(s));
+	m = deserializeMap(getString(s));
 }
 
 static void sendInitResponse(boost::asio::ip::tcp::socket *s)
 {
 	std::cout << "Send init\n";
     std::string response = "Done";
-    sendObject(s, response);
+    sendString(s, response);
 }
 
 static void getFrame(boost::asio::ip::tcp::socket *s, hlt::Map& m)
 {
-	std::string mapString = "";
-    getObject(s, mapString);
-	m = deserializeMap(mapString);
+	m = deserializeMap(getString(s));
 }
 
 static void sendFrame(boost::asio::ip::tcp::socket *s, std::set<hlt::Move>& moves)
@@ -170,8 +151,7 @@ static void sendFrame(boost::asio::ip::tcp::socket *s, std::set<hlt::Move>& move
 	std::cout << "Send frame\n";
 	std::string movesString = "";
 	
-    sendObject(s, serializeMoveSet(moves));
-	//sendObject(s, moves);
+    sendString(s, serializeMoveSet(moves));
 }
 
 #endif

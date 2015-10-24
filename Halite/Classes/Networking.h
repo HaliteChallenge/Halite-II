@@ -87,47 +87,12 @@ static std::string getString(boost::asio::ip::tcp::socket * s) {
 	return std::string(stringVector.begin(), stringVector.end());
 }
 
-template<class type>
-static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObject)
-{
-    boost::asio::streambuf buf;
-    std::ostream os( &buf );
-    boost::archive::text_oarchive ar( os, boost::archive::archive_flags::no_header);
-    ar << sendingObject;
-    
-    size_t header = buf.size();
-    
-    // send header and buffer using scatter
-    std::vector<boost::asio::const_buffer> buffers;
-    buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
-    buffers.push_back( buf.data() );
-    int len = boost::asio::write(*s, buffers);
-}
-
-template<class type>
-static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
-{
-    size_t header;
-	boost::asio::read(*s, boost::asio::buffer(&header, sizeof(header)));
-    
-    boost::asio::streambuf buf;
-    boost::asio::read(*s, buf.prepare( header ));
-
-    buf.commit( header );
-    
-    std::istream is( &buf );
-    boost::archive::text_iarchive ar( is, boost::archive::archive_flags::no_header);
-    ar >> receivingObject;
-}
-
 static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned char playerTag, std::string name, hlt::Map & m)
 {
     using boost::asio::ip::tcp;
 
 	sendString(s, std::to_string(playerTag));
 	sendString(s, serializeMap(m));
-    //sendObject(s, playerTag);
-	//sendObject(s, m);
     
     std::string str = "Init Message sent to player " + name + "\n";
     std::cout << str;
@@ -135,10 +100,11 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
     std::string receiveString = "";
     
     clock_t initialTime = clock();
-    //getObject(s, receiveString);
+
 	receiveString = getString(s);
     str = "Init Message received from player " + name + "\n";
     std::cout << str;
+
     clock_t finalTime = clock() - initialTime;
     double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
     
@@ -148,16 +114,16 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 
 static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	///sendObject(s, serializeMap(m));
 	sendString(s, serializeMap(m));
 
 	moves->clear();
+
 	clock_t initialTime = clock();
+
 	std::string movesString = "";
-	///getObject(s, movesString);
 	movesString = getString(s);
 	*moves = deserializeMoveSet(movesString);
-	//getObject(s, *moves);
+
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 
