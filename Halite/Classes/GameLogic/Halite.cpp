@@ -184,6 +184,9 @@ unsigned char Halite::getNextFrame(bool requireAnswer)
 			//Erase from oldPieces. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
 			game_map.getSite(b->loc, STILL) = { 255, 0 };
 		}
+		else {
+			std::cout << "Invalid move!!! " << b->loc.x << " " << b->loc.y << "\n";
+		}
 	}
 
 	//Add in all of the remaining pieces whose moves weren't specified. 

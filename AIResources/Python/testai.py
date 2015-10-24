@@ -5,13 +5,13 @@ sock = connectToGame()
 playerTag, gameMap = getInit(sock)
 sendInit(sock)
 
-moves = []
-
 while True:
+	moves = []
 	gameMap = getFrame(sock)
-	for a in range(0, len(gameMap.contents)):
-		for b in range(0, len(gameMap.contents[a])):
-			site = gameMap.contents[a][b]
+	for y in range(0, len(gameMap.contents)):
+		for x in range(0, len(gameMap.contents[y])):
+			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
-				moves.append(Move(Location(b, a), 1))
+				moves.append(Move(Location(x, y), 2))
+				print("loc: %d, %d " % (x, y))
 	sendFrame(sock, moves)

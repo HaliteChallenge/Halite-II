@@ -65,14 +65,14 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
     
     std::stringstream iss(inputString);
     hlt::Location l;
-    unsigned char d;
-    while(iss >> l.x >> l.y >> d) moves.insert({l, d});
+    int d;
+    while(iss >> l.x >> l.y >> d) moves.insert({l, (unsigned char)d});
 
 	return moves;
 }
 
 static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
-	int length = sendString.length();
+	size_t length = sendString.length();
 	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));
 	boost::asio::write(*s, boost::asio::buffer(sendString));
 }
@@ -102,7 +102,6 @@ static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObje
     buffers.push_back( boost::asio::buffer(&header, sizeof(header)) );
     buffers.push_back( buf.data() );
     int len = boost::asio::write(*s, buffers);
-	///std::cout << "len: " << len << "\n";
 }
 
 template<class type>
@@ -124,7 +123,7 @@ static void getObject(boost::asio::ip::tcp::socket *s, type &receivingObject)
 static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned char playerTag, std::string name, hlt::Map & m)
 {
     using boost::asio::ip::tcp;
-    
+
 	sendString(s, std::to_string(playerTag));
 	sendString(s, serializeMap(m));
     //sendObject(s, playerTag);
@@ -149,18 +148,18 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 
 static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	sendObject(s, serializeMap(m));
+	///sendObject(s, serializeMap(m));
+	sendString(s, serializeMap(m));
 
 	moves->clear();
 	clock_t initialTime = clock();
 	std::string movesString = "";
-	getObject(s, movesString);
+	///getObject(s, movesString);
+	movesString = getString(s);
 	*moves = deserializeMoveSet(movesString);
 	//getObject(s, *moves);
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
-
-	std::cout << "time: " << timeElapsed << "\n";
 
 	return timeElapsed;
 }
