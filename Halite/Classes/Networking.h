@@ -71,6 +71,22 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 	return moves;
 }
 
+static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
+	int length = sendString.length();
+	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));
+	boost::asio::write(*s, boost::asio::buffer(sendString));
+}
+
+static std::string getString(boost::asio::ip::tcp::socket * s) {
+	size_t numChars;
+	boost::asio::read(*s, boost::asio::buffer(&numChars, sizeof(numChars)));
+
+	std::vector<char> stringVector(numChars);
+	boost::asio::read(*s, boost::asio::buffer(stringVector));
+
+	return std::string(stringVector.begin(), stringVector.end());
+}
+
 template<class type>
 static void sendObject(boost::asio::ip::tcp::socket * s, const type &sendingObject)
 {
@@ -109,8 +125,10 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
 {
     using boost::asio::ip::tcp;
     
-    sendObject(s, playerTag);
-	sendObject(s, m);
+	sendString(s, std::to_string(playerTag));
+	sendString(s, serializeMap(m));
+    //sendObject(s, playerTag);
+	//sendObject(s, m);
     
     std::string str = "Init Message sent to player " + name + "\n";
     std::cout << str;
@@ -118,7 +136,8 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
     std::string receiveString = "";
     
     clock_t initialTime = clock();
-    getObject(s, receiveString);
+    //getObject(s, receiveString);
+	receiveString = getString(s);
     str = "Init Message received from player " + name + "\n";
     std::cout << str;
     clock_t finalTime = clock() - initialTime;

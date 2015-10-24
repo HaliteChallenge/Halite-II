@@ -400,7 +400,10 @@ Halite::Halite(unsigned short w, unsigned short h)
 
         tcp::socket *socket = new tcp::socket(*io_service);
 		tcp::socket &referenceSocket = *socket;
-		acceptor.accept(referenceSocket);
+
+		std::cout << "Waiting to accept\n";
+		acceptor.accept(*socket);
+		std::cout << "Accepted\n";
 
         player_connections.push_back(socket);
         
