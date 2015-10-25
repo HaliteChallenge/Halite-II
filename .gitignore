@@ -203,3 +203,4 @@ FakesAssemblies/
 *.vcxproj.filters
 *.vcxproj
 *.sln
+Halite/Halite.exe

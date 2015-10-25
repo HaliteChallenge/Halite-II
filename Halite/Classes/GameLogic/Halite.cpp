@@ -178,11 +178,8 @@ std::vector<bool> Halite::getNextFrame()
 				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
 			}
 
-			//Erase from oldPieces. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
+			//Erase from the game map so that the player can't make another move with the same piece. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
 			game_map.getSite(b->loc, STILL) = { 255, 0 };
-		}
-		else {
-			std::cout << "Invalid move!!! " << b->loc.x << " " << b->loc.y << "\n";
 		}
 	}
 
@@ -208,7 +205,7 @@ std::vector<bool> Halite::getNextFrame()
 
 	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players + 1); //This is a short so that we don't have to worry about 255 overflows.
 
-	//Sweep through locations and find the correct damage for each piece. accordingly.   ---   std::min(pieces[d][tempLoc], pieces[c][l]
+	//Sweep through locations and find the correct damage for each piece. accordingly.   ---   std::min(pieces[d][tempLoc], pieces[c][l])
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
@@ -220,6 +217,8 @@ std::vector<bool> Halite::getNextFrame()
 				//Check 'STILL' square:
 				if(pieces[d].count(tempLoc))
 				{
+					//Add to damage total, but only if it's not the null player:
+					if(c != 0) attack_count[c - 1] += pieces[d][tempLoc] > pieces[c][l] ? pieces[c][l] : pieces[d][tempLoc];
 					//Apply damage, but not more than they have strength:
 					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
@@ -231,6 +230,8 @@ std::vector<bool> Halite::getNextFrame()
 					tempLoc = game_map.getLocation(l, NORTH);
 					if(pieces[d].count(tempLoc))
 					{
+						//Add to damage total:
+						attack_count[c - 1] += pieces[d][tempLoc] > pieces[c][l] ? pieces[c][l] : pieces[d][tempLoc];
 						//Apply damage, but not more than they have strength:
 						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
@@ -239,6 +240,8 @@ std::vector<bool> Halite::getNextFrame()
 					tempLoc = game_map.getLocation(l, EAST);
 					if(pieces[d].count(tempLoc))
 					{
+						//Add to damage total:
+						attack_count[c - 1] += pieces[d][tempLoc] > pieces[c][l] ? pieces[c][l] : pieces[d][tempLoc];
 						//Apply damage, but not more than they have strength:
 						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
@@ -247,6 +250,8 @@ std::vector<bool> Halite::getNextFrame()
 					tempLoc = game_map.getLocation(l, SOUTH);
 					if(pieces[d].count(tempLoc))
 					{
+						//Add to damage total:
+						attack_count[c - 1] += pieces[d][tempLoc] > pieces[c][l] ? pieces[c][l] : pieces[d][tempLoc];
 						//Apply damage, but not more than they have strength:
 						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
@@ -255,6 +260,8 @@ std::vector<bool> Halite::getNextFrame()
 					tempLoc = game_map.getLocation(l, WEST);
 					if(pieces[d].count(tempLoc))
 					{
+						//Add to damage total:
+						attack_count[c - 1] += pieces[d][tempLoc] > pieces[c][l] ? pieces[c][l] : pieces[d][tempLoc];
 						//Apply damage, but not more than they have strength:
 						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
 						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
@@ -264,13 +271,13 @@ std::vector<bool> Halite::getNextFrame()
 		}
 	}
 
-	//Injure and/or delete pieces. Note > rather than >= indicates that pieces with a strength of 0 are not killed.
+	//Injure and/or delete pieces. Note >= rather than > indicates that pieces with a strength of 0 are killed.
 	for(unsigned char a = 0; a < number_of_players + 1; a++)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
 			if(a != 0) attack_count[a - 1] += b->second;
-			if(b->second > pieces[a][b->first]) pieces[a].erase(b->first);
+			if(b->second >= pieces[a][b->first]) pieces[a].erase(b->first);
 			else pieces[a][b->first] -= b->second;
 		}
 	}
