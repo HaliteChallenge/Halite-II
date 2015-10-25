@@ -56,7 +56,9 @@ static hlt::Map deserializeMap(std::string &inputString)
     {
         for (int b = 0; b < map.contents[a].size(); ++b) 
         {
-            iss >> map.contents[a][b].strength;
+			short strengthShort;
+            iss >> strengthShort;
+			map.contents[a][b].strength = strengthShort;
         }
     }
 

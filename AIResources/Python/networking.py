@@ -10,7 +10,6 @@ def serializeMoveSet(moves):
 	return returnString
 
 def deserializeMap(inputString):
-	print(inputString)
 	splitString = inputString.split(" ")
 
 	width = int(splitString.pop(0))
