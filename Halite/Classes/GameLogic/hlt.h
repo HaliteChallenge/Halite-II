@@ -62,7 +62,11 @@ namespace hlt
 	{
 	public:
 		std::vector< std::vector<Site> > contents;
-		unsigned short map_width, map_height; //Number of rows & columns, NOT maximum index.
+		unsigned short map_width, map_height; //Number of rows and columns, NOT maximum index.
+
+		//These are statistics that are stored in the map so they don't have to be recalculated, since it's very little memory and it's expensive to recalculate.
+		std::vector<unsigned int> territory_count;
+		std::vector<unsigned int> strength_count;
 
 		Map()
 		{
@@ -75,6 +79,8 @@ namespace hlt
 			map_width = otherMap.map_width;
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
+			territory_count = otherMap.territory_count;
+			strength_count = otherMap.strength_count;
 		}
 		Map(short width, short height, unsigned char numberOfPlayers)
 		{
@@ -165,6 +171,23 @@ namespace hlt
 		{
 			l = getLocation(l, direction);
 			return contents[l.y][l.x];
+		}
+		void getStatistics()
+		{
+			territory_count = std::vector<unsigned int>(254, 0);
+			strength_count = std::vector<unsigned int>(254, 0);
+			for(unsigned short a = 0; a < map_height; a++) for(unsigned short b = 0; b < map_width; b++) if(contents[a][b].owner != 0)
+			{
+				territory_count[contents[a][b].owner - 1]++;
+				strength_count[contents[a][b].owner - 1] += contents[a][b].strength;
+			}
+			while(territory_count.back() == 0)
+			{
+				territory_count.pop_back();
+				strength_count.pop_back();
+			}
+			territory_count.shrink_to_fit();
+			strength_count.shrink_to_fit();
 		}
 
 	private:
