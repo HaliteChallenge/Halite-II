@@ -28,9 +28,17 @@ private:
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
     
-	GLuint vertex_buffer, color_buffer, strength_buffer, vertex_attributes, vertex_shader, geometry_shader, fragment_shader, shader_program;
+	//Map rendering
+	GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;
+
+	//Graph rendering
+	GLuint graph_vertex_buffer, graph_color_buffer, graph_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
+	//Number of frames in graph. This lets us know if we need to redo the setup for the graph.
+	unsigned short graph_frame_number;
+
 	void loadColorCodes();
-	void setupRendering(unsigned short width, unsigned short height);
+	void setupMapRendering(unsigned short width, unsigned short height);
+	void setupGraphRendering();
 	void clearFullGame();
     std::vector<bool> getNextFrame(std::vector<bool> alive);
 public:
@@ -39,8 +47,8 @@ public:
     void init();
 	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
-	void render(short& turnNumber);
-	void renderStatistics();
+	void renderMap(short& turnNumber);
+	void renderGraph();
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);
 	std::map<unsigned char, hlt::Color> getColorCodes();
