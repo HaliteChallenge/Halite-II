@@ -181,7 +181,7 @@ namespace hlt
 				territory_count[contents[a][b].owner - 1]++;
 				strength_count[contents[a][b].owner - 1] += contents[a][b].strength;
 			}
-			while(territory_count.back() == 0)
+			while(territory_count.size() != 0 && territory_count.back() == 0)
 			{
 				territory_count.pop_back();
 				strength_count.pop_back();
