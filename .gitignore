@@ -225,3 +225,6 @@ hs_err_pid*
 *.ctxt
 *.bluej
 .DS_Store
+
+
+Halite/Halite.exe

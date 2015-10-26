@@ -32,7 +32,7 @@ private:
 	void loadColorCodes();
 	void setupRendering(unsigned short width, unsigned short height);
 	void clearFullGame();
-    std::vector<bool> getNextFrame();
+    std::vector<bool> getNextFrame(std::vector<bool> alive);
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
@@ -40,9 +40,10 @@ public:
 	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
 	void render(short& turnNumber);
+	void renderStatistics();
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);
-    void getColorCodes();
+	std::map<unsigned char, hlt::Color> getColorCodes();
 	~Halite();
 };
 
