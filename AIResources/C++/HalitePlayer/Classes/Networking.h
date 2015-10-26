@@ -151,8 +151,6 @@ static void getFrame(boost::asio::ip::tcp::socket *s, hlt::Map& m)
 static void sendFrame(boost::asio::ip::tcp::socket *s, std::set<hlt::Move>& moves)
 {
 	std::cout << "Send frame\n";
-	std::string movesString = "";
-	
     sendString(s, serializeMoveSet(moves));
 }
 
