@@ -40,7 +40,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 	glGenBuffers(1, &map_strength_buffer);
 	glGenVertexArrays(1, &map_vertex_attributes);
 
-	//Generate vertices of centers of squares:
+	//Generate vertices of centers of squares.
 	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
 	float xLoc = -1.0 + 1.0 / width, yLoc = 1.0 - 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
 	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
@@ -109,9 +109,9 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
 
 	//Cleanup - delete shaders
-	//glDeleteShader(map_vertex_shader);
-	//glDeleteShader(map_geometry_shader);
-	//glDeleteShader(map_fragment_shader);
+	glDeleteShader(map_vertex_shader);
+	glDeleteShader(map_geometry_shader);
+	glDeleteShader(map_fragment_shader);
 }
 
 void Halite::setupGraphRendering()
@@ -132,6 +132,8 @@ void Halite::setupGraphRendering()
 	//Bind vertex attribute object.
 	glBindVertexArray(graph_vertex_attributes);
 
+//We're having problems, so I'm just gonna draw a single square now to attempt to see what's going on.
+
 	//Set the number of frames the graph will handle. Also prevents race conditions with full_game by not using iterators, but rather up to a numeric frame.
 	graph_frame_number = full_game.size();
 
@@ -143,9 +145,9 @@ void Halite::setupGraphRendering()
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > maxTerritoryValue) maxTerritoryValue = full_game[b]->territory_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphVertices(unsigned int(number_of_players) * graph_frame_number * 2);
+	std::vector<float> graphVertices(8);// unsigned int(number_of_players) * graph_frame_number * 2);
 
-	//Set vertices by player:
+	/*TRY NEW VERTEX DATA: Set vertices by player:
 	unsigned int graphVerticesLoc = 0; //Location in graphVertices.
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
 	{
@@ -153,7 +155,16 @@ void Halite::setupGraphRendering()
 		if(full_game[b]->territory_count.size() > a) graphVertices[graphVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
 		else graphVertices[graphVerticesLoc + 1] = GRAPH_BOTTOM;
 		graphVerticesLoc += 2;
-	}
+	}*/
+
+	graphVertices[0] = -0.5;
+	graphVertices[1] = -0.5;
+	graphVertices[2] = 0.5;
+	graphVertices[3] = -0.5;
+	graphVertices[4] = -0.5;
+	graphVertices[5] = 0.5;
+	graphVertices[6] = 0.5;
+	graphVertices[7] = 0.5;
 
 	//Set vertices in buffer object
 	glBindBuffer(graph_vertex_buffer, GL_ARRAY_BUFFER);
@@ -162,9 +173,9 @@ void Halite::setupGraphRendering()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector representing color data:
-	std::vector<float> graphColors(unsigned int(number_of_players) * graph_frame_number * 3, 1.0);
+	std::vector<float> graphColors(12);//unsigned int(number_of_players) * graph_frame_number * 3, 1.0);
 
-	/*Set color data:
+	/* TRY NEW COLORS: Set color data:
 	unsigned int graphColorsLoc = 0; //Location in graphColors.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -177,6 +188,18 @@ void Halite::setupGraphRendering()
 			graphColorsLoc += 3;
 		}
 	}*/
+	graphColors[0] = 1.0;
+	graphColors[1] = .0;
+	graphColors[2] = .0;
+	graphColors[3] = 1.0;
+	graphColors[4] = 1.0;
+	graphColors[5] = .0;
+	graphColors[6] = .0;
+	graphColors[7] = .0;
+	graphColors[8] = 1.0;
+	graphColors[9] = .0;
+	graphColors[10] = 1.0;
+	graphColors[11] = 1.0;
 
 	//Set colors in buffer object
 	glBindBuffer(graph_color_buffer, GL_ARRAY_BUFFER);
@@ -199,8 +222,8 @@ void Halite::setupGraphRendering()
 	glDetachShader(graph_shader_program, graph_fragment_shader);
 
 	//Cleanup - delete shaders
-	//glDeleteShader(graph_vertex_shader);
-	//glDeleteShader(graph_fragment_shader);
+	glDeleteShader(graph_vertex_shader);
+	glDeleteShader(graph_fragment_shader);
 }
 
 void Halite::clearFullGame()
@@ -587,7 +610,6 @@ void Halite::renderMap(short& turnNumber)
 	if(!full_game.empty())
 	{
 		hlt::Map * m = full_game[turnNumber];
-		//setupMapRendering(m->map_width, m->map_height);
 
 		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
 		std::vector<unsigned int> strengths(unsigned int(m->map_width) * m->map_height);
@@ -625,7 +647,8 @@ void Halite::renderGraph()
 	if(graph_frame_number < full_game.size()) setupGraphRendering();
 	glUseProgram(graph_shader_program);
 	glBindVertexArray(graph_vertex_attributes);
-	for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
+	//for(unsigned char a = 0; a < number_of_players; a++)
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);//a * graph_frame_number, graph_frame_number);
 }
 
 bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
@@ -669,7 +692,7 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 	full_game.pop_back();
 
 	setupMapRendering(full_game[0]->map_width, full_game[0]->map_height);
-	//setupGraphRendering();
+	setupGraphRendering();
 
 	game_file.close();
 
