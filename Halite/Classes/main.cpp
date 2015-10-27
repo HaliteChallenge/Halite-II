@@ -268,7 +268,7 @@ void render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if(mapNotGraph) my_game->renderMap(turn_number);
-	else my_game->renderGraph(territoryNotStrength);
+	else my_game->renderGraph(territoryNotStrength, turn_number);
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);
