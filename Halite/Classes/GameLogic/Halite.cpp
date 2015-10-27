@@ -164,7 +164,7 @@ void Halite::setupGraphRendering()
 	graphBorderBufferValues[18] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[19] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[20] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[21] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[22] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[23] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[24] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[25] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[26] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[27] = STRENGTH_GRAPH_TOP;
 
 	//Create map borders:
-	graphBorderBufferValues[28] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[29] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[30] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[31] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[32] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[33] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[34] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[35] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[36] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[37] = STRENGTH_GRAPH_TOP;
+	graphBorderBufferValues[28] = MAP_LEFT; graphBorderBufferValues[29] = MAP_TOP; graphBorderBufferValues[30] = MAP_LEFT; graphBorderBufferValues[31] = MAP_BOTTOM; graphBorderBufferValues[32] = MAP_RIGHT; graphBorderBufferValues[33] = MAP_BOTTOM; graphBorderBufferValues[34] = MAP_RIGHT; graphBorderBufferValues[35] = MAP_TOP; graphBorderBufferValues[36] = MAP_LEFT; graphBorderBufferValues[37] = MAP_TOP;
 
 	for(unsigned short a = 38; a < 95; a++) graphBorderBufferValues[a] = 1.0;
 
