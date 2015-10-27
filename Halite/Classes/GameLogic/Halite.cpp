@@ -117,65 +117,60 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 void Halite::setupGraphRendering()
 {
 	//Delete buffers and vaos
-	glDeleteBuffers(1, &graph_vertex_buffer);
+	glDeleteBuffers(1, &graph_territory_vertex_buffer);
+	glDeleteBuffers(1, &graph_strength_vertex_buffer);
 	glDeleteBuffers(1, &graph_color_buffer);
-	glDeleteVertexArrays(1, &graph_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
 	//Ensure that shaders are deleted:
 	glDeleteShader(graph_vertex_shader);
 	glDeleteShader(graph_fragment_shader);
 	glDeleteProgram(graph_shader_program);
 	//Generate buffers and vaos.
-	glGenBuffers(1, &graph_vertex_buffer);
+	glGenBuffers(1, &graph_territory_vertex_buffer);
+	glGenBuffers(1, &graph_strength_vertex_buffer);
 	glGenBuffers(1, &graph_color_buffer);
-	glGenVertexArrays(1, &graph_vertex_attributes);
+	glGenVertexArrays(1, &graph_territory_vertex_attributes);
+	glGenVertexArrays(1, &graph_strength_vertex_attributes);
+
+//Setup territory graph:
 
 	//Bind vertex attribute object.
-	glBindVertexArray(graph_vertex_attributes);
-
-//We're having problems, so I'm just gonna draw a single square now to attempt to see what's going on.
+	glBindVertexArray(graph_territory_vertex_attributes);
 
 	//Set the number of frames the graph will handle. Also prevents race conditions with full_game by not using iterators, but rather up to a numeric frame.
 	graph_frame_number = full_game.size();
 
 	//Some constants to represent the top, bottom, left, and right of the graph.
-	const float GRAPH_TOP = -0.7, GRAPH_BOTTOM = 0.7, GRAPH_LEFT = -0.7, GRAPH_RIGHT = 0.7;
+	const float GRAPH_TOP = 0.7, GRAPH_BOTTOM = -0.7, GRAPH_LEFT = -0.7, GRAPH_RIGHT = 0.7;
 
 	//Find the greatest territory_count existent.
 	unsigned int maxTerritoryValue = 0;
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > maxTerritoryValue) maxTerritoryValue = full_game[b]->territory_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphVertices(8);// unsigned int(number_of_players) * graph_frame_number * 2);
+	std::vector<float> graphTerritoryVertices(unsigned int(number_of_players) * graph_frame_number * 2);
 
-	/*TRY NEW VERTEX DATA: Set vertices by player:
-	unsigned int graphVerticesLoc = 0; //Location in graphVertices.
+	//Set vertices by player:
+	unsigned int graphTerritoryVerticesLoc = 0; //Location in graphTerritoryVertices.
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
 	{
-		graphVertices[graphVerticesLoc] = (float(b) / graph_frame_number) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
-		if(full_game[b]->territory_count.size() > a) graphVertices[graphVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
-		else graphVertices[graphVerticesLoc + 1] = GRAPH_BOTTOM;
-		graphVerticesLoc += 2;
-	}*/
-
-	graphVertices[0] = -0.5;
-	graphVertices[1] = -0.5;
-	graphVertices[2] = 0.5;
-	graphVertices[3] = -0.5;
-	graphVertices[4] = -0.5;
-	graphVertices[5] = 0.5;
-	graphVertices[6] = 0.5;
-	graphVertices[7] = 0.5;
+		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b) / graph_frame_number) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
+		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
+		else graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = GRAPH_BOTTOM;
+		graphTerritoryVerticesLoc += 2;
+	}
 
 	//Set vertices in buffer object
-	glBindBuffer(graph_vertex_buffer, GL_ARRAY_BUFFER);
-	glBufferData(GL_ARRAY_BUFFER, graphVertices.size() * sizeof(float), graphVertices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, graph_territory_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, graphTerritoryVertices.size() * sizeof(float), graphTerritoryVertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector representing color data:
-	std::vector<float> graphColors(12);//unsigned int(number_of_players) * graph_frame_number * 3, 1.0);
+	std::vector<float> graphColors(unsigned int(number_of_players) * graph_frame_number * 3);
 
-	/* TRY NEW COLORS: Set color data:
+	//Set color data:
 	unsigned int graphColorsLoc = 0; //Location in graphColors.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -187,23 +182,44 @@ void Halite::setupGraphRendering()
 			graphColors[graphColorsLoc + 2] = c.b;
 			graphColorsLoc += 3;
 		}
-	}*/
-	graphColors[0] = 1.0;
-	graphColors[1] = .0;
-	graphColors[2] = .0;
-	graphColors[3] = 1.0;
-	graphColors[4] = 1.0;
-	graphColors[5] = .0;
-	graphColors[6] = .0;
-	graphColors[7] = .0;
-	graphColors[8] = 1.0;
-	graphColors[9] = .0;
-	graphColors[10] = 1.0;
-	graphColors[11] = 1.0;
+	}
 
 	//Set colors in buffer object
-	glBindBuffer(graph_color_buffer, GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glBufferData(GL_ARRAY_BUFFER, graphColors.size()*sizeof(float), graphColors.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+//Setup strength graph:
+
+	//Bind Vertex Array:
+	glBindVertexArray(graph_strength_vertex_attributes);
+
+	//Find the greatest strength_count existent.
+	unsigned int maxStrengthValue = 0;
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > maxStrengthValue) maxStrengthValue = full_game[b]->strength_count[a];
+
+	//Create vector of graph vertices.
+	std::vector<float> graphStrengthVertices(unsigned int(number_of_players) * graph_frame_number * 2);
+
+	//Set vertices by player:
+	unsigned int graphStrengthVerticesLoc = 0; //Location in graphStrengthVertices.
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
+	{
+		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b) / graph_frame_number) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
+		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / maxStrengthValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
+		else graphStrengthVertices[graphStrengthVerticesLoc + 1] = GRAPH_BOTTOM;
+		graphStrengthVerticesLoc += 2;
+	}
+
+	//Set vertices in buffer object
+	glBindBuffer(GL_ARRAY_BUFFER, graph_strength_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, graphStrengthVertices.size() * sizeof(float), graphStrengthVertices.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Add in color buffer as well:
+	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
@@ -642,13 +658,12 @@ void Halite::renderMap(short& turnNumber)
 	}
 }
 
-void Halite::renderGraph()
+void Halite::renderGraph(bool territoryNotStrength)
 {
 	if(graph_frame_number < full_game.size()) setupGraphRendering();
 	glUseProgram(graph_shader_program);
-	glBindVertexArray(graph_vertex_attributes);
-	//for(unsigned char a = 0; a < number_of_players; a++)
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);//a * graph_frame_number, graph_frame_number);
+	glBindVertexArray(territoryNotStrength ? graph_territory_vertex_attributes : graph_strength_vertex_attributes);
+	for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
 }
 
 bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
@@ -747,7 +762,7 @@ Halite::~Halite()
 	glDeleteShader(graph_vertex_shader);
 	glDeleteShader(graph_fragment_shader);
 	glDeleteProgram(graph_shader_program);
-	glDeleteBuffers(1, &graph_vertex_buffer);
+	glDeleteBuffers(1, &graph_territory_vertex_buffer);
 	glDeleteBuffers(1, &graph_color_buffer);
 	glDeleteVertexArrays(1, &map_vertex_attributes);
 	

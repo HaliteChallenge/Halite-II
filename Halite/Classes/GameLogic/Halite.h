@@ -32,7 +32,7 @@ private:
 	GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;
 
 	//Graph rendering
-	GLuint graph_vertex_buffer, graph_color_buffer, graph_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
+	GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
 	//Number of frames in graph. This lets us know if we need to redo the setup for the graph.
 	unsigned short graph_frame_number;
 
@@ -48,7 +48,7 @@ public:
 	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
 	void renderMap(short& turnNumber);
-	void renderGraph();
+	void renderGraph(bool territoryNotStrength);
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);
 	std::map<unsigned char, hlt::Color> getColorCodes();

@@ -16,7 +16,7 @@ void render();
 void doLogic();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed = false, newGame = false, mapNotGraph = true;
+bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed = false, newGame = false, mapNotGraph = true, territoryNotStrength = false;
 signed short turn_number = 0;
 float maxFps = 20;
 
@@ -238,6 +238,10 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	{
 		mapNotGraph = !mapNotGraph;
 	}
+	else if(code == 'q' || code == 'Q' && newGame)
+	{
+		territoryNotStrength = !territoryNotStrength;
+	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
@@ -264,7 +268,7 @@ void render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if(mapNotGraph) my_game->renderMap(turn_number);
-	else my_game->renderGraph();
+	else my_game->renderGraph(territoryNotStrength);
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);
