@@ -8,7 +8,11 @@ using boost::asio::ip::tcp;
 const unsigned short DEFAULT_PORT = 2000;
 
 //Graph constants:
-const float GRAPH_TOP = 0.7, GRAPH_BOTTOM = -0.7, GRAPH_LEFT = -0.7, GRAPH_RIGHT = 0.7;
+const float TERRITORY_GRAPH_TOP = 0.98, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
+const float STRENGTH_GRAPH_TOP = -0.01, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
+
+//Map constants:
+const float MAP_TOP = 0.98, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
 
 //Private Functions ------------------
 
@@ -46,16 +50,16 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 
 	//Generate vertices of centers of squares.
 	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
-	float xLoc = -1.0 + 1.0 / width, yLoc = 1.0 - 1.0 / height, dX = 2.0 / width, dY = 2.0 / height;
+	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2*width), yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * height), dX = (MAP_RIGHT - MAP_LEFT) / width, dY = (MAP_TOP - MAP_BOTTOM) / height;
 	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
 	{
 		vertexLocations[a] = xLoc;
 		vertexLocations[a + 1] = yLoc;
 
 		xLoc += dX;
-		if(xLoc > 1.0)
+		if(xLoc > MAP_RIGHT)
 		{
-			xLoc = -1.0 + 1.0 / width;
+			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width);
 			yLoc -= dY;
 		}
 	}
@@ -149,14 +153,20 @@ void Halite::setupGraphRendering()
 	glBindVertexArray(graph_border_vertex_attributes);
 
 	//Floats representing contents of the buffer.
-	std::vector<float> graphBorderBufferValues(35, 0.4);
+	std::vector<float> graphBorderBufferValues(95);
 
-	//First 4 floats represent position vertices in game. Their values are undefined for now, sinec they're set every frame. Next 10 floats represent actual border. Next 6 floats represent colors of position vertices, and final 15 floats represent colors of border vertices.
+	//First 8 floats represent position vertices in game. Their values are undefined for now, since they're set every frame. Next 30 floats represent actual border. Next 12 floats represent colors of position vertices, and final 45 floats represent colors of border vertices.
 
-	//Create borders:
-	graphBorderBufferValues[4] = GRAPH_RIGHT; graphBorderBufferValues[5] = GRAPH_BOTTOM; graphBorderBufferValues[6] = GRAPH_RIGHT; graphBorderBufferValues[7] = GRAPH_TOP; graphBorderBufferValues[8] = GRAPH_LEFT; graphBorderBufferValues[9] = GRAPH_TOP; graphBorderBufferValues[10] = GRAPH_LEFT; graphBorderBufferValues[11] = GRAPH_BOTTOM; graphBorderBufferValues[12] = GRAPH_RIGHT; graphBorderBufferValues[13] = GRAPH_BOTTOM;
+	//Create territory borders:
+	graphBorderBufferValues[8] = TERRITORY_GRAPH_LEFT; graphBorderBufferValues[9] = TERRITORY_GRAPH_TOP; graphBorderBufferValues[10] = TERRITORY_GRAPH_LEFT; graphBorderBufferValues[11] = TERRITORY_GRAPH_BOTTOM; graphBorderBufferValues[12] = TERRITORY_GRAPH_RIGHT; graphBorderBufferValues[13] = TERRITORY_GRAPH_BOTTOM; graphBorderBufferValues[14] = TERRITORY_GRAPH_RIGHT; graphBorderBufferValues[15] = TERRITORY_GRAPH_TOP; graphBorderBufferValues[16] = TERRITORY_GRAPH_LEFT; graphBorderBufferValues[17] = TERRITORY_GRAPH_TOP;
 
-	for(unsigned short a = 17; a < 35; a++) graphBorderBufferValues[a] = 1.0;
+	//Create strength borders:
+	graphBorderBufferValues[18] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[19] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[20] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[21] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[22] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[23] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[24] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[25] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[26] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[27] = STRENGTH_GRAPH_TOP;
+
+	//Create map borders:
+	graphBorderBufferValues[28] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[29] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[30] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[31] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[32] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[33] = STRENGTH_GRAPH_BOTTOM; graphBorderBufferValues[34] = STRENGTH_GRAPH_RIGHT; graphBorderBufferValues[35] = STRENGTH_GRAPH_TOP; graphBorderBufferValues[36] = STRENGTH_GRAPH_LEFT; graphBorderBufferValues[37] = STRENGTH_GRAPH_TOP;
+
+	for(unsigned short a = 38; a < 95; a++) graphBorderBufferValues[a] = 1.0;
 
 	//Bind graph border buffer
 	glBindBuffer(GL_ARRAY_BUFFER, graph_border_buffer);
@@ -165,7 +175,7 @@ void Halite::setupGraphRendering()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(14*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(38*sizeof(float)));
 
 //Setup territory graph:
 
@@ -183,9 +193,9 @@ void Halite::setupGraphRendering()
 	unsigned int graphTerritoryVerticesLoc = 0; //Location in graphTerritoryVertices.
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
 	{
-		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
-		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
-		else graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = GRAPH_BOTTOM;
+		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
+		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (TERRITORY_GRAPH_BOTTOM - TERRITORY_GRAPH_TOP) + TERRITORY_GRAPH_TOP;
+		else graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = TERRITORY_GRAPH_BOTTOM;
 		graphTerritoryVerticesLoc += 2;
 	}
 
@@ -234,9 +244,9 @@ void Halite::setupGraphRendering()
 	unsigned int graphStrengthVerticesLoc = 0; //Location in graphStrengthVertices.
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
 	{
-		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
-		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / maxStrengthValue)) * (GRAPH_BOTTOM - GRAPH_TOP) + GRAPH_TOP;
-		else graphStrengthVertices[graphStrengthVerticesLoc + 1] = GRAPH_BOTTOM;
+		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (STRENGTH_GRAPH_RIGHT - STRENGTH_GRAPH_LEFT) + STRENGTH_GRAPH_LEFT;
+		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / maxStrengthValue)) * (STRENGTH_GRAPH_BOTTOM - STRENGTH_GRAPH_TOP) + STRENGTH_GRAPH_TOP;
+		else graphStrengthVertices[graphStrengthVerticesLoc + 1] = STRENGTH_GRAPH_BOTTOM;
 		graphStrengthVerticesLoc += 2;
 	}
 
@@ -647,7 +657,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	return relativeScores;
 }
 
-void Halite::renderMap(short & turnNumber)
+void Halite::render(short & turnNumber)
 {
 	confirmWithinGame(turnNumber);
 
@@ -680,27 +690,32 @@ void Halite::renderMap(short & turnNumber)
 		glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, strengths.size() * sizeof(unsigned int), strengths.data());
 
+		//Draw map:
 		glUseProgram(map_shader_program);
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
-	}
-}
 
-void Halite::renderGraph(bool territoryNotStrength, short & turnNumber)
-{
-	if(graph_frame_number < full_game.size()) setupGraphRendering();
-	confirmWithinGame(turnNumber);
-	float xPos = (float(turnNumber) / (graph_frame_number - 1)) * (GRAPH_RIGHT - GRAPH_LEFT) + GRAPH_LEFT;
-	float positionVertices[4];
-	positionVertices[0] = xPos; positionVertices[1] = GRAPH_BOTTOM; positionVertices[2] = xPos; positionVertices[3] = GRAPH_TOP;
-	glBindBuffer(GL_ARRAY_BUFFER, graph_border_buffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(float), positionVertices);
-	glUseProgram(graph_shader_program);
-	glBindVertexArray(territoryNotStrength ? graph_territory_vertex_attributes : graph_strength_vertex_attributes);
-	for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
-	glBindVertexArray(graph_border_vertex_attributes);
-	glDrawArrays(GL_LINE_STRIP, 2, 5);
-	glDrawArrays(GL_LINES, 0, 2);
+		//Draw graphs:
+		glUseProgram(graph_shader_program);
+		glBindVertexArray(graph_territory_vertex_attributes);
+		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
+		glBindVertexArray(graph_strength_vertex_attributes);
+		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
+
+		//Edit border buffer
+		float xPos = (float(turnNumber) / (graph_frame_number - 1)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
+		glBindBuffer(GL_ARRAY_BUFFER, graph_border_buffer);
+		float positionVertices[8];
+		positionVertices[0] = xPos; positionVertices[1] = TERRITORY_GRAPH_BOTTOM; positionVertices[2] = xPos; positionVertices[3] = TERRITORY_GRAPH_TOP; positionVertices[4] = xPos; positionVertices[5] = STRENGTH_GRAPH_BOTTOM; positionVertices[6] = xPos; positionVertices[7] = STRENGTH_GRAPH_TOP;
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), positionVertices);
+
+		//Draw borders:
+		glBindVertexArray(graph_border_vertex_attributes);
+		glDrawArrays(GL_LINE_STRIP, 4, 5);
+		glDrawArrays(GL_LINE_STRIP, 9, 5);
+		glDrawArrays(GL_LINE_STRIP, 14, 5);
+		glDrawArrays(GL_LINES, 0, 4);
+	}
 }
 
 bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)

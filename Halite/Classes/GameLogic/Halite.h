@@ -47,7 +47,7 @@ public:
     void init();
 	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
-	void renderMap(short& turnNumber);
+	void render(short& turnNumber);
 	void renderGraph(bool territoryNotStrength, short & turnNumber);
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);
