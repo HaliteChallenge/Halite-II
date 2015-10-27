@@ -131,12 +131,12 @@ public class Networking
 
         InitPackage initPackage = new InitPackage();
         initPackage.playerTag = Short.parseShort(getString(s));
-        initPackage.m = deserializeMap(getString(s));
+        initPackage.map = deserializeMap(getString(s));
 
         return initPackage;
     }
 
-    static void sendInitResponse(Socket s)
+    static void sendInit(Socket s)
     {
         System.out.println("Send init\n");
         sendString(s, "Done");
