@@ -111,7 +111,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 
 	//Set uniforms:
 	glUseProgram(map_shader_program);
-	const float SPACE_FACTOR = 0.6;
+	const float SPACE_FACTOR = 0.8;
 	GLint widthLoc = glGetUniformLocation(map_shader_program, "width"), heightLoc = glGetUniformLocation(map_shader_program, "height");
 	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
 	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
@@ -694,6 +694,8 @@ void Halite::render(short & turnNumber)
 		glUseProgram(map_shader_program);
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
+
+		if(turnNumber >= graph_frame_number) setupGraphRendering();
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
