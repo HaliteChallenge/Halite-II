@@ -4,8 +4,9 @@ import java.util.ArrayList;
 public class TestAI
 {
     public static void main(String[] args) {
+        System.out.println("\u000c");
         Socket sock = Networking.connectToGame();
-
+        
         InitPackage iPackage = Networking.getInit(sock);
         short playerTag = iPackage.playerTag;
         Map gameMap = iPackage.map;

@@ -2,9 +2,12 @@ import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.nio.ByteBuffer;
 
 public class Networking
 {
+    public static final int SIZEOF_SIZE_T = 4;
+    
     static String serializeMoveList(ArrayList<Move> moves)
     {
         String returnString = "";
@@ -58,10 +61,15 @@ public class Networking
 
     static void sendString(Socket s, String sendString) {
         try {
+            System.out.println("send string: " + sendString);
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
-            out.writeInt(sendString.length());
+            
+            byte[] lengthArray = ByteBuffer.allocate(SIZEOF_SIZE_T).putInt(sendString.length()).array();
+            
+            out.write(lengthArray, 0, lengthArray.length);
+            System.out.println("sent int");
             out.writeChars(sendString);
+            System.out.println("sent string");
         } catch(Exception e) {
             System.out.println("Error while trying to send String.");
             e.printStackTrace();
@@ -73,13 +81,23 @@ public class Networking
 
     static String getString(Socket s) {
         try {
+            System.out.println("getting string");
             DataInputStream in = new DataInputStream (s.getInputStream());
-
-            int length = in.readInt();
-            String returnString = "";
-            for(int a = 0; a < length; a++) {
-                returnString += in.readChar();
+            
+            byte[] lengthArray = new byte[SIZEOF_SIZE_T];
+            in.read(lengthArray, 0, lengthArray.length);
+            
+            for(int a = 0; a < lengthArray.length; a++) {
+                System.out.printf("0x%02X", lengthArray[a]);
             }
+            
+            int length = ByteBuffer.wrap(lengthArray).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
+            
+            System.out.println("int " + length);
+            String returnString = in.readUTF();
+            System.out.println("got string");
+            
+            return returnString;
         } catch(Exception e) {
             System.out.println("Error while trying to send String.");
             e.printStackTrace();
@@ -132,6 +150,8 @@ public class Networking
         InitPackage initPackage = new InitPackage();
         initPackage.playerTag = Short.parseShort(getString(s));
         initPackage.map = deserializeMap(getString(s));
+        
+        System.out.println("finished init");
 
         return initPackage;
     }
