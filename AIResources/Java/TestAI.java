@@ -21,9 +21,9 @@ public class TestAI
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
                     Site site = gameMap.contents.get(y).get(x);
                     if(site.owner == playerTag) {
-                        System.out.println("x: " + x + "; y: " + y + "; dir: " + Direction.EAST);
-                        moves.add(new Move(new Location((short)x, (short)y), Direction.EAST));
-                        
+                        byte dir = Direction.randomDirection();
+                        System.out.println("x: " + x + "; y: " + y + "; move: " + dir);
+                        moves.add(new Move(new Location((short)x, (short)y), dir));
                     }
                 }
             }

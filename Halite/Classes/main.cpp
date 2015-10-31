@@ -30,18 +30,16 @@ int main(int argc, char* args[])
 	unsigned short mapWidth, mapHeight;
 
 	std::cout << "Would you like to run a new game or render a past one? Please enter \"New\" or \"Past\": ";
-	/*while(true)
+	while(true)
 	{
 		std::getline(std::cin, in);
 		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
 		if(in == "p" || in == "past" || in == "n" || in == "new") break;
 		std::cout << "That isn't a valid input. Please enter \"New\" or \"Past\": ";
 	}
-	bool newGame = in == "new" || in == "n";*/
-	// TEMPORARY: for debugging purposes
-	bool newGame = true;
+	bool newGame = in == "new" || in == "n";
 
-	/*if(newGame)
+	if(newGame)
 	{
 		std::cout << "Please enter the width of the map: ";
 		std::getline(std::cin, in);
@@ -74,9 +72,7 @@ int main(int argc, char* args[])
 			}
 		}
 		newGame = true;
-	}*/
-	// TEMPORARY: Set width and height for debugging purposes
-	mapWidth = mapHeight = 10;
+	}
 
 	// start GL context and O/S window using the GLFW helper library
 	if(!glfwInit())

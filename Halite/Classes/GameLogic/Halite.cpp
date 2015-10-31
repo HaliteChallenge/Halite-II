@@ -515,15 +515,14 @@ Halite::Halite(unsigned short w, unsigned short h)
     //Ask if the user would like to use the default ports?
     bool useDefaultPorts = true;
     std::cout << "Would you like to use the default ports? Please enter Yes or No: ";
-	// TEMPORARY: for debugging purposes
-    /*while(true)
+	while(true)
     {
         std::getline(std::cin, in);
         std::transform(in.begin(), in.end(), in.begin(), ::tolower);
         if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
         std::cout << "That isn't a valid input. Please enter Yes or No: ";
     }
-    if(in == "n" || in == "no" || in == "nope") useDefaultPorts = false;*/
+    if(in == "n" || in == "no" || in == "nope") useDefaultPorts = false;
     
     bool done = false;
     while(!done)
@@ -532,7 +531,7 @@ Halite::Halite(unsigned short w, unsigned short h)
         //If less than 2, bypass this step: Ask if the user like to add another AI
         if(number_of_players >= 2)
         {
-            /*std::cout << "Would you like to add another player? Please enter Yes or No: ";
+            std::cout << "Would you like to add another player? Please enter Yes or No: ";
             while(true)
             {
                 std::getline(std::cin, in);
@@ -540,8 +539,7 @@ Halite::Halite(unsigned short w, unsigned short h)
                 if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
                 std::cout << "That isn't a valid input. Please enter Yes or No: ";
             }
-            if(in == "n" || in == "no" || in == "nope") break;*/
-			break;
+            if(in == "n" || in == "no" || in == "nope") break;
         }
         
         unsigned short portNumber;
@@ -579,7 +577,7 @@ Halite::Halite(unsigned short w, unsigned short h)
         player_connections.push_back(socket);
         
         std::cout << "Connected to player " << number_of_players + 1 << " at " << socket->remote_endpoint().address().to_string() << std::endl << "How should I refer to this player? Please enter their name: ";
-		/*while(true)
+		while(true)
 		{
 			std::getline(std::cin, in);
 			if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
@@ -595,7 +593,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 				else std::cout << "That name is already taken. Please enter another name for this player: ";
 			}
 		}
-        player_names.push_back(in);*/
+        player_names.push_back(in);
 
 		player_names.push_back(std::to_string(number_of_players));
         number_of_players++;

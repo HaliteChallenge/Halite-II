@@ -62,16 +62,13 @@ public class Networking
 
     static void sendString(Socket s, String sendString) {
         try {
-            System.out.println("send string: " + sendString);
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
 
             byte[] lengthArray = ByteBuffer.allocate(SIZEOF_SIZE_T).order(ByteOrder.LITTLE_ENDIAN).putInt(sendString.length()).array();
             out.write(lengthArray, 0, lengthArray.length);
-            System.out.println("sent int");
             
             byte[] messageArray = sendString.getBytes();
             out.write(messageArray, 0, messageArray.length);
-            System.out.println("sent string");
         } catch(Exception e) {
             System.out.println("Error while trying to send String.");
             e.printStackTrace();
@@ -80,18 +77,14 @@ public class Networking
 
     static String getString(Socket s) {
         try {
-            System.out.println("getting string");
             DataInputStream in = new DataInputStream (s.getInputStream());
 
             byte[] lengthArray = new byte[SIZEOF_SIZE_T];
             in.read(lengthArray, 0, lengthArray.length);
             int length = ByteBuffer.wrap(lengthArray).order(ByteOrder.LITTLE_ENDIAN).getInt();
-            System.out.println("int " + length);
 
             byte[] messageArray = new byte[length*CHAR_SIZE];
             in.read(messageArray, 0, messageArray.length);
-
-            System.out.println("got string");
 
             return new String(messageArray).trim();
         } catch(Exception e) {
@@ -162,7 +155,6 @@ public class Networking
 
     static void sendFrame(Socket s, ArrayList<Move> moves)
     {
-        System.out.println("Send frame\n");
         sendString(s, serializeMoveList(moves));
     }
 
