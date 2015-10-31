@@ -3,11 +3,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class Networking
 {
     public static final int SIZEOF_SIZE_T = 4;
-    
+    public static final int CHAR_SIZE = 4;
+
     static String serializeMoveList(ArrayList<Move> moves)
     {
         String returnString = "";
@@ -17,13 +19,12 @@ public class Networking
 
     static Map deserializeMap(String inputString)
     {
-        Map map = new Map();
 
         String[] inputStringComponents = inputString.split(" ");
 
-        map.map_width = Short.parseShort(inputStringComponents[0]);
-        map.map_height = Short.parseShort(inputStringComponents[1]);
-        map.contents = new ArrayList<ArrayList<Site>>();
+        short map_width = Short.parseShort(inputStringComponents[0]);
+        short map_height = Short.parseShort(inputStringComponents[1]);
+        Map map = new Map(map_width, map_height);
 
         // Run-length encode of owners
         short y = 0, x = 0;
@@ -63,19 +64,17 @@ public class Networking
         try {
             System.out.println("send string: " + sendString);
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
-            
-            byte[] lengthArray = ByteBuffer.allocate(SIZEOF_SIZE_T).putInt(sendString.length()).array();
-            
+
+            byte[] lengthArray = ByteBuffer.allocate(SIZEOF_SIZE_T).order(ByteOrder.LITTLE_ENDIAN).putInt(sendString.length()).array();
             out.write(lengthArray, 0, lengthArray.length);
             System.out.println("sent int");
-            out.writeChars(sendString);
+            
+            byte[] messageArray = sendString.getBytes();
+            out.write(messageArray, 0, messageArray.length);
             System.out.println("sent string");
         } catch(Exception e) {
             System.out.println("Error while trying to send String.");
             e.printStackTrace();
-        } finally {
-            try{s.close();}
-            catch(Exception e){System.out.println("Could not close socket.");}
         }
     }
 
@@ -83,27 +82,21 @@ public class Networking
         try {
             System.out.println("getting string");
             DataInputStream in = new DataInputStream (s.getInputStream());
-            
+
             byte[] lengthArray = new byte[SIZEOF_SIZE_T];
             in.read(lengthArray, 0, lengthArray.length);
-            
-            for(int a = 0; a < lengthArray.length; a++) {
-                System.out.printf("0x%02X", lengthArray[a]);
-            }
-            
-            int length = ByteBuffer.wrap(lengthArray).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-            
+            int length = ByteBuffer.wrap(lengthArray).order(ByteOrder.LITTLE_ENDIAN).getInt();
             System.out.println("int " + length);
-            String returnString = in.readUTF();
+
+            byte[] messageArray = new byte[length*CHAR_SIZE];
+            in.read(messageArray, 0, messageArray.length);
+
             System.out.println("got string");
-            
-            return returnString;
+
+            return new String(messageArray).trim();
         } catch(Exception e) {
-            System.out.println("Error while trying to send String.");
+            System.out.println("Error while trying to get String.");
             e.printStackTrace();
-        } finally {
-            try{s.close();}
-            catch(Exception e){System.out.println("Could not close socket.");}
         }
 
         return null;
@@ -148,9 +141,9 @@ public class Networking
         System.out.println("Get init\n");
 
         InitPackage initPackage = new InitPackage();
-        initPackage.playerTag = Short.parseShort(getString(s));
+        initPackage.playerTag = (short)Long.parseLong(getString(s));
         initPackage.map = deserializeMap(getString(s));
-        
+
         System.out.println("finished init");
 
         return initPackage;

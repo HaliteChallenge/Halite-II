@@ -4,11 +4,25 @@ public class Map
     public ArrayList< ArrayList<Site> > contents;
     public short map_width, map_height;
 
-    Map()
+    public Map()
     {
         map_width = 0;
         map_height = 0;
         contents = new ArrayList< ArrayList<Site> >(0);
+    }
+    
+    public Map(short map_width_, short map_height_)
+    {
+        map_width = map_width_;
+        map_height = map_height_;
+        contents = new ArrayList< ArrayList<Site> >(0);
+        for(int y = 0; y < map_height; y++) {
+            ArrayList<Site> row = new ArrayList<Site>();
+            for(int x = 0; x < map_width; x++) {
+                row.add(new Site());
+            }
+            contents.add(row);
+        }
     }
 
     public Location getLocation(Location loc, byte dir)

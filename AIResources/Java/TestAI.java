@@ -14,13 +14,14 @@ public class TestAI
         Networking.sendInit(sock);
 
         while(true) {
-            ArrayList<Move> moves = new ArrayList<Move>();
+            ArrayList<Move> moves = new ArrayList<Move>(0);
             gameMap = Networking.getFrame(sock);
 
             for(int y = 0; y++ < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
                     Site site = gameMap.contents.get(y).get(x);
                     if(site.owner == playerTag) {
+                        System.out.println("x: " + x + "; y: " + y + "; dir: " + Direction.EAST);
                         moves.add(new Move(new Location((short)x, (short)y), Direction.EAST));
                         
                     }

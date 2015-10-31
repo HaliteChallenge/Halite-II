@@ -4,6 +4,6 @@ public class Location
     
     public Location(short x_, short y_) {
         x = x_;
-        y = x_;
+        y = y_;
     }
 }

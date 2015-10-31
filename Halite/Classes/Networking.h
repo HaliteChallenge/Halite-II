@@ -73,7 +73,7 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 
 static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
 	size_t length = sendString.length();
-	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));
+	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));	
 	boost::asio::write(*s, boost::asio::buffer(sendString));
 }
 
