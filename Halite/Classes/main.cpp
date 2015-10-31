@@ -16,9 +16,9 @@ void render();
 void doLogic();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, shiftPressed = false, newGame = false, mapNotGraph = true, territoryNotStrength = false;
-signed short turn_number = 0;
-float maxFps = 20;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false;
+signed short turnNumber = 0, maxFps = 30;
+float graphZoom = 1.0;
 
 std::string filename;
 
@@ -133,17 +133,21 @@ int main(int argc, char* args[])
 	while(!glfwWindowShouldClose(window))
 	{
 		render();
+
+		if(upPressed && maxFps != 60) maxFps++;
+		else if(downPressed && maxFps != 4) maxFps--;
+
 		if(leftPressed)
 		{
-			if(shiftPressed) turn_number -= 15;
-			else turn_number--;
+			if(shiftPressed) turnNumber -= 15;
+			else turnNumber--;
 		}
 		else if(rightPressed)
 		{
-			if(shiftPressed) turn_number += 15;
-			else turn_number++;
+			if(shiftPressed) turnNumber += 15;
+			else turnNumber++;
 		}
-		else if(!isPaused) turn_number++;
+		else if(!isPaused) turnNumber++;
 
 		//Limit render rate:
 		float delta = 1000.0 * float(clock() - c) / CLOCKS_PER_SEC;
@@ -193,6 +197,22 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
 	{
 		rightPressed = false;
 	}
+	else if(key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		upPressed = true;
+	}
+	else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		downPressed = true;
+	}
+	else if(key == GLFW_KEY_UP && action == GLFW_RELEASE)
+	{
+		upPressed = false;
+	}
+	else if(key == GLFW_KEY_DOWN && action == GLFW_RELEASE)
+	{
+		downPressed = false;
+	}
 	else if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
 	{
 		shiftPressed = true;
@@ -212,36 +232,29 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	if(code == ' ') isPaused = !isPaused;
 	else if(code == '+')
 	{
-		maxFps = maxFps * 1.5 + 1;
-		if(maxFps > 100) maxFps = 100;
+		graphZoom *= 1.5;
+		if(graphZoom > 129.7) graphZoom = 129.7463;
 	}
 	else if(code == '-')
 	{
-		maxFps = maxFps / 1.5 - 1;
-		if(maxFps < 1) maxFps = 1;
+		graphZoom /= 1.5;
+		if(graphZoom < 1) graphZoom = 1;
 	}
 	else if(code == '>' || code == '.')
 	{
-		turn_number++;
+		turnNumber++;
 		isPaused = true;
 	}
 	else if(code == '<' || code == ',')
 	{
-		turn_number--;
+		turnNumber--;
 		isPaused = true;
 	}
 	else if(code == 'o' || code == 'O' && newGame)
 	{
 		my_game->output(filename);
 	}
-	else if(code == 'g' || code == 'G' && newGame)
-	{
-		mapNotGraph = !mapNotGraph;
-	}
-	else if(code == 'q' || code == 'Q' && newGame)
-	{
-		territoryNotStrength = !territoryNotStrength;
-	}
+
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
@@ -249,7 +262,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 	unsigned short wi, he;
 	if(!my_game->input(paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
 	isPaused = false;
-	turn_number = 0;
+	turnNumber = 0;
 }
 
 void handleErrors(int error, const char * description)
@@ -267,7 +280,7 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	my_game->render(turn_number);
+	my_game->render(turnNumber, graphZoom);
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);

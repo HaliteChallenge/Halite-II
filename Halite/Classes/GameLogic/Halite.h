@@ -33,12 +33,13 @@ private:
 
 	//Graph rendering
 	GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_border_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_border_vertex_attributes,graph_vertex_shader, graph_fragment_shader, graph_shader_program;
-	//Number of frames in graph. This lets us know if we need to redo the setup for the graph.
-	unsigned short graph_frame_number;
+	//Stats about the graph. This lets us know if we need to redo the setup for the graph.
+	unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
+	float graph_zoom;
 
 	void loadColorCodes();
 	void setupMapRendering(unsigned short width, unsigned short height);
-	void setupGraphRendering();
+	void setupGraphRendering(float zoom, short turnNumber);
 	void clearFullGame();
     std::vector<bool> getNextFrame(std::vector<bool> alive);
 public:
@@ -47,7 +48,7 @@ public:
     void init();
 	std::vector< std::pair<std::string, float> > runGame();
     void confirmWithinGame(signed short& turnNumber);
-	void render(short& turnNumber);
+	void render(short& turnNumber, float zoom);
 	void renderGraph(bool territoryNotStrength, short & turnNumber);
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
     void output(std::string filename);

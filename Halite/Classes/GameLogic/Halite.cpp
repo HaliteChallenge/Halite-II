@@ -122,7 +122,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 	glDeleteShader(map_fragment_shader);
 }
 
-void Halite::setupGraphRendering()
+void Halite::setupGraphRendering(float zoom, short turnNumber)
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
@@ -146,6 +146,52 @@ void Halite::setupGraphRendering()
 
 	//Set the number of frames the graph will handle. Also prevents race conditions with full_game by not using iterators, but rather up to a numeric frame.
 	graph_frame_number = full_game.size();
+	graph_zoom = zoom;
+	graph_turn_number = turnNumber;
+
+	//Figure out first and last turns to do based on zoom and turnNumber.
+	short numberOfFrames = graph_frame_number / zoom;
+	if(numberOfFrames < 3) numberOfFrames = 3;
+	if(numberOfFrames % 2 == 0) numberOfFrames++;
+	short turnsOnEachSide = numberOfFrames / 2; //Rounded down through truncation.
+	if(turnNumber + turnsOnEachSide < graph_frame_number && turnNumber - turnsOnEachSide >= 0)
+	{
+		//No border problems:
+		graph_turn_min = turnNumber - turnsOnEachSide;
+		graph_turn_max = turnNumber + turnsOnEachSide;
+	}
+	else if(turnNumber - turnsOnEachSide < 0) //Shift right
+	{
+		short rightShift = -(turnNumber - turnsOnEachSide);
+		if(turnNumber + turnsOnEachSide + rightShift >= graph_frame_number)
+		{
+			//Just use the whole thing:
+			graph_turn_min = 0;
+			graph_turn_max = graph_frame_number - 1;
+		}
+		else
+		{
+			//Use shift:
+			graph_turn_min = 0;
+			graph_turn_max = turnNumber + turnsOnEachSide + rightShift;
+		}
+	}
+	else if(turnNumber + turnsOnEachSide >= graph_frame_number) //Shift left
+	{
+		short leftShift = (turnNumber + turnsOnEachSide) - (graph_frame_number - 1);
+		if(turnNumber - turnsOnEachSide - leftShift < 0)
+		{
+			//Just use the whole thing:
+			graph_turn_min = 0;
+			graph_turn_max = graph_frame_number - 1;
+		}
+		else
+		{
+			//Use shift:
+			graph_turn_min = turnNumber - turnsOnEachSide - leftShift;
+			graph_turn_max = graph_frame_number - 1;
+		}
+	}
 
 //Setup graph border:
 
@@ -184,16 +230,16 @@ void Halite::setupGraphRendering()
 
 	//Find the greatest territory_count existent.
 	unsigned int maxTerritoryValue = 0;
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > maxTerritoryValue) maxTerritoryValue = full_game[b]->territory_count[a];
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > maxTerritoryValue) maxTerritoryValue = full_game[b]->territory_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphTerritoryVertices(unsigned int(number_of_players) * graph_frame_number * 2);
+	std::vector<float> graphTerritoryVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
 
 	//Set vertices by player:
 	unsigned int graphTerritoryVerticesLoc = 0; //Location in graphTerritoryVertices.
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 	{
-		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
+		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
 		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (TERRITORY_GRAPH_BOTTOM - TERRITORY_GRAPH_TOP) + TERRITORY_GRAPH_TOP;
 		else graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = TERRITORY_GRAPH_BOTTOM;
 		graphTerritoryVerticesLoc += 2;
@@ -206,14 +252,14 @@ void Halite::setupGraphRendering()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector representing color data:
-	std::vector<float> graphColors(unsigned int(number_of_players) * graph_frame_number * 3);
+	std::vector<float> graphColors(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 3);
 
 	//Set color data:
 	unsigned int graphColorsLoc = 0; //Location in graphColors.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		hlt::Color c = color_codes[a + 1];
-		for(unsigned short b = 0; b < graph_frame_number; b++)
+		for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 		{
 			graphColors[graphColorsLoc] = c.r;
 			graphColors[graphColorsLoc + 1] = c.g;
@@ -235,16 +281,16 @@ void Halite::setupGraphRendering()
 
 	//Find the greatest strength_count existent.
 	unsigned int maxStrengthValue = 0;
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > maxStrengthValue) maxStrengthValue = full_game[b]->strength_count[a];
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > maxStrengthValue) maxStrengthValue = full_game[b]->strength_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphStrengthVertices(unsigned int(number_of_players) * graph_frame_number * 2);
+	std::vector<float> graphStrengthVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
 
 	//Set vertices by player:
 	unsigned int graphStrengthVerticesLoc = 0; //Location in graphStrengthVertices.
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = 0; b < graph_frame_number; b++)
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 	{
-		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b) / (graph_frame_number - 1)) * (STRENGTH_GRAPH_RIGHT - STRENGTH_GRAPH_LEFT) + STRENGTH_GRAPH_LEFT;
+		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (STRENGTH_GRAPH_RIGHT - STRENGTH_GRAPH_LEFT) + STRENGTH_GRAPH_LEFT;
 		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / maxStrengthValue)) * (STRENGTH_GRAPH_BOTTOM - STRENGTH_GRAPH_TOP) + STRENGTH_GRAPH_TOP;
 		else graphStrengthVertices[graphStrengthVerticesLoc + 1] = STRENGTH_GRAPH_BOTTOM;
 		graphStrengthVerticesLoc += 2;
@@ -658,7 +704,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	return relativeScores;
 }
 
-void Halite::render(short & turnNumber)
+void Halite::render(short & turnNumber, float zoom)
 {
 	confirmWithinGame(turnNumber);
 
@@ -696,17 +742,17 @@ void Halite::render(short & turnNumber)
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
 
-		if(turnNumber >= graph_frame_number) setupGraphRendering();
+		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
 		glBindVertexArray(graph_territory_vertex_attributes);
-		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
+		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * (graph_turn_max + 1 - graph_turn_min), graph_turn_max + 1 - graph_turn_min);
 		glBindVertexArray(graph_strength_vertex_attributes);
-		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * graph_frame_number, graph_frame_number);
+		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * (graph_turn_max + 1 - graph_turn_min), graph_turn_max + 1 - graph_turn_min);
 
 		//Edit border buffer
-		float xPos = (float(turnNumber) / (graph_frame_number - 1)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
+		float xPos = (float(graph_turn_number - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
 		glBindBuffer(GL_ARRAY_BUFFER, graph_border_buffer);
 		float positionVertices[8];
 		positionVertices[0] = xPos; positionVertices[1] = TERRITORY_GRAPH_BOTTOM; positionVertices[2] = xPos; positionVertices[3] = TERRITORY_GRAPH_TOP; positionVertices[4] = xPos; positionVertices[5] = STRENGTH_GRAPH_BOTTOM; positionVertices[6] = xPos; positionVertices[7] = STRENGTH_GRAPH_TOP;
@@ -762,7 +808,7 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 	full_game.pop_back();
 
 	setupMapRendering(full_game[0]->map_width, full_game[0]->map_height);
-	setupGraphRendering();
+	setupGraphRendering(1.0, 0);
 
 	game_file.close();
 
