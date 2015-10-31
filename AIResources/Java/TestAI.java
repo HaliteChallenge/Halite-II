@@ -16,13 +16,12 @@ public class TestAI
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>(0);
             gameMap = Networking.getFrame(sock);
-
-            for(int y = 0; y++ < gameMap.contents.size(); y++) {
+            
+            for(int y = 0; y < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
                     Site site = gameMap.contents.get(y).get(x);
                     if(site.owner == playerTag) {
                         byte dir = Direction.randomDirection();
-                        System.out.println("x: " + x + "; y: " + y + "; move: " + dir);
                         moves.add(new Move(new Location((short)x, (short)y), dir));
                     }
                 }
