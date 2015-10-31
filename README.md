@@ -6,6 +6,6 @@ This repository contains the environment for running Halite games and replays, a
 
 We're presently in the works of:
  - Formalizing and writing up the rules (eta - very soon).
- - Changing the rendering mechanism to a cleaner version (eta - very soon).
  - Adding interAI messaging (for forming alliances, coordinating attacks, etc) (eta - one week).
- - Porting the starter kits to Java and Python (eta - a few weeks).
+ - Building a website to host playbacks of Halite games and to rank AIs against each other.
+ - Adding the rendering of hlt files in javascript, so that they may be displayed from a website.
