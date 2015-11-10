@@ -1,0 +1,23 @@
+body {
+	font-family: "Helvetica Neue", Helvetica, "Arial", sans-serif;
+}
+
+a:link {
+	color: #0645AD;
+}
+
+a:visited {
+	color: #0645AD;
+}
+
+p, ul {
+	color: #333;
+}
+
+hr {
+	color: #333;
+	border: 0;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border-top: 1px solid #eee;
+}
