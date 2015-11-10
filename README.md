@@ -5,7 +5,7 @@ Halite is a game meant to be played by computers. Halite was created by [Benjami
 This repository contains the environment for running Halite games and replays, a C++ starter kit for making your own AIs, and a starter AI (C++).
 
 We're presently in the works of:
- - Formalizing and writing up the rules (eta - very soon).
- - Adding interAI messaging (for forming alliances, coordinating attacks, etc) (eta - one week).
+ - Formalizing and writing up the rules.
+ - Adding interAI messaging (for forming alliances, coordinating attacks, etc).
  - Building a website to host playbacks of Halite games and to rank AIs against each other.
  - Adding the rendering of hlt files in javascript, so that they may be displayed from a website.
