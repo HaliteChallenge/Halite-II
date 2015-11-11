@@ -42,12 +42,12 @@ class HaliteAPI extends API
 				$username = $_GET["username"];
 				$password = $_GET["password"];
 
-				return select("SELECT * FROM User WHERE username = $username AND password = $password");
+				return $this->select("SELECT * FROM User WHERE username = '".$username."' AND password = '".$password."'");
 			}
 			if(isset($_GET["userID"]) && isset($_GET["password"])) {
 				$useID = $_GET["userID"];
 				$password = $_GET["password"];
-				return select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+				return $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
 			}
 		}
 
@@ -56,7 +56,7 @@ class HaliteAPI extends API
 				$username = $_GET["username"];
 				$password = $_GET["password"];
 
-				insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
+				$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
 				return "success";
 			}
 		}
