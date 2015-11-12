@@ -31,6 +31,7 @@ class HaliteAPI extends API
 	}
 
 	private function insert($sql) {
+		echo $sql;
 		mysqli_query($this->mysqli, $sql);
 	}
 
@@ -52,9 +53,9 @@ class HaliteAPI extends API
 		}
 
 		if($this->method == 'POST') {
-			if(isset($_GET["username"]) && isset($_GET["password"])) {
-				$username = $_GET["username"];
-				$password = $_GET["password"];
+			if(isset($_POST["username"]) && isset($_POST["password"])) {
+				$username = $_POST["username"];
+				$password = $_POST["password"];
 
 				$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
 				return "success";

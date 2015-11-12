@@ -5,21 +5,34 @@
 	<title>Halite4</title>
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#submit").click(function() {
+				var username = $("input:text[name=username]").val();
+				var password = $("input:text[name=password]").val();
+
+				$.ajax({
+					url: "Backend/user", 
+					async: true,
+					method: "POST",
+					data: {username: username, password: password}
+			    });
+
+				window.location.replace("index.html");
+			});
+		});
+	</script>	
 </head>
 
 <body>
 	<h1>Sign Up</h1>
-
-	<p id="message"></p>
 	
-	<form action="Backend/user" method="POST">
-		<input type="text" name="username" value="">
-		<br>
-		<input type="text" name="password" value="">
-		<br>
-		<button id="submit">Submit</button>
-	</form>
+	<input type="text" name="username" value="">
+	<br>
+	<input type="text" name="password" value="">
+	<br>
+	<button id="submit">Submit</button>
 </body>
 
 </html>
