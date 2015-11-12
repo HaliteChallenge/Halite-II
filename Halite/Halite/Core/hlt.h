@@ -11,8 +11,6 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 
-#include "OpenGL.h"
-
 #define STILL 0
 #define NORTH 1
 #define EAST 2
