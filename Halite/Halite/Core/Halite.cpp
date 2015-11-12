@@ -1,5 +1,7 @@
 #include "Halite.h"
 
+//Default port number.
+const unsigned short DEFAULT_PORT = 2000;
 using boost::asio::ip::tcp;
 
 void Halite::clearFullGame()
@@ -202,9 +204,7 @@ std::vector<bool> Halite::getNextFrame(std::vector<bool> alive)
 
 Halite::Halite()
 {
-	graph_frame_number = 0;
     last_turn_output = 0;
-    color_codes = std::map<unsigned char, hlt::Color>();
     number_of_players = 0;
     game_map = hlt::Map();
     turn_number = 0;
@@ -212,19 +212,13 @@ Halite::Halite()
     full_game = std::vector<hlt::Map * >();
     player_connections = std::vector<tcp::socket * >();
     player_moves = std::vector< std::set<hlt::Move> >();
-    //Init Color Codes:
-    loadColorCodes();
 }
 
 Halite::Halite(unsigned short w, unsigned short h)
 {
-	graph_frame_number = 0;
-    last_turn_output = 0;
+	last_turn_output = 0;
     player_moves = std::vector< std::set<hlt::Move> >();
     full_game = std::vector<hlt::Map * >();
-    
-    //Init Color Codes:
-    loadColorCodes();
 
     turn_number = 0;
     
@@ -320,8 +314,6 @@ Halite::Halite(unsigned short w, unsigned short h)
 		player_names.push_back(std::to_string(number_of_players));
         number_of_players++;
     }
-
-    getColorCodes();
     
     //Initialize map:
     game_map = hlt::Map(w, h, number_of_players);
@@ -349,14 +341,6 @@ void Halite::init()
     {
     	initThreads[a].join();
     }
-    
-    setupMapRendering(game_map.map_width, game_map.map_height);
-}
-
-void Halite::confirmWithinGame(signed short & turnNumber)
-{
-	if(turnNumber < 0) turnNumber = 0;
-	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 }
 
 std::vector< std::pair<std::string, float> > Halite::runGame()
@@ -420,9 +404,6 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 	delete full_game.back();
 	full_game.pop_back();
 
-	setupMapRendering(full_game[0]->map_width, full_game[0]->map_height);
-	setupGraphRendering(1.0, 0);
-
 	game_file.close();
 
 	return true;
@@ -453,38 +434,4 @@ void Halite::output(std::string filename)
 	std::cout << "Output file until frame #" << last_turn_output + 1 << ".\n";
 
 	game_file.close();
-}
-
-std::map<unsigned char, hlt::Color> Halite::getColorCodes()
-{
-	return color_codes;
-}
-
-Halite::~Halite()
-{
-	//Get rid of map OpenGL stuff
-	glDeleteShader(map_vertex_shader);
-	glDeleteShader(map_geometry_shader);
-	glDeleteShader(map_fragment_shader);
-	glDeleteProgram(map_shader_program);
-	glDeleteBuffers(1, &map_vertex_buffer);
-	glDeleteBuffers(1, &map_color_buffer);
-	glDeleteBuffers(1, &map_strength_buffer);
-	glDeleteVertexArrays(1, &map_vertex_attributes);
-
-	//Get rid of graph OpenGL stuff
-	glDeleteShader(graph_vertex_shader);
-	glDeleteShader(graph_fragment_shader);
-	glDeleteProgram(graph_shader_program);
-	glDeleteBuffers(1, &graph_territory_vertex_buffer);
-	glDeleteBuffers(1, &graph_strength_vertex_buffer);
-	glDeleteBuffers(1, &graph_border_buffer);
-	glDeleteBuffers(1, &graph_color_buffer);
-	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
-	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
-	glDeleteVertexArrays(1, &graph_border_vertex_attributes);
-	
-	//Get rid of dynamically allocated memory:
-	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
-	clearFullGame();
 }

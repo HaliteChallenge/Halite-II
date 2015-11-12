@@ -2,9 +2,6 @@
 
 //Consts -----------------------------
 
-//Default port number.
-const unsigned short DEFAULT_PORT = 2000;
-
 //Graph constants:
 const float TERRITORY_GRAPH_TOP = 0.98, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
 const float STRENGTH_GRAPH_TOP = -0.01, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
@@ -16,6 +13,7 @@ const float MAP_TOP = 0.98, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.
     
 //Map rendering
 GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;
+unsigned char number_of_players;
 
 //Graph rendering
 GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_border_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_border_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
@@ -23,10 +21,15 @@ GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_border
 unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
 float graph_zoom;
 
-void loadColorCodes()
+//Color codes
+std::map<unsigned char, hlt::Color> color_codes;
+
+//Functions --------------------------
+
+void loadColorCodes(std::string filename)
 {
 	std::fstream colorFile;
-	colorFile.open("ColorCodes.txt", std::ios_base::in);
+	colorFile.open(filename, std::ios_base::in);
 	color_codes.clear();
 	int n; float r, g, b;
 	while(!colorFile.eof())
@@ -129,7 +132,7 @@ void setupMapRendering(unsigned short width, unsigned short height)
 	glDeleteShader(map_fragment_shader);
 }
 
-void setupGraphRendering(float zoom, short turnNumber)
+void setupGraphRendering(std::vector<hlt::Map * > & full_game, float zoom, short turnNumber)
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
@@ -333,9 +336,17 @@ void setupGraphRendering(float zoom, short turnNumber)
 	glDeleteShader(graph_fragment_shader);
 }
 
-void render(short & turnNumber, float zoom)
+void setup(unsigned short width, unsigned short height, unsigned char numPlayers)
 {
-	confirmWithinGame(turnNumber);
+	loadColorCodes("Colorcodes.txt");
+	number_of_players = numPlayers;
+	setupMapRendering(width, height);
+}
+
+void render(std::vector<hlt::Map * > & full_game, short & turnNumber, float zoom)
+{
+	if(turnNumber < 0) turnNumber = 0;
+	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 
 	if(!full_game.empty())
 	{
@@ -371,7 +382,7 @@ void render(short & turnNumber, float zoom)
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
 
-		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
+		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(full_game, zoom, turnNumber);
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
