@@ -1,7 +1,7 @@
 import java.net.*;
 import java.util.ArrayList;
 
-public class TestAI
+public class ExampleBot
 {
     public static void main(String[] args) {
         System.out.println("\u000c");
