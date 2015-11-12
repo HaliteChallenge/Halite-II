@@ -14,7 +14,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/asio.hpp>
 
-#include "GameLogic/hlt.h"
+#include "../Core/hlt.h"
 
 
 static std::string serializeMap(hlt::Map & map)
