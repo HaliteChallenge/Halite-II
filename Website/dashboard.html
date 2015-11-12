@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Halite4</title>
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+	<script type="text/javascript">
+		var username = "";
+		$.ajax({
+			url: "Backend/session", 
+			method: "GET",
+			async: false,
+			success: function(sessionResult) {
+				if(sessionResult == null) {
+					window.location.replace("index.html");
+				} else {
+					username = sessionResult['username'];
+				}
+	    	}
+	    });
+		$(document).ready(function() {
+			$("#welcome").text("Welcome " + username + "!")
+		});
+	</script>
+</head>
+
+<body>
+	<h1>Halite</h1>
+	
+	<p id="welcome">Welcome!</p>
+
+	<p>You rank __ out of __. <a href="#">Rankings</a></p>
+	<a href="newbot.html">Upload New Bot</a>
+
+
+</body>
+
+</html>

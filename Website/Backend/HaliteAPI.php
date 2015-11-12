@@ -64,6 +64,22 @@ class HaliteAPI extends API
 
 		return "ERROR";
 	}
+
+	protected function session() {
+		session_start();
+		if($this->method == 'GET') {
+			return $_SESSION;
+		} else if($this->method == 'POST' && (isset($_POST['username']) || isset($_POST['password']))) {
+			if(isset($_POST['username'])) $_SESSION['username'] = $_POST['username'];
+			if(isset($_POST['password'])) $_SESSION['password'] = $_POST['password'];
+		} else if($this->method == 'DELETE') {
+			session_destroy();
+		} else {
+			return "error";
+		}
+
+		return "success";
+	}
  }
 
  ?>

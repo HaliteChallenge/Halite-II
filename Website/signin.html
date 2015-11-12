@@ -7,7 +7,18 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	
 	<script type="text/javascript">
+		$.ajax({
+			url: "Backend/session", 
+			async: false,
+			success: function(result) {
+				if(result != null) {
+					window.location.replace("dashboard.html");
+				}
+			}
+		});
+
 		$(document).ready(function() {
+			
 			$("#submit").click(function() {
 				var username = $("input:text[name=username]").val();
 				var password = $("input:text[name=password]").val();
@@ -22,7 +33,14 @@
 			       		if(result == null) {
 			       			$("#message").text("That username/password combo is incorrect.");
 			       		} else {
-			       			window.location.replace("index.html");
+			       			$.ajax({
+								url: "Backend/session", 
+								async: false,
+								method: "POST",
+								data: {username: username, password: password}
+						    });
+
+			       			window.location.replace("dashboard.html");
 			       		}
 			    	}
 			    });

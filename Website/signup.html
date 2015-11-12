@@ -19,7 +19,14 @@
 					data: {username: username, password: password}
 			    });
 
-				window.location.replace("index.html");
+			    $.ajax({
+					url: "Backend/session", 
+					async: true,
+					method: "POST",
+					data: {username: username, password: password}
+			    });
+
+				window.location.replace("dashboard.html");
 			});
 		});
 	</script>	
