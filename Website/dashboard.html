@@ -5,23 +5,20 @@
 	<title>Halite4</title>
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="backend.js"></script>
 
 	<script type="text/javascript">
-		var username = "";
-		$.ajax({
-			url: "Backend/session", 
-			method: "GET",
-			async: false,
-			success: function(sessionResult) {
-				if(sessionResult == null) {
-					window.location.replace("index.html");
-				} else {
-					username = sessionResult['username'];
-				}
-	    	}
-	    });
+		var credentials = getSession();
+		if(credentials == null) {
+			window.location.replace("index.html");
+		}
+
 		$(document).ready(function() {
-			$("#welcome").text("Welcome " + username + "!")
+			$("#welcome").text("Welcome " + credentials.username + "!");
+			$("#signOut").click(function() {
+				destroySession(true);
+				window.location.replace("index.html");
+			});
 		});
 	</script>
 </head>
@@ -30,9 +27,25 @@
 	<h1>Halite</h1>
 	
 	<p id="welcome">Welcome!</p>
+	<a href="#" id="signOut">Sign out</a>
+	<hr>
 
-	<p>You rank __ out of __. <a href="#">Rankings</a></p>
-	<a href="newbot.html">Upload New Bot</a>
+	<h3>Rankings</h3>
+	<p>You rank __ out of __. <a href="#">Full Rankings</a></p>
+
+	<h3>Existing Bots</h3>
+	<div id="existingBotDiv">
+		Dummy text.
+	</div>
+
+	<h3>New Bot</h3>
+	<form action="upload.php" method="post" enctype="multipart/form-data">
+   		Bot name:<br>
+   		<input type="text" name="botName" value=""><br>
+   		Code:<br>
+    	<input name="upload[]" type="file" multiple="multiple"><br>
+    	<input type="submit" value="Submit New Bot" name="submit">
+	</form>
 
 
 </body>

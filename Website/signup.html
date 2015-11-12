@@ -5,28 +5,25 @@
 	<title>Halite4</title>
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="backend.js"></script>
 
 	<script type="text/javascript">
+		if(getSession() != null) {
+			window.location.replace("dashboard.html");
+		}
+		
 		$(document).ready(function() {
 			$("#submit").click(function() {
 				var username = $("input:text[name=username]").val();
 				var password = $("input:text[name=password]").val();
 
-				$.ajax({
-					url: "Backend/user", 
-					async: true,
-					method: "POST",
-					data: {username: username, password: password}
-			    });
+			    if(putUsernamePasswordDatabase(username, password) == true) {
+			    	putUsernamePasswordSession(username, password, true);
 
-			    $.ajax({
-					url: "Backend/session", 
-					async: true,
-					method: "POST",
-					data: {username: username, password: password}
-			    });
-
-				window.location.replace("dashboard.html");
+					window.location.replace("dashboard.html");
+				} else {
+					$("#message").text("That username is already taken");
+				}
 			});
 		});
 	</script>	
@@ -34,6 +31,8 @@
 
 <body>
 	<h1>Sign Up</h1>
+
+	<p id="message"></p>
 	
 	<input type="text" name="username" value="">
 	<br>

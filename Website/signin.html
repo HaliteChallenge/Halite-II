@@ -5,46 +5,25 @@
 	<title>Halite4</title>
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	
+	<script src="backend.js"></script>
+
 	<script type="text/javascript">
-		$.ajax({
-			url: "Backend/session", 
-			async: false,
-			success: function(result) {
-				if(result != null) {
-					window.location.replace("dashboard.html");
-				}
-			}
-		});
+		if(getSession() != null) {
+			window.location.replace("dashboard.html");
+		}
 
 		$(document).ready(function() {
-			
 			$("#submit").click(function() {
 				var username = $("input:text[name=username]").val();
 				var password = $("input:text[name=password]").val();
 
-				$.ajax({
-					url: "Backend/user", 
-					async: false,
-					method: "GET",
-					data: {username: username, password: password},
-					success: function(result){
-						// Not signin
-			       		if(result == null) {
-			       			$("#message").text("That username/password combo is incorrect.");
-			       		} else {
-			       			$.ajax({
-								url: "Backend/session", 
-								async: false,
-								method: "POST",
-								data: {username: username, password: password}
-						    });
-
-			       			window.location.replace("dashboard.html");
-			       		}
-			    	}
-			    });
-
+				var signInResult = getUserCredentials(username, password);
+				if(signInResult == null) {
+					$("#message").text("That username/password combo is incorrect.");
+				} else {
+					putUsernamePasswordSession(username, password, true);
+					window.location.replace("dashboard.html");
+				}
 			});
 		});
 	</script>
