@@ -39,7 +39,7 @@ function getUserCredentials(username, password) {
 		data: {username: username, password: password}
     });
 
-    if(didSucceed(response) == false)  return null;
+    if(didSucceed(result) == false)  return null;
 	return result.responseJSON;
 }
 

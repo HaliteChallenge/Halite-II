@@ -56,8 +56,8 @@ class HaliteAPI extends API
 				$username = $_POST["username"];
 				$password = $_POST["password"];
 
-				$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' LIMIT 1");
-				if(isset($userIDArray['userID'])) {
+				$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
+				if(isset($usernameArray['username'])) {
 					return NULL;
 				}
 
@@ -70,20 +70,24 @@ class HaliteAPI extends API
 	}
 
 	protected function bots() {
-		if($this->method == 'GET') {
-			if(isset($_GET["userID"])) {
-				$userID = $_GET["userID"];
+		if(isset($_GET["userID"])) {
+			$userID = $_GET["userID"];
 
-				return $this->select("SELECT * FROM Bot WHERE userID = $userID");
-			}
-			if(isset($_GET["username"])) {
-				$username = $_GET["username"];
-				$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' LIMIT 1");
-				$userID = $userIDArray['userID'];
+			return $this->select("SELECT * FROM Bot WHERE userID = $userID");
+		} else if(isset($_GET["name"])) {
+			$name = $_GET["name"];
 
-				return $this->select("SELECT * FROM Bot WHERE userID = $userID");
+			return $this->select("SELECT * FROM Bot WHERE name = '$name'");
+		} else if(isset($_POST['name']) && isset($_POST['userID'])) {
+			$name = $_POST['name'];
+			$userID = $_POST['userID'];
+
+			$botNameArray = $this->select("SELECT name FROM Bot WHERE name = '$name' LIMIT 1");
+			if(isset($botNameArray['name'])) {
+				return NULL;
 			}
-		} else if($this->method == 'POST') {
+
+			$this->insert("INSERT INTO Bot (userID, name) VALUES ($userID, '$name')");
 
 		} else {
 			return NULL;
