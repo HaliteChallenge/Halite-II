@@ -31,7 +31,6 @@ class HaliteAPI extends API
 	}
 
 	private function insert($sql) {
-		echo $sql;
 		mysqli_query($this->mysqli, $sql);
 	}
 
@@ -58,9 +57,8 @@ class HaliteAPI extends API
 				$password = $_POST["password"];
 
 				$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' LIMIT 1");
-				$existingUserID = $userIDArray['userID'];
-				if(isset($existingUserID)) {
-					return "ERROR";
+				if(isset($userIDArray['userID'])) {
+					return NULL;
 				}
 
 				$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
@@ -68,7 +66,7 @@ class HaliteAPI extends API
 			}
 		}
 
-		return "ERROR";
+		return NULL;
 	}
 
 	protected function bots() {
@@ -88,7 +86,7 @@ class HaliteAPI extends API
 		} else if($this->method == 'POST') {
 
 		} else {
-			return "ERROR";
+			return NULL;
 		}
 
 		return "success";
@@ -98,16 +96,20 @@ class HaliteAPI extends API
 		session_start();
 		if($this->method == 'GET') {
 			return $_SESSION;
-		} else if($this->method == 'POST' && (isset($_POST['username']) & isset($_POST['password']))) {
+		} else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$_SESSION['username'] = $_POST['username'];
 			$_SESSION['password'] = $_POST['password'];
 			$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' AND password = '$password'");
 			$_SESSION['userID'] = $userIDArray['userID'];
-
+		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
+			$_SESSION['userID'] = $_POST['userID'];
+			$_SESSION['password'] = $_POST['password'];
+			$usernameArray = $this->select("SELECT username FROM User WHERE userID = $userID AND password = '$password'");
+			$_SESSION['username'] = $usernameArray['username'];
 		} else if($this->method == 'DELETE') {
 			session_destroy();
 		} else {
-			return "error";
+			return NULL;
 		}
 
 		return "success";

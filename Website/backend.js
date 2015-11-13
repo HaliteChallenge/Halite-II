@@ -1,17 +1,19 @@
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
-function putUsernamePasswordDatabase(username, password) {
+// If async returns null
+function putUsernamePasswordDatabase(username, password, async) {
 	var result = $.ajax({
 		url: "Backend/user", 
-		async: false,
+		async: async,
 		method: "POST",
 		data: {username: username, password: password}
     });
 
-    if(result.responseText.localeCompare("ERROR") || result.responseText.localeCompare("null")) {
-		return false;
-	}
-	return true;
+    if(async == true) {
+    	return null;
+    }
+
+    return didSucceed(result);
 }
 
 function putUsernamePasswordSession(username, password, async) {
@@ -25,9 +27,7 @@ function putUsernamePasswordSession(username, password, async) {
 
 function getSession() {
 	var response =  $.ajax({ url: "Backend/session", async: false });
-	if(response.responseText.localeCompare("null") == 0 || Object.keys(response.responseJSON).length === 0) {
-		return null;
-	}
+	if(didSucceed(response) == false)  return null;
 	return response.responseJSON;
 }
 
@@ -39,10 +39,8 @@ function getUserCredentials(username, password) {
 		data: {username: username, password: password}
     });
 
-    if(result.responseText.localeCompare("ERROR") || result.responseText.localeCompare("null")) {
-		return false;
-	}
-	return true;
+    if(didSucceed(response) == false)  return null;
+	return result.responseJSON;
 }
 
 function destroySession(async) {
@@ -51,4 +49,11 @@ function destroySession(async) {
 		async: async,
 		method: "DELETE"
     });
+}
+
+function didSucceed(response) {
+	if(response.responseText.localeCompare("null") == 0 || Object.keys(response.responseJSON).length === 0) {
+		return false;
+	}
+	return true;
 }

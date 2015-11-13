@@ -6,18 +6,19 @@
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="backend.js"></script>
+	<script src="app.js"></script>
 
 	<script type="text/javascript">
 		var credentials = getSession();
 		if(credentials == null) {
-			window.location.replace("index.html");
+			goToHomepage();
 		}
 
 		$(document).ready(function() {
 			$("#welcome").text("Welcome " + credentials.username + "!");
 			$("#signOut").click(function() {
 				destroySession(true);
-				window.location.replace("index.html");
+				goToHomepage();
 			});
 		});
 	</script>

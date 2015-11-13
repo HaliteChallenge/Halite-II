@@ -6,10 +6,11 @@
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="backend.js"></script>
+	<script src="app.js"></script>
 
 	<script type="text/javascript">
 		if(getSession() != null) {
-			window.location.replace("dashboard.html");
+			goToDashboard();
 		}
 		
 		$(document).ready(function() {
@@ -17,10 +18,10 @@
 				var username = $("input:text[name=username]").val();
 				var password = $("input:text[name=password]").val();
 
-			    if(putUsernamePasswordDatabase(username, password) == true) {
+			    if(putUsernamePasswordDatabase(username, password, false) == true) {
 			    	putUsernamePasswordSession(username, password, true);
 
-					window.location.replace("dashboard.html");
+					goToDashboard();
 				} else {
 					$("#message").text("That username is already taken");
 				}

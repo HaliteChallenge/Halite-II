@@ -6,10 +6,11 @@
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="backend.js"></script>
+	<script src="app.js"></script>
 
 	<script type="text/javascript">
 		if(getSession() != null) {
-			window.location.replace("dashboard.html");
+			goToDashboard();
 		}
 
 		$(document).ready(function() {
@@ -22,7 +23,7 @@
 					$("#message").text("That username/password combo is incorrect.");
 				} else {
 					putUsernamePasswordSession(username, password, true);
-					window.location.replace("dashboard.html");
+					goToDashboard();
 				}
 			});
 		});
