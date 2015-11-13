@@ -69,7 +69,7 @@ class HaliteAPI extends API
 		return NULL;
 	}
 
-	protected function bots() {
+	protected function bot() {
 		if(isset($_GET["userID"])) {
 			$userID = $_GET["userID"];
 
@@ -78,6 +78,10 @@ class HaliteAPI extends API
 			$name = $_GET["name"];
 
 			return $this->select("SELECT * FROM Bot WHERE name = '$name'");
+		} else if(isset($_GET["botID"])) {
+			$botID = $_GET["botID"];
+
+			return $this->select("SELECT * FROM Bot WHERE botID = $botID");
 		} else if(isset($_POST['name']) && isset($_POST['userID'])) {
 			$name = $_POST['name'];
 			$userID = $_POST['userID'];
