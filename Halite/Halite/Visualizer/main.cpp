@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "../Core/Halite.h"
-#include "Rendering.h"
 
 GLFWwindow * window;
 
@@ -66,7 +65,6 @@ int main(int argc, char* args[])
 
 	my_game = new Halite();
 	std::cout << "Simply drop the file onto the window." << std::endl;
-	setup(my_game->game_map.map_width, my_game->game_map.map_height, my_game->number_of_players);
 
 	clock_t c = clock();
 	while(!glfwWindowShouldClose(window))
@@ -204,7 +202,7 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	render(my_game->full_game, turnNumber, graphZoom);
+	my_game->render(turnNumber, graphZoom);
 
 	glfwPollEvents();
 	glfwSwapBuffers(window);
