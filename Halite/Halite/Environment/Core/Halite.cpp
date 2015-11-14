@@ -184,6 +184,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
+	//Output game state to file.
+	game_file << std::endl;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
+
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
 	unsigned char numAlive = 0;
@@ -200,9 +204,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 Halite::Halite(unsigned short w, unsigned short h, std::string filename)
 {
-	last_turn_output = 0;
     player_moves = std::vector< std::set<hlt::Move> >();
-	output.open(filename, std::ios_base::out);
+	game_file.open(filename, std::ios_base::out);
     turn_number = 0;
     
     //Connect to players
@@ -293,13 +296,17 @@ Halite::Halite(unsigned short w, unsigned short h, std::string filename)
 			}
 		}
         player_names.push_back(in);
-
-		player_names.push_back(std::to_string(number_of_players));
         number_of_players++;
     }
     
     //Initialize map:
-    game_map = hlt::Map(w, h, number_of_players);
+	game_map = hlt::Map(w, h, number_of_players);
+
+	//Output game information to file, such as map dimensions, number of players, their names, and the first frame.
+	game_file << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << '\n';
+	for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file << *a << '\n';
+	game_file << *(player_names.end() - 1) << std::endl;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
     
     //Initialize player moves vector
     player_moves.resize(number_of_players);
@@ -332,6 +339,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 		//Frame logic.
 		result = processNextFrame(result);
 	}
+	game_file.close();
 	unsigned int maxValue = 2 * *std::max_element(attack_count.begin(), attack_count.end());
 	std::vector< std::pair<std::string, float> > relativeScores(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
@@ -341,33 +349,6 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	for(unsigned char a = 0; a < number_of_players; a++) if(result[a]) relativeScores[a].second += 0.5;
 	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<std::string, float> & a, const std::pair<std::string, float> & b) -> bool { return a.second > b.second; });
 	return relativeScores;
-}
-
-void Halite::output(std::string filename)
-{
-	std::cout << "Beginning to output file from frame #" << last_turn_output + 1 << ".\n";
-
-	std::fstream game_file;
-	if(last_turn_output == 0)
-	{
-		game_file.open(filename, std::ios_base::out);
-		game_file << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << "\n";
-		for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file << *a << "\n";
-		game_file << *(player_names.end() - 1);
-	}
-	else game_file.open(filename, std::ios_base::app);
-
-	while(last_turn_output < full_game.size())
-	{
-		game_file << std::endl;
-		for(auto a = full_game[last_turn_output]->contents.begin(); a != full_game[last_turn_output]->contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
-		last_turn_output++;
-		std::cout << "Finished outputting frame " << last_turn_output + 1 << ".\n";
-	}
-
-	std::cout << "Output file until frame #" << last_turn_output + 1 << ".\n";
-
-	game_file.close();
 }
 
 Halite::~Halite()

@@ -13,18 +13,17 @@
 
 #include "hlt.h"
 #include "../Networking.h"
-#include "../../Visualizer/OpenGL.h"
 
 class Halite
 {
 private:
-    unsigned short turn_number, last_turn_output;
+	unsigned short turn_number;
     std::vector<std::string> player_names;
     std::vector<boost::asio::ip::tcp::socket *> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
 	hlt::Map game_map;
-	std::fstream output;
+	std::ofstream game_file;
 	unsigned short number_of_players;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
