@@ -5,25 +5,16 @@
 #include <string>
 #include <map>
 #include <set>
-#include <algorithm>
 #include <iostream>
-#include <thread>
-#include <future>
-#include <boost/asio.hpp>
 
 #include "hlt.h"
-#include "../Environment/Networking.h"
-#include "../Visualizer/OpenGL.h"
+#include "../OpenGL.h"
 
 class Halite
 {
 private:
-    unsigned short turn_number, last_turn_output;
     std::vector<std::string> player_names;
-    std::vector<boost::asio::ip::tcp::socket *> player_connections;
-    std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
-	hlt::Map game_map;
 	std::vector<hlt::Map * > full_game;
 	std::map<unsigned char, hlt::Color> color_codes;
 	unsigned short number_of_players;
@@ -41,14 +32,10 @@ private:
 	void setupMapRendering(unsigned short width, unsigned short height);
 	void setupGraphRendering(float zoom, short turnNumber);
 	void clearFullGame();
-    std::vector<bool> getNextFrame(std::vector<bool> alive);
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
-    void init();
-	std::vector< std::pair<std::string, float> > runGame();
 	bool input(std::string filename, unsigned short& width, unsigned short& height);
-	void output(std::string filename);
 	void render(short& turnNumber, float zoom);
 	std::map<unsigned char, hlt::Color> getColorCodes();
 	~Halite();

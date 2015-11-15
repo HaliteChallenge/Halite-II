@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../Core/Halite.h"
+#include "Core/Halite.h"
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
@@ -44,15 +44,14 @@ int main(int argc, char* args[])
 		}
 	}
 
-	my_game = new Halite(mapWidth, mapHeight);
-
+	my_game = new Halite(mapWidth, mapHeight, "../../Replays/" + std::to_string(time(NULL)) + ".hlt");
 	my_game->init();
 	
-
 	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
 	std::string victoryOut;
 	for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player " + rankings[a].first + " with a relative score of " + std::to_string(rankings[a].second).substr(0, 5) + "\n";
 	std::cout << victoryOut;
 
+	system("PAUSE");
 	return 0;
 }

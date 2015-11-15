@@ -1,4 +1,4 @@
-#include "Rendering.h"
+#include "Halite.h"
 
 //Consts -----------------------------
 
@@ -9,24 +9,9 @@ const float STRENGTH_GRAPH_TOP = -0.01, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_
 //Map constants:
 const float MAP_TOP = 0.98, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
 
-//Variables --------------------------
-    
-//Map rendering
-GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;
-unsigned char number_of_players;
+//Private Functions ------------------
 
-//Graph rendering
-GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_border_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_border_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
-//Stats about the graph. This lets us know if we need to redo the setup for the graph.
-unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
-float graph_zoom;
-
-//Color codes
-std::map<unsigned char, hlt::Color> color_codes;
-
-//Functions --------------------------
-
-void loadColorCodes(std::string filename)
+void Halite::loadColorCodes(std::string filename)
 {
 	std::fstream colorFile;
 	colorFile.open(filename, std::ios_base::in);
@@ -40,7 +25,7 @@ void loadColorCodes(std::string filename)
 	colorFile.close();
 }
 
-void setupMapRendering(unsigned short width, unsigned short height)
+void Halite::setupMapRendering(unsigned short width, unsigned short height)
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &map_vertex_buffer);
@@ -103,11 +88,11 @@ void setupMapRendering(unsigned short width, unsigned short height)
 
 	//Setup shaders:
 	map_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	util::shaderFromFile(map_vertex_shader, "../Visualizer/shaders/mapvertexshader.glsl", "map_vertex_shader");
+	util::shaderFromFile(map_vertex_shader, "shaders/mapvertexshader.glsl", "map_vertex_shader");
 	map_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-	util::shaderFromFile(map_geometry_shader, "../Visualizer//shaders/mapgeometryshader.glsl", "map_geometry_shader");
+	util::shaderFromFile(map_geometry_shader, "shaders/mapgeometryshader.glsl", "map_geometry_shader");
 	map_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	util::shaderFromFile(map_fragment_shader, "../Visualizer/shaders/mapfragmentshader.glsl", "map_fragment_shader");
+	util::shaderFromFile(map_fragment_shader, "shaders/mapfragmentshader.glsl", "map_fragment_shader");
 
 	//Setup shader program:
 	map_shader_program = glCreateProgram();
@@ -132,7 +117,7 @@ void setupMapRendering(unsigned short width, unsigned short height)
 	glDeleteShader(map_fragment_shader);
 }
 
-void setupGraphRendering(std::vector<hlt::Map * > & full_game, float zoom, short turnNumber)
+void Halite::setupGraphRendering(float zoom, short turnNumber)
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
@@ -319,9 +304,9 @@ void setupGraphRendering(std::vector<hlt::Map * > & full_game, float zoom, short
 
 	//Setup shaders:
 	graph_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	util::shaderFromFile(graph_vertex_shader, "../Visualizer/shaders/graphvertexshader.glsl", "graph_vertex_shader");
+	util::shaderFromFile(graph_vertex_shader, "shaders/graphvertexshader.glsl", "graph_vertex_shader");
 	graph_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	util::shaderFromFile(graph_fragment_shader, "../Visualizer/shaders/graphfragmentshader.glsl", "graph_fragment_shader");
+	util::shaderFromFile(graph_fragment_shader, "shaders/graphfragmentshader.glsl", "graph_fragment_shader");
 
 	//Setup shader program:
 	graph_shader_program = glCreateProgram();
@@ -336,14 +321,71 @@ void setupGraphRendering(std::vector<hlt::Map * > & full_game, float zoom, short
 	glDeleteShader(graph_fragment_shader);
 }
 
-void setup(unsigned short width, unsigned short height, unsigned char numPlayers)
+void Halite::clearFullGame()
 {
-	loadColorCodes("Colorcodes.txt");
-	number_of_players = numPlayers;
-	setupMapRendering(width, height);
+	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
+	full_game.clear();
 }
 
-void render(std::vector<hlt::Map * > & full_game, short & turnNumber, float zoom)
+//Public Functions -------------------
+
+Halite::Halite()
+{
+    number_of_players = 0;
+    player_names = std::vector<std::string>();
+    full_game = std::vector<hlt::Map * >();
+	loadColorCodes("settings/colorcodes.txt");
+}
+
+bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
+{
+	std::fstream game_file;
+	hlt::Map m;
+	game_file.open(filename, std::ios_base::in);
+	if(!game_file.is_open()) return false;
+
+	std::cout << "Beginning to read in file:\n";
+
+	clearFullGame();
+	m.map_width = 0;
+	m.map_height = 0;
+
+	std::string in;
+	game_file >> width >> height >> number_of_players;
+	m.map_width = width;
+	m.map_height = height;
+	std::getline(game_file, in);
+	player_names.resize(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
+
+	m.contents.resize(m.map_height);
+	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
+
+	short ownerIn, ageIn;
+	while(!game_file.eof())
+	{
+		for(unsigned short a = 0; a < m.map_height; a++) for(unsigned short b = 0; b < m.map_width; b++)
+		{
+			game_file >> ownerIn >> ageIn;
+			m.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
+		}
+		m.getStatistics();
+		//Add game map to full game
+		full_game.push_back(new hlt::Map(m));
+		std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
+	}
+
+	delete full_game.back();
+	full_game.pop_back();
+
+	setupMapRendering(m.map_width, m.map_height);
+
+	game_file.close();
+
+	return true;
+}
+
+void Halite::render(short & turnNumber, float zoom)
 {
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
@@ -382,7 +424,7 @@ void render(std::vector<hlt::Map * > & full_game, short & turnNumber, float zoom
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
 
-		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(full_game, zoom, turnNumber);
+		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
@@ -405,4 +447,32 @@ void render(std::vector<hlt::Map * > & full_game, short & turnNumber, float zoom
 		glDrawArrays(GL_LINE_STRIP, 14, 5);
 		glDrawArrays(GL_LINES, 0, 4);
 	}
+}
+
+Halite::~Halite()
+{
+	//Get rid of map OpenGL stuff
+	glDeleteShader(map_vertex_shader);
+	glDeleteShader(map_geometry_shader);
+	glDeleteShader(map_fragment_shader);
+	glDeleteProgram(map_shader_program);
+	glDeleteBuffers(1, &map_vertex_buffer);
+	glDeleteBuffers(1, &map_color_buffer);
+	glDeleteBuffers(1, &map_strength_buffer);
+	glDeleteVertexArrays(1, &map_vertex_attributes);
+
+	//Get rid of graph OpenGL stuff
+	glDeleteShader(graph_vertex_shader);
+	glDeleteShader(graph_fragment_shader);
+	glDeleteProgram(graph_shader_program);
+	glDeleteBuffers(1, &graph_territory_vertex_buffer);
+	glDeleteBuffers(1, &graph_strength_vertex_buffer);
+	glDeleteBuffers(1, &graph_border_buffer);
+	glDeleteBuffers(1, &graph_color_buffer);
+	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_border_vertex_attributes);
+
+	//Get rid of dynamically allocated memory:
+	clearFullGame();
 }
