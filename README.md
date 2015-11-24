@@ -1,5 +1,18 @@
 # Halite
 
+## Due when we get back to school
+- Michael
+ - C sockets
+ - Manager
+  - People can upload bots
+  - People are ranked every x hours
+ - InterAI messaging (across all Java, Python, and C++)
+- Ben
+ - WebGL
+ - Fix map system
+ - Talk to companies
+ - Fix relative scoreing system
+
 Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
 
 This repository contains the environment for running Halite games and replays, a C++ starter kit for making your own AIs, and a starter AI (C++).
