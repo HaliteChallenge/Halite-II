@@ -337,30 +337,68 @@ Halite::Halite()
 	loadColorCodes("settings/colorcodes.txt");
 }
 
-bool Halite::input(std::string filename, unsigned short& width, unsigned short& height)
+bool Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
 {
 	std::fstream game_file;
 	hlt::Map m;
+	std::string in;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 
-	std::cout << "Beginning to read in file:\n";
-
+	//Clear previous game
 	clearFullGame();
+
+	//Generate a buffer for the loading bar's inside. We'll delete this near the end of the function.
+	GLuint loadingBuffer; glGenBuffers(1, &loadingBuffer);
+	std::vector<float> loadingVertices(12);
+	const float LOADING_TOP = -0.2, LOADING_BOTTOM = 0.2, LOADING_LEFT = -0.8, LOADING_RIGHT = 0.8;
+	loadingVertices[0] = LOADING_LEFT; loadingVertices[1] = LOADING_BOTTOM; loadingVertices[2] = LOADING_LEFT; loadingVertices[3] = LOADING_TOP; loadingVertices[4] = LOADING_LEFT; loadingVertices[5] = LOADING_BOTTOM; loadingVertices[6] = LOADING_LEFT; loadingVertices[7] = LOADING_TOP; loadingVertices[8] = LOADING_RIGHT; loadingVertices[9] = LOADING_TOP; loadingVertices[10] = LOADING_RIGHT; loadingVertices[11] = LOADING_BOTTOM;
+	GLuint loadingAttributes; glGenVertexArrays(1, &loadingAttributes);
+	glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+	glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+	glBindVertexArray(loadingAttributes);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER), fs = glCreateShader(GL_FRAGMENT_SHADER); //Create shaders.
+	util::shaderFromFile(vs, "shaders/loading/vertexshader.glsl", "Loading Vertex Shader"); util::shaderFromFile(fs, "shaders/loading/fragmentshader.glsl", "Loading Fragment Shader");
+	GLuint p = glCreateProgram();
+	glAttachShader(p, vs); glAttachShader(p, fs);
+	glLinkProgram(p); glUseProgram(p);
+	glDetachShader(p, vs); glDetachShader(p, fs);
+	glDeleteShader(vs); glDeleteShader(fs);
+
+	//Set window for rendering:
+	glfwMakeContextCurrent(window);
+
+	//Do first rendering:
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBindVertexArray(loadingAttributes);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+	glfwPollEvents();
+	glfwSwapBuffers(window);
+
+	//Read in names and dimensions
 	m.map_width = 0;
 	m.map_height = 0;
-
-	std::string in;
 	game_file >> width >> height >> number_of_players;
 	m.map_width = width;
 	m.map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
-
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
 
+	//Find number of lines.
+	std::fstream lineCounter; lineCounter.open(filename, std::ios_base::in);
+	for(int a = 0; a < number_of_players; a++) std::getline(lineCounter, in);
+	int numLines = std::count(std::istreambuf_iterator<char>(lineCounter),
+		std::istreambuf_iterator<char>(), '\n');
+
+	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 	short ownerIn, ageIn;
 	while(!game_file.eof())
 	{
@@ -372,8 +410,26 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 		m.getStatistics();
 		//Add game map to full game
 		full_game.push_back(new hlt::Map(m));
-		std::cout << "Gotten frame #" << short(full_game.size()) << ".\n";
+		
+		//No longer console: std::cout << "Gotten frame #" << short(full_game.size()) << ".\n"; Instead render the loading bar:
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
+		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+		glBindVertexArray(loadingAttributes);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+		glfwPollEvents();
+		glfwSwapBuffers(window);
 	}
+
+	//Cleanup
+	glDeleteBuffers(1, &loadingBuffer);
+	glDeleteVertexArrays(1, &loadingAttributes);
+	glDeleteProgram(p);
 
 	delete full_game.back();
 	full_game.pop_back();
@@ -385,8 +441,14 @@ bool Halite::input(std::string filename, unsigned short& width, unsigned short& 
 	return true;
 }
 
-void Halite::render(short & turnNumber, float zoom)
+void Halite::render(GLFWwindow * window, short & turnNumber, float zoom)
 {
+	//Set window for rendering.
+	glfwMakeContextCurrent(window);
+
+	//Clear color buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 
@@ -447,6 +509,10 @@ void Halite::render(short & turnNumber, float zoom)
 		glDrawArrays(GL_LINE_STRIP, 14, 5);
 		glDrawArrays(GL_LINES, 0, 4);
 	}
+
+	//Update window
+	glfwPollEvents();
+	glfwSwapBuffers(window);
 }
 
 Halite::~Halite()

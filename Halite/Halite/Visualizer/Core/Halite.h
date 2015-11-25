@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 #include "hlt.h"
 #include "../OpenGL.h"
@@ -35,8 +36,8 @@ private:
 public:
     Halite();
     Halite(unsigned short w, unsigned short h);
-	bool input(std::string filename, unsigned short& width, unsigned short& height);
-	void render(short& turnNumber, float zoom);
+	bool input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height);
+	void render(GLFWwindow * window, short& turnNumber, float zoom);
 	std::map<unsigned char, hlt::Color> getColorCodes();
 	~Halite();
 };

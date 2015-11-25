@@ -1,6 +1,6 @@
 #include <iostream>
 #include <thread>
-
+#include <Windows.h>
 #include "Core/Halite.h"
 
 GLFWwindow * window;
@@ -21,7 +21,7 @@ float graphZoom = 1.0;
 
 std::string filename;
 
-int main(int argc, char* args[])
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)
 {
 	// start GL context and O/S window using the GLFW helper library
 	if(!glfwInit())
@@ -70,7 +70,7 @@ int main(int argc, char* args[])
 	clock_t c = clock();
 	while(!glfwWindowShouldClose(window))
 	{
-		render();
+		my_game->render(window, turnNumber, graphZoom);
 
 		if(upPressed && maxFps <= 120) maxFps++;
 		else if(downPressed && maxFps != 4) maxFps--;
@@ -183,7 +183,7 @@ void handleChars(GLFWwindow * w, unsigned int code)
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	if(!my_game->input(paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
+	if(!my_game->input(w, paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
 	isPaused = false;
 	turnNumber = 0;
 }
@@ -200,11 +200,4 @@ void handleResize(GLFWwindow * w, int width, int height)
 
 void render()
 {
-	//Clear color buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	my_game->render(turnNumber, graphZoom);
-
-	glfwPollEvents();
-	glfwSwapBuffers(window);
 }
