@@ -8,6 +8,8 @@ std::string filename;
 
 int main(int argc, char* args[])
 {
+	srand(time(NULL));
+
 	std::string in;
 	filename = "Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 	std::thread logicThread;
