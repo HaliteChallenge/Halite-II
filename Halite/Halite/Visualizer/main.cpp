@@ -12,11 +12,11 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths);
 void handleErrors(int error, const char * description);
 void handleResize(GLFWwindow * w, int width, int height);
 
-void render();
+void renderLaunch();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false;
-signed short turnNumber = 0, maxFps = 60;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true;
+signed short turnNumber = 0, maxFps = 8;
 float graphZoom = 1.0;
 
 std::string filename;
@@ -64,8 +64,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	//Set window resize handler
 	glfwSetWindowSizeCallback(window, handleResize);
 
-	my_game = new Halite();
-	std::cout << "Simply drop the file onto the window." << std::endl;
+	while(isLaunch)
+	{
+		renderLaunch();
+	}
 
 	clock_t c = clock();
 	while(!glfwWindowShouldClose(window))
@@ -178,12 +180,24 @@ void handleChars(GLFWwindow * w, unsigned int code)
 		turnNumber--;
 		isPaused = true;
 	}
+	else if(code == 'Z' || code == 'z')
+	{
+		turnNumber = 0;
+	}
+	else if(code == 'X' || code == 'x')
+	{
+		turnNumber = 1000;
+	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	if(!my_game->input(w, paths[0], wi, he)) std::cout << "I couldn't open the specified file. Please drop another file onto the window.\n";
+	isLaunch = false;
+	delete my_game;
+	std::this_thread::sleep_for(std::chrono::milliseconds(int(10000)));
+	my_game = new Halite();
+	if(!my_game->input(w, paths[0], wi, he)) /*Do something*/;
 	isPaused = false;
 	turnNumber = 0;
 }
@@ -198,6 +212,12 @@ void handleResize(GLFWwindow * w, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void render()
+void renderLaunch()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Fill me in with actual rendering later:
+
+	glfwSwapBuffers(window);
+	glfwPollEvents();
 }
