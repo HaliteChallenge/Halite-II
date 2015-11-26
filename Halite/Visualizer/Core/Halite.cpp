@@ -357,13 +357,13 @@ Halite::Halite()
 	loadColorCodes("settings/colorcodes.txt");
 }
 
-bool Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
+short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
 {
 	std::fstream game_file;
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in);
-	if(!game_file.is_open()) return false;
+	if(!game_file.is_open()) return -1;
 
 	//Clear previous game
 	clearFullGame();
@@ -459,7 +459,7 @@ bool Halite::input(GLFWwindow * window, std::string filename, unsigned short& wi
 
 	game_file.close();
 
-	return true;
+	return numLines;
 }
 
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom)

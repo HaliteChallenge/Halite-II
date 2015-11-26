@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include "Core/Halite.h"
 
+//#define CONSOLE_DEBUG
+
 GLFWwindow * window;
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods);
@@ -17,16 +19,41 @@ void renderLaunch();
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true;
 signed short turnNumber = 0, maxFps = 8;
-float graphZoom = 1.0;
+float graphZoom = 1.0, maxZoom;
 
 std::string filename;
+std::fstream debug;
 
+#ifdef CONSOLE_DEBUG
+int main()
+#else
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)
+#endif
 {
+	//Open debug:
+	std::string debugfilename = "logs/";
+	time_t rawtime;
+	tm timeinfo;
+	time(&rawtime);
+	localtime_s(&timeinfo, &rawtime);
+	const int STRING_LEN = 30;  char timeC[STRING_LEN]; asctime_s(timeC, STRING_LEN, &timeinfo);
+	std::string timeString(timeC);  timeString.pop_back();
+	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ' '; }, '_');
+	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ':'; }, '-');
+	debugfilename += timeString;
+	debugfilename += ".log";
+	debug.open(debugfilename, std::ios_base::out);
+	if(!debug.is_open()) //If file couldn't be opened.
+	{
+		debug.open("DEBUG.log", std::ios_base::out);
+		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.";
+		debug.flush();
+	}
+
 	// start GL context and O/S window using the GLFW helper library
 	if(!glfwInit())
 	{
-		fprintf(stderr, "Could not start GLFW3\n");
+		debug << "Could not start GLFW3\n";
 		return EXIT_FAILURE;
 	}
 
@@ -37,7 +64,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	window = glfwCreateWindow(mode->width * 2 / 3, mode->height * 2 / 3, "Halite", NULL, NULL);
 	if(!window)
 	{
-		fprintf(stderr, "Could not open window with GLFW3\n");
+		debug << "Could not open window with GLFW3\n";
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
@@ -47,7 +74,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
-	util::initShaderHandler(true);
+	util::initShaderHandler(&debug);
 
 	//Set handlers:
 
@@ -64,10 +91,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	//Set window resize handler
 	glfwSetWindowSizeCallback(window, handleResize);
 
-	while(isLaunch)
-	{
-		renderLaunch();
-	}
+	while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 
 	clock_t c = clock();
 	while(!glfwWindowShouldClose(window))
@@ -163,7 +187,7 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	else if(code == '+')
 	{
 		graphZoom *= 1.5;
-		if(graphZoom > 129.7) graphZoom = 129.7463;
+		if(graphZoom > maxZoom) graphZoom = maxZoom;
 	}
 	else if(code == '-')
 	{
@@ -195,16 +219,26 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 	unsigned short wi, he;
 	isLaunch = false;
 	delete my_game;
-	std::this_thread::sleep_for(std::chrono::milliseconds(int(10000)));
 	my_game = new Halite();
-	if(!my_game->input(w, paths[0], wi, he)) /*Do something*/;
+	short numTurns = my_game->input(w, paths[0], wi, he);
+	if(numTurns == -1)
+	{
+		debug << "Failed to open file at " << paths[0] << ". The file was invalid or didn't exist, as my_game->input returned -1.\n"
+		/*Alert user*/;
+	}
+	else
+	{
+		const int MIN_POINTS_VISIBLE = 3;
+		//Set new max_zoom. We allow zooming until only MIN_POINTS_VISIBLE points are visible.
+		maxZoom = numTurns/float(MIN_POINTS_VISIBLE);
+	}
 	isPaused = false;
 	turnNumber = 0;
 }
 
 void handleErrors(int error, const char * description)
 {
-	fprintf(stderr, description);
+	debug << description;
 }
 
 void handleResize(GLFWwindow * w, int width, int height)
