@@ -24,6 +24,12 @@ float graphZoom = 1.0, maxZoom;
 std::string filename;
 std::fstream debug;
 
+//TEMP -----
+
+Text * t;
+
+//END TEMP--
+
 #ifdef CONSOLE_DEBUG
 int main()
 #else
@@ -75,6 +81,13 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
 	util::initShaderHandler(&debug);
+	Text::init(&debug);
+
+	/// ---- TEMP
+
+	t = new Text("fonts/FreeSans.ttf", 36);
+
+	//END TEMP --
 
 	//Set handlers:
 
@@ -251,6 +264,7 @@ void renderLaunch()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Fill me in with actual rendering later:
+	t->render("Sphinx of black quartz, judge my vow", -0.5, 0.8, 1, 1, { 1.0, 1.0, 0.5});
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

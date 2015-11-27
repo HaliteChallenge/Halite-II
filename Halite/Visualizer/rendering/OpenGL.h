@@ -15,6 +15,12 @@
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 800;
 
+//Color struct.
+struct Color
+{
+	float r, g, b;
+};
+
 namespace util
 {
 	void initShaderHandler(std::fstream * ds);

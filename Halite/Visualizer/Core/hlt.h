@@ -15,11 +15,6 @@ namespace hlt
 		return ((l1.x + l1.y)*((unsigned int)l1.x + l1.y + 1) / 2) + l1.y < ((l2.x + l2.y)*((unsigned int)l2.x + l2.y + 1) / 2) + l2.y;
 	}
 
-	struct Color
-	{
-		float r, g, b;
-	};
-
 	struct Site
 	{
 		unsigned char owner, strength;

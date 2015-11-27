@@ -9,7 +9,8 @@
 #include <algorithm>
 
 #include "hlt.h"
-#include "../OpenGL.h"
+#include "../rendering/OpenGL.h"
+#include "../rendering/Text.h"
 
 class Halite
 {
@@ -17,7 +18,7 @@ private:
     std::vector<std::string> player_names;
 	std::vector<unsigned int> attack_count;
 	std::vector<hlt::Map * > full_game;
-	std::map<unsigned char, hlt::Color> color_codes;
+	std::map<unsigned char, Color> color_codes;
 	unsigned short number_of_players;
 
 	//Map rendering
@@ -42,7 +43,7 @@ public:
     Halite(unsigned short w, unsigned short h);
 	short input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height);
 	void render(GLFWwindow * window, short& turnNumber, float zoom);
-	std::map<unsigned char, hlt::Color> getColorCodes();
+	std::map<unsigned char, Color> getColorCodes();
 	~Halite();
 };
 

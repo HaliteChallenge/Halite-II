@@ -3,8 +3,8 @@
 //Consts -----------------------------
 
 //Graph constants:
-const float TERRITORY_GRAPH_TOP = 0.98, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
-const float STRENGTH_GRAPH_TOP = -0.01, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
+const float TERRITORY_GRAPH_TOP = 0.85, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
+const float STRENGTH_GRAPH_TOP = -0.14, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
 
 //Map constants:
 const float MAP_TOP = 0.98, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
@@ -20,7 +20,7 @@ void Halite::loadColorCodes(std::string filename)
 	while(!colorFile.eof())
 	{
 		colorFile >> n >> r >> g >> b;
-		color_codes.insert(std::pair<unsigned char, hlt::Color>(unsigned char(n), { r, g, b }));
+		color_codes.insert(std::pair<unsigned char, Color>(unsigned char(n), { r, g, b }));
 	}
 	colorFile.close();
 }
@@ -220,7 +220,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	unsigned int graphColorsLoc = 0; //Location in graphColors.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		hlt::Color c = color_codes[a + 1];
+		Color c = color_codes[a + 1];
 		for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 		{
 			graphColors[graphColorsLoc] = c.r;
@@ -486,7 +486,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom)
 		{
 			for(auto b = a->begin(); b != a->end(); b++)
 			{
-				hlt::Color c = color_codes[b->owner];
+				Color c = color_codes[b->owner];
 				colors[colorLoc] = c.r;
 				colors[colorLoc + 1] = c.g;
 				colors[colorLoc + 2] = c.b;
