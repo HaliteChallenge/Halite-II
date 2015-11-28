@@ -14,12 +14,23 @@
 			goToHomepage();
 		}
 
+		console.log(credentials)
+
 		$(document).ready(function() {
+			// Set the welcome text to include the user's name
 			$("#welcome").text("Welcome " + credentials.username + "!");
+
+			
 			$("#signOut").click(function() {
 				destroySession(true);
 				goToHomepage();
 			});
+
+			$("#uploadBot").click(function() {
+				$("#uploadBotForm").find("input[name='userID']").val(credentials.userID+"")
+				putBotFiles("uploadBotForm");
+				$("#welcome").text("Uploaded!");
+			})
 		});
 	</script>
 </head>
@@ -35,10 +46,11 @@
 	<p>You rank __ out of __. <a href="#">Full Rankings</a></p>
 
 	<h3>Update Bot</h3>
-	<form action="upload.php" method="post" enctype="multipart/form-data">
+	<form enctype="multipart/form-data" id="uploadBotForm">
    		Bot Code:<br>
-    	<input name="upload[]" type="file" multiple="multiple"><br>
-    	<input type="submit" value="Update Bot" name="submit">
+   		<input type="hidden" name="userID" value="">
+    	<input name="files[]" type="file" multiple="multiple"><br>
+    	<input type="button" value="Update Bot" id="uploadBot">
 	</form>
 
 </body>
