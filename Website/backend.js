@@ -34,6 +34,34 @@ function putBot(userID, name, async) {
     });
 }
 
+// Uploads source code for users's bot
+// When given the html ID of a form with the userID as a value
+// and the forms as another value
+function putBotFiles(formID) {
+	if(!$("#"+formID).find("input[name='userID']").length || $("#"+formID).find("input[name='userID']").val().localeCompare("") == 0) {
+		console.log("Form not setup correctly. Does not include userID");
+		throw 1;
+	}
+	var formData = new FormData($("#"+formID)[0]);
+	console.log(formData);
+	var result = $.ajax({
+        url: 'Backend/botFiles',
+        type: 'POST',
+        async: false,
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function() {
+            var myXhr = $.ajaxSettings.xhr();
+            return myXhr;
+        },
+        success: function (data) {
+            alert("Data Uploaded: "+data);
+        }
+    });
+    console.log(result)
+}
+
 function getSession() {
 	var response =  $.ajax({ url: "Backend/session", async: false });
 	if(didSucceed(response) == false)  return null;

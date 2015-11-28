@@ -100,18 +100,45 @@ class HaliteAPI extends API
 		return "success";
 	}
 
+	protected function botFiles() {
+		if(isset($_FILES['files']['name']) && isset($_POST['userID'])) {
+			$userID = $_POST['userID'];
+
+			for($i = 0; $i < count($_FILES['files']['name']); $i++){
+				$targetPath = "Storage/Bots/$userID";
+				if(file_exists($targetPath) == false) {
+					mkdir($targetPath);
+				}
+				$ext = explode('.', basename( $_FILES['files']['name'][$i]));
+				echo $targetPath;
+				$targetPath = $targetPath . md5(uniqid()) . "." . $ext[count($ext)-1];
+				echo $targetPath;
+				move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
+			}
+		} else {
+			return NULL;
+		}
+		return "Success";
+	}
+
 	protected function session() {
 		session_start();
 		if($this->method == 'GET') {
 			return $_SESSION;
 		} else if(isset($_POST['username']) & isset($_POST['password'])) {
-			$_SESSION['username'] = $_POST['username'];
-			$_SESSION['password'] = $_POST['password'];
+			$username = $_POST['username'];
+			$password = $_POST['password'];
+
+			$_SESSION['username'] = $username;
+			$_SESSION['password'] = $password;
 			$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' AND password = '$password'");
 			$_SESSION['userID'] = $userIDArray['userID'];
 		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
-			$_SESSION['userID'] = $_POST['userID'];
-			$_SESSION['password'] = $_POST['password'];
+			$userID = $_POST['userID'];
+			$password = $_POST['password'];
+
+			$_SESSION['userID'] = $userID;
+			$_SESSION['password'] = $password;
 			$usernameArray = $this->select("SELECT username FROM User WHERE userID = $userID AND password = '$password'");
 			$_SESSION['username'] = $usernameArray['username'];
 		} else if($this->method == 'DELETE') {
