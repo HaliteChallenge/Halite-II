@@ -199,6 +199,11 @@ FakesAssemblies/
 *.hlt
 
 
+#Visual studio.
+*.vcxproj.filters
+*.vcxproj
+*.sln
+
 #Java
 *.class
 
