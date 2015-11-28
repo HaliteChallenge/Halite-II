@@ -2,7 +2,7 @@
 
 ## Due when we get back to school
 - Michael
- - C sockets
+ - ~~C sockets~~
  - Manager
   - People can upload bots
   - People are ranked every x hours
