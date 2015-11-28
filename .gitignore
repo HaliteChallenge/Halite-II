@@ -221,5 +221,8 @@ hs_err_pid*
 *.bluej
 .DS_Store
 
-
-Halite/Halite.exe
+#Friggin VS
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
