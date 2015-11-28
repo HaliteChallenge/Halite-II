@@ -363,7 +363,10 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in);
-	if(!game_file.is_open()) return -1;
+	if(!game_file.is_open()) throw std::runtime_error("File could not be opened");
+
+	std::string format; std::getline(game_file, format);
+	if(format != "HLT 1" && format != "HLT 2") throw std::runtime_error("Unrecognized format");
 
 	//Clear previous game
 	clearFullGame();
@@ -417,33 +420,81 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	for(int a = 0; a < number_of_players; a++) std::getline(lineCounter, in);
 	int numLines = std::count(std::istreambuf_iterator<char>(lineCounter),
 		std::istreambuf_iterator<char>(), '\n');
-
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
-	short ownerIn, ageIn;
-	while(!game_file.eof())
+
+	if(format == "HLT 1")
 	{
-		for(unsigned short a = 0; a < m.map_height; a++) for(unsigned short b = 0; b < m.map_width; b++)
+		short ownerIn, ageIn;
+		while(!game_file.eof())
 		{
-			game_file >> ownerIn >> ageIn;
-			m.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
+			for(unsigned short a = 0; a < m.map_height; a++) for(unsigned short b = 0; b < m.map_width; b++)
+			{
+				game_file >> ownerIn >> ageIn;
+				m.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
+			}
+
+			//Get statistics
+			m.getStatistics();
+			//Add game map to full game
+			full_game.push_back(new hlt::Map(m));
+
+			//Render the loading bar:
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
+			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+			glBindVertexArray(loadingAttributes);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+			glfwPollEvents();
+			glfwSwapBuffers(window);
 		}
-		m.getStatistics();
-		//Add game map to full game
-		full_game.push_back(new hlt::Map(m));
-		
-		//No longer console: std::cout << "Gotten frame #" << short(full_game.size()) << ".\n"; Instead render the loading bar:
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	else if(format == "HLT 2")
+	{
+		short numPieces, presentOwner, strength;
+		for(short a = 0; a < numLines; a++)
+		{
+			short x = 0, y = 0;
+			while(y < m.map_height && x < m.map_width)
+			{
+				game_file >> numPieces >> presentOwner;
+				for(short b = 0; b < numPieces; b++)
+				{
+					game_file >> strength;
+					if(y >= 30) break;
+					m.contents[y][x] = { static_cast<unsigned char>(presentOwner), static_cast<unsigned char>(strength) };
+					x++;
+					if(x >= m.map_width)
+					{
+						x = 0;
+						y++;
+					}
+				}
+			}
 
-		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+			//Get statistics
+			m.getStatistics();
+			//Add game map to full game
+			full_game.push_back(new hlt::Map(m));
 
-		glBindVertexArray(loadingAttributes);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDrawArrays(GL_LINE_LOOP, 2, 4);
+			//Render the loading bar:
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glfwPollEvents();
-		glfwSwapBuffers(window);
+			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
+			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+			glBindVertexArray(loadingAttributes);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+			glfwPollEvents();
+			glfwSwapBuffers(window);
+		}
 	}
 
 	//Cleanup

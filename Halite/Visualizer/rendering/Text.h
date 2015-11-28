@@ -3,10 +3,13 @@
 //Based on the Tutorial found at http://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01.
 
 #include <ft2build.h>
+#include FT_FREETYPE_H
+/*
 #include <freetype/freetype.h>
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
+*/
 
 #include <stdexcept>
 #include <fstream>

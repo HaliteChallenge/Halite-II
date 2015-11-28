@@ -45,7 +45,13 @@ void Text::cleanup()
 
 Text::Text(std::string font, int size)
 {
-	if(FT_New_Face(ft, font.c_str(), 0, &face))
+	FT_Error error = FT_New_Face(ft, font.c_str(), 0, &face);
+	if(error == FT_Err_Unknown_File_Format)
+	{
+		printDebug("Font " + font + " could not be read.\n");
+		throw std::runtime_error("FT_New_Face failed");
+	}
+	else if(error == 0) //0 is success.
 	{
 		printDebug("Could not open font " + font + ".\n");
 		throw std::runtime_error("FT_New_Face failed");
@@ -113,6 +119,7 @@ void Text::render(std::string text, float x, float y, float sx, float sy, Color 
 
 Text::~Text()
 {
+	FT_Done_Face(face);
 	glDeleteTextures(1, &tex);
 	glDeleteBuffers(1, &buffer);
 	glDeleteVertexArrays(1, &attributes);

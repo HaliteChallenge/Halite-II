@@ -184,9 +184,29 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	//Output game state to file.
+	//Output game state to file (run length encoding).
 	game_file << std::endl;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
+	short presentOwner = game_map.contents.begin()->begin()->owner, numPieces = 0;
+	std::list<unsigned char> strengths;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	{
+		if(presentOwner == b->owner)
+		{
+			numPieces++;
+			strengths.push_back(b->strength);
+		}
+		else if(numPieces != 0)
+		{
+			game_file << numPieces << ' ' << presentOwner << ' ';
+			for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
+			numPieces = 1;
+			presentOwner = b->owner;
+			strengths.clear(); strengths.push_back(b->strength);
+		}
+	}
+	//Final output set:
+	game_file << numPieces << ' ' << presentOwner << ' ';
+	for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
@@ -206,6 +226,7 @@ Halite::Halite(unsigned short w, unsigned short h, std::string filename)
 {
     player_moves = std::vector< std::set<hlt::Move> >();
 	game_file.open(filename, std::ios_base::out);
+	if(!game_file.is_open()) throw std::runtime_error("Could not open file for results");
     turn_number = 0;
     
     //Connect to players
@@ -302,11 +323,33 @@ Halite::Halite(unsigned short w, unsigned short h, std::string filename)
     //Initialize map:
 	game_map = hlt::Map(w, h, number_of_players);
 
-	//Output game information to file, such as map dimensions, number of players, their names, and the first frame.
+	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
+	game_file << "HLT 2\n";
 	game_file << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << '\n';
 	for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file << *a << '\n';
 	game_file << *(player_names.end() - 1) << std::endl;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) game_file << short(b->owner) << ' ' << short(b->strength) << ' ';
+	//Output game state to file (run length encoding).
+	short presentOwner = game_map.contents.begin()->begin()->owner, numPieces = 0;
+	std::list<unsigned char> strengths;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	{
+		if(presentOwner == b->owner)
+		{
+			numPieces++;
+			strengths.push_back(b->strength);
+		}
+		else if(numPieces != 0)
+		{
+			game_file << numPieces << ' ' << presentOwner << ' ';
+			for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
+			numPieces = 1;
+			presentOwner = b->owner;
+			strengths.clear(); strengths.push_back(b->strength);
+		}
+	}
+	//Final output set:
+	game_file << numPieces << ' ' << presentOwner << ' ';
+	for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
     
     //Initialize player moves vector
     player_moves.resize(number_of_players);

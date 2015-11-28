@@ -11,7 +11,7 @@ int main(int argc, char* args[])
 	srand(time(NULL));
 
 	std::string in;
-	filename = "Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
+	filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 	std::thread logicThread;
 	unsigned short mapWidth, mapHeight;
 
@@ -46,7 +46,16 @@ int main(int argc, char* args[])
 		}
 	}
 
-	my_game = new Halite(mapWidth, mapHeight, "../../Replays/" + std::to_string(time(NULL)) + ".hlt");
+	try
+	{
+		my_game = new Halite(mapWidth, mapHeight, filename);
+	}
+	catch(std::runtime_error e)
+	{
+		std::cout << e.what() << std::endl;
+		system("PAUSE");
+		return EXIT_FAILURE;
+	}
 	my_game->init();
 	
 	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
