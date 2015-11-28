@@ -14,6 +14,19 @@
 #include <boost/serialization/string.hpp>
 #include <boost/asio.hpp>
 
+#ifdef WIN32
+	#include <sys/types.h>
+	#include <Winsock2.h>
+	#define WINSOCKVERSION MAKEWORD(2,2)
+#else
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <unistd.h>
+	#include <time.h>
+#endif
+
+#include <stdio.h>
+
 #include "../Core/hlt.h"
 
 
@@ -71,10 +84,30 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 	return moves;
 }
 
+static void sendStringC(int connectionFd, const std::string &sendString) {
+	size_t length = sendString.length();
+	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
+	std::vector<char> buffer(sendString.begin(), sendString.end());
+
+	send(connectionFd, (char *)&length, sizeof(length), 0);
+	send(connectionFd, &buffer[0], buffer.size(), 0);
+}
+
 static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
 	size_t length = sendString.length();
 	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));	
 	boost::asio::write(*s, boost::asio::buffer(sendString));
+}
+
+static std::string getStringC(int connectionFd) {
+	size_t numChars;
+	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
+
+	std::vector<char> buffer(numChars);
+	recv(connectionFd, &buffer[0], buffer.size(), 0);
+
+	// Copy the buffer into a string. May want to get rid of this for performance purposes
+	return std::string(buffer.begin(), buffer.end());
 }
 
 static std::string getString(boost::asio::ip::tcp::socket * s) {
@@ -85,6 +118,42 @@ static std::string getString(boost::asio::ip::tcp::socket * s) {
 	boost::asio::read(*s, boost::asio::buffer(stringVector));
 
 	return std::string(stringVector.begin(), stringVector.end());
+}
+
+static int createAndConnectSocket(int port) {
+	#ifdef WIN32
+		WSADATA wsaData;
+		if (WSAStartup(WINSOCKVERSION, &wsaData) != 0) return 1;
+	#endif
+
+	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
+	if (socketFd < 0) {
+		std::cout << "ERROR opening socket\n";
+		throw 1;
+	}
+
+	struct sockaddr_in serverAddr;
+	memset(&serverAddr, 0, sizeof(serverAddr));
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = INADDR_ANY;
+	serverAddr.sin_port = htons(port);
+
+	if (bind(socketFd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+		std::cout << "ERROR on binding to port number " << port << "\n";
+		throw 1;
+	}
+		
+	listen(socketFd, 5);
+
+	struct sockaddr_in clientAddr;
+	socklen_t clientLength = sizeof(clientAddr);
+	int connectionFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientLength);
+	if (connectionFd < 0) {
+		std::cout << "ERROR on accepting\n";
+		throw 1;
+	}
+
+	return connectionFd;
 }
 
 static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned char playerTag, std::string name, hlt::Map & m)

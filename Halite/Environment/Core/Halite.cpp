@@ -382,6 +382,8 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 		//Frame logic.
 		result = processNextFrame(result);
 	}
+
+	// Game is now over
 	game_file.close();
 	unsigned int maxValue = 2 * *std::max_element(attack_count.begin(), attack_count.end());
 	std::vector< std::pair<std::string, float> > relativeScores(number_of_players);
