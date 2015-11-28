@@ -10,7 +10,7 @@
 
 #include "hlt.h"
 #include "../rendering/OpenGL.h"
-#include "../rendering/Text.h"
+//#include "../rendering/Text.h"
 
 class Halite
 {
