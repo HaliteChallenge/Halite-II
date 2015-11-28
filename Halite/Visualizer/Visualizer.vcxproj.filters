@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{35452e9a-b780-464c-8a5c-6dfd7a9b6d70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="settings">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{8361e3c5-c377-4f66-9220-46ec945444f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\loading">
+      <UniqueIdentifier>{7707c4d9-b01c-4123-a8fa-7d794d87c291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\border">
+      <UniqueIdentifier>{576c1892-2052-44a7-8def-cb2e2ae67cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\graph">
+      <UniqueIdentifier>{d7c60f56-3f46-4f09-aec4-94d02fa64de3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\map">
+      <UniqueIdentifier>{c8d96e67-840e-4034-9b7a-61ef6d03e462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering">
+      <UniqueIdentifier>{f6809f7e-b957-48bf-8557-7177d55821c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\text">
+      <UniqueIdentifier>{b60c1ee6-e9af-4aac-9fd4-058cc7bd81e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="settings\colorcodes.txt">
+      <Filter>settings</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Halite.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="rendering\Text.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\OpenGL.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Halite.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\hlt.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering\Text.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering\OpenGL.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\loading\fragment.glsl">
+      <Filter>shaders\loading</Filter>
+    </None>
+    <None Include="shaders\loading\vertex.glsl">
+      <Filter>shaders\loading</Filter>
+    </None>
+    <None Include="shaders\border\fragment.glsl">
+      <Filter>shaders\border</Filter>
+    </None>
+    <None Include="shaders\border\vertex.glsl">
+      <Filter>shaders\border</Filter>
+    </None>
+    <None Include="shaders\graph\fragment.glsl">
+      <Filter>shaders\graph</Filter>
+    </None>
+    <None Include="shaders\graph\vertex.glsl">
+      <Filter>shaders\graph</Filter>
+    </None>
+    <None Include="shaders\map\fragment.glsl">
+      <Filter>shaders\map</Filter>
+    </None>
+    <None Include="shaders\map\geometry.glsl">
+      <Filter>shaders\map</Filter>
+    </None>
+    <None Include="shaders\map\vertex.glsl">
+      <Filter>shaders\map</Filter>
+    </None>
+    <None Include="shaders\text\fragment.glsl">
+      <Filter>shaders\text</Filter>
+    </None>
+    <None Include="shaders\text\vertex.glsl">
+      <Filter>shaders\text</Filter>
+    </None>
+  </ItemGroup>
+</Project>
