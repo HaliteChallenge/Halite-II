@@ -8,8 +8,7 @@ int main(int argc, char* args[])
 {
 	srand(time(NULL));
 
-	std::string in;
-	std::thread logicThread;
+	std::string in, filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 	unsigned short mapWidth, mapHeight;
 
 	std::cout << "Please enter the width of the map: ";
@@ -42,9 +41,17 @@ int main(int argc, char* args[])
 			std::getline(std::cin, in);
 		}
 	}
-	std::string filename = std::to_string(time(NULL)) + ".hlt";
-	std::cout << "filename: " << filename << "\n";
-	my_game = new Halite(mapWidth, mapHeight, filename);
+
+	try
+	{
+		my_game = new Halite(mapWidth, mapHeight, filename);
+	}
+	catch(std::runtime_error e)
+	{
+		std::cout << e.what() << std::endl;
+		system("PAUSE");
+		return EXIT_FAILURE;
+	}
 	my_game->init();
 	
 	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
