@@ -16,7 +16,7 @@
 		$(document).ready(function() {
 			$("#submit").click(function() {
 				var username = $("input:text[name=username]").val();
-				var password = $("input:text[name=password]").val();
+				var password = $("input:password[name=password]").val();
 
 				var signInResult = getUserCredentials(username, password);
 				if(signInResult == null) {
@@ -37,7 +37,7 @@
 	
 	<input type="text" name="username" value="">
 	<br>
-	<input type="text" name="password" value="">
+	<input type="password" name="password" value="">
 	<br>
 	<button id="submit">Submit</button>
 </body>
