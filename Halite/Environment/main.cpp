@@ -4,14 +4,11 @@
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
-std::string filename;
-
 int main(int argc, char* args[])
 {
 	srand(time(NULL));
 
 	std::string in;
-	filename = "Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 	std::thread logicThread;
 	unsigned short mapWidth, mapHeight;
 
@@ -45,8 +42,9 @@ int main(int argc, char* args[])
 			std::getline(std::cin, in);
 		}
 	}
-
-	my_game = new Halite(mapWidth, mapHeight, "../../Replays/" + std::to_string(time(NULL)) + ".hlt");
+	std::string filename = std::to_string(time(NULL)) + ".hlt";
+	std::cout << "filename: " << filename << "\n";
+	my_game = new Halite(mapWidth, mapHeight, filename);
 	my_game->init();
 	
 	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();

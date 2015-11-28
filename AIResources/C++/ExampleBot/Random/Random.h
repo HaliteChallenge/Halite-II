@@ -5,7 +5,7 @@
 #include <set>
 
 #include "../../Networking.h"
-#include "hlt.h"
+#include "../../hlt.h"
 
 class Random
 {
