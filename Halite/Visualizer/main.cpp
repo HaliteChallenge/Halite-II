@@ -1,14 +1,14 @@
+//#define CONSOLE_DEBUG
+
 #include <iostream>
 #include <thread>
 #include <Windows.h>
 #include "Core/Halite.h"
 
-#define CONSOLE_DEBUG
-//#define USE_TEXT
-
 GLFWwindow * window;
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods);
+void handleCursor(GLFWwindow * w, double x, double y);
 void handleKeys(GLFWwindow * w, int button, int scancode, int action, int mods);
 void handleChars(GLFWwindow * w, unsigned int code);
 void handleDrop(GLFWwindow * w, int count, const char ** paths);
@@ -18,16 +18,13 @@ void handleResize(GLFWwindow * w, int width, int height);
 void renderLaunch();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true;
-signed short turnNumber = 0, maxFps = 8;
-float graphZoom = 1.0, maxZoom;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false;
+float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
 
 std::string filename;
 std::fstream debug;
 
-#ifdef USE_TEXT
-Text * t;
-#endif
+FTPixmapFont * t;
 
 #ifdef CONSOLE_DEBUG
 int main()
@@ -45,7 +42,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	std::string timeString(timeC);  timeString.pop_back();
 	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ' '; }, '_');
 	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ':'; }, '-');
-	debugfilename += timeString;
+	debugfilename += timeString.substr(4);
 	debugfilename += ".log";
 	debug.open(debugfilename, std::ios_base::out);
 	if(!debug.is_open()) //If file couldn't be opened.
@@ -80,11 +77,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
 	util::initShaderHandler(&debug);
-
-#ifdef USE_TEXT
-	Text::init(&debug);
-	t = new Text("fonts/FreeSans.ttf", 36);
-#endif
+	t = new FTPixmapFont("fonts/FreeSans.ttf");
+	t->FaceSize(48);
 
 	//Set handlers:
 
@@ -94,6 +88,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	glfwSetCharCallback(window, handleChars);
 	//Set mouse handler
 	glfwSetMouseButtonCallback(window, handleMouse);
+	//Set cursor handler.
+	glfwSetCursorPosCallback(window, handleCursor);
 	//Set error callback handler
 	glfwSetErrorCallback(handleErrors);
 	//Set file drop function
@@ -101,36 +97,35 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	//Set window resize handler
 	glfwSetWindowSizeCallback(window, handleResize);
 
+	my_game = new Halite();
 	while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 
 	clock_t c = clock();
 	while(!glfwWindowShouldClose(window))
 	{
-		my_game->render(window, turnNumber, graphZoom);
+		//Limit render rate:
+		float delta = float(clock() - c) / CLOCKS_PER_SEC;
+		c = clock();
 
-		if(upPressed && maxFps <= 120) maxFps++;
-		else if(downPressed && maxFps != 4) maxFps--;
+		short turnNumberS = turnNumber;
+		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed);
+		if(abs(turnNumber - float(turnNumberS) > 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
+
+		if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
+		else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
 
 		if(leftPressed)
 		{
-			if(shiftPressed) turnNumber -= 15;
-			else turnNumber--;
+			if(shiftPressed) turnNumber -= 5 * maxFps * delta;
+			else turnNumber -= maxFps * delta;
 		}
 		else if(rightPressed)
 		{
-			if(shiftPressed) turnNumber += 15;
-			else turnNumber++;
+			if(shiftPressed) turnNumber += 5 * maxFps * delta;
+			else turnNumber += maxFps * delta;
 		}
-		else if(!isPaused) turnNumber++;
-
-		//Limit render rate:
-		float delta = 1000.0 * float(clock() - c) / CLOCKS_PER_SEC;
-		//std::cout << delta << std::endl;
-		if(delta < 1000.0 / maxFps)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 / maxFps - delta)));
-		}
-		c = clock();
+		else if(!isPaused) turnNumber += maxFps * delta;
+		if(turnNumber < 0) turnNumber = 0;
 	}
 
 	return EXIT_SUCCESS;
@@ -138,7 +133,17 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods)
 {
+	if(button == GLFW_MOUSE_BUTTON_1)
+	{
+		mousePressed = action == GLFW_PRESS;
+	}
+}
 
+void handleCursor(GLFWwindow * w, double x, double y)
+{
+	int sx, sy; glfwGetWindowSize(window, &sx, &sy);
+	mouseX = (float(2 * x) / sx) - 1.0;
+	mouseY = (float(-2 * y) / sy) + 1.0;
 }
 
 void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
@@ -227,8 +232,6 @@ void handleChars(GLFWwindow * w, unsigned int code)
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	delete my_game;
-	my_game = new Halite();
 	short numTurns;
 	try
 	{
@@ -264,10 +267,7 @@ void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Fill me in with actual rendering later:
-#ifdef USE_TEXT
-	t->render("Sphinx of black quartz, judge my vow", -0.5, 0.8, 1, 1, { 1.0, 1.0, 0.5 });
-#endif
+	util::renderText(t, window, -.85, 0.0, 36, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

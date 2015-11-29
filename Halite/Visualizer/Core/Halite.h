@@ -10,7 +10,6 @@
 
 #include "hlt.h"
 #include "../rendering/OpenGL.h"
-//#include "../rendering/Text.h"
 
 class Halite
 {
@@ -18,6 +17,7 @@ private:
     std::vector<std::string> player_names;
 	std::vector<unsigned int> attack_count;
 	std::vector<hlt::Map * > full_game;
+	std::string present_file;
 	std::map<unsigned char, Color> color_codes;
 	unsigned short number_of_players;
 
@@ -29,20 +29,23 @@ private:
 	//Stats about the graph. This lets us know if we need to redo the setup for the graph.
 	unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
 	float graph_zoom;
+	unsigned int graph_max_territory, graph_max_strength;
 
-	//Border rendering:
+	//Border rendering
 	GLuint border_vertex_buffer, border_vertex_attributes, border_vertex_shader, border_fragment_shader, border_shader_program;
 
-	void loadColorCodes(std::string s);
+	//Text rendering
+	FTPixmapFont * font;
+
+	//void loadColorCodes(std::string s);
 	void setupMapRendering(unsigned short width, unsigned short height);
 	void setupGraphRendering(float zoom, short turnNumber);
 	void setupBorders();
 	void clearFullGame();
 public:
     Halite();
-    Halite(unsigned short w, unsigned short h);
 	short input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height);
-	void render(GLFWwindow * window, short& turnNumber, float zoom);
+	void render(GLFWwindow * window, short& turnNumber, float zoom, float mouseX, float mouseY, bool mousePress);
 	std::map<unsigned char, Color> getColorCodes();
 	~Halite();
 };

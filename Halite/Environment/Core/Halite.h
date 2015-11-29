@@ -24,6 +24,7 @@ private:
 	std::vector<unsigned int> attack_count;
 	hlt::Map game_map;
 	std::vector<std::vector<unsigned char> * > full_game;
+	std::vector<Color> possible_colors;
 	unsigned short number_of_players;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);

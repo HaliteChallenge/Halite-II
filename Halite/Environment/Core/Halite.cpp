@@ -226,6 +226,20 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 Halite::Halite(unsigned short w, unsigned short h)
 {
+	//Add colors to possible colors:
+	possible_colors.clear();
+	possible_colors.push_back({ 1.0, 0.0, 0.0 });
+	possible_colors.push_back({ 0.0, 1.0, 0.0 });
+	possible_colors.push_back({ 0.0, 0.0, 1.0 });
+	possible_colors.push_back({ 1.0, 1.1, 0.0 });
+	possible_colors.push_back({ 1.0, 0.0, 1.0 });
+	possible_colors.push_back({ 0.0, 1.0, 1.0 });
+	possible_colors.push_back({ 1.0, 1.0, 1.0 });
+	possible_colors.push_back({ .87, .72, .53 });
+	possible_colors.push_back({ 1.0, 0.5, 0.5 });
+	possible_colors.push_back({ 1.0, .65, 0.0 });
+
+	//Default initialize
     player_moves = std::vector< std::set<hlt::Move> >();
     turn_number = 0;
     
@@ -304,6 +318,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 		{
 			std::getline(std::cin, in);
 			if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
+			else if(std::find(in.begin(), in.end(), ' ') != in.end()) std::cout << "Players' names cannot be multiple words. Please enter another name for this player: ";
 			else
 			{
 				bool good = true;
@@ -373,14 +388,21 @@ void Halite::init()
 
 void Halite::output(std::string filename)
 {
+	std::vector<Color> newColors = possible_colors;
+
 	std::ofstream gameFile;
 	gameFile.open(filename);
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 3\n";
+	gameFile << "HLT 4\n";
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << '\n';
-	for(auto a = player_names.begin(); a != player_names.end(); a++) gameFile << *a << '\n';
+	for(auto a = player_names.begin(); a != player_names.end(); a++)
+	{
+		int index = rand() % newColors.size();
+		Color c = newColors[index]; newColors.erase(newColors.begin() + index);
+		gameFile << *a << ' ' << c.r << ' ' << c.g << ' ' << c.b << '\n';
+	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
 	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);

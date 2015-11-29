@@ -40,9 +40,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="rendering\Text.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
     <ClCompile Include="rendering\OpenGL.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
@@ -53,9 +50,6 @@
     </ClInclude>
     <ClInclude Include="Core\hlt.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="rendering\Text.h">
-      <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="rendering\OpenGL.h">
       <Filter>rendering</Filter>

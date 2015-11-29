@@ -17,6 +17,11 @@
 #define SOUTH 3
 #define WEST 4
 
+struct Color
+{
+	float r, g, b;
+};
+
 namespace hlt
 {
 	struct Location

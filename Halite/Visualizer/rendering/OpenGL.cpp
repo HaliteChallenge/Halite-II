@@ -39,3 +39,13 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	}
 	return true;
 }
+
+void util::renderText(FTFont * f, GLFWwindow * w, float x, float y, int size, const std::string & text)
+{
+	x += 1; x /= 2; //Normalize
+	y += 1; y /= 2; //Normalize and reverse
+	int sx, sy; glfwGetWindowSize(w, &sx, &sy);
+	FTPoint p(sx *x, sy * y);
+	f->FaceSize(size * sqrt(sx * sy) / 600);
+	f->Render(text.c_str(), -1, p, FTPoint(), FTGL::RENDER_ALL);
+}

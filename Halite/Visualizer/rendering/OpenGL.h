@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <time.h>
+#include "FTGL/ftgl.h"
 
 ///Screen constants
 const int SCREEN_WIDTH = 800;
@@ -24,6 +25,6 @@ struct Color
 namespace util
 {
 	void initShaderHandler(std::fstream * ds);
-
 	bool shaderFromFile(GLuint shader, std::string filename, std::string shadername);
+	void renderText(FTFont * f, GLFWwindow * w, float x, float y, int size, const std::string & text);
 }

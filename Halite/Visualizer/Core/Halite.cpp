@@ -3,14 +3,15 @@
 //Consts -----------------------------
 
 //Graph constants:
-const float TERRITORY_GRAPH_TOP = 0.85, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
-const float STRENGTH_GRAPH_TOP = -0.14, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
+const float TERRITORY_GRAPH_TOP = 0.92, TERRITORY_GRAPH_BOTTOM = 0.01, TERRITORY_GRAPH_LEFT = 0.51, TERRITORY_GRAPH_RIGHT = 0.98;
+const float STRENGTH_GRAPH_TOP = -0.07, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_GRAPH_LEFT = 0.51, STRENGTH_GRAPH_RIGHT = 0.98;
 
 //Map constants:
-const float MAP_TOP = 0.98, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
+const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
 
 //Private Functions ------------------
 
+/*
 void Halite::loadColorCodes(std::string filename)
 {
 	std::fstream colorFile;
@@ -24,6 +25,7 @@ void Halite::loadColorCodes(std::string filename)
 	}
 	colorFile.close();
 }
+*/
 
 void Halite::setupMapRendering(unsigned short width, unsigned short height)
 {
@@ -191,8 +193,8 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glBindVertexArray(graph_territory_vertex_attributes);
 
 	//Find the greatest territory_count existent.
-	unsigned int maxTerritoryValue = 0;
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > maxTerritoryValue) maxTerritoryValue = full_game[b]->territory_count[a];
+	graph_max_territory = 0;
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > graph_max_territory) graph_max_territory = full_game[b]->territory_count[a];
 
 	//Create vector of graph vertices.
 	std::vector<float> graphTerritoryVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
@@ -202,7 +204,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 	{
 		graphTerritoryVertices[graphTerritoryVerticesLoc] = (float(b - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + TERRITORY_GRAPH_LEFT;
-		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / maxTerritoryValue)) * (TERRITORY_GRAPH_BOTTOM - TERRITORY_GRAPH_TOP) + TERRITORY_GRAPH_TOP;
+		if(full_game[b]->territory_count.size() > a) graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = (1 - (float(full_game[b]->territory_count[a]) / graph_max_territory)) * (TERRITORY_GRAPH_BOTTOM - TERRITORY_GRAPH_TOP) + TERRITORY_GRAPH_TOP;
 		else graphTerritoryVertices[graphTerritoryVerticesLoc + 1] = TERRITORY_GRAPH_BOTTOM;
 		graphTerritoryVerticesLoc += 2;
 	}
@@ -242,8 +244,8 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glBindVertexArray(graph_strength_vertex_attributes);
 
 	//Find the greatest strength_count existent.
-	unsigned int maxStrengthValue = 0;
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > maxStrengthValue) maxStrengthValue = full_game[b]->strength_count[a];
+	graph_max_strength = 0;
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > graph_max_strength) graph_max_strength = full_game[b]->strength_count[a];
 
 	//Create vector of graph vertices.
 	std::vector<float> graphStrengthVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
@@ -253,7 +255,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++)
 	{
 		graphStrengthVertices[graphStrengthVerticesLoc] = (float(b - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (STRENGTH_GRAPH_RIGHT - STRENGTH_GRAPH_LEFT) + STRENGTH_GRAPH_LEFT;
-		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / maxStrengthValue)) * (STRENGTH_GRAPH_BOTTOM - STRENGTH_GRAPH_TOP) + STRENGTH_GRAPH_TOP;
+		if(full_game[b]->strength_count.size() > a) graphStrengthVertices[graphStrengthVerticesLoc + 1] = (1 - (float(full_game[b]->strength_count[a]) / graph_max_strength)) * (STRENGTH_GRAPH_BOTTOM - STRENGTH_GRAPH_TOP) + STRENGTH_GRAPH_TOP;
 		else graphStrengthVertices[graphStrengthVerticesLoc + 1] = STRENGTH_GRAPH_BOTTOM;
 		graphStrengthVerticesLoc += 2;
 	}
@@ -354,7 +356,9 @@ Halite::Halite()
     number_of_players = 0;
     player_names = std::vector<std::string>();
     full_game = std::vector<hlt::Map * >();
-	loadColorCodes("settings/colorcodes.txt");
+	//loadColorCodes("settings/colorcodes.txt");
+	color_codes[0] = { 0.3, 0.3, 0.3 };
+	font = new FTPixmapFont("fonts/FreeSans.ttf");
 }
 
 short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
@@ -366,16 +370,22 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 3") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 4") throw std::runtime_error("Unrecognized format in file " + filename);
 
+	present_file = filename;
 	//Clear previous game
 	clearFullGame();
+
+	//Generate text for the loading bar:
+	std::string loadingText = "LOADING..........";
+	const int TEXT_SIZE = 36;
+	const float TEXT_OFFSET = 0.025;
 
 	//Generate a buffer for the loading bar's inside. We'll delete this near the end of the function.
 	GLuint loadingBuffer; glGenBuffers(1, &loadingBuffer);
 	std::vector<float> loadingVertices(12);
-	const float LOADING_TOP = -0.2, LOADING_BOTTOM = 0.2, LOADING_LEFT = -0.8, LOADING_RIGHT = 0.8;
+	const float LOADING_TOP = 0.2, LOADING_BOTTOM = -0.2, LOADING_LEFT = -0.8, LOADING_RIGHT = 0.8;
 	loadingVertices[0] = LOADING_LEFT; loadingVertices[1] = LOADING_BOTTOM; loadingVertices[2] = LOADING_LEFT; loadingVertices[3] = LOADING_TOP; loadingVertices[4] = LOADING_LEFT; loadingVertices[5] = LOADING_BOTTOM; loadingVertices[6] = LOADING_LEFT; loadingVertices[7] = LOADING_TOP; loadingVertices[8] = LOADING_RIGHT; loadingVertices[9] = LOADING_TOP; loadingVertices[10] = LOADING_RIGHT; loadingVertices[11] = LOADING_BOTTOM;
 	GLuint loadingAttributes; glGenVertexArrays(1, &loadingAttributes);
 	glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
@@ -413,7 +423,21 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	m.map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		player_names[a] = "";
+		char c;
+		while(true)
+		{
+			game_file.get(c);
+			if(c == ' ') break;
+			player_names[a] += c;
+		}
+		Color color;
+		game_file >> color.r >> color.g >> color.b;
+		color_codes[a + 1] = color;
+		game_file.get(); //Get newline character
+	}
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
@@ -464,6 +488,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glDrawArrays(GL_LINE_LOOP, 2, 4);
 
+		util::renderText(font, window, LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, loadingText);
+
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
@@ -481,7 +507,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	return numLines;
 }
 
-void Halite::render(GLFWwindow * window, short & turnNumber, float zoom)
+void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick)
 {
 	//Set window for rendering.
 	glfwMakeContextCurrent(window);
@@ -541,6 +567,58 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom)
 		float positionVertices[8];
 		positionVertices[0] = xPos; positionVertices[1] = TERRITORY_GRAPH_BOTTOM; positionVertices[2] = xPos; positionVertices[3] = TERRITORY_GRAPH_TOP; positionVertices[4] = xPos; positionVertices[5] = STRENGTH_GRAPH_BOTTOM; positionVertices[6] = xPos; positionVertices[7] = STRENGTH_GRAPH_TOP;
 		glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), positionVertices);
+
+		//Generate text for the titles of the graphs
+		std::string territoryText = "Territory";
+		std::string strengthText = "Strength";
+		const int TEXT_SIZE = 15;
+		const float TEXT_OFFSET = 0.02;
+		util::renderText(font, window, TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
+		util::renderText(font, window, STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
+
+		//Find name of replay:
+		char search = '/';
+#ifdef _WIN32
+		search = '\\';
+#endif
+		auto index = std::find(present_file.begin(), present_file.end(), search); auto index2 = index;
+		while(index != present_file.end())
+		{
+			index2 = index + 1;
+			index = std::find(index2, present_file.end(), search);
+		}
+		//Display header
+		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
+		const int HEADER_TEXT_SIZE = 15;
+		util::renderText(font, window, MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
+
+		if(mouseClick)
+		{
+			//If mouse is in strength graph:
+			const int LABEL_TEXT_SIZE = 10;
+			const float X_OFFSET = -0.07, Y_OFFSET = -0.0;
+			if(mouseX <= STRENGTH_GRAPH_RIGHT && mouseX >= STRENGTH_GRAPH_LEFT && mouseY <= STRENGTH_GRAPH_TOP && mouseY >= STRENGTH_GRAPH_BOTTOM)
+			{
+				//Find turn number:
+				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - STRENGTH_GRAPH_LEFT) / (STRENGTH_GRAPH_RIGHT - STRENGTH_GRAPH_LEFT) + graph_turn_min;
+
+				unsigned int val = graph_max_strength * (mouseY - STRENGTH_GRAPH_BOTTOM) / (STRENGTH_GRAPH_TOP- STRENGTH_GRAPH_BOTTOM);
+
+				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
+				util::renderText(font, window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+			}
+			//Else if mouse is in territory graph:
+			else if(mouseX <= TERRITORY_GRAPH_RIGHT && mouseX >= TERRITORY_GRAPH_LEFT && mouseY <= TERRITORY_GRAPH_TOP && mouseY >= TERRITORY_GRAPH_BOTTOM)
+			{
+				//Find turn number:
+				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - TERRITORY_GRAPH_LEFT) / (TERRITORY_GRAPH_RIGHT - TERRITORY_GRAPH_LEFT) + graph_turn_min;
+
+				unsigned int val = graph_max_territory * (mouseY - TERRITORY_GRAPH_BOTTOM) / (TERRITORY_GRAPH_TOP - TERRITORY_GRAPH_BOTTOM);
+
+				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
+				util::renderText(font, window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+			}
+		}
 
 		//Draw borders:
 		glUseProgram(border_shader_program);
