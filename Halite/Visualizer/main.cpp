@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include "Core/Halite.h"
 
-//#define CONSOLE_DEBUG
+#define CONSOLE_DEBUG
 //#define USE_TEXT
 
 GLFWwindow * window;
@@ -227,21 +227,25 @@ void handleChars(GLFWwindow * w, unsigned int code)
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	isLaunch = false;
 	delete my_game;
 	my_game = new Halite();
-	short numTurns = my_game->input(w, paths[0], wi, he);
-	if(numTurns == -1)
+	short numTurns;
+	try
 	{
-		debug << "Failed to open file at " << paths[0] << ". The file was invalid or didn't exist, as my_game->input returned -1.\n"
-		/*Alert user*/;
+		numTurns = my_game->input(w, paths[0], wi, he);
 	}
-	else
+	catch(std::runtime_error e)
 	{
-		const int MIN_POINTS_VISIBLE = 3;
-		//Set new max_zoom. We allow zooming until only MIN_POINTS_VISIBLE points are visible.
-		maxZoom = numTurns/float(MIN_POINTS_VISIBLE);
+		debug << e.what();
+#ifdef CONSOLE_DEBUG
+		std::cout << e.what();
+#endif
+		return;
 	}
+	const int MIN_POINTS_VISIBLE = 3;
+	//Set new max_zoom. We allow zooming until only MIN_POINTS_VISIBLE points are visible.
+	maxZoom = numTurns / float(MIN_POINTS_VISIBLE);
+	isLaunch = false;
 	isPaused = false;
 	turnNumber = 0;
 }

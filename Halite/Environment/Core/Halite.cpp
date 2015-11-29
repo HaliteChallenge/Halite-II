@@ -184,29 +184,31 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	//Output game state to file (run length encoding).
-	game_file << std::endl;
-	short presentOwner = game_map.contents.begin()->begin()->owner, numPieces = 0;
+	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
+	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
 	std::list<unsigned char> strengths;
+	short numPieces = 0;
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
 	{
-		if(presentOwner == b->owner)
+		if(numPieces == 255 || b->owner != presentOwner)
 		{
-			numPieces++;
-			strengths.push_back(b->strength);
-		}
-		else if(numPieces != 0)
-		{
-			game_file << numPieces << ' ' << presentOwner << ' ';
-			for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
-			numPieces = 1;
+			turn->push_back(numPieces);
+			turn->push_back(presentOwner);
+			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			strengths.clear();
+			numPieces = 0;
 			presentOwner = b->owner;
-			strengths.clear(); strengths.push_back(b->strength);
 		}
+		numPieces++;
+		strengths.push_back(b->strength);
 	}
 	//Final output set:
-	game_file << numPieces << ' ' << presentOwner << ' ';
-	for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
+	turn->push_back(numPieces);
+	turn->push_back(presentOwner);
+	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	turn->shrink_to_fit();
+	//Add to full game:
+	full_game.push_back(turn);
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
@@ -222,11 +224,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 //Public Functions -------------------
 
-Halite::Halite(unsigned short w, unsigned short h, std::string filename)
+Halite::Halite(unsigned short w, unsigned short h)
 {
     player_moves = std::vector< std::set<hlt::Move> >();
-	game_file.open(filename, std::ios_base::out);
-	if(!game_file.is_open()) throw std::runtime_error("Could not open file for results");
     turn_number = 0;
     
     //Connect to players
@@ -323,34 +323,33 @@ Halite::Halite(unsigned short w, unsigned short h, std::string filename)
     //Initialize map:
 	game_map = hlt::Map(w, h, number_of_players);
 
-	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	game_file << "HLT 2\n";
-	game_file << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << '\n';
-	for(auto a = player_names.begin(); a != player_names.end() - 1; a++) game_file << *a << '\n';
-	game_file << *(player_names.end() - 1) << std::endl;
-	//Output game state to file (run length encoding).
-	short presentOwner = game_map.contents.begin()->begin()->owner, numPieces = 0;
+	//Output initial map to file
+	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
+	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
 	std::list<unsigned char> strengths;
+	short numPieces = 0;
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
 	{
-		if(presentOwner == b->owner)
+		if(numPieces == 255 || b->owner != presentOwner)
 		{
-			numPieces++;
-			strengths.push_back(b->strength);
-		}
-		else if(numPieces != 0)
-		{
-			game_file << numPieces << ' ' << presentOwner << ' ';
-			for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
-			numPieces = 1;
+			turn->push_back(numPieces);
+			turn->push_back(presentOwner);
+			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			strengths.clear();
+			numPieces = 0;
 			presentOwner = b->owner;
-			strengths.clear(); strengths.push_back(b->strength);
 		}
+		numPieces++;
+		strengths.push_back(b->strength);
 	}
 	//Final output set:
-	game_file << numPieces << ' ' << presentOwner << ' ';
-	for(auto c = strengths.begin(); c != strengths.end(); c++) game_file << short(*c) << ' ';
-    
+	turn->push_back(numPieces);
+	turn->push_back(presentOwner);
+	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	turn->shrink_to_fit();
+	//Add to full game:
+	full_game.push_back(turn);
+
     //Initialize player moves vector
     player_moves.resize(number_of_players);
 
@@ -372,6 +371,24 @@ void Halite::init()
     }
 }
 
+void Halite::output(std::string filename)
+{
+	std::ofstream gameFile;
+	gameFile.open(filename);
+	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
+
+	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
+	gameFile << "HLT 3\n";
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << '\n';
+	for(auto a = player_names.begin(); a != player_names.end(); a++) gameFile << *a << '\n';
+	gameFile.close();
+	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
+	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
+
+	gameFile.flush();
+	gameFile.close();
+}
+
 std::vector< std::pair<std::string, float> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
@@ -383,8 +400,6 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 		result = processNextFrame(result);
 	}
 
-	// Game is now over
-	game_file.close();
 	unsigned int maxValue = 2 * *std::max_element(attack_count.begin(), attack_count.end());
 	std::vector< std::pair<std::string, float> > relativeScores(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
@@ -400,4 +415,5 @@ Halite::~Halite()
 {
 	//Get rid of dynamically allocated memory:
 	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
+	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
 }

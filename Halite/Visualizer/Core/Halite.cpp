@@ -363,10 +363,10 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in);
-	if(!game_file.is_open()) throw std::runtime_error("File could not be opened");
+	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format != "HLT 1" && format != "HLT 2") throw std::runtime_error("Unrecognized format");
+	if(format != "HLT 1" && format != "HLT 2" && format != "HLT 3") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	//Clear previous game
 	clearFullGame();
@@ -404,9 +404,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glfwSwapBuffers(window);
 
 	//Read in names and dimensions
+	int numLines;
 	m.map_width = 0;
 	m.map_height = 0;
 	game_file >> width >> height >> number_of_players;
+	if(format == "HLT 3") game_file >> numLines;
 	m.map_width = width;
 	m.map_height = height;
 	std::getline(game_file, in);
@@ -415,11 +417,14 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
 
-	//Find number of lines.
-	std::fstream lineCounter; lineCounter.open(filename, std::ios_base::in);
-	for(int a = 0; a < number_of_players; a++) std::getline(lineCounter, in);
-	int numLines = std::count(std::istreambuf_iterator<char>(lineCounter),
-		std::istreambuf_iterator<char>(), '\n');
+	if(format == "HLT 1" || format == "HLT 2")
+	{
+		//Find number of lines.
+		std::fstream lineCounter; lineCounter.open(filename, std::ios_base::in);
+		for(int a = 0; a < number_of_players; a++) std::getline(lineCounter, in);
+		numLines = std::count(std::istreambuf_iterator<char>(lineCounter),
+			std::istreambuf_iterator<char>(), '\n');
+	}
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
 	if(format == "HLT 1")
@@ -456,16 +461,18 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	else if(format == "HLT 2")
 	{
 		short numPieces, presentOwner, strength;
+		int totalTiles = m.map_height*m.map_width;
 		for(short a = 0; a < numLines; a++)
 		{
 			short x = 0, y = 0;
-			while(y < m.map_height && x < m.map_width)
+			int tilesSoFar = 0;
+			while(tilesSoFar < totalTiles)
 			{
 				game_file >> numPieces >> presentOwner;
 				for(short b = 0; b < numPieces; b++)
 				{
 					game_file >> strength;
-					if(y >= 30) break;
+					if(y >= m.map_height) break;
 					m.contents[y][x] = { static_cast<unsigned char>(presentOwner), static_cast<unsigned char>(strength) };
 					x++;
 					if(x >= m.map_width)
@@ -474,6 +481,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 						y++;
 					}
 				}
+				tilesSoFar += numPieces;
 			}
 
 			//Get statistics
@@ -496,6 +504,93 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			glfwSwapBuffers(window);
 		}
 	}
+	else if(format == "HLT 3")
+	{
+		//Get total file sum:
+		/*
+		std::streampos pos = game_file.tellg();
+		game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
+		game_file.seekg(pos);
+		int sum = 0;
+		std::vector<unsigned char> nums;
+		while(!game_file.eof())
+		{
+			char c, d;
+			game_file.get(c);
+			nums.push_back(unsigned char(c));
+			sum += unsigned char(c);
+			for(int a = 0; a <= unsigned char(c); a++)
+			{
+				if(game_file.eof()) break;
+				game_file.get(d);
+				nums.push_back(d);
+			}
+		}
+		std::cout << std::count(nums.begin(), nums.end(), '\0') << ' ' << sum << ' ' << m.map_width * m.map_height * numLines << std::endl;
+		//throw std::runtime_error("BAD\n");*/
+		
+		std::streampos pos = game_file.tellg();
+		game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
+		game_file.seekg(pos);
+		std::list<unsigned char> chars;
+		unsigned char numPieces, presentOwner, strength;
+		char c;
+		const int totalTiles = m.map_height*m.map_width;
+		for(short a = 0; a < numLines; a++)
+		{
+			short x = 0, y = 0;
+			int tilesSoFar = 0;
+			while(tilesSoFar < totalTiles)
+			{
+				game_file.get(c); numPieces = unsigned char(c);
+				if(numPieces == 0) std::cout << (game_file.eof() ? "End of file" : "Not done yet") << std::endl;
+				chars.push_back(c);
+				game_file.get(c); presentOwner = unsigned char(c);
+				chars.push_back(c);
+				for(short b = 0; b < numPieces; b++)
+				{
+					game_file.get(c); strength = unsigned char(c);
+					chars.push_back(c);
+					if(y >= m.map_height) break;
+					m.contents[y][x] = { presentOwner, strength };
+					x++;
+					if(x >= m.map_width)
+					{
+						x = 0;
+						y++;
+					}
+				}
+				tilesSoFar += numPieces;
+				/*
+				if(tilesSoFar > totalTiles)
+				{
+					std::cout << (totalTiles * a) + tilesSoFar << std::endl;
+					throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
+				}
+				*/
+			}
+
+			//Get statistics
+			m.getStatistics();
+			//Add game map to full game
+			full_game.push_back(new hlt::Map(m));
+
+			//Render the loading bar:
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
+			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+			glBindVertexArray(loadingAttributes);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+			glfwPollEvents();
+			glfwSwapBuffers(window);
+		} //*/
+	}
+
 
 	//Cleanup
 	glDeleteBuffers(1, &loadingBuffer);

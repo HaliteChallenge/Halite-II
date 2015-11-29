@@ -23,13 +23,14 @@ private:
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
 	hlt::Map game_map;
-	std::ofstream game_file;
+	std::vector<std::vector<unsigned char> * > full_game;
 	unsigned short number_of_players;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
-    Halite(unsigned short w, unsigned short h, std::string filename);
+    Halite(unsigned short w, unsigned short h);
     void init();
+	void output(std::string filename);
 	std::vector< std::pair<std::string, float> > runGame();
 	~Halite();
 };
