@@ -457,6 +457,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			glfwPollEvents();
 			glfwSwapBuffers(window);
 		}
+
+		delete full_game.back();
+		full_game.pop_back();
 	}
 	else if(format == "HLT 2")
 	{
@@ -503,36 +506,15 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			glfwPollEvents();
 			glfwSwapBuffers(window);
 		}
+
+		delete full_game.back();
+		full_game.pop_back();
 	}
 	else if(format == "HLT 3")
 	{
-		//Get total file sum:
-		/*
 		std::streampos pos = game_file.tellg();
 		game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
 		game_file.seekg(pos);
-		int sum = 0;
-		std::vector<unsigned char> nums;
-		while(!game_file.eof())
-		{
-			char c, d;
-			game_file.get(c);
-			nums.push_back(unsigned char(c));
-			sum += unsigned char(c);
-			for(int a = 0; a <= unsigned char(c); a++)
-			{
-				if(game_file.eof()) break;
-				game_file.get(d);
-				nums.push_back(d);
-			}
-		}
-		std::cout << std::count(nums.begin(), nums.end(), '\0') << ' ' << sum << ' ' << m.map_width * m.map_height * numLines << std::endl;
-		//throw std::runtime_error("BAD\n");*/
-		
-		std::streampos pos = game_file.tellg();
-		game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
-		game_file.seekg(pos);
-		std::list<unsigned char> chars;
 		unsigned char numPieces, presentOwner, strength;
 		char c;
 		const int totalTiles = m.map_height*m.map_width;
@@ -544,13 +526,10 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			{
 				game_file.get(c); numPieces = unsigned char(c);
 				if(numPieces == 0) std::cout << (game_file.eof() ? "End of file" : "Not done yet") << std::endl;
-				chars.push_back(c);
 				game_file.get(c); presentOwner = unsigned char(c);
-				chars.push_back(c);
 				for(short b = 0; b < numPieces; b++)
 				{
 					game_file.get(c); strength = unsigned char(c);
-					chars.push_back(c);
 					if(y >= m.map_height) break;
 					m.contents[y][x] = { presentOwner, strength };
 					x++;
@@ -561,13 +540,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 					}
 				}
 				tilesSoFar += numPieces;
-				/*
 				if(tilesSoFar > totalTiles)
 				{
 					std::cout << (totalTiles * a) + tilesSoFar << std::endl;
 					throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
 				}
-				*/
 			}
 
 			//Get statistics
@@ -588,17 +565,13 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 			glfwPollEvents();
 			glfwSwapBuffers(window);
-		} //*/
+		}
 	}
-
 
 	//Cleanup
 	glDeleteBuffers(1, &loadingBuffer);
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
-
-	delete full_game.back();
-	full_game.pop_back();
 
 	setupMapRendering(m.map_width, m.map_height);
 	setupBorders();
