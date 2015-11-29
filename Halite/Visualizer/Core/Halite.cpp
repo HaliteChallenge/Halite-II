@@ -366,7 +366,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format != "HLT 1" && format != "HLT 2" && format != "HLT 3") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 2" || format == "HLT 1") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 3") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	//Clear previous game
 	clearFullGame();
@@ -407,8 +408,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	int numLines;
 	m.map_width = 0;
 	m.map_height = 0;
-	game_file >> width >> height >> number_of_players;
-	if(format == "HLT 3") game_file >> numLines;
+	game_file >> width >> height >> number_of_players >> numLines;
 	m.map_width = width;
 	m.map_height = height;
 	std::getline(game_file, in);
@@ -416,156 +416,56 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	for(unsigned char a = 0; a < number_of_players; a++) std::getline(game_file, player_names[a]);
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
-
-	if(format == "HLT 1" || format == "HLT 2")
-	{
-		//Find number of lines.
-		std::fstream lineCounter; lineCounter.open(filename, std::ios_base::in);
-		for(int a = 0; a < number_of_players; a++) std::getline(lineCounter, in);
-		numLines = std::count(std::istreambuf_iterator<char>(lineCounter),
-			std::istreambuf_iterator<char>(), '\n');
-	}
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
-	if(format == "HLT 1")
+	std::streampos pos = game_file.tellg();
+	game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
+	game_file.seekg(pos);
+	unsigned char numPieces, presentOwner, strength;
+	char c;
+	const int totalTiles = m.map_height*m.map_width;
+	for(short a = 0; a < numLines; a++)
 	{
-		short ownerIn, ageIn;
-		while(!game_file.eof())
+		short x = 0, y = 0;
+		int tilesSoFar = 0;
+		while(tilesSoFar < totalTiles)
 		{
-			for(unsigned short a = 0; a < m.map_height; a++) for(unsigned short b = 0; b < m.map_width; b++)
+			game_file.get(c); numPieces = unsigned char(c);
+			game_file.get(c); presentOwner = unsigned char(c);
+			for(short b = 0; b < numPieces; b++)
 			{
-				game_file >> ownerIn >> ageIn;
-				m.contents[a][b] = { static_cast<unsigned char>(ownerIn), static_cast<unsigned char>(ageIn) };
-			}
-
-			//Get statistics
-			m.getStatistics();
-			//Add game map to full game
-			full_game.push_back(new hlt::Map(m));
-
-			//Render the loading bar:
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
-
-			glBindVertexArray(loadingAttributes);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glDrawArrays(GL_LINE_LOOP, 2, 4);
-
-			glfwPollEvents();
-			glfwSwapBuffers(window);
-		}
-
-		delete full_game.back();
-		full_game.pop_back();
-	}
-	else if(format == "HLT 2")
-	{
-		short numPieces, presentOwner, strength;
-		int totalTiles = m.map_height*m.map_width;
-		for(short a = 0; a < numLines; a++)
-		{
-			short x = 0, y = 0;
-			int tilesSoFar = 0;
-			while(tilesSoFar < totalTiles)
-			{
-				game_file >> numPieces >> presentOwner;
-				for(short b = 0; b < numPieces; b++)
+				game_file.get(c); strength = unsigned char(c);
+				if(y >= m.map_height) break;
+				m.contents[y][x] = { presentOwner, strength };
+				x++;
+				if(x >= m.map_width)
 				{
-					game_file >> strength;
-					if(y >= m.map_height) break;
-					m.contents[y][x] = { static_cast<unsigned char>(presentOwner), static_cast<unsigned char>(strength) };
-					x++;
-					if(x >= m.map_width)
-					{
-						x = 0;
-						y++;
-					}
-				}
-				tilesSoFar += numPieces;
-			}
-
-			//Get statistics
-			m.getStatistics();
-			//Add game map to full game
-			full_game.push_back(new hlt::Map(m));
-
-			//Render the loading bar:
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
-
-			glBindVertexArray(loadingAttributes);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glDrawArrays(GL_LINE_LOOP, 2, 4);
-
-			glfwPollEvents();
-			glfwSwapBuffers(window);
-		}
-
-		delete full_game.back();
-		full_game.pop_back();
-	}
-	else if(format == "HLT 3")
-	{
-		std::streampos pos = game_file.tellg();
-		game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
-		game_file.seekg(pos);
-		unsigned char numPieces, presentOwner, strength;
-		char c;
-		const int totalTiles = m.map_height*m.map_width;
-		for(short a = 0; a < numLines; a++)
-		{
-			short x = 0, y = 0;
-			int tilesSoFar = 0;
-			while(tilesSoFar < totalTiles)
-			{
-				game_file.get(c); numPieces = unsigned char(c);
-				if(numPieces == 0) std::cout << (game_file.eof() ? "End of file" : "Not done yet") << std::endl;
-				game_file.get(c); presentOwner = unsigned char(c);
-				for(short b = 0; b < numPieces; b++)
-				{
-					game_file.get(c); strength = unsigned char(c);
-					if(y >= m.map_height) break;
-					m.contents[y][x] = { presentOwner, strength };
-					x++;
-					if(x >= m.map_width)
-					{
-						x = 0;
-						y++;
-					}
-				}
-				tilesSoFar += numPieces;
-				if(tilesSoFar > totalTiles)
-				{
-					std::cout << (totalTiles * a) + tilesSoFar << std::endl;
-					throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
+					x = 0;
+					y++;
 				}
 			}
-
-			//Get statistics
-			m.getStatistics();
-			//Add game map to full game
-			full_game.push_back(new hlt::Map(m));
-
-			//Render the loading bar:
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
-
-			glBindVertexArray(loadingAttributes);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glDrawArrays(GL_LINE_LOOP, 2, 4);
-
-			glfwPollEvents();
-			glfwSwapBuffers(window);
+			tilesSoFar += numPieces;
+			if(tilesSoFar > totalTiles) throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
 		}
+
+		//Get statistics
+		m.getStatistics();
+		//Add game map to full game
+		full_game.push_back(new hlt::Map(m));
+
+		//Render the loading bar:
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
+		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+		glBindVertexArray(loadingAttributes);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+		glfwPollEvents();
+		glfwSwapBuffers(window);
 	}
 
 	//Cleanup
