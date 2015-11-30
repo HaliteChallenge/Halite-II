@@ -48,12 +48,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Programming\boost_1_58_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Programming\boost_1_58_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\boost_1_58_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost_1_58_0;C:\vsProjects\freeglut\include;$(ProjectDir)\Classes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\boost_1_58_0\stage\lib;C:\vsProjects\freeglut\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\boost_1_58_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -85,7 +85,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\freeglutMSVC\SFML-2.3.1\lib;C:\freeglutMSVC\lib;C:\freeglutMSVC\boost_1_58_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glfw.lib;glu.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

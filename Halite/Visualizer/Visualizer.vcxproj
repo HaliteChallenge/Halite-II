@@ -39,8 +39,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>C:\Programming\ftgl-2.1.3~rc5\msvc\Build;C:\Programming\Freetype\lib;C:\Programming\GLEW\glew-1.12.0\lib\Release\Win32;C:\Programming\GLFW\glfw-3.1.1.bin.WIN32\lib-vc2013;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Programming\ftgl-2.1.3~rc5\src;C:\Programming\Freetype\include;C:\Programming\GLEW\glew-1.12.0\include;C:\Programming\GLFW\glfw-3.1.1.bin.WIN32\include;C:\Programming\Freetype\include\freetype2;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\vsProjects\glew-1.13.0\lib\Release\Win32;C:\vsProjects\glfw-3.1.1\lib-vc2013;C:\vsProjects\Freetype\lib;C:\vsProjects\ftgl-2.1.3-rc5\ftgl-2.1.3~rc5\msvc\Build;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\vsProjects\glfw-3.1.1\include;C:\vsProjects\glew-1.13.0\include;C:\vsProjects\ftgl-2.1.3-rc5\ftgl-2.1.3~rc5\src;C:\vsProjects\Freetype\include\freetype2;C:\vsProjects\Freetype\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\vsProjects\glfw-3.1.1\include;C:\vsProjects\glew-1.13.0\include;C:\vsProjects\ftgl-2.1.3-rc5\ftgl-2.1.3~rc5\src;C:\vsProjects\Freetype\include\freetype2;C:\vsProjects\Freetype\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\vsProjects\glew-1.13.0\lib\Release\Win32;C:\vsProjects\glfw-3.1.1\lib-vc2013;C:\vsProjects\Freetype\lib;C:\vsProjects\ftgl-2.1.3-rc5\ftgl-2.1.3~rc5\msvc\Build;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -66,6 +70,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glu32.lib;glfw3.lib;freetype.lib;ftgl_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
