@@ -20,6 +20,7 @@ void renderLaunch();
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
+short numTurns;
 
 std::string filename;
 std::fstream debug;
@@ -110,6 +111,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		short turnNumberS = turnNumber;
 		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed);
 		if(abs(turnNumber - float(turnNumberS) > 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
+
+		//Poll events
+		glfwPollEvents();
 
 		if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
 		else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
@@ -225,14 +229,13 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	}
 	else if(code == 'X' || code == 'x')
 	{
-		turnNumber = 1000;
+		turnNumber = numTurns - 1;
 	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	short numTurns;
 	try
 	{
 		numTurns = my_game->input(w, paths[0], wi, he);

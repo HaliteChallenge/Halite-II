@@ -630,7 +630,6 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 	}
 
 	//Update window
-	glfwPollEvents();
 	glfwSwapBuffers(window);
 }
 
