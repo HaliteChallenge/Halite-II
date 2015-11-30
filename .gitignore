@@ -226,3 +226,6 @@ hs_err_pid*
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.vcxproj
+Halite/Visualizer/Visualizer.vcxproj
+Halite/Visualizer/Visualizer.exe
