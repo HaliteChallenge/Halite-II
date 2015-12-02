@@ -77,6 +77,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
+	debug << (const char *)glGetString(GL_VERSION);
 	util::initShaderHandler(&debug);
 	t = new FTPixmapFont("fonts/FreeSans.ttf");
 	t->FaceSize(48);
@@ -248,6 +249,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 #endif
 		return;
 	}
+	maxFps = 8;
 	const int MIN_POINTS_VISIBLE = 3;
 	//Set new max_zoom. We allow zooming until only MIN_POINTS_VISIBLE points are visible.
 	maxZoom = numTurns / float(MIN_POINTS_VISIBLE);
