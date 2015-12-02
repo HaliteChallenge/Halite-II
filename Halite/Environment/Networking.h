@@ -84,7 +84,8 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 	return moves;
 }
 
-static void sendStringC(int connectionFd, const std::string &sendString) {
+static void sendStringC(int connectionFd, const std::string &sendString) 
+{
 	size_t length = sendString.length();
 	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
 	std::vector<char> buffer(sendString.begin(), sendString.end());
@@ -93,13 +94,15 @@ static void sendStringC(int connectionFd, const std::string &sendString) {
 	send(connectionFd, &buffer[0], buffer.size(), 0);
 }
 
-static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) {
+static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) 
+{
 	size_t length = sendString.length();
 	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));	
 	boost::asio::write(*s, boost::asio::buffer(sendString));
 }
 
-static std::string getStringC(int connectionFd) {
+static std::string getStringC(int connectionFd) 
+{
 	size_t numChars;
 	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
 
@@ -110,7 +113,8 @@ static std::string getStringC(int connectionFd) {
 	return std::string(buffer.begin(), buffer.end());
 }
 
-static std::string getString(boost::asio::ip::tcp::socket * s) {
+static std::string getString(boost::asio::ip::tcp::socket * s) 
+{
 	size_t numChars;
 	boost::asio::read(*s, boost::asio::buffer(&numChars, sizeof(numChars)));
 
@@ -120,14 +124,16 @@ static std::string getString(boost::asio::ip::tcp::socket * s) {
 	return std::string(stringVector.begin(), stringVector.end());
 }
 
-static int createAndConnectSocket(int port) {
+static int createAndConnectSocket(int port) 
+{
 	#ifdef WIN32
 		WSADATA wsaData;
 		if (WSAStartup(WINSOCKVERSION, &wsaData) != 0) return 1;
 	#endif
 
 	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
-	if (socketFd < 0) {
+	if (socketFd < 0)
+	 {
 		std::cout << "ERROR opening socket\n";
 		throw 1;
 	}
@@ -138,7 +144,8 @@ static int createAndConnectSocket(int port) {
 	serverAddr.sin_addr.s_addr = INADDR_ANY;
 	serverAddr.sin_port = htons(port);
 
-	if (bind(socketFd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+	if (bind(socketFd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) 
+	{
 		std::cout << "ERROR on binding to port number " << port << "\n";
 		throw 1;
 	}
@@ -148,7 +155,8 @@ static int createAndConnectSocket(int port) {
 	struct sockaddr_in clientAddr;
 	socklen_t clientLength = sizeof(clientAddr);
 	int connectionFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientLength);
-	if (connectionFd < 0) {
+	if (connectionFd < 0) 
+	{
 		std::cout << "ERROR on accepting\n";
 		throw 1;
 	}
