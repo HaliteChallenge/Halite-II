@@ -1,5 +1,5 @@
-from [dir]/hlt import *
-from [dir]/networking import *
+from hlt import *
+from networking import *
 
 sock = connectToGame()
 playerTag, gameMap = getInit(sock)

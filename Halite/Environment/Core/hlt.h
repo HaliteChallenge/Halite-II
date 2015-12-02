@@ -5,12 +5,6 @@
 #include <vector>
 #include <random>
 
-#include <boost/interprocess/ipc/message_queue.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/string.hpp>
-
 #define STILL 0
 #define NORTH 1
 #define EAST 2
@@ -28,14 +22,6 @@ namespace hlt
 	{
 		unsigned short x, y;
 
-		friend class boost::serialization::access;
-
-		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version)
-		{
-			ar & x;
-			ar & y;
-		}
 	};
 	static bool operator<(const Location & l1, const Location & l2)
 	{
@@ -45,15 +31,6 @@ namespace hlt
 	struct Site
 	{
 		unsigned char owner, strength;
-
-		friend class boost::serialization::access;
-
-		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version)
-		{
-			ar & owner;
-			ar & strength;
-		}
 	};
 
 	class Map
@@ -164,31 +141,11 @@ namespace hlt
 			l = getLocation(l, direction);
 			return contents[l.y][l.x];
 		}
-
-	private:
-		friend class boost::serialization::access;
-
-		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version)
-		{
-			ar & map_width;
-			ar & map_height;
-			ar & contents;
-		}
 	};
 
 	struct Move
 	{
 		Location loc; unsigned char dir;
-
-		friend class boost::serialization::access;
-
-		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version)
-		{
-			ar & loc;
-			ar & dir;
-		}
 	};
 	static bool operator<(const Move& m1, const Move& m2)
 	{

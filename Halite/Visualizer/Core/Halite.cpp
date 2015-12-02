@@ -357,7 +357,7 @@ Halite::Halite()
     player_names = std::vector<std::string>();
     full_game = std::vector<hlt::Map * >();
 	//loadColorCodes("settings/colorcodes.txt");
-	color_codes[0] = { 0.3, 0.3, 0.3 };
+	color_codes[0] = { 0.3f, 0.3f, 0.3f };
 	font = new FTPixmapFont("fonts/FreeSans.ttf");
 }
 

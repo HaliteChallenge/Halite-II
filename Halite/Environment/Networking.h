@@ -6,13 +6,6 @@
 #include <set>
 #include <cfloat>
 #include <fstream>
-#include <boost/asio.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/asio.hpp>
 
 #ifdef WIN32
 	#include <sys/types.h>
@@ -84,7 +77,7 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 	return moves;
 }
 
-static void sendStringC(int connectionFd, const std::string &sendString) 
+static void sendString(int connectionFd, const std::string &sendString) 
 {
 	size_t length = sendString.length();
 	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
@@ -94,14 +87,7 @@ static void sendStringC(int connectionFd, const std::string &sendString)
 	send(connectionFd, &buffer[0], buffer.size(), 0);
 }
 
-static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) 
-{
-	size_t length = sendString.length();
-	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));	
-	boost::asio::write(*s, boost::asio::buffer(sendString));
-}
-
-static std::string getStringC(int connectionFd) 
+static std::string getString(int connectionFd) 
 {
 	size_t numChars;
 	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
@@ -113,16 +99,6 @@ static std::string getStringC(int connectionFd)
 	return std::string(buffer.begin(), buffer.end());
 }
 
-static std::string getString(boost::asio::ip::tcp::socket * s) 
-{
-	size_t numChars;
-	boost::asio::read(*s, boost::asio::buffer(&numChars, sizeof(numChars)));
-
-	std::vector<char> stringVector(numChars);
-	boost::asio::read(*s, boost::asio::buffer(stringVector));
-
-	return std::string(stringVector.begin(), stringVector.end());
-}
 
 static int createAndConnectSocket(int port) 
 {
@@ -130,6 +106,8 @@ static int createAndConnectSocket(int port)
 		WSADATA wsaData;
 		if (WSAStartup(WINSOCKVERSION, &wsaData) != 0) return 1;
 	#endif
+
+	std::cout << "Waiting for player to connect on port " << port << ".\n";
 
 	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socketFd < 0)
@@ -161,15 +139,17 @@ static int createAndConnectSocket(int port)
 		throw 1;
 	}
 
+	std::cout << "Connected.\n";
+
 	return connectionFd;
 }
 
-static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned char playerTag, std::string name, hlt::Map & m)
+static double handleInitNetworking(int connectionFd, unsigned char playerTag, std::string name, hlt::Map & m)
 {
     using boost::asio::ip::tcp;
 
-	sendString(s, std::to_string(playerTag));
-	sendString(s, serializeMap(m));
+	sendString(connectionFd, std::to_string(playerTag));
+	sendString(connectionFd, serializeMap(m));
     
     std::string str = "Init Message sent to player " + name + "\n";
     std::cout << str;
@@ -178,7 +158,7 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
     
     clock_t initialTime = clock();
 
-	receiveString = getString(s);
+	receiveString = getString(connectionFd);
     str = "Init Message received from player " + name + "\n";
     std::cout << str;
 
@@ -189,16 +169,16 @@ static double handleInitNetworking(boost::asio::ip::tcp::socket * s, unsigned ch
     return timeElapsed;
 }
 
-static double handleFrameNetworking(boost::asio::ip::tcp::socket * s, hlt::Map & m, std::set<hlt::Move> * moves)
+static double handleFrameNetworking(int connectionFd, hlt::Map & m, std::set<hlt::Move> * moves)
 {
-	sendString(s, serializeMap(m));
+	sendString(connectionFd, serializeMap(m));
 
 	moves->clear();
 
 	clock_t initialTime = clock();
 
 	std::string movesString = "";
-	movesString = getString(s);
+	movesString = getString(connectionFd);
 	*moves = deserializeMoveSet(movesString);
 
 	clock_t finalTime = clock() - initialTime;

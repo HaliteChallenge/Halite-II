@@ -228,16 +228,16 @@ Halite::Halite(unsigned short w, unsigned short h)
 {
 	//Add colors to possible colors:
 	possible_colors.clear();
-	possible_colors.push_back({ 1.0, 0.0, 0.0 });
-	possible_colors.push_back({ 0.0, 1.0, 0.0 });
-	possible_colors.push_back({ 0.0, 0.0, 1.0 });
-	possible_colors.push_back({ 1.0, 1.1, 0.0 });
-	possible_colors.push_back({ 1.0, 0.0, 1.0 });
-	possible_colors.push_back({ 0.0, 1.0, 1.0 });
-	possible_colors.push_back({ 1.0, 1.0, 1.0 });
-	possible_colors.push_back({ .87, .72, .53 });
-	possible_colors.push_back({ 1.0, 0.5, 0.5 });
-	possible_colors.push_back({ 1.0, .65, 0.0 });
+	possible_colors.push_back({ 1.0, 0.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.1f, 0.0f });
+	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ .87f, .72f, .53f });
+	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
+	possible_colors.push_back({ 1.0f, .65f, 0.0f });
 
 	//Default initialize
     player_moves = std::vector< std::set<hlt::Move> >();
@@ -246,7 +246,7 @@ Halite::Halite(unsigned short w, unsigned short h)
     //Connect to players
     number_of_players = 0;
     player_names = std::vector<std::string>();
-    player_connections = std::vector<tcp::socket * >();
+    player_connections = std::vector<int>();
     
     std::string in;
     //Ask if the user would like to use the default ports?
@@ -300,21 +300,13 @@ Halite::Halite(unsigned short w, unsigned short h)
             }
         }
         std::cout << "Waiting for a connection on port " << portNumber << ".\n";
+
+        player_connections.push_back(createAndConnectSocket(portNumber));
+
+		std::cout << "Connected to player " << number_of_players + 1 << std::endl;
+		std::cout << "How should I refer to this player? Please enter their name: ";
         
-        boost::asio::io_service *io_service = new boost::asio::io_service();
-		tcp::acceptor acceptor(*io_service, tcp::endpoint(tcp::v4(), portNumber));
-
-        tcp::socket *socket = new tcp::socket(*io_service);
-		tcp::socket &referenceSocket = *socket;
-
-		std::cout << "Waiting to accept\n";
-		acceptor.accept(*socket);
-		std::cout << "Accepted\n";
-
-        player_connections.push_back(socket);
-        
-        std::cout << "Connected to player " << number_of_players + 1 << " at " << socket->remote_endpoint().address().to_string() << std::endl << "How should I refer to this player? Please enter their name: ";
-		while(true)
+        while(true)
 		{
 			std::getline(std::cin, in);
 			if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
@@ -436,6 +428,5 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 Halite::~Halite()
 {
 	//Get rid of dynamically allocated memory:
-	for(auto a = player_connections.begin(); a != player_connections.end(); a++) if(*a != NULL) delete *a;
 	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
 }

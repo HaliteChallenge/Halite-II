@@ -19,7 +19,7 @@ class Halite
 private:
 	unsigned short turn_number;
     std::vector<std::string> player_names;
-    std::vector<boost::asio::ip::tcp::socket *> player_connections;
+    std::vector<int> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
 	hlt::Map game_map;
