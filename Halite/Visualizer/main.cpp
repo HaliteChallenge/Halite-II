@@ -60,6 +60,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		return EXIT_FAILURE;
 	}
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
@@ -76,6 +80,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
+
+	const char * glVersion = (const char * )glGetString(GL_VERSION);
+	debug << glVersion;
+	debug.flush();
 
 	util::initShaderHandler(&debug);
 	t = new FTPixmapFont("fonts/FreeSans.ttf");
