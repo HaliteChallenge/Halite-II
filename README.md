@@ -14,7 +14,7 @@
 - Ben
  - WebGL
  - Change text rendering from FTGL to plain Freetype
- - Fix rendering system to work with fewer pixels
+ - Fix rendering system to work with fewer pixels [DONE]
  - Have files store more data than just the map position (will be useful in future)
  - Fix map system
  - Talk to companies
