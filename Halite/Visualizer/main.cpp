@@ -60,10 +60,6 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		return EXIT_FAILURE;
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
