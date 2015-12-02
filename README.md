@@ -1,6 +1,6 @@
 # Halite
 
-## Due when we get back to school
+## TODO
 - Michael
  - Actually put in C Sockets and take out Boost::asio
  - Manager
