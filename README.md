@@ -2,7 +2,7 @@
 
 ## TODO
 - Michael
- - Actually put in C Sockets and take out Boost::asio
+ - Goddamnit Michael take out Boost::asio
  - Manager
   - People can upload bots
   - People are ranked every x hours
