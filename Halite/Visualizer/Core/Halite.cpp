@@ -27,7 +27,7 @@ void Halite::loadColorCodes(std::string filename)
 }
 */
 
-void Halite::setupMapRendering(unsigned short width, unsigned short height)
+void Halite::setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset)
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &map_vertex_buffer);
@@ -45,9 +45,19 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 	glGenBuffers(1, &map_strength_buffer);
 	glGenVertexArrays(1, &map_vertex_attributes);
 
+	map_y_offset = yOffset;
+	map_x_offset = xOffset;
+
 	//Generate vertices of centers of squares.
 	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
-	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width), yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * height), dX = (MAP_RIGHT - MAP_LEFT) / width, dY = (MAP_TOP - MAP_BOTTOM) / height;
+	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * height), dX = (MAP_RIGHT - MAP_LEFT) / width, dY = (MAP_TOP - MAP_BOTTOM) / height;
+	xLoc += xOffset * dX;
+	while(xLoc > MAP_RIGHT) xLoc -= (MAP_RIGHT - MAP_LEFT);
+	while(xLoc < MAP_LEFT) xLoc += (MAP_RIGHT - MAP_LEFT);
+	const float initialXLoc = xLoc;
+	yLoc += yOffset * dY;
+	while(yLoc > MAP_TOP) yLoc -= (MAP_TOP - MAP_BOTTOM);
+	while(yLoc < MAP_BOTTOM) yLoc += (MAP_TOP - MAP_BOTTOM);
 	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
 	{
 		vertexLocations[a] = xLoc;
@@ -57,7 +67,14 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height)
 		if(xLoc > MAP_RIGHT)
 		{
 			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width);
-			yLoc -= dY;
+		}
+		if(abs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
+		{
+			yLoc += dY;
+			if(yLoc > MAP_TOP)
+			{
+				yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * height);
+			}
 		}
 	}
 
@@ -358,6 +375,8 @@ Halite::Halite()
     full_game = std::vector<hlt::Map * >();
 	//loadColorCodes("settings/colorcodes.txt");
 	color_codes[0] = { 0.3f, 0.3f, 0.3f };
+	map_x_offset = 0;
+	map_y_offset = 0;
 	font = new FTPixmapFont("fonts/FreeSans.ttf");
 }
 
@@ -420,7 +439,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	m.map_height = 0;
 	game_file >> width >> height >> number_of_players >> numLines;
 	m.map_width = width;
+	map_width = width;
 	m.map_height = height;
+	map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
@@ -499,7 +520,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
 
-	setupMapRendering(m.map_width, m.map_height);
+	setupMapRendering(m.map_width, m.map_height, 0, 0);
 	setupBorders();
 
 	game_file.close();
@@ -507,7 +528,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	return numLines;
 }
 
-void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick)
+void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
 	//Set window for rendering.
 	glfwMakeContextCurrent(window);
@@ -540,6 +561,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				loc++;
 			}
 		}
+
+		if(xOffset != map_x_offset || yOffset != map_y_offset) setupMapRendering(map_width, map_height, xOffset, yOffset);
 
 		glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());

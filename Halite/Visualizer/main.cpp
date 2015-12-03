@@ -20,7 +20,7 @@ void renderLaunch();
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
-short numTurns;
+short numTurns, xOffset = 0, yOffset = 0;
 
 std::string filename;
 std::fstream debug;
@@ -113,7 +113,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		c = clock();
 
 		short turnNumberS = turnNumber;
-		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed);
+		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed, xOffset, yOffset);
 		if(abs(turnNumber - float(turnNumberS) > 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
 
 		//Poll events
@@ -234,6 +234,22 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	else if(code == 'X' || code == 'x')
 	{
 		turnNumber = numTurns - 1;
+	}
+	else if(code == 'W' || code == 'w')
+	{
+		yOffset++;
+	}
+	else if(code == 'A' || code == 'a')
+	{
+		xOffset--;
+	}
+	else if(code == 'S' || code == 's')
+	{
+		yOffset--;
+	}
+	else if(code == 'D' || code == 'd')
+	{
+		xOffset++;
 	}
 }
 

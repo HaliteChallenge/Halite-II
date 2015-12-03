@@ -14,7 +14,7 @@ void main()
 {
 	uint s = strength[0];
 	vec4 position = gl_in[0].gl_Position;
-	vec3 c = 0.15 * color[0];
+	vec3 c = 0.2 * color[0];
 	
 	//Declare float which represents dialation factor of inner square:
 	float dialationFactor = 0.85;
