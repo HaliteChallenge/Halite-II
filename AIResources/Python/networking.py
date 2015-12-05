@@ -1,6 +1,7 @@
 from hlt import *
 import socket
 import traceback
+import struct
 from ctypes import *
 
 def serializeMoveSet(moves):
@@ -38,12 +39,14 @@ def deserializeMap(inputString):
 	return m
 
 def sendString(s, toBeSent):
-	numChars = c_size_t(len(toBeSent));
+	numChars = c_uint32(len(toBeSent));
+	print(numChars)
 	s.send(numChars);
+	print(len(toBeSent))
 	s.send(toBeSent.encode())
 
 def getString(s):
-	headerString = s.recv(sizeof(c_size_t))
+	headerString = s.recv(sizeof(c_uint32))
 	header = int.from_bytes(headerString, byteorder="little")
 	print("Header: %d" % header)
 	received = s.recv(header*128)

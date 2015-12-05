@@ -7,7 +7,7 @@
 #include <cfloat>
 #include <fstream>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <sys/types.h>
 	#include <Winsock2.h>
 	#define WINSOCKVERSION MAKEWORD(2,2)
@@ -49,7 +49,7 @@ static std::string serializeMap(hlt::Map & map)
         }
     }
     // Place the last run into the string
-    oss << counter << " " << currentOwner << " ";
+    oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
     
     // Encoding of ages
     for (int a = 0; a < map.contents.size(); ++a)
@@ -79,7 +79,7 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 
 static void sendString(int connectionFd, const std::string &sendString) 
 {
-	size_t length = sendString.length();
+	uint32_t length = sendString.length();
 	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
 	std::vector<char> buffer(sendString.begin(), sendString.end());
 
@@ -89,20 +89,21 @@ static void sendString(int connectionFd, const std::string &sendString)
 
 static std::string getString(int connectionFd) 
 {
-	size_t numChars;
+	uint32_t numChars;
 	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
-
+	
 	std::vector<char> buffer(numChars);
 	recv(connectionFd, &buffer[0], buffer.size(), 0);
 
 	// Copy the buffer into a string. May want to get rid of this for performance purposes
 	return std::string(buffer.begin(), buffer.end());
+	//return "Done";
 }
 
 
 static int createAndConnectSocket(int port) 
 {
-	#ifdef WIN32
+	#ifdef _WIN32
 		WSADATA wsaData;
 		if (WSAStartup(WINSOCKVERSION, &wsaData) != 0) return 1;
 	#endif

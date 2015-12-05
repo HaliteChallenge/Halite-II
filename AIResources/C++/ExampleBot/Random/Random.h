@@ -11,7 +11,7 @@ class Random
 {
 private:
     unsigned char my_tag;
-    boost::asio::ip::tcp::socket *connection;
+    int connection;
     hlt::Map present_map;
     std::set<hlt::Move> moves;
 public:

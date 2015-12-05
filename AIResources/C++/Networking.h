@@ -1,19 +1,27 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
+#include <iostream>
 #include <time.h>
 #include <set>
-#include <iostream>
-#include <cstdlib>
+#include <cfloat>
 #include <fstream>
-#include <boost/archive/archive_exception.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
+#include <string>
+#include <sstream>
+#include <algorithm>
+
+#ifdef _WIN32
+	#include <sys/types.h>
+	#include <Winsock2.h>
+	#include <Ws2tcpip.h>
+	#define WINSOCKVERSION MAKEWORD(2,2)
+#else
+	#include <sys/socket.h>
+	#include <sys/ioctl.h>
+	#include <arpa/inet.h>
+	#include <unistd.h>
+	#include <time.h>
+#endif
 
 #include "hlt.h"
 
@@ -65,50 +73,51 @@ static hlt::Map deserializeMap(std::string &inputString)
 	return map;
 }
 
-static void sendStringC(int connectionFd, const std::string &sendString) 
+static void sendString(int connectionFd, std::string &sendString) 
 {
+	if (sendString.length() < 1) sendString = " ";
+
     size_t length = sendString.length();
     // Copy the string into a buffer. May want to get rid of this operation for performance purposes
-    std::vector<char> buffer(sendString.begin(), sendString.end());
+	std::vector<char> buffer(sendString.begin(), sendString.end());
 
-    send(connectionFd, (char *)&length, sizeof(length), 0);
-    send(connectionFd, &buffer[0], buffer.size(), 0);
+	if (send(connectionFd, (char *)&length, sizeof(length), 0) < 0) 
+	{
+		std::cout << "Error recieving\n";
+		throw 1;
+	}
+	if (send(connectionFd, &buffer[0], buffer.size(), 0) < 0)
+	{
+		std::cout << "Error recieving\n";
+		throw 1;
+	}
 }
 
-static void sendString(boost::asio::ip::tcp::socket * s, const std::string &sendString) 
-{
-	size_t length = sendString.length();
-	boost::asio::write(*s, boost::asio::buffer(&length, sizeof(length)));
-	boost::asio::write(*s, boost::asio::buffer(sendString));
-}
-
-static std::string getStringC(int connectionFd) 
+static std::string getString(int connectionFd) 
 {
     size_t numChars;
-    recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
+	if (recv(connectionFd, (char *)&numChars, sizeof(numChars), 0) < 0) 
+	{
+		std::cout << "Error recieving\n";
+		throw 1;
+	}
+
 
     std::vector<char> buffer(numChars);
-    recv(connectionFd, &buffer[0], buffer.size(), 0);
+	if (recv(connectionFd, &buffer[0], buffer.size(), 0) < 0)
+	{
+		std::cout << "Error recieving\n";
+		throw 1;
+	}
 
     // Copy the buffer into a string. May want to get rid of this for performance purposes
-    return std::string(buffer.begin(), buffer.end());
+    std::string string = std::string(buffer.begin(), buffer.end());
+	std::cout << string << std::endl;
+	return string;
 }
 
-static std::string getString(boost::asio::ip::tcp::socket * s) 
+static int connectToGame()
 {
-	size_t numChars;
-	boost::asio::read(*s, boost::asio::buffer(&numChars, sizeof(numChars)));
-
-	std::vector<char> stringVector(numChars);
-	boost::asio::read(*s, boost::asio::buffer(stringVector));
-
-	return std::string(stringVector.begin(), stringVector.end());
-}
-
-static int connectToGameC()
-{
-    using boost::asio::ip::tcp;
-    
     while(true)
     {
         std::string in;
@@ -129,7 +138,7 @@ static int connectToGameC()
             }
         }
 
-        #ifdef WIN32
+        #ifdef _WIN32
             WSADATA wsaData;
             if(WSAStartup(WINSOCKVERSION, &wsaData) != 0) return 1;
         #endif
@@ -138,9 +147,9 @@ static int connectToGameC()
         memset(&servAddr, 0, sizeof(servAddr));
         servAddr.sin_family = AF_INET;
         servAddr.sin_port = htons(portNumber);
-        servAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        inet_pton(AF_INET, "127.0.0.1", &(servAddr.sin_addr));
         
-        connectionFd = socket(AF_INET, SOCK_STREAM, 0);
+        int connectionFd = socket(AF_INET, SOCK_STREAM, 0);
         if(connectionFd < 0) {
             std::cout << "There was a problem connecting. Let's try again: \n";
             continue;
@@ -150,83 +159,43 @@ static int connectToGameC()
             std::cout << "There was a problem connecting. Let's try again: \n";
             continue;
         }
+		
+		u_long iMode = 0;
+		#ifdef _WIN32
+			ioctlsocket(connectionFd, FIONBIO, &iMode);
+		#else
+			ioctl(connectionFd, FIONBIO, &iMode);
+		#endif
 
         return connectionFd;
         
     }
 }
 
-static boost::asio::ip::tcp::socket * connectToGame()
-{
-    using boost::asio::ip::tcp;
-    
-    while(true)
-    {
-        std::string in;
-        unsigned short portNumber;
-        std::cout << "What port would you like to connect to? Please enter a valid port number: ";
-        while(true)
-        {
-            std::getline(std::cin, in);
-            std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-            try
-            {
-                portNumber = std::stoi(in);
-                break;
-            }
-            catch(std::exception e)
-            {
-                std::cout << "That isn't a valid input. Please enter a valid port number: ";
-            }
-        }
-
-        boost::asio::io_service *io_service = new boost::asio::io_service();
-        tcp::endpoint endpoint(boost::asio::ip::address::from_string("127.0.0.1"), portNumber);
-
-        tcp::socket *socket = new tcp::socket(*io_service);
-        boost::system::error_code error;
-        socket->connect(endpoint, error);
-
-        std::cout << "open " << socket->is_open() << "\n";
-        
-        if (error)
-        {
-            std::cout << "There was a problem connecting. Let's try again: \n";
-        } 
-        else 
-        {
-            std::cout << "Successfully established contact with " << socket->remote_endpoint().address().to_string() << ".\n";
-            return socket;
-        }
-        
-    }
-}
-
-
-static void getInit(boost::asio::ip::tcp::socket *s, unsigned char& playerTag, hlt::Map& m)
+static void getInit(int connectionFd, unsigned char& playerTag, hlt::Map& m)
 {
 	std::cout << "Get init\n";
     
-    playerTag = (unsigned char)std::stoi(getString(s));
-	m = deserializeMap(getString(s));
+    playerTag = (unsigned char)std::stoi(getString(connectionFd));
+	m = deserializeMap(getString(connectionFd));
 }
 
-static void sendInitResponse(boost::asio::ip::tcp::socket *s)
+static void sendInitResponse(int connectionFd)
 {
 	std::cout << "Send init\n";
     std::string response = "Done";
-    sendString(s, response);
+    sendString(connectionFd, response);
 }
 
-static void getFrame(boost::asio::ip::tcp::socket *s, hlt::Map& m)
+static void getFrame(int connectionFd, hlt::Map& m)
 {
-	m = deserializeMap(getString(s));
+	m = deserializeMap(getString(connectionFd));
 }
 
-static void sendFrame(boost::asio::ip::tcp::socket *s, std::set<hlt::Move>& moves)
+static void sendFrame(int connectionFd, std::set<hlt::Move>& moves)
 {
 	std::cout << "Send frame\n";
-    sendString(s, serializeMoveSet(moves));
+    sendString(connectionFd, serializeMoveSet(moves));
 }
 
 #endif

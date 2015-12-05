@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 
 public class Networking
 {
-    public static final int SIZEOF_SIZE_T = 4;
+    public static final int SIZE_OF_INTEGER_PREFIX = 4;
     public static final int CHAR_SIZE = 4;
 
     static String serializeMoveList(ArrayList<Move> moves)
@@ -64,7 +64,7 @@ public class Networking
         try {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
 
-            byte[] lengthArray = ByteBuffer.allocate(SIZEOF_SIZE_T).order(ByteOrder.LITTLE_ENDIAN).putInt(sendString.length()).array();
+            byte[] lengthArray = ByteBuffer.allocate(SIZE_OF_INTEGER_PREFIX).order(ByteOrder.LITTLE_ENDIAN).putInt(sendString.length()).array();
             out.write(lengthArray, 0, lengthArray.length);
             
             byte[] messageArray = sendString.getBytes();
@@ -79,7 +79,7 @@ public class Networking
         try {
             DataInputStream in = new DataInputStream (s.getInputStream());
 
-            byte[] lengthArray = new byte[SIZEOF_SIZE_T];
+            byte[] lengthArray = new byte[SIZE_OF_INTEGER_PREFIX];
             in.read(lengthArray, 0, lengthArray.length);
             int length = ByteBuffer.wrap(lengthArray).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
