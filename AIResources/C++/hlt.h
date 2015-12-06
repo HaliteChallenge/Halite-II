@@ -13,6 +13,11 @@
 
 namespace hlt
 {
+	enum MessageType { ATTACK, STOP_ATTACK };
+	struct Message {
+		MessageType type;
+		int senderID, recipientID, targetID;
+	};
 	struct Location
 	{
 		unsigned short x, y;
