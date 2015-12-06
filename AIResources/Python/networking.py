@@ -41,7 +41,7 @@ def deserializeMap(inputString):
 def serializeMessages(messages):
 	messageString = str(len(messages)) + " "
 	for message in messages:
-		messageString += str(message.type) + " " + str(message.senderID) + " " + str(message.recipientID) + " " + str(message.targetID)
+		messageString += str(message.type) + " " + str(message.senderID) + " " + str(message.recipientID) + " " + str(message.targetID) + " "
 	return messageString
 
 def deserializeMessages(messageString):

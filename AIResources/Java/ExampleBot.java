@@ -14,8 +14,13 @@ public class ExampleBot
         Networking.sendInit(sock);
 
         while(true) {
-            ArrayList<Move> moves = new ArrayList<Move>(0);
-            gameMap = Networking.getFrame(sock);
+            ArrayList<Move> moves = new ArrayList<Move>();
+            ArrayList<Message> sendMessages = new ArrayList<Message>();
+            
+            FramePackage fPackage = Networking.getFrame(sock);
+            gameMap = fPackage.map;
+            ArrayList<Message> recievedMessages = fPackage.messages;
+            
             
             for(int y = 0; y < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
@@ -27,7 +32,7 @@ public class ExampleBot
                 }
             }
             
-            Networking.sendFrame(sock, moves);
+            Networking.sendFrame(sock, moves, sendMessages);
         }
     }
 }

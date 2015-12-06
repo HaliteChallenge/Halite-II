@@ -59,7 +59,34 @@ public class Networking
 
         return map;
     }
-
+    
+    static String serializeMessages(ArrayList<Message> messages) {
+        String returnString = messages.size()+"";
+        for(Message message : messages) {
+            returnString += message.type.getValue() + " " + message.senderID + " " + message.recipientID + " " + message.targetID + " ";
+        }
+        return returnString;
+    }
+    
+    static ArrayList<Message> deserializeMessages(String messageString) {
+        ArrayList<Message> messages = new ArrayList<Message>();
+        String[] splitString = messageString.split(" ");
+        int numberOfMessages = Integer.parseInt(splitString[0]);
+        
+        int currentIndex = 1;
+        for(int a = 0; a < numberOfMessages; a++) {
+            MessageType type = MessageType.getType(Integer.parseInt(splitString[currentIndex]));
+            int senderID = Integer.parseInt(splitString[currentIndex+1]);
+            int recipientID = Integer.parseInt(splitString[currentIndex+2]);
+            int targetID = Integer.parseInt(splitString[currentIndex+3]);
+            
+            messages.add(new Message(type, senderID, recipientID, targetID));
+            currentIndex += 4;
+        }
+        
+        return messages;
+    }
+    
     static void sendString(Socket s, String sendString) {
         try {
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
@@ -148,14 +175,15 @@ public class Networking
         sendString(s, "Done");
     }
 
-    static Map getFrame(Socket s)
+    static FramePackage getFrame(Socket s)
     {
-        return deserializeMap(getString(s));
+        return new FramePackage(deserializeMap(getString(s)), deserializeMessages(getString(s)));
     }
 
-    static void sendFrame(Socket s, ArrayList<Move> moves)
+    static void sendFrame(Socket s, ArrayList<Move> moves, ArrayList<Message> messages)
     {
         sendString(s, serializeMoveList(moves));
+        sendString(s, serializeMessages(messages));
     }
 
 }

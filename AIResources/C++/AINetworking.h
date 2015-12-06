@@ -79,7 +79,7 @@ static std::string serializeMessages(const std::vector<hlt::Message> &messages) 
 	{
 		hlt::Message message = messages[a];
 		oss << (unsigned short)message.type << " ";
-		oss <<  message.senderID << " " << message.recipientID << " " << message.targetID;
+		oss <<  message.senderID << " " << message.recipientID << " " << message.targetID << " ";
 	}
 
 	return oss.str();
