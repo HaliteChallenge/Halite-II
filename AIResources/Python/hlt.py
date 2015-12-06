@@ -7,7 +7,15 @@ EAST = 2
 SOUTH = 3
 WEST = 4
 
+ATTACK = 0
+STOP_ATTACK = 1
 
+class Message:
+	def __init__(self, messageType, senderID, recipientID, targetID):
+		self.type = messageType
+		self.senderID = senderID
+		self.recipientID = recipientID
+		self.targetID = targetID
 class Location:
 	def __init__(self, x=0, y=0):
 		self.x = x

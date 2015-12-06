@@ -38,6 +38,20 @@ def deserializeMap(inputString):
 
 	return m
 
+def serializeMessages(messages):
+	messageString = str(len(messages)) + " "
+	for message in messages:
+		messageString += str(message.type) + " " + str(message.senderID) + " " + str(message.recipientID) + " " + str(message.targetID)
+	return messageString
+
+def deserializeMessages(messageString):
+	messages = []
+	splitString = messageString.split(" ")
+	numMessages = int(splitString.pop(0))
+	for a in range(0, numMessages):
+		messages.append(Message(int(splitString.pop(0)), int(splitString.pop(0)), int(splitString.pop(0)), int(splitString.pop(0)) ))
+	return messages
+
 def sendString(s, toBeSent):
 	numChars = c_uint32(len(toBeSent));
 	print(numChars)
@@ -82,7 +96,8 @@ def sendInit(s):
 	sendString(s, message)
 
 def getFrame(s):
-	return deserializeMap(getString(s))
+	return (deserializeMap(getString(s)), deserializeMessages(getString(s)))
 
-def sendFrame(s, moves):
+def sendFrame(s, moves, messages):
 	sendString(s, serializeMoveSet(moves))
+	sendString(s, serializeMessages(messages))
