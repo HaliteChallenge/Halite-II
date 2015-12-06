@@ -2,7 +2,6 @@
 
 ## TODO
 - Michael
- - Goddamnit Michael take out Boost::asio
  - Manager
   - People can upload bots
   - People are ranked every x hours
