@@ -77,7 +77,12 @@ static void sendString(int connectionFd, std::string &sendString)
 {
 	if (sendString.length() < 1) sendString = " ";
 
-    size_t length = sendString.length();
+	uint32_t length = sendString.length();
+	char lengthBuffer[4];
+	lengthBuffer[0] = length >> 24;
+	lengthBuffer[1] = length >> 16;
+	lengthBuffer[2] = length >> 8;
+	lengthBuffer[3] = length >> 0;
     // Copy the string into a buffer. May want to get rid of this operation for performance purposes
 	std::vector<char> buffer(sendString.begin(), sendString.end());
 
@@ -95,7 +100,7 @@ static void sendString(int connectionFd, std::string &sendString)
 
 static std::string getString(int connectionFd) 
 {
-    size_t numChars;
+	uint32_t numChars;
 	if (recv(connectionFd, (char *)&numChars, sizeof(numChars), 0) < 0) 
 	{
 		std::cout << "Error recieving\n";
@@ -112,7 +117,6 @@ static std::string getString(int connectionFd)
 
     // Copy the buffer into a string. May want to get rid of this for performance purposes
     std::string string = std::string(buffer.begin(), buffer.end());
-	std::cout << string << std::endl;
 	return string;
 }
 
