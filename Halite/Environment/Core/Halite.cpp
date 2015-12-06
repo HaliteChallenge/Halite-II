@@ -26,7 +26,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			std::vector<hlt::Message> messagesFromThisBot;
 			for (int b = 0; b < pastFrameMessages.size(); b++) if (pastFrameMessages[a].recipientID == a) messagesForThisBot.push_back(pastFrameMessages[a]);
-			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], messagesFromThisBot);
+			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], &messagesFromThisBot);
+			thisFrameMessages.insert(thisFrameMessages.end(), messagesFromThisBot.begin(), messagesFromThisBot.end());
 			threadLocation++;
 		}
 	}

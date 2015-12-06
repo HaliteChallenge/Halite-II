@@ -84,8 +84,7 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
 static std::string serializeMessages(const std::vector<hlt::Message> &messages) {
 	std::ostringstream oss;
 
-	int numberOfMessages;
-	oss << numberOfMessages << " ";
+	oss << messages.size() << " ";
 
 	for (int a = 0; a < messages.size(); a++)
 	{
