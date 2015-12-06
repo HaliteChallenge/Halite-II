@@ -12,13 +12,14 @@
 #include <boost/asio.hpp>
 
 #include "hlt.h"
-#include "../Networking.h"
+#include "../EnvironmentNetworking.h"
 
 class Halite
 {
 private:
 	unsigned short turn_number;
     std::vector<std::string> player_names;
+	std::vector<hlt::Message> pastFrameMessages;
     std::vector<int> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;

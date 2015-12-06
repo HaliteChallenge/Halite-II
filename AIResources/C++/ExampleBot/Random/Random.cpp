@@ -13,7 +13,9 @@ void Random::run()
     while(true)
     {
         moves.clear();
-        getFrame(connection, present_map);
+		messagesFromMe.clear();
+
+        getFrame(connection, present_map, messagesToMe);
 		for(unsigned short a = 0; a < present_map.map_height; a++)
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)
@@ -28,6 +30,6 @@ void Random::run()
 				}
 			}
 		}
-        sendFrame(connection, moves);
+        sendFrame(connection, moves, messagesFromMe);
     }
 }

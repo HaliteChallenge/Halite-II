@@ -6,24 +6,28 @@
 #include <set>
 #include <cfloat>
 #include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
 	#include <sys/types.h>
 	#include <Winsock2.h>
+	#include <Ws2tcpip.h>
 	#define WINSOCKVERSION MAKEWORD(2,2)
 #else
 	#include <sys/socket.h>
 	#include <arpa/inet.h>
-	#include <unistd.h>
 	#include <time.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
 #endif
 
 #include <stdio.h>
 
-#include "../Core/hlt.h"
+#include "Core/hlt.h"
 
 
-static std::string serializeMap(hlt::Map & map)
+static std::string serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
     std::ostringstream oss;
@@ -75,6 +79,42 @@ static std::set<hlt::Move> deserializeMoveSet(std::string & inputString)
     while(iss >> l.x >> l.y >> d) moves.insert({l, (unsigned char)d});
 
 	return moves;
+}
+
+static std::string serializeMessages(const std::vector<hlt::Message> &messages) {
+	std::ostringstream oss;
+
+	int numberOfMessages;
+	oss << numberOfMessages << " ";
+
+	for (int a = 0; a < messages.size(); a++)
+	{
+		hlt::Message message = messages[a];
+		oss << (unsigned short)message.type << " ";
+		oss << message.senderID << " " << message.recipientID << " " << message.targetID;
+	}
+
+	return oss.str();
+}
+
+static std::vector<hlt::Message> deserializeMessages(const std::string &inputString)
+{
+	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
+	std::stringstream iss(inputString);
+
+	int numberOfMessages;
+	iss >> numberOfMessages;
+
+	for (int a = 0; a < numberOfMessages; a++)
+	{
+		hlt::Message message;
+		iss >> ((char*)&message.type);
+		iss >> message.senderID >> message.recipientID >> message.targetID;
+
+		messages.push_back(message);
+	}
+
+	return messages;
 }
 
 static void sendString(int connectionFd, const std::string &sendString) 
@@ -147,7 +187,6 @@ static int createAndConnectSocket(int port)
 
 static double handleInitNetworking(int connectionFd, unsigned char playerTag, std::string name, hlt::Map & m)
 {
-    using boost::asio::ip::tcp;
 
 	sendString(connectionFd, std::to_string(playerTag));
 	sendString(connectionFd, serializeMap(m));
@@ -170,18 +209,18 @@ static double handleInitNetworking(int connectionFd, unsigned char playerTag, st
     return timeElapsed;
 }
 
-static double handleFrameNetworking(int connectionFd, hlt::Map & m, std::set<hlt::Move> * moves)
+static double handleFrameNetworking(int connectionFd, const hlt::Map & m, const std::vector<hlt::Message> &sendMessages, std::set<hlt::Move> * moves, std::vector<hlt::Message> * recievedMessages)
 {
 	sendString(connectionFd, serializeMap(m));
+	sendString(connectionFd, serializeMessages(sendMessages));
 
 	moves->clear();
 
 	clock_t initialTime = clock();
 
-	std::string movesString = "";
-	movesString = getString(connectionFd);
-	*moves = deserializeMoveSet(movesString);
-
+	*moves = deserializeMoveSet(getString(connectionFd));
+	*recievedMessages = deserializeMessages(getString(connectionFd));
+	
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 

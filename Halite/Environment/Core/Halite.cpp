@@ -15,14 +15,22 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
 	std::vector< std::future<double> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
+
+	// Stores the messages sent by bots this frame
+	std::vector<hlt::Message> thisFrameMessages;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		if(alive[a])
 		{
-			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, &player_moves[a]);
+			// Find the messages sent last frame that were directed at this bot
+			std::vector<hlt::Message> messagesForThisBot;
+			std::vector<hlt::Message> messagesFromThisBot;
+			for (int b = 0; b < pastFrameMessages.size(); b++) if (pastFrameMessages[a].recipientID == a) messagesForThisBot.push_back(pastFrameMessages[a]);
+			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], messagesFromThisBot);
 			threadLocation++;
 		}
 	}
+	pastFrameMessages = thisFrameMessages;
 
 	//Figure out how long each AI is permitted to respond.
 	std::vector<double> allowableTimesToRespond(number_of_players);

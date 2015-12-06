@@ -25,7 +25,7 @@
 
 #include "hlt.h"
 
-static std::string serializeMoveSet(std::set<hlt::Move> &moves) {
+static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
     std::ostringstream oss;
     for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
 	return oss.str();
@@ -73,8 +73,7 @@ static hlt::Map deserializeMap(const std::string &inputString)
 static std::string serializeMessages(const std::vector<hlt::Message> &messages) {
 	std::ostringstream oss;
 
-	int numberOfMessages;
-	oss << numberOfMessages << " ";
+	oss << messages.size() << " ";
 
 	for (int a = 0; a < messages.size(); a++)
 	{
@@ -86,7 +85,7 @@ static std::string serializeMessages(const std::vector<hlt::Message> &messages) 
 	return oss.str();
 }
 
-static std::vector<hlt::Message> deseralizeMessages(const std::string &inputString) 
+static std::vector<hlt::Message> deserializeMessages(const std::string &inputString)
 {
 	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
 	std::stringstream iss(inputString);
@@ -229,10 +228,10 @@ static void sendInitResponse(int connectionFd)
 static void getFrame(int connectionFd, hlt::Map& m, std::vector<hlt::Message> &messages)
 {
 	m = deserializeMap(getString(connectionFd));
-	messages = deseralizeMessages(getString(connectionFd));
+	messages = deserializeMessages(getString(connectionFd));
 }
 
-static void sendFrame(int connectionFd, std::set<hlt::Move> &moves, std::vector<hlt::Message> &messages)
+static void sendFrame(int connectionFd, const std::set<hlt::Move> &moves, const std::vector<hlt::Message> &messages)
 {
 	std::cout << "Send frame\n";
     sendString(connectionFd, serializeMoveSet(moves));
