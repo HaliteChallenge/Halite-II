@@ -10,6 +10,7 @@
   - Compile bots
   - Run games
  - InterAI messaging (across all Java, Python, and C++)
+ - Test networking on Unix
 - Ben
  - WebGL
  - Change text rendering from FTGL to plain Freetype
