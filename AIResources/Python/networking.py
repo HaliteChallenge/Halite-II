@@ -63,7 +63,7 @@ def getString(s):
 	headerString = s.recv(sizeof(c_uint32))
 	header = int.from_bytes(headerString, byteorder="little")
 	print("Header: %d" % header)
-	received = s.recv(header*128)
+	received = s.recv(header)
 	return received.decode()
 
 def connectToGame():

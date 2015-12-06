@@ -107,7 +107,11 @@ static std::vector<hlt::Message> deserializeMessages(const std::string &inputStr
 	for (int a = 0; a < numberOfMessages; a++)
 	{
 		hlt::Message message;
-		iss >> ((char*)&message.type);
+		
+		int messageTypeInt;
+		iss >> messageTypeInt;
+		message.type = static_cast<hlt::MessageType>(messageTypeInt);
+		
 		iss >> message.senderID >> message.recipientID >> message.targetID;
 
 		messages.push_back(message);
@@ -208,17 +212,18 @@ static double handleInitNetworking(int connectionFd, unsigned char playerTag, st
     return timeElapsed;
 }
 
-static double handleFrameNetworking(int connectionFd, const hlt::Map & m, const std::vector<hlt::Message> &sendMessages, std::set<hlt::Move> * moves, std::vector<hlt::Message> * recievedMessages)
+static double handleFrameNetworking(int connectionFd, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
+	// Send this bot the game map and the messages addressed to this bot
 	sendString(connectionFd, serializeMap(m));
-	sendString(connectionFd, serializeMessages(sendMessages));
+	sendString(connectionFd, serializeMessages(messagesForThisBot));
 
 	moves->clear();
 
 	clock_t initialTime = clock();
 
 	*moves = deserializeMoveSet(getString(connectionFd));
-	*recievedMessages = deserializeMessages(getString(connectionFd));
+	*messagesFromThisBot = deserializeMessages(getString(connectionFd));
 	
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;

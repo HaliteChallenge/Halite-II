@@ -17,21 +17,20 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
 	// Stores the messages sent by bots this frame
-	std::vector<hlt::Message> thisFrameMessages;
+	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		if(alive[a])
 		{
-			// Find the messages sent last frame that were directed at this bot
+			// Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
 			std::vector<hlt::Message> messagesForThisBot;
-			std::vector<hlt::Message> messagesFromThisBot;
-			for (int b = 0; b < pastFrameMessages.size(); b++) if (pastFrameMessages[a].recipientID == a) messagesForThisBot.push_back(pastFrameMessages[a]);
-			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], &messagesFromThisBot);
-			thisFrameMessages.insert(thisFrameMessages.end(), messagesFromThisBot.begin(), messagesFromThisBot.end());
+			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
+			
+			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+
 			threadLocation++;
 		}
 	}
-	pastFrameMessages = thisFrameMessages;
 
 	//Figure out how long each AI is permitted to respond.
 	std::vector<double> allowableTimesToRespond(number_of_players);
@@ -50,6 +49,16 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		{
 			permissibleTime[a] = frameThreads[threadLocation].get() <= allowableTimesToRespond[a];
 			threadLocation++;
+		}
+	}
+
+	// Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
+	pastFrameMessages = std::vector<hlt::Message>();
+	// Ensure that the player signed their messages correctly
+	for (int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++) {
+		for (auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++) {
+			message->senderID = playerIndex+1; // playerIndex + 1 equals the playerID of the sender
+			pastFrameMessages.push_back(*message);
 		}
 	}
 
