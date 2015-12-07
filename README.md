@@ -3,12 +3,12 @@
 ## TODO
 - Michael
  - Manager
-  - People can upload bots
-  - People are ranked every x hours
-  - Prevents players from doing anything funky, like using too much RAM or creating multiple OS threads or writing to files
+   - People can upload bots
+    - People are ranked every x hours
+    - Prevents players from doing anything funky, like using too much RAM or creating multiple OS threads or writing to files
  - Workers
-  - Compile bots
-  - Run games
+   - Compile bots
+    - Run games
  - Test networking on Unix
 - Ben
  - WebGL
