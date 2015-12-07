@@ -96,7 +96,11 @@ static std::vector<hlt::Message> deserializeMessages(const std::string &inputStr
 	for (int a = 0; a < numberOfMessages; a++) 
 	{
 		hlt::Message message;
-		iss >> ((char*)&message.type);
+		
+		int messageTypeInt;
+		iss >> messageTypeInt;
+		message.type = static_cast<hlt::MessageType>(messageTypeInt);
+		
 		iss >> message.senderID >> message.recipientID >> message.targetID;
 
 		messages.push_back(message);
@@ -139,6 +143,7 @@ static std::string getString(int connectionFd)
 		throw 1;
 	}
 
+	std::cout << "numm: " << numChars << "\n";
 
     std::vector<char> buffer(numChars);
 	if (recv(connectionFd, &buffer[0], buffer.size(), 0) < 0)

@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 public class Networking
 {
     public static final int SIZE_OF_INTEGER_PREFIX = 4;
-    public static final int CHAR_SIZE = 4;
+    public static final int CHAR_SIZE = 1;
 
     static String serializeMoveList(ArrayList<Move> moves)
     {
@@ -61,7 +61,7 @@ public class Networking
     }
     
     static String serializeMessages(ArrayList<Message> messages) {
-        String returnString = messages.size()+"";
+        String returnString = messages.size()+" ";
         for(Message message : messages) {
             returnString += message.type.getValue() + " " + message.senderID + " " + message.recipientID + " " + message.targetID + " ";
         }

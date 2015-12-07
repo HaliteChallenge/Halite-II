@@ -17,10 +17,15 @@ public class ExampleBot
             ArrayList<Move> moves = new ArrayList<Move>();
             ArrayList<Message> sendMessages = new ArrayList<Message>();
             
+            sendMessages.add(new Message(MessageType.STOP_ATTACK, playerTag, playerTag != 1 ? 1 : 2, playerTag));
+            
             FramePackage fPackage = Networking.getFrame(sock);
             gameMap = fPackage.map;
             ArrayList<Message> recievedMessages = fPackage.messages;
             
+            for(Message message : recievedMessages) {
+                System.out.println("Message: " + message.type.getValue() + " " + message.senderID + " " + message.recipientID + " " + message.targetID);
+            }
             
             for(int y = 0; y < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {

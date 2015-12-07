@@ -15,7 +15,17 @@ void Random::run()
         moves.clear();
 		messagesFromMe.clear();
 
+		hlt::Message exampleMessage;
+		exampleMessage.type = hlt::MessageType::ATTACK;
+		exampleMessage.senderID = my_tag;
+		exampleMessage.recipientID = my_tag != 1 ? 1 : 2;
+		exampleMessage.targetID = my_tag;
+		messagesFromMe.push_back(exampleMessage);
+
         getFrame(connection, present_map, messagesToMe);
+
+		for (auto message = messagesToMe.begin(); message != messagesToMe.end(); message++) std::cout << message->type << " " << message->senderID << " " << message->recipientID << " " << message->targetID << "\n";
+
 		for(unsigned short a = 0; a < present_map.map_height; a++)
 		{
 			for(unsigned short b = 0; b < present_map.map_width; b++)

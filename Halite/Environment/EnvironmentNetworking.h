@@ -123,6 +123,7 @@ static std::vector<hlt::Message> deserializeMessages(const std::string &inputStr
 static void sendString(int connectionFd, const std::string &sendString) 
 {
 	uint32_t length = sendString.length();
+	std::cout << "send: " << length << "\n";
 	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
 	std::vector<char> buffer(sendString.begin(), sendString.end());
 
@@ -134,6 +135,8 @@ static std::string getString(int connectionFd)
 {
 	uint32_t numChars;
 	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
+
+	std::cout << "get: " << numChars << "\n";
 	
 	std::vector<char> buffer(numChars);
 	recv(connectionFd, &buffer[0], buffer.size(), 0);
