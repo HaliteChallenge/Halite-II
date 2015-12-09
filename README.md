@@ -2,14 +2,16 @@
 
 ## TODO
 - Michael
- - Manager
-   - People can upload bots
-    - People are ranked every x hours
-    - Prevents players from doing anything funky, like using too much RAM or creating multiple OS threads or writing to files
- - Workers
-   - Compile bots
-    - Run games
- - Test networking on Unix
+ - Allow people to upload their bot code and store position of code in database
+ - Worker - Server
+   - Server
+     - Have a queue of things that need to be compiled
+      - Manage the Trueskill algorithm
+    - Worker
+      - Setup chroot jail and sandboxing from python
+       - Query the server for a job
+       - given the task of compiling code or running a game
+ - Test networking on Unix computer
 - Ben
  - WebGL
  - Change text rendering from FTGL to plain Freetype
