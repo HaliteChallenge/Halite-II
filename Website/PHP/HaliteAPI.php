@@ -105,7 +105,7 @@ class HaliteAPI extends API
 			$userID = $_POST['userID'];
 
 			for($i = 0; $i < count($_FILES['files']['name']); $i++){
-				$targetPath = "Storage/Bots/$userID";
+				$targetPath = "../Storage/Bots/$userID";
 				if(file_exists($targetPath) == false) {
 					mkdir($targetPath);
 				}
