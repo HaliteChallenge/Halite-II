@@ -289,3 +289,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Sublime preview of markdown creates html files
+*.html

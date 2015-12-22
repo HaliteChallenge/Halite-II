@@ -1,5 +1,25 @@
 #include "EnvironmentNetworking.h"
 
+#include <time.h>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <stdio.h>
+
+#ifdef _WIN32
+	#include <windows.h> 
+	#include <tchar.h>
+	#include <stdio.h> 
+	#include <strsafe.h>
+#else
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <time.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+#endif
+
 std::string EnvironmentNetworking::serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
@@ -93,23 +113,29 @@ std::vector<hlt::Message> EnvironmentNetworking::deserializeMessages(const std::
 	return messages;
 }
 
-void EnvironmentNetworking::sendString(int connectionFd, const std::string &sendString)
+void EnvironmentNetworking::sendString(unsigned char playerTag, const std::string &sendString)
 {
+#ifdef _WIN32
+
+#else
+	int connectionFd = connections[playerTag - 1];
 	uint32_t length = sendString.length();
-	std::cout << "send: " << length << "\n";
 	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
 	std::vector<char> buffer(sendString.begin(), sendString.end());
 
 	send(connectionFd, (char *)&length, sizeof(length), 0);
 	send(connectionFd, &buffer[0], buffer.size(), 0);
+#endif
 }
 
-std::string EnvironmentNetworking::getString(int connectionFd)
+std::string EnvironmentNetworking::getString(unsigned char playerTag)
 {
+#ifdef _WIN32
+
+#else
+	int connectionFd = connections[playerTag - 1];
 	uint32_t numChars;
 	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
-
-	std::cout << "get: " << numChars << "\n";
 
 	std::vector<char> buffer(numChars);
 	recv(connectionFd, &buffer[0], buffer.size(), 0);
@@ -117,15 +143,32 @@ std::string EnvironmentNetworking::getString(int connectionFd)
 	// Copy the buffer into a string. May want to get rid of this for performance purposes
 	return std::string(buffer.begin(), buffer.end());
 	//return "Done";
+#endif
 }
 
 void EnvironmentNetworking::createAndConnectSocket(int port)
 {
 #ifdef _WIN32
-	WSADATA wsaData;
-	if (WSAStartup(WINSOCKVERSION, &wsaData) != 0) return;
-#endif
+	// stdin write - write to this
+	// stdout read - read from this 
+	Connection connection;
 
+	SECURITY_ATTRIBUTES saAttr;
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+
+	bool success = CreateProcess(NULL,
+		"../Debug/ExampleBot.exe",     // command line 
+		NULL,          // process security attributes 
+		NULL,          // primary thread security attributes 
+		TRUE,          // handles are inherited 
+		0,             // creation flags 
+		NULL,          // use parent's environment 
+		NULL,          // use parent's current directory 
+		&siStartInfo,  // STARTUPINFO pointer 
+		&piProcInfo);  // receives PROCESS_INFORMATION 
+#else
 	std::cout << "Waiting for player to connect on port " << port << ".\n";
 
 	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -161,14 +204,13 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	std::cout << "Connected.\n";
 
 	connections.push_back(connectionFd);
+#endif
 }
 
 double EnvironmentNetworking::handleInitNetworking(unsigned char playerTag, std::string name, hlt::Map & m)
 {
-	int connectionFd = connections[playerTag - 1];
-
-	sendString(connectionFd, std::to_string(playerTag));
-	sendString(connectionFd, serializeMap(m));
+	sendString(playerTag, std::to_string(playerTag));
+	sendString(playerTag, serializeMap(m));
 
 	std::string str = "Init Message sent to player " + name + "\n";
 	std::cout << str;
@@ -177,7 +219,7 @@ double EnvironmentNetworking::handleInitNetworking(unsigned char playerTag, std:
 
 	clock_t initialTime = clock();
 
-	receiveString = getString(connectionFd);
+	receiveString = getString(playerTag);
 	str = "Init Message received from player " + name + "\n";
 	std::cout << str;
 
@@ -190,18 +232,16 @@ double EnvironmentNetworking::handleInitNetworking(unsigned char playerTag, std:
 
 double EnvironmentNetworking::handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
-	int connectionFd = connections[playerTag - 1];
-
 	// Send this bot the game map and the messages addressed to this bot
-	sendString(connectionFd, serializeMap(m));
-	sendString(connectionFd, serializeMessages(messagesForThisBot));
+	sendString(playerTag, serializeMap(m));
+	sendString(playerTag, serializeMessages(messagesForThisBot));
 
 	moves->clear();
 
 	clock_t initialTime = clock();
 
-	*moves = deserializeMoveSet(getString(connectionFd));
-	*messagesFromThisBot = deserializeMessages(getString(connectionFd));
+	*moves = deserializeMoveSet(getString(playerTag));
+	*messagesFromThisBot = deserializeMessages(getString(playerTag));
 
 	clock_t finalTime = clock() - initialTime;
 	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;

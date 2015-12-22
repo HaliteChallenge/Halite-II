@@ -1,28 +1,36 @@
 # Halite
 
-## TODO
-- Michael
- - Allow people to upload their bot code and store position of code in database
- - Worker - Server
-   - Server
-     - Have a queue of things that need to be compiled
-      - Manage the Trueskill algorithm
-    - Worker
-      - Setup chroot jail and sandboxing from python
-       - Query the server for a job
-       - given the task of compiling code or running a game
- - Test networking on Unix computer
-- Ben
- - WebGL
- - Change text rendering from FTGL to plain Freetype
- - Fix rendering system to work with fewer pixels [DONE]
- - Have files store more data than just the map position (will be useful in future)
- - Fix map system
- - Talk to companies
- - Fix relative scoring system
- - Update rules
-- Luca
- - Make website pretty
+## To Do Michael
+
+### Website
+- Allow people to upload their bot code and store position of code in database
+- Setup leaderboard
+
+### Halite Program
+- Switch to pipes on Windows
+- Switch to pipes on Linux
+- Switch to pipes on clients
+- Test networking on unix and windows
+
+### Worker
+- Rewrite Sandbox in C++
+- When sent a request with 2 userIDs, have php program spawn c++ program which plays halite with 2 sandboxes (starts docker container which redirects program output to stdout) and returns the result of the game
+- Separate compiling and running. Store compiled programs on server
+
+### Server
+- Continuously tell workers to play games and update the Trueskill rankings accordingly
+
+## To Do Ben
+- WebGL
+- Change text rendering from FTGL to plain Freetype
+- Have files store more data than just the map position (will be useful in future)
+- Fix map system
+- Talk to companies
+- Fix relative scoring system
+- Update rules on the Google Doc
+
+## To Do Luca
+- Make website pretty
 
 ## About
 Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
