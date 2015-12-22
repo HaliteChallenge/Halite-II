@@ -116,7 +116,25 @@ std::vector<hlt::Message> EnvironmentNetworking::deserializeMessages(const std::
 void EnvironmentNetworking::sendString(unsigned char playerTag, const std::string &sendString)
 {
 #ifdef _WIN32
+	Connection connection = connections[playerTag - 1];
 
+	uint32_t length = sendString.length();
+	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
+	std::vector<char> buffer(sendString.begin(), sendString.end());
+
+	DWORD charsWritten;
+	bool success;
+
+	success = WriteFile(connection.write, (char *)&length, sizeof(length), &charsWritten, NULL);
+	if (!success || charsWritten == 0) {
+		std::cout << "problem writing\n";
+		throw 1;
+	}
+	success = WriteFile(connection.write, &buffer[0], buffer.size(), &charsWritten, NULL);
+	if (!success || charsWritten == 0) {
+		std::cout << "problem writing\n";
+		throw 1;
+	}
 #else
 	int connectionFd = connections[playerTag - 1];
 	uint32_t length = sendString.length();
@@ -131,7 +149,39 @@ void EnvironmentNetworking::sendString(unsigned char playerTag, const std::strin
 std::string EnvironmentNetworking::getString(unsigned char playerTag)
 {
 #ifdef _WIN32
+	Connection connection = connections[playerTag - 1];
 
+	DWORD charsRead;
+	bool success;
+
+	uint32_t numChars;
+	ReadFile(connection.read, (char *)&numChars, sizeof(numChars), &charsRead, NULL);
+	if (!success || charsRead == 0) 
+	{
+		std::cout << "problem reading\n";
+		throw 1;
+	}
+	if (charsRead < sizeof(numChars))
+	{
+		std::cout << "Read too little. Read " << charsRead << " of " << sizeof(numChars) << "\n";
+		throw 1;
+	}
+
+	std::vector<char> buffer(numChars);
+	ReadFile(connection.read, &buffer[0], buffer.size(), &charsRead, NULL);
+	if (!success || charsRead == 0) 
+	{
+		std::cout << "problem reading\n";
+		throw 1;
+	}
+	if (charsRead < buffer.size())
+	{
+		std::cout << "Read too little. Read " << charsRead << " of " << buffer.size() << "\n";
+		throw 1;
+	}
+
+	// Copy the buffer into a string. May want to get rid of this for performance purposes
+	return std::string(buffer.begin(), buffer.end());
 #else
 	int connectionFd = connections[playerTag - 1];
 	uint32_t numChars;
@@ -151,14 +201,43 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 #ifdef _WIN32
 	// stdin write - write to this
 	// stdout read - read from this 
-	Connection connection;
+	Connection parentConnection, childConnection;
 
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = TRUE;
 	saAttr.lpSecurityDescriptor = NULL;
 
-	bool success = CreateProcess(NULL,
+	// Child stdout pipe
+	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) 
+	{
+		std::cout << "Could not create pipe\n";
+		throw 1;
+	}
+	if (!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
+
+	// Child stdin pipe
+	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) 
+	{
+		std::cout << "Could not create pipe\n";
+		throw 1;
+	}
+	if (!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
+
+	// MAKE SURE THIS MEMORY IS ERASED
+	PROCESS_INFORMATION piProcInfo;
+	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+	STARTUPINFO siStartInfo;
+	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	siStartInfo.cb = sizeof(STARTUPINFO);
+	siStartInfo.hStdError = childConnection.write;
+	siStartInfo.hStdOutput = childConnection.write;
+	siStartInfo.hStdInput = childConnection.read;
+	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+	bool success = CreateProcess(
+		NULL,
 		"../Debug/ExampleBot.exe",     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
@@ -167,7 +246,19 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 		NULL,          // use parent's environment 
 		NULL,          // use parent's current directory 
 		&siStartInfo,  // STARTUPINFO pointer 
-		&piProcInfo);  // receives PROCESS_INFORMATION 
+		&piProcInfo
+	);  // receives PROCESS_INFORMATION 
+	if(!success) 
+	{
+		std::cout << "Could not start process\n";
+		throw 1;
+	}
+	else 
+	{
+		CloseHandle(piProcInfo.hProcess);
+		CloseHandle(piProcInfo.hThread);
+		connections.push_back(parentConnection);
+	}
 #else
 	std::cout << "Waiting for player to connect on port " << port << ".\n";
 
