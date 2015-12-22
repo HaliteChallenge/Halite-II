@@ -18,9 +18,9 @@ class Halite
 {
 private:
 	unsigned short turn_number;
+	EnvironmentNetworking networking;
     std::vector<std::string> player_names;
 	std::vector<hlt::Message> pastFrameMessages;
-    std::vector<int> player_connections;
     std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> attack_count;
 	hlt::Map game_map;

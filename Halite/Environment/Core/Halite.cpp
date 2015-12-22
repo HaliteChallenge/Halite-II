@@ -26,7 +26,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
-			frameThreads[threadLocation] = std::async(handleFrameNetworking, player_connections[a], game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			frameThreads[threadLocation] = std::async([](EnvironmentNetworking networking, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) -> double {
+				return networking.handleFrameNetworking(playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
+			}, networking, a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
@@ -264,86 +266,85 @@ Halite::Halite(unsigned short w, unsigned short h)
     //Connect to players
     number_of_players = 0;
     player_names = std::vector<std::string>();
-    player_connections = std::vector<int>();
     
-    std::string in;
-    //Ask if the user would like to use the default ports?
-    bool useDefaultPorts = true;
-    std::cout << "Would you like to use the default ports? Please enter Yes or No: ";
-	while(true)
-    {
-        std::getline(std::cin, in);
-        std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-        if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
-        std::cout << "That isn't a valid input. Please enter Yes or No: ";
-    }
-    if(in == "n" || in == "no" || in == "nope") useDefaultPorts = false;
-    
-    bool done = false;
-    while(!done)
-    {
-        in;
-        //If less than 2, bypass this step: Ask if the user like to add another AI
-        if(number_of_players >= 2)
-        {
-            std::cout << "Would you like to add another player? Please enter Yes or No: ";
-            while(true)
-            {
-                std::getline(std::cin, in);
-                std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-                if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
-                std::cout << "That isn't a valid input. Please enter Yes or No: ";
-            }
-            if(in == "n" || in == "no" || in == "nope") break;
-        }
-        
-        unsigned short portNumber;
-        if(useDefaultPorts) portNumber = number_of_players + DEFAULT_PORT;
-        else
-        {
-            std::cout << "What port would you like to connect player " << number_of_players + 1 << " on? Please enter a valid port number: ";
-            while(true)
-            {
-                std::getline(std::cin, in);
-                std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-                try
-                {
-                    portNumber = std::stoi(in);
-                    break;
-                }
-                catch(std::exception e)
-                {
-                    std::cout << "That isn't a valid input. Please enter a valid port number: ";
-                }
-            }
-        }
-        std::cout << "Waiting for a connection on port " << portNumber << ".\n";
+	std::string in;
+	//Ask if the user would like to use the default ports?
+	bool useDefaultPorts = true;
+	std::cout << "Would you like to use the default ports? Please enter Yes or No: ";
+	while (true)
+	{
+		std::getline(std::cin, in);
+		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+		if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
+		std::cout << "That isn't a valid input. Please enter Yes or No: ";
+	}
+	if (in == "n" || in == "no" || in == "nope") useDefaultPorts = false;
 
-        player_connections.push_back(createAndConnectSocket(portNumber));
+	bool done = false;
+	while (!done)
+	{
+		in;
+		//If less than 2, bypass this step: Ask if the user like to add another AI
+		if (number_of_players >= 2)
+		{
+			std::cout << "Would you like to add another player? Please enter Yes or No: ";
+			while (true)
+			{
+				std::getline(std::cin, in);
+				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+				if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
+				std::cout << "That isn't a valid input. Please enter Yes or No: ";
+			}
+			if (in == "n" || in == "no" || in == "nope") break;
+		}
+
+		unsigned short portNumber;
+		if (useDefaultPorts) portNumber = number_of_players + DEFAULT_PORT;
+		else
+		{
+			std::cout << "What port would you like to connect player " << number_of_players + 1 << " on? Please enter a valid port number: ";
+			while (true)
+			{
+				std::getline(std::cin, in);
+				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+				try
+				{
+					portNumber = std::stoi(in);
+					break;
+				}
+				catch (std::exception e)
+				{
+					std::cout << "That isn't a valid input. Please enter a valid port number: ";
+				}
+			}
+		}
+		std::cout << "Waiting for a connection on port " << portNumber << ".\n";
+
+		networking.createAndConnectSocket(portNumber);
 
 		std::cout << "Connected to player " << number_of_players + 1 << std::endl;
 		std::cout << "How should I refer to this player? Please enter their name: ";
-        
-        while(true)
+
+		while (true)
 		{
 			std::getline(std::cin, in);
-			if(in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
-			else if(std::find(in.begin(), in.end(), ' ') != in.end()) std::cout << "Players' names cannot be multiple words. Please enter another name for this player: ";
+			if (in == "") std::cout << "Each player requires a name to be uniquely identifiable. Please enter a name for this player: ";
+			else if (std::find(in.begin(), in.end(), ' ') != in.end()) std::cout << "Players' names cannot be multiple words. Please enter another name for this player: ";
 			else
 			{
 				bool good = true;
-				for(auto a = player_names.begin(); a != player_names.end(); a++) if(*a == in)
+				for (auto a = player_names.begin(); a != player_names.end(); a++) if (*a == in)
 				{
 					good = false;
 					break;
 				}
-				if(good) break;
+				if (good) break;
 				else std::cout << "That name is already taken. Please enter another name for this player: ";
 			}
 		}
-        player_names.push_back(in);
-        number_of_players++;
-    }
+		player_names.push_back(in);
+		number_of_players++;
+	}
     
     //Initialize map:
 	game_map = hlt::Map(w, h, number_of_players);
@@ -388,7 +389,9 @@ void Halite::init()
     std::vector<std::thread> initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-        initThreads[a] = std::thread(handleInitNetworking, player_connections[a], a + 1, player_names[a], game_map);
+		initThreads[a] = std::thread([](EnvironmentNetworking networking, unsigned char playerTag, std::string name, hlt::Map & m) {
+			networking.handleInitNetworking(playerTag, name, m);
+		}, networking, a + 1, player_names[a], game_map);
     }
     for(unsigned char a = 0; a < number_of_players; a++)
     {
