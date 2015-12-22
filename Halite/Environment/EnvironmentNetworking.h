@@ -4,6 +4,20 @@
 #include <iostream>
 #include <set>
 
+#ifdef _WIN32
+	#include <windows.h> 
+	#include <tchar.h>
+	#include <stdio.h> 
+	#include <strsafe.h>
+#else
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <time.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+#endif
+
 #include "Core/hlt.h"
 
 class EnvironmentNetworking {
@@ -14,7 +28,8 @@ public:
 private:
 #ifdef _WIN32
 	struct Connection {
-		HANDLE write, read;
+		HANDLE write;
+		HANDLE read;
 	};
 	std::vector<Connection> connections;
 #else
@@ -26,7 +41,7 @@ private:
 	std::string serializeMessages(const std::vector<hlt::Message> &messages);
 	std::vector<hlt::Message> deserializeMessages(const std::string &inputString);
 
-	void sendString(unsigned char playerTag, const std::string &sendString);
+	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag);
 };
 

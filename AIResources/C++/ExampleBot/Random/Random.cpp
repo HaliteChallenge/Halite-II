@@ -3,9 +3,15 @@
 Random::Random()
 {
     srand(time(NULL));
-    connection = connectToGame();
-    getInit(connection, my_tag, present_map);
-    sendInitResponse(connection);
+	std::cout.sync_with_stdio(0);
+	
+    getInit(my_tag, present_map);
+    sendInitResponse();
+	
+	// FOR DEBUGGING PURPOSES. Clears the test file
+	std::ofstream ofs;
+	ofs.open(std::to_string(my_tag) +".log", std::ofstream::out | std::ofstream::trunc);
+	ofs.close();
 }
 
 void Random::run()
@@ -22,9 +28,7 @@ void Random::run()
 		exampleMessage.targetID = my_tag;
 		messagesFromMe.push_back(exampleMessage);
 
-        getFrame(connection, present_map, messagesToMe);
-
-		for (auto message = messagesToMe.begin(); message != messagesToMe.end(); message++) std::cout << message->type << " " << message->senderID << " " << message->recipientID << " " << message->targetID << "\n";
+        getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
 		{
@@ -40,6 +44,6 @@ void Random::run()
 				}
 			}
 		}
-        sendFrame(connection, moves, messagesFromMe);
+        sendFrame(moves, messagesFromMe);
     }
 }

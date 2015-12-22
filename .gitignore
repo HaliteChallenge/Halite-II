@@ -198,7 +198,6 @@ FakesAssemblies/
 #Halite replays
 *.hlt
 
-
 #Java
 *.class
 

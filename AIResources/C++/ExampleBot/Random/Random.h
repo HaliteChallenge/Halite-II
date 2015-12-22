@@ -11,7 +11,6 @@ class Random
 {
 private:
     unsigned char my_tag;
-    int connection;
     hlt::Map present_map;
     std::set<hlt::Move> moves;
 	std::vector<hlt::Message> messagesToMe, messagesFromMe;

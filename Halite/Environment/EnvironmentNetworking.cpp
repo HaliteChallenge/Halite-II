@@ -6,20 +6,6 @@
 #include <algorithm>
 #include <stdio.h>
 
-#ifdef _WIN32
-	#include <windows.h> 
-	#include <tchar.h>
-	#include <stdio.h> 
-	#include <strsafe.h>
-#else
-	#include <sys/socket.h>
-	#include <arpa/inet.h>
-	#include <time.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <unistd.h>
-#endif
-
 std::string EnvironmentNetworking::serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
@@ -113,24 +99,18 @@ std::vector<hlt::Message> EnvironmentNetworking::deserializeMessages(const std::
 	return messages;
 }
 
-void EnvironmentNetworking::sendString(unsigned char playerTag, const std::string &sendString)
+void EnvironmentNetworking::sendString(unsigned char playerTag, std::string &sendString)
 {
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
+	
+	// End message with newline character
+	sendString += '\n';
 
-	uint32_t length = sendString.length();
-	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
-	std::vector<char> buffer(sendString.begin(), sendString.end());
-
+	// Write sendstring to pipe
 	DWORD charsWritten;
 	bool success;
-
-	success = WriteFile(connection.write, (char *)&length, sizeof(length), &charsWritten, NULL);
-	if (!success || charsWritten == 0) {
-		std::cout << "problem writing\n";
-		throw 1;
-	}
-	success = WriteFile(connection.write, &buffer[0], buffer.size(), &charsWritten, NULL);
+	success = WriteFile(connection.write, sendString.c_str(), sendString.length(), &charsWritten, NULL);
 	if (!success || charsWritten == 0) {
 		std::cout << "problem writing\n";
 		throw 1;
@@ -153,35 +133,21 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag)
 
 	DWORD charsRead;
 	bool success;
+	std::string newString;
+	char buffer;
 
-	uint32_t numChars;
-	ReadFile(connection.read, (char *)&numChars, sizeof(numChars), &charsRead, NULL);
-	if (!success || charsRead == 0) 
-	{
-		std::cout << "problem reading\n";
-		throw 1;
+	// Keep reading until newline
+	while (true) {
+		success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
+		if (!success)
+		{
+			std::cout << "problem reading\n";
+			throw 1;
+		}
+		if (buffer == '\n') break;
+		else newString += buffer;
 	}
-	if (charsRead < sizeof(numChars))
-	{
-		std::cout << "Read too little. Read " << charsRead << " of " << sizeof(numChars) << "\n";
-		throw 1;
-	}
-
-	std::vector<char> buffer(numChars);
-	ReadFile(connection.read, &buffer[0], buffer.size(), &charsRead, NULL);
-	if (!success || charsRead == 0) 
-	{
-		std::cout << "problem reading\n";
-		throw 1;
-	}
-	if (charsRead < buffer.size())
-	{
-		std::cout << "Read too little. Read " << charsRead << " of " << buffer.size() << "\n";
-		throw 1;
-	}
-
-	// Copy the buffer into a string. May want to get rid of this for performance purposes
-	return std::string(buffer.begin(), buffer.end());
+	return newString;
 #else
 	int connectionFd = connections[playerTag - 1];
 	uint32_t numChars;
@@ -237,8 +203,8 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
 	bool success = CreateProcess(
-		NULL,
-		"../Debug/ExampleBot.exe",     // command line 
+		"C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe",
+		NULL,     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
 		TRUE,          // handles are inherited 
