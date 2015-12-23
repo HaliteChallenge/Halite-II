@@ -4,14 +4,11 @@ import java.util.ArrayList;
 public class ExampleBot
 {
     public static void main(String[] args) {
-        System.out.println("\u000c");
-        Socket sock = Networking.connectToGame();
-        
-        InitPackage iPackage = Networking.getInit(sock);
+        InitPackage iPackage = Networking.getInit();
         short playerTag = iPackage.playerTag;
         Map gameMap = iPackage.map;
 
-        Networking.sendInit(sock);
+        Networking.sendInit();
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();
@@ -19,13 +16,9 @@ public class ExampleBot
             
             sendMessages.add(new Message(MessageType.STOP_ATTACK, playerTag, playerTag != 1 ? 1 : 2, playerTag));
             
-            FramePackage fPackage = Networking.getFrame(sock);
+            FramePackage fPackage = Networking.getFrame();
             gameMap = fPackage.map;
             ArrayList<Message> recievedMessages = fPackage.messages;
-            
-            for(Message message : recievedMessages) {
-                System.out.println("Message: " + message.type.getValue() + " " + message.senderID + " " + message.recipientID + " " + message.targetID);
-            }
             
             for(int y = 0; y < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
@@ -37,7 +30,7 @@ public class ExampleBot
                 }
             }
             
-            Networking.sendFrame(sock, moves, sendMessages);
+            Networking.sendFrame(moves, sendMessages);
         }
     }
 }

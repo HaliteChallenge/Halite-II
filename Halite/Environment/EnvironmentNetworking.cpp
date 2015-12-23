@@ -202,10 +202,12 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	siStartInfo.hStdInput = childConnection.read;
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-	//C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
+	// C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
+	// C:/Users/Michael/Anaconda3/python.exe
+	// C:/Program Files/Java/jre7/bin/java.exe
 	bool success = CreateProcess(
 		NULL,
-		"\"C:/Users/Michael/Anaconda3/python.exe\" C:/xampp/htdocs/Halite/AIResources/Python/ExampleBot.py",     // command line 
+		"\"C:/Program Files/Java/jre1.8.0_65/bin/java.exe\" -cp C:/xampp/htdocs/Halite/AIResources/Java ExampleBot",     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
 		TRUE,          // handles are inherited 

@@ -87,103 +87,52 @@ public class Networking
         return messages;
     }
     
-    static void sendString(Socket s, String sendString) {
-        try {
-            DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
-            byte[] lengthArray = ByteBuffer.allocate(SIZE_OF_INTEGER_PREFIX).order(ByteOrder.LITTLE_ENDIAN).putInt(sendString.length()).array();
-            out.write(lengthArray, 0, lengthArray.length);
-            
-            byte[] messageArray = sendString.getBytes();
-            out.write(messageArray, 0, messageArray.length);
-        } catch(Exception e) {
-            System.out.println("Error while trying to send String.");
-            e.printStackTrace();
-        }
+    static void sendString(String sendString) {
+        System.out.print(sendString+'\n');
+        System.out.flush();
     }
 
-    static String getString(Socket s) {
+    static String getString() {
         try {
-            DataInputStream in = new DataInputStream (s.getInputStream());
-
-            byte[] lengthArray = new byte[SIZE_OF_INTEGER_PREFIX];
-            in.read(lengthArray, 0, lengthArray.length);
-            int length = ByteBuffer.wrap(lengthArray).order(ByteOrder.LITTLE_ENDIAN).getInt();
-
-            byte[] messageArray = new byte[length*CHAR_SIZE];
-            in.read(messageArray, 0, messageArray.length);
-
-            return new String(messageArray).trim();
-        } catch(Exception e) {
-            System.out.println("Error while trying to get String.");
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    static Socket connectToGame()
-    {
-        while(true)
-        {
-            Scanner input = new Scanner(System.in);
-            int port = 0;
-            System.out.println("What port would you like to connect to? Please enter a valid port number: ");
-            while(true)
-            {
-                try
-                {
-                    port = Integer.parseInt(input.nextLine());
+            StringBuilder builder = new StringBuilder();
+            int buffer;
+            while ((buffer = System.in.read()) >= 0) {
+                if (buffer == '\n') {
                     break;
-                }
-                catch(Exception e)
-                {
-                    System.out.println("That isn't a valid input. Please enter a valid port number: ");
+                } else {
+                    builder = builder.append((char)buffer);
                 }
             }
-
-            try
-            {
-                Socket socket = new Socket(InetAddress.getLocalHost().getHostName(), port);
-                System.out.println("Successfully established contact");
-                return socket;
-            } 
-            catch(Exception e) 
-            {
-                System.out.println("There was a problem connecting. Let's try again: ");
-            }
-
+            return builder.toString();
+        } catch(Exception e) {
+            System.exit(1);
+            return null; // the java compiler is stupid
         }
     }
 
-    static InitPackage getInit(Socket s)
+    static InitPackage getInit()
     {
-        System.out.println("Get init\n");
-
         InitPackage initPackage = new InitPackage();
-        initPackage.playerTag = (short)Long.parseLong(getString(s));
-        initPackage.map = deserializeMap(getString(s));
-
-        System.out.println("finished init");
+        initPackage.playerTag = (short)Long.parseLong(getString());
+        initPackage.map = deserializeMap(getString());
 
         return initPackage;
     }
 
-    static void sendInit(Socket s)
+    static void sendInit()
     {
-        System.out.println("Send init\n");
-        sendString(s, "Done");
+        sendString("Done");
     }
 
-    static FramePackage getFrame(Socket s)
+    static FramePackage getFrame()
     {
-        return new FramePackage(deserializeMap(getString(s)), deserializeMessages(getString(s)));
+        return new FramePackage(deserializeMap(getString()), deserializeMessages(getString()));
     }
 
-    static void sendFrame(Socket s, ArrayList<Move> moves, ArrayList<Message> messages)
+    static void sendFrame(ArrayList<Move> moves, ArrayList<Message> messages)
     {
-        sendString(s, serializeMoveList(moves));
-        sendString(s, serializeMessages(messages));
+        sendString(serializeMoveList(moves));
+        sendString(serializeMessages(messages));
     }
 
 }
