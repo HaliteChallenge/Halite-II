@@ -1,7 +1,7 @@
 import java.net.*;
 import java.util.ArrayList;
 
-public class ExampleBot
+public class MyBot
 {
     public static void main(String[] args) {
         InitPackage iPackage = Networking.getInit();

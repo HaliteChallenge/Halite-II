@@ -1,6 +1,6 @@
-#include "Random.h"
+#include "MyBot.h"
 
-Random::Random()
+MyBot::MyBot()
 {
     srand(time(NULL));
 	std::cout.sync_with_stdio(0);
@@ -14,7 +14,7 @@ Random::Random()
 	ofs.close();
 }
 
-void Random::run()
+void MyBot::run()
 {
     while(true)
     {

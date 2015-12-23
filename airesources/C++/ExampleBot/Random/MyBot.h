@@ -1,5 +1,5 @@
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef MYBOT_H
+#define MYBOT_H
 
 #include <time.h>
 #include <set>
@@ -7,7 +7,7 @@
 #include "../../AINetworking.h"
 #include "../../hlt.h"
 
-class Random
+class MyBot
 {
 private:
     unsigned char my_tag;
@@ -15,7 +15,7 @@ private:
     std::set<hlt::Move> moves;
 	std::vector<hlt::Message> messagesToMe, messagesFromMe;
 public:
-    Random();
+	MyBot();
     void run();
 };
 

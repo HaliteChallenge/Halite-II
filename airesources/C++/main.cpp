@@ -3,13 +3,13 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "ExampleBot/Random/Random.h"
+#include "ExampleBot/Random/MyBot.h"
 
 int main()
 {
 	srand(time(NULL));
 
-	Random r = Random();
+	MyBot r = MyBot();
 	r.run();
 
 	return 0;
