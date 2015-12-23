@@ -18,11 +18,11 @@
 				var username = $("input:text[name=username]").val();
 				var password = $("input:password[name=password]").val();
 
-				var signInResult = getUserCredentials(username, password);
+				var signInResult = getUser(null, username, password);
 				if(signInResult == null) {
 					$("#message").text("That username/password combo is incorrect.");
 				} else {
-					putUsernamePasswordSession(username, password, true);
+					storeUserSession(username, password, true);
 					goToDashboard();
 				}
 			});

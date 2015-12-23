@@ -1,8 +1,8 @@
-var url = "../php/"
+var url = "/php/"
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
 // If async returns null
-function putUsernamePasswordDatabase(username, password, async) {
+function storeUserDatabase(username, password, async) {
 	var result = $.ajax({
 		url: url+"user", 
 		async: async,
@@ -13,11 +13,9 @@ function putUsernamePasswordDatabase(username, password, async) {
     if(async == true) {
     	return null;
     }
-
-    return didSucceed(result);
 }
 
-function putUsernamePasswordSession(username, password, async) {
+function storeUserSession(username, password, async) {
 	$.ajax({
 		url: url+"session", 
 		async: async,
@@ -26,7 +24,7 @@ function putUsernamePasswordSession(username, password, async) {
     });
 }
 
-function putBot(userID, name, async) {
+function storeBot(userID, name, async) {
 	$.ajax({
 		url: url+"bot", 
 		async: async,
@@ -38,7 +36,7 @@ function putBot(userID, name, async) {
 // Uploads source code for users's bot
 // When given the html ID of a form with the userID as a value
 // and the forms as another value
-function putBotFiles(formID) {
+function storeBotFiles(formID) {
 	if(!$("#"+formID).find("input[name='userID']").length || $("#"+formID).find("input[name='userID']").val().localeCompare("") == 0) {
 		console.log("Form not setup correctly. Does not include userID");
 		throw 1;
@@ -64,20 +62,18 @@ function putBotFiles(formID) {
 }
 
 function getSession() {
-	var response =  $.ajax({ url: url+"session", async: false });
-	if(didSucceed(response) == false)  return null;
-	return response.responseJSON;
+	var result =  $.ajax({ url: url+"session", async: false });
+	return result.responseJSON;
 }
 
-function getUserCredentials(username, password) {
+function getUser(userID, username, password) {
 	var result = $.ajax({
 		url: url+"user", 
 		async: false,
 		method: "GET",
-		data: {username: username, password: password}
+		data: {userID: userID, username: username, password: password}
     });
 
-    if(didSucceed(result) == false)  return null;
 	return result.responseJSON;
 }
 
@@ -92,18 +88,16 @@ function getBot(botID, name) {
 		data: data
     });
 
-    if(didSucceed(result) == false)  return null;
 	return result.responseJSON;
 }
 
-function getBotsOfUser(userID) {
+function getUserBots(userID) {
 	var result = $.ajax({
 		url: url+"bot", 
 		async: false,
 		data: {userID: userID}
     });
 
-    if(didSucceed(result) == false)  return null;
 	return result.responseJSON;
 }
 
@@ -113,11 +107,4 @@ function destroySession(async) {
 		async: async,
 		method: "DELETE"
     });
-}
-
-function didSucceed(response) {
-	if(response.responseText.localeCompare("null") == 0 || Object.keys(response.responseJSON).length === 0) {
-		return false;
-	}
-	return true;
 }

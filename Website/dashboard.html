@@ -9,26 +9,26 @@
 	<script src="script/app.js"></script>
 
 	<script type="text/javascript">
-		var credentials = getSession();
-		if(credentials == null) {
+		var user = getSession();
+		if(user == null) {
 			goToHomepage();
 		}
 
-		console.log(credentials)
+		console.log(user)
 
 		$(document).ready(function() {
 			// Set the welcome text to include the user's name
-			$("#welcome").text("Welcome " + credentials.username + "!");
+			$("#welcome").text("Welcome " + user.username + "!");
 
 			
 			$("#signOut").click(function() {
-				destroySession(true);
+				destroySession(false);
 				goToHomepage();
 			});
 
 			$("#uploadBot").click(function() {
-				$("#uploadBotForm").find("input[name='userID']").val(credentials.userID+"")
-				putBotFiles("uploadBotForm");
+				$("#uploadBotForm").find("input[name='userID']").val(user.userID+"")
+				storeBotFiles("uploadBotForm");
 				$("#welcome").text("Uploaded!");
 			})
 		});

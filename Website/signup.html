@@ -18,8 +18,9 @@
 				var username = $("input:text[name=username]").val();
 				var password = $("input:password[name=password]").val();
 
-			    if(putUsernamePasswordDatabase(username, password, false) == true) {
-			    	putUsernamePasswordSession(username, password, true);
+			    if(getUser(null, username, null) == null) {
+			    	storeUserDatabase(username, password, false)
+			    	storeUserSession(username, password, false);
 
 					goToDashboard();
 				} else {

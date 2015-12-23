@@ -14,10 +14,11 @@ class HaliteAPI extends API
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$this->mysqli = new mysqli("Halite.db.12061709.hostedresource.com", 
-			"Halite", 
-			"Fustercluck2!", 
-			"Halite");
+		$config = include("config.php");
+		$this->mysqli = new mysqli($config['hostname'], 
+			$config['username'], 
+			$config['password'], 
+			$config['databaseName']);
 		
 		if (mysqli_connect_errno()) { 
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
@@ -30,6 +31,17 @@ class HaliteAPI extends API
 		return mysqli_fetch_array($res, MYSQLI_ASSOC);
 	}
 
+	private function selectMultiple($sql) {
+		$res = mysqli_query($this->mysqli, $sql);
+		$finalArray = array();
+
+		while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+			array_push($finalArray, $temp);
+		}
+
+		return $finalArray;
+	}
+
 	private function insert($sql) {
 		mysqli_query($this->mysqli, $sql);
 	}
@@ -37,36 +49,35 @@ class HaliteAPI extends API
 	// API ENDPOINTS
 	// Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
 	protected function user() {
-		if($this->method == 'GET') {
-			if(isset($_GET["username"]) && isset($_GET["password"])) {
-				$username = $_GET["username"];
-				$password = $_GET["password"];
+		if(isset($_GET["username"]) && isset($_GET["password"])) {
+			$username = $_GET["username"];
+			$password = $_GET["password"];
+			return $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+		} else if (isset($_GET["userID"]) && isset($_GET["password"])) {
+			$userID = $_GET["userID"];
+			$password = $_GET["password"];
+			return $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+		} else if (isset($_GET["username"])) {
+			$username = $_GET["username"];
+			return $this->select("SELECT userID, username FROM User WHERE username = '$username'");
+		} else if (isset($_GET["userID"])) {
+			$userID = $_GET["userID"];
+			return $this->select("SELECT userID, username FROM User WHERE userID = $userID");
+		} else if (isset($_POST["username"]) && isset($_POST["password"])) {
+			$username = $_POST["username"];
+			$password = $_POST["password"];
 
-				return $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
+			if(isset($usernameArray['username'])) {
+				return NULL;
 			}
-			if(isset($_GET["userID"]) && isset($_GET["password"])) {
-				$userID = $_GET["userID"];
-				$password = $_GET["password"];
-				return $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
-			}
+
+			$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
+		} else {
+			return "No endpoint reached";
 		}
 
-		if($this->method == 'POST') {
-			if(isset($_POST["username"]) && isset($_POST["password"])) {
-				$username = $_POST["username"];
-				$password = $_POST["password"];
-
-				$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
-				if(isset($usernameArray['username'])) {
-					return NULL;
-				}
-
-				$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
-				return "success";
-			}
-		}
-
-		return NULL;
+		return "Success";
 	}
 
 	protected function bot() {
@@ -74,10 +85,6 @@ class HaliteAPI extends API
 			$userID = $_GET["userID"];
 
 			return $this->select("SELECT * FROM Bot WHERE userID = $userID");
-		} else if(isset($_GET["name"])) {
-			$name = $_GET["name"];
-
-			return $this->select("SELECT * FROM Bot WHERE name = '$name'");
 		} else if(isset($_GET["botID"])) {
 			$botID = $_GET["botID"];
 
@@ -92,12 +99,11 @@ class HaliteAPI extends API
 			}
 
 			$this->insert("INSERT INTO Bot (userID, name) VALUES ($userID, '$name')");
-
 		} else {
-			return NULL;
+			return "No endpoint reached";
 		}
 
-		return "success";
+		return "Success";
 	}
 
 	protected function botFiles() {
@@ -116,7 +122,7 @@ class HaliteAPI extends API
 				move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
 			}
 		} else {
-			return NULL;
+			return "No endpoint reached";
 		}
 		return "Success";
 	}
@@ -144,10 +150,10 @@ class HaliteAPI extends API
 		} else if($this->method == 'DELETE') {
 			session_destroy();
 		} else {
-			return NULL;
+			return "No endpoint reached";
 		}
 
-		return "success";
+		return "Success";
 	}
  }
 
