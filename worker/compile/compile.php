@@ -25,5 +25,4 @@
 	}
 
 	exec("python compiler.py ../../storage/bots/$userID");
-
 ?>
