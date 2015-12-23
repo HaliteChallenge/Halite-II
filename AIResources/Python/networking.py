@@ -3,6 +3,7 @@ import socket
 import traceback
 import struct
 from ctypes import *
+import sys
 
 def serializeMoveSet(moves):
 	returnString = ""
@@ -52,52 +53,28 @@ def deserializeMessages(messageString):
 		messages.append(Message(int(splitString.pop(0)), int(splitString.pop(0)), int(splitString.pop(0)), int(splitString.pop(0)) ))
 	return messages
 
-def sendString(s, toBeSent):
-	numChars = c_uint32(len(toBeSent));
-	print(numChars)
-	s.send(numChars);
-	print(len(toBeSent))
-	s.send(toBeSent.encode())
+def sendString(toBeSent):
+	toBeSent += "\n"
 
-def getString(s):
-	headerString = s.recv(sizeof(c_uint32))
-	header = int.from_bytes(headerString, byteorder="little")
-	print("Header: %d" % header)
-	received = s.recv(header)
-	return received.decode()
+	sys.stdout.write(toBeSent)
+	sys.stdout.flush()
 
-def connectToGame():
-	while True:
-		port = 0
-		while True:
-			try:
-				port = int(input("What port would you like to connect to? Please enter a valid port number: "))
-				break
-			except ValueError:
-				print("That isn't a valid input. Try again.")
-		print("Port: %d" % port)
-		sock = socket.socket()
-		try:
-			sock.connect((socket.gethostname(), port))
-			print("Successfully established contact")
-			return sock
-		except Exception:
-			print(traceback.format_exc())
-			print("There was a problem connecting. Let's try again:")
+def getString():
+	return sys.stdin.readline().rstrip('\n')
 
-def getInit(s):
-	playerTag = int(getString(s))
-	m = deserializeMap(getString(s))
+def getInit():
+	playerTag = int(getString())
+	m = deserializeMap(getString())
 
 	return (playerTag, m)
 
-def sendInit(s):
+def sendInit():
 	message = "Done"
-	sendString(s, message)
+	sendString(message)
 
-def getFrame(s):
-	return (deserializeMap(getString(s)), deserializeMessages(getString(s)))
+def getFrame():
+	return (deserializeMap(getString()), deserializeMessages(getString()))
 
-def sendFrame(s, moves, messages):
-	sendString(s, serializeMoveSet(moves))
-	sendString(s, serializeMessages(messages))
+def sendFrame(moves, messages):
+	sendString(serializeMoveSet(moves))
+	sendString(serializeMessages(messages))

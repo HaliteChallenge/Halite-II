@@ -202,9 +202,10 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	siStartInfo.hStdInput = childConnection.read;
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
+	//C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
 	bool success = CreateProcess(
-		"C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe",
-		NULL,     // command line 
+		NULL,
+		"\"C:/Users/Michael/Anaconda3/python.exe\" C:/xampp/htdocs/Halite/AIResources/Python/ExampleBot.py",     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
 		TRUE,          // handles are inherited 
@@ -289,6 +290,7 @@ double EnvironmentNetworking::handleInitNetworking(unsigned char playerTag, std:
 
 double EnvironmentNetworking::handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
+	std::cout << "turn";
 	// Send this bot the game map and the messages addressed to this bot
 	sendString(playerTag, serializeMap(m));
 	sendString(playerTag, serializeMessages(messagesForThisBot));
