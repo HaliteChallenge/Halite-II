@@ -9,6 +9,12 @@ class HaliteAPI extends API
 
 	public function __construct($request, $origin) {
 		$this->initDB();
+
+		// Sanitize HTTP parameters
+		foreach ($_GET as $key => $value) {
+			$_GET[$key] = $this->mysqli->real_escape_string($value);
+		}
+
 		parent::__construct($request);
 	}
 
