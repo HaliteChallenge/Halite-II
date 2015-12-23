@@ -3,7 +3,7 @@
 ## To Do Michael
 
 ### Website
-- Allow people to upload their bot code and store position of code in database
+- ~~Allow people to upload their bot code and store position of code in database~~
 - Setup leaderboard
 
 ### Halite Program
