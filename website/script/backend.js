@@ -1,4 +1,4 @@
-var url = "/php/"
+var url = "/Halite/website/php/"
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
 // If async returns null
@@ -56,13 +56,21 @@ function storeBotFiles(formID) {
         },
         success: function (data) {
             alert("Data Uploaded: "+data);
-        }
+        },
+		error: function (xhr, ajaxOptions, thrownError) {
+			console.log(xhr.responseText);
+			console.log(thrownError);
+		}
     });
     console.log(result)
 }
 
 function getSession() {
-	var result =  $.ajax({ url: url+"session", async: false });
+	var result =  $.ajax({ 
+		url: url+"session", 
+		async: false,
+		method: 'GET'
+	});
 	return result.responseJSON;
 }
 

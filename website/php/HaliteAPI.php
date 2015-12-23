@@ -110,16 +110,25 @@ class HaliteAPI extends API
 		if(isset($_FILES['files']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
-			for($i = 0; $i < count($_FILES['files']['name']); $i++){
-				$targetPath = "../Storage/Bots/$userID";
-				if(file_exists($targetPath) == false) {
-					mkdir($targetPath);
+			$targetPath = "../../storage/bots/$userID";
+			if(file_exists($targetPath) == true) {
+				$it = new RecursiveDirectoryIterator($targetPath, RecursiveDirectoryIterator::SKIP_DOTS);
+				$files = new RecursiveIteratorIterator($it,
+				             RecursiveIteratorIterator::CHILD_FIRST);
+				foreach($files as $file) {
+				    if ($file->isDir()){
+				        rmdir($file->getRealPath());
+				    } else {
+				        unlink($file->getRealPath());
+				    }
 				}
-				$ext = explode('.', basename( $_FILES['files']['name'][$i]));
-				echo $targetPath;
-				$targetPath = $targetPath . md5(uniqid()) . "." . $ext[count($ext)-1];
-				echo $targetPath;
-				move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
+			} else {
+				mkdir($targetPath);
+			}
+			
+			for($i = 0; $i < count($_FILES['files']['name']); $i++){
+				$finalPath = $targetPath."/".$_FILES['files']['name'][$i];
+				move_uploaded_file($_FILES['files']['tmp_name'][$i], $finalPath);
 			}
 		} else {
 			return "No endpoint reached";
@@ -130,7 +139,8 @@ class HaliteAPI extends API
 	protected function session() {
 		session_start();
 		if($this->method == 'GET') {
-			return $_SESSION;
+			if(count($_SESSION) > 0) return $_SESSION;
+			else return NULL;
 		} else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$username = $_POST['username'];
 			$password = $_POST['password'];
