@@ -7,15 +7,12 @@
 - Setup leaderboard
 
 ### Halite Program
-- Switch to pipes on Windows
+- ~~Switch to pipes on Windows~~
 - Switch to pipes on Linux
-- Switch to pipes on clients
-- Test networking on unix and windows
+- ~~Switch to pipes on clients~~
+- Test networking on unix and ~~windows~~
 - MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.
-- In thee Java API Networking Class, to exit on error, we do this in one of our methods:
-	System.exit(1);
-	return null; // the java compiler is stupid
-Is there a prettier way? The compiler makes us put a return statement eventhough we are exiting.
+- In thee Java API Networking Class, to exit on error, we do this in one of our methods: System.exit(1); return null; // the java compiler is stupid. Is there a prettier way? The compiler makes us put a return statement eventhough we are exiting.
 
 ### Worker
 - Rewrite Sandbox in C++
