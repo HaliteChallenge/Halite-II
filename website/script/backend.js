@@ -24,15 +24,6 @@ function storeUserSession(username, password, async) {
     });
 }
 
-function storeBot(userID, name, async) {
-	$.ajax({
-		url: url+"bot", 
-		async: async,
-		method: "POST",
-		data: {name: name, userID: userID}
-    });
-}
-
 // Uploads source code for users's bot
 // When given the html ID of a form with the userID as a value
 // and the forms as another value
@@ -85,29 +76,6 @@ function getUser(userID, username, password) {
 	return result.responseJSON;
 }
 
-function getBot(botID, name) {
-	var data = null;
-	if(typeof botID !== "undefined") data = {boID: botID};
-	else data = {name: name};
-
-	var result = $.ajax({
-		url: url+"bot", 
-		async: false,
-		data: data
-    });
-
-	return result.responseJSON;
-}
-
-function getUserBots(userID) {
-	var result = $.ajax({
-		url: url+"bot", 
-		async: false,
-		data: {userID: userID}
-    });
-
-	return result.responseJSON;
-}
 
 function destroySession(async) {
 	$.ajax({

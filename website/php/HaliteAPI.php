@@ -80,32 +80,6 @@ class HaliteAPI extends API
 		return "Success";
 	}
 
-	protected function bot() {
-		if(isset($_GET["userID"])) {
-			$userID = $_GET["userID"];
-
-			return $this->select("SELECT * FROM Bot WHERE userID = $userID");
-		} else if(isset($_GET["botID"])) {
-			$botID = $_GET["botID"];
-
-			return $this->select("SELECT * FROM Bot WHERE botID = $botID");
-		} else if(isset($_POST['name']) && isset($_POST['userID'])) {
-			$name = $_POST['name'];
-			$userID = $_POST['userID'];
-
-			$botNameArray = $this->select("SELECT name FROM Bot WHERE name = '$name' LIMIT 1");
-			if(isset($botNameArray['name'])) {
-				return NULL;
-			}
-
-			$this->insert("INSERT INTO Bot (userID, name) VALUES ($userID, '$name')");
-		} else {
-			return "No endpoint reached";
-		}
-
-		return "Success";
-	}
-
 	protected function botFiles() {
 		if(isset($_FILES['files']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
