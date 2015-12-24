@@ -1,0 +1,104 @@
+#include <iostream>
+
+#include "Core/Halite.h"
+
+Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
+
+
+// Returns true if all the arguments required of a user to run a game of Halite are present
+// 4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
+bool allArgumentsPresent(int argc, char* args[]) 
+{
+	auto is_number = [](const std::string& s)
+	{
+		return !s.empty() && std::find_if(s.begin(),
+			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+	};
+	// Remember, the executable name counts as an argument
+	if (argc < 5) return false;
+	
+	if (is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
+
+	return false;
+}
+
+int main(int argc, char* args[])
+{
+	srand(time(NULL));
+
+	// Parse command line parameters
+	if (allArgumentsPresent(argc, args)) 
+	{
+		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
+		
+		std::vector<std::string> player_names;
+		for (int a = 3; a < argc; a++)  player_names.push_back(std::string(args[a]));
+
+		EnvironmentNetworking networking;
+		for (int a = 0; a < player_names.size(); a++) networking.createAndConnectSocket(2000);
+
+		my_game = new Halite(mapWidth, mapHeight, player_names, networking);
+	}
+	// The programs arguments were not passed in the run command.
+	// Instead, we will ask the user for them
+	else 
+	{
+		std::string in;
+		unsigned short mapWidth, mapHeight;
+
+		std::cout << "Please enter the width of the map: ";
+		std::getline(std::cin, in);
+		while (true)
+		{
+			try
+			{
+				mapWidth = std::stoi(in);
+				break;
+			}
+			catch (std::exception e)
+			{
+				std::cout << "That isn't a valid input. Please enter an integer width of the map: ";
+				std::getline(std::cin, in);
+			}
+		}
+		std::cout << "Please enter the height of the map: ";
+		std::getline(std::cin, in);
+		while (true)
+		{
+			try
+			{
+				mapHeight = std::stoi(in);
+				break;
+			}
+			catch (std::exception e)
+			{
+				std::cout << "That isn't a valid input. Please enter an integer height of the map: ";
+				std::getline(std::cin, in);
+			}
+		}
+
+
+		my_game = new Halite(mapWidth, mapHeight);
+	}
+
+	std::string filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
+
+	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
+
+	try
+	{
+		my_game->output(filename);
+	}
+	catch(std::runtime_error e)
+	{
+		std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename.substr(11) << std::endl;
+		my_game->output(filename.substr(11));
+	}
+
+	std::string victoryOut;
+	for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player " + rankings[a].first + " with a relative score of " + std::to_string(rankings[a].second).substr(0, 5) + "\n";
+	std::cout << victoryOut;
+
+	system("PAUSE");
+	return 0;
+}
