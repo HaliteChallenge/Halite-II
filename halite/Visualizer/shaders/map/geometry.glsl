@@ -35,13 +35,8 @@ void main()
 	gl_Position = tlBPosition;
 	EmitVertex();
 	gl_Position = trBPosition;
-	EmitVertex();
-	gl_Position = blBPosition;
-	EmitVertex();
-	gl_Position = brBPosition;
-	EmitVertex();
 
-	float dialationfactor = sqrt(float(s) / 255.0);
+	float newdialationFactor = sqrt(float(s) / 255.0);
 
 	//Find top left vertices.
 	vec4 tlLPosition = position + vec4(-width*dialationfactor, height*dialationfactor, 0.0, 0.0);
