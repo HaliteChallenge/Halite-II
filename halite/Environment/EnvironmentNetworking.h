@@ -22,10 +22,11 @@
 
 class EnvironmentNetworking {
 public:
-	void createAndConnectSocket(int port);
-	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m);
+	void startAndConnectBot(std::string command);
+	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName);
 	bool handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot);
 	void killPlayer(unsigned char playerTag);
+	int numberOfPlayers();
 
 private:
 #ifdef _WIN32

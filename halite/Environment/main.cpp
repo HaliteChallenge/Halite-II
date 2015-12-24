@@ -25,19 +25,15 @@ bool allArgumentsPresent(int argc, char* args[])
 int main(int argc, char* args[])
 {
 	srand(time(NULL));
-
 	// Parse command line parameters
 	if (allArgumentsPresent(argc, args)) 
 	{
 		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
 		
-		std::vector<std::string> player_names;
-		for (int a = 3; a < argc; a++)  player_names.push_back(std::string(args[a]));
-
 		EnvironmentNetworking networking;
-		for (int a = 0; a < player_names.size(); a++) networking.createAndConnectSocket(2000);
+		for (int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
 
-		my_game = new Halite(mapWidth, mapHeight, player_names, networking);
+		my_game = new Halite(mapWidth, mapHeight, networking);
 	}
 	// The programs arguments were not passed in the run command.
 	// Instead, we will ask the user for them

@@ -178,11 +178,11 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag, unsigned i
 #endif
 }
 
-void EnvironmentNetworking::createAndConnectSocket(int port)
+void EnvironmentNetworking::startAndConnectBot(std::string command)
 {
 #ifdef _WIN32
-	// stdin write - write to this
-	// stdout read - read from this 
+	command = "/C " + command;
+
 	Connection parentConnection, childConnection;
 
 	SECURITY_ATTRIBUTES saAttr;
@@ -222,8 +222,8 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	// C:/Users/Michael/Anaconda3/python.exe
 	// C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
 	bool success = CreateProcess(
-		NULL,
-		"\"C:/Users/Michael/Anaconda3/python.exe\" C:/xampp/htdocs/Halite/AIResources/Python/MyBot.py",     // command line 
+		"C:\\windows\\system32\\cmd.exe",
+		LPSTR(command.c_str()),     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
 		TRUE,          // handles are inherited 
@@ -285,27 +285,15 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 #endif
 }
 
-bool EnvironmentNetworking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m)
+bool EnvironmentNetworking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName)
 {
 	try {
 		sendString(playerTag, std::to_string(playerTag));
 		sendString(playerTag, serializeMap(m));
+		std::cout << "Init Message sent to player " << playerTag << "\n";
 
-		std::string str = "Init Message sent to player " + name + "\n";
-		std::cout << str;
-
-		std::string receiveString = "";
-
-		clock_t initialTime = clock();
-
-		receiveString = getString(playerTag, timeoutMillis);
-		str = "Init Message received from player " + name + "\n";
-		std::cout << str;
-
-		clock_t finalTime = clock() - initialTime;
-		double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
-
-		if (receiveString != "Done") return false;
+		playerName = getString(playerTag, timeoutMillis);
+		std::cout << "Init Message received from player " << playerTag << "\n";
 
 		return true;
 	}
@@ -350,5 +338,11 @@ void EnvironmentNetworking::killPlayer(unsigned char playerTag) {
 	processes[playerTag - 1] = NULL;
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
+#endif
+}
+
+int EnvironmentNetworking::numberOfPlayers() {
+#ifdef _WIN32
+	return connections.size();
 #endif
 }
