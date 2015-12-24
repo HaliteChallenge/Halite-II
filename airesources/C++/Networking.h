@@ -1,5 +1,5 @@
-#ifndef NETWORKING_H
-#define NETWORKING_H
+#ifndef AI_NETWORKING_H
+#define AI_NETWORKING_H
 
 #include <iostream>
 #include <time.h>

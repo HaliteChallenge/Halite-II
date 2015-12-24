@@ -1,5 +1,5 @@
-#ifndef NETWORKING_H
-#define NETWORKING_H
+#ifndef ENVIRONMENT_NETWORKING_H
+#define ENVIRONMENT_NETWORKING_H
 
 #include <iostream>
 #include <set>
