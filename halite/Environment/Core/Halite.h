@@ -12,7 +12,7 @@
 #include <boost/asio.hpp>
 
 #include "hlt.h"
-#include "../EnvironmentNetworking.h"
+#include "../networking/Networking.h"
 
 class Halite
 {

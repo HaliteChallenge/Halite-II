@@ -1,5 +1,4 @@
-#ifndef ENVIRONMENTNETWORKING_H
-#define ENVIRONMENTNETWORKING_H
+#pragma once
 
 #include <iostream>
 #include <set>
@@ -18,7 +17,7 @@
 	#include <unistd.h>
 #endif
 
-#include "Core/hlt.h"
+#include "../core/hlt.h"
 
 class EnvironmentNetworking {
 public:

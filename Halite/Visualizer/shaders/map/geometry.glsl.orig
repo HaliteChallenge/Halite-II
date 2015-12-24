@@ -14,7 +14,14 @@ void main()
 {
 	uint s = strength[0];
 	vec4 position = gl_in[0].gl_Position;
+<<<<<<< HEAD:Halite/Visualizer/shaders/map/geometry.glsl
+	vec3 c = 0.15 * color[0];
+=======
 	vec3 c = 0.2 * color[0];
+	
+	//Declare float which represents dialation factor of inner square:
+	float dialationFactor = 0.85;
+>>>>>>> origin/master:halite/Visualizer/shaders/map/geometry.glsl
 
 	//Find top left vertices.
 	vec4 tlBPosition = position + vec4(-width, height, 0.0, 0.0);
@@ -32,16 +39,29 @@ void main()
 
 	//Create outer square:
 	fragColor = c;
-	gl_Position = tlBPosition;
+<<<<<<< HEAD:Halite/Visualizer/shaders/map/geometry.glsl
+	gl_Position = brBPosition;
+	EmitVertex();
+	gl_Position = blBPosition;
 	EmitVertex();
 	gl_Position = trBPosition;
 	EmitVertex();
+	gl_Position = tlBPosition;
+	EmitVertex();
+
+	float dialationfactor = sqrt(float(s) / 255.0);
+=======
 	gl_Position = blBPosition;
 	EmitVertex();
 	gl_Position = brBPosition;
 	EmitVertex();
+	gl_Position = tlBPosition;
+	EmitVertex();
+	gl_Position = trBPosition;
+	EmitVertex();
 
-	float dialationfactor = sqrt(float(s) / 255.0);
+	float newdialationFactor = sqrt(float(s) / 255.0);
+>>>>>>> origin/master:halite/Visualizer/shaders/map/geometry.glsl
 
 	//Find top left vertices.
 	vec4 tlLPosition = position + vec4(-width*dialationfactor, height*dialationfactor, 0.0, 0.0);
