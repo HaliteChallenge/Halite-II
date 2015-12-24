@@ -147,6 +147,10 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag)
 		if (buffer == '\n') break;
 		else newString += buffer;
 	}
+
+	// Python turns \n into \r\n
+	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
+
 	return newString;
 #else
 	int connectionFd = connections[playerTag - 1];
@@ -204,10 +208,10 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 
 	// C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
 	// C:/Users/Michael/Anaconda3/python.exe
-	// C:/Program Files/Java/jre7/bin/java.exe
+	// C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
 	bool success = CreateProcess(
 		NULL,
-		"\"C:/Program Files/Java/jre1.8.0_65/bin/java.exe\" -cp C:/xampp/htdocs/Halite/AIResources/Java ExampleBot",     // command line 
+		"\"C:/Users/Michael/Anaconda3/python.exe\" C:/xampp/htdocs/Halite/AIResources/Python/MyBot.py",     // command line 
 		NULL,          // process security attributes 
 		NULL,          // primary thread security attributes 
 		TRUE,          // handles are inherited 

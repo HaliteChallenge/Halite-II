@@ -245,30 +245,14 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 //Public Functions -------------------
 
 Halite::Halite(unsigned short w, unsigned short h)
-{
-	//Add colors to possible colors:
-	possible_colors.clear();
-	possible_colors.push_back({ 1.0, 0.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.1f, 0.0f });
-	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ .87f, .72f, .53f });
-	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
-	possible_colors.push_back({ 1.0f, .65f, 0.0f });
-
-	//Default initialize
-    player_moves = std::vector< std::set<hlt::Move> >();
-    turn_number = 0;
-    
+{   
     //Connect to players
     number_of_players = 0;
     player_names = std::vector<std::string>();
     
 	std::string in;
-	//Ask if the user would like to use the default ports?
+
+	//Ask if the user would like to use the default ports
 	bool useDefaultPorts = true;
 	std::cout << "Would you like to use the default ports? Please enter Yes or No: ";
 	while (true)
@@ -346,21 +330,56 @@ Halite::Halite(unsigned short w, unsigned short h)
 		number_of_players++;
 	}
     
-    //Initialize map:
+    //Initialize map
 	game_map = hlt::Map(w, h, number_of_players);
+
+	//Perform initialization not specific to constructor
+	init();
+}
+
+Halite::Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, EnvironmentNetworking networking_) {
+	player_names = player_names_;
+	networking = networking_;
+	number_of_players = player_names.size();
+	
+	//Initialize map
+	game_map = hlt::Map(width_, height_, number_of_players);
+
+	//Perform initialization not specific to constructor
+	init();
+}
+
+void Halite::init()
+{
+	//Add colors to possible colors:
+	possible_colors.clear();
+	possible_colors.push_back({ 1.0, 0.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.1f, 0.0f });
+	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ .87f, .72f, .53f });
+	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
+	possible_colors.push_back({ 1.0f, .65f, 0.0f });
+
+	//Default initialize
+	player_moves = std::vector< std::set<hlt::Move> >();
+	turn_number = 0;
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
 	std::list<unsigned char> strengths;
 	short numPieces = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	for (auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for (auto b = a->begin(); b != a->end(); b++)
 	{
-		if(numPieces == 255 || b->owner != presentOwner)
+		if (numPieces == 255 || b->owner != presentOwner)
 		{
 			turn->push_back(numPieces);
 			turn->push_back(presentOwner);
-			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			for (auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
 			strengths.clear();
 			numPieces = 0;
 			presentOwner = b->owner;
@@ -368,23 +387,21 @@ Halite::Halite(unsigned short w, unsigned short h)
 		numPieces++;
 		strengths.push_back(b->strength);
 	}
+
 	//Final output set:
 	turn->push_back(numPieces);
 	turn->push_back(presentOwner);
-	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	for (auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
 	turn->shrink_to_fit();
 	//Add to full game:
 	full_game.push_back(turn);
 
-    //Initialize player moves vector
-    player_moves.resize(number_of_players);
+	//Initialize player moves vector
+	player_moves.resize(number_of_players);
 
 	//Initialize player attack_count vector.
 	attack_count = std::vector<unsigned int>(number_of_players, 0);
-}
 
-void Halite::init()
-{
     //Send initial package 
     std::vector<std::thread> initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)

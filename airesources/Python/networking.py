@@ -54,7 +54,7 @@ def deserializeMessages(messageString):
 	return messages
 
 def sendString(toBeSent):
-	toBeSent += "\n"
+	toBeSent += '\n'
 
 	sys.stdout.write(toBeSent)
 	sys.stdout.flush()

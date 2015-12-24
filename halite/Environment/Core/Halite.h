@@ -31,7 +31,9 @@ private:
     std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
     Halite(unsigned short w, unsigned short h);
-    void init();
+	Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, EnvironmentNetworking networking_);
+
+	void init();
 	void output(std::string filename);
 	std::vector< std::pair<std::string, float> > runGame();
 	~Halite();
