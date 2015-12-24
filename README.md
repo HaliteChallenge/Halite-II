@@ -14,7 +14,7 @@
 - MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.
 
 ### Worker
-- The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox
+- ~~The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox~~
 - The worker can run a game between two or more bots using our Docker sandbox
 
 ### Server
