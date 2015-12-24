@@ -1,9 +1,9 @@
 #include <iostream>
+#include <cctype>
 
 #include "Core/Halite.h"
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-
 
 // Returns true if all the arguments required of a user to run a game of Halite are present
 // 4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
@@ -34,7 +34,7 @@ int main(int argc, char* args[])
 		std::vector<std::string> player_names;
 		for (int a = 3; a < argc; a++)  player_names.push_back(std::string(args[a]));
 
-		EnvironmentNetworking networking;
+		Networking networking;
 		for (int a = 0; a < player_names.size(); a++) networking.createAndConnectSocket(2000);
 
 		my_game = new Halite(mapWidth, mapHeight, player_names, networking);

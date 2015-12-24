@@ -9,10 +9,9 @@
 #include <iostream>
 #include <thread>
 #include <future>
-#include <boost/asio.hpp>
 
 #include "hlt.h"
-#include "../EnvironmentNetworking.h"
+#include "../networking/networking.h"
 
 #define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
 
@@ -20,7 +19,7 @@ class Halite
 {
 private:
 	unsigned short turn_number;
-	EnvironmentNetworking networking;
+	Networking networking;
     std::vector<std::string> player_names;
 	std::vector<hlt::Message> pastFrameMessages;
     std::vector< std::set<hlt::Move> > player_moves;
@@ -33,7 +32,7 @@ private:
     std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
     Halite(unsigned short w, unsigned short h);
-	Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, EnvironmentNetworking networking_);
+	Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, Networking networking_);
 
 	void init();
 	void output(std::string filename);

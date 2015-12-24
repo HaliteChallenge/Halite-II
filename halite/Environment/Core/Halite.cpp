@@ -4,7 +4,6 @@
 
 //Default port number.
 const unsigned short DEFAULT_PORT = 2000;
-using boost::asio::ip::tcp;
 
 //Private Functions ------------------
 
@@ -33,7 +32,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
-			frameThreads[threadLocation] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
+			frameThreads[threadLocation] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
 				return networking.handleFrameNetworking(timeoutMillis, playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
 			}, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
@@ -361,7 +360,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 	init();
 }
 
-Halite::Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, EnvironmentNetworking networking_) {
+Halite::Halite(unsigned short width_, unsigned short height_, std::vector<std::string> player_names_, Networking networking_) {
 	player_names = player_names_;
 	networking = networking_;
 	number_of_players = player_names.size();
@@ -430,7 +429,7 @@ void Halite::init()
     std::vector< std::future<bool> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-		initThreads[a] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m) {
+		initThreads[a] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m) {
 			return networking.handleInitNetworking(timeoutMillis, playerTag, name, m);
 		}, networking, BOT_INITIALIZATION_TIMEOUT_MILLIS, a + 1, player_names[a], game_map);
     }

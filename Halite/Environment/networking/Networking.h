@@ -1,5 +1,4 @@
-#ifndef ENVIRONMENTNETWORKING_H
-#define ENVIRONMENTNETWORKING_H
+#pragma once
 
 #include <iostream>
 #include <set>
@@ -18,9 +17,9 @@
 	#include <unistd.h>
 #endif
 
-#include "Core/hlt.h"
+#include "../core/hlt.h"
 
-class EnvironmentNetworking {
+class Networking {
 public:
 	void createAndConnectSocket(int port);
 	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m);
@@ -47,5 +46,3 @@ private:
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
 };
-
-#endif
