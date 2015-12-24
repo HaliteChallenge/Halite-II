@@ -30,7 +30,7 @@ int main(int argc, char* args[])
 	{
 		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
 		
-		EnvironmentNetworking networking;
+		Networking networking;
 		for (int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
 
 		my_game = new Halite(mapWidth, mapHeight, networking);

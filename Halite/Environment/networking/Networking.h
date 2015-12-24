@@ -18,7 +18,7 @@
 	#include <unistd.h>
 #endif
 
-#include "Core/hlt.h"
+#include "../Core/hlt.h"
 
 class Networking {
 public:

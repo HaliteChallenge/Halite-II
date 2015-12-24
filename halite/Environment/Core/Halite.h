@@ -32,7 +32,7 @@ private:
     std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
     Halite(unsigned short w, unsigned short h);
-	Halite(unsigned short width_, unsigned short height_, EnvironmentNetworking networking_);
+	Halite(unsigned short width_, unsigned short height_, Networking networking_);
 
 	void init();
 	void output(std::string filename);

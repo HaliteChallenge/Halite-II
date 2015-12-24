@@ -320,7 +320,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 	init();
 }
 
-Halite::Halite(unsigned short width_, unsigned short height_, EnvironmentNetworking networking_) {
+Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_) {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 	
@@ -389,7 +389,7 @@ void Halite::init()
     std::vector< std::future<bool> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-		initThreads[a] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, hlt::Map & m, std::string * playerName) {
+		initThreads[a] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, hlt::Map & m, std::string * playerName) {
 			return networking.handleInitNetworking(timeoutMillis, playerTag, m, *playerName);
 		}, networking, BOT_INITIALIZATION_TIMEOUT_MILLIS, a + 1, game_map, &player_names[a]);
     }
