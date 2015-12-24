@@ -202,6 +202,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		numPieces++;
 		strengths.push_back(b->strength);
 	}
+
 	//Final output set:
 	turn->push_back(numPieces);
 	turn->push_back(presentOwner);
