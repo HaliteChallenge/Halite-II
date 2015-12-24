@@ -11,7 +11,7 @@
 - Switch to pipes on unix
 - ~~Switch to pipes on clients~~
 - Test networking on unix and ~~windows~~
-- MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.
+- ~~MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.~~
 
 ### Worker
 - ~~The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox~~
