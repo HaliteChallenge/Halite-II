@@ -149,10 +149,9 @@ static void getInit(unsigned char& playerTag, hlt::Map& m)
 	m = deserializeMap(getString());
 }
 
-static void sendInitResponse()
+static void sendInitResponse(std::string name)
 {
-    std::string response = "Done";
-    sendString(response);
+    sendString(name);
 }
 
 static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)

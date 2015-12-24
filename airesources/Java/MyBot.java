@@ -8,7 +8,7 @@ public class MyBot
         short playerTag = iPackage.playerTag;
         Map gameMap = iPackage.map;
 
-        Networking.sendInit();
+        Networking.sendInit("JavaBot " + playerTag);
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();

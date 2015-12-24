@@ -68,9 +68,8 @@ def getInit():
 
 	return (playerTag, m)
 
-def sendInit():
-	message = "Done"
-	sendString(message)
+def sendInit(name):
+	sendString(name)
 
 def getFrame():
 	return (deserializeMap(getString()), deserializeMessages(getString()))

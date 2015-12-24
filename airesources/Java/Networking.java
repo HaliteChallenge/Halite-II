@@ -119,9 +119,9 @@ public class Networking
         return initPackage;
     }
 
-    static void sendInit()
+    static void sendInit(String name)
     {
-        sendString("Done");
+        sendString(name);
     }
 
     static FramePackage getFrame()
