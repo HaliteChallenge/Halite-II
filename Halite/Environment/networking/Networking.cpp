@@ -1,4 +1,4 @@
-#include "EnvironmentNetworking.h"
+#include "Networking.h"
 
 #include <time.h>
 #include <fstream>
@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <stdio.h>
 
-std::string EnvironmentNetworking::serializeMap(const hlt::Map & map)
+std::string Networking::serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
 	std::ostringstream oss;
@@ -48,7 +48,7 @@ std::string EnvironmentNetworking::serializeMap(const hlt::Map & map)
 	return returnString;
 }
 
-std::set<hlt::Move> EnvironmentNetworking::deserializeMoveSet(std::string & inputString)
+std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString)
 {
 	std::set<hlt::Move> moves = std::set<hlt::Move>();
 
@@ -60,7 +60,7 @@ std::set<hlt::Move> EnvironmentNetworking::deserializeMoveSet(std::string & inpu
 	return moves;
 }
 
-std::string EnvironmentNetworking::serializeMessages(const std::vector<hlt::Message> &messages) {
+std::string Networking::serializeMessages(const std::vector<hlt::Message> &messages) {
 	std::ostringstream oss;
 
 	oss << messages.size() << " ";
@@ -75,7 +75,7 @@ std::string EnvironmentNetworking::serializeMessages(const std::vector<hlt::Mess
 	return oss.str();
 }
 
-std::vector<hlt::Message> EnvironmentNetworking::deserializeMessages(const std::string &inputString)
+std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inputString)
 {
 	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
 	std::stringstream iss(inputString);
@@ -99,7 +99,7 @@ std::vector<hlt::Message> EnvironmentNetworking::deserializeMessages(const std::
 	return messages;
 }
 
-void EnvironmentNetworking::sendString(unsigned char playerTag, std::string &sendString)
+void Networking::sendString(unsigned char playerTag, std::string &sendString)
 {
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
@@ -126,7 +126,7 @@ void EnvironmentNetworking::sendString(unsigned char playerTag, std::string &sen
 #endif
 }
 
-std::string EnvironmentNetworking::getString(unsigned char playerTag, unsigned int timeoutMillis)
+std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis)
 {
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
@@ -178,7 +178,7 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag, unsigned i
 #endif
 }
 
-void EnvironmentNetworking::startAndConnectBot(std::string command)
+void Networking::startAndConnectBot(std::string command)
 {
 #ifdef _WIN32
 	command = "/C " + command;
@@ -285,7 +285,7 @@ void EnvironmentNetworking::startAndConnectBot(std::string command)
 #endif
 }
 
-bool EnvironmentNetworking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName)
+bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName)
 {
 	try {
 		sendString(playerTag, std::to_string(playerTag));
@@ -302,7 +302,7 @@ bool EnvironmentNetworking::handleInitNetworking(unsigned int timeoutMillis, uns
 	}
 }
 
-bool EnvironmentNetworking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
+bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
 	try
 	{
@@ -327,7 +327,7 @@ bool EnvironmentNetworking::handleFrameNetworking(unsigned int timeoutMillis, un
 
 }
 
-void EnvironmentNetworking::killPlayer(unsigned char playerTag) {
+void Networking::killPlayer(unsigned char playerTag) {
 #ifdef _WIN32
 	
 	HANDLE process = processes[playerTag - 1];
@@ -341,7 +341,7 @@ void EnvironmentNetworking::killPlayer(unsigned char playerTag) {
 #endif
 }
 
-int EnvironmentNetworking::numberOfPlayers() {
+int Networking::numberOfPlayers() {
 #ifdef _WIN32
 	return connections.size();
 #endif

@@ -1,9 +1,9 @@
 #include <iostream>
+#include <cctype>
 
 #include "Core/Halite.h"
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-
 
 // Returns true if all the arguments required of a user to run a game of Halite are present
 // 4 arguments are required width, height, name1, name2 in that order (though more names are welcome)

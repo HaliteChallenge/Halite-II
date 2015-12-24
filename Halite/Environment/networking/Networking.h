@@ -1,5 +1,5 @@
-#ifndef ENVIRONMENTNETWORKING_H
-#define ENVIRONMENTNETWORKING_H
+#ifndef NETWORKING_H
+#define NETWORKING_H
 
 #include <iostream>
 #include <set>
@@ -20,7 +20,7 @@
 
 #include "Core/hlt.h"
 
-class EnvironmentNetworking {
+class Networking {
 public:
 	void startAndConnectBot(std::string command);
 	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName);

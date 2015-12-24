@@ -4,7 +4,6 @@
 
 //Default port number.
 const unsigned short DEFAULT_PORT = 2000;
-using boost::asio::ip::tcp;
 
 //Private Functions ------------------
 
@@ -33,7 +32,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
-			frameThreads[threadLocation] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
+			frameThreads[threadLocation] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
 				return networking.handleFrameNetworking(timeoutMillis, playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
 			}, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 

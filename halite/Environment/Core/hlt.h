@@ -1,5 +1,4 @@
-#ifndef HLT_H
-#define HLT_H
+#pragma once
 
 #include <list>
 #include <vector>
@@ -158,5 +157,3 @@ namespace hlt
 		return ((l1Prod + m1.dir)*(l1Prod + m1.dir + 1) / 2) + m1.dir < ((l2Prod + m2.dir)*(l2Prod + m2.dir + 1) / 2) + m2.dir;
 	}
 }
-
-#endif
