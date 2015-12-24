@@ -14,6 +14,8 @@
 #include "hlt.h"
 #include "../EnvironmentNetworking.h"
 
+#define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
+
 class Halite
 {
 private:

@@ -23,8 +23,10 @@
 class EnvironmentNetworking {
 public:
 	void createAndConnectSocket(int port);
-	double handleInitNetworking(unsigned char playerTag, std::string name, hlt::Map & m);
-	double handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot);
+	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m);
+	bool handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot);
+	void killPlayer(unsigned char playerTag);
+
 private:
 #ifdef _WIN32
 	struct Connection {
@@ -32,6 +34,7 @@ private:
 		HANDLE read;
 	};
 	std::vector<Connection> connections;
+	std::vector<HANDLE> processes;
 #else
 	std::vector<int> connections;
 #endif
@@ -42,7 +45,7 @@ private:
 	std::vector<hlt::Message> deserializeMessages(const std::string &inputString);
 
 	void sendString(unsigned char playerTag, std::string &sendString);
-	std::string getString(unsigned char playerTag);
+	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
 };
 
 #endif

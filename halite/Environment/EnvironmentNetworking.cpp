@@ -126,7 +126,7 @@ void EnvironmentNetworking::sendString(unsigned char playerTag, std::string &sen
 #endif
 }
 
-std::string EnvironmentNetworking::getString(unsigned char playerTag)
+std::string EnvironmentNetworking::getString(unsigned char playerTag, unsigned int timeoutMillis)
 {
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
@@ -136,12 +136,25 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag)
 	std::string newString;
 	char buffer;
 
-	// Keep reading until newline
+	// Keep reading char by char until a newline
 	while (true) {
+		// Check to see that there are bytes in the pipe before reading
+		// Throw error if no bytes in alloted time
+		// Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
+		DWORD bytesAvailable = 0;
+		PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
+		if (bytesAvailable < 1) {
+			clock_t initialTime = clock();
+			while (bytesAvailable < 1) {
+				if (((clock() - initialTime) * 1000 / CLOCKS_PER_SEC) > timeoutMillis) throw 1;
+				PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
+			}
+		}
+
 		success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
-		if (!success)
+		if (!success || charsRead < 1)
 		{
-			std::cout << "problem reading\n";
+			std::cout << "Pipe probably timed out\n";
 			throw 1;
 		}
 		if (buffer == '\n') break;
@@ -150,7 +163,6 @@ std::string EnvironmentNetworking::getString(unsigned char playerTag)
 
 	// Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
-
 	return newString;
 #else
 	int connectionFd = connections[playerTag - 1];
@@ -230,6 +242,8 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 	{
 		CloseHandle(piProcInfo.hProcess);
 		CloseHandle(piProcInfo.hThread);
+
+		processes.push_back(piProcInfo.hProcess);
 		connections.push_back(parentConnection);
 	}
 #else
@@ -271,45 +285,70 @@ void EnvironmentNetworking::createAndConnectSocket(int port)
 #endif
 }
 
-double EnvironmentNetworking::handleInitNetworking(unsigned char playerTag, std::string name, hlt::Map & m)
+bool EnvironmentNetworking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m)
 {
-	sendString(playerTag, std::to_string(playerTag));
-	sendString(playerTag, serializeMap(m));
+	try {
+		sendString(playerTag, std::to_string(playerTag));
+		sendString(playerTag, serializeMap(m));
 
-	std::string str = "Init Message sent to player " + name + "\n";
-	std::cout << str;
+		std::string str = "Init Message sent to player " + name + "\n";
+		std::cout << str;
 
-	std::string receiveString = "";
+		std::string receiveString = "";
 
-	clock_t initialTime = clock();
+		clock_t initialTime = clock();
 
-	receiveString = getString(playerTag);
-	str = "Init Message received from player " + name + "\n";
-	std::cout << str;
+		receiveString = getString(playerTag, timeoutMillis);
+		str = "Init Message received from player " + name + "\n";
+		std::cout << str;
 
-	clock_t finalTime = clock() - initialTime;
-	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
+		clock_t finalTime = clock() - initialTime;
+		double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
 
-	if (receiveString != "Done") return FLT_MAX;
-	return timeElapsed;
+		if (receiveString != "Done") return false;
+
+		return true;
+	}
+	catch (int e) {
+		return false;
+	}
 }
 
-double EnvironmentNetworking::handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
+bool EnvironmentNetworking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
-	std::cout << "turn";
-	// Send this bot the game map and the messages addressed to this bot
-	sendString(playerTag, serializeMap(m));
-	sendString(playerTag, serializeMessages(messagesForThisBot));
+	try
+	{
+		if (processes[playerTag - 1] == NULL) return false;
 
-	moves->clear();
+		std::cout << "turn";
+		// Send this bot the game map and the messages addressed to this bot
+		sendString(playerTag, serializeMap(m));
+		sendString(playerTag, serializeMessages(messagesForThisBot));
 
-	clock_t initialTime = clock();
+		moves->clear();
 
-	*moves = deserializeMoveSet(getString(playerTag));
-	*messagesFromThisBot = deserializeMessages(getString(playerTag));
+		*moves = deserializeMoveSet(getString(playerTag, timeoutMillis));
+		*messagesFromThisBot = deserializeMessages(getString(playerTag, timeoutMillis));
 
-	clock_t finalTime = clock() - initialTime;
-	double timeElapsed = float(finalTime) / CLOCKS_PER_SEC;
+		return true;
+	}
+	catch (int e) 
+	{
+		return false;
+	}
 
-	return timeElapsed;
+}
+
+void EnvironmentNetworking::killPlayer(unsigned char playerTag) {
+#ifdef _WIN32
+	
+	HANDLE process = processes[playerTag - 1];
+	if (process == NULL) return;
+
+	TerminateProcess(process, 0);
+
+	processes[playerTag - 1] = NULL;
+	connections[playerTag - 1].read = NULL;
+	connections[playerTag - 1].write = NULL;
+#endif
 }

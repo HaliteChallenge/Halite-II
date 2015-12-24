@@ -13,8 +13,15 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	if(game_map.map_width == 0 || game_map.map_height == 0) return std::vector<bool>(0);
 
 	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<double> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
+
+	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
+	std::vector<int> allowableTimesToRespond(number_of_players);
+	for (unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = 300;
+
+	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
+	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
 
 	// Stores the messages sent by bots this frame
 	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
@@ -26,30 +33,36 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
-			frameThreads[threadLocation] = std::async([](EnvironmentNetworking networking, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) -> double {
-				return networking.handleFrameNetworking(playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
-			}, networking, a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			frameThreads[threadLocation] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
+				return networking.handleFrameNetworking(timeoutMillis, playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
+			}, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
 	}
 
-	//Figure out how long each AI is permitted to respond.
-	std::vector<double> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
-	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
-	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
-
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
 
-	//Join threads. Figure out if the player responded in an allowable amount of time.
+	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<bool> permissibleTime(number_of_players, false);
 	threadLocation = 0; //Represents place in frameThreads.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		if(alive[a])
 		{
-			permissibleTime[a] = frameThreads[threadLocation].get() <= allowableTimesToRespond[a];
+
+			bool success = frameThreads[threadLocation].get();
+			if(success)
+			{
+				permissibleTime[a] = true;
+			}
+			//  There was an exception in the networking thread or the player timed out. Either way, kill their thread 
+			else 
+			{
+				std::cout << player_names[a] << " timed out\n";
+				permissibleTime[a] = false;
+				networking.killPlayer(a+1);
+			}
 			threadLocation++;
 		}
 	}
@@ -234,12 +247,22 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
 	unsigned char numAlive = 0;
-	for(unsigned short a = 0; a < game_map.map_height && numAlive != number_of_players; a++) for(unsigned short b = 0; b < game_map.map_width && numAlive != number_of_players; b++) if(game_map.contents[a][b].owner != 0 && !stillAlive[game_map.contents[a][b].owner - 1])
+	for (unsigned short a = 0; a < game_map.map_height && numAlive != number_of_players; a++)
 	{
-		stillAlive[game_map.contents[a][b].owner - 1] = true;
-		numAlive++;
+		for (unsigned short b = 0; b < game_map.map_width && numAlive != number_of_players; b++)
+		{
+			if (game_map.contents[a][b].owner != 0 && !stillAlive[game_map.contents[a][b].owner - 1])
+			{
+				stillAlive[game_map.contents[a][b].owner - 1] = true;
+				numAlive++;
+			}
+		}
 	}
-	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false;
+	for (unsigned char a = 0; a < permissibleTime.size(); a++) {
+		if (!permissibleTime[a]) {
+			stillAlive[a] = false;
+		}
+	}
 	return stillAlive;
 }
 
@@ -404,16 +427,19 @@ void Halite::init()
 	attack_count = std::vector<unsigned int>(number_of_players, 0);
 
     //Send initial package 
-    std::vector<std::thread> initThreads(number_of_players);
+    std::vector< std::future<bool> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-		initThreads[a] = std::thread([](EnvironmentNetworking networking, unsigned char playerTag, std::string name, hlt::Map & m) {
-			networking.handleInitNetworking(playerTag, name, m);
-		}, networking, a + 1, player_names[a], game_map);
+		initThreads[a] = std::async([](EnvironmentNetworking &networking, unsigned int timeoutMillis, unsigned char playerTag, std::string name, hlt::Map & m) {
+			return networking.handleInitNetworking(timeoutMillis, playerTag, name, m);
+		}, networking, BOT_INITIALIZATION_TIMEOUT_MILLIS, a + 1, player_names[a], game_map);
     }
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-    	initThreads[a].join();
+    	bool success = initThreads[a].get();
+		if (!success) {
+			networking.killPlayer(a + 1);
+		}
     }
 }
 
