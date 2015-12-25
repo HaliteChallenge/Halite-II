@@ -253,9 +253,11 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	}
 	else if(code == 'R' || code == 'r')
 	{
-		const char * fn = filename.c_str();
-		handleDrop(window, 1, &fn);
-		delete[] fn;
+		if(filename != "")
+		{
+			const char * fn = filename.c_str();
+			handleDrop(window, 1, &fn);
+		}
 	}
 }
 
