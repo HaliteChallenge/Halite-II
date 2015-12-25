@@ -23,8 +23,10 @@
 		echo "Necessary files do not exist";
 		exit(0);
 	}
-
-	exec("python compiler.py ../../storage/bots/$userID");
+	var_dump(scandir($dir));
+	
+	echo "python compiler.py $dir<br>";
+	shell_exec("python compiler.py $dir", $shellOutput);
 
 	if(file_exists("{$dir}/run.sh")) {
 		echo "Success";
