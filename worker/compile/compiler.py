@@ -616,6 +616,8 @@ def compile_anything(bot_dir, timelimit=600, max_error_len = 3072):
 			name = detected_language.name
 			run_cmd = detected_language.command
 			run_filename = os.path.join(bot_dir, 'run.sh')
+			print("filename:")
+			print(run_filename)
 			with open(run_filename, 'w') as f:
 				f.write('#%s\n%s\n' % (name, run_cmd))
 			return name, None
