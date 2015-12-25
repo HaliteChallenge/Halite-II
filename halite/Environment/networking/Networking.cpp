@@ -329,7 +329,6 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 	{
 		if (isProcessDead(playerTag)) return false;
 
-		std::cout << "turn";
 		// Send this bot the game map and the messages addressed to this bot
         std::string mapString = serializeMap(m), sendMessagesString = serializeMessages(messagesForThisBot);
 		sendString(playerTag, mapString);

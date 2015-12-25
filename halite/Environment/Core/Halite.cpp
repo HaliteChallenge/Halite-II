@@ -14,7 +14,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INT_MAX;
 
 	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
 	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
@@ -434,6 +434,7 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	{
 		//Increment turn number:
 		turn_number++;
+		std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		result = processNextFrame(result);
 	}
