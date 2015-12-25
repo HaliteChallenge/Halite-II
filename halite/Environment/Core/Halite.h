@@ -11,7 +11,7 @@
 #include <future>
 
 #include "hlt.h"
-#include "../networking/networking.h"
+#include "../networking/Networking.h"
 
 #define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
 
