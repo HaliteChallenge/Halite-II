@@ -26,7 +26,8 @@
 	var_dump(scandir($dir));
 	
 	echo "python compiler.py $dir<br>";
-	shell_exec("python compiler.py $dir", $shellOutput);
+	exec("python compiler.py $dir", $shellOutput);
+	var_dump($shellOutput);
 
 	if(file_exists("{$dir}/run.sh")) {
 		echo "Success";

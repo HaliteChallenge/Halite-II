@@ -19,8 +19,8 @@
 
 		$startGameCommand .= "\"$botRunPath\" ";
 	}
-
-	exec($startGameCommand, $gameOutput);
+	echo $startGameCommand;
+	/*exec($startGameCommand, $gameOutput);
 
 	// Return the botIDs ordered by ranking (first to last)
 	$returnArray = array();
@@ -35,5 +35,5 @@
 		array_push($returnArray, $userIDs[$playerID-1]);
 	}
 
-	return json_encode($returnArray);
+	echo json_encode($returnArray);*/
 ?>
