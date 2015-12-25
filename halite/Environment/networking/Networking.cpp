@@ -15,9 +15,9 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	// Run-length encode of owners
 	unsigned short currentOwner = map.contents[0][0].owner;
 	unsigned short counter = 0;
-	for (int a = 0; a < map.contents.size(); ++a)
+	for(int a = 0; a < map.contents.size(); ++a)
 	{
-		for (int b = 0; b < map.contents[a].size(); ++b)
+		for(int b = 0; b < map.contents[a].size(); ++b)
 		{
 			if (map.contents[a][b].owner == currentOwner)
 			{
@@ -35,9 +35,9 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
 
 	// Encoding of ages
-	for (int a = 0; a < map.contents.size(); ++a)
+	for(int a = 0; a < map.contents.size(); ++a)
 	{
-		for (int b = 0; b < map.contents[a].size(); ++b)
+		for(int b = 0; b < map.contents[a].size(); ++b)
 		{
 			oss << (unsigned short)map.contents[a][b].strength << " ";
 		}
@@ -65,7 +65,7 @@ std::string Networking::serializeMessages(const std::vector<hlt::Message> &messa
 
 	oss << messages.size() << " ";
 
-	for (int a = 0; a < messages.size(); a++)
+	for(int a = 0; a < messages.size(); a++)
 	{
 		hlt::Message message = messages[a];
 		oss << (unsigned short)message.type << " ";
@@ -83,7 +83,7 @@ std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inp
 	int numberOfMessages;
 	iss >> numberOfMessages;
 
-	for (int a = 0; a < numberOfMessages; a++)
+	for(int a = 0; a < numberOfMessages; a++)
 	{
 		hlt::Message message;
 
@@ -105,7 +105,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString)
     sendString += '\n';
     
 #ifdef _WIN32
-	Connection connection = connections[playerTag - 1];
+	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsWritten;
 	bool success;
@@ -128,7 +128,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 {
     std::string newString;
 #ifdef _WIN32
-	Connection connection = connections[playerTag - 1];
+	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsRead;
 	bool success;
@@ -197,7 +197,7 @@ void Networking::startAndConnectBot(std::string command)
 #ifdef _WIN32
 	command = "/C " + command;
 
-	Connection parentConnection, childConnection;
+	WinConnection parentConnection, childConnection;
 
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);

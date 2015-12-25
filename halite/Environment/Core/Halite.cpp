@@ -14,7 +14,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for (unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = 5000;
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = FLT_MAX;
 
 	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
 	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
@@ -27,7 +27,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		{
 			// Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
 			std::vector<hlt::Message> messagesForThisBot;
-			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
+			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
             frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
@@ -64,8 +64,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	// Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
 	pastFrameMessages = std::vector<hlt::Message>();
 	// Ensure that the player signed their messages correctly
-	for (int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++) {
-		for (auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++) {
+	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
+	{
+		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
+		{
 			message->senderID = playerIndex+1; // playerIndex + 1 equals the playerID of the sender
 			pastFrameMessages.push_back(*message);
 		}
@@ -241,9 +243,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
 	unsigned char numAlive = 0;
-	for (unsigned short a = 0; a < game_map.map_height && numAlive != number_of_players; a++)
+	for(unsigned short a = 0; a < game_map.map_height && numAlive != number_of_players; a++)
 	{
-		for (unsigned short b = 0; b < game_map.map_width && numAlive != number_of_players; b++)
+		for(unsigned short b = 0; b < game_map.map_width && numAlive != number_of_players; b++)
 		{
 			if (game_map.contents[a][b].owner != 0 && !stillAlive[game_map.contents[a][b].owner - 1])
 			{
@@ -252,8 +254,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			}
 		}
 	}
-	for (unsigned char a = 0; a < permissibleTime.size(); a++) {
-		if (!permissibleTime[a]) {
+	for(unsigned char a = 0; a < permissibleTime.size(); a++)
+	{
+		if (!permissibleTime[a])
+		{
 			stillAlive[a] = false;
 		}
 	}
@@ -288,7 +292,8 @@ Halite::Halite(unsigned short w, unsigned short h)
 			if (in == "n" || in == "no" || in == "nope") break;
 		}
 
-		while (true) {
+		while (true)
+		{
 			std::string startCommand;
 			std::cout << "What is the start command for this bot: ";
 			std::getline(std::cin, startCommand);
@@ -315,7 +320,8 @@ Halite::Halite(unsigned short w, unsigned short h)
 	init();
 }
 
-Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_) {
+Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_)
+{
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 	
@@ -351,13 +357,13 @@ void Halite::init()
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
 	std::list<unsigned char> strengths;
 	short numPieces = 0;
-	for (auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for (auto b = a->begin(); b != a->end(); b++)
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
 	{
 		if (numPieces == 255 || b->owner != presentOwner)
 		{
 			turn->push_back(numPieces);
 			turn->push_back(presentOwner);
-			for (auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
 			strengths.clear();
 			numPieces = 0;
 			presentOwner = b->owner;
@@ -369,7 +375,7 @@ void Halite::init()
 	//Final output set:
 	turn->push_back(numPieces);
 	turn->push_back(presentOwner);
-	for (auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
 	turn->shrink_to_fit();
 	//Add to full game:
 	full_game.push_back(turn);
@@ -389,7 +395,8 @@ void Halite::init()
     for(unsigned char a = 0; a < number_of_players; a++)
     {
     	bool success = initThreads[a].get();
-		if (!success) {
+		if (!success)
+		{
 			networking.killPlayer(a + 1);
 		}
     }

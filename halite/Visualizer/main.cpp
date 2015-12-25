@@ -237,19 +237,25 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	}
 	else if(code == 'W' || code == 'w')
 	{
-		yOffset++;
+		yOffset--;
 	}
 	else if(code == 'A' || code == 'a')
 	{
-		xOffset--;
+		xOffset++;
 	}
 	else if(code == 'S' || code == 's')
 	{
-		yOffset--;
+		yOffset++;
 	}
 	else if(code == 'D' || code == 'd')
 	{
-		xOffset++;
+		xOffset--;
+	}
+	else if(code == 'R' || code == 'r')
+	{
+		const char * fn = filename.c_str();
+		handleDrop(window, 1, &fn);
+		delete[] fn;
 	}
 }
 
@@ -259,6 +265,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 	try
 	{
 		numTurns = my_game->input(w, paths[0], wi, he);
+		filename = paths[0];
 	}
 	catch(std::runtime_error e)
 	{

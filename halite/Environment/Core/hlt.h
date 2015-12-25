@@ -63,7 +63,7 @@ namespace hlt
 
 			std::list<Location> takenSpots;
 			float minDistance = sqrt(map_height*map_width) / 2;
-			for (int a = 1; a <= numberOfPlayers; a++)
+			for(int a = 1; a <= numberOfPlayers; a++)
 			{
 				bool bad = true;
 				int counter = 0;
@@ -72,7 +72,7 @@ namespace hlt
 				{
 					bad = false;
 					l = { static_cast<unsigned short>(rand() % map_width), static_cast<unsigned short>(rand() % map_height) };
-					for (auto b = takenSpots.begin(); b != takenSpots.end(); b++)
+					for(auto b = takenSpots.begin(); b != takenSpots.end(); b++)
 					{
 						if (getDistance(l, *b) <= minDistance)
 						{
