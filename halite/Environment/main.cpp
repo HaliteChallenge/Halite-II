@@ -80,7 +80,7 @@ int main(int argc, char* args[])
     
 	std::string filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 
-	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
+	std::vector< std::pair<unsigned char, float> >rankings = my_game->runGame();
 
 	try
 	{
@@ -91,9 +91,9 @@ int main(int argc, char* args[])
 		std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename.substr(11) << std::endl;
 		my_game->output(filename.substr(11));
 	}
-
+	
 	std::string victoryOut;
-	for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player " + rankings[a].first + " with a relative score of " + std::to_string(rankings[a].second).substr(0, 5) + "\n";
+	for (unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a relative score of " + std::to_string(rankings[a].second).substr(0, 5) + "\n";
 	std::cout << victoryOut;
     
     delete my_game;

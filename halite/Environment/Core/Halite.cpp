@@ -427,7 +427,7 @@ void Halite::output(std::string filename)
 	gameFile.close();
 }
 
-std::vector< std::pair<std::string, float> > Halite::runGame()
+std::vector< std::pair<unsigned char, float> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 1000)
@@ -440,14 +440,19 @@ std::vector< std::pair<std::string, float> > Halite::runGame()
 	}
 
 	unsigned int maxValue = 2 * *std::max_element(attack_count.begin(), attack_count.end());
-	std::vector< std::pair<std::string, float> > relativeScores(number_of_players);
+	std::vector< std::pair< unsigned char, float> > relativeScores(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		relativeScores[a] = std::pair<std::string, float>(player_names[a], round(1000.0 * float(attack_count[a]) / maxValue) / 1000.0);
+
+		relativeScores[a] = std::pair< unsigned char, float>(a+1, round(1000.0 * float(attack_count[a]) / maxValue) / 1000.0);
 	}
 	for(unsigned char a = 0; a < number_of_players; a++) if(result[a]) relativeScores[a].second += 0.5;
-	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<std::string, float> & a, const std::pair<std::string, float> & b) -> bool { return a.second > b.second; });
+	std::sort(relativeScores.begin(), relativeScores.end(), [](const std::pair<unsigned char, float> & a, const std::pair<unsigned char, float> & b) -> bool { return a.second > b.second; });
 	return relativeScores;
+}
+
+std::string Halite::getName(unsigned char playerTag) {
+	return player_names[playerTag - 1];
 }
 
 Halite::~Halite()

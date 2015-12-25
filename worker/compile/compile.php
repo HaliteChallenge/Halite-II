@@ -17,12 +17,18 @@
 	}
 
 	$userID = $_GET['userID'];
-	$dir = "../../storage/bots/$userID/";
+	$dir = "../../storage/bots/$userID";
 
 	if(!file_exists($dir) || isDirEmpty($dir)) {
-		echo "Connot compile this bot";
+		echo "Necessary files do not exist";
 		exit(0);
 	}
 
 	exec("python compiler.py ../../storage/bots/$userID");
+
+	if(file_exists("{$dir}/run.sh")) {
+		echo "Success";
+	} else {
+		echo "Cannot compile this bot";
+	}
 ?>

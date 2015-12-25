@@ -36,7 +36,9 @@ public:
 
 	void init();
 	void output(std::string filename);
-	std::vector< std::pair<std::string, float> > runGame();
+	std::vector< std::pair<unsigned char, float> > runGame();
+	std::string getName(unsigned char playerTag);
+	
 	~Halite();
 };
 
