@@ -618,8 +618,12 @@ def compile_anything(bot_dir, timelimit=600, max_error_len = 3072):
 			run_filename = os.path.join(bot_dir, 'run.sh')
 			print("filename:")
 			print(run_filename)
-			with open(run_filename, 'w') as f:
+			with open(run_filename, 'wb') as f:
 				f.write('#%s\n%s\n' % (name, run_cmd))
+			print("file:")
+			with open(run_filename, 'r') as f:
+				for line in f:
+					print(line)
 			return name, None
 		else:
 			# limit length of reported errors
