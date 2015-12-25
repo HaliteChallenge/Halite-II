@@ -87,7 +87,7 @@ namespace hlt
 						minDistance *= 0.85;
 					}
 				}
-				contents[l.y][l.x] = { unsigned char(a), 255 };
+                contents[l.y][l.x] = { static_cast<unsigned char>(a), 255 };
 				takenSpots.push_back(l);
 			}
 		}

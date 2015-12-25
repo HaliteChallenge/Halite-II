@@ -101,39 +101,37 @@ std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inp
 
 void Networking::sendString(unsigned char playerTag, std::string &sendString)
 {
+    // End message with newline character
+    sendString += '\n';
+    
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
-	
-	// End message with newline character
-	sendString += '\n';
 
-	// Write sendstring to pipe
 	DWORD charsWritten;
 	bool success;
 	success = WriteFile(connection.write, sendString.c_str(), sendString.length(), &charsWritten, NULL);
 	if (!success || charsWritten == 0) {
-		std::cout << "problem writing\n";
+		std::cout << "Problem writing to pipe\n";
 		throw 1;
 	}
 #else
-	int connectionFd = connections[playerTag - 1];
-	uint32_t length = sendString.length();
-	// Copy the string into a buffer. May want to get rid of this operation for performance purposes
-	std::vector<char> buffer(sendString.begin(), sendString.end());
-
-	send(connectionFd, (char *)&length, sizeof(length), 0);
-	send(connectionFd, &buffer[0], buffer.size(), 0);
+    UniConnection connection = connections[playerTag - 1];
+    ssize_t charsWritten = write(connection.write, sendString.c_str(), sendString.length());
+    if(charsWritten < sendString.length()) {
+        std::cout << "Problem writing to pipe\n";
+        throw 1;
+    }
 #endif
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis)
 {
+    std::string newString;
 #ifdef _WIN32
 	Connection connection = connections[playerTag - 1];
 
 	DWORD charsRead;
 	bool success;
-	std::string newString;
 	char buffer;
 
 	// Keep reading char by char until a newline
@@ -160,22 +158,38 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		if (buffer == '\n') break;
 		else newString += buffer;
 	}
-
-	// Python turns \n into \r\n
-	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
-	return newString;
 #else
-	int connectionFd = connections[playerTag - 1];
-	uint32_t numChars;
-	recv(connectionFd, (char *)&numChars, sizeof(numChars), 0);
-
-	std::vector<char> buffer(numChars);
-	recv(connectionFd, &buffer[0], buffer.size(), 0);
-
-	// Copy the buffer into a string. May want to get rid of this for performance purposes
-	return std::string(buffer.begin(), buffer.end());
-	//return "Done";
+	UniConnection connection = connections[playerTag - 1];
+    
+    fd_set set;
+    FD_ZERO(&set); /* clear the set */
+    FD_SET(connection.read, &set); /* add our file descriptor to the set */
+    
+    struct timeval timeout;
+    timeout.tv_sec = timeoutMillis / 1000;
+    timeout.tv_usec = timeoutMillis % 1000;
+    
+    char buffer;
+    
+    // Keep reading char by char until a newline
+    while(true) {
+        // Check if there are bytes in the pipe
+        int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
+        
+        if(selectionResult > 0) {
+            read(connection.read, &buffer, 1);
+            
+            if (buffer == '\n') break;
+            else newString += buffer;
+        } else {
+            std::cout << "Unix bot timeout or error " << selectionResult << "\n";
+            throw 1;
+        }
+    }
 #endif
+    // Python turns \n into \r\n
+    if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
+    return newString;
 }
 
 void Networking::startAndConnectBot(std::string command)
@@ -247,52 +261,59 @@ void Networking::startAndConnectBot(std::string command)
 		connections.push_back(parentConnection);
 	}
 #else
-	std::cout << "Waiting for player to connect on port " << port << ".\n";
-
-	int socketFd = socket(AF_INET, SOCK_STREAM, 0);
-	if (socketFd < 0)
-	{
-		std::cout << "ERROR opening socket\n";
-		throw 1;
-	}
-
-	struct sockaddr_in serverAddr;
-	memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = INADDR_ANY;
-	serverAddr.sin_port = htons(port);
-
-	if (bind(socketFd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
-	{
-		std::cout << "ERROR on binding to port number " << port << "\n";
-		throw 1;
-	}
-
-	listen(socketFd, 5);
-
-	struct sockaddr_in clientAddr;
-	socklen_t clientLength = sizeof(clientAddr);
-	int connectionFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientLength);
-	if (connectionFd < 0)
-	{
-		std::cout << "ERROR on accepting\n";
-		throw 1;
-	}
-
-	std::cout << "Connected.\n";
-
-	connections.push_back(connectionFd);
+    std::cout << command << "\n";
+    
+    pid_t pid = NULL;
+    int writePipe[2];
+    int readPipe[2];
+    
+    if(pipe(writePipe)) {
+        std::cout << "Error creating pipe\n";
+        throw 1;
+    }
+    if(pipe(readPipe)) {
+        std::cout << "Error creating pipe\n";
+        throw 1;
+    }
+    
+    // Fork a child process
+    pid = fork();
+    if (pid == 0) // This is the child
+    {
+        dup2(writePipe[0], STDIN_FILENO);
+        
+        dup2(readPipe[1], STDOUT_FILENO);
+        dup2(readPipe[1], STDERR_FILENO);
+        
+        execl("/bin/sh", "sh", "-c", command.c_str(), (char*) NULL);
+        
+        // Nothing past the execl should be run
+        
+        exit(1);
+    } else if(pid < 0) {
+        std::cout << "Fork failed\n";
+        throw 1;
+    }
+    
+    UniConnection connection;
+    connection.read = readPipe[0];
+    connection.write = writePipe[1];
+    
+    connections.push_back(connection);
+    processes.push_back(pid);
+    
 #endif
 }
 
-bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string & playerName)
+bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
 {
 	try {
-		sendString(playerTag, std::to_string(playerTag));
-		sendString(playerTag, serializeMap(m));
+        std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m);
+		sendString(playerTag, playerTagString);
+		sendString(playerTag, mapString);
 		std::cout << "Init Message sent to player " << playerTag << "\n";
 
-		playerName = getString(playerTag, timeoutMillis);
+		*playerName = getString(playerTag, timeoutMillis);
 		std::cout << "Init Message received from player " << playerTag << "\n";
 
 		return true;
@@ -306,17 +327,19 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 {
 	try
 	{
-		if (processes[playerTag - 1] == NULL) return false;
+		if (isProcessDead(playerTag)) return false;
 
 		std::cout << "turn";
 		// Send this bot the game map and the messages addressed to this bot
-		sendString(playerTag, serializeMap(m));
-		sendString(playerTag, serializeMessages(messagesForThisBot));
+        std::string mapString = serializeMap(m), sendMessagesString = serializeMessages(messagesForThisBot);
+		sendString(playerTag, mapString);
+		sendString(playerTag, sendMessagesString);
 
 		moves->clear();
-
-		*moves = deserializeMoveSet(getString(playerTag, timeoutMillis));
-		*messagesFromThisBot = deserializeMessages(getString(playerTag, timeoutMillis));
+        
+        std::string movesString = getString(playerTag, timeoutMillis), getMessagesString = getString(playerTag, timeoutMillis);
+		*moves = deserializeMoveSet(movesString);
+		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
 		return true;
 	}
@@ -328,21 +351,37 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 }
 
 void Networking::killPlayer(unsigned char playerTag) {
+if (isProcessDead(playerTag)) return;
 #ifdef _WIN32
 	
 	HANDLE process = processes[playerTag - 1];
-	if (process == NULL) return;
 
 	TerminateProcess(process, 0);
 
 	processes[playerTag - 1] = NULL;
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
+#else
+    kill(processes[playerTag - 1], SIGKILL);
+    
+    processes[playerTag - 1] = -1;
+    connections[playerTag - 1].read = -1;
+    connections[playerTag - 1].write = -1;
+#endif
+}
+
+bool Networking::isProcessDead(unsigned char playerTag) {
+#ifdef _WIN32
+    return processes[playerTag - 1] == NULL;
+#else
+    return processes[playerTag - 1] == -1;
 #endif
 }
 
 int Networking::numberOfPlayers() {
 #ifdef _WIN32
 	return connections.size();
+#else
+    return connections.size();
 #endif
 }
