@@ -15,9 +15,9 @@ bool allArgumentsPresent(int argc, char* args[])
 			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
 	// Remember, the executable name counts as an argument
-	if (argc < 5) return false;
+	if(argc < 5) return false;
 	
-	if (is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
+	if(is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
 
 	return false;
 }
@@ -26,12 +26,12 @@ int main(int argc, char* args[])
 {
 	srand(time(NULL));
 	// Parse command line parameters
-	if (allArgumentsPresent(argc, args)) 
+	if(allArgumentsPresent(argc, args)) 
 	{
 		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
 		
 		Networking networking;
-		for (int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
+		for(int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
 
 		my_game = new Halite(mapWidth, mapHeight, networking);
 	}
@@ -44,14 +44,14 @@ int main(int argc, char* args[])
 
 		std::cout << "Please enter the width of the map: ";
 		std::getline(std::cin, in);
-		while (true)
+		while(true)
 		{
 			try
 			{
 				mapWidth = std::stoi(in);
 				break;
 			}
-			catch (std::exception e)
+			catch(std::exception e)
 			{
 				std::cout << "That isn't a valid input. Please enter an integer width of the map: ";
 				std::getline(std::cin, in);
@@ -59,14 +59,14 @@ int main(int argc, char* args[])
 		}
 		std::cout << "Please enter the height of the map: ";
 		std::getline(std::cin, in);
-		while (true)
+		while(true)
 		{
 			try
 			{
 				mapHeight = std::stoi(in);
 				break;
 			}
-			catch (std::exception e)
+			catch(std::exception e)
 			{
 				std::cout << "That isn't a valid input. Please enter an integer height of the map: ";
 				std::getline(std::cin, in);

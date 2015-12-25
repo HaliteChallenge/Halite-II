@@ -2,9 +2,6 @@
 
 //Consts -----------------------------
 
-//Default port number.
-const unsigned short DEFAULT_PORT = 2000;
-
 //Private Functions ------------------
 
 std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
