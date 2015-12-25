@@ -1,0 +1,2 @@
+#Python
+python MyBot.py

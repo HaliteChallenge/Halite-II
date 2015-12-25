@@ -23,11 +23,8 @@
 		echo "Necessary files do not exist";
 		exit(0);
 	}
-	var_dump(scandir($dir));
 	
-	echo "python compiler.py $dir<br>";
 	exec("python compiler.py $dir", $shellOutput);
-	var_dump($shellOutput);
 
 	if(file_exists("{$dir}/run.sh")) {
 		echo "Success";
