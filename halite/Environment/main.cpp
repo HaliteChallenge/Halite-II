@@ -25,6 +25,7 @@ bool allArgumentsPresent(int argc, char* args[])
 int main(int argc, char* args[])
 {
 	srand(time(NULL));
+    
 	// Parse command line parameters
 	if (allArgumentsPresent(argc, args)) 
 	{
@@ -76,7 +77,7 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-
+    
 	std::string filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
 
 	std::vector< std::pair<std::string, float> >rankings = my_game->runGame();
@@ -94,6 +95,8 @@ int main(int argc, char* args[])
 	std::string victoryOut;
 	for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In ranking " + std::to_string(a + 1) + " is player " + rankings[a].first + " with a relative score of " + std::to_string(rankings[a].second).substr(0, 5) + "\n";
 	std::cout << victoryOut;
+    
+    delete my_game;
 
 	system("PAUSE");
 	return 0;

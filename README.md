@@ -8,9 +8,9 @@
 
 ### Halite Program
 - ~~Switch to pipes on Windows~~
-- Switch to pipes on unix
+- ~~Switch to pipes on unix~~
 - ~~Switch to pipes on clients~~
-- Test networking on unix and ~~windows~~
+- ~~Test networking on unix and windows~~
 - ~~MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.~~
 - Downgrade example C++ bot from C++ 11 (it will piss some people off some people if we don't)  
 

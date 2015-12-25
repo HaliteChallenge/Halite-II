@@ -17,7 +17,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for (unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = 300;
+	for (unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = 5000;
 
 	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
 	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
@@ -32,9 +32,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for (auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
 			
-			frameThreads[threadLocation] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot) {
-				return networking.handleFrameNetworking(timeoutMillis, playerTag, m, messagesForThisBot, moves, messagesFromThisBot);
-			}, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+            frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
@@ -389,9 +387,7 @@ void Halite::init()
     std::vector< std::future<bool> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++)
     {
-		initThreads[a] = std::async([](Networking &networking, unsigned int timeoutMillis, unsigned char playerTag, hlt::Map & m, std::string * playerName) {
-			return networking.handleInitNetworking(timeoutMillis, playerTag, m, *playerName);
-		}, networking, BOT_INITIALIZATION_TIMEOUT_MILLIS, a + 1, game_map, &player_names[a]);
+        initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
     }
     for(unsigned char a = 0; a < number_of_players; a++)
     {
@@ -453,4 +449,5 @@ Halite::~Halite()
 {
 	//Get rid of dynamically allocated memory:
 	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
+    for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
 }
