@@ -289,9 +289,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Sublime preview of markdown creates html files
-*.html
-
 # Sensitive files and folders
 Values.sql
 storage/
