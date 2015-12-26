@@ -1,7 +1,7 @@
 <?php
 
-require_once 'API.class.php';
-class HaliteAPI extends API
+require_once '../API.class.php';
+class WebsiteAPI extends API
 {
 
 	// The database
@@ -20,7 +20,7 @@ class HaliteAPI extends API
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = include("config.php");
+		$config = include("../config.php");
 		$this->mysqli = new mysqli($config['hostname'], 
 			$config['username'], 
 			$config['password'], 
