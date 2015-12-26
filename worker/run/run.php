@@ -8,6 +8,9 @@
 	$height = $_GET['height'];
 	$userIDs = $_GET['userIDs'];
 
+	$storageDir = "../../storage/bots/$userID";
+	$tempDir = "$userID";
+
 	$startGameCommand = "./Environment $width $height ";
 
 	foreach($userIDs as $userID) {
@@ -20,7 +23,12 @@
 		$startGameCommand .= "\"$botRunPath\" ";
 	}
 	echo $startGameCommand;
-	/*exec($startGameCommand, $gameOutput);
+
+	exec("mkdir $tempDir");
+	exec("cp -a $storageDir/. $tempDir");
+	exec("chmod 777 $tempDir");
+
+	exec($startGameCommand, $gameOutput);
 
 	// Return the botIDs ordered by ranking (first to last)
 	$returnArray = array();
@@ -35,5 +43,7 @@
 		array_push($returnArray, $userIDs[$playerID-1]);
 	}
 
-	echo json_encode($returnArray);*/
+	echo json_encode($returnArray);
+
+	exec("rm -r $tempDir");
 ?>
