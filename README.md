@@ -16,7 +16,7 @@
 
 ### Worker
 - ~~The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox~~
-- The worker can run a game between two or more bots using our Docker sandbox
+- ~~The worker can run a game between two or more bots using our Docker sandbox~~
 
 ### Server
 - Tell workers to compile bots when needed
