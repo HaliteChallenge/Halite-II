@@ -294,5 +294,5 @@ target/
 
 # Sensitive files and folders
 Values.sql
-Storage/
+storage/
 config.php
