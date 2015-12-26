@@ -9,7 +9,7 @@
 	$userIDs = $_GET['userIDs'];
 
 	// Make a game folder to hold the bot folders whose name is a random string
-	$gameFolder = bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
+	$gameFolder = uniqid();
 	exec("mkdir $gameFolder");
 	exec("chmod 777 $gameFolder");
 
@@ -26,11 +26,14 @@
 		}
 
 		exec("cp -a $storageDir/. $tempDir");
-
-		$startGameCommand .= "\"$tempDir/run.sh\" ";
+		exec("chmod 777 $tempDir");
+		exec("chmod +x {$tempDir}/run.sh");
+		
+		$cwd = getcwd();
+		$startGameCommand .= "\"cd {$cwd}/{$tempDir}; {$cwd}/{$tempDir}/run.sh\" ";
 	}
-
 	exec($startGameCommand, $gameOutput);
+	exec("rm -r $gameFolder");
 
 	// Return the botIDs ordered by ranking (first to last)
 	$returnArray = array();
@@ -41,11 +44,9 @@
 		$line = $gameOutput[$a];
 		$start = strpos($line, "is player ") + strlen("is player ");
 		$end = 	strpos($line, " named");
-		$playerID = intval(substr($line, $start, $end));
-		array_push($returnArray, $userIDs[$playerID-1]);
+		$playerID = intval(substr($line, $start, $end-$start));
+		array_push($returnArray, intval($userIDs[$playerID-1]));
 	}
-
+	var_dump($returnArray);
 	echo json_encode($returnArray);
-
-	exec("rm -r $gameFolder");
 ?>
