@@ -17,18 +17,26 @@
 	}
 
 	$userID = $_GET['userID'];
-	$dir = "../../storage/bots/$userID";
+	$storageDir = "../../storage/bots/$userID";
+	$tempDir = "$userID";
 
-	if(!file_exists($dir) || isDirEmpty($dir)) {
+	if(!file_exists($storageDir) || isDirEmpty($storageDir)) {
 		echo "Necessary files do not exist";
 		exit(0);
 	}
 	
-	exec("python compiler.py $dir", $shellOutput);
+	exec("mkdir $tempDir");
+	exec("cp -a $storageDir/. $tempDir");
+	exec("chmod 777 $tempDir");
+	exec("python compiler.py $tempDir");
 
-	if(file_exists("{$dir}/run.sh")) {
+	if(file_exists("{$tempDir}/run.sh")) {
+		exec("cp {$tempDir}/run.sh $storageDir");
+
 		echo "Success";
 	} else {
 		echo "Cannot compile this bot";
 	}
+
+	exec("rm -r $tempDir");
 ?>
