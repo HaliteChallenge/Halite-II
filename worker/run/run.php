@@ -8,25 +8,27 @@
 	$height = $_GET['height'];
 	$userIDs = $_GET['userIDs'];
 
-	$storageDir = "../../storage/bots/$userID";
-	$tempDir = "$userID";
+	// Make a game folder to hold the bot folders whose name is a random string
+	$gameFolder = bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
+	exec("mkdir $gameFolder");
+	exec("chmod 777 $gameFolder");
 
+	// Copy all bot folders into game folder
+	// Assemble start command
 	$startGameCommand = "./Environment $width $height ";
-
 	foreach($userIDs as $userID) {
-		$botRunPath = "../../storage/bots/$userID/run.sh";
-		if(!file_exists($botRunPath)) {
+		$storageDir = "../../storage/bots/{$userID}";
+		$tempDir = "{$gameFolder}/{$userID}";
+
+		if(!file_exists("{$storageDir}/run.sh")) {
 			echo "Run file for user ".$userID." does not exist";
 			exit(0);
 		}
 
-		$startGameCommand .= "\"$botRunPath\" ";
-	}
-	echo $startGameCommand;
+		exec("cp -a $storageDir/. $tempDir");
 
-	exec("mkdir $tempDir");
-	exec("cp -a $storageDir/. $tempDir");
-	exec("chmod 777 $tempDir");
+		$startGameCommand .= "\"$tempDir/run.sh\" ";
+	}
 
 	exec($startGameCommand, $gameOutput);
 
@@ -45,5 +47,5 @@
 
 	echo json_encode($returnArray);
 
-	exec("rm -r $tempDir");
+	exec("rm -r $gameFolder");
 ?>
