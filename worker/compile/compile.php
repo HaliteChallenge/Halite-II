@@ -28,8 +28,8 @@
 	
 	exec("mkdir $tempDir");
 	exec("cp -a $storageDir/. $tempDir");
-	
 	exec("chmod 777 $tempDir");
+	
 	exec("python compiler.py $tempDir");
 
 	if(file_exists("{$tempDir}/run.sh")) {

@@ -493,7 +493,7 @@ languages = (
 		[(["*.php"], ChmodCompiler("PHP"))]
 	),
 	Language("Python", BOT +".py", "MyBot.py",
-		"python MyBot.py",
+		"python3 MyBot.py",
 		["*.pyc"],
 		[(["*.py"], ChmodCompiler("Python")),
 		(["setup_exts"], ErrorFilterCompiler(comp_args["Python"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
