@@ -5,7 +5,7 @@
 
 Here is a screenshot of the game visualizer (more multimedia is available in the multimedia folder):
 
-![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/Halite.PNG)
+![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/Visualizer.png)
 
 This repository contains the environment for running Halite games, the visualizer for replays, the starter kits for making your own AIs (Java, C++, Python), and the website that sandboxes, compiles, and runs bots and hosts leaderboards and replays.
 
