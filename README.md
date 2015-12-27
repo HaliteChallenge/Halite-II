@@ -36,6 +36,3 @@ This repository contains the environment for running Halite games, the visualize
 - Talk to companies
 - Fix relative scoring system
 - Update rules on the Google Doc
-
-## To Do Luca
-- Make website look pretty. This will probably require incorporating Bootstrap.
