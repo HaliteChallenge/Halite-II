@@ -1,7 +1,7 @@
 # Halite
 
 ## About
-Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
+**Halite is still under development.** Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
 
 This repository contains the environment for running Halite games and replays and Starter kits for making your own AIs.
 
