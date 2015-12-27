@@ -1,4 +1,4 @@
-//#define CONSOLE_DEBUG
+#define CONSOLE_DEBUG
 
 #include <iostream>
 #include <thread>
@@ -24,8 +24,6 @@ short numTurns, xOffset = 0, yOffset = 0;
 
 std::string filename;
 std::fstream debug;
-
-FTPixmapFont * t;
 
 #ifdef CONSOLE_DEBUG
 int main()
@@ -74,6 +72,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	glfwMakeContextCurrent(window);
 
+	// tell GL to only draw onto a pixel if the shape is closer to the viewer
+	//glEnable(GL_DEPTH_TEST); // enable depth-testing
+	//glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
+
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
 
@@ -82,8 +84,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	debug.flush();
 
 	util::initShaderHandler(&debug);
-	t = new FTPixmapFont("fonts/FreeSans.ttf");
-	t->FaceSize(48);
+
+	util::initText(); //Confirmed to be working
+	util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
+	util::setScreenSize(mode->width * 2 / 3, mode->height * 2 / 3);
 
 	//Set handlers:
 
@@ -293,13 +297,14 @@ void handleErrors(int error, const char * description)
 void handleResize(GLFWwindow * w, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	util::setScreenSize(width, height);
 }
 
 void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	util::renderText(t, window, -.85, 0.0, 36, "Drop a replay on-screen to watch it!");
+	//util::renderText(window, -.85, 0.0, 95, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

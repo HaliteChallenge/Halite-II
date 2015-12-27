@@ -35,9 +35,6 @@ private:
 	//Border rendering
 	GLuint border_vertex_buffer, border_vertex_attributes, border_vertex_shader, border_fragment_shader, border_shader_program;
 
-	//Text rendering
-	FTPixmapFont * font;
-
 	//void loadColorCodes(std::string s);
 	void setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset);
 	void setupGraphRendering(float zoom, short turnNumber);

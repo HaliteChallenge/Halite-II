@@ -377,7 +377,6 @@ Halite::Halite()
 	color_codes[0] = { 0.3f, 0.3f, 0.3f };
 	map_x_offset = 0;
 	map_y_offset = 0;
-	font = new FTPixmapFont("fonts/FreeSans.ttf");
 }
 
 short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
@@ -509,7 +508,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glDrawArrays(GL_LINE_LOOP, 2, 4);
 
-		util::renderText(font, window, LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, loadingText);
+		//util::renderText(window, LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, loadingText);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -594,10 +593,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Generate text for the titles of the graphs
 		std::string territoryText = "Territory";
 		std::string strengthText = "Strength";
-		const int TEXT_SIZE = 15;
+		const int TEXT_SIZE = 32;
 		const float TEXT_OFFSET = 0.02;
-		util::renderText(font, window, TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
-		util::renderText(font, window, STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
+		//util::renderText(window, TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
+		//util::renderText(window, STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
 
 		//Find name of replay:
 		char search = '/';
@@ -612,13 +611,13 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		}
 		//Display header
 		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
-		const int HEADER_TEXT_SIZE = 15;
-		util::renderText(font, window, MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
+		const int HEADER_TEXT_SIZE = 32;
+		//util::renderText(window, MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
 
 		if(mouseClick)
 		{
 			//If mouse is in strength graph:
-			const int LABEL_TEXT_SIZE = 10;
+			const int LABEL_TEXT_SIZE = 24;
 			const float X_OFFSET = -0.07, Y_OFFSET = -0.0;
 			if(mouseX <= STRENGTH_GRAPH_RIGHT && mouseX >= STRENGTH_GRAPH_LEFT && mouseY <= STRENGTH_GRAPH_TOP && mouseY >= STRENGTH_GRAPH_BOTTOM)
 			{
@@ -628,7 +627,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_strength * (mouseY - STRENGTH_GRAPH_BOTTOM) / (STRENGTH_GRAPH_TOP- STRENGTH_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::renderText(font, window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				//util::renderText(window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 			//Else if mouse is in territory graph:
 			else if(mouseX <= TERRITORY_GRAPH_RIGHT && mouseX >= TERRITORY_GRAPH_LEFT && mouseY <= TERRITORY_GRAPH_TOP && mouseY >= TERRITORY_GRAPH_BOTTOM)
@@ -639,7 +638,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_territory * (mouseY - TERRITORY_GRAPH_BOTTOM) / (TERRITORY_GRAPH_TOP - TERRITORY_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::renderText(font, window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				//util::renderText(window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 		}
 

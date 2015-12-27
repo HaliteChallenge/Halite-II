@@ -1,11 +1,16 @@
 #version 400
 
-in vec2 texcoord;
-uniform sampler2D tex;
-uniform vec4 color;
-out vec4 frag_color;
+// Interpolated values from the vertex shaders
+in vec2 UV;
 
-void main ()
+// Ouput data
+out vec3 color; 
+
+// Values that stay constant for the whole mesh.
+uniform sampler2D textureSampler;
+
+void main()
 {
-	frag_color = vec4(1.0, 1.0, 1.0, texture2D(tex, texcoord).r) * color;
-};
+    // Output color = color of the texture at the specified UV
+    color = texture(textureSampler, UV).rgb;
+}
