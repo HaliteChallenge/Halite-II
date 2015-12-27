@@ -1,18 +1,17 @@
 # Halite
 
+## About
+Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
+
+This repository contains the environment for running Halite games and replays and Starter kits for making your own AIs.
+
 ## To Do Michael
 
 ### Website
-- ~~Allow people to upload their bot code and store position of code in database~~
 - Setup leaderboard
 
 ### Halite Program
-- ~~Switch to pipes on Windows~~
-- ~~Switch to pipes on unix~~
-- ~~Switch to pipes on clients~~
-- ~~Test networking on unix and windows~~
-- ~~MAKE IT SO THAT USERS CANNOT SEND GIBBERISH. IF WE CANNOT PARSE IT, THEN KILL THEIR PROCESS.~~
-- Downgrade example C++ bot from C++ 11 (it will piss some people off some people if we don't)  
+- Downgrade example C++ bot from C++ 11  
 
 ### Worker
 - Switch to python
@@ -35,9 +34,4 @@
 - Update rules on the Google Doc
 
 ## To Do Luca
-- Make website pretty
-
-## About
-Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
-
-This repository contains the environment for running Halite games and replays and Starter kits for making your own AIs.
+- Make website look pretty. This will probably require incorporating Bootstrap.
