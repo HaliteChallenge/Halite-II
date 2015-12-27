@@ -30,8 +30,6 @@ This repository contains the environment for running Halite games, the visualize
 
 ## To Do Ben
 - WebGL
-- Change text rendering from FTGL to plain Freetype
-- Have files store more data than just the map position (will be useful in future)
 - Fix map system
 - Talk to companies
 - Fix relative scoring system
