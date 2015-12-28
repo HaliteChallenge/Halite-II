@@ -17,6 +17,13 @@ class Backend:
 		self.apiKey = apiKey
 		self.url = "http://localhost:80/Halite/website/php/manager/"
 
+	def getTask(self):
+		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
+		if content == "null":
+			return None
+		else:
+			return json.loads(content)
+
 	def getBotHash(self, userID):
 		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
 		return json.loads(result.text).get("hash")
@@ -123,10 +130,8 @@ def zipFolder(folderPath, destinationFilePath):
 
 	os.chdir(originalDir)
 
-def compile(userID):
+def compile(userID, backend):
 	global workingPath
-
-	backend = Backend(1)
 
 	makeWorkingPath()
 	botPath = backend.storeBotLocally(userID, workingPath)
@@ -142,4 +147,13 @@ def compile(userID):
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
-compile(29)
+backend = Backend(1)
+task = backend.getTask()
+
+if task != None:
+	if task.get("type") == "compile":
+		compile(task.get("userID"), backend)
+	else:
+		print("Unknown task")
+else:
+	print("No task")

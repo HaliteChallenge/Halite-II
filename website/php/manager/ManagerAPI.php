@@ -106,8 +106,8 @@ class ManagerAPI extends API
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
-			$needToBeCompiled = $this->select("SELECT userID FROM User WHERE status = 2 ORDER BY userID ASC");
-			if(count($needToBeCompiled > 0)) {
+			$needToBeCompiled = $this->select("SELECT userID FROM User WHERE status = 1 ORDER BY userID ASC");
+			if(count($needToBeCompiled) > 0) {
 				$this->insert("UPDATE User SET status = 2 WHERE userID = {$needToBeCompiled['userID']}");
 				return array(
 					"type" => "compile",
