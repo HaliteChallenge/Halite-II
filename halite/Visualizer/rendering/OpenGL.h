@@ -32,6 +32,6 @@ namespace util
 	bool initText();
 	bool setFont(std::string path);
 	//Returns 0 if all went well; the character it failed on otherwise.
-	char renderText(GLFWwindow * w, float x, float y, int size, const std::string & text);
+	char renderText(float x, float y, int size, const std::string & text);
 	void cleanup();
 }

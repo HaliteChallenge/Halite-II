@@ -77,9 +77,13 @@ bool util::setFont(std::string path)
 	return FT_New_Face(ft, path.c_str(), 0, &face) == 0;
 }
 
-char util::renderText(GLFWwindow * w, float x, float y, int size, const std::string & text)
+#include <iostream>
+
+char util::renderText(float x, float y, int size, const std::string & text)
 {
-	glfwMakeContextCurrent(w);
+	//Get currently bound program:
+	GLint currentProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
 
 	//Set size.
 	FT_Set_Pixel_Sizes(face, size, size);
@@ -122,8 +126,6 @@ char util::renderText(GLFWwindow * w, float x, float y, int size, const std::str
 	//For each character, load the position:
 	for(int a = 0; a < text.size(); a++)
 	{
-		//std::cout << text[a];
-
 		if(FT_Load_Char(face, text[a], FT_LOAD_RENDER) != 0) return text[a];
 
 		float left = x + float(g->bitmap_left) / screenWidth, top = y + float(g->bitmap_top) / screenHeight, right = left + (float(g->bitmap.width) / screenWidth), bottom = top - (float(g->bitmap.rows) / screenHeight);
@@ -149,6 +151,9 @@ char util::renderText(GLFWwindow * w, float x, float y, int size, const std::str
 	glDeleteBuffers(1, &vbot);
 	glDeleteVertexArrays(1, &vao);
 	glDeleteTextures(1, &tex);
+
+	//Set program back to previous program:
+	glUseProgram(currentProgram);
 
 	return 0;
 }

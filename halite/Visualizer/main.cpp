@@ -114,6 +114,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	{
 		//Limit render rate:
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
+		if(delta > .05) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
 		c = clock();
 
 		short turnNumberS = turnNumber;
@@ -304,7 +305,7 @@ void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//util::renderText(window, -.85, 0.0, 95, "Drop a replay on-screen to watch it!");
+	util::renderText(-.85, 0.0, 95, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

@@ -1,5 +1,9 @@
 #include "Halite.h"
 
+//For debugging purposes:
+#include <chrono>
+#include <thread>
+
 //Consts -----------------------------
 
 //Graph constants:
@@ -10,22 +14,6 @@ const float STRENGTH_GRAPH_TOP = -0.07, STRENGTH_GRAPH_BOTTOM = -0.98, STRENGTH_
 const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
 
 //Private Functions ------------------
-
-/*
-void Halite::loadColorCodes(std::string filename)
-{
-	std::fstream colorFile;
-	colorFile.open(filename, std::ios_base::in);
-	color_codes.clear();
-	int n; float r, g, b;
-	while(!colorFile.eof())
-	{
-		colorFile >> n >> r >> g >> b;
-		color_codes.insert(std::pair<unsigned char, Color>(unsigned char(n), { r, g, b }));
-	}
-	colorFile.close();
-}
-*/
 
 void Halite::setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset)
 {
@@ -504,11 +492,13 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
 		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
 
+		//glUseProgram(p);
 		glBindVertexArray(loadingAttributes);
+		glEnableVertexAttribArray(0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glDrawArrays(GL_LINE_LOOP, 2, 4);
 
-		//util::renderText(window, LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, loadingText);
+		util::renderText(LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, loadingText);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -529,17 +519,18 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
-	//Set window for rendering.
-	glfwMakeContextCurrent(window);
-
-	//Clear color buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 
 	if(!full_game.empty())
 	{
+		//Set window for rendering.
+		glfwMakeContextCurrent(window);
+
+		//Clear color buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		hlt::Map * m = full_game[turnNumber];
 
 		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
@@ -595,8 +586,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		std::string strengthText = "Strength";
 		const int TEXT_SIZE = 32;
 		const float TEXT_OFFSET = 0.02;
-		//util::renderText(window, TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
-		//util::renderText(window, STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
+		util::renderText(TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
+		util::renderText(STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
 
 		//Find name of replay:
 		char search = '/';
@@ -609,10 +600,11 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			index2 = index + 1;
 			index = std::find(index2, present_file.end(), search);
 		}
+
 		//Display header
 		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
 		const int HEADER_TEXT_SIZE = 32;
-		//util::renderText(window, MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
+		util::renderText(MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
 
 		if(mouseClick)
 		{
@@ -627,7 +619,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_strength * (mouseY - STRENGTH_GRAPH_BOTTOM) / (STRENGTH_GRAPH_TOP- STRENGTH_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				//util::renderText(window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				util::renderText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 			//Else if mouse is in territory graph:
 			else if(mouseX <= TERRITORY_GRAPH_RIGHT && mouseX >= TERRITORY_GRAPH_LEFT && mouseY <= TERRITORY_GRAPH_TOP && mouseY >= TERRITORY_GRAPH_BOTTOM)
@@ -638,7 +630,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_territory * (mouseY - TERRITORY_GRAPH_BOTTOM) / (TERRITORY_GRAPH_TOP - TERRITORY_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				//util::renderText(window, mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				util::renderText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 		}
 
