@@ -93,7 +93,7 @@ char util::renderText(float x, float y, int size, const std::string & text)
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
 
 	float tpoints[] = { 0, 0, 1, 0, 0, 1, 1, 1 };
 	GLuint vbot = 0;
@@ -131,7 +131,7 @@ char util::renderText(float x, float y, int size, const std::string & text)
 		float left = x + float(g->bitmap_left) / screenWidth, top = y + float(g->bitmap_top) / screenHeight, right = left + (float(g->bitmap.width) / screenWidth), bottom = top - (float(g->bitmap.rows) / screenHeight);
 		points[0] = left; points[1] = top; points[2] = right; points[3] = top; points[4] = left; points[5] = bottom; points[6] = right; points[7] = bottom;
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -154,6 +154,94 @@ char util::renderText(float x, float y, int size, const std::string & text)
 
 	//Set program back to previous program:
 	glUseProgram(currentProgram);
+
+	return 0;
+}
+
+std::map<std::pair<char, int>, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > > > textJobs;
+
+void util::addText(float x, float y, int size, const std::string & text)
+{
+	FT_GlyphSlot g = face->glyph;
+	for(auto a = text.begin(); a != text.end(); a++)
+	{
+		if(FT_Load_Char(face, *a, FT_LOAD_RENDER) != 0) continue; //Ignore characters which can't be loaded.
+		float left = x + float(g->bitmap_left) / screenWidth, top = y + float(g->bitmap_top) / screenHeight, right = left + (float(g->bitmap.width) / screenWidth), bottom = top - (float(g->bitmap.rows) / screenHeight);
+		if(!textJobs.count({ *a, size })) textJobs.insert({ { *a, size }, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > >() });
+		textJobs[{ *a, size }].push_back({ { left, bottom }, { right, top } });
+		x += float(g->advance.x) / 64 / screenWidth;
+		y += float(g->advance.y) / 64 / screenHeight;
+	}
+}
+
+char util::renderAllText()
+{
+	//Get currently bound program:
+	GLint currentProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
+
+	GLuint vbo[2];
+	glGenBuffers(1, vbo);
+	float textureVertices[] = { 0, 0, 1, 0, 0, 1, 1, 1 };
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), textureVertices, GL_STATIC_DRAW);
+
+	GLuint vao = 0;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glActiveTexture(GL_TEXTURE0);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	float points[8];
+
+	glUseProgram(shaderProgram);
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	FT_GlyphSlot g = face->glyph;
+
+	for(auto a = textJobs.begin(); a != textJobs.end(); a++)
+	{
+		FT_Set_Pixel_Sizes(face, a->first.second, a->first.second);
+		if(FT_Load_Char(face, a->first.first, FT_LOAD_RENDER) != 0) return a->first.first;
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g->bitmap.width, g->bitmap.rows, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, g->bitmap.buffer);
+
+		for(auto b = a->second.begin(); b != a->second.end(); b++)
+		{
+			points[0] = b->first.first; points[1] = b->second.second; points[2] = b->second.first; points[3] = b->second.second; points[4] = b->first.first; points[5] = b->first.second; points[6] = b->second.first; points[7] = b->first.second;
+
+			glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
+	}
+
+	glDeleteBuffers(2, vbo);
+	glDeleteVertexArrays(1, &vao);
+	glDeleteTextures(1, &tex);
+
+	//Set program back to previous program:
+	glUseProgram(currentProgram);
+
+	textJobs.clear();
 
 	return 0;
 }

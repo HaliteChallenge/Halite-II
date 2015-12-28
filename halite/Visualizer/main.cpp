@@ -110,11 +110,16 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 
 	clock_t c = clock();
+
+	int count = 0; double total = 0;
 	while(!glfwWindowShouldClose(window))
 	{
 		//Limit render rate:
+		count++;
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
-		if(delta > .05) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
+		total += delta;
+		if(count % 100 == 0) std::cout << "Average time of " << total / count << " over " << count << " frames.\n";
+		//if(delta > .05) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
 		c = clock();
 
 		short turnNumberS = turnNumber;

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 #include <time.h>
 #include "ft2build.h"
 #include FT_FREETYPE_H
@@ -33,5 +34,7 @@ namespace util
 	bool setFont(std::string path);
 	//Returns 0 if all went well; the character it failed on otherwise.
 	char renderText(float x, float y, int size, const std::string & text);
+	void addText(float x, float y, int size, const std::string & text);
+	char renderAllText();
 	void cleanup();
 }

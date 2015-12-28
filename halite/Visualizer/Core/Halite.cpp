@@ -586,8 +586,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		std::string strengthText = "Strength";
 		const int TEXT_SIZE = 32;
 		const float TEXT_OFFSET = 0.02;
-		util::renderText(TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
-		util::renderText(STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
+		util::addText(TERRITORY_GRAPH_LEFT, TERRITORY_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, territoryText);
+		util::addText(STRENGTH_GRAPH_LEFT, STRENGTH_GRAPH_TOP + TEXT_OFFSET, TEXT_SIZE, strengthText);
 
 		//Find name of replay:
 		char search = '/';
@@ -604,7 +604,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Display header
 		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
 		const int HEADER_TEXT_SIZE = 32;
-		util::renderText(MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
+		util::addText(MAP_LEFT, MAP_TOP + TEXT_OFFSET, HEADER_TEXT_SIZE, headerText);
 
 		if(mouseClick)
 		{
@@ -619,7 +619,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_strength * (mouseY - STRENGTH_GRAPH_BOTTOM) / (STRENGTH_GRAPH_TOP- STRENGTH_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::renderText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				util::addText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 			//Else if mouse is in territory graph:
 			else if(mouseX <= TERRITORY_GRAPH_RIGHT && mouseX >= TERRITORY_GRAPH_LEFT && mouseY <= TERRITORY_GRAPH_TOP && mouseY >= TERRITORY_GRAPH_BOTTOM)
@@ -630,9 +630,11 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				unsigned int val = graph_max_territory * (mouseY - TERRITORY_GRAPH_BOTTOM) / (TERRITORY_GRAPH_TOP - TERRITORY_GRAPH_BOTTOM);
 
 				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::renderText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
+				util::addText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_SIZE, labelText);
 			}
 		}
+
+		util::renderAllText();
 
 		//Draw borders:
 		glUseProgram(border_shader_program);
