@@ -29,25 +29,28 @@ def getBotHash(userID):
 def getBot(userID, storageDir):
 	global url
 
-	remoteZip = urllib.request.urlopen(url+"bot?apiKey=1&userID="+str(userID))
-	zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
-	zipPath = os.path.join(storageDir, zipFilename)
-	
-	remoteZipContents = remoteZip.read()
-	remoteZip.close()
-	
-	localZip = open(zipPath, "wb")
-	localZip.write(remoteZipContents)
-	localZip.close()
-
-	localHash = md5(remoteZipContents).hexdigest()
-	remoteHash = getBotHash(userID)
-	print(localHash)
-	print(remoteHash)
-	if localHash != remoteHash:
-		raise ValueError
+	iterations = 0
+	while iterations < 100:
+		remoteZip = urllib.request.urlopen(url+"bot?apiKey=1&userID="+str(userID))
+		zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
+		zipPath = os.path.join(storageDir, zipFilename)
+		if os.path.exists(zipPath):
+			os.remove(zipPath)
 		
-	return zipPath
+		remoteZipContents = remoteZip.read()
+		remoteZip.close()
+		
+		localZip = open(zipPath, "wb")
+		localZip.write(remoteZipContents)
+		localZip.close()
+
+		if md5(remoteZipContents).hexdigest() != getBotHash(userID):
+			iterations += 1
+			continue
+
+		return zipPath
+
+	raise ValueError
 
 def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
@@ -101,15 +104,32 @@ def zipFolder(folderPath, destinationFilePath):
 def storeBot(userID, zipFilePath):
 	global url
 
-	r = requests.post(url+"bot", data= {"apiKey": "1", "userID": str(userID)}, files={"bot.zip": open(zipFilePath, "rb").read()})
-	print(r.text)
+	zipContents = open(zipFilePath, "rb").read()
+	iterations = 0
+
+	while iterations < 100:
+		r = requests.post(url+"bot", data= {"apiKey": "1", "userID": str(userID)}, files={"bot.zip": zipContents})
+		print(r.text)
+
+		# Try again if local and remote hashes differ
+		if md5(zipContents).hexdigest() != getBotHash(userID):
+			iterations += 1
+			continue
+
+		return
+	raise ValueError
+
 
 def compile(userID):
 	global workingPath
 
 	makeWorkingPath()
-	unpack(getBot(userID, workingPath))
+	botPath = getBot(userID, workingPath)
+	unpack(botPath)
 	compile_anything(workingPath)
 	zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
 	storeBot(userID, os.path.join(workingPath, "bot.zip"))
+	
 	shutil.rmtree(workingPath)
+
+compile(29)
