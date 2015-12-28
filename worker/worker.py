@@ -9,8 +9,62 @@ import json
 from hashlib import md5
 from compiler import *
 
-url = "http://localhost:80/Halite/website/php/manager/"
+
 workingPath = "workingPath"
+
+class Backend:
+	def __init__(self, apiKey):
+		self.apiKey = apiKey
+		self.url = "http://localhost:80/Halite/website/php/manager/"
+
+	def getBotHash(self, userID):
+		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
+		return json.loads(result.text).get("hash")
+
+	def storeBotLocally(self, userID, storageDir):
+		iterations = 0
+		while iterations < 100:
+			remoteZip = urllib.request.urlopen(self.url+"botFile?apiKey="+str(self.apiKey)+"&userID="+str(userID))
+			zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
+			zipPath = os.path.join(storageDir, zipFilename)
+			if os.path.exists(zipPath):
+				os.remove(zipPath)
+			
+			remoteZipContents = remoteZip.read()
+			remoteZip.close()
+			
+			localZip = open(zipPath, "wb")
+			localZip.write(remoteZipContents)
+			localZip.close()
+
+			if md5(remoteZipContents).hexdigest() != self.getBotHash(userID):
+				iterations += 1
+				continue
+
+			return zipPath
+
+		raise ValueError
+
+	def storeBotRemotely(self, userID, zipFilePath):
+		zipContents = open(zipFilePath, "rb").read()
+		iterations = 0
+
+		while iterations < 100:
+			r = requests.post(self.url+"botFile", data={"apiKey": self.apiKey, "userID": str(userID)}, files={"bot.zip": zipContents})
+			print(r.text)
+
+			# Try again if local and remote hashes differ
+			if md5(zipContents).hexdigest() != self.getBotHash(userID):
+				print(md5(zipContents).hexdigest())
+				print(self.getBotHash(userID))
+				iterations += 1
+				continue
+
+			return
+		raise ValueError
+
+	def compileResult(self, userID, didCompile, language):
+		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
 def makeWorkingPath():
 	global workingPath
@@ -19,38 +73,6 @@ def makeWorkingPath():
 		shutil.rmtree(workingPath)	
 	os.makedirs(workingPath)
 	os.chmod(workingPath, 0o777)
-
-def getBotHash(userID):
-	global url
-
-	contents = urllib.request.urlopen(url+"botHash?apiKey=1&userID="+str(userID)).read().decode("utf-8")
-	return json.loads(contents).get("hash")
-
-def getBot(userID, storageDir):
-	global url
-
-	iterations = 0
-	while iterations < 100:
-		remoteZip = urllib.request.urlopen(url+"bot?apiKey=1&userID="+str(userID))
-		zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
-		zipPath = os.path.join(storageDir, zipFilename)
-		if os.path.exists(zipPath):
-			os.remove(zipPath)
-		
-		remoteZipContents = remoteZip.read()
-		remoteZip.close()
-		
-		localZip = open(zipPath, "wb")
-		localZip.write(remoteZipContents)
-		localZip.close()
-
-		if md5(remoteZipContents).hexdigest() != getBotHash(userID):
-			iterations += 1
-			continue
-
-		return zipPath
-
-	raise ValueError
 
 def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
@@ -101,35 +123,23 @@ def zipFolder(folderPath, destinationFilePath):
 
 	os.chdir(originalDir)
 
-def storeBot(userID, zipFilePath):
-	global url
-
-	zipContents = open(zipFilePath, "rb").read()
-	iterations = 0
-
-	while iterations < 100:
-		r = requests.post(url+"bot", data= {"apiKey": "1", "userID": str(userID)}, files={"bot.zip": zipContents})
-		print(r.text)
-
-		# Try again if local and remote hashes differ
-		if md5(zipContents).hexdigest() != getBotHash(userID):
-			iterations += 1
-			continue
-
-		return
-	raise ValueError
-
-
 def compile(userID):
 	global workingPath
 
+	backend = Backend(1)
+
 	makeWorkingPath()
-	botPath = getBot(userID, workingPath)
+	botPath = backend.storeBotLocally(userID, workingPath)
 	unpack(botPath)
-	compile_anything(workingPath)
-	zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
-	storeBot(userID, os.path.join(workingPath, "bot.zip"))
+
+	language, errors = compile_anything(workingPath)
+	didCompile = True if errors == None else False
+
+	if didCompile:
+		zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
+		backend.storeBotRemotely(userID, os.path.join(workingPath, "bot.zip"))
 	
+	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
 compile(29)
