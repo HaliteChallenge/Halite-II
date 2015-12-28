@@ -3,6 +3,7 @@ import os.path
 import platform
 import tempfile
 import urllib.request
+import json
 from hashlib import md5
 from compiler import *
 
@@ -19,8 +20,9 @@ def makeWorkingPath():
 
 def getBotHash(userID):
 	global url
-
-	return urllib.request.urlopen(url+"botHash?apiKey=1&userID="+str(userID)).read()
+	
+	contents = urllib.request.urlopen(url+"botHash?apiKey=1&userID="+str(userID)).read().decode("utf-8")
+	return json.loads(contents).get("hash")
 
 def getBot(userID, storageDir):
 	global url
@@ -38,9 +40,10 @@ def getBot(userID, storageDir):
 
 	localHash = md5(remoteZipContents).hexdigest()
 	remoteHash = getBotHash(userID)
-
-	##if localHash != remoteHash:
-	##	raise ValueError
+	print(localHash)
+	print(remoteHash)
+	if localHash != remoteHash:
+		raise ValueError
 		
 	return zipPath
 
@@ -85,3 +88,4 @@ def compile(userID):
 	makeWorkingPath()
 	unpack(getBot(userID, workingPath))
 	compile_anything(workingPath)
+compile(29)

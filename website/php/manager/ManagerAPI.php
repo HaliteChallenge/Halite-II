@@ -164,7 +164,7 @@ class ManagerAPI extends API
 	protected function botHash() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
-			return md5_file($this->botFile($userID));
+			return array("hash" => md5_file($this->botFile($userID)));
 		}
 	}
  }
