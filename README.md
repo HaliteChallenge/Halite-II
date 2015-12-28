@@ -9,6 +9,13 @@ Here is a screenshot of the game visualizer (more multimedia is available in the
 
 This repository contains the environment for running Halite games, the visualizer for replays, the starter kits for making your own AIs (Java, C++, Python), and the website that sandboxes, compiles, and runs bots and hosts leaderboards and replays.
 
+## Folder Contents
+- `airesources/` - The starter kits for writing bots
+- `halite/` - The halite game engine and visualizer
+- `multimedia/` - Photos and videos of a halite game
+- `website/` - The website that will host the competition
+- `worker/` - Code run on worker servers that will compile bots and run games safely
+
 ## To Do Michael
 
 ### Website
