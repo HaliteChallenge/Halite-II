@@ -3,12 +3,75 @@ import os.path
 import platform
 import tempfile
 import urllib.request
+import requests
+import zipfile
 import json
 from hashlib import md5
 from compiler import *
 
-url = "http://localhost:80/Halite/website/php/manager/"
+
 workingPath = "workingPath"
+
+class Backend:
+	def __init__(self, apiKey):
+		self.apiKey = apiKey
+		self.url = "http://localhost:80/Halite/website/php/manager/"
+
+	def getTask(self):
+		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
+		if content == "null":
+			return None
+		else:
+			return json.loads(content)
+
+	def getBotHash(self, userID):
+		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
+		return json.loads(result.text).get("hash")
+
+	def storeBotLocally(self, userID, storageDir):
+		iterations = 0
+		while iterations < 100:
+			remoteZip = urllib.request.urlopen(self.url+"botFile?apiKey="+str(self.apiKey)+"&userID="+str(userID))
+			zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
+			zipPath = os.path.join(storageDir, zipFilename)
+			if os.path.exists(zipPath):
+				os.remove(zipPath)
+			
+			remoteZipContents = remoteZip.read()
+			remoteZip.close()
+			
+			localZip = open(zipPath, "wb")
+			localZip.write(remoteZipContents)
+			localZip.close()
+
+			if md5(remoteZipContents).hexdigest() != self.getBotHash(userID):
+				iterations += 1
+				continue
+
+			return zipPath
+
+		raise ValueError
+
+	def storeBotRemotely(self, userID, zipFilePath):
+		zipContents = open(zipFilePath, "rb").read()
+		iterations = 0
+
+		while iterations < 100:
+			r = requests.post(self.url+"botFile", data={"apiKey": self.apiKey, "userID": str(userID)}, files={"bot.zip": zipContents})
+			print(r.text)
+
+			# Try again if local and remote hashes differ
+			if md5(zipContents).hexdigest() != self.getBotHash(userID):
+				print(md5(zipContents).hexdigest())
+				print(self.getBotHash(userID))
+				iterations += 1
+				continue
+
+			return
+		raise ValueError
+
+	def compileResult(self, userID, didCompile, language):
+		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
 def makeWorkingPath():
 	global workingPath
@@ -17,35 +80,6 @@ def makeWorkingPath():
 		shutil.rmtree(workingPath)	
 	os.makedirs(workingPath)
 	os.chmod(workingPath, 0o777)
-
-def getBotHash(userID):
-	global url
-	
-	contents = urllib.request.urlopen(url+"botHash?apiKey=1&userID="+str(userID)).read().decode("utf-8")
-	return json.loads(contents).get("hash")
-
-def getBot(userID, storageDir):
-	global url
-
-	remoteZip = urllib.request.urlopen(url+"bot?apiKey=1&userID="+str(userID))
-	zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
-	zipPath = os.path.join(storageDir, zipFilename)
-	
-	remoteZipContents = remoteZip.read()
-	remoteZip.close()
-	
-	localZip = open(zipPath, "wb")
-	localZip.write(remoteZipContents)
-	localZip.close()
-
-	localHash = md5(remoteZipContents).hexdigest()
-	remoteHash = getBotHash(userID)
-	print(localHash)
-	print(remoteHash)
-	if localHash != remoteHash:
-		raise ValueError
-		
-	return zipPath
 
 def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
@@ -74,18 +108,52 @@ def unpack(filePath):
 	if os.path.exists(macFolderPath) and os.path.isdir(macFolderPath):
 		shutil.rmtree(macFolderPath)
 
-	# Copy folders to folderPath remove bot folder
-	filenames = [f for f in os.listdir(tempPath) if os.path.isfile(os.path.join(tempPath, f))]
-	for filename in filenames:
+	# Copy contents of bot folder to folderPath remove bot folder
+	for filename in os.listdir(tempPath):
 		shutil.move(os.path.join(tempPath, filename), os.path.join(folderPath, filename))
 	
 	shutil.rmtree(tempPath)
 	os.remove(filePath)
 
-def compile(userID):
+def zipFolder(folderPath, destinationFilePath):
+	zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
+
+	originalDir = os.getcwd()
+	os.chdir(folderPath)
+
+	for rootPath, dirs, files in os.walk("."):
+		for file in files:
+			if os.path.basename(file) != os.path.basename(destinationFilePath):
+				zipFile.write(os.path.join(rootPath, file))
+
+	zipFile.close()
+
+	os.chdir(originalDir)
+
+def compile(userID, backend):
 	global workingPath
 
 	makeWorkingPath()
-	unpack(getBot(userID, workingPath))
-	compile_anything(workingPath)
-compile(29)
+	botPath = backend.storeBotLocally(userID, workingPath)
+	unpack(botPath)
+
+	language, errors = compile_anything(workingPath)
+	didCompile = True if errors == None else False
+
+	if didCompile:
+		zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
+		backend.storeBotRemotely(userID, os.path.join(workingPath, "bot.zip"))
+	
+	backend.compileResult(userID, didCompile, language)
+	shutil.rmtree(workingPath)
+
+backend = Backend(1)
+task = backend.getTask()
+
+if task != None:
+	if task.get("type") == "compile":
+		compile(task.get("userID"), backend)
+	else:
+		print("Unknown task")
+else:
+	print("No task")

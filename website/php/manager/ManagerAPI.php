@@ -44,12 +44,12 @@ class ManagerAPI extends API
 		}
 	}
 
-	private function botDirectory($userID) {
+	private function getBotDirectory($userID) {
 		return "../../../storage/bots/$userID";
 	}
 
-	private function botFile($userID) {
-		$botDirectory = $this->botDirectory($userID);
+	private function getBotFile($userID) {
+		$botDirectory = $this->getBotDirectory($userID);
 		$file = NULL;
 		
 		if (file_exists("{$botDirectory}/bot.zip")) $file = "{$botDirectory}/bot.zip";
@@ -106,8 +106,9 @@ class ManagerAPI extends API
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
-			$needToBeCompiled = $this->select("SELECT userID FROM User WHERE status = 0 ORDER BY userID ASC");
-			if(count($needToBeCompiled > 0)) {
+			$needToBeCompiled = $this->select("SELECT userID FROM User WHERE status = 1 ORDER BY userID ASC");
+			if(count($needToBeCompiled) > 0) {
+				$this->insert("UPDATE User SET status = 2 WHERE userID = {$needToBeCompiled['userID']}");
 				return array(
 					"type" => "compile",
 					"userID" => $needToBeCompiled['userID']);
@@ -119,10 +120,24 @@ class ManagerAPI extends API
 		return NULL;
 	}
 
-	protected function bot() {
+	protected function compile() {
+		if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
+			$userID = $_POST['userID'];
+			$didCompile = $_POST['didCompile'];
+
+			if($didCompile) {
+				$language = isset($_POST['language']) ? $_POST['language'] : "Other";
+				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
+			} else {
+				$this->insert("UPDATE User SET status = 0 WHERE userID = $userID");
+			}
+		}
+	}
+
+	protected function botFile() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
-			$botDirectory = $this->botDirectory($userID);
+			$botDirectory = $this->getBotDirectory($userID);
 
 			if (file_exists("{$botDirectory}/bot.zip")) {
 				header("Content-disposition: attachment; filename=bot.zip");
@@ -152,9 +167,17 @@ class ManagerAPI extends API
 
 			ob_clean();
 			flush();
-			readfile($this->botFile($userID));
+			readfile($this->getBotFile($userID));
 			exit;
+		} else if(isset($_POST['userID']) && count($_FILES)) {
+			$userID = $_POST['userID'];
+			$key = array_keys($_FILES)[0];
+			$name = basename($_FILES[$key]['name']);
+
+			$targetPath = "../../../storage/bots/{$userID}/{$name}";
+			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
+			var_dump($_FILES);
 			return NULL;
 		}
 
@@ -164,7 +187,7 @@ class ManagerAPI extends API
 	protected function botHash() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
-			return array("hash" => md5_file($this->botFile($userID)));
+			return array("hash" => md5_file($this->getBotFile($userID)));
 		}
 	}
  }
