@@ -31,7 +31,6 @@ class ManagerAPI extends API
 
 		// Get ip
 		$ipAddress = $_SERVER['REMOTE_ADDR'];
-
 		if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '$ipAddress' and apiKey = $apiKey")) > 0) return true;
 		else return false;
 	}
@@ -79,8 +78,13 @@ class ManagerAPI extends API
 	}
 
 	private function select($sql) {
-		$res = mysqli_query($this->mysqli, $sql);
-		return mysqli_fetch_array($res, MYSQLI_ASSOC);
+		try {
+			$res = mysqli_query($this->mysqli, $sql);
+			$array = mysqli_fetch_array($res, MYSQLI_ASSOC);
+			return $array;
+		} catch(Exception $e) {
+			return array();
+		}
 	}
 
 	private function selectMultiple($sql) {
