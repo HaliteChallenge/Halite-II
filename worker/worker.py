@@ -3,6 +3,8 @@ import os.path
 import platform
 import tempfile
 import urllib.request
+import requests
+import zipfile
 import json
 from hashlib import md5
 from compiler import *
@@ -20,7 +22,7 @@ def makeWorkingPath():
 
 def getBotHash(userID):
 	global url
-	
+
 	contents = urllib.request.urlopen(url+"botHash?apiKey=1&userID="+str(userID)).read().decode("utf-8")
 	return json.loads(contents).get("hash")
 
@@ -74,13 +76,33 @@ def unpack(filePath):
 	if os.path.exists(macFolderPath) and os.path.isdir(macFolderPath):
 		shutil.rmtree(macFolderPath)
 
-	# Copy folders to folderPath remove bot folder
-	filenames = [f for f in os.listdir(tempPath) if os.path.isfile(os.path.join(tempPath, f))]
-	for filename in filenames:
+	# Copy contents of bot folder to folderPath remove bot folder
+	for filename in os.listdir(tempPath):
 		shutil.move(os.path.join(tempPath, filename), os.path.join(folderPath, filename))
 	
 	shutil.rmtree(tempPath)
 	os.remove(filePath)
+
+def zipFolder(folderPath, destinationFilePath):
+	zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
+
+	originalDir = os.getcwd()
+	os.chdir(folderPath)
+
+	for rootPath, dirs, files in os.walk("."):
+		for file in files:
+			if os.path.basename(file) != os.path.basename(destinationFilePath):
+				zipFile.write(os.path.join(rootPath, file))
+
+	zipFile.close()
+
+	os.chdir(originalDir)
+
+def storeBot(userID, zipFilePath):
+	global url
+
+	r = requests.post(url+"bot", data= {"apiKey": "1", "userID": str(userID)}, files={"bot.zip": open(zipFilePath, "rb").read()})
+	print(r.text)
 
 def compile(userID):
 	global workingPath
@@ -88,4 +110,6 @@ def compile(userID):
 	makeWorkingPath()
 	unpack(getBot(userID, workingPath))
 	compile_anything(workingPath)
-compile(29)
+	zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
+	storeBot(userID, os.path.join(workingPath, "bot.zip"))
+	shutil.rmtree(workingPath)

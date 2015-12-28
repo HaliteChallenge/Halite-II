@@ -154,7 +154,16 @@ class ManagerAPI extends API
 			flush();
 			readfile($this->botFile($userID));
 			exit;
+		} else if(isset($_POST['userID']) && count($_FILES)) {
+			$userID = $_POST['userID'];
+			$key = array_keys($_FILES)[0];
+			$name = basename($_FILES[$key]['name']);
+
+			$targetPath = "../../../storage/bots/{$userID}/{$name}";
+			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
+
 		} else {
+			var_dump($_FILES);
 			return NULL;
 		}
 
