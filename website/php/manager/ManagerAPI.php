@@ -103,6 +103,7 @@ class ManagerAPI extends API
 	}
 
 	// API ENDPOINTS
+	/*-----------------------------------------------------------------------*/
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
@@ -114,8 +115,24 @@ class ManagerAPI extends API
 					"userID" => $needToBeCompiled['userID']);
 			}
 
-			// TODO: Run a game
+			// Run a game
+			$users = $this->selectMultiple("SELECT userID FROM User");
 
+			$userIDs = array();
+			$numPlayers = 2;
+
+			for($a = 0; $a < $numPlayers; $a++) {
+				$key = array_rand($users);
+				array_push($userIDs, $users[$key]['userID']);
+				unset($users[$key]);
+			}
+
+			return array(
+				"type" => "run",
+				"width" => 10,
+				"height" => 10,
+				"userIDs" => $userIDs);
+			
 		}
 		return NULL;
 	}
