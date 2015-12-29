@@ -10,19 +10,20 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <time.h>
 #include "ft2build.h"
 #include FT_FREETYPE_H
-
-///Screen constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 800;
 
 //Color struct.
 struct Color
 {
 	float r, g, b;
 };
+static bool operator==(const Color & c1, const Color & c2)
+{
+	return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b;
+}
 
 namespace util
 {
@@ -33,8 +34,8 @@ namespace util
 	bool initText();
 	bool setFont(std::string path);
 	//Returns 0 if all went well; the character it failed on otherwise.
-	char renderText(float x, float y, int size, const std::string & text);
-	void addText(float x, float y, int size, const std::string & text);
-	char renderAllText();
+	char renderText(float x, float y, int size, Color c, const std::string & text);
+	void addText(float x, float y, int size, Color c, const std::string & text);
+	char renderAllText(GLFWwindow * w);
 	void cleanup();
 }

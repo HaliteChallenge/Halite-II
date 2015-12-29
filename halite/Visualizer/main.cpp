@@ -15,12 +15,15 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths);
 void handleErrors(int error, const char * description);
 void handleResize(GLFWwindow * w, int width, int height);
 
+void setWindowed();
+void setFullscreen();
 void renderLaunch();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
 short numTurns, xOffset = 0, yOffset = 0;
+int windowedWidth, windowedHeight;
 
 std::string filename;
 std::fstream debug;
@@ -58,23 +61,13 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		return EXIT_FAILURE;
 	}
 
+	window = NULL;
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
-	window = glfwCreateWindow(mode->width * 2 / 3, mode->height * 2 / 3, "Halite", NULL, NULL);
-	if(!window)
-	{
-		debug << "Could not open window with GLFW3\n";
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-
-	glfwMakeContextCurrent(window);
-
-	// tell GL to only draw onto a pixel if the shape is closer to the viewer
-	//glEnable(GL_DEPTH_TEST); // enable depth-testing
-	//glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
+	windowedWidth = mode->width * 3 / 4;
+	windowedHeight = mode->height * 2 / 3;
+	setWindowed();
 
 	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
@@ -85,28 +78,12 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	util::initShaderHandler(&debug);
 
-	util::initText(); //Confirmed to be working
-	util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
-	util::setScreenSize(mode->width * 2 / 3, mode->height * 2 / 3);
-
-	//Set handlers:
-
-	//Set leopard handler.
-	glfwSetKeyCallback(window, handleKeys);
-	//Set character handler.
-	glfwSetCharCallback(window, handleChars);
-	//Set mouse handler
-	glfwSetMouseButtonCallback(window, handleMouse);
-	//Set cursor handler.
-	glfwSetCursorPosCallback(window, handleCursor);
-	//Set error callback handler
-	glfwSetErrorCallback(handleErrors);
-	//Set file drop function
-	glfwSetDropCallback(window, handleDrop);
-	//Set window resize handler
-	glfwSetWindowSizeCallback(window, handleResize);
+	util::initText();
+	util::setFont("fonts/FreeSans.ttf");
+	util::setScreenSize(windowedWidth, windowedHeight);
 
 	my_game = new Halite();
+
 	while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 
 	clock_t c = clock();
@@ -144,9 +121,79 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		}
 		else if(!isPaused) turnNumber += maxFps * delta;
 		if(turnNumber < 0) turnNumber = 0;
+
+		if(wPressed) yOffset--;
+		if(aPressed) xOffset++;
+		if(sPressed) yOffset++;
+		if(dPressed) xOffset--;
 	}
 
 	return EXIT_SUCCESS;
+}
+
+void setWindowed()
+{
+	GLFWwindow * w = glfwCreateWindow(windowedWidth, windowedHeight, "Halite", NULL, window);
+	if(window != NULL) glfwDestroyWindow(window);
+	window = w;
+	//Set leopard handler.
+	glfwSetKeyCallback(window, handleKeys);
+	//Set character handler.
+	glfwSetCharCallback(window, handleChars);
+	//Set mouse handler
+	glfwSetMouseButtonCallback(window, handleMouse);
+	//Set cursor handler.
+	glfwSetCursorPosCallback(window, handleCursor);
+	//Set error callback handler
+	glfwSetErrorCallback(handleErrors);
+	//Set file drop function
+	glfwSetDropCallback(window, handleDrop);
+	//Set window resize handler
+	glfwSetWindowSizeCallback(window, handleResize);
+	//Make context current:
+	glfwMakeContextCurrent(window);
+	//If possible, fix the Halite's VAOs.
+	if(my_game != NULL) my_game->recreateGL();
+	//It's now windowed.
+	isWindowed = true;
+	//Fix text.
+	util::setScreenSize(windowedWidth, windowedHeight);
+	//Viewport.
+	/////////////////glViewport(0, 0, windowedWidth, windowedHeight);
+}
+
+void setFullscreen()
+{
+	if(window != NULL) glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
+	GLFWmonitor * primary = glfwGetPrimaryMonitor();
+	const GLFWvidmode * mode = glfwGetVideoMode(primary);
+	GLFWwindow * w = glfwCreateWindow(mode->width, mode->height, "Halite", primary, window);
+	if(window != NULL) glfwDestroyWindow(window);
+	window = w;
+	//Set leopard handler.
+	glfwSetKeyCallback(window, handleKeys);
+	//Set character handler.
+	glfwSetCharCallback(window, handleChars);
+	//Set mouse handler
+	glfwSetMouseButtonCallback(window, handleMouse);
+	//Set cursor handler.
+	glfwSetCursorPosCallback(window, handleCursor);
+	//Set error callback handler
+	glfwSetErrorCallback(handleErrors);
+	//Set file drop function
+	glfwSetDropCallback(window, handleDrop);
+	//Set window resize handler
+	glfwSetWindowSizeCallback(window, handleResize);
+	//Make context current:
+	glfwMakeContextCurrent(window);
+	//If possible, fix the Halite's VAOs.
+	if(my_game != NULL) my_game->recreateGL();
+	//It's now fullscreen.
+	isWindowed = false;
+	//Fix text.
+	util::setScreenSize(mode->width, mode->height);
+	//Viewport.
+	glViewport(0, 0, mode->width, mode->height);
 }
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods)
@@ -208,6 +255,38 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
 	{
 		shiftPressed = false;
 	}
+	else if(key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		wPressed = true;
+	}
+	else if(key == GLFW_KEY_W && action == GLFW_RELEASE)
+	{
+		wPressed = false;
+	}
+	else if(key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		sPressed = true;
+	}
+	else if(key == GLFW_KEY_S && action == GLFW_RELEASE)
+	{
+		sPressed = false;
+	}
+	else if(key == GLFW_KEY_A && action == GLFW_PRESS)
+	{
+		aPressed = true;
+	}
+	else if(key == GLFW_KEY_A && action == GLFW_RELEASE)
+	{
+		aPressed = false;
+	}
+	else if(key == GLFW_KEY_D && action == GLFW_PRESS)
+	{
+		dPressed = true;
+	}
+	else if(key == GLFW_KEY_D && action == GLFW_RELEASE)
+	{
+		dPressed = false;
+	}
 	else if(key == GLFW_KEY_ESCAPE)
 	{
 		exit(0);
@@ -245,22 +324,6 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	{
 		turnNumber = numTurns - 1;
 	}
-	else if(code == 'W' || code == 'w')
-	{
-		yOffset--;
-	}
-	else if(code == 'A' || code == 'a')
-	{
-		xOffset++;
-	}
-	else if(code == 'S' || code == 's')
-	{
-		yOffset++;
-	}
-	else if(code == 'D' || code == 'd')
-	{
-		xOffset--;
-	}
 	else if(code == 'R' || code == 'r')
 	{
 		if(filename != "")
@@ -269,24 +332,23 @@ void handleChars(GLFWwindow * w, unsigned int code)
 			handleDrop(window, 1, &fn);
 		}
 	}
+	else if(code == 'F' || code == 'f')
+	{
+		isWindowed ? setFullscreen() : setWindowed();
+	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
 {
 	unsigned short wi, he;
-	try
+	if(my_game->isValid(paths[0]))
 	{
+		delete my_game;
+		my_game = new Halite();
 		numTurns = my_game->input(w, paths[0], wi, he);
 		filename = paths[0];
 	}
-	catch(std::runtime_error e)
-	{
-		debug << e.what();
-#ifdef CONSOLE_DEBUG
-		std::cout << e.what();
-#endif
-		return;
-	}
+	else return;
 	const int MIN_POINTS_VISIBLE = 3;
 	//Set new max_zoom. We allow zooming until only MIN_POINTS_VISIBLE points are visible.
 	maxZoom = numTurns / float(MIN_POINTS_VISIBLE);
@@ -304,13 +366,15 @@ void handleResize(GLFWwindow * w, int width, int height)
 {
 	glViewport(0, 0, width, height);
 	util::setScreenSize(width, height);
+	windowedWidth = width;
+	windowedHeight = height;
 }
 
 void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	util::renderText(-.85, 0.0, 95, "Drop a replay on-screen to watch it!");
+	util::renderText(-.85, 0.0, 95, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

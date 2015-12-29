@@ -79,7 +79,7 @@ bool util::setFont(std::string path)
 
 #include <iostream>
 
-char util::renderText(float x, float y, int size, const std::string & text)
+char util::renderText(float x, float y, int size, Color c, const std::string & text)
 {
 	//Get currently bound program:
 	GLint currentProgram;
@@ -123,6 +123,14 @@ char util::renderText(float x, float y, int size, const std::string & text)
 
 	FT_GlyphSlot g = face->glyph;
 
+	glUseProgram(shaderProgram);
+	glUniform3fv(glGetUniformLocation(shaderProgram, "c"), 1, (GLfloat *)&c);
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
 	//For each character, load the position:
 	for(int a = 0; a < text.size(); a++)
 	{
@@ -133,14 +141,8 @@ char util::renderText(float x, float y, int size, const std::string & text)
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g->bitmap.width, g->bitmap.rows, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 		
-		glUseProgram(shaderProgram);
-		glBindVertexArray(vao);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		x += float(g->advance.x) / 64 / screenWidth;
@@ -158,24 +160,33 @@ char util::renderText(float x, float y, int size, const std::string & text)
 	return 0;
 }
 
-std::map<std::pair<char, int>, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > > > textJobs;
+std::map<std::pair<char, int>, std::vector< std::pair< Color, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > > > > > textJobs;
 
-void util::addText(float x, float y, int size, const std::string & text)
+void util::addText(float x, float y, int size, Color c, const std::string & text)
 {
-	FT_GlyphSlot g = face->glyph;
+	FT_GlyphSlot g = face->glyph;//Set size.
+	FT_Set_Pixel_Sizes(face, size, size);
 	for(auto a = text.begin(); a != text.end(); a++)
 	{
 		if(FT_Load_Char(face, *a, FT_LOAD_RENDER) != 0) continue; //Ignore characters which can't be loaded.
 		float left = x + float(g->bitmap_left) / screenWidth, top = y + float(g->bitmap_top) / screenHeight, right = left + (float(g->bitmap.width) / screenWidth), bottom = top - (float(g->bitmap.rows) / screenHeight);
-		if(!textJobs.count({ *a, size })) textJobs.insert({ { *a, size }, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > >() });
-		textJobs[{ *a, size }].push_back({ { left, bottom }, { right, top } });
+		if(!textJobs.count({ *a, size })) textJobs.insert({ { *a, size }, { std::vector< std::pair<Color, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > > > >() } });
+		auto b = std::find_if(textJobs[{ *a, size }].begin(), textJobs[{ *a, size }].end(), [&c](const std::pair< Color, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > > > & p) -> bool { return c == p.first; });
+		if(b == textJobs[{ *a, size }].end())
+		{
+			textJobs[{ *a, size }].push_back({ c, std::vector< std::pair< std::pair<float, float>, std::pair<float, float> > >() });
+			b = textJobs[{ *a, size }].end() - 1;
+		}
+		b->second.push_back({ { left, bottom }, { right, top } });
 		x += float(g->advance.x) / 64 / screenWidth;
 		y += float(g->advance.y) / 64 / screenHeight;
 	}
 }
 
-char util::renderAllText()
+char util::renderAllText(GLFWwindow * w)
 {
+	glfwMakeContextCurrent(w);
+
 	//Get currently bound program:
 	GLint currentProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
@@ -226,11 +237,16 @@ char util::renderAllText()
 
 		for(auto b = a->second.begin(); b != a->second.end(); b++)
 		{
-			points[0] = b->first.first; points[1] = b->second.second; points[2] = b->second.first; points[3] = b->second.second; points[4] = b->first.first; points[5] = b->first.second; points[6] = b->second.first; points[7] = b->first.second;
+			glUniform3fv(glGetUniformLocation(shaderProgram, "c"), 1, (GLfloat *)&b->first);
 
-			glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
+			for(auto c = b->second.begin(); c != b->second.end(); c++)
+			{
+				points[0] = c->first.first; points[1] = c->second.second; points[2] = c->second.first; points[3] = c->second.second; points[4] = c->first.first; points[5] = c->first.second; points[6] = c->second.first; points[7] = c->first.second;
 
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+				glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), points, GL_DYNAMIC_DRAW);
+
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			}
 		}
 	}
 
