@@ -39,5 +39,5 @@ This repository contains the environment for running Halite games, the visualize
 - WebGL
 - Fix map system
 - Talk to companies
-- Fix relative scoring system
+- ~~Fix relative scoring system~~
 - Update rules on the Google Doc
