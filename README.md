@@ -25,15 +25,15 @@ This repository contains the environment for running Halite games, the visualize
 - Downgrade example C++ bot from C++ 11  
 
 ### Worker
-- Switch to python
-- Encorporate file checksums and api keys
-- The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox
-- The worker can run a game between two or more bots using our Docker sandbox
+- ~~Switch to python~~
+- ~~Encorporate file checksums and api keys~~
+- ~~The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox~~
+- ~~The worker can run a game between two or more bots using our Docker sandbox~~
 
 ### Server
-- Tell workers to compile bots when needed
-- Continuously tell workers to play games
-- Update rankings according to the Trueskill algorithm accordingly
+- ~~Tell workers to compile bots when needed~~
+- ~~Continuously tell workers to play games~~ according to Trueskill
+- ~~Update rankings according to the Trueskill algorithm accordingly~~
 
 ## To Do Ben
 - WebGL
