@@ -13,6 +13,7 @@ class ManagerAPI extends API
 		$this->sanitizeHTTPParameters();
 
 		if($this->isValidWorker() == false) {
+			echo "Not valid worker";
 			exit(1);
 		}
 
@@ -179,7 +180,7 @@ class ManagerAPI extends API
 				header("Content-type: application/x-gtar");
 			} else {
 				header("HTTP/1.0 404 Not Found");
-				die();
+				die("Could not find file");
 			}
 
 			ob_clean();
