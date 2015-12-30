@@ -10,8 +10,13 @@ import json
 from hashlib import md5
 from compiler import *
 
+import sys
+sys.path.insert(0, os.path.abspath('trueskill'))
+import trueskill
+
 
 workingPath = "workingPath"
+
 
 class Backend:
 	def __init__(self, apiKey):
@@ -75,8 +80,8 @@ class Backend:
 	def compileResult(self, userID, didCompile, language):
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
-	def gameResult(self, rankedUserIDs, rankedScores, replayPath):
-		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "rankedUserIDs[]": rankedUserIDs, "rankedScores[]": rankedScores}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+	def gameResult(self, userIDs, scores, muValues, sigmaValues, replayPath):
+		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "userIDs[]": userIDs, "scores[]": scores, "muValues": muValues, "sigmaValues": sigmaValues}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
 		print(r.text)
 def makeWorkingPath():
 	global workingPath
@@ -157,10 +162,12 @@ def compile(userID, backend):
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
-def runGame(width, height, userIDs, backend):
+def runGame(width, height, userIDs, muValues, sigmaValues, backend):
 	global workingPath
 
 	makeWorkingPath()
+	
+	# Download players
 	for userID in userIDs:
 		path = os.path.join(workingPath, str(userID))
 		os.mkdir(path)
@@ -171,6 +178,7 @@ def runGame(width, height, userIDs, backend):
 		st = os.stat(os.path.join(path, "run.sh"))
 		os.chmod(os.path.join(path, "run.sh"), st.st_mode | stat.S_IEXEC)
 	
+	# Build the shell command that will run the game. Executable called Environment houses the game environment
 	runGameShellCommand = "./Environment "+str(width)+" "+str(height)+" "
 	for userID in userIDs:
 		absolutePath = os.path.abspath(os.path.join(workingPath, str(userID)))
@@ -191,18 +199,31 @@ def runGame(width, height, userIDs, backend):
 	rankedScores = []
 	for a in range(len(lines) - len(userIDs), len(lines)):
 		line = lines[a]
+		
 		start = line.index("is player ") + len("is player ")
 		end = line.index(" named")
 		playerID = int(line[start:end])
-		userID = userIDs[playerID-1]
-		print(userID)
-		rankedUserIDs.append(userID)
+		rankedUserIDs.append(userIDs[playerID-1])
 		
 		start = line.index("score of ") + len("score of ")
-		score = float(line[start:len(line)])
-		rankedScores.append(score)
+		rankedScores.append(float(line[start:len(line)]))
 
-	backend.gameResult(rankedUserIDs, rankedScores, replayPath)
+	# Update trueskill mu and sigma values
+	trueSkillPlayers = []
+	for a in range(0, len(userIDs)):
+		newPlayer = TrueSkillPlayer()
+		newPlayer.skill = (muValues[a], sigmaValues[a])
+		newPlayer.rank = rankedUserIDs.index(userIDs[a])
+		players.append(newPlayer)
+
+	trueskill.AdjustPlayers(players)
+
+	# Sort players by rank, so that muValues and sigmaValues are sorted by rank
+	players.sort(key=lambda player: player.rank)
+	rankedMuValues = [player.skill[0] for player in players]
+	rankedSigmaValues = [player.skill[1] for player in players]
+
+	backend.gameResult(rankedUserIDs, rankedScores, rankedMuValues, rankedSigmaValues, replayPath)
 	shutil.rmtree(workingPath)
 
 
@@ -213,7 +234,7 @@ if task != None:
 	if task.get("type") == "compile":
 		compile(task.get("userID"), backend)
 	elif task.get("type") == "game":
-		runGame(task.get("width"), task.get("height"), task.get("userIDs"), backend)
+		runGame(task.get("width"), task.get("height"), task.get("userIDs"), task.get("muValues"), task.get("sigmaValues"), backend)
 	else:
 		print("Unknown task")
 else:

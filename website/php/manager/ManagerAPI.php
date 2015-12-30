@@ -121,14 +121,21 @@ class ManagerAPI extends API
 			}
 
 			// Run a game
-			$users = $this->selectMultiple("SELECT userID FROM User");
+			$users = $this->selectMultiple("SELECT userID, mu, sigma FROM User");
 
 			$userIDs = array();
+			$muValues = array();
+			$sigmaValues = array();
+
 			$numPlayers = 2;
 
 			for($a = 0; $a < $numPlayers; $a++) {
 				$key = array_rand($users);
+				
 				array_push($userIDs, $users[$key]['userID']);
+				array_push($muValues, $users[$key]['mu']);
+				array_push($sigmaValues, $users[$key]['sigma']);
+
 				unset($users[$key]);
 			}
 
@@ -136,7 +143,9 @@ class ManagerAPI extends API
 				"type" => "game",
 				"width" => 10,
 				"height" => 10,
-				"userIDs" => $userIDs);
+				"userIDs" => $userIDs,
+				"muValues" => $muValues,
+				"sigmaValues" => $sigmaValues);
 			
 		}
 		return NULL;
@@ -157,9 +166,11 @@ class ManagerAPI extends API
 	}
 
 	protected function game() {
-		if(isset($_POST['rankedUserIDs']) && isset($_POST['rankedScores']) && count($_FILES) > 0) {
+		if(isset($_POST['rankedUserIDs']) && isset($_POST['scores']) && isset($_POST['muValues']) && isset($_POST['sigmaValues']) && count($_FILES) > 0) {
 			$rankedUserIDs = $_POST['rankedUserIDs'];			
-			$rankedScores = $_POST['rankedScores'];			
+			$scores = $_POST['scores'];			
+			$muValues = $_POST['muValues'];
+			$sigmaValues = $_POST['sigmaValues'];
 
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
@@ -167,15 +178,19 @@ class ManagerAPI extends API
 			$targetPath = "../../../storage/replays/{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			
-			// Store game infromation in db
+			// Store game information in db
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
 			
 			for($a = 0; $a < count($rankedUserIDs); $a++) {
 				$userID = $rankedUserIDs[$a];
-				$score = $rankedScores[$a];
+				$score = $scores[$a];
+				$mu = $muValues[$a];
+				$sigma = $sigmaValues[$a];
+
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, $userID, $a, $score)");
+				$this->insert("UPDATE User SET mu = $mu, sigma = $sigma WHERE userID = $userID");
 			}
 		}
 	}
