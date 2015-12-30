@@ -61,6 +61,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		return EXIT_FAILURE;
 	}
 
+	util::initShaderHandler(&debug);
+
 	window = NULL;
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
@@ -69,18 +71,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	windowedHeight = mode->height * 2 / 3;
 	setWindowed();
 
-	glewExperimental = GL_TRUE;
-	if(glewInit() != GLEW_OK) return EXIT_FAILURE;
-
 	const char * glVersion = (const char * )glGetString(GL_VERSION);
 	debug << glVersion;
 	debug.flush();
-
-	util::initShaderHandler(&debug);
-
-	util::initText();
-	util::setFont("fonts/FreeSans.ttf");
-	util::setScreenSize(windowedWidth, windowedHeight);
 
 	my_game = new Halite();
 
@@ -96,7 +89,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
 		total += delta;
 		if(count % 100 == 0) std::cout << "Average time of " << total / count << " over " << count << " frames.\n";
-		//if(delta > .05) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
+		if(delta > 1.5 * total / count) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
 		c = clock();
 
 		short turnNumberS = turnNumber;
@@ -134,6 +127,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 void setWindowed()
 {
 	GLFWwindow * w = glfwCreateWindow(windowedWidth, windowedHeight, "Halite", NULL, window);
+	glfwGetWindowSize(w, &windowedWidth, &windowedHeight);
 	if(window != NULL) glfwDestroyWindow(window);
 	window = w;
 	//Set leopard handler.
@@ -152,14 +146,21 @@ void setWindowed()
 	glfwSetWindowSizeCallback(window, handleResize);
 	//Make context current:
 	glfwMakeContextCurrent(window);
-	//If possible, fix the Halite's VAOs.
-	if(my_game != NULL) my_game->recreateGL();
 	//It's now windowed.
 	isWindowed = true;
+	//If necessary, initialize GLEW
+	if(my_game == NULL)
+	{
+		glewExperimental = GL_TRUE;
+		if(glewInit() != GLEW_OK) exit(EXIT_FAILURE);
+	}
+	//If possible, fix the Halite's VAOs.
+	if(my_game != NULL) my_game->recreateGL();
 	//Fix text.
+	if(my_game != NULL) util::cleanup();
+	util::initText();
+	util::setFont("fonts/FreeSans.ttf");
 	util::setScreenSize(windowedWidth, windowedHeight);
-	//Viewport.
-	/////////////////glViewport(0, 0, windowedWidth, windowedHeight);
 }
 
 void setFullscreen()
@@ -347,6 +348,8 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 		my_game = new Halite();
 		numTurns = my_game->input(w, paths[0], wi, he);
 		filename = paths[0];
+		xOffset = 0;
+		yOffset = 0;
 	}
 	else return;
 	const int MIN_POINTS_VISIBLE = 3;

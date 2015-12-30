@@ -17,7 +17,6 @@ class Halite
 private:
     std::vector< std::pair<std::string, float> > player_names; //float represents rendering position
 	std::vector<int> player_scores;
-	std::vector<unsigned int> attack_count;
 	std::vector<hlt::Map * > full_game;
 	std::string present_file;
 	std::map<unsigned char, Color> color_codes;
@@ -37,13 +36,15 @@ private:
 	float strength_graph_top, strength_graph_bottom, strength_graph_left, strength_graph_right;
 
 	//Statistics constants:
-	const float STAT_LEFT, STAT_RIGHT, STAT_BOTTOM, STAT_TOP, NAME_TEXT_HEIGHT, NAME_TEXT_OFFSET, GRAPH_TEXT_HEIGHT, GRAPH_TEXT_OFFSET, LABEL_TEXT_HEIGHT, MAP_TEXT_HEIGHT, MAP_TEXT_OFFSET;
+	const float STAT_LEFT, STAT_RIGHT, STAT_BOTTOM, STAT_TOP, NAME_TEXT_HEIGHT, NAME_TEXT_OFFSET, GRAPH_TEXT_HEIGHT, GRAPH_TEXT_OFFSET, LABEL_TEXT_HEIGHT, LABEL_TEXT_OFFSET, MAP_TEXT_HEIGHT, MAP_TEXT_OFFSET;
 
 	//Border rendering
 	GLuint border_vertex_buffer, border_vertex_attributes, border_vertex_shader, border_fragment_shader, border_shader_program;
 
 	//void loadColorCodes(std::string s);
+	void setupMapGL();
 	void setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset);
+	void setupGraphGL();
 	void setupGraphRendering(float zoom, short turnNumber);
 	void setupBorders();
 	void clearFullGame();

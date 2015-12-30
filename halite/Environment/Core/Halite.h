@@ -23,10 +23,11 @@ private:
     std::vector<std::string> player_names;
 	std::vector<hlt::Message> pastFrameMessages;
     std::vector< std::set<hlt::Move> > player_moves;
-	std::vector<unsigned int> attack_count;
+	std::vector<unsigned int> full_territory_count;
 	hlt::Map game_map;
 	std::vector<std::vector<unsigned char> * > full_game;
 	std::vector<Color> possible_colors;
+	std::vector<unsigned int> player_scores;
 	unsigned short number_of_players;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
@@ -36,7 +37,7 @@ public:
 
 	void init();
 	void output(std::string filename);
-	std::vector< std::pair<unsigned char, float> > runGame();
+	std::vector< std::pair<unsigned char, unsigned int> > runGame();
 	std::string getName(unsigned char playerTag);
 	
 	~Halite();

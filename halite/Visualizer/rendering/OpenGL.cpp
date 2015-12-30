@@ -73,7 +73,6 @@ bool util::initText()
 
 bool util::setFont(std::string path)
 {
-	FT_Done_Face(face);
 	return FT_New_Face(ft, path.c_str(), 0, &face) == 0;
 }
 
@@ -265,4 +264,5 @@ char util::renderAllText(GLFWwindow * w)
 void util::cleanup()
 {
 	glDeleteProgram(shaderProgram);
+	FT_Done_FreeType(ft);
 }
