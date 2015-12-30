@@ -16,10 +16,11 @@ workingPath = "workingPath"
 class Backend:
 	def __init__(self, apiKey):
 		self.apiKey = apiKey
-		self.url = "http://localhost:80/Halite/website/php/manager/"
+		self.url = "http://localhost/website/php/manager/"
 
 	def getTask(self):
 		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
+		print("contents: " + content)
 		if content == "null":
 			return None
 		else:
@@ -85,7 +86,8 @@ def makeWorkingPath():
 def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
 	tempPath = os.path.join(folderPath, "bot")
-
+	os.mkdir(tempPath)
+	
 	# Extract the archive into a folder call 'bot'
 	if platform.system() == 'Windows':
 		os.system("7z x -o"+tempPath+" -y "+filePath+". > NUL")
@@ -100,8 +102,12 @@ def unpack(filePath):
 			(".zip", "unzip -u -d"+tempPath+" "+filePath+" > /dev/null 2> /dev/null")
 		]
 		_, extension = os.path.splitext(filePath)
+		print(extension)
 		for possibleExtension, command, in zipFiles:
+			print(possibleExtension)
 			if(extension == possibleExtension):
+				print("True!")
+				print(command)
 				os.system(command)
 
 	# Remove __MACOSX folder if present
