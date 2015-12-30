@@ -37,7 +37,7 @@ This repository contains the environment for running Halite games, the visualize
 
 ## To Do Ben
 - WebGL
-- Fix map system
+- ~~Fix map system~~
 - Talk to companies
 - ~~Fix relative scoring system~~
 - Update rules on the Google Doc
