@@ -21,6 +21,7 @@ private:
 	std::string present_file;
 	std::map<unsigned char, Color> color_codes;
 	unsigned short number_of_players;
+	float defense_bonus;
 
 	//Map rendering
 	GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;

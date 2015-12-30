@@ -388,8 +388,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 5" && format != "HLT 4") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 6") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	present_file = filename;
 	//Clear previous game
@@ -436,7 +436,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	int numLines;
 	m.map_width = 0;
 	m.map_height = 0;
-	game_file >> width >> height >> number_of_players >> numLines;
+	game_file >> width >> height >> defense_bonus >> number_of_players >> numLines;
 	m.map_width = width;
 	map_width = width;
 	m.map_height = height;
@@ -454,7 +454,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			if(c == ' ') break;
 			player_names[a].first += c;
 		}
-		if(format == "HLT 5") game_file >> player_scores[a];
+		game_file >> player_scores[a];
 
 		Color color;
 		game_file >> color.r >> color.g >> color.b;
@@ -525,9 +525,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
 
-	//If old format, figure out what the scores are.
-	if(format == "HLT 4") for(auto a = full_game.begin(); a != full_game.end(); a++) for(int b = 0; b < (*a)->territory_count.size(); b++) player_scores[b] += (*a)->territory_count[b];
-
 	//Put the names in their places.
 	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
 	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
@@ -565,8 +562,7 @@ bool Halite::isValid(std::string filename)
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3") return false;
-	else if(format != "HLT 5" && format != "HLT 4") return false;
+	if(format != "HLT 6") return false;
 	return true;
 }
 
@@ -663,9 +659,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
 		util::addText(MAP_LEFT, MAP_TOP + MAP_TEXT_OFFSET, MAP_TEXT_HEIGHT * height, TEXT_COLOR, headerText);
 
+		std::string labelText = "";
 		if(mouseClick)
 		{
-			std::string labelText = "";
 			if(mouseX <= strength_graph_right && mouseX >= strength_graph_left && mouseY <= strength_graph_top && mouseY >= strength_graph_bottom)
 			{
 				//Find turn number:
@@ -703,9 +699,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength);
 			}
-
-			if(labelText != "") util::addText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+			else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
 		}
+		else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
+		util::addText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:
 		for(int a = 0; a < number_of_players; a++)

@@ -2,6 +2,8 @@
 
 //Consts -----------------------------
 
+const float MIN_DEFENSE_BONUS = 1, MAX_DEFENSE_BONUS = 1.5;
+
 //Private Functions ------------------
 
 std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
@@ -36,6 +38,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	}
 
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
+	std::vector< std::map<hlt::Location, float> > effectivePieces(number_of_players + 1);
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<bool> permissibleTime(number_of_players, false);
@@ -81,19 +84,23 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		{
 			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
 			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
-			if(pieces[a + 1].count(newLoc))
+			if(pieces[a + 1].count(newLoc)) //pieces and effectivepieces are synced.
 			{
+				//If not moving, apply defense_bonus.
+				effectivePieces[a + 1][newLoc] += b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength;
 				if(short(pieces[a + 1][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a + 1][newLoc] += game_map.getSite(b->loc, STILL).strength;
 				else pieces[a + 1][newLoc] = 255;
 			}
 			else
 			{
+				effectivePieces[a + 1].insert(std::pair<hlt::Location, unsigned short>(newLoc, b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength));
 				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
 			}
 
 			//Add in a new piece with a strength of 0 if necessary.
 			if(!pieces[a + 1].count(b->loc))
 			{
+				effectivePieces[a + 1].insert(std::pair<hlt::Location, unsigned short>(newLoc, 0));
 				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
 			}
 
@@ -110,25 +117,27 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		hlt::Site s = game_map.getSite(l, STILL);
 		if(s.owner != 255)
 		{
-			if(pieces[s.owner].count(l))
+			if(pieces[s.owner].count(l)) //pieces and effectivepieces are synced.
 			{
 				if(short(pieces[s.owner][l]) + s.strength <= 255) pieces[s.owner][l] += s.strength;
 				else pieces[s.owner][l] = 255;
+				effectivePieces[s.owner][l] += s.strength * defense_bonus;
 			}
 			else
 			{
 				pieces[s.owner].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
+				effectivePieces[s.owner].insert(std::pair<hlt::Location, unsigned short>(l, s.strength * defense_bonus));
 			}
 		}
 	}
 
-	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players + 1); //This is a short so that we don't have to worry about 255 overflows.
+	std::vector< std::map<hlt::Location, float> > toInjure(number_of_players + 1); //This is a short so that we don't have to worry about 255 overflows.
 
 	//Sweep through locations and find the correct damage for each piece.
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players + 1; c++) if((c == 0 || alive[c - 1]) && pieces[c].count(l))
+		for(unsigned short c = 0; c < number_of_players + 1; c++) if((c == 0 || alive[c - 1]) && pieces[c].count(l)) //pieces and effectivepieces are synced.
 		{
 			for(unsigned short d = 0; d < number_of_players + 1; d++) if(d != c && (d == 0 || alive[d-1]))
 			{
@@ -137,8 +146,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
 				}
 				//Only resolve adjacent squares if both players involved are not the NULL player.
 				if(c != 0 && d != 0)
@@ -148,32 +157,32 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 					if(pieces[d].count(tempLoc))
 					{
 						//Apply damage, but not more than they have strength:
-						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
 					}
 					//Check 'EAST' square:
 					tempLoc = game_map.getLocation(l, EAST);
 					if(pieces[d].count(tempLoc))
 					{
 						//Apply damage, but not more than they have strength:
-						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
 					}
 					//Check 'SOUTH' square:
 					tempLoc = game_map.getLocation(l, SOUTH);
 					if(pieces[d].count(tempLoc))
 					{
 						//Apply damage, but not more than they have strength:
-						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
 					}
 					//Check 'WEST' square:
 					tempLoc = game_map.getLocation(l, WEST);
 					if(pieces[d].count(tempLoc))
 					{
 						//Apply damage, but not more than they have strength:
-						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
-						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
 					}
 				}
 			}
@@ -185,8 +194,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
-			if(b->second >= pieces[a][b->first]) pieces[a].erase(b->first);
-			else pieces[a][b->first] -= b->second;
+			b->second = floor(b->second); //Floor injuries; pieces retain health if possible.
+			if(b->second >= effectivePieces[a][b->first])
+			{
+				effectivePieces[a].erase(b->first);
+				pieces[a].erase(b->first); //effectivePieces can only be higher; therefore we must delete this too.
+			}
+			else effectivePieces[a][b->first] -= b->second;
 		}
 	}
 
@@ -198,7 +212,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { a, b->second };
+			game_map.getSite(b->first, STILL) = { a, min(b->second, effectivePieces[a][b->first]) };
 		}
 	}
 
@@ -330,6 +344,9 @@ void Halite::init()
 	player_names = std::vector< std::string >(number_of_players);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 
+	//Figure out what defense_bonus should be.
+	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
+
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
@@ -386,8 +403,8 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 5\n";
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << '\n';
+	gameFile << "HLT 6\n";
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << '\n';
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		int index = rand() % newColors.size();

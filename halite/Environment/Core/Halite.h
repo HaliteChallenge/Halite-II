@@ -19,6 +19,7 @@ class Halite
 {
 private:
 	unsigned short turn_number;
+	float defense_bonus;
 	Networking networking;
     std::vector<std::string> player_names;
 	std::vector<hlt::Message> pastFrameMessages;
