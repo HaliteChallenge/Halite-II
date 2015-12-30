@@ -1,4 +1,4 @@
-#define CONSOLE_DEBUG
+//#define CONSOLE_DEBUG
 
 #include <iostream>
 #include <thread>
@@ -81,15 +81,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	clock_t c = clock();
 
-	int count = 0; double total = 0;
 	while(!glfwWindowShouldClose(window))
 	{
 		//Limit render rate:
-		count++;
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
-		total += delta;
-		if(count % 100 == 0) std::cout << "Average time of " << total / count << " over " << count << " frames.\n";
-		if(delta > 1.5 * total / count) std::cout << "Frame time: " << delta * 1000 << " milliseconds.\n";
 		c = clock();
 
 		short turnNumberS = turnNumber;
