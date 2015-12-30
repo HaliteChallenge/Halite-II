@@ -572,12 +572,13 @@ bool Halite::isValid(std::string filename)
 
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
-
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
 
 	if(!full_game.empty())
 	{
+		//Ensure that one can go around the map at most once.
+
 		//Set window for rendering.
 		glfwMakeContextCurrent(window);
 
@@ -693,9 +694,11 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				float dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
 
 				int xPos = round((mouseDX + (dX / 2)) / dX) - (1 + xOffset);
+				xPos %= map_width; if(xPos < 0) xPos += map_width;
 				int yPos = round((mouseDY + (dY / 2)) / dY) - (1 + yOffset);
+				yPos %= map_height; if(yPos < 0) yPos += map_height;
 
-				int posInVector = yPos * map_width + xPos;//screenYPos * map_width + screenXPos;
+				int posInVector = yPos * map_width + xPos;
 				int strength = strengths[posInVector];
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength);

@@ -332,6 +332,11 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	{
 		isWindowed ? setFullscreen() : setWindowed();
 	}
+	else if(code == 'O' || code == 'o')
+	{
+		xOffset = 0;
+		yOffset = 0;
+	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths)
