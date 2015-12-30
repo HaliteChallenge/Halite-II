@@ -9,13 +9,13 @@ import zipfile
 import json
 from hashlib import md5
 from compiler import *
-
-import sys
-sys.path.insert(0, os.path.abspath('trueskill'))
 import trueskill
 
 
 workingPath = "workingPath"
+
+class TrueSkillPlayer(object):
+  pass
 
 
 class Backend:
@@ -81,7 +81,7 @@ class Backend:
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
 	def gameResult(self, userIDs, scores, muValues, sigmaValues, replayPath):
-		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "userIDs[]": userIDs, "scores[]": scores, "muValues": muValues, "sigmaValues": sigmaValues}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "rankedUserIDs[]": userIDs, "scores[]": scores, "muValues[]": muValues, "sigmaValues[]": sigmaValues}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
 		print(r.text)
 def makeWorkingPath():
 	global workingPath
@@ -209,19 +209,21 @@ def runGame(width, height, userIDs, muValues, sigmaValues, backend):
 		rankedScores.append(float(line[start:len(line)]))
 
 	# Update trueskill mu and sigma values
-	trueSkillPlayers = []
-	for a in range(0, len(userIDs)):
-		newPlayer = TrueSkillPlayer()
-		newPlayer.skill = (muValues[a], sigmaValues[a])
-		newPlayer.rank = rankedUserIDs.index(userIDs[a])
-		players.append(newPlayer)
-
-	trueskill.AdjustPlayers(players)
+	teams = []
+	ranks = []
+	for a in range(0, len(rankedUserIDs)):
+		unRankedIndex = userIDs.index(rankedUserIDs[a])
+		teams.append([trueskill.Rating(mu=float(muValues[unRankedIndex]), sigma=float(sigmaValues[unRankedIndex]))])
+		ranks.append(a)
+	newRatings = trueskill.rate(teams)
+		
 
 	# Sort players by rank, so that muValues and sigmaValues are sorted by rank
-	players.sort(key=lambda player: player.rank)
-	rankedMuValues = [player.skill[0] for player in players]
-	rankedSigmaValues = [player.skill[1] for player in players]
+	rankedMuValues = [ratingTuple[0].mu for ratingTuple in newRatings]
+	rankedSigmaValues = [ratingTuple[0].sigma for ratingTuple in newRatings]
+	for a in range(0, len(rankedMuValues)):
+		print("mu: "+str(rankedMuValues[a]))
+		print(rankedSigmaValues[a])
 
 	backend.gameResult(rankedUserIDs, rankedScores, rankedMuValues, rankedSigmaValues, replayPath)
 	shutil.rmtree(workingPath)
