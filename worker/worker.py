@@ -75,6 +75,9 @@ class Backend:
 	def compileResult(self, userID, didCompile, language):
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
+	def gameResult(self, rankedUserIDs, rankedScores, replayPath):
+		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "rankedUserIDs[]": rankedUserIDs, "rankedScores[]": rankedScores}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+		print(r.text)
 def makeWorkingPath():
 	global workingPath
 
@@ -175,6 +178,31 @@ def runGame(width, height, userIDs, backend):
 	print(runGameShellCommand)
 	shellOutput = os.popen(runGameShellCommand).read()
 	print(shellOutput)
+	
+	lines = shellOutput.split("\n")
+	lines.remove("")
+	
+	# Get replay name by parsing shellOutput
+	replayLine = lines[len(lines) - (len(userIDs)+1)];
+	replayPath = replayLine[replayLine.index("file at ")+len("file at ") : len(replayLine)];
+	
+	# Get player ranks and scores by parsing shellOutput
+	rankedUserIDs = []
+	rankedScores = []
+	for a in range(len(lines) - len(userIDs), len(lines)):
+		line = lines[a]
+		start = line.index("is player ") + len("is player ")
+		end = line.index(" named")
+		playerID = int(line[start:end])
+		userID = userIDs[playerID-1]
+		print(userID)
+		rankedUserIDs.append(userID)
+		
+		start = line.index("score of ") + len("score of ")
+		score = float(line[start:len(line)])
+		rankedScores.append(score)
+
+	backend.gameResult(rankedUserIDs, rankedScores, replayPath)
 	shutil.rmtree(workingPath)
 
 
@@ -184,7 +212,7 @@ task = backend.getTask()
 if task != None:
 	if task.get("type") == "compile":
 		compile(task.get("userID"), backend)
-	elif task.get("type") == "run":
+	elif task.get("type") == "game":
 		runGame(task.get("width"), task.get("height"), task.get("userIDs"), backend)
 	else:
 		print("Unknown task")

@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require_once '../API.class.php';
 class ManagerAPI extends API
@@ -36,13 +39,14 @@ class ManagerAPI extends API
 		else return false;
 	}
 
+	private function escapeString($var) {
+		if(is_string($var)) return $this->mysqli->real_escape_string($var);
+		else return $var;
+	}
+	
 	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = $this->mysqli->real_escape_string($value);
-		}
-		foreach ($_POST as $key => $value) {
-			$_POST[$key] = $this->mysqli->real_escape_string($value);
-		}
+		$_GET = array_map(array($this, "escapeString"), $_GET);
+		$_POST = array_map(array($this, "escapeString"), $_POST);
 	}
 
 	private function getBotDirectory($userID) {
@@ -129,7 +133,7 @@ class ManagerAPI extends API
 			}
 
 			return array(
-				"type" => "run",
+				"type" => "game",
 				"width" => 10,
 				"height" => 10,
 				"userIDs" => $userIDs);
@@ -148,6 +152,30 @@ class ManagerAPI extends API
 				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 			} else {
 				$this->insert("UPDATE User SET status = 0 WHERE userID = $userID");
+			}
+		}
+	}
+
+	protected function game() {
+		if(isset($_POST['rankedUserIDs']) && isset($_POST['rankedScores']) && count($_FILES) > 0) {
+			$rankedUserIDs = $_POST['rankedUserIDs'];			
+			$rankedScores = $_POST['rankedScores'];			
+
+			// Store replay file
+			$fileKey = array_keys($_FILES)[0];
+			$name = basename($_FILES[$fileKey]['name']);
+			$targetPath = "../../../storage/replays/{$name}";
+			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
+			
+			// Store game infromation in db
+			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
+			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
+			$gameID = $gameIDArray['gameID'];
+			
+			for($a = 0; $a < count($rankedUserIDs); $a++) {
+				$userID = $rankedUserIDs[$a];
+				$score = $rankedScores[$a];
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, $userID, $a, $score)");
 			}
 		}
 	}
@@ -187,7 +215,7 @@ class ManagerAPI extends API
 			flush();
 			readfile($this->getBotFile($userID));
 			exit;
-		} else if(isset($_POST['userID']) && count($_FILES)) {
+		} else if(isset($_POST['userID']) && count($_FILES) > 0) {
 			$userID = $_POST['userID'];
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
