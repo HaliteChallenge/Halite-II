@@ -6,8 +6,6 @@
 
 //Consts -----------------------------
 
-
-
 //Graph constants. These are technically not constant, as they are initialized during input, but oh well.
 float territory_graph_top = 0.92, territory_graph_bottom = 0.01, territory_graph_left = 0.51, territory_graph_right = 0.98;
 float strength_graph_top = -0.07, strength_graph_bottom = -0.98, strength_graph_left = 0.51, strength_graph_right = 0.98;
@@ -17,7 +15,7 @@ const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.
 
 //Private Functions ------------------
 
-void Halite::setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset)
+void Halite::setupMapGL()
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &map_vertex_buffer);
@@ -35,6 +33,39 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glGenBuffers(1, &map_strength_buffer);
 	glGenVertexArrays(1, &map_vertex_attributes);
 
+	//Setup shaders:
+	map_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	util::shaderFromFile(map_vertex_shader, "shaders/map/vertex.glsl", "map_vertex_shader");
+	map_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+	util::shaderFromFile(map_geometry_shader, "shaders/map/geometry.glsl", "map_geometry_shader");
+	map_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	util::shaderFromFile(map_fragment_shader, "shaders/map/fragment.glsl", "map_fragment_shader");
+
+	//Setup shader program:
+	map_shader_program = glCreateProgram();
+	glAttachShader(map_shader_program, map_vertex_shader);
+	glAttachShader(map_shader_program, map_geometry_shader);
+	glAttachShader(map_shader_program, map_fragment_shader);
+	glLinkProgram(map_shader_program);
+	glDetachShader(map_shader_program, map_vertex_shader);
+	glDetachShader(map_shader_program, map_geometry_shader);
+	glDetachShader(map_shader_program, map_fragment_shader);
+
+	//Set uniforms:
+	glUseProgram(map_shader_program);
+	const float SPACE_FACTOR = 0.8;
+	GLint widthLoc = glGetUniformLocation(map_shader_program, "width"), heightLoc = glGetUniformLocation(map_shader_program, "height");
+	glUniform1f(widthLoc, (MAP_RIGHT - MAP_LEFT) * SPACE_FACTOR * 0.5 / map_width);
+	glUniform1f(heightLoc, (MAP_TOP - MAP_BOTTOM) * SPACE_FACTOR * 0.5 / map_height);
+
+	//Cleanup - delete shaders
+	glDeleteShader(map_vertex_shader);
+	glDeleteShader(map_geometry_shader);
+	glDeleteShader(map_fragment_shader);
+}
+
+void Halite::setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset)
+{
 	map_y_offset = yOffset;
 	map_x_offset = xOffset;
 
@@ -94,39 +125,9 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
-
-	//Setup shaders:
-	map_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	util::shaderFromFile(map_vertex_shader, "shaders/map/vertex.glsl", "map_vertex_shader");
-	map_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-	util::shaderFromFile(map_geometry_shader, "shaders/map/geometry.glsl", "map_geometry_shader");
-	map_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	util::shaderFromFile(map_fragment_shader, "shaders/map/fragment.glsl", "map_fragment_shader");
-
-	//Setup shader program:
-	map_shader_program = glCreateProgram();
-	glAttachShader(map_shader_program, map_vertex_shader);
-	glAttachShader(map_shader_program, map_geometry_shader);
-	glAttachShader(map_shader_program, map_fragment_shader);
-	glLinkProgram(map_shader_program);
-	glDetachShader(map_shader_program, map_vertex_shader);
-	glDetachShader(map_shader_program, map_geometry_shader);
-	glDetachShader(map_shader_program, map_fragment_shader);
-
-	//Set uniforms:
-	glUseProgram(map_shader_program);
-	const float SPACE_FACTOR = 0.8;
-	GLint widthLoc = glGetUniformLocation(map_shader_program, "width"), heightLoc = glGetUniformLocation(map_shader_program, "height");
-	glUniform1f(widthLoc, dX * SPACE_FACTOR * 0.5);
-	glUniform1f(heightLoc, dY * SPACE_FACTOR * 0.5);
-
-	//Cleanup - delete shaders
-	glDeleteShader(map_vertex_shader);
-	glDeleteShader(map_geometry_shader);
-	glDeleteShader(map_fragment_shader);
 }
 
-void Halite::setupGraphRendering(float zoom, short turnNumber)
+void Halite::setupGraphGL()
 {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
@@ -145,6 +146,28 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glGenVertexArrays(1, &graph_territory_vertex_attributes);
 	glGenVertexArrays(1, &graph_strength_vertex_attributes);
 
+
+	//Setup shaders:
+	graph_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	util::shaderFromFile(graph_vertex_shader, "shaders/graph/vertex.glsl", "Graph Vertex Shader");
+	graph_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	util::shaderFromFile(graph_fragment_shader, "shaders/graph/fragment.glsl", "Graph Fragment Shader");
+
+	//Setup shader program:
+	graph_shader_program = glCreateProgram();
+	glAttachShader(graph_shader_program, graph_vertex_shader);
+	glAttachShader(graph_shader_program, graph_fragment_shader);
+	glLinkProgram(graph_shader_program);
+	glDetachShader(graph_shader_program, graph_vertex_shader);
+	glDetachShader(graph_shader_program, graph_fragment_shader);
+
+	//Cleanup - delete shaders
+	glDeleteShader(graph_vertex_shader);
+	glDeleteShader(graph_fragment_shader);
+}
+
+void Halite::setupGraphRendering(float zoom, short turnNumber)
+{
 	//Set the number of frames the graph will handle. Also prevents race conditions with full_game by not using iterators, but rather up to a numeric frame.
 	graph_frame_number = full_game.size();
 	graph_zoom = zoom;
@@ -277,24 +300,6 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	//Setup shaders:
-	graph_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	util::shaderFromFile(graph_vertex_shader, "shaders/graph/vertex.glsl", "Graph Vertex Shader");
-	graph_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	util::shaderFromFile(graph_fragment_shader, "shaders/graph/fragment.glsl", "Graph Fragment Shader");
-
-	//Setup shader program:
-	graph_shader_program = glCreateProgram();
-	glAttachShader(graph_shader_program, graph_vertex_shader);
-	glAttachShader(graph_shader_program, graph_fragment_shader);
-	glLinkProgram(graph_shader_program);
-	glDetachShader(graph_shader_program, graph_vertex_shader);
-	glDetachShader(graph_shader_program, graph_fragment_shader);
-
-	//Cleanup - delete shaders
-	glDeleteShader(graph_vertex_shader);
-	glDeleteShader(graph_fragment_shader);
 }
 
 void Halite::setupBorders()
@@ -324,8 +329,9 @@ void Halite::setupBorders()
 	borderBufferValues[28] = MAP_LEFT; borderBufferValues[29] = MAP_TOP; borderBufferValues[30] = MAP_LEFT; borderBufferValues[31] = MAP_BOTTOM; borderBufferValues[32] = MAP_RIGHT; borderBufferValues[33] = MAP_BOTTOM; borderBufferValues[34] = MAP_RIGHT; borderBufferValues[35] = MAP_TOP; borderBufferValues[36] = MAP_LEFT; borderBufferValues[37] = MAP_TOP;
 
 	//Create stat borders:
-	float statBottom = (STAT_TOP - (number_of_players * ( NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET ))) - (1.5 * GRAPH_TEXT_OFFSET);
-	borderBufferValues[38] = STAT_LEFT; borderBufferValues[39] = statBottom; borderBufferValues[40] = STAT_RIGHT; borderBufferValues[41] = statBottom; borderBufferValues[42] = STAT_RIGHT; borderBufferValues[43] = STAT_TOP; borderBufferValues[44] = STAT_LEFT; borderBufferValues[45] = STAT_TOP; borderBufferValues[46] = STAT_LEFT; borderBufferValues[47] = statBottom;
+	float statBottom = STAT_TOP - ((number_of_players * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	borderBufferValues[38] = STAT_LEFT; borderBufferValues[39] = statBottom; borderBufferValues[40] = STAT_RIGHT; borderBufferValues[41] = statBottom; borderBufferValues[42] = STAT_RIGHT; borderBufferValues[43] = statTop; borderBufferValues[44] = STAT_LEFT; borderBufferValues[45] = statTop; borderBufferValues[46] = STAT_LEFT; borderBufferValues[47] = statBottom;
 
 	//Bind graph border buffer
 	glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
@@ -362,7 +368,7 @@ void Halite::clearFullGame()
 
 //Public Functions -------------------
 
-Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.03)
+Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
     number_of_players = 0;
     player_names = std::vector< std::pair<std::string, float> >();
@@ -526,7 +532,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
 	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
 	std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
-	float statPos = (STAT_TOP - NAME_TEXT_HEIGHT) - NAME_TEXT_OFFSET;
+	float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	for(int a = 0; a < number_of_players; a++)
 	{
 		player_names[playerScoresCpy[a].first].second = statPos;
@@ -546,8 +552,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	strength_graph_top = strength_graph_bottom + graphHeight;
 	territory_graph_bottom = territory_graph_top - graphHeight;
 
-	setupMapRendering(m.map_width, m.map_height, 0, 0);
-	setupBorders();
+	recreateGL();
 
 	game_file.close();
 
@@ -659,8 +664,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		if(mouseClick)
 		{
-			//If mouse is in strength graph:
-			const float X_OFFSET = -0.05, Y_OFFSET = -0.0;
+			std::string labelText = "";
 			if(mouseX <= strength_graph_right && mouseX >= strength_graph_left && mouseY <= strength_graph_top && mouseY >= strength_graph_bottom)
 			{
 				//Find turn number:
@@ -668,8 +672,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top- strength_graph_bottom);
 
-				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::addText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+				labelText = "Turn: " + std::to_string(tn) + " | Strength: " + std::to_string(val);
 			}
 			//Else if mouse is in territory graph:
 			else if(mouseX <= territory_graph_right && mouseX >= territory_graph_left && mouseY <= territory_graph_top && mouseY >= territory_graph_bottom)
@@ -679,9 +682,26 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				unsigned int val = graph_max_territory * (mouseY - territory_graph_bottom) / (territory_graph_top - territory_graph_bottom);
 
-				std::string labelText = '(' + std::to_string(tn) + ", " + std::to_string(val) + ')';
-				util::addText(mouseX + X_OFFSET, mouseY + Y_OFFSET, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+				labelText = "Turn: " + std::to_string(tn) + " | Territory: " + std::to_string(val);
 			}
+			else if(mouseX <= MAP_RIGHT && mouseX >= MAP_LEFT && mouseY <= MAP_TOP && mouseY >= MAP_BOTTOM)
+			{
+				//Get mouseDX and mouseDY
+				float mouseDX = mouseX - MAP_LEFT, mouseDY = mouseY - MAP_BOTTOM;
+
+				//Recalculate the dx and dy which were used to create the map.
+				float dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
+
+				int xPos = round((mouseDX + (dX / 2)) / dX) - (1 + xOffset);
+				int yPos = round((mouseDY + (dY / 2)) / dY) - (1 + yOffset);
+
+				int posInVector = yPos * map_width + xPos;//screenYPos * map_width + screenXPos;
+				int strength = strengths[posInVector];
+
+				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength);
+			}
+
+			if(labelText != "") util::addText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 		}
 
 		//Draw names:
@@ -709,43 +729,11 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 void Halite::recreateGL()
 {
-	glGenVertexArrays(1, &border_vertex_attributes);
-	glBindVertexArray(border_vertex_attributes);
-	glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glGenVertexArrays(1, &graph_territory_vertex_attributes);
-	glBindVertexArray(graph_territory_vertex_attributes);
-	glBindBuffer(GL_ARRAY_BUFFER, graph_territory_vertex_buffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	glGenVertexArrays(1, &graph_strength_vertex_attributes);
-	glBindVertexArray(graph_strength_vertex_attributes);
-	glBindBuffer(GL_ARRAY_BUFFER, graph_strength_vertex_buffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	glGenVertexArrays(1, &map_vertex_attributes);
-	glBindVertexArray(map_vertex_attributes);
-	glBindBuffer(GL_ARRAY_BUFFER, map_vertex_buffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
-	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
-
+	setupBorders();
+	setupMapGL();
 	setupMapRendering(map_width, map_height, map_x_offset, map_y_offset);
+	setupGraphGL();
+	setupGraphRendering(1, 0);
 }
 
 Halite::~Halite()
