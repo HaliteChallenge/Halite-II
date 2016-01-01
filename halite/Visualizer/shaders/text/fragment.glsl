@@ -13,5 +13,5 @@ uniform vec3 c;
 void main()
 {
     // Output color = color of the texture at the specified UV
-    color = texture(textureSampler, UV).rgb * c;
+    color = texture(textureSampler, UV).rrr * c;
 }

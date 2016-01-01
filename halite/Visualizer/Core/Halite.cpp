@@ -640,8 +640,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Generate text for the titles of the graphs
 		std::string territoryText = "Territory";
 		std::string strengthText = "Strength";
-		util::addText(territory_graph_left, territory_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, territoryText);
-		util::addText(strength_graph_left, strength_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, strengthText);
+		util::renderText(territory_graph_left, territory_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, territoryText);
+		util::renderText(strength_graph_left, strength_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, strengthText);
 
 		//Find name of replay:
 		char search = '/';
@@ -657,7 +657,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		//Display header
 		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
-		util::addText(MAP_LEFT, MAP_TOP + MAP_TEXT_OFFSET, MAP_TEXT_HEIGHT * height, TEXT_COLOR, headerText);
+		util::renderText(MAP_LEFT, MAP_TOP + MAP_TEXT_OFFSET, MAP_TEXT_HEIGHT * height, TEXT_COLOR, headerText);
 
 		std::string labelText = "";
 		if(mouseClick)
@@ -702,16 +702,16 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
 		}
 		else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
-		util::addText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+		util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:
 		for(int a = 0; a < number_of_players; a++)
 		{
-			util::addText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
-			util::addText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string(player_scores[a]));
+			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
+			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string(player_scores[a]));
 		}
 
-		util::renderAllText(window);
+		//util::renderAllText(window);
 
 		//Draw borders:
 		glUseProgram(border_shader_program);

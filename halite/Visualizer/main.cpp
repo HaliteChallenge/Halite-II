@@ -1,4 +1,4 @@
-//#define CONSOLE_DEBUG
+#define CONSOLE_DEBUG
 
 #include <iostream>
 #include <thread>
@@ -20,7 +20,7 @@ void setFullscreen();
 void renderLaunch();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
 short numTurns, xOffset = 0, yOffset = 0;
 int windowedWidth, windowedHeight;
@@ -81,10 +81,14 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	clock_t c = clock();
 
+	disregardFullscreenAttempts = false;
 	while(!glfwWindowShouldClose(window))
 	{
 		//Limit render rate:
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
+#ifdef CONSOLE_DEBUG
+		std::cout << "Frame time of " << delta << ".\n";
+#endif
 		c = clock();
 
 		short turnNumberS = turnNumber;
@@ -152,9 +156,11 @@ void setWindowed()
 	//If possible, fix the Halite's VAOs.
 	if(my_game != NULL) my_game->recreateGL();
 	//Fix text.
-	if(my_game != NULL) util::cleanup();
-	util::initText();
-	util::setFont("fonts/FreeSans.ttf");
+	if(my_game == NULL) //util::cleanup();
+	{
+		util::initText();
+		util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
+	}
 	util::setScreenSize(windowedWidth, windowedHeight);
 }
 
@@ -330,7 +336,7 @@ void handleChars(GLFWwindow * w, unsigned int code)
 	}
 	else if(code == 'F' || code == 'f')
 	{
-		isWindowed ? setFullscreen() : setWindowed();
+		if(!disregardFullscreenAttempts) isWindowed ? setFullscreen() : setWindowed();
 	}
 	else if(code == 'O' || code == 'o')
 	{
@@ -371,13 +377,14 @@ void handleResize(GLFWwindow * w, int width, int height)
 	util::setScreenSize(width, height);
 	windowedWidth = width;
 	windowedHeight = height;
+	util::removeAllFontSizes();
 }
 
 void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	util::renderText(-.85, 0.0, 95, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
+	util::renderText(-.85, 0.0, 96, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();

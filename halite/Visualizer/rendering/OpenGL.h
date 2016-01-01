@@ -9,6 +9,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 #include <algorithm>
 #include <time.h>
@@ -32,10 +33,10 @@ namespace util
 	bool shaderFromFile(GLuint shader, std::string filename, std::string shadername);
 	void setScreenSize(int w, int h);
 	bool initText();
-	bool setFont(std::string path);
+	void addFontSize(int s); //If font size is already present, returns immediately (little cost).
+	void removeAllFontSizes(); //If font size is not already present, returns immediately (little cost).
+	bool setFont(std::string path); //Now going to create text atlas here as well.
 	//Returns 0 if all went well; the character it failed on otherwise.
 	char renderText(float x, float y, int size, Color c, const std::string & text);
-	void addText(float x, float y, int size, Color c, const std::string & text);
-	char renderAllText(GLFWwindow * w);
 	void cleanup();
 }
