@@ -212,7 +212,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { a, min(b->second, effectivePieces[a][b->first]) };
+			game_map.getSite(b->first, STILL) = { a, min(b->second, static_cast<unsigned char>(effectivePieces[a][b->first])) };
 		}
 	}
 
