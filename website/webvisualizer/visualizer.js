@@ -49,10 +49,10 @@ function loadHLTFile(filename, callback) {
 				currentIndex += 2
 
 				for(var b = 0; b < numPieces; b++) {
-					var strength = contents.charCodeAt(currentIndex);
+					var strength = contents.charCodeAt(currentIndex)
 					currentIndex++
 					
-					if(y >= height) break;
+					if(y >= height) break
 
 					map.contents[y][x] = new hltSite(presentOwner, strength)
 					
@@ -64,7 +64,7 @@ function loadHLTFile(filename, callback) {
 				}
 
 				tilesSoFar += numPieces
-				if(tilesSoFar > totalTiles) throw "Internal desync detected at frame " + a + " in file " + filename;
+				if(tilesSoFar > totalTiles) throw "Internal desync detected at frame " + a + " in file " + filename
 			}
 
 			map.getStatistics()
@@ -75,5 +75,5 @@ function loadHLTFile(filename, callback) {
 		console.log(contents.length)
 
 		callback(fullGame, defenseBonus, playerNames, playerScores, playerColors)
-	});
+	})
 }

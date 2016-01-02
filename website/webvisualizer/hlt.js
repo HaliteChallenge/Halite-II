@@ -24,20 +24,20 @@ function hltMap(width, height) {
 hltMap.prototype.getStatistics = function() {
 	this.territory_count = new Array()
 	var size = 254
-	while(size--) this.territory_count[size] = 0;
+	while(size--) this.territory_count[size] = 0
 	
 	this.strength_count = new Array()
 	size = 254
-	while(size--) this.strength_count[size] = 0;
+	while(size--) this.strength_count[size] = 0
 
 	for(var a = 0; a < this.height; a++) for(var b = 0; b < this.width; b++) if(this.contents[a][b].owner != 0)
 	{
-		this.territory_count[this.contents[a][b].owner - 1]++;
-		this.strength_count[this.contents[a][b].owner - 1] += this.contents[a][b].strength;
+		this.territory_count[this.contents[a][b].owner - 1]++
+		this.strength_count[this.contents[a][b].owner - 1] += this.contents[a][b].strength
 	}
 	while(this.territory_count.length != 0 && this.territory_count[this.territory_count.length - 1] == 0)
 	{
-		this.territory_count.pop();
-		this.strength_count.pop();
+		this.territory_count.pop()
+		this.strength_count.pop()
 	}
 }
