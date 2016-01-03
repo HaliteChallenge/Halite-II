@@ -1,4 +1,83 @@
 <!DOCTYPE html>
+<!-- I have no idea what I'm doing. The goal is to create the GL stuff here: -->
+<html> 
+	<head> 
+		<meta charset="utf-8"> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Halite Visualizer</title> 
+		<style> 
+			body
+			{
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style> 
+	</head> 
+	<body> 
+		<canvas></canvas>
+		<div id="info"></div> 
+		<script id="border-vertex" type="x-shader/vertex"> 
+			attribute vec2 vp;
+			void main()
+			{
+				gl_Position = vec4(vp, 0.0, 1.0);
+			}
+		</script> 
+		<script id="border-fragment" type="x-shader/fragment"> 
+			void main()
+			{
+				gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+			};
+		</script>
+		<script id="graph-vertex" type="x-shader/vertex"> 
+			attribute vec2 vp;
+			attribute vec3 vertexColor;
+			varying vec3 color;
+			void main ()
+			{
+				gl_Position = vec4 (vp, 0.0, 1.0);
+				color = vertexColor;
+			}
+		</script> 
+		<script id="graph-fragment" type="x-shader/fragment"> 
+			varying vec3 color;
+			void main()
+			{
+				gl_FragColor = vec4(color, 1.0);
+			};
+		</script>
+		<script id="loading-vertex" type="x-shader/vertex"> 
+			attribute vec2 vp;
+			void main()
+			{
+				gl_Position = vec4(vp, 0.0, 1.0);
+			}
+		</script> 
+		<script id="loading-fragment" type="x-shader/fragment"> 
+			void main()
+			{
+				gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+			};
+		</script>
+		<script id="map-vertex" type="x-shader/vertex"> 
+			attribute vec2 vp;
+			attribute vec3 vertexColor;
+			varying vec3 color;
+			void main()
+			{
+				gl_Position = vec4(vp, 0.0, 1.0);
+				color = vertexColor;
+			}
+		</script> 
+		<script id="map-fragment" type="x-shader/fragment"> 
+			varying vec3 color;
+			void main()
+			{
+				gl_FragColor = vec4(color, 1.0);
+			};
+		</script>
+
 <html lang="en">
 <head>
 	<title>Halite Web Visualizer</title>
