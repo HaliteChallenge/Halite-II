@@ -384,7 +384,8 @@ void renderLaunch()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	util::renderText(-.85, 0.0, 96, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
+	int height; glfwGetWindowSize(window, NULL, &height);
+	util::renderText(-.85, 0.0, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
