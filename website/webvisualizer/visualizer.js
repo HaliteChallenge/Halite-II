@@ -1,8 +1,3 @@
-loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors) {
-	// Put visualizer stuff here
-	
-})
-
 function loadHLTFile(filename, callback) {
 	$.get(filename, function(contents) {
 		var fileComponents = contents.trim().split(/\s+/)
