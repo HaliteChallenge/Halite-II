@@ -32,12 +32,12 @@
 		</script>
 		<script id="graph-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
-			attribute vec3 vertexColor;
+			attribute vec3 vc;
 			varying vec3 color;
 			void main ()
 			{
 				gl_Position = vec4 (vp, 0.0, 1.0);
-				color = vertexColor;
+				color = vc;
 			}
 		</script> 
 		<script id="graph-fragment" type="x-shader/fragment"> 
@@ -62,12 +62,12 @@
 		</script>
 		<script id="map-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
-			attribute vec3 vertexColor;
+			attribute vec3 vc;
 			varying vec3 color;
 			void main()
 			{
 				gl_Position = vec4(vp, 0.0, 1.0);
-				color = vertexColor;
+				color = vc;
 			}
 		</script> 
 		<script id="map-fragment" type="x-shader/fragment"> 
@@ -76,6 +76,249 @@
 			{
 				gl_FragColor = vec4(color, 1.0);
 			};
+		</script>
+		/*
+		<script id="text-vertex" type="x-shader/vertex"> 
+			attribute vec2 vp;
+			attribute vec3 vc;
+			varying vec3 color;
+			void main()
+			{
+				gl_Position = vec4(vp, 0.0, 1.0);
+				color = vc;
+			}
+		</script> 
+		<script id="text-fragment" type="x-shader/fragment"> 
+			varying vec3 color;
+			void main()
+			{
+				gl_FragColor = vec4(color, 1.0);
+			};
+		</script>
+		*/
+		
+		<script>
+			//Create global variables:
+			var canvas, gl,
+			border_vertex_shader, border_fragment_shader, border_shader_program, border_vp_location,
+			graph_vertex_shader, graph_fragment_shader, graph_shader_program, graph_vp_location, graph_vc_location,
+			loading_vertex_shader, loading_fragment_shader, loading_shader_program, loading_vp_location,
+			map_vertex_shader, map_fragment_shader, map_shader_program, map_vp_location, map_vc_location,
+			text_vertex_shader, text_fragment_shader, text_shader_program, text_vp_location, text_vc_location,
+			buffer;
+		
+			loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors)
+			{
+				//Do initialization:
+				canvas = document.querySelector('canvas')
+				try
+				{
+					gl = canvas.getContext('experimental-webgl')
+				}
+				catch(error) {}
+				if(!gl) throw "cannot create webgl context"
+				onWindowResize();
+				window.addEventListener('resize', onWindowResize, false);
+				//Create all of the shaders
+				createPrograms();
+				
+				//Temp buffer (render w/ loading program, good test);
+				buffer = gl.createBuffer();
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW )
+				
+				gl.useProgram(loading_shader_program)
+				gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+				gl.vertexAttribPointer(loading_vp_location, 2, gl.FLOAT, false, 0, 0)
+				gl.enableVertexAttribArray(loading_vp_location)
+				while(loading_shader_program)
+				{
+					gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+					gl.drawArrays(gl.TRIANGLES, 0, 6)
+				}
+			})
+			
+			function createBorderProgram()
+			{
+				//Ensure that shader program does not exist:
+				gl.deleteProgram(border_shader_program)
+				//Create shader program:
+				border_vertex_shader = document.getElementById('border-vertex').textContent
+				border_fragment_shader = document.getElementById('border-fragment').textContent
+				border_shader_program = createProgram(border_vertex_shader, border_fragment_shader)
+				//Get attribute locations:
+				border_vp_location = gl.getAttribLocation(border_shader_program, 'vp')
+			}
+			function createGraphProgram()
+			{
+				//Ensure that shader program does not exist:
+				gl.deleteProgram(graph_shader_program)
+				//Create shader program:
+				graph_vertex_shader = document.getElementById('graph-vertex').textContent
+				graph_fragment_shader = document.getElementById('graph-fragment').textContent
+				graph_shader_program = createProgram(graph_vertex_shader, graph_fragment_shader)
+				//Get attribute locations:
+				graph_vp_location = gl.getAttribLocation(graph_shader_program, 'vp')
+				graph_vc_location = gl.getAttribLocation(graph_shader_program, 'vc')
+			}
+			function createLoadingProgram()
+			{
+				//Ensure that shader program does not exist:
+				gl.deleteProgram(loading_shader_program)
+				//Create shader program:
+				loading_vertex_shader = document.getElementById('loading-vertex').textContent
+				loading_fragment_shader = document.getElementById('loading-fragment').textContent
+				loading_shader_program = createProgram(loading_vertex_shader, loading_fragment_shader)
+				//Get attribute locations:
+				loading_vp_location = gl.getAttribLocation(loading_shader_program, 'vp')
+			}
+			function createMapProgram()
+			{
+				//Ensure that shader program does not exist:
+				gl.deleteProgram(map_shader_program)
+				//Create shader program:
+				map_vertex_shader = document.getElementById('map-vertex').textContent
+				map_fragment_shader = document.getElementById('map-fragment').textContent
+				map_shader_program = createProgram(map_vertex_shader, map_fragment_shader)
+				//Get attribute locations:
+				map_vp_location = gl.getAttribLocation(map_shader_program, 'vp')
+				map_vc_location = gl.getAttribLocation(map_shader_program, 'vc')
+			}
+			function createTextProgram()
+			{
+				//Ensure that shader program does not exist:
+				gl.deleteProgram(text_shader_program)
+				//Create shader program:
+				text_vertex_shader = document.getElementById('text-vertex').textContent
+				text_fragment_shader = document.getElementById('text-fragment').textContent
+				text_shader_program = createProgram(text_vertex_shader, text_fragment_shader)
+				//Get attribute locations:
+				text_vp_location = gl.getAttribLocation(text_shader_program, 'vp')
+				text_vc_location = gl.getAttribLocation(text_shader_program, 'vc')
+			}
+			function createPrograms()
+			{
+				createBorderProgram()
+				createGraphProgram()
+				createLoadingProgram()
+				createMapProgram()
+				createTextProgram()
+			}
+			
+			function createProgram(vertex, fragment)
+			{
+				var program = gl.createProgram()
+				var vs = createShader(vertex, gl.VERTEX_SHADER)
+				var fs = createShader('#ifdef GL_ES\nprecision highp float;\n#endif\n\n' + fragment, gl.FRAGMENT_SHADER)
+				if (vs == null || fs == null) return null
+				gl.attachShader(program, vs)
+				gl.attachShader(program, fs)
+				gl.linkProgram(program)
+				gl.deleteShader(vs);
+				gl.deleteShader(fs)
+				if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+				{
+					alert("ERROR:\n" +
+					"VALIDATE_STATUS: " + gl.getProgramParameter(program, gl.VALIDATE_STATUS) + "\n" +
+					"ERROR: " + gl.getError() + "\n\n" +
+					"- Vertex Shader -\n" + vertex + "\n\n" +
+					"- Fragment Shader -\n" + fragment);
+					return null;
+				}
+				return program;
+			}
+			function createShader(src, type)
+			{
+				var shader = gl.createShader(type)
+				gl.shaderSource(shader, src)
+				gl.compileShader(shader)
+				if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+				{
+					alert((type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT") + " SHADER:\n" + gl.getShaderInfoLog(shader))
+					return null
+				}
+				return shader
+			}
+
+			function loadHLTFile(filename, callback)
+			{
+				$.get(filename, function(contents)
+				{
+					var fileComponents = contents.trim().split(/\s+/)
+					var originalLength = fileComponents.length
+
+					//Remove file version header
+					fileComponents.shift()
+					fileComponents.shift()
+
+					var width = parseInt(fileComponents.shift())
+					var height = parseInt(fileComponents.shift())
+					var defenseBonus = parseFloat(fileComponents.shift())
+					var numPlayers = parseInt(fileComponents.shift())
+					var numLines = parseInt(fileComponents.shift())
+					
+					var playerNames = new Array()
+					var playerScores = new Array()
+					var playerColors = new Array()
+					var fullGame = new Array()
+
+					for(var a = 0; a < numPlayers; a++) {
+						playerNames.push(fileComponents.shift())
+						playerScores.push(parseInt(fileComponents.shift()))
+						playerColors.push({r: parseFloat(fileComponents.shift()), g: parseFloat(fileComponents.shift()), b: parseFloat(fileComponents.shift())})
+					}
+
+					//START TO READ THE ACTUAL GAME. DONE WITH FILECOMPONENTS
+					//Find our current place in the file
+					var linesDown = 2 + numPlayers
+					//find nth occurrence of "\n" where linesDown is n
+					var currentIndex = contents.split("\n", linesDown).join("\n").length + 1
+
+					var fullGame = new Array()
+
+					var totalTiles = width*height
+					for(var a = 0; a < numLines; a++)
+					{
+						var x = 0, y = 0
+						var tilesSoFar = 0
+						var map = new hltMap(width, height)
+
+						while(tilesSoFar < totalTiles)
+						{
+							var numPieces = contents.charCodeAt(currentIndex)
+							var presentOwner = contents.charCodeAt(currentIndex+1)
+							currentIndex += 2
+
+							for(var b = 0; b < numPieces; b++) {
+								var strength = contents.charCodeAt(currentIndex)
+								currentIndex++
+								
+								if(y >= height) break
+
+								map.contents[y][x] = new hltSite(presentOwner, strength)
+								
+								x++
+								if(x >= width)
+								{
+									x = 0
+									y++
+								}
+							}
+
+							tilesSoFar += numPieces
+							if(tilesSoFar > totalTiles) throw "Internal desync detected at frame " + a + " in file " + filename
+						}
+
+						map.getStatistics()
+						fullGame.push(map)
+					}
+
+					console.log(currentIndex)
+					console.log(contents.length)
+
+					callback(fullGame, defenseBonus, playerNames, playerScores, playerColors)
+				})
+			}
 		</script>
 
 <html lang="en">
