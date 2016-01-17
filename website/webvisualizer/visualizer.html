@@ -32,8 +32,8 @@
 		<script id="border-fragment" type="x-shader/fragment"> 
 			void main()
 			{
-				gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-			};
+				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); //Red for border debugging
+			}
 		</script>
 		<script id="graph-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
@@ -50,7 +50,7 @@
 			void main()
 			{
 				gl_FragColor = vec4(color, 1.0);
-			};
+			}
 		</script>
 		<script id="loading-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
@@ -62,8 +62,8 @@
 		<script id="loading-fragment" type="x-shader/fragment"> 
 			void main()
 			{
-				gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-			};
+				gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); //Green for loading debugging
+			}
 		</script>
 		<script id="map-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
@@ -80,9 +80,8 @@
 			void main()
 			{
 				gl_FragColor = vec4(color, 1.0);
-			};
+			}
 		</script>
-		/*
 		<script id="text-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
 			attribute vec3 vc;
@@ -98,9 +97,8 @@
 			void main()
 			{
 				gl_FragColor = vec4(color, 1.0);
-			};
+			}
 		</script>
-		*/
 		
 		<script>
 			//Create global variables:
@@ -111,7 +109,33 @@
 			map_vertex_shader, map_fragment_shader, map_shader_program, map_vp_location, map_vc_location,
 			text_vertex_shader, text_fragment_shader, text_shader_program, text_vp_location, text_vc_location,
 			buffer;
+			
+			function onWindowResize(event)
+			{
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				gl.viewport(0, 0, canvas.width, canvas.height);
+			}
+			window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
+				return  window.webkitRequestAnimationFrame ||
+				        window.mozRequestAnimationFrame ||
+				        window.oRequestAnimationFrame ||
+				        window.msRequestAnimationFrame ||
+				        function(  callback, element ) {
+					        window.setTimeout( callback, 1000 / 60 );
+				        };
+			})();
 		
+			function run()
+			{
+				requestAnimationFrame(run)
+				render()
+			}
+			function render()
+			{
+				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+				gl.drawArrays(gl.TRIANGLES, 0, 6)
+			}
 			loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors)
 			{
 				//Do initialization:
@@ -136,11 +160,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 				gl.vertexAttribPointer(loading_vp_location, 2, gl.FLOAT, false, 0, 0)
 				gl.enableVertexAttribArray(loading_vp_location)
-				while(loading_shader_program)
-				{
-					gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-					gl.drawArrays(gl.TRIANGLES, 0, 6)
-				}
+				run();
 			})
 			
 			function createBorderProgram()
