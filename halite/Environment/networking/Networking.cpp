@@ -360,6 +360,8 @@ if (isProcessDead(playerTag)) return;
 	processes[playerTag - 1] = NULL;
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
+
+	std::cout << "Player " << playerTag << " is dead\n";
 #else
     kill(processes[playerTag - 1], SIGKILL);
     

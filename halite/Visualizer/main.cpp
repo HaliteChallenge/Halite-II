@@ -1,8 +1,10 @@
-#define CONSOLE_DEBUG
+//#define CONSOLE_DEBUG
 
 #include <iostream>
 #include <thread>
+#include <stdlib.h>
 #include <Windows.h>
+#include <direct.h>
 #include "Core/Halite.h"
 
 GLFWwindow * window;
@@ -29,11 +31,19 @@ std::string filename;
 std::fstream debug;
 
 #ifdef CONSOLE_DEBUG
-int main()
+int main(int argc, const char ** argv)
 #else
-INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow)
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow)
 #endif
 {
+	if(__argc == 2)
+	{
+		std::string loc(__argv[0]);
+		std::replace(loc.begin(), loc.end(), '\\', '/');
+		loc = loc.substr(0, loc.find_last_of('/'));
+		_chdir(loc.c_str());
+	}
+
 	//Open debug:
 	std::string debugfilename = "logs/";
 	time_t rawtime;
@@ -77,7 +87,14 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	my_game = new Halite();
 
-	while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
+	if(__argc == 2)
+	{
+		handleDrop(window, 1, (const char **)(__argv + 1));
+	}
+	else
+	{
+		while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
+	}
 
 	clock_t c = clock();
 
@@ -385,7 +402,7 @@ void renderLaunch()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int height; glfwGetWindowSize(window, NULL, &height);
-	util::renderText(-.85, 0.0, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
+	util::renderText(-.85, 0.0, height / 8, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
