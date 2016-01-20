@@ -16,7 +16,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = game_map.map_width * game_map.map_height + 100;
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = game_map.map_width * game_map.map_height + last_territory_count[a] + 100;
 
 	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
 	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
@@ -244,13 +244,15 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	full_game.push_back(turn);
 
 	//Check if the game is over:
+	last_territory_count = std::vector<unsigned int>(number_of_players);
 	std::vector<bool> stillAlive(number_of_players, false);
 	unsigned char numAlive = 0;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0)
 	{
-		full_territory_count[game_map.contents[a][b].owner - 1]++;
+		last_territory_count[game_map.contents[a][b].owner - 1]++;
 		stillAlive[game_map.contents[a][b].owner - 1] = true;
 	}
+	for(int a = 0; a < last_territory_count.size(); a++) full_territory_count[a] += last_territory_count[a];
 	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false; 
 	return stillAlive;
 }
@@ -351,6 +353,7 @@ void Halite::init()
 	player_moves = std::vector< std::set<hlt::Move> >();
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
+	last_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 
 	//Figure out what defense_bonus should be.
