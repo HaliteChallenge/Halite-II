@@ -523,6 +523,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		glfwSwapBuffers(window);
 	}
 
+	//Set last position to be where we're out.
+	last_pos = game_file.tellg();
+
 	//Cleanup
 	glDeleteBuffers(1, &loadingBuffer);
 	glDeleteVertexArrays(1, &loadingAttributes);

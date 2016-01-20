@@ -1,12 +1,14 @@
 #include "Halite.h"
 
-//For debugging purposes:
-#include <chrono>
-#include <thread>
-
 //Consts -----------------------------
 
-//Graph constants. These are technically not constant, as they are initialized during input, but oh well.
+//Environment:
+
+const float MIN_DEFENSE_BONUS = 1, MAX_DEFENSE_BONUS = 1.5;
+
+//Visualizer:
+
+//Graph constants. These are technically not constant, as they are initialized during init, but oh well.
 float territory_graph_top = 0.92, territory_graph_bottom = 0.01, territory_graph_left = 0.51, territory_graph_right = 0.98;
 float strength_graph_top = -0.07, strength_graph_bottom = -0.98, strength_graph_left = 0.51, strength_graph_right = 0.98;
 
@@ -14,6 +16,259 @@ float strength_graph_top = -0.07, strength_graph_bottom = -0.98, strength_graph_
 const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.49;
 
 //Private Functions ------------------
+
+//Environment:
+
+std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
+{
+	if(game_map.map_width == 0 || game_map.map_height == 0) return std::vector<bool>(0);
+
+	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
+	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	unsigned char threadLocation = 0; //Represents place in frameThreads.
+
+	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
+	std::vector<int> allowableTimesToRespond(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = 10000;
+
+	//For the time being we'll allow infinte time (debugging purposes), but eventually this will come into use):
+	//allowableTimesToRespond[a] = 0.2 + (double(game_map.map_height)*game_map.map_width*.0001) + (double(game_map.territory_count[a]) * game_map.territory_count[a] * .001);
+
+	// Stores the messages sent by bots this frame
+	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		if(alive[a])
+		{
+			// Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
+			std::vector<hlt::Message> messagesForThisBot;
+			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
+
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+
+			threadLocation++;
+		}
+	}
+
+	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players + 1);
+	std::vector< std::map<hlt::Location, float> > effectivePieces(number_of_players + 1);
+
+	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
+	std::vector<bool> permissibleTime(number_of_players, false);
+	threadLocation = 0; //Represents place in frameThreads.
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		if(alive[a])
+		{
+
+			bool success = frameThreads[threadLocation].get();
+			if(success)
+			{
+				permissibleTime[a] = true;
+			}
+			//  There was an exception in the networking thread or the player timed out. Either way, kill their thread 
+			else
+			{
+				std::cout << player_names[a].first << " timed out\n";
+				permissibleTime[a] = false;
+				networking.killPlayer(a + 1);
+			}
+			threadLocation++;
+		}
+	}
+
+	// Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
+	pastFrameMessages = std::vector<hlt::Message>();
+	// Ensure that the player signed their messages correctly
+	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
+	{
+		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
+		{
+			message->senderID = playerIndex + 1; // playerIndex + 1 equals the playerID of the sender
+			pastFrameMessages.push_back(*message);
+		}
+	}
+
+	//For each player, use their moves to create the pieces map.
+	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
+	{
+		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
+		{
+			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
+			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
+			if(pieces[a + 1].count(newLoc)) //pieces and effectivepieces are synced.
+			{
+				//If not moving, apply defense_bonus.
+				effectivePieces[a + 1][newLoc] += b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength;
+				if(short(pieces[a + 1][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a + 1][newLoc] += game_map.getSite(b->loc, STILL).strength;
+				else pieces[a + 1][newLoc] = 255;
+			}
+			else
+			{
+				effectivePieces[a + 1].insert(std::pair<hlt::Location, unsigned short>(newLoc, b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength));
+				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
+			}
+
+			//Add in a new piece with a strength of 0 if necessary.
+			if(!pieces[a + 1].count(b->loc))
+			{
+				effectivePieces[a + 1].insert(std::pair<hlt::Location, unsigned short>(newLoc, 0));
+				pieces[a + 1].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
+			}
+
+			//Erase from the game map so that the player can't make another move with the same piece. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
+			game_map.getSite(b->loc, STILL) = { 255, 0 };
+		}
+	}
+
+	//Add in all of the remaining pieces whose moves weren't specified. 
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+	{
+		hlt::Location l = { b, a };
+		if(game_map.getSite(l, STILL).strength != 255 && !(game_map.getSite(l, STILL).strength == 1 && game_map.getSite(l, STILL).owner == 0)) game_map.getSite(l, STILL).strength++;
+		hlt::Site s = game_map.getSite(l, STILL);
+		if(s.owner != 255)
+		{
+			if(pieces[s.owner].count(l)) //pieces and effectivepieces are synced.
+			{
+				if(short(pieces[s.owner][l]) + s.strength <= 255) pieces[s.owner][l] += s.strength;
+				else pieces[s.owner][l] = 255;
+				effectivePieces[s.owner][l] += s.strength * defense_bonus;
+			}
+			else
+			{
+				pieces[s.owner].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
+				effectivePieces[s.owner].insert(std::pair<hlt::Location, unsigned short>(l, s.strength * defense_bonus));
+			}
+		}
+	}
+
+	std::vector< std::map<hlt::Location, float> > toInjure(number_of_players + 1); //This is a short so that we don't have to worry about 255 overflows.
+
+	//Sweep through locations and find the correct damage for each piece.
+	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+	{
+		hlt::Location l = { b, a };
+		for(unsigned short c = 0; c < number_of_players + 1; c++) if((c == 0 || alive[c - 1]) && pieces[c].count(l)) //pieces and effectivepieces are synced.
+		{
+			for(unsigned short d = 0; d < number_of_players + 1; d++) if(d != c && (d == 0 || alive[d - 1]))
+			{
+				hlt::Location tempLoc = l;
+				//Check 'STILL' square:
+				if(pieces[d].count(tempLoc))
+				{
+					//Apply damage, but not more than they have strength:
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+				}
+				//Only resolve adjacent squares if both players involved are not the NULL player.
+				if(c != 0 && d != 0)
+				{
+					//Check 'NORTH' square:
+					tempLoc = game_map.getLocation(l, NORTH);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage, but not more than they have strength:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					}
+					//Check 'EAST' square:
+					tempLoc = game_map.getLocation(l, EAST);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage, but not more than they have strength:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					}
+					//Check 'SOUTH' square:
+					tempLoc = game_map.getLocation(l, SOUTH);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage, but not more than they have strength:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					}
+					//Check 'WEST' square:
+					tempLoc = game_map.getLocation(l, WEST);
+					if(pieces[d].count(tempLoc))
+					{
+						//Apply damage, but not more than they have strength:
+						if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
+						else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					}
+				}
+			}
+		}
+	}
+
+	//Injure and/or delete pieces. Note >= rather than > indicates that pieces with a strength of 0 are killed.
+	for(unsigned char a = 0; a < number_of_players + 1; a++) if(a == 0 || alive[a - 1])
+	{
+		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
+		{
+			b->second = floor(b->second); //Floor injuries; pieces retain health if possible.
+			if(b->second >= effectivePieces[a][b->first])
+			{
+				effectivePieces[a].erase(b->first);
+				pieces[a].erase(b->first); //effectivePieces can only be higher; therefore we must delete this too.
+			}
+			else effectivePieces[a][b->first] -= b->second;
+		}
+	}
+
+	//Clear the map (everything to {0, 1})
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b = { 0, 1 };
+
+	//Add pieces back into the map.
+	for(unsigned char a = 0; a < number_of_players + 1; a++)
+	{
+		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
+		{
+			game_map.getSite(b->first, STILL) = { a, min(b->second, static_cast<unsigned char>(effectivePieces[a][b->first])) };
+		}
+	}
+
+	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
+	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
+	std::list<unsigned char> strengths;
+	short numPieces = 0;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	{
+		if(numPieces == 255 || b->owner != presentOwner)
+		{
+			turn->push_back(numPieces);
+			turn->push_back(presentOwner);
+			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			strengths.clear();
+			numPieces = 0;
+			presentOwner = b->owner;
+		}
+		numPieces++;
+		strengths.push_back(b->strength);
+	}
+
+	//Final output set:
+	turn->push_back(numPieces);
+	turn->push_back(presentOwner);
+	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	turn->shrink_to_fit();
+	//Add to full game:
+	full_game_output.push_back(turn);
+
+	//Check if the game is over:
+	std::vector<bool> stillAlive(number_of_players, false);
+	unsigned char numAlive = 0;
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0)
+	{
+		full_territory_count[game_map.contents[a][b].owner - 1]++;
+		stillAlive[game_map.contents[a][b].owner - 1] = true;
+	}
+	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false;
+	return stillAlive;
+}
+
+//Visualizer:
 
 void Halite::setupMapGL()
 {
@@ -360,214 +615,208 @@ void Halite::setupBorders()
 	glDeleteShader(border_fragment_shader);
 }
 
-void Halite::clearFullGame()
-{
-	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
-	full_game.clear();
-}
-
 //Public Functions -------------------
 
-Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
+Halite::Halite(unsigned short w, unsigned short h): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
-    number_of_players = 0;
-    player_names = std::vector< std::pair<std::string, float> >();
-    full_game = std::vector<hlt::Map * >();
-	//loadColorCodes("settings/colorcodes.txt");
-	color_codes[0] = { 0.3f, 0.3f, 0.3f };
-	map_x_offset = 0;
-	map_y_offset = 0;
-}
+	//Connect to players
+	number_of_players = 0;
+	player_names = std::vector< std::pair<std::string, float> >();
 
-short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
-{
-	std::fstream game_file;
-	hlt::Map m;
 	std::string in;
-	game_file.open(filename, std::ios_base::in);
-	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
-	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 6") throw std::runtime_error("Unrecognized format in file " + filename);
-
-	present_file = filename;
-	//Clear previous game
-	clearFullGame();
-
-	//Generate text for the loading bar:
-	std::string loadingText = "LOADING..........";
-	const int TEXT_SIZE = 64;
-	const float TEXT_OFFSET = 0.025;
-
-	//Generate a buffer for the loading bar's inside. We'll delete this near the end of the function.
-	GLuint loadingBuffer; glGenBuffers(1, &loadingBuffer);
-	std::vector<float> loadingVertices(12);
-	const float LOADING_TOP = 0.2, LOADING_BOTTOM = -0.2, LOADING_LEFT = -0.8, LOADING_RIGHT = 0.8;
-	loadingVertices[0] = LOADING_LEFT; loadingVertices[1] = LOADING_BOTTOM; loadingVertices[2] = LOADING_LEFT; loadingVertices[3] = LOADING_TOP; loadingVertices[4] = LOADING_LEFT; loadingVertices[5] = LOADING_BOTTOM; loadingVertices[6] = LOADING_LEFT; loadingVertices[7] = LOADING_TOP; loadingVertices[8] = LOADING_RIGHT; loadingVertices[9] = LOADING_TOP; loadingVertices[10] = LOADING_RIGHT; loadingVertices[11] = LOADING_BOTTOM;
-	GLuint loadingAttributes; glGenVertexArrays(1, &loadingAttributes);
-	glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-	glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
-	glBindVertexArray(loadingAttributes);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER), fs = glCreateShader(GL_FRAGMENT_SHADER); //Create shaders.
-	util::shaderFromFile(vs, "shaders/loading/vertex.glsl", "Loading Vertex Shader"); util::shaderFromFile(fs, "shaders/loading/fragment.glsl", "Loading Fragment Shader");
-	GLuint p = glCreateProgram();
-	glAttachShader(p, vs); glAttachShader(p, fs);
-	glLinkProgram(p); glUseProgram(p);
-	glDetachShader(p, vs); glDetachShader(p, fs);
-	glDeleteShader(vs); glDeleteShader(fs);
-
-	//Set window for rendering:
-	glfwMakeContextCurrent(window);
-
-	//Do first rendering:
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glBindVertexArray(loadingAttributes);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDrawArrays(GL_LINE_LOOP, 2, 4);
-
-	glfwPollEvents();
-	glfwSwapBuffers(window);
-
-	//Read in names and dimensions
-	int numLines;
-	m.map_width = 0;
-	m.map_height = 0;
-	game_file >> width >> height >> defense_bonus >> number_of_players >> numLines;
-	m.map_width = width;
-	map_width = width;
-	m.map_height = height;
-	map_height = height;
-	std::getline(game_file, in);
-	player_names.resize(number_of_players);
-	player_scores.resize(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++)
+	bool done = false;
+	while(!done)
 	{
-		player_names[a].first = "";
-		char c;
+		in;
+		//If less than 2, bypass this step: Ask if the user like to add another AI
+		if(number_of_players >= 2)
+		{
+			std::cout << "Would you like to add another player? Please enter Yes or No: ";
+			while(true)
+			{
+				std::getline(std::cin, in);
+				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+				if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
+				std::cout << "That isn't a valid input. Please enter Yes or No: ";
+			}
+			if(in == "n" || in == "no" || in == "nope") break;
+		}
+
 		while(true)
 		{
-			game_file.get(c);
-			if(c == ' ') break;
-			player_names[a].first += c;
-		}
-		game_file >> player_scores[a];
+			std::string startCommand;
+			std::cout << "What is the start command for this bot: ";
+			std::getline(std::cin, startCommand);
 
-		Color color;
-		game_file >> color.r >> color.g >> color.b;
-		color_codes[a + 1] = color;
-		game_file.get(); //Get newline character
-	}
-
-	m.contents.resize(m.map_height);
-	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
-	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
-
-	//If we reach the end of the file, ignore that last file.
-	std::streampos pos = game_file.tellg();
-	game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
-	game_file.seekg(pos);
-	unsigned char numPieces, presentOwner, strength;
-	char c;
-	const int totalTiles = m.map_height*m.map_width;
-	bool shouldLeave = false;
-	for(short a = 0; a < numLines; a++)
-	{
-		short x = 0, y = 0;
-		int tilesSoFar = 0;
-		while(tilesSoFar < totalTiles)
-		{
-			game_file.get(c); numPieces = unsigned char(c);
-			game_file.get(c); presentOwner = unsigned char(c);
-			for(short b = 0; b < numPieces; b++)
+			try
 			{
-				game_file.get(c); strength = unsigned char(c);
-				if(y >= m.map_height) break;
-				m.contents[y][x] = { presentOwner, strength };
-				x++;
-				if(x >= m.map_width)
-				{
-					x = 0;
-					y++;
-				}
+				networking.startAndConnectBot(startCommand);
+				break;
 			}
-			shouldLeave = game_file.eof();
-			tilesSoFar += numPieces;
-			if(tilesSoFar > totalTiles) throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
+			catch(int e)
+			{
+				std::cout << "There was a problem with that start command. Please enter another one.\n";
+			}
 		}
 
-		//Get statistics
-		m.getStatistics();
-		//Add game map to full game
-		full_game.push_back(new hlt::Map(m));
-
-		//Render the loading bar:
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
-
-		//glUseProgram(p);
-		glBindVertexArray(loadingAttributes);
-		glEnableVertexAttribArray(0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDrawArrays(GL_LINE_LOOP, 2, 4);
-
-		util::renderText(LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, { 1, 1, 1 },  loadingText);
-
-		glfwPollEvents();
-		glfwSwapBuffers(window);
+		std::cout << "Connected to player #" << int(number_of_players + 1) << std::endl;
+		number_of_players++;
 	}
 
-	//Cleanup
-	glDeleteBuffers(1, &loadingBuffer);
-	glDeleteVertexArrays(1, &loadingAttributes);
-	glDeleteProgram(p);
+	//Initialize map
+	game_map = hlt::Map(w, h, number_of_players);
 
-	//Put the names in their places.
-	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
-	std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
-	float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	//Perform initialization not specific to constructor
+	init();
+}
+
+Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
+{
+	networking = networking_;
+	number_of_players = networking.numberOfPlayers();
+
+	//Initialize map
+	game_map = hlt::Map(width_, height_, number_of_players);
+
+	//Perform initialization not specific to constructor
+	init();
+}
+
+//Environment:
+
+void Halite::init()
+{
+	//Add colors to possible colors:
+	possible_colors.clear();
+	possible_colors.push_back({ 1.0, 0.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
+	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.0f, 0.0f });
+	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
+	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
+	possible_colors.push_back({ .87f, .72f, .53f });
+	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
+	possible_colors.push_back({ 1.0f, .65f, 0.0f });
+
+	//Create color codes
+	std::vector<Color> newColors = possible_colors;
+	color_codes.clear();
 	for(int a = 0; a < number_of_players; a++)
 	{
-		player_names[playerScoresCpy[a].first].second = statPos;
-		statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
+		int index = rand() % newColors.size();
+		color_codes[a + 1] = newColors[index]; newColors.erase(newColors.begin() + index);
 	}
-	statPos += NAME_TEXT_OFFSET;
 
-	//Figure out where to put all of the graph stuff:
-	statPos -= GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET;
-	strength_graph_left = STAT_LEFT;
-	strength_graph_right = STAT_RIGHT;
-	strength_graph_bottom = STAT_BOTTOM;
-	territory_graph_left = STAT_LEFT;
-	territory_graph_right = STAT_RIGHT;
-	territory_graph_top = statPos;
-	float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
-	strength_graph_top = strength_graph_bottom + graphHeight;
-	territory_graph_bottom = territory_graph_top - graphHeight;
+	//Default initialize
+	player_moves = std::vector< std::set<hlt::Move> >();
+	turn_number = 0;
+	player_names = std::vector< std::pair<std::string, float> >(number_of_players);
+	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 
-	recreateGL();
+	//Figure out what defense_bonus should be.
+	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
 
-	game_file.close();
+	//Output initial map to file
+	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
+	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
+	std::list<unsigned char> strengths;
+	short numPieces = 0;
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
+	{
+		if(numPieces == 255 || b->owner != presentOwner)
+		{
+			turn->push_back(numPieces);
+			turn->push_back(presentOwner);
+			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+			strengths.clear();
+			numPieces = 0;
+			presentOwner = b->owner;
+		}
+		numPieces++;
+		strengths.push_back(b->strength);
+	}
 
-	return numLines;
+	//Final output set:
+	turn->push_back(numPieces);
+	turn->push_back(presentOwner);
+	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
+	turn->shrink_to_fit();
+	//Add to full game:
+	full_game_output.push_back(turn);
+
+	//Initialize player moves vector
+	player_moves.resize(number_of_players);
+
+	//Send initial package 
+	std::vector< std::future<bool> > initThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+	}
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		bool success = initThreads[a].get();
+		if(!success)
+		{
+			networking.killPlayer(a + 1);
+		}
+	}
 }
 
-bool Halite::isValid(std::string filename)
+void Halite::output(std::string filename)
 {
-	std::fstream game_file;
-	game_file.open(filename, std::ios_base::in);
-	if(!game_file.is_open()) return false;
-	std::string format; std::getline(game_file, format);
-	if(format != "HLT 6") return false;
-	return true;
+	std::ofstream gameFile;
+	gameFile.open(filename);
+	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
+
+	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
+	gameFile << "HLT 6\n";
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game_output.size()) << '\n';
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		Color c = color_codes[a + 1];
+		gameFile << player_names[a].first << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << '\n';
+	}
+	gameFile.close();
+	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
+	for(auto a = full_game_output.begin(); a != full_game_output.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
+
+	gameFile.flush();
+	gameFile.close();
 }
+
+std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
+{
+	std::vector<bool> result(number_of_players, true);
+	player_scores = std::vector<unsigned int>(number_of_players);
+	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 1000)
+	{
+		//Increment turn number:
+		turn_number++;
+		std::cout << "Turn " << turn_number << "\n";
+		//Frame logic.
+		result = processNextFrame(result);
+		//Set scores:
+		for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = full_territory_count[a];
+	}
+
+	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
+	std::vector< std::pair<unsigned char, unsigned int> > results(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, player_scores[a] };
+	std::sort(results.begin(), results.end(), [](const std::pair<unsigned char, unsigned int> & a, const std::pair<unsigned char, unsigned int> & b) -> bool { return a.second > b.second; });
+	return results;
+}
+
+std::string Halite::getName(unsigned char playerTag)
+{
+	return player_names[playerTag - 1].first;
+}
+
+//Visualizer:
+
+//Visualizer functions:
 
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
@@ -646,20 +895,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		util::renderText(territory_graph_left, territory_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, territoryText);
 		util::renderText(strength_graph_left, strength_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, strengthText);
 
-		//Find name of replay:
-		char search = '/';
-#ifdef _WIN32
-		search = '\\';
-#endif
-		auto index = std::find(present_file.begin(), present_file.end(), search); auto index2 = index;
-		while(index != present_file.end())
-		{
-			index2 = index + 1;
-			index = std::find(index2, present_file.end(), search);
-		}
-
 		//Display header
-		std::string headerText = "Viewing replay " + present_file.substr(std::distance(present_file.begin(), index2)) + " at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
+		std::string headerText = "Viewing a game presently running at frame #" + std::to_string(turnNumber + 1) + " and zoom " + std::to_string(graph_zoom);
 		util::renderText(MAP_LEFT, MAP_TOP + MAP_TEXT_OFFSET, MAP_TEXT_HEIGHT * height, TEXT_COLOR, headerText);
 
 		std::string labelText = "";
@@ -670,7 +907,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				//Find turn number:
 				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - strength_graph_left) / (strength_graph_right - strength_graph_left) + graph_turn_min;
 
-				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top- strength_graph_bottom);
+				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top - strength_graph_bottom);
 
 				labelText = "Turn: " + std::to_string(tn) + " | Strength: " + std::to_string(val);
 			}
@@ -766,5 +1003,7 @@ Halite::~Halite()
 	glDeleteVertexArrays(1, &border_vertex_attributes);
 
 	//Get rid of dynamically allocated memory:
-	clearFullGame();
+	for(auto a = full_game_output.begin(); a != full_game_output.end(); a++) delete *a;
+	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
+	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a + 1);
 }

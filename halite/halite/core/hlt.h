@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HLT_H
+#define HLT_H
 
 #include <list>
 #include <vector>
@@ -10,14 +11,9 @@
 #define SOUTH 3
 #define WEST 4
 
-struct Color
-{
-	float r, g, b;
-};
-
 namespace hlt
 {
-enum MessageType {ATTACK, STOP_ATTACK};
+enum MessageType { ATTACK, STOP_ATTACK };
 struct Message {
 	MessageType type;
 	int senderID, recipientID, targetID;
@@ -25,7 +21,6 @@ struct Message {
 struct Location
 {
 	unsigned short x, y;
-
 };
 static bool operator<(const Location & l1, const Location & l2)
 {
@@ -47,6 +42,10 @@ public:
 	std::vector< std::vector<Site> > contents;
 	unsigned short map_width, map_height; //Number of rows and columns, NOT maximum index.
 
+	//These are statistics that are stored in the map so they don't have to be recalculated, since it's very little memory and it's expensive to recalculate.
+	std::vector<unsigned int> territory_count;
+	std::vector<unsigned int> strength_count;
+
 	Map()
 	{
 		map_width = 0;
@@ -58,6 +57,8 @@ public:
 		map_width = otherMap.map_width;
 		map_height = otherMap.map_height;
 		contents = otherMap.contents;
+		territory_count = otherMap.territory_count;
+		strength_count = otherMap.strength_count;
 	}
 	Map(short width, short height, unsigned char numberOfPlayers)
 	{
@@ -72,28 +73,46 @@ public:
 			bool bad = true;
 			int counter = 0;
 			Location l;
-			while (bad)
+			while(bad)
 			{
 				bad = false;
 				l = { static_cast<unsigned short>(rand() % map_width), static_cast<unsigned short>(rand() % map_height) };
 				for(auto b = takenSpots.begin(); b != takenSpots.end(); b++)
 				{
-					if (getDistance(l, *b) <= minDistance)
+					if(getDistance(l, *b) <= minDistance)
 					{
 						bad = true;
 						break;
 					}
 				}
 				counter++;
-				if (counter > 150)
+				if(counter > 150)
 				{
 					counter = 0;
 					minDistance *= 0.85;
 				}
 			}
-            contents[l.y][l.x] = { static_cast<unsigned char>(a), 255 };
+			contents[l.y][l.x] = { static_cast<unsigned char>(a), 255 };
 			takenSpots.push_back(l);
 		}
+	}
+
+	void getStatistics()
+	{
+		territory_count = std::vector<unsigned int>(254, 0);
+		strength_count = std::vector<unsigned int>(254, 0);
+		for(unsigned short a = 0; a < map_height; a++) for(unsigned short b = 0; b < map_width; b++) if(contents[a][b].owner != 0)
+		{
+			territory_count[contents[a][b].owner - 1]++;
+			strength_count[contents[a][b].owner - 1] += contents[a][b].strength;
+		}
+		while(territory_count.size() != 0 && territory_count.back() == 0)
+		{
+			territory_count.pop_back();
+			strength_count.pop_back();
+		}
+		territory_count.shrink_to_fit();
+		strength_count.shrink_to_fit();
 	}
 
 	bool inBounds(Location l)
@@ -103,17 +122,17 @@ public:
 	float getDistance(Location l1, Location l2)
 	{
 		short dx = abs(l1.x - l2.x), dy = abs(l1.y - l2.y);
-		if (dx > map_width / 2) dx = map_width - dx;
-		if (dy > map_height / 2) dy = map_height - dy;
+		if(dx > map_width / 2) dx = map_width - dx;
+		if(dy > map_height / 2) dy = map_height - dy;
 		return sqrt((dx*dx) + (dy*dy));
 	}
 	float getAngle(Location l1, Location l2)
 	{
 		short dx = l2.x - l1.x, dy = l2.y - l1.y;
-		if (dx > map_width - dx) dx -= map_width;
-		else if (-dx > map_width + dx) dx += map_width;
-		if (dy > map_height - dy) dy -= map_height;
-		else if (-dy > map_height + dy) dy += map_height;
+		if(dx > map_width - dx) dx -= map_width;
+		else if(-dx > map_width + dx) dx += map_width;
+		if(dy > map_height - dy) dy -= map_height;
+		else if(-dy > map_height + dy) dy += map_height;
 		return atan2(dy, dx);
 	}
 
@@ -161,3 +180,5 @@ static bool operator<(const Move& m1, const Move& m2)
 	return ((l1Prod + m1.dir)*(l1Prod + m1.dir + 1) / 2) + m1.dir < ((l2Prod + m2.dir)*(l2Prod + m2.dir + 1) / 2) + m2.dir;
 }
 }
+
+#endif

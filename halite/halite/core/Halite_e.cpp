@@ -29,9 +29,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		{
 			// Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
 			std::vector<hlt::Message> messagesForThisBot;
-			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
-			
-            frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
+
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
@@ -54,11 +54,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 				permissibleTime[a] = true;
 			}
 			//  There was an exception in the networking thread or the player timed out. Either way, kill their thread 
-			else 
+			else
 			{
 				std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
-				networking.killPlayer(a+1);
+				networking.killPlayer(a + 1);
 			}
 			threadLocation++;
 		}
@@ -71,7 +71,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
 		{
-			message->senderID = playerIndex+1; // playerIndex + 1 equals the playerID of the sender
+			message->senderID = playerIndex + 1; // playerIndex + 1 equals the playerID of the sender
 			pastFrameMessages.push_back(*message);
 		}
 	}
@@ -139,7 +139,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		hlt::Location l = { b, a };
 		for(unsigned short c = 0; c < number_of_players + 1; c++) if((c == 0 || alive[c - 1]) && pieces[c].count(l)) //pieces and effectivepieces are synced.
 		{
-			for(unsigned short d = 0; d < number_of_players + 1; d++) if(d != c && (d == 0 || alive[d-1]))
+			for(unsigned short d = 0; d < number_of_players + 1; d++) if(d != c && (d == 0 || alive[d - 1]))
 			{
 				hlt::Location tempLoc = l;
 				//Check 'STILL' square:
@@ -251,50 +251,50 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		full_territory_count[game_map.contents[a][b].owner - 1]++;
 		stillAlive[game_map.contents[a][b].owner - 1] = true;
 	}
-	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false; 
+	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false;
 	return stillAlive;
 }
 
 //Public Functions -------------------
 
 Halite::Halite(unsigned short w, unsigned short h)
-{   
-    //Connect to players
-    number_of_players = 0;
-    player_names = std::vector<std::string>();
-    
+{
+	//Connect to players
+	number_of_players = 0;
+	player_names = std::vector<std::string>();
+
 	std::string in;
 
 	bool done = false;
-	while (!done)
+	while(!done)
 	{
 		in;
 		//If less than 2, bypass this step: Ask if the user like to add another AI
-		if (number_of_players >= 2)
+		if(number_of_players >= 2)
 		{
 			std::cout << "Would you like to add another player? Please enter Yes or No: ";
-			while (true)
+			while(true)
 			{
 				std::getline(std::cin, in);
 				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-				if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
+				if(in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
 				std::cout << "That isn't a valid input. Please enter Yes or No: ";
 			}
-			if (in == "n" || in == "no" || in == "nope") break;
+			if(in == "n" || in == "no" || in == "nope") break;
 		}
 
-		while (true)
+		while(true)
 		{
 			std::string startCommand;
 			std::cout << "What is the start command for this bot: ";
 			std::getline(std::cin, startCommand);
 
-			try 
+			try
 			{
 				networking.startAndConnectBot(startCommand);
 				break;
 			}
-			catch (int e) 
+			catch(int e)
 			{
 				std::cout << "There was a problem with that start command. Please enter another one.\n";
 			}
@@ -303,8 +303,8 @@ Halite::Halite(unsigned short w, unsigned short h)
 		std::cout << "Connected to player #" << int(number_of_players + 1) << std::endl;
 		number_of_players++;
 	}
-    
-    //Initialize map
+
+	//Initialize map
 	game_map = hlt::Map(w, h, number_of_players);
 
 	//Perform initialization not specific to constructor
@@ -315,7 +315,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, Networking network
 {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
-	
+
 	//Initialize map
 	game_map = hlt::Map(width_, height_, number_of_players);
 
@@ -363,7 +363,7 @@ void Halite::init()
 	short numPieces = 0;
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++)
 	{
-		if (numPieces == 255 || b->owner != presentOwner)
+		if(numPieces == 255 || b->owner != presentOwner)
 		{
 			turn->push_back(numPieces);
 			turn->push_back(presentOwner);
@@ -387,20 +387,20 @@ void Halite::init()
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
 
-    //Send initial package 
-    std::vector< std::future<bool> > initThreads(number_of_players);
-    for(unsigned char a = 0; a < number_of_players; a++)
-    {
-        initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
-    }
-    for(unsigned char a = 0; a < number_of_players; a++)
-    {
-    	bool success = initThreads[a].get();
-		if (!success)
+	//Send initial package 
+	std::vector< std::future<bool> > initThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+	}
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		bool success = initThreads[a].get();
+		if(!success)
 		{
 			networking.killPlayer(a + 1);
 		}
-    }
+	}
 }
 
 void Halite::output(std::string filename)
@@ -428,6 +428,7 @@ void Halite::output(std::string filename)
 std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
+	player_scores = std::vector<unsigned int>(number_of_players);
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 1000)
 	{
 		//Increment turn number:
@@ -435,9 +436,9 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 		std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		result = processNextFrame(result);
+		for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = full_territory_count[a];
 	}
 
-	player_scores = std::vector<unsigned int>(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
 	std::vector< std::pair<unsigned char, unsigned int> > results(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, player_scores[a] };
@@ -454,5 +455,5 @@ Halite::~Halite()
 {
 	//Get rid of dynamically allocated memory:
 	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
-    for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
+	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a + 1);
 }

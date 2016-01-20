@@ -28,7 +28,6 @@ private:
 	hlt::Map game_map;
 	std::vector<std::vector<unsigned char> * > full_game;
 	std::vector<Color> possible_colors;
-	std::map<unsigned char, Color> color_codes;
 	std::vector<unsigned int> player_scores;
 	unsigned short number_of_players;
 
