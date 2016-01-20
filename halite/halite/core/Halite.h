@@ -25,6 +25,7 @@ private:
 	std::vector< std::pair<std::string, float> > player_names;
 	std::vector<hlt::Message> pastFrameMessages;
 	std::vector< std::set<hlt::Move> > player_moves;
+	std::vector<unsigned int> last_territory_count;
 	std::vector<unsigned int> full_territory_count;
 	hlt::Map game_map;
 	std::vector<std::vector<unsigned char> * > full_game_output;
