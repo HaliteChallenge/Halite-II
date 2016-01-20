@@ -256,6 +256,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	//Add to full game:
 	full_game_output.push_back(turn);
 
+	//Do game statistics and add it to the full game:
+	game_map.getStatistics();
+	hlt::Map * m = new hlt::Map(game_map); //Copy
+	full_game.push_back(m);
+
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
 	unsigned char numAlive = 0;
@@ -619,6 +624,10 @@ void Halite::setupBorders()
 
 Halite::Halite(unsigned short w, unsigned short h): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
+	//Set map_width and map_height variables
+	map_width = w;
+	map_height = h;
+
 	//Connect to players
 	number_of_players = 0;
 	player_names = std::vector< std::pair<std::string, float> >();
@@ -673,6 +682,10 @@ Halite::Halite(unsigned short w, unsigned short h): STAT_LEFT(0.51), STAT_RIGHT(
 
 Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
+	//Set map_width and map_height variables
+	map_width = width_;
+	map_height = height_;
+
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 
@@ -703,6 +716,7 @@ void Halite::init()
 	//Create color codes
 	std::vector<Color> newColors = possible_colors;
 	color_codes.clear();
+	color_codes[0] = { 0.3f, 0.3f, 0.3f };
 	for(int a = 0; a < number_of_players; a++)
 	{
 		int index = rand() % newColors.size();
@@ -710,10 +724,34 @@ void Halite::init()
 	}
 
 	//Default initialize
+	player_scores = std::vector<unsigned int>(number_of_players);
 	player_moves = std::vector< std::set<hlt::Move> >();
 	turn_number = 0;
 	player_names = std::vector< std::pair<std::string, float> >(number_of_players);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
+
+	//Initialize the positions of the names and graphs.
+	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
+	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
+	std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
+	float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	for(int a = 0; a < number_of_players; a++)
+	{
+		player_names[playerScoresCpy[a].first].second = statPos;
+		statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
+	}
+	//graphs:
+	statPos += NAME_TEXT_OFFSET;
+	statPos -= GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET;
+	strength_graph_left = STAT_LEFT;
+	strength_graph_right = STAT_RIGHT;
+	strength_graph_bottom = STAT_BOTTOM;
+	territory_graph_left = STAT_LEFT;
+	territory_graph_right = STAT_RIGHT;
+	territory_graph_top = statPos;
+	float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
+	strength_graph_top = strength_graph_bottom + graphHeight;
+	territory_graph_bottom = territory_graph_top - graphHeight;
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
@@ -746,6 +784,13 @@ void Halite::init()
 	//Add to full game:
 	full_game_output.push_back(turn);
 
+	//Add initial map to full_game:
+	hlt::Map * m = new hlt::Map(game_map);
+	full_game.push_back(m);
+
+	//Create OpenGL stuff
+	recreateGL();
+
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
 
@@ -753,7 +798,7 @@ void Halite::init()
 	std::vector< std::future<bool> > initThreads(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &(player_names[a].first));
 	}
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -800,6 +845,16 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 		result = processNextFrame(result);
 		//Set scores:
 		for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = full_territory_count[a];
+		//Reorganize the names and to fit the scores.
+		std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
+		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
+		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
+		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+		for(int a = 0; a < number_of_players; a++)
+		{
+			player_names[playerScoresCpy[a].first].second = statPos;
+			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
+		}
 	}
 
 	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
@@ -816,7 +871,10 @@ std::string Halite::getName(unsigned char playerTag)
 
 //Visualizer:
 
-//Visualizer functions:
+short Halite::getNumFrames()
+{
+	return full_game.size();
+}
 
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
@@ -860,7 +918,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			}
 		}
 
-		if(xOffset != map_x_offset || yOffset != map_y_offset) setupMapRendering(map_width, map_height, xOffset, yOffset);
+		//For the time being, we're just going to redo it every frame until I get it working.
+		//if(xOffset != map_x_offset || yOffset != map_y_offset)
+			setupMapRendering(map_width, map_height, xOffset, yOffset);
 
 		glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
@@ -873,7 +933,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		glBindVertexArray(map_vertex_attributes);
 		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
 
-		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
+		//For the time being, we're just going to redo it every frame until I get it working.
+		//if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber)
+			setupGraphRendering(zoom, turnNumber);
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
@@ -950,8 +1012,6 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
 			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string(player_scores[a]));
 		}
-
-		//util::renderAllText(window);
 
 		//Draw borders:
 		glUseProgram(border_shader_program);

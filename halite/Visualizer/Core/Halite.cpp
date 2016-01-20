@@ -373,7 +373,6 @@ Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TO
     number_of_players = 0;
     player_names = std::vector< std::pair<std::string, float> >();
     full_game = std::vector<hlt::Map * >();
-	//loadColorCodes("settings/colorcodes.txt");
 	color_codes[0] = { 0.3f, 0.3f, 0.3f };
 	map_x_offset = 0;
 	map_y_offset = 0;

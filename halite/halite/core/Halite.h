@@ -74,6 +74,7 @@ public:
 	std::string getName(unsigned char playerTag);
 
 	//Visualizer functions:
+	short getNumFrames();
 	void render(GLFWwindow * window, short& turnNumber, float zoom, float mouseX, float mouseY, bool mousePress, short xOffset, short yOffset);
 	void recreateGL();
 
