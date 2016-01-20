@@ -442,7 +442,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
-	player_scores.resize(number_of_players);
+	player_scores.resize(numLines);
+	for(int a = 0; a < numLines; a++) player_scores[a] = new std::vector<int>(number_of_players);
+	for(int a = 0; a < number_of_players; a++) (*player_scores[0])[a] = 1;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		player_names[a].first = "";
@@ -453,7 +455,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			if(c == ' ') break;
 			player_names[a].first += c;
 		}
-		game_file >> player_scores[a];
+		game_file >> (*player_scores[numLines - 1])[a];
 
 		Color color;
 		game_file >> color.r >> color.g >> color.b;
@@ -503,6 +505,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		//Add game map to full game
 		full_game.push_back(new hlt::Map(m));
 
+		if(a < numLines - 2)
+		{
+			for(int b = 0; b < m.territory_count.size(); b++) (*player_scores[a + 1])[b] = (*player_scores[a])[b] + m.territory_count[b];
+		}
+
 		//Render the loading bar:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -526,30 +533,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteBuffers(1, &loadingBuffer);
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
-
-	//Put the names in their places.
-	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
-	std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
-	float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-	for(int a = 0; a < number_of_players; a++)
-	{
-		player_names[playerScoresCpy[a].first].second = statPos;
-		statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
-	}
-	statPos += NAME_TEXT_OFFSET;
-
-	//Figure out where to put all of the graph stuff:
-	statPos -= GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET;
-	strength_graph_left = STAT_LEFT;
-	strength_graph_right = STAT_RIGHT;
-	strength_graph_bottom = STAT_BOTTOM;
-	territory_graph_left = STAT_LEFT;
-	territory_graph_right = STAT_RIGHT;
-	territory_graph_top = statPos;
-	float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
-	strength_graph_top = strength_graph_bottom + graphHeight;
-	territory_graph_bottom = territory_graph_top - graphHeight;
 
 	recreateGL();
 
@@ -575,7 +558,29 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 	if(!full_game.empty())
 	{
-		//Ensure that one can go around the map at most once.
+		//Put the names in their places.
+		std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
+		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, (*player_scores[turnNumber])[a] };
+		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
+		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+		for(int a = 0; a < number_of_players; a++)
+		{
+			player_names[playerScoresCpy[a].first].second = statPos;
+			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
+		}
+		statPos += NAME_TEXT_OFFSET;
+		//Figure out where to put all of the graph stuff:
+		statPos -= GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET;
+		strength_graph_left = STAT_LEFT;
+		strength_graph_right = STAT_RIGHT;
+		strength_graph_bottom = STAT_BOTTOM;
+		territory_graph_left = STAT_LEFT;
+		territory_graph_right = STAT_RIGHT;
+		territory_graph_top = statPos;
+		float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
+		strength_graph_top = strength_graph_bottom + graphHeight;
+		territory_graph_bottom = territory_graph_top - graphHeight;
+		setupBorders();
 
 		//Set window for rendering.
 		glfwMakeContextCurrent(window);
@@ -710,7 +715,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		for(int a = 0; a < number_of_players; a++)
 		{
 			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
-			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string(player_scores[a]));
+			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
 		}
 
 		//util::renderAllText(window);

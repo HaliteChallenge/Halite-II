@@ -16,7 +16,7 @@ class Halite
 {
 private:
     std::vector< std::pair<std::string, float> > player_names; //float represents rendering position
-	std::vector<int> player_scores;
+	std::vector< std::vector<int> * > player_scores;
 	std::vector<hlt::Map * > full_game;
 	std::string present_file;
 	std::map<unsigned char, Color> color_codes;
