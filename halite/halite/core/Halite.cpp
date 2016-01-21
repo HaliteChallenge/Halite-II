@@ -271,6 +271,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		stillAlive[game_map.contents[a][b].owner - 1] = true;
 	}
 	for(int a = 0; a < last_territory_count.size(); a++) full_territory_count[a] += last_territory_count[a];
+	player_scores.push_back(new std::vector<unsigned int>(full_territory_count));
 	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false;
 	return stillAlive;
 }
@@ -726,7 +727,7 @@ void Halite::init()
 	}
 
 	//Default initialize
-	player_scores = std::vector<unsigned int>(number_of_players);
+	player_scores = std::vector< std::vector<unsigned int> * >(1, new std::vector<unsigned int>(number_of_players, 1));
 	player_moves = std::vector< std::set<hlt::Move> >();
 	turn_number = 0;
 	player_names = std::vector< std::pair<std::string, float> >(number_of_players);
@@ -735,7 +736,7 @@ void Halite::init()
 
 	//Initialize the positions of the names and graphs.
 	std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
+	for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, a };
 	std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
 	float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	for(int a = 0; a < number_of_players; a++)
@@ -825,7 +826,7 @@ void Halite::output(std::string filename)
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		Color c = color_codes[a + 1];
-		gameFile << player_names[a].first << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << '\n';
+		gameFile << player_names[a].first << ' ' << (*player_scores.back())[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << '\n';
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
@@ -838,7 +839,6 @@ void Halite::output(std::string filename)
 std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	player_scores = std::vector<unsigned int>(number_of_players);
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 1000)
 	{
 		//Increment turn number:
@@ -846,23 +846,11 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 		std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		result = processNextFrame(result);
-		//Set scores:
-		for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = full_territory_count[a];
-		//Reorganize the names and to fit the scores.
-		std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, player_scores[a] };
-		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
-		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-		for(int a = 0; a < number_of_players; a++)
-		{
-			player_names[playerScoresCpy[a].first].second = statPos;
-			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
-		}
 	}
 
-	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
+	for(unsigned char a = 0; a < number_of_players; a++) (*player_scores.back())[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
 	std::vector< std::pair<unsigned char, unsigned int> > results(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, player_scores[a] };
+	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, (*player_scores.back())[a] };
 	std::sort(results.begin(), results.end(), [](const std::pair<unsigned char, unsigned int> & a, const std::pair<unsigned char, unsigned int> & b) -> bool { return a.second > b.second; });
 	return results;
 }
@@ -882,11 +870,20 @@ short Halite::getNumFrames()
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
 {
 	if(turnNumber < 0) turnNumber = 0;
-	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
+	if(turnNumber >= full_game.size() || turnNumber >= player_scores.size()) turnNumber = min(full_game.size() - 1, player_scores.size() - 1);
 
 	if(!full_game.empty())
 	{
-		//Ensure that one can go around the map at most once.
+		//Reorganize the names and to fit the scores.
+		std::vector< std::pair<int, int> > playerScoresCpy(number_of_players);
+		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, (*player_scores[turnNumber])[a] };
+		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
+		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+		for(int a = 0; a < number_of_players; a++)
+		{
+			player_names[playerScoresCpy[a].first].second = statPos;
+			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
+		}
 
 		//Set window for rendering.
 		glfwMakeContextCurrent(window);
@@ -923,7 +920,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		//For the time being, we're just going to redo it every frame until I get it working.
 		//if(xOffset != map_x_offset || yOffset != map_y_offset)
-			setupMapRendering(map_width, map_height, xOffset, yOffset);
+		setupMapRendering(map_width, map_height, xOffset, yOffset);
 
 		glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
@@ -938,7 +935,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		//For the time being, we're just going to redo it every frame until I get it working.
 		//if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber)
-			setupGraphRendering(zoom, turnNumber);
+		setupGraphRendering(zoom, turnNumber);
 
 		//Draw graphs:
 		glUseProgram(graph_shader_program);
@@ -1013,7 +1010,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		for(int a = 0; a < number_of_players; a++)
 		{
 			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
-			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string(player_scores[a]));
+			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
 		}
 
 		//Draw borders:
