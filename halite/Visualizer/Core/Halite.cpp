@@ -505,9 +505,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		//Add game map to full game
 		full_game.push_back(new hlt::Map(m));
 
-		if(a < numLines - 2)
+		if(a < numLines - 1 && a > 0)
 		{
-			for(int b = 0; b < m.territory_count.size(); b++) (*player_scores[a + 1])[b] = (*player_scores[a])[b] + m.territory_count[b];
+			for(int b = 0; b < number_of_players; b++) b < m.territory_count.size() ? (*player_scores[a])[b] = (*player_scores[a - 1])[b] + m.territory_count[b] : (*player_scores[a])[b] = (*player_scores[a - 1])[b];
 		}
 
 		//Render the loading bar:

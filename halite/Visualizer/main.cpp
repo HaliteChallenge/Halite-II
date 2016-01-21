@@ -110,7 +110,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT n
 
 		short turnNumberS = turnNumber;
 		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed, xOffset, yOffset);
-		if(abs(turnNumber - float(turnNumberS) > 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
+		if(abs(turnNumber - float(turnNumberS) >= 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
 
 		//Poll events
 		glfwPollEvents();
