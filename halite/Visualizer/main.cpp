@@ -135,6 +135,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT n
 		if(aPressed) xOffset++;
 		if(sPressed) yOffset++;
 		if(dPressed) xOffset--;
+
+		//Cap to 60 fps:
+		const float FRAME_TIME = 2.f / maxFps;
+		if(delta < FRAME_TIME) std::this_thread::sleep_for(std::chrono::milliseconds(long((FRAME_TIME - delta) * 1000)));
 	}
 
 	return EXIT_SUCCESS;
