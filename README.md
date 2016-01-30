@@ -1,7 +1,7 @@
 # Halite
 
 ## About
-**Halite is still under development.** Halite is a game meant to be played by computers. Halite was created by [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector") and [Michael Truell](https://github.com/truell20 "Michael Truell").
+**Halite is still under development.** Halite is a game meant to be played by computers. Halite was created by [Michael Truell](https://github.com/truell20 "Michael Truell") and [Benjamin Spector](https://github.com/Sydriax "Benjamin Spector").
 
 Here is a screenshot of the game visualizer (more multimedia is available in the multimedia folder):
 
