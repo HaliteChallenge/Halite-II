@@ -16,28 +16,17 @@ This repository contains the environment for running Halite games, the visualize
 - `website/` - The website that will host the competition
 - `worker/` - Code run on worker servers that will compile bots and run games safely
 
-## To Do Michael
+## Saturday
 
-### Website
-- Setup leaderboard
+- Integrate NYCSL code
+- Get worker and manager working
 
-### Halite Program
-- Downgrade example C++ bot from C++ 11  
+## Sunday
 
-### Worker
-- ~~Switch to python~~
-- ~~Encorporate file checksums and api keys~~
-- ~~The worker can compile the raw bot files using the Ants Auto compile python code and our Docker sandbox~~
-- ~~The worker can run a game between two or more bots using our Docker sandbox~~
+- Barebones frontend
+- Basic web visualizer
 
-### Server
-- ~~Tell workers to compile bots when needed~~
-- ~~Continuously tell workers to play games~~ according to Trueskill
-- ~~Update rankings according to the Trueskill algorithm accordingly~~
+## Monday
 
-## To Do Ben
-- WebGL
-- ~~Fix map system~~
-- Talk to companies
-- ~~Fix relative scoring system~~
-- Update rules on the Google Doc
+- Test environment, visualizer, worker, website, example bots
+- Think through presentation
