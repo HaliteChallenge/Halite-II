@@ -19,10 +19,11 @@ class TrueSkillPlayer(object):
 class Backend:
 	def __init__(self, apiKey):
 		self.apiKey = apiKey
-		self.url = "http://localhost/website/php/manager/"
+		self.url = "http://104.131.205.10/php/manager/"
 
 	# Gets either a run or a compile task from the API
 	def getTask(self):
+		print("url: " +self.url+"task")
 		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
 		print("contents: " + content)
 		if content == "null":
@@ -86,7 +87,7 @@ class Backend:
 
 	# Posts the result of a game task
 	def gameResult(self, users, replayPath):
-		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "users[]": users}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "users": json.dumps(users)}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
 		print(r.text)
 
 # Deletes anything residing at path, creates path, and chmods the directory
@@ -160,10 +161,10 @@ def runGame(width, height, users, backend):
 	
 	# Download players
 	for user in users:
-		userPath = os.path.join(workingPath, str(users["userID"]))
+		userPath = os.path.join(workingPath, str(user["userID"]))
 		os.mkdir(userPath)
 
-		unpack(backend.storeBotLocally(users["userID"], userPath))
+		unpack(backend.storeBotLocally(user["userID"], userPath))
 
 		# Mark run file executable
 		st = os.stat(os.path.join(userPath, "run.sh"))
@@ -183,28 +184,30 @@ def runGame(width, height, users, backend):
 	lines.remove("")
 	
 	# Get replay name by parsing shellOutput
-	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") : 0];
+	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at "):];
 	
 	# Get player ranks and scores by parsing shellOutput
 	for lineIndex in range(len(lines) - len(users), len(lines)):
 		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
 		users[playerIndex-1]["rank"] = lineIndex - (len(lines) - len(users))
-		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") : 0])
+		print("Score of: " + lines[lineIndex][lines[lineIndex].index("score of ") + len("score of "):])
+		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of "):])
 
 	# Update trueskill mu and sigma values
-	teams = [[trueskill.Rating(mu=user['mu'], sigma=user['sigma'])] for user in users]
+	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
 	newRatings = trueskill.rate(teams)
 	for a in range(len(newRatings)):
-		users[a]['mu'] = rating[0].mu
-		users[a]['sigma'] = rating[0].sigma
+		users[a]['mu'] = newRatings[a][0].mu
+		users[a]['sigma'] = newRatings[a][0].sigma
 
 	backend.gameResult(users, replayPath)
 	shutil.rmtree(workingPath)
 
-
+print("Starting")
 backend = Backend(1)
+print("Made Backend")
 task = backend.getTask()
-
+print("Task: " + task)
 if task != None:
 	if task["type"] == "compile":
 		compile(task["userID"], backend)

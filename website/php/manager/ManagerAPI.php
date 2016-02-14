@@ -15,7 +15,7 @@ class ManagerAPI extends API
 	public function __construct($request, $origin) {
 		$this->initDB();
 
-		$this->sanitizeHTTPParameters();
+		//$this->sanitizeHTTPParameters();
 
 		if($this->isValidWorker() == false) {
 			echo "Not valid worker";
@@ -38,6 +38,7 @@ class ManagerAPI extends API
 
 		// Get ip
 		$ipAddress = $_SERVER['REMOTE_ADDR'];
+
 		if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '$ipAddress' and apiKey = $apiKey")) > 0) return true;
 		else return false;
 	}
@@ -145,8 +146,8 @@ class ManagerAPI extends API
 	protected function game() {
 		// Each user in users must have a rank, score, mu, sigma, and userID
 		if(isset($_POST['users']) && count($_FILES) > 0) {
-			$users = $_POST['users'];
-
+			$users = json_decode($_POST['users']);
+			var_dump($users);
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
 			$name = basename($_FILES[$fileKey]['name']);
@@ -159,8 +160,8 @@ class ManagerAPI extends API
 			$gameID = $gameIDArray['gameID'];
 			
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, {$users['userID']}, {$users['rank']}, {$users['score']})");
-				$this->insert("UPDATE User SET mu = {$users['mu']}, sigma = {$users['sigma']} WHERE userID = {$users['userID']}");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->score})");
+				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 		}
 	}
