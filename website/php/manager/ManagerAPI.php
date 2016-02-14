@@ -1,4 +1,6 @@
 <?php
+
+// FOR DEBUGGING PURPOSES
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -7,9 +9,9 @@ require_once '../API.class.php';
 class ManagerAPI extends API
 {
 
-	// The database
 	private $mysqli = NULL;
 
+	// Init database, sanitize parameters, and check if worker is valid
 	public function __construct($request, $origin) {
 		$this->initDB();
 
@@ -23,6 +25,7 @@ class ManagerAPI extends API
 		parent::__construct($request);
 	}
 
+	// Checks HTTP parameters and request IP to make sure that the client provided a valid API key
 	private function isValidWorker() {
 		// Get apiKey
 		$apiKey = NULL;
@@ -39,33 +42,23 @@ class ManagerAPI extends API
 		else return false;
 	}
 
-	private function escapeString($var) {
-		if(is_string($var)) return $this->mysqli->real_escape_string($var);
-		else return $var;
+	private function sanitizeHTTPParameters() {
+		foreach ($_GET as $key => $value) {
+			$_GET[$key] = escapeshellcmd($this->mysqli->real_escape_string($value));
+		}
+		foreach ($_POST as $key => $value) {
+			$_POST[$key] = escapeshellcmd($this->mysqli->real_escape_string($value));
+		}
 	}
 	
-	private function sanitizeHTTPParameters() {
-		$_GET = array_map(array($this, "escapeString"), $_GET);
-		$_POST = array_map(array($this, "escapeString"), $_POST);
-	}
-
+	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotDirectory($userID) {
 		return "../../../storage/bots/$userID";
 	}
 
 	private function getBotFile($userID) {
 		$botDirectory = $this->getBotDirectory($userID);
-		$file = NULL;
-		
-		if (file_exists("{$botDirectory}/bot.zip")) $file = "{$botDirectory}/bot.zip";
-		else if (file_exists("{$botDirectory}/bot.tgz")) $file = "{$botDirectory}/bot.tgz";
-		else if (file_exists("{$botDirectory}/bot.tar.gz")) $file = "{$botDirectory}/bot.tar.gz";
-		else if (file_exists("{$botDirectory}/bot.tar.xz")) $file = "{$botDirectory}/bot.tar.xz";
-		else if (file_exists("{$botDirectory}/bot.txz")) $file = "{$botDirectory}/bot.txz";
-		else if (file_exists("{$botDirectory}/bot.tar.bz2")) $file = "{$botDirectory}/bot.tar.bz2";
-		else if (file_exists("{$botDirectory}/bot.tbz")) $file = "{$botDirectory}/bot.tbz";
-
-		return $file;
+		return "{$botDirectory}/bot.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
@@ -107,8 +100,9 @@ class ManagerAPI extends API
 		mysqli_query($this->mysqli, $sql);
 	}
 
-	// API ENDPOINTS
-	/*-----------------------------------------------------------------------*/
+	/////////////////////////API ENDPOINTS\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+	// Delegate a task to a workers
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
@@ -120,37 +114,19 @@ class ManagerAPI extends API
 					"userID" => $needToBeCompiled['userID']);
 			}
 
-			// Run a game
-			$users = $this->selectMultiple("SELECT userID, mu, sigma FROM User");
-
-			$userIDs = array();
-			$muValues = array();
-			$sigmaValues = array();
-
+			// Assign a run game tasks
 			$numPlayers = 2;
-
-			for($a = 0; $a < $numPlayers; $a++) {
-				$key = array_rand($users);
-				
-				array_push($userIDs, $users[$key]['userID']);
-				array_push($muValues, $users[$key]['mu']);
-				array_push($sigmaValues, $users[$key]['sigma']);
-
-				unset($users[$key]);
-			}
-
 			return array(
 				"type" => "game",
 				"width" => 10,
 				"height" => 10,
-				"userIDs" => $userIDs,
-				"muValues" => $muValues,
-				"sigmaValues" => $sigmaValues);
+				"users" => $this->selectMultiple("SELECT userID, mu, sigma FROM User ORDER BY rand() LIMIT $numPlayers")
+			);
 			
 		}
-		return NULL;
 	}
 
+	// Allow worker to post the result of their compilation
 	protected function compile() {
 		if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
 			$userID = $_POST['userID'];
@@ -165,12 +141,11 @@ class ManagerAPI extends API
 		}
 	}
 
+	// Allow workers to post the result of their game
 	protected function game() {
-		if(isset($_POST['rankedUserIDs']) && isset($_POST['scores']) && isset($_POST['muValues']) && isset($_POST['sigmaValues']) && count($_FILES) > 0) {
-			$rankedUserIDs = $_POST['rankedUserIDs'];			
-			$scores = $_POST['scores'];			
-			$muValues = $_POST['muValues'];
-			$sigmaValues = $_POST['sigmaValues'];
+		// Each user in users must have a rank, score, mu, sigma, and userID
+		if(isset($_POST['users']) && count($_FILES) > 0) {
+			$users = $_POST['users'];
 
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
@@ -183,48 +158,21 @@ class ManagerAPI extends API
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
 			
-			for($a = 0; $a < count($rankedUserIDs); $a++) {
-				$userID = $rankedUserIDs[$a];
-				$score = $scores[$a];
-				$mu = $muValues[$a];
-				$sigma = $sigmaValues[$a];
-
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, $userID, $a, $score)");
-				$this->insert("UPDATE User SET mu = $mu, sigma = $sigma WHERE userID = $userID");
+			for($a = 0; $a < count($users); $a++) {
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score) VALUES ($gameID, {$users['userID']}, {$users['rank']}, {$users['score']})");
+				$this->insert("UPDATE User SET mu = {$users['mu']}, sigma = {$users['sigma']} WHERE userID = {$users['userID']}");
 			}
 		}
 	}
 
+	// Allow workers to download and post bot files
 	protected function botFile() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
 			$botDirectory = $this->getBotDirectory($userID);
 
-			if (file_exists("{$botDirectory}/bot.zip")) {
-				header("Content-disposition: attachment; filename=bot.zip");
-				header("Content-type: application/zip");
-			} else if (file_exists("{$botDirectory}/bot.tgz")) {
-				header("Content-disposition: attachment; filename=bot.tgz");
-				header("Content-type: application/x-gtar");
-			} else if (file_exists("{$botDirectory}/bot.tar.gz")) {
-				header("Content-disposition: attachment; filename=bot.tgz");
-				header("Content-type: application/x-gtar");
-			} else if (file_exists("{$botDirectory}/bot.tar.xz")) {
-				header("Content-disposition: attachment; filename=bot.txz");
-				header("Content-type: application/x-gtar");
-			} else if (file_exists("{$botDirectory}/bot.txz")) {
-				header("Content-disposition: attachment; filename=bot.txz");
-				header("Content-type: application/x-gtar");
-			} else if (file_exists("{$botDirectory}/bot.tar.bz2")) {
-				header("Content-disposition: attachment; filename=bot.tbz");
-				header("Content-type: application/x-gtar");
-			} else if (file_exists("{$botDirectory}/bot.tbz")) {
-				header("Content-disposition: attachment; filename=bot.tbz");
-				header("Content-type: application/x-gtar");
-			} else {
-				header("HTTP/1.0 404 Not Found");
-				die("Could not find file");
-			}
+			header("Content-disposition: attachment; filename=bot.zip");
+			header("Content-type: application/zip");
 
 			ob_clean();
 			flush();
@@ -238,13 +186,13 @@ class ManagerAPI extends API
 			$targetPath = "../../../storage/bots/{$userID}/{$name}";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
-			var_dump($_FILES);
 			return NULL;
 		}
 
 		return "Success";
 	}
 
+	// Allow workers to get the hash of a bot file so that they know that they downloaded the file correctly
 	protected function botHash() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
