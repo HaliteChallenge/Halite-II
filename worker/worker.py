@@ -12,17 +12,16 @@ from compiler import *
 import trueskill
 
 
-workingPath = "workingPath"
-
 class TrueSkillPlayer(object):
   pass
 
-
+# Interface between worker and manager RESTFul API
 class Backend:
 	def __init__(self, apiKey):
 		self.apiKey = apiKey
 		self.url = "http://localhost/website/php/manager/"
 
+	# Gets either a run or a compile task from the API
 	def getTask(self):
 		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
 		print("contents: " + content)
@@ -31,10 +30,13 @@ class Backend:
 		else:
 			return json.loads(content)
 
+	# Allows us to get the hash of a bot's zip file from the server so that we may verify that a bot was downloaded properly
 	def getBotHash(self, userID):
 		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
 		return json.loads(result.text).get("hash")
 
+	# Downloads and store's a bot's zip file locally
+	# Checks the file's checksum to make sure the file was downloaded properly
 	def storeBotLocally(self, userID, storageDir):
 		iterations = 0
 		while iterations < 100:
@@ -59,6 +61,7 @@ class Backend:
 
 		raise ValueError
 
+	# Posts a bot file to the manager
 	def storeBotRemotely(self, userID, zipFilePath):
 		zipContents = open(zipFilePath, "rb").read()
 		iterations = 0
@@ -77,20 +80,23 @@ class Backend:
 			return
 		raise ValueError
 
+	# Posts the result of a compilation task
 	def compileResult(self, userID, didCompile, language):
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
 
-	def gameResult(self, userIDs, scores, muValues, sigmaValues, replayPath):
-		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "rankedUserIDs[]": userIDs, "scores[]": scores, "muValues[]": muValues, "sigmaValues[]": sigmaValues}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+	# Posts the result of a game task
+	def gameResult(self, users, replayPath):
+		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "users[]": users}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
 		print(r.text)
-def makeWorkingPath():
-	global workingPath
 
-	if os.path.exists(workingPath):
-		shutil.rmtree(workingPath)	
-	os.makedirs(workingPath)
-	os.chmod(workingPath, 0o777)
+# Deletes anything residing at path, creates path, and chmods the directory
+def makePath(path):
+	if os.path.exists(path):
+		shutil.rmtree(path)	
+	os.makedirs(path)
+	os.chmod(path, 0o777)
 
+# Unpacks and deletes a zip file into the files current path
 def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
 	tempPath = os.path.join(folderPath, "bot")
@@ -100,23 +106,7 @@ def unpack(filePath):
 	if platform.system() == 'Windows':
 		os.system("7z x -o"+tempPath+" -y "+filePath+". > NUL")
 	else:
-		zipFiles = [
-			(".tar.gz", "mkdir "+tempPath+"; tar xfz "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".tar.xz", "mkdir "+tempPath+"; tar xfJ "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".tar.bz2", "mkdir "+tempPath+"; tar xfj "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".txz", "mkdir "+tempPath+"; tar xfJ "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".tbz", "mkdir "+tempPath+"; tar xfj "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".tgz", "mkdir "+tempPath+"; tar xfz "+filePath+" -C "+tempPath+" > /dev/null 2> /dev/null"),
-			(".zip", "unzip -u -d"+tempPath+" "+filePath+" > /dev/null 2> /dev/null")
-		]
-		_, extension = os.path.splitext(filePath)
-		print(extension)
-		for possibleExtension, command, in zipFiles:
-			print(possibleExtension)
-			if(extension == possibleExtension):
-				print("True!")
-				print(command)
-				os.system(command)
+		os.system("unzip -u -d"+tempPath+" "+filePath+" > /dev/null 2> /dev/null")
 
 	# Remove __MACOSX folder if present
 	macFolderPath = os.path.join(tempPath, "__MACOSX")
@@ -130,6 +120,7 @@ def unpack(filePath):
 	shutil.rmtree(tempPath)
 	os.remove(filePath)
 
+# Zips a folder to a path
 def zipFolder(folderPath, destinationFilePath):
 	zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
 
@@ -145,10 +136,10 @@ def zipFolder(folderPath, destinationFilePath):
 
 	os.chdir(originalDir)
 
+# Downloads and compiles a bot. Posts the compiled bot files to the manager.
 def compile(userID, backend):
-	
-
-	makeWorkingPath()
+	workingPath = "workingPath"
+	makePath(workingPath)
 	botPath = backend.storeBotLocally(userID, workingPath)
 	unpack(botPath)
 
@@ -162,28 +153,29 @@ def compile(userID, backend):
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
-def runGame(width, height, userIDs, muValues, sigmaValues, backend):
-	global workingPath
-
-	makeWorkingPath()
+# Downloads compiled bots, runs a game, and posts the results of the game
+def runGame(width, height, users, backend):
+	workingPath = "workingPath"
+	makePath(workingPath)
 	
 	# Download players
-	for userID in userIDs:
-		path = os.path.join(workingPath, str(userID))
-		os.mkdir(path)
+	for user in users:
+		userPath = os.path.join(workingPath, str(users["userID"]))
+		os.mkdir(userPath)
 
-		unpack(backend.storeBotLocally(userID, path))
+		unpack(backend.storeBotLocally(users["userID"], userPath))
 
 		# Mark run file executable
-		st = os.stat(os.path.join(path, "run.sh"))
-		os.chmod(os.path.join(path, "run.sh"), st.st_mode | stat.S_IEXEC)
+		st = os.stat(os.path.join(userPath, "run.sh"))
+		os.chmod(os.path.join(userPath, "run.sh"), st.st_mode | stat.S_IEXEC)
 	
 	# Build the shell command that will run the game. Executable called Environment houses the game environment
 	runGameShellCommand = "./Environment "+str(width)+" "+str(height)+" "
-	for userID in userIDs:
-		absolutePath = os.path.abspath(os.path.join(workingPath, str(userID)))
+	for user in users:
+		absolutePath = os.path.abspath(os.path.join(workingPath, str(user['userID'])))
 		runGameShellCommand += "\"cd "+absolutePath+"; "+os.path.join(absolutePath, "run.sh")+"\" "
 	print(runGameShellCommand)
+	
 	shellOutput = os.popen(runGameShellCommand).read()
 	print(shellOutput)
 	
@@ -191,41 +183,22 @@ def runGame(width, height, userIDs, muValues, sigmaValues, backend):
 	lines.remove("")
 	
 	# Get replay name by parsing shellOutput
-	replayLine = lines[len(lines) - (len(userIDs)+1)];
-	replayPath = replayLine[replayLine.index("file at ")+len("file at ") : len(replayLine)];
+	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") : 0];
 	
 	# Get player ranks and scores by parsing shellOutput
-	rankedUserIDs = []
-	rankedScores = []
-	for a in range(len(lines) - len(userIDs), len(lines)):
-		line = lines[a]
-		
-		start = line.index("is player ") + len("is player ")
-		end = line.index(" named")
-		playerID = int(line[start:end])
-		rankedUserIDs.append(userIDs[playerID-1])
-		
-		start = line.index("score of ") + len("score of ")
-		rankedScores.append(float(line[start:len(line)]))
+	for lineIndex in range(len(lines) - len(users), len(lines)):
+		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
+		users[playerIndex-1]["rank"] = lineIndex - (len(lines) - len(users))
+		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") : 0])
 
 	# Update trueskill mu and sigma values
-	teams = []
-	ranks = []
-	for a in range(0, len(rankedUserIDs)):
-		unRankedIndex = userIDs.index(rankedUserIDs[a])
-		teams.append([trueskill.Rating(mu=float(muValues[unRankedIndex]), sigma=float(sigmaValues[unRankedIndex]))])
-		ranks.append(a)
+	teams = [[trueskill.Rating(mu=user['mu'], sigma=user['sigma'])] for user in users]
 	newRatings = trueskill.rate(teams)
-		
+	for a in range(len(newRatings)):
+		users[a]['mu'] = rating[0].mu
+		users[a]['sigma'] = rating[0].sigma
 
-	# Sort players by rank, so that muValues and sigmaValues are sorted by rank
-	rankedMuValues = [ratingTuple[0].mu for ratingTuple in newRatings]
-	rankedSigmaValues = [ratingTuple[0].sigma for ratingTuple in newRatings]
-	for a in range(0, len(rankedMuValues)):
-		print("mu: "+str(rankedMuValues[a]))
-		print(rankedSigmaValues[a])
-
-	backend.gameResult(rankedUserIDs, rankedScores, rankedMuValues, rankedSigmaValues, replayPath)
+	backend.gameResult(users, replayPath)
 	shutil.rmtree(workingPath)
 
 
@@ -233,10 +206,10 @@ backend = Backend(1)
 task = backend.getTask()
 
 if task != None:
-	if task.get("type") == "compile":
-		compile(task.get("userID"), backend)
-	elif task.get("type") == "game":
-		runGame(task.get("width"), task.get("height"), task.get("userIDs"), task.get("muValues"), task.get("sigmaValues"), backend)
+	if task["type"] == "compile":
+		compile(task["userID"], backend)
+	elif task["type"] == "game":
+		runGame(task["width"], task["height"], task["users"], backend)
 	else:
 		print("Unknown task")
 else:
