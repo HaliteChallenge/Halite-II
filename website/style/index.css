@@ -1,23 +1,58 @@
 body {
-	font-family: "Helvetica Neue", Helvetica, "Arial", sans-serif;
+	padding-top: 20px;
 }
 
-a:link {
-	color: #0645AD;
-}
-
-a:visited {
-	color: #0645AD;
-}
-
-p, ul {
-	color: #333;
-}
-
-hr {
-	color: #333;
-	border: 0;
-	margin-top: 20px;
+.navbar {
 	margin-bottom: 20px;
-	border-top: 1px solid #eee;
+}
+
+.jumbotron {
+	padding: 0.9em 0.9em;
+}
+
+#navvy {
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
+
+#jHeader {
+	font-size: 50px;
+}
+
+#myFile {
+	display:none;
+}
+
+#gameFile {
+	display:none;
+}
+
+#navCont {
+	margin:0 auto;
+	width:90%;
+}
+
+#loginNav {
+	display:inline;
+}
+
+#logoutNav {
+	display:none;
+}
+
+#archivedTag {
+	display:none;
+}
+
+.gameRow {
+	display:none;
+}
+
+#leaderTable {
+	padding-bottom:0px;
+	margin-bottom:0px;
+}
+
+.gameRow {
+	background-color:#F8F8F8;
 }
