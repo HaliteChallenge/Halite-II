@@ -53,13 +53,8 @@ class ManagerAPI extends API
 	}
 	
 	// Returns the directory that holds a bot, given the bot's userID
-	private function getBotDirectory($userID) {
-		return "../../../storage/bots/$userID";
-	}
-
 	private function getBotFile($userID) {
-		$botDirectory = $this->getBotDirectory($userID);
-		return "{$botDirectory}/bot.zip";
+		return "../../../storage/bots/{$userID}.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
@@ -170,9 +165,8 @@ class ManagerAPI extends API
 	protected function botFile() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
-			$botDirectory = $this->getBotDirectory($userID);
 
-			header("Content-disposition: attachment; filename=bot.zip");
+			header("Content-disposition: attachment; filename={$userID}.zip");
 			header("Content-type: application/zip");
 
 			ob_clean();

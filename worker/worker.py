@@ -148,8 +148,8 @@ def compile(userID, backend):
 	didCompile = True if errors == None else False
 
 	if didCompile:
-		zipFolder(workingPath, os.path.join(workingPath, "bot.zip"))
-		backend.storeBotRemotely(userID, os.path.join(workingPath, "bot.zip"))
+		zipFolder(workingPath, os.path.join(workingPath, userID+".zip"))
+		backend.storeBotRemotely(userID, os.path.join(workingPath, userID+".zip"))
 	
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)

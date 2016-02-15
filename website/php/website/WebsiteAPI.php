@@ -23,6 +23,7 @@ class WebsiteAPI extends API
 			$_POST[$key] = $this->mysqli->real_escape_string($value);
 		}
 	}
+
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$config = include("../config.php");
@@ -95,26 +96,11 @@ class WebsiteAPI extends API
 		if(isset($_FILES['files']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
-			$targetPath = "../../storage/bots/$userID";
-			if(file_exists($targetPath) == true) {
-				$it = new RecursiveDirectoryIterator($targetPath, RecursiveDirectoryIterator::SKIP_DOTS);
-				$files = new RecursiveIteratorIterator($it,
-				             RecursiveIteratorIterator::CHILD_FIRST);
-				foreach($files as $file) {
-				    if ($file->isDir()){
-				        rmdir($file->getRealPath());
-				    } else {
-				        unlink($file->getRealPath());
-				    }
-				}
-			} else {
-				mkdir($targetPath);
-			}
+			$targetPath = "../../storage/bots/{$userID}.zip";
+			if(file_exists($targetPath) == true) unlink($targetPath);
+			else mkdir($targetPath);
 			
-			for($i = 0; $i < count($_FILES['files']['name']); $i++){
-				$finalPath = $targetPath."/".$_FILES['files']['name'][$i];
-				move_uploaded_file($_FILES['files']['tmp_name'][$i], $finalPath);
-			}
+			move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
 		} else {
 			return "No endpoint reached";
 		}
@@ -129,19 +115,12 @@ class WebsiteAPI extends API
 		} else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$username = $_POST['username'];
 			$password = $_POST['password'];
-
-			$_SESSION['username'] = $username;
-			$_SESSION['password'] = $password;
-			$userIDArray = $this->select("SELECT userID FROM User WHERE username = '$username' AND password = '$password'");
-			$_SESSION['userID'] = $userIDArray['userID'];
+			$_SESSION = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
 		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
-			$_SESSION['userID'] = $userID;
-			$_SESSION['password'] = $password;
-			$usernameArray = $this->select("SELECT username FROM User WHERE userID = $userID AND password = '$password'");
-			$_SESSION['username'] = $usernameArray['username'];
+			$_SESSION = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
 		} else if($this->method == 'DELETE') {
 			session_destroy();
 		} else {
