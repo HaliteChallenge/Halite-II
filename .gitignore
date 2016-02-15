@@ -292,3 +292,5 @@ target/
 Values.sql
 storage/
 config.php
+
+!sudo

@@ -112,13 +112,15 @@ class ManagerAPI extends API
 
 			// Assign a run game tasks
 			$numPlayers = 2;
-			return array(
-				"type" => "game",
-				"width" => 10,
-				"height" => 10,
-				"users" => $this->selectMultiple("SELECT userID, mu, sigma FROM User ORDER BY rand() LIMIT $numPlayers")
-			);
-			
+			$players = $this->selectMultiple("SELECT userID, mu, sigma FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
+			if(count($players) == 2) {
+				return array(
+					"type" => "game",
+					"width" => 10,
+					"height" => 10,
+					"users" => $players
+				);
+			}
 		}
 	}
 
@@ -178,7 +180,7 @@ class ManagerAPI extends API
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = "../../../storage/bots/{$userID}/{$name}";
+			$targetPath = "../../../storage/bots/{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;
@@ -191,7 +193,8 @@ class ManagerAPI extends API
 	protected function botHash() {
 		if(isset($_GET['userID'])) {
 			$userID = $_GET['userID'];
-			return array("hash" => md5_file($this->getBotFile($userID)));
+			if(file_exists($this->getBotFile($userID))) return array("hash" => md5_file($this->getBotFile($userID)));
+			else return "Bot file does not exist";
 		}
 	}
  }

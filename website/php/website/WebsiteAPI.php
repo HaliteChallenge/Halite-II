@@ -71,25 +71,22 @@ class WebsiteAPI extends API
 			return $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
 		} else if (isset($_GET["username"])) {
 			$username = $_GET["username"];
-			return $this->select("SELECT userID, username FROM User WHERE username = '$username'");
+			return $this->select("SELECT * FROM User WHERE username = '$username'");
 		} else if (isset($_GET["userID"])) {
 			$userID = $_GET["userID"];
-			return $this->select("SELECT userID, username FROM User WHERE userID = $userID");
+			return $this->select("SELECT * FROM User WHERE userID = $userID");
 		} else if (isset($_POST["username"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
 			$password = $_POST["password"];
 
 			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
 			if(isset($usernameArray['username'])) {
-				return NULL;
+				return "Username already existsZ";
 			}
 
 			$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
-		} else {
-			return "No endpoint reached";
+			return "Success";
 		}
-
-		return "Success";
 	}
 
 	protected function botFiles() {
@@ -101,10 +98,8 @@ class WebsiteAPI extends API
 			else mkdir($targetPath);
 			
 			move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
-		} else {
-			return "No endpoint reached";
+			return "Success";
 		}
-		return "Success";
 	}
 
 	protected function session() {
@@ -116,18 +111,17 @@ class WebsiteAPI extends API
 			$username = $_POST['username'];
 			$password = $_POST['password'];
 			$_SESSION = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+			return "Success";
 		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
 			$_SESSION = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+			return "Success";
 		} else if($this->method == 'DELETE') {
 			session_destroy();
-		} else {
-			return "No endpoint reached";
+			return "Success";
 		}
-
-		return "Success";
 	}
  }
 

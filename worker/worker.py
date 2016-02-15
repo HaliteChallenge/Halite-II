@@ -7,6 +7,7 @@ import urllib.request
 import requests
 import zipfile
 import json
+from time import sleep
 from hashlib import md5
 from compiler import *
 import trueskill
@@ -19,7 +20,7 @@ class TrueSkillPlayer(object):
 class Backend:
 	def __init__(self, apiKey):
 		self.apiKey = apiKey
-		self.url = "http://104.131.205.10/php/manager/"
+		self.url = "http://localhost/Halite/website/php/manager/"
 
 	# Gets either a run or a compile task from the API
 	def getTask(self):
@@ -34,6 +35,7 @@ class Backend:
 	# Allows us to get the hash of a bot's zip file from the server so that we may verify that a bot was downloaded properly
 	def getBotHash(self, userID):
 		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
+		print("Got bot hash: %s" % (result.text))
 		return json.loads(result.text).get("hash")
 
 	# Downloads and store's a bot's zip file locally
@@ -75,6 +77,7 @@ class Backend:
 			if md5(zipContents).hexdigest() != self.getBotHash(userID):
 				print(md5(zipContents).hexdigest())
 				print(self.getBotHash(userID))
+				print("Hashes do not match!")
 				iterations += 1
 				continue
 
@@ -83,7 +86,7 @@ class Backend:
 
 	# Posts the result of a compilation task
 	def compileResult(self, userID, didCompile, language):
-		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": str(userID), "didCompile": didCompile, "language": language})	
+		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": didCompile, "language": language})	
 
 	# Posts the result of a game task
 	def gameResult(self, users, replayPath):
@@ -139,6 +142,8 @@ def zipFolder(folderPath, destinationFilePath):
 
 # Downloads and compiles a bot. Posts the compiled bot files to the manager.
 def compile(userID, backend):
+	print("Compiling a bot with userID %d" % (userID))
+
 	workingPath = "workingPath"
 	makePath(workingPath)
 	botPath = backend.storeBotLocally(userID, workingPath)
@@ -148,14 +153,19 @@ def compile(userID, backend):
 	didCompile = True if errors == None else False
 
 	if didCompile:
-		zipFolder(workingPath, os.path.join(workingPath, userID+".zip"))
-		backend.storeBotRemotely(userID, os.path.join(workingPath, userID+".zip"))
+		print("Bot did compile")
+		zipFolder(workingPath, os.path.join(workingPath, str(userID)+".zip"))
+		backend.storeBotRemotely(userID, os.path.join(workingPath, str(userID)+".zip"))
+	else:
+		print("Bot did not compile")
 	
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
 # Downloads compiled bots, runs a game, and posts the results of the game
 def runGame(width, height, users, backend):
+	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+
 	workingPath = "workingPath"
 	makePath(workingPath)
 	
@@ -184,14 +194,14 @@ def runGame(width, height, users, backend):
 	lines.remove("")
 	
 	# Get replay name by parsing shellOutput
-	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at "):];
+	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") :]
 	
 	# Get player ranks and scores by parsing shellOutput
 	for lineIndex in range(len(lines) - len(users), len(lines)):
 		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
 		users[playerIndex-1]["rank"] = lineIndex - (len(lines) - len(users))
-		print("Score of: " + lines[lineIndex][lines[lineIndex].index("score of ") + len("score of "):])
-		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of "):])
+		print("Score of: " + lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") :])
+		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") :])
 
 	# Update trueskill mu and sigma values
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
@@ -201,19 +211,24 @@ def runGame(width, height, users, backend):
 		users[a]['sigma'] = newRatings[a][0].sigma
 
 	backend.gameResult(users, replayPath)
+
+	os.remove(replayPath)
 	shutil.rmtree(workingPath)
 
-print("Starting")
-backend = Backend(1)
-print("Made Backend")
-task = backend.getTask()
-print("Task: " + task)
-if task != None:
-	if task["type"] == "compile":
-		compile(task["userID"], backend)
-	elif task["type"] == "game":
-		runGame(task["width"], task["height"], task["users"], backend)
-	else:
-		print("Unknown task")
-else:
-	print("No task")
+if __name__ == "__main__":
+	print("Starting up worker...")
+	backend = Backend(1)
+
+	while True:
+		task = backend.getTask()
+		if task != None:
+			print("Got new task: " + str(task))
+			if task["type"] == "compile":
+				compile(int(task["userID"]), backend)
+			elif task["type"] == "game":
+				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
+			else:
+				print("Unknown task")
+		else:
+			print("No task available. Sleeping for 2 seconds")
+			sleep(2)
