@@ -16,6 +16,7 @@ function loadHLTFile(filename, callback) {
 		var playerNames = new Array()
 		var playerScores = new Array()
 		var playerColors = new Array()
+		playerColors.push({r: 0.3, g: 0.3, b: 0.3 })
 		var fullGame = new Array()
 
 		for(var a = 0; a < numPlayers; a++) {

@@ -311,6 +311,8 @@ void Halite::setupBorders()
 	glDeleteShader(border_fragment_shader);
 
 	glGenBuffers(1, &border_vertex_buffer);
+	glGenVertexArrays(1, &border_vertex_attributes);
+	
 	//Bind vertex attribute object.
 	glBindVertexArray(border_vertex_attributes);
 
@@ -618,10 +620,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		if(xOffset != map_x_offset || yOffset != map_y_offset) setupMapRendering(map_width, map_height, xOffset, yOffset);
 
 		glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, colors.size() * sizeof(float), colors.data());
+		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, strengths.size() * sizeof(unsigned int), strengths.data());
+		glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(unsigned int), strengths.data(), GL_DYNAMIC_DRAW);
 
 		//Draw map:
 		glUseProgram(map_shader_program);

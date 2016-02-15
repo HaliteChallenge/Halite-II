@@ -103,12 +103,14 @@
 		<script>
 			//Create global variables:
 			var canvas, gl,
+			full_game,
 			border_vertex_shader, border_fragment_shader, border_shader_program, border_vp_location,
 			graph_vertex_shader, graph_fragment_shader, graph_shader_program, graph_vp_location, graph_vc_location,
-			loading_vertex_shader, loading_fragment_shader, loading_shader_program, loading_vp_location,
+			//loading_vertex_shader, loading_fragment_shader, loading_shader_program, loading_vp_location, -> I don't think we're using loading at the moment.
 			map_vertex_shader, map_fragment_shader, map_shader_program, map_vp_location, map_vc_location,
 			text_vertex_shader, text_fragment_shader, text_shader_program, text_vp_location, text_vc_location,
-			buffer;
+			//buffer,
+			map_x_offset, map_y_offset, map_width, map_height;
 			
 			function onWindowResize(event)
 			{
@@ -131,11 +133,41 @@
 				requestAnimationFrame(run)
 				render()
 			}
-			function render()
+			function render(turnNumber, zoom, mouseX, mouseY, mouseClick, xOffset, yOffset)
 			{
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-				gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+				if(turnNumber < 0 || turnNumber >= full_game.length) return; //This also causes it to return if full_game.length == 0.
+
+				/* Skip name rendering for now */
+
+				hltMap m = full_game[turnNumber];
+				var col = [];
+				var str [];
+
+				for(var a = 0; a < map_height; a++)
+				{
+					for(var b = 0; b < map_width; b++)
+					{
+						Color c = color_codes[m.contents[a][b].owner];
+						col.push(c.r); col.push(c.g); col.push(c.b);
+						str.push(b->strength);
+					}
+				}
+
+				var colors = new Float32Array(col);
+				var strengths = new Uint32Array(str);
+
+				if(xOffset != map_x_offset || yOffset != map_y_offset) setupMapRendering(map_width, map_height, xOffset, yOffset);
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, map_color_buffer);
+				gl.bufferData(gl.ARRAY_BUFFER, colors, gl.DYNAMIC_DRAW);
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, map_strength_buffer);
+				gl.bufferData(gl.ARRAY_BUFFER, strengths, gl.DYNAMIC_DRAW);
 			}
+
+			/* Rendering Setup Functions */
 			loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors)
 			{
 				//Do initialization:
@@ -149,7 +181,10 @@
 				onWindowResize();
 				window.addEventListener('resize', onWindowResize, false);
 				//Create all of the shaders
-				createPrograms();
+				setupGL();
+
+				//Store fullGame globally:
+				full_game = fullGame;
 				
 				//Temp buffer (render w/ loading program, good test);
 				buffer = gl.createBuffer();
@@ -162,7 +197,40 @@
 				gl.enableVertexAttribArray(loading_vp_location)
 				run();
 			})
-			
+
+
+			/* GL Setup Functions */
+			function setupGL()
+			{
+				createPrograms();
+				setupBorders();
+				setupMapGL();
+				setupMapRendering(map_width, map_height, map_x_offset, map_y_offset);
+				setupGraphGL();
+				setupGraphRendering(1, 0);
+			}
+			function setupBorders()
+			{
+				gl.deleteBuffer(border_vertex_buffer);
+				gl.deleteProgram(border_shader_program);
+				gl.deleteShader(border_vertex_shader);
+				gl.deleteShader(border_fragment_shader);
+
+				border_vertex_buffer = gl.createBuffer();
+
+			}
+			function setupMapGL()
+			{
+
+			}
+			function setupGraphGL()
+			{
+
+			}
+			function setupGraphRendering()
+			{
+
+			}
 			function createBorderProgram()
 			{
 				//Ensure that shader program does not exist:
@@ -221,15 +289,8 @@
 				text_vp_location = gl.getAttribLocation(text_shader_program, 'vp')
 				text_vc_location = gl.getAttribLocation(text_shader_program, 'vc')
 			}
-			function createPrograms()
-			{
-				createBorderProgram()
-				createGraphProgram()
-				createLoadingProgram()
-				createMapProgram()
-				createTextProgram()
-			}
 			
+			/* GL Convienence Functions */
 			function createProgram(vertex, fragment)
 			{
 				var program = gl.createProgram()
