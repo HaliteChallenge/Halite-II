@@ -8,11 +8,11 @@ function storeUserDatabase(username, password, async) {
 		async: async,
 		method: "POST",
 		data: {username: username, password: password}
-    });
+	});
 
-    if(async == true) {
-    	return null;
-    }
+	if(async == true) {
+		return null;
+	}
 }
 
 function storeUserSession(username, password, async) {
@@ -21,7 +21,7 @@ function storeUserSession(username, password, async) {
 		async: async,
 		method: "POST",
 		data: {username: username, password: password}
-    });
+	});
 }
 
 // Uploads source code for users's bot
@@ -35,25 +35,25 @@ function storeBotFiles(formID) {
 	var formData = new FormData($("#"+formID)[0]);
 	console.log(formData);
 	var result = $.ajax({
-        url: url+"botFiles",
-        type: "POST",
-        async: false,
-        data: formData,
-        processData: false,
-        contentType: false,
-        xhr: function() {
-            var myXhr = $.ajaxSettings.xhr();
-            return myXhr;
-        },
-        success: function (data) {
-            alert("Data Uploaded: "+data);
-        },
+		url: url+"botFiles",
+		type: "POST",
+		async: false,
+		data: formData,
+		processData: false,
+		contentType: false,
+		xhr: function() {
+			var myXhr = $.ajaxSettings.xhr();
+			return myXhr;
+		},
+		success: function (data) {
+			alert("Data Uploaded: "+data);
+		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			console.log(xhr.responseText);
 			console.log(thrownError);
 		}
-    });
-    console.log(result)
+	});
+	console.log(result)
 }
 
 function getSession() {
@@ -71,16 +71,40 @@ function getUser(userID, username, password) {
 		async: false,
 		method: "GET",
 		data: {userID: userID, username: username, password: password}
-    });
+	});
 
 	return result.responseJSON;
 }
 
+function getActiveUsers() {
+	var result = $.ajax({
+		url: url+"user", 
+		async: false,
+		method: "GET",
+		data: {active: 1}
+	});
+	console.log(result)
+	console.log(result.responseJSON)
+	return result.responseJSON;
+}
+
+function getLatestGamesForUser() {
+	var result = $.ajax({
+		url: url+"games", 
+		async: false,
+		method: "GET",
+	});
+	return result.responseJSON;
+}
+
+function getGameFile(filename) {
+
+}
 
 function destroySession(async) {
 	$.ajax({
 		url: url+"session", 
 		async: async,
 		method: "DELETE"
-    });
+	});
 }

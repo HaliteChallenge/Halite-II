@@ -75,6 +75,8 @@ class WebsiteAPI extends API
 		} else if (isset($_GET["userID"])) {
 			$userID = $_GET["userID"];
 			return $this->select("SELECT * FROM User WHERE userID = $userID");
+		} else if(isset($_GET['active'])) {
+			return $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 		} else if (isset($_POST["username"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
 			$password = $_POST["password"];
