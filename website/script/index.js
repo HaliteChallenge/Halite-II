@@ -171,7 +171,10 @@ $(function() {
 				this.$form.append("<input type='hidden' name='userID' value='"+userID+"'>");
 			},
 			buttonClicked: function() { this.$fileInput.click(); },
-			fileChanged: function() { storeBotFile("submitForm"); }
+			fileChanged: function() { 
+				storeBotFile("submitForm"); 
+				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. You should show up on the leaderboard within a couple of minutes.", true)
+			}
 		},
 
 		init: function() {

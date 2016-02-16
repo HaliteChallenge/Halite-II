@@ -121,13 +121,10 @@ class WebsiteAPI extends API
 	}
 
 	protected function botFile() {
-		var_dump($_POST);
-		var_dump($_FILES);
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
 			$targetPath = "../../../storage/bots/{$userID}.zip";
-			echo $targetPath;
 			if(file_exists($targetPath) == true) unlink($targetPath);
 			
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
