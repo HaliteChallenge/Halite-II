@@ -2,6 +2,7 @@
 #include <cctype>
 #include <iostream>
 #include <thread>
+#include <chrono>
 #include <stdlib.h>
 #include <Windows.h>
 #include <direct.h>
@@ -144,7 +145,6 @@ int main()
 				std::getline(std::cin, in);
 			}
 		}
-
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
@@ -435,7 +435,7 @@ void renderLaunch()
 
 void handleLogic()
 {
-	std::string filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
+	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
 
