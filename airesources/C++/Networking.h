@@ -162,8 +162,11 @@ static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
 
 static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::Message> &messages)
 {
-    sendString(serializeMoveSet(moves));
-	sendString(serializeMessages(messages));
+	std::string movesString = serializeMoveSet(moves);
+    sendString(movesString);
+
+    std::string messagesString = serializeMessages(messages);
+	sendString(messagesString);
 }
 
 #endif
