@@ -113,11 +113,13 @@ class ManagerAPI extends API
 			// Assign a run game tasks
 			$numPlayers = 2;
 			$players = $this->selectMultiple("SELECT userID, mu, sigma FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
+			$sizes = array(20, 40 , 50);
+			$size = $sizes[array_rand($sizes)];
 			if(count($players) == 2) {
 				return array(
 					"type" => "game",
-					"width" => 10,
-					"height" => 10,
+					"width" => $size,
+					"height" => $size,
 					"users" => $players
 				);
 			}
@@ -126,11 +128,12 @@ class ManagerAPI extends API
 
 	// Allow worker to post the result of their compilation
 	protected function compile() {
+		var_dump($_POST);
 		if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
 			$userID = $_POST['userID'];
 			$didCompile = $_POST['didCompile'];
 
-			if($didCompile) {
+			if($didCompile == 1) {
 				$language = isset($_POST['language']) ? $_POST['language'] : "Other";
 				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 			} else {
