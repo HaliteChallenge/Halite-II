@@ -11,7 +11,7 @@ from time import sleep
 from hashlib import md5
 from compiler import *
 import trueskill
-
+import configparser
 
 class TrueSkillPlayer(object):
   pass
@@ -19,8 +19,10 @@ class TrueSkillPlayer(object):
 # Interface between worker and manager RESTFul API
 class Backend:
 	def __init__(self, apiKey):
+		config = configparser.ConfigParser()
+		config.read("../halite.ini")
 		self.apiKey = apiKey
-		self.url = "http://localhost/Halite/website/php/manager/"
+		self.url = config.get("worker", "managerURL")
 
 	# Gets either a run or a compile task from the API
 	def getTask(self):
