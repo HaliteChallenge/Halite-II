@@ -166,6 +166,11 @@ def compile(userID, backend):
 def runGame(width, height, users, backend):
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
+	# Mark each player's playerIndex based on their order in the users array
+	for a in range(len(users)):
+		users[a]['playerIndex'] = a
+
+	# Setup the workingPath
 	workingPath = "workingPath"
 	makePath(workingPath)
 	

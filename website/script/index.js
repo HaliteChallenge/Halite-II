@@ -1,11 +1,41 @@
 $(function() {
+	var gameDisplay = {
+		isInitialized: false,
+		init: function() {
+			this.isInitialized = true;
+			this.cacheDOM();
+		},
+		cacheDOM: function() {
+			this.$modal = $("#gameModal");
+			this.$player1Field = $("#player1");
+			this.$player2Field = $("#player2");
+		},
+		setGame: function(player1Name, player2Name, replayContents) {
+			if(this.isInitialized == false) this.init();
+
+			this.player1Name = player1Name;
+			this.player2Name = player2Name;
+			this.replayContents = replayContents;
+			this.render();
+		},
+		render: function() {
+			this.$modal.modal('show');
+			this.$player1Field.html(this.player1Name);
+			this.$player2Field.html(this.player2Name);
+			begin(this.replayContents);
+		},
+		hide: function() {
+			this.$modal.modal('hide');
+		}
+	};
+
 	var messageBox = {
 		$messageBox: $("#messageBox"),
 		alert: function(title, message, isSuccess) {
 			$messageBox.empty()
 			$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>Email Verification Success.</strong>&nbsp;&nbsp;Your email has been verified. You may now log in.</div>"))
 		}
-	}
+	};
 
 	function GameDropdown(user, $parentField) {
 		this.setGames = function(games) {
@@ -14,12 +44,13 @@ $(function() {
 			this.hide();
 		};
 		this.render = function() {
+			console.log("games: " + this.games)
 			this.$parentField.find(".gameRow").remove();
 			for(var a = 0; a < this.games.length; a++) {
-				var opponent = this.games[a].users[0].userID == thisuserID ? this.games[a].users[1] : this.games[a].users[0];
+				var opponent = this.games[a].users[0].userID == this.userID ? this.games[a].users[1] : this.games[a].users[0];
 				var gameResult = opponent.rank === "0" ? "Lost" : "Won";
 
-				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a href='#' gameID='"+this.games[a].gameID+"' class='gameLink"+thisuserID+"'>"+gameResult+"</a></td></tr>");
+				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a href='#' gameID='"+this.games[a].gameID+"' class='gameLink"+this.userID+"'>"+gameResult+"</a></td></tr>");
 			}
 		};
 		this.toggle = function() {
@@ -44,7 +75,7 @@ $(function() {
 				return a.playerIndex > b.playerIndex;
 			});
 
-			gameDisplay.setGame(users[0].username, users[1].username, getGameFile(game.replayFilename));
+			gameDisplay.setGame(users[0].username, users[1].username, getGameFile(game.replayName));
 		};
 
 		this.user = user;
@@ -73,7 +104,7 @@ $(function() {
 			for(var a = 0; a < this.submissions.length; a++) this.dropdowns.push(new GameDropdown(this.submissions[a], $("#user"+this.submissions[a].userID)));
 		},
 		render: function() {
-			this.$table.empty();
+			this.$table.find("tbody").remove();
 			for(var a = 0; a < this.submissions.length; a++) {
 				var user = this.submissions[a];
 				var score = this.submissions[a].mu-(3*this.submissions[a].sigma);
@@ -96,7 +127,108 @@ $(function() {
 			return getUser(userID);
 		}
 	};
+	
+	function SmartForm($submitButton, $form, onSubmit) {
+		$submitButton.click(function() {
+			console.log("CLICK");
+			onSubmit();
+		});
+		$form.keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				onSubmit();
+			}
+		});
+	};
+
+	var navbar = {
+		loggedIn: false,
+		$logInUsername: $("#login_user"),
+		$logInPassword: $("#login_pass"),
+		$logInButton: $("#loginButton"),
+		$logInForm: $("#loginForm"),
+		$registerUsername: $("#register_user"),
+		$registerPassword: $("#register_pass"),
+		$registerButton: $("#registerButton"),
+		$registerForm: $("#registerForm"),
+		$logInNav: $("#loginNav"),
+		$logOutNav: $("#logoutNav"),
+		$logOutButton: $("#logoutButton"),
+
+		uploadButton: {
+			$button: $("#submitButton"),
+			$form: $("#submitForm"),
+			$fileInput: $("#myFile"),
+			init: function() {
+				this.$button.click(this, this.buttonClicked.bind(this));
+				this.$fileInput.change(this, this.fileChanged.bind(this));
+			},
+			setUserID: function(userID) {
+				this.$form.append("<input type='hidden' name='userID' value='"+userID+"'>");
+			},
+			buttonClicked: function() { this.$fileInput.click(); },
+			fileChanged: function() { storeBotFile("submitForm"); }
+		},
+
+		init: function() {
+			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
+			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
+			
+			this.uploadButton.init();
+			this.$logOutButton.click(this.logOut.bind(this));
+
+			var session = getSession();
+			if(session != null && session.userID != null) {
+				this.user = session;
+				this.loggedIn = true;
+			}
+
+			this.render();
+		},
+		logIn: function() {
+			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
+			if(user == null) {
+				console.log("Could not log in");
+			} else {
+				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
+				this.loggedIn = true;
+				this.user = user;
+				this.render();
+			}
+		},
+		register: function() {
+			var username = this.$registerUsername.val();
+			var password = this.$registerPassword.val();
+
+			var resp = storeUserDatabase(username, password, false);
+			if (resp === "Success") {
+				storeUserSession(username, password, false);
+
+				this.loggedIn = true;
+				this.user = getSession();
+				this.render();
+			} else  {
+				console.log("Could not register")
+			}
+		},
+		logOut: function() {
+			destroySession(false);
+			this.loggedIn = false;
+			this.render();
+		},
+		render: function() {
+			if(this.loggedIn) {
+				this.$logInNav.css("display", "none");
+				this.$logOutNav.css("display", "inline");
+
+				this.uploadButton.setUserID(this.user.userID);
+			} else {
+				this.$logInNav.css("display", "inline");
+				this.$logOutNav.css("display", "none");
+			}
+		}
+	}
 
 	table.init(getActiveUsers());
-	
+	navbar.init();
 })

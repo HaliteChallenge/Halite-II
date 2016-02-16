@@ -86,20 +86,54 @@ class WebsiteAPI extends API
 				return "Username already existsZ";
 			}
 
-			$this->insert("INSERT INTO User (username, password) VALUES ('$username', '$password')");
+			$this->insert("INSERT INTO User (username, password, mu, sigma, status) VALUES ('$username', '$password', 25.000, 8.333, 0)");
 			return "Success";
 		}
 	}
 
-	protected function botFiles() {
-		if(isset($_FILES['files']['name']) && isset($_POST['userID'])) {
+	protected function game() {
+		if(isset($_GET['userID'])) {
+			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
+			$userID = $_GET['userID'];
+
+			$gameIDArrays = $this->selectMultiple("SELECT * FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
+			$gameArrays = array();
+			
+			// Get each game's info
+			foreach ($gameIDArrays as $gameIDArray) {
+				$gameID = $gameIDArray['gameID'];
+				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
+				
+				// Get information about users
+				$gameArray['users'] = $this->selectMultiple("SELECT * FROM GameUser WHERE gameID = $gameID");
+				foreach($gameArray['users'] as &$gameUserRow) {
+					// Get rid of gameID
+					unset($gameUserRow['gameID']);
+					
+					// Add in user info
+					$userInfo = $this->select("SELECT * FROM User WHERE userID = {$gameUserRow['userID']}");
+					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
+				}
+				array_push($gameArrays, $gameArray);
+			}
+			return $gameArrays;
+		}
+	}
+
+	protected function botFile() {
+		var_dump($_POST);
+		var_dump($_FILES);
+		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
-			$targetPath = "../../storage/bots/{$userID}.zip";
+			$targetPath = "../../../storage/bots/{$userID}.zip";
+			echo $targetPath;
 			if(file_exists($targetPath) == true) unlink($targetPath);
-			else mkdir($targetPath);
 			
-			move_uploaded_file($_FILES['files']['tmp_name'][$i], $targetPath);
+			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
+
+			$this->insert("UPDATE User SET status = 1 WHERE userID = $userID");
+			
 			return "Success";
 		}
 	}

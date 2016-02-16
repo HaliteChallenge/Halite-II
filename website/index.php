@@ -31,8 +31,8 @@
 							<a class="dropdown-toggle" href="#" data-toggle="dropdown">Login<strong class="caret"></strong></a>
 							<ul id="loginForm" class="dropdown-menu" style="padding: 10px; padding-bottom: 0px;">
 								<div class="form-group label-floating is-empty">
-									<label for="login_user" class="control-label">Email</label>
-									<input type="email" class="form-control" id="login_user">
+									<label for="login_user" class="control-label">Username</label>
+									<input type="username" class="form-control" id="login_user">
 									<input type="submit" style="display: none;">
 								</div>
 
@@ -49,20 +49,8 @@
 							<a class="dropdown-toggle" href="#" data-toggle="dropdown">Register<strong class="caret"></strong></a>
 							<ul id="registerForm" class="dropdown-menu" style="padding: 15px; padding-bottom: 0px;">
 								<div class="form-group label-floating is-empty">
-									<label for="register_first" class="control-label">First Name</label>
-									<input id="register_first" class="form-control" type="text" size="30" >
-									<span class="material-input"></span>
-								</div>
-								<div class="form-group label-floating is-empty">
-									<label for="register_last" class="control-label">Last Name</label>
-									<input id="register_last" class="form-control" type="text" size="30" >
-									<span class="material-input"></span>
-								</div>
-								<div class="form-group label-floating is-empty">
-									<label for="register_email" class="control-label">Email</label>
-									<input id="register_email" class="form-control" type="email" size="30" >
-									<span class="help-block" id="schoolField">Enter your school email.</span>
-									<span class="material-input"></span>
+									<label for="register_user" class="control-label">Username</label>
+									<input id="register_user" class="form-control" type="username" size="30" >
 								</div>
 								<div class="form-group label-floating is-empty">
 									<label for="register_pass" class="control-label">Password</label>
@@ -76,7 +64,7 @@
 				</ul>
 				<form id="submitForm">
 					<ul class="nav navbar-nav navbar-right loggedIn" id="logoutNav">
-						<li><a href="#" id="submitButton">Submit To Current Competition</a><input type="file" id="myFile" name="outputFile" onchange="fileChanged()"></li>
+						<li><a href="#" id="submitButton">Submit To Current Competition</a><input type="file" id="myFile" name="botFile"></li>
 						<li><a href="#" id="logoutButton">Logout</a></li>
 					</ul>
 				</form>
@@ -117,27 +105,11 @@
 							<thead>
 								<tr>
 									<th>#</th>
-									<th>Name</th>
-									<th>Organization</th>
+									<th>Username</th>
+									<th>Language</th>
 									<th>Score</th>
 								</tr>
-								<tbody>
-									<tr>
-										<th>1</th>
-										<th>Michael Truell</th>
-										<th>Google</th>
-										<th>78</th>
-									</tr>
-									<tr>
-										<th>2</th>
-										<th>Ben Spector</th>
-										<th>Yahoo</th>
-										<th>2</th>
-									</tr>
-								</tbody>
 							</thead>
-							<tbody id="leaderboard">
-							</tbody>
 						</table>
 					</div>
 				</div>
@@ -147,6 +119,7 @@
 
 	<?php
 		include 'includes/shaders.php';
+		include 'includes/game.php';
 	?>
 
 	<script src="lib/jquery.min.js"></script>
