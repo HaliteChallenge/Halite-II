@@ -32,8 +32,8 @@ $(function() {
 	var messageBox = {
 		$messageBox: $("#messageBox"),
 		alert: function(title, message, isSuccess) {
-			$messageBox.empty()
-			$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>Email Verification Success.</strong>&nbsp;&nbsp;Your email has been verified. You may now log in.</div>"))
+			this.$messageBox.empty()
+			this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
 		}
 	};
 
@@ -188,7 +188,7 @@ $(function() {
 		logIn: function() {
 			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
 			if(user == null) {
-				console.log("Could not log in");
+				messageBox.alert("Login failed", "That username/password combo does not exist", false);
 			} else {
 				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
 				this.loggedIn = true;
@@ -207,8 +207,9 @@ $(function() {
 				this.loggedIn = true;
 				this.user = getSession();
 				this.render();
+				messageBox.alert("Registration succeeded", "You successfully registered and were logged in for the Halite competition.", true);
 			} else  {
-				console.log("Could not register")
+				messageBox.alert("Registration failed", "That username is already taken", false);
 			}
 		},
 		logOut: function() {
