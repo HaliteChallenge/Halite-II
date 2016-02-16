@@ -88,7 +88,8 @@ class Backend:
 
 	# Posts the result of a compilation task
 	def compileResult(self, userID, didCompile, language):
-		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": didCompile, "language": language})	
+		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": int(didCompile), "language": language})
+		print(r.text)	
 
 	# Posts the result of a game task
 	def gameResult(self, users, replayPath):
@@ -160,6 +161,7 @@ def compile(userID, backend):
 		backend.storeBotRemotely(userID, os.path.join(workingPath, str(userID)+".zip"))
 	else:
 		print("Bot did not compile")
+		print(str(errors))
 	
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)

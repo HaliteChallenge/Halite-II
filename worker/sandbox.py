@@ -51,6 +51,19 @@ def _guard_monitor(jail):
 		elif msg == "SIGNALED":
 			jail.resp_queue.put((time, data))
 
+
+def _monitor_file(fd, q):
+	print("Start monitor")
+	while True:
+		line = fd.readline()
+		print(line)
+		if not line:
+			q.put(None)
+			break
+		line = unicode(line, errors="replace")
+		line = line.rstrip('\r\n')
+		q.put(line)
+
 class Sandbox:
 
 	def __init__(self, working_directory):
@@ -78,7 +91,7 @@ class Sandbox:
 
 	def start(self, shell_command):
 		"""Start a command running in the sandbox"""
-		shell_command = "docker run virtual_machine " + shell_command
+		shell_command = shell_command
 		if self.is_alive:
 			raise SandboxError("Tried to run command with one in progress.")
 		working_directory = self.working_directory
@@ -199,6 +212,10 @@ class Sandbox:
 		at least once after each command that is run in the sandbox.
 
 		"""
+		time.sleep(0.3)
+		print("Reading")
+		print(self.is_alive)
+		print("Done reading")
 		if not self.is_alive:
 			timeout=0
 		try:

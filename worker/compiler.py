@@ -318,7 +318,7 @@ comp_args = {
 	"VB"            : [["vbnc", "-out:%s.exe" % BOT]],
 	"C++"         : [["g++", "-O3", "-funroll-loops", "-c"],
 							 ["g++", "-O2", "-lm", "-o", BOT]],
-	"C++11"         : [["g++", "-O3", "-std=c++0x", "-c"],
+	"C++11"         : [["g++", "-O3", "-std=c++11", "-c"],
 							 ["g++", "-O2", "-lm", "-std=c++0x", "-o", BOT]],
 	"D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
 	"Go"            : [["6g", "-o", "_go_.6"],
