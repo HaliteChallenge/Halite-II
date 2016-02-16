@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cctype>
+#include <chrono>
 
 #include "Core/Halite.h"
 
@@ -77,8 +78,8 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-    
-	std::string filename = "../Replays/Output_" + std::to_string(time(NULL)) + ".hlt";
+
+	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
 
