@@ -105,9 +105,13 @@ $(function() {
 		},
 		render: function() {
 			this.$table.find("tbody").remove();
+			this.submissions.sort(function(a, b) {
+				return a.mu-(a.sigma*3) < b.mu-(b.sigma*3);
+			});
+			console.log(this.submissions)
 			for(var a = 0; a < this.submissions.length; a++) {
 				var user = this.submissions[a];
-				var score = this.submissions[a].mu-(3*this.submissions[a].sigma);
+				var score = Math.round((this.submissions[a].mu-(3*this.submissions[a].sigma))*100)/100;
 				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td>"+user.username+"</td><td>"+user.language+"</td><td><a class='matchDrop' userID= '"+user.userID+"' href='#'>"+score+"</a></td></tr></tbody>");
 			}
 		},
