@@ -51,7 +51,7 @@ public:
 	{
 		map_width = 0;
 		map_height = 0;
-		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 1 }));
+		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
 	}
 	Map(const Map &otherMap)
 	{
@@ -63,7 +63,7 @@ public:
 	{
 		map_width = width;
 		map_height = height;
-		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 1 }));
+		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
 
 		std::list<Location> takenSpots;
 		float minDistance = sqrt(map_height*map_width) / 2;
