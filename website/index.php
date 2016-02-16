@@ -77,7 +77,7 @@
 		<div class="pageContent">
 			<div class="jumbotron" id="jumbotron">
 				<h1 id="jHeader">Halite</h1>
-				<p id="jParagraph">A multi-player turn-based strategy game played on a rectangular grid</p>
+				<p id="jParagraph">A multi-player turn-based strategy game</p>
 			</div>
 			<div class="row">
 				<div class="col-sm-5">
