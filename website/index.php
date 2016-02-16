@@ -42,7 +42,7 @@
 										<input id="login_pass" class="form-control" type="password" size="30" >
 										<span class="material-input"></span>
 									</div>
-									<input id="loginButton" class="btn btn-primary" style="clear: left; width: 100%; height: 32px; font-size: 13px; margin-bottom:0px" type="submit" name="commit" value="Login" />
+									<input id="loginButton" class="btn btn-primary" style="clear: left; width: 100%; height: 32px; font-size: 13px; margin-bottom:15px" type="submit" name="commit" value="Login" />
 								</ul>
 							</li>
 
