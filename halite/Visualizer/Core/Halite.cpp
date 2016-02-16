@@ -701,7 +701,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				int xPos = round((mouseDX + (dX / 2)) / dX) - (1 + xOffset);
 				xPos %= map_width; if(xPos < 0) xPos += map_width;
 				int yPos = round((mouseDY + (dY / 2)) / dY) - (1 + yOffset);
-				yPos %= map_height; if(yPos < 0) yPos += map_height;
+				yPos = map_height - yPos; yPos %= map_height; if(yPos < 0) yPos += map_height;
 
 				int posInVector = yPos * map_width + xPos;
 				int strength = strengths[posInVector];
