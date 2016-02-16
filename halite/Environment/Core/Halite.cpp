@@ -1,5 +1,7 @@
 #include "Halite.h"
 
+#include "limits.h"
+
 #define INFINITE_RESPOND_TIME true
 
 //Consts -----------------------------
