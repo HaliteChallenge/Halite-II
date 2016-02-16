@@ -50,7 +50,7 @@ $(function() {
 				var opponent = this.games[a].users[0].userID == this.user.userID ? this.games[a].users[1] : this.games[a].users[0];
 				var gameResult = opponent.rank === "0" ? "Lost" : "Won";
 
-				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a href='#' gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"'>"+gameResult+"</a></td></tr>");
+				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"' target='_blank' href='../storage/replays/"+this.games[a].replayName+"'>"+gameResult+"</a></td></tr>");
 			}
 		};
 		this.toggle = function() {
@@ -65,7 +65,7 @@ $(function() {
 			this.isShown = true;
 			this.$parentField.find(".gameRow").css("display", "table-row");
 		};
-		this.displayGame = function(event) {
+		/*this.displayGame = function(event) {
 			var gameID = $(event.target).attr("gameID");
 			var game = null;
 			for(var a = 0; a < this.games.length; a++) if (this.games[a].gameID == gameID) game = this.games[a];
@@ -76,11 +76,11 @@ $(function() {
 			});
 
 			gameDisplay.setGame(users[0].username, users[1].username, getGameFile(game.replayName));
-		};
+		};*/
 
 		this.user = user;
 		this.$parentField = $parentField;
-		$(document).on("click", ".gameLink"+this.user.userID, this.displayGame.bind(this));
+		//$(document).on("click", ".gameLink"+this.user.userID, this.downloadGame.bind(this));
 	};
 
 	var table = {
