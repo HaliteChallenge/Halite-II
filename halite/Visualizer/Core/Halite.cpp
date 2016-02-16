@@ -91,10 +91,10 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 		}
 		if(abs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
 		{
-			yLoc += dY;
-			if(yLoc > MAP_TOP)
+			yLoc -= dY;
+			if(yLoc < MAP_BOTTOM)
 			{
-				yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * height);
+				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * height);
 			}
 		}
 	}
