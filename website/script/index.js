@@ -39,18 +39,18 @@ $(function() {
 
 	function GameDropdown(user, $parentField) {
 		this.setGames = function(games) {
+			console.log(games)
 			this.games = games;
 			this.render();
 			this.hide();
 		};
 		this.render = function() {
-			console.log("games: " + this.games)
 			this.$parentField.find(".gameRow").remove();
 			for(var a = 0; a < this.games.length; a++) {
-				var opponent = this.games[a].users[0].userID == this.userID ? this.games[a].users[1] : this.games[a].users[0];
+				var opponent = this.games[a].users[0].userID == this.user.userID ? this.games[a].users[1] : this.games[a].users[0];
 				var gameResult = opponent.rank === "0" ? "Lost" : "Won";
 
-				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a href='#' gameID='"+this.games[a].gameID+"' class='gameLink"+this.userID+"'>"+gameResult+"</a></td></tr>");
+				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a href='#' gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"'>"+gameResult+"</a></td></tr>");
 			}
 		};
 		this.toggle = function() {
@@ -80,7 +80,7 @@ $(function() {
 
 		this.user = user;
 		this.$parentField = $parentField;
-		$(document).on("click", ".gameLink"+this.userID, this.displayGame.bind(this));
+		$(document).on("click", ".gameLink"+this.user.userID, this.displayGame.bind(this));
 	};
 
 	var table = {
