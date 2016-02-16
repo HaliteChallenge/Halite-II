@@ -14,7 +14,12 @@ When pieces from opposing players try to occupy either the same or adjacent site
 
 Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and opposing pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).
 
-Throughout the game, scores are calculated as a sum of all territory that each player has controlled.
+Throughout the game, scores are calculated as a sum of all territory that each player has controlled throughout the game. Players which survive until the end of the game receive a 2x bonus to their score. Scores are calculated purely for ranking players in games (i.e. First, Second, Third place...).
+
+The game ends if one of two conditions are met:
+ - Only one player is left.
+ - A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a large map may take up to thousands.
+
 ## Game Specifications
 
 ## Notes
