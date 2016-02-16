@@ -190,7 +190,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
+			if(effectivePieces[a][b->first] != pieces[a][b->first]) b->second /= defense_bonus; //Decrease damage if the piece didn't move.
 			b->second = floor(b->second); //Floor injuries; pieces retain health if possible.
+
+			//Apply damage
 			if(b->second >= pieces[a][b->first])
 			{
 				effectivePieces[a].erase(b->first);
@@ -208,7 +211,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { a + 1, /*min(b->second, static_cast<unsigned char>(effectivePieces[a][b->first]))*/ b->second };
+			game_map.getSite(b->first, STILL) = { a + 1, b->second };
 		}
 	}
 

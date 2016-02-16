@@ -1,5 +1,7 @@
 #include "Halite.h"
 
+#define INFINITE_RESPOND_TIME true
+
 //Consts -----------------------------
 
 //Environment:
@@ -93,7 +95,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
 	{
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
 			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
 			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
@@ -203,13 +205,16 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
+			if(effectivePieces[a][b->first] != pieces[a][b->first]) b->second /= defense_bonus; //Decrease damage if the piece didn't move.
 			b->second = floor(b->second); //Floor injuries; pieces retain health if possible.
-			if(b->second >= effectivePieces[a][b->first])
+
+			//Apply damage
+			if(b->second >= pieces[a][b->first])
 			{
 				effectivePieces[a].erase(b->first);
 				pieces[a].erase(b->first); //effectivePieces can only be higher; therefore we must delete this too.
 			}
-			else effectivePieces[a][b->first] -= b->second;
+			else pieces[a][b->first] -= b->second;
 		}
 	}
 
@@ -221,7 +226,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { a + 1, min(b->second, static_cast<unsigned char>(effectivePieces[a][b->first])) };
+			game_map.getSite(b->first, STILL) = { a + 1, b->second };
 		}
 	}
 
