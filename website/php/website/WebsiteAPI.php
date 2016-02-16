@@ -132,7 +132,7 @@ class WebsiteAPI extends API
 			
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
 
-			$this->insert("UPDATE User SET status = 1 WHERE userID = $userID");
+			$this->insert("UPDATE User SET status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 			
 			return "Success";
 		}
