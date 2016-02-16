@@ -4,8 +4,8 @@
 #include <time.h>
 #include <set>
 
-#include "../../Networking.h"
-#include "../../hlt.h"
+#include "Networking.h"
+#include "hlt.h"
 
 class MyBot
 {

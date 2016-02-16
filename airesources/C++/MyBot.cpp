@@ -1,3 +1,8 @@
+#include <stdlib.h>
+#include <time.h> 
+#include <cstdlib>
+#include <ctime>
+
 #include "MyBot.h"
 
 MyBot::MyBot()
@@ -46,4 +51,14 @@ void MyBot::run()
 		}
         sendFrame(moves, messagesFromMe);
     }
+}
+
+int main()
+{
+	srand(time(NULL));
+
+	MyBot r = MyBot();
+	r.run();
+
+	return 0;
 }
