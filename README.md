@@ -1,8 +1,15 @@
 # Halite
+
 A project by Benjamin Spector and Michael Truell
+
+![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/Visualizer.png)
+
 ## Overview
+
 Halite is a multi-player turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire map, in competition with every other player in the game. Players use their territory to gain strength, and their strength to gain territory; they must move intelligently on both the micro and macro scales to play effectively.
+
 ## Game Description
+
 During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, two things will happen to it:
 
  - It will permanently increase its Strength by one.
@@ -20,6 +27,10 @@ The game ends if one of two conditions are met:
  - Only one player is left.
  - A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a large map may take up to thousands.
 
-## Game Specifications
+## Folder Contents
 
-## Notes
+- `airesources/` - The starter kits for writing bots
+- `halite/` - The halite game engine and visualizer
+- `multimedia/` - Photos and videos of a halite game
+- `website/` - The website that will host the competition
+- `worker/` - Code run on worker servers that will compile bots and run games safely
