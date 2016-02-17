@@ -11,7 +11,7 @@ MyBot::MyBot()
 	std::cout.sync_with_stdio(0);
 	
     getInit(my_tag, present_map);
-	sendInitResponse("CppBot " + std::to_string(my_tag));
+	sendInitResponse("CppBot" + std::to_string(my_tag));
 	
 	// FOR DEBUGGING PURPOSES. Clears the test file
 	std::ofstream ofs;
