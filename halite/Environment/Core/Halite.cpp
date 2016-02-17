@@ -413,12 +413,12 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 6\n";
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << '\n';
+	gameFile << "HLT 6\r\n";
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << "\r\n";
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << '\n';
+		gameFile << player_names[a] << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << "\r\n";
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
