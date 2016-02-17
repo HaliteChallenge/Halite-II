@@ -86,6 +86,8 @@
 							<h3 class="panel-title">Problem</h3>
 						</div>
 						<div class="panel-body" id="rulesPanelBody">
+							<p><b>Download the starter package <a href="../StarterPackage.zip">here</a></b></p>
+
 							<h3>Overview</h3>
 							
 							<p>Halite is a multi-player turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire map, in competition with every other player in the game. Players use their territory to gain strength, and their strength to gain territory; they must move intelligently on both the micro and macro scales to play effectively.</p>
