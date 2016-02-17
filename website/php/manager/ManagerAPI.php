@@ -113,7 +113,7 @@ class ManagerAPI extends API
 			// Assign a run game tasks
 			$numPlayers = 2;
 			$players = $this->selectMultiple("SELECT userID, mu, sigma FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
-			$sizes = array(20, 40 , 50);
+			$sizes = array(10, 20);
 			$size = $sizes[array_rand($sizes)];
 			if(count($players) == 2) {
 				return array(

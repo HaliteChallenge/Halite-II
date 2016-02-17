@@ -229,14 +229,15 @@ if __name__ == "__main__":
 	backend = Backend(1)
 
 	task = backend.getTask()
-	if task != None:
-		print("Got new task: " + str(task))
-		if task["type"] == "compile":
-			compile(int(task["userID"]), backend)
-		elif task["type"] == "game":
-			runGame(int(task["width"]), int(task["height"]), task["users"], backend)
+	while True:
+		if task != None:
+			print("Got new task: " + str(task))
+			if task["type"] == "compile":
+				compile(int(task["userID"]), backend)
+			elif task["type"] == "game":
+				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
+			else:
+				print("Unknown task")
 		else:
-			print("Unknown task")
-	else:
-		print("No task available. Sleeping for 2 seconds")
-		sleep(2)
+			print("No task available. Sleeping for 2 seconds")
+			sleep(2)
