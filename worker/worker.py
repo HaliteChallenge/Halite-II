@@ -228,8 +228,8 @@ if __name__ == "__main__":
 	print("Starting up worker...")
 	backend = Backend(1)
 
-	task = backend.getTask()
 	while True:
+		task = backend.getTask()
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
