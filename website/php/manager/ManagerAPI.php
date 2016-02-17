@@ -144,6 +144,8 @@ class ManagerAPI extends API
 
 	// Allow workers to post the result of their game
 	protected function game() {
+		var_dump($_FILES);
+		var_dump($_POST);
 		// Each user in users must have a rank, playerIndex, score, mu, sigma, and userID
 		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$users = json_decode($_POST['users']);
@@ -153,7 +155,13 @@ class ManagerAPI extends API
 			$name = basename($_FILES[$fileKey]['name']);
 			$targetPath = "../../../storage/replays/{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
-			
+			if(is_file($targetPath) == false) {
+				echo "Did not work";
+			} else {
+				echo "File transfer worked!!!!!!!!!!!";
+			}
+			chmod($targetPath, 0777);
+
 			// Store game information in db
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
