@@ -2,7 +2,7 @@
 
 A project by Benjamin Spector and Michael Truell
 
-![Demo](https://raw.github.com/Sydriax/Halite/master/multimedia/SampleGame.gif)
+![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/SampleGame.gif)
 
 ## Overview
 
