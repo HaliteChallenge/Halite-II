@@ -2,7 +2,7 @@
 
 #include "limits.h"
 
-#define INFINITE_RESPOND_TIME true
+#define INFINITE_RESPOND_TIME false
 
 #ifdef _WIN32
 #define F_NEWLINE '\n'
