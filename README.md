@@ -34,7 +34,7 @@ The game ends if one of two conditions are met:
 - `multimedia/` - Photos and videos of a halite game
 - `website/` - The website that will host the competition
 - `worker/` - Code run on worker servers that will compile bots and run games safely
-- 
+
 ## Contributing
 
 Send us a pull request. If you are looking for things to do, check out the repo's open issues. We will be happy to add you as a contributor and credit you in the README.
