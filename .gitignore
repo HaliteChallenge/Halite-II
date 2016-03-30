@@ -246,6 +246,8 @@ dist/
 downloads/
 eggs/
 .eggs/
+
+*.o
 lib64/
 parts/
 sdist/
