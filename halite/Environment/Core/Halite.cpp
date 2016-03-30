@@ -12,7 +12,7 @@
 
 //Consts -----------------------------
 
-const float MIN_DEFENSE_BONUS = 1, MAX_DEFENSE_BONUS = 1.5;
+const float MIN_DEFENSE_BONUS = 1.5, MAX_DEFENSE_BONUS = 1.5;
 
 //Private Functions ------------------
 
@@ -364,6 +364,7 @@ void Halite::init()
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
+	std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);

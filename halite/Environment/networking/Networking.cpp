@@ -311,10 +311,12 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
         std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m);
 		sendString(playerTag, playerTagString);
 		sendString(playerTag, mapString);
-		std::cout << "Init Message sent to player " << int(playerTag) << "\n";
+		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
+		std::cout << outMessage;
 
 		*playerName = getString(playerTag, timeoutMillis);
-		std::cout << "Init Message received from player " << int(playerTag) << "\n";
+		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
+		std::cout << inMessage;
 
 		return true;
 	}
