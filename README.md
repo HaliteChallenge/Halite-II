@@ -10,8 +10,8 @@ Halite is an original multi-player turn-based strategy game played on a rectangu
 
 During a move, every tile on the map (called a Site) a player controls can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, two things will happen to it:
 
- - It will permanently increase its Strength by one.
- - It will receive, for the duration of that turn, a temporary strength boost. The amount of this boost is a randomly generated floating-point value given to the players at the beginning of the game, ranging from one to three-halves.
+- It will permanently increase its Strength by one.
+- It will receive, for the duration of that turn, a temporary strength boost. The amount of this boost is a randomly generated floating-point value given to the players at the beginning of the game, ranging from one to three-halves.
 
 Players gain pieces by simply moving their own pieces over other Sites on the map. When a piece moves off of a Site, it leaves behind a piece with an identical Owner and with a Strength of 0, in doing so expanding the size of their territory.
 
@@ -22,8 +22,10 @@ Players should note that the map wraps around in all directions; if a piece at t
 Throughout the game, scores are calculated as a sum of all territory that each player has controlled throughout the game. Players which survive until the end of the game receive a 2x bonus to their score. Scores are calculated purely for ranking players in games (i.e. First, Second, Third place...).
 
 The game ends if one of two conditions are met:
- - Only one player is left.
- - A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a very large map may take up to thousands.
+
+- Only one player is left.
+- A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a very large map may take up to thousands.
+
 
 ## Folder Contents
 
