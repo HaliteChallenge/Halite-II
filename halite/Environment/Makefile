@@ -7,7 +7,7 @@ TARGET=environment.o
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) $(FIDOLIB) -o $@
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 .PHONY: clean
 clean:
