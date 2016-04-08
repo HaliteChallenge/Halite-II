@@ -298,4 +298,4 @@ config.php
 workingPath/
 
 halite.ini
-
+*.swp
