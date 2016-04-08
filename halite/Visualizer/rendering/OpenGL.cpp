@@ -1,5 +1,7 @@
 #include "OpenGL.h"
 
+
+
 std::fstream * debugstream;
 
 void util::initShaderHandler(std::fstream * ds)
@@ -94,7 +96,7 @@ void util::addFontSize(int s)
 
 	atlases[s] = { 0, 0 }; //Insert
 	atlases[s].second = new CharTrait[128];
-	int texWidth = 0, texHeight = 0;
+	unsigned int texWidth = 0, texHeight = 0;
 	FT_GlyphSlot g = face->glyph;
 	for(int i = 32; i < 128; i++)
 	{
@@ -105,7 +107,7 @@ void util::addFontSize(int s)
 		}
 
 		texWidth += g->bitmap.width;
-		texHeight = std::max(texHeight, g->bitmap.rows);;
+		texHeight = std::max(texHeight, g->bitmap.rows);
 	}
 	glDeleteTextures(1, &atlases[s].first);
 	glGenTextures(1, &atlases[s].first);
@@ -155,7 +157,7 @@ bool util::setFont(std::string path)
 		delete[] atlases[*a].second;
 		atlases[*a].second = new CharTrait[128];
 
-		int texWidth = 0, texHeight = 0;
+		unsigned int texWidth = 0, texHeight = 0;
 		FT_GlyphSlot g = face->glyph;
 		for(int i = 32; i < 128; i++)
 		{

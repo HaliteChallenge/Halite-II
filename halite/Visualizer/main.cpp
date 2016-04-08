@@ -3,9 +3,16 @@
 #include <iostream>
 #include <thread>
 #include <stdlib.h>
-#include <Windows.h>
-#include <direct.h>
+#include <stdio.h>
 #include "Core/Halite.h"
+
+#ifdef __WIN32__
+	#include <Windows.h>
+	#include <direct.h>
+#else
+	#include <unistd.h>
+#endif
+
 
 GLFWwindow * window;
 
@@ -30,32 +37,18 @@ int windowedWidth, windowedHeight;
 std::string filename;
 std::fstream debug;
 
-#ifdef CONSOLE_DEBUG
 int main(int argc, const char ** argv)
-#else
-INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow)
-#endif
 {
-	if(__argc == 2)
+	if(argc == 2)
 	{
-		std::string loc(__argv[0]);
+		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
 		loc = loc.substr(0, loc.find_last_of('/'));
-		_chdir(loc.c_str());
+		chdir(loc.c_str());
 	}
 
 	//Open debug:
-	std::string debugfilename = "logs/";
-	time_t rawtime;
-	tm timeinfo;
-	time(&rawtime);
-	localtime_s(&timeinfo, &rawtime);
-	const int STRING_LEN = 30;  char timeC[STRING_LEN]; asctime_s(timeC, STRING_LEN, &timeinfo);
-	std::string timeString(timeC);  timeString.pop_back();
-	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ' '; }, '_');
-	std::replace_if(timeString.begin(), timeString.end(), [](char c) -> bool { return c == ':'; }, '-');
-	debugfilename += timeString.substr(4);
-	debugfilename += ".log";
+	std::string debugfilename = "logs/debug.log";
 	debug.open(debugfilename, std::ios_base::out);
 	if(!debug.is_open()) //If file couldn't be opened.
 	{
@@ -87,9 +80,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT n
 
 	my_game = new Halite();
 
-	if(__argc == 2)
+	if(argc == 2)
 	{
-		handleDrop(window, 1, (const char **)(__argv + 1));
+		handleDrop(window, 1, (const char **)(argv + 1));
 	}
 	else
 	{

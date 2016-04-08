@@ -70,7 +70,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	map_x_offset = xOffset;
 
 	//Generate vertices of centers of squares.
-	std::vector<float> vertexLocations(unsigned int(width) * height * 2); //2 because there are x and y values for every vertex.
+	std::vector<float> vertexLocations((unsigned int)width * height * 2); //2 because there are x and y values for every vertex.
 	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * height), dX = (MAP_RIGHT - MAP_LEFT) / width, dY = (MAP_TOP - MAP_BOTTOM) / height;
 	xLoc += xOffset * dX;
 	while(xLoc > MAP_RIGHT) xLoc -= (MAP_RIGHT - MAP_LEFT);
@@ -109,7 +109,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors(unsigned int(width) * height * 3); //r, g, and b components.
+	std::vector<float> colors((unsigned int)width * height * 3); //r, g, and b components.
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
@@ -118,7 +118,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<unsigned int> strengths(unsigned int(width) * height, 0); //r, g, and b components.
+	std::vector<unsigned int> strengths((unsigned int)width * height, 0); //r, g, and b components.
 
 	//Setup strength buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
@@ -227,7 +227,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->territory_count.size() > a && full_game[b]->territory_count[a] > graph_max_territory) graph_max_territory = full_game[b]->territory_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphTerritoryVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
+	std::vector<float> graphTerritoryVertices((unsigned int)number_of_players * (graph_turn_max + 1 - graph_turn_min) * 2);
 
 	//Set vertices by player:
 	unsigned int graphTerritoryVerticesLoc = 0; //Location in graphTerritoryVertices.
@@ -246,7 +246,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector representing color data:
-	std::vector<float> graphColors(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 3);
+	std::vector<float> graphColors((unsigned int)number_of_players * (graph_turn_max + 1 - graph_turn_min) * 3);
 
 	//Set color data:
 	unsigned int graphColorsLoc = 0; //Location in graphColors.
@@ -278,7 +278,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->strength_count.size() > a && full_game[b]->strength_count[a] > graph_max_strength) graph_max_strength = full_game[b]->strength_count[a];
 
 	//Create vector of graph vertices.
-	std::vector<float> graphStrengthVertices(unsigned int(number_of_players) * (graph_turn_max + 1 - graph_turn_min) * 2);
+	std::vector<float> graphStrengthVertices((unsigned int)number_of_players * (graph_turn_max + 1 - graph_turn_min) * 2);
 
 	//Set vertices by player:
 	unsigned int graphStrengthVerticesLoc = 0; //Location in graphStrengthVertices.
@@ -483,11 +483,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		int tilesSoFar = 0;
 		while(tilesSoFar < totalTiles)
 		{
-			game_file.get(c); numPieces = unsigned char(c);
-			game_file.get(c); presentOwner = unsigned char(c);
+			game_file.get(c); numPieces = (unsigned char)c;
+			game_file.get(c); presentOwner = (unsigned char)c;
 			for(short b = 0; b < numPieces; b++)
 			{
-				game_file.get(c); strength = unsigned char(c);
+				game_file.get(c); strength = (unsigned char)c;
 				if(y >= m.map_height) break;
 				m.contents[y][x] = { presentOwner, strength };
 				x++;
@@ -598,8 +598,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		hlt::Map * m = full_game[turnNumber];
 
-		std::vector<float> colors(unsigned int(m->map_width) * m->map_height * 3);
-		std::vector<unsigned int> strengths(unsigned int(m->map_width) * m->map_height);
+		std::vector<float> colors((unsigned int)m->map_width * m->map_height * 3);
+		std::vector<unsigned int> strengths((unsigned int)m->map_width * m->map_height);
 
 		unsigned int loc = 0;
 		unsigned int colorLoc = 0;
@@ -628,7 +628,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Draw map:
 		glUseProgram(map_shader_program);
 		glBindVertexArray(map_vertex_attributes);
-		glDrawArrays(GL_POINTS, 0, unsigned int(m->map_width) * m->map_height);
+		glDrawArrays(GL_POINTS, 0, (unsigned int)m->map_width * m->map_height);
 
 		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
 
