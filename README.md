@@ -35,7 +35,7 @@ The game ends if one of two conditions are met:
 - A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a very large map may take up to thousands.
 
 ## Writing a bot
-Here is a simple bot written in Python 3 and utlizing our starter package that moves all of its pieces randomly.
+Here is a simple bot written in Python 3 that utilizes our starter package and moves all of its pieces randomly.
 ```python
 from hlt import *
 from networking import *
@@ -47,6 +47,8 @@ sendInit("PythonBot"+str(playerTag))
 # Game loop
 while True:
 	moves = []
+	
+	# Get state of play
 	gameMap, _ = getFrame()
 	
 	# Move all of our pieces randomly
@@ -55,7 +57,8 @@ while True:
 			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
 				moves.append(Move(Location(x, y), int(random.random() * 5)))
-
+	
+	# Send moves to environment
 	sendFrame(moves, sendMessages)
 ```
 
