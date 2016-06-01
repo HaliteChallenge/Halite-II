@@ -1,5 +1,7 @@
 # Halite
 
+**The Halite competition will be released publically in the fall of 2016.**
+
 ![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/NewVisualizer.png)
 
 ## Overview
