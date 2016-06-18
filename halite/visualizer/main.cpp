@@ -4,7 +4,7 @@
 #include <thread>
 #include <stdlib.h>
 #include <stdio.h>
-#include "Core/Halite.h"
+#include "core/Halite.h"
 
 #ifdef __WIN32__
 	#include <Windows.h>
