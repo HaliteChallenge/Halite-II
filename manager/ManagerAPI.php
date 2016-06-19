@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once '../API.class.php';
+require_once 'API.class.php';
 class ManagerAPI extends API
 {
 
@@ -52,7 +52,7 @@ class ManagerAPI extends API
 			$_POST[$key] = escapeshellcmd($this->mysqli->real_escape_string($value));
 		}
 	}
-	
+
 	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotFile($userID) {
 		return "../../../storage/bots/{$userID}.zip";
@@ -61,14 +61,14 @@ class ManagerAPI extends API
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$config = include("../config.php");
-		$this->mysqli = new mysqli($config['hostname'], 
-			$config['username'], 
-			$config['password'], 
+		$this->mysqli = new mysqli($config['hostname'],
+			$config['username'],
+			$config['password'],
 			$config['databaseName']);
-		
-		if (mysqli_connect_errno()) { 
+
+		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-			exit(); 
+			exit();
 		}
 	}
 
@@ -167,7 +167,7 @@ class ManagerAPI extends API
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
-			
+
 			for($a = 0; $a < count($users); $a++) {
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->score}, {$users[$a]->playerIndex})");
 				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");

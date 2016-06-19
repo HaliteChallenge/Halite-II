@@ -1,6 +1,6 @@
 <?php
 
-require_once '../API.class.php';
+require_once 'API.class.php';
 class WebsiteAPI extends API
 {
 
@@ -27,14 +27,14 @@ class WebsiteAPI extends API
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$config = include("../config.php");
-		$this->mysqli = new mysqli($config['hostname'], 
-			$config['username'], 
-			$config['password'], 
+		$this->mysqli = new mysqli($config['hostname'],
+			$config['username'],
+			$config['password'],
 			$config['databaseName']);
-		
-		if (mysqli_connect_errno()) { 
+
+		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-			exit(); 
+			exit();
 		}
 	}
 
@@ -98,18 +98,18 @@ class WebsiteAPI extends API
 
 			$gameIDArrays = $this->selectMultiple("SELECT * FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
 			$gameArrays = array();
-			
+
 			// Get each game's info
 			foreach ($gameIDArrays as $gameIDArray) {
 				$gameID = $gameIDArray['gameID'];
 				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
-				
+
 				// Get information about users
 				$gameArray['users'] = $this->selectMultiple("SELECT * FROM GameUser WHERE gameID = $gameID");
 				foreach($gameArray['users'] as &$gameUserRow) {
 					// Get rid of gameID
 					unset($gameUserRow['gameID']);
-					
+
 					// Add in user info
 					$userInfo = $this->select("SELECT * FROM User WHERE userID = {$gameUserRow['userID']}");
 					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
@@ -126,11 +126,11 @@ class WebsiteAPI extends API
 
 			$targetPath = "../../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath) == true) unlink($targetPath);
-			
+
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
 
 			$this->insert("UPDATE User SET status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
-			
+
 			return "Success";
 		}
 	}
