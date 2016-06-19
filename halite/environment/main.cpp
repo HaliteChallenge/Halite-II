@@ -2,7 +2,7 @@
 #include <cctype>
 #include <chrono>
 
-#include "core/Halite.h"
+#include "core/Halite.hpp"
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 

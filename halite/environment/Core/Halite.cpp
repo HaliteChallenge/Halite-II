@@ -1,4 +1,4 @@
-#include "Halite.h"
+#include "Halite.hpp"
 
 #include "limits.h"
 
@@ -252,7 +252,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	//Check if the game is over:
 	last_territory_count = std::vector<unsigned int>(number_of_players);
 	std::vector<bool> stillAlive(number_of_players, false);
-	unsigned char numAlive = 0;
+
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0)
 	{
 		last_territory_count[game_map.contents[a][b].owner - 1]++;
@@ -276,8 +276,6 @@ Halite::Halite(unsigned short w, unsigned short h)
 	bool done = false;
 	while (!done)
 	{
-
-		in;
 		//If less than 2, bypass this step: Ask if the user like to add another AI
 		if (number_of_players >= 2)
 		{
@@ -465,5 +463,5 @@ Halite::~Halite()
 {
 	//Get rid of dynamically allocated memory:
 	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
-		for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
+	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
 }

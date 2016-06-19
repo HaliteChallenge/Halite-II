@@ -19,7 +19,7 @@
 	#include <unistd.h>
 #endif
 
-#include "../core/hlt.h"
+#include "../core/hlt.hpp"
 
 class Networking {
 public:

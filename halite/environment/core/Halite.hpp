@@ -10,8 +10,8 @@
 #include <thread>
 #include <future>
 
-#include "hlt.h"
-#include "../networking/Networking.h"
+#include "hlt.hpp"
+#include "../networking/Networking.hpp"
 
 #define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
 
@@ -42,7 +42,7 @@ public:
 	void output(std::string filename);
 	std::vector< std::pair<unsigned char, unsigned int> > runGame();
 	std::string getName(unsigned char playerTag);
-	
+
 	~Halite();
 };
 

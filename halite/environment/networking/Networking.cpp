@@ -1,4 +1,4 @@
-#include "Networking.h"
+#include "Networking.hpp"
 
 #include <time.h>
 #include <fstream>
@@ -103,7 +103,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString)
 {
     // End message with newline character
     sendString += '\n';
-    
+
 #ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
 
@@ -160,25 +160,25 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	}
 #else
 	UniConnection connection = connections[playerTag - 1];
-    
+
     fd_set set;
     FD_ZERO(&set); /* clear the set */
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
-    
+
     struct timeval timeout;
     timeout.tv_sec = timeoutMillis / 1000;
     timeout.tv_usec = timeoutMillis % 1000;
-    
+
     char buffer;
-    
+
     // Keep reading char by char until a newline
     while(true) {
         // Check if there are bytes in the pipe
         int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
-        
+
         if(selectionResult > 0) {
             read(connection.read, &buffer, 1);
-            
+
             if (buffer == '\n') break;
             else newString += buffer;
         } else {
@@ -205,7 +205,7 @@ void Networking::startAndConnectBot(std::string command)
 	saAttr.lpSecurityDescriptor = NULL;
 
 	// Child stdout pipe
-	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) 
+	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0))
 	{
 		std::cout << "Could not create pipe\n";
 		throw 1;
@@ -213,7 +213,7 @@ void Networking::startAndConnectBot(std::string command)
 	if (!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
 	// Child stdin pipe
-	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) 
+	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0))
 	{
 		std::cout << "Could not create pipe\n";
 		throw 1;
@@ -237,22 +237,22 @@ void Networking::startAndConnectBot(std::string command)
 	// C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
 	bool success = CreateProcess(
 		"C:\\windows\\system32\\cmd.exe",
-		LPSTR(command.c_str()),     // command line 
-		NULL,          // process security attributes 
-		NULL,          // primary thread security attributes 
-		TRUE,          // handles are inherited 
-		0,             // creation flags 
-		NULL,          // use parent's environment 
-		NULL,          // use parent's current directory 
-		&siStartInfo,  // STARTUPINFO pointer 
+		LPSTR(command.c_str()),     // command line
+		NULL,          // process security attributes
+		NULL,          // primary thread security attributes
+		TRUE,          // handles are inherited
+		0,             // creation flags
+		NULL,          // use parent's environment
+		NULL,          // use parent's current directory
+		&siStartInfo,  // STARTUPINFO pointer
 		&piProcInfo
-	);  // receives PROCESS_INFORMATION 
-	if(!success) 
+	);  // receives PROCESS_INFORMATION
+	if(!success)
 	{
 		std::cout << "Could not start process\n";
 		throw 1;
 	}
-	else 
+	else
 	{
 		CloseHandle(piProcInfo.hProcess);
 		CloseHandle(piProcInfo.hThread);
@@ -262,11 +262,11 @@ void Networking::startAndConnectBot(std::string command)
 	}
 #else
     std::cout << command << "\n";
-    
+
     pid_t pid = NULL;
     int writePipe[2];
     int readPipe[2];
-    
+
     if(pipe(writePipe)) {
         std::cout << "Error creating pipe\n";
         throw 1;
@@ -275,33 +275,33 @@ void Networking::startAndConnectBot(std::string command)
         std::cout << "Error creating pipe\n";
         throw 1;
     }
-    
+
     // Fork a child process
     pid = fork();
     if (pid == 0) // This is the child
     {
         dup2(writePipe[0], STDIN_FILENO);
-        
+
         dup2(readPipe[1], STDOUT_FILENO);
         dup2(readPipe[1], STDERR_FILENO);
-        
+
         execl("/bin/sh", "sh", "-c", command.c_str(), (char*) NULL);
-        
+
         // Nothing past the execl should be run
-        
+
         exit(1);
     } else if(pid < 0) {
         std::cout << "Fork failed\n";
         throw 1;
     }
-    
+
     UniConnection connection;
     connection.read = readPipe[0];
     connection.write = writePipe[1];
-    
+
     connections.push_back(connection);
     processes.push_back(pid);
-    
+
 #endif
 }
 
@@ -337,14 +337,14 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 		sendString(playerTag, sendMessagesString);
 
 		moves->clear();
-        
+
         std::string movesString = getString(playerTag, timeoutMillis), getMessagesString = getString(playerTag, timeoutMillis);
 		*moves = deserializeMoveSet(movesString);
 		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
 		return true;
 	}
-	catch (int e) 
+	catch (int e)
 	{
 		return false;
 	}
@@ -354,7 +354,7 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 void Networking::killPlayer(unsigned char playerTag) {
 if (isProcessDead(playerTag)) return;
 #ifdef _WIN32
-	
+
 	HANDLE process = processes[playerTag - 1];
 
 	TerminateProcess(process, 0);
@@ -366,7 +366,7 @@ if (isProcessDead(playerTag)) return;
 	std::cout << "Player " << playerTag << " is dead\n";
 #else
     kill(processes[playerTag - 1], SIGKILL);
-    
+
     processes[playerTag - 1] = -1;
     connections[playerTag - 1].read = -1;
     connections[playerTag - 1].write = -1;
