@@ -9,8 +9,8 @@
 #include <iostream>
 #include <algorithm>
 
-#include "hlt.h"
-#include "../rendering/OpenGL.h"
+#include "hlt.hpp"
+#include "../rendering/OpenGL.hpp"
 
 class Halite
 {

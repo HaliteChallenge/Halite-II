@@ -1,4 +1,4 @@
-#include "OpenGL.h"
+#include "OpenGL.hpp"
 
 
 
@@ -127,7 +127,7 @@ void util::addFontSize(int s)
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 
-		atlases[s].second[i] = { float(g->advance.x) / 64 / screenWidth, float(g->advance.y) / 64 / screenHeight, g->bitmap.width, g->bitmap.rows, g->bitmap_left, g->bitmap_top, (float(g->bitmap.width) / texWidth), (float(g->bitmap.rows) / texHeight), float(x) / texWidth };
+		atlases[s].second[i] = { float(g->advance.x) / 64 / screenWidth, float(g->advance.y) / 64 / screenHeight, short(g->bitmap.width), short(g->bitmap.rows), float(g->bitmap_left), float(g->bitmap_top), (float(g->bitmap.width) / texWidth), (float(g->bitmap.rows) / texHeight), float(x) / texWidth };
 
 		x += g->bitmap.width;
 	}
@@ -188,7 +188,7 @@ bool util::setFont(std::string path)
 
 			glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
 
-			atlases[*a].second[i] = { float(g->advance.x) / 64 / screenWidth, float(g->advance.y) / 64 / screenHeight, g->bitmap.width, g->bitmap.rows, g->bitmap_left, g->bitmap_top, (float(g->bitmap.width) / texWidth), (float(g->bitmap.rows) / texHeight), float(x) / texWidth };
+			atlases[*a].second[i] = { float(g->advance.x) / 64 / screenWidth, float(g->advance.y) / 64 / screenHeight, short(g->bitmap.width), short(g->bitmap.rows), float(g->bitmap_left), float(g->bitmap_top), (float(g->bitmap.width) / texWidth), (float(g->bitmap.rows) / texHeight), float(x) / texWidth };
 
 			x += g->bitmap.width;
 		}
@@ -252,7 +252,7 @@ char util::renderText(float x, float y, int size, Color c, const std::string & t
 		tpoints[0] = t.texture_x; tpoints[1] = 0; tpoints[2] = t.texture_x + t.texture_width; tpoints[3] = 0; tpoints[4] = t.texture_x; tpoints[5] = t.texture_height; tpoints[6] = t.texture_x + t.texture_width; tpoints[7] = t.texture_height;
 		glBindBuffer(GL_ARRAY_BUFFER, vbot);
 		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), tpoints, GL_DYNAMIC_DRAW);
-		
+
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		x += t.advance_x;

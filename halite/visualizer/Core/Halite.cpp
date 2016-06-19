@@ -1,8 +1,9 @@
-#include "Halite.h"
+#include "Halite.hpp"
 
 //For debugging purposes:
 #include <chrono>
 #include <thread>
+#include <cmath>
 
 //Consts -----------------------------
 
@@ -89,7 +90,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 		{
 			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width);
 		}
-		if(abs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
+		if(fabs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
 		{
 			yLoc -= dY;
 			if(yLoc < MAP_BOTTOM)
@@ -312,7 +313,7 @@ void Halite::setupBorders()
 
 	glGenBuffers(1, &border_vertex_buffer);
 	glGenVertexArrays(1, &border_vertex_attributes);
-	
+
 	//Bind vertex attribute object.
 	glBindVertexArray(border_vertex_attributes);
 
