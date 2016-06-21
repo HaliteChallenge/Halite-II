@@ -1,4 +1,4 @@
-var url = "php/website/";
+var url = "php/";
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
 // If async returns null

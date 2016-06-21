@@ -26,7 +26,7 @@ class WebsiteAPI extends API
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = include("../config.php");
+		$config = include("config.php");
 		$this->mysqli = new mysqli($config['hostname'],
 			$config['username'],
 			$config['password'],
@@ -124,7 +124,7 @@ class WebsiteAPI extends API
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
-			$targetPath = "../../../storage/bots/{$userID}.zip";
+			$targetPath = "../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath) == true) unlink($targetPath);
 
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);

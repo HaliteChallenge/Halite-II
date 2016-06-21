@@ -55,12 +55,12 @@ class ManagerAPI extends API
 
 	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotFile($userID) {
-		return "../../../storage/bots/{$userID}.zip";
+		return "../../storage/bots/{$userID}.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = include("../config.php");
+		$config = include("config.php");
 		$this->mysqli = new mysqli($config['hostname'],
 			$config['username'],
 			$config['password'],
@@ -154,7 +154,7 @@ class ManagerAPI extends API
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
 			$name = basename($_FILES[$fileKey]['name']);
-			$targetPath = "../../../storage/replays/{$name}";
+			$targetPath = "../../storage/replays/{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			if(is_file($targetPath) == false) {
 				echo "Did not work";
@@ -192,7 +192,7 @@ class ManagerAPI extends API
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = "../../../storage/bots/{$userID}.zip";
+			$targetPath = "../../storage/bots/{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;
