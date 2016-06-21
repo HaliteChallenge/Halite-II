@@ -124,7 +124,7 @@ class WebsiteAPI extends API
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
-			$targetPath = "../../../storage/bots/{$userID}.zip";
+			$targetPath = "../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath) == true) unlink($targetPath);
 
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
