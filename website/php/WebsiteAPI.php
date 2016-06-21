@@ -26,7 +26,7 @@ class WebsiteAPI extends API
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = include("../config.php");
+		$config = include("config.php");
 		$this->mysqli = new mysqli($config['hostname'],
 			$config['username'],
 			$config['password'],
