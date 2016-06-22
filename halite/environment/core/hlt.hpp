@@ -3,6 +3,8 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <chrono>
+#include <iostream>
 
 #define STILL 0
 #define NORTH 1
@@ -38,9 +40,8 @@ static bool operator==(const Location & l1, const Location & l2)
 struct Site
 {
 	unsigned char owner;
-	signed short strength;
+	unsigned char strength;
 	unsigned char production;
-	unsigned char threshold;
 };
 
 class Map
@@ -63,38 +64,69 @@ public:
 	}
 	Map(short width, short height, unsigned char numberOfPlayers)
 	{
-		map_width = width;
-		map_height = height;
-		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
+		//Find number closest to square that makes the match symmetric.
+		int dw = sqrt(numberOfPlayers);
+		while(numberOfPlayers % dw != 0) dw--;
+		int dh = numberOfPlayers / dw;
 
-		std::list<Location> takenSpots;
-		float minDistance = sqrt(map_height*map_width) / 2;
-		for(int a = 1; a <= numberOfPlayers; a++)
-		{
-			bool bad = true;
-			int counter = 0;
-			Location l;
-			while (bad)
-			{
-				bad = false;
-				l = { static_cast<unsigned short>(rand() % map_width), static_cast<unsigned short>(rand() % map_height) };
-				for(auto b = takenSpots.begin(); b != takenSpots.end(); b++)
-				{
-					if (getDistance(l, *b) <= minDistance)
-					{
-						bad = true;
-						break;
+		//Figure out chunk width and height accordingly.
+		//Matches width and height as closely as it can, but is not guaranteed to match exactly.
+		//It is guaranteed to be smaller if not the same size, however.
+		int cw = width / dw;
+		int ch = height / dh;
+		//We're temporarily setting the map width and height to be that of the chunks,
+		//which lets us use the getLocation function with the chunks.
+		//We'll set it again later.
+		map_width = cw;
+		map_height = ch;
+
+		//Pseudorandom number generator.
+		std::mt19937 prg(std::chrono::system_clock::now().time_since_epoch().count());
+		std::uniform_real_distribution<double> urd(0.0, 1.0);
+		//Generate the chunk with random values:
+		std::vector< std::vector<float> > chunk(ch, std::vector<float>(cw));
+		for(int a = 0; a < ch; a++) {
+	    for(int b = 0; b < cw; b++) {
+	      float d = 2 * urd(prg);
+	      d = d * d * d * d;
+	      chunk[a][b] = d;
+	    }
+	  }
+		//Iterate over the map 3 times (found by experiment) to produce the chunk.
+		for(int a = 0; a < 3; a++) {
+			std::vector< std::vector<float> > newChunk = std::vector< std::vector<float> >(ch, std::vector<float>(cw, 0));
+			const double OWN_WEIGHT = 0.5;
+			for(unsigned short y = 0; y < ch; y++) {
+		    for(unsigned short x = 0; x < cw; x++) {
+		      Location l = { x, y };
+		      Location n = getLocation(l, NORTH), e = getLocation(l, EAST), s = getLocation(l, SOUTH), w = getLocation(l, WEST);
+		      newChunk[l.y][l.x] = OWN_WEIGHT * chunk[l.y][l.x];
+		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[n.y][n.x] / 4;
+		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[e.y][e.x] / 4;
+		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[s.y][s.x] / 4;
+		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[w.y][w.x] / 4;
+		      newChunk[l.y][l.x] -= urd(prg);
+					if(newChunk[l.y][l.x] < 0) newChunk[l.y][l.x] = 0;
+		    }
+		  }
+		  chunk = newChunk;
+		}
+
+		map_width = cw * dw;
+		map_height = ch * dh;
+		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+
+		//Fill in with chunks.
+		for(int a = 0; a < dh; a++) {
+			for(int b = 0; b < dw; b++) {
+				for(int c = 0; c < ch; c++) {
+					for(int d = 0; d < cw; d++) {
+						contents[a * ch + c][b * cw + d].production = chunk[c][d]; //Set production values.
 					}
 				}
-				counter++;
-				if (counter > 150)
-				{
-					counter = 0;
-					minDistance *= 0.85;
-				}
+				contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
+				contents[a * ch + ch / 2][b * cw + cw / 2].strength = 255; //Set strengths
 			}
-            contents[l.y][l.x] = { static_cast<unsigned char>(a), 255 };
-			takenSpots.push_back(l);
 		}
 	}
 

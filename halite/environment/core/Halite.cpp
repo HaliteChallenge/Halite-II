@@ -44,7 +44,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	std::vector< std::map<hlt::Location, signed short> > pieces(number_of_players);
+	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<bool> permissibleTime(number_of_players, false);
@@ -85,7 +85,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
 	{
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1) if(game_map.getSite(b->loc, STILL).strength >= 0)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
 			if(b->dir == STILL)
 		 	{
@@ -120,7 +120,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).strength >= 0 && game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
+		if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
+		else game_map.getSite(l, STILL).strength = 255;
 		hlt::Site s = game_map.getSite(l, STILL);
 		if(s.owner != 255 && s.owner != 0) //Ensuring that it's not just an already moved piece.
 		{
@@ -195,25 +196,25 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
-			//Apply damage
-			if(b->second >= pieces[a][b->first])
-			{
-				effectivePieces[a].erase(b->first);
-				pieces[a].erase(b->first); //effectivePieces can only be higher; therefore we must delete this too.
-			}
+			//Apply damage.
+			if(b->second >= pieces[a][b->first]) pieces[a].erase(b->first);
 			else pieces[a][b->first] -= b->second;
 		}
 	}
 
 	//Clear the map (everything to { 0, 0 })
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b = { 0, 0 };
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+		b->strength = 0;
+		b->owner = 0;
+	}
 
 	//Add pieces back into the map.
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++)
 		{
-			game_map.getSite(b->first, STILL) = { (unsigned char)(a + 1), b->second };
+			game_map.getSite(b->first, STILL).owner = a + 1;
+			game_map.getSite(b->first, STILL).strength = b->second;
 		}
 	}
 
