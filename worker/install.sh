@@ -6,6 +6,7 @@ apt-get install clang++-3.5
 pip3 install trueskill
 pip3 install pymysql
 
-sudo chmod +x setup/Install_14.04.sh
-./setup/Install_14.04.sh
+cd setup
+sudo chmod +x Install_14.04.sh
+./Install_14.04.sh
 
