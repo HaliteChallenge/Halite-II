@@ -8,3 +8,6 @@
 * Create and write a halite.ini file in the root directory of the project
 
 ## Worker setup
+Execute:
+
+```cd HALITE_FOLDER/worker && ./install.sh && sudo python3 worker.py```
