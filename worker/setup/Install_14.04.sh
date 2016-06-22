@@ -11,14 +11,6 @@ sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
 echo "Docker Setup complete"
 
 ###########################
-# NodeJS setup
-###########################
-apt-get update
-apt-get install nodejs
-apt-get install npm
-echo "NodeJS setup Complete"
-
-###########################
 # Start Docker 
 ###########################
 chmod 777 ../API/DockerTimeout.sh
