@@ -38,7 +38,10 @@ static bool operator==(const Location & l1, const Location & l2)
 
 struct Site
 {
-	unsigned char owner, strength;
+	unsigned char owner;
+	signed short strength;
+	unsigned char production;
+	unsigned char threshold;
 };
 
 class Map
