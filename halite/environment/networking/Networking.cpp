@@ -307,8 +307,10 @@ void Networking::startAndConnectBot(std::string command)
 
 bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
 {
+	std::cout << "2.1!\n";
+	std::cout.flush();
 	try {
-        std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m);
+    std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m);
 		sendString(playerTag, playerTagString);
 		sendString(playerTag, mapString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";

@@ -263,9 +263,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 Halite::Halite(unsigned short w, unsigned short h)
 {
-		//Connect to players
-		number_of_players = 0;
-		player_names = std::vector<std::string>();
+	//Connect to players
+	number_of_players = 0;
+	player_names = std::vector<std::string>();
 
 	std::string in;
 
@@ -396,15 +396,21 @@ void Halite::init()
 		std::vector< std::future<bool> > initThreads(number_of_players);
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
-				initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+			std::cout << "1!\n";
+			std::cout.flush();
+			initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 		}
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
+			std::cout << "2!\n";
+			std::cout.flush();
 			bool success = initThreads[a].get();
-		if (!success)
-		{
-			networking.killPlayer(a + 1);
-		}
+			std::cout << "3!\n";
+			std::cout.flush();
+			if (!success)
+			{
+				networking.killPlayer(a + 1);
+			}
 		}
 }
 

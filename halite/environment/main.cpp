@@ -78,7 +78,6 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-
 	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
@@ -97,8 +96,9 @@ int main(int argc, char* args[])
 	for (unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a score of " + std::to_string(rankings[a].second) + "\n";
 	std::cout << victoryOut;
 
-    delete my_game;
+  delete my_game;
 
-	system("PAUSE");
+	std::cout << "Press enter to continue:";
+	getchar();
 	return 0;
 }
