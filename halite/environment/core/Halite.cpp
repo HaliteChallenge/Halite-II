@@ -138,11 +138,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	std::vector< std::map<hlt::Location, float> > toInjure(number_of_players);
 
-	//Sweep through locations and find the correct damage for each piece.
+	//Sweep through locations and find the correct damage for each piece. Start by applying damage within only the active strengths.
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l)) //pieces and effectivepieces are synced.
+		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l) && pieces[c][l] > 0)
 		{
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
 			{
@@ -151,40 +151,40 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'NORTH' square:
 				tempLoc = game_map.getLocation(l, NORTH);
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'EAST' square:
 				tempLoc = game_map.getLocation(l, EAST);
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'SOUTH' square:
 				tempLoc = game_map.getLocation(l, SOUTH);
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 				//Check 'WEST' square:
 				tempLoc = game_map.getLocation(l, WEST);
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
-					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += effectivePieces[c][l];
-					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, effectivePieces[c][l]));
+					if(toInjure[d].count(tempLoc)) toInjure[d][tempLoc] += pieces[c][l];
+					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 			}
 		}
@@ -195,9 +195,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		for(auto b = toInjure[a].begin(); b != toInjure[a].end(); b++)
 		{
-			if(effectivePieces[a][b->first] != pieces[a][b->first]) b->second /= defense_bonus; //Decrease damage if the piece didn't move.
-			b->second = floor(b->second); //Floor injuries; pieces retain health if possible.
-
 			//Apply damage
 			if(b->second >= pieces[a][b->first])
 			{
