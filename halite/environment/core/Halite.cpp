@@ -85,9 +85,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
 	{
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1) if(game_map.getSite(b->loc, STILL).strength >= 0)
 		{
-			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength >= 0 && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
+			if(b->dir == STILL)
+		 	{
+				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
+				else game_map.getSite(b->loc, STILL).strength = 255;
+			}
 			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
 			if(pieces[a].count(newLoc))
 			{
@@ -116,11 +120,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength++;
+		if(game_map.getSite(l, STILL).strength >= 0 && game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
 		hlt::Site s = game_map.getSite(l, STILL);
-		if(s.owner != 255 && s.owner != 0)
+		if(s.owner != 255 && s.owner != 0) //Ensuring that it's not just an already moved piece.
 		{
-			if(pieces[s.owner - 1].count(l)) //pieces and effectivepieces are synced.
+			if(pieces[s.owner - 1].count(l))
 			{
 				if(short(pieces[s.owner - 1][l]) + s.strength <= 255) pieces[s.owner - 1][l] += s.strength;
 				else pieces[s.owner - 1][l] = 255;
@@ -143,7 +147,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
 			{
 				hlt::Location tempLoc = l;
-				//Check 'STILL' square:
+				//Check 'STILL' square. We also need to deal with the threshold here:
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
