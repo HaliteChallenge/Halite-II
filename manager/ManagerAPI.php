@@ -55,7 +55,7 @@ class ManagerAPI extends API
 
 	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotFile($userID) {
-		return "../../storage/bots/{$userID}.zip";
+		return "../storage/bots/{$userID}.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
@@ -114,7 +114,7 @@ class ManagerAPI extends API
 			// Assign a run game tasks
 			$numPlayers = 2;
 			$players = $this->selectMultiple("SELECT userID, mu, sigma FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
-			$sizes = array(10, 20, 30);
+			$sizes = array(10, 20);
 			$size = $sizes[array_rand($sizes)];
 			if(count($players) == 2) {
 				return array(
@@ -154,7 +154,7 @@ class ManagerAPI extends API
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
 			$name = basename($_FILES[$fileKey]['name']);
-			$targetPath = "../../storage/replays/{$name}";
+			$targetPath = "../storage/replays/{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			if(is_file($targetPath) == false) {
 				echo "Did not work";
@@ -192,7 +192,7 @@ class ManagerAPI extends API
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = "../../storage/bots/{$userID}.zip";
+			$targetPath = "../storage/bots/{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;
