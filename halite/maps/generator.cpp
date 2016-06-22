@@ -86,7 +86,8 @@ int main() {
   }
   for(short y = 0; y < height; y++) {
     for(short x = 0; x < width; x++) {
-      map[y][x].threshold = map[y][x].production * map[y][x].production * (urd(prg) + 1);
+      map[y][x].threshold = (map[y][x].production * map[y][x].production + 1) * (urd(prg) + 0.5);
+
     }
   }
   std::ofstream out("out.txt");
