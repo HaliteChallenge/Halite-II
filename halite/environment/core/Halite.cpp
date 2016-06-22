@@ -26,7 +26,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : game_map.map_width * game_map.map_height + last_territory_count[a] + 100;
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : 1000;
 
 	// Stores the messages sent by bots this frame
 	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);

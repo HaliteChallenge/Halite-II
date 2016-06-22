@@ -25,7 +25,6 @@ struct Message {
 struct Location
 {
 	unsigned short x, y;
-
 };
 static bool operator<(const Location & l1, const Location & l2)
 {
