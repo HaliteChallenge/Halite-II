@@ -26,7 +26,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : game_map.map_width * game_map.map_height + last_territory_count[a] + 100;
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : 1000;
 
 	// Stores the messages sent by bots this frame
 	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
@@ -44,8 +44,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
-	std::vector< std::map<hlt::Location, float> > effectivePieces(number_of_players);
+	std::vector< std::map<hlt::Location, signed short> > pieces(number_of_players);
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<bool> permissibleTime(number_of_players, false);
@@ -54,7 +53,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	{
 		if(alive[a])
 		{
-
 			bool success = frameThreads[threadLocation].get();
 			if(success)
 			{
@@ -87,31 +85,33 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
 	{
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1) if(game_map.getSite(b->loc, STILL).strength >= 0)
 		{
-			if(b->dir == STILL && game_map.getSite(b->loc, STILL).strength != 255) game_map.getSite(b->loc, STILL).strength++;
+			if(b->dir == STILL)
+		 	{
+				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
+				else game_map.getSite(b->loc, STILL).strength = 255;
+			}
 			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
-			if(pieces[a].count(newLoc)) //pieces and effectivepieces are synced.
+			if(pieces[a].count(newLoc))
 			{
-				//If not moving, apply defense_bonus.
-				effectivePieces[a][newLoc] += b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength;
 				if(short(pieces[a][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->loc, STILL).strength;
 				else pieces[a][newLoc] = 255;
 			}
 			else
 			{
-				effectivePieces[a].insert(std::pair<hlt::Location, unsigned short>(newLoc, b->dir == STILL ? game_map.getSite(b->loc, STILL).strength * defense_bonus : game_map.getSite(b->loc, STILL).strength));
 				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
 			}
 
 			//Add in a new piece with a strength of 0 if necessary.
 			if(!pieces[a].count(b->loc))
 			{
-				effectivePieces[a].insert(std::pair<hlt::Location, unsigned short>(newLoc, 0));
 				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
 			}
 
-			//Erase from the game map so that the player can't make another move with the same piece. Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems. This also means that one can have at most 254 players, but that is really not that dissimilar from having 255 players, and would be unbearably slow, so I'm willing to sacrifice that for simplicity.
+			//Erase from the game map so that the player can't make another move with the same piece.
+			//Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems.
+			//This also means that one can have at most 254 players.
 			game_map.getSite(b->loc, STILL) = { 255, 0 };
 		}
 	}
@@ -120,20 +120,18 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength++;
+		if(game_map.getSite(l, STILL).strength >= 0 && game_map.getSite(l, STILL).strength != 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
 		hlt::Site s = game_map.getSite(l, STILL);
-		if(s.owner != 255 && s.owner != 0)
+		if(s.owner != 255 && s.owner != 0) //Ensuring that it's not just an already moved piece.
 		{
-			if(pieces[s.owner - 1].count(l)) //pieces and effectivepieces are synced.
+			if(pieces[s.owner - 1].count(l))
 			{
 				if(short(pieces[s.owner - 1][l]) + s.strength <= 255) pieces[s.owner - 1][l] += s.strength;
 				else pieces[s.owner - 1][l] = 255;
-				effectivePieces[s.owner - 1][l] += s.strength * defense_bonus;
 			}
 			else
 			{
 				pieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
-				effectivePieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned short>(l, s.strength * defense_bonus));
 			}
 		}
 	}
@@ -149,7 +147,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
 			{
 				hlt::Location tempLoc = l;
-				//Check 'STILL' square:
+				//Check 'STILL' square. We also need to deal with the threshold here:
 				if(pieces[d].count(tempLoc))
 				{
 					//Apply damage, but not more than they have strength:
