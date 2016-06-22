@@ -1,42 +1,3 @@
-#!/usr/bin/python
-# compiler.py
-# Author: Jeff Cameron (jeff@jpcameron.com)
-#
-# Auto-detects the language of the entry based on the extension,
-# attempts to compile it, returning the stdout and stderr.
-# The auto-detection works by looking for the "main" code file of
-# the available languages. If the number of matching languages is 0 or
-# more than 1, it is an error, and an appropriate error message is returned.
-#
-# To add a new language you must add an entry to the "languages" list.
-#
-# For example the entry for Python is as follows:
-#    Language("Python", BOT +".py", "MyBot.py",
-#        "python MyBot.py",
-#        ["*.pyc"],
-#        [(["*.py"], ChmodCompiler("Python"))]
-#    ),
-# This defines the output file as MyBot.py, removes all .pyc files, and runs
-# all the found .py files through the ChmodCompiler, which is a pseudo-compiler
-# class which only chmods the found files.
-#
-# If you want to run a real compiler then you need to define a set of flags to
-# send it. In this case you would either use TargetCompiler or ExternalCompiler.
-# The difference between the two is the TargetCompiler iterates over the found
-# files and creates object files from them, whereas the External doesn't.
-# If in doubt just stick to the ExternalCompiler.
-#
-# An example is from the C# Entry:
-#     "C#" : (".exe", ["*.exe"],
-#                     [(["*.cs"], ExternalCompiler(comp_args["C#"][0]))])
-#
-# To make the dictionary more readable the flags have been split into a
-# separate "comp_args" dictionary. C#'s entry looks like so:
-#     "C#" : [["gmcs", "-warn:0", "-out:%s.exe" % BOT]]
-# At runtime this all boils down to:
-#     gmcs -warn:0 -out:MyBot.exe *.cs
-# (though the *.cs is actually replaced with the list of files found)
-
 import collections
 import errno
 import fnmatch
@@ -316,10 +277,10 @@ comp_args = {
 							 ["gcc", "-O2", "-lm", "-o", BOT]],
 	"C#"            : [["gmcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
 	"VB"            : [["vbnc", "-out:%s.exe" % BOT]],
-	"C++"         : [["g++-5", "-O3", "-funroll-loops", "-c"],
-							 ["g++-5", "-O2", "-lm", "-o", BOT]],
-	"C++11"         : [["g++-5", "-O3", "-std=c++11", "-c"],
-							 ["g++-5", "-O2", "-lm", "-std=c++0x", "-o", BOT]],
+	"C++"         : [["g++", "-O3", "-funroll-loops", "-c"],
+							 ["g++", "-O2", "-lm", "-o", BOT]],
+	"C++11"         : [["g++", "-O3", "-std=c++11", "-c"],
+							 ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
 	"D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
 	"Go"            : [["6g", "-o", "_go_.6"],
 							 ["6l", "-o", BOT, "_go_.6"]],
@@ -359,12 +320,12 @@ languages = (
 	# The compilers are run in the order given.
 	# If a source glob is "" it means the source is part of the compiler
 	#   arguments.
-	Language("Ada", BOT, "mybot.adb",
+	Language("Ada", BOT, "MyBot.adb",
 		"./MyBot",
 		["*.ali"],
 		[(["*.adb"], ExternalCompiler(comp_args["Ada"][0])),
-			(["mybot.ali"], ExternalCompiler(comp_args["Ada"][1])),
-			(["mybot.ali"], ExternalCompiler(comp_args["Ada"][2]))]
+			(["MyBot.ali"], ExternalCompiler(comp_args["Ada"][1])),
+			(["MyBot.ali"], ExternalCompiler(comp_args["Ada"][2]))]
 	),
 	Language("C", BOT, "MyBot.c",
 		"./MyBot",
@@ -470,7 +431,7 @@ languages = (
 		[BOT + ".native"],
 		[([""], ExternalCompiler(comp_args["OCaml"][0]))]
 	),
-	Language("Octave", BOT + ".m", "MyBot.m", 
+	Language("Octave", BOT + ".m", "MyBot.m",
 		"octave -qf MyBot.m",
 		[],
 		[(["*.m"], ChmodCompiler("Octave"))]
@@ -478,7 +439,7 @@ languages = (
 	Language("Pascal", BOT, BOT + ".pas",
 		"./" + BOT,
 		[BOT, "*.o", "*.ppu"],
-		[([BOT + ".pas"], ErrorFilterCompiler(comp_args["Pascal"][0], 
+		[([BOT + ".pas"], ErrorFilterCompiler(comp_args["Pascal"][0],
 		   stdout_is_error=True, skip_stdout=2,
 		   filter_stderr='^/usr/bin/ld: warning: link.res contains output sections; did you forget -T\?$'))]
 	),
@@ -492,16 +453,10 @@ languages = (
 		[],
 		[(["*.php"], ChmodCompiler("PHP"))]
 	),
-	Language("Python", BOT +".py", "MyBot.py",
+	Language("Python3", BOT +".py", "MyBot.py",
 		"python3 MyBot.py",
 		["*.pyc"],
-		[(["*.py"], ChmodCompiler("Python")),
-		(["setup_exts"], ErrorFilterCompiler(comp_args["Python"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
-	),
-	Language("Python3", BOT +".py3", "MyBot.py3",
-		"python3 MyBot.py3",
-		["*.pyc"],
-		[(["*.py3"], ChmodCompiler("Python3")),
+		[(["*.py"], ChmodCompiler("Python3")),
 		(["setup_exts"], ErrorFilterCompiler(comp_args["Python3"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
 	),
 	Language("PyPy", BOT +".pypy", "MyBot.pypy",
