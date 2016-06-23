@@ -2,17 +2,18 @@
 #include <iostream>
 
 int main() {
-  hlt::Map map(30, 30, 4);
-  for(int a = 0; a < 30; a++) {
-    for(int b = 0; b < 30; b++) {
+  const int WIDTH = 44, HEIGHT = 45;
+  hlt::Map map(WIDTH, HEIGHT, 4);
+  for(int a = 0; a < map.map_height; a++) {
+    for(int b = 0; b < map.map_width; b++) {
       std::cout << int(map.contents[a][b].production) << ' ';
     }
     std::cout << std::endl;
   }
   int count[20];
   for(int a = 0; a < 20; a++) count[a] = 0;
-  for(int a = 0; a < 30; a++) {
-    for(int b = 0; b < 30; b++) {
+  for(int a = 0; a < map.map_height; a++) {
+    for(int b = 0; b <  map.map_width; b++) {
       if(map.contents[a][b].production != 0) count[map.contents[a][b].production] += map.contents[a][b].production;
       else count[0]++;
     }

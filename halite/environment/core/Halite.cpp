@@ -4,11 +4,7 @@
 
 #define INFINITE_RESPOND_TIME false
 
-#ifdef _WIN32
 #define F_NEWLINE '\n'
-#else
-#define F_NEWLINE "\r\n"
-#endif
 
 //Consts -----------------------------
 
@@ -61,7 +57,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
 			else
 			{
-				std::cout << player_names[a] << " timed out\n";
+				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
 				networking.killPlayer(a + 1);
 			}
@@ -120,10 +116,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		//std::cout << int(game_map.getSite(l, STILL).owner) << " " << int(game_map.getSite(l, STILL).production) << "\n";
 		if(game_map.getSite(l, STILL).owner != 0 && game_map.getSite(l, STILL).owner != 255)
 		{
-			//std::cout << "It's happening!\n";
 			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
 				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
 			}
@@ -267,9 +261,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 
 Halite::Halite(unsigned short w, unsigned short h)
 {
-		//Connect to players
-		number_of_players = 0;
-		player_names = std::vector<std::string>();
+	//Connect to players
+	number_of_players = 0;
+	player_names = std::vector<std::string>();
 
 	std::string in;
 
@@ -363,7 +357,7 @@ void Halite::init()
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
-	std::cout << "Defense Bonus is " << defense_bonus << ".\n";
+	if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
@@ -400,15 +394,15 @@ void Halite::init()
 		std::vector< std::future<bool> > initThreads(number_of_players);
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
-				initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+			initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 		}
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
 			bool success = initThreads[a].get();
-		if (!success)
-		{
-			networking.killPlayer(a + 1);
-		}
+			if (!success)
+			{
+				networking.killPlayer(a + 1);
+			}
 		}
 }
 
@@ -419,7 +413,7 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 6" << F_NEWLINE;
+	gameFile << "HLT 7" << F_NEWLINE;
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -428,6 +422,8 @@ void Halite::output(std::string filename)
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
+	gameFile << F_NEWLINE; //Newline helps organize the file for me.
 	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
 
 	gameFile.flush();
@@ -441,7 +437,7 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 	{
 		//Increment turn number:
 		turn_number++;
-		std::cout << "Turn " << turn_number << "\n";
+		if(!program_output_style) std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		result = processNextFrame(result);
 	}

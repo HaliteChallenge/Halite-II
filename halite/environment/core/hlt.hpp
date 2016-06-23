@@ -87,15 +87,15 @@ public:
 		std::vector< std::vector<float> > chunk(ch, std::vector<float>(cw));
 		for(int a = 0; a < ch; a++) {
 	    for(int b = 0; b < cw; b++) {
-	      float d = 2 * urd(prg);
-	      d = d * d * d * d;
+	      float d = urd(prg);
+	      d = pow(d, 5) * 32;
 	      chunk[a][b] = d;
 	    }
 	  }
-		//Iterate over the map 3 times (found by experiment) to produce the chunk.
-		for(int a = 0; a < 3; a++) {
+		//Iterate over the map 6 times (found by experiment) to produce the chunk
+		for(int a = 0; a < 6; a++) {
 			std::vector< std::vector<float> > newChunk = std::vector< std::vector<float> >(ch, std::vector<float>(cw, 0));
-			const double OWN_WEIGHT = 0.5;
+			const double OWN_WEIGHT = 0.667;
 			for(unsigned short y = 0; y < ch; y++) {
 		    for(unsigned short x = 0; x < cw; x++) {
 		      Location l = { x, y };
@@ -105,8 +105,8 @@ public:
 		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[e.y][e.x] / 4;
 		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[s.y][s.x] / 4;
 		      newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[w.y][w.x] / 4;
-		      newChunk[l.y][l.x] -= urd(prg);
-					if(newChunk[l.y][l.x] < 0) newChunk[l.y][l.x] = 0;
+		      newChunk[l.y][l.x] -= 1.5 * urd(prg);
+					if(newChunk[l.y][l.x] < 0) newChunk[l.y][l.x] = 1;
 		    }
 		  }
 		  chunk = newChunk;
@@ -121,7 +121,7 @@ public:
 			for(int b = 0; b < dw; b++) {
 				for(int c = 0; c < ch; c++) {
 					for(int d = 0; d < cw; d++) {
-						contents[a * ch + c][b * cw + d].production = chunk[c][d]; //Set production values.
+						contents[a * ch + c][b * cw + d].production = round(chunk[c][d]); //Set production values.
 					}
 				}
 				contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
