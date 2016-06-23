@@ -1,6 +1,6 @@
 # Halite
 
-![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/NewVisualizer.png)
+![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/ExampleGame.gif)
 
 ## Overview
 
