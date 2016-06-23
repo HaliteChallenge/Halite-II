@@ -83,7 +83,7 @@ int main(int argc, const char ** argv)
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -183,7 +183,7 @@ void setWindowed()
 	//If possible, fix the Halite's VAOs.
 	if(my_game != NULL) my_game->recreateGL();
 	//Fix text.
-	if(my_game == NULL) //util::cleanup();
+	if(my_game == NULL)
 	{
 		util::initText();
 		util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
