@@ -28,17 +28,17 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	std::vector<int> allowableTimesToRespond(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : 1000;
 
-	// Stores the messages sent by bots this frame
+	//Stores the messages sent by bots this frame
 	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		if(alive[a])
 		{
-			// Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
+			//Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
 			std::vector<hlt::Message> messagesForThisBot;
-			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if (pastMessage->recipientID == a+1) messagesForThisBot.push_back(*pastMessage);
+			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
 
-						frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a+1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
@@ -63,20 +63,20 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			{
 				std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
-				networking.killPlayer(a+1);
+				networking.killPlayer(a + 1);
 			}
 			threadLocation++;
 		}
 	}
 
-	// Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
+	//Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
 	pastFrameMessages = std::vector<hlt::Message>();
-	// Ensure that the player signed their messages correctly
+	//Ensure that the player signed their messages correctly
 	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
 	{
 		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
 		{
-			message->senderID = playerIndex+1; // playerIndex + 1 equals the playerID of the sender
+			message->senderID = playerIndex + 1; //playerIndex + 1 equals the playerID of the sender
 			pastFrameMessages.push_back(*message);
 		}
 	}
@@ -88,7 +88,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
 		{
 			if(b->dir == STILL)
-		 	{
+			{
 				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
 				else game_map.getSite(b->loc, STILL).strength = 255;
 			}
@@ -112,7 +112,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			//Erase from the game map so that the player can't make another move with the same piece.
 			//Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems.
 			//This also means that one can have at most 254 players.
-			game_map.getSite(b->loc, STILL) = { 255, 0 };
+			game_map.getSite(b->loc, STILL).owner = 255;
 		}
 	}
 
@@ -120,11 +120,15 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
-		else game_map.getSite(l, STILL).strength = 255;
-		hlt::Site s = game_map.getSite(l, STILL);
-		if(s.owner != 255 && s.owner != 0) //Ensuring that it's not just an already moved piece.
+		//std::cout << int(game_map.getSite(l, STILL).owner) << " " << int(game_map.getSite(l, STILL).production) << "\n";
+		if(game_map.getSite(l, STILL).owner != 0 && game_map.getSite(l, STILL).owner != 255)
 		{
+			//std::cout << "It's happening!\n";
+			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
+				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
+			}
+			else game_map.getSite(l, STILL).strength = 255;
+			hlt::Site s = game_map.getSite(l, STILL);
 			if(pieces[s.owner - 1].count(l))
 			{
 				if(short(pieces[s.owner - 1][l]) + s.strength <= 255) pieces[s.owner - 1][l] += s.strength;
@@ -330,7 +334,7 @@ void Halite::init()
 {
 	//Add colors to possible colors:
 	possible_colors.clear();
-	possible_colors.push_back({ 1.0, 0.0f, 0.0f });
+	possible_colors.push_back({ 1.0f, 0.0f, 0.0f });
 	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
 	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
 	possible_colors.push_back({ 1.0f, 1.0f, 0.0f });
@@ -433,7 +437,7 @@ void Halite::output(std::string filename)
 std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 1000)
+	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 200)
 	{
 		//Increment turn number:
 		turn_number++;

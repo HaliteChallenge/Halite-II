@@ -57,7 +57,7 @@ int main(int argc, const char ** argv)
 		debug.flush();
 	}
 
-	// start GL context and O/S window using the GLFW helper library
+	//start GL context and O/S window using the GLFW helper library
 	if(!glfwInit())
 	{
 		debug << "Could not start GLFW3\n";
