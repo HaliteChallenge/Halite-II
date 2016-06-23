@@ -12,6 +12,9 @@ from hashlib import md5
 from compiler import *
 import trueskill
 import configparser
+from sandbox import *
+
+RUN_GAME_FILE_NAME = "runGame.sh"
 
 class TrueSkillPlayer(object):
   pass
@@ -24,7 +27,7 @@ class Backend:
 		self.apiKey = apiKey
 		self.url = config.get("worker", "managerURL")
 
-	# Gets either a run or a compile task from the API
+        # Gets either a run or a compile task from the API
 	def getTask(self):
 		print("url: " +self.url+"task")
 		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
@@ -50,10 +53,10 @@ class Backend:
 			zipPath = os.path.join(storageDir, zipFilename)
 			if os.path.exists(zipPath):
 				os.remove(zipPath)
-			
+
 			remoteZipContents = remoteZip.read()
 			remoteZip.close()
-			
+
 			localZip = open(zipPath, "wb")
 			localZip.write(remoteZipContents)
 			localZip.close()
@@ -89,7 +92,7 @@ class Backend:
 	# Posts the result of a compilation task
 	def compileResult(self, userID, didCompile, language):
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": int(didCompile), "language": language})
-		print(r.text)	
+		print(r.text)
 
 	# Posts the result of a game task
 	def gameResult(self, users, replayPath):
@@ -99,7 +102,7 @@ class Backend:
 # Deletes anything residing at path, creates path, and chmods the directory
 def makePath(path):
 	if os.path.exists(path):
-		shutil.rmtree(path)	
+		shutil.rmtree(path)
 	os.makedirs(path)
 	os.chmod(path, 0o777)
 
@@ -108,7 +111,7 @@ def unpack(filePath):
 	folderPath = os.path.dirname(filePath)
 	tempPath = os.path.join(folderPath, "bot")
 	os.mkdir(tempPath)
-	
+
 	# Extract the archive into a folder call 'bot'
 	if platform.system() == 'Windows':
 		os.system("7z x -o"+tempPath+" -y "+filePath+". > NUL")
@@ -123,7 +126,7 @@ def unpack(filePath):
 	# Copy contents of bot folder to folderPath remove bot folder
 	for filename in os.listdir(tempPath):
 		shutil.move(os.path.join(tempPath, filename), os.path.join(folderPath, filename))
-	
+
 	shutil.rmtree(tempPath)
 	os.remove(filePath)
 
@@ -162,7 +165,7 @@ def compile(userID, backend):
 	else:
 		print("Bot did not compile")
 		print(str(errors))
-	
+
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
@@ -170,41 +173,29 @@ def compile(userID, backend):
 def runGame(width, height, users, backend):
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
-	# Mark each player's playerIndex based on their order in the users array
-	for a in range(len(users)):
-		users[a]['playerIndex'] = a
-
-	# Setup the workingPath
-	workingPath = "workingPath"
-	makePath(workingPath)
-	
-	# Download players
+	# Download players to current directory
 	for user in users:
-		userPath = os.path.join(workingPath, str(user["userID"]))
-		os.mkdir(userPath)
+		userDir = str(user["userID"])
+		if os.path.isdir(userDir):
+			shutil.rmtree(userDir)
+		os.mkdir(userDir)
+		unpack(backend.storeBotLocally(user["userID"], userDir))
 
-		unpack(backend.storeBotLocally(user["userID"], userPath))
-
-		# Mark run file executable
-		st = os.stat(os.path.join(userPath, "run.sh"))
-		os.chmod(os.path.join(userPath, "run.sh"), st.st_mode | stat.S_IEXEC)
-	
-	# Build the shell command that will run the game. Executable called Environment houses the game environment
-	runGameShellCommand = "./Environment "+str(width)+" "+str(height)+" "
-	for user in users:
-		absolutePath = os.path.abspath(os.path.join(workingPath, str(user['userID'])))
-		runGameShellCommand += "\"cd "+absolutePath+"; "+os.path.join(absolutePath, "run.sh")+"\" "
-	print(runGameShellCommand)
-	
-	shellOutput = os.popen(runGameShellCommand).read()
-	print(shellOutput)
-	
-	lines = shellOutput.split("\n")
+	# Run game within sandbox
+	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
+	print(runGameCommand)
+	sandbox = Sandbox(os.getcwd())
+	sandbox.start(runGameCommand)
+	while True:
+		line = sandbox.read_line(200)
+		if line == None:
+			break
+		print(line)
+		lines.append(line)
 	lines.remove("")
-	
-	# Get replay name by parsing shellOutput
+
 	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") :]
-	
+
 	# Get player ranks and scores by parsing shellOutput
 	for lineIndex in range(len(lines) - len(users), len(lines)):
 		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
