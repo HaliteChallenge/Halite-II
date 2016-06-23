@@ -6,8 +6,8 @@
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
-// Returns true if all the arguments required of a user to run a game of Halite are present
-// 4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
+//Returns true if all the arguments required of a user to run a game of Halite are present
+//4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
 bool allArgumentsPresent(int argc, char* args[])
 {
 	auto is_number = [](const std::string& s)
@@ -15,7 +15,7 @@ bool allArgumentsPresent(int argc, char* args[])
 		return !s.empty() && std::find_if(s.begin(),
 			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
-	// Remember, the executable name counts as an argument
+	//Remember, the executable name counts as an argument
 	if(argc < 5) return false;
 
 	if(is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
@@ -27,7 +27,7 @@ int main(int argc, char* args[])
 {
 	srand(time(NULL));
 
-	// Parse command line parameters
+	//Parse command line parameters
 	if(allArgumentsPresent(argc, args))
 	{
 		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
@@ -37,8 +37,8 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight, networking);
 	}
-	// The programs arguments were not passed in the run command.
-	// Instead, we will ask the user for them
+	//The programs arguments were not passed in the run command.
+	//Instead, we will ask the user for them
 	else
 	{
 		std::string in;

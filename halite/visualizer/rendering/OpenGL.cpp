@@ -107,7 +107,7 @@ void util::addFontSize(int s)
 		}
 
 		texWidth += g->bitmap.width;
-		texHeight = std::max(texHeight, g->bitmap.rows);
+		if(texHeight < g->bitmap.rows) texHeight = g->bitmap.rows;
 	}
 	glDeleteTextures(1, &atlases[s].first);
 	glGenTextures(1, &atlases[s].first);
@@ -168,7 +168,7 @@ bool util::setFont(std::string path)
 			}
 
 			texWidth += g->bitmap.width;
-			texHeight = std::max(texHeight, g->bitmap.rows);;
+			if(texHeight < g->bitmap.rows) texHeight = g->bitmap.rows;
 		}
 		glDeleteTextures(1, &atlases[*a].first);
 		glGenTextures(1, &atlases[*a].first);
