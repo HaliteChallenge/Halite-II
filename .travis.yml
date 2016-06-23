@@ -5,6 +5,7 @@ compiler: gcc
 before_install:
   # g++4.8.1
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository -y ppa:keithw/glfw3 
   - sudo apt-get update -qq
 
 install:
