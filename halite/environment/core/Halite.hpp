@@ -15,6 +15,8 @@
 
 #define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
 
+extern bool program_output_style;
+
 class Halite
 {
 private:

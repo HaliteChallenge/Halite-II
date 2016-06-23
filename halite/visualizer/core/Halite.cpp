@@ -390,8 +390,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 6") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 7") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	present_file = filename;
 	//Clear previous game
@@ -468,14 +468,23 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
-	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
-	//If we reach the end of the file, ignore that last file.
+	//Reopen the file in binary format.
 	std::streampos pos = game_file.tellg();
 	game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
 	game_file.seekg(pos);
+	char c; //For getting characters from the file.
+
+	//Get the productions from the next width * height characters of the file.
+	for(auto a = m.contents.begin(); a != m.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+		game_file.get(c); b->production = (unsigned char)c;
+	}
+	game_file.get(c); //Get newline character.
+
+	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
+
+	//If we reach the end of the file, ignore that last file.
 	unsigned char numPieces, presentOwner, strength;
-	char c;
 	const int totalTiles = m.map_height*m.map_width;
 	bool shouldLeave = false;
 	for(short a = 0; a < numLines; a++)
@@ -490,7 +499,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			{
 				game_file.get(c); strength = (unsigned char)c;
 				if(y >= m.map_height) break;
-				m.contents[y][x] = { presentOwner, strength };
+				m.contents[y][x].owner = presentOwner;
+				m.contents[y][x].strength = strength;
 				x++;
 				if(x >= m.map_width)
 				{
@@ -550,7 +560,7 @@ bool Halite::isValid(std::string filename)
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 	std::string format; std::getline(game_file, format);
-	if(format != "HLT 6") return false;
+	if(format != "HLT 7") return false;
 	return true;
 }
 
@@ -706,8 +716,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				int posInVector = yPos * map_width + xPos;
 				int strength = strengths[posInVector];
+				int production = m->contents[yPos][xPos].production;
 
-				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength);
+				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength) + " | Production: " + std::to_string(production);
 			}
 			else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
 		}

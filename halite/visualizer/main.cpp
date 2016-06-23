@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "core/Halite.hpp"
 
-#ifdef __WIN32__
+#ifdef _WIN32
 	#include <Windows.h>
 	#include <direct.h>
 #else
@@ -37,14 +37,27 @@ int windowedWidth, windowedHeight;
 std::string filename;
 std::fstream debug;
 
+#ifdef _WIN32
+#define argc __argc
+#define argv __argv
+#endif
+
+#ifdef _WIN2
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
+#else
 int main(int argc, const char ** argv)
+#endif
 {
 	if(argc == 2)
 	{
 		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
 		loc = loc.substr(0, loc.find_last_of('/'));
+#ifdef _WIN32
+		_chdir(loc.c_str());
+#else
 		chdir(loc.c_str());
+#endif
 	}
 
 	//Open debug:

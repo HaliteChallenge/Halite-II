@@ -1,9 +1,11 @@
 #include <iostream>
 #include <cctype>
 #include <chrono>
+#include <string.h>
 
 #include "core/Halite.hpp"
 
+bool program_output_style;
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
 //Returns true if all the arguments required of a user to run a game of Halite are present
@@ -16,9 +18,14 @@ bool allArgumentsPresent(int argc, char* args[])
 			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
 	//Remember, the executable name counts as an argument
-	if(argc < 5) return false;
-
-	if(is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
+	if(strcmp(args[1], "-p") == 0) {
+		if(argc < 6) return false;
+		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
+	}
+	else {
+		if(argc < 5) return false;
+		if(is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
+	}
 
 	return false;
 }
@@ -30,17 +37,33 @@ int main(int argc, char* args[])
 	//Parse command line parameters
 	if(allArgumentsPresent(argc, args))
 	{
-		unsigned short mapWidth = atoi(args[1]), mapHeight = atoi(args[2]);
-
+		unsigned short mapWidth, mapHeight;
 		Networking networking;
-		for(int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
+
+		if(strcmp(args[1], "-p") == 0) {
+			program_output_style = true;
+			mapWidth = atoi(args[2]);
+			mapHeight = atoi(args[3]);
+			for(int a = 4; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
+		}
+		else {
+			program_output_style = false;
+			mapWidth = atoi(args[1]);
+			mapHeight = atoi(args[2]);
+			for(int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
+		}
 
 		my_game = new Halite(mapWidth, mapHeight, networking);
 	}
+
+	//Check if we should give output for the program or give output for the human.
+
 	//The programs arguments were not passed in the run command.
 	//Instead, we will ask the user for them
 	else
 	{
+		program_output_style = false;
+
 		std::string in;
 		unsigned short mapWidth, mapHeight;
 
@@ -78,7 +101,6 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-
 	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
@@ -89,16 +111,23 @@ int main(int argc, char* args[])
 	}
 	catch(std::runtime_error e)
 	{
-		std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename.substr(11) << std::endl;
+		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename.substr(11) << std::endl;
 		my_game->output(filename.substr(11));
 	}
 
 	std::string victoryOut;
-	for (unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a score of " + std::to_string(rankings[a].second) + "\n";
+	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a score of " + std::to_string(rankings[a].second) + "\n";
+	else {
+		std::cout << filename << std::endl;
+		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a].first) + ' ';
+	}
 	std::cout << victoryOut;
 
-    delete my_game;
+  delete my_game;
 
-	system("PAUSE");
+	if(!program_output_style) {
+		std::cout << "Press enter to continue:";
+		getchar();
+	}
 	return 0;
 }
