@@ -16,9 +16,6 @@ from sandbox import *
 
 RUN_GAME_FILE_NAME = "runGame.sh"
 
-class TrueSkillPlayer(object):
-  pass
-
 # Interface between worker and manager RESTFul API
 class Backend:
 	def __init__(self, apiKey):
