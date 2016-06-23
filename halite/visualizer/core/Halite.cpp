@@ -513,12 +513,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			if(tilesSoFar > totalTiles) throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
 		}
 
-		int totalProd = 0;
-		for(auto a = m.contents.begin(); a != m.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-			totalProd += b->production;
-		}
-		std::cout << totalProd << std::endl;
-
 		//Get statistics
 		m.getStatistics();
 		//Add game map to full game

@@ -53,7 +53,11 @@ int main(int argc, const char ** argv)
 		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
 		loc = loc.substr(0, loc.find_last_of('/'));
+#ifdef _WIN32
 		_chdir(loc.c_str());
+#else
+		chdir(loc.c_str());
+#endif
 	}
 
 	//Open debug:
