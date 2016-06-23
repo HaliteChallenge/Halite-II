@@ -54,7 +54,7 @@ public:
 	{
 		map_width = 0;
 		map_height = 0;
-		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0}));
+		contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
 	}
 	Map(const Map &otherMap)
 	{

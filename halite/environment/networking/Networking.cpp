@@ -12,7 +12,7 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	std::ostringstream oss;
 	oss << map.map_width << " " << map.map_height << " ";
 
-	// Run-length encode of owners
+	//Run-length encode of owners
 	unsigned short currentOwner = map.contents[0][0].owner;
 	unsigned short counter = 0;
 	for(int a = 0; a < map.contents.size(); ++a)
@@ -31,10 +31,10 @@ std::string Networking::serializeMap(const hlt::Map & map)
 			}
 		}
 	}
-	// Place the last run into the string
+	//Place the last run into the string
 	oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
 
-	// Encoding of ages
+	//Encoding of ages
 	for(int a = 0; a < map.contents.size(); ++a)
 	{
 		for(int b = 0; b < map.contents[a].size(); ++b)
@@ -101,7 +101,7 @@ std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inp
 
 void Networking::sendString(unsigned char playerTag, std::string &sendString)
 {
-    // End message with newline character
+    //End message with newline character
     sendString += '\n';
 
 #ifdef _WIN32
@@ -134,11 +134,11 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	bool success;
 	char buffer;
 
-	// Keep reading char by char until a newline
+	//Keep reading char by char until a newline
 	while (true) {
-		// Check to see that there are bytes in the pipe before reading
-		// Throw error if no bytes in alloted time
-		// Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
+		//Check to see that there are bytes in the pipe before reading
+		//Throw error if no bytes in alloted time
+		//Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
 		DWORD bytesAvailable = 0;
 		PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
 		if (bytesAvailable < 1) {
@@ -171,9 +171,9 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 
     char buffer;
 
-    // Keep reading char by char until a newline
+    //Keep reading char by char until a newline
     while(true) {
-        // Check if there are bytes in the pipe
+        //Check if there are bytes in the pipe
         int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
 
         if(selectionResult > 0) {
@@ -187,7 +187,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
         }
     }
 #endif
-    // Python turns \n into \r\n
+    //Python turns \n into \r\n
     if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
     return newString;
 }
@@ -204,7 +204,7 @@ void Networking::startAndConnectBot(std::string command)
 	saAttr.bInheritHandle = TRUE;
 	saAttr.lpSecurityDescriptor = NULL;
 
-	// Child stdout pipe
+	//Child stdout pipe
 	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0))
 	{
 		std::cout << "Could not create pipe\n";
@@ -212,7 +212,7 @@ void Networking::startAndConnectBot(std::string command)
 	}
 	if (!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-	// Child stdin pipe
+	//Child stdin pipe
 	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0))
 	{
 		std::cout << "Could not create pipe\n";
@@ -220,7 +220,7 @@ void Networking::startAndConnectBot(std::string command)
 	}
 	if (!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-	// MAKE SURE THIS MEMORY IS ERASED
+	//MAKE SURE THIS MEMORY IS ERASED
 	PROCESS_INFORMATION piProcInfo;
 	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
 
@@ -232,21 +232,21 @@ void Networking::startAndConnectBot(std::string command)
 	siStartInfo.hStdInput = childConnection.read;
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-	// C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
-	// C:/Users/Michael/Anaconda3/python.exe
-	// C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
+	//C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
+	//C:/Users/Michael/Anaconda3/python.exe
+	//C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
 	bool success = CreateProcess(
 		"C:\\windows\\system32\\cmd.exe",
-		LPSTR(command.c_str()),     // command line
-		NULL,          // process security attributes
-		NULL,          // primary thread security attributes
-		TRUE,          // handles are inherited
-		0,             // creation flags
-		NULL,          // use parent's environment
-		NULL,          // use parent's current directory
-		&siStartInfo,  // STARTUPINFO pointer
+		LPSTR(command.c_str()),     //command line
+		NULL,          //process security attributes
+		NULL,          //primary thread security attributes
+		TRUE,          //handles are inherited
+		0,             //creation flags
+		NULL,          //use parent's environment
+		NULL,          //use parent's current directory
+		&siStartInfo,  //STARTUPINFO pointer
 		&piProcInfo
-	);  // receives PROCESS_INFORMATION
+	);  //receives PROCESS_INFORMATION
 	if(!success)
 	{
 		std::cout << "Could not start process\n";
@@ -276,9 +276,9 @@ void Networking::startAndConnectBot(std::string command)
         throw 1;
     }
 
-    // Fork a child process
+    //Fork a child process
     pid = fork();
-    if (pid == 0) // This is the child
+    if (pid == 0) //This is the child
     {
         dup2(writePipe[0], STDIN_FILENO);
 
@@ -287,7 +287,7 @@ void Networking::startAndConnectBot(std::string command)
 
         execl("/bin/sh", "sh", "-c", command.c_str(), (char*) NULL);
 
-        // Nothing past the execl should be run
+        //Nothing past the execl should be run
 
         exit(1);
     } else if(pid < 0) {
@@ -331,7 +331,7 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 	{
 		if (isProcessDead(playerTag)) return false;
 
-		// Send this bot the game map and the messages addressed to this bot
+		//Send this bot the game map and the messages addressed to this bot
         std::string mapString = serializeMap(m), sendMessagesString = serializeMessages(messagesForThisBot);
 		sendString(playerTag, mapString);
 		sendString(playerTag, sendMessagesString);
