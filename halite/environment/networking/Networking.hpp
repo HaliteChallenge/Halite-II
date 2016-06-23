@@ -21,6 +21,8 @@
 
 #include "../core/hlt.hpp"
 
+extern bool program_output_style;
+
 class Networking {
 public:
 	void startAndConnectBot(std::string command);

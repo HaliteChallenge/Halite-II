@@ -57,7 +57,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
 			else
 			{
-				std::cout << player_names[a] << " timed out\n";
+				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
 				networking.killPlayer(a + 1);
 			}
@@ -116,10 +116,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		//std::cout << int(game_map.getSite(l, STILL).owner) << " " << int(game_map.getSite(l, STILL).production) << "\n";
 		if(game_map.getSite(l, STILL).owner != 0 && game_map.getSite(l, STILL).owner != 255)
 		{
-			//std::cout << "It's happening!\n";
 			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
 				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
 			}
@@ -359,7 +357,7 @@ void Halite::init()
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
-	std::cout << "Defense Bonus is " << defense_bonus << ".\n";
+	if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
@@ -396,17 +394,11 @@ void Halite::init()
 		std::vector< std::future<bool> > initThreads(number_of_players);
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
-			std::cout << "1!\n";
-			std::cout.flush();
 			initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 		}
 		for(unsigned char a = 0; a < number_of_players; a++)
 		{
-			std::cout << "2!\n";
-			std::cout.flush();
 			bool success = initThreads[a].get();
-			std::cout << "3!\n";
-			std::cout.flush();
 			if (!success)
 			{
 				networking.killPlayer(a + 1);
@@ -445,7 +437,7 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 	{
 		//Increment turn number:
 		turn_number++;
-		std::cout << "Turn " << turn_number << "\n";
+		if(!program_output_style) std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		result = processNextFrame(result);
 	}
