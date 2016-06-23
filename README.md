@@ -1,6 +1,8 @@
 # Halite
 
-![alt tag](multimedia/ExampleGame.gif)
+[![Travis badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
+
+![Game gif](multimedia/ExampleGame.gif)
 
 ## Overview
 
