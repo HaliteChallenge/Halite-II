@@ -302,5 +302,5 @@ workingPath/
 halite.ini
 *.swp
 *.gch
-environment
-visualizer
+environment/environment
+visualizer/visualizer
