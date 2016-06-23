@@ -169,7 +169,7 @@ class ManagerAPI extends API
 			$gameID = $gameIDArray['gameID'];
 
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->score}, {$users[$a]->playerIndex})");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->score}, $a)");
 				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 		}
