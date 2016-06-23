@@ -4,11 +4,7 @@
 
 #define INFINITE_RESPOND_TIME false
 
-#ifdef _WIN32
 #define F_NEWLINE '\n'
-#else
-#define F_NEWLINE "\r\n"
-#endif
 
 //Consts -----------------------------
 
@@ -419,7 +415,7 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 6" << F_NEWLINE;
+	gameFile << "HLT 7" << F_NEWLINE;
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -428,6 +424,8 @@ void Halite::output(std::string filename)
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
+	gameFile << F_NEWLINE; //Newline helps organize the file for me.
 	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
 
 	gameFile.flush();

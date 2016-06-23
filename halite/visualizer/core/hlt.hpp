@@ -17,7 +17,9 @@ namespace hlt
 
 	struct Site
 	{
-		unsigned char owner, strength;
+		unsigned char owner;
+		unsigned char strength;
+		unsigned char production;
 	};
 
 	class Map
