@@ -9,6 +9,35 @@ public class Networking
 {
     public static final int SIZE_OF_INTEGER_PREFIX = 4;
     public static final int CHAR_SIZE = 1;
+    private static short _width, _height;
+    private static ArrayList< ArrayList<short> > _productions;
+
+    static void deserializeMapSize(String inputString)
+    {
+        String[] inputStringComponents = inputString.split(" ");
+
+        _width = Short.parseShort(inputStringComponents[0]);
+        _height = Short.parseShort(inputStringComponents[1]);
+    }
+
+
+    static Map deserializeProductions(String inputString)
+    {
+        String[] inputStringComponents = inputString.split(" ");
+
+        short index = 0;
+        _productions.clear();
+        for(int a = 0; a < _height; a++)
+        {
+            ArrayList<short> row;
+            for(int b = 0; b < _width; b++)
+            {
+                row.add(Short.parseShort(inputStringComponents[index]));
+                index++;
+            }
+            _productions.add(row);
+        }
+    }
 
     static String serializeMoveList(ArrayList<Move> moves)
     {
@@ -19,12 +48,9 @@ public class Networking
 
     static Map deserializeMap(String inputString)
     {
-
         String[] inputStringComponents = inputString.split(" ");
 
-        short map_width = Short.parseShort(inputStringComponents[0]);
-        short map_height = Short.parseShort(inputStringComponents[1]);
-        Map map = new Map(map_width, map_height);
+        Map map = new Map(_width, _height);
 
         // Run-length encode of owners
         short y = 0, x = 0;
@@ -114,6 +140,8 @@ public class Networking
     {
         InitPackage initPackage = new InitPackage();
         initPackage.playerTag = (short)Long.parseLong(getString());
+        deserializeMapSize(getString());
+        deserializeProductions(getString());
         initPackage.map = deserializeMap(getString());
 
         return initPackage;
