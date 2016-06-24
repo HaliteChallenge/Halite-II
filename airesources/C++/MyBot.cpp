@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "MyBot.h"
+#include "MyBot.hpp"
 
 MyBot::MyBot()
 {
