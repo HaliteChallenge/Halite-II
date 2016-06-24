@@ -19,7 +19,7 @@ bool allArgumentsPresent(int argc, char* args[])
 	};
 	if(argc == 1) return false;
 	//Remember, the executable name counts as an argument
-	if(strcmp(args[1], "-p") == 0) {
+	if(strcmp(args[1], "-q") == 0) {
 		if(argc < 6) return false;
 		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
 	}
@@ -41,7 +41,7 @@ int main(int argc, char* args[])
 		unsigned short mapWidth, mapHeight;
 		Networking networking;
 
-		if(strcmp(args[1], "-p") == 0) {
+		if(strcmp(args[1], "-q") == 0) {
 			program_output_style = true;
 			mapWidth = atoi(args[2]);
 			mapHeight = atoi(args[3]);

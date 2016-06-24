@@ -26,6 +26,8 @@
 
 #include "hlt.hpp"
 
+static std::ofstream f;
+
 namespace detail
 {
 static std::vector< std::vector<unsigned char> > productions;
@@ -66,8 +68,7 @@ static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int 
 	std::stringstream iss(inputString);
 
 	hlt::Map map;
-	if(w != -1) map.map_width = w;
-	if(h != -1) map.map_height = h;
+	if(w != -1 && h != -1) map = hlt::Map(w, h);
 
 	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0, 0 }));
 
@@ -86,21 +87,21 @@ static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int 
 	while(y != map.map_height)
 	{
 		iss >> counter >> owner;
-		for(int a = 0; a < counter; ++a)
+		for(int a = 0; a < counter; a++)
 		{
 			map.contents[y][x].owner = owner;
-			++x;
+			x++;
 			if(x == map.map_width)
 			{
 				x = 0;
-				++y;
+				y++;
 			}
 		}
 	}
 
-	for (int a = 0; a < map.contents.size(); ++a)
+	for (int a = 0; a < map.contents.size(); a++)
 	{
-		for (int b = 0; b < map.contents[a].size(); ++b)
+		for (int b = 0; b < map.contents[a].size(); b++)
 		{
 			short strengthShort;
 			iss >> strengthShort;
@@ -171,19 +172,36 @@ static std::string getString()
 static void getInit(unsigned char& playerTag, hlt::Map& m)
 {
 	playerTag = (unsigned char)std::stoi(detail::getString());
-	
+	f.open(std::to_string(int(playerTag)) + "-o.log");
 	std::pair<int, int> mapSize = detail::deserializeMapSize(detail::getString());
-	detail::deserializeProductions(detail::getString(), mapSize.first, mapSize.second);
+	std::string pstring = detail::getString();
+	detail::deserializeProductions(pstring, mapSize.first, mapSize.second);
+	
+	//f << pstring;
+	for(int a = 0; a < mapSize.second; a++)  {
+		for(int b = 0; b < mapSize.first; b++)
+		{
+			f << (int)(detail::productions[a][b]) << ' ';
+		}
+		f << std::endl;
+	}
 	m = detail::deserializeMap(detail::getString(), mapSize.first, mapSize.second);
+	f << "I made it here!\n";
+	f.flush();
+
 }
 
 static void sendInitResponse(std::string name)
 {
 	detail::sendString(name);
+	f << "I sent my initresponse!\n";
+	f.flush();
 }
 
 static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
 {
+	f << "I got a frame!\n";
+	f.flush();
 	m = detail::deserializeMap(detail::getString());
 	messages = detail::deserializeMessages(detail::getString());
 }
@@ -195,6 +213,8 @@ static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::M
 
 	std::string messagesString = detail::serializeMessages(messages);
 	detail::sendString(messagesString);
+	f << "I sent a frame!\n";
+	f.flush();
 }
 
 #endif
