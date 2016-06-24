@@ -1,4 +1,7 @@
 import zipfile
+import os
+import platform
+import shutil
 
 def unpack(filePath):
 	"""Unpacks and deletes a zip file into the files current path"""
