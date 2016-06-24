@@ -39,29 +39,9 @@ class Map:
 		for y in range(0, self.map_height):
 			row = []
 			for x in range(0, self.map_width):
-				row.append(Site(0, 0))
+				row.append(Site(0, 0, 0))
 			self.contents.append(row)
 
-		## Place players onto map
-		takenSpots = []
-		minDistance = math.sqrt(self.map_height*self.map_width) / 2
-		for a in range(1, numberOfPlayers + 1):
-			bad = True
-			counter = 0
-			location = None
-			while bad == True:
-				bad == False
-				location = Location(int(random.random()*self.map_width), int(random.random()*self.map_height))
-				for spot in takenSpots:
-					if getDistance(location, spot) <= minDistance:
-						bad = True
-						break
-				counter += 1
-				if counter > 150:
-					counter = 0
-					minDistance *= 0.85
-			self.contents[location.x][location.y] = Site(a, 255)
-			takenSpots.append(location)
 	def inBounds(l):
 		return l.x < self.map_width and l.y < self.map_height
 
