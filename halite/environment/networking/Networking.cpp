@@ -6,6 +6,19 @@
 #include <algorithm>
 #include <stdio.h>
 
+std::string serializeProductions(const hlt::Map & map)
+{
+	std::string returnString = "";
+	for(auto a = map.contents.begin(); a !+ map.contents.end(); a++)
+	{
+		for(auto b = a->begin(); b != a->end(); b++)
+		{
+			returnString += (char)(b->production);
+		}
+	}
+	return returnString;
+}
+
 std::string Networking::serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
@@ -278,7 +291,7 @@ void Networking::startAndConnectBot(std::string command)
 
     //Fork a child process
     pid = fork();
-    if (pid == 0) //This is the child
+    if(pid == 0) //This is the child
     {
         dup2(writePipe[0], STDIN_FILENO);
 
@@ -309,10 +322,12 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 {
 	if(!program_output_style) std::cout << "2.1!\n";
 	if(!program_output_style) std::cout.flush();
-	try {
-    std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m);
+	try
+	{
+    	std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
 		sendString(playerTag, mapString);
+		sendString(playerTag, prodString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!program_output_style) std::cout << outMessage;
 
@@ -322,7 +337,8 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 
 		return true;
 	}
-	catch (int e) {
+	catch (int e)
+	{
 		return false;
 	}
 }
