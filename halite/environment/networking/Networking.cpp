@@ -374,6 +374,7 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 	catch (int e)
 	{
 		return false;
+		
 	}
 
 }
