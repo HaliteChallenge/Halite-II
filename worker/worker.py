@@ -16,36 +16,34 @@ from sandbox import *
 
 RUN_GAME_FILE_NAME = "runGame.sh"
 
-class TrueSkillPlayer(object):
-  pass
+config = configparser.ConfigParser()
+config.read("../halite.ini")
+API_KEY = config.get("worker", "apiKey")
+MANAGER_URL = config.get("worker", "managerURL")
 
-# Interface between worker and manager RESTFul API
 class Backend:
-	def __init__(self, apiKey):
-		config = configparser.ConfigParser()
-		config.read("../halite.ini")
-		self.apiKey = apiKey
-		self.url = config.get("worker", "managerURL")
+    """Interface between the worker and the manager's API"""
 
-        # Gets either a run or a compile task from the API
+    @staticmethod
 	def getTask(self):
-		print("url: " +self.url+"task")
+        """Gets either a run or a compile task from the API"""
 		content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
-		print("contents: " + content)
 		if content == "null":
 			return None
 		else:
 			return json.loads(content)
 
-	# Allows us to get the hash of a bot's zip file from the server so that we may verify that a bot was downloaded properly
+	@staticmethod
 	def getBotHash(self, userID):
+        """Gets the checksum of a user's bot's zipped source code"""
 		result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
-		print("Got bot hash: %s" % (result.text))
 		return json.loads(result.text).get("hash")
 
-	# Downloads and store's a bot's zip file locally
-	# Checks the file's checksum to make sure the file was downloaded properly
+    @staticmethod
 	def storeBotLocally(self, userID, storageDir):
+        """Downloads and store's a bot's zip file locally
+        Checks the file's checksum to make sure the file was downloaded properly
+        """
 		iterations = 0
 		while iterations < 100:
 			remoteZip = urllib.request.urlopen(self.url+"botFile?apiKey="+str(self.apiKey)+"&userID="+str(userID))
@@ -69,45 +67,43 @@ class Backend:
 
 		raise ValueError
 
-	# Posts a bot file to the manager
+    @staticmethod
 	def storeBotRemotely(self, userID, zipFilePath):
+        """Posts a bot file to the manager"""
 		zipContents = open(zipFilePath, "rb").read()
 		iterations = 0
 
 		while iterations < 100:
 			r = requests.post(self.url+"botFile", data={"apiKey": self.apiKey, "userID": str(userID)}, files={"bot.zip": zipContents})
-			print(r.text)
 
 			# Try again if local and remote hashes differ
 			if md5(zipContents).hexdigest() != self.getBotHash(userID):
-				print(md5(zipContents).hexdigest())
-				print(self.getBotHash(userID))
-				print("Hashes do not match!")
+				print("Hashes do not match! Redoing file upload.")
 				iterations += 1
 				continue
 
 			return
 		raise ValueError
 
-	# Posts the result of a compilation task
+    @staticmethod
 	def compileResult(self, userID, didCompile, language):
+        """Posts the result of a compilation task"""
 		r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": int(didCompile), "language": language})
-		print(r.text)
 
-	# Posts the result of a game task
+    @staticmethod
 	def gameResult(self, users, replayPath):
+        """Posts the result of a game task"""
 		r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "users": json.dumps(users)}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
-		print(r.text)
 
-# Deletes anything residing at path, creates path, and chmods the directory
 def makePath(path):
+    """Deletes anything residing at path, creates path, and chmods the directory"""
 	if os.path.exists(path):
 		shutil.rmtree(path)
 	os.makedirs(path)
 	os.chmod(path, 0o777)
 
-# Unpacks and deletes a zip file into the files current path
 def unpack(filePath):
+    """Unpacks and deletes a zip file into the files current path"""
 	folderPath = os.path.dirname(filePath)
 	tempPath = os.path.join(folderPath, "bot")
 	os.mkdir(tempPath)
@@ -130,8 +126,8 @@ def unpack(filePath):
 	shutil.rmtree(tempPath)
 	os.remove(filePath)
 
-# Zips a folder to a path
 def zipFolder(folderPath, destinationFilePath):
+    """Zips a folder to a path"""
 	zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
 
 	originalDir = os.getcwd()
@@ -146,8 +142,8 @@ def zipFolder(folderPath, destinationFilePath):
 
 	os.chdir(originalDir)
 
-# Downloads and compiles a bot. Posts the compiled bot files to the manager.
 def compile(userID, backend):
+    """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
 	print("Compiling a bot with userID %d" % (userID))
 
 	workingPath = "workingPath"
@@ -169,8 +165,8 @@ def compile(userID, backend):
 	backend.compileResult(userID, didCompile, language)
 	shutil.rmtree(workingPath)
 
-# Downloads compiled bots, runs a game, and posts the results of the game
 def runGame(width, height, users, backend):
+    """Downloads compiled bots, runs a game, and posts the results of the game"""
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
 	# Download players to current directory
@@ -183,11 +179,10 @@ def runGame(width, height, users, backend):
 
 	# Run game within sandbox
 	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
-	print(runGameCommand)
-	sandbox = Sandbox("./")
-	sandbox.start("sh -c '/var/www/html/worker/runGame.sh 10 10 31 32'")
-    #sandbox.start(runGameCommand)
-	lines = []
+	print("Run game command: " + runGameCommand)
+	print("Game output:")
+	sandbox = Sandbox(os.getcwd())
+	sandbox.start("sh -c '"+runGameCommand+"'")
 	while True:
 		line = sandbox.read_line(200)
 		if line == None:
@@ -201,7 +196,6 @@ def runGame(width, height, users, backend):
 	for lineIndex in range(len(lines) - len(users), len(lines)):
 		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
 		users[playerIndex-1]["rank"] = lineIndex - (len(lines) - len(users))
-		print("Score of: " + lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") :])
 		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") :])
 
 	# Update trueskill mu and sigma values
@@ -217,7 +211,7 @@ def runGame(width, height, users, backend):
 
 if __name__ == "__main__":
 	print("Starting up worker...")
-	backend = Backend(1)
+	backend = Backend()
 
 	while True:
 		task = backend.getTask()
