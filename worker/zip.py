@@ -1,7 +1,7 @@
 import zipfile
 
 def unpack(filePath):
-    """Unpacks and deletes a zip file into the files current path"""
+	"""Unpacks and deletes a zip file into the files current path"""
 	folderPath = os.path.dirname(filePath)
 	tempPath = os.path.join(folderPath, "bot")
 	os.mkdir(tempPath)
@@ -25,7 +25,7 @@ def unpack(filePath):
 	os.remove(filePath)
 
 def zipFolder(folderPath, destinationFilePath):
-    """Zips a folder to a path"""
+	"""Zips a folder to a path"""
 	zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
 
 	originalDir = os.getcwd()
