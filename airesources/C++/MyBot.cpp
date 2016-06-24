@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <time.h> 
+#include <time.h>
 #include <cstdlib>
 #include <ctime>
 
@@ -25,7 +25,7 @@ void MyBot::run()
 	{
 		moves.clear();
 		messagesFromMe.clear();
-
+		
 		hlt::Message exampleMessage;
 		exampleMessage.type = hlt::MessageType::ATTACK;
 		exampleMessage.senderID = my_tag;
@@ -55,10 +55,10 @@ void MyBot::run()
 
 int main()
 {
-	srand(time(NULL));
+  srand(time(NULL));
 
-	MyBot r = MyBot();
-	r.run();
+  MyBot r = MyBot();
+  r.run();
 
-	return 0;
+  return 0;
 }

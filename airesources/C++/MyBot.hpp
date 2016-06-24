@@ -10,13 +10,13 @@
 class MyBot
 {
 private:
-    unsigned char my_tag;
-    hlt::Map present_map;
-    std::set<hlt::Move> moves;
-	std::vector<hlt::Message> messagesToMe, messagesFromMe;
+  unsigned char my_tag;
+  hlt::Map present_map;
+  std::set<hlt::Move> moves;
+  std::vector<hlt::Message> messagesToMe, messagesFromMe;
 public:
-	MyBot();
-    void run();
+  MyBot();
+  void run();
 };
 
 #endif

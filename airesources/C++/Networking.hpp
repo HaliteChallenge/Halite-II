@@ -12,16 +12,16 @@
 #include <bitset>
 
 #ifdef _WIN32
-	#include <sys/types.h>
-	#include <Winsock2.h>
-	#include <Ws2tcpip.h>
-	#define WINSOCKVERSION MAKEWORD(2,2)
+#include <sys/types.h>
+#include <Winsock2.h>
+#include <Ws2tcpip.h>
+#define WINSOCKVERSION MAKEWORD(2,2)
 #else
-	#include <sys/socket.h>
-	#include <sys/ioctl.h>
-	#include <arpa/inet.h>
-	#include <unistd.h>
-	#include <time.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <time.h>
 #endif
 
 #include "hlt.h"
@@ -29,46 +29,46 @@
 namespace detail
 {
 static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
-    std::ostringstream oss;
-    for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
+	std::ostringstream oss;
+	for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
 	return oss.str();
 }
 
 static hlt::Map deserializeMap(const std::string &inputString)
 {
-    hlt::Map map = hlt::Map();
-    std::stringstream iss(inputString);
+	hlt::Map map = hlt::Map();
+	std::stringstream iss(inputString);
 
-    iss >> map.map_width >> map.map_height;
-    map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0 }));
-    
-    // Run-length encode of owners
-    unsigned short y = 0, x = 0;
-    unsigned short counter = 0, owner = 0;
-    while(y != map.map_height)
-    {
-        iss >> counter >> owner;
-        for(int a = 0; a < counter; ++a)
-        {
-            map.contents[y][x].owner = owner;
-            ++x;
-            if(x == map.map_width)
-            {
-                x = 0;
-                ++y;
-            }
-        }
-    }
+	iss >> map.map_width >> map.map_height;
+	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0 }));
 
-    for (int a = 0; a < map.contents.size(); ++a) 
-    {
-        for (int b = 0; b < map.contents[a].size(); ++b) 
-        {
+	// Run-length encode of owners
+	unsigned short y = 0, x = 0;
+	unsigned short counter = 0, owner = 0;
+	while(y != map.map_height)
+	{
+		iss >> counter >> owner;
+		for(int a = 0; a < counter; ++a)
+		{
+			map.contents[y][x].owner = owner;
+			++x;
+			if(x == map.map_width)
+			{
+				x = 0;
+				++y;
+			}
+		}
+	}
+
+	for (int a = 0; a < map.contents.size(); ++a)
+	{
+		for (int b = 0; b < map.contents[a].size(); ++b)
+		{
 			short strengthShort;
-            iss >> strengthShort;
+			iss >> strengthShort;
 			map.contents[a][b].strength = strengthShort;
-        }
-    }
+		}
+	}
 
 	return map;
 }
@@ -96,14 +96,14 @@ static std::vector<hlt::Message> deserializeMessages(const std::string &inputStr
 	int numberOfMessages;
 	iss >> numberOfMessages;
 
-	for (int a = 0; a < numberOfMessages; a++) 
+	for (int a = 0; a < numberOfMessages; a++)
 	{
 		hlt::Message message;
-		
+
 		int messageTypeInt;
 		iss >> messageTypeInt;
 		message.type = static_cast<hlt::MessageType>(messageTypeInt);
-		
+
 		iss >> message.senderID >> message.recipientID >> message.targetID;
 
 		messages.push_back(message);
@@ -112,17 +112,17 @@ static std::vector<hlt::Message> deserializeMessages(const std::string &inputStr
 	return messages;
 }
 
-static void sendString(std::string &sendString) 
+static void sendString(std::string &sendString)
 {
 	if (sendString.length() < 1) sendString = " ";
 
 	// End message with newline character
 	sendString += '\n';
-	
+
 	std::cout << sendString;
 }
 
-static std::string getString() 
+static std::string getString()
 {
 	std::string newString;
 	std::getline(std::cin, newString);
@@ -131,8 +131,8 @@ static std::string getString()
 }
 
 static void getInit(unsigned char& playerTag, hlt::Map& m)
-{   
-    playerTag = (unsigned char)std::stoi(getString());
+{
+	playerTag = (unsigned char)std::stoi(getString());
 	testTag = playerTag;
 
 	int throwAway;
@@ -141,7 +141,7 @@ static void getInit(unsigned char& playerTag, hlt::Map& m)
 
 static void sendInitResponse(std::string name)
 {
-    sendString(name);
+	sendString(name);
 }
 
 static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
@@ -153,9 +153,9 @@ static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
 static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::Message> &messages)
 {
 	std::string movesString = serializeMoveSet(moves);
-    sendString(movesString);
+	sendString(movesString);
 
-    std::string messagesString = serializeMessages(messages);
+	std::string messagesString = serializeMessages(messages);
 	sendString(messagesString);
 }
 
