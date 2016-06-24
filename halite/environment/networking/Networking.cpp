@@ -335,8 +335,9 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 	if(!program_output_style) std::cout.flush();
 	try
 	{
-    	std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m), prodString = serializeProductions(m);
+    	std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
+		sendString(playerTag, mapSizeString);
 		sendString(playerTag, prodString);
 		sendString(playerTag, mapString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
