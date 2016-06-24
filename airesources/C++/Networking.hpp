@@ -28,21 +28,59 @@
 
 namespace detail
 {
-static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
+static std::vector< std::vector<unsigned char> > productions;
+
+static std::string serializeMoveSet(const std::set<hlt::Move> &moves)
+{
 	std::ostringstream oss;
 	for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
 	return oss.str();
 }
 
-static hlt::Map deserializeMap(const std::string &inputString)
+static std::pair<int, int> deserializeMapSize((const std::string & inputString)
 {
-	hlt::Map map = hlt::Map();
+	std::stringstream iss(inputString);
+	std::pair<int, int> answer;
+	iss >> answer.first >> answer.second;
+	return answer;
+}
+
+static void deserializeProductions(const std::string & inputString, int w, int h)
+{
+	std::stringstream iss(inputString);
+	productions.resize(h);
+	short temp;
+	for(auto a = productions.begin(); a != productions.end(); a++)
+	{
+		a->resize(w);
+		for(auto b = a->begin(); b != a->end(); b++)
+		{
+			iss >> temp;
+			*b = temp;
+		}
+	}
+}
+
+static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int h = -1)
+{
 	std::stringstream iss(inputString);
 
-	iss >> map.map_width >> map.map_height;
-	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0 }));
+	hlt::Map map;
+	if(w != -1) map.map_width = w;
+	if(h != -1) map.map_height = h;
 
-	// Run-length encode of owners
+	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0, 0 }));
+
+	//Set productions
+	for(int a = 0; a < m.map_height; a++)
+	{
+		for(int b = 0; b < m.map_width; b++)
+		{
+			map.contents[a][b].production = productions[a][b];
+		}
+	}
+
+	//Run-length encode of owners
 	unsigned short y = 0, x = 0;
 	unsigned short counter = 0, owner = 0;
 	while(y != map.map_height)
@@ -116,7 +154,7 @@ static void sendString(std::string &sendString)
 {
 	if (sendString.length() < 1) sendString = " ";
 
-	// End message with newline character
+	//End message with newline character
 	sendString += '\n';
 
 	std::cout << sendString;
@@ -133,10 +171,10 @@ static std::string getString()
 static void getInit(unsigned char& playerTag, hlt::Map& m)
 {
 	playerTag = (unsigned char)std::stoi(getString());
-	testTag = playerTag;
-
-	int throwAway;
-	m = deserializeMap(getString());
+	
+	std::pair<int, int> mapSize = deserializeMapSize(getString());
+	deserializeProductions(getString(), mapSize.first, mapSize.second);
+	m = deserializeMap(getString(), mapSize.first, mapSize.second);
 }
 
 static void sendInitResponse(std::string name)
