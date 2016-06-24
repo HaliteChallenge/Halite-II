@@ -12,9 +12,10 @@ Halite is an original multi-player turn-based strategy game played on a rectangu
 
 - `airesources/` - The language-specific starter kits for writing bots
 - `halite/` - The halite game engine and visualizer
+- `manager/` - The API that manages worker servers
 - `multimedia/` - Photos and videos of a halite game
-- `website/` - The website (frontend and backend) that will host the competition and manage worker servers
-- `worker/` - The source for the worker servers that will compile bots and run games safely
+- `website/` - The website that hosts the competition
+- `worker/` - The source for the worker servers that compiles bots and runs games safely
 
 ## Game Description
 
