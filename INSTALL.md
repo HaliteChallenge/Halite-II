@@ -12,7 +12,7 @@
 * Execute: ```$ cd HALITE_FOLDER && ./setupDatabase.sh```
 * Add a superuser by wildcarding its host and allowing remote login
  * ```CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';```
- * ```GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
+ * ```GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
  * ```FLUSH PRIVILEGES;```
 
 ## Worker server setup
