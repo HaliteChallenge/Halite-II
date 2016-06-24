@@ -34,7 +34,7 @@ void MyBot::run()
 			{
 				if (present_map.getSite({b, a}, STILL).owner == my_tag)
 				{
-					moves.insert({ { b, a }, NORTH });
+					moves.insert({ { b, a }, rand() % 5 });
 				}
 			}
 		}
