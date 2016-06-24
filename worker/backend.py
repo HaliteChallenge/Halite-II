@@ -10,7 +10,7 @@ API_KEY = config.get("worker", "apiKey")
 MANAGER_URL = config.get("worker", "managerURL")
 
 def getTask(self):
-    """Gets either a run or a compile task from the API"""
+	"""Gets either a run or a compile task from the API"""
 	content = requests.get(self.url+"task", params={"apiKey": self.apiKey}).text
 	if content == "null":
 		return None
@@ -18,14 +18,14 @@ def getTask(self):
 		return json.loads(content)
 
 def getBotHash(self, userID):
-    """Gets the checksum of a user's bot's zipped source code"""
+	"""Gets the checksum of a user's bot's zipped source code"""
 	result = requests.get(self.url+"botHash", params={"apiKey": self.apiKey, "userID": userID})
 	return json.loads(result.text).get("hash")
 
 def storeBotLocally(self, userID, storageDir):
-    """Downloads and store's a bot's zip file locally
-    Checks the file's checksum to make sure the file was downloaded properly
-    """
+	"""Downloads and store's a bot's zip file locally
+	Checks the file's checksum to make sure the file was downloaded properly
+	"""
 	iterations = 0
 	while iterations < 100:
 		remoteZip = urllib.request.urlopen(self.url+"botFile?apiKey="+str(self.apiKey)+"&userID="+str(userID))
@@ -50,7 +50,7 @@ def storeBotLocally(self, userID, storageDir):
 	raise ValueError
 
 def storeBotRemotely(self, userID, zipFilePath):
-    """Posts a bot file to the manager"""
+	"""Posts a bot file to the manager"""
 	zipContents = open(zipFilePath, "rb").read()
 	iterations = 0
 
@@ -67,9 +67,9 @@ def storeBotRemotely(self, userID, zipFilePath):
 	raise ValueError
 
 def compileResult(self, userID, didCompile, language):
-    """Posts the result of a compilation task"""
+	"""Posts the result of a compilation task"""
 	r = requests.post(self.url+"compile", data={"apiKey": self.apiKey, "userID": userID, "didCompile": int(didCompile), "language": language})
 
 def gameResult(self, users, replayPath):
-    """Posts the result of a game task"""
+	"""Posts the result of a game task"""
 	r = requests.post(self.url+"game", data={"apiKey": self.apiKey, "users": json.dumps(users)}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})

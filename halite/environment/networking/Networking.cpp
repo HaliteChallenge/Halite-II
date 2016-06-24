@@ -20,7 +20,7 @@ std::string serializeProductions(const hlt::Map & map)
 	std::string returnString = "";
 	std::ostringstream oss;
 	oss << map.map_width << ' ' << map.map_height << ' ';
-	for(auto a = map.contents.begin(); a !+ map.contents.end(); a++)
+	for(auto a = map.contents.begin(); a != map.contents.end(); a++)
 	{
 		for(auto b = a->begin(); b != a->end(); b++)
 		{
