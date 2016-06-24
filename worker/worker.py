@@ -65,6 +65,8 @@ def runGame(width, height, users, backend):
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
 	sandbox.start("sh -c '"+runGameCommand+"'")
+
+	lines = []
 	while True:
 		line = sandbox.read_line(200)
 		if line == None:
@@ -93,7 +95,6 @@ def runGame(width, height, users, backend):
 
 if __name__ == "__main__":
 	print("Starting up worker...")
-	backend = Backend()
 
 	while True:
 		task = backend.getTask()
