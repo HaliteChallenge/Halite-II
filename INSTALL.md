@@ -15,6 +15,7 @@
  * ```GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
  * ```FLUSH PRIVILEGES;```
  * Comment out `bind-address = 127.0.0.1` in `/etc/mysql/my.cnf`
+ * ```sudo service mysql restart```
 
 ## Worker server setup
 
