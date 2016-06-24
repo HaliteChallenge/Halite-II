@@ -62,17 +62,15 @@ def runGame(width, height, users, backend):
 	# Run game within sandbox
 	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
 	print("Run game command: " + runGameCommand)
-
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
-	sandbox.start(runGameCommand)
+	sandbox.start("sh -c '"+runGameCommand+"'")
 	while True:
 		line = sandbox.read_line(200)
 		if line == None:
 			break
 		print(line)
 		lines.append(line)
-	lines.remove("")
 
 	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") :]
 
@@ -92,7 +90,6 @@ def runGame(width, height, users, backend):
 	backend.gameResult(users, replayPath)
 
 	os.remove(replayPath)
-	shutil.rmtree(workingPath)
 
 if __name__ == "__main__":
 	print("Starting up worker...")

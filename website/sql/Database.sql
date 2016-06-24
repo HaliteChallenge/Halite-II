@@ -24,7 +24,8 @@ CREATE TABLE `GameUser` (
   `gameID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL,
   `rank` smallint(5) unsigned NOT NULL,
-  `score` float unsigned NOT NULL
+  `score` float unsigned NOT NULL,
+  `playerIndex` smallint(5) unsigned NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -50,4 +51,3 @@ CREATE TABLE `Worker` (
   `apiKey` smallint(5) unsigned NOT NULL,
   `ipAddress` varchar(32) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-

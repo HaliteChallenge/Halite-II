@@ -9,10 +9,10 @@ MyBot::MyBot()
 {
 	srand(time(NULL));
 	std::cout.sync_with_stdio(0);
-	
+
 	getInit(my_tag, present_map);
 	sendInitResponse("CppBot" + std::to_string(my_tag));
-	
+
 	// FOR DEBUGGING PURPOSES. Clears the test file
 	std::ofstream ofs;
 	ofs.open(std::to_string(my_tag) +".log", std::ofstream::out | std::ofstream::trunc);
@@ -25,6 +25,7 @@ void MyBot::run()
 	{
 		moves.clear();
 		messagesFromMe.clear();
+<<<<<<< HEAD
 		
 		hlt::Message exampleMessage;
 		exampleMessage.type = hlt::MessageType::ATTACK;
@@ -33,6 +34,16 @@ void MyBot::run()
 		exampleMessage.targetID = my_tag;
 		messagesFromMe.push_back(exampleMessage);
 
+=======
+
+		hlt::Message exampleMessage;
+		exampleMessage.type = hlt::MessageType::ATTACK;
+		exampleMessage.senderID = my_tag;
+		exampleMessage.recipientID = my_tag != 1 ? 1 : 2;
+		exampleMessage.targetID = my_tag;
+		messagesFromMe.push_back(exampleMessage);
+
+>>>>>>> ab8c458... Fix merges
 		getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
@@ -55,10 +66,10 @@ void MyBot::run()
 
 int main()
 {
-  srand(time(NULL));
+	srand(time(NULL));
 
-  MyBot r = MyBot();
-  r.run();
+	MyBot r = MyBot();
+	r.run();
 
-  return 0;
+	return 0;
 }
