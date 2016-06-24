@@ -26,19 +26,8 @@
 
 #include "hlt.h"
 
-static int testTag = -1;
-
-static void testPrint(std::string testString) {
-	if (testTag == -1) return;
-
-	std::ofstream myfile(std::to_string(testTag) + ".log", std::ios::app);
-	if (myfile.is_open())
-	{
-		myfile << testString;
-		myfile.close();
-	}
-}
-
+namespace detail
+{
 static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
 	std::ostringstream oss;
 	for(auto a = moves.begin(); a != moves.end(); ++a) oss << a->loc.x << " " << a->loc.y << " " << (int)a->dir << " ";
@@ -138,6 +127,7 @@ static std::string getString()
 	std::string newString;
 	std::getline(std::cin, newString);
 	return newString;
+}
 }
 
 static void getInit(unsigned char& playerTag, hlt::Map& m)

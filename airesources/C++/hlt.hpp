@@ -29,7 +29,9 @@ namespace hlt
 
 	struct Site
 	{
-		unsigned char owner, strength;
+		unsigned char owner;
+		unsigned char strength;
+		unsigned char production;
 	};
 
 	class Map
@@ -49,42 +51,6 @@ namespace hlt
 			map_width = otherMap.map_width;
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
-		}
-		Map(short width, short height, unsigned char numberOfPlayers)
-		{
-			map_width = width;
-			map_height = height;
-			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
-
-			std::list<Location> takenSpots;
-			float minDistance = sqrt(map_height*map_width) / 2;
-			for(int a = 1; a <= numberOfPlayers; a++)
-			{
-				bool bad = true;
-				int counter = 0;
-				Location l;
-				while(bad)
-				{
-					bad = false;
-					l = { static_cast<unsigned short>(rand() % map_width), static_cast<unsigned short>(rand() % map_height) };
-					for(auto b = takenSpots.begin(); b != takenSpots.end(); b++)
-					{
-						if(getDistance(l, *b) <= minDistance)
-						{
-							bad = true;
-							break;
-						}
-					}
-					counter++;
-					if(counter > 150)
-					{
-						counter = 0;
-						minDistance *= 0.85;
-					}
-				}
-				contents[l.y][l.x] = { (unsigned char)a, 255 };
-				takenSpots.push_back(l);
-			}
 		}
 
 		bool inBounds(Location l)
