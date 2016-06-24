@@ -10,7 +10,6 @@ apt-get install clang++-3.5
 # Worker
 #############
 pip3 install trueskill
-pip3 install pymysql
 
 ###########################
 # Docker SETUP
