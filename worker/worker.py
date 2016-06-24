@@ -62,10 +62,6 @@ def runGame(width, height, users, backend):
 	# Run game within sandbox
 	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
 	print("Run game command: " + runGameCommand)
-<<<<<<< HEAD
-=======
-
->>>>>>> 9105db601f3986f6c5c9a9cced212dce3cda6583
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
 	sandbox.start("sh -c '"+runGameCommand+"'")
