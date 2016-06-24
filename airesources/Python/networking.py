@@ -5,19 +5,35 @@ import struct
 from ctypes import *
 import sys
 
+_productions = []
+_width = -1
+_height = -1
+
 def serializeMoveSet(moves):
 	returnString = ""
 	for move in moves:
 		returnString += str(move.loc.x) + " " + str(move.loc.y) + " " + str(move.direction) + " " 
 	return returnString
 
+def deserializeMapSize(inputString):
+	splitString = inputString.split(" ")
+
+	_width = int(splitString.pop(0))
+	_height = int(splitString.pop(0))
+
+def deserializeProductions(inputString):
+	splitString = inputString.split(" ")
+	
+	for a in range(0, _height):
+		row = []
+		for b in range(0, _width):
+			row.append(int(splitString.pop(0)))
+		_productions.append(row)
+
 def deserializeMap(inputString):
 	splitString = inputString.split(" ")
 
-	width = int(splitString.pop(0))
-	height = int(splitString.pop(0))
-
-	m = Map(width, height)
+	m = Map(_width, _height)
 	
 	y = 0
 	x = 0
@@ -33,9 +49,10 @@ def deserializeMap(inputString):
 				x = 0
 				y += 1
 
-	for a in range(0, len(m.contents)): 
-		for b in range(0, len(m.contents[a])):
+	for a in range(0, _height): 
+		for b in range(0, _width):
 			m.contents[a][b].strength = int(splitString.pop(0))
+			m.contents[a][b].production = _productions[a][b]
 
 	return m
 
@@ -64,6 +81,8 @@ def getString():
 
 def getInit():
 	playerTag = int(getString())
+	deserializeMapSize(getString())
+	deserializeProductions(getString())
 	m = deserializeMap(getString())
 
 	return (playerTag, m)
