@@ -1,21 +1,19 @@
 #################
 # Compiler tools
 #################
-apt-get install python3-pip
-apt-get install default-jdk
-apt-get install zip
-apt-get install clang++-3.5
+apt-get -y update 
+apt-get install -y python3 python3-pip default-jdk clang++-3.5
 
 #############
 # Worker
 #############
 pip3 install trueskill
+apt-get install zip
 
 ###########################
 # Docker SETUP
 ###########################
-apt-get update
-apt-get install docker.io
+apt-get install -y docker.io
 ln -sf /usr/bin/docker.io /usr/local/bin/docker
 sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
 

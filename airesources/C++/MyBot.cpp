@@ -25,7 +25,14 @@ void MyBot::run()
 	{
 		moves.clear();
 		messagesFromMe.clear();
-
+		
+		hlt::Message exampleMessage;
+		exampleMessage.type = hlt::MessageType::ATTACK;
+		exampleMessage.senderID = my_tag;
+		exampleMessage.recipientID = my_tag != 1 ? 1 : 2;
+		exampleMessage.targetID = my_tag;
+		messagesFromMe.push_back(exampleMessage);
+	
 		getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
