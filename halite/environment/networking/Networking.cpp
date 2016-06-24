@@ -6,16 +6,28 @@
 #include <algorithm>
 #include <stdio.h>
 
+std::string serializeMapSize(const hlt::Map & map)
+{
+	std::string returnString = "";
+	std::ostringstream oss;
+	oss << map.map_width << ' ' << map.map_height << ' ';
+	returnString = oss.str();
+	return returnString;
+}
+
 std::string serializeProductions(const hlt::Map & map)
 {
 	std::string returnString = "";
+	std::ostringstream oss;
+	oss << map.map_width << ' ' << map.map_height << ' ';
 	for(auto a = map.contents.begin(); a !+ map.contents.end(); a++)
 	{
 		for(auto b = a->begin(); b != a->end(); b++)
 		{
-			returnString += (char)(b->production);
+			oss << (unsigned short)(b->production) << ' ';
 		}
 	}
+	returnString = oss.str();
 	return returnString;
 }
 
@@ -23,7 +35,6 @@ std::string Networking::serializeMap(const hlt::Map & map)
 {
 	std::string returnString = "";
 	std::ostringstream oss;
-	oss << map.map_width << " " << map.map_height << " ";
 
 	//Run-length encode of owners
 	unsigned short currentOwner = map.contents[0][0].owner;
@@ -38,21 +49,21 @@ std::string Networking::serializeMap(const hlt::Map & map)
 			}
 			else
 			{
-				oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
+				oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
 				counter = 1;
 				currentOwner = map.contents[a][b].owner;
 			}
 		}
 	}
 	//Place the last run into the string
-	oss << (unsigned short)counter << " " << (unsigned short)currentOwner << " ";
+	oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
 
 	//Encoding of ages
 	for(int a = 0; a < map.contents.size(); ++a)
 	{
 		for(int b = 0; b < map.contents[a].size(); ++b)
 		{
-			oss << (unsigned short)map.contents[a][b].strength << " ";
+			oss << (unsigned short)map.contents[a][b].strength << ' ';
 		}
 	}
 
@@ -76,13 +87,13 @@ std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString)
 std::string Networking::serializeMessages(const std::vector<hlt::Message> &messages) {
 	std::ostringstream oss;
 
-	oss << messages.size() << " ";
+	oss << messages.size() << ' ';
 
 	for(int a = 0; a < messages.size(); a++)
 	{
 		hlt::Message message = messages[a];
-		oss << (unsigned short)message.type << " ";
-		oss << message.senderID << " " << message.recipientID << " " << message.targetID << " ";
+		oss << (unsigned short)message.type << ' ';
+		oss << message.senderID << ' ' << message.recipientID << ' ' << message.targetID << ' ';
 	}
 
 	return oss.str();
@@ -326,8 +337,8 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 	{
     	std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
-		sendString(playerTag, mapString);
 		sendString(playerTag, prodString);
+		sendString(playerTag, mapString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!program_output_style) std::cout << outMessage;
 
