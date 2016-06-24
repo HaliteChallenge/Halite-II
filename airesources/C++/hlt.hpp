@@ -44,13 +44,19 @@ namespace hlt
 		{
 			map_width = 0;
 			map_height = 0;
-			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0 }));
+			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
 		}
 		Map(const Map &otherMap)
 		{
 			map_width = otherMap.map_width;
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
+		}
+		Map(int width, int height)
+		{
+			map_width = width;
+			map_height = height;
+			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
 		}
 
 		bool inBounds(Location l)

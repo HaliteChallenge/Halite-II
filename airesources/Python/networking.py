@@ -18,6 +18,7 @@ def serializeMoveSet(moves):
 def deserializeMapSize(inputString):
 	splitString = inputString.split(" ")
 
+	global _width, _height
 	_width = int(splitString.pop(0))
 	_height = int(splitString.pop(0))
 
