@@ -17,6 +17,7 @@ bool allArgumentsPresent(int argc, char* args[])
 		return !s.empty() && std::find_if(s.begin(),
 			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
+	if(argc == 1) return false;
 	//Remember, the executable name counts as an argument
 	if(strcmp(args[1], "-p") == 0) {
 		if(argc < 6) return false;
