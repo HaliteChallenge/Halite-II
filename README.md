@@ -69,7 +69,7 @@ In practice, finished bots will be submitted to halite's [website](http://halite
 
 ## Contributing
 
-Send us a pull request. If you are looking for things to do, check out the repo's open issues. We will be happy to add you as a contributor and credit you in the README.
+Send us a pull request. If you are looking for things to do, check out our [Trello](https://trello.com/b/z8jUXTA0/halite). We will be happy to add you as a contributor and credit you in the README.
 
 If you find a bug or a feature request, please open an issue. We are happy to help you out.
 
