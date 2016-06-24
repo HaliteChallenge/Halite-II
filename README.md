@@ -1,6 +1,8 @@
 # Halite
 
-![alt tag](https://raw.github.com/Sydriax/Halite/master/multimedia/NewVisualizer.png)
+[![Travis badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
+
+![Game gif](multimedia/ExampleGame.gif)
 
 ## Overview
 
