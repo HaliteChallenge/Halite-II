@@ -26,6 +26,8 @@
 
 #include "hlt.hpp"
 
+static std::ofstream f;
+
 namespace detail
 {
 static std::vector< std::vector<unsigned char> > productions;
@@ -170,7 +172,7 @@ static std::string getString()
 static void getInit(unsigned char& playerTag, hlt::Map& m)
 {
 	playerTag = (unsigned char)std::stoi(detail::getString());
-	std::ofstream f(std::to_string(int(playerTag)) + "-o.log");
+	f.open(std::to_string(int(playerTag)) + "-o.log");
 	std::pair<int, int> mapSize = detail::deserializeMapSize(detail::getString());
 	std::string pstring = detail::getString();
 	detail::deserializeProductions(pstring, mapSize.first, mapSize.second);
@@ -184,15 +186,22 @@ static void getInit(unsigned char& playerTag, hlt::Map& m)
 		f << std::endl;
 	}
 	m = detail::deserializeMap(detail::getString(), mapSize.first, mapSize.second);
+	f << "I made it here!\n";
+	f.flush();
+
 }
 
 static void sendInitResponse(std::string name)
 {
 	detail::sendString(name);
+	f << "I sent my initresponse!\n";
+	f.flush();
 }
 
 static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
 {
+	f << "I got a frame!\n";
+	f.flush();
 	m = detail::deserializeMap(detail::getString());
 	messages = detail::deserializeMessages(detail::getString());
 }
@@ -204,6 +213,8 @@ static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::M
 
 	std::string messagesString = detail::serializeMessages(messages);
 	detail::sendString(messagesString);
+	f << "I sent a frame!\n";
+	f.flush();
 }
 
 #endif
