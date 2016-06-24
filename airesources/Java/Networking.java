@@ -10,7 +10,7 @@ public class Networking
     public static final int SIZE_OF_INTEGER_PREFIX = 4;
     public static final int CHAR_SIZE = 1;
     private static short _width, _height;
-    private static ArrayList< ArrayList<short> > _productions;
+    private static ArrayList< ArrayList<Short> > _productions;
 
     static void deserializeMapSize(String inputString)
     {
@@ -21,15 +21,15 @@ public class Networking
     }
 
 
-    static Map deserializeProductions(String inputString)
+    static void deserializeProductions(String inputString)
     {
         String[] inputStringComponents = inputString.split(" ");
 
         short index = 0;
-        _productions.clear();
+        _productions = new ArrayList< ArrayList<Short> >();
         for(int a = 0; a < _height; a++)
         {
-            ArrayList<short> row;
+            ArrayList<Short> row = new ArrayList<Short>();
             for(int b = 0; b < _width; b++)
             {
                 row.add(Short.parseShort(inputStringComponents[index]));
@@ -55,7 +55,7 @@ public class Networking
         // Run-length encode of owners
         short y = 0, x = 0;
         short counter = 0, owner = 0;
-        short currentIndex = 2;
+        short currentIndex = 0;
         while(y != map.map_height)
         {
             counter = Short.parseShort(inputStringComponents[currentIndex]);
