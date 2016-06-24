@@ -24,7 +24,7 @@
 #include <time.h>
 #endif
 
-#include "hlt.h"
+#include "hlt.hpp"
 
 namespace detail
 {
@@ -37,7 +37,7 @@ static std::string serializeMoveSet(const std::set<hlt::Move> &moves)
 	return oss.str();
 }
 
-static std::pair<int, int> deserializeMapSize((const std::string & inputString)
+static std::pair<int, int> deserializeMapSize(const std::string & inputString)
 {
 	std::stringstream iss(inputString);
 	std::pair<int, int> answer;
@@ -72,9 +72,9 @@ static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int 
 	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0, 0 }));
 
 	//Set productions
-	for(int a = 0; a < m.map_height; a++)
+	for(int a = 0; a < map.map_height; a++)
 	{
-		for(int b = 0; b < m.map_width; b++)
+		for(int b = 0; b < map.map_width; b++)
 		{
 			map.contents[a][b].production = productions[a][b];
 		}
@@ -170,31 +170,31 @@ static std::string getString()
 
 static void getInit(unsigned char& playerTag, hlt::Map& m)
 {
-	playerTag = (unsigned char)std::stoi(getString());
+	playerTag = (unsigned char)std::stoi(detail::getString());
 	
-	std::pair<int, int> mapSize = deserializeMapSize(getString());
-	deserializeProductions(getString(), mapSize.first, mapSize.second);
-	m = deserializeMap(getString(), mapSize.first, mapSize.second);
+	std::pair<int, int> mapSize = detail::deserializeMapSize(detail::getString());
+	detail::deserializeProductions(detail::getString(), mapSize.first, mapSize.second);
+	m = detail::deserializeMap(detail::getString(), mapSize.first, mapSize.second);
 }
 
 static void sendInitResponse(std::string name)
 {
-	sendString(name);
+	detail::sendString(name);
 }
 
 static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages)
 {
-	m = deserializeMap(getString());
-	messages = deserializeMessages(getString());
+	m = detail::deserializeMap(detail::getString());
+	messages = detail::deserializeMessages(detail::getString());
 }
 
 static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::Message> &messages)
 {
-	std::string movesString = serializeMoveSet(moves);
-	sendString(movesString);
+	std::string movesString = detail::serializeMoveSet(moves);
+	detail::sendString(movesString);
 
-	std::string messagesString = serializeMessages(messages);
-	sendString(messagesString);
+	std::string messagesString = detail::serializeMessages(messages);
+	detail::sendString(messagesString);
 }
 
 #endif
