@@ -61,29 +61,33 @@ class WebsiteAPI extends API
 	// API ENDPOINTS
 	// Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
 	protected function user() {
-		if(isset($_GET["username"]) && isset($_GET["password"])) {
-			$username = $_GET["username"];
-			$password = $_GET["password"];
-			return $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
-		} else if (isset($_GET["userID"]) && isset($_GET["password"])) {
-			$userID = $_GET["userID"];
-			$password = $_GET["password"];
-			return $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
-		} else if (isset($_GET["username"])) {
-			$username = $_GET["username"];
-			return $this->select("SELECT * FROM User WHERE username = '$username'");
+		if(isset($_GET["username"])) {
+			if(isset($_GET["password"])) {
+				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '{$_GET['password']}'");
+			} else {
+				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+				unset($fields["password"]);
+				return $fields;
+			}
 		} else if (isset($_GET["userID"])) {
-			$userID = $_GET["userID"];
-			return $this->select("SELECT * FROM User WHERE userID = $userID");
+			if(isset($_GET["password"])) {
+				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$_GET['password']}'");
+			} else {
+				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+				unset($fields["password"]);
+				return $fields;
+			}
 		} else if(isset($_GET['active'])) {
-			return $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
+			return $results;
 		} else if (isset($_POST["username"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
 			$password = $_POST["password"];
 
 			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
 			if(isset($usernameArray['username'])) {
-				return "Username already existsZ";
+				return "Username already exists";
 			}
 
 			$this->insert("INSERT INTO User (username, password, mu, sigma, status) VALUES ('$username', '$password', 25.000, 8.333, 0)");

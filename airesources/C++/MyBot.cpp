@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <time.h> 
+#include <time.h>
 #include <cstdlib>
 #include <ctime>
 
@@ -7,10 +7,10 @@
 
 MyBot::MyBot()
 {
-    srand(time(NULL));
+	srand(time(NULL));
 	std::cout.sync_with_stdio(0);
 	
-    getInit(my_tag, present_map);
+	getInit(my_tag, present_map);
 	sendInitResponse("CppBot" + std::to_string(my_tag));
 	
 	// FOR DEBUGGING PURPOSES. Clears the test file
@@ -21,11 +21,11 @@ MyBot::MyBot()
 
 void MyBot::run()
 {
-    while(true)
-    {
-        moves.clear();
+	while(true)
+	{
+		moves.clear();
 		messagesFromMe.clear();
-
+		
 		hlt::Message exampleMessage;
 		exampleMessage.type = hlt::MessageType::ATTACK;
 		exampleMessage.senderID = my_tag;
@@ -33,7 +33,7 @@ void MyBot::run()
 		exampleMessage.targetID = my_tag;
 		messagesFromMe.push_back(exampleMessage);
 
-        getFrame(present_map, messagesToMe);
+		getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
 		{
@@ -49,16 +49,16 @@ void MyBot::run()
 				}
 			}
 		}
-        sendFrame(moves, messagesFromMe);
-    }
+		sendFrame(moves, messagesFromMe);
+	}
 }
 
 int main()
 {
-	srand(time(NULL));
+  srand(time(NULL));
 
-	MyBot r = MyBot();
-	r.run();
+  MyBot r = MyBot();
+  r.run();
 
-	return 0;
+  return 0;
 }

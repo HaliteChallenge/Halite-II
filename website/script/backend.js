@@ -4,7 +4,7 @@ var url = "php/";
 // If async returns null
 function storeUserDatabase(username, password, async) {
 	var result = $.ajax({
-		url: url+"user", 
+		url: url+"user",
 		async: async,
 		method: "POST",
 		data: {username: username, password: password}
@@ -18,7 +18,7 @@ function storeUserDatabase(username, password, async) {
 
 function storeUserSession(username, password, async) {
 	$.ajax({
-		url: url+"session", 
+		url: url+"session",
 		async: async,
 		method: "POST",
 		data: {username: username, password: password}
@@ -34,7 +34,7 @@ function storeBotFile(formID) {
 	}
 	var formData = new FormData($("#"+formID)[0]);
 	var result = $.ajax({
-		url: url+"botFile", 
+		url: url+"botFile",
 		async: false,
 		method: "POST",
 		data: formData,
@@ -55,8 +55,8 @@ function storeBotFile(formID) {
 }
 
 function getSession() {
-	var result =  $.ajax({ 
-		url: url+"session", 
+	var result =  $.ajax({
+		url: url+"session",
 		async: false,
 		method: 'GET'
 	});
@@ -65,18 +65,18 @@ function getSession() {
 
 function getUser(userID, username, password) {
 	var result = $.ajax({
-		url: url+"user", 
+		url: url+"user",
 		async: false,
 		method: "GET",
 		data: {userID: userID, username: username, password: password}
 	});
-
+	console.log(result)
 	return result.responseJSON;
 }
 
 function getActiveUsers() {
 	var result = $.ajax({
-		url: url+"user", 
+		url: url+"user",
 		async: false,
 		method: "GET",
 		data: {active: 1}
@@ -88,7 +88,7 @@ function getActiveUsers() {
 
 function getLatestGamesForUser(userID) {
 	var result = $.ajax({
-		url: url+"game", 
+		url: url+"game",
 		async: false,
 		method: "GET",
 		data: {userID: userID}
@@ -98,7 +98,7 @@ function getLatestGamesForUser(userID) {
 
 function getGameFile(filename) {
 	var result = $.ajax({
-		url: "../storage/replays/"+filename, 
+		url: "../storage/replays/"+filename,
 		async: false,
 		method: "GET"
 	});
@@ -108,7 +108,7 @@ function getGameFile(filename) {
 
 function destroySession(async) {
 	$.ajax({
-		url: url+"session", 
+		url: url+"session",
 		async: async,
 		method: "DELETE"
 	});
