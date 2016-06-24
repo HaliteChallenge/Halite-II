@@ -32,7 +32,7 @@ void MyBot::run()
 		exampleMessage.recipientID = my_tag != 1 ? 1 : 2;
 		exampleMessage.targetID = my_tag;
 		messagesFromMe.push_back(exampleMessage);
-
+	
 		getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
