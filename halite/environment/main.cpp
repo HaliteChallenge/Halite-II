@@ -112,8 +112,9 @@ int main(int argc, char* args[])
 	}
 	catch(std::runtime_error e)
 	{
-		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename.substr(11) << std::endl;
-		my_game->output(filename.substr(11));
+		filename = filename.substr(11);
+		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename << std::endl;
+		my_game->output(filename);
 	}
 
 	std::string victoryOut;
@@ -124,7 +125,7 @@ int main(int argc, char* args[])
 	}
 	std::cout << victoryOut;
 
-  delete my_game;
+  	delete my_game;
 
 	if(!program_output_style) {
 		std::cout << "Press enter to continue:";
