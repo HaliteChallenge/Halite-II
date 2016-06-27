@@ -305,4 +305,4 @@ halite.ini
 *.exe
 halite/environment/environment
 halite/visualizer/visualizer
-worker/Environment
+worker/environment
