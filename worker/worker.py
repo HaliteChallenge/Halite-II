@@ -18,9 +18,14 @@ from sandbox import *
 import smtplib
 from email.mime.text import MIMEText
 
+import configparser
+
+parser = configparser.ConfigParser()
+parser.read("../halite.ini")
+
 RUN_GAME_FILE_NAME = "runGame.sh"
 HALITE_EMAIL = "halite@halite.io"
-
+HALITE_EMAIL_PASSWORD = parser["worker"]["emailPassword"]
 
 def makePath(path):
 	"""Deletes anything residing at path, creates path, and chmods the directory"""
@@ -32,12 +37,15 @@ def makePath(path):
 def sendEmail(subject, body, recipient):
 	print("Sending email")
 
-	msg = MIMEText(body)
+	msg = MIMEText(body, "html")
 	msg['Subject'] = subject
 	msg['From'] = HALITE_EMAIL
 	msg['To'] = recipient
 
-	s = smtplib.SMTP('localhost')
+	s = smtplib.SMTP('smtp.gmail.com:587')
+	s.ehlo()
+	s.starttls();
+	s.login(HALITE_EMAIL, HALITE_EMAIL_PASSWORD)
 	s.sendmail(HALITE_EMAIL, [recipient], msg.as_string())
 	s.quit()
 
@@ -61,7 +69,7 @@ def compile(user, backend):
 	else:
 		print("Bot did not compile")
 		print(str(errors))
-		sendEmail("Halite Bot Compilation Error", "The "+language+" bot that you recently submitted to the Halite competition would not compile on our servers. Here is a description of the error: "+"\n".join(errors), user["email"])
+		sendEmail("Halite Bot Compilation Error", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> Our autocompile script thought that your bot was written in \""+language+".\" Here is a description of the error:<br><pre><code>"+"<br>".join(errors)+"</code></pre>", user["email"])
 	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
