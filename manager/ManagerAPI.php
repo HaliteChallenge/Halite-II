@@ -147,7 +147,7 @@ class ManagerAPI extends API
 	protected function game() {
 		var_dump($_FILES);
 		var_dump($_POST);
-		// Each user in users must have a rank, playerIndex, score, mu, sigma, and userID
+		// Each user in users must have a rank, playerIndex, mu, sigma, and userID
 		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$users = json_decode($_POST['users']);
 			var_dump($users);
@@ -169,7 +169,7 @@ class ManagerAPI extends API
 			$gameID = $gameIDArray['gameID'];
 
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, score, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->score}, $a)");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, $a)");
 				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 		}
