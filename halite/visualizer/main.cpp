@@ -66,7 +66,7 @@ int main(int argc, const char ** argv)
 	if(!debug.is_open()) //If file couldn't be opened.
 	{
 		debug.open("DEBUG.log", std::ios_base::out);
-		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.";
+		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.\n";
 		debug.flush();
 	}
 

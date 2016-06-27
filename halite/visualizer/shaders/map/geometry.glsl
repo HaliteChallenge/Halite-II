@@ -1,20 +1,15 @@
 #version 400
-
 uniform float width;
 uniform float height;
-
 layout(points) in;
 layout(triangle_strip, max_vertices = 16) out;
-
-in vec3 color[];
+in vec3 geoColor[];
 in uint strength[];
-out vec3 fragColor;
-
-void main()
-{
+out vec3 color;
+void main() {
 	uint s = strength[0];
 	vec4 position = gl_in[0].gl_Position;
-	vec3 c = 0.2 * color[0];
+	vec3 c = 0.2 * geoColor[0];
 
 	//Find top left vertices.
 	vec4 tlBPosition = position + vec4(-width, height, 0.0, 0.0);
@@ -31,7 +26,7 @@ void main()
 	//NEW METHOD:
 
 	//Create outer square:
-	fragColor = c;
+	color = c;
 	gl_Position = tlBPosition;
 	EmitVertex();
 	gl_Position = trBPosition;
@@ -60,7 +55,7 @@ void main()
 	gl_Position = brLPosition;
 	EmitVertex();
 
-	fragColor = color[0];
+	color = geoColor[0];
 	EmitVertex();
 	gl_Position = blLPosition;
 	EmitVertex();

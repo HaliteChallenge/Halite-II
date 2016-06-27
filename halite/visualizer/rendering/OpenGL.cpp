@@ -1,7 +1,5 @@
 #include "OpenGL.hpp"
 
-
-
 std::fstream * debugstream;
 
 void util::initShaderHandler(std::fstream * ds)
@@ -18,17 +16,19 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 		*debugstream << "File " << filename << " could not be opened, and consequently <<" << shadername << ">> couldn't be compiled." << std::endl;
 		return false;
 	}
-	std::string line, answer;
-	while(std::getline(in, line)) answer += line + "\n";
+	in.seekg(0, std::ios::end);
+	int length = in.tellg();
+	in.seekg(0, std::ios::beg);
+	char * file = new char[length];
+	in.read(file, length);
 	in.close();
-	const char * c_str = answer.c_str();
-	GLint size = answer.size();
-	glShaderSource(shader, 1, &(c_str), &(size));
+	glShaderSource(shader, 1, &file, &length);
 	glCompileShader(shader);
+	delete[] file;
 	//Check for proper compilation:
 	GLint _compiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &_compiled);
-	if(!_compiled)
+	if(_compiled == GL_FALSE)
 	{
 		GLint length;
 		GLchar* log;
@@ -229,7 +229,7 @@ char util::renderText(float x, float y, int size, Color c, const std::string & t
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	glUseProgram(shaderProgram);
-	glUniform3fv(glGetUniformLocation(shaderProgram, "c"), 1, (GLfloat *)&c);
+	glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, (GLfloat *)&c);
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
