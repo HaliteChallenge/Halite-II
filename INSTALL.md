@@ -19,4 +19,8 @@
 
 ## Worker server setup
 
-Execute: ```cd HALITE_FOLDER/worker && ./install.sh && sudo python3 worker.py```
+* Execute: ```cd HALITE_FOLDER/worker && ./install.sh```
+* Create the worker's `halite.ini` file
+ * Create a `[worker]` section
+ * Fill in `apiKey`, `managerURL`, and `emailPassword`
+* Execute ```sudo python3 worker.py```
