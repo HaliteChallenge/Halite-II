@@ -1,6 +1,15 @@
-ENVIRONMENT="Environment"
+ENVIRONMENT="environment"
 RUNFILE="run.sh"
 WORKINGPATH="workingPath"
+
+if [ ! -f $ENVIRONMENT ]; then
+	echo "NO ENVIRONMENT!!"
+	cd ../halite/environment
+	make clean
+	make
+	mv environment ../../worker
+	cd ../../worker
+fi
 
 WIDTH=$1
 HEIGHT=$2
@@ -17,7 +26,7 @@ cd $WORKINGPATH
 chmod +x "$BOT1/$RUNFILE"
 chmod +x "$BOT2/$RUNFILE"
 
-docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT $WIDTH $HEIGHT 'cd $PWD/$BOT1 && ./$RUNFILE' 'cd $PWD/$BOT2 && ./$RUNFILE'"
+docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q $WIDTH $HEIGHT 'cd $PWD/$BOT1 && ./$RUNFILE' 'cd $PWD/$BOT2 && ./$RUNFILE'"
 
 mv *.hlt ../
 cd ..
