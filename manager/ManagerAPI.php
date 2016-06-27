@@ -1,10 +1,5 @@
 <?php
 
-// FOR DEBUGGING PURPOSES
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'API.class.php';
 class ManagerAPI extends API
 {
@@ -27,7 +22,6 @@ class ManagerAPI extends API
 
 	// Checks HTTP parameters and request IP to make sure that the client provided a valid API key
 	private function isValidWorker() {
-		return true;
 		// Get apiKey
 		$apiKey = NULL;
 		if(isset($_GET['apiKey'])) $apiKey = $_GET['apiKey'];
