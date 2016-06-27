@@ -44,11 +44,11 @@ def sendEmail(subject, body, recipient):
 
 def compile(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
-	print("Compiling a bot with userID %d" % (user["userID"]))
+	print("Compiling a bot with userID %s" % (user["userID"]))
 
 	workingPath = "workingPath"
 	makePath(workingPath)
-	botPath = backend.storeBotLocally(user["userID"], workingPath)
+	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
 	zip.unpack(botPath)
 
 	language, errors = compile_anything(workingPath)
@@ -56,13 +56,13 @@ def compile(user, backend):
 
 	if didCompile:
 		print("Bot did compile")
-		zip.zipFolder(workingPath, os.path.join(workingPath, str(user["userID"])+".zip"))
-		backend.storeBotRemotely(user["userID"], os.path.join(workingPath, str(user["userID"])+".zip"))
+		zip.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
+		backend.storeBotRemotely(int(user["userID"]), os.path.join(workingPath, user["userID"]+".zip"))
 	else:
 		print("Bot did not compile")
 		print(str(errors))
 		sendEmail("Halite Bot Compilation Error", "The "+language+" bot that you recently submitted to the Halite competition would not compile on our servers. Here is a description of the error: "+"\n".join(errors), user["email"])
-	backend.compileResult(user["userID"], didCompile, language)
+	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
 def runGame(width, height, users, backend):
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
-				compile(int(task["user"]), backend)
+				compile(task["user"], backend)
 			elif task["type"] == "game":
 				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
 			else:
