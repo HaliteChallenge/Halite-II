@@ -56,3 +56,9 @@ body {
 .gameRow {
 	background-color:#F8F8F8;
 }
+
+.arrow {
+	height: 16px;
+	width: 16px;
+	cursor: hand;
+}

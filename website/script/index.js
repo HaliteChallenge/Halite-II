@@ -50,7 +50,7 @@ $(function() {
 				var opponent = this.games[a].users[0].userID == this.user.userID ? this.games[a].users[1] : this.games[a].users[0];
 				var gameResult = opponent.rank === "0" ? "Lost" : "Won";
 
-				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"' target='_blank' href='../storage/replays/"+this.games[a].replayName+"'>"+gameResult+"</a></td></tr>");
+				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"' target='_blank' href='../storage/replays/"+this.games[a].replayName+"'>"+gameResult+"</a></td><td></td></tr>");
 			}
 		};
 		this.toggle = function() {
@@ -59,10 +59,12 @@ $(function() {
 		};
 		this.hide = function() {
 			this.isShown = false;
+			this.$parentField.find(".arrow").attr('src', "assets/up-arrow.png");
 			this.$parentField.find(".gameRow").css("display", "none");
 		};
 		this.show = function() {
 			this.isShown = true;
+			this.$parentField.find(".arrow").attr('src', "assets/down-arrow.png");
 			this.$parentField.find(".gameRow").css("display", "table-row");
 		};
 		/*this.displayGame = function(event) {
@@ -97,7 +99,7 @@ $(function() {
 		},
 		setSubmissions: function(submissions) {
 			this.submissions = submissions;
-			
+
 			this.render();
 
 			this.dropdowns = Array();
@@ -112,7 +114,7 @@ $(function() {
 			for(var a = 0; a < this.submissions.length; a++) {
 				var user = this.submissions[a];
 				var score = Math.round((this.submissions[a].mu-(3*this.submissions[a].sigma))*100)/100;
-				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td>"+user.username+"</td><td>"+user.language+"</td><td><a class='matchDrop' userID= '"+user.userID+"' href='#'>"+score+"</a></td></tr></tbody>");
+				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td>"+user.username+"</td><td>"+user.language+"</td><td>"+score+"</td><td><img class='matchDrop arrow' userID='"+user.userID+"' src='assets/up-arrow.png'></td></tr></tbody>");
 			}
 		},
 		toggleDropdown: function(event) {
@@ -131,7 +133,7 @@ $(function() {
 			return getUser(userID);
 		}
 	};
-	
+
 	function SmartForm($submitButton, $form, onSubmit) {
 		$submitButton.click(function() {
 			console.log("CLICK");
@@ -172,8 +174,8 @@ $(function() {
 				this.$form.append("<input type='hidden' name='userID' value='"+userID+"'>");
 			},
 			buttonClicked: function() { this.$fileInput.click(); },
-			fileChanged: function() { 
-				storeBotFile("submitForm"); 
+			fileChanged: function() {
+				storeBotFile("submitForm");
 				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. You should show up on the leaderboard within a couple of minutes.", true)
 			}
 		},
@@ -181,7 +183,7 @@ $(function() {
 		init: function() {
 			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
 			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
-			
+
 			this.uploadButton.init();
 			this.$logOutButton.click(this.logOut.bind(this));
 
