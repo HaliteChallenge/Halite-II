@@ -25,14 +25,14 @@ void MyBot::run()
 	{
 		moves.clear();
 		messagesFromMe.clear();
-
+		
 		hlt::Message exampleMessage;
 		exampleMessage.type = hlt::MessageType::ATTACK;
 		exampleMessage.senderID = my_tag;
 		exampleMessage.recipientID = my_tag != 1 ? 1 : 2;
 		exampleMessage.targetID = my_tag;
 		messagesFromMe.push_back(exampleMessage);
-
+	
 		getFrame(present_map, messagesToMe);
 
 		for(unsigned short a = 0; a < present_map.map_height; a++)
@@ -41,15 +41,11 @@ void MyBot::run()
 			{
 				if (present_map.getSite({b, a}, STILL).owner == my_tag)
 				{
-					if (float(rand()) / RAND_MAX > .20)
-					{
-						moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
-					}
-					else moves.insert({ { b, a }, (unsigned char)(STILL) });
+					moves.insert({ { b, a }, rand() % 5 });
 				}
 			}
 		}
-		sendFrame(moves, messagesFromMe);
+		sendFrame(moves, std::vector<hlt::Message>());
 	}
 }
 

@@ -19,7 +19,6 @@ std::string serializeProductions(const hlt::Map & map)
 {
 	std::string returnString = "";
 	std::ostringstream oss;
-	oss << map.map_width << ' ' << map.map_height << ' ';
 	for(auto a = map.contents.begin(); a != map.contents.end(); a++)
 	{
 		for(auto b = a->begin(); b != a->end(); b++)
@@ -331,12 +330,11 @@ void Networking::startAndConnectBot(std::string command)
 
 bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
 {
-	if(!program_output_style) std::cout << "2.1!\n";
-	if(!program_output_style) std::cout.flush();
 	try
 	{
-    	std::string playerTagString = std::to_string(playerTag), mapString = serializeMap(m), prodString = serializeProductions(m);
+    	std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
+		sendString(playerTag, mapSizeString);
 		sendString(playerTag, prodString);
 		sendString(playerTag, mapString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
@@ -376,6 +374,7 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 	catch (int e)
 	{
 		return false;
+		
 	}
 
 }

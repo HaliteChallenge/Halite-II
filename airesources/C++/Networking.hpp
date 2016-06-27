@@ -29,6 +29,7 @@
 namespace detail
 {
 static std::vector< std::vector<unsigned char> > productions;
+int width, height;
 
 static std::string serializeMoveSet(const std::set<hlt::Move> &moves)
 {
@@ -37,22 +38,20 @@ static std::string serializeMoveSet(const std::set<hlt::Move> &moves)
 	return oss.str();
 }
 
-static std::pair<int, int> deserializeMapSize(const std::string & inputString)
+static void deserializeMapSize(const std::string & inputString)
 {
 	std::stringstream iss(inputString);
-	std::pair<int, int> answer;
-	iss >> answer.first >> answer.second;
-	return answer;
+	iss >> width >> height;
 }
 
-static void deserializeProductions(const std::string & inputString, int w, int h)
+static void deserializeProductions(const std::string & inputString)
 {
 	std::stringstream iss(inputString);
-	productions.resize(h);
+	productions.resize(height);
 	short temp;
 	for(auto a = productions.begin(); a != productions.end(); a++)
 	{
-		a->resize(w);
+		a->resize(width);
 		for(auto b = a->begin(); b != a->end(); b++)
 		{
 			iss >> temp;
@@ -61,16 +60,12 @@ static void deserializeProductions(const std::string & inputString, int w, int h
 	}
 }
 
-static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int h = -1)
+static hlt::Map deserializeMap(const std::string & inputString)
 {
 	std::stringstream iss(inputString);
 
-	hlt::Map map;
-	if(w != -1) map.map_width = w;
-	if(h != -1) map.map_height = h;
-
-	map.contents = std::vector< std::vector<hlt::Site> >(map.map_height, std::vector<hlt::Site>(map.map_width, { 0, 0, 0 }));
-
+	hlt::Map map(width, height);
+	
 	//Set productions
 	for(int a = 0; a < map.map_height; a++)
 	{
@@ -86,21 +81,21 @@ static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int 
 	while(y != map.map_height)
 	{
 		iss >> counter >> owner;
-		for(int a = 0; a < counter; ++a)
+		for(int a = 0; a < counter; a++)
 		{
 			map.contents[y][x].owner = owner;
-			++x;
+			x++;
 			if(x == map.map_width)
 			{
 				x = 0;
-				++y;
+				y++;
 			}
 		}
 	}
 
-	for (int a = 0; a < map.contents.size(); ++a)
+	for (int a = 0; a < map.contents.size(); a++)
 	{
-		for (int b = 0; b < map.contents[a].size(); ++b)
+		for (int b = 0; b < map.contents[a].size(); b++)
 		{
 			short strengthShort;
 			iss >> strengthShort;
@@ -114,7 +109,7 @@ static hlt::Map deserializeMap(const std::string & inputString, int w = -1, int 
 static std::string serializeMessages(const std::vector<hlt::Message> &messages) {
 	std::ostringstream oss;
 
-	oss << messages.size() << " ";
+	oss << (int)(messages.size()) << " ";
 
 	for (int a = 0; a < messages.size(); a++)
 	{
@@ -158,6 +153,7 @@ static void sendString(std::string &sendString)
 	sendString += '\n';
 
 	std::cout << sendString;
+	std::cout.flush();
 }
 
 static std::string getString()
@@ -171,10 +167,10 @@ static std::string getString()
 static void getInit(unsigned char& playerTag, hlt::Map& m)
 {
 	playerTag = (unsigned char)std::stoi(detail::getString());
-	
-	std::pair<int, int> mapSize = detail::deserializeMapSize(detail::getString());
-	detail::deserializeProductions(detail::getString(), mapSize.first, mapSize.second);
-	m = detail::deserializeMap(detail::getString(), mapSize.first, mapSize.second);
+	detail::deserializeMapSize(detail::getString());
+	detail::deserializeProductions(detail::getString());
+	m = detail::deserializeMap(detail::getString());
+
 }
 
 static void sendInitResponse(std::string name)
