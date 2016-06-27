@@ -74,13 +74,12 @@ def runGame(width, height, users, backend):
 		print(line)
 		lines.append(line)
 
-	replayPath = lines[(len(lines)-len(users)) - 1][len("Failed to output to file. Opening a file at ") :]
+	replayPath = lines[-2]
 
 	# Get player ranks and scores by parsing shellOutput
-	for lineIndex in range(len(lines) - len(users), len(lines)):
-		playerIndex = int(lines[lineIndex][lines[lineIndex].index("is player ") + len("is player ") : lines[lineIndex].index(" named")])
-		users[playerIndex-1]["rank"] = lineIndex - (len(lines) - len(users))
-		users[playerIndex-1]["score"] = float(lines[lineIndex][lines[lineIndex].index("score of ") + len("score of ") :])
+	rankedPlayerIndexes = [int(a) for a in lines[-1].strip().split(" ")]
+	for a in range(len(rankedPlayerIndexes)):
+		users[rankedPlayerIndexes[a]-1]["rank"] = a
 
 	# Update trueskill mu and sigma values
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
