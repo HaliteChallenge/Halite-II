@@ -152,6 +152,7 @@ $(function() {
 		$logInButton: $("#loginButton"),
 		$logInForm: $("#loginForm"),
 		$registerUsername: $("#register_user"),
+		$registerEmail: $("#register_email"),
 		$registerPassword: $("#register_pass"),
 		$registerButton: $("#registerButton"),
 		$registerForm: $("#registerForm"),
@@ -205,9 +206,10 @@ $(function() {
 		},
 		register: function() {
 			var username = this.$registerUsername.val();
+			var email = this.$registerEmail.val();
 			var password = this.$registerPassword.val();
 
-			var resp = storeUserDatabase(username, password, false);
+			var resp = storeUserDatabase(email, username, password, false);
 			if (resp === "Success") {
 				storeUserSession(username, password, false);
 
@@ -216,7 +218,11 @@ $(function() {
 				this.render();
 				messageBox.alert("Registration succeeded", "You successfully registered and were logged in for the Halite competition.", true);
 			} else  {
-				messageBox.alert("Registration failed", "That username is already taken", false);
+				if(resp.toLowerCase().indexOf("usernmae") > -1) {
+					messageBox.alert("Registration failed", "That username is already taken", false);
+				} else {
+					messageBox.alert("Registration failed", "That email is already taken", false);
+				}
 			}
 		},
 		logOut: function() {
