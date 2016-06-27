@@ -23,4 +23,5 @@
 * Create the worker's `halite.ini` file
  * Create a `[worker]` section
  * Fill in `apiKey`, `managerURL`, and `emailPassword`
+* Add the `apiKey` and the worker's ip address to the `Worker` table
 * Execute ```sudo python3 worker.py```
