@@ -2,12 +2,12 @@ var url = "php/";
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
 // If async returns null
-function storeUserDatabase(username, password, async) {
+function storeUserDatabase(email, username, password, async) {
 	var result = $.ajax({
 		url: url+"user",
 		async: async,
 		method: "POST",
-		data: {username: username, password: password}
+		data: {email: email, username: username, password: password}
 	});
 
 	if(async == true) {

@@ -37,6 +37,7 @@
 										<input type="submit" style="display: none;">
 									</div>
 
+
 									<div class="form-group label-floating is-empty">
 										<label for="login_pass" class="control-label">Password</label>
 										<input id="login_pass" class="form-control" type="password" size="30" >
@@ -49,6 +50,10 @@
 							<li class="dropdown">
 								<a class="dropdown-toggle" href="#" data-toggle="dropdown">Register<strong class="caret"></strong></a>
 								<ul id="registerForm" class="dropdown-menu" style="padding: 15px; padding-bottom: 0px;">
+									<div class="form-group label-floating is-empty">
+										<label for="register_email" class="control-label">Email</label>
+										<input id="register_email" class="form-control" type="email" size="30" >
+									</div>							
 									<div class="form-group label-floating is-empty">
 										<label for="register_user" class="control-label">Username</label>
 										<input id="register_user" class="form-control" type="username" size="30" >

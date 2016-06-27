@@ -15,7 +15,12 @@ import backend
 from compiler import *
 from sandbox import *
 
+import smtplib
+from email.mime.text import MIMEText
+
 RUN_GAME_FILE_NAME = "runGame.sh"
+HALITE_EMAIL = "halite@halite.io"
+
 
 def makePath(path):
 	"""Deletes anything residing at path, creates path, and chmods the directory"""
@@ -24,13 +29,26 @@ def makePath(path):
 	os.makedirs(path)
 	os.chmod(path, 0o777)
 
-def compile(userID, backend):
+def sendEmail(subject, body, recipient):
+	print("Sending email")
+
+	msg = MIMEText(body)
+	msg['Subject'] = subject
+	msg['From'] = HALITE_EMAIL
+	msg['To'] = recipient
+
+	s = smtplib.SMTP('localhost')
+	s.sendmail(HALITE_EMAIL, [recipient], msg.as_string())
+	s.quit()
+
+
+def compile(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
-	print("Compiling a bot with userID %d" % (userID))
+	print("Compiling a bot with userID %s" % (user["userID"]))
 
 	workingPath = "workingPath"
 	makePath(workingPath)
-	botPath = backend.storeBotLocally(userID, workingPath)
+	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
 	zip.unpack(botPath)
 
 	language, errors = compile_anything(workingPath)
@@ -38,13 +56,13 @@ def compile(userID, backend):
 
 	if didCompile:
 		print("Bot did compile")
-		zip.zipFolder(workingPath, os.path.join(workingPath, str(userID)+".zip"))
-		backend.storeBotRemotely(userID, os.path.join(workingPath, str(userID)+".zip"))
+		zip.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
+		backend.storeBotRemotely(int(user["userID"]), os.path.join(workingPath, user["userID"]+".zip"))
 	else:
 		print("Bot did not compile")
 		print(str(errors))
-
-	backend.compileResult(userID, didCompile, language)
+		sendEmail("Halite Bot Compilation Error", "The "+language+" bot that you recently submitted to the Halite competition would not compile on our servers. Here is a description of the error: "+"\n".join(errors), user["email"])
+	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
 def runGame(width, height, users, backend):
@@ -100,7 +118,7 @@ if __name__ == "__main__":
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
-				compile(int(task["userID"]), backend)
+				compile(task["user"], backend)
 			elif task["type"] == "game":
 				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
 			else:

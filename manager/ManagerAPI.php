@@ -103,17 +103,17 @@ class ManagerAPI extends API
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
-			$needToBeCompiled = $this->select("SELECT userID FROM User WHERE status = 1 ORDER BY userID ASC");
+			$needToBeCompiled = $this->select("SELECT * FROM User WHERE status = 1 ORDER BY userID ASC");
 			if(count($needToBeCompiled) > 0) {
 				$this->insert("UPDATE User SET status = 2 WHERE userID = {$needToBeCompiled['userID']}");
 				return array(
 					"type" => "compile",
-					"userID" => $needToBeCompiled['userID']);
+					"user" => $needToBeCompiled);
 			}
 
 			// Assign a run game tasks
 			$numPlayers = 2;
-			$players = $this->selectMultiple("SELECT userID, mu, sigma FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
+			$players = $this->selectMultiple("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
 			$sizes = array(10, 20);
 			$size = $sizes[array_rand($sizes)];
 			if(count($players) == 2) {

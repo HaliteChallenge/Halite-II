@@ -81,16 +81,22 @@ class WebsiteAPI extends API
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
 			return $results;
-		} else if (isset($_POST["username"]) && isset($_POST["password"])) {
+		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
+			$email = $_POST["email"];
 			$password = $_POST["password"];
 
 			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
 			if(isset($usernameArray['username'])) {
 				return "Username already exists";
 			}
+			
+			$emailArray = $this->select("SELECT email FROM User WHERE email = '$email' LIMIT 1");
+			if(isset($emailArray['email'])) {
+				return "Email already exists";
+			}
 
-			$this->insert("INSERT INTO User (username, password, mu, sigma, status) VALUES ('$username', '$password', 25.000, 8.333, 0)");
+			$this->insert("INSERT INTO User (username, email, password, mu, sigma, status) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0)");
 			return "Success";
 		}
 	}
