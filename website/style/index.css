@@ -67,3 +67,11 @@ body {
 	height: 16px;
 	width: 16px;
 }
+
+.won {
+	color: green;
+}
+
+.lost {
+	color: red;
+}
