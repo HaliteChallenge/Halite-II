@@ -1,4 +1,5 @@
-import java.util.concurrent.ThreadLocalRandom;
+
+import java.util.Random;
 
 public class Direction
 {
@@ -7,8 +8,13 @@ public class Direction
     public static final byte EAST = 2;
     public static final byte SOUTH = 3;
     public static final byte WEST = 4;
-    
+
+    public static final byte[] DIRECTIONS = {STILL, NORTH, EAST, SOUTH, WEST};
+    public static final byte[] CARDINALS = {NORTH, EAST, SOUTH, WEST};
+
     public static byte randomDirection() {
-        return (byte)ThreadLocalRandom.current().nextInt(0, 5);
+        byte[] b = new byte[1];
+        new Random().nextBytes(b);
+        return b[0];
     }
 }
