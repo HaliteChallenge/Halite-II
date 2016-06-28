@@ -1,5 +1,4 @@
-#CXXFLAGS += -std=c++11 -I/opt/X11/include/ `pkg-config --cflags glfw3`
-CXXFLAGS += -g -std=c++11 -I/usr/local/include/freetype2 `pkg-config --cflags glfw3`
+CXXFLAGS += -g -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/usr/include/freetype2 -std=c++11 `pkg-config --cflags glfw3`
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=visualizer
