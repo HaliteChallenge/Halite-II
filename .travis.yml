@@ -1,5 +1,7 @@
 sudo: true
 
+dist: trusty
+
 language: cpp
 
 compiler: gcc
