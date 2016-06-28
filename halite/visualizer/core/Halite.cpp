@@ -849,10 +849,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength) + " | Production: " + std::to_string(production);
 			}
-			else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
+			else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
 		}
-		else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
-		util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+		else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
+		if(labelText != "") util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:
 		for(int a = 0; a < number_of_players; a++)
