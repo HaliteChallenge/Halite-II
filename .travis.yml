@@ -18,7 +18,6 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install -y cmake
   - sudo apt-get install -y xorg-dev libglu1-mesa-dev
-  - sudo apt-get build-dep -y glfw3
   - sudo apt-get build-dep -y glfw
   - echo "Done with glfw3 setup"
   
