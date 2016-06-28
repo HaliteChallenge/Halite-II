@@ -492,9 +492,9 @@ void Halite::clearFullGame()
 
 Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
-    number_of_players = 0;
-    player_names = std::vector< std::pair<std::string, float> >();
-    full_game = std::vector<hlt::Map * >();
+	number_of_players = 0;
+	player_names = std::vector< std::pair<std::string, float> >();
+	full_game = std::vector<hlt::Map * >();
 	color_codes[0] = { 0.3f, 0.3f, 0.3f };
 	x_offset = 0;
 	y_offset = 0;
@@ -725,7 +725,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		const Color TEXT_COLOR = { 1, 1, 1 };
-		
+
 		hlt::Map * m = full_game[turnNumber];
 
 		std::vector<float> colors((unsigned int)m->map_width * m->map_height * 3);
@@ -794,9 +794,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		//Find name of replay:
 		char search = '/';
-#ifdef _WIN32
+		#ifdef _WIN32
 		search = '\\';
-#endif
+		#endif
 		auto index = std::find(present_file.begin(), present_file.end(), search); auto index2 = index;
 		while(index != present_file.end())
 		{

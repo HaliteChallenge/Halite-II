@@ -15,7 +15,7 @@ bool allArgumentsPresent(int argc, char* args[])
 	auto is_number = [](const std::string& s)
 	{
 		return !s.empty() && std::find_if(s.begin(),
-			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
 	if(argc == 1) return false;
 	//Remember, the executable name counts as an argument
@@ -125,11 +125,11 @@ int main(int argc, char* args[])
 	}
 	std::cout << victoryOut;
 
-  	delete my_game;
+	delete my_game;
 
 	/*if(!program_output_style) {
-		std::cout << "Press enter to continue:";
-		getchar();
-	}*/
-	return 0;
+	std::cout << "Press enter to continue:";
+	getchar();
+}*/
+return 0;
 }

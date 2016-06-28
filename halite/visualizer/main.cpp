@@ -7,10 +7,10 @@
 #include "core/Halite.hpp"
 
 #ifdef _WIN32
-	#include <Windows.h>
-	#include <direct.h>
+#include <Windows.h>
+#include <direct.h>
 #else
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 
 
@@ -52,11 +52,11 @@ int main(int argc, const char ** argv)
 		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
 		loc = loc.substr(0, loc.find_last_of('/'));
-#ifdef _WIN32
+		#ifdef _WIN32
 		_chdir(loc.c_str());
-#else
+		#else
 		chdir(loc.c_str());
-#endif
+		#endif
 	}
 
 	//Open debug:
@@ -112,9 +112,9 @@ int main(int argc, const char ** argv)
 	{
 		//Limit render rate:
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
-#ifdef CONSOLE_DEBUG
+		#ifdef CONSOLE_DEBUG
 		std::cout << "Frame time of " << delta << ".\n";
-#endif
+		#endif
 		c = clock();
 
 		short turnNumberS = turnNumber;

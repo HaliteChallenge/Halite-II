@@ -315,7 +315,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 		number_of_players++;
 	}
 
-		//Initialize map
+	//Initialize map
 	game_map = hlt::Map(w, h, number_of_players);
 
 	//Perform initialization not specific to constructor
@@ -400,20 +400,20 @@ void Halite::init()
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
 
-		//Send initial package
-		std::vector< std::future<bool> > initThreads(number_of_players);
-		for(unsigned char a = 0; a < number_of_players; a++)
+	//Send initial package
+	std::vector< std::future<bool> > initThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+	}
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		bool success = initThreads[a].get();
+		if (!success)
 		{
-			initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+			networking.killPlayer(a + 1);
 		}
-		for(unsigned char a = 0; a < number_of_players; a++)
-		{
-			bool success = initThreads[a].get();
-			if (!success)
-			{
-				networking.killPlayer(a + 1);
-			}
-		}
+	}
 }
 
 void Halite::output(std::string filename)
