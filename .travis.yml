@@ -9,7 +9,7 @@ compiler: gcc
 install:
   - cd halite/visualizer
   - sudo apt-get install -y g++-4.8 libstdc++6-4.7-dev
-  - sudo apt-get install -y libXmu-dev libXi-dev libgl-dev dos2unix git wget
+  - sudo apt-get install -y libXmu-dev libXi-dev dos2unix git wget
   - sudo apt-get install -y libfreetype6-dev libglew-dev pkg-config
   - echo "Done with non glfw3"
   
