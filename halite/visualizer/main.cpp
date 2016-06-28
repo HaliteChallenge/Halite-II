@@ -7,10 +7,10 @@
 #include "core/Halite.hpp"
 
 #ifdef _WIN32
-	#include <Windows.h>
-	#include <direct.h>
+#include <Windows.h>
+#include <direct.h>
 #else
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 
 
