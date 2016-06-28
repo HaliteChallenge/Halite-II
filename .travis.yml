@@ -12,3 +12,5 @@ script:
   - cd ../visualizer
   - make
 
+notifications:
+    slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
