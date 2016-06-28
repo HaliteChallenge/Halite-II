@@ -127,9 +127,9 @@ int main(int argc, char* args[])
 
   	delete my_game;
 
-	if(!program_output_style) {
+	/*if(!program_output_style) {
 		std::cout << "Press enter to continue:";
 		getchar();
-	}
+	}*/
 	return 0;
 }
