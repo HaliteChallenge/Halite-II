@@ -227,7 +227,7 @@ void Halite::setupProductionRendering(const hlt::Map & map)
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors((unsigned int)map_width * map_width); //Map to r, r, r
+	std::vector<float> colors((unsigned int)map_width * map_height); //Map to r, r, r
 
 	unsigned char maxProduction = 0;
 	for(auto a = map.contents.begin(); a != map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
