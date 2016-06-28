@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	<meta name="google-site-verification" content="UzLAOvN92N2iaw_7HcFXSOc_M-WIe3KFXaozuaNsZo4" />
 	<title>Halite</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
@@ -53,7 +53,7 @@
 									<div class="form-group label-floating is-empty">
 										<label for="register_email" class="control-label">Email</label>
 										<input id="register_email" class="form-control" type="email" size="30" >
-									</div>							
+									</div>
 									<div class="form-group label-floating is-empty">
 										<label for="register_user" class="control-label">Username</label>
 										<input id="register_user" class="form-control" type="username" size="30" >
@@ -77,7 +77,7 @@
 				</div>
 			</div>
 		</nav>
-		
+
 		<div id="messageBox"></div>
 		<div class="pageContent">
 			<div class="jumbotron" id="jumbotron">
@@ -94,11 +94,11 @@
 							<p><b>Download the starter package <a href="../StarterPackage.zip">here</a></b></p>
 
 							<h3>Overview</h3>
-							
+
 							<p>Halite is a multi-player turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire map, in competition with every other player in the game. Players use their territory to gain strength, and their strength to gain territory; they must move intelligently on both the micro and macro scales to play effectively.</p>
-							
+
 							<h3>Game Description</h3>
-							
+
 							<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, two things will happen to it:
 								<ul>
 							 		<li>It will permanently increase its Strength by one.</li>
@@ -136,6 +136,7 @@
 									<th>Username</th>
 									<th>Language</th>
 									<th>Score</th>
+									<th></th>
 								</tr>
 							</thead>
 						</table>
@@ -154,7 +155,7 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="script/backend.js"></script>
 	<script src="script/index.js"></script>
-	<script src="script/visualizer.js"></script>	
+	<script src="script/visualizer.js"></script>
 </body>
 
 </html>
