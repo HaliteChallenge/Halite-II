@@ -13,13 +13,13 @@ while True:
 		for x in range(0, len(gameMap.contents[y])):
 			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
-				if site.strength < 5*site.production:
+				direction = random.randint(0, 5)
+				if site.strength < 100*site.production:
 					direction = STILL
 				else:
 					for d in CARDINALS:
 						if gameMap.getSite(Location(x, y), d).owner != playerTag:
 							direction = d
 							break
-					direction = random.randint(0, 5)
 				moves.append(Move(Location(x, y), direction))
 	sendFrame(moves, sendMessages)
