@@ -367,7 +367,7 @@ void Halite::init()
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
-	if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
+	// TEMP DEFENSE BONUS REMOVAL: if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
@@ -443,7 +443,8 @@ void Halite::output(std::string filename)
 std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 200)
+	const int maxTurnNumber = game-map.map_width * game_map.map_height;
+	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber)
 	{
 		//Increment turn number:
 		turn_number++;
