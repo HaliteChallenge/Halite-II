@@ -42,7 +42,7 @@ public:
 
 	void init();
 	void output(std::string filename);
-	std::vector< std::pair<unsigned char, unsigned int> > runGame();
+	std::vector<unsigned char> runGame();
 	std::string getName(unsigned char playerTag);
 
 	~Halite();

@@ -104,7 +104,7 @@ int main(int argc, char* args[])
 	}
 	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
-	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
+	std::vector<unsigned char> rankings = my_game->runGame();
 
 	try
 	{
@@ -118,10 +118,10 @@ int main(int argc, char* args[])
 	}
 
 	std::string victoryOut;
-	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a score of " + std::to_string(rankings[a].second) + "\n";
+	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a]) + " named " + my_game->getName(rankings[a]) + "\n";
 	else {
 		std::cout << filename << std::endl;
-		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a].first) + ' ';
+		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a]) + ' ';
 	}
 	std::cout << victoryOut;
 

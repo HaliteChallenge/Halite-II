@@ -440,9 +440,10 @@ void Halite::output(std::string filename)
 	gameFile.close();
 }
 
-std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
+std::vector<unsigned char> Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
+	std::vector<unsigned char> answer;
 	const int maxTurnNumber = game_map.map_width * game_map.map_height;
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber)
 	{
@@ -450,15 +451,17 @@ std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 		turn_number++;
 		if(!program_output_style) std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
-		result = processNextFrame(result);
+		std::vector<bool> newResult = processNextFrame(result);
+		//Add to vector of players that should be dead.
+		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a])
+		{
+			answer.push_back(a + 1);
+		}
+		result = newResult;
 	}
-
-	player_scores = std::vector<unsigned int>(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
-	std::vector< std::pair<unsigned char, unsigned int> > results(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, player_scores[a] };
-	std::sort(results.begin(), results.end(), [](const std::pair<unsigned char, unsigned int> & a, const std::pair<unsigned char, unsigned int> & b) -> bool { return a.second > b.second; });
-	return results;
+	for(int a = 0; a < result.size(); a++) if(result[a]) answer.push_back(a + 1);
+	std::reverse(answer.begin(), answer.end());
+	return answer;
 }
 
 std::string Halite::getName(unsigned char playerTag)

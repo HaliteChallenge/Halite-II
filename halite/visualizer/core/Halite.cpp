@@ -239,22 +239,12 @@ void Halite::setupProductionRendering(const hlt::Map & map)
 		colors[loc] = float(b->production) / maxProduction;
 		loc++;
 	}
-	std::cout << production_color_buffer << "\n";
-	std::cout.flush();
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, production_color_buffer);
-	std::cout << "I made it here!\n";
-	std::cout.flush();
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
-	std::cout << "I made it here!\n";
-	std::cout.flush();
 	glEnableVertexAttribArray(1);
-	std::cout << "I made it here!\n";
-	std::cout.flush();
 	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
-	std::cout << "I made it here!\n";
-	std::cout.flush();
 }
 
 void Halite::setupGraphGL()
@@ -888,8 +878,6 @@ void Halite::recreateGL()
 	setupProductionGL();
 	assert(!full_game.empty()); //Ensures that we cleanly abort if we try to recreate the production rendering without an existant map.
 	setupProductionRendering(*full_game[0]);
-	std::cout << "I made it here!\n";
-	std::cout.flush();
 	setupGraphGL();
 	setupGraphRendering(1, 0);
 }
