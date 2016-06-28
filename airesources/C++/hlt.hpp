@@ -11,6 +11,9 @@
 #define SOUTH 3
 #define WEST 4
 
+#define DIRECTIONS {STILL, NORTH, EAST, SOUTH, WEST}
+#define CARDINALS {NORTH, EAST, SOUTH, WEST}
+
 namespace hlt
 {
 	enum MessageType { ATTACK, STOP_ATTACK };

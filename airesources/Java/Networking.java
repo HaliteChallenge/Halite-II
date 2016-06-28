@@ -73,19 +73,20 @@ public class Networking
             }
         }
 
-        for (int a = 0; a < map.contents.size(); ++a) 
+        for (int a = 0; a < map.contents.size(); ++a)
         {
-            for (int b = 0; b < map.contents.get(a).size(); ++b) 
+            for (int b = 0; b < map.contents.get(a).size(); ++b)
             {
                 short strengthShort = Short.parseShort(inputStringComponents[currentIndex]);
                 currentIndex++;
                 map.contents.get(a).get(b).strength = strengthShort;
+                map.contents.get(a).get(b).production = _productions.get(a).get(b);
             }
         }
 
         return map;
     }
-    
+
     static String serializeMessages(ArrayList<Message> messages) {
         String returnString = messages.size()+" ";
         for(Message message : messages) {
@@ -93,26 +94,26 @@ public class Networking
         }
         return returnString;
     }
-    
+
     static ArrayList<Message> deserializeMessages(String messageString) {
         ArrayList<Message> messages = new ArrayList<Message>();
         String[] splitString = messageString.split(" ");
         int numberOfMessages = Integer.parseInt(splitString[0]);
-        
+
         int currentIndex = 1;
         for(int a = 0; a < numberOfMessages; a++) {
             MessageType type = MessageType.getType(Integer.parseInt(splitString[currentIndex]));
             int senderID = Integer.parseInt(splitString[currentIndex+1]);
             int recipientID = Integer.parseInt(splitString[currentIndex+2]);
             int targetID = Integer.parseInt(splitString[currentIndex+3]);
-            
+
             messages.add(new Message(type, senderID, recipientID, targetID));
             currentIndex += 4;
         }
-        
+
         return messages;
     }
-    
+
     static void sendString(String sendString) {
         System.out.print(sendString+'\n');
         System.out.flush();

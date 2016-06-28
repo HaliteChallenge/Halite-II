@@ -13,8 +13,6 @@ public class Direction
     public static final byte[] CARDINALS = {NORTH, EAST, SOUTH, WEST};
 
     public static byte randomDirection() {
-        byte[] b = new byte[1];
-        new Random().nextBytes(b);
-        return b[0];
+        return (byte)new Random().nextInt(5);
     }
 }

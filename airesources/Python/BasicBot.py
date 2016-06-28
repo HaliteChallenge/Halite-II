@@ -14,7 +14,7 @@ while True:
 			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
 				direction = random.randint(0, 5)
-				if site.strength < 100*site.production:
+				if site.strength < 5*site.production:
 					direction = STILL
 				else:
 					for d in CARDINALS:

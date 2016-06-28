@@ -22,7 +22,7 @@ public class BasicBot
 					Site site = gameMap.contents.get(y).get(x);
 					if(site.owner == playerTag) {
 						byte moveDirection = Direction.randomDirection();
-						if(site.strength < site.production*10) {
+						if(site.strength < site.production*5) {
 							moveDirection = Direction.STILL;
 						} else {
 							for(byte d : Direction.CARDINALS) {
