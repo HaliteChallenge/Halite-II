@@ -7,6 +7,7 @@
 #include <set>
 #include <queue>
 #include <iostream>
+#include <assert.h>
 #include <algorithm>
 
 #include "hlt.hpp"
@@ -23,9 +24,14 @@ private:
 	unsigned short number_of_players;
 	float defense_bonus;
 
+	//Rendering values to remember generally
+	signed short x_offset, y_offset, map_width, map_height;
+
 	//Map rendering
 	GLuint map_vertex_buffer, map_color_buffer, map_strength_buffer, map_vertex_attributes, map_vertex_shader, map_geometry_shader, map_fragment_shader, map_shader_program;
-	signed short map_x_offset, map_y_offset, map_width, map_height;
+
+	//Production rendering
+	GLuint production_vertex_buffer, production_color_buffer, production_vertex_attributes, production_vertex_shader, production_geometry_shader, production_fragment_shader, production_shader_program;
 
 	//Graph rendering
 	GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
@@ -43,8 +49,11 @@ private:
 	GLuint border_vertex_buffer, border_vertex_attributes, border_vertex_shader, border_fragment_shader, border_shader_program;
 
 	//void loadColorCodes(std::string s);
+	void setOffset(signed short xOffset, signed short yOffset);
 	void setupMapGL();
-	void setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset);
+	void setupMapRendering();
+	void setupProductionGL();
+	void setupProductionRendering(const hlt::Map & map);
 	void setupGraphGL();
 	void setupGraphRendering(float zoom, short turnNumber);
 	void setupBorders();
@@ -53,7 +62,7 @@ public:
     Halite();
 	short input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height);
 	bool isValid(std::string filename);
-	void render(GLFWwindow * window, short& turnNumber, float zoom, float mouseX, float mouseY, bool mousePress, short xOffset, short yOffset);
+	void render(GLFWwindow * window, short& turnNumber, float zoom, float mouseX, float mouseY, bool tab, bool mousePress, short xOffset, short yOffset);
 	std::map<unsigned char, Color> getColorCodes();
 	void recreateGL();
 	~Halite();

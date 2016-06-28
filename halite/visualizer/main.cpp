@@ -29,10 +29,9 @@ void setFullscreen();
 void renderLaunch();
 
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true;
-float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY;
-short numTurns, xOffset = 0, yOffset = 0;
-int windowedWidth, windowedHeight;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true, tabPressed = false;
+float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
+int windowedWidth, windowedHeight, numTurns;
 
 std::string filename;
 std::fstream debug;
@@ -119,7 +118,7 @@ int main(int argc, const char ** argv)
 		c = clock();
 
 		short turnNumberS = turnNumber;
-		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, mousePressed, xOffset, yOffset);
+		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, tabPressed, mousePressed, xOffset, yOffset);
 		if(abs(turnNumber - float(turnNumberS) >= 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
 
 		//Poll events
@@ -138,13 +137,13 @@ int main(int argc, const char ** argv)
 			if(shiftPressed) turnNumber += 5 * maxFps * delta;
 			else turnNumber += maxFps * delta;
 		}
-		else if(!isPaused) turnNumber += maxFps * delta;
+		else if(!isPaused && !tabPressed) turnNumber += maxFps * delta;
 		if(turnNumber < 0) turnNumber = 0;
 
-		if(wPressed) yOffset--;
-		if(aPressed) xOffset++;
-		if(sPressed) yOffset++;
-		if(dPressed) xOffset--;
+		if(wPressed) yOffset -= 0.25;
+		if(aPressed) xOffset += 0.25;
+		if(sPressed) yOffset += 0.25;
+		if(dPressed) xOffset -= 0.25;
 	}
 
 	return EXIT_SUCCESS;
@@ -315,6 +314,14 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
 	else if(key == GLFW_KEY_D && action == GLFW_RELEASE)
 	{
 		dPressed = false;
+	}
+	else if(key == GLFW_KEY_TAB && action == GLFW_PRESS)
+	{
+		tabPressed = true;
+	}
+	else if(key == GLFW_KEY_TAB && action == GLFW_RELEASE)
+	{
+		tabPressed = false;
 	}
 	else if(key == GLFW_KEY_ESCAPE)
 	{

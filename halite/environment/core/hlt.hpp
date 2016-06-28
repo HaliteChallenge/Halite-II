@@ -122,6 +122,7 @@ public:
 				for(int c = 0; c < ch; c++) {
 					for(int d = 0; d < cw; d++) {
 						contents[a * ch + c][b * cw + d].production = round(chunk[c][d]); //Set production values.
+						contents[a * ch + c][b * cw + d].strength = 8 * ((urd(prg) / 2) + 0.75) * round(chunk[c][d]);
 					}
 				}
 				contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.

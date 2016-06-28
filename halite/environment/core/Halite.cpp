@@ -106,9 +106,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			}
 
 			//Erase from the game map so that the player can't make another move with the same piece.
-			//Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems.
-			//This also means that one can have at most 254 players.
-			game_map.getSite(b->loc, STILL).owner = 255;
+			game_map.getSite(b->loc, STILL).owner = 0;
+			game_map.getSite(b->loc, STILL).strength = 0;
 		}
 	}
 
@@ -116,7 +115,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).owner != 0 && game_map.getSite(l, STILL).owner != 255)
+		if(game_map.getSite(l, STILL).owner != 0)
 		{
 			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
 				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
@@ -132,16 +131,20 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			{
 				pieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
 			}
+			//Erase from game map.
+			game_map.getSite(l, STILL).owner = 0;
+			game_map.getSite(l, STILL).strength = 0;
 		}
 	}
 
-	std::vector< std::map<hlt::Location, float> > toInjure(number_of_players);
+	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players);
+	std::vector< std::vector<unsigned short> > injureMap(game_map.map_height, std::vector<unsigned short>(game_map.map_width, 0));
 
 	//Sweep through locations and find the correct damage for each piece. Start by applying damage within only the active strengths.
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l) && pieces[c][l] > 0)
+		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l))
 		{
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
 			{
@@ -186,6 +189,12 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 			}
+			if(game_map.getSite(l, STILL).strength > 0)
+			{
+				if(toInjure[c].count(l)) toInjure[c][l] += game_map.getSite(l, STILL).strength;
+				else toInjure[c].insert(std::pair<hlt::Location, unsigned short>(l, game_map.getSite(l, STILL).strength));
+				injureMap[l.y][l.x] += pieces[c][l];
+			}
 		}
 	}
 
@@ -200,10 +209,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	//Clear the map (everything to { 0, 0 })
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		b->strength = 0;
-		b->owner = 0;
+	//Apply damage to map pieces.
+	for(int a = 0; a < game_map.map_height; a++) for(int b = 0; b < game_map.map_width; b++) {
+		if(game_map.contents[a][b].strength < injureMap[a][b]) game_map.contents[a][b].strength = 0;
+		else game_map.contents[a][b].strength -= injureMap[a][b];
+		game_map.contents[a][b].owner = 0;
 	}
 
 	//Add pieces back into the map.
