@@ -60,5 +60,10 @@ body {
 .arrow {
 	height: 16px;
 	width: 16px;
-	cursor: hand;
+	cursor: pointer;
+}
+
+.file-icon {
+	height: 16px;
+	width: 16px;
 }

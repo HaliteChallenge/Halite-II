@@ -50,7 +50,7 @@ $(function() {
 				var opponent = this.games[a].users[0].userID == this.user.userID ? this.games[a].users[1] : this.games[a].users[0];
 				var gameResult = opponent.rank === "0" ? "Lost" : "Won";
 
-				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td><a gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"' target='_blank' href='../storage/replays/"+this.games[a].replayName+"'>"+gameResult+"</a></td><td></td></tr>");
+				this.$parentField.append("<tr class='gameRow'><td></td><td>vs "+opponent.username+"</td><td>"+opponent.language+"</td><td>"+gameResult+"</td><td><a gameID='"+this.games[a].gameID+"' class='gameLink"+this.user.userID+"' target='_blank' href='../storage/replays/"+this.games[a].replayName+"'><img class='file-icon' src='assets/file.png'></a></td></tr>");
 			}
 		};
 		this.toggle = function() {
