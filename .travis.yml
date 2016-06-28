@@ -26,7 +26,6 @@ install:
   - yes | unzip glfw-3.2.zip -d glfw
   - cd glfw/glfw-3.2
   - cmake -G "Unix Makefiles"
-  - "Ready to build glfw3"
   
   - sudo make
   - sudo make install
