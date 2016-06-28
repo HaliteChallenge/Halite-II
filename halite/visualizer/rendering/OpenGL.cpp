@@ -19,10 +19,10 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	in.seekg(0, std::ios::end);
 	int length = in.tellg();
 	in.seekg(0, std::ios::beg);
-	char * file = new char[length];
+	char * file = new GLchar[length];
 	in.read(file, length);
 	in.close();
-	glShaderSource(shader, 1, &file, &length);
+	glShaderSource(shader, 1, (const char **)&file, &length);
 	glCompileShader(shader);
 	delete[] file;
 	//Check for proper compilation:
