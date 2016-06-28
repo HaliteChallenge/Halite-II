@@ -48,8 +48,8 @@ namespace hlt
 		}
 		void getStatistics()
 		{
-			territory_count = std::vector<unsigned int>(254, 0);
-			strength_count = std::vector<unsigned int>(254, 0);
+			territory_count = std::vector<unsigned int>(255, 0);
+			strength_count = std::vector<unsigned int>(255, 0);
 			for(unsigned short a = 0; a < map_height; a++) for(unsigned short b = 0; b < map_width; b++) if(contents[a][b].owner != 0)
 			{
 				territory_count[contents[a][b].owner - 1]++;
@@ -62,6 +62,12 @@ namespace hlt
 			}
 			territory_count.shrink_to_fit();
 			strength_count.shrink_to_fit();
+		}
+		bool isAlive(int tag)
+		{
+			if(tag >= territory_count.size()) return false;
+			if(territory_count[tag] == 0) return false;
+			return true;
 		}
 	};
 }

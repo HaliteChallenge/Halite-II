@@ -423,12 +423,12 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 7" << F_NEWLINE;
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
+	gameFile << "HLT 8" << F_NEWLINE;
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
+		gameFile << player_names[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
@@ -443,7 +443,7 @@ void Halite::output(std::string filename)
 std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	const int maxTurnNumber = game-map.map_width * game_map.map_height;
+	const int maxTurnNumber = game_map.map_width * game_map.map_height;
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber)
 	{
 		//Increment turn number:

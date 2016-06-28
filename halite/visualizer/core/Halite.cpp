@@ -239,12 +239,22 @@ void Halite::setupProductionRendering(const hlt::Map & map)
 		colors[loc] = float(b->production) / maxProduction;
 		loc++;
 	}
+	std::cout << production_color_buffer << "\n";
+	std::cout.flush();
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, production_color_buffer);
+	std::cout << "I made it here!\n";
+	std::cout.flush();
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
+	std::cout << "I made it here!\n";
+	std::cout.flush();
 	glEnableVertexAttribArray(1);
+	std::cout << "I made it here!\n";
+	std::cout.flush();
 	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	std::cout << "I made it here!\n";
+	std::cout.flush();
 }
 
 void Halite::setupGraphGL()
@@ -422,7 +432,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
-void Halite::setupBorders()
+void Halite::setupBorders(short turnNumber)
 {
 	glDeleteBuffers(1, &border_vertex_buffer);
 	glDeleteVertexArrays(1, &border_vertex_attributes);
@@ -451,7 +461,7 @@ void Halite::setupBorders()
 	borderBufferValues[28] = MAP_LEFT; borderBufferValues[29] = MAP_TOP; borderBufferValues[30] = MAP_LEFT; borderBufferValues[31] = MAP_BOTTOM; borderBufferValues[32] = MAP_RIGHT; borderBufferValues[33] = MAP_BOTTOM; borderBufferValues[34] = MAP_RIGHT; borderBufferValues[35] = MAP_TOP; borderBufferValues[36] = MAP_LEFT; borderBufferValues[37] = MAP_TOP;
 
 	//Create stat borders:
-	float statBottom = STAT_TOP - ((number_of_players * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	float statBottom = STAT_TOP - ((std::count(players_alive[turnNumber].begin(), players_alive[turnNumber].end(), true) * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	borderBufferValues[38] = STAT_LEFT; borderBufferValues[39] = statBottom; borderBufferValues[40] = STAT_RIGHT; borderBufferValues[41] = statBottom; borderBufferValues[42] = STAT_RIGHT; borderBufferValues[43] = statTop; borderBufferValues[44] = STAT_LEFT; borderBufferValues[45] = statTop; borderBufferValues[46] = STAT_LEFT; borderBufferValues[47] = statBottom;
 
@@ -509,8 +519,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 7") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 8") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	present_file = filename;
 	//Clear previous game
@@ -557,16 +567,15 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	int numLines;
 	m.map_width = 0;
 	m.map_height = 0;
-	game_file >> width >> height >> defense_bonus >> number_of_players >> numLines;
+	game_file >> width >> height >> number_of_players >> numLines;
 	m.map_width = width;
 	map_width = width;
 	m.map_height = height;
 	map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
-	player_scores.resize(numLines);
-	for(int a = 0; a < numLines; a++) player_scores[a] = new std::vector<int>(number_of_players);
-	for(int a = 0; a < number_of_players; a++) (*player_scores[0])[a] = 1;
+	players_alive.resize(numLines);
+	for(int a = 0; a < numLines; a++) players_alive[a] = std::vector<bool>(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		player_names[a].first = "";
@@ -577,7 +586,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			if(c == ' ') break;
 			player_names[a].first += c;
 		}
-		game_file >> (*player_scores[numLines - 1])[a];
 
 		Color color;
 		game_file >> color.r >> color.g >> color.b;
@@ -637,10 +645,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		//Add game map to full game
 		full_game.push_back(new hlt::Map(m));
 
-		if(a < numLines - 1 && a > 0)
-		{
-			for(int b = 0; b < number_of_players; b++) b < m.territory_count.size() ? (*player_scores[a])[b] = (*player_scores[a - 1])[b] + m.territory_count[b] : (*player_scores[a])[b] = (*player_scores[a - 1])[b];
-		}
+		for(int b = 0; b < number_of_players; b++) players_alive[a][b] = m.isAlive(b);
 
 		//Render the loading bar:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -666,6 +671,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
 
+	//Create GL for rendering now.
 	recreateGL();
 
 	game_file.close();
@@ -679,7 +685,7 @@ bool Halite::isValid(std::string filename)
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 	std::string format; std::getline(game_file, format);
-	if(format != "HLT 7") return false;
+	if(format != "HLT 8") return false;
 	return true;
 }
 
@@ -691,13 +697,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 	if(!full_game.empty())
 	{
 		//Put the names in their places.
-		std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, (*player_scores[turnNumber])[a] };
-		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
 		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-		for(int a = 0; a < number_of_players; a++)
+		for(int a = 0; a < number_of_players; a++) if(players_alive[turnNumber][a])
 		{
-			player_names[playerScoresCpy[a].first].second = statPos;
+			player_names[a].second = statPos;
 			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
 		}
 		statPos += NAME_TEXT_OFFSET;
@@ -712,7 +715,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
 		strength_graph_top = strength_graph_bottom + graphHeight;
 		territory_graph_bottom = territory_graph_top - graphHeight;
-		setupBorders();
+		setupBorders(turnNumber);
 
 		//Set window for rendering.
 		glfwMakeContextCurrent(window);
@@ -855,10 +858,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		if(labelText != "") util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:
-		for(int a = 0; a < number_of_players; a++)
+		for(int a = 0; a < number_of_players; a++) if(players_alive[turnNumber][a])
 		{
 			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
-			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
+			//util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
 		}
 
 		//util::renderAllText(window);
@@ -879,12 +882,14 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 void Halite::recreateGL()
 {
-	setupBorders();
+	setupBorders(0);
 	setupMapGL();
 	setupMapRendering();
 	setupProductionGL();
 	assert(!full_game.empty()); //Ensures that we cleanly abort if we try to recreate the production rendering without an existant map.
 	setupProductionRendering(*full_game[0]);
+	std::cout << "I made it here!\n";
+	std::cout.flush();
 	setupGraphGL();
 	setupGraphRendering(1, 0);
 }
