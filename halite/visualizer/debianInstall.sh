@@ -8,7 +8,7 @@ sudo apt-get install -y software-properties-common
 sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
 sudo apt-get update -qq
 sudo apt-get install -y cmake
-sudo apt-get upgrade -qq
+sudo apt-get upgrade -y -qq
 sudo apt-get install -y xorg-dev libglu1-mesa-dev
 sudo apt-get build-dep -y glfw3
 sudo apt-get build-dep -y glfw
