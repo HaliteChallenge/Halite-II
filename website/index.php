@@ -91,7 +91,13 @@
 							<h3 class="panel-title">Problem</h3>
 						</div>
 						<div class="panel-body" id="rulesPanelBody">
-							<p><b>Download the starter package <a href="../StarterPackage.zip">here</a></b></p>
+							<h3>Downloads</h3>
+								<ul>
+									<li><a href="downloads/StarterPackages.zip">Starter Packages</a></li>
+									<li><a href="downloads/MacOSX.zip">Mac Environment and Visualizer</a></li>
+									<li><a href="downloads/Debian.zip">Debian Environment and Visualizer</a></li>
+									<li><b>Pending:</b> Windows Environment and Visualizer</li>
+								</ul>
 
 							<h3>Overview</h3>
 
@@ -101,7 +107,7 @@
 
 							<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, two things will happen to it:
 								<ul>
-							 		<li>It will permanently increase its Strength by one.</li>
+									 <li>It will permanently increase its Strength by one.</li>
 									<li>It will receive, for the duration of that turn, a temporary strength boost.</li>
 								</ul>
 							</p>
@@ -116,9 +122,9 @@
 
 							<p>The game ends if one of two conditions are met:
 								<ul>
-							 		<li>Only one player is left.</li>
-							 		<li>A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a large map may take up to thousands.</li>
-							 	</ul>
+									 <li>Only one player is left.</li>
+									 <li>A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a large map may take up to thousands.</li>
+								 </ul>
 							 </p>
 						</div>
 					</div>
