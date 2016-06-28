@@ -29,6 +29,9 @@ install:
   
   - sudo make
   - sudo make install
+  
+  - cd ../../../../
+  
   - export CXX="g++-4.8"
 
 script:
