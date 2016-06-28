@@ -102,7 +102,7 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
+	std::string filename = "Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	std::vector<unsigned char> rankings = my_game->runGame();
 
@@ -112,7 +112,7 @@ int main(int argc, char* args[])
 	}
 	catch(std::runtime_error e)
 	{
-		filename = filename.substr(11);
+		filename = filename.substr(8);
 		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename << std::endl;
 		my_game->output(filename);
 	}
