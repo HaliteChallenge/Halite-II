@@ -21,27 +21,62 @@
 
 				<h3>Game Description</h3>
 
-				<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, two things will happen to it:
-					<ul>
-				 		<li>It will permanently increase its Strength by one.</li>
-						<li>It will receive, for the duration of that turn, a temporary strength boost.</li>
-					</ul>
-				</p>
+				<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, it will permanently increase its Strength by the Production of the tile it sits on.</li>
 
 				<p>Players gain pieces by simply moving their own pieces over Sites on the map. When a piece moves off of a Site, it leaves behind a piece with an identical Owner and with a Strength of 0, in doing so expanding the size of their territory.</p>
 
-				<p>When pieces from the same player try to occupy the same site, the resultant piece has the sum of their strengths. Real strengths are capped at 255 (although strength boosts can push strengths above that). When pieces from opposing players try to occupy either the same or adjacent sites, the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the Strength of every adjacent or coinciding opposing piece by its own Strength. Pieces with a strength of 0 or less are removed from the game, excepting those which have not been in combat during that turn.</p>
+				<p>When pieces from the same player try to occupy the same site, the resultant piece has the sum of their strengths. Strengths are capped at 255, so if two pieces with a strength of 150 were to both attempt to occupy the same square, the resultant piece would still have a strength of 255. When pieces from opposing players try to occupy either the same or adjacent sites, the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the Strength of every adjacent or coinciding opposing piece by its own Strength. Pieces with a strength of 0 or less are removed from the game, excepting pieces with a strength of 0 which have not engaged in combat during that turn.</p>
 
-				<p>Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and opposing pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).</p>
+				<p>The map is initialized by the environment to have productions and strengths. Combat with map squares works identically to combat with other players except only applies on that square; empty map squares neither apply damage to nor take damage from adjacent squares. Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).</p>
 
-				<p>Throughout the game, scores are calculated as a sum of all territory that each player has controlled throughout the game. Players which survive until the end of the game receive a 2x bonus to their score. Scores are calculated purely for ranking players in games (i.e. First, Second, Third place...).</p>
+				<p>Players are scored according to the reverse of the order in which they are destroyed. The player last standing wins, whereas the player which was destroyed first comes in last. Bots are scored relatively; in a game with many players it is far better to come in second than to come in last.</p>
 
 				<p>The game ends if one of two conditions are met:
 					<ul>
-				 		<li>Only one player is left.</li>
-				 		<li>A certain number of terms has been reached. This number will vary depending on the size of the map in question; a small map may end after a hundred moves or so, whereas a large map may take up to thousands.</li>
+				 		<li>Only one player has any pieces left.</li>
+				 		<li>A certain number of turns has been reached. This number will vary depending on the size of the map in question; a small map may end after a few hundred turns, whereas a large map may take up many thousands.</li>
 				 	</ul>
 				</p>
+
+				<p>The number of turns is generally given to be high enough that only the best-matched of bots will reach the turn limit; the vast majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are deem to have tied within the game.</p>
+
+				<h3>Game Specification</h3>
+
+				<h4>Initialization</h4>
+
+				<p>At the start of the game, each bot is sent some information (accessed using getInit in the starter packages):
+					<ul>
+				 		<li>Their own tag within the map - that is, which player they are.</li>
+				 		<li>The initial map state.</li>
+				 	</ul>
+				</p>
+
+				<p>Bots are given three seconds at the start of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, and/or planning the bot's initial expansion strategy. Once bots are done initializing (before their three seconds are up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
+
+				<h4>Turns</h4>
+
+				<p>After all bots have finished setting up, the environment will do the following until endgame conditions are met.
+					<ol>
+				 		<li>Send the present gamestate - map and messages - to all players.</li>
+				 		<li>Receive moves from the players.</li>
+				 		<li>Add strength to pieces which choose to remain where they are.</li>
+				 		<li>Simultaneously move all player's pieces.</li>
+				 		<li>Simultaneously damage (and remove if damage exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
+				 		<li>Check if endgame conditions have been met.</li>
+				 	</ol>
+				</p>
+
+				<h4>Maps</h4>
+
+				<p>Maps are randomly generated at the start of each game. The generator does the following:
+					<ol>
+				 		<li>Try to match the given width and height as closely as it can while still creating a symmetric map. Maps are guaranteed to be the given size or smaller in each dimension; never larger.</li>
+				 		<li>Try to create interesting maps in which there are patches of high production squares and patches of low production squares, with fairly low noise on the small scale.</li>
+				 		<li>Try to relatively match the production of tiles on the map with their starting strengths. That is, a square with a production of 3 will likely not have a strength of 3, but rather will usually have a higher strength than a tile with a production of 2 and a lower strength than a tile with a production of 4.</li>
+				 		<li>Always creates symmetric maps. Specifically, the generator generates a chunk of the map and then tesselates it to produce the entire map.</li>
+				 	</ol>
+				</p>
+
 			</div>
 		</div>
 	</div>
