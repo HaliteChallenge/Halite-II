@@ -6,6 +6,7 @@
 #include "GLFW/glfw3.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -14,8 +15,8 @@
 #include <map>
 #include <algorithm>
 #include <time.h>
-#include "ft2build.h"
-#include "freetype/freetype.h"
+#include "freetype2/ft2build.h"
+#include "freetype2/freetype/freetype.h"
 
 //Color struct.
 struct Color

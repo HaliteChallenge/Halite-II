@@ -15,7 +15,7 @@ bool allArgumentsPresent(int argc, char* args[])
 	auto is_number = [](const std::string& s)
 	{
 		return !s.empty() && std::find_if(s.begin(),
-			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
 	if(argc == 1) return false;
 	//Remember, the executable name counts as an argument
@@ -102,9 +102,9 @@ int main(int argc, char* args[])
 
 		my_game = new Halite(mapWidth, mapHeight);
 	}
-	std::string filename = "../Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
+	std::string filename = "Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
-	std::vector< std::pair<unsigned char, unsigned int> > rankings = my_game->runGame();
+	std::vector<unsigned char> rankings = my_game->runGame();
 
 	try
 	{
@@ -112,24 +112,24 @@ int main(int argc, char* args[])
 	}
 	catch(std::runtime_error e)
 	{
-		filename = filename.substr(11);
+		filename = filename.substr(8);
 		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename << std::endl;
 		my_game->output(filename);
 	}
 
 	std::string victoryOut;
-	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a].first) + " named " + my_game->getName(rankings[a].first) + " with a score of " + std::to_string(rankings[a].second) + "\n";
+	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a]) + " named " + my_game->getName(rankings[a]) + "\n";
 	else {
 		std::cout << filename << std::endl;
-		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a].first) + ' ';
+		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a]) + ' ';
 	}
 	std::cout << victoryOut;
 
-  	delete my_game;
+	delete my_game;
 
-	if(!program_output_style) {
-		std::cout << "Press enter to continue:";
-		getchar();
-	}
-	return 0;
+	/*if(!program_output_style) {
+	std::cout << "Press enter to continue:";
+	getchar();
+}*/
+return 0;
 }

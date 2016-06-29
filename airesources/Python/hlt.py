@@ -7,6 +7,9 @@ EAST = 2
 SOUTH = 3
 WEST = 4
 
+DIRECTIONS = [a for a in range(0, 5)]
+CARDINALS = [a for a in range(1, 5)]
+
 ATTACK = 0
 STOP_ATTACK = 1
 
@@ -42,10 +45,10 @@ class Map:
 				row.append(Site(0, 0, 0))
 			self.contents.append(row)
 
-	def inBounds(l):
+	def inBounds(self, l):
 		return l.x < self.map_width and l.y < self.map_height
 
-	def getDistance(l1, l2):
+	def getDistance(self, l1, l2):
 		dx = math.abs(l1.x - l2.x)
 		dy = math.abs(l1.y - l2.y)
 		if dx > self.map_width / 2:
@@ -54,7 +57,7 @@ class Map:
 			dy = self.map_height - dy
 		return math.sqrt((dx*dx) + (dy*dy))
 
-	def getAngle(l1, l2):
+	def getAngle(self, l1, l2):
 		dx = l2.x - l1.x
 		dy = l2.y - l1.y
 
@@ -69,7 +72,7 @@ class Map:
 			dy += self.map_height
 		return math.atan2(dy, dx)
 
-	def getLocation(l, direction):
+	def getLocation(self, l, direction):
 		if direction != STILL:
 			if direction == NORTH:
 				if l.y == 0:
@@ -92,6 +95,6 @@ class Map:
 				else:
 					l.x -= 1
 		return l
-	def getSite(l, direction):
-		l = getLocation(l, direction)
+	def getSite(self, l, direction):
+		l = self.getLocation(l, direction)
 		return self.contents[l.y][l.x]

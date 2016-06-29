@@ -16,6 +16,19 @@ const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.
 
 //Private Functions ------------------
 
+void Halite::setOffset(signed short xOffset, signed short yOffset)
+{
+	bool mustRedo = xOffset != x_offset || yOffset != y_offset;
+	x_offset = xOffset;
+	y_offset = yOffset;
+	if(mustRedo)
+	{
+		setupMapRendering();
+		assert(!full_game.empty());
+		setupProductionRendering(*full_game.front());
+	}
+}
+
 void Halite::setupMapGL()
 {
 	//Delete buffers and vaos
@@ -36,11 +49,11 @@ void Halite::setupMapGL()
 
 	//Setup shaders:
 	map_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	util::shaderFromFile(map_vertex_shader, "shaders/map/vertex.glsl", "map_vertex_shader");
+	util::shaderFromFile(map_vertex_shader, "shaders/map/vertex.glsl", "Map Vertex Shader");
 	map_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
-	util::shaderFromFile(map_geometry_shader, "shaders/map/geometry.glsl", "map_geometry_shader");
+	util::shaderFromFile(map_geometry_shader, "shaders/map/geometry.glsl", "Map Geometry Shader");
 	map_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	util::shaderFromFile(map_fragment_shader, "shaders/map/fragment.glsl", "map_fragment_shader");
+	util::shaderFromFile(map_fragment_shader, "shaders/map/fragment.glsl", "Map Fragment Shader");
 
 	//Setup shader program:
 	map_shader_program = glCreateProgram();
@@ -65,19 +78,16 @@ void Halite::setupMapGL()
 	glDeleteShader(map_fragment_shader);
 }
 
-void Halite::setupMapRendering(unsigned short width, unsigned short height, signed short xOffset, signed short yOffset)
+void Halite::setupMapRendering()
 {
-	map_y_offset = yOffset;
-	map_x_offset = xOffset;
-
 	//Generate vertices of centers of squares.
-	std::vector<float> vertexLocations((unsigned int)width * height * 2); //2 because there are x and y values for every vertex.
-	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * height), dX = (MAP_RIGHT - MAP_LEFT) / width, dY = (MAP_TOP - MAP_BOTTOM) / height;
-	xLoc += xOffset * dX;
+	std::vector<float> vertexLocations((unsigned int)map_width * map_height * 2); //2 because there are x and y values for every vertex.
+	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * map_height), dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
+	xLoc += x_offset * dX;
 	while(xLoc > MAP_RIGHT) xLoc -= (MAP_RIGHT - MAP_LEFT);
 	while(xLoc < MAP_LEFT) xLoc += (MAP_RIGHT - MAP_LEFT);
 	const float initialXLoc = xLoc;
-	yLoc += yOffset * dY;
+	yLoc += y_offset * dY;
 	while(yLoc > MAP_TOP) yLoc -= (MAP_TOP - MAP_BOTTOM);
 	while(yLoc < MAP_BOTTOM) yLoc += (MAP_TOP - MAP_BOTTOM);
 	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
@@ -88,14 +98,14 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 		xLoc += dX;
 		if(xLoc > MAP_RIGHT)
 		{
-			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * width);
+			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width);
 		}
 		if(fabs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
 		{
 			yLoc -= dY;
 			if(yLoc < MAP_BOTTOM)
 			{
-				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * height);
+				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * map_height);
 			}
 		}
 	}
@@ -110,7 +120,7 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors((unsigned int)width * height * 3); //r, g, and b components.
+	std::vector<float> colors((unsigned int)map_width * map_height * 3); //r, g, and b components.
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
@@ -119,13 +129,122 @@ void Halite::setupMapRendering(unsigned short width, unsigned short height, sign
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<unsigned int> strengths((unsigned int)width * height, 0); //r, g, and b components.
+	std::vector<unsigned int> strengths((unsigned int)map_width * map_height, 0); //r, g, and b components.
 
 	//Setup strength buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
 	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
+}
+
+void Halite::setupProductionGL()
+{
+	//Delete buffers and vaos
+	glDeleteBuffers(1, &production_vertex_buffer);
+	glDeleteBuffers(1, &production_color_buffer);
+	glDeleteVertexArrays(1, &production_vertex_attributes);
+	//Ensure that shaders are deleted:
+	glDeleteShader(production_vertex_shader);
+	glDeleteShader(production_geometry_shader);
+	glDeleteShader(production_fragment_shader);
+	glDeleteProgram(production_shader_program);
+	//Generate buffers and vaos.
+	glGenBuffers(1, &production_vertex_buffer);
+	glGenBuffers(1, &production_color_buffer);
+	glGenVertexArrays(1, &production_vertex_attributes);
+
+	//Setup shaders:
+	production_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	util::shaderFromFile(production_vertex_shader, "shaders/production/vertex.glsl", "Production Vertex Shader");
+	production_geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+	util::shaderFromFile(production_geometry_shader, "shaders/production/geometry.glsl", "Production Geometry Shader");
+	production_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	util::shaderFromFile(production_fragment_shader, "shaders/production/fragment.glsl", "Production Fragment Shader");
+
+	//Setup shader program:
+	production_shader_program = glCreateProgram();
+	glAttachShader(production_shader_program, production_vertex_shader);
+	glAttachShader(production_shader_program, production_geometry_shader);
+	glAttachShader(production_shader_program, production_fragment_shader);
+	glLinkProgram(production_shader_program);
+	glDetachShader(production_shader_program, production_vertex_shader);
+	glDetachShader(production_shader_program, production_geometry_shader);
+	glDetachShader(production_shader_program, production_fragment_shader);
+
+	//Set uniforms:
+	glUseProgram(production_shader_program);
+	const float SPACE_FACTOR = 0.8;
+	GLint widthLoc = glGetUniformLocation(production_shader_program, "width"), heightLoc = glGetUniformLocation(production_shader_program, "height");
+	glUniform1f(widthLoc, (MAP_RIGHT - MAP_LEFT) * SPACE_FACTOR * 0.5 / map_width); //Note: eventually distinguish map size from production size.
+	glUniform1f(heightLoc, (MAP_TOP - MAP_BOTTOM) * SPACE_FACTOR * 0.5 / map_height);
+
+	//Cleanup - delete shaders
+	glDeleteShader(production_vertex_shader);
+	glDeleteShader(production_geometry_shader);
+	glDeleteShader(production_fragment_shader);
+}
+
+void Halite::setupProductionRendering(const hlt::Map & map)
+{
+	//Generate vertices of centers of squares.
+	std::vector<float> vertexLocations((unsigned int)map_width * map_height * 2); //2 because there are x and y values for every vertex.
+	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * map_height), dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
+	xLoc += x_offset * dX;
+	while(xLoc > MAP_RIGHT) xLoc -= (MAP_RIGHT - MAP_LEFT);
+	while(xLoc < MAP_LEFT) xLoc += (MAP_RIGHT - MAP_LEFT);
+	const float initialXLoc = xLoc;
+	yLoc += y_offset * dY;
+	while(yLoc > MAP_TOP) yLoc -= (MAP_TOP - MAP_BOTTOM);
+	while(yLoc < MAP_BOTTOM) yLoc += (MAP_TOP - MAP_BOTTOM);
+	for(unsigned int a = 0; a < vertexLocations.size(); a += 2)
+	{
+		vertexLocations[a] = xLoc;
+		vertexLocations[a + 1] = yLoc;
+
+		xLoc += dX;
+		if(xLoc > MAP_RIGHT)
+		{
+			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width);
+		}
+		if(fabs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
+		{
+			yLoc -= dY;
+			if(yLoc < MAP_BOTTOM)
+			{
+				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * map_height);
+			}
+		}
+	}
+
+	//Bind vertex attribute object.
+	glBindVertexArray(production_vertex_attributes);
+
+	//Setup vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, production_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, vertexLocations.size() * sizeof(float), vertexLocations.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
+	std::vector<float> colors((unsigned int)map_width * map_height); //Map to r, r, r
+
+	unsigned char maxProduction = 0;
+	for(auto a = map.contents.begin(); a != map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+		if(b->production > maxProduction) maxProduction = b->production;
+	}
+
+	int loc = 0;
+	for(auto a = map.contents.begin(); a != map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+		colors[loc] = float(b->production) / maxProduction;
+		loc++;
+	}
+
+	//Setup color buffer
+	glBindBuffer(GL_ARRAY_BUFFER, production_color_buffer);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 void Halite::setupGraphGL()
@@ -303,7 +422,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
-void Halite::setupBorders()
+void Halite::setupBorders(short turnNumber)
 {
 	glDeleteBuffers(1, &border_vertex_buffer);
 	glDeleteVertexArrays(1, &border_vertex_attributes);
@@ -332,7 +451,7 @@ void Halite::setupBorders()
 	borderBufferValues[28] = MAP_LEFT; borderBufferValues[29] = MAP_TOP; borderBufferValues[30] = MAP_LEFT; borderBufferValues[31] = MAP_BOTTOM; borderBufferValues[32] = MAP_RIGHT; borderBufferValues[33] = MAP_BOTTOM; borderBufferValues[34] = MAP_RIGHT; borderBufferValues[35] = MAP_TOP; borderBufferValues[36] = MAP_LEFT; borderBufferValues[37] = MAP_TOP;
 
 	//Create stat borders:
-	float statBottom = STAT_TOP - ((number_of_players * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
+	float statBottom = STAT_TOP - ((std::count(players_alive[turnNumber].begin(), players_alive[turnNumber].end(), true) * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	borderBufferValues[38] = STAT_LEFT; borderBufferValues[39] = statBottom; borderBufferValues[40] = STAT_RIGHT; borderBufferValues[41] = statBottom; borderBufferValues[42] = STAT_RIGHT; borderBufferValues[43] = statTop; borderBufferValues[44] = STAT_LEFT; borderBufferValues[45] = statTop; borderBufferValues[46] = STAT_LEFT; borderBufferValues[47] = statBottom;
 
@@ -373,25 +492,25 @@ void Halite::clearFullGame()
 
 Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015)
 {
-    number_of_players = 0;
-    player_names = std::vector< std::pair<std::string, float> >();
-    full_game = std::vector<hlt::Map * >();
+	number_of_players = 0;
+	player_names = std::vector< std::pair<std::string, float> >();
+	full_game = std::vector<hlt::Map * >();
 	color_codes[0] = { 0.3f, 0.3f, 0.3f };
-	map_x_offset = 0;
-	map_y_offset = 0;
+	x_offset = 0;
+	y_offset = 0;
 }
 
 short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
 {
-	std::fstream game_file;
+	std::ifstream game_file;
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
 	std::string format; std::getline(game_file, format);
-	if(format == "HLT 2" || format == "HLT 1" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 7") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") throw std::runtime_error("File format no longer supported in file " + filename);
+	else if(format != "HLT 8") throw std::runtime_error("Unrecognized format in file " + filename);
 
 	present_file = filename;
 	//Clear previous game
@@ -438,16 +557,15 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	int numLines;
 	m.map_width = 0;
 	m.map_height = 0;
-	game_file >> width >> height >> defense_bonus >> number_of_players >> numLines;
+	game_file >> width >> height >> number_of_players >> numLines;
 	m.map_width = width;
 	map_width = width;
 	m.map_height = height;
 	map_height = height;
 	std::getline(game_file, in);
 	player_names.resize(number_of_players);
-	player_scores.resize(numLines);
-	for(int a = 0; a < numLines; a++) player_scores[a] = new std::vector<int>(number_of_players);
-	for(int a = 0; a < number_of_players; a++) (*player_scores[0])[a] = 1;
+	players_alive.resize(numLines);
+	for(int a = 0; a < numLines; a++) players_alive[a] = std::vector<bool>(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		player_names[a].first = "";
@@ -458,7 +576,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			if(c == ' ') break;
 			player_names[a].first += c;
 		}
-		game_file >> (*player_scores[numLines - 1])[a];
 
 		Color color;
 		game_file >> color.r >> color.g >> color.b;
@@ -471,15 +588,21 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	//Reopen the file in binary format.
 	std::streampos pos = game_file.tellg();
-	game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
+	game_file.close();
+	game_file.open(filename, std::ios_base::in | std::ios_base::binary);
 	game_file.seekg(pos);
-	char c; //For getting characters from the file.
+	std::ostringstream game_file_stream;
+	game_file_stream << game_file.rdbuf();
+	game_file.close();
+	std::string game_file_string = game_file_stream.str();
+	int loc = 0; //For getting characters from the file.
+	auto getChar = [&]() -> char { char c = game_file_string[loc]; loc++; return c; };
 
 	//Get the productions from the next width * height characters of the file.
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		game_file.get(c); b->production = (unsigned char)c;
+		b->production = getChar();
 	}
-	game_file.get(c); //Get newline character.
+	getChar(); //Get newline character.
 
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
@@ -493,11 +616,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		int tilesSoFar = 0;
 		while(tilesSoFar < totalTiles)
 		{
-			game_file.get(c); numPieces = (unsigned char)c;
-			game_file.get(c); presentOwner = (unsigned char)c;
+			numPieces = getChar();
+			presentOwner = getChar();
 			for(short b = 0; b < numPieces; b++)
 			{
-				game_file.get(c); strength = (unsigned char)c;
+				strength = getChar();
 				if(y >= m.map_height) break;
 				m.contents[y][x].owner = presentOwner;
 				m.contents[y][x].strength = strength;
@@ -508,7 +631,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 					y++;
 				}
 			}
-			shouldLeave = game_file.eof();
+			shouldLeave = game_file_stream.eof();
 			tilesSoFar += numPieces;
 			if(tilesSoFar > totalTiles) throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
 		}
@@ -518,10 +641,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		//Add game map to full game
 		full_game.push_back(new hlt::Map(m));
 
-		if(a < numLines - 1 && a > 0)
-		{
-			for(int b = 0; b < number_of_players; b++) b < m.territory_count.size() ? (*player_scores[a])[b] = (*player_scores[a - 1])[b] + m.territory_count[b] : (*player_scores[a])[b] = (*player_scores[a - 1])[b];
-		}
+		for(int b = 0; b < number_of_players; b++) players_alive[a][b] = m.isAlive(b);
 
 		//Render the loading bar:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -547,24 +667,23 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
 
+	//Create GL for rendering now.
 	recreateGL();
-
-	game_file.close();
 
 	return numLines;
 }
 
 bool Halite::isValid(std::string filename)
 {
-	std::fstream game_file;
+	std::ifstream game_file;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 	std::string format; std::getline(game_file, format);
-	if(format != "HLT 7") return false;
+	if(format != "HLT 8") return false;
 	return true;
 }
 
-void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool mouseClick, short xOffset, short yOffset)
+void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool tab, bool mouseClick, short xOffset, short yOffset)
 {
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
@@ -572,13 +691,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 	if(!full_game.empty())
 	{
 		//Put the names in their places.
-		std::vector<std::pair<int, int>> playerScoresCpy(number_of_players);
-		for(int a = 0; a < number_of_players; a++) playerScoresCpy[a] = { a, (*player_scores[turnNumber])[a] };
-		std::sort(playerScoresCpy.begin(), playerScoresCpy.end(), [](const std::pair<int, int> & p1, const std::pair<int, int> & p2) -> bool { return p1.second > p2.second; });
 		float statPos = STAT_TOP - (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-		for(int a = 0; a < number_of_players; a++)
+		for(int a = 0; a < number_of_players; a++) if(players_alive[turnNumber][a])
 		{
-			player_names[playerScoresCpy[a].first].second = statPos;
+			player_names[a].second = statPos;
 			statPos -= NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET;
 		}
 		statPos += NAME_TEXT_OFFSET;
@@ -593,7 +709,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
 		strength_graph_top = strength_graph_bottom + graphHeight;
 		territory_graph_bottom = territory_graph_top - graphHeight;
-		setupBorders();
+		setupBorders(turnNumber);
 
 		//Set window for rendering.
 		glfwMakeContextCurrent(window);
@@ -628,18 +744,28 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			}
 		}
 
-		if(xOffset != map_x_offset || yOffset != map_y_offset) setupMapRendering(map_width, map_height, xOffset, yOffset);
+		setOffset(xOffset, yOffset);
 
-		glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
-		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
+		if(tab)
+		{
+			//Draw productions:
+			glUseProgram(production_shader_program);
+			glBindVertexArray(production_vertex_attributes);
+			glDrawArrays(GL_POINTS, 0, (unsigned int)map_width * map_height);
+		}
+		else
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
+			glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
-		glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(unsigned int), strengths.data(), GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
+			glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(unsigned int), strengths.data(), GL_DYNAMIC_DRAW);
 
-		//Draw map:
-		glUseProgram(map_shader_program);
-		glBindVertexArray(map_vertex_attributes);
-		glDrawArrays(GL_POINTS, 0, (unsigned int)m->map_width * m->map_height);
+			//Draw map:
+			glUseProgram(map_shader_program);
+			glBindVertexArray(map_vertex_attributes);
+			glDrawArrays(GL_POINTS, 0, (unsigned int)m->map_width * m->map_height);
+		}
 
 		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
 
@@ -665,9 +791,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		//Find name of replay:
 		char search = '/';
-#ifdef _WIN32
+		#ifdef _WIN32
 		search = '\\';
-#endif
+		#endif
 		auto index = std::find(present_file.begin(), present_file.end(), search); auto index2 = index;
 		while(index != present_file.end())
 		{
@@ -720,16 +846,16 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength) + " | Production: " + std::to_string(production);
 			}
-			else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
+			else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
 		}
-		else labelText = "Defense Bonus: " + std::to_string(defense_bonus);
-		util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
+		else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
+		if(labelText != "") util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:
-		for(int a = 0; a < number_of_players; a++)
+		for(int a = 0; a < number_of_players; a++) if(players_alive[turnNumber][a])
 		{
 			util::renderText(STAT_LEFT + NAME_TEXT_OFFSET, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], player_names[a].first);
-			util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
+			//util::renderText((STAT_LEFT + STAT_RIGHT) / 2, player_names[a].second, NAME_TEXT_HEIGHT * height, color_codes[a + 1], std::to_string((*player_scores[turnNumber])[a]));
 		}
 
 		//util::renderAllText(window);
@@ -750,9 +876,12 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 void Halite::recreateGL()
 {
-	setupBorders();
+	setupBorders(0);
 	setupMapGL();
-	setupMapRendering(map_width, map_height, map_x_offset, map_y_offset);
+	setupMapRendering();
+	setupProductionGL();
+	assert(!full_game.empty()); //Ensures that we cleanly abort if we try to recreate the production rendering without an existant map.
+	setupProductionRendering(*full_game[0]);
 	setupGraphGL();
 	setupGraphRendering(1, 0);
 }

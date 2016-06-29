@@ -23,9 +23,9 @@ private:
 	unsigned short turn_number;
 	float defense_bonus;
 	Networking networking;
-    std::vector<std::string> player_names;
+	std::vector<std::string> player_names;
 	std::vector<hlt::Message> pastFrameMessages;
-    std::vector< std::set<hlt::Move> > player_moves;
+	std::vector< std::set<hlt::Move> > player_moves;
 	std::vector<unsigned int> last_territory_count;
 	std::vector<unsigned int> full_territory_count;
 	hlt::Map game_map;
@@ -35,14 +35,14 @@ private:
 	std::vector<unsigned int> player_scores;
 	unsigned short number_of_players;
 
-    std::vector<bool> processNextFrame(std::vector<bool> alive);
+	std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
-    Halite(unsigned short w, unsigned short h);
+	Halite(unsigned short w, unsigned short h);
 	Halite(unsigned short width_, unsigned short height_, Networking networking_);
 
 	void init();
 	void output(std::string filename);
-	std::vector< std::pair<unsigned char, unsigned int> > runGame();
+	std::vector<unsigned char> runGame();
 	std::string getName(unsigned char playerTag);
 
 	~Halite();

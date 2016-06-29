@@ -106,9 +106,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			}
 
 			//Erase from the game map so that the player can't make another move with the same piece.
-			//Essentially, I need another number which will never be in use, and there is unlikely to ever be 255 players, so I'm utilizing 255 to ensure that there aren't problems.
-			//This also means that one can have at most 254 players.
-			game_map.getSite(b->loc, STILL).owner = 255;
+			game_map.getSite(b->loc, STILL).owner = 0;
+			game_map.getSite(b->loc, STILL).strength = 0;
 		}
 	}
 
@@ -116,7 +115,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		if(game_map.getSite(l, STILL).owner != 0 && game_map.getSite(l, STILL).owner != 255)
+		if(game_map.getSite(l, STILL).owner != 0)
 		{
 			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
 				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
@@ -132,16 +131,20 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			{
 				pieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
 			}
+			//Erase from game map.
+			game_map.getSite(l, STILL).owner = 0;
+			game_map.getSite(l, STILL).strength = 0;
 		}
 	}
 
-	std::vector< std::map<hlt::Location, float> > toInjure(number_of_players);
+	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players);
+	std::vector< std::vector<unsigned short> > injureMap(game_map.map_height, std::vector<unsigned short>(game_map.map_width, 0));
 
 	//Sweep through locations and find the correct damage for each piece. Start by applying damage within only the active strengths.
 	for(unsigned char a = 0; a != game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
-		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l) && pieces[c][l] > 0)
+		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l))
 		{
 			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
 			{
@@ -186,6 +189,12 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 			}
+			if(game_map.getSite(l, STILL).strength > 0)
+			{
+				if(toInjure[c].count(l)) toInjure[c][l] += game_map.getSite(l, STILL).strength;
+				else toInjure[c].insert(std::pair<hlt::Location, unsigned short>(l, game_map.getSite(l, STILL).strength));
+				injureMap[l.y][l.x] += pieces[c][l];
+			}
 		}
 	}
 
@@ -200,10 +209,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		}
 	}
 
-	//Clear the map (everything to { 0, 0 })
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		b->strength = 0;
-		b->owner = 0;
+	//Apply damage to map pieces.
+	for(int a = 0; a < game_map.map_height; a++) for(int b = 0; b < game_map.map_width; b++) {
+		if(game_map.contents[a][b].strength < injureMap[a][b]) game_map.contents[a][b].strength = 0;
+		else game_map.contents[a][b].strength -= injureMap[a][b];
+		game_map.contents[a][b].owner = 0;
 	}
 
 	//Add pieces back into the map.
@@ -305,7 +315,7 @@ Halite::Halite(unsigned short w, unsigned short h)
 		number_of_players++;
 	}
 
-		//Initialize map
+	//Initialize map
 	game_map = hlt::Map(w, h, number_of_players);
 
 	//Perform initialization not specific to constructor
@@ -357,7 +367,7 @@ void Halite::init()
 
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
-	if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
+	// TEMP DEFENSE BONUS REMOVAL: if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
@@ -390,20 +400,20 @@ void Halite::init()
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
 
-		//Send initial package
-		std::vector< std::future<bool> > initThreads(number_of_players);
-		for(unsigned char a = 0; a < number_of_players; a++)
+	//Send initial package
+	std::vector< std::future<bool> > initThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+	}
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		bool success = initThreads[a].get();
+		if (!success)
 		{
-			initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+			networking.killPlayer(a + 1);
 		}
-		for(unsigned char a = 0; a < number_of_players; a++)
-		{
-			bool success = initThreads[a].get();
-			if (!success)
-			{
-				networking.killPlayer(a + 1);
-			}
-		}
+	}
 }
 
 void Halite::output(std::string filename)
@@ -413,12 +423,12 @@ void Halite::output(std::string filename)
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 7" << F_NEWLINE;
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << defense_bonus << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
+	gameFile << "HLT 8" << F_NEWLINE;
+	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << ' ' << player_scores[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
+		gameFile << player_names[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
 	}
 	gameFile.close();
 	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
@@ -430,24 +440,28 @@ void Halite::output(std::string filename)
 	gameFile.close();
 }
 
-std::vector< std::pair<unsigned char, unsigned int> > Halite::runGame()
+std::vector<unsigned char> Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	while(std::count(result.begin(), result.end(), true) > 1 && turn_number <= 200)
+	std::vector<unsigned char> answer;
+	const int maxTurnNumber = game_map.map_width * game_map.map_height;
+	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber)
 	{
 		//Increment turn number:
 		turn_number++;
 		if(!program_output_style) std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
-		result = processNextFrame(result);
+		std::vector<bool> newResult = processNextFrame(result);
+		//Add to vector of players that should be dead.
+		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a])
+		{
+			answer.push_back(a + 1);
+		}
+		result = newResult;
 	}
-
-	player_scores = std::vector<unsigned int>(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) player_scores[a] = result[a] ? 2 * full_territory_count[a] : full_territory_count[a];
-	std::vector< std::pair<unsigned char, unsigned int> > results(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) results[a] = { a + 1, player_scores[a] };
-	std::sort(results.begin(), results.end(), [](const std::pair<unsigned char, unsigned int> & a, const std::pair<unsigned char, unsigned int> & b) -> bool { return a.second > b.second; });
-	return results;
+	for(int a = 0; a < result.size(); a++) if(result[a]) answer.push_back(a + 1);
+	std::reverse(answer.begin(), answer.end());
+	return answer;
 }
 
 std::string Halite::getName(unsigned char playerTag)

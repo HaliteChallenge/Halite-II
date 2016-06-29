@@ -56,3 +56,26 @@ body {
 .gameRow {
 	background-color:#F8F8F8;
 }
+
+.arrow {
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+}
+
+.file-icon {
+	height: 16px;
+	width: 16px;
+}
+
+.won {
+	color: green;
+}
+
+.lost {
+	color: red;
+}
+
+code {
+	font-family: monospace;
+}

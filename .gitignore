@@ -245,7 +245,6 @@ env/
 build/
 develop-eggs/
 dist/
-downloads/
 eggs/
 .eggs/
 
@@ -306,3 +305,4 @@ halite.ini
 halite/environment/environment
 halite/visualizer/visualizer
 worker/environment
+git_pull.php

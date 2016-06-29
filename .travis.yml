@@ -1,22 +1,21 @@
+sudo: true
+
+dist: trusty
+
 language: cpp
 
 compiler: gcc
 
-before_install:
-  # g++4.8.1
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo add-apt-repository -y ppa:keithw/glfw3 
-  - sudo apt-get update -qq
-
 install:
-  - halite/visualizer/install.sh
+  - ~/build/HaliteChallenge/Halite/halite/visualizer/debianInstall.sh
   - export CXX="g++-4.8"
 
 script:
-  - cd ~/build/HaliteChallenge/Halite
-    
-  - cd halite/environment
+  - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
+
   - cd ../visualizer
   - make
 
+notifications:
+    slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
