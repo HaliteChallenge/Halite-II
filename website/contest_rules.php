@@ -86,14 +86,14 @@
 				Name2 r2 g2 b2<br>
 				...<br>
 				NameU rU gU bU<br>
-				[WIDTH * HEIGHT bytes] <-- Represents the production of the map. Fills in the map from row #1 to row #HEIGHT, and within each row from column #1 to column #WIDTH, where each byte is the production of that square.<br>
+				[WIDTH * HEIGHT bytes] <-- Represents the production of the map. Fills in the map by row, and within a row by column, where each byte is the production of that square.<br>
 				FRAME(1)FRAME(2)FRAME(3)...FRAME(NUM_FRAMES)<br>
 				<hr>
 				An individual FRAME(#) consists of the following format:<br>
 				One byte, COUNTER, representing the number of tiles with the same owner consecutively.<br>
 				One byte, OWNER, which is the owner the preceding COUNTER relies on.<br>
 				COUNTER bytes, representing the individual strengths of the pieces encoded.<br>
-				The above is repeated until the sum of all COUNTERs is equal to WIDTH * HEIGHT. As with the productions, the frame fills in the map from row #1 to row #HEIGHT, and within each row from column #1 to column #WIDTH.
+				The above is repeated until the sum of all COUNTERs is equal to WIDTH * HEIGHT. As with the productions, the frame fills in the map by row, and within a row by column.
 				</p>
 
 			</div>
