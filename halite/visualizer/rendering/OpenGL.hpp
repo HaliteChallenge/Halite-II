@@ -6,6 +6,7 @@
 #include "GLFW/glfw3.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <fstream>
 #include <iostream>
 #include <string>

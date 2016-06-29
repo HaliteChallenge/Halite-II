@@ -19,10 +19,16 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	in.seekg(0, std::ios::end);
 	int length = in.tellg();
 	in.seekg(0, std::ios::beg);
-	char * file = new GLchar[length];
+	char * file = new char[length + 1];
+	file[length] = 0;
 	in.read(file, length);
 	in.close();
-	glShaderSource(shader, 1, (const char **)&file, &length);
+#ifdef _WIN32
+	char * end = std::remove_if(file, file + length + 1, [](const char & c) -> bool { return !(isprint(c) || isspace(c)) });
+	if(end != file + length + 1) *end = 0;
+	end = NULL; //Not valid as soon as file is deleted. Putting inside the #ifdef for convenience.
+#endif
+	glShaderSource(shader, 1, (const char **)&file, NULL);
 	glCompileShader(shader);
 	delete[] file;
 	//Check for proper compilation:
