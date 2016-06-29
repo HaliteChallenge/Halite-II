@@ -502,7 +502,7 @@ Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TO
 
 short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height)
 {
-	std::fstream game_file;
+	std::ifstream game_file;
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in);
@@ -588,15 +588,21 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	//Reopen the file in binary format.
 	std::streampos pos = game_file.tellg();
-	game_file.close(); game_file.open(filename, std::ios_base::in | std::ios_base::binary);
+	game_file.close();
+	game_file.open(filename, std::ios_base::in | std::ios_base::binary);
 	game_file.seekg(pos);
-	char c; //For getting characters from the file.
+	std::ostringstream game_file_stream;
+	game_file_stream << game_file.rdbuf();
+	game_file.close();
+	std::string game_file_string = game_file_stream.str();
+	int loc = 0; //For getting characters from the file.
+	auto getChar = [&]() -> char { char c = game_file_string[loc]; loc++; return c; };
 
 	//Get the productions from the next width * height characters of the file.
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		game_file.get(c); b->production = (unsigned char)c;
+		b->production = getChar();
 	}
-	game_file.get(c); //Get newline character.
+	getChar(); //Get newline character.
 
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
@@ -610,11 +616,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		int tilesSoFar = 0;
 		while(tilesSoFar < totalTiles)
 		{
-			game_file.get(c); numPieces = (unsigned char)c;
-			game_file.get(c); presentOwner = (unsigned char)c;
+			numPieces = getChar();
+			presentOwner = getChar();
 			for(short b = 0; b < numPieces; b++)
 			{
-				game_file.get(c); strength = (unsigned char)c;
+				strength = getChar();
 				if(y >= m.map_height) break;
 				m.contents[y][x].owner = presentOwner;
 				m.contents[y][x].strength = strength;
@@ -625,7 +631,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 					y++;
 				}
 			}
-			shouldLeave = game_file.eof();
+			shouldLeave = game_file_stream.eof();
 			tilesSoFar += numPieces;
 			if(tilesSoFar > totalTiles) throw std::runtime_error("Internal desync detected at frame " + std::to_string(a) + " in file " + filename);
 		}
@@ -664,14 +670,12 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	//Create GL for rendering now.
 	recreateGL();
 
-	game_file.close();
-
 	return numLines;
 }
 
 bool Halite::isValid(std::string filename)
 {
-	std::fstream game_file;
+	std::ifstream game_file;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
 	std::string format; std::getline(game_file, format);
