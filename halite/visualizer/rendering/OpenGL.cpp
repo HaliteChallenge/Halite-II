@@ -24,7 +24,7 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	in.read(file, length);
 	in.close();
 #ifdef _WIN32
-	char * end = std::remove_if(file, file + length + 1, isprint);
+	char * end = std::remove_if(file, file + length + 1, [](const char & c) -> bool { return !(isprint(c) || isspace(c)) });
 	if(end != file + length + 1) *end = 0;
 	end = NULL; //Not valid as soon as file is deleted. Putting inside the #ifdef for convenience.
 #endif
