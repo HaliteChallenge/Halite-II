@@ -1,6 +1,11 @@
 <?php
 
 require_once 'API.class.php';
+
+define("REPLAYS_DIR", "../storage/replays/");
+define("BOTS_DIR", "../storage/bots/");
+define("INI_FILE", "../halite.ini");
+
 class ManagerAPI extends API
 {
 
@@ -49,12 +54,12 @@ class ManagerAPI extends API
 
 	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotFile($userID) {
-		return "../storage/bots/{$userID}.zip";
+		return BOTS_DIR."{$userID}.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = parse_ini_file("../halite.ini");
+		$config = parse_ini_file(INI_FILE);
 		$this->mysqli = new mysqli($config['hostname'],
 			$config['username'],
 			$config['password'],
@@ -145,10 +150,11 @@ class ManagerAPI extends API
 		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$users = json_decode($_POST['users']);
 			var_dump($users);
+
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
 			$name = basename($_FILES[$fileKey]['name']);
-			$targetPath = "../storage/replays/{$name}";
+			$targetPath = REPLAYS_DIR."{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			if(is_file($targetPath) == false) {
 				echo "Did not work";
@@ -156,6 +162,13 @@ class ManagerAPI extends API
 				echo "File transfer worked!!!!!!!!!!!";
 			}
 			chmod($targetPath, 0777);
+
+			// Check that we arent storing too many replay files
+			$fi = new FilesystemIterator(REPLAYS_DIR, FilesystemIterator::SKIP_DOTS);
+			if(iterator_count($fi) > 10000) {
+				unlink(readdir(opendir(REPLAYS_DIR)));
+			}
+
 
 			// Store game information in db
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
@@ -186,7 +199,7 @@ class ManagerAPI extends API
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = "../storage/bots/{$userID}.zip";
+			$targetPath = BOTS_DIR."{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;
