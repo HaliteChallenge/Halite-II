@@ -28,6 +28,8 @@ chmod +x "$BOT2/$RUNFILE"
 
 docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q $WIDTH $HEIGHT 'cd $PWD/$BOT1 && ./$RUNFILE' 'cd $PWD/$BOT2 && ./$RUNFILE'"
 
+docker rm $(docker ps -aq)
+
 mv *.hlt ../
 cd ..
 rm -r $WORKINGPATH
