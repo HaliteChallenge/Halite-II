@@ -12,7 +12,7 @@
 	<div class="container">
 		<?php include 'includes/navbar.php'; ?>
 		<div class="jumbotron" id="jumbotron">
-			<h1 id="jHeader">Michael Truell</h1>
+			<h1 id="jHeader"></h1>
 		</div>
 		<div class="row">
 			<div class="col-md-5">
@@ -20,8 +20,8 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">Statistics</h3>
 					</div>
-					<table class="table well well-sm" id="leaderTable">
-						<tbody>
+					<table class="table well well-sm" id="statTable">
+						<tbody id="statTableBody">
 							<tr><td>Stat1</td><td>Value1</td></tr>
 							<tr><td>Stat2</td><td>Value2</td></tr>
 							<tr><td>Stat3</td><td>Value3</td></tr>
@@ -35,7 +35,7 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">Past Games</h3>
 					</div>
-					<table class="table well well-sm" id="leaderTable">
+					<table class="table well well-sm" id="gameTable">
 						<thead>
 							<tr>
 								<th>Opponent</th>
@@ -43,7 +43,7 @@
 								<th>Gamefile</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="gameTableBody">
 							<tr><td>Other User</td><td><span class="lost">Lost</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
 							<tr><td>John Doe</td><td><span class="won">Won</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
 						</tbody>
@@ -52,5 +52,10 @@
 			</div>
 		</div>
 	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	<script src="script/general.js"></script>
+	<script src="script/backend.js"></script>
+	<script src="script/user.js"></script>
 </body>
 </html>
