@@ -61,7 +61,7 @@ $(function() {
 			}
 		},
 		getTableRow: function(game) {
-			return "<tr><td><a href='user.php?userID="+game.opponent.userID+"'>"+game.opponent.username+"</a></td><td>"+game.result+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><img class='file-icon' src='assets/file.png'></a></td></tr>";
+			return "<tr><td><a href='user.php?userID="+game.opponent.userID+"'>"+game.opponent.username+"</a></td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><img class='file-icon' src='assets/file.png'></a></td></tr>";
 		}
 	}
 
