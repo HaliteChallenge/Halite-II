@@ -6,6 +6,14 @@ function getGET(name) {
 }
 
 $(function() {
+	var messageBox = {
+		$messageBox: $("#messageBox"),
+		alert: function(title, message, isSuccess) {
+			this.$messageBox.empty()
+			this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+		}
+	};
+	
 	function SmartForm($submitButton, $form, onSubmit) {
 		$submitButton.click(function() {
 			console.log("CLICK");
