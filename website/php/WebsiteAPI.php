@@ -8,6 +8,8 @@ class WebsiteAPI extends API
 	private $mysqli = NULL;
 
 	public function __construct($request, $origin) {
+		$this->config = parse_ini_file("../../halite.ini");
+
 		$this->initDB();
 
 		$this->sanitizeHTTPParameters();
@@ -24,13 +26,16 @@ class WebsiteAPI extends API
 		}
 	}
 
+	private function encryptPassword($password) {
+		return $this->mysqli->real_escape_string(crypt($password, $this->config['salt']));
+	}
+
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = parse_ini_file("../../halite.ini");
-		$this->mysqli = new mysqli($config['hostname'],
-			$config['username'],
-			$config['password'],
-			$config['databaseName']);
+		$this->mysqli = new mysqli($this->config['hostname'],
+			$this->config['username'],
+			$this->config['password'],
+			$this->config['databaseName']);
 
 		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
@@ -63,7 +68,8 @@ class WebsiteAPI extends API
 	protected function user() {
 		if(isset($_GET["username"])) {
 			if(isset($_GET["password"])) {
-				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '{$_GET['password']}'");
+				$password = $this->encryptPassword($_GET['password']);
+				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
 			} else {
 				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
 				unset($fields["password"]);
@@ -71,7 +77,8 @@ class WebsiteAPI extends API
 			}
 		} else if (isset($_GET["userID"])) {
 			if(isset($_GET["password"])) {
-				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$_GET['password']}'");
+				$password = $this->encryptPassword($_GET['password']);
+				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$password}'");
 			} else {
 				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
 				unset($fields["password"]);
@@ -84,13 +91,13 @@ class WebsiteAPI extends API
 		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
 			$email = $_POST["email"];
-			$password = $_POST["password"];
+			$password = $this->encryptPassword($_POST["password"]);
 
 			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
 			if(isset($usernameArray['username'])) {
 				return "Username already exists";
 			}
-			
+
 			$emailArray = $this->select("SELECT email FROM User WHERE email = '$email' LIMIT 1");
 			if(isset($emailArray['email'])) {
 				return "Email already exists";
@@ -152,12 +159,13 @@ class WebsiteAPI extends API
 			else return NULL;
 		} else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$username = $_POST['username'];
-			$password = $_POST['password'];
+			$password = $this->encryptPassword($_POST['password']);
+			
 			$_SESSION = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
 			return "Success";
 		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
 			$userID = $_POST['userID'];
-			$password = $_POST['password'];
+			$password = $this->encryptPassword($_POST['password']);
 
 			$_SESSION = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
 			return "Success";
