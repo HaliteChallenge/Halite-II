@@ -114,7 +114,7 @@ $(function() {
 			for(var a = 0; a < this.submissions.length; a++) {
 				var user = this.submissions[a];
 				var score = Math.round((this.submissions[a].mu-(3*this.submissions[a].sigma))*100)/100;
-				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td>"+user.username+"</td><td>"+user.language+"</td><td>"+score+"</td><td><img class='matchDrop arrow' userID='"+user.userID+"' src='assets/up-arrow.png'></td></tr></tbody>");
+				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td><a href='user.php?"+user.userID+"'>"+user.username+"</a></td><td>"+user.language+"</td><td>"+score+"</td><td><img class='matchDrop arrow' userID='"+user.userID+"' src='assets/up-arrow.png'></td></tr></tbody>");
 			}
 		},
 		toggleDropdown: function(event) {

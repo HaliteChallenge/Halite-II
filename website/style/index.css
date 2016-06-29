@@ -75,3 +75,7 @@ body {
 .lost {
 	color: red;
 }
+
+code {
+	font-family: monospace;
+}
