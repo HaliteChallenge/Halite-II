@@ -77,6 +77,25 @@
 				 	</ol>
 				</p>
 
+				<h4>Files</h4>
+
+				<p>Once a game ends, the environment will output it as a file for replaying at high speed later. Presently, the file does not contain the decisions of the players; only the game states resolved by the environment. A sample file should look like:
+				HLT 8 <-- A header to distinguish version and ensure that the file will be valid.
+				WIDTH HEIGHT NUM_PLAYERS NUM_FRAMES <-- The number of frames is always one more than the number of turns.
+				Name1 r1 g1 b1 <-- The player name and the color to map the player to.
+				Name2 r2 g2 b2
+				...
+				NameU rU gU bU
+				[WIDTH * HEIGHT bytes] <-- Represents the production of the map. Fills in the map from row #1 to row #HEIGHT, and within each row from column #1 to column #WIDTH, where each byte is the production of that square.
+				FRAME(1)FRAME(2)FRAME(3)...FRAME(NUM_FRAMES)
+				<hr>
+				An individual FRAME(#) consists of the following format:
+				One byte, COUNTER, representing the number of tiles with the same owner consecutively.
+				One byte, OWNER, which is the owner the preceding COUNTER relies on.
+				COUNTER bytes, representing the individual strengths of the pieces encoded.
+				The above is repeated until the sum of all COUNTERs is equal to WIDTH * HEIGHT. As with the productions, the frame fills in the map from row #1 to row #HEIGHT, and within each row from column #1 to column #WIDTH.
+				</p>
+
 			</div>
 		</div>
 	</div>
