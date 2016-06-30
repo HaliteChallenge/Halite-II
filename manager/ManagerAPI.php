@@ -165,10 +165,14 @@ class ManagerAPI extends API
 
 			// Check that we arent storing too many replay files
 			$fi = new FilesystemIterator(REPLAYS_DIR, FilesystemIterator::SKIP_DOTS);
+			$handle = opendir(REPLAYS_DIR);
 			while(iterator_count($fi) > 10000) {
-				unlink(readdir(opendir(REPLAYS_DIR)));
+				$entry = NULL;
+				do {
+					$entry = readdir($handle);
+				} while($entry == "." || $entry == "..");
+			   unlink(REPLAYS_DIR.$entry);	
 			}
-
 
 			// Store game information in db
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
