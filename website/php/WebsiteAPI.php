@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('America/New_York');
+
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
@@ -90,9 +92,10 @@ class WebsiteAPI extends API
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
 			return $results;
-		} else if(isset($_PUT['verificationCode']) && isset($_PUT['userID'])) {
-			if($this->select("SELECT isVerified FROM User WHERE userID={$_GET['userID']} LIMIT 1")['verificationCode'] == $_GET['verificationCode']) {
-				$this->insert("UPDATE User SET isVerified=1 WHERE userID={$_GET['userID']}");
+		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
+			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
+			if($user['verificationCode'] == $_POST['verificationCode']) {
+				$this->insert("UPDATE User SET isVerified=1 WHERE userID={$_POST['userID']}");
 				return "Success";
 			}
 			return "Fail";
@@ -111,18 +114,25 @@ class WebsiteAPI extends API
 				return "Email already exists";
 			}
 
-			$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '".rand(0, 9999999999)."')");
-
 			// Send verification email
-			$transport = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, "ssl")
-			->setUsername($this->config['email']['email'])
-			->setPassword($this->config['email']['password']);
-			$mailer = Swift_Mailer::newInstance($transport);
-			$message = Swift_Message::newInstance('Halite Email Verification')
-				->setFrom(array($this->config['email']['email'] => 'Halite Competition'))
-				->setTo(array($email))
-				->setBody('To verify you email, <a href="#">click here</a>.', 'text/html');
-			$result = $mailer->send($message);
+			$verificationCode = rand(0, 9999999999);
+			try{
+				$transport = Swift_SmtpTransport::newInstance("smtp.gmail.com", 465, "ssl")
+				->setUsername($this->config['email']['email'])
+				->setPassword($this->config['email']['password']);
+				$mailer = Swift_Mailer::newInstance($transport);
+				$message = Swift_Message::newInstance("Halite Email Verification")
+					->setFrom(array($this->config['email']['email'] => "Halite Competition"))
+					->setTo(array($email));
+
+				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
+				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
+
+				$message->setBody("To verify you email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
+				$result = $mailer->send($message);
+			} catch (Exception $e) {
+				return "Invalid email address";
+			}
 
 			return "Success";
 		}
