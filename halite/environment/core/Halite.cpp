@@ -2,8 +2,6 @@
 
 #include "limits.h"
 
-#define INFINITE_RESPOND_TIME false
-
 #define F_NEWLINE '\n'
 
 //Consts -----------------------------
@@ -12,130 +10,134 @@ const float MIN_DEFENSE_BONUS = 1.5, MAX_DEFENSE_BONUS = 1.5;
 
 //Private Functions ------------------
 
-std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
+//These will be filled in when the time comes.
+std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const std::vector<bool> & alive)
 {
-	if(game_map.map_width == 0 || game_map.map_height == 0) return std::vector<bool>(0);
-
-	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
-	unsigned char threadLocation = 0; //Represents place in frameThreads.
-
-	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
-	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : 1000;
-
-	//Stores the messages sent by bots this frame
-	std::vector<std::vector<hlt::Message>> recievedMessages(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++)
-	{
-		if(alive[a])
-		{
-			//Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
-			std::vector<hlt::Message> messagesForThisBot;
-			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
-
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
-
-			threadLocation++;
-		}
-	}
-
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
+	std::map<hlt::Location, std::list< std::tuple<unsigned char, unsigned char, hlt::Location> > > potentialMoves; //Tuple consists of owner, strength, previous location.
 
-	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
-	std::vector<bool> permissibleTime(number_of_players, false);
-	threadLocation = 0; //Represents place in frameThreads.
-	for(unsigned char a = 0; a < number_of_players; a++)
-	{
-		if(alive[a])
-		{
-			bool success = frameThreads[threadLocation].get();
-			if(success)
-			{
-				permissibleTime[a] = true;
-			}
-			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
-			else
-			{
-				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
-				permissibleTime[a] = false;
-				networking.killPlayer(a + 1);
-			}
-			threadLocation++;
-		}
-	}
-
-	//Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
-	pastFrameMessages = std::vector<hlt::Message>();
-	//Ensure that the player signed their messages correctly
-	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
-	{
-		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
-		{
-			message->senderID = playerIndex + 1; //playerIndex + 1 equals the playerID of the sender
-			pastFrameMessages.push_back(*message);
-		}
-	}
-
-	//For each player, use their moves to create the pieces map.
+	//For each player, fill in their still pieces to the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
 	{
-		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1)
+		//Move pieces designated to move STILL.
+		auto b = player_moves[a].begin();
+		while(b != player_moves[a].end())
 		{
-			if(b->dir == STILL)
+			if(game_map.getSite(b->loc, STILL).owner == a + 1 && b->dir == STILL)
 			{
 				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
 				else game_map.getSite(b->loc, STILL).strength = 255;
-			}
-			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
-			if(pieces[a].count(newLoc))
-			{
-				if(short(pieces[a][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->loc, STILL).strength;
-				else pieces[a][newLoc] = 255;
-			}
-			else
-			{
+				full_production_count[a] += game_map.getSite(b->loc, STILL).production;
+				hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
 				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
+				//Erase from the game map so that the player can't make another move with the same piece.
+				game_map.getSite(b->loc, STILL).owner = 0;
+				game_map.getSite(b->loc, STILL).strength = 0;
 			}
+			//For later efficiency, erase bad or used-up moves.
+			if(game_map.getSite(b->loc, STILL).owner != a + 1 || b->dir == STILL || !hlt::isValidDirection(b->dir)) b = player_moves[a].erase(b);
+			else b++;
+		}
+	}
 
-			//Add in a new piece with a strength of 0 if necessary.
-			if(!pieces[a].count(b->loc))
-			{
-				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
-			}
-
+	//For each player, use their moves to create the potentialMoves map.
+	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
+	{
+		//Move pieces designated to move STILL.
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) //Guaranteed at this point to be theirs and to not be moving still.
+		{
+			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
+			potentialMoves[newLoc].push_front(std::make_tuple(a, game_map.getSite(b->loc, STILL).strength, b->loc));
+			//Add in a new piece with a strength of 0.
+			pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
 			//Erase from the game map so that the player can't make another move with the same piece.
 			game_map.getSite(b->loc, STILL).owner = 0;
 			game_map.getSite(b->loc, STILL).strength = 0;
 		}
 	}
 
-	//Add in all of the remaining pieces whose moves weren't specified.
+	//Add in all of the remaining pieces whose moves weren't specified to the pieces map.
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
 		hlt::Location l = { b, a };
 		if(game_map.getSite(l, STILL).owner != 0)
 		{
-			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) {
-				game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
-			}
+			if(short(game_map.getSite(l, STILL).strength) + game_map.getSite(l, STILL).production <= 255) game_map.getSite(l, STILL).strength += game_map.getSite(l, STILL).production;
 			else game_map.getSite(l, STILL).strength = 255;
-			hlt::Site s = game_map.getSite(l, STILL);
-			if(pieces[s.owner - 1].count(l))
-			{
-				if(short(pieces[s.owner - 1][l]) + s.strength <= 255) pieces[s.owner - 1][l] += s.strength;
-				else pieces[s.owner - 1][l] = 255;
-			}
-			else
-			{
-				pieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
-			}
+			pieces[game_map.getSite(l, STILL).owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, game_map.getSite(l, STILL).strength));
+			full_production_count[game_map.getSite(l, STILL).owner - 1] += game_map.getSite(l, STILL).production;
 			//Erase from game map.
 			game_map.getSite(l, STILL).owner = 0;
 			game_map.getSite(l, STILL).strength = 0;
 		}
 	}
+
+	//Look through the map to find conflicts of allied pieces trying to occupy the same space. Return conflicts to the square they were on.
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+	{
+		hlt::Location l = { b, a };
+		std::list<std::list< std::tuple<unsigned char, unsigned char, hlt::Location> >::iterator> toUndo;
+		for(auto c = potentialMoves[l].begin(); c != potentialMoves[l].end(); c++) 
+		{
+			unsigned char owner = std::get<0>(*c);
+			for(unsigned char d = 0; d < number_of_players; d++) if(owner != d && alive[owner] && alive[d] && alliances[owner][d] != 0 && pieces[d].count(l))
+			{
+				toUndo.push_front(c);
+				break; //We know we can break because we can't have two still moves ending up in the same place.
+			}
+			std::list< std::tuple<unsigned char, unsigned char, hlt::Location> >::iterator d = c;
+			for(d++; d != potentialMoves[l].end(); d++)
+			{
+				unsigned char dOwner = std::get<0>(*d);
+				if(owner != dOwner && alive[owner] && alive[dOwner] && alliances[owner][dOwner] != 0)
+				{
+					toUndo.push_front(c);
+					toUndo.push_front(d);
+				}
+			}
+		}
+		//Undo those moves.
+		for(auto c = toUndo.begin(); c != toUndo.end(); c++) 
+		{
+			unsigned char owner = std::get<0>(**c);
+			unsigned char strength = std::get<1>(**c);
+			hlt::Location oldLocation = std::get<2>(**c);
+			if(short(strength) + game_map.getSite(oldLocation, STILL).production < 255) strength += game_map.getSite(oldLocation, STILL).production;
+			else strength = 255;
+			if(pieces[owner].count(oldLocation))
+			{
+				if(short(pieces[owner][oldLocation]) + strength < 255) pieces[owner][oldLocation] += strength;
+				else pieces[owner][oldLocation] = 255;
+			}
+			else pieces[owner].insert(std::pair<hlt::Location, unsigned char>(oldLocation, strength));
+			full_production_count[owner] += game_map.getSite(oldLocation, STILL).production;
+			auto d = c;
+			for(d++; d != toUndo.end(); d++) if(c == d) toUndo.erase(d); //Get rid of duplicate iterators - we don't want to try to erase an invalid iterator.
+			potentialMoves[l].erase(*c);
+		}
+	}
+
+	//Add all of the moves back into the map.
+	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
+	{
+		hlt::Location l = { b, a };
+		for(auto c = potentialMoves[l].begin(); c != potentialMoves[l].end(); c++)
+		{
+			unsigned char owner = std::get<0>(*c);
+			if(pieces[owner].count(l))
+			{
+				if(short(pieces[owner][l]) + std::get<1>(*c) < 255) pieces[owner][l] += std::get<1>(*c);
+				else pieces[owner][l] = 255;
+			}
+			else pieces[owner].insert(std::pair<hlt::Location, unsigned char>(l, std::get<1>(*c)));
+		}
+	}
+
+	return pieces;
+}
+
+void Halite::doCombat(std::vector< std::map<hlt::Location, unsigned char> > & pieces, const std::vector<bool> & alive)
+{
 
 	std::vector< std::map<hlt::Location, unsigned short> > toInjure(number_of_players);
 	std::vector< std::vector<unsigned short> > injureMap(game_map.map_height, std::vector<unsigned short>(game_map.map_width, 0));
@@ -146,7 +148,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		hlt::Location l = { b, a };
 		for(unsigned short c = 0; c < number_of_players; c++) if(alive[c] && pieces[c].count(l))
 		{
-			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d])
+			for(unsigned short d = 0; d < number_of_players; d++) if(d != c && alive[d] && alliances[d][c] == 0)
 			{
 				hlt::Location tempLoc = l;
 				//Check 'STILL' square. We also need to deal with the threshold here:
@@ -215,6 +217,72 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 		else game_map.contents[a][b].strength -= injureMap[a][b];
 		game_map.contents[a][b].owner = 0;
 	}
+}
+
+std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
+{
+	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
+	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	unsigned char threadLocation = 0; //Represents place in frameThreads.
+
+	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
+	std::vector<int> allowableTimesToRespond(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS;
+
+	//Stores the messages sent by bots this frame
+	std::vector< std::vector<hlt::Message> > recievedMessages(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		if(alive[a])
+		{
+			//Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
+			std::vector<hlt::Message> messagesForThisBot;
+			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
+
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+
+			threadLocation++;
+		}
+	}
+
+	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
+	std::vector<bool> permissibleTime(number_of_players, false);
+	threadLocation = 0; //Represents place in frameThreads.
+	for(unsigned char a = 0; a < number_of_players; a++)
+	{
+		if(alive[a])
+		{
+			unsigned int millis = frameThreads[threadLocation].get();
+			if(millis < (INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS))
+			{
+				permissibleTime[a] = true;
+			}
+			//There was an exception in the networking thread or the player timed out. Either way, kill their thread
+			else
+			{
+				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
+				permissibleTime[a] = false;
+				networking.killPlayer(a + 1);
+			}
+			threadLocation++;
+			total_response_time[a] += millis;
+		}
+	}
+
+	//Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
+	pastFrameMessages = std::vector<hlt::Message>();
+	//Ensure that the player signed their messages correctly
+	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
+	{
+		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
+		{
+			message->senderID = playerIndex + 1; //playerIndex + 1 equals the playerID of the sender
+			pastFrameMessages.push_back(*message);
+		}
+	}
+
+	auto pieces = getPieces(alive); //Throws out moves invalidating alliances; defaults to STILL instead.
+	doCombat(pieces, alive);
 
 	//Add pieces back into the map.
 	for(unsigned char a = 0; a < number_of_players; a++)
@@ -225,6 +293,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 			game_map.getSite(b->first, STILL).strength = b->second;
 		}
 	}
+
+	//Decrement the time left on all alliances.
+	for(auto a = alliances.begin(); a != alliances.end(); a++) for(auto b = a->begin(); b != a->end(); b++) if(*b != 0) (*b)--;
 
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
@@ -254,16 +325,21 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	full_game.push_back(turn);
 
 	//Check if the game is over:
-	last_territory_count = std::vector<unsigned int>(number_of_players);
 	std::vector<bool> stillAlive(number_of_players, false);
 
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0)
 	{
-		last_territory_count[game_map.contents[a][b].owner - 1]++;
+		full_territory_count[game_map.contents[a][b].owner - 1]++;
+		full_strength_count[game_map.contents[a][b].owner - 1] += game_map.contents[a][b].strength;
 		stillAlive[game_map.contents[a][b].owner - 1] = true;
 	}
-	for(int a = 0; a < last_territory_count.size(); a++) full_territory_count[a] += last_territory_count[a];
-	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(!permissibleTime[a]) stillAlive[a] = false;
+	for(unsigned char a = 0; a < number_of_players; a++) if(!permissibleTime[a] && alive[a]) {
+		stillAlive[a] = false;
+		timeout_tags.insert(a + 1)
+	}
+
+	for(unsigned char a = 0; a < number_of_players; a++) if(stillAlive[a]) alive_frame_count[a]++;
+
 	return stillAlive;
 }
 
@@ -362,9 +438,6 @@ void Halite::init()
 	player_moves = std::vector< std::set<hlt::Move> >();
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
-	last_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
-	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
-
 	//Figure out what defense_bonus should be.
 	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
 	// TEMP DEFENSE BONUS REMOVAL: if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
@@ -404,7 +477,7 @@ void Halite::init()
 	std::vector< std::future<bool> > initThreads(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>( INFINITE_RESPOND_TIME ? INT_MAX : BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 	}
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -414,6 +487,14 @@ void Halite::init()
 			networking.killPlayer(a + 1);
 		}
 	}
+
+	//Init statistics
+	alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
+	total_response_time = std::vector<double>(number_of_players, 0);
+	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
+	full_strength_count = std::vector<unsigned int>(number_of_players, 255); //Every piece starts with 1 piece, which won't get counted unless we do it here.
+	full_production_count = std::vector<unsigned int>(number_of_players, 0);
+	timeout_tags = std::set<unsigned char>();
 }
 
 void Halite::output(std::string filename)
