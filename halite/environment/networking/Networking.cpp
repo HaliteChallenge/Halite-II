@@ -352,7 +352,7 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 	}
 }
 
-bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
+unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
 	try
 	{
@@ -365,11 +365,14 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 
 		moves->clear();
 
-		std::string movesString = getString(playerTag, timeoutMillis), getMessagesString = getString(playerTag, timeoutMillis);
+		clock_t initialTime = clock();
+		std::string movesString = getString(playerTag, timeoutMillis);
+		std::string getMessagesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
+		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
 		*moves = deserializeMoveSet(movesString);
 		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
-		return true;
+		return millisTaken;
 	}
 	catch (int e)
 	{
