@@ -369,6 +369,7 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 		std::string movesString = getString(playerTag, timeoutMillis);
 		std::string getMessagesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
 		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+
 		*moves = deserializeMoveSet(movesString);
 		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
@@ -376,7 +377,7 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 	}
 	catch (int e)
 	{
-		return false;
+		return timeoutMillis+1;
 
 	}
 
