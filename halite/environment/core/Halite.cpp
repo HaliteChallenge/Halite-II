@@ -13,20 +13,8 @@ const float MIN_DEFENSE_BONUS = 1.5, MAX_DEFENSE_BONUS = 1.5;
 //These will be filled in when the time comes.
 std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const std::vector<bool> & alive)
 {
-<<<<<<< HEAD
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
 	std::map<hlt::Location, std::list< std::tuple<unsigned char, unsigned char, hlt::Location> > > potentialMoves; //Tuple consists of owner, strength, previous location.
-=======
-	if(game_map.map_width == 0 || game_map.map_height == 0) return std::vector<bool>(0);
-
-	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<unsigned int> > frameThreads(std::count(alive.begin(), alive.end(), true));
-	unsigned char threadLocation = 0; //Represents place in frameThreads.
-
-	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
-	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : 1000;
->>>>>>> 5649967723683bbb2ca3c04cb8e027b1e2785b6a
 
 	//For each player, fill in their still pieces to the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a])
