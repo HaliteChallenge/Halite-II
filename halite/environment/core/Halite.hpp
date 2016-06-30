@@ -21,6 +21,35 @@
 
 extern bool program_output_style;
 
+struct PlayerStatistics
+{
+	int tag;
+	int rank;
+	double average_territory_count;
+	double average_strength_count;
+	double average_production_count;
+	double still_to_cardinal;
+	double average_alliance_count;
+	double average_response_time;
+};
+static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p)
+{
+	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_to_cardinal << ' ' << p.average_alliance_count << ' ' << p.average_response_time;
+	return o;
+}
+
+struct GameStatistics
+{
+	std::vector<PlayerStatistics> player_statistics;
+	std::set<unsigned char> timeout_tags;
+};
+static std::ostream & operator<<(std::ostream & o, const GameStatistics & g)
+{
+	for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
+	for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << (*a) << ' ';
+	return o;
+}
+
 class Halite
 {
 private:
@@ -39,10 +68,13 @@ private:
 
 	//Statistics
 	std::vector<unsigned short> alive_frame_count;
-	std::vector<double> total_response_time;
 	std::vector<unsigned int> full_territory_count;
 	std::vector<unsigned int> full_strength_count;
 	std::vector<unsigned int> full_production_count;
+	std::vector<unsigned int> full_still_count;
+	std::vector<unsigned int> full_cardinal_count;
+	std::vector<unsigned short> full_alliance_count;
+	std::vector<unsigned int> total_response_time;
 	std::set<unsigned char> timeout_tags;
 
 	//Colors
@@ -58,7 +90,7 @@ public:
 
 	void init();
 	void output(std::string filename);
-	std::vector<unsigned char> runGame();
+	GameStatistics runGame();
 	std::string getName(unsigned char playerTag);
 
 	~Halite();
