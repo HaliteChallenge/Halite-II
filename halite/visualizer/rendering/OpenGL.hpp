@@ -15,8 +15,8 @@
 #include <map>
 #include <algorithm>
 #include <time.h>
-#include "freetype2/ft2build.h"
-#include "freetype2/freetype/freetype.h"
+#include "ft2build.h"
+#include "freetype.h"
 
 //Color struct.
 struct Color
