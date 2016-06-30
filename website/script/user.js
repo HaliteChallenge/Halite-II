@@ -13,40 +13,52 @@ $(function() {
 	var statTable = {
 		$tableBody: $("#statTableBody"),
 		stats: [],
-		init: function(userID) {
-			this.userID = userID;
-			this.generateStats();
+		init: function(user) {
+			this.user = user;
+			this.extractStats();
 			this.render();
 		},
-		generateStats: function() {
-
+		extractStats: function() {
+			var statDetails = {
+				"territoryAverage": {name: "Territory Factor", mouseOverText: ""},
+				"strengthAverage": {name: "Strength Factor", mouseOverText: ""},
+				"productionAverage": {name: "Production Factor", mouseOverText: ""},
+				"stillPercentage": {name: "Still Moves To Total Moves", mouseOverText: ""},
+				"allianceAverage": {name: "Alliance Level", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game"},
+				"turnTimeAverage": {name: "Average Milliseconds per Turn", mouseOverText: ""}
+			};
+			for(var key in this.user) {
+				if(statDetails[key] != undefined) {
+					this.stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: this.user[key]})
+				}
+			}
 		},
-		render: function() {
+ 		render: function() {
 			this.$tableBody.empty();
-			for(var a = 0; a < stats.length; a++) {
-				this.$tableBody.append(getTableRow(stats[a]));
+			for(var a = 0; a < this.stats.length; a++) {
+				this.$tableBody.append(this.getTableRow(this.stats[a]));
 			}
 		},
 		getTableRow: function(stat) {
-			return "<tr><td>"+stat.name+"</td><td>"+stat.value+"</td></tr>";
+			return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
 		}
 	}
 
 	var gameTable = {
 		$tableBody: $("#gameTableBody"),
 		games: [],
-		init: function(userID) {
+		init: function(userID, rawGames) {
 			this.userID = userID;
-			this.pullGames();
+			this.rawGames = rawGames;
+			this.transformGames();
 			this.render();
 		},
-		pullGames: function() {
-			var rawGames = getLatestGamesForUser(this.userID, 10);
-			console.log(rawGames)
-			for(var a = 0; a < rawGames.length; a++) {
-				var opponent = rawGames[a].users[0].userID == this.userID ? rawGames[a].users[1] : rawGames[a].users[0];
+		transformGames: function() {
+			console.log(this.rawGames)
+			for(var a = 0; a < this.rawGames.length; a++) {
+				var opponent = this.rawGames[a].users[0].userID == this.userID ? this.rawGames[a].users[1] : this.rawGames[a].users[0];
 				var result = opponent.rank == "1" ? "Lost" : "Won";
-				var replayName = rawGames[a].replayName;
+				var replayName = this.rawGames[a].replayName;
 				this.games.push({
 					opponent: opponent,
 					result: result,
@@ -67,11 +79,11 @@ $(function() {
 
 	var userID = getGET("userID");
 
-	//statTable.init(userID);
-	gameTable.init(userID);
-
 	var user = getUser(userID);
 	console.log(user)
 	jumboTron.init(user.username);
+
+	statTable.init(user);
+	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
 })

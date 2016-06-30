@@ -22,10 +22,6 @@
 					</div>
 					<table class="table well well-sm" id="statTable">
 						<tbody id="statTableBody">
-							<tr><td>Stat1</td><td>Value1</td></tr>
-							<tr><td>Stat2</td><td>Value2</td></tr>
-							<tr><td>Stat3</td><td>Value3</td></tr>
-							<tr><td>Stat4</td><td>Value4</td></tr>
 						</tbody>
 					</table>
 				</div>
