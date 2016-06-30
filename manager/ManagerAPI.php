@@ -180,9 +180,28 @@ class ManagerAPI extends API
 			$gameID = $gameIDArray['gameID'];
 
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, $a)");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->allianceAverage}, {$users[$a]->turnTimeAverage})");
+
+				// Cache average stats
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage FROM GameUser WHERE userID={$users->userID} LIMIT 500");
+				$totalGameStats = array();
+				foreach($gameStats as $oneGameStats) {
+					foreach($oneGameStats as $statName => $statValue) {
+						if(!array_key_exists($statName, $totalGameStats)) {
+							$totalGameStats[$statName] = 0;
+						}
+						$totalGameStats[$statName] += $statValue;
+					}
+				}
+
+				foreach($totalGameStats as $statName => $totalStatValue) {
+					$averageStatValue = $totalStatValue / count($gameStats);
+					$this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = {$users[$a]->userID}");
+				}
+
 				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
+
 		}
 	}
 
