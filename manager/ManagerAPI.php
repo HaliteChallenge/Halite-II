@@ -59,11 +59,11 @@ class ManagerAPI extends API
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = parse_ini_file(INI_FILE);
-		$this->mysqli = new mysqli($config['hostname'],
-			$config['username'],
-			$config['password'],
-			$config['databaseName']);
+		$config = parse_ini_file(INI_FILE, true);
+		$this->mysqli = new mysqli($config['database']['hostname'],
+			$config['database']['username'],
+			$config['database']['password'],
+			$config['database']['name']);
 
 		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
@@ -171,7 +171,7 @@ class ManagerAPI extends API
 				do {
 					$entry = readdir($handle);
 				} while($entry == "." || $entry == "..");
-			   unlink(REPLAYS_DIR.$entry);	
+			   unlink(REPLAYS_DIR.$entry);
 			}
 
 			// Store game information in db
