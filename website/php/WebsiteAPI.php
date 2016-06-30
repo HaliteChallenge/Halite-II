@@ -1,6 +1,8 @@
 <?php
 
 require_once 'API.class.php';
+require_once '../lib/swiftmailer/lib/swift_required.php';
+
 class WebsiteAPI extends API
 {
 
@@ -8,7 +10,7 @@ class WebsiteAPI extends API
 	private $mysqli = NULL;
 
 	public function __construct($request, $origin) {
-		$this->config = parse_ini_file("../../halite.ini");
+		$this->config = parse_ini_file("../../halite.ini", true);
 
 		$this->initDB();
 
@@ -27,15 +29,15 @@ class WebsiteAPI extends API
 	}
 
 	private function encryptPassword($password) {
-		return $this->mysqli->real_escape_string(crypt($password, $this->config['salt']));
+		return $this->mysqli->real_escape_string(crypt($password, $this->config['encrypt']['salt']));
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$this->mysqli = new mysqli($this->config['hostname'],
-			$this->config['username'],
-			$this->config['password'],
-			$this->config['databaseName']);
+		$this->mysqli = new mysqli($this->config['database']['hostname'],
+			$this->config['database']['username'],
+			$this->config['database']['password'],
+			$this->config['database']['name']);
 
 		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
@@ -88,6 +90,12 @@ class WebsiteAPI extends API
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
 			return $results;
+		} else if(isset($_PUT['verificationCode']) && isset($_PUT['userID'])) {
+			if($this->select("SELECT isVerified FROM User WHERE userID={$_GET['userID']} LIMIT 1")['verificationCode'] == $_GET['verificationCode']) {
+				$this->insert("UPDATE User SET isVerified=1 WHERE userID={$_GET['userID']}");
+				return "Success";
+			}
+			return "Fail";
 		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = $_POST["username"];
 			$email = $_POST["email"];
@@ -103,7 +111,19 @@ class WebsiteAPI extends API
 				return "Email already exists";
 			}
 
-			$this->insert("INSERT INTO User (username, email, password, mu, sigma, status) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0)");
+			$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '".rand(0, 9999999999)."')");
+
+			// Send verification email
+			$transport = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, "ssl")
+			->setUsername($this->config['email']['email'])
+			->setPassword($this->config['email']['password']);
+			$mailer = Swift_Mailer::newInstance($transport);
+			$message = Swift_Message::newInstance('Halite Email Verification')
+				->setFrom(array($this->config['email']['email'] => 'Halite Competition'))
+				->setTo(array($email))
+				->setBody('To verify you email, <a href="#">click here</a>.', 'text/html');
+			$result = $mailer->send($message);
+
 			return "Success";
 		}
 	}
@@ -141,6 +161,11 @@ class WebsiteAPI extends API
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
 			$userID = $_POST['userID'];
 
+			$user = $this->select("SELECT isVerified FROM User WHERE userID={$_POST['userID']}");
+			if(count($user) == 0 || $user['isVerified'] == false) {
+				return "Unverified email";
+			}
+
 			$targetPath = "../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath) == true) unlink($targetPath);
 
@@ -160,14 +185,22 @@ class WebsiteAPI extends API
 		} else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$username = $_POST['username'];
 			$password = $this->encryptPassword($_POST['password']);
-			
-			$_SESSION = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+
+			$user = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+			if($user['isVerified'] == false) {
+				return "Unverified user";
+			}
+			$_SESSION = $user;
 			return "Success";
 		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
 			$userID = $_POST['userID'];
 			$password = $this->encryptPassword($_POST['password']);
 
-			$_SESSION = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+			$user = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+			if($user['isVerified'] == false) {
+				return "Unverified user";
+			}
+			$_SESSION = $user;
 			return "Success";
 		} else if($this->method == 'DELETE') {
 			session_destroy();
