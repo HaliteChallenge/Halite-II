@@ -11,9 +11,6 @@ install:
   - export CXX="g++-4.8"
 
 script:
-  - ls /usr/include
-  - ls /usr/local/include
-
   - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
 
