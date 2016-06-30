@@ -552,8 +552,6 @@ GameStatistics Halite::runGame()
 	}
 	for(int a = 0; a < number_of_players; a++) if(result[a]) rankings.push_back(a);
 	std::reverse(rankings.begin(), rankings.end());
-	for(unsigned char a = 0; a < number_of_players; a++) std::cout << (int)rankings[a] << ' ';
-		std::cout << std::endl;
 	GameStatistics stats;
 	int chunkSize = game_map.map_width * game_map.map_height / number_of_players;
 	for(unsigned char a = 0; a < number_of_players; a++)

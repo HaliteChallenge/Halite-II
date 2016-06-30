@@ -39,8 +39,14 @@ DROP TABLE IF EXISTS `GameUser`;
 CREATE TABLE `GameUser` (
   `gameID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL,
+  `playerIndex` smallint(5) unsigned NOT NULL,
   `rank` smallint(5) unsigned NOT NULL,
-  `playerIndex` smallint(5) unsigned NOT NULL
+  `territoryAverage` FLOAT(8, 5) NOT NULL,
+  `strengthAverage` FLOAT(8, 5) NOT NULL,
+  `productionAverage` FLOAT(8, 5) NOT NULL,
+  `stillPercentage` FLOAT(8, 5) NOT NULL,
+  `allianceAverage` FLOAT(8, 5) NOT NULL,
+  `turnTimeAverage` FLOAT(8, 5) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
