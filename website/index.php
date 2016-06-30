@@ -41,7 +41,6 @@
 									<th>Username</th>
 									<th>Language</th>
 									<th>Score</th>
-									<th></th>
 								</tr>
 							</thead>
 						</table>
