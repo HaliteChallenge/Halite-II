@@ -68,6 +68,12 @@ CREATE TABLE `User` (
   `email` varchar(32) NOT NULL,
   `verificationCode` varchar(32),
   `isVerified` tinyint(1) NOT NULL,
+  `territoryAverage` FLOAT(8, 5) NOT NULL,
+  `strengthAverage` FLOAT(8, 5) NOT NULL,
+  `productionAverage` FLOAT(8, 5) NOT NULL,
+  `stillPercentage` FLOAT(8, 5) NOT NULL,
+  `allianceAverage` FLOAT(8, 5) NOT NULL,
+  `turnTimeAverage` FLOAT(8, 5) NOT NULL,
   PRIMARY KEY (`userID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
