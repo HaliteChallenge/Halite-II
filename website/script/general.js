@@ -5,15 +5,16 @@ function getGET(name) {
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+// The message box should be accessible to all pages
+var messageBox = {
+	$messageBox: $("#messageBox"),
+	alert: function(title, message, isSuccess) {
+		this.$messageBox.empty()
+		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+	}
+};
+
 $(function() {
-	var messageBox = {
-		$messageBox: $("#messageBox"),
-		alert: function(title, message, isSuccess) {
-			this.$messageBox.empty()
-			this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
-		}
-	};
-	
 	function SmartForm($submitButton, $form, onSubmit) {
 		$submitButton.click(function() {
 			console.log("CLICK");
@@ -79,6 +80,8 @@ $(function() {
 			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
 			if(user == null) {
 				messageBox.alert("Login failed", "That username/password combo does not exist", false);
+			} else if(user['isVerified'] == false) {
+				messageBox.alert("Login failed", "Your email needs to be verified", false);
 			} else {
 				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
 				this.loggedIn = true;
@@ -92,18 +95,17 @@ $(function() {
 			var password = this.$registerPassword.val();
 
 			var resp = storeUserDatabase(email, username, password, false);
+			console.log(resp)
 			if (resp === "Success") {
 				storeUserSession(username, password, false);
-
-				this.loggedIn = true;
-				this.user = getSession();
-				this.render();
-				messageBox.alert("Registration succeeded", "You successfully registered and were logged in for the Halite competition.", true);
+				messageBox.alert("Verify Your Email", "You may not log in until you verify your email.", true);
 			} else  {
-				if(resp.toLowerCase().indexOf("usernmae") > -1) {
+				if(resp.toLowerCase().indexOf("username") > -1) {
 					messageBox.alert("Registration failed", "That username is already taken", false);
-				} else {
+				} else if (resp.toLowerCase().indexOf("exists") > -1) {
 					messageBox.alert("Registration failed", "That email is already taken", false);
+				} else {
+					messageBox.alert("Registration failed", "That email is invalid", false);
 				}
 			}
 		},
