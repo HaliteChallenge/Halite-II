@@ -25,7 +25,7 @@ parser.read("../halite.ini")
 
 RUN_GAME_FILE_NAME = "runGame.sh"
 HALITE_EMAIL = "halite@halite.io"
-HALITE_EMAIL_PASSWORD = parser["worker"]["emailPassword"]
+HALITE_EMAIL_PASSWORD = parser["email"]["password"]
 
 def makePath(path):
 	"""Deletes anything residing at path, creates path, and chmods the directory"""

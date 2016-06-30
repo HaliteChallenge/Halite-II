@@ -31,8 +31,6 @@ If you have not already:
 
 * Execute: ```./install.sh```
 * Create a `halite.ini` file in the root directory of the project
- * Create a `[worker]` section
- * Fill in `apiKey`, `managerURL`, and `emailPassword`
 * Add the `apiKey` and the ip address of the worker to the `Worker` table
 * Execute ```sudo python3 worker.py```
 
