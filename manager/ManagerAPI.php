@@ -165,7 +165,7 @@ class ManagerAPI extends API
 
 			// Check that we arent storing too many replay files
 			$fi = new FilesystemIterator(REPLAYS_DIR, FilesystemIterator::SKIP_DOTS);
-			if(iterator_count($fi) > 10000) {
+			while(iterator_count($fi) > 10000) {
 				unlink(readdir(opendir(REPLAYS_DIR)));
 			}
 
