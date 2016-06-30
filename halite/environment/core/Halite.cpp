@@ -17,7 +17,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive)
 	if(game_map.map_width == 0 || game_map.map_height == 0) return std::vector<bool>(0);
 
 	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	std::vector< std::future<unsigned int> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
