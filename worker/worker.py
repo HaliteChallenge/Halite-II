@@ -100,12 +100,20 @@ def runGame(width, height, users, backend):
 		print(line)
 		lines.append(line)
 
-	replayPath = lines[-2]
+	replayPath = lines[0]
 
 	# Get player ranks and scores by parsing shellOutput
-	rankedPlayerIndexes = [int(a) for a in lines[-1].strip().split(" ")]
-	for a in range(len(rankedPlayerIndexes)):
-		users[rankedPlayerIndexes[a]-1]["rank"] = a
+	for line in range(len(lines)-len(users), len(lines)):
+		components = line.split(" ")
+		playerTag = int(components[0])
+		users[playerTag-1]["playerTag"] = playerTag
+		users[playerTag-1]["rank"] = int(components[1])
+		users[playerTag-1]["territoryAverage"] = float(components[2])
+		users[playerTag-1]["strengthAverage"] = float(components[3])
+		users[playerTag-1]["productionAverage"] = float(components[4])
+		users[playerTag-1]["stillPercentage"] = float(components[5])
+		users[playerTag-1]["allianceAverage"] = float(components[6])
+		users[playerTag-1]["turnTimeAverage"] = float(components[7])
 
 	# Update trueskill mu and sigma values
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
