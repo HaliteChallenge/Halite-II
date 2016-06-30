@@ -117,7 +117,7 @@ std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const st
 		}
 	}
 
-	for(unsigned char a = 0; a < number_of_players; a++) full_still_count[a] += pieces[a].size();
+	for(unsigned char a = 0; a < number_of_players; a++) for(auto b = pieces[a].begin(); b != pieces[a].end(); b++) if(b->second != 0) full_still_count[a]++;
 
 	//Add all of the moves back into the map.
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
@@ -562,7 +562,7 @@ GameStatistics Halite::runGame()
 		p.average_territory_count = full_territory_count[a] / double(chunkSize * alive_frame_count[a]);
 		p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
 		p.average_production_count = full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)); //For this, we want turns rather than frames.
-		p.still_to_cardinal = full_still_count[a] / double(full_cardinal_count[a]);
+		p.still_percentage = full_still_count[a] / double(full_cardinal_count[a] + full_still_count[a]);
 		p.average_alliance_count = full_alliance_count[a] / double(alive_frame_count[a]);
 		p.average_response_time = total_response_time[a] / double(alive_frame_count[a]); //In milliseconds.
 		stats.player_statistics.push_back(p);
