@@ -495,6 +495,9 @@ void Halite::init()
 		}
 	}
 
+	//Init alliances vector.
+	alliances = std::vector< std::vector<unsigned int> >(number_of_players, std::vector<unsigned int>(number_of_players));
+
 	//Init statistics
 	alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
