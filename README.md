@@ -1,5 +1,7 @@
 # Halite
 
+[![Travis Badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
+
 ![Game gif](multimedia/ExampleGame.gif)
 
 ## Overview
@@ -60,7 +62,7 @@ while True:
 				moves.append(Move(Location(x, y), int(random.random() * 5)))
 	
 	# Send moves to environment
-	sendFrame(moves, sendMessages)
+	sendFrame(moves, [])
 ```
 
 To test a bot, users must first run a game over the command line between two or more bots using Halite's environment. A replay file will be outputted by the environment and may be viewed using Halite's visualizer. 

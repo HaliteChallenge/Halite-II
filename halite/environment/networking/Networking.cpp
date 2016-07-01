@@ -5,6 +5,11 @@
 #include <sstream>
 #include <algorithm>
 #include <stdio.h>
+#include <chrono>
+#include <thread>
+#include <mutex>
+
+std::mutex coutMutex;
 
 std::string serializeMapSize(const hlt::Map & map)
 {
@@ -149,8 +154,10 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString)
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis)
 {
+	srand(time(NULL));
+
 	std::string newString;
-	#ifdef _WIN32
+#ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsRead;
@@ -205,13 +212,33 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 			if (buffer == '\n') break;
 			else newString += buffer;
 		} else {
-			if(!program_output_style) std::cout << "Unix bot timeout or error " << selectionResult << "\n";
+			if(!program_output_style) {
+				// Buffer error message output
+				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
+				// That looks really weird
+				std::string errorMessage = "";
+				errorMessage += std::string("Unix bot timeout or error ") + std::to_string(selectionResult) + std::string("\n");
+
+				playerLogs[playerTag-1].push_back(newString);
+				errorMessage += "#---------ALL OF THE OUTPUT OF THE BOT THAT TIMED OUT----------#\n";
+				for(auto stringIter = playerLogs[playerTag-1].begin(); stringIter != playerLogs[playerTag-1].end(); stringIter++) {
+					errorMessage += std::string("# ") + *stringIter + std::string("\n");
+				}
+				errorMessage += "#--------------------------------------------------------------#\n";
+
+				std::lock_guard<std::mutex> guard(coutMutex);
+				std::cout << errorMessage;
+			}
 			throw 1;
 		}
 	}
 	#endif
+
 	//Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
+
+	playerLogs[playerTag-1].push_back(newString);
+
 	return newString;
 }
 
@@ -326,6 +353,8 @@ void Networking::startAndConnectBot(std::string command)
 	processes.push_back(pid);
 
 	#endif
+
+	playerLogs.push_back(std::vector<std::string>(0));
 }
 
 bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
@@ -352,7 +381,7 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 	}
 }
 
-bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
+unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
 {
 	try
 	{
@@ -365,15 +394,19 @@ bool Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char
 
 		moves->clear();
 
-		std::string movesString = getString(playerTag, timeoutMillis), getMessagesString = getString(playerTag, timeoutMillis);
+		clock_t initialTime = clock();
+		std::string movesString = getString(playerTag, timeoutMillis);
+		std::string getMessagesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
+		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+
 		*moves = deserializeMoveSet(movesString);
 		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
-		return true;
+		return millisTaken;
 	}
 	catch (int e)
 	{
-		return false;
+		return timeoutMillis+1;
 
 	}
 

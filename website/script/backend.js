@@ -13,6 +13,8 @@ function storeUserDatabase(email, username, password, async) {
 	if(async == true) {
 		return null;
 	}
+
+	console.log(result)
 	return result.responseJSON;
 }
 
@@ -86,12 +88,12 @@ function getActiveUsers() {
 	return result.responseJSON;
 }
 
-function getLatestGamesForUser(userID) {
+function getLatestGamesForUser(userID, limit) {
 	var result = $.ajax({
 		url: url+"game",
 		async: false,
 		method: "GET",
-		data: {userID: userID}
+		data: {userID: userID, limit: limit}
 	});
 	return result.responseJSON;
 }
@@ -112,4 +114,13 @@ function destroySession(async) {
 		async: async,
 		method: "DELETE"
 	});
+}
+
+function verifyUser(userID, verificationCode) {
+	return $.ajax({
+		url: url+"user",
+		async: false,
+		method: "POST",
+		data: {userID: userID, verificationCode: verificationCode}
+	}).responseJSON;
 }

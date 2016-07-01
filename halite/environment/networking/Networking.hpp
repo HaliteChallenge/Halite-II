@@ -27,7 +27,7 @@ class Networking {
 public:
 	void startAndConnectBot(std::string command);
 	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName);
-	bool handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot);
+	unsigned int handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot);
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
@@ -54,6 +54,8 @@ private:
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
+
+	std::vector< std::vector<std::string> > playerLogs;
 };
 
 #endif

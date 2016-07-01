@@ -20,6 +20,12 @@
 			<div class="jumbotron" id="jumbotron">
 				<h1 id="jHeader">Halite</h1>
 				<p id="jParagraph">A multi-player turn-based strategy game</p>
+				<p>
+					<a href="quickstart.php" class="btn btn-info" role="button">Quickstart</a>
+					<a href="tutorial.php" class="btn btn-info" role="button">Tutorial</a>
+					<a href="contest_rules.php" class="btn btn-info" role="button">Game Rules</a>
+					<a href="downloads.php" class="btn btn-info" role="button">Downloads</a>
+				</p>
 			</div>
 			<div class="row">
 				<div class="col-sm-12">
@@ -35,7 +41,6 @@
 									<th>Username</th>
 									<th>Language</th>
 									<th>Score</th>
-									<th></th>
 								</tr>
 							</thead>
 						</table>
@@ -53,6 +58,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="script/backend.js"></script>
+	<script src="script/general.js"></script>
 	<script src="script/index.js"></script>
 	<script src="script/visualizer.js"></script>
 </body>

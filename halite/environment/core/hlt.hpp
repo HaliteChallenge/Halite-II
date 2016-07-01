@@ -19,6 +19,17 @@ struct Color
 
 namespace hlt
 {
+	static bool isValidDirection(unsigned char d)
+	{
+		return d >= STILL && d <= WEST;
+	}
+	static unsigned char oppositeDirection(unsigned char d)
+	{
+		if(d == STILL) return STILL;
+		if(d % 2 == 1) return 4 - d;
+		return 6 - d;
+	}
+
 	enum MessageType {ATTACK, STOP_ATTACK};
 	struct Message {
 		MessageType type;

@@ -1,6 +1,11 @@
 <?php
 
 require_once 'API.class.php';
+
+define("REPLAYS_DIR", "../storage/replays/");
+define("BOTS_DIR", "../storage/bots/");
+define("INI_FILE", "../halite.ini");
+
 class ManagerAPI extends API
 {
 
@@ -49,16 +54,16 @@ class ManagerAPI extends API
 
 	// Returns the directory that holds a bot, given the bot's userID
 	private function getBotFile($userID) {
-		return "../storage/bots/{$userID}.zip";
+		return BOTS_DIR."{$userID}.zip";
 	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
-		$config = parse_ini_file("../halite.ini");
-		$this->mysqli = new mysqli($config['hostname'],
-			$config['username'],
-			$config['password'],
-			$config['databaseName']);
+		$config = parse_ini_file(INI_FILE, true);
+		$this->mysqli = new mysqli($config['database']['hostname'],
+			$config['database']['username'],
+			$config['database']['password'],
+			$config['database']['name']);
 
 		if (mysqli_connect_errno()) {
 			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
@@ -145,10 +150,11 @@ class ManagerAPI extends API
 		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$users = json_decode($_POST['users']);
 			var_dump($users);
+
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
 			$name = basename($_FILES[$fileKey]['name']);
-			$targetPath = "../storage/replays/{$name}";
+			$targetPath = REPLAYS_DIR."{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			if(is_file($targetPath) == false) {
 				echo "Did not work";
@@ -157,15 +163,45 @@ class ManagerAPI extends API
 			}
 			chmod($targetPath, 0777);
 
+			// Check that we arent storing too many replay files
+			$fi = new FilesystemIterator(REPLAYS_DIR, FilesystemIterator::SKIP_DOTS);
+			$handle = opendir(REPLAYS_DIR);
+			while(iterator_count($fi) > 10000) {
+				$entry = NULL;
+				do {
+					$entry = readdir($handle);
+				} while($entry == "." || $entry == "..");
+			   unlink(REPLAYS_DIR.$entry);
+			}
+
 			// Store game information in db
 			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
 
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, $a)");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->allianceAverage}, {$users[$a]->turnTimeAverage})");
+
+				// Cache average stats
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
+				$totalGameStats = array();
+				foreach($gameStats as $oneGameStats) {
+					foreach($oneGameStats as $statName => $statValue) {
+						if(!array_key_exists($statName, $totalGameStats)) {
+							$totalGameStats[$statName] = 0;
+						}
+						$totalGameStats[$statName] += $statValue;
+					}
+				}
+
+				foreach($totalGameStats as $statName => $totalStatValue) {
+					$averageStatValue = $totalStatValue / count($gameStats);
+					$this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = {$users[$a]->userID}");
+				}
+
 				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
+
 		}
 	}
 
@@ -186,7 +222,7 @@ class ManagerAPI extends API
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = "../storage/bots/{$userID}.zip";
+			$targetPath = BOTS_DIR."{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;

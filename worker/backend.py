@@ -7,8 +7,8 @@ import os
 
 config = configparser.ConfigParser()
 config.read("../halite.ini")
-API_KEY = config.get("worker", "apiKey")
-MANAGER_URL = config.get("worker", "managerURL")
+API_KEY = config.get("hce", "apiKey")
+MANAGER_URL = config.get("hce", "managerURL")
 
 def getTask():
 	"""Gets either a run or a compile task from the API"""

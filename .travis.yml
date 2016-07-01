@@ -8,13 +8,21 @@ compiler: gcc
 
 install:
   - ~/build/HaliteChallenge/Halite/halite/visualizer/debianInstall.sh
+  - sudo apt-get install -y python3 openjdk-7-jdk
   - export CXX="g++-4.8"
 
 script:
+  - cd ~/build/HaliteChallenge/Halite/airesources/Java
+  - javac MyBot.java
+  - cd ../C++
+  - g++ -std=c++11 MyBot.cpp -o MyBot.o
+
   - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
+  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot"
+  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "../../airesources/C++/MyBot.o"
 
-  - cd ../visualizer
+  - cd  ~/build/HaliteChallenge/Halite/halite/visualizer
   - make
 
 notifications:
