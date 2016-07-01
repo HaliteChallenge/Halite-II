@@ -281,8 +281,8 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 		while(b != receivedResponses.end() && a->senderID != b->recepientID && b->senderID != a->recepientID) b++;
 		if(b != receivedResponses.end() && b->response)
 		{
-			alliances[a->senderID][b->senderID] += a->numTurns;
-			alliances[b->senderID][a->senderID] += a->numTurns;
+			alliances[a->senderID - 1][b->senderID - 1] += a->numTurns;
+			alliances[b->senderID - 1][a->senderID - 1] += a->numTurns;
 		}
 
 	}

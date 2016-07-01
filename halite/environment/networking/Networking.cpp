@@ -11,26 +11,11 @@
 
 std::mutex coutMutex;
 
-std::string serializeMapSize(const hlt::Map & map)
+std::string Networking::serializeMapSize(const hlt::Map & map)
 {
 	std::string returnString = "";
 	std::ostringstream oss;
 	oss << map.map_width << ' ' << map.map_height << ' ';
-	returnString = oss.str();
-	return returnString;
-}
-
-std::string serializeProductions(const hlt::Map & map)
-{
-	std::string returnString = "";
-	std::ostringstream oss;
-	for(auto a = map.contents.begin(); a != map.contents.end(); a++)
-	{
-		for(auto b = a->begin(); b != a->end(); b++)
-		{
-			oss << (unsigned short)(b->production) << ' ';
-		}
-	}
 	returnString = oss.str();
 	return returnString;
 }
@@ -76,55 +61,61 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	return returnString;
 }
 
+std::string Networking::serializeProductions(const hlt::Map & map)
+{
+	std::string returnString = "";
+	std::ostringstream oss;
+	for(auto a = map.contents.begin(); a != map.contents.end(); a++)
+	{
+		for(auto b = a->begin(); b != a->end(); b++)
+		{
+			oss << (unsigned short)(b->production) << ' ';
+		}
+	}
+	returnString = oss.str();
+	return returnString;
+}
+
+std::string Networking::serializeAllianceStates(const std::vector< std::vector<unsigned short> > & alliances)
+{
+	std::string answer;
+	for(auto a = alliances.begin(); a != alliances.end(); a++) for(auto b = alliances.begin(); b != alliances.end(); b++) answer += std::to_string(*b) + ' ';
+	return answer;
+}
+
+std::string Networking::serializeAllianceRequests(const std::vector<hlt::AllianceRequest> & requests)
+{
+	std::string answer;
+	for(auto a = requests.begin(); a != requests.end(); a++) answer += std::to_string(a->senderID) + ' ' + std::to_string(a->numTurns) + ' ';
+	return answer;
+}
+
 std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString)
 {
 	std::set<hlt::Move> moves = std::set<hlt::Move>();
-
 	std::stringstream iss(inputString);
 	hlt::Location l;
 	int d;
 	while (iss >> l.x >> l.y >> d) moves.insert({ l, (unsigned char)d });
-
 	return moves;
 }
 
-std::string Networking::serializeMessages(const std::vector<hlt::Message> &messages) {
-	std::ostringstream oss;
-
-	oss << messages.size() << ' ';
-
-	for(int a = 0; a < messages.size(); a++)
-	{
-		hlt::Message message = messages[a];
-		oss << (unsigned short)message.type << ' ';
-		oss << message.senderID << ' ' << message.recipientID << ' ' << message.targetID << ' ';
-	}
-
-	return oss.str();
+std::vector<hlt::AllianceRequest> Networking::deserializeAllianceRequests(const std::string &inputString, unsigned char senderTag)
+{
+	std::vector<hlt::AllianceRequest> answer;
+	std::stringstream iss(inputString);
+	int p, t;
+	while(iss >> p >> t) answer.push_back({ senderTag, p, t });
+	return answer;
 }
 
-std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inputString)
+std::vector<hlt::AllianceResponse> Networking::deserializeAllianceResponses(const std::string &inputString, unsigned char senderTag)
 {
-	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
+	std::vector<hlt::AllianceResponse> answer;
 	std::stringstream iss(inputString);
-
-	int numberOfMessages;
-	iss >> numberOfMessages;
-
-	for(int a = 0; a < numberOfMessages; a++)
-	{
-		hlt::Message message;
-
-		int messageTypeInt;
-		iss >> messageTypeInt;
-		message.type = static_cast<hlt::MessageType>(messageTypeInt);
-
-		iss >> message.senderID >> message.recipientID >> message.targetID;
-
-		messages.push_back(message);
-	}
-
-	return messages;
+	int p, r;
+	while(iss >> p >> r) answer.push_back({ senderTag, p, r });
+	return answer;
 }
 
 void Networking::sendString(unsigned char playerTag, std::string &sendString)
@@ -357,11 +348,11 @@ void Networking::startAndConnectBot(std::string command)
 	playerLogs.push_back(std::vector<std::string>(0));
 }
 
-bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
+bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::vector<AllianceRequest> * requests, std::string * playerName)
 {
 	try
 	{
-		std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
+		std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), prodString = serializeProductions(m), mapString = serializeMap(m);
 		sendString(playerTag, playerTagString);
 		sendString(playerTag, mapSizeString);
 		sendString(playerTag, prodString);
@@ -369,9 +360,12 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!program_output_style) std::cout << outMessage;
 
+		clock_t initialTime = clock();
 		*playerName = getString(playerTag, timeoutMillis);
-		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
-		if(!program_output_style) std::cout << inMessage;
+		std::string allianceRequestsString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
+		unsigned int millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+		*requests = deserializeAllianceRequests(allianceRequestsString);
+		if(!program_output_style) std::cout << "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
 
 		return true;
 	}
@@ -381,26 +375,29 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 	}
 }
 
-unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
+unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector< std::vector<unsigned short> > & alliances, const std::vector<hlt::AllianceRequest> & requests, std::set<hlt::Move> * moves, std::vector<hlt::AllianceRequest> * newRequests, std::vector<hlt::AllianceResponse> * newResponses)
 {
 	try
 	{
 		if (isProcessDead(playerTag)) return false;
 
 		//Send this bot the game map and the messages addressed to this bot
-		std::string mapString = serializeMap(m), sendMessagesString = serializeMessages(messagesForThisBot);
+		std::string mapString = serializeMap(m), alliancesString = serializeMessages(alliances), requestsString = serializeAllianceRequests(requests);
 		sendString(playerTag, mapString);
-		sendString(playerTag, sendMessagesString);
+		sendString(playerTag, alliancesString);
+		sendString(playerTag, requestsString);
 
 		moves->clear();
 
 		clock_t initialTime = clock();
 		std::string movesString = getString(playerTag, timeoutMillis);
-		std::string getMessagesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
+		std::string allianceRequestsString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
+		std::string allianceResponsesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
 		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
 
 		*moves = deserializeMoveSet(movesString);
-		*messagesFromThisBot = deserializeMessages(getMessagesString);
+		*newRequests = deserializeAllianceRequests(allianceRequestsString, playerTag);
+		*newResponses = deserializeAllianceResponses(allianceResponsesString, playerTag);
 
 		return millisTaken;
 	}

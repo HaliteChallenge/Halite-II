@@ -100,8 +100,8 @@
 
 				<h4>[OUT] Move Set Format:</h4>
 
-				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter<br>Valid directions include:
-					<ul>
+				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
+					<ul
 				 		<li>0 - STILL</li>
 				 		<li>1 - NORTH</li>
 				 		<li>2 - EAST</li>
