@@ -22,13 +22,6 @@
 						<h3 class="panel-title">Statistics</h3>
 					</div>
 					<table class="table well well-sm" id="statTable">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Raw Value</th>
-								<th>Ranking</th>
-							</tr>
-						</thead>
 						<tbody id="statTableBody">
 						</tbody>
 					</table>
