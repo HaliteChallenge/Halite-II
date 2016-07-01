@@ -62,7 +62,7 @@ private:
 	hlt::Map game_map;
 	std::vector<std::vector<unsigned char> * > full_game;
 	std::vector<std::string> player_names;
-	std::vector<hlt::Message> pastFrameMessages;
+	std::vector<hlt::AllianceRequest> past_alliance_requests;
 	std::vector< std::set<hlt::Move> > player_moves;
 	std::vector< std::vector<unsigned int> > alliances;
 
