@@ -16,7 +16,25 @@
 
 				<h3>Overview</h3>
 
-				
+				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline.</p>
+
+				<p>There are two separate formats of information that are sent between the environment and bots.
+					<ul>
+				 		<li>Initialization</li>
+				 		<li>Frame</li>
+				 	</ul>
+				 Bots are initialized only once at the start of the game, before the first frame. Following initialization, bots follow the frame format until the end of the game, when the environment will automatically terminate them.</p>
+
+
+				<h3>Initialization</h3>
+
+				<p>Bots are sent the following, each on their own line:
+					<ul>
+				 		<li>A single integer representing their own tag within the game.</li>
+				 		<li>Two integers respresenting the WIDTH and HEIGHT of the map.</li>
+				 		<li>WIDTH * HEIGHT integers respresenting the production values of the map. The integers fill in the map by row, and within a row by column.</li>
+				 	</ul>
+				 </p>
 
 			</div>
 		</div>
