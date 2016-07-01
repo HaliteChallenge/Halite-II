@@ -41,7 +41,7 @@ std::fstream debug;
 #define argv __argv
 #endif
 
-#ifdef _WIN2
+#ifdef _WIN32
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
 #else
 int main(int argc, const char ** argv)

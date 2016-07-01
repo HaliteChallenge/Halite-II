@@ -15,8 +15,13 @@
 #include <map>
 #include <algorithm>
 #include <time.h>
+#ifdef _WIN32
+#include "ft2build.h"
+#include "freetype/freetype.h"
+#else
 #include "freetype2/ft2build.h"
 #include "freetype2/freetype/freetype.h"
+#endif
 
 //Color struct.
 struct Color
