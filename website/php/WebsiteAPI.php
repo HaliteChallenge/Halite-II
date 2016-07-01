@@ -129,6 +129,8 @@ class WebsiteAPI extends API
 
 				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
 				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
+				
+				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
 
 				$message->setBody("To verify you email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
 				$result = $mailer->send($message);
@@ -151,7 +153,7 @@ class WebsiteAPI extends API
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
 			$userID = $_GET['userID'];
 
-			$gameIDArrays = $this->selectMultiple("SELECT * FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
+			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
 			$gameArrays = array();
 
 			// Get each game's info
@@ -160,7 +162,7 @@ class WebsiteAPI extends API
 				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
 
 				// Get information about users
-				$gameArray['users'] = $this->selectMultiple("SELECT * FROM GameUser WHERE gameID = $gameID");
+				$gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
 				foreach($gameArray['users'] as &$gameUserRow) {
 					// Get rid of gameID
 					unset($gameUserRow['gameID']);
@@ -189,7 +191,7 @@ class WebsiteAPI extends API
 
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
 
-			$this->insert("UPDATE User SET status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
+			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
 			return "Success";
 		}
