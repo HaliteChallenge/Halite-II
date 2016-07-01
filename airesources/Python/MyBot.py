@@ -1,11 +1,8 @@
 from hlt import *
 from networking import *
 
-import random
-import copy
-
 playerTag, gameMap = getInit()
-sendInit("ExpandBot"+str(expandFactor))
+sendInit("PythonBot"+str(playerTag))
 
 while True:
 	moves = []
@@ -16,15 +13,5 @@ while True:
 		for x in range(0, len(gameMap.contents[y])):
 			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
-				direction = random.randint(0, 5)
-				if site.strength < 5*site.production:
-					direction = STILL
-				else:
-					scrambledCardinals = copy.deepcopy(CARDINALS)
-					random.shuffle(scrambledCardinals)
-					for d in scrambledCardinals:
-						if gameMap.getSite(Location(x, y), d).owner != playerTag:
-							direction = d
-							break
-				moves.append(Move(Location(x, y), direction))
+				moves.append(Move(Location(x, y), int(random.random() * 5)))
 	sendFrame(moves, sendMessages)
