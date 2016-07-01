@@ -92,6 +92,34 @@
 
 				<p>Consider the following case as an example:<br>There are 4 players in the game. Players 1 and 4 are allied for 8 more turns, while players 2 and 3 are only bound in alliance for 3 more turns. We could then represent this setup with the following square grid:<br>0 0 0 8<br>0 0 3 0<br>0 3 0 0<br>8 0 0 0<br>This would in turn be encoded with the following string:<br>0 0 0 8 0 0 3 0 0 3 0 0 8 0 0 0</p>
 
+				<h4>Move Set Format:</h4>
+
+				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter<br>Valid directions include:
+					<ul>
+				 		<li>0 - STILL</li>
+				 		<li>1 - NORTH</li>
+				 		<li>2 - EAST</li>
+				 		<li>3 - SOUTH</li>
+				 		<li>4 - WEST</li>
+				 	</ul>
+				Please note that these directions correspond most directly to screen coordinates; that is, NORTH decrements the y value of the site by 1 and SOUTH increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
+
+				<p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain STILL, and a piece located at (4, 5) to move NORTH.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
+
+				<h4>Move Set Format:</h4>
+
+				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter<br>Valid directions include:
+					<ul>
+				 		<li>0 - STILL</li>
+				 		<li>1 - NORTH</li>
+				 		<li>2 - EAST</li>
+				 		<li>3 - SOUTH</li>
+				 		<li>4 - WEST</li>
+				 	</ul>
+				Please note that these directions correspond most directly to screen coordinates; that is, NORTH decrements the y value of the site by 1 and SOUTH increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
+
+				<p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain STILL, and a piece located at (4, 5) to move NORTH.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
+
 			</div>
 		</div>
 	</div>
