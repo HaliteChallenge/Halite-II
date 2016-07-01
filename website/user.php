@@ -40,8 +40,6 @@
 							</tr>
 						</thead>
 						<tbody id="gameTableBody">
-							<tr><td>Other User</td><td><span class="lost">Lost</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
-							<tr><td>John Doe</td><td><span class="won">Won</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
 						</tbody>
 					</table>
 				</div>
