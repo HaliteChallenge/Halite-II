@@ -14,42 +14,83 @@
 		<div class="row">
 			<div class="col-sm-12">
 
-				<h3>Overview</h3>
+				<h3>Overview:</h3>
 
-				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline.</p>
+				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Bots are expected to communicate using the format found below; any deviation from it will likely result in the bot being ejected from the game.</p>
 
 				<p>There are two separate formats of information that are sent between the environment and bots.
 					<ul>
 				 		<li>Initialization</li>
 				 		<li>Frame</li>
 				 	</ul>
-				 Bots are initialized only once at the start of the game, before the first frame. Following initialization, bots follow the frame format until the end of the game, when the environment will automatically terminate them.</p>
+				 </p>
+				 
+				 <p>Bots are initialized only once at the start of the game, before the first frame. Following initialization, bots follow the frame format until the end of the game, when the environment will automatically terminate them.</p>
 
 
-				<h3>Initialization</h3>
+				<h3>Initialization Format:</h3>
 
-				<p>Bots are sent the following, each on their own line:
+				<p>Every bot is sent the following, with each item newline-terminated:
 					<ul>
 				 		<li>A single integer representing their own tag within the game.</li>
 				 		<li>Two integers respresenting the WIDTH and HEIGHT of the map.</li>
-				 		<li>WIDTH * HEIGHT integers respresenting the production values of the map. The integers fill in the map by row, and within a row by column.</li>
-				 		<li>The initial game map (in the format discussed below)</li>
+				 		<li>The production map.</li>
+				 		<li>The initial game map.</li>
 				 	</ul>
-				 </p>
-				 <p>Bots are expected to respond with a single string containing their name.</p>
+				</p>
 
+				 <p>Every bot is expected to respond with the following, with each item newline-terminated:
+				 	<ul>
+				 		<li>A string representing their name.</li>
+				 		<li>A set of alliance requests.</li>
+				 	</ul>
+				</p>
 
-				<h3>Frame</h3>
+				<h3>Frame Format:</h3>
 
-				<p>Bots are sent the following, each on their own line:
+				<p>Every bot is sent the following, with each item newline-terminated:
 					<ul>
-				 		<li>A single integer representing their own tag within the game.</li>
-				 		<li>Two integers respresenting the WIDTH and HEIGHT of the map.</li>
-				 		<li>WIDTH * HEIGHT integers respresenting the production values of the map. The integers fill in the map by row, and within a row by column.</li>
-				 		<li>The initial game map (in the format discussed below)</li>
+				 		<li>The present game map (in the format described below).</li>
+				 		<li>The present state of alliances.</li>
+				 		<li>A set of alliance requests.</li>
 				 	</ul>
-				 </p>
-				 <p>Bots are expected to respond with a single string containing their name.</p>
+				</p>
+
+				<p>Every bot is expected to respond with the following, with each item newline-terminated:
+				 	<ul>
+				 		<li>A set of moves.</li>
+				 		<li>A set of alliance requests.</li>
+				 		<li>A set of alliance request responses.</li>
+				 	</ul>
+				</p>
+
+
+				<h3>Format Specifics:</h3>
+
+				<h4>Map Format:</h4>
+
+				<p>The state of the map (including owner and strength values, but excluding production values) is sent in the following way:
+				 	<ul>
+				 		<li>One integer, COUNTER, representing the number of tiles with the same owner consecutively.</li>
+				 		<li>One integer, OWNER, representing the owner of the tiles COUNTER encodes.</li>
+				 	</ul>
+				The above repeats until the COUNTER total is equal to the area of the map. It fills in the map from row 1 to row HEIGHT and within a row from column 1 to column WIDTH.<br>
+				This is then followed by WIDTH * HEIGHT integers, representing the strength values of the tiles in the map. It fills in the map in the same way owner values fill in the map.
+				</p>
+
+				<p>Consider the following map as an example:<br>[O=0,S=122] [O=1,S=25] [O=1,S=18]<br>[O=0,S=13] [O=0,S=45] [O=1,S=182]<br>[O=2,S=255] [O=2,S=85] [O=0,S=0]<br>This map would be encoded using the following string:<br>1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0</p>
+
+				<h4>Production Format:</h4>
+
+				<p>The production values of the map are sent using WIDTH * HEIGHT integers which fill in the production values of the map from row 1 to row HEIGHT and within a row from column 1 to column WIDTH</p>
+
+				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
+				
+				<h4>Production Format:</h4>
+
+				<p>The production values of the map are sent using WIDTH * HEIGHT integers which fill in the production values of the map from row 1 to row HEIGHT and within a row from column 1 to column WIDTH</p>
+
+				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
 
 			</div>
 		</div>
