@@ -5,6 +5,8 @@
 #include <sstream>
 #include <algorithm>
 #include <stdio.h>
+#include <chrono>
+#include <thread>
 
 std::string serializeMapSize(const hlt::Map & map)
 {
@@ -149,6 +151,8 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString)
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis)
 {
+	srand(time(NULL));
+
 	std::string newString;
 #ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
@@ -205,13 +209,32 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 			if (buffer == '\n') break;
 			else newString += buffer;
 		} else {
-			if(!program_output_style) std::cout << "Unix bot timeout or error " << selectionResult << "\n";
+			if(!program_output_style) {
+				// Buffer error message output
+				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
+				// That looks really weird
+				std::string errorMessage = "";
+				errorMessage += std::string("Unix bot timeout or error ") + std::to_string(selectionResult) + std::string("\n");
+
+				playerLogs[playerTag-1].push_back(newString);
+				errorMessage += "#---------ALL OF THE OUTPUT OF THE BOT THAT TIMED OUT----------#\n";
+				for(auto stringIter = playerLogs[playerTag-1].begin(); stringIter != playerLogs[playerTag-1].end(); stringIter++) {
+					errorMessage += std::string("# ") + *stringIter + std::string("\n");
+				}
+				errorMessage += "#--------------------------------------------------------------#\n";
+
+				std::cout << errorMessage;
+			}
 			throw 1;
 		}
 	}
 	#endif
+
 	//Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
+
+	playerLogs[playerTag-1].push_back(newString);
+
 	return newString;
 }
 
@@ -326,6 +349,8 @@ void Networking::startAndConnectBot(std::string command)
 	processes.push_back(pid);
 
 	#endif
+
+	playerLogs.push_back(std::vector<std::string>(0));
 }
 
 bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)

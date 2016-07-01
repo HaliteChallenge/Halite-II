@@ -77,7 +77,7 @@ std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const st
 	{
 		hlt::Location l = { b, a };
 		std::list<std::list< std::tuple<unsigned char, unsigned char, hlt::Location> >::iterator> toUndo;
-		for(auto c = potentialMoves[l].begin(); c != potentialMoves[l].end(); c++) 
+		for(auto c = potentialMoves[l].begin(); c != potentialMoves[l].end(); c++)
 		{
 			unsigned char owner = std::get<0>(*c);
 			for(unsigned char d = 0; d < number_of_players; d++) if(owner != d && alive[owner] && alive[d] && alliances[owner][d] != 0 && pieces[d].count(l))
@@ -97,7 +97,7 @@ std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const st
 			}
 		}
 		//Undo those moves.
-		for(auto c = toUndo.begin(); c != toUndo.end(); c++) 
+		for(auto c = toUndo.begin(); c != toUndo.end(); c++)
 		{
 			unsigned char owner = std::get<0>(**c);
 			unsigned char strength = std::get<1>(**c);
@@ -242,7 +242,7 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 			std::vector<hlt::Message> messagesForThisBot;
 			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
 
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
 
 			threadLocation++;
 		}
