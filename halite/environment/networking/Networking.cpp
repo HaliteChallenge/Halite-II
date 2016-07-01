@@ -8,6 +8,8 @@
 #include <chrono>
 #include <thread>
 
+std::mutex coutMutex;
+
 std::string serializeMapSize(const hlt::Map & map)
 {
 	std::string returnString = "";
@@ -223,6 +225,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 				}
 				errorMessage += "#--------------------------------------------------------------#\n";
 
+				std::lock_guard<std::mutex> guard(coutMutex);
 				std::cout << errorMessage;
 			}
 			throw 1;
