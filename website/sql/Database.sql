@@ -61,16 +61,31 @@ CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(20) NOT NULL,
   `password` varchar(30) NOT NULL,
-  `language` varchar(16) DEFAULT NULL,
   `status` smallint(5) unsigned NOT NULL,
-  `mu` float unsigned NOT NULL,
-  `sigma` float unsigned NOT NULL,
   `email` varchar(32) NOT NULL,
   `verificationCode` varchar(32),
   `isVerified` tinyint(1) NOT NULL,
+  `language` varchar(16) DEFAULT NULL,
+  `mu` float unsigned NOT NULL,
+  `sigma` float unsigned NOT NULL,
   `rank` smallint(5),
   `numSubmissions` smallint(5) NOT NULL,
   `numGames` smallint(5) NOT NULL,
+  PRIMARY KEY (`userID`)
+) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `UserExtraStats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `UserExtraStats` (
+  `userID` mediumint(8) unsigned NOT NULL,
+  `territoryAverage` FLOAT(8, 5) NOT NULL,
+  `strengthAverage` FLOAT(8, 5) NOT NULL,
+  `productionAverage` FLOAT(8, 5) NOT NULL,
+  `stillPercentage` FLOAT(8, 5) NOT NULL,
+  `allianceAverage` FLOAT(8, 5) NOT NULL,
+  `turnTimeAverage` FLOAT(8, 5) NOT NULL,
   `territoryRanking` smallint(5) NOT NULL,
   `strengthRanking` smallint(5) NOT NULL,
   `productionRanking` smallint(5) NOT NULL,
@@ -78,7 +93,7 @@ CREATE TABLE `User` (
   `allianceRanking` smallint(5) NOT NULL,
   `turnTimeRanking` smallint(5) NOT NULL,
   PRIMARY KEY (`userID`)
-) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
