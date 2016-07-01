@@ -86,46 +86,53 @@
 					1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0
 				</p>
 
-				<h4>[IN] Production Format:</h4>
+				<h4>Input Production Format:</h4>
 
 				<p>The production values of the map are sent using <code>WIDTH</code> * <code>HEIGHT</code> integers which fill in the production values of the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code></p>
 
 				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
 
-				<h4>[IN] Alliance State Format:</h4>
+				<h4>Input Alliance State Format:</h4>
 
 				<p>The present state of alliances will be sent using ((<code>NUM_PLAYERS</code>)^2) integers. If one were to interpret the list of integers into a square grid, again filling spots from row 1 to row <code>NUM_PLAYERS</code> and within a row from column 1 to column <code>NUM_PLAYERS</code>, the grid would serve as a table for looking up the remaining numbers of turns that the two players are bound in alliance. Additionally, this means that the grid is symmetric over the line y=x, and furthermore grid spots along y=x will always be 0.</p>
 
 				<p>Consider the following case as an example:<br>There are 4 players in the game. Players 1 and 4 are allied for 8 more turns, while players 2 and 3 are only bound in alliance for 3 more turns. We could then represent this setup with the following square grid:<br>0 0 0 8<br>0 0 3 0<br>0 3 0 0<br>8 0 0 0<br>This would in turn be encoded with the following string:<br>0 0 0 8 0 0 3 0 0 3 0 0 8 0 0 0</p>
 
-				<h4>[IN] Alliance Request Set Format:</h4>
+				<h4>Input Alliance Request Set Format:</h4>
 
 				<p>Bots are sent alliance requests as a list of integers in sets of 2. In each set, the first integer is the tag of the player which requested the alliance, and the second integer is the number of turns for which the alliance would be binding, starting with this (upcoming) turn. Bots will not receive more than one alliance request from any individual player, nor will they ever receive requests from themselves.</p>
 
 				<p>Consider the following case as an example:<br>Player 3 wishes to enter an alliance for 20 moves, and player 6 wishes to enter an alliance for 5 moves.<br>This would be encoded with the following string:<br>3 20 6 5</p>
 
-				<h4>[OUT] Move Set Format:</h4>
+				<h4>Output Move Set Format:</h4>
 
-				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter<br>Valid directions include:
+				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
 					<ul>
 				 		<li>0 - <code>STILL</code></li>
 				 		<li>1 - <code>NORTH</code></li>
 				 		<li>2 - <code>EAST</code></li>
 				 		<li>3 - <code>SOUTH</code></li>
 				 		<li>4 - <code>WEST</code></li>
+				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
+					<ul
+				 		<li>0 - STILL</li>
+				 		<li>1 - NORTH</li>
+				 		<li>2 - EAST</li>
+				 		<li>3 - SOUTH</li>
+				 		<li>4 - WEST</li>
 				 	</ul>
 				Please note that these directions correspond most directly to screen coordinates; that is, <code>NORTH</code> decrements the y value of the site by 1 and <code>SOUTH</code> increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
 
 				<p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain <code>STILL</code>, and a piece located at (4, 5) to move <code>NORTH</code>.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
 
-				<h4>[OUT] Alliance Request Set Format:</h4>
+				<h4>Output Alliance Request Set Format:</h4>
 
 				<p>Bots should send alliance requests as a list of integers in sets of 2. In each set, the first integer is the tag of the player with whom the bot requests the alliance, and the second integer is the number of turns for which the alliance would be binding, starting with the next (not upcoming) turn. Bots should not send more than one alliance request to any other bot each turn.</p>
 
 				<p>Consider the following case as an example:<br>A bot wishes to propose an alliance with player 2 for 12 moves and with player 1 for 120 moves.<br>This would be encoded with the following string:<br>2 12 1 120</p>
 
 
-				<h4>[OUT] Alliance Response Set Format:</h4>
+				<h4>Output Alliance Response Set Format:</h4>
 
 				<p>Bots should send alliance requests as a list of integers in sets of 2. In each set, the first integer is the tag of the player which requested the alliance, and the second integer is either a 0 or 1, correspondingly representing a <code>DECLINE</code> or <code>ACCEPT</code> of the alliance, starting with this (upcoming) turn. Bots should not send more than one alliance response to any other bot each turn.</p>
 

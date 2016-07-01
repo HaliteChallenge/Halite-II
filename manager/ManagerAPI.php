@@ -183,7 +183,7 @@ class ManagerAPI extends API
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->allianceAverage}, {$users[$a]->turnTimeAverage})");
 
 				// Cache raw game stats
-				$gameStats = $this->selectMultiple("SELECT territoryRanking, strengthRanking, productionRanking, stillRanking, allianceRanking, turnTimeRanking FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
+				$gameStats = $this->selectMultiple("SELECT territor FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
 				$totalGameStats = array();
 				foreach($gameStats as $oneGameStats) {
 					foreach($oneGameStats as $statName => $statValue) {
@@ -192,13 +192,13 @@ class ManagerAPI extends API
 						}
 						$totalGameStats[$statName] += $statValue;
 					}
-				}
-				foreach($totalGameStats as $statName => $totalStatValue) {
+				}*/
+				/*foreach($totalGameStats as $statName => $totalStatValue) {
 					$averageStatValue = $totalStatValue / count($gameStats);
 					$this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = {$users[$a]->userID}");
-				}
+				}*/
 
-				// Game game stat rankings
+				/*// Game game stat rankings
 				$statToRankedStat = array("territoryAverage" => "territoryRanking");
 				$allUsers = $this->selectMultiple("SELECT * FROM User");
 				foreach($users as $currentUser) {
@@ -215,10 +215,10 @@ class ManagerAPI extends API
 						}
 						$this->insert("UPDATE User SET {$rankedStatName}={$rank} WHERE userID = {$currentUser->userID}");
 					}
-				}
+				}*/
 
 				// Add to other stats
-				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
+				$this->insert("UPDATE User SET mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 
 		}
