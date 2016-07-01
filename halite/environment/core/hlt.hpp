@@ -30,11 +30,14 @@ namespace hlt
 		return 6 - d;
 	}
 
-	enum MessageType {ATTACK, STOP_ATTACK};
-	struct Message {
-		MessageType type;
-		int senderID, recipientID, targetID;
+	struct AllianceRequest {
+		int senderID, recipientID, numTurns;
 	};
+	struct AllianceResponse {
+		int senderID, recipientID;
+		bool response;
+	};
+	
 	struct Location
 	{
 		unsigned short x, y;

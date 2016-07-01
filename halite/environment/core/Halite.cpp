@@ -228,25 +228,27 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 	std::vector< std::future<unsigned int> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
-	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
-	std::vector<int> allowableTimesToRespond(number_of_players);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS;
-
 	//Stores the messages sent by bots this frame
-	std::vector< std::vector<hlt::Message> > recievedMessages(number_of_players);
+	std::vector< std::vector<hlt::AllianceRequest> > receivedRequests(number_of_players);
+	std::vector< std::vector<hlt::AllianceResponse> > receivedResponses(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
 		if(alive[a])
 		{
 			//Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
-			std::vector<hlt::Message> messagesForThisBot;
-			for(auto pastMessage = pastFrameMessages.begin(); pastMessage != pastFrameMessages.end(); pastMessage++) if(pastMessage->recipientID == a + 1) messagesForThisBot.push_back(*pastMessage);
+			std::vector<AllianceRequest> requestsForThisBot;
+			for(auto r = past_alliance_requests.begin(); r != past_alliance_requests.end(); r++) if(r->recipientID == a + 1) requestsForThisBot.push_back(*r);
 
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, allowableTimesToRespond[a], a + 1, game_map, messagesForThisBot, &player_moves[a], &recievedMessages[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS, a + 1, game_map, requestsForThisBot, &player_moves[a], &receivedRequests[a], &receivedResponses[a]);
 
 			threadLocation++;
 		}
 	}
+
+	std::vector<hlt::AllianceRequest> presentRequests;
+	std::vector<hlt::AllianceResponse> presentResponses;
+	for(auto a = receivedRequests.begin(); a != receivedRequests.end(); a++) presentRequests.insert(presentRequests.end(), a->begin(), a->end());
+	for(auto a = receivedResponses.begin(); a != receivedResponses.end(); a++) presentResponses.insert(presentResponses.end(), a->begin(), a->end());
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<bool> permissibleTime(number_of_players, false);
@@ -272,17 +274,22 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 		}
 	}
 
-	//Ensure that all of the recieved messages were assigned correctly. Then concatenate them into the pastFrameMessages vector
-	pastFrameMessages = std::vector<hlt::Message>();
-	//Ensure that the player signed their messages correctly
-	for(int playerIndex = 0; playerIndex < recievedMessages.size(); playerIndex++)
+	//Construct alliances
+	for(auto a = past_alliance_requests.begin(); a != past_alliance_requests.end(); a++)
 	{
-		for(auto message = recievedMessages[playerIndex].begin(); message != recievedMessages[playerIndex].end(); message++)
+		auto b = receivedResponses.begin();
+		while(b != receivedResponses.end() && a->senderID != b->recepientID && b->senderID != a->recepientID) b++;
+		if(b != receivedResponses.end() && b->response)
 		{
-			message->senderID = playerIndex + 1; //playerIndex + 1 equals the playerID of the sender
-			pastFrameMessages.push_back(*message);
+			alliances[a->senderID][b->senderID] += a->numTurns;
+			alliances[b->senderID][a->senderID] += a->numTurns;
 		}
+
 	}
+
+	//Set requests to correspond to new requests.
+	past_alliance_requests = presentRequests;
+
 
 	auto pieces = getPieces(alive); //Throws out moves invalidating alliances; defaults to STILL instead.
 	doCombat(pieces, alive);
