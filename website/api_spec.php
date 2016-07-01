@@ -33,8 +33,23 @@
 				 		<li>A single integer representing their own tag within the game.</li>
 				 		<li>Two integers respresenting the WIDTH and HEIGHT of the map.</li>
 				 		<li>WIDTH * HEIGHT integers respresenting the production values of the map. The integers fill in the map by row, and within a row by column.</li>
+				 		<li>The initial game map (in the format discussed below)</li>
 				 	</ul>
 				 </p>
+				 <p>Bots are expected to respond with a single string containing their name.</p>
+
+
+				<h3>Frame</h3>
+
+				<p>Bots are sent the following, each on their own line:
+					<ul>
+				 		<li>A single integer representing their own tag within the game.</li>
+				 		<li>Two integers respresenting the WIDTH and HEIGHT of the map.</li>
+				 		<li>WIDTH * HEIGHT integers respresenting the production values of the map. The integers fill in the map by row, and within a row by column.</li>
+				 		<li>The initial game map (in the format discussed below)</li>
+				 	</ul>
+				 </p>
+				 <p>Bots are expected to respond with a single string containing their name.</p>
 
 			</div>
 		</div>
