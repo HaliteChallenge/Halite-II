@@ -41,6 +41,15 @@ std::fstream debug;
 #define argv __argv
 #endif
 
+//Define shifts.
+#if defined(_WIN32)
+#define SHIFT 1
+#elif defined(__APPLE__)
+#define SHIFT 2
+#else
+#define SHIFT 0.2
+#endif
+
 #ifdef _WIN32
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
 #else
@@ -140,10 +149,10 @@ int main(int argc, const char ** argv)
 		else if(!isPaused && !tabPressed) turnNumber += maxFps * delta;
 		if(turnNumber < 0) turnNumber = 0;
 
-		if(wPressed) yOffset -= 0.25;
-		if(aPressed) xOffset += 0.25;
-		if(sPressed) yOffset += 0.25;
-		if(dPressed) xOffset -= 0.25;
+		if(wPressed) yOffset -= SHIFT;
+		if(aPressed) xOffset += SHIFT;
+		if(sPressed) yOffset += SHIFT;
+		if(dPressed) xOffset -= SHIFT;
 	}
 
 	return EXIT_SUCCESS;
