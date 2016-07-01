@@ -67,13 +67,14 @@ $(function() {
 			}
 		},
 		render: function() {
+
 			this.$tableBody.empty();
 			for(var a = 0; a < this.games.length; a++) {
 				this.$tableBody.append(this.getTableRow(this.games[a]));
 			}
 		},
 		getTableRow: function(game) {
-			return "<tr><td><a href='user.php?userID="+game.opponent.userID+"'>"+game.opponent.username+"</a></td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file' aria-hidden="true"></span></a></td></tr>";
+			return "<tr><td><a href='user.php?userID="+game.opponent.userID+"'>"+game.opponent.username+"</a></td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
 		}
 	}
 
