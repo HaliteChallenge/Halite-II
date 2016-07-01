@@ -92,6 +92,8 @@ class WebsiteAPI extends API
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
 			return $results;
+		} else if(isset($_GET['numActive'])) {
+			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
 		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
 			if($user['verificationCode'] == $_POST['verificationCode']) {

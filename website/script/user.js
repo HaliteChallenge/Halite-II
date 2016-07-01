@@ -1,16 +1,12 @@
 $(function() {
 	var jumboTron = {
 		$nameField: $("#jHeader"),
-		$rankField: $("#jBody"),
-		init: function(name, rank, totalUsers) {
+		init: function(name) {
 			this.name = name;
-			this.rank = rank;
-			this.totalUsers = totalUsers;
 			this.render();
 		},
 		render: function() {
 			this.$nameField.html(this.name);
-			this.$rankField.html(this.rank + " out of " + this.totalUsers);
 		}
 	}
 
@@ -70,7 +66,7 @@ $(function() {
 		}
 	}
 
-	function statsFromUser(user, users) {
+	function statsFromUser(user, numUsers) {
 		var statDetails = {
 			"rank": {name: "Rank", mouseOverText: ""},
 			"language": {name: "Language", mouseOverText: ""},
@@ -86,7 +82,7 @@ $(function() {
 		for(var key in statDetails) {
 			if(user[key] != undefined && user[key] != null) {
 				if(statDetails[key].percentile == true) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" out of the "+users.length+" competitors"})
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" out of the "+numUsers+" competitors"})
 				} else {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
 				}
@@ -96,25 +92,15 @@ $(function() {
 	}
 
 	var userID = getGET("userID");
+	var user = getUser(userID);
+	var extraStats = getExtraStats(userID);
+	$.extend(user, extraStats);
+	var numUsers = getNumActiveUsers();
 
-	var submissions = getActiveUsers();
-	submissions.sort(function(a, b) {
-		return a.mu-(a.sigma*3) < b.mu-(b.sigma*3);
-	});
+	jumboTron.init(user.username);
 
-	var user = null;
-	var rank = -1;
-	for(var a = 0; a < submissions.length; a++) {
-		if(submissions[a].userID == userID) {
-			rank = a+1;
-			user = submissions[a];
-			break;
-		}
-	}
-	jumboTron.init(user.username, rank, submissions.length);
-
-	console.log(statsFromUser(user, submissions))
-	statTable.init(statsFromUser(user, submissions));
+	console.log(statsFromUser(user, numUsers))
+	statTable.init(statsFromUser(user, numUsers));
 	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
 })

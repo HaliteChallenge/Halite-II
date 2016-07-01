@@ -124,3 +124,21 @@ function verifyUser(userID, verificationCode) {
 		data: {userID: userID, verificationCode: verificationCode}
 	}).responseJSON;
 }
+
+function getNumActiveUsers() {
+	return $.ajax({
+		url: url+"user",
+		async: false,
+		method: "GET",
+		data: {numActive: 1}
+	}).responseJSON;
+}
+
+function getExtraStats(userID) {
+	return $.ajax({
+		url: url+"extraStats",
+		async: false,
+		method: "GET",
+		data: {userID: userID}
+	}).responseJSON;
+}
