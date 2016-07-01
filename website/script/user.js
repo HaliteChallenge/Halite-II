@@ -1,35 +1,50 @@
 $(function() {
 	var jumboTron = {
 		$nameField: $("#jHeader"),
-		init: function(name) {
+		$rankField: $("#jBody"),
+		init: function(name, rank, totalUsers) {
 			this.name = name;
+			this.rank = rank;
+			this.totalUsers = totalUsers;
 			this.render();
 		},
 		render: function() {
 			this.$nameField.html(this.name);
+			this.$rankField.html(this.rank + " out of " + this.totalUsers);
 		}
 	}
 
 	var statTable = {
 		$tableBody: $("#statTableBody"),
 		stats: [],
-		init: function(user) {
+		init: function(user, users) {
 			this.user = user;
+			this.users = users;
 			this.extractStats();
 			this.render();
 		},
 		extractStats: function() {
 			var statDetails = {
-				"territoryAverage": {name: "Territory Factor", mouseOverText: ""},
-				"strengthAverage": {name: "Strength Factor", mouseOverText: ""},
-				"productionAverage": {name: "Production Factor", mouseOverText: ""},
+				"territoryAverage": {name: "Territory", mouseOverText: ""},
+				"strengthAverage": {name: "Strength", mouseOverText: ""},
+				"productionAverage": {name: "Production", mouseOverText: ""},
 				"stillPercentage": {name: "Still Moves To Total Moves", mouseOverText: ""},
-				"allianceAverage": {name: "Alliance Level", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game"},
-				"turnTimeAverage": {name: "Average Milliseconds per Turn", mouseOverText: ""}
+				"allianceAverage": {name: "Alliance Frequency", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game"},
+				"turnTimeAverage": {name: "Time per Turn (ms)", mouseOverText: ""}
 			};
 			for(var key in this.user) {
 				if(statDetails[key] != undefined) {
-					this.stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: this.user[key]})
+					var rank = 0;
+					this.users.sort(function(a, b) {
+						return a[key] < b[key];
+					});
+					for(var a = 0; a < this.users.length; a++) {
+						if(this.users[a][key] == this.user[key]) {
+							rank = a+1;
+							break;
+						}
+					}
+					this.stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: this.user[key], rank: rank})
 				}
 			}
 		},
@@ -40,7 +55,7 @@ $(function() {
 			}
 		},
 		getTableRow: function(stat) {
-			return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
+			return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td><td>"+stat.rank+" out of "+this.users.length+"</td></tr>";
 		}
 	}
 
@@ -80,11 +95,23 @@ $(function() {
 
 	var userID = getGET("userID");
 
-	var user = getUser(userID);
-	console.log(user)
-	jumboTron.init(user.username);
+	var submissions = getActiveUsers();
+	submissions.sort(function(a, b) {
+		return a.mu-(a.sigma*3) < b.mu-(b.sigma*3);
+	});
 
-	statTable.init(user);
+	var user = null;
+	var rank = -1;
+	for(var a = 0; a < submissions.length; a++) {
+		if(submissions[a].userID == userID) {
+			rank = a+1;
+			user = submissions[a];
+			break;
+		}
+	}
+	jumboTron.init(user.username, rank, submissions.length);
+
+	statTable.init(user, submissions);
 	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
 })

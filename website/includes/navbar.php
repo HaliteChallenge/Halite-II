@@ -54,7 +54,7 @@
 			</ul>
 			<form id="submitForm">
 				<ul class="nav navbar-nav navbar-right loggedIn" id="logoutNav">
-					<li><a href="#" id="submitButton">Submit To Current Competition</a><input type="file" id="myFile" name="botFile"></li>
+					<li><a href="#" id="submitButton">Submit To Competition</a><input type="file" id="myFile" name="botFile"></li>
 					<li><a href="#" id="logoutButton">Logout</a></li>
 				</ul>
 			</form>

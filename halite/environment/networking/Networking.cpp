@@ -196,8 +196,8 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	FD_SET(connection.read, &set); /* add our file descriptor to the set */
 
 	struct timeval timeout;
-	timeout.tv_sec = timeoutMillis / 1000;
-	timeout.tv_usec = timeoutMillis % 1000;
+	timeout.tv_sec = timeoutMillis / 1000.0;
+	timeout.tv_usec = (timeoutMillis % 1000)*1000;
 
 	char buffer;
 

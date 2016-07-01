@@ -13,6 +13,7 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div class="jumbotron" id="jumbotron">
 			<h1 id="jHeader"></h1>
+			<p id="jBody"></p>
 		</div>
 		<div class="row">
 			<div class="col-md-5">
@@ -21,6 +22,13 @@
 						<h3 class="panel-title">Statistics</h3>
 					</div>
 					<table class="table well well-sm" id="statTable">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Raw Value</th>
+								<th>Ranking</th>
+							</tr>
+						</thead>
 						<tbody id="statTableBody">
 						</tbody>
 					</table>
