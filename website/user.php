@@ -22,10 +22,6 @@
 					</div>
 					<table class="table well well-sm" id="statTable">
 						<tbody id="statTableBody">
-							<tr><td>Stat1</td><td>Value1</td></tr>
-							<tr><td>Stat2</td><td>Value2</td></tr>
-							<tr><td>Stat3</td><td>Value3</td></tr>
-							<tr><td>Stat4</td><td>Value4</td></tr>
 						</tbody>
 					</table>
 				</div>
@@ -44,8 +40,6 @@
 							</tr>
 						</thead>
 						<tbody id="gameTableBody">
-							<tr><td>Other User</td><td><span class="lost">Lost</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
-							<tr><td>John Doe</td><td><span class="won">Won</span></td><td><img class='file-icon' src='assets/file.png'></td></tr>
 						</tbody>
 					</table>
 				</div>

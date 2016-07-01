@@ -54,6 +54,8 @@ private:
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
+
+	std::vector< std::vector<std::string> > playerLogs;
 };
 
 #endif

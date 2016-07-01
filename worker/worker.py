@@ -103,8 +103,8 @@ def runGame(width, height, users, backend):
 	replayPath = lines[0]
 
 	# Get player ranks and scores by parsing shellOutput
-	for line in range(len(lines)-len(users), len(lines)):
-		components = line.split(" ")
+	for lineIndex in range(len(lines)-len(users), len(lines)):
+		components = lines[lineIndex].split(" ")
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
 		users[playerTag-1]["rank"] = int(components[1])
