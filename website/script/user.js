@@ -17,36 +17,9 @@ $(function() {
 	var statTable = {
 		$tableBody: $("#statTableBody"),
 		stats: [],
-		init: function(user, users) {
-			this.user = user;
-			this.users = users;
-			this.extractStats();
+		init: function(stats) {
+			this.stats = stats;
 			this.render();
-		},
-		extractStats: function() {
-			var statDetails = {
-				"territoryAverage": {name: "Territory", mouseOverText: ""},
-				"strengthAverage": {name: "Strength", mouseOverText: ""},
-				"productionAverage": {name: "Production", mouseOverText: ""},
-				"stillPercentage": {name: "Still Moves To Total Moves", mouseOverText: ""},
-				"allianceAverage": {name: "Alliance Frequency", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game"},
-				"turnTimeAverage": {name: "Time per Turn (ms)", mouseOverText: ""}
-			};
-			for(var key in this.user) {
-				if(statDetails[key] != undefined) {
-					var rank = 0;
-					this.users.sort(function(a, b) {
-						return a[key] < b[key];
-					});
-					for(var a = 0; a < this.users.length; a++) {
-						if(this.users[a][key] == this.user[key]) {
-							rank = a+1;
-							break;
-						}
-					}
-					this.stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: this.user[key], rank: rank})
-				}
-			}
 		},
  		render: function() {
 			this.$tableBody.empty();
@@ -55,7 +28,11 @@ $(function() {
 			}
 		},
 		getTableRow: function(stat) {
-			return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td><td>"+stat.rank+" out of "+this.users.length+"</td></tr>";
+			if(stat.mouseOverText != undefined && stat.mouseOverText != null) {
+				return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
+			} else {
+				return "<tr><td><span>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
+			}
 		}
 	}
 
@@ -93,6 +70,31 @@ $(function() {
 		}
 	}
 
+	function statsFromUser(user, users) {
+		var statDetails = {
+			"rank": {name: "Rank", mouseOverText: ""},
+			"language": {name: "Language", mouseOverText: ""},
+			"numSubmissions": {name: "# of Bots Submitted", mouseOverText: ""},
+			"numGames": {name: "# of Games Played", mouseOverText: ""},
+			"strengthRanking": {name: "Strength", mouseOverText: "", percentile: true},
+			"productionRanking": {name: "Production", mouseOverText: "", percentile: true},
+			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
+			"allianceRanking": {name: "Alliance Frequency", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game", percentile: true},
+			"turnTimeAverage": {name: "Time per Turn (ms)", mouseOverText: "", percentile: true}
+		};
+		var stats = [];
+		for(var key in statDetails) {
+			if(user[key] != undefined && user[key] != null) {
+				if(statDetails[key].percentile == true) {
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" out of the "+users.length+" competitors"})
+				} else {
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
+				}
+			}
+		}
+		return stats;
+	}
+
 	var userID = getGET("userID");
 
 	var submissions = getActiveUsers();
@@ -111,7 +113,8 @@ $(function() {
 	}
 	jumboTron.init(user.username, rank, submissions.length);
 
-	statTable.init(user, submissions);
+	console.log(statsFromUser(user, submissions))
+	statTable.init(statsFromUser(user, submissions));
 	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
 })
