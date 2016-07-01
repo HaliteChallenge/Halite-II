@@ -85,12 +85,12 @@
 				<p>The production values of the map are sent using WIDTH * HEIGHT integers which fill in the production values of the map from row 1 to row HEIGHT and within a row from column 1 to column WIDTH</p>
 
 				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
-				
-				<h4>Production Format:</h4>
 
-				<p>The production values of the map are sent using WIDTH * HEIGHT integers which fill in the production values of the map from row 1 to row HEIGHT and within a row from column 1 to column WIDTH</p>
+				<h4>Alliance State Format:</h4>
 
-				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
+				<p>The present state of alliances will be sent using ((NUM_PLAYERS)^2) integers. If one were to interpret the list of integers into a square grid, again filling spots from row 1 to row NUM_PLAYERS and within a row from column 1 to column NUM_PLAYERS, the grid would serve as a table for looking up the remaining numbers of turns that the two players are bound in alliance. Additionally, this means that the grid is symmetric over the line y=x, and furthermore grid spots along y=x will always be 0.</p>
+
+				<p>Consider the following case as an example:<br>There are 4 players in the game. Players 1 and 4 are allied for 8 more turns, while players 2 and 3 are only bound in alliance for 3 more turns. We could then represent this setup with the following square grid:<br>0 0 0 8<br>0 0 3 0<br>0 3 0 0<br>8 0 0 0<br>This would in turn be encoded with the following string:<br>0 0 0 8 0 0 3 0 0 3 0 0 8 0 0 0</p>
 
 			</div>
 		</div>
