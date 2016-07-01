@@ -1,5 +1,5 @@
-# Linguist ignor
-catch.h website/lib
+# Linguist ignore
+website/lib/* linguist-vendored
 
 # Auto detect text files and perform LF normalization
 * text=auto
