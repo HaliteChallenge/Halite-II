@@ -126,10 +126,5 @@ int main(int argc, char* args[])
 	else std::cout << filename << std::endl << stats;
 
 	delete my_game;
-
-	/*if(!program_output_style) {
-	std::cout << "Press enter to continue:";
-	getchar();
-}*/
-return 0;
+	return 0;
 }

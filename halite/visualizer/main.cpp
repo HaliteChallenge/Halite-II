@@ -41,7 +41,16 @@ std::fstream debug;
 #define argv __argv
 #endif
 
-#ifdef _WIN2
+//Define shifts.
+#if defined(_WIN32)
+#define SHIFT 1
+#elif defined(__APPLE__)
+#define SHIFT 2
+#else
+#define SHIFT 0.025
+#endif
+
+#ifdef _WIN32
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
 #else
 int main(int argc, const char ** argv)
@@ -81,11 +90,12 @@ int main(int argc, const char ** argv)
 	window = NULL;
 	GLFWmonitor* primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
-	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+	glfwWindowHint(GLFW_REFRESH_RATE, 60);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwSwapInterval(1);
 	windowedWidth = mode->width * 3 / 4;
 	windowedHeight = mode->height * 2 / 3;
 	setWindowed();
@@ -140,10 +150,10 @@ int main(int argc, const char ** argv)
 		else if(!isPaused && !tabPressed) turnNumber += maxFps * delta;
 		if(turnNumber < 0) turnNumber = 0;
 
-		if(wPressed) yOffset -= 0.25;
-		if(aPressed) xOffset += 0.25;
-		if(sPressed) yOffset += 0.25;
-		if(dPressed) xOffset -= 0.25;
+		if(wPressed) yOffset -= SHIFT;
+		if(aPressed) xOffset += SHIFT;
+		if(sPressed) yOffset += SHIFT;
+		if(dPressed) xOffset -= SHIFT;
 	}
 
 	return EXIT_SUCCESS;
@@ -286,34 +296,50 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
 	else if(key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
 		wPressed = true;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_W && action == GLFW_RELEASE)
 	{
 		wPressed = false;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_S && action == GLFW_PRESS)
 	{
 		sPressed = true;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_S && action == GLFW_RELEASE)
 	{
 		sPressed = false;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_A && action == GLFW_PRESS)
 	{
 		aPressed = true;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_A && action == GLFW_RELEASE)
 	{
 		aPressed = false;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_D && action == GLFW_PRESS)
 	{
 		dPressed = true;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_D && action == GLFW_RELEASE)
 	{
 		dPressed = false;
+		yOffset = int(yOffset);
+		xOffset = int(xOffset);
 	}
 	else if(key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{
