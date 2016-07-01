@@ -138,6 +138,12 @@ class WebsiteAPI extends API
 		}
 	}
 
+	protected function extraStats() {
+		if(isset($_GET["userID"])) {
+			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
+		}
+	}
+
 	protected function game() {
 		if(isset($_GET['userID'])) {
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
