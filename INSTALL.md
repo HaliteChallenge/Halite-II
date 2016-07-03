@@ -38,7 +38,7 @@ If you have not already:
 
 Give apache pulling permission
 
-```chown www-data:www-data -R ./ .git && ```
+```chown www-data:www-data -R ./ .git```
 
 Create a `git_pull.php` script
 
