@@ -26,8 +26,8 @@ extern bool program_output_style;
 class Networking {
 public:
 	void startAndConnectBot(std::string command);
-	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::vector<AllianceRequest> * requests, std::string * playerName);
-	unsigned int handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector< std::vector<unsigned short> > & alliances, const std::vector<hlt::AllianceRequest> & requests, std::set<hlt::Move> * moves, std::vector<hlt::AllianceRequest> * newRequests, std::vector<hlt::AllianceResponse> * newResponses);
+	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::vector<hlt::AllianceRequest> * requests, std::string * playerName);
+	unsigned int handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector< std::vector<unsigned int> > & alliances, const std::vector<hlt::AllianceRequest> & requests, std::set<hlt::Move> * moves, std::vector<hlt::AllianceRequest> * newRequests, std::vector<hlt::AllianceResponse> * newResponses);
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
@@ -50,12 +50,12 @@ private:
 	std::string serializeMapSize(const hlt::Map & map);
 	std::string serializeMap(const hlt::Map & map);
 	std::string serializeProductions(const hlt::Map & map);
-	std::string serializeAllianceStates(const std::vector< std::vector<unsigned short> > & alliances);
+	std::string serializeAllianceStates(const std::vector< std::vector<unsigned int> > & alliances);
 	std::string serializeAllianceRequests(const std::vector<hlt::AllianceRequest> & requests); //Specific; ignores recipient.
 
 	std::set<hlt::Move> deserializeMoveSet(std::string & inputString);
-	std::vector<hlt::Message> deserializeAllianceRequests(const std::string &inputString, unsigned char senderTag);
-	std::vector<hlt::Message> deserializeAllianceResponses(const std::string &inputString, unsigned char senderTag);
+	std::vector<hlt::AllianceRequest> deserializeAllianceRequests(const std::string &inputString, unsigned char senderTag);
+	std::vector<hlt::AllianceResponse> deserializeAllianceResponses(const std::string &inputString, unsigned char senderTag);
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);

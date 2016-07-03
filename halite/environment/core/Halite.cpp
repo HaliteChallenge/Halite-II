@@ -236,10 +236,10 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 		if(alive[a])
 		{
 			//Find the messages sent last frame that were directed at this bot (i.e. when a+1 == recipientID of the message)
-			std::vector<AllianceRequest> requestsForThisBot;
+			std::vector<hlt::AllianceRequest> requestsForThisBot;
 			for(auto r = past_alliance_requests.begin(); r != past_alliance_requests.end(); r++) if(r->recipientID == a + 1) requestsForThisBot.push_back(*r);
 
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS, a + 1, game_map, requestsForThisBot, &player_moves[a], &receivedRequests[a], &receivedResponses[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, INFINITE_RESPOND_TIME ? INT_MAX : BOT_FRAME_TIMEOUT_MILLIS, a + 1, game_map, alliances, requestsForThisBot, &player_moves[a], &receivedRequests[a], &receivedResponses[a]);
 
 			threadLocation++;
 		}
@@ -277,9 +277,9 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 	//Construct alliances
 	for(auto a = past_alliance_requests.begin(); a != past_alliance_requests.end(); a++)
 	{
-		auto b = receivedResponses.begin();
-		while(b != receivedResponses.end() && a->senderID != b->recepientID && b->senderID != a->recepientID) b++;
-		if(b != receivedResponses.end() && b->response)
+		auto b = presentResponses.begin();
+		while(b != presentResponses.end() && a->senderID != b->recipientID && b->senderID != a->recipientID) b++;
+		if(b != presentResponses.end() && b->response)
 		{
 			alliances[a->senderID - 1][b->senderID - 1] += a->numTurns;
 			alliances[b->senderID - 1][a->senderID - 1] += a->numTurns;
@@ -489,9 +489,10 @@ void Halite::init()
 
 	//Send initial package
 	std::vector< std::future<bool> > initThreads(number_of_players);
+	std::vector< std::vector<hlt::AllianceRequest> > receivedRequests(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
-		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>( INFINITE_RESPOND_TIME ? INT_MAX : BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>( INFINITE_RESPOND_TIME ? INT_MAX : BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &receivedRequests[a], &player_names[a]);
 	}
 	for(unsigned char a = 0; a < number_of_players; a++)
 	{
@@ -501,6 +502,7 @@ void Halite::init()
 			networking.killPlayer(a + 1);
 		}
 	}
+	for(auto a = receivedRequests.begin(); a != receivedRequests.end(); a++) past_alliance_requests.insert(past_alliance_requests.end(), a->begin(), a->end());
 
 	//Init alliances vector.
 	alliances = std::vector< std::vector<unsigned int> >(number_of_players, std::vector<unsigned int>(number_of_players));
