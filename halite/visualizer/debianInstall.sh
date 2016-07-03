@@ -21,3 +21,7 @@ echo "Ready to compile glfw"
 sudo make
 sudo make install
 echo "Done installing the visualizer's dependencies"
+
+cd ../..
+rm -r glfw
+rm glfw-3.2.zip
