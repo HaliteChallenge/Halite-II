@@ -46,7 +46,7 @@ struct GameStatistics
 static std::ostream & operator<<(std::ostream & o, const GameStatistics & g)
 {
 	for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
-	for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << int(*a) << ' ';
+	for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << (*a) << ' ';
 	if(g.timeout_tags.empty()) o << ' ';
 	return o;
 }

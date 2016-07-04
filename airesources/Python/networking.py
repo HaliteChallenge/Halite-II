@@ -90,14 +90,10 @@ def getInit():
 
 def sendInit(name):
 	sendString(name)
-	sendString("")
 
 def getFrame():
-	return (deserializeMap(getString()), getString(), getString())
+	return (deserializeMap(getString()), deserializeMessages(getString()))
 
-def sendFrame(moves, requests = [], responses = []):
+def sendFrame(moves, messages):
 	sendString(serializeMoveSet(moves))
-	sendString("")
-	sendString("")
-	#sendString(serializeAllianceRequests(requests))
-	#sendString(serializeAllianceResponses(responses))
+	sendString(serializeMessages(messages))
