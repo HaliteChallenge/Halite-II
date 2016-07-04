@@ -4,5 +4,5 @@ uniform vec3 color;
 in vec2 UV;
 out vec4 fragColor;
 void main() {
-    fragColor = vec4(texture(textureSampler, UV).rrr * color, 1);
+    fragColor = vec4(texture(textureSampler, UV).rrr * color, texture(textureSampler, UV).r);
 }

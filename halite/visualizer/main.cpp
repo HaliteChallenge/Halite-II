@@ -95,10 +95,14 @@ int main(int argc, const char ** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 	windowedWidth = mode->width * 3 / 4;
 	windowedHeight = mode->height * 2 / 3;
 	setWindowed();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0, 0, 0, 1);
 
 	const char * glVersion = (const char * )glGetString(GL_VERSION);
 	debug << glVersion;
@@ -114,6 +118,8 @@ int main(int argc, const char ** argv)
 	{
 		while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 	}
+
+	glfwSwapInterval(2);
 
 	clock_t c = clock();
 
