@@ -105,22 +105,15 @@
 				<p>Consider the following case as an example:<br>Player 3 wishes to enter an alliance for 20 moves, and player 6 wishes to enter an alliance for 5 moves.<br>This would be encoded with the following string:<br>3 20 6 5</p>
 
 				<h4>Output Move Set Format:</h4>
-
+				
 				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
-					<ul>
-				 		<li>0 - <code>STILL</code></li>
-				 		<li>1 - <code>NORTH</code></li>
-				 		<li>2 - <code>EAST</code></li>
-				 		<li>3 - <code>SOUTH</code></li>
-				 		<li>4 - <code>WEST</code></li>
-				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
-					<ul
-				 		<li>0 - STILL</li>
-				 		<li>1 - NORTH</li>
-				 		<li>2 - EAST</li>
-				 		<li>3 - SOUTH</li>
-				 		<li>4 - WEST</li>
-				 	</ul>
+				<ul>
+			 		<li>0 - <code>STILL</code></li>
+			 		<li>1 - <code>NORTH</code></li>
+			 		<li>2 - <code>EAST</code></li>
+			 		<li>3 - <code>SOUTH</code></li>
+			 		<li>4 - <code>WEST</code></li>
+				</ul>
 				Please note that these directions correspond most directly to screen coordinates; that is, <code>NORTH</code> decrements the y value of the site by 1 and <code>SOUTH</code> increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
 
 				<p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain <code>STILL</code>, and a piece located at (4, 5) to move <code>NORTH</code>.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
