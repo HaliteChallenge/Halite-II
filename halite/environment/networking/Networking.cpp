@@ -157,7 +157,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	srand(time(NULL));
 
 	std::string newString;
-#ifdef _WIN32
+	#ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsRead;
