@@ -68,7 +68,7 @@ private:
 	std::vector< std::vector<unsigned int> > alliances;
 
 	//Statistics
-	std::vector<unsigned short> alive_frame_count;
+	std::vector<unsigned short> alive_turn_count;
 	std::vector<double> total_response_time;
 	std::vector<unsigned int> full_territory_count;
 	std::vector<unsigned int> full_strength_count;

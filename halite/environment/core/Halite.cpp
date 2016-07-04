@@ -225,7 +225,7 @@ void Halite::doCombat(std::vector< std::map<hlt::Location, unsigned char> > & pi
 std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 {
 	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<unsigned int> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	std::vector< std::future<bool> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
@@ -338,7 +338,7 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 	}
 	for(unsigned char a = 0; a < number_of_players; a++) if(!permissibleTime[a] && alive[a]) {
 		stillAlive[a] = false;
-		timeout_tags.insert(a + 1);
+		timeout_tags.insert(a + 1)
 	}
 
 	for(unsigned char a = 0; a < number_of_players; a++) if(stillAlive[a]) alive_frame_count[a]++;
@@ -441,6 +441,9 @@ void Halite::init()
 	player_moves = std::vector< std::set<hlt::Move> >();
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
+	//Figure out what defense_bonus should be.
+	defense_bonus = (float(rand()) * (MAX_DEFENSE_BONUS - MIN_DEFENSE_BONUS) / RAND_MAX) + MIN_DEFENSE_BONUS;
+	// TEMP DEFENSE BONUS REMOVAL: if(!program_output_style) std::cout << "Defense Bonus is " << defense_bonus << ".\n";
 
 	//Output initial map to file
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
