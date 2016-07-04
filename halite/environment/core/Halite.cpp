@@ -119,6 +119,7 @@ std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const st
 
 	for(unsigned char a = 0; a < number_of_players; a++) for(auto b = pieces[a].begin(); b != pieces[a].end(); b++) if(b->second != 0) full_still_count[a]++;
 
+
 	//Add all of the moves back into the map.
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++)
 	{
@@ -126,7 +127,6 @@ std::vector< std::map<hlt::Location, unsigned char> > Halite::getPieces(const st
 		for(auto c = potentialMoves[l].begin(); c != potentialMoves[l].end(); c++)
 		{
 			unsigned char owner = std::get<0>(*c);
-			full_cardinal_count[owner]++;
 			if(pieces[owner].count(l))
 			{
 				if(short(pieces[owner][l]) + std::get<1>(*c) < 255) pieces[owner][l] += std::get<1>(*c);
@@ -297,15 +297,8 @@ std::vector<bool> Halite::processNextFrame(const std::vector<bool> & alive)
 		}
 	}
 
-	//Update alliance counts:
-	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned char b = a + 1; b < number_of_players; b++) if(alliances[a][b] > 0)
-	{
-		full_alliance_count[a]++;
-		full_alliance_count[b]++;
-	}
-
 	//Decrement the time left on all alliances.
-	for(auto a = alliances.begin(); a != alliances.end(); a++) for(auto b = a->begin(); b != a->end(); b++) if(*b > 0) (*b)--;
+	for(auto a = alliances.begin(); a != alliances.end(); a++) for(auto b = a->begin(); b != a->end(); b++) if(*b != 0) (*b)--;
 
 	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
@@ -497,13 +490,10 @@ void Halite::init()
 
 	//Init statistics
 	alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
+	total_response_time = std::vector<double>(number_of_players, 0);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 	full_strength_count = std::vector<unsigned int>(number_of_players, 255); //Every piece starts with 1 piece, which won't get counted unless we do it here.
 	full_production_count = std::vector<unsigned int>(number_of_players, 0);
-	full_still_count = std::vector<unsigned int>(number_of_players, 0);
-	full_cardinal_count = std::vector<unsigned int>(number_of_players, 0);
-	full_alliance_count = std::vector<unsigned short>(number_of_players, 0);
-	total_response_time = std::vector<unsigned int>(number_of_players, 0);
 	timeout_tags = std::set<unsigned char>();
 }
 
@@ -531,10 +521,10 @@ void Halite::output(std::string filename)
 	gameFile.close();
 }
 
-GameStatistics Halite::runGame()
+std::vector<unsigned char> Halite::runGame()
 {
 	std::vector<bool> result(number_of_players, true);
-	std::vector<unsigned char> rankings;
+	std::vector<unsigned char> answer;
 	const int maxTurnNumber = game_map.map_width * game_map.map_height;
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber)
 	{
@@ -544,9 +534,13 @@ GameStatistics Halite::runGame()
 		//Frame logic.
 		std::vector<bool> newResult = processNextFrame(result);
 		//Add to vector of players that should be dead.
-		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a]) rankings.push_back(a);
+		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a])
+		{
+			answer.push_back(a + 1);
+		}
 		result = newResult;
 	}
+	
 	for(int a = 0; a < number_of_players; a++) if(result[a]) rankings.push_back(a);
 	std::reverse(rankings.begin(), rankings.end());
 	GameStatistics stats;
@@ -566,6 +560,7 @@ GameStatistics Halite::runGame()
 	}
 	stats.timeout_tags = timeout_tags;
 	return stats;
+
 }
 
 std::string Halite::getName(unsigned char playerTag)

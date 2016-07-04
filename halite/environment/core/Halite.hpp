@@ -69,13 +69,10 @@ private:
 
 	//Statistics
 	std::vector<unsigned short> alive_frame_count;
+	std::vector<double> total_response_time;
 	std::vector<unsigned int> full_territory_count;
 	std::vector<unsigned int> full_strength_count;
 	std::vector<unsigned int> full_production_count;
-	std::vector<unsigned int> full_still_count;
-	std::vector<unsigned int> full_cardinal_count;
-	std::vector<unsigned short> full_alliance_count;
-	std::vector<unsigned int> total_response_time;
 	std::set<unsigned char> timeout_tags;
 
 	//Colors
@@ -91,7 +88,7 @@ public:
 
 	void init();
 	void output(std::string filename);
-	GameStatistics runGame();
+	std::vector<unsigned char> runGame();
 	std::string getName(unsigned char playerTag);
 
 	~Halite();
