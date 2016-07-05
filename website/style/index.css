@@ -79,3 +79,8 @@ body {
 code {
 	font-family: monospace;
 }
+
+.jumbotron-btn {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}

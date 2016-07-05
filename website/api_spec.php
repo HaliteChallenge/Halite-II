@@ -105,7 +105,7 @@
 				<p>Consider the following case as an example:<br>Player 3 wishes to enter an alliance for 20 moves, and player 6 wishes to enter an alliance for 5 moves.<br>This would be encoded with the following string:<br>3 20 6 5</p>
 
 				<h4>Output Move Set Format:</h4>
-				
+
 				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
 				<ul>
 			 		<li>0 - <code>STILL</code></li>
@@ -138,7 +138,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="previous"><a href="tutorial.php"><span aria-hidden="true">&larr;</span> Tutorial</a></li>
+					<li class="previous"><a href="contest_rules.php"><span aria-hidden="true">&larr;</span> Game Rules</a></li>
 				</ul>
 			</div>
 		</div>

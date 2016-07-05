@@ -21,10 +21,10 @@
 				<h1 id="jHeader">Halite</h1>
 				<p id="jParagraph">A multi-player turn-based strategy game</p>
 				<p>
-					<a href="quickstart.php" class="btn btn-info" role="button">Quickstart</a>
-					<a href="tutorial.php" class="btn btn-info" role="button">Tutorial</a>
-					<a href="contest_rules.php" class="btn btn-info" role="button">Game Rules</a>
-					<a href="downloads.php" class="btn btn-info" role="button">Downloads</a>
+					<a href="quickstart.php" class="btn btn-info jumbotron-btn" role="button">Quickstart</a>
+					<a href="tutorial.php" class="btn btn-info jumbotron-btn" role="button">Tutorial</a>
+					<a href="contest_rules.php" class="btn btn-info jumbotron-btn" role="button">Game Rules</a>
+					<a href="downloads.php" class="btn btn-primary jumbotron-btn" role="button">Downloads</a>
 				</p>
 			</div>
 			<div class="row">

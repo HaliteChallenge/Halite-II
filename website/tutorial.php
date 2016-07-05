@@ -31,7 +31,7 @@
 			<div id="footer">
 				<ul class="pager">
 					<li class="previous"><a href="quickstart.php"><span aria-hidden="true">&larr;</span> Quickstart</a></li>
-					<li class="next"><a href="contest_rules.php">Contest Rules <span aria-hidden="true">&rarr;</span></a></li>
+					<li class="next"><a href="contest_rules.php">Game Rules <span aria-hidden="true">&rarr;</span></a></li>
 				</ul>
 			</div>
 		</div>
