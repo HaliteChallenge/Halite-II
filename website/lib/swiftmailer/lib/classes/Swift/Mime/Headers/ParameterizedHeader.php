@@ -119,7 +119,7 @@ class Swift_Mime_Headers_ParameterizedHeader extends Swift_Mime_Headers_Unstruct
      *
      * @return string
      */
-    public function getFieldBody() //TODO: Check caching here{
+    public function getFieldBody() { //TODO: Check caching here
         $body = parent::getFieldBody();
         foreach ($this->_params as $name => $value) {
             if (!is_null($value)) {
