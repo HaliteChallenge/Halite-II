@@ -16,12 +16,10 @@
 				<h1>Quickstart</h1>
 
 				<h3>Register</h3>
-				<p>Sign up for Halite with a Two Sigma email. Click on the link in the verification email that we sent you. Now log in to your account. You are ready to start competing!</p>
+				<p>Sign up for Halite with a Two Sigma email. Click on the link in the verification email that we sent you. Now log in to your account.</p>
 
 				<h3>Download a Starter Package</h3>
-				<p>Halite is language agnostic; bots talk to the game environment using pipes. However, this requires some boilerplate code. We provide that boilerplate and a couple of basic Halite bots in the form of language "starter packages." Navigate <a href="downloads.php">here</a> to download the starter package for your preferred language. If we don't currently support your preferred language, you can send us an email at <a href="mailto:halite@halite.io">halite@halite.io</a>. You may also write your own starter package. The networking protocol that the game environment uses to interface with the starter packages is detailed <a href="api_spec.php">here</a>.</p>
-
-				<p>To visualize the game that you just ran, run the visualizer binary and drop the game's replay file, ending with <code>hlt</code> and located in the directory of you environment binary.</p>
+				<p>Halite is language agnostic; bots talk to the game environment using stdin and stdout. However, this requires some boilerplate code. We provide that boilerplate and a couple of basic Halite bots in the form of language "starter packages." Navigate <a href="downloads.php">here</a> to download the starter package for your preferred language. If we don't currently support your preferred language, you can send us an email at <a href="mailto:halite@halite.io">halite@halite.io</a>. You may also write your own starter package. The networking protocol that the game environment uses to interface with the starter packages is detailed <a href="api_spec.php">here</a>. If you write your own stater package, please contact us so we can publish it on this site.</p>
 
 				<h3>Submit the Starter Bot</h3>
 				<p>Users may submit their bots to Halite's website in order to qualify for the playoffs, to get their ranking, and to see their bot in match against others. In order to submit the random bot given in the starter packages, click the "Submit to Competition" button and upload a zip of the files inside your starter package's directory. Your bot should appear on the leaderboard within a couple of minutes.</p>
