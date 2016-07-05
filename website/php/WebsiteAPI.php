@@ -128,7 +128,7 @@ class WebsiteAPI extends API{
 
 				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
 				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
-				
+
 				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
 
 				$message->setBody("To verify you email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
@@ -189,6 +189,12 @@ class WebsiteAPI extends API{
 			if(file_exists($targetPath) == true) unlink($targetPath);
 
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
+
+			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
+			foreach($oldGameUsers as $oldGameUser) {
+				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
+			}
+			$this->insert("DELETE FROM GameUser WHERE userID=$userID");
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
