@@ -1,12 +1,15 @@
 $(function() {
 	var jumboTron = {
-		$nameField: $("#jHeader"),
-		init: function(name) {
-			this.name = name;
+		$headerField: $("#jHeader"),
+		$bodyField: $("#jBody"),
+		init: function(header, body) {
+			this.header = header;
+			this.body = body;
 			this.render();
 		},
 		render: function() {
-			this.$nameField.html(this.name);
+			this.$headerField.html(this.header);
+			this.$bodyField.html(this.body);
 		}
 	}
 
@@ -68,21 +71,19 @@ $(function() {
 
 	function statsFromUser(user, numUsers) {
 		var statDetails = {
-			"rank": {name: "Rank", mouseOverText: ""},
+			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: ""},
+			"numGames": {name: "Number of Games Played", mouseOverText: ""},
 			"language": {name: "Language", mouseOverText: ""},
-			"numSubmissions": {name: "# of Bots Submitted", mouseOverText: ""},
-			"numGames": {name: "# of Games Played", mouseOverText: ""},
 			"strengthRanking": {name: "Strength", mouseOverText: "", percentile: true},
 			"productionRanking": {name: "Production", mouseOverText: "", percentile: true},
 			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
-			"allianceRanking": {name: "Alliance Frequency", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game", percentile: true},
 			"turnTimeRanking": {name: "Time per Turn (ms)", mouseOverText: "", percentile: true}
 		};
 		var stats = [];
 		for(var key in statDetails) {
 			if(user[key] != undefined && user[key] != null) {
 				if(statDetails[key].percentile == true) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" out of the "+numUsers+" competitors"})
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" of "+numUsers})
 				} else {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
 				}
@@ -97,7 +98,7 @@ $(function() {
 	$.extend(user, extraStats);
 	var numUsers = getNumActiveUsers();
 
-	jumboTron.init(user.username);
+	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
 
 	console.log(statsFromUser(user, numUsers))
 	statTable.init(statsFromUser(user, numUsers));

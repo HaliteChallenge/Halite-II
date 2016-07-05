@@ -178,6 +178,9 @@ class ManagerAPI extends API{
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
 
+			// Update each participant's stats
+			$allUsers = $this->selectMultiple("SELECT * FROM User");
+			$allUserExtras = $this->selectMultiple("SELECT * FROM UserExtraStats");
 			for($a = 0; $a < count($users); $a++) {
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->allianceAverage}, {$users[$a]->turnTimeAverage})");
 
@@ -199,23 +202,31 @@ class ManagerAPI extends API{
 
 				// Game game stat rankings
 				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "allianceAverage" => "allianceRanking", "turnTimeAverage" => "turnTimeRanking");
-				$allUsers = $this->selectMultiple("SELECT * FROM UserExtraStats");
 				foreach($statToRankedStat as $statName => $rankedStatName) {
-					usort($allUsers, function($a, $b) use ($statName) {
+					usort($allUserExtras, function($a, $b) use ($statName) {
 						return $a[$statName] < $b[$statName];
 					});
 					$rank = 100000;
-					for($b = 0; $b < count($allUsers); $b++) {
-						if($allUsers[$b]['userID'] == $users[$a]->userID) {
+					for($b = 0; $b < count($allUserExtras); $b++) {
+						if($allUserExtras[$b]['userID'] == $users[$a]->userID) {
 							$rank = $b+1;
 							break;
 						}
 					}
 					$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}");
 				}
-
+				
 				// Add to other stats
 				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
+			}
+
+			// Update rank
+			usort($allUsers, function($a, $b) {
+				return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
+			});
+			for($userIndex = 0; $userIndex < count($allUsers); $userIndex++) {
+				$rank = $userIndex+1;
+				$this->insert("UPDATE User SET rank={$rank} WHERE userID={$allUsers[$userIndex]['userID']}");
 			}
 
 		}

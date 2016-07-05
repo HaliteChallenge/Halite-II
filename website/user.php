@@ -19,7 +19,7 @@
 			<div class="col-md-5">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Statistics</h3>
+						<h3 class="panel-title">Detailed Statistics</h3>
 					</div>
 					<table class="table well well-sm" id="statTable">
 						<tbody id="statTableBody">

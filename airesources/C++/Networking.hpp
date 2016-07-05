@@ -91,7 +91,6 @@ static hlt::Map deserializeMap(const std::string & inputString) {
 
 	return map;
 }
-
 static void sendString(std::string &sendString) {
 	if (sendString.length() < 1) sendString = " ";
 
@@ -124,7 +123,6 @@ static void sendInitResponse(std::string name) {
 static void getFrame(hlt::Map& m) {
 	m = detail::deserializeMap(detail::getString());
 }
-
 static void sendFrame(const std::set<hlt::Move> &moves) {
 	detail::sendString(detail::serializeMoveSet(moves));
 }
