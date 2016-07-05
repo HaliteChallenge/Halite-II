@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Tutorial</title>
+	<title>Basic Bot Tutorial</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/index.css" rel="stylesheet">
@@ -13,7 +13,7 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div class="row">
 			<div class="col-sm-12">
-				<h1>Basic Tutorial</h1>
+				<h1>Basic Bot Tutorial</h1>
 
 				<h3>Prerequisites</h3>
 				<p>It is highly recommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a> before following this tutorial.</p>
