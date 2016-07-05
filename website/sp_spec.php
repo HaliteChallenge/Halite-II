@@ -16,13 +16,13 @@
 
 				<h3>Overview:</h3>
 
-				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Although the api is fairly straightforward, to aid in the creation of bots we provide boilerplate code for some common languages (presently C++, Java, and Python 3). Due to language differences, the syntax is not identical in each of these languages, but the overall function names and meanings are the same.</p>
+				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline.<br>Although the api is fairly straightforward, to aid in the creation of bots we provide boilerplate code for some common languages (presently C++, Java, and Python 3).<br>Due to language differences, the syntax is not identical in each of these languages, but the overall function names and meanings are the same.</p>
 
 				<h4>Initialization Input - getInit</h4>
 
 				<p>This function reads in the initial game state for the bot. Internally, it also receives and decodes the production map and game size and stores a local copy, but it only returns the player tag and game map (which itself contains the production map).</p>			
 
-				<h4>Initialization Otuput - sendInit</h4>
+				<h4>Initialization Output - sendInit</h4>
 
 				<p>This function sends the desired player name back to the game environment. In sending the name, it effectively signals the environment that the player is ready for the start of the game, and the player should be prepared to immediately receive the first frame of the game (which will incidentally contain the same map as was received in getInit). sendInit is a separate function from getInit to give players time to initialize potential strategies after receiving the initial map, and should at latest be called three seconds after calling getInit, although probably earlier to provide a networking buffer.</p>
 
