@@ -1,9 +1,7 @@
 <?php
 
-class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCase
-{
-    public function testValidatorAlgorithmOnImportString()
-    {
+class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCase{
+    public function testValidatorAlgorithmOnImportString() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -30,8 +28,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         );
     }
 
-    public function testCharactersWrittenUseValidator()
-    {
+    public function testCharactersWrittenUseValidator() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -61,8 +58,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         );
     }
 
-    public function testReadCharactersAreInTact()
-    {
+    public function testReadCharactersAreInTact() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -106,8 +102,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->read(1));
     }
 
-    public function testCharactersCanBeReadAsByteArrays()
-    {
+    public function testCharactersCanBeReadAsByteArrays() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -149,8 +144,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->readBytes(1));
     }
 
-    public function testRequestingLargeCharCountPastEndOfStream()
-    {
+    public function testRequestingLargeCharCountPastEndOfStream() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -172,8 +166,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->read(1));
     }
 
-    public function testRequestingByteArrayCountPastEndOfStream()
-    {
+    public function testRequestingByteArrayCountPastEndOfStream() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -195,8 +188,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->readBytes(1));
     }
 
-    public function testPointerOffsetCanBeSet()
-    {
+    public function testPointerOffsetCanBeSet() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -222,8 +214,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertIdenticalBinary(pack('C*', 0xD0, 0xBE), $stream->read(1));
     }
 
-    public function testContentsCanBeFlushed()
-    {
+    public function testContentsCanBeFlushed() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -243,8 +234,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->read(1));
     }
 
-    public function testByteStreamCanBeImportingUsesValidator()
-    {
+    public function testByteStreamCanBeImportingUsesValidator() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
         $os = $this->_getByteStream();
@@ -274,8 +264,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $stream->importByteStream($os);
     }
 
-    public function testImportingStreamProducesCorrectCharArray()
-    {
+    public function testImportingStreamProducesCorrectCharArray() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
         $os = $this->_getByteStream();
@@ -311,8 +300,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         $this->assertSame(false, $stream->read(1));
     }
 
-    public function testAlgorithmWithFixedWidthCharsets()
-    {
+    public function testAlgorithmWithFixedWidthCharsets() {
         $reader = $this->_getReader();
         $factory = $this->_getFactory($reader);
 
@@ -337,13 +325,11 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
 
     // -- Creation methods
 
-    private function _getReader()
-    {
+    private function _getReader() {
         return $this->getMockery('Swift_CharacterReader');
     }
 
-    private function _getFactory($reader)
-    {
+    private function _getFactory($reader) {
         $factory = $this->getMockery('Swift_CharacterReaderFactory');
         $factory->shouldReceive('getReaderFor')
                 ->zeroOrMoreTimes()
@@ -353,8 +339,7 @@ class Swift_CharacterStream_ArrayCharacterStreamTest extends \SwiftMailerTestCas
         return $factory;
     }
 
-    private function _getByteStream()
-    {
+    private function _getByteStream() {
         return $this->getMockery('Swift_OutputByteStream');
     }
 }

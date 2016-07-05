@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Bug274Test extends \PHPUnit_Framework_TestCase
-{
-    public function testEmptyFileNameAsAttachment()
-    {
+class Swift_Bug274Test extends \PHPUnit_Framework_TestCase{
+    public function testEmptyFileNameAsAttachment() {
         $message = new Swift_Message();
         $this->setExpectedException('Swift_IoException', 'The path cannot be empty');
         $message->attach(Swift_Attachment::fromPath(''));
     }
 
-    public function testNonEmptyFileNameAsAttachment()
-    {
+    public function testNonEmptyFileNameAsAttachment() {
         $message = new Swift_Message();
         try {
             $message->attach(Swift_Attachment::fromPath(__FILE__));

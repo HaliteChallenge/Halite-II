@@ -1,14 +1,12 @@
 <?php
 
-class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_contentEncoder;
     private $_cache;
     private $_grammar;
     private $_headers;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_cache = new Swift_KeyCache_ArrayKeyCache(
             new Swift_KeyCache_SimpleKeyCacheInputStream()
             );
@@ -33,8 +31,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testCharsetIsSetInHeader()
-    {
+    public function testCharsetIsSetInHeader() {
         $part = $this->_createMimePart();
         $part->setContentType('text/plain');
         $part->setCharset('utf-8');
@@ -48,8 +45,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testFormatIsSetInHeaders()
-    {
+    public function testFormatIsSetInHeaders() {
         $part = $this->_createMimePart();
         $part->setContentType('text/plain');
         $part->setFormat('flowed');
@@ -63,8 +59,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testDelSpIsSetInHeaders()
-    {
+    public function testDelSpIsSetInHeaders() {
         $part = $this->_createMimePart();
         $part->setContentType('text/plain');
         $part->setDelSp(true);
@@ -78,8 +73,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testAll3ParamsInHeaders()
-    {
+    public function testAll3ParamsInHeaders() {
         $part = $this->_createMimePart();
         $part->setContentType('text/plain');
         $part->setCharset('utf-8');
@@ -95,8 +89,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testBodyIsCanonicalized()
-    {
+    public function testBodyIsCanonicalized() {
         $part = $this->_createMimePart();
         $part->setContentType('text/plain');
         $part->setCharset('utf-8');
@@ -115,8 +108,7 @@ class Swift_Mime_MimePartAcceptanceTest extends \PHPUnit_Framework_TestCase
 
     // -- Private helpers
 
-    protected function _createMimePart()
-    {
+    protected function _createMimePart() {
         $entity = new Swift_Mime_MimePart(
             $this->_headers,
             $this->_contentEncoder,

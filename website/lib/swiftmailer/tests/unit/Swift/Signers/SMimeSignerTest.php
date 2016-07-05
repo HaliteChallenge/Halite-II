@@ -1,7 +1,6 @@
 <?php
 
-class Swift_Signers_SMimeSignerTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Signers_SMimeSignerTest extends \PHPUnit_Framework_TestCase{
     /**
      * @var Swift_StreamFilters_StringReplacementFilterFactory
      */
@@ -9,16 +8,14 @@ class Swift_Signers_SMimeSignerTest extends \PHPUnit_Framework_TestCase
 
     protected $samplesDir;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->replacementFactory = Swift_DependencyContainer::getInstance()
             ->lookup('transport.replacementfactory');
 
         $this->samplesDir = str_replace('\\', '/', realpath(__DIR__.'/../../../_samples/')).'/';
     }
 
-    public function testUnSingedMessage()
-    {
+    public function testUnSingedMessage() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -27,8 +24,7 @@ class Swift_Signers_SMimeSignerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Here is the message itself', $message->getBody());
     }
 
-    public function testSingedMessage()
-    {
+    public function testSingedMessage() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -70,8 +66,7 @@ OEL;
         unset($messageStream);
     }
 
-    public function testSingedMessageExtraCerts()
-    {
+    public function testSingedMessageExtraCerts() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -113,8 +108,7 @@ OEL;
         unset($messageStream);
     }
 
-    public function testSingedMessageBinary()
-    {
+    public function testSingedMessageBinary() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -148,8 +142,7 @@ OEL;
         unset($messageStreamClean, $messageStream);
     }
 
-    public function testSingedMessageWithAttachments()
-    {
+    public function testSingedMessageWithAttachments() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -212,8 +205,7 @@ OEL;
         unset($messageStream);
     }
 
-    public function testEncryptedMessage()
-    {
+    public function testEncryptedMessage() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -250,8 +242,7 @@ OEL;
         unset($decryptedMessageStream, $messageStream);
     }
 
-    public function testEncryptedMessageWithMultipleCerts()
-    {
+    public function testEncryptedMessageWithMultipleCerts() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -297,8 +288,7 @@ OEL;
         unset($decryptedMessageStream, $messageStream);
     }
 
-    public function testSignThenEncryptedMessage()
-    {
+    public function testSignThenEncryptedMessage() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -362,8 +352,7 @@ OEL;
         unset($decryptedMessageStream, $messageStream);
     }
 
-    public function testEncryptThenSignMessage()
-    {
+    public function testEncryptThenSignMessage() {
         $message = Swift_SignedMessage::newInstance('Wonderful Subject')
           ->setFrom(array('john@doe.com' => 'John Doe'))
           ->setTo(array('receiver@domain.org', 'other@domain.org' => 'A name'))
@@ -434,8 +423,7 @@ OEL;
         unset($messageStreamClean, $messageStream, $decryptedMessageStream);
     }
 
-    protected function assertValidVerify($expected, Swift_ByteStream_TemporaryFileByteStream $messageStream)
-    {
+    protected function assertValidVerify($expected, Swift_ByteStream_TemporaryFileByteStream $messageStream) {
         $actual = $messageStream->getContent();
 
         // File is UNIX encoded so convert them to correct line ending
@@ -462,8 +450,7 @@ OEL;
         return true;
     }
 
-    protected function getBoundary($contentType)
-    {
+    protected function getBoundary($contentType) {
         if (!preg_match('/boundary=("[^"]+"|(?:[^\s]+|$))/is', $contentType, $contentTypeData)) {
             $this->fail('Failed to find Boundary parameter');
 
@@ -473,8 +460,7 @@ OEL;
         return trim($contentTypeData[1], '"');
     }
 
-    protected function newFilteredStream()
-    {
+    protected function newFilteredStream() {
         $messageStream = new Swift_ByteStream_TemporaryFileByteStream();
         $messageStream->addFilter($this->replacementFactory->createFilter("\r\n", "\n"), 'CRLF to LF');
         $messageStream->addFilter($this->replacementFactory->createFilter("\n", "\r\n"), 'LF to CRLF');
@@ -482,8 +468,7 @@ OEL;
         return $messageStream;
     }
 
-    protected static function getBodyOfMessage($message)
-    {
+    protected static function getBodyOfMessage($message) {
         return substr($message, strpos($message, "\r\n\r\n"));
     }
 
@@ -493,8 +478,7 @@ OEL;
      * @param Swift_ByteStream_TemporaryFileByteStream $messageStream
      * @param Swift_ByteStream_TemporaryFileByteStream $inputStream
      */
-    protected function cleanMessage($content)
-    {
+    protected function cleanMessage($content) {
         $newContent = '';
 
         $headers = self::getHeadersOfMessage($content);
@@ -526,8 +510,7 @@ OEL;
      *
      * @return array
      */
-    protected static function getHeadersOfMessage($message)
-    {
+    protected static function getHeadersOfMessage($message) {
         $headersPosEnd = strpos($message, "\r\n\r\n");
         $headerData = substr($message, 0, $headersPosEnd);
         $headerLines = explode("\r\n", $headerData);

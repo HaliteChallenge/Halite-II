@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Events_ResponseListener extends Swift_Events_EventListener
-{
+interface Swift_Events_ResponseListener extends Swift_Events_EventListener{
     /**
      * Invoked immediately following a response coming back.
      *

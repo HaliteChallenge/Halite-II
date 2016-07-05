@@ -30,13 +30,11 @@ hltMap.prototype.getStatistics = function() {
 	size = 254
 	while(size--) this.strength_count[size] = 0
 
-	for(var a = 0; a < this.height; a++) for(var b = 0; b < this.width; b++) if(this.contents[a][b].owner != 0)
-	{
+	for(var a = 0; a < this.height; a++) for(var b = 0; b < this.width; b++) if(this.contents[a][b].owner != 0) {
 		this.territory_count[this.contents[a][b].owner - 1]++
 		this.strength_count[this.contents[a][b].owner - 1] += this.contents[a][b].strength
 	}
-	while(this.territory_count.length != 0 && this.territory_count[this.territory_count.length - 1] == 0)
-	{
+	while(this.territory_count.length != 0 && this.territory_count[this.territory_count.length - 1] == 0) {
 		this.territory_count.pop()
 		this.strength_count.pop()
 	}

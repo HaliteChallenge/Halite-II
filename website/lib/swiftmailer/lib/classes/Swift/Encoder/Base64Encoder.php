@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Encoder_Base64Encoder implements Swift_Encoder
-{
+class Swift_Encoder_Base64Encoder implements Swift_Encoder{
     /**
      * Takes an unencoded string and produces a Base64 encoded string from it.
      *
@@ -28,8 +27,7 @@ class Swift_Encoder_Base64Encoder implements Swift_Encoder
      *
      * @return string
      */
-    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0)
-    {
+    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0) {
         if (0 >= $maxLineLength || 76 < $maxLineLength) {
             $maxLineLength = 76;
         }
@@ -52,7 +50,6 @@ class Swift_Encoder_Base64Encoder implements Swift_Encoder
     /**
      * Does nothing.
      */
-    public function charsetChanged($charset)
-    {
+    public function charsetChanged($charset) {
     }
 }

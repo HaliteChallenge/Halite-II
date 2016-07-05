@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_ParameterizedHeader extends Swift_Mime_Header
-{
+interface Swift_Mime_ParameterizedHeader extends Swift_Mime_Header{
     /**
      * Set the value of $parameter.
      *

@@ -13,8 +13,7 @@
  *
  * @author     Chris Corbyn
  */
-class Swift_Transport_SimpleMailInvoker implements Swift_Transport_MailInvoker
-{
+class Swift_Transport_SimpleMailInvoker implements Swift_Transport_MailInvoker{
     /**
      * Send mail via the mail() function.
      *
@@ -28,8 +27,7 @@ class Swift_Transport_SimpleMailInvoker implements Swift_Transport_MailInvoker
      *
      * @return bool
      */
-    public function mail($to, $subject, $body, $headers = null, $extraParams = null)
-    {
+    public function mail($to, $subject, $body, $headers = null, $extraParams = null) {
         if (!ini_get('safe_mode')) {
             return @mail($to, $subject, $body, $headers, $extraParams);
         }

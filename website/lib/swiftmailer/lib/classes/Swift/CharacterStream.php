@@ -17,8 +17,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_CharacterStream
-{
+interface Swift_CharacterStream{
     /**
      * Set the character set used in this CharacterStream.
      *

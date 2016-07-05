@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_CharsetObserver
-{
+interface Swift_Mime_CharsetObserver{
     /**
      * Notify this observer that the entity's charset has changed.
      *

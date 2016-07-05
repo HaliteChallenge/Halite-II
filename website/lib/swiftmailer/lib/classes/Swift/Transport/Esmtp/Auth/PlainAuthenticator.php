@@ -13,15 +13,13 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Transport_Esmtp_Auth_PlainAuthenticator implements Swift_Transport_Esmtp_Authenticator
-{
+class Swift_Transport_Esmtp_Auth_PlainAuthenticator implements Swift_Transport_Esmtp_Authenticator{
     /**
      * Get the name of the AUTH mechanism this Authenticator handles.
      *
      * @return string
      */
-    public function getAuthKeyword()
-    {
+    public function getAuthKeyword() {
         return 'PLAIN';
     }
 
@@ -34,8 +32,7 @@ class Swift_Transport_Esmtp_Auth_PlainAuthenticator implements Swift_Transport_E
      *
      * @return bool
      */
-    public function authenticate(Swift_Transport_SmtpAgent $agent, $username, $password)
-    {
+    public function authenticate(Swift_Transport_SmtpAgent $agent, $username, $password) {
         try {
             $message = base64_encode($username.chr(0).$username.chr(0).$password);
             $agent->executeCommand(sprintf("AUTH PLAIN %s\r\n", $message), array(235));

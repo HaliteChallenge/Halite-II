@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTestCase
-{
+class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTestCase{
     private $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_encoder = new Swift_Mime_ContentEncoder_Base64ContentEncoder();
     }
 
-    public function testNameIsBase64()
-    {
+    public function testNameIsBase64() {
         $this->assertEquals('base64', $this->_encoder->getName());
     }
 
@@ -20,8 +17,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
     years.
     */
 
-    public function testInputOutputRatioIs3to4Bytes()
-    {
+    public function testInputOutputRatioIs3to4Bytes() {
         /*
         RFC 2045, 6.8
 
@@ -50,8 +46,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
         $this->assertEquals('MTIz', $collection->content);
     }
 
-    public function testPadLength()
-    {
+    public function testPadLength() {
         /*
         RFC 2045, 6.8
 
@@ -136,8 +131,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
         }
     }
 
-    public function testMaximumLineLengthIs76Characters()
-    {
+    public function testMaximumLineLengthIs76Characters() {
         /*
          The encoded output stream must be represented in lines of no more
          than 76 characters each.  All line breaks or other characters not
@@ -184,8 +178,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
             );
     }
 
-    public function testMaximumLineLengthCanBeDifferent()
-    {
+    public function testMaximumLineLengthCanBeDifferent() {
         $os = $this->_createOutputByteStream();
         $is = $this->_createInputByteStream();
         $collection = new Swift_StreamCollector();
@@ -227,8 +220,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
             );
     }
 
-    public function testMaximumLineLengthIsNeverMoreThan76Chars()
-    {
+    public function testMaximumLineLengthIsNeverMoreThan76Chars() {
         $os = $this->_createOutputByteStream();
         $is = $this->_createInputByteStream();
         $collection = new Swift_StreamCollector();
@@ -269,8 +261,7 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
             );
     }
 
-    public function testFirstLineLengthCanBeDifferent()
-    {
+    public function testFirstLineLengthCanBeDifferent() {
         $os = $this->_createOutputByteStream();
         $is = $this->_createInputByteStream();
         $collection = new Swift_StreamCollector();
@@ -311,13 +302,11 @@ class Swift_Mime_ContentEncoder_Base64ContentEncoderTest extends \SwiftMailerTes
             );
     }
 
-    private function _createOutputByteStream($stub = false)
-    {
+    private function _createOutputByteStream($stub = false) {
         return $this->getMockery('Swift_OutputByteStream')->shouldIgnoreMissing();
     }
 
-    private function _createInputByteStream($stub = false)
-    {
+    private function _createInputByteStream($stub = false) {
         return $this->getMockery('Swift_InputByteStream')->shouldIgnoreMissing();
     }
 }

@@ -18,6 +18,5 @@
  *
  * @deprecated
  */
-class Swift_SignedMessage extends Swift_Message
-{
+class Swift_SignedMessage extends Swift_Message{
 }

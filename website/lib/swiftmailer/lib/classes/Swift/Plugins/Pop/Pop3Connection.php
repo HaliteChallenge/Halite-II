@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Plugins_Pop_Pop3Connection
-{
+interface Swift_Plugins_Pop_Pop3Connection{
     /**
      * Connect to the POP3 host and throw an Exception if it fails.
      *

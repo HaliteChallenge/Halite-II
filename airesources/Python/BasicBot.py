@@ -6,8 +6,7 @@ sendInit("BasicBot"+str(playerTag))
 
 while True:
 	moves = []
-	sendMessages = [Message(ATTACK, playerTag, 1 if playerTag == 2 else 2, playerTag)]
-	gameMap, recievedMessages = getFrame()
+	gameMap = getFrame()
 
 	for y in range(0, len(gameMap.contents)):
 		for x in range(0, len(gameMap.contents[y])):
@@ -22,4 +21,5 @@ while True:
 							direction = d
 							break
 				moves.append(Move(Location(x, y), direction))
-	sendFrame(moves, sendMessages)
+
+	sendFrame(moves)

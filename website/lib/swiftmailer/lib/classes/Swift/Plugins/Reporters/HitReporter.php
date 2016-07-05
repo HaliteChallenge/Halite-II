@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Plugins_Reporters_HitReporter implements Swift_Plugins_Reporter
-{
+class Swift_Plugins_Reporters_HitReporter implements Swift_Plugins_Reporter{
     /**
      * The list of failures.
      *
@@ -31,8 +30,7 @@ class Swift_Plugins_Reporters_HitReporter implements Swift_Plugins_Reporter
      * @param string             $address
      * @param int                $result  from {@link RESULT_PASS, RESULT_FAIL}
      */
-    public function notify(Swift_Mime_Message $message, $address, $result)
-    {
+    public function notify(Swift_Mime_Message $message, $address, $result) {
         if (self::RESULT_FAIL == $result && !isset($this->_failures_cache[$address])) {
             $this->_failures[] = $address;
             $this->_failures_cache[$address] = true;
@@ -44,16 +42,14 @@ class Swift_Plugins_Reporters_HitReporter implements Swift_Plugins_Reporter
      *
      * @return array
      */
-    public function getFailedRecipients()
-    {
+    public function getFailedRecipients() {
         return $this->_failures;
     }
 
     /**
      * Clear the buffer (empty the list).
      */
-    public function clear()
-    {
+    public function clear() {
         $this->_failures = $this->_failures_cache = array();
     }
 }

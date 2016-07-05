@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_OutputByteStream
-{
+class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_OutputByteStream{
     /**
      * The internal stack of bytes.
      *
@@ -50,8 +49,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @param mixed $stack of bytes in string or array form, optional
      */
-    public function __construct($stack = null)
-    {
+    public function __construct($stack = null) {
         if (is_array($stack)) {
             $this->_array = $stack;
             $this->_arraySize = count($stack);
@@ -74,8 +72,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @return string
      */
-    public function read($length)
-    {
+    public function read($length) {
         if ($this->_offset == $this->_arraySize) {
             return false;
         }
@@ -96,8 +93,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @param string $bytes
      */
-    public function write($bytes)
-    {
+    public function write($bytes) {
         $to_add = str_split($bytes);
         foreach ($to_add as $value) {
             $this->_array[] = $value;
@@ -112,8 +108,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
     /**
      * Not used.
      */
-    public function commit()
-    {
+    public function commit() {
     }
 
     /**
@@ -124,8 +119,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @param Swift_InputByteStream $is
      */
-    public function bind(Swift_InputByteStream $is)
-    {
+    public function bind(Swift_InputByteStream $is) {
         $this->_mirrors[] = $is;
     }
 
@@ -138,8 +132,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @param Swift_InputByteStream $is
      */
-    public function unbind(Swift_InputByteStream $is)
-    {
+    public function unbind(Swift_InputByteStream $is) {
         foreach ($this->_mirrors as $k => $stream) {
             if ($is === $stream) {
                 unset($this->_mirrors[$k]);
@@ -154,8 +147,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      *
      * @return bool
      */
-    public function setReadPointer($byteOffset)
-    {
+    public function setReadPointer($byteOffset) {
         if ($byteOffset > $this->_arraySize) {
             $byteOffset = $this->_arraySize;
         } elseif ($byteOffset < 0) {
@@ -169,8 +161,7 @@ class Swift_ByteStream_ArrayByteStream implements Swift_InputByteStream, Swift_O
      * Flush the contents of the stream (empty it) and set the internal pointer
      * to the beginning.
      */
-    public function flushBuffers()
-    {
+    public function flushBuffers() {
         $this->_offset = 0;
         $this->_array = array();
         $this->_arraySize = 0;

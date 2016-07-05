@@ -1,9 +1,7 @@
 <?php
 
-class Swift_MailerTest extends \SwiftMailerTestCase
-{
-    public function testTransportIsStartedWhenSending()
-    {
+class Swift_MailerTest extends \SwiftMailerTestCase{
+    public function testTransportIsStartedWhenSending() {
         $transport = $this->_createTransport();
         $message = $this->_createMessage();
 
@@ -25,8 +23,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         $mailer->send($message);
     }
 
-    public function testTransportIsOnlyStartedOnce()
-    {
+    public function testTransportIsOnlyStartedOnce() {
         $transport = $this->_createTransport();
         $message = $this->_createMessage();
 
@@ -50,8 +47,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testMessageIsPassedToTransport()
-    {
+    public function testMessageIsPassedToTransport() {
         $transport = $this->_createTransport();
         $message = $this->_createMessage();
         $transport->shouldReceive('send')
@@ -62,8 +58,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         $mailer->send($message);
     }
 
-    public function testSendReturnsCountFromTransport()
-    {
+    public function testSendReturnsCountFromTransport() {
         $transport = $this->_createTransport();
         $message = $this->_createMessage();
         $transport->shouldReceive('send')
@@ -75,8 +70,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         $this->assertEquals(57, $mailer->send($message));
     }
 
-    public function testFailedRecipientReferenceIsPassedToTransport()
-    {
+    public function testFailedRecipientReferenceIsPassedToTransport() {
         $failures = array();
 
         $transport = $this->_createTransport();
@@ -90,8 +84,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         $mailer->send($message, $failures);
     }
 
-    public function testSendRecordsRfcComplianceExceptionAsEntireSendFailure()
-    {
+    public function testSendRecordsRfcComplianceExceptionAsEntireSendFailure() {
         $failures = array();
 
         $rfcException = new Swift_RfcComplianceException('test');
@@ -110,8 +103,7 @@ class Swift_MailerTest extends \SwiftMailerTestCase
         $this->assertEquals(array('foo&invalid', 'bar@valid.tld'), $failures, '%s: Failures should contain all addresses since the entire message failed to compile');
     }
 
-    public function testRegisterPluginDelegatesToTransport()
-    {
+    public function testRegisterPluginDelegatesToTransport() {
         $plugin = $this->_createPlugin();
         $transport = $this->_createTransport();
         $mailer = $this->_createMailer($transport);
@@ -125,23 +117,19 @@ class Swift_MailerTest extends \SwiftMailerTestCase
 
     // -- Creation methods
 
-    private function _createPlugin()
-    {
+    private function _createPlugin() {
         return $this->getMockery('Swift_Events_EventListener')->shouldIgnoreMissing();
     }
 
-    private function _createTransport()
-    {
+    private function _createTransport() {
         return $this->getMockery('Swift_Transport')->shouldIgnoreMissing();
     }
 
-    private function _createMessage()
-    {
+    private function _createMessage() {
         return $this->getMockery('Swift_Mime_Message')->shouldIgnoreMissing();
     }
 
-    private function _createMailer(Swift_Transport $transport)
-    {
+    private function _createMailer(Swift_Transport $transport) {
         return new Swift_Mailer($transport);
     }
 }

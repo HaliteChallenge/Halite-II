@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
-{
+class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader{
     /**
      * The mailboxes used in this Header.
      *
@@ -29,8 +28,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      * @param Swift_Mime_HeaderEncoder $encoder
      * @param Swift_Mime_Grammar       $grammar
      */
-    public function __construct($name, Swift_Mime_HeaderEncoder $encoder, Swift_Mime_Grammar $grammar)
-    {
+    public function __construct($name, Swift_Mime_HeaderEncoder $encoder, Swift_Mime_Grammar $grammar) {
         $this->setFieldName($name);
         $this->setEncoder($encoder);
         parent::__construct($grammar);
@@ -44,8 +42,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return int
      */
-    public function getFieldType()
-    {
+    public function getFieldType() {
         return self::TYPE_MAILBOX;
     }
 
@@ -58,8 +55,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setFieldBodyModel($model)
-    {
+    public function setFieldBodyModel($model) {
         $this->setNameAddresses($model);
     }
 
@@ -72,8 +68,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return array
      */
-    public function getFieldBodyModel()
-    {
+    public function getFieldBodyModel() {
         return $this->getNameAddresses();
     }
 
@@ -101,8 +96,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setNameAddresses($mailboxes)
-    {
+    public function setNameAddresses($mailboxes) {
         $this->_mailboxes = $this->normalizeMailboxes((array) $mailboxes);
         $this->setCachedValue(null); //Clear any cached value
     }
@@ -132,8 +126,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string[]
      */
-    public function getNameAddressStrings()
-    {
+    public function getNameAddressStrings() {
         return $this->_createNameAddressStrings($this->getNameAddresses());
     }
 
@@ -161,8 +154,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string[]
      */
-    public function getNameAddresses()
-    {
+    public function getNameAddresses() {
         return $this->_mailboxes;
     }
 
@@ -186,8 +178,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setAddresses($addresses)
-    {
+    public function setAddresses($addresses) {
         $this->setNameAddresses(array_values((array) $addresses));
     }
 
@@ -198,8 +189,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string[]
      */
-    public function getAddresses()
-    {
+    public function getAddresses() {
         return array_keys($this->_mailboxes);
     }
 
@@ -208,8 +198,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @param string|string[] $addresses
      */
-    public function removeAddresses($addresses)
-    {
+    public function removeAddresses($addresses) {
         $this->setCachedValue(null);
         foreach ((array) $addresses as $address) {
             unset($this->_mailboxes[$address]);
@@ -228,8 +217,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string
      */
-    public function getFieldBody()
-    {
+    public function getFieldBody() {
         // Compute the string value of the header only if needed
         if (is_null($this->getCachedValue())) {
             $this->setCachedValue($this->createMailboxListString($this->_mailboxes));
@@ -247,8 +235,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string[]
      */
-    protected function normalizeMailboxes(array $mailboxes)
-    {
+    protected function normalizeMailboxes(array $mailboxes) {
         $actualMailboxes = array();
 
         foreach ($mailboxes as $key => $value) {
@@ -275,8 +262,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string
      */
-    protected function createDisplayNameString($displayName, $shorten = false)
-    {
+    protected function createDisplayNameString($displayName, $shorten = false) {
         return $this->createPhrase($this, $displayName,
             $this->getCharset(), $this->getEncoder(), $shorten
             );
@@ -291,8 +277,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string
      */
-    protected function createMailboxListString(array $mailboxes)
-    {
+    protected function createMailboxListString(array $mailboxes) {
         return implode(', ', $this->_createNameAddressStrings($mailboxes));
     }
 
@@ -306,8 +291,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return bool
      */
-    protected function tokenNeedsEncoding($token)
-    {
+    protected function tokenNeedsEncoding($token) {
         return preg_match('/[,;]/', $token) || parent::tokenNeedsEncoding($token);
     }
 
@@ -318,8 +302,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string[]
      */
-    private function _createNameAddressStrings(array $mailboxes)
-    {
+    private function _createNameAddressStrings(array $mailboxes) {
         $strings = array();
 
         foreach ($mailboxes as $email => $name) {
@@ -341,8 +324,7 @@ class Swift_Mime_Headers_MailboxHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException If invalid.
      */
-    private function _assertValidAddress($address)
-    {
+    private function _assertValidAddress($address) {
         if (!preg_match('/^'.$this->getGrammar()->getDefinition('addr-spec').'$/D',
             $address)) {
             throw new Swift_RfcComplianceException(

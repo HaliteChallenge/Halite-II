@@ -6,8 +6,7 @@ define("REPLAYS_DIR", "../storage/replays/");
 define("BOTS_DIR", "../storage/bots/");
 define("INI_FILE", "../halite.ini");
 
-class ManagerAPI extends API
-{
+class ManagerAPI extends API{
 
 	private $mysqli = NULL;
 

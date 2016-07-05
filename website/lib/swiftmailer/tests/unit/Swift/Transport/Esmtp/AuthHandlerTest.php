@@ -1,43 +1,36 @@
 <?php
 
-class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
-{
+class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase{
     private $_agent;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_agent = $this->getMockery('Swift_Transport_SmtpAgent')->shouldIgnoreMissing();
     }
 
-    public function testKeywordIsAuth()
-    {
+    public function testKeywordIsAuth() {
         $auth = $this->_createHandler(array());
         $this->assertEquals('AUTH', $auth->getHandledKeyword());
     }
 
-    public function testUsernameCanBeSetAndFetched()
-    {
+    public function testUsernameCanBeSetAndFetched() {
         $auth = $this->_createHandler(array());
         $auth->setUsername('jack');
         $this->assertEquals('jack', $auth->getUsername());
     }
 
-    public function testPasswordCanBeSetAndFetched()
-    {
+    public function testPasswordCanBeSetAndFetched() {
         $auth = $this->_createHandler(array());
         $auth->setPassword('pass');
         $this->assertEquals('pass', $auth->getPassword());
     }
 
-    public function testAuthModeCanBeSetAndFetched()
-    {
+    public function testAuthModeCanBeSetAndFetched() {
         $auth = $this->_createHandler(array());
         $auth->setAuthMode('PLAIN');
         $this->assertEquals('PLAIN', $auth->getAuthMode());
     }
 
-    public function testMixinMethods()
-    {
+    public function testMixinMethods() {
         $auth = $this->_createHandler(array());
         $mixins = $auth->exposeMixinMethods();
         $this->assertTrue(in_array('getUsername', $mixins),
@@ -60,8 +53,7 @@ class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testAuthenticatorsAreCalledAccordingToParamsAfterEhlo()
-    {
+    public function testAuthenticatorsAreCalledAccordingToParamsAfterEhlo() {
         $a1 = $this->_createMockAuthenticator('PLAIN');
         $a2 = $this->_createMockAuthenticator('LOGIN');
 
@@ -81,8 +73,7 @@ class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
         $auth->afterEhlo($this->_agent);
     }
 
-    public function testAuthenticatorsAreNotUsedIfNoUsernameSet()
-    {
+    public function testAuthenticatorsAreNotUsedIfNoUsernameSet() {
         $a1 = $this->_createMockAuthenticator('PLAIN');
         $a2 = $this->_createMockAuthenticator('LOGIN');
 
@@ -100,8 +91,7 @@ class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
         $auth->afterEhlo($this->_agent);
     }
 
-    public function testSeveralAuthenticatorsAreTriedIfNeeded()
-    {
+    public function testSeveralAuthenticatorsAreTriedIfNeeded() {
         $a1 = $this->_createMockAuthenticator('PLAIN');
         $a2 = $this->_createMockAuthenticator('LOGIN');
 
@@ -122,8 +112,7 @@ class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
         $auth->afterEhlo($this->_agent);
     }
 
-    public function testFirstAuthenticatorToPassBreaksChain()
-    {
+    public function testFirstAuthenticatorToPassBreaksChain() {
         $a1 = $this->_createMockAuthenticator('PLAIN');
         $a2 = $this->_createMockAuthenticator('LOGIN');
         $a3 = $this->_createMockAuthenticator('CRAM-MD5');
@@ -150,13 +139,11 @@ class Swift_Transport_Esmtp_AuthHandlerTest extends \SwiftMailerTestCase
 
     // -- Private helpers
 
-    private function _createHandler($authenticators)
-    {
+    private function _createHandler($authenticators) {
         return new Swift_Transport_Esmtp_AuthHandler($authenticators);
     }
 
-    private function _createMockAuthenticator($type)
-    {
+    private function _createMockAuthenticator($type) {
         $authenticator = $this->getMockery('Swift_Transport_Esmtp_Authenticator')->shouldIgnoreMissing();
         $authenticator->shouldReceive('getAuthKeyword')
                       ->zeroOrMoreTimes()

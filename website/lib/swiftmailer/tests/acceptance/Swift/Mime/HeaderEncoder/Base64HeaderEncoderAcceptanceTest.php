@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Mime_HeaderEncoder_Base64HeaderEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_HeaderEncoder_Base64HeaderEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_encoder = new Swift_Mime_HeaderEncoder_Base64HeaderEncoder();
     }
 
-    public function testEncodingJIS()
-    {
+    public function testEncodingJIS() {
         if (function_exists('mb_convert_encoding')) {
             // base64_encode and split cannot handle long JIS text to fold
             $subject = '長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い件名';

@@ -1,9 +1,7 @@
 <?php
 
-class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCase
-{
-    public function testNameIsQuotedPrintable()
-    {
+class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCase{
+    public function testNameIsQuotedPrintable() {
         $encoder = new Swift_Mime_ContentEncoder_QpContentEncoder(
             $this->_createCharacterStream(true)
             );
@@ -26,8 +24,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
                     allow an alternative encoding.
                     */
 
-    public function testPermittedCharactersAreNotEncoded()
-    {
+    public function testPermittedCharactersAreNotEncoded() {
         /* -- RFC 2045, 6.7 --
         (2)   (Literal representation) Octets with decimal values of
                     33 through 60 inclusive, and 62 through 126, inclusive,
@@ -66,8 +63,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         }
     }
 
-    public function testLinearWhiteSpaceAtLineEndingIsEncoded()
-    {
+    public function testLinearWhiteSpaceAtLineEndingIsEncoded() {
         /* -- RFC 2045, 6.7 --
         (3)   (White Space) Octets with values of 9 and 32 MAY be
                     represented as US-ASCII TAB (HT) and SPACE characters,
@@ -177,8 +173,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $this->assertEquals("a =20\r\nb", $collection->content);
     }
 
-    public function testCRLFIsLeftAlone()
-    {
+    public function testCRLFIsLeftAlone() {
         /*
         (4)   (Line Breaks) A line break in a text body, represented
                     as a CRLF sequence in the text canonical form, must be
@@ -255,8 +250,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $this->assertEquals("a\r\nb\r\nc\r\n", $collection->content);
     }
 
-    public function testLinesLongerThan76CharactersAreSoftBroken()
-    {
+    public function testLinesLongerThan76CharactersAreSoftBroken() {
         /*
         (5)   (Soft Line Breaks) The Quoted-Printable encoding
                     REQUIRES that encoded lines be no more than 76
@@ -295,8 +289,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $this->assertEquals(str_repeat('a', 75)."=\r\n".str_repeat('a', 66), $collection->content);
     }
 
-    public function testMaxLineLengthCanBeSpecified()
-    {
+    public function testMaxLineLengthCanBeSpecified() {
         $os = $this->_createOutputByteStream(true);
         $charStream = $this->_createCharacterStream();
         $is = $this->_createInputByteStream();
@@ -325,8 +318,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $this->assertEquals(str_repeat('a', 53)."=\r\n".str_repeat('a', 48), $collection->content);
     }
 
-    public function testBytesBelowPermittedRangeAreEncoded()
-    {
+    public function testBytesBelowPermittedRangeAreEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -360,8 +352,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         }
     }
 
-    public function testDecimalByte61IsEncoded()
-    {
+    public function testDecimalByte61IsEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -393,8 +384,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $this->assertEquals(sprintf('=%02X', 61), $collection->content);
     }
 
-    public function testBytesAbovePermittedRangeAreEncoded()
-    {
+    public function testBytesAbovePermittedRangeAreEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -428,8 +418,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         }
     }
 
-    public function testFirstLineLengthCanBeDifferent()
-    {
+    public function testFirstLineLengthCanBeDifferent() {
         $os = $this->_createOutputByteStream(true);
         $charStream = $this->_createCharacterStream();
         $is = $this->_createInputByteStream();
@@ -461,8 +450,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
             );
     }
 
-    public function testObserverInterfaceCanChangeCharset()
-    {
+    public function testObserverInterfaceCanChangeCharset() {
         $stream = $this->_createCharacterStream();
         $stream->shouldReceive('setCharacterSet')
                ->once()
@@ -472,8 +460,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
         $encoder->charsetChanged('windows-1252');
     }
 
-    public function testTextIsPreWrapped()
-    {
+    public function testTextIsPreWrapped() {
         $encoder = $this->createEncoder();
 
         $input = str_repeat('a', 70)."\r\n".
@@ -493,26 +480,22 @@ class Swift_Mime_ContentEncoder_QpContentEncoderTest extends \SwiftMailerTestCas
 
     // -- Creation Methods
 
-    private function _createCharacterStream($stub = false)
-    {
+    private function _createCharacterStream($stub = false) {
         return $this->getMockery('Swift_CharacterStream')->shouldIgnoreMissing();
     }
 
-    private function createEncoder()
-    {
+    private function createEncoder() {
         $factory = new Swift_CharacterReaderFactory_SimpleCharacterReaderFactory();
         $charStream = new Swift_CharacterStream_NgCharacterStream($factory, 'utf-8');
 
         return new Swift_Mime_ContentEncoder_QpContentEncoder($charStream);
     }
 
-    private function _createOutputByteStream($stub = false)
-    {
+    private function _createOutputByteStream($stub = false) {
         return $this->getMockery('Swift_OutputByteStream')->shouldIgnoreMissing();
     }
 
-    private function _createInputByteStream($stub = false)
-    {
+    private function _createInputByteStream($stub = false) {
         return $this->getMockery('Swift_InputByteStream')->shouldIgnoreMissing();
     }
 }

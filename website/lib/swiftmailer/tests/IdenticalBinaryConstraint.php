@@ -5,12 +5,10 @@
  *
  * @author Chris Corbyn
  */
-class IdenticalBinaryConstraint extends \PHPUnit_Framework_Constraint
-{
+class IdenticalBinaryConstraint extends \PHPUnit_Framework_Constraint{
     protected $value;
 
-    public function __construct($value)
-    {
+    public function __construct($value) {
         $this->value = $value;
     }
 
@@ -22,8 +20,7 @@ class IdenticalBinaryConstraint extends \PHPUnit_Framework_Constraint
      *
      * @return bool
      */
-    public function matches($other)
-    {
+    public function matches($other) {
         $aHex = $this->asHexString($this->value);
         $bHex = $this->asHexString($other);
 
@@ -35,8 +32,7 @@ class IdenticalBinaryConstraint extends \PHPUnit_Framework_Constraint
      *
      * @return string
      */
-    public function toString()
-    {
+    public function toString() {
         return 'indentical binary';
     }
 
@@ -47,8 +43,7 @@ class IdenticalBinaryConstraint extends \PHPUnit_Framework_Constraint
      *
      * @return string
      */
-    private function asHexString($binary)
-    {
+    private function asHexString($binary) {
         $hex = '';
 
         $bytes = unpack('H*', $binary);

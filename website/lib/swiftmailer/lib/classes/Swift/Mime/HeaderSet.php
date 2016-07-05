@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_HeaderSet extends Swift_Mime_CharsetObserver
-{
+interface Swift_Mime_HeaderSet extends Swift_Mime_CharsetObserver{
     /**
      * Add a new Mailbox Header with a list of $addresses.
      *

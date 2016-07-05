@@ -1,7 +1,6 @@
 <?php
 
-abstract class API
-{
+abstract class API{
     /**
      * Property: method
      * The HTTP method this request was made in, either GET, POST, PUT or DELETE

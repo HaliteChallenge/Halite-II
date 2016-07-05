@@ -3,17 +3,14 @@
 /**
  * @group smoke
  */
-class Swift_Smoke_HtmlWithAttachmentSmokeTest extends SwiftMailerSmokeTestCase
-{
+class Swift_Smoke_HtmlWithAttachmentSmokeTest extends SwiftMailerSmokeTestCase{
     private $_attFile;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_attFile = __DIR__.'/../../../_samples/files/textfile.zip';
     }
 
-    public function testAttachmentSending()
-    {
+    public function testAttachmentSending() {
         $mailer = $this->_getMailer();
         $message = Swift_Message::newInstance('[Swift Mailer] HtmlWithAttachmentSmokeTest')
             ->setFrom(array(SWIFT_SMOKE_EMAIL_ADDRESS => 'Swift Mailer'))

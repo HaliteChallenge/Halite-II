@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase{
     private $_dispatcher;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_dispatcher = new Swift_Events_SimpleEventDispatcher();
     }
 
-    public function testSendEventCanBeCreated()
-    {
+    public function testSendEventCanBeCreated() {
         $transport = $this->getMock('Swift_Transport');
         $message = $this->getMock('Swift_Mime_Message');
         $evt = $this->_dispatcher->createSendEvent($transport, $message);
@@ -19,8 +16,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($transport, $evt->getTransport());
     }
 
-    public function testCommandEventCanBeCreated()
-    {
+    public function testCommandEventCanBeCreated() {
         $buf = $this->getMock('Swift_Transport');
         $evt = $this->_dispatcher->createCommandEvent($buf, "FOO\r\n", array(250));
         $this->assertInstanceof('Swift_Events_CommandEvent', $evt);
@@ -29,8 +25,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(250), $evt->getSuccessCodes());
     }
 
-    public function testResponseEventCanBeCreated()
-    {
+    public function testResponseEventCanBeCreated() {
         $buf = $this->getMock('Swift_Transport');
         $evt = $this->_dispatcher->createResponseEvent($buf, "250 Ok\r\n", true);
         $this->assertInstanceof('Swift_Events_ResponseEvent', $evt);
@@ -39,16 +34,14 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($evt->isValid());
     }
 
-    public function testTransportChangeEventCanBeCreated()
-    {
+    public function testTransportChangeEventCanBeCreated() {
         $transport = $this->getMock('Swift_Transport');
         $evt = $this->_dispatcher->createTransportChangeEvent($transport);
         $this->assertInstanceof('Swift_Events_TransportChangeEvent', $evt);
         $this->assertSame($transport, $evt->getSource());
     }
 
-    public function testTransportExceptionEventCanBeCreated()
-    {
+    public function testTransportExceptionEventCanBeCreated() {
         $transport = $this->getMock('Swift_Transport');
         $ex = new Swift_TransportException('');
         $evt = $this->_dispatcher->createTransportExceptionEvent($transport, $ex);
@@ -57,8 +50,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ex, $evt->getException());
     }
 
-    public function testListenersAreNotifiedOfDispatchedEvent()
-    {
+    public function testListenersAreNotifiedOfDispatchedEvent() {
         $transport = $this->getMock('Swift_Transport');
 
         $evt = $this->_dispatcher->createTransportChangeEvent($transport);
@@ -79,8 +71,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->_dispatcher->dispatchEvent($evt, 'transportStarted');
     }
 
-    public function testListenersAreOnlyCalledIfImplementingCorrectInterface()
-    {
+    public function testListenersAreOnlyCalledIfImplementingCorrectInterface() {
         $transport = $this->getMock('Swift_Transport');
         $message = $this->getMock('Swift_Mime_Message');
 
@@ -101,8 +92,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->_dispatcher->dispatchEvent($evt, 'sendPerformed');
     }
 
-    public function testListenersCanCancelBubblingOfEvent()
-    {
+    public function testListenersCanCancelBubblingOfEvent() {
         $transport = $this->getMock('Swift_Transport');
         $message = $this->getMock('Swift_Mime_Message');
 
@@ -128,8 +118,7 @@ class Swift_Events_SimpleEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($evt->bubbleCancelled());
     }
 
-    private function _createDispatcher(array $map)
-    {
+    private function _createDispatcher(array $map) {
         return new Swift_Events_SimpleEventDispatcher($map);
     }
 }

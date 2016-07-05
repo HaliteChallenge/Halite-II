@@ -1,9 +1,7 @@
 <?php
 
-class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
-{
-    public function testReadingSingleBytesFromBaseInput()
-    {
+class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase{
+    public function testReadingSingleBytesFromBaseInput() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
         $output = array();
@@ -15,8 +13,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testReadingMultipleBytesFromBaseInput()
-    {
+    public function testReadingMultipleBytesFromBaseInput() {
         $input = array('a', 'b', 'c', 'd');
         $bs = $this->_createArrayStream($input);
         $output = array();
@@ -28,8 +25,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testReadingOddOffsetOnLastByte()
-    {
+    public function testReadingOddOffsetOnLastByte() {
         $input = array('a', 'b', 'c', 'd', 'e');
         $bs = $this->_createArrayStream($input);
         $output = array();
@@ -41,8 +37,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testSettingPointerPartway()
-    {
+    public function testSettingPointerPartway() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
         $bs->setReadPointer(1);
@@ -51,8 +46,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testResettingPointerAfterExhaustion()
-    {
+    public function testResettingPointerAfterExhaustion() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input); while (false !== $bs->read(1));
 
@@ -62,8 +56,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testPointerNeverSetsBelowZero()
-    {
+    public function testPointerNeverSetsBelowZero() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
 
@@ -73,8 +66,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testPointerNeverSetsAboveStackSize()
-    {
+    public function testPointerNeverSetsAboveStackSize() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
 
@@ -84,8 +76,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testBytesCanBeWrittenToStream()
-    {
+    public function testBytesCanBeWrittenToStream() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
 
@@ -100,8 +91,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testContentsCanBeFlushed()
-    {
+    public function testContentsCanBeFlushed() {
         $input = array('a', 'b', 'c');
         $bs = $this->_createArrayStream($input);
 
@@ -112,8 +102,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testConstructorCanTakeStringArgument()
-    {
+    public function testConstructorCanTakeStringArgument() {
         $bs = $this->_createArrayStream('abc');
         $output = array();
         while (false !== $bytes = $bs->read(1)) {
@@ -124,8 +113,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testBindingOtherStreamsMirrorsWriteOperations()
-    {
+    public function testBindingOtherStreamsMirrorsWriteOperations() {
         $bs = $this->_createArrayStream('');
         $is1 = $this->getMock('Swift_InputByteStream');
         $is2 = $this->getMock('Swift_InputByteStream');
@@ -150,8 +138,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
         $bs->write('y');
     }
 
-    public function testBindingOtherStreamsMirrorsFlushOperations()
-    {
+    public function testBindingOtherStreamsMirrorsFlushOperations() {
         $bs = $this->_createArrayStream('');
         $is1 = $this->getMock('Swift_InputByteStream');
         $is2 = $this->getMock('Swift_InputByteStream');
@@ -167,8 +154,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
         $bs->flushBuffers();
     }
 
-    public function testUnbindingStreamPreventsFurtherWrites()
-    {
+    public function testUnbindingStreamPreventsFurtherWrites() {
         $bs = $this->_createArrayStream('');
         $is1 = $this->getMock('Swift_InputByteStream');
         $is2 = $this->getMock('Swift_InputByteStream');
@@ -195,8 +181,7 @@ class Swift_ByteStream_ArrayByteStreamTest extends \PHPUnit_Framework_TestCase
 
     // -- Creation Methods
 
-    private function _createArrayStream($input)
-    {
+    private function _createArrayStream($input) {
         return new Swift_ByteStream_ArrayByteStream($input);
     }
 }

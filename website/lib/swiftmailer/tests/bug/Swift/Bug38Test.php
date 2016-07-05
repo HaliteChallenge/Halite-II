@@ -1,21 +1,18 @@
 <?php
 
-class Swift_Bug38Test extends \PHPUnit_Framework_TestCase
-{
+class Swift_Bug38Test extends \PHPUnit_Framework_TestCase{
     private $_attFile;
     private $_attFileName;
     private $_attFileType;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_attFileName = 'data.txt';
         $this->_attFileType = 'text/plain';
         $this->_attFile = __DIR__.'/../../_samples/files/data.txt';
         Swift_Preferences::getInstance()->setCharset('utf-8');
     }
 
-    public function testWritingMessageToByteStreamProducesCorrectStructure()
-    {
+    public function testWritingMessageToByteStreamProducesCorrectStructure() {
         $message = new Swift_Message();
         $message->setSubject('test subject');
         $message->setTo('user@domain.tld');
@@ -68,8 +65,7 @@ class Swift_Bug38Test extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testWritingMessageToByteStreamTwiceProducesCorrectStructure()
-    {
+    public function testWritingMessageToByteStreamTwiceProducesCorrectStructure() {
         $message = new Swift_Message();
         $message->setSubject('test subject');
         $message->setTo('user@domain.tld');
@@ -125,8 +121,7 @@ class Swift_Bug38Test extends \PHPUnit_Framework_TestCase
         $this->assertPatternInStream($pattern, $streamB);
     }
 
-    public function testWritingMessageToByteStreamTwiceUsingAFileAttachment()
-    {
+    public function testWritingMessageToByteStreamTwiceUsingAFileAttachment() {
         $message = new Swift_Message();
         $message->setSubject('test subject');
         $message->setTo('user@domain.tld');
@@ -183,8 +178,7 @@ class Swift_Bug38Test extends \PHPUnit_Framework_TestCase
 
     // -- Helpers
 
-    public function assertPatternInStream($pattern, $stream, $message = '%s')
-    {
+    public function assertPatternInStream($pattern, $stream, $message = '%s') {
         $string = '';
         while (false !== $bytes = $stream->read(8192)) {
             $string .= $bytes;

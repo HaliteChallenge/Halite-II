@@ -13,15 +13,13 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Encoding
-{
+class Swift_Encoding{
     /**
      * Get the Encoder that provides 7-bit encoding.
      *
      * @return Swift_Mime_ContentEncoder
      */
-    public static function get7BitEncoding()
-    {
+    public static function get7BitEncoding() {
         return self::_lookup('mime.7bitcontentencoder');
     }
 
@@ -30,8 +28,7 @@ class Swift_Encoding
      *
      * @return Swift_Mime_ContentEncoder
      */
-    public static function get8BitEncoding()
-    {
+    public static function get8BitEncoding() {
         return self::_lookup('mime.8bitcontentencoder');
     }
 
@@ -40,8 +37,7 @@ class Swift_Encoding
      *
      * @return Swift_Mime_ContentEncoder
      */
-    public static function getQpEncoding()
-    {
+    public static function getQpEncoding() {
         return self::_lookup('mime.qpcontentencoder');
     }
 
@@ -50,15 +46,13 @@ class Swift_Encoding
      *
      * @return Swift_Mime_ContentEncoder
      */
-    public static function getBase64Encoding()
-    {
+    public static function getBase64Encoding() {
         return self::_lookup('mime.base64contentencoder');
     }
 
     // -- Private Static Methods
 
-    private static function _lookup($key)
-    {
+    private static function _lookup($key) {
         return Swift_DependencyContainer::getInstance()->lookup($key);
     }
 }

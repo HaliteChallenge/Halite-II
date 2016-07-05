@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Transport_Esmtp_Auth_CramMd5AuthenticatorTest extends \SwiftMailerTestCase
-{
+class Swift_Transport_Esmtp_Auth_CramMd5AuthenticatorTest extends \SwiftMailerTestCase{
     private $_agent;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_agent = $this->getMockery('Swift_Transport_SmtpAgent')->shouldIgnoreMissing();
     }
 
-    public function testKeywordIsCramMd5()
-    {
+    public function testKeywordIsCramMd5() {
         /* -- RFC 2195, 2.
         The authentication type associated with CRAM is "CRAM-MD5".
         */
@@ -19,8 +16,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5AuthenticatorTest extends \SwiftMailerTe
         $this->assertEquals('CRAM-MD5', $cram->getAuthKeyword());
     }
 
-    public function testSuccessfulAuthentication()
-    {
+    public function testSuccessfulAuthentication() {
         $cram = $this->_getAuthenticator();
 
         $this->_agent->shouldReceive('executeCommand')
@@ -36,8 +32,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5AuthenticatorTest extends \SwiftMailerTe
             );
     }
 
-    public function testAuthenticationFailureSendRsetAndReturnFalse()
-    {
+    public function testAuthenticationFailureSendRsetAndReturnFalse() {
         $cram = $this->_getAuthenticator();
 
         $this->_agent->shouldReceive('executeCommand')
@@ -59,8 +54,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5AuthenticatorTest extends \SwiftMailerTe
 
     // -- Private helpers
 
-    private function _getAuthenticator()
-    {
+    private function _getAuthenticator() {
         return new Swift_Transport_Esmtp_Auth_CramMd5Authenticator();
     }
 }

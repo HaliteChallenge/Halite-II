@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_ContentEncoder extends Swift_Encoder
-{
+interface Swift_Mime_ContentEncoder extends Swift_Encoder{
     /**
      * Encode $in to $out.
      *

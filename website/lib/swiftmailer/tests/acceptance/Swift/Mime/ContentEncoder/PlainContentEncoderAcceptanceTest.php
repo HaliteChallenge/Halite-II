@@ -1,18 +1,15 @@
 <?php
 
-class Swift_Mime_ContentEncoder_PlainContentEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_ContentEncoder_PlainContentEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_samplesDir;
     private $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_samplesDir = realpath(__DIR__.'/../../../../_samples/charsets');
         $this->_encoder = new Swift_Mime_ContentEncoder_PlainContentEncoder('8bit');
     }
 
-    public function testEncodingAndDecodingSamplesString()
-    {
+    public function testEncodingAndDecodingSamplesString() {
         $sampleFp = opendir($this->_samplesDir);
         while (false !== $encodingDir = readdir($sampleFp)) {
             if (substr($encodingDir, 0, 1) == '.') {
@@ -43,8 +40,7 @@ class Swift_Mime_ContentEncoder_PlainContentEncoderAcceptanceTest extends \PHPUn
         closedir($sampleFp);
     }
 
-    public function testEncodingAndDecodingSamplesByteStream()
-    {
+    public function testEncodingAndDecodingSamplesByteStream() {
         $sampleFp = opendir($this->_samplesDir);
         while (false !== $encodingDir = readdir($sampleFp)) {
             if (substr($encodingDir, 0, 1) == '.') {

@@ -1,12 +1,10 @@
 <?php
 
-class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_tmpDir;
     private $_testFile;
 
-    public function setUp()
-    {
+    public function setUp() {
         if (!defined('SWIFT_TMP_DIR')) {
             $this->markTestSkipped(
                 'Cannot run test without a writable directory to use ('.
@@ -19,13 +17,11 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         file_put_contents($this->_testFile, 'abcdefghijklm');
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         unlink($this->_testFile);
     }
 
-    public function testFileDataCanBeRead()
-    {
+    public function testFileDataCanBeRead() {
         $file = $this->_createFileStream($this->_testFile);
         $str = '';
         while (false !== $bytes = $file->read(8192)) {
@@ -34,22 +30,19 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $this->assertEquals('abcdefghijklm', $str);
     }
 
-    public function testFileDataCanBeReadSequentially()
-    {
+    public function testFileDataCanBeReadSequentially() {
         $file = $this->_createFileStream($this->_testFile);
         $this->assertEquals('abcde', $file->read(5));
         $this->assertEquals('fghijklm', $file->read(8));
         $this->assertFalse($file->read(1));
     }
 
-    public function testFilenameIsReturned()
-    {
+    public function testFilenameIsReturned() {
         $file = $this->_createFileStream($this->_testFile);
         $this->assertEquals($this->_testFile, $file->getPath());
     }
 
-    public function testFileCanBeWrittenTo()
-    {
+    public function testFileCanBeWrittenTo() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -57,8 +50,7 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $this->assertEquals('foobar', $file->read(8192));
     }
 
-    public function testReadingFromThenWritingToFile()
-    {
+    public function testReadingFromThenWritingToFile() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -68,8 +60,7 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $this->assertEquals('zipbutton', $file->read(8192));
     }
 
-    public function testWritingToFileWithCanonicalization()
-    {
+    public function testWritingToFileWithCanonicalization() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -80,8 +71,7 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $this->assertEquals("foo\nbar\nzip\ntest\n", file_get_contents($this->_testFile));
     }
 
-    public function testBindingOtherStreamsMirrorsWriteOperations()
-    {
+    public function testBindingOtherStreamsMirrorsWriteOperations() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -108,8 +98,7 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $file->write('y');
     }
 
-    public function testBindingOtherStreamsMirrorsFlushOperations()
-    {
+    public function testBindingOtherStreamsMirrorsFlushOperations() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -127,8 +116,7 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
         $file->flushBuffers();
     }
 
-    public function testUnbindingStreamPreventsFurtherWrites()
-    {
+    public function testUnbindingStreamPreventsFurtherWrites() {
         $file = $this->_createFileStream(
             $this->_testFile, true
             );
@@ -157,18 +145,15 @@ class Swift_ByteStream_FileByteStreamAcceptanceTest extends \PHPUnit_Framework_T
 
     // -- Creation methods
 
-    private function _createFilter($search, $replace)
-    {
+    private function _createFilter($search, $replace) {
         return new Swift_StreamFilters_StringReplacementFilter($search, $replace);
     }
 
-    private function _createMockInputStream()
-    {
+    private function _createMockInputStream() {
         return $this->getMock('Swift_InputByteStream');
     }
 
-    private function _createFileStream($file, $writable = false)
-    {
+    private function _createFileStream($file, $writable = false) {
         return new Swift_ByteStream_FileByteStream($file, $writable);
     }
 }

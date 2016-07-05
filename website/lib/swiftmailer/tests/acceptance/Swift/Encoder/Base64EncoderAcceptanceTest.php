@@ -1,18 +1,15 @@
 <?php
 
-class Swift_Encoder_Base64EncoderAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Encoder_Base64EncoderAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_samplesDir;
     private $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_samplesDir = realpath(__DIR__.'/../../../_samples/charsets');
         $this->_encoder = new Swift_Encoder_Base64Encoder();
     }
 
-    public function testEncodingAndDecodingSamples()
-    {
+    public function testEncodingAndDecodingSamples() {
         $sampleFp = opendir($this->_samplesDir);
         while (false !== $encodingDir = readdir($sampleFp)) {
             if (substr($encodingDir, 0, 1) == '.') {

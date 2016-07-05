@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Filterable
-{
+interface Swift_Filterable{
     /**
      * Add a new StreamFilter, referenced by $key.
      *

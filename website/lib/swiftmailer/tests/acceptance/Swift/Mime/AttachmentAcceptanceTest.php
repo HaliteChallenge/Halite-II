@@ -1,14 +1,12 @@
 <?php
 
-class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_contentEncoder;
     private $_cache;
     private $_grammar;
     private $_headers;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_cache = new Swift_KeyCache_ArrayKeyCache(
             new Swift_KeyCache_SimpleKeyCacheInputStream()
             );
@@ -27,8 +25,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testDispositionIsSetInHeader()
-    {
+    public function testDispositionIsSetInHeader() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $attachment->setDisposition('inline');
@@ -40,8 +37,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testDispositionIsAttachmentByDefault()
-    {
+    public function testDispositionIsAttachmentByDefault() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $this->assertEquals(
@@ -52,8 +48,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testFilenameIsSetInHeader()
-    {
+    public function testFilenameIsSetInHeader() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $attachment->setFilename('foo.pdf');
@@ -65,8 +60,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testSizeIsSetInHeader()
-    {
+    public function testSizeIsSetInHeader() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $attachment->setSize(12340);
@@ -78,8 +72,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testMultipleParametersInHeader()
-    {
+    public function testMultipleParametersInHeader() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $attachment->setFilename('foo.pdf');
@@ -92,8 +85,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testEndToEnd()
-    {
+    public function testEndToEnd() {
         $attachment = $this->_createAttachment();
         $attachment->setContentType('application/pdf');
         $attachment->setFilename('foo.pdf');
@@ -111,8 +103,7 @@ class Swift_Mime_AttachmentAcceptanceTest extends \PHPUnit_Framework_TestCase
 
     // -- Private helpers
 
-    protected function _createAttachment()
-    {
+    protected function _createAttachment() {
         $entity = new Swift_Mime_Attachment(
             $this->_headers,
             $this->_contentEncoder,

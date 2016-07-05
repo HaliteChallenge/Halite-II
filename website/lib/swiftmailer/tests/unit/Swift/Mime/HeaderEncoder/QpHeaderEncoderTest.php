@@ -1,20 +1,17 @@
 <?php
 
-class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
-{
+class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase{
     //Most tests are already covered in QpEncoderTest since this subclass only
     // adds a getName() method
 
-    public function testNameIsQ()
-    {
+    public function testNameIsQ() {
         $encoder = $this->_createEncoder(
             $this->_createCharacterStream(true)
             );
         $this->assertEquals('Q', $encoder->getName());
     }
 
-    public function testSpaceAndTabNeverAppear()
-    {
+    public function testSpaceAndTabNeverAppear() {
         /* -- RFC 2047, 4.
      Only a subset of the printable ASCII characters may be used in
      'encoded-text'.  Space and tab characters are not allowed, so that
@@ -32,8 +29,7 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSpaceIsRepresentedByUnderscore()
-    {
+    public function testSpaceIsRepresentedByUnderscore() {
         /* -- RFC 2047, 4.2.
         (2) The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be
        represented as "_" (underscore, ASCII 95.).  (This character may
@@ -63,8 +59,7 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testEqualsAndQuestionAndUnderscoreAreEncoded()
-    {
+    public function testEqualsAndQuestionAndUnderscoreAreEncoded() {
         /* -- RFC 2047, 4.2.
         (3) 8-bit values which correspond to printable ASCII characters other
        than "=", "?", and "_" (underscore), MAY be represented as those
@@ -92,8 +87,7 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testParensAndQuotesAreEncoded()
-    {
+    public function testParensAndQuotesAreEncoded() {
         /* -- RFC 2047, 5 (2).
      A "Q"-encoded 'encoded-word' which appears in a 'comment' MUST NOT
      contain the characters "(", ")" or "
@@ -119,8 +113,7 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testOnlyCharactersAllowedInPhrasesAreUsed()
-    {
+    public function testOnlyCharactersAllowedInPhrasesAreUsed() {
         /* -- RFC 2047, 5.
         (3) As a replacement for a 'word' entity within a 'phrase', for example,
         one that precedes an address in a From, To, or Cc header.  The ABNF
@@ -173,8 +166,7 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testEqualsNeverAppearsAtEndOfLine()
-    {
+    public function testEqualsNeverAppearsAtEndOfLine() {
         /* -- RFC 2047, 5 (3).
         The 'encoded-text' in an 'encoded-word' must be self-contained;
         'encoded-text' MUST NOT be continued from one 'encoded-word' to
@@ -211,13 +203,11 @@ class Swift_Mime_HeaderEncoder_QpHeaderEncoderTest extends \SwiftMailerTestCase
 
     // -- Creation Methods
 
-    private function _createEncoder($charStream)
-    {
+    private function _createEncoder($charStream) {
         return new Swift_Mime_HeaderEncoder_QpHeaderEncoder($charStream);
     }
 
-    private function _createCharacterStream($stub = false)
-    {
+    private function _createCharacterStream($stub = false) {
         return $this->getMockery('Swift_CharacterStream')->shouldIgnoreMissing();
     }
 }

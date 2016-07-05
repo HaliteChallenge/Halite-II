@@ -1,5 +1,4 @@
-public class Location
-{
+public class Location{
     public short x, y;
     
     public Location(short x_, short y_) {

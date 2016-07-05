@@ -1,11 +1,9 @@
 <?php
 
-class Swift_StreamCollector
-{
+class Swift_StreamCollector{
     public $content = '';
 
-    public function __invoke($arg)
-    {
+    public function __invoke($arg) {
         $this->content .= $arg;
     }
 }

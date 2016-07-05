@@ -1,9 +1,7 @@
 <?php
 
-class Swift_Events_TransportExceptionEventTest extends \PHPUnit_Framework_TestCase
-{
-    public function testExceptionCanBeFetchViaGetter()
-    {
+class Swift_Events_TransportExceptionEventTest extends \PHPUnit_Framework_TestCase{
+    public function testExceptionCanBeFetchViaGetter() {
         $ex = $this->_createException();
         $transport = $this->_createTransport();
         $evt = $this->_createEvent($transport, $ex);
@@ -13,8 +11,7 @@ class Swift_Events_TransportExceptionEventTest extends \PHPUnit_Framework_TestCa
             );
     }
 
-    public function testSourceIsTransport()
-    {
+    public function testSourceIsTransport() {
         $ex = $this->_createException();
         $transport = $this->_createTransport();
         $evt = $this->_createEvent($transport, $ex);
@@ -26,18 +23,15 @@ class Swift_Events_TransportExceptionEventTest extends \PHPUnit_Framework_TestCa
 
     // -- Creation Methods
 
-    private function _createEvent(Swift_Transport $transport, Swift_TransportException $ex)
-    {
+    private function _createEvent(Swift_Transport $transport, Swift_TransportException $ex) {
         return new Swift_Events_TransportExceptionEvent($transport, $ex);
     }
 
-    private function _createTransport()
-    {
+    private function _createTransport() {
         return $this->getMock('Swift_Transport');
     }
 
-    private function _createException()
-    {
+    private function _createException() {
         return new Swift_TransportException('');
     }
 }

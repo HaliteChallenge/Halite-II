@@ -1,11 +1,9 @@
 <?php
 
-class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase{
     private $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_encoder = new Swift_Encoder_Base64Encoder();
     }
 
@@ -15,8 +13,7 @@ class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
     years.
     */
 
-    public function testInputOutputRatioIs3to4Bytes()
-    {
+    public function testInputOutputRatioIs3to4Bytes() {
         /*
         RFC 2045, 6.8
 
@@ -41,8 +38,7 @@ class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testPadLength()
-    {
+    public function testPadLength() {
         /*
         RFC 2045, 6.8
 
@@ -88,8 +84,7 @@ class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testMaximumLineLengthIs76Characters()
-    {
+    public function testMaximumLineLengthIs76Characters() {
         /*
          The encoded output stream must be represented in lines of no more
          than 76 characters each.  All line breaks or other characters not
@@ -119,8 +114,7 @@ class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testMaximumLineLengthCanBeSpecified()
-    {
+    public function testMaximumLineLengthCanBeSpecified() {
         $input =
         'abcdefghijklmnopqrstuvwxyz'.
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.
@@ -146,8 +140,7 @@ class Swift_Encoder_Base64EncoderTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testFirstLineLengthCanBeDifferent()
-    {
+    public function testFirstLineLengthCanBeDifferent() {
         $input =
         'abcdefghijklmnopqrstuvwxyz'.
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableInputStream implements Swift_Transport_IoBuffer
-{
+class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableInputStream implements Swift_Transport_IoBuffer{
     /** A primary socket */
     private $_stream;
 
@@ -38,8 +37,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      *
      * @param Swift_ReplacementFilterFactory $replacementFactory
      */
-    public function __construct(Swift_ReplacementFilterFactory $replacementFactory)
-    {
+    public function __construct(Swift_ReplacementFilterFactory $replacementFactory) {
         $this->_replacementFactory = $replacementFactory;
     }
 
@@ -50,8 +48,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      *
      * @param array $params
      */
-    public function initialize(array $params)
-    {
+    public function initialize(array $params) {
         $this->_params = $params;
         switch ($params['type']) {
             case self::TYPE_PROCESS:
@@ -70,8 +67,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      * @param string $param
      * @param mixed  $value
      */
-    public function setParam($param, $value)
-    {
+    public function setParam($param, $value) {
         if (isset($this->_stream)) {
             switch ($param) {
                 case 'timeout':
@@ -90,16 +86,14 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
         $this->_params[$param] = $value;
     }
 
-    public function startTLS()
-    {
+    public function startTLS() {
         return stream_socket_enable_crypto($this->_stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
     }
 
     /**
      * Perform any shutdown logic needed.
      */
-    public function terminate()
-    {
+    public function terminate() {
         if (isset($this->_stream)) {
             switch ($this->_params['type']) {
                 case self::TYPE_PROCESS:
@@ -126,8 +120,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      *
      * @param string[] $replacements
      */
-    public function setWriteTranslations(array $replacements)
-    {
+    public function setWriteTranslations(array $replacements) {
         foreach ($this->_translations as $search => $replace) {
             if (!isset($replacements[$search])) {
                 $this->removeFilter($search);
@@ -157,8 +150,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      *
      * @return string
      */
-    public function readLine($sequence)
-    {
+    public function readLine($sequence) {
         if (isset($this->_out) && !feof($this->_out)) {
             $line = fgets($this->_out);
             if (strlen($line) == 0) {
@@ -189,8 +181,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
      *
      * @return string|bool
      */
-    public function read($length)
-    {
+    public function read($length) {
         if (isset($this->_out) && !feof($this->_out)) {
             $ret = fread($this->_out, $length);
             if (strlen($ret) == 0) {
@@ -209,21 +200,18 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
     }
 
     /** Not implemented */
-    public function setReadPointer($byteOffset)
-    {
+    public function setReadPointer($byteOffset) {
     }
 
     /** Flush the stream contents */
-    protected function _flush()
-    {
+    protected function _flush() {
         if (isset($this->_in)) {
             fflush($this->_in);
         }
     }
 
     /** Write this bytes to the stream */
-    protected function _commit($bytes)
-    {
+    protected function _commit($bytes) {
         if (isset($this->_in)) {
             $bytesToWrite = strlen($bytes);
             $totalBytesWritten = 0;
@@ -246,8 +234,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
     /**
      * Establishes a connection to a remote server.
      */
-    private function _establishSocketConnection()
-    {
+    private function _establishSocketConnection() {
         $host = $this->_params['host'];
         if (!empty($this->_params['protocol'])) {
             $host = $this->_params['protocol'].'://'.$host;
@@ -284,8 +271,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
     /**
      * Opens a process for input/output.
      */
-    private function _establishProcessConnection()
-    {
+    private function _establishProcessConnection() {
         $command = $this->_params['command'];
         $descriptorSpec = array(
             0 => array('pipe', 'r'),
@@ -303,8 +289,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
         $this->_out = &$pipes[1];
     }
 
-    private function _getReadConnectionDescription()
-    {
+    private function _getReadConnectionDescription() {
         switch ($this->_params['type']) {
             case self::TYPE_PROCESS:
                 return 'Process '.$this->_params['command'];

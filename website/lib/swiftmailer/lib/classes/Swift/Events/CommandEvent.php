@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Events_CommandEvent extends Swift_Events_EventObject
-{
+class Swift_Events_CommandEvent extends Swift_Events_EventObject{
     /**
      * The command sent to the server.
      *
@@ -36,8 +35,7 @@ class Swift_Events_CommandEvent extends Swift_Events_EventObject
      * @param string          $command
      * @param array           $successCodes
      */
-    public function __construct(Swift_Transport $source, $command, $successCodes = array())
-    {
+    public function __construct(Swift_Transport $source, $command, $successCodes = array()) {
         parent::__construct($source);
         $this->_command = $command;
         $this->_successCodes = $successCodes;
@@ -48,8 +46,7 @@ class Swift_Events_CommandEvent extends Swift_Events_EventObject
      *
      * @return string
      */
-    public function getCommand()
-    {
+    public function getCommand() {
         return $this->_command;
     }
 
@@ -58,8 +55,7 @@ class Swift_Events_CommandEvent extends Swift_Events_EventObject
      *
      * @return integer[]
      */
-    public function getSuccessCodes()
-    {
+    public function getSuccessCodes() {
         return $this->_successCodes;
     }
 }

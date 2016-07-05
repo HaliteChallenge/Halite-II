@@ -2,10 +2,8 @@
 
 use Mockery as m;
 
-class Swift_Bug534Test extends \PHPUnit_Framework_TestCase
-{
-    public function testEmbeddedImagesAreEmbedded()
-    {
+class Swift_Bug534Test extends \PHPUnit_Framework_TestCase{
+    public function testEmbeddedImagesAreEmbedded() {
         $message = Swift_Message::newInstance()
             ->setFrom('from@example.com')
             ->setTo('to@example.com')

@@ -1,9 +1,7 @@
 <?php
 
-class Swift_MessageTest extends \PHPUnit_Framework_TestCase
-{
-    public function testCloning()
-    {
+class Swift_MessageTest extends \PHPUnit_Framework_TestCase{
+    public function testCloning() {
         $message1 = new Swift_Message('subj', 'body', 'ctype');
         $message2 = new Swift_Message('subj', 'body', 'ctype');
         $message1_clone = clone $message1;
@@ -11,8 +9,7 @@ class Swift_MessageTest extends \PHPUnit_Framework_TestCase
         $this->_recursiveObjectCloningCheck($message1, $message2, $message1_clone);
     }
 
-    public function testCloningWithSigners()
-    {
+    public function testCloningWithSigners() {
         $message1 = new Swift_Message('subj', 'body', 'ctype');
         $signer = new Swift_Signers_DKIMSigner(dirname(dirname(__DIR__)).'/_samples/dkim/dkim.test.priv', 'test.example', 'example');
         $message1->attachSigner($signer);
@@ -24,8 +21,7 @@ class Swift_MessageTest extends \PHPUnit_Framework_TestCase
         $this->_recursiveObjectCloningCheck($message1, $message2, $message1_clone);
     }
 
-    public function testBodySwap()
-    {
+    public function testBodySwap() {
         $message1 = new Swift_Message('Test');
         $html = Swift_MimePart::newInstance('<html></html>', 'text/html');
         $html->getHeaders()->addTextHeader('X-Test-Remove', 'Test-Value');
@@ -55,8 +51,7 @@ class Swift_MessageTest extends \PHPUnit_Framework_TestCase
     }
 
     // -- Private helpers
-    protected function _recursiveObjectCloningCheck($obj1, $obj2, $obj1_clone)
-    {
+    protected function _recursiveObjectCloningCheck($obj1, $obj2, $obj1_clone) {
         $obj1_properties = (array) $obj1;
         $obj2_properties = (array) $obj2;
         $obj1_clone_properties = (array) $obj1_clone;
@@ -94,8 +89,7 @@ class Swift_MessageTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function _recursiveArrayCloningCheck($array1, $array2, $array1_clone)
-    {
+    protected function _recursiveArrayCloningCheck($array1, $array2, $array1_clone) {
         foreach ($array1 as $key => $value) {
             if (is_object($value)) {
                 $arr1_value = $array1[$key];

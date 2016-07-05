@@ -13,8 +13,7 @@
  *
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
-{
+class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream{
     /**
      * The char reader (lazy-loaded) for the current charset.
      *
@@ -84,8 +83,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      * @param Swift_CharacterReaderFactory $factory
      * @param string                       $charset
      */
-    public function __construct(Swift_CharacterReaderFactory $factory, $charset)
-    {
+    public function __construct(Swift_CharacterReaderFactory $factory, $charset) {
         $this->setCharacterReaderFactory($factory);
         $this->setCharacterSet($charset);
     }
@@ -97,8 +95,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param string $charset
      */
-    public function setCharacterSet($charset)
-    {
+    public function setCharacterSet($charset) {
         $this->_charset = $charset;
         $this->_charReader = null;
         $this->_mapType = 0;
@@ -109,16 +106,14 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param Swift_CharacterReaderFactory $factory
      */
-    public function setCharacterReaderFactory(Swift_CharacterReaderFactory $factory)
-    {
+    public function setCharacterReaderFactory(Swift_CharacterReaderFactory $factory) {
         $this->_charReaderFactory = $factory;
     }
 
     /**
      * @see Swift_CharacterStream::flushContents()
      */
-    public function flushContents()
-    {
+    public function flushContents() {
         $this->_datas = null;
         $this->_map = null;
         $this->_charCount = 0;
@@ -131,8 +126,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param Swift_OutputByteStream $os
      */
-    public function importByteStream(Swift_OutputByteStream $os)
-    {
+    public function importByteStream(Swift_OutputByteStream $os) {
         $this->flushContents();
         $blocks = 512;
         $os->setReadPointer(0);
@@ -146,8 +140,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param string $string
      */
-    public function importString($string)
-    {
+    public function importString($string) {
         $this->flushContents();
         $this->write($string);
     }
@@ -159,8 +152,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @return string
      */
-    public function read($length)
-    {
+    public function read($length) {
         if ($this->_currentPos >= $this->_charCount) {
             return false;
         }
@@ -217,8 +209,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @return integer[]
      */
-    public function readBytes($length)
-    {
+    public function readBytes($length) {
         $read = $this->read($length);
         if ($read !== false) {
             $ret = array_map('ord', str_split($read, 1));
@@ -234,8 +225,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param int $charOffset
      */
-    public function setPointer($charOffset)
-    {
+    public function setPointer($charOffset) {
         if ($this->_charCount < $charOffset) {
             $charOffset = $this->_charCount;
         }
@@ -247,8 +237,7 @@ class Swift_CharacterStream_NgCharacterStream implements Swift_CharacterStream
      *
      * @param string $chars
      */
-    public function write($chars)
-    {
+    public function write($chars) {
         if (!isset($this->_charReader)) {
             $this->_charReader = $this->_charReaderFactory->getReaderFor(
                 $this->_charset);

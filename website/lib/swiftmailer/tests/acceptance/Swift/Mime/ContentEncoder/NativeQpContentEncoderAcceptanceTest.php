@@ -1,7 +1,6 @@
 <?php
 
-class Swift_Mime_ContentEncoder_NativeQpContentEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_ContentEncoder_NativeQpContentEncoderAcceptanceTest extends \PHPUnit_Framework_TestCase{
     protected $_samplesDir;
 
     /**
@@ -9,14 +8,12 @@ class Swift_Mime_ContentEncoder_NativeQpContentEncoderAcceptanceTest extends \PH
      */
     protected $_encoder;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_samplesDir = realpath(__DIR__.'/../../../../_samples/charsets');
         $this->_encoder = new Swift_Mime_ContentEncoder_NativeQpContentEncoder();
     }
 
-    public function testEncodingAndDecodingSamples()
-    {
+    public function testEncodingAndDecodingSamples() {
         $sampleFp = opendir($this->_samplesDir);
         while (false !== $encodingDir = readdir($sampleFp)) {
             if (substr($encodingDir, 0, 1) == '.') {
@@ -58,8 +55,7 @@ class Swift_Mime_ContentEncoder_NativeQpContentEncoderAcceptanceTest extends \PH
         closedir($sampleFp);
     }
 
-    public function testEncodingAndDecodingSamplesFromDiConfiguredInstance()
-    {
+    public function testEncodingAndDecodingSamplesFromDiConfiguredInstance() {
         $encoder = $this->_createEncoderFromContainer();
         $this->assertSame('=C3=A4=C3=B6=C3=BC=C3=9F', $encoder->encodeString('äöüß'));
     }
@@ -67,20 +63,17 @@ class Swift_Mime_ContentEncoder_NativeQpContentEncoderAcceptanceTest extends \PH
     /**
      * @expectedException RuntimeException
      */
-    public function testCharsetChangeNotImplemented()
-    {
+    public function testCharsetChangeNotImplemented() {
         $this->_encoder->charsetChanged('utf-8');
         $this->_encoder->charsetChanged('charset');
         $this->_encoder->encodeString('foo');
     }
 
-    public function testGetName()
-    {
+    public function testGetName() {
         $this->assertSame('quoted-printable', $this->_encoder->getName());
     }
 
-    private function _createEncoderFromContainer()
-    {
+    private function _createEncoderFromContainer() {
         return Swift_DependencyContainer::getInstance()
             ->lookup('mime.nativeqpcontentencoder')
             ;

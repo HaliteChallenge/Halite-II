@@ -1,9 +1,7 @@
 <?php
 
-class Swift_CharacterReader_GenericFixedWidthReaderTest extends \PHPUnit_Framework_TestCase
-{
-    public function testInitialByteSizeMatchesWidth()
-    {
+class Swift_CharacterReader_GenericFixedWidthReaderTest extends \PHPUnit_Framework_TestCase{
+    public function testInitialByteSizeMatchesWidth() {
         $reader = new Swift_CharacterReader_GenericFixedWidthReader(1);
         $this->assertSame(1, $reader->getInitialByteSize());
 
@@ -11,8 +9,7 @@ class Swift_CharacterReader_GenericFixedWidthReaderTest extends \PHPUnit_Framewo
         $this->assertSame(4, $reader->getInitialByteSize());
     }
 
-    public function testValidationValueIsBasedOnOctetCount()
-    {
+    public function testValidationValueIsBasedOnOctetCount() {
         $reader = new Swift_CharacterReader_GenericFixedWidthReader(4);
 
         $this->assertSame(
@@ -32,8 +29,7 @@ class Swift_CharacterReader_GenericFixedWidthReaderTest extends \PHPUnit_Framewo
             ); //All 4 octets
     }
 
-    public function testValidationFailsIfTooManyOctets()
-    {
+    public function testValidationFailsIfTooManyOctets() {
         $reader = new Swift_CharacterReader_GenericFixedWidthReader(6);
 
         $this->assertSame(-1, $reader->validateByteSequence(

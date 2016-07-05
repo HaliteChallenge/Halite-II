@@ -1,24 +1,20 @@
 <?php
 
-class Swift_Events_EventObjectTest extends \PHPUnit_Framework_TestCase
-{
-    public function testEventSourceCanBeReturnedViaGetter()
-    {
+class Swift_Events_EventObjectTest extends \PHPUnit_Framework_TestCase{
+    public function testEventSourceCanBeReturnedViaGetter() {
         $source = new stdClass();
         $evt = $this->_createEvent($source);
         $ref = $evt->getSource();
         $this->assertEquals($source, $ref);
     }
 
-    public function testEventDoesNotHaveCancelledBubbleWhenNew()
-    {
+    public function testEventDoesNotHaveCancelledBubbleWhenNew() {
         $source = new stdClass();
         $evt = $this->_createEvent($source);
         $this->assertFalse($evt->bubbleCancelled());
     }
 
-    public function testBubbleCanBeCancelledInEvent()
-    {
+    public function testBubbleCanBeCancelledInEvent() {
         $source = new stdClass();
         $evt = $this->_createEvent($source);
         $evt->cancelBubble();
@@ -27,8 +23,7 @@ class Swift_Events_EventObjectTest extends \PHPUnit_Framework_TestCase
 
     // -- Creation Methods
 
-    private function _createEvent($source)
-    {
+    private function _createEvent($source) {
         return new Swift_Events_EventObject($source);
     }
 }

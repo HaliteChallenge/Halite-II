@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Transport_EsmtpHandler
-{
+interface Swift_Transport_EsmtpHandler{
     /**
      * Get the name of the ESMTP extension this handles.
      *

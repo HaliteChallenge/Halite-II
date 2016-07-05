@@ -1,22 +1,18 @@
 <?php
 
-class Swift_Transport_Esmtp_Auth_LoginAuthenticatorTest extends \SwiftMailerTestCase
-{
+class Swift_Transport_Esmtp_Auth_LoginAuthenticatorTest extends \SwiftMailerTestCase{
     private $_agent;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_agent = $this->getMockery('Swift_Transport_SmtpAgent')->shouldIgnoreMissing();
     }
 
-    public function testKeywordIsLogin()
-    {
+    public function testKeywordIsLogin() {
         $login = $this->_getAuthenticator();
         $this->assertEquals('LOGIN', $login->getAuthKeyword());
     }
 
-    public function testSuccessfulAuthentication()
-    {
+    public function testSuccessfulAuthentication() {
         $login = $this->_getAuthenticator();
 
         $this->_agent->shouldReceive('executeCommand')
@@ -34,8 +30,7 @@ class Swift_Transport_Esmtp_Auth_LoginAuthenticatorTest extends \SwiftMailerTest
             );
     }
 
-    public function testAuthenticationFailureSendRsetAndReturnFalse()
-    {
+    public function testAuthenticationFailureSendRsetAndReturnFalse() {
         $login = $this->_getAuthenticator();
 
         $this->_agent->shouldReceive('executeCommand')
@@ -59,8 +54,7 @@ class Swift_Transport_Esmtp_Auth_LoginAuthenticatorTest extends \SwiftMailerTest
 
     // -- Private helpers
 
-    private function _getAuthenticator()
-    {
+    private function _getAuthenticator() {
         return new Swift_Transport_Esmtp_Auth_LoginAuthenticator();
     }
 }

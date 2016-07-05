@@ -1,18 +1,15 @@
 <?php
 
-class Swift_Plugins_Reporters_HtmlReporterTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Plugins_Reporters_HtmlReporterTest extends \PHPUnit_Framework_TestCase{
     private $_html;
     private $_message;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_html = new Swift_Plugins_Reporters_HtmlReporter();
         $this->_message = $this->getMock('Swift_Mime_Message');
     }
 
-    public function testReportingPass()
-    {
+    public function testReportingPass() {
         ob_start();
         $this->_html->notify($this->_message, 'foo@bar.tld',
             Swift_Plugins_Reporter::RESULT_PASS
@@ -23,8 +20,7 @@ class Swift_Plugins_Reporters_HtmlReporterTest extends \PHPUnit_Framework_TestCa
         $this->assertRegExp('~foo@bar\.tld~', $html, '%s: Reporter should show address');
     }
 
-    public function testReportingFail()
-    {
+    public function testReportingFail() {
         ob_start();
         $this->_html->notify($this->_message, 'zip@button',
             Swift_Plugins_Reporter::RESULT_FAIL
@@ -35,8 +31,7 @@ class Swift_Plugins_Reporters_HtmlReporterTest extends \PHPUnit_Framework_TestCa
         $this->assertRegExp('~zip@button~', $html, '%s: Reporter should show address');
     }
 
-    public function testMultipleReports()
-    {
+    public function testMultipleReports() {
         ob_start();
         $this->_html->notify($this->_message, 'foo@bar.tld',
             Swift_Plugins_Reporter::RESULT_PASS

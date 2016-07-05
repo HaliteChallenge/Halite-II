@@ -1,10 +1,8 @@
 <?php
 
 class Swift_Transport_EsmtpTransportTest
-    extends Swift_Transport_AbstractSmtpEventSupportTest
-{
-    protected function _getTransport($buf, $dispatcher = null)
-    {
+    extends Swift_Transport_AbstractSmtpEventSupportTest{
+    protected function _getTransport($buf, $dispatcher = null) {
         if (!$dispatcher) {
             $dispatcher = $this->_createEventDispatcher();
         }
@@ -12,24 +10,21 @@ class Swift_Transport_EsmtpTransportTest
         return new Swift_Transport_EsmtpTransport($buf, array(), $dispatcher);
     }
 
-    public function testHostCanBeSetAndFetched()
-    {
+    public function testHostCanBeSetAndFetched() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $smtp->setHost('foo');
         $this->assertEquals('foo', $smtp->getHost(), '%s: Host should be returned');
     }
 
-    public function testPortCanBeSetAndFetched()
-    {
+    public function testPortCanBeSetAndFetched() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $smtp->setPort(25);
         $this->assertEquals(25, $smtp->getPort(), '%s: Port should be returned');
     }
 
-    public function testTimeoutCanBeSetAndFetched()
-    {
+    public function testTimeoutCanBeSetAndFetched() {
         $buf = $this->_getBuffer();
         $buf->shouldReceive('setParam')
             ->once()
@@ -40,21 +35,18 @@ class Swift_Transport_EsmtpTransportTest
         $this->assertEquals(10, $smtp->getTimeout(), '%s: Timeout should be returned');
     }
 
-    public function testEncryptionCanBeSetAndFetched()
-    {
+    public function testEncryptionCanBeSetAndFetched() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $smtp->setEncryption('tls');
         $this->assertEquals('tls', $smtp->getEncryption(), '%s: Crypto should be returned');
     }
 
-    public function testStartSendsHeloToInitiate()
-    {
+    public function testStartSendsHeloToInitiate() {
         //Overridden for EHLO instead
     }
 
-    public function testStartSendsEhloToInitiate()
-    {
+    public function testStartSendsEhloToInitiate() {
         /* -- RFC 2821, 3.2.
 
             3.2 Client Initiation
@@ -115,8 +107,7 @@ class Swift_Transport_EsmtpTransportTest
         }
     }
 
-    public function testHeloIsUsedAsFallback()
-    {
+    public function testHeloIsUsedAsFallback() {
         /* -- RFC 2821, 4.1.4.
 
        If the EHLO command is not acceptable to the SMTP server, 501, 500,
@@ -161,8 +152,7 @@ class Swift_Transport_EsmtpTransportTest
         }
     }
 
-    public function testInvalidHeloResponseCausesException()
-    {
+    public function testInvalidHeloResponseCausesException() {
         //Overridden to first try EHLO
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
@@ -200,8 +190,7 @@ class Swift_Transport_EsmtpTransportTest
         }
     }
 
-    public function testDomainNameIsPlacedInEhlo()
-    {
+    public function testDomainNameIsPlacedInEhlo() {
         /* -- RFC 2821, 4.1.4.
 
        The SMTP client MUST, if possible, ensure that the domain parameter
@@ -235,8 +224,7 @@ class Swift_Transport_EsmtpTransportTest
         $smtp->start();
     }
 
-    public function testDomainNameIsPlacedInHelo()
-    {
+    public function testDomainNameIsPlacedInHelo() {
         //Overridden to include ESMTP
         /* -- RFC 2821, 4.1.4.
 
@@ -279,8 +267,7 @@ class Swift_Transport_EsmtpTransportTest
         $smtp->start();
     }
 
-    public function testFluidInterface()
-    {
+    public function testFluidInterface() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $buf->shouldReceive('setParam')

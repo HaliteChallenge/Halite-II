@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Plugins_Logger
-{
+interface Swift_Plugins_Logger{
     /**
      * Add a log entry.
      *

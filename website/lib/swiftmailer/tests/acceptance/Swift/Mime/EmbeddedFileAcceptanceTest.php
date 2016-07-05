@@ -1,14 +1,12 @@
 <?php
 
-class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_contentEncoder;
     private $_cache;
     private $_grammar;
     private $_headers;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_cache = new Swift_KeyCache_ArrayKeyCache(
             new Swift_KeyCache_SimpleKeyCacheInputStream()
             );
@@ -27,8 +25,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testContentIdIsSetInHeader()
-    {
+    public function testContentIdIsSetInHeader() {
         $file = $this->_createEmbeddedFile();
         $file->setContentType('application/pdf');
         $file->setId('foo@bar');
@@ -41,8 +38,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testDispositionIsSetInHeader()
-    {
+    public function testDispositionIsSetInHeader() {
         $file = $this->_createEmbeddedFile();
         $id = $file->getId();
         $file->setContentType('application/pdf');
@@ -56,8 +52,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testFilenameIsSetInHeader()
-    {
+    public function testFilenameIsSetInHeader() {
         $file = $this->_createEmbeddedFile();
         $id = $file->getId();
         $file->setContentType('application/pdf');
@@ -71,8 +66,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testSizeIsSetInHeader()
-    {
+    public function testSizeIsSetInHeader() {
         $file = $this->_createEmbeddedFile();
         $id = $file->getId();
         $file->setContentType('application/pdf');
@@ -86,8 +80,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testMultipleParametersInHeader()
-    {
+    public function testMultipleParametersInHeader() {
         $file = $this->_createEmbeddedFile();
         $id = $file->getId();
         $file->setContentType('application/pdf');
@@ -103,8 +96,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testEndToEnd()
-    {
+    public function testEndToEnd() {
         $file = $this->_createEmbeddedFile();
         $id = $file->getId();
         $file->setContentType('application/pdf');
@@ -124,8 +116,7 @@ class Swift_Mime_EmbeddedFileAcceptanceTest extends \PHPUnit_Framework_TestCase
 
     // -- Private helpers
 
-    protected function _createEmbeddedFile()
-    {
+    protected function _createEmbeddedFile() {
         $entity = new Swift_Mime_EmbeddedFile(
             $this->_headers,
             $this->_contentEncoder,
