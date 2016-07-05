@@ -28,7 +28,7 @@ void setWindowed();
 void setFullscreen();
 void renderLaunch();
 
-Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
+Halite * my_game = NULL; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true, tabPressed = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
 int windowedWidth, windowedHeight, numTurns;
@@ -55,16 +55,15 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nC
 #else
 int main(int argc, const char ** argv) {
 #endif
-	if(argc == 2) {
-		std::string loc(argv[0]);
-		std::replace(loc.begin(), loc.end(), '\\', '/');
-		loc = loc.substr(0, loc.find_last_of('/'));
-		#ifdef _WIN32
-		_chdir(loc.c_str());
-		#else
-		chdir(loc.c_str());
-		#endif
-	}
+
+	std::string loc(argv[0]);
+	std::replace(loc.begin(), loc.end(), '\\', '/');
+	loc = loc.substr(0, loc.find_last_of('/'));
+#ifdef _WIN32
+	_chdir(loc.c_str());
+#else
+	if(chdir(loc.c_str())) return EXIT_FAILURE;
+#endif
 
 	//Open debug:
 	std::string debugfilename = "logs/debug.log";
@@ -109,11 +108,13 @@ int main(int argc, const char ** argv) {
 	if(argc == 2) {
 		handleDrop(window, 1, (const char **)(argv + 1));
 	}
-	else{
-		while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
+	else {
+		while(isLaunch && !glfwWindowShouldClose(window)) {
+			renderLaunch();
+		}
 	}
 
-	glfwSwapInterval(2);
+	glfwSwapInterval(1);
 
 	clock_t c = clock();
 

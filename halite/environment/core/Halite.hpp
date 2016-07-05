@@ -49,7 +49,7 @@ static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
 	return o;
 }
 
-class Halite{
+class Halite {
 private:
 	//Networking
 	Networking networking;

@@ -57,7 +57,7 @@ int main(int argc, char* args[]) {
 
 	//The programs arguments were not passed in the run command.
 	//Instead, we will ask the user for them
-	else{
+	else {
 		program_output_style = false;
 
 		std::string in;
