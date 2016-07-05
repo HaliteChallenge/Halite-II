@@ -12,7 +12,7 @@ If you have not already:
 * Create and write a halite.ini file in the root directory of the project
 * Apache setup
  * Allow the following of symlinks by apache
- * Allow .htaccess override
+ * [Allow .htaccess override](http://stackoverflow.com/questions/18740419/how-to-set-allowoverride-all)
  * Enable apache modules named mod_rewrite and php5_module, if not already enabled
  * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
  * Dont forget to restart apache: ```sudo service apache2 restart```
