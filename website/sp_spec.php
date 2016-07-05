@@ -32,7 +32,7 @@
 
 				<h4>Frame Output - sendFrame</h4>
 
-				<p>This function encodes and sends the moves from the player. If given duplicate moves or multiple moves for the same piece, it will send all of the moves it is given, so it is recommended that the player carefully compile their list of moves before sending them with this function.</p>
+				<p>This function encodes and sends the moves from the player. This function will send all of the moves it is given, so it is recommended that the player carefully compile their list of moves before sending them with this function.</p>
 
 			</div>
 		</div>
