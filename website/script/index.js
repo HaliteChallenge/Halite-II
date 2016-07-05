@@ -45,7 +45,7 @@ $(function() {
 		render: function() {
 			this.$table.find("tbody").remove();
 			this.submissions.sort(function(a, b) {
-				return a.mu-(a.sigma*3) < b.mu-(b.sigma*3);
+				return a.rank > b.rank;
 			});
 			console.log(this.submissions)
 			for(var a = 0; a < this.submissions.length; a++) {
