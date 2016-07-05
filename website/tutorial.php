@@ -50,19 +50,87 @@
 
 				<h3>Basic Bot</h3>
 				<p>
-					As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. We can very easily improve on this. We will program our bot move each of its pieces like so:
+					As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. This logic is encoded in these lines of the starter bot.
+					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
+if(site.owner == playerTag) {
+  byte dir = Direction.randomDirection();
+  moves.add(new Move(new Location((short)x, (short)y), dir));
+}</pre>
+				</p>
+
+				<p>
+					We can very easily improve on this. We will program our bot, Basic Bot, move each of its pieces like so:
 					<ul>
-						<li>If adjacent to a tile owned an opposing player, attack it</li>
-						<li>If the previous condition is false and my current strength is less than 5 times the production of my tile, stay still (when a piece stays still, its tile's production is added to its strength)</li>
-						<li>Otherwise, move randomly</li>
+						<li>If the piece's current strength is less than 5 times the production of its tile, stay still (when a piece stays still, its tile's production is added to its strength).</li>
+
+						<li>If the previous condition is false and the piece is adjacent to a tile owned an opposing player, attack the opposing tile.</li>
+						<li>Otherwise, move randomly.</li>
 					</ul>
 				</p>
 
 				<p>
-					Open up the <code>MyBot</code> file of your starter package. This file contains all of your bot's logic.
+					This logic may easily be transferred to code like so:
+					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
+if(site.owner == playerTag) {
+  byte moveDirection = Direction.randomDirection();
+  if(site.strength < site.production*5) {
+    moveDirection = Direction.STILL;
+  } else {
+    for(byte possibleDirection : Direction.CARDINALS) {
+      if(gameMap.getSite(new Location(x, y), possibleDirection).owner != playerTag) {
+        moveDirection = possibleDirection;
+        break;
+      }
+    }
+  }
+  moves.add(new Move(new Location(x, y), moveDirection));
+}</pre>
 				</p>
 
-				<p>The source code of the basic bot by language is available <a href="downloads.php">here</a>.</p>
+				<p>
+					Here is the full Basic Bot:
+					<pre class="prettyprint">import java.util.ArrayList;
+
+public class BasicBot{
+  public static void main(String[] args) {
+    InitPackage iPackage = Networking.getInit();
+    short playerTag = iPackage.playerTag;
+    Map gameMap = iPackage.map;
+
+    Networking.sendInit("JavaBot" + playerTag);
+
+    while(true) {
+      ArrayList<Move> moves = new ArrayList<Move>();
+
+      gameMap = Networking.getFrame();
+
+      for(short y = 0; y < gameMap.contents.size(); y++) {
+        for(short x = 0; x < gameMap.contents.get(y).size(); x++) {
+          Site site = gameMap.contents.get(y).get(x);
+          if(site.owner == playerTag) {
+            byte moveDirection = Direction.randomDirection();
+            if(site.strength < site.production*5) {
+              moveDirection = Direction.STILL;
+            } else {
+              for(byte d : Direction.CARDINALS) {
+                if(gameMap.getSite(new Location(x, y), d).owner != playerTag) {
+                  moveDirection = d;
+                  break;
+                }
+              }
+            }
+            moves.add(new Move(new Location(x, y), moveDirection));
+          }
+        }
+      }
+
+      Networking.sendFrame(moves);
+    }
+  }
+}</pre>
+				</p>
+
+				<p>Try running a game between two basics and compare it to the game between two starter bots.</p>
 
 				<h3>What's Next?</h3>
 				<p>
@@ -92,6 +160,7 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
 </body>
