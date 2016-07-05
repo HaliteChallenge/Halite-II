@@ -14,8 +14,6 @@ public class MyBot{
             
             gameMap = Networking.getFrame();
             
-            ArrayList<Message> recievedMessages = fPackage.messages;
-            
             for(int y = 0; y < gameMap.contents.size(); y++) {
                 for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
                     Site site = gameMap.contents.get(y).get(x);
@@ -26,7 +24,7 @@ public class MyBot{
                 }
             }
             
-            Networking.sendFrame(moves, sendMessages);
+            Networking.sendFrame(moves);
         }
     }
 }
