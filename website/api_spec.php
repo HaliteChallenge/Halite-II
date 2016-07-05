@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 
-				<h3>Overview:</h3>
+				<h3>API Overview:</h3>
 
 				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Bots are expected to communicate using the format found below; any deviation from it will likely result in the bot being ejected from the game.</p>
 
