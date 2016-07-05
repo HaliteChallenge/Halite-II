@@ -40,6 +40,8 @@
 									<th>#</th>
 									<th>Username</th>
 									<th>Language</th>
+									<th>Submissions</th>
+									<th>Games Played</th>
 									<th>Score</th>
 								</tr>
 							</thead>
