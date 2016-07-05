@@ -48,7 +48,7 @@
 					To visualize the game that you just ran, run the visualizer binary. Drag the game's replay file from your file explorer into the visualizer's window. Soon a grid filled with a few of brightly colored squares this is the map at the very start of the game.
 				</p>
 
-				<h3>Basic Bot</h3>
+				<h3>Writing a Basic Bot</h3>
 				<p>
 					As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. This logic is encoded in these lines of the starter bot.
 					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
@@ -59,7 +59,7 @@ if(site.owner == playerTag) {
 				</p>
 
 				<p>
-					We can very easily improve on this. We will program our bot, Basic Bot, move each of its pieces like so:
+					We can very easily build on the starter bot to write a basic bot. We will write the basic bot to move each of its pieces like so:
 					<ul>
 						<li>If the piece's current strength is less than 5 times the production of its tile, stay still (when a piece stays still, its tile's production is added to its strength).</li>
 
@@ -88,7 +88,7 @@ if(site.owner == playerTag) {
 				</p>
 
 				<p>
-					Here is the full Basic Bot:
+					Here is the full basic bot:
 					<pre class="prettyprint">import java.util.ArrayList;
 
 public class BasicBot{
@@ -134,13 +134,13 @@ public class BasicBot{
 
 				<h3>What's Next?</h3>
 				<p>
-					There are a number of problems with the current Basic Bot. These include but definitely are not limited to:
+					There are a number of problems with the basic bot. These include but definitely are not limited to:
 
 					<ul>
-						<li>At any given point, most of the Basic Bot's pieces are moving randomly inside the Basic Bot's territory. It would be much more efficient if those pieces would go straight towards the nearest opposing tile.</li>
-						<li>The Basic Bot expands very stupidly. It doesn't prioritize expanding to opposing territory with low strength and high production.</li>
-						<li>The Basic Bot decides to stop growing a piece and start moving it when that piece's strength is greater than its production times 5. That factor of 5 is completely arbitrary. Another value is probably more optimal.</li>
-						<li>When deciding whether to attack opposing tiles, neither the strength of the Basic Bot's piece nor the strength of its opponent are taken into account. It may be more optimal to refrain from attacking under some circumstances.</li>
+						<li>At any given point, most of the bot's pieces are moving randomly inside the bot's territory. It would be much more efficient if those pieces would go straight towards the nearest opposing tile.</li>
+						<li>The bot expands very stupidly. It doesn't prioritize expanding to opposing territory with low strength and high production.</li>
+						<li>The bot decides to stop growing a piece and start moving it when that piece's strength is greater than its production times 5. That factor of 5 is completely arbitrary. Another value is probably more optimal.</li>
+						<li>When deciding whether to attack opposing tiles, neither the strength of the bot's piece nor the strength of its opponent are taken into account. It may be more optimal to refrain from attacking under some circumstances.</li>
 					</ul>
 				</p>
 			</div>
