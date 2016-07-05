@@ -104,7 +104,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	srand(time(NULL));
 
 	std::string newString;
-	#ifdef _WIN32
+#ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsRead;
@@ -134,7 +134,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		if (buffer == '\n') break;
 		else newString += buffer;
 	}
-	#else
+#else
 	UniConnection connection = connections[playerTag - 1];
 
 	fd_set set;
@@ -178,7 +178,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 			throw 1;
 		}
 	}
-	#endif
+#endif
 
 	//Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
@@ -189,7 +189,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 }
 
 void Networking::startAndConnectBot(std::string command) {
-	#ifdef _WIN32
+#ifdef _WIN32
 	command = "/C " + command;
 
 	WinConnection parentConnection, childConnection;
@@ -244,14 +244,14 @@ void Networking::startAndConnectBot(std::string command) {
 		if(!program_output_style) std::cout << "Could not start process\n";
 		throw 1;
 	}
-	else{
+	else {
 		CloseHandle(piProcInfo.hProcess);
 		CloseHandle(piProcInfo.hThread);
 
 		processes.push_back(piProcInfo.hProcess);
 		connections.push_back(parentConnection);
 	}
-	#else
+#else
 	if(!program_output_style) std::cout << command << "\n";
 
 	pid_t pid = NULL;
@@ -269,7 +269,7 @@ void Networking::startAndConnectBot(std::string command) {
 
 	//Fork a child process
 	pid = fork();
-	if(pid == 0) //This is the child{
+	if(pid == 0) { //This is the child
 		dup2(writePipe[0], STDIN_FILENO);
 
 		dup2(readPipe[1], STDOUT_FILENO);
@@ -292,7 +292,7 @@ void Networking::startAndConnectBot(std::string command) {
 	connections.push_back(connection);
 	processes.push_back(pid);
 
-	#endif
+#endif
 
 	playerLogs.push_back(std::vector<std::string>(0));
 }
