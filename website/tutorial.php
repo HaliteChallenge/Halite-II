@@ -22,7 +22,7 @@
 				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the game environment, which runs games and outputs replay files, and the desktop visualizer, which visualizes the environment's replay files. These are located <a href="downloads.php">here</a>.</p>
 
 				<h3>Running a Game</h3>
-				<p>Once those are downloaded, unzip you starter package. If you are using a compiled language, please compile the <code>MyBot</code> file of the starter package. We are going to run a game between three instances of the provided starter bot, which simply moves all of its peices randomly. To do this, run the environment binary. It should promt you for the game's dimensions (40 by 40 is perfectly resonable) and the command to start your bot. Examples of these commands include:
+				<p>Once those are downloaded, unzip you starter package. If you are using a compiled language, please compile the <code>MyBot</code> (ex. <code>javac MyBot.java</code> or <code>g++ -std=c++11 MyBot -o MyBot.o</code>) file of the starter package. We are going to run a game between three instances of the provided starter bot, which simply moves all of its peices randomly. To do this, run the environment binary. It should promt you for the game's dimensions (40 by 40 is perfectly resonable) and the "start command" for you bot, just the command that you would type in terminal to start a program in your language. Examples of these commands include:
 					<ul>
 						<li>Java - <code>cd PATH_TO_BOT; java MyBot</code></li>
 						<li>Python - <code>python3 PATH_TO_BOT/MyBot.py</code></li>
@@ -31,6 +31,7 @@
 				The environment should then execute your game, outputting the turn number intermittently and finishing with a ranking of each of the instances of your bot.
 				</p>
 
+				<h3>Visualizing a Games</h3>
 				<p>To visualize the game that you just ran, run the visualizer binary and drop the game's replay file, ending with <code>hlt</code> and located in the directory of you environment binary.</p>
 
 				<h3>Basic Bot</h3>
