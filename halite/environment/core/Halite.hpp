@@ -13,28 +13,34 @@
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
 
-#define BOT_INITIALIZATION_TIMEOUT_MILLIS 10000
+//#define INFINITE_RESPOND_TIME
+#ifndef INFINITE_RESPOND_TIME
+	#define BOT_INITIALIZATION_TIMEOUT_MILLIS 3000
+	#define BOT_FRAME_TIMEOUT_MILLIS 1000
+#else
+	#define BOT_INITIALIZATION_TIMEOUT_MILLIS 2147483647
+	#define BOT_FRAME_TIMEOUT_MILLIS 2147483647
+#endif
 
 extern bool program_output_style;
 
-struct PlayerStatistics{
+struct PlayerStatistics {
 	int tag;
 	int rank;
 	double average_territory_count;
 	double average_strength_count;
 	double average_production_count;
 	double still_percentage;
-	double average_alliance_count;
 	double average_response_time;
 };
 static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
-	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_alliance_count << ' ' << p.average_response_time;
+	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
 	return o;
 }
 
-struct GameStatistics{
+struct GameStatistics {
 	std::vector<PlayerStatistics> player_statistics;
-	std::set<unsigned char> timeout_tags;
+	std::set<unsigned short> timeout_tags;
 };
 static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
 	for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
@@ -45,20 +51,30 @@ static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
 
 class Halite{
 private:
-	unsigned short turn_number;
-	float defense_bonus;
+	//Networking
 	Networking networking;
-	std::vector<std::string> player_names;
-	std::vector<hlt::Message> pastFrameMessages;
-	std::vector< std::set<hlt::Move> > player_moves;
-	std::vector<unsigned int> last_territory_count;
-	std::vector<unsigned int> full_territory_count;
+
+	//Game state
+	unsigned short turn_number;
+	unsigned short number_of_players;
 	hlt::Map game_map;
-	std::vector<std::vector<unsigned char> * > full_game;
+	std::vector<std::string> player_names;
+	std::vector< std::set<hlt::Move> > player_moves;
+
+	//Statistics
+	std::vector<unsigned short> alive_frame_count;
+	std::vector<unsigned int> full_territory_count;
+	std::vector<unsigned int> full_strength_count;
+	std::vector<unsigned int> full_production_count;
+	std::vector<unsigned int> full_still_count;
+	std::vector<unsigned int> full_cardinal_count;
+	std::vector<unsigned int> total_response_time;
+	std::set<unsigned short> timeout_tags;
+
+	//Output
 	std::vector<Color> possible_colors;
 	std::map<unsigned char, Color> color_codes;
-	std::vector<unsigned int> player_scores;
-	unsigned short number_of_players;
+	std::vector<std::vector<unsigned char> * > full_game;
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
@@ -67,7 +83,7 @@ public:
 
 	void init();
 	void output(std::string filename);
-	std::vector<unsigned char> runGame();
+	GameStatistics runGame();
 	std::string getName(unsigned char playerTag);
 
 	~Halite();

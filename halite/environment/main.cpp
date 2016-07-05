@@ -93,7 +93,7 @@ int main(int argc, char* args[]) {
 	}
 	std::string filename = "Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
-	std::vector<unsigned char> rankings = my_game->runGame();
+	GameStatistics stats = my_game->runGame();
 
 	try{
 		my_game->output(filename);
@@ -105,12 +105,12 @@ int main(int argc, char* args[]) {
 	}
 
 	std::string victoryOut;
-	if(!program_output_style) for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += "In place #" + std::to_string(a + 1) + " is player "  + std::to_string(rankings[a]) + " named " + my_game->getName(rankings[a]) + "\n";
-	else {
-		std::cout << filename << std::endl;
-		for(unsigned int a = 0; a < rankings.size(); a++) victoryOut += std::to_string(rankings[a]) + ' ';
+	if(program_output_style) {
+		std::cout << filename << std::endl << stats;
 	}
-	std::cout << victoryOut;
+	else {
+		for(unsigned int a = 0; a < stats.player_statistics.size(); a++) std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << "!\n";
+	}
 
 	delete my_game;
 	return 0;
