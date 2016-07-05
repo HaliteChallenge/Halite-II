@@ -39,13 +39,13 @@
 				 	</ul>
 				</p>
 
-				 <p>Every bot is expected to respond with a string representing their name (newline-terminated).</p>
+				 <p>Every bot is expected to respond with a string representing their name (newline-terminated) within three seconds.</p>
 
 				<h3>Frame Format:</h3>
 
 				<p>Every bot is sent the the present game map (newline-terminated).
 
-				<p>Every bot is expected to respond with a set of moves (newline-terminated).
+				<p>Every bot is expected to respond with a set of moves (newline-terminated) within one second.
 
 				<h3>Format Specifics:</h3>
 
