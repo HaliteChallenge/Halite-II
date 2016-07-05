@@ -7,10 +7,10 @@
 #include "core/Halite.hpp"
 
 #ifdef _WIN32
-#include <Windows.h>
-#include <direct.h>
+	#include <Windows.h>
+	#include <direct.h>
 #else
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
 
@@ -34,27 +34,27 @@ float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOff
 int windowedWidth, windowedHeight, numTurns;
 
 std::string filename;
-std::fstream debug;
+std::ofstream debug;
 
 #ifdef _WIN32
-#define argc __argc
-#define argv __argv
+	#define argc __argc
+	#define argv __argv
 #endif
 
 //Define shifts.
 #if defined(_WIN32)
-#define SHIFT 1
+	#define SHIFT 1
 #elif defined(__APPLE__)
-#define SHIFT 2
+	#define SHIFT 2
 #else
-#define SHIFT 0.025
+	#define SHIFT 0.025
 #endif
 
 #ifdef _WIN32
-INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow) {
 #else
-int main(int argc, const char ** argv)
-#endif{
+int main(int argc, const char ** argv) {
+#endif
 	if(argc == 2) {
 		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
@@ -69,7 +69,7 @@ int main(int argc, const char ** argv)
 	//Open debug:
 	std::string debugfilename = "logs/debug.log";
 	debug.open(debugfilename, std::ios_base::out);
-	if(!debug.is_open()) //If file couldn't be opened.{
+	if(!debug.is_open()) { //If file couldn't be opened.
 		debug.open("DEBUG.log", std::ios_base::out);
 		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.\n";
 		debug.flush();

@@ -1,14 +1,13 @@
 #include "OpenGL.hpp"
 
-std::fstream * debugstream;
+std::ofstream * debugstream;
 
-void util::initShaderHandler(std::fstream * ds) {
+void util::initShaderHandler(std::ofstream * ds) {
 	debugstream = ds;
 }
 
 bool util::shaderFromFile(GLuint shader, std::string filename, std::string shadername) {
-	std::fstream in;
-	in.open(filename, std::ios_base::in);
+	std::ifstream in(filename);
 	if(!in.is_open()) {
 		*debugstream << "File " << filename << " could not be opened, and consequently <<" << shadername << ">> couldn't be compiled." << std::endl;
 		return false;

@@ -94,7 +94,7 @@ void Halite::setupMapRendering() {
 		if(xLoc > MAP_RIGHT) {
 			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width);
 		}
-		if(fabs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.{
+		if(fabs(xLoc - initialXLoc) < dX / 3) { //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
 			yLoc -= dY;
 			if(yLoc < MAP_BOTTOM) {
 				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * map_height);
@@ -195,7 +195,7 @@ void Halite::setupProductionRendering(const hlt::Map & map) {
 		if(xLoc > MAP_RIGHT) {
 			xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width);
 		}
-		if(fabs(xLoc - initialXLoc) < dX / 3) //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.{
+		if(fabs(xLoc - initialXLoc) < dX / 3) { //Floats are weird, so this is basically just to check if xLoc == initialLoc, but without bit-for-bit matching.
 			yLoc -= dY;
 			if(yLoc < MAP_BOTTOM) {
 				yLoc = MAP_TOP - (MAP_TOP - MAP_BOTTOM) / (2 * map_height);
@@ -287,7 +287,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		graph_turn_min = turnNumber - turnsOnEachSide;
 		graph_turn_max = turnNumber + turnsOnEachSide;
 	}
-	else if(turnNumber - turnsOnEachSide < 0) //Shift right{
+	else if(turnNumber - turnsOnEachSide < 0) { //Shift right
 		short rightShift = -(turnNumber - turnsOnEachSide);
 		if(turnNumber + turnsOnEachSide + rightShift >= graph_frame_number) {
 			//Just use the whole thing:
@@ -300,7 +300,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 			graph_turn_max = turnNumber + turnsOnEachSide + rightShift;
 		}
 	}
-	else if(turnNumber + turnsOnEachSide >= graph_frame_number) //Shift left{
+	else if(turnNumber + turnsOnEachSide >= graph_frame_number) { //Shift left
 		short leftShift = (turnNumber + turnsOnEachSide) - (graph_frame_number - 1);
 		if(turnNumber - turnsOnEachSide - leftShift < 0) {
 			//Just use the whole thing:

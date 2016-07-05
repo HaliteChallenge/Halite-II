@@ -33,7 +33,7 @@ static bool operator==(const Color & c1, const Color & c2) {
 }
 
 namespace util{
-	void initShaderHandler(std::fstream * ds);
+	void initShaderHandler(std::ofstream * ds);
 	//Returns true if all went well; false otherwise (or throws an exception).
 	bool shaderFromFile(GLuint shader, std::string filename, std::string shadername);
 	void setScreenSize(int w, int h);

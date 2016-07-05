@@ -168,7 +168,8 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 				playerLogs[playerTag-1].push_back(newString);
 				errorMessage += "#---------ALL OF THE OUTPUT OF THE BOT THAT TIMED OUT----------#\n";
 				for(auto stringIter = playerLogs[playerTag-1].begin(); stringIter != playerLogs[playerTag-1].end(); stringIter++) {
-					errorMessage += std::string("# ") + *stringIter + std::string("\n");
+					while(stringIter->size() < 60) stringIter->push_back(' ');
+					errorMessage += "# " + *stringIter + " #\n";
 				}
 				errorMessage += "#--------------------------------------------------------------#\n";
 

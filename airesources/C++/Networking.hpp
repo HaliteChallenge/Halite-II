@@ -91,14 +91,9 @@ static hlt::Map deserializeMap(const std::string & inputString) {
 
 	return map;
 }
-static void sendString(std::string &sendString) {
-	if (sendString.length() < 1) sendString = " ";
-
-	//End message with newline character
-	sendString += '\n';
-
-	std::cout << sendString;
-	std::cout.flush();
+static void sendString(const std::string & sendString) {
+	if(sendString.length() < 1) std::cout << ' ' << std::endl; //Automatically flushes.
+	else std::cout << sendString << std::endl; //Automatically flushes.
 }
 
 static std::string getString() {
