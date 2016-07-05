@@ -92,42 +92,6 @@ static hlt::Map deserializeMap(const std::string & inputString) {
 	return map;
 }
 
-static std::string serializeMessages(const std::vector<hlt::Message> &messages) {
-	std::ostringstream oss;
-
-	oss << (int)(messages.size()) << " ";
-
-	for (int a = 0; a < messages.size(); a++) {
-		hlt::Message message = messages[a];
-		oss << (unsigned short)message.type << " ";
-		oss <<  message.senderID << " " << message.recipientID << " " << message.targetID << " ";
-	}
-
-	return oss.str();
-}
-
-static std::vector<hlt::Message> deserializeMessages(const std::string &inputString) {
-	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
-	std::stringstream iss(inputString);
-
-	int numberOfMessages;
-	iss >> numberOfMessages;
-
-	for (int a = 0; a < numberOfMessages; a++) {
-		hlt::Message message;
-
-		int messageTypeInt;
-		iss >> messageTypeInt;
-		message.type = static_cast<hlt::MessageType>(messageTypeInt);
-
-		iss >> message.senderID >> message.recipientID >> message.targetID;
-
-		messages.push_back(message);
-	}
-
-	return messages;
-}
-
 static void sendString(std::string &sendString) {
 	if (sendString.length() < 1) sendString = " ";
 
@@ -157,17 +121,12 @@ static void sendInitResponse(std::string name) {
 	detail::sendString(name);
 }
 
-static void getFrame(hlt::Map& m, std::vector<hlt::Message> &messages) {
+static void getFrame(hlt::Map& m) {
 	m = detail::deserializeMap(detail::getString());
-	messages = detail::deserializeMessages(detail::getString());
 }
 
-static void sendFrame(const std::set<hlt::Move> &moves, const std::vector<hlt::Message> &messages) {
-	std::string movesString = detail::serializeMoveSet(moves);
-	detail::sendString(movesString);
-
-	std::string messagesString = detail::serializeMessages(messages);
-	detail::sendString(messagesString);
+static void sendFrame(const std::set<hlt::Move> &moves) {
+	detail::sendString(detail::serializeMoveSet(moves));
 }
 
 #endif
