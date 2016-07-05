@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Events_EventDispatcher
-{
+interface Swift_Events_EventDispatcher{
     /**
      * Create a new SendEvent for $source and $message.
      *

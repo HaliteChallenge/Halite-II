@@ -1,83 +1,69 @@
 <?php
 
-class One
-{
+class One{
     public $arg1, $arg2;
-    public function __construct($arg1 = null, $arg2 = null)
-    {
+    public function __construct($arg1 = null, $arg2 = null) {
         $this->arg1 = $arg1;
         $this->arg2 = $arg2;
     }
 }
 
-class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase{
     private $_container;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_container = new Swift_DependencyContainer();
     }
 
-    public function testRegisterAndLookupValue()
-    {
+    public function testRegisterAndLookupValue() {
         $this->_container->register('foo')->asValue('bar');
         $this->assertEquals('bar', $this->_container->lookup('foo'));
     }
 
-    public function testHasReturnsTrueForRegisteredValue()
-    {
+    public function testHasReturnsTrueForRegisteredValue() {
         $this->_container->register('foo')->asValue('bar');
         $this->assertTrue($this->_container->has('foo'));
     }
 
-    public function testHasReturnsFalseForUnregisteredValue()
-    {
+    public function testHasReturnsFalseForUnregisteredValue() {
         $this->assertFalse($this->_container->has('foo'));
     }
 
-    public function testRegisterAndLookupNewInstance()
-    {
+    public function testRegisterAndLookupNewInstance() {
         $this->_container->register('one')->asNewInstanceOf('One');
         $this->assertInstanceof('One', $this->_container->lookup('one'));
     }
 
-    public function testHasReturnsTrueForRegisteredInstance()
-    {
+    public function testHasReturnsTrueForRegisteredInstance() {
         $this->_container->register('one')->asNewInstanceOf('One');
         $this->assertTrue($this->_container->has('one'));
     }
 
-    public function testNewInstanceIsAlwaysNew()
-    {
+    public function testNewInstanceIsAlwaysNew() {
         $this->_container->register('one')->asNewInstanceOf('One');
         $a = $this->_container->lookup('one');
         $b = $this->_container->lookup('one');
         $this->assertEquals($a, $b);
     }
 
-    public function testRegisterAndLookupSharedInstance()
-    {
+    public function testRegisterAndLookupSharedInstance() {
         $this->_container->register('one')->asSharedInstanceOf('One');
         $this->assertInstanceof('One', $this->_container->lookup('one'));
     }
 
-    public function testHasReturnsTrueForSharedInstance()
-    {
+    public function testHasReturnsTrueForSharedInstance() {
         $this->_container->register('one')->asSharedInstanceOf('One');
         $this->assertTrue($this->_container->has('one'));
     }
 
-    public function testMultipleSharedInstancesAreSameInstance()
-    {
+    public function testMultipleSharedInstancesAreSameInstance() {
         $this->_container->register('one')->asSharedInstanceOf('One');
         $a = $this->_container->lookup('one');
         $b = $this->_container->lookup('one');
         $this->assertEquals($a, $b);
     }
 
-    public function testNewInstanceWithDependencies()
-    {
+    public function testNewInstanceWithDependencies() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('one')->asNewInstanceOf('One')
             ->withDependencies(array('foo'));
@@ -85,8 +71,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FOO', $obj->arg1);
     }
 
-    public function testNewInstanceWithMultipleDependencies()
-    {
+    public function testNewInstanceWithMultipleDependencies() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('bar')->asValue(42);
         $this->_container->register('one')->asNewInstanceOf('One')
@@ -96,8 +81,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(42, $obj->arg2);
     }
 
-    public function testNewInstanceWithInjectedObjects()
-    {
+    public function testNewInstanceWithInjectedObjects() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('one')->asNewInstanceOf('One');
         $this->_container->register('two')->asNewInstanceOf('One')
@@ -107,8 +91,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FOO', $obj->arg2);
     }
 
-    public function testNewInstanceWithAddConstructorValue()
-    {
+    public function testNewInstanceWithAddConstructorValue() {
         $this->_container->register('one')->asNewInstanceOf('One')
             ->addConstructorValue('x')
             ->addConstructorValue(99);
@@ -117,8 +100,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(99, $obj->arg2);
     }
 
-    public function testNewInstanceWithAddConstructorLookup()
-    {
+    public function testNewInstanceWithAddConstructorLookup() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('bar')->asValue(42);
         $this->_container->register('one')->asNewInstanceOf('One')
@@ -130,8 +112,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(42, $obj->arg2);
     }
 
-    public function testResolvedDependenciesCanBeLookedUp()
-    {
+    public function testResolvedDependenciesCanBeLookedUp() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('one')->asNewInstanceOf('One');
         $this->_container->register('two')->asNewInstanceOf('One')
@@ -142,8 +123,7 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testArrayOfDependenciesCanBeSpecified()
-    {
+    public function testArrayOfDependenciesCanBeSpecified() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('one')->asNewInstanceOf('One');
         $this->_container->register('two')->asNewInstanceOf('One')
@@ -154,16 +134,14 @@ class Swift_DependencyContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FOO', $obj->arg2);
     }
 
-    public function testAliasCanBeSet()
-    {
+    public function testAliasCanBeSet() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('bar')->asAliasOf('foo');
 
         $this->assertSame('FOO', $this->_container->lookup('bar'));
     }
 
-    public function testAliasOfAliasCanBeSet()
-    {
+    public function testAliasOfAliasCanBeSet() {
         $this->_container->register('foo')->asValue('FOO');
         $this->_container->register('bar')->asAliasOf('foo');
         $this->_container->register('zip')->asAliasOf('bar');

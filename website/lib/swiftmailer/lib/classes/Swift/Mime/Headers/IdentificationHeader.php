@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_AbstractHeader
-{
+class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_AbstractHeader{
     /**
      * The IDs used in the value of this Header.
      *
@@ -30,8 +29,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      * @param string             $name
      * @param Swift_Mime_Grammar $grammar
      */
-    public function __construct($name, Swift_Mime_Grammar $grammar)
-    {
+    public function __construct($name, Swift_Mime_Grammar $grammar) {
         $this->setFieldName($name);
         parent::__construct($grammar);
     }
@@ -44,8 +42,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @return int
      */
-    public function getFieldType()
-    {
+    public function getFieldType() {
         return self::TYPE_ID;
     }
 
@@ -58,8 +55,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setFieldBodyModel($model)
-    {
+    public function setFieldBodyModel($model) {
         $this->setId($model);
     }
 
@@ -70,8 +66,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @return array
      */
-    public function getFieldBodyModel()
-    {
+    public function getFieldBodyModel() {
         return $this->getIds();
     }
 
@@ -82,8 +77,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setId($id)
-    {
+    public function setId($id) {
         $this->setIds(is_array($id) ? $id : array($id));
     }
 
@@ -94,8 +88,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @return string
      */
-    public function getId()
-    {
+    public function getId() {
         if (count($this->_ids) > 0) {
             return $this->_ids[0];
         }
@@ -108,8 +101,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setIds(array $ids)
-    {
+    public function setIds(array $ids) {
         $actualIds = array();
 
         foreach ($ids as $id) {
@@ -126,8 +118,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @return string[]
      */
-    public function getIds()
-    {
+    public function getIds() {
         return $this->_ids;
     }
 
@@ -143,8 +134,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @return string
      */
-    public function getFieldBody()
-    {
+    public function getFieldBody() {
         if (!$this->getCachedValue()) {
             $angleAddrs = array();
 
@@ -165,8 +155,7 @@ class Swift_Mime_Headers_IdentificationHeader extends Swift_Mime_Headers_Abstrac
      *
      * @throws Swift_RfcComplianceException
      */
-    private function _assertValidId($id)
-    {
+    private function _assertValidId($id) {
         if (!preg_match(
             '/^'.$this->getGrammar()->getDefinition('id-left').'@'.
             $this->getGrammar()->getDefinition('id-right').'$/D',

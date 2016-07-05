@@ -1,8 +1,7 @@
 import java.net.*;
 import java.util.ArrayList;
 
-public class BasicBot
-{
+public class BasicBot{
 	public static void main(String[] args) {
 		InitPackage iPackage = Networking.getInit();
 		short playerTag = iPackage.playerTag;
@@ -13,9 +12,7 @@ public class BasicBot
 		while(true) {
 			ArrayList<Move> moves = new ArrayList<Move>();
 
-			FramePackage fPackage = Networking.getFrame();
-			gameMap = fPackage.map;
-			ArrayList<Message> recievedMessages = fPackage.messages;
+			gameMap = Networking.getFrame();
 
 			for(short y = 0; y < gameMap.contents.size(); y++) {
 				for(short x = 0; x < gameMap.contents.get(y).size(); x++) {
@@ -37,7 +34,7 @@ public class BasicBot
 				}
 			}
 
-			Networking.sendFrame(moves, new ArrayList<Message>());
+			Networking.sendFrame(moves);
 		}
 	}
 }

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Encoder_Rfc2231Encoder implements Swift_Encoder
-{
+class Swift_Encoder_Rfc2231Encoder implements Swift_Encoder{
     /**
      * A character stream to use when reading a string as characters instead of bytes.
      *
@@ -27,8 +26,7 @@ class Swift_Encoder_Rfc2231Encoder implements Swift_Encoder
      *
      * @param Swift_CharacterStream
      */
-    public function __construct(Swift_CharacterStream $charStream)
-    {
+    public function __construct(Swift_CharacterStream $charStream) {
         $this->_charStream = $charStream;
     }
 
@@ -42,8 +40,7 @@ class Swift_Encoder_Rfc2231Encoder implements Swift_Encoder
      *
      * @return string
      */
-    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0)
-    {
+    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0) {
         $lines = array();
         $lineCount = 0;
         $lines[] = '';
@@ -77,16 +74,14 @@ class Swift_Encoder_Rfc2231Encoder implements Swift_Encoder
      *
      * @param string $charset
      */
-    public function charsetChanged($charset)
-    {
+    public function charsetChanged($charset) {
         $this->_charStream->setCharacterSet($charset);
     }
 
     /**
      * Make a deep copy of object.
      */
-    public function __clone()
-    {
+    public function __clone() {
         $this->_charStream = clone $this->_charStream;
     }
 }

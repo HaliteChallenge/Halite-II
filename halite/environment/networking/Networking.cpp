@@ -11,8 +11,7 @@
 
 std::mutex coutMutex;
 
-std::string serializeMapSize(const hlt::Map & map)
-{
+std::string serializeMapSize(const hlt::Map & map) {
 	std::string returnString = "";
 	std::ostringstream oss;
 	oss << map.map_width << ' ' << map.map_height << ' ';
@@ -20,14 +19,11 @@ std::string serializeMapSize(const hlt::Map & map)
 	return returnString;
 }
 
-std::string serializeProductions(const hlt::Map & map)
-{
+std::string serializeProductions(const hlt::Map & map) {
 	std::string returnString = "";
 	std::ostringstream oss;
-	for(auto a = map.contents.begin(); a != map.contents.end(); a++)
-	{
-		for(auto b = a->begin(); b != a->end(); b++)
-		{
+	for(auto a = map.contents.begin(); a != map.contents.end(); a++) {
+		for(auto b = a->begin(); b != a->end(); b++) {
 			oss << (unsigned short)(b->production) << ' ';
 		}
 	}
@@ -35,24 +31,19 @@ std::string serializeProductions(const hlt::Map & map)
 	return returnString;
 }
 
-std::string Networking::serializeMap(const hlt::Map & map)
-{
+std::string Networking::serializeMap(const hlt::Map & map) {
 	std::string returnString = "";
 	std::ostringstream oss;
 
 	//Run-length encode of owners
 	unsigned short currentOwner = map.contents[0][0].owner;
 	unsigned short counter = 0;
-	for(int a = 0; a < map.contents.size(); ++a)
-	{
-		for(int b = 0; b < map.contents[a].size(); ++b)
-		{
-			if (map.contents[a][b].owner == currentOwner)
-			{
+	for(int a = 0; a < map.contents.size(); ++a) {
+		for(int b = 0; b < map.contents[a].size(); ++b) {
+			if (map.contents[a][b].owner == currentOwner) {
 				counter++;
 			}
-			else
-			{
+			else{
 				oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
 				counter = 1;
 				currentOwner = map.contents[a][b].owner;
@@ -63,10 +54,8 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
 
 	//Encoding of ages
-	for(int a = 0; a < map.contents.size(); ++a)
-	{
-		for(int b = 0; b < map.contents[a].size(); ++b)
-		{
+	for(int a = 0; a < map.contents.size(); ++a) {
+		for(int b = 0; b < map.contents[a].size(); ++b) {
 			oss << (unsigned short)map.contents[a][b].strength << ' ';
 		}
 	}
@@ -76,8 +65,7 @@ std::string Networking::serializeMap(const hlt::Map & map)
 	return returnString;
 }
 
-std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString)
-{
+std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString) {
 	std::set<hlt::Move> moves = std::set<hlt::Move>();
 
 	std::stringstream iss(inputString);
@@ -88,47 +76,7 @@ std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString)
 	return moves;
 }
 
-std::string Networking::serializeMessages(const std::vector<hlt::Message> &messages) {
-	std::ostringstream oss;
-
-	oss << messages.size() << ' ';
-
-	for(int a = 0; a < messages.size(); a++)
-	{
-		hlt::Message message = messages[a];
-		oss << (unsigned short)message.type << ' ';
-		oss << message.senderID << ' ' << message.recipientID << ' ' << message.targetID << ' ';
-	}
-
-	return oss.str();
-}
-
-std::vector<hlt::Message> Networking::deserializeMessages(const std::string &inputString)
-{
-	std::vector<hlt::Message> messages = std::vector<hlt::Message>();
-	std::stringstream iss(inputString);
-
-	int numberOfMessages;
-	iss >> numberOfMessages;
-
-	for(int a = 0; a < numberOfMessages; a++)
-	{
-		hlt::Message message;
-
-		int messageTypeInt;
-		iss >> messageTypeInt;
-		message.type = static_cast<hlt::MessageType>(messageTypeInt);
-
-		iss >> message.senderID >> message.recipientID >> message.targetID;
-
-		messages.push_back(message);
-	}
-
-	return messages;
-}
-
-void Networking::sendString(unsigned char playerTag, std::string &sendString)
-{
+void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 	//End message with newline character
 	sendString += '\n';
 
@@ -152,8 +100,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString)
 	#endif
 }
 
-std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis)
-{
+std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
 	srand(time(NULL));
 
 	std::string newString;
@@ -180,8 +127,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		}
 
 		success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
-		if (!success || charsRead < 1)
-		{
+		if (!success || charsRead < 1) {
 			if(!program_output_style) std::cout << "Pipe probably timed out\n";
 			throw 1;
 		}
@@ -242,8 +188,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	return newString;
 }
 
-void Networking::startAndConnectBot(std::string command)
-{
+void Networking::startAndConnectBot(std::string command) {
 	#ifdef _WIN32
 	command = "/C " + command;
 
@@ -255,16 +200,14 @@ void Networking::startAndConnectBot(std::string command)
 	saAttr.lpSecurityDescriptor = NULL;
 
 	//Child stdout pipe
-	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0))
-	{
+	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
 		if(!program_output_style) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
 	if (!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
 	//Child stdin pipe
-	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0))
-	{
+	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
 		if(!program_output_style) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
@@ -297,13 +240,11 @@ void Networking::startAndConnectBot(std::string command)
 		&siStartInfo,  //STARTUPINFO pointer
 		&piProcInfo
 	);  //receives PROCESS_INFORMATION
-	if(!success)
-	{
+	if(!success) {
 		if(!program_output_style) std::cout << "Could not start process\n";
 		throw 1;
 	}
-	else
-	{
+	else{
 		CloseHandle(piProcInfo.hProcess);
 		CloseHandle(piProcInfo.hThread);
 
@@ -328,8 +269,7 @@ void Networking::startAndConnectBot(std::string command)
 
 	//Fork a child process
 	pid = fork();
-	if(pid == 0) //This is the child
-	{
+	if(pid == 0) //This is the child{
 		dup2(writePipe[0], STDIN_FILENO);
 
 		dup2(readPipe[1], STDOUT_FILENO);
@@ -357,10 +297,8 @@ void Networking::startAndConnectBot(std::string command)
 	playerLogs.push_back(std::vector<std::string>(0));
 }
 
-bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName)
-{
-	try
-	{
+bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName) {
+	try{
 		std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
 		sendString(playerTag, mapSizeString);
@@ -375,37 +313,30 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 
 		return true;
 	}
-	catch (int e)
-	{
+	catch (int e) {
 		return false;
 	}
 }
 
-unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, const std::vector<hlt::Message> &messagesForThisBot, std::set<hlt::Move> * moves, std::vector<hlt::Message> * messagesFromThisBot)
-{
-	try
-	{
+unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::set<hlt::Move> * moves) {
+	try{
 		if (isProcessDead(playerTag)) return false;
 
 		//Send this bot the game map and the messages addressed to this bot
-		std::string mapString = serializeMap(m), sendMessagesString = serializeMessages(messagesForThisBot);
+		std::string mapString = serializeMap(m);
 		sendString(playerTag, mapString);
-		sendString(playerTag, sendMessagesString);
 
 		moves->clear();
 
 		clock_t initialTime = clock();
 		std::string movesString = getString(playerTag, timeoutMillis);
-		std::string getMessagesString = getString(playerTag, timeoutMillis - ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC));
 		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
 
 		*moves = deserializeMoveSet(movesString);
-		*messagesFromThisBot = deserializeMessages(getMessagesString);
 
 		return millisTaken;
 	}
-	catch (int e)
-	{
+	catch (int e) {
 		return timeoutMillis+1;
 
 	}

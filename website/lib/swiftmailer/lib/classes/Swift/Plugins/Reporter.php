@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Plugins_Reporter
-{
+interface Swift_Plugins_Reporter{
     /** The recipient was accepted for delivery */
     const RESULT_PASS = 0x01;
 

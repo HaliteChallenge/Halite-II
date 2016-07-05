@@ -15,8 +15,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_StreamFilters_ByteArrayReplacementFilter implements Swift_StreamFilter
-{
+class Swift_StreamFilters_ByteArrayReplacementFilter implements Swift_StreamFilter{
     /** The needle(s) to search for */
     private $_search;
 
@@ -40,8 +39,7 @@ class Swift_StreamFilters_ByteArrayReplacementFilter implements Swift_StreamFilt
      * @param array $search
      * @param array $replace
      */
-    public function __construct($search, $replace)
-    {
+    public function __construct($search, $replace) {
         $this->_search = $search;
         $this->_index = array();
         $this->_tree = array();
@@ -101,8 +99,7 @@ class Swift_StreamFilters_ByteArrayReplacementFilter implements Swift_StreamFilt
      *
      * @return bool
      */
-    public function shouldBuffer($buffer)
-    {
+    public function shouldBuffer($buffer) {
         $endOfBuffer = end($buffer);
 
         return isset($this->_index[$endOfBuffer]);
@@ -116,8 +113,7 @@ class Swift_StreamFilters_ByteArrayReplacementFilter implements Swift_StreamFilt
      *
      * @return array
      */
-    public function filter($buffer, $_minReplaces = -1)
-    {
+    public function filter($buffer, $_minReplaces = -1) {
         if ($this->_treeMaxLen == 0) {
             return $buffer;
         }

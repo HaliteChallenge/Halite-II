@@ -14,8 +14,7 @@
  *
  * @author Chris Corbyn
  */
-abstract class Swift
-{
+abstract class Swift{
     /** Swift Mailer Version number generated during dist release process */
     const VERSION = '@SWIFT_VERSION_NUMBER@';
 
@@ -30,8 +29,7 @@ abstract class Swift
      *
      * @param mixed $callable A valid PHP callable that will be called when autoloading the first Swift class
      */
-    public static function init($callable)
-    {
+    public static function init($callable) {
         self::$inits[] = $callable;
     }
 
@@ -40,8 +38,7 @@ abstract class Swift
      *
      * @param string $class
      */
-    public static function autoload($class)
-    {
+    public static function autoload($class) {
         // Don't interfere with other autoloaders
         if (0 !== strpos($class, 'Swift_')) {
             return;
@@ -70,8 +67,7 @@ abstract class Swift
      *
      * @param mixed $callable A valid PHP callable that will be called when autoloading the first Swift class
      */
-    public static function registerAutoload($callable = null)
-    {
+    public static function registerAutoload($callable = null) {
         if (null !== $callable) {
             self::$inits[] = $callable;
         }

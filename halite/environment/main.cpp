@@ -10,10 +10,8 @@ Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memo
 
 //Returns true if all the arguments required of a user to run a game of Halite are present
 //4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
-bool allArgumentsPresent(int argc, char* args[])
-{
-	auto is_number = [](const std::string& s)
-	{
+bool allArgumentsPresent(int argc, char* args[]) {
+	auto is_number = [](const std::string& s) {
 		return !s.empty() && std::find_if(s.begin(),
 		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 	};
@@ -31,13 +29,11 @@ bool allArgumentsPresent(int argc, char* args[])
 	return false;
 }
 
-int main(int argc, char* args[])
-{
+int main(int argc, char* args[]) {
 	srand(time(NULL));
 
 	//Parse command line parameters
-	if(allArgumentsPresent(argc, args))
-	{
+	if(allArgumentsPresent(argc, args)) {
 		unsigned short mapWidth, mapHeight;
 		Networking networking;
 
@@ -61,8 +57,7 @@ int main(int argc, char* args[])
 
 	//The programs arguments were not passed in the run command.
 	//Instead, we will ask the user for them
-	else
-	{
+	else{
 		program_output_style = false;
 
 		std::string in;
@@ -70,30 +65,24 @@ int main(int argc, char* args[])
 
 		std::cout << "Please enter the width of the map: ";
 		std::getline(std::cin, in);
-		while(true)
-		{
-			try
-			{
+		while(true) {
+			try{
 				mapWidth = std::stoi(in);
 				break;
 			}
-			catch(std::exception e)
-			{
+			catch(std::exception e) {
 				std::cout << "That isn't a valid input. Please enter an integer width of the map: ";
 				std::getline(std::cin, in);
 			}
 		}
 		std::cout << "Please enter the height of the map: ";
 		std::getline(std::cin, in);
-		while(true)
-		{
-			try
-			{
+		while(true) {
+			try{
 				mapHeight = std::stoi(in);
 				break;
 			}
-			catch(std::exception e)
-			{
+			catch(std::exception e) {
 				std::cout << "That isn't a valid input. Please enter an integer height of the map: ";
 				std::getline(std::cin, in);
 			}
@@ -106,12 +95,10 @@ int main(int argc, char* args[])
 
 	std::vector<unsigned char> rankings = my_game->runGame();
 
-	try
-	{
+	try{
 		my_game->output(filename);
 	}
-	catch(std::runtime_error e)
-	{
+	catch(std::runtime_error e) {
 		filename = filename.substr(8);
 		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename << std::endl;
 		my_game->output(filename);

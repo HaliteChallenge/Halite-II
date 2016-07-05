@@ -14,8 +14,7 @@
  * @author Fabien Potencier
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-class Swift_FileSpool extends Swift_ConfigurableSpool
-{
+class Swift_FileSpool extends Swift_ConfigurableSpool{
     /** The spool directory */
     private $_path;
 
@@ -33,8 +32,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @throws Swift_IoException
      */
-    public function __construct($path)
-    {
+    public function __construct($path) {
         $this->_path = $path;
 
         if (!file_exists($this->_path)) {
@@ -49,23 +47,20 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @return bool
      */
-    public function isStarted()
-    {
+    public function isStarted() {
         return true;
     }
 
     /**
      * Starts this Spool mechanism.
      */
-    public function start()
-    {
+    public function start() {
     }
 
     /**
      * Stops this Spool mechanism.
      */
-    public function stop()
-    {
+    public function stop() {
     }
 
     /**
@@ -75,8 +70,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @param int $limit
      */
-    public function setRetryLimit($limit)
-    {
+    public function setRetryLimit($limit) {
         $this->_retryLimit = $limit;
     }
 
@@ -89,8 +83,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @return bool
      */
-    public function queueMessage(Swift_Mime_Message $message)
-    {
+    public function queueMessage(Swift_Mime_Message $message) {
         $ser = serialize($message);
         $fileName = $this->_path.'/'.$this->getRandomString(10);
         for ($i = 0; $i < $this->_retryLimit; ++$i) {
@@ -116,8 +109,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @param int $timeout in second Defaults is for very slow smtp responses
      */
-    public function recover($timeout = 900)
-    {
+    public function recover($timeout = 900) {
         foreach (new DirectoryIterator($this->_path) as $file) {
             $file = $file->getRealPath();
 
@@ -138,8 +130,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @return int The number of sent e-mail's
      */
-    public function flushQueue(Swift_Transport $transport, &$failedRecipients = null)
-    {
+    public function flushQueue(Swift_Transport $transport, &$failedRecipients = null) {
         $directoryIterator = new DirectoryIterator($this->_path);
 
         /* Start the transport only if there are queued files to send */
@@ -193,8 +184,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
      *
      * @return string
      */
-    protected function getRandomString($count)
-    {
+    protected function getRandomString($count) {
         // This string MUST stay FS safe, avoid special chars
         $base = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
         $ret = '';

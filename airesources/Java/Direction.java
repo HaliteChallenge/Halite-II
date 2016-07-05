@@ -1,8 +1,7 @@
 
 import java.util.Random;
 
-public class Direction
-{
+public class Direction{
     public static final byte STILL = 0;
     public static final byte NORTH = 1;
     public static final byte EAST = 2;

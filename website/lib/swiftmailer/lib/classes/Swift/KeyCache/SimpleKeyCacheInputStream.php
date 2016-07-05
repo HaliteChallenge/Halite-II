@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCacheInputStream
-{
+class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCacheInputStream{
     /** The KeyCache being written to */
     private $_keyCache;
 
@@ -32,8 +31,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      *
      * @param Swift_KeyCache $keyCache
      */
-    public function setKeyCache(Swift_KeyCache $keyCache)
-    {
+    public function setKeyCache(Swift_KeyCache $keyCache) {
         $this->_keyCache = $keyCache;
     }
 
@@ -42,8 +40,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      *
      * @param Swift_InputByteStream $is
      */
-    public function setWriteThroughStream(Swift_InputByteStream $is)
-    {
+    public function setWriteThroughStream(Swift_InputByteStream $is) {
         $this->_writeThrough = $is;
     }
 
@@ -53,8 +50,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      * @param string                $bytes
      * @param Swift_InputByteStream $is    optional
      */
-    public function write($bytes, Swift_InputByteStream $is = null)
-    {
+    public function write($bytes, Swift_InputByteStream $is = null) {
         $this->_keyCache->setString(
             $this->_nsKey, $this->_itemKey, $bytes, Swift_KeyCache::MODE_APPEND
             );
@@ -69,30 +65,26 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
     /**
      * Not used.
      */
-    public function commit()
-    {
+    public function commit() {
     }
 
     /**
      * Not used.
      */
-    public function bind(Swift_InputByteStream $is)
-    {
+    public function bind(Swift_InputByteStream $is) {
     }
 
     /**
      * Not used.
      */
-    public function unbind(Swift_InputByteStream $is)
-    {
+    public function unbind(Swift_InputByteStream $is) {
     }
 
     /**
      * Flush the contents of the stream (empty it) and set the internal pointer
      * to the beginning.
      */
-    public function flushBuffers()
-    {
+    public function flushBuffers() {
         $this->_keyCache->clearKey($this->_nsKey, $this->_itemKey);
     }
 
@@ -101,8 +93,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      *
      * @param string $nsKey
      */
-    public function setNsKey($nsKey)
-    {
+    public function setNsKey($nsKey) {
         $this->_nsKey = $nsKey;
     }
 
@@ -111,8 +102,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      *
      * @param string $itemKey
      */
-    public function setItemKey($itemKey)
-    {
+    public function setItemKey($itemKey) {
         $this->_itemKey = $itemKey;
     }
 
@@ -120,8 +110,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStream implements Swift_KeyCache_KeyCach
      * Any implementation should be cloneable, allowing the clone to access a
      * separate $nsKey and $itemKey.
      */
-    public function __clone()
-    {
+    public function __clone() {
         $this->_writeThrough = null;
     }
 }

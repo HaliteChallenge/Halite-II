@@ -14,8 +14,7 @@
  * @author Chris Corbyn
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader
-{
+class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader{
     /** Pre-computed for optimization */
     private static $length_map = array(
         // N=0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,
@@ -82,8 +81,7 @@ class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars)
-    {
+    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars) {
         if (!isset($currentMap['i']) || !isset($currentMap['p'])) {
             $currentMap['p'] = $currentMap['i'] = array();
         }
@@ -136,8 +134,7 @@ class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader
      *
      * @return int mapType
      */
-    public function getMapType()
-    {
+    public function getMapType() {
         return self::MAP_TYPE_POSITIONS;
     }
 
@@ -154,8 +151,7 @@ class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function validateByteSequence($bytes, $size)
-    {
+    public function validateByteSequence($bytes, $size) {
         if ($size < 1) {
             return -1;
         }
@@ -169,8 +165,7 @@ class Swift_CharacterReader_Utf8Reader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function getInitialByteSize()
-    {
+    public function getInitialByteSize() {
         return 1;
     }
 }

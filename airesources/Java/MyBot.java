@@ -1,8 +1,7 @@
 import java.net.*;
 import java.util.ArrayList;
 
-public class MyBot
-{
+public class MyBot{
     public static void main(String[] args) {
         InitPackage iPackage = Networking.getInit();
         short playerTag = iPackage.playerTag;
@@ -12,12 +11,9 @@ public class MyBot
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();
-            ArrayList<Message> sendMessages = new ArrayList<Message>();
             
-            sendMessages.add(new Message(MessageType.STOP_ATTACK, playerTag, playerTag != 1 ? 1 : 2, playerTag));
+            gameMap = Networking.getFrame();
             
-            FramePackage fPackage = Networking.getFrame();
-            gameMap = fPackage.map;
             ArrayList<Message> recievedMessages = fPackage.messages;
             
             for(int y = 0; y < gameMap.contents.size(); y++) {

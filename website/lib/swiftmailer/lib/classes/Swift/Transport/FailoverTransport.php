@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTransport
-{
+class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTransport{
     /**
      * Registered transport currently used.
      *
@@ -23,8 +22,7 @@ class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTran
     private $_currentTransport;
 
     // needed as __construct is called from elsewhere explicitly
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -39,8 +37,7 @@ class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTran
      *
      * @return int
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
-    {
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
         $maxTransports = count($this->_transports);
         $sent = 0;
         $this->_lastUsedTransport = null;
@@ -71,8 +68,7 @@ class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTran
         return $sent;
     }
 
-    protected function _getNextTransport()
-    {
+    protected function _getNextTransport() {
         if (!isset($this->_currentTransport)) {
             $this->_currentTransport = parent::_getNextTransport();
         }
@@ -80,8 +76,7 @@ class Swift_Transport_FailoverTransport extends Swift_Transport_LoadBalancedTran
         return $this->_currentTransport;
     }
 
-    protected function _killCurrentTransport()
-    {
+    protected function _killCurrentTransport() {
         $this->_currentTransport = null;
         parent::_killCurrentTransport();
     }

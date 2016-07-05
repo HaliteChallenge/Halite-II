@@ -25,17 +25,14 @@
 #endif
 
 //Color struct.
-struct Color
-{
+struct Color{
 	float r, g, b;
 };
-static bool operator==(const Color & c1, const Color & c2)
-{
+static bool operator==(const Color & c1, const Color & c2) {
 	return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b;
 }
 
-namespace util
-{
+namespace util{
 	void initShaderHandler(std::fstream * ds);
 	//Returns true if all went well; false otherwise (or throws an exception).
 	bool shaderFromFile(GLuint shader, std::string filename, std::string shadername);

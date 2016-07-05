@@ -13,8 +13,7 @@
  *
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-interface Swift_Signers_BodySigner extends Swift_Signer
-{
+interface Swift_Signers_BodySigner extends Swift_Signer{
     /**
      * Change the Swift_Signed_Message to apply the singing.
      *

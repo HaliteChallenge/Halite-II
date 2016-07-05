@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_CharacterReaderFactory
-{
+interface Swift_CharacterReaderFactory{
     /**
      * Returns a CharacterReader suitable for the charset applied.
      *

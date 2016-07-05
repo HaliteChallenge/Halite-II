@@ -17,8 +17,7 @@
 
 extern bool program_output_style;
 
-struct PlayerStatistics
-{
+struct PlayerStatistics{
 	int tag;
 	int rank;
 	double average_territory_count;
@@ -28,27 +27,23 @@ struct PlayerStatistics
 	double average_alliance_count;
 	double average_response_time;
 };
-static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p)
-{
+static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
 	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_alliance_count << ' ' << p.average_response_time;
 	return o;
 }
 
-struct GameStatistics
-{
+struct GameStatistics{
 	std::vector<PlayerStatistics> player_statistics;
 	std::set<unsigned char> timeout_tags;
 };
-static std::ostream & operator<<(std::ostream & o, const GameStatistics & g)
-{
+static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
 	for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
 	for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << (*a) << ' ';
 	if(g.timeout_tags.empty()) o << ' ';
 	return o;
 }
 
-class Halite
-{
+class Halite{
 private:
 	unsigned short turn_number;
 	float defense_bonus;

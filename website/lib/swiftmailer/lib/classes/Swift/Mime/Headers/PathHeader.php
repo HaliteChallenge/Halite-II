@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
-{
+class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader{
     /**
      * The address in this Header (if specified).
      *
@@ -28,8 +27,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      * @param string             $name
      * @param Swift_Mime_Grammar $grammar
      */
-    public function __construct($name, Swift_Mime_Grammar $grammar)
-    {
+    public function __construct($name, Swift_Mime_Grammar $grammar) {
         $this->setFieldName($name);
         parent::__construct($grammar);
     }
@@ -42,8 +40,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return int
      */
-    public function getFieldType()
-    {
+    public function getFieldType() {
         return self::TYPE_PATH;
     }
 
@@ -55,8 +52,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setFieldBodyModel($model)
-    {
+    public function setFieldBodyModel($model) {
         $this->setAddress($model);
     }
 
@@ -66,8 +62,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return mixed
      */
-    public function getFieldBodyModel()
-    {
+    public function getFieldBodyModel() {
         return $this->getAddress();
     }
 
@@ -78,8 +73,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException
      */
-    public function setAddress($address)
-    {
+    public function setAddress($address) {
         if (is_null($address)) {
             $this->_address = null;
         } elseif ('' == $address) {
@@ -98,8 +92,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string
      */
-    public function getAddress()
-    {
+    public function getAddress() {
         return $this->_address;
     }
 
@@ -113,8 +106,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @return string
      */
-    public function getFieldBody()
-    {
+    public function getFieldBody() {
         if (!$this->getCachedValue()) {
             if (isset($this->_address)) {
                 $this->setCachedValue('<'.$this->_address.'>');
@@ -131,8 +123,7 @@ class Swift_Mime_Headers_PathHeader extends Swift_Mime_Headers_AbstractHeader
      *
      * @throws Swift_RfcComplianceException If address is invalid
      */
-    private function _assertValidAddress($address)
-    {
+    private function _assertValidAddress($address) {
         if (!preg_match('/^'.$this->getGrammar()->getDefinition('addr-spec').'$/D',
             $address)) {
             throw new Swift_RfcComplianceException(

@@ -15,8 +15,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Encoder_QpEncoder implements Swift_Encoder
-{
+class Swift_Encoder_QpEncoder implements Swift_Encoder{
     /**
      * The CharacterStream used for reading characters (as opposed to bytes).
      *
@@ -106,8 +105,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      * @param Swift_CharacterStream $charStream to use for reading characters
      * @param Swift_StreamFilter    $filter     if input should be canonicalized
      */
-    public function __construct(Swift_CharacterStream $charStream, Swift_StreamFilter $filter = null)
-    {
+    public function __construct(Swift_CharacterStream $charStream, Swift_StreamFilter $filter = null) {
         $this->_charStream = $charStream;
         if (!isset(self::$_safeMapShare[$this->getSafeMapShareId()])) {
             $this->initSafeMap();
@@ -118,13 +116,11 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
         $this->_filter = $filter;
     }
 
-    public function __sleep()
-    {
+    public function __sleep() {
         return array('_charStream', '_filter');
     }
 
-    public function __wakeup()
-    {
+    public function __wakeup() {
         if (!isset(self::$_safeMapShare[$this->getSafeMapShareId()])) {
             $this->initSafeMap();
             self::$_safeMapShare[$this->getSafeMapShareId()] = $this->_safeMap;
@@ -133,13 +129,11 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
         }
     }
 
-    protected function getSafeMapShareId()
-    {
+    protected function getSafeMapShareId() {
         return get_class($this);
     }
 
-    protected function initSafeMap()
-    {
+    protected function initSafeMap() {
         foreach (array_merge(
             array(0x09, 0x20), range(0x21, 0x3C), range(0x3E, 0x7E)) as $byte) {
             $this->_safeMap[$byte] = chr($byte);
@@ -159,8 +153,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      *
      * @return string
      */
-    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0)
-    {
+    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0) {
         if ($maxLineLength > 76 || $maxLineLength <= 0) {
             $maxLineLength = 76;
         }
@@ -227,8 +220,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      *
      * @param string $charset
      */
-    public function charsetChanged($charset)
-    {
+    public function charsetChanged($charset) {
         $this->_charStream->setCharacterSet($charset);
     }
 
@@ -240,8 +232,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      *
      * @return string
      */
-    protected function _encodeByteSequence(array $bytes, &$size)
-    {
+    protected function _encodeByteSequence(array $bytes, &$size) {
         $ret = '';
         $size = 0;
         foreach ($bytes as $b) {
@@ -264,8 +255,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      *
      * @return integer[]
      */
-    protected function _nextSequence($size = 4)
-    {
+    protected function _nextSequence($size = 4) {
         return $this->_charStream->readBytes($size);
     }
 
@@ -276,8 +266,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
      *
      * @return string
      */
-    protected function _standardize($string)
-    {
+    protected function _standardize($string) {
         $string = str_replace(array("\t=0D=0A", ' =0D=0A', '=0D=0A'),
             array("=09\r\n", "=20\r\n", "\r\n"), $string
             );
@@ -293,8 +282,7 @@ class Swift_Encoder_QpEncoder implements Swift_Encoder
     /**
      * Make a deep copy of object.
      */
-    public function __clone()
-    {
+    public function __clone() {
         $this->_charStream = clone $this->_charStream;
     }
 }

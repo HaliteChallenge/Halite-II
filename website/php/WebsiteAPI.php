@@ -5,8 +5,7 @@ date_default_timezone_set('America/New_York');
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
-class WebsiteAPI extends API
-{
+class WebsiteAPI extends API{
 
 	// The database
 	private $mysqli = NULL;

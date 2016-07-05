@@ -1,18 +1,15 @@
 <?php
 
-class Swift_Encoder_Rfc2231EncoderAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Encoder_Rfc2231EncoderAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_samplesDir;
     private $_factory;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_samplesDir = realpath(__DIR__.'/../../../_samples/charsets');
         $this->_factory = new Swift_CharacterReaderFactory_SimpleCharacterReaderFactory();
     }
 
-    public function testEncodingAndDecodingSamples()
-    {
+    public function testEncodingAndDecodingSamples() {
         $sampleFp = opendir($this->_samplesDir);
         while (false !== $encodingDir = readdir($sampleFp)) {
             if (substr($encodingDir, 0, 1) == '.') {

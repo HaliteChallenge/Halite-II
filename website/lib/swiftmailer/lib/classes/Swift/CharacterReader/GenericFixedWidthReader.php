@@ -14,8 +14,7 @@
  * @author Chris Corbyn
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterReader
-{
+class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterReader{
     /**
      * The number of bytes in a single character.
      *
@@ -28,8 +27,7 @@ class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterRe
      *
      * @param int $width
      */
-    public function __construct($width)
-    {
+    public function __construct($width) {
         $this->_width = $width;
     }
 
@@ -43,8 +41,7 @@ class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterRe
      *
      * @return int
      */
-    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars)
-    {
+    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars) {
         $strlen = strlen($string);
         // % and / are CPU intensive, so, maybe find a better way
         $ignored = $strlen % $this->_width;
@@ -59,8 +56,7 @@ class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterRe
      *
      * @return int
      */
-    public function getMapType()
-    {
+    public function getMapType() {
         return self::MAP_TYPE_FIXED_LEN;
     }
 
@@ -78,8 +74,7 @@ class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterRe
      *
      * @return int
      */
-    public function validateByteSequence($bytes, $size)
-    {
+    public function validateByteSequence($bytes, $size) {
         $needed = $this->_width - $size;
 
         return $needed > -1 ? $needed : -1;
@@ -90,8 +85,7 @@ class Swift_CharacterReader_GenericFixedWidthReader implements Swift_CharacterRe
      *
      * @return int
      */
-    public function getInitialByteSize()
-    {
+    public function getInitialByteSize() {
         return $this->_width;
     }
 }

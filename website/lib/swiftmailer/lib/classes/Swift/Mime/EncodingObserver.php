@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_EncodingObserver
-{
+interface Swift_Mime_EncodingObserver{
     /**
      * Notify this observer that the observed entity's ContentEncoder has changed.
      *

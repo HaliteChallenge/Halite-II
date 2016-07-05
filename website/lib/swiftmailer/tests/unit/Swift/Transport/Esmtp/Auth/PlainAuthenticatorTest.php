@@ -1,16 +1,13 @@
 <?php
 
-class Swift_Transport_Esmtp_Auth_PlainAuthenticatorTest extends \SwiftMailerTestCase
-{
+class Swift_Transport_Esmtp_Auth_PlainAuthenticatorTest extends \SwiftMailerTestCase{
     private $_agent;
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_agent = $this->getMockery('Swift_Transport_SmtpAgent')->shouldIgnoreMissing();
     }
 
-    public function testKeywordIsPlain()
-    {
+    public function testKeywordIsPlain() {
         /* -- RFC 4616, 1.
         The name associated with this mechanism is "PLAIN".
         */
@@ -19,8 +16,7 @@ class Swift_Transport_Esmtp_Auth_PlainAuthenticatorTest extends \SwiftMailerTest
         $this->assertEquals('PLAIN', $login->getAuthKeyword());
     }
 
-    public function testSuccessfulAuthentication()
-    {
+    public function testSuccessfulAuthentication() {
         /* -- RFC 4616, 2.
         The client presents the authorization identity (identity to act as),
         followed by a NUL (U+0000) character, followed by the authentication
@@ -41,8 +37,7 @@ class Swift_Transport_Esmtp_Auth_PlainAuthenticatorTest extends \SwiftMailerTest
             );
     }
 
-    public function testAuthenticationFailureSendRsetAndReturnFalse()
-    {
+    public function testAuthenticationFailureSendRsetAndReturnFalse() {
         $plain = $this->_getAuthenticator();
 
         $this->_agent->shouldReceive('executeCommand')
@@ -62,8 +57,7 @@ class Swift_Transport_Esmtp_Auth_PlainAuthenticatorTest extends \SwiftMailerTest
 
     // -- Private helpers
 
-    private function _getAuthenticator()
-    {
+    private function _getAuthenticator() {
         return new Swift_Transport_Esmtp_Auth_PlainAuthenticator();
     }
 }

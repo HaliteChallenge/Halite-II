@@ -14,8 +14,7 @@
  * @author Chris Corbyn
  * @author Fabien Potencier
  */
-class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements
-{
+class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_Plugins_Decorator_Replacements{
     /** The replacement map */
     private $_replacements;
 
@@ -51,8 +50,7 @@ class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_
      *
      * @param mixed $replacements Array or Swift_Plugins_Decorator_Replacements
      */
-    public function __construct($replacements)
-    {
+    public function __construct($replacements) {
         $this->setReplacements($replacements);
     }
 
@@ -63,8 +61,7 @@ class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_
      *
      * @see __construct()
      */
-    public function setReplacements($replacements)
-    {
+    public function setReplacements($replacements) {
         if (!($replacements instanceof Swift_Plugins_Decorator_Replacements)) {
             $this->_replacements = (array) $replacements;
         } else {
@@ -77,8 +74,7 @@ class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_
      *
      * @param Swift_Events_SendEvent $evt
      */
-    public function beforeSendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function beforeSendPerformed(Swift_Events_SendEvent $evt) {
         $message = $evt->getMessage();
         $this->_restoreMessage($message);
         $to = array_keys($message->getTo());
@@ -153,8 +149,7 @@ class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_
      *
      * @return array
      */
-    public function getReplacementsFor($address)
-    {
+    public function getReplacementsFor($address) {
         if ($this->_replacements instanceof Swift_Plugins_Decorator_Replacements) {
             return $this->_replacements->getReplacementsFor($address);
         }
@@ -167,14 +162,12 @@ class Swift_Plugins_DecoratorPlugin implements Swift_Events_SendListener, Swift_
      *
      * @param Swift_Events_SendEvent $evt
      */
-    public function sendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function sendPerformed(Swift_Events_SendEvent $evt) {
         $this->_restoreMessage($evt->getMessage());
     }
 
     /** Restore a changed message back to its original state */
-    private function _restoreMessage(Swift_Mime_Message $message)
-    {
+    private function _restoreMessage(Swift_Mime_Message $message) {
         if ($this->_lastMessage === $message) {
             if (isset($this->_originalBody)) {
                 $message->setBody($this->_originalBody);

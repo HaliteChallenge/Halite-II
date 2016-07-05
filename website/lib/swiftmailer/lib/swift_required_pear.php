@@ -20,8 +20,7 @@ if (class_exists('Swift', false)) {
 require dirname(__FILE__).'/Swift.php';
 
 if (!function_exists('_swiftmailer_init')) {
-    function _swiftmailer_init()
-    {
+    function _swiftmailer_init() {
         require dirname(__FILE__).'/swift_init.php';
     }
 }

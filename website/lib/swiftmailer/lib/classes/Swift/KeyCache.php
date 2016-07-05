@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_KeyCache
-{
+interface Swift_KeyCache{
     /** Mode for replacing existing cached data */
     const MODE_WRITE = 1;
 

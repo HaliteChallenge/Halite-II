@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Events_TransportExceptionListener extends Swift_Events_EventListener
-{
+interface Swift_Events_TransportExceptionListener extends Swift_Events_EventListener{
     /**
      * Invoked as a TransportException is thrown in the Transport system.
      *

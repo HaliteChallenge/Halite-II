@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Plugins_Reporters_HtmlReporter implements Swift_Plugins_Reporter
-{
+class Swift_Plugins_Reporters_HtmlReporter implements Swift_Plugins_Reporter{
     /**
      * Notifies this ReportNotifier that $address failed or succeeded.
      *
@@ -22,8 +21,7 @@ class Swift_Plugins_Reporters_HtmlReporter implements Swift_Plugins_Reporter
      * @param string             $address
      * @param int                $result  from {@see RESULT_PASS, RESULT_FAIL}
      */
-    public function notify(Swift_Mime_Message $message, $address, $result)
-    {
+    public function notify(Swift_Mime_Message $message, $address, $result) {
         if (self::RESULT_PASS == $result) {
             echo '<div style="color: #fff; background: #006600; padding: 2px; margin: 2px;">'.PHP_EOL;
             echo 'PASS '.$address.PHP_EOL;

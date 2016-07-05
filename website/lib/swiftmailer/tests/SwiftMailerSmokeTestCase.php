@@ -5,10 +5,8 @@
  *
  * @author Rouven Weßling
  */
-class SwiftMailerSmokeTestCase extends SwiftMailerTestCase
-{
-    public function setUp()
-    {
+class SwiftMailerSmokeTestCase extends SwiftMailerTestCase{
+    public function setUp() {
         if (!defined('SWIFT_SMOKE_TRANSPORT_TYPE')) {
             $this->markTestSkipped(
                 'Smoke tests are skipped if tests/smoke.conf.php is not edited'
@@ -16,8 +14,7 @@ class SwiftMailerSmokeTestCase extends SwiftMailerTestCase
         }
     }
 
-    protected function _getMailer()
-    {
+    protected function _getMailer() {
         switch (SWIFT_SMOKE_TRANSPORT_TYPE) {
             case 'smtp':
                 $transport = Swift_DependencyContainer::getInstance()->lookup('transport.smtp')

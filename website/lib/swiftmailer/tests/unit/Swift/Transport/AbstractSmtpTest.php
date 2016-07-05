@@ -1,12 +1,10 @@
 <?php
 
-abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
-{
+abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase{
     /** Abstract test method */
     abstract protected function _getTransport($buf);
 
-    public function testStartAccepts220ServiceGreeting()
-    {
+    public function testStartAccepts220ServiceGreeting() {
         /* -- RFC 2821, 4.2.
 
      Greeting = "220 " Domain [ SP text ] CRLF
@@ -37,8 +35,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testBadGreetingCausesException()
-    {
+    public function testBadGreetingCausesException() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $buf->shouldReceive('initialize')
@@ -57,8 +54,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testStartSendsHeloToInitiate()
-    {
+    public function testStartSendsHeloToInitiate() {
         /* -- RFC 2821, 3.2.
 
             3.2 Client Initiation
@@ -119,8 +115,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testInvalidHeloResponseCausesException()
-    {
+    public function testInvalidHeloResponseCausesException() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
 
@@ -149,8 +144,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testDomainNameIsPlacedInHelo()
-    {
+    public function testDomainNameIsPlacedInHelo() {
         /* -- RFC 2821, 4.1.4.
 
        The SMTP client MUST, if possible, ensure that the domain parameter
@@ -185,8 +179,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->start();
     }
 
-    public function testSuccessfulMailCommand()
-    {
+    public function testSuccessfulMailCommand() {
         /* -- RFC 2821, 3.3.
 
         There are three steps to SMTP mail transactions.  The transaction
@@ -251,8 +244,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testInvalidResponseCodeFromMailCausesException()
-    {
+    public function testInvalidResponseCodeFromMailCausesException() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -281,8 +273,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testSenderIsPreferredOverFrom()
-    {
+    public function testSenderIsPreferredOverFrom() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -310,8 +301,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testReturnPathIsPreferredOverSender()
-    {
+    public function testReturnPathIsPreferredOverSender() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -342,8 +332,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testSuccessfulRcptCommandWith250Response()
-    {
+    public function testSuccessfulRcptCommandWith250Response() {
         /* -- RFC 2821, 3.3.
 
      The second step in the procedure is the RCPT command.
@@ -428,8 +417,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testMailFromCommandIsOnlySentOncePerMessage()
-    {
+    public function testMailFromCommandIsOnlySentOncePerMessage() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -465,8 +453,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testMultipleRecipientsSendsMultipleRcpt()
-    {
+    public function testMultipleRecipientsSendsMultipleRcpt() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -511,8 +498,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testCcRecipientsSendsMultipleRcpt()
-    {
+    public function testCcRecipientsSendsMultipleRcpt() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -559,8 +545,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testSendReturnsNumberOfSuccessfulRecipients()
-    {
+    public function testSendReturnsNumberOfSuccessfulRecipients() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -609,8 +594,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testRsetIsSentIfNoSuccessfulRecipients()
-    {
+    public function testRsetIsSentIfNoSuccessfulRecipients() {
         /* --RFC 2821, 4.1.1.5.
 
         This command specifies that the current mail transaction will be
@@ -659,8 +643,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSuccessfulDataCommand()
-    {
+    public function testSuccessfulDataCommand() {
         /* -- RFC 2821, 3.3.
 
         The third step in the procedure is the DATA command (or some
@@ -719,8 +702,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testBadDataResponseCausesException()
-    {
+    public function testBadDataResponseCausesException() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -749,8 +731,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testMessageIsStreamedToBufferForData()
-    {
+    public function testMessageIsStreamedToBufferForData() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -783,8 +764,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testBadResponseAfterDataTransmissionCausesException()
-    {
+    public function testBadResponseAfterDataTransmissionCausesException() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -821,8 +801,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testBccRecipientsAreRemovedFromHeaders()
-    {
+    public function testBccRecipientsAreRemovedFromHeaders() {
         /* -- RFC 2821, 7.2.
 
      Addresses that do not appear in the message headers may appear in the
@@ -866,8 +845,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    public function testEachBccRecipientIsSentASeparateMessage()
-    {
+    public function testEachBccRecipientIsSentASeparateMessage() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -932,8 +910,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $this->assertEquals(3, $smtp->send($message));
     }
 
-    public function testMessageStateIsRestoredOnFailure()
-    {
+    public function testMessageStateIsRestoredOnFailure() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -994,8 +971,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testStopSendsQuitCommand()
-    {
+    public function testStopSendsQuitCommand() {
         /* -- RFC 2821, 4.1.1.10.
 
         This command specifies that the receiver MUST send an OK reply, and
@@ -1043,16 +1019,14 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $this->assertFalse($smtp->isStarted());
     }
 
-    public function testBufferCanBeFetched()
-    {
+    public function testBufferCanBeFetched() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $ref = $smtp->getBuffer();
         $this->assertEquals($buf, $ref);
     }
 
-    public function testBufferCanBeWrittenToUsingExecuteCommand()
-    {
+    public function testBufferCanBeWrittenToUsingExecuteCommand() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -1069,8 +1043,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $this->assertEquals("250 OK\r\n", $res);
     }
 
-    public function testResponseCodesAreValidated()
-    {
+    public function testResponseCodesAreValidated() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -1090,8 +1063,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testFailedRecipientsCanBeCollectedByReference()
-    {
+    public function testFailedRecipientsCanBeCollectedByReference() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -1155,8 +1127,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSendingRegeneratesMessageId()
-    {
+    public function testSendingRegeneratesMessageId() {
         $buf = $this->_getBuffer();
         $smtp = $this->_getTransport($buf);
         $message = $this->_createMessage();
@@ -1174,18 +1145,15 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         $smtp->send($message);
     }
 
-    protected function _getBuffer()
-    {
+    protected function _getBuffer() {
         return $this->getMockery('Swift_Transport_IoBuffer')->shouldIgnoreMissing();
     }
 
-    protected function _createMessage()
-    {
+    protected function _createMessage() {
         return $this->getMockery('Swift_Mime_Message')->shouldIgnoreMissing();
     }
 
-    protected function _finishBuffer($buf)
-    {
+    protected function _finishBuffer($buf) {
         $buf->shouldReceive('readLine')
             ->zeroOrMoreTimes()
             ->with(0)

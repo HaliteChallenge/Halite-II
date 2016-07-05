@@ -2,17 +2,14 @@
 
 std::fstream * debugstream;
 
-void util::initShaderHandler(std::fstream * ds)
-{
+void util::initShaderHandler(std::fstream * ds) {
 	debugstream = ds;
 }
 
-bool util::shaderFromFile(GLuint shader, std::string filename, std::string shadername)
-{
+bool util::shaderFromFile(GLuint shader, std::string filename, std::string shadername) {
 	std::fstream in;
 	in.open(filename, std::ios_base::in);
-	if(!in.is_open())
-	{
+	if(!in.is_open()) {
 		*debugstream << "File " << filename << " could not be opened, and consequently <<" << shadername << ">> couldn't be compiled." << std::endl;
 		return false;
 	}
@@ -32,8 +29,7 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	//Check for proper compilation:
 	GLint _compiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &_compiled);
-	if(_compiled == GL_FALSE)
-	{
+	if(_compiled == GL_FALSE) {
 		GLint length;
 		GLchar* log;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
@@ -46,8 +42,7 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 	return true;
 }
 
-struct CharTrait
-{
+struct CharTrait{
 	float advance_x, advance_y;
 	short bitmap_width, bitmap_rows;
 	float bitmap_left, bitmap_top;
@@ -64,14 +59,12 @@ FT_Library ft;
 FT_Face face;
 int screenWidth, screenHeight;
 
-void util::setScreenSize(int w, int h)
-{
+void util::setScreenSize(int w, int h) {
 	screenWidth = w;
 	screenHeight = h;
 }
 
-bool util::initText()
-{
+bool util::initText() {
 	shaderProgram = glCreateProgram();
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	util::shaderFromFile(vs, "shaders/text/vertex.glsl", "Text Vertex Shader");
@@ -90,8 +83,7 @@ bool util::initText()
 	return FT_Init_FreeType(&ft) == 0;
 }
 
-void util::addFontSize(int s)
-{
+void util::addFontSize(int s) {
 	if(std::count(fontSizes.begin(), fontSizes.end(), s)) return;
 
 	fontSizes.insert(s);
@@ -102,10 +94,8 @@ void util::addFontSize(int s)
 	atlases[s].second = new CharTrait[128];
 	unsigned int texWidth = 0, texHeight = 0;
 	FT_GlyphSlot g = face->glyph;
-	for(int i = 32; i < 128; i++)
-	{
-		if(FT_Load_Char(face, i, FT_LOAD_RENDER))
-		{
+	for(int i = 32; i < 128; i++) {
+		if(FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			*debugstream << "Loading character " << char(i) << " failed in font " << currentFont << ".\n";
 			continue;
 		}
@@ -125,8 +115,7 @@ void util::addFontSize(int s)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 
 	int x = 0;
-	for(int i = 32; i < 128; i++)
-	{
+	for(int i = 32; i < 128; i++) {
 		if(FT_Load_Char(face, i, FT_LOAD_RENDER)) continue;
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
@@ -137,10 +126,8 @@ void util::addFontSize(int s)
 	}
 }
 
-void util::removeAllFontSizes()
-{
-	for(auto a = fontSizes.begin(); a != fontSizes.end(); a++)
-	{
+void util::removeAllFontSizes() {
+	for(auto a = fontSizes.begin(); a != fontSizes.end(); a++) {
 		glDeleteTextures(1, &atlases[*a].first);
 		delete[] atlases[*a].second;
 	}
@@ -148,14 +135,12 @@ void util::removeAllFontSizes()
 	atlases.clear();
 }
 
-bool util::setFont(std::string path)
-{
+bool util::setFont(std::string path) {
 	if(path == currentFont) return true;
 	if(FT_New_Face(ft, path.c_str(), 0, &face) != 0) return false;
 
 	currentFont = path;
-	for(auto a = fontSizes.begin(); a != fontSizes.end(); a++)
-	{
+	for(auto a = fontSizes.begin(); a != fontSizes.end(); a++) {
 		FT_Set_Pixel_Sizes(face, 0, *a);
 
 		delete[] atlases[*a].second;
@@ -163,10 +148,8 @@ bool util::setFont(std::string path)
 
 		unsigned int texWidth = 0, texHeight = 0;
 		FT_GlyphSlot g = face->glyph;
-		for(int i = 32; i < 128; i++)
-		{
-			if(FT_Load_Char(face, i, FT_LOAD_RENDER))
-			{
+		for(int i = 32; i < 128; i++) {
+			if(FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 				*debugstream << "Loading character " << char(i) << " failed in font " << path << ".\n";
 				continue;
 			}
@@ -186,8 +169,7 @@ bool util::setFont(std::string path)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 
 		int x = 0;
-		for(int i = 32; i < 128; i++)
-		{
+		for(int i = 32; i < 128; i++) {
 			if(FT_Load_Char(face, i, FT_LOAD_RENDER)) continue;
 
 			glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
@@ -203,8 +185,7 @@ bool util::setFont(std::string path)
 
 #include <iostream>
 
-char util::renderText(float x, float y, int size, Color c, const std::string & text)
-{
+char util::renderText(float x, float y, int size, Color c, const std::string & text) {
 	//Get currently bound program:
 	GLint currentProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
@@ -244,8 +225,7 @@ char util::renderText(float x, float y, int size, Color c, const std::string & t
 	glActiveTexture(GL_TEXTURE0);
 
 	//Skip blank characters, load the position:
-	for(int a = 0; a < text.size(); a++)
-	{
+	for(int a = 0; a < text.size(); a++) {
 		CharTrait t = charTraits[text[a]];
 		//if(t.bitmap_width == 0 || t.bitmap_rows == 0) continue;
 
@@ -273,8 +253,7 @@ char util::renderText(float x, float y, int size, Color c, const std::string & t
 	return 0;
 }
 
-void util::cleanup()
-{
+void util::cleanup() {
 	glDeleteProgram(shaderProgram);
 	util::removeAllFontSizes();
 	FT_Done_FreeType(ft);

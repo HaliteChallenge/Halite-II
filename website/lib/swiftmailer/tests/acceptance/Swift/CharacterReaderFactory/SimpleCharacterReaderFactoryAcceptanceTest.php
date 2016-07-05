@@ -1,25 +1,21 @@
 <?php
 
-class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest extends \PHPUnit_Framework_TestCase{
     private $_factory;
     private $_prefix = 'Swift_CharacterReader_';
 
-    public function setUp()
-    {
+    public function setUp() {
         $this->_factory = new Swift_CharacterReaderFactory_SimpleCharacterReaderFactory();
     }
 
-    public function testCreatingUtf8Reader()
-    {
+    public function testCreatingUtf8Reader() {
         foreach (array('utf8', 'utf-8', 'UTF-8', 'UTF8') as $utf8) {
             $reader = $this->_factory->getReaderFor($utf8);
             $this->assertInstanceof($this->_prefix.'Utf8Reader', $reader);
         }
     }
 
-    public function testCreatingIso8859XReaders()
-    {
+    public function testCreatingIso8859XReaders() {
         $charsets = array();
         foreach (range(1, 16) as $number) {
             foreach (array('iso', 'iec') as $body) {
@@ -37,8 +33,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingWindows125XReaders()
-    {
+    public function testCreatingWindows125XReaders() {
         $charsets = array();
         foreach (range(0, 8) as $number) {
             $charsets[] = 'windows-125'.$number;
@@ -54,8 +49,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingCodePageReaders()
-    {
+    public function testCreatingCodePageReaders() {
         $charsets = array();
         foreach (range(0, 8) as $number) {
             $charsets[] = 'cp-125'.$number;
@@ -79,8 +73,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingAnsiReader()
-    {
+    public function testCreatingAnsiReader() {
         foreach (array('ansi', 'ANSI') as $ansi) {
             $reader = $this->_factory->getReaderFor($ansi);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -88,8 +81,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingMacintoshReader()
-    {
+    public function testCreatingMacintoshReader() {
         foreach (array('macintosh', 'MACINTOSH') as $mac) {
             $reader = $this->_factory->getReaderFor($mac);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -97,8 +89,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingKOIReaders()
-    {
+    public function testCreatingKOIReaders() {
         $charsets = array();
         foreach (array('7', '8-r', '8-u', '8u', '8r') as $end) {
             $charsets[] = 'koi-'.$end;
@@ -114,8 +105,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingIsciiReaders()
-    {
+    public function testCreatingIsciiReaders() {
         foreach (array('iscii', 'ISCII', 'viscii', 'VISCII') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -123,8 +113,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingMIKReader()
-    {
+    public function testCreatingMIKReader() {
         foreach (array('mik', 'MIK') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -132,8 +121,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingCorkReader()
-    {
+    public function testCreatingCorkReader() {
         foreach (array('cork', 'CORK', 't1', 'T1') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -141,8 +129,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingUcs2Reader()
-    {
+    public function testCreatingUcs2Reader() {
         foreach (array('ucs-2', 'UCS-2', 'ucs2', 'UCS2') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -150,8 +137,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingUtf16Reader()
-    {
+    public function testCreatingUtf16Reader() {
         foreach (array('utf-16', 'UTF-16', 'utf16', 'UTF16') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -159,8 +145,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingUcs4Reader()
-    {
+    public function testCreatingUcs4Reader() {
         foreach (array('ucs-4', 'UCS-4', 'ucs4', 'UCS4') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);
@@ -168,8 +153,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactoryAcceptanceTest ex
         }
     }
 
-    public function testCreatingUtf32Reader()
-    {
+    public function testCreatingUtf32Reader() {
         foreach (array('utf-32', 'UTF-32', 'utf32', 'UTF32') as $charset) {
             $reader = $this->_factory->getReaderFor($charset);
             $this->assertInstanceof($this->_prefix.'GenericFixedWidthReader', $reader);

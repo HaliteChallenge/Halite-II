@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
-{
+abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header{
     /**
      * The name of this Header.
      *
@@ -69,8 +68,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param Swift_Mime_Grammar $grammar
      */
-    public function __construct(Swift_Mime_Grammar $grammar)
-    {
+    public function __construct(Swift_Mime_Grammar $grammar) {
         $this->setGrammar($grammar);
     }
 
@@ -79,8 +77,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param string $charset
      */
-    public function setCharset($charset)
-    {
+    public function setCharset($charset) {
         $this->clearCachedValueIf($charset != $this->_charset);
         $this->_charset = $charset;
         if (isset($this->_encoder)) {
@@ -93,8 +90,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    public function getCharset()
-    {
+    public function getCharset() {
         return $this->_charset;
     }
 
@@ -106,8 +102,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param string $lang
      */
-    public function setLanguage($lang)
-    {
+    public function setLanguage($lang) {
         $this->clearCachedValueIf($this->_lang != $lang);
         $this->_lang = $lang;
     }
@@ -117,8 +112,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    public function getLanguage()
-    {
+    public function getLanguage() {
         return $this->_lang;
     }
 
@@ -127,8 +121,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param Swift_Mime_HeaderEncoder $encoder
      */
-    public function setEncoder(Swift_Mime_HeaderEncoder $encoder)
-    {
+    public function setEncoder(Swift_Mime_HeaderEncoder $encoder) {
         $this->_encoder = $encoder;
         $this->setCachedValue(null);
     }
@@ -138,8 +131,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return Swift_Mime_HeaderEncoder
      */
-    public function getEncoder()
-    {
+    public function getEncoder() {
         return $this->_encoder;
     }
 
@@ -148,8 +140,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param Swift_Mime_Grammar $grammar
      */
-    public function setGrammar(Swift_Mime_Grammar $grammar)
-    {
+    public function setGrammar(Swift_Mime_Grammar $grammar) {
         $this->_grammar = $grammar;
         $this->setCachedValue(null);
     }
@@ -159,8 +150,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return Swift_Mime_Grammar
      */
-    public function getGrammar()
-    {
+    public function getGrammar() {
         return $this->_grammar;
     }
 
@@ -169,8 +159,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    public function getFieldName()
-    {
+    public function getFieldName() {
         return $this->_name;
     }
 
@@ -179,8 +168,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param int $lineLength
      */
-    public function setMaxLineLength($lineLength)
-    {
+    public function setMaxLineLength($lineLength) {
         $this->clearCachedValueIf($this->_lineLength != $lineLength);
         $this->_lineLength = $lineLength;
     }
@@ -190,8 +178,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return int
      */
-    public function getMaxLineLength()
-    {
+    public function getMaxLineLength() {
         return $this->_lineLength;
     }
 
@@ -202,8 +189,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    public function toString()
-    {
+    public function toString() {
         return $this->_tokensToString($this->toTokens());
     }
 
@@ -214,8 +200,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @see toString()
      */
-    public function __toString()
-    {
+    public function __toString() {
         return $this->toString();
     }
 
@@ -226,8 +211,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param string $name
      */
-    protected function setFieldName($name)
-    {
+    protected function setFieldName($name) {
         $this->_name = $name;
     }
 
@@ -242,8 +226,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    protected function createPhrase(Swift_Mime_Header $header, $string, $charset, Swift_Mime_HeaderEncoder $encoder = null, $shorten = false)
-    {
+    protected function createPhrase(Swift_Mime_Header $header, $string, $charset, Swift_Mime_HeaderEncoder $encoder = null, $shorten = false) {
         // Treat token as exactly what was given
         $phraseStr = $string;
         // If it's not valid
@@ -279,8 +262,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    protected function encodeWords(Swift_Mime_Header $header, $input, $usedLength = -1)
-    {
+    protected function encodeWords(Swift_Mime_Header $header, $input, $usedLength = -1) {
         $value = '';
 
         $tokens = $this->getEncodableWordTokens($input);
@@ -318,8 +300,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return bool
      */
-    protected function tokenNeedsEncoding($token)
-    {
+    protected function tokenNeedsEncoding($token) {
         return preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $token);
     }
 
@@ -330,8 +311,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string[]
      */
-    protected function getEncodableWordTokens($string)
-    {
+    protected function getEncodableWordTokens($string) {
         $tokens = array();
 
         $encodedToken = '';
@@ -362,8 +342,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    protected function getTokenAsEncodedWord($token, $firstLineOffset = 0)
-    {
+    protected function getTokenAsEncodedWord($token, $firstLineOffset = 0) {
         // Adjust $firstLineOffset to account for space needed for syntax
         $charsetDecl = $this->_charset;
         if (isset($this->_lang)) {
@@ -403,8 +382,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string[]
      */
-    protected function generateTokenLines($token)
-    {
+    protected function generateTokenLines($token) {
         return preg_split('~(\r\n)~', $token, -1, PREG_SPLIT_DELIM_CAPTURE);
     }
 
@@ -413,8 +391,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param string $value
      */
-    protected function setCachedValue($value)
-    {
+    protected function setCachedValue($value) {
         $this->_cachedValue = $value;
     }
 
@@ -423,8 +400,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    protected function getCachedValue()
-    {
+    protected function getCachedValue() {
         return $this->_cachedValue;
     }
 
@@ -433,8 +409,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @param bool $condition
      */
-    protected function clearCachedValueIf($condition)
-    {
+    protected function clearCachedValueIf($condition) {
         if ($condition) {
             $this->setCachedValue(null);
         }
@@ -447,8 +422,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return array An array of tokens as strings
      */
-    protected function toTokens($string = null)
-    {
+    protected function toTokens($string = null) {
         if (is_null($string)) {
             $string = $this->getFieldBody();
         }
@@ -474,8 +448,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      *
      * @return string
      */
-    private function _tokensToString(array $tokens)
-    {
+    private function _tokensToString(array $tokens) {
         $lineCount = 0;
         $headerLines = array();
         $headerLines[] = $this->_name.': ';

@@ -13,8 +13,7 @@
  *
  * @author Xavier De Cock <xdecock@gmail.com>
  */
-interface Swift_Signers_HeaderSigner extends Swift_Signer, Swift_InputByteStream
-{
+interface Swift_Signers_HeaderSigner extends Swift_Signer, Swift_InputByteStream{
     /**
      * Exclude an header from the signed headers.
      *

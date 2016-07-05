@@ -13,16 +13,14 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Mime_HeaderEncoder_Base64HeaderEncoder extends Swift_Encoder_Base64Encoder implements Swift_Mime_HeaderEncoder
-{
+class Swift_Mime_HeaderEncoder_Base64HeaderEncoder extends Swift_Encoder_Base64Encoder implements Swift_Mime_HeaderEncoder{
     /**
      * Get the name of this encoding scheme.
      * Returns the string 'B'.
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return 'B';
     }
 
@@ -39,8 +37,7 @@ class Swift_Mime_HeaderEncoder_Base64HeaderEncoder extends Swift_Encoder_Base64E
      *
      * @return string
      */
-    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0, $charset = 'utf-8')
-    {
+    public function encodeString($string, $firstLineOffset = 0, $maxLineLength = 0, $charset = 'utf-8') {
         if (strtolower($charset) === 'iso-2022-jp') {
             $old = mb_internal_encoding();
             mb_internal_encoding('utf-8');

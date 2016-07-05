@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Transport_IoBuffer extends Swift_InputByteStream, Swift_OutputByteStream
-{
+interface Swift_Transport_IoBuffer extends Swift_InputByteStream, Swift_OutputByteStream{
     /** A socket buffer over TCP */
     const TYPE_SOCKET = 0x0001;
 

@@ -2,10 +2,8 @@
 
 require_once __DIR__.'/AbstractSmtpTest.php';
 
-abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transport_AbstractSmtpTest
-{
-    public function testRegisterPluginLoadsPluginInEventDispatcher()
-    {
+abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transport_AbstractSmtpTest{
+    public function testRegisterPluginLoadsPluginInEventDispatcher() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $listener = $this->getMockery('Swift_Events_EventListener');
@@ -17,8 +15,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->registerPlugin($listener);
     }
 
-    public function testSendingDispatchesBeforeSendEvent()
-    {
+    public function testSendingDispatchesBeforeSendEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $message = $this->_createMessage();
@@ -48,8 +45,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(1, $smtp->send($message));
     }
 
-    public function testSendingDispatchesSendEvent()
-    {
+    public function testSendingDispatchesSendEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $message = $this->_createMessage();
@@ -79,8 +75,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(1, $smtp->send($message));
     }
 
-    public function testSendEventCapturesFailures()
-    {
+    public function testSendEventCapturesFailures() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_SendEvent')->shouldIgnoreMissing();
@@ -130,8 +125,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(0, $smtp->send($message));
     }
 
-    public function testSendEventHasResultFailedIfAllFailures()
-    {
+    public function testSendEventHasResultFailedIfAllFailures() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_SendEvent')->shouldIgnoreMissing();
@@ -181,8 +175,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(0, $smtp->send($message));
     }
 
-    public function testSendEventHasResultTentativeIfSomeFailures()
-    {
+    public function testSendEventHasResultTentativeIfSomeFailures() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_SendEvent')->shouldIgnoreMissing();
@@ -235,8 +228,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(1, $smtp->send($message));
     }
 
-    public function testSendEventHasResultSuccessIfNoFailures()
-    {
+    public function testSendEventHasResultSuccessIfNoFailures() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_SendEvent')->shouldIgnoreMissing();
@@ -273,8 +265,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(2, $smtp->send($message));
     }
 
-    public function testCancellingEventBubbleBeforeSendStopsEvent()
-    {
+    public function testCancellingEventBubbleBeforeSendStopsEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_SendEvent')->shouldIgnoreMissing();
@@ -305,8 +296,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $this->assertEquals(0, $smtp->send($message));
     }
 
-    public function testStartingTransportDispatchesTransportChangeEvent()
-    {
+    public function testStartingTransportDispatchesTransportChangeEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent');
@@ -329,8 +319,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->start();
     }
 
-    public function testStartingTransportDispatchesBeforeTransportChangeEvent()
-    {
+    public function testStartingTransportDispatchesBeforeTransportChangeEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent');
@@ -353,8 +342,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->start();
     }
 
-    public function testCancellingBubbleBeforeTransportStartStopsEvent()
-    {
+    public function testCancellingBubbleBeforeTransportStartStopsEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent');
@@ -381,8 +369,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         );
     }
 
-    public function testStoppingTransportDispatchesTransportChangeEvent()
-    {
+    public function testStoppingTransportDispatchesTransportChangeEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent')->shouldIgnoreMissing();
@@ -403,8 +390,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->stop();
     }
 
-    public function testStoppingTransportDispatchesBeforeTransportChangeEvent()
-    {
+    public function testStoppingTransportDispatchesBeforeTransportChangeEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent')->shouldIgnoreMissing();
@@ -425,8 +411,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->stop();
     }
 
-    public function testCancellingBubbleBeforeTransportStoppedStopsEvent()
-    {
+    public function testCancellingBubbleBeforeTransportStoppedStopsEvent() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportChangeEvent');
@@ -460,8 +445,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         );
     }
 
-    public function testResponseEventsAreGenerated()
-    {
+    public function testResponseEventsAreGenerated() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_ResponseEvent');
@@ -479,8 +463,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->start();
     }
 
-    public function testCommandEventsAreGenerated()
-    {
+    public function testCommandEventsAreGenerated() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_CommandEvent');
@@ -498,8 +481,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         $smtp->start();
     }
 
-    public function testExceptionsCauseExceptionEvents()
-    {
+    public function testExceptionsCauseExceptionEvents() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportExceptionEvent');
@@ -526,8 +508,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
         }
     }
 
-    public function testExceptionBubblesCanBeCancelled()
-    {
+    public function testExceptionBubblesCanBeCancelled() {
         $buf = $this->_getBuffer();
         $dispatcher = $this->_createEventDispatcher(false);
         $evt = $this->getMockery('Swift_Events_TransportExceptionEvent');
@@ -553,8 +534,7 @@ abstract class Swift_Transport_AbstractSmtpEventSupportTest extends Swift_Transp
 
     // -- Creation Methods
 
-    protected function _createEventDispatcher($stub = true)
-    {
+    protected function _createEventDispatcher($stub = true) {
         return $this->getMockery('Swift_Events_EventDispatcher')->shouldIgnoreMissing();
     }
 }

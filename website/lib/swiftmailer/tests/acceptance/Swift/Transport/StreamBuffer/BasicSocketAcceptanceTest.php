@@ -3,10 +3,8 @@
 require_once __DIR__.'/AbstractStreamBufferAcceptanceTest.php';
 
 class Swift_Transport_StreamBuffer_BasicSocketAcceptanceTest
-    extends Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
-{
-    public function setUp()
-    {
+    extends Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest{
+    public function setUp() {
         if (!defined('SWIFT_SMTP_HOST')) {
             $this->markTestSkipped(
                 'Cannot run test without an SMTP host to connect to (define '.
@@ -16,8 +14,7 @@ class Swift_Transport_StreamBuffer_BasicSocketAcceptanceTest
         parent::setUp();
     }
 
-    protected function _initializeBuffer()
-    {
+    protected function _initializeBuffer() {
         $parts = explode(':', SWIFT_SMTP_HOST);
         $host = $parts[0];
         $port = isset($parts[1]) ? $parts[1] : 25;

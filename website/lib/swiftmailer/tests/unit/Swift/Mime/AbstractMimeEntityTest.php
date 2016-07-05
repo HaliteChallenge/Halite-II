@@ -2,10 +2,8 @@
 
 require_once dirname(dirname(dirname(__DIR__))).'/fixtures/MimeEntityFixture.php';
 
-abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
-{
-    public function testGetHeadersReturnsHeaderSet()
-    {
+abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase{
+    public function testGetHeadersReturnsHeaderSet() {
         $headers = $this->_createHeaderSet();
         $entity = $this->_createEntity($headers, $this->_createEncoder(),
             $this->_createCache()
@@ -13,8 +11,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertSame($headers, $entity->getHeaders());
     }
 
-    public function testContentTypeIsReturnedFromHeader()
-    {
+    public function testContentTypeIsReturnedFromHeader() {
         $ctype = $this->_createHeader('Content-Type', 'image/jpeg-test');
         $headers = $this->_createHeaderSet(array('Content-Type' => $ctype));
         $entity = $this->_createEntity($headers, $this->_createEncoder(),
@@ -23,8 +20,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals('image/jpeg-test', $entity->getContentType());
     }
 
-    public function testContentTypeIsSetInHeader()
-    {
+    public function testContentTypeIsSetInHeader() {
         $ctype = $this->_createHeader('Content-Type', 'text/plain', array(), false);
         $headers = $this->_createHeaderSet(array('Content-Type' => $ctype));
 
@@ -41,8 +37,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setContentType('image/jpeg');
     }
 
-    public function testContentTypeHeaderIsAddedIfNoneSet()
-    {
+    public function testContentTypeHeaderIsAddedIfNoneSet() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('addParameterizedHeader')
                 ->once()
@@ -56,8 +51,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setContentType('image/jpeg');
     }
 
-    public function testContentTypeCanBeSetViaSetBody()
-    {
+    public function testContentTypeCanBeSetViaSetBody() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('addParameterizedHeader')
                 ->once()
@@ -71,8 +65,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setBody('<b>foo</b>', 'text/html');
     }
 
-    public function testGetEncoderFromConstructor()
-    {
+    public function testGetEncoderFromConstructor() {
         $encoder = $this->_createEncoder('base64');
         $entity = $this->_createEntity($this->_createHeaderSet(), $encoder,
             $this->_createCache()
@@ -80,8 +73,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertSame($encoder, $entity->getEncoder());
     }
 
-    public function testSetAndGetEncoder()
-    {
+    public function testSetAndGetEncoder() {
         $encoder = $this->_createEncoder('base64');
         $headers = $this->_createHeaderSet();
         $entity = $this->_createEntity($headers, $this->_createEncoder(),
@@ -91,8 +83,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertSame($encoder, $entity->getEncoder());
     }
 
-    public function testSettingEncoderUpdatesTransferEncoding()
-    {
+    public function testSettingEncoderUpdatesTransferEncoding() {
         $encoder = $this->_createEncoder('base64');
         $encoding = $this->_createHeader(
             'Content-Transfer-Encoding', '8bit', array(), false
@@ -112,8 +103,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setEncoder($encoder);
     }
 
-    public function testSettingEncoderAddsEncodingHeaderIfNonePresent()
-    {
+    public function testSettingEncoderAddsEncodingHeaderIfNonePresent() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('addTextHeader')
                 ->once()
@@ -127,8 +117,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setEncoder($this->_createEncoder('something'));
     }
 
-    public function testIdIsReturnedFromHeader()
-    {
+    public function testIdIsReturnedFromHeader() {
         /* -- RFC 2045, 7.
         In constructing a high-level user agent, it may be desirable to allow
         one body to make reference to another.  Accordingly, bodies may be
@@ -144,8 +133,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals('zip@button', $entity->getId());
     }
 
-    public function testIdIsSetInHeader()
-    {
+    public function testIdIsSetInHeader() {
         $cid = $this->_createHeader('Content-ID', 'zip@button', array(), false);
         $headers = $this->_createHeaderSet(array('Content-ID' => $cid));
 
@@ -161,16 +149,14 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setId('foo@bar');
     }
 
-    public function testIdIsAutoGenerated()
-    {
+    public function testIdIsAutoGenerated() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
         $this->assertRegExp('/^.*?@.*?$/D', $entity->getId());
     }
 
-    public function testGenerateIdCreatesNewId()
-    {
+    public function testGenerateIdCreatesNewId() {
         $headers = $this->_createHeaderSet();
         $entity = $this->_createEntity($headers, $this->_createEncoder(),
             $this->_createCache()
@@ -180,8 +166,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertNotEquals($id1, $id2);
     }
 
-    public function testGenerateIdSetsNewId()
-    {
+    public function testGenerateIdSetsNewId() {
         $headers = $this->_createHeaderSet();
         $entity = $this->_createEntity($headers, $this->_createEncoder(),
             $this->_createCache()
@@ -190,8 +175,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals($id, $entity->getId());
     }
 
-    public function testDescriptionIsReadFromHeader()
-    {
+    public function testDescriptionIsReadFromHeader() {
         /* -- RFC 2045, 8.
         The ability to associate some descriptive information with a given
         body is often desirable.  For example, it may be useful to mark an
@@ -208,8 +192,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals('something', $entity->getDescription());
     }
 
-    public function testDescriptionIsSetInHeader()
-    {
+    public function testDescriptionIsSetInHeader() {
         $desc = $this->_createHeader('Content-Description', '', array(), false);
         $desc->shouldReceive('setFieldBodyModel')->once()->with('whatever');
 
@@ -221,8 +204,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setDescription('whatever');
     }
 
-    public function testDescriptionHeaderIsAddedIfNotPresent()
-    {
+    public function testDescriptionHeaderIsAddedIfNotPresent() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('addTextHeader')
                 ->once()
@@ -236,8 +218,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setDescription('whatever');
     }
 
-    public function testSetAndGetMaxLineLength()
-    {
+    public function testSetAndGetMaxLineLength() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -245,8 +226,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals(60, $entity->getMaxLineLength());
     }
 
-    public function testEncoderIsUsedForStringGeneration()
-    {
+    public function testEncoderIsUsedForStringGeneration() {
         $encoder = $this->_createEncoder('base64', false);
         $encoder->expects($this->once())
                 ->method('encodeString')
@@ -259,8 +239,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toString();
     }
 
-    public function testMaxLineLengthIsProvidedWhenEncoding()
-    {
+    public function testMaxLineLengthIsProvidedWhenEncoding() {
         $encoder = $this->_createEncoder('base64', false);
         $encoder->expects($this->once())
                 ->method('encodeString')
@@ -274,8 +253,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toString();
     }
 
-    public function testHeadersAppearInString()
-    {
+    public function testHeadersAppearInString() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->once()
@@ -294,8 +272,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSetAndGetBody()
-    {
+    public function testSetAndGetBody() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -303,8 +280,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals("blah\r\nblah!", $entity->getBody());
     }
 
-    public function testBodyIsAppended()
-    {
+    public function testBodyIsAppended() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->once()
@@ -322,8 +298,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testGetBodyReturnsStringFromByteStream()
-    {
+    public function testGetBodyReturnsStringFromByteStream() {
         $os = $this->_createOutputStream('byte stream string');
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
@@ -332,8 +307,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals('byte stream string', $entity->getBody());
     }
 
-    public function testByteStreamBodyIsAppended()
-    {
+    public function testByteStreamBodyIsAppended() {
         $headers = $this->_createHeaderSet(array(), false);
         $os = $this->_createOutputStream('streamed');
         $headers->shouldReceive('toString')
@@ -352,8 +326,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testBoundaryCanBeRetrieved()
-    {
+    public function testBoundaryCanBeRetrieved() {
         /* -- RFC 2046, 5.1.1.
      boundary := 0*69<bchars> bcharsnospace
 
@@ -373,8 +346,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testBoundaryNeverChanges()
-    {
+    public function testBoundaryNeverChanges() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -384,8 +356,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testBoundaryCanBeSet()
-    {
+    public function testBoundaryCanBeSet() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -393,8 +364,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $this->assertEquals('foobar', $entity->getBoundary());
     }
 
-    public function testAddingChildrenGeneratesBoundaryInHeaders()
-    {
+    public function testAddingChildrenGeneratesBoundaryInHeaders() {
         $child = $this->_createChild();
         $cType = $this->_createHeader('Content-Type', 'text/plain', array(), false);
         $cType->shouldReceive('setParameter')
@@ -411,8 +381,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setChildren(array($child));
     }
 
-    public function testChildrenOfLevelAttachmentAndLessCauseMultipartMixed()
-    {
+    public function testChildrenOfLevelAttachmentAndLessCauseMultipartMixed() {
         for ($level = Swift_Mime_MimeEntity::LEVEL_MIXED;
             $level > Swift_Mime_MimeEntity::LEVEL_TOP; $level /= 2) {
             $child = $this->_createChild($level);
@@ -433,8 +402,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testChildrenOfLevelAlternativeAndLessCauseMultipartAlternative()
-    {
+    public function testChildrenOfLevelAlternativeAndLessCauseMultipartAlternative() {
         for ($level = Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE;
             $level > Swift_Mime_MimeEntity::LEVEL_MIXED; $level /= 2) {
             $child = $this->_createChild($level);
@@ -455,8 +423,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testChildrenOfLevelRelatedAndLessCauseMultipartRelated()
-    {
+    public function testChildrenOfLevelRelatedAndLessCauseMultipartRelated() {
         for ($level = Swift_Mime_MimeEntity::LEVEL_RELATED;
             $level > Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE; $level /= 2) {
             $child = $this->_createChild($level);
@@ -477,8 +444,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testHighestLevelChildDeterminesContentType()
-    {
+    public function testHighestLevelChildDeterminesContentType() {
         $combinations = array(
             array('levels' => array(Swift_Mime_MimeEntity::LEVEL_MIXED,
                 Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE,
@@ -529,8 +495,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testChildrenAppearNestedInString()
-    {
+    public function testChildrenAppearNestedInString() {
         /* -- RFC 2046, 5.1.1.
      (excerpt too verbose to paste here)
      */
@@ -575,8 +540,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testMixingLevelsIsHierarchical()
-    {
+    public function testMixingLevelsIsHierarchical() {
         $headers = $this->_createHeaderSet(array(), false);
         $newHeaders = $this->_createHeaderSet(array(), false);
 
@@ -628,8 +592,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSettingEncoderNotifiesChildren()
-    {
+    public function testSettingEncoderNotifiesChildren() {
         $child = $this->_createChild(0, '', false);
         $encoder = $this->_createEncoder('base64');
 
@@ -644,8 +607,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setEncoder($encoder);
     }
 
-    public function testReceiptOfEncoderChangeNotifiesChildren()
-    {
+    public function testReceiptOfEncoderChangeNotifiesChildren() {
         $child = $this->_createChild(0, '', false);
         $encoder = $this->_createEncoder('base64');
 
@@ -660,8 +622,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->encoderChanged($encoder);
     }
 
-    public function testReceiptOfCharsetChangeNotifiesChildren()
-    {
+    public function testReceiptOfCharsetChangeNotifiesChildren() {
         $child = $this->_createChild(0, '', false);
         $child->shouldReceive('charsetChanged')
               ->once()
@@ -674,8 +635,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->charsetChanged('windows-874');
     }
 
-    public function testEntityIsWrittenToByteStream()
-    {
+    public function testEntityIsWrittenToByteStream() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -686,8 +646,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toByteStream($is);
     }
 
-    public function testEntityHeadersAreComittedToByteStream()
-    {
+    public function testEntityHeadersAreComittedToByteStream() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -700,8 +659,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toByteStream($is);
     }
 
-    public function testOrderingTextBeforeHtml()
-    {
+    public function testOrderingTextBeforeHtml() {
         $htmlChild = new MimeEntityFixture(Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE,
             "Content-Type: text/html\r\n".
             "\r\n".
@@ -740,8 +698,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testUnsettingChildrenRestoresContentType()
-    {
+    public function testUnsettingChildrenRestoresContentType() {
         $cType = $this->_createHeader('Content-Type', 'text/plain', array(), false);
         $child = $this->_createChild(Swift_Mime_MimeEntity::LEVEL_ALTERNATIVE);
 
@@ -766,8 +723,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setChildren(array());
     }
 
-    public function testBodyIsReadFromCacheWhenUsingToStringIfPresent()
-    {
+    public function testBodyIsReadFromCacheWhenUsingToStringIfPresent() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->zeroOrMoreTimes()
@@ -796,8 +752,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testBodyIsAddedToCacheWhenUsingToString()
-    {
+    public function testBodyIsAddedToCacheWhenUsingToString() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->zeroOrMoreTimes()
@@ -820,8 +775,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toString();
     }
 
-    public function testBodyIsClearedFromCacheIfNewBodySet()
-    {
+    public function testBodyIsClearedFromCacheIfNewBodySet() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->zeroOrMoreTimes()
@@ -843,8 +797,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setBody("new\r\nnew!");
     }
 
-    public function testBodyIsNotClearedFromCacheIfSameBodySet()
-    {
+    public function testBodyIsNotClearedFromCacheIfSameBodySet() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->zeroOrMoreTimes()
@@ -865,8 +818,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setBody("blah\r\nblah!");
     }
 
-    public function testBodyIsClearedFromCacheIfNewEncoderSet()
-    {
+    public function testBodyIsClearedFromCacheIfNewEncoderSet() {
         $headers = $this->_createHeaderSet(array(), false);
         $headers->shouldReceive('toString')
                 ->zeroOrMoreTimes()
@@ -889,8 +841,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->setEncoder($otherEncoder);
     }
 
-    public function testBodyIsReadFromCacheWhenUsingToByteStreamIfPresent()
-    {
+    public function testBodyIsReadFromCacheWhenUsingToByteStreamIfPresent() {
         $is = $this->_createInputStream();
         $cache = $this->_createCache(false);
         $cache->shouldReceive('hasKey')
@@ -909,8 +860,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toByteStream($is);
     }
 
-    public function testBodyIsAddedToCacheWhenUsingToByteStream()
-    {
+    public function testBodyIsAddedToCacheWhenUsingToByteStream() {
         $is = $this->_createInputStream();
         $cache = $this->_createCache(false);
         $cache->shouldReceive('hasKey')
@@ -929,8 +879,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         $entity->toByteStream($is);
     }
 
-    public function testFluidInterface()
-    {
+    public function testFluidInterface() {
         $entity = $this->_createEntity($this->_createHeaderSet(),
             $this->_createEncoder(), $this->_createCache()
             );
@@ -952,8 +901,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
 
     abstract protected function _createEntity($headers, $encoder, $cache);
 
-    protected function _createChild($level = null, $string = '', $stub = true)
-    {
+    protected function _createChild($level = null, $string = '', $stub = true) {
         $child = $this->getMockery('Swift_Mime_MimeEntity')->shouldIgnoreMissing();
         if (isset($level)) {
             $child->shouldReceive('getNestingLevel')
@@ -967,8 +915,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         return $child;
     }
 
-    protected function _createEncoder($name = 'quoted-printable', $stub = true)
-    {
+    protected function _createEncoder($name = 'quoted-printable', $stub = true) {
         $encoder = $this->getMock('Swift_Mime_ContentEncoder');
         $encoder->expects($this->any())
                 ->method('getName')
@@ -984,13 +931,11 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         return $encoder;
     }
 
-    protected function _createCache($stub = true)
-    {
+    protected function _createCache($stub = true) {
         return $this->getMockery('Swift_KeyCache')->shouldIgnoreMissing();
     }
 
-    protected function _createHeaderSet($headers = array(), $stub = true)
-    {
+    protected function _createHeaderSet($headers = array(), $stub = true) {
         $set = $this->getMockery('Swift_Mime_HeaderSet')->shouldIgnoreMissing();
         $set->shouldReceive('get')
             ->zeroOrMoreTimes()
@@ -1006,8 +951,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         return $set;
     }
 
-    protected function _createHeader($name, $model = null, $params = array(), $stub = true)
-    {
+    protected function _createHeader($name, $model = null, $params = array(), $stub = true) {
         $header = $this->getMockery('Swift_Mime_ParameterizedHeader')->shouldIgnoreMissing();
         $header->shouldReceive('getFieldName')
                ->zeroOrMoreTimes()
@@ -1024,8 +968,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         return $header;
     }
 
-    protected function _createOutputStream($data = null, $stub = true)
-    {
+    protected function _createOutputStream($data = null, $stub = true) {
         $os = $this->getMockery('Swift_OutputByteStream');
         if (isset($data)) {
             $os->shouldReceive('read')
@@ -1047,8 +990,7 @@ abstract class Swift_Mime_AbstractMimeEntityTest extends \SwiftMailerTestCase
         return $os;
     }
 
-    protected function _createInputStream($stub = true)
-    {
+    protected function _createInputStream($stub = true) {
         return $this->getMock('Swift_InputByteStream');
     }
 }

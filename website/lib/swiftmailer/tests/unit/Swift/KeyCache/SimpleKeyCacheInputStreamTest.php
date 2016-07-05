@@ -1,11 +1,9 @@
 <?php
 
-class Swift_KeyCache_SimpleKeyCacheInputStreamTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_KeyCache_SimpleKeyCacheInputStreamTest extends \PHPUnit_Framework_TestCase{
     private $_nsKey = 'ns1';
 
-    public function testStreamWritesToCacheInAppendMode()
-    {
+    public function testStreamWritesToCacheInAppendMode() {
         $cache = $this->getMock('Swift_KeyCache');
         $cache->expects($this->at(0))
               ->method('setString')
@@ -27,8 +25,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStreamTest extends \PHPUnit_Framework_Te
         $stream->write('c');
     }
 
-    public function testFlushContentClearsKey()
-    {
+    public function testFlushContentClearsKey() {
         $cache = $this->getMock('Swift_KeyCache');
         $cache->expects($this->once())
               ->method('clearKey')
@@ -42,8 +39,7 @@ class Swift_KeyCache_SimpleKeyCacheInputStreamTest extends \PHPUnit_Framework_Te
         $stream->flushBuffers();
     }
 
-    public function testClonedStreamStillReferencesSameCache()
-    {
+    public function testClonedStreamStillReferencesSameCache() {
         $cache = $this->getMock('Swift_KeyCache');
         $cache->expects($this->at(0))
               ->method('setString')

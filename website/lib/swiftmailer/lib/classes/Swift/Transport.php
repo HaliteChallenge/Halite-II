@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Transport
-{
+interface Swift_Transport{
     /**
      * Test if this Transport mechanism has started.
      *

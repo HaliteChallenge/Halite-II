@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Plugins_ReporterPlugin implements Swift_Events_SendListener
-{
+class Swift_Plugins_ReporterPlugin implements Swift_Events_SendListener{
     /**
      * The reporter backend which takes notifications.
      *
@@ -27,16 +26,14 @@ class Swift_Plugins_ReporterPlugin implements Swift_Events_SendListener
      *
      * @param Swift_Plugins_Reporter $reporter
      */
-    public function __construct(Swift_Plugins_Reporter $reporter)
-    {
+    public function __construct(Swift_Plugins_Reporter $reporter) {
         $this->_reporter = $reporter;
     }
 
     /**
      * Not used.
      */
-    public function beforeSendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function beforeSendPerformed(Swift_Events_SendEvent $evt) {
     }
 
     /**
@@ -44,8 +41,7 @@ class Swift_Plugins_ReporterPlugin implements Swift_Events_SendListener
      *
      * @param Swift_Events_SendEvent $evt
      */
-    public function sendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function sendPerformed(Swift_Events_SendEvent $evt) {
         $message = $evt->getMessage();
         $failures = array_flip($evt->getFailedRecipients());
         foreach ((array) $message->getTo() as $address => $null) {

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Events_TransportChangeListener extends Swift_Events_EventListener
-{
+interface Swift_Events_TransportChangeListener extends Swift_Events_EventListener{
     /**
      * Invoked just before a Transport is started.
      *

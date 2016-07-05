@@ -1,7 +1,6 @@
 <?php
 
-class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase
-{
+class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase{
     private $_rfc2045Token = '/^[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+$/D';
 
     /* --
@@ -13,8 +12,7 @@ class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase
     which matches RFC 2045's definition of "token".
     */
 
-    public function testEncodingAsciiCharactersProducesValidToken()
-    {
+    public function testEncodingAsciiCharactersProducesValidToken() {
         $charStream = $this->getMockery('Swift_CharacterStream');
 
         $string = '';
@@ -44,8 +42,7 @@ class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testEncodingNonAsciiCharactersProducesValidToken()
-    {
+    public function testEncodingNonAsciiCharactersProducesValidToken() {
         $charStream = $this->getMockery('Swift_CharacterStream');
 
         $string = '';
@@ -74,8 +71,7 @@ class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testMaximumLineLengthCanBeSet()
-    {
+    public function testMaximumLineLengthCanBeSet() {
         $charStream = $this->getMockery('Swift_CharacterStream');
 
         $string = '';
@@ -107,8 +103,7 @@ class Swift_Encoder_Rfc2231EncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testFirstLineCanHaveShorterLength()
-    {
+    public function testFirstLineCanHaveShorterLength() {
         $charStream = $this->getMockery('Swift_CharacterStream');
 
         $string = '';

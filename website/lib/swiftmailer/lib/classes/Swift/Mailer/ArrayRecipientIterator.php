@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientIterator
-{
+class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientIterator{
     /**
      * The list of recipients.
      *
@@ -27,8 +26,7 @@ class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientItera
      *
      * @param array $recipients
      */
-    public function __construct(array $recipients)
-    {
+    public function __construct(array $recipients) {
         $this->_recipients = $recipients;
     }
 
@@ -37,8 +35,7 @@ class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientItera
      *
      * @return bool
      */
-    public function hasNext()
-    {
+    public function hasNext() {
         return !empty($this->_recipients);
     }
 
@@ -48,8 +45,7 @@ class Swift_Mailer_ArrayRecipientIterator implements Swift_Mailer_RecipientItera
      *
      * @return array
      */
-    public function nextRecipient()
-    {
+    public function nextRecipient() {
         return array_splice($this->_recipients, 0, 1);
     }
 }

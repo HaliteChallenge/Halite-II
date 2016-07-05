@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
-{
+class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler{
     /**
      * Authenticators available to process the request.
      *
@@ -55,8 +54,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param Swift_Transport_Esmtp_Authenticator[] $authenticators
      */
-    public function __construct(array $authenticators)
-    {
+    public function __construct(array $authenticators) {
         $this->setAuthenticators($authenticators);
     }
 
@@ -65,8 +63,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param Swift_Transport_Esmtp_Authenticator[] $authenticators
      */
-    public function setAuthenticators(array $authenticators)
-    {
+    public function setAuthenticators(array $authenticators) {
         $this->_authenticators = $authenticators;
     }
 
@@ -75,8 +72,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return Swift_Transport_Esmtp_Authenticator[]
      */
-    public function getAuthenticators()
-    {
+    public function getAuthenticators() {
         return $this->_authenticators;
     }
 
@@ -85,8 +81,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param string $username
      */
-    public function setUsername($username)
-    {
+    public function setUsername($username) {
         $this->_username = $username;
     }
 
@@ -95,8 +90,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return string
      */
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->_username;
     }
 
@@ -105,8 +99,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param string $password
      */
-    public function setPassword($password)
-    {
+    public function setPassword($password) {
         $this->_password = $password;
     }
 
@@ -115,8 +108,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return string
      */
-    public function getPassword()
-    {
+    public function getPassword() {
         return $this->_password;
     }
 
@@ -125,8 +117,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param string $mode
      */
-    public function setAuthMode($mode)
-    {
+    public function setAuthMode($mode) {
         $this->_auth_mode = $mode;
     }
 
@@ -135,8 +126,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return string
      */
-    public function getAuthMode()
-    {
+    public function getAuthMode() {
         return $this->_auth_mode;
     }
 
@@ -145,8 +135,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return bool
      */
-    public function getHandledKeyword()
-    {
+    public function getHandledKeyword() {
         return 'AUTH';
     }
 
@@ -155,8 +144,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param string[] $parameters
      */
-    public function setKeywordParams(array $parameters)
-    {
+    public function setKeywordParams(array $parameters) {
         $this->_esmtpParams = $parameters;
     }
 
@@ -165,8 +153,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @param Swift_Transport_SmtpAgent $agent to read/write
      */
-    public function afterEhlo(Swift_Transport_SmtpAgent $agent)
-    {
+    public function afterEhlo(Swift_Transport_SmtpAgent $agent) {
         if ($this->_username) {
             $count = 0;
             foreach ($this->_getAuthenticatorsForAgent() as $authenticator) {
@@ -188,24 +175,21 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
     /**
      * Not used.
      */
-    public function getMailParams()
-    {
+    public function getMailParams() {
         return array();
     }
 
     /**
      * Not used.
      */
-    public function getRcptParams()
-    {
+    public function getRcptParams() {
         return array();
     }
 
     /**
      * Not used.
      */
-    public function onCommand(Swift_Transport_SmtpAgent $agent, $command, $codes = array(), &$failedRecipients = null, &$stop = false)
-    {
+    public function onCommand(Swift_Transport_SmtpAgent $agent, $command, $codes = array(), &$failedRecipients = null, &$stop = false) {
     }
 
     /**
@@ -217,8 +201,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return int
      */
-    public function getPriorityOver($esmtpKeyword)
-    {
+    public function getPriorityOver($esmtpKeyword) {
         return 0;
     }
 
@@ -227,16 +210,14 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return string[]
      */
-    public function exposeMixinMethods()
-    {
+    public function exposeMixinMethods() {
         return array('setUsername', 'getUsername', 'setPassword', 'getPassword', 'setAuthMode', 'getAuthMode');
     }
 
     /**
      * Not used.
      */
-    public function resetState()
-    {
+    public function resetState() {
     }
 
     /**
@@ -246,8 +227,7 @@ class Swift_Transport_Esmtp_AuthHandler implements Swift_Transport_EsmtpHandler
      *
      * @return array
      */
-    protected function _getAuthenticatorsForAgent()
-    {
+    protected function _getAuthenticatorsForAgent() {
         if (!$mode = strtolower($this->_auth_mode)) {
             return $this->_authenticators;
         }

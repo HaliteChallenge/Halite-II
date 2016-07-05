@@ -13,15 +13,13 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport_Esmtp_Authenticator
-{
+class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport_Esmtp_Authenticator{
     /**
      * Get the name of the AUTH mechanism this Authenticator handles.
      *
      * @return string
      */
-    public function getAuthKeyword()
-    {
+    public function getAuthKeyword() {
         return 'CRAM-MD5';
     }
 
@@ -34,8 +32,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport
      *
      * @return bool
      */
-    public function authenticate(Swift_Transport_SmtpAgent $agent, $username, $password)
-    {
+    public function authenticate(Swift_Transport_SmtpAgent $agent, $username, $password) {
         try {
             $challenge = $agent->executeCommand("AUTH CRAM-MD5\r\n", array(334));
             $challenge = base64_decode(substr($challenge, 4));
@@ -60,8 +57,7 @@ class Swift_Transport_Esmtp_Auth_CramMd5Authenticator implements Swift_Transport
      *
      * @return string
      */
-    private function _getResponse($secret, $challenge)
-    {
+    private function _getResponse($secret, $challenge) {
         if (strlen($secret) > 64) {
             $secret = pack('H32', md5($secret));
         }

@@ -2,10 +2,8 @@
 
 use Mockery as m;
 
-class Swift_Bug518Test extends \PHPUnit_Framework_TestCase
-{
-    public function testIfEmailChangesAfterQueued()
-    {
+class Swift_Bug518Test extends \PHPUnit_Framework_TestCase{
+    public function testIfEmailChangesAfterQueued() {
         $failedRecipients = 'value';
         $message = new Swift_Message();
         $message->setTo('foo@bar.com');

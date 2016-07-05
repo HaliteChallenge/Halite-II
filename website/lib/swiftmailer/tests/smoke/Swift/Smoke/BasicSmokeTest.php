@@ -3,10 +3,8 @@
 /**
  * @group smoke
  */
-class Swift_Smoke_BasicSmokeTest extends SwiftMailerSmokeTestCase
-{
-    public function testBasicSending()
-    {
+class Swift_Smoke_BasicSmokeTest extends SwiftMailerSmokeTestCase{
+    public function testBasicSending() {
         $mailer = $this->_getMailer();
         $message = Swift_Message::newInstance()
             ->setSubject('[Swift Mailer] BasicSmokeTest')

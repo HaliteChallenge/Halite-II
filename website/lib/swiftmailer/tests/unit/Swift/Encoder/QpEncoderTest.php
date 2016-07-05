@@ -1,7 +1,6 @@
 <?php
 
-class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
-{
+class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase{
     /* -- RFC 2045, 6.7 --
     (1)   (General 8bit representation) Any octet, except a CR or
                     LF that is part of a CRLF line break of the canonical
@@ -18,8 +17,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
                     allow an alternative encoding.
                     */
 
-    public function testPermittedCharactersAreNotEncoded()
-    {
+    public function testPermittedCharactersAreNotEncoded() {
         /* -- RFC 2045, 6.7 --
         (2)   (Literal representation) Octets with decimal values of
                     33 through 60 inclusive, and 62 through 126, inclusive,
@@ -51,8 +49,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testWhiteSpaceAtLineEndingIsEncoded()
-    {
+    public function testWhiteSpaceAtLineEndingIsEncoded() {
         /* -- RFC 2045, 6.7 --
         (3)   (White Space) Octets with values of 9 and 32 MAY be
                     represented as US-ASCII TAB (HT) and SPACE characters,
@@ -128,8 +125,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testCRLFIsLeftAlone()
-    {
+    public function testCRLFIsLeftAlone() {
         /*
         (4)   (Line Breaks) A line break in a text body, represented
                     as a CRLF sequence in the text canonical form, must be
@@ -181,8 +177,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         $this->assertEquals($string, $encoder->encodeString($string));
     }
 
-    public function testLinesLongerThan76CharactersAreSoftBroken()
-    {
+    public function testLinesLongerThan76CharactersAreSoftBroken() {
         /*
         (5)   (Soft Line Breaks) The Quoted-Printable encoding
                     REQUIRES that encoded lines be no more than 76
@@ -222,8 +217,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         $this->assertEquals($output, $encoder->encodeString($input));
     }
 
-    public function testMaxLineLengthCanBeSpecified()
-    {
+    public function testMaxLineLengthCanBeSpecified() {
         $input = str_repeat('a', 100);
 
         $charStream = $this->_createCharStream();
@@ -252,8 +246,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         $this->assertEquals($output, $encoder->encodeString($input, 0, 54));
     }
 
-    public function testBytesBelowPermittedRangeAreEncoded()
-    {
+    public function testBytesBelowPermittedRangeAreEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -282,8 +275,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testDecimalByte61IsEncoded()
-    {
+    public function testDecimalByte61IsEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -308,8 +300,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         $this->assertEquals('=3D', $encoder->encodeString('='));
     }
 
-    public function testBytesAbovePermittedRangeAreEncoded()
-    {
+    public function testBytesAbovePermittedRangeAreEncoded() {
         /*
         According to Rule (1 & 2)
         */
@@ -338,8 +329,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testFirstLineLengthCanBeDifferent()
-    {
+    public function testFirstLineLengthCanBeDifferent() {
         $input = str_repeat('a', 140);
 
         $charStream = $this->_createCharStream();
@@ -372,8 +362,7 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testTextIsPreWrapped()
-    {
+    public function testTextIsPreWrapped() {
         $encoder = $this->createEncoder();
 
         $input = str_repeat('a', 70)."\r\n".
@@ -387,13 +376,11 @@ class Swift_Encoder_QpEncoderTest extends \SwiftMailerTestCase
 
     // -- Creation methods
 
-    private function _createCharStream()
-    {
+    private function _createCharStream() {
         return $this->getMockery('Swift_CharacterStream')->shouldIgnoreMissing();
     }
 
-    private function createEncoder()
-    {
+    private function createEncoder() {
         $factory = new Swift_CharacterReaderFactory_SimpleCharacterReaderFactory();
         $charStream = new Swift_CharacterStream_NgCharacterStream($factory, 'utf-8');
 

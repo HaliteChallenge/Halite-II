@@ -1,14 +1,12 @@
 <?php
 
 abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
-    extends \PHPUnit_Framework_TestCase
-{
+    extends \PHPUnit_Framework_TestCase{
     protected $_buffer;
 
     abstract protected function _initializeBuffer();
 
-    public function setUp()
-    {
+    public function setUp() {
         if (true == getenv('TRAVIS')) {
             $this->markTestSkipped(
                 'Will fail on travis-ci if not skipped due to travis blocking '.
@@ -21,8 +19,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
         );
     }
 
-    public function testReadLine()
-    {
+    public function testReadLine() {
         $this->_initializeBuffer();
 
         $line = $this->_buffer->readLine(0);
@@ -34,8 +31,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
         $this->_buffer->terminate();
     }
 
-    public function testWrite()
-    {
+    public function testWrite() {
         $this->_initializeBuffer();
 
         $line = $this->_buffer->readLine(0);
@@ -53,8 +49,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
         $this->_buffer->terminate();
     }
 
-    public function testBindingOtherStreamsMirrorsWriteOperations()
-    {
+    public function testBindingOtherStreamsMirrorsWriteOperations() {
         $this->_initializeBuffer();
 
         $is1 = $this->_createMockInputStream();
@@ -80,8 +75,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
         $this->_buffer->write('y');
     }
 
-    public function testBindingOtherStreamsMirrorsFlushOperations()
-    {
+    public function testBindingOtherStreamsMirrorsFlushOperations() {
         $this->_initializeBuffer();
 
         $is1 = $this->_createMockInputStream();
@@ -98,8 +92,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
         $this->_buffer->flushBuffers();
     }
 
-    public function testUnbindingStreamPreventsFurtherWrites()
-    {
+    public function testUnbindingStreamPreventsFurtherWrites() {
         $this->_initializeBuffer();
 
         $is1 = $this->_createMockInputStream();
@@ -127,8 +120,7 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest
 
     // -- Creation Methods
 
-    private function _createMockInputStream()
-    {
+    private function _createMockInputStream() {
         return $this->getMock('Swift_InputByteStream');
     }
 }

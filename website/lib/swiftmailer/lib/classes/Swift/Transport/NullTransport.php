@@ -13,16 +13,14 @@
  *
  * @author Fabien Potencier
  */
-class Swift_Transport_NullTransport implements Swift_Transport
-{
+class Swift_Transport_NullTransport implements Swift_Transport{
     /** The event dispatcher from the plugin API */
     private $_eventDispatcher;
 
     /**
      * Constructor.
      */
-    public function __construct(Swift_Events_EventDispatcher $eventDispatcher)
-    {
+    public function __construct(Swift_Events_EventDispatcher $eventDispatcher) {
         $this->_eventDispatcher = $eventDispatcher;
     }
 
@@ -31,23 +29,20 @@ class Swift_Transport_NullTransport implements Swift_Transport
      *
      * @return bool
      */
-    public function isStarted()
-    {
+    public function isStarted() {
         return true;
     }
 
     /**
      * Starts this Transport mechanism.
      */
-    public function start()
-    {
+    public function start() {
     }
 
     /**
      * Stops this Transport mechanism.
      */
-    public function stop()
-    {
+    public function stop() {
     }
 
     /**
@@ -58,8 +53,7 @@ class Swift_Transport_NullTransport implements Swift_Transport
      *
      * @return int The number of sent emails
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
-    {
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null) {
         if ($evt = $this->_eventDispatcher->createSendEvent($this, $message)) {
             $this->_eventDispatcher->dispatchEvent($evt, 'beforeSendPerformed');
             if ($evt->bubbleCancelled()) {
@@ -86,8 +80,7 @@ class Swift_Transport_NullTransport implements Swift_Transport
      *
      * @param Swift_Events_EventListener $plugin
      */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
+    public function registerPlugin(Swift_Events_EventListener $plugin) {
         $this->_eventDispatcher->bindEventListener($plugin);
     }
 }

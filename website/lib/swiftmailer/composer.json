@@ -5,11 +5,9 @@
     "keywords": ["mail","mailer","email"],
     "homepage": "http://swiftmailer.org",
     "license": "MIT",
-    "authors": [
-        {
+    "authors": [{
             "name": "Chris Corbyn"
-        },
-        {
+        },{
             "name": "Fabien Potencier",
             "email": "fabien@symfony.com"
         }

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Mime_Header
-{
+interface Swift_Mime_Header{
     /** Text headers */
     const TYPE_TEXT = 2;
 

@@ -14,8 +14,7 @@
  * @author     Fabien Potencier
  * @author     Chris Corbyn
  */
-class Swift_Mime_Grammar
-{
+class Swift_Mime_Grammar{
     /**
      * Special characters used in the syntax which need to be escaped.
      *
@@ -33,18 +32,15 @@ class Swift_Mime_Grammar
     /**
      * Initialize some RFC 2822 (and friends) ABNF grammar definitions.
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->init();
     }
 
-    public function __wakeup()
-    {
+    public function __wakeup() {
         $this->init();
     }
 
-    protected function init()
-    {
+    protected function init() {
         if (count(self::$_specials) > 0) {
             return;
         }
@@ -125,8 +121,7 @@ class Swift_Mime_Grammar
      *
      * @return string
      */
-    public function getDefinition($name)
-    {
+    public function getDefinition($name) {
         if (array_key_exists($name, self::$_grammar)) {
             return self::$_grammar[$name];
         }
@@ -141,8 +136,7 @@ class Swift_Mime_Grammar
      *
      * @return array
      */
-    public function getGrammarDefinitions()
-    {
+    public function getGrammarDefinitions() {
         return self::$_grammar;
     }
 
@@ -151,8 +145,7 @@ class Swift_Mime_Grammar
      *
      * @return array
      */
-    public function getSpecials()
-    {
+    public function getSpecials() {
         return self::$_specials;
     }
 
@@ -165,8 +158,7 @@ class Swift_Mime_Grammar
      *
      * @return string
      */
-    public function escapeSpecials($token, $include = array(), $exclude = array())
-    {
+    public function escapeSpecials($token, $include = array(), $exclude = array()) {
         foreach (array_merge(array('\\'), array_diff(self::$_specials, $exclude), $include) as $char) {
             $token = str_replace($char, '\\'.$char, $token);
         }

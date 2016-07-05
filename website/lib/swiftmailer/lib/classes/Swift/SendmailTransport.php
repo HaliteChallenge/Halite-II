@@ -13,15 +13,13 @@
  *
  * @author Chris Corbyn
  */
-class Swift_SendmailTransport extends Swift_Transport_SendmailTransport
-{
+class Swift_SendmailTransport extends Swift_Transport_SendmailTransport{
     /**
      * Create a new SendmailTransport, optionally using $command for sending.
      *
      * @param string $command
      */
-    public function __construct($command = '/usr/sbin/sendmail -bs')
-    {
+    public function __construct($command = '/usr/sbin/sendmail -bs') {
         call_user_func_array(
             array($this, 'Swift_Transport_SendmailTransport::__construct'),
             Swift_DependencyContainer::getInstance()
@@ -38,8 +36,7 @@ class Swift_SendmailTransport extends Swift_Transport_SendmailTransport
      *
      * @return Swift_SendmailTransport
      */
-    public static function newInstance($command = '/usr/sbin/sendmail -bs')
-    {
+    public static function newInstance($command = '/usr/sbin/sendmail -bs') {
         return new self($command);
     }
 }

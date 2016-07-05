@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Events_SendListener extends Swift_Events_EventListener
-{
+interface Swift_Events_SendListener extends Swift_Events_EventListener{
     /**
      * Invoked immediately before the Message is sent.
      *

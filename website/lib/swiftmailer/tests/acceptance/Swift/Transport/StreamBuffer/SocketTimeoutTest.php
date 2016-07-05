@@ -1,15 +1,13 @@
 <?php
 
-class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit_Framework_TestCase
-{
+class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit_Framework_TestCase{
     protected $_buffer;
 
     protected $_randomHighPort;
 
     protected $_server;
 
-    public function setUp()
-    {
+    public function setUp() {
         if (!defined('SWIFT_SMTP_HOST')) {
             $this->markTestSkipped(
                 'Cannot run test without an SMTP host to connect to (define '.
@@ -31,8 +29,7 @@ class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit_Framework_
         );
     }
 
-    protected function _initializeBuffer()
-    {
+    protected function _initializeBuffer() {
         $host = '127.0.0.1';
         $port = $this->_randomHighPort;
 
@@ -46,8 +43,7 @@ class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit_Framework_
         ));
     }
 
-    public function testTimeoutException()
-    {
+    public function testTimeoutException() {
         $this->_initializeBuffer();
         $e = null;
         try {
@@ -58,8 +54,7 @@ class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit_Framework_
         $this->assertRegExp('/Connection to .* Timed Out/', $e->getMessage());
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         if ($this->_server) {
             stream_socket_shutdown($this->_server, STREAM_SHUT_RDWR);
         }

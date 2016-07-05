@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader
-{
+class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader{
     /**
      * Returns the complete character map.
      *
@@ -25,8 +24,7 @@ class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars)
-    {
+    public function getCharPositions($string, $startOffset, &$currentMap, &$ignoredChars) {
         $strlen = strlen($string);
         $ignoredChars = '';
         for ($i = 0; $i < $strlen; ++$i) {
@@ -44,8 +42,7 @@ class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader
      *
      * @return int mapType
      */
-    public function getMapType()
-    {
+    public function getMapType() {
         return self::MAP_TYPE_INVALID;
     }
 
@@ -62,8 +59,7 @@ class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function validateByteSequence($bytes, $size)
-    {
+    public function validateByteSequence($bytes, $size) {
         $byte = reset($bytes);
         if (1 == count($bytes) && $byte >= 0x00 && $byte <= 0x7F) {
             return 0;
@@ -77,8 +73,7 @@ class Swift_CharacterReader_UsAsciiReader implements Swift_CharacterReader
      *
      * @return int
      */
-    public function getInitialByteSize()
-    {
+    public function getInitialByteSize() {
         return 1;
     }
 }

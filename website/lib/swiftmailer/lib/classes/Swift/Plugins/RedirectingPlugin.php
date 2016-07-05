@@ -13,8 +13,7 @@
  *
  * @author Fabien Potencier
  */
-class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
-{
+class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener{
     /**
      * The recipient who will receive all messages.
      *
@@ -35,8 +34,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      * @param mixed $recipient
      * @param array $whitelist
      */
-    public function __construct($recipient, array $whitelist = array())
-    {
+    public function __construct($recipient, array $whitelist = array()) {
         $this->_recipient = $recipient;
         $this->_whitelist = $whitelist;
     }
@@ -46,8 +44,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @param mixed $recipient
      */
-    public function setRecipient($recipient)
-    {
+    public function setRecipient($recipient) {
         $this->_recipient = $recipient;
     }
 
@@ -56,8 +53,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @return mixed
      */
-    public function getRecipient()
-    {
+    public function getRecipient() {
         return $this->_recipient;
     }
 
@@ -66,8 +62,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @param array $whitelist
      */
-    public function setWhitelist(array $whitelist)
-    {
+    public function setWhitelist(array $whitelist) {
         $this->_whitelist = $whitelist;
     }
 
@@ -76,8 +71,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @return array
      */
-    public function getWhitelist()
-    {
+    public function getWhitelist() {
         return $this->_whitelist;
     }
 
@@ -86,8 +80,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @param Swift_Events_SendEvent $evt
      */
-    public function beforeSendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function beforeSendPerformed(Swift_Events_SendEvent $evt) {
         $message = $evt->getMessage();
         $headers = $message->getHeaders();
 
@@ -129,8 +122,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      * @param Swift_Mime_HeaderSet $headerSet
      * @param string               $type
      */
-    private function _filterHeaderSet(Swift_Mime_HeaderSet $headerSet, $type)
-    {
+    private function _filterHeaderSet(Swift_Mime_HeaderSet $headerSet, $type) {
         foreach ($headerSet->getAll($type) as $headers) {
             $headers->setNameAddresses($this->_filterNameAddresses($headers->getNameAddresses()));
         }
@@ -143,8 +135,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @return array
      */
-    private function _filterNameAddresses(array $recipients)
-    {
+    private function _filterNameAddresses(array $recipients) {
         $filtered = array();
 
         foreach ($recipients as $address => $name) {
@@ -163,8 +154,7 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @return bool
      */
-    protected function _isWhitelisted($recipient)
-    {
+    protected function _isWhitelisted($recipient) {
         if (in_array($recipient, (array) $this->_recipient)) {
             return true;
         }
@@ -183,13 +173,11 @@ class Swift_Plugins_RedirectingPlugin implements Swift_Events_SendListener
      *
      * @param Swift_Events_SendEvent $evt
      */
-    public function sendPerformed(Swift_Events_SendEvent $evt)
-    {
+    public function sendPerformed(Swift_Events_SendEvent $evt) {
         $this->_restoreMessage($evt->getMessage());
     }
 
-    private function _restoreMessage(Swift_Mime_Message $message)
-    {
+    private function _restoreMessage(Swift_Mime_Message $message) {
         // restore original headers
         $headers = $message->getHeaders();
 

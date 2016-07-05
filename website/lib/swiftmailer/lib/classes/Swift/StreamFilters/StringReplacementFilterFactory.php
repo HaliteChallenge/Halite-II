@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_StreamFilters_StringReplacementFilterFactory implements Swift_ReplacementFilterFactory
-{
+class Swift_StreamFilters_StringReplacementFilterFactory implements Swift_ReplacementFilterFactory{
     /** Lazy-loaded filters */
     private $_filters = array();
 
@@ -26,8 +25,7 @@ class Swift_StreamFilters_StringReplacementFilterFactory implements Swift_Replac
      *
      * @return Swift_StreamFilter
      */
-    public function createFilter($search, $replace)
-    {
+    public function createFilter($search, $replace) {
         if (!isset($this->_filters[$search][$replace])) {
             if (!isset($this->_filters[$search])) {
                 $this->_filters[$search] = array();

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_Events_ResponseListener, Swift_Events_TransportChangeListener, Swift_Events_TransportExceptionListener, Swift_Plugins_Logger
-{
+class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_Events_ResponseListener, Swift_Events_TransportChangeListener, Swift_Events_TransportExceptionListener, Swift_Plugins_Logger{
     /** The logger which is delegated to */
     private $_logger;
 
@@ -23,8 +22,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Plugins_Logger $logger
      */
-    public function __construct(Swift_Plugins_Logger $logger)
-    {
+    public function __construct(Swift_Plugins_Logger $logger) {
         $this->_logger = $logger;
     }
 
@@ -33,16 +31,14 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param string $entry
      */
-    public function add($entry)
-    {
+    public function add($entry) {
         $this->_logger->add($entry);
     }
 
     /**
      * Clear the log contents.
      */
-    public function clear()
-    {
+    public function clear() {
         $this->_logger->clear();
     }
 
@@ -51,8 +47,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @return string
      */
-    public function dump()
-    {
+    public function dump() {
         return $this->_logger->dump();
     }
 
@@ -61,8 +56,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_CommandEvent $evt
      */
-    public function commandSent(Swift_Events_CommandEvent $evt)
-    {
+    public function commandSent(Swift_Events_CommandEvent $evt) {
         $command = $evt->getCommand();
         $this->_logger->add(sprintf('>> %s', $command));
     }
@@ -72,8 +66,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_ResponseEvent $evt
      */
-    public function responseReceived(Swift_Events_ResponseEvent $evt)
-    {
+    public function responseReceived(Swift_Events_ResponseEvent $evt) {
         $response = $evt->getResponse();
         $this->_logger->add(sprintf('<< %s', $response));
     }
@@ -83,8 +76,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_TransportChangeEvent $evt
      */
-    public function beforeTransportStarted(Swift_Events_TransportChangeEvent $evt)
-    {
+    public function beforeTransportStarted(Swift_Events_TransportChangeEvent $evt) {
         $transportName = get_class($evt->getSource());
         $this->_logger->add(sprintf('++ Starting %s', $transportName));
     }
@@ -94,8 +86,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_TransportChangeEvent $evt
      */
-    public function transportStarted(Swift_Events_TransportChangeEvent $evt)
-    {
+    public function transportStarted(Swift_Events_TransportChangeEvent $evt) {
         $transportName = get_class($evt->getSource());
         $this->_logger->add(sprintf('++ %s started', $transportName));
     }
@@ -105,8 +96,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_TransportChangeEvent $evt
      */
-    public function beforeTransportStopped(Swift_Events_TransportChangeEvent $evt)
-    {
+    public function beforeTransportStopped(Swift_Events_TransportChangeEvent $evt) {
         $transportName = get_class($evt->getSource());
         $this->_logger->add(sprintf('++ Stopping %s', $transportName));
     }
@@ -116,8 +106,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_TransportChangeEvent $evt
      */
-    public function transportStopped(Swift_Events_TransportChangeEvent $evt)
-    {
+    public function transportStopped(Swift_Events_TransportChangeEvent $evt) {
         $transportName = get_class($evt->getSource());
         $this->_logger->add(sprintf('++ %s stopped', $transportName));
     }
@@ -127,8 +116,7 @@ class Swift_Plugins_LoggerPlugin implements Swift_Events_CommandListener, Swift_
      *
      * @param Swift_Events_TransportExceptionEvent $evt
      */
-    public function exceptionThrown(Swift_Events_TransportExceptionEvent $evt)
-    {
+    public function exceptionThrown(Swift_Events_TransportExceptionEvent $evt) {
         $e = $evt->getException();
         $message = $e->getMessage();
         $code = $e->getCode();

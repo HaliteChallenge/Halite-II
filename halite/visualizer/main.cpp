@@ -54,10 +54,8 @@ std::fstream debug;
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nCmdShow)
 #else
 int main(int argc, const char ** argv)
-#endif
-{
-	if(argc == 2)
-	{
+#endif{
+	if(argc == 2) {
 		std::string loc(argv[0]);
 		std::replace(loc.begin(), loc.end(), '\\', '/');
 		loc = loc.substr(0, loc.find_last_of('/'));
@@ -71,16 +69,14 @@ int main(int argc, const char ** argv)
 	//Open debug:
 	std::string debugfilename = "logs/debug.log";
 	debug.open(debugfilename, std::ios_base::out);
-	if(!debug.is_open()) //If file couldn't be opened.
-	{
+	if(!debug.is_open()) //If file couldn't be opened.{
 		debug.open("DEBUG.log", std::ios_base::out);
 		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.\n";
 		debug.flush();
 	}
 
 	//start GL context and O/S window using the GLFW helper library
-	if(!glfwInit())
-	{
+	if(!glfwInit()) {
 		debug << "Could not start GLFW3\n";
 		return EXIT_FAILURE;
 	}
@@ -110,12 +106,10 @@ int main(int argc, const char ** argv)
 
 	my_game = new Halite();
 
-	if(argc == 2)
-	{
+	if(argc == 2) {
 		handleDrop(window, 1, (const char **)(argv + 1));
 	}
-	else
-	{
+	else{
 		while(isLaunch && !glfwWindowShouldClose(window)) renderLaunch();
 	}
 
@@ -124,8 +118,7 @@ int main(int argc, const char ** argv)
 	clock_t c = clock();
 
 	disregardFullscreenAttempts = false;
-	while(!glfwWindowShouldClose(window))
-	{
+	while(!glfwWindowShouldClose(window)) {
 		//Limit render rate:
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
 		#ifdef CONSOLE_DEBUG
@@ -143,13 +136,11 @@ int main(int argc, const char ** argv)
 		if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
 		else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
 
-		if(leftPressed)
-		{
+		if(leftPressed) {
 			if(shiftPressed) turnNumber -= 5 * maxFps * delta;
 			else turnNumber -= maxFps * delta;
 		}
-		else if(rightPressed)
-		{
+		else if(rightPressed) {
 			if(shiftPressed) turnNumber += 5 * maxFps * delta;
 			else turnNumber += maxFps * delta;
 		}
@@ -165,8 +156,7 @@ int main(int argc, const char ** argv)
 	return EXIT_SUCCESS;
 }
 
-void setWindowed()
-{
+void setWindowed() {
 	GLFWwindow * w = glfwCreateWindow(windowedWidth, windowedHeight, "Halite", NULL, window);
 	glfwGetWindowSize(w, &windowedWidth, &windowedHeight);
 	if(window != NULL) glfwDestroyWindow(window);
@@ -190,24 +180,21 @@ void setWindowed()
 	//It's now windowed.
 	isWindowed = true;
 	//If necessary, initialize GLEW
-	if(my_game == NULL)
-	{
+	if(my_game == NULL) {
 		glewExperimental = GL_TRUE;
 		if(glewInit() != GLEW_OK) exit(EXIT_FAILURE);
 	}
 	//If possible, fix the Halite's VAOs.
 	if(my_game != NULL) my_game->recreateGL();
 	//Fix text.
-	if(my_game == NULL)
-	{
+	if(my_game == NULL) {
 		util::initText();
 		util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
 	}
 	util::setScreenSize(windowedWidth, windowedHeight);
 }
 
-void setFullscreen()
-{
+void setFullscreen() {
 	if(window != NULL) glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
 	GLFWmonitor * primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
@@ -240,182 +227,144 @@ void setFullscreen()
 	glViewport(0, 0, mode->width, mode->height);
 }
 
-void handleMouse(GLFWwindow * w, int button, int action, int mods)
-{
-	if(button == GLFW_MOUSE_BUTTON_1)
-	{
+void handleMouse(GLFWwindow * w, int button, int action, int mods) {
+	if(button == GLFW_MOUSE_BUTTON_1) {
 		mousePressed = action == GLFW_PRESS;
 	}
 }
 
-void handleCursor(GLFWwindow * w, double x, double y)
-{
+void handleCursor(GLFWwindow * w, double x, double y) {
 	int sx, sy; glfwGetWindowSize(window, &sx, &sy);
 	mouseX = (float(2 * x) / sx) - 1.0;
 	mouseY = (float(-2 * y) / sy) + 1.0;
 }
 
-void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods)
-{
-	if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-	{
+void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods) {
+	if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
 		leftPressed = true;
 		isPaused = true;
 	}
-	else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
 		rightPressed = true;
 		isPaused = true;
 	}
-	else if(key == GLFW_KEY_LEFT && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
 		leftPressed = false;
 	}
-	else if(key == GLFW_KEY_RIGHT && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		rightPressed = false;
 	}
-	else if(key == GLFW_KEY_UP && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		upPressed = true;
 	}
-	else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
 		downPressed = true;
 	}
-	else if(key == GLFW_KEY_UP && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_UP && action == GLFW_RELEASE) {
 		upPressed = false;
 	}
-	else if(key == GLFW_KEY_DOWN && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
 		downPressed = false;
 	}
-	else if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
-	{
+	else if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS) {
 		shiftPressed = true;
 	}
-	else if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_RELEASE)
-	{
+	else if((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_RELEASE) {
 		shiftPressed = false;
 	}
-	else if(key == GLFW_KEY_W && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
 		wPressed = true;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_W && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_W && action == GLFW_RELEASE) {
 		wPressed = false;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_S && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
 		sPressed = true;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_S && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_S && action == GLFW_RELEASE) {
 		sPressed = false;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_A && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_A && action == GLFW_PRESS) {
 		aPressed = true;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_A && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_A && action == GLFW_RELEASE) {
 		aPressed = false;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_D && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_D && action == GLFW_PRESS) {
 		dPressed = true;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_D && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_D && action == GLFW_RELEASE) {
 		dPressed = false;
 		yOffset = int(yOffset);
 		xOffset = int(xOffset);
 	}
-	else if(key == GLFW_KEY_TAB && action == GLFW_PRESS)
-	{
+	else if(key == GLFW_KEY_TAB && action == GLFW_PRESS) {
 		tabPressed = true;
 	}
-	else if(key == GLFW_KEY_TAB && action == GLFW_RELEASE)
-	{
+	else if(key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
 		tabPressed = false;
 	}
-	else if(key == GLFW_KEY_ESCAPE)
-	{
+	else if(key == GLFW_KEY_ESCAPE) {
 		exit(0);
 	}
 }
 
-void handleChars(GLFWwindow * w, unsigned int code)
-{
+void handleChars(GLFWwindow * w, unsigned int code) {
 	if(code == ' ') isPaused = !isPaused;
-	else if(code == '+')
-	{
+	else if(code == '+') {
 		graphZoom *= 1.5;
 		if(graphZoom > maxZoom) graphZoom = maxZoom;
 	}
-	else if(code == '-')
-	{
+	else if(code == '-') {
 		graphZoom /= 1.5;
 		if(graphZoom < 1) graphZoom = 1;
 	}
-	else if(code == '>' || code == '.')
-	{
+	else if(code == '>' || code == '.') {
 		turnNumber++;
 		isPaused = true;
 	}
-	else if(code == '<' || code == ',')
-	{
+	else if(code == '<' || code == ',') {
 		turnNumber--;
 		isPaused = true;
 	}
-	else if(code == 'Z' || code == 'z')
-	{
+	else if(code == 'Z' || code == 'z') {
 		turnNumber = 0;
 	}
-	else if(code == 'X' || code == 'x')
-	{
+	else if(code == 'X' || code == 'x') {
 		turnNumber = numTurns - 1;
 	}
-	else if(code == 'R' || code == 'r')
-	{
-		if(filename != "")
-		{
+	else if(code == 'R' || code == 'r') {
+		if(filename != "") {
 			const char * fn = filename.c_str();
 			handleDrop(window, 1, &fn);
 		}
 	}
-	else if(code == 'F' || code == 'f')
-	{
+	else if(code == 'F' || code == 'f') {
 		if(!disregardFullscreenAttempts) isWindowed ? setFullscreen() : setWindowed();
 	}
-	else if(code == 'O' || code == 'o')
-	{
+	else if(code == 'O' || code == 'o') {
 		xOffset = 0;
 		yOffset = 0;
 	}
 }
 
-void handleDrop(GLFWwindow * w, int count, const char ** paths)
-{
+void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 	unsigned short wi, he;
-	if(my_game->isValid(paths[0]))
-	{
+	if(my_game->isValid(paths[0])) {
 		delete my_game;
 		my_game = new Halite();
 		numTurns = my_game->input(w, paths[0], wi, he);
@@ -432,13 +381,11 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths)
 	turnNumber = 0;
 }
 
-void handleErrors(int error, const char * description)
-{
+void handleErrors(int error, const char * description) {
 	debug << description;
 }
 
-void handleResize(GLFWwindow * w, int width, int height)
-{
+void handleResize(GLFWwindow * w, int width, int height) {
 	glViewport(0, 0, width, height);
 	util::setScreenSize(width, height);
 	windowedWidth = width;
@@ -446,8 +393,7 @@ void handleResize(GLFWwindow * w, int width, int height)
 	util::removeAllFontSizes();
 }
 
-void renderLaunch()
-{
+void renderLaunch() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int height; glfwGetWindowSize(window, NULL, &height);

@@ -16,8 +16,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_OutputByteStream
-{
+interface Swift_OutputByteStream{
     /**
      * Reads $length bytes from the stream into a string and moves the pointer
      * through the stream by $length.

@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-interface Swift_Plugins_Sleeper
-{
+interface Swift_Plugins_Sleeper{
     /**
      * Sleep for $seconds.
      *

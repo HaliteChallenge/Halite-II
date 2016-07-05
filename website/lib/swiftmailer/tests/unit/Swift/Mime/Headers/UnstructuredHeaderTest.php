@@ -1,30 +1,25 @@
 <?php
 
-class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
-{
+class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase{
     private $_charset = 'utf-8';
 
-    public function testTypeIsTextHeader()
-    {
+    public function testTypeIsTextHeader() {
         $header = $this->_getHeader('Subject', $this->_getEncoder('Q', true));
         $this->assertEquals(Swift_Mime_Header::TYPE_TEXT, $header->getFieldType());
     }
 
-    public function testGetNameReturnsNameVerbatim()
-    {
+    public function testGetNameReturnsNameVerbatim() {
         $header = $this->_getHeader('Subject', $this->_getEncoder('Q', true));
         $this->assertEquals('Subject', $header->getFieldName());
     }
 
-    public function testGetValueReturnsValueVerbatim()
-    {
+    public function testGetValueReturnsValueVerbatim() {
         $header = $this->_getHeader('Subject', $this->_getEncoder('Q', true));
         $header->setValue('Test');
         $this->assertEquals('Test', $header->getValue());
     }
 
-    public function testBasicStructureIsKeyValuePair()
-    {
+    public function testBasicStructureIsKeyValuePair() {
         /* -- RFC 2822, 2.2
         Header fields are lines composed of a field name, followed by a colon
         (":"), followed by a field body, and terminated by CRLF.
@@ -34,8 +29,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
         $this->assertEquals('Subject: Test'."\r\n", $header->toString());
     }
 
-    public function testLongHeadersAreFoldedAtWordBoundary()
-    {
+    public function testLongHeadersAreFoldedAtWordBoundary() {
         /* -- RFC 2822, 2.2.3
         Each header field is logically a single line of characters comprising
         the field name, the colon, and the field body.  For convenience
@@ -65,8 +59,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testPrintableAsciiOnlyAppearsInHeaders()
-    {
+    public function testPrintableAsciiOnlyAppearsInHeaders() {
         /* -- RFC 2822, 2.2.
         A field name MUST be composed of printable US-ASCII characters (i.e.,
         characters that have values between 33 and 126, inclusive), except
@@ -83,8 +76,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testEncodedWordsFollowGeneralStructure()
-    {
+    public function testEncodedWordsFollowGeneralStructure() {
         /* -- RFC 2047, 1.
         Generally, an "encoded-word" is a sequence of printable ASCII
         characters that begins with "=?", ends with "?=", and has two "?"s in
@@ -100,8 +92,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testEncodedWordIncludesCharsetAndEncodingMethodAndText()
-    {
+    public function testEncodedWordIncludesCharsetAndEncodingMethodAndText() {
         /* -- RFC 2047, 2.
         An 'encoded-word' is defined by the following ABNF grammar.  The
         notation of RFC 822 is used, with the exception that white space
@@ -126,8 +117,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testEncodedWordsAreUsedToEncodedNonPrintableAscii()
-    {
+    public function testEncodedWordsAreUsedToEncodedNonPrintableAscii() {
         //SPACE and TAB permitted
         $nonPrintableBytes = array_merge(
             range(0x00, 0x08), range(0x10, 0x19), array(0x7F)
@@ -153,8 +143,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testEncodedWordsAreUsedToEncode8BitOctets()
-    {
+    public function testEncodedWordsAreUsedToEncode8BitOctets() {
         $_8BitBytes = range(0x80, 0xFF);
 
         foreach ($_8BitBytes as $byte) {
@@ -177,8 +166,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
         }
     }
 
-    public function testEncodedWordsAreNoMoreThan75CharsPerLine()
-    {
+    public function testEncodedWordsAreNoMoreThan75CharsPerLine() {
         /* -- RFC 2047, 2.
         An 'encoded-word' may not be more than 75 characters long, including
         'charset', 'encoding', 'encoded-text', and delimiters.
@@ -210,8 +198,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testFWSPIsUsedWhenEncoderReturnsMultipleLines()
-    {
+    public function testFWSPIsUsedWhenEncoderReturnsMultipleLines() {
         /* --RFC 2047, 2.
         If it is desirable to encode more text than will fit in an 'encoded-word' of
         75 characters, multiple 'encoded-word's (separated by CRLF SPACE) may
@@ -242,8 +229,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testAdjacentWordsAreEncodedTogether()
-    {
+    public function testAdjacentWordsAreEncodedTogether() {
         /* -- RFC 2047, 5 (1)
      Ordinary ASCII text and 'encoded-word's may appear together in the
      same header field.  However, an 'encoded-word' that appears in a
@@ -286,8 +272,7 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testLanguageInformationAppearsInEncodedWords()
-    {
+    public function testLanguageInformationAppearsInEncodedWords() {
         /* -- RFC 2231, 5.
         5.  Language specification in Encoded Words
 
@@ -321,30 +306,26 @@ class Swift_Mime_Headers_UnstructuredHeaderTest extends \SwiftMailerTestCase
             );
     }
 
-    public function testSetBodyModel()
-    {
+    public function testSetBodyModel() {
         $header = $this->_getHeader('Subject', $this->_getEncoder('Q', true));
         $header->setFieldBodyModel('test');
         $this->assertEquals('test', $header->getValue());
     }
 
-    public function testGetBodyModel()
-    {
+    public function testGetBodyModel() {
         $header = $this->_getHeader('Subject', $this->_getEncoder('Q', true));
         $header->setValue('test');
         $this->assertEquals('test', $header->getFieldBodyModel());
     }
 
-    private function _getHeader($name, $encoder)
-    {
+    private function _getHeader($name, $encoder) {
         $header = new Swift_Mime_Headers_UnstructuredHeader($name, $encoder, new Swift_Mime_Grammar());
         $header->setCharset($this->_charset);
 
         return $header;
     }
 
-    private function _getEncoder($type, $stub = false)
-    {
+    private function _getEncoder($type, $stub = false) {
         $encoder = $this->getMockery('Swift_Mime_HeaderEncoder')->shouldIgnoreMissing();
         $encoder->shouldReceive('getName')
                 ->zeroOrMoreTimes()

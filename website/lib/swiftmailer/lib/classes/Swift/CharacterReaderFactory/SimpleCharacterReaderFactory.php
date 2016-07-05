@@ -13,8 +13,7 @@
  *
  * @author Chris Corbyn
  */
-class Swift_CharacterReaderFactory_SimpleCharacterReaderFactory implements Swift_CharacterReaderFactory
-{
+class Swift_CharacterReaderFactory_SimpleCharacterReaderFactory implements Swift_CharacterReaderFactory{
     /**
      * A map of charset patterns to their implementation classes.
      *
@@ -32,18 +31,15 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactory implements Swift
     /**
      * Creates a new CharacterReaderFactory.
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->init();
     }
 
-    public function __wakeup()
-    {
+    public function __wakeup() {
         $this->init();
     }
 
-    public function init()
-    {
+    public function init() {
         if (count(self::$_map) > 0) {
             return;
         }
@@ -101,8 +97,7 @@ class Swift_CharacterReaderFactory_SimpleCharacterReaderFactory implements Swift
      *
      * @return Swift_CharacterReader
      */
-    public function getReaderFor($charset)
-    {
+    public function getReaderFor($charset) {
         $charset = trim(strtolower($charset));
         foreach (self::$_map as $pattern => $spec) {
             $re = '/^'.$pattern.'$/D';

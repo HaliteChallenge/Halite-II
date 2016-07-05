@@ -11,8 +11,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<title>Halite Visualizer</title> 
 		<style> 
-			body
-			{
+			body{
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
@@ -24,14 +23,12 @@
 		<div id="info"></div> 
 		<script id="border-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
-			void main()
-			{
+			void main() {
 				gl_Position = vec4(vp, 0.0, 1.0);
 			}
 		</script> 
 		<script id="border-fragment" type="x-shader/fragment"> 
-			void main()
-			{
+			void main() {
 				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); //Red for border debugging
 			}
 		</script>
@@ -39,29 +36,25 @@
 			attribute vec2 vp;
 			attribute vec3 vc;
 			varying vec3 color;
-			void main ()
-			{
+			void main () {
 				gl_Position = vec4 (vp, 0.0, 1.0);
 				color = vc;
 			}
 		</script> 
 		<script id="graph-fragment" type="x-shader/fragment"> 
 			varying vec3 color;
-			void main()
-			{
+			void main() {
 				gl_FragColor = vec4(color, 1.0);
 			}
 		</script>
 		<script id="loading-vertex" type="x-shader/vertex"> 
 			attribute vec2 vp;
-			void main()
-			{
+			void main() {
 				gl_Position = vec4(vp, 0.0, 1.0);
 			}
 		</script> 
 		<script id="loading-fragment" type="x-shader/fragment"> 
-			void main()
-			{
+			void main() {
 				gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); //Green for loading debugging
 			}
 		</script>
@@ -69,16 +62,14 @@
 			attribute vec2 vp;
 			attribute vec3 vc;
 			varying vec3 color;
-			void main()
-			{
+			void main() {
 				gl_Position = vec4(vp, 0.0, 1.0);
 				color = vc;
 			}
 		</script> 
 		<script id="map-fragment" type="x-shader/fragment"> 
 			varying vec3 color;
-			void main()
-			{
+			void main() {
 				gl_FragColor = vec4(color, 1.0);
 			}
 		</script>
@@ -86,16 +77,14 @@
 			attribute vec2 vp;
 			attribute vec3 vc;
 			varying vec3 color;
-			void main()
-			{
+			void main() {
 				gl_Position = vec4(vp, 0.0, 1.0);
 				color = vc;
 			}
 		</script> 
 		<script id="text-fragment" type="x-shader/fragment"> 
 			varying vec3 color;
-			void main()
-			{
+			void main() {
 				gl_FragColor = vec4(color, 1.0);
 			}
 		</script>
@@ -112,8 +101,7 @@
 			//buffer,
 			map_x_offset, map_y_offset, map_width, map_height;
 			
-			function onWindowResize(event)
-			{
+			function onWindowResize(event) {
 				canvas.width = window.innerWidth;
 				canvas.height = window.innerHeight;
 				gl.viewport(0, 0, canvas.width, canvas.height);
@@ -128,13 +116,11 @@
 				        };
 			})();
 		
-			function run()
-			{
+			function run() {
 				requestAnimationFrame(run)
 				render()
 			}
-			function render(turnNumber, zoom, mouseX, mouseY, mouseClick, xOffset, yOffset)
-			{
+			function render(turnNumber, zoom, mouseX, mouseY, mouseClick, xOffset, yOffset) {
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 				if(turnNumber < 0 || turnNumber >= full_game.length) return; //This also causes it to return if full_game.length == 0.
@@ -145,10 +131,8 @@
 				var col = [];
 				var str [];
 
-				for(var a = 0; a < map_height; a++)
-				{
-					for(var b = 0; b < map_width; b++)
-					{
+				for(var a = 0; a < map_height; a++) {
+					for(var b = 0; b < map_width; b++) {
 						Color c = color_codes[m.contents[a][b].owner];
 						col.push(c.r); col.push(c.g); col.push(c.b);
 						str.push(b->strength);
@@ -168,12 +152,10 @@
 			}
 
 			/* Rendering Setup Functions */
-			loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors)
-			{
+			loadHLTFile("example.hlt", function(fullGame, defenseBonus, playerNames, playerScores, playerColors) {
 				//Do initialization:
 				canvas = document.querySelector('canvas')
-				try
-				{
+				try{
 					gl = canvas.getContext('experimental-webgl')
 				}
 				catch(error) {}
@@ -200,8 +182,7 @@
 
 
 			/* GL Setup Functions */
-			function setupGL()
-			{
+			function setupGL() {
 				createPrograms();
 				setupBorders();
 				setupMapGL();
@@ -209,8 +190,7 @@
 				setupGraphGL();
 				setupGraphRendering(1, 0);
 			}
-			function setupBorders()
-			{
+			function setupBorders() {
 				gl.deleteBuffer(border_vertex_buffer);
 				gl.deleteProgram(border_shader_program);
 				gl.deleteShader(border_vertex_shader);
@@ -219,20 +199,16 @@
 				border_vertex_buffer = gl.createBuffer();
 
 			}
-			function setupMapGL()
-			{
+			function setupMapGL() {
 
 			}
-			function setupGraphGL()
-			{
+			function setupGraphGL() {
 
 			}
-			function setupGraphRendering()
-			{
+			function setupGraphRendering() {
 
 			}
-			function createBorderProgram()
-			{
+			function createBorderProgram() {
 				//Ensure that shader program does not exist:
 				gl.deleteProgram(border_shader_program)
 				//Create shader program:
@@ -242,8 +218,7 @@
 				//Get attribute locations:
 				border_vp_location = gl.getAttribLocation(border_shader_program, 'vp')
 			}
-			function createGraphProgram()
-			{
+			function createGraphProgram() {
 				//Ensure that shader program does not exist:
 				gl.deleteProgram(graph_shader_program)
 				//Create shader program:
@@ -254,8 +229,7 @@
 				graph_vp_location = gl.getAttribLocation(graph_shader_program, 'vp')
 				graph_vc_location = gl.getAttribLocation(graph_shader_program, 'vc')
 			}
-			function createLoadingProgram()
-			{
+			function createLoadingProgram() {
 				//Ensure that shader program does not exist:
 				gl.deleteProgram(loading_shader_program)
 				//Create shader program:
@@ -265,8 +239,7 @@
 				//Get attribute locations:
 				loading_vp_location = gl.getAttribLocation(loading_shader_program, 'vp')
 			}
-			function createMapProgram()
-			{
+			function createMapProgram() {
 				//Ensure that shader program does not exist:
 				gl.deleteProgram(map_shader_program)
 				//Create shader program:
@@ -277,8 +250,7 @@
 				map_vp_location = gl.getAttribLocation(map_shader_program, 'vp')
 				map_vc_location = gl.getAttribLocation(map_shader_program, 'vc')
 			}
-			function createTextProgram()
-			{
+			function createTextProgram() {
 				//Ensure that shader program does not exist:
 				gl.deleteProgram(text_shader_program)
 				//Create shader program:
@@ -291,8 +263,7 @@
 			}
 			
 			/* GL Convienence Functions */
-			function createProgram(vertex, fragment)
-			{
+			function createProgram(vertex, fragment) {
 				var program = gl.createProgram()
 				var vs = createShader(vertex, gl.VERTEX_SHADER)
 				var fs = createShader('#ifdef GL_ES\nprecision highp float;\n#endif\n\n' + fragment, gl.FRAGMENT_SHADER)
@@ -302,8 +273,7 @@
 				gl.linkProgram(program)
 				gl.deleteShader(vs);
 				gl.deleteShader(fs)
-				if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-				{
+				if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
 					alert("ERROR:\n" +
 					"VALIDATE_STATUS: " + gl.getProgramParameter(program, gl.VALIDATE_STATUS) + "\n" +
 					"ERROR: " + gl.getError() + "\n\n" +
@@ -313,13 +283,11 @@
 				}
 				return program;
 			}
-			function createShader(src, type)
-			{
+			function createShader(src, type) {
 				var shader = gl.createShader(type)
 				gl.shaderSource(shader, src)
 				gl.compileShader(shader)
-				if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-				{
+				if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 					alert((type == gl.VERTEX_SHADER ? "VERTEX" : "FRAGMENT") + " SHADER:\n" + gl.getShaderInfoLog(shader))
 					return null
 				}
