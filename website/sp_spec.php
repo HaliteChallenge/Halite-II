@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 
-				<h3>Overview:</h3>
+				<h3>Starter Package Overview:</h3>
 
 				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline.<br>Although the api is fairly straightforward, to aid in the creation of bots we provide boilerplate code for some common languages (presently C++, Java, and Python 3).<br>Due to language differences, the syntax is not identical in each of these languages, but the overall function names and meanings are the same.</p>
 
