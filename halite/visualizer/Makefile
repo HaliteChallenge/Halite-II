@@ -2,7 +2,7 @@ CXXFLAGS += -g -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/us
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=visualizer
-LDFLAGS= -lGLEW `pkg-config --static --libs glfw3` -lglfw3 -L/usr/X11/lib -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -lpthread -lfreetype
+LDFLAGS= -lGLEW `pkg-config --static --libs glfw3` -lpthread -lfreetype
 
 .PHONY: alls
 all: $(TARGET)

@@ -37,7 +37,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 				permissibleTime[a] = true;
 			}
 			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
-			else{
+			else {
 				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
 				networking.killPlayer(a + 1);
@@ -69,7 +69,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 				if(short(pieces[a][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->loc, STILL).strength;
 				else pieces[a][newLoc] = 255;
 			}
-			else{
+			else {
 				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
 			}
 
@@ -97,7 +97,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 				if(short(pieces[s.owner - 1][l]) + s.strength <= 255) pieces[s.owner - 1][l] += s.strength;
 				else pieces[s.owner - 1][l] = 255;
 			}
-			else{
+			else {
 				pieces[s.owner - 1].insert(std::pair<hlt::Location, unsigned char>(l, s.strength));
 			}
 			//Add to full production

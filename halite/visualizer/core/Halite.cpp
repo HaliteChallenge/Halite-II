@@ -294,7 +294,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 			graph_turn_min = 0;
 			graph_turn_max = graph_frame_number - 1;
 		}
-		else{
+		else {
 			//Use shift:
 			graph_turn_min = 0;
 			graph_turn_max = turnNumber + turnsOnEachSide + rightShift;
@@ -307,7 +307,7 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 			graph_turn_min = 0;
 			graph_turn_max = graph_frame_number - 1;
 		}
-		else{
+		else {
 			//Use shift:
 			graph_turn_min = turnNumber - turnsOnEachSide - leftShift;
 			graph_turn_max = graph_frame_number - 1;
@@ -709,7 +709,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 			glBindVertexArray(production_vertex_attributes);
 			glDrawArrays(GL_POINTS, 0, (unsigned int)map_width * map_height);
 		}
-		else{
+		else {
 			glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 			glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 

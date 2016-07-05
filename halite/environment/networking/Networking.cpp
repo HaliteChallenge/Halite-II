@@ -43,7 +43,7 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 			if (map.contents[a][b].owner == currentOwner) {
 				counter++;
 			}
-			else{
+			else {
 				oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
 				counter = 1;
 				currentOwner = map.contents[a][b].owner;

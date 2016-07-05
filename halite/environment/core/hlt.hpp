@@ -27,7 +27,7 @@ namespace hlt{
 		return l1.x == l2.x && l1.y == l2.y;
 	}
 
-	struct Site{
+	struct Site {
 		unsigned char owner;
 		unsigned char strength;
 		unsigned char production;
@@ -161,7 +161,7 @@ namespace hlt{
 		}
 	};
 
-	struct Move{
+	struct Move {
 		Location loc; unsigned char dir;
 	};
 	static bool operator<(const Move& m1, const Move& m2) {

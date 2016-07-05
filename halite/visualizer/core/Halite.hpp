@@ -14,7 +14,7 @@
 #include "hlt.hpp"
 #include "../rendering/OpenGL.hpp"
 
-class Halite{
+class Halite {
 private:
   std::vector< std::pair<std::string, float> > player_names; //float represents rendering position
   std::vector< std::vector<bool> > players_alive;
