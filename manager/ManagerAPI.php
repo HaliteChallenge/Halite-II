@@ -182,10 +182,10 @@ class ManagerAPI extends API{
 			$allUsers = $this->selectMultiple("SELECT * FROM User");
 			$allUserExtras = $this->selectMultiple("SELECT * FROM UserExtraStats");
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->allianceAverage}, {$users[$a]->turnTimeAverage})");
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage})");
 
 				// Cache raw game stats
-				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, allianceAverage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
 				$totalGameStats = array();
 				foreach($gameStats as $oneGameStats) {
 					foreach($oneGameStats as $statName => $statValue) {
@@ -201,7 +201,7 @@ class ManagerAPI extends API{
 				}
 
 				// Game game stat rankings
-				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "allianceAverage" => "allianceRanking", "turnTimeAverage" => "turnTimeRanking");
+				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "turnTimeAverage" => "turnTimeRanking");
 				foreach($statToRankedStat as $statName => $rankedStatName) {
 					usort($allUserExtras, function($a, $b) use ($statName) {
 						return $a[$statName] < $b[$statName];
