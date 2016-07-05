@@ -16,11 +16,12 @@
 				<h1>Basic Tutorial</h1>
 
 				<h3>Prerequisites</h3>
-				<p></p>
+				<p>It is highly reccommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a>.</p>
 
-				<h3>Run a Game</h3>
+				<h3>Download the Tools</h3>
 				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the game environment, which runs games and outputs replay files, and the desktop visualizer, which visualizes the environment's replay files. These are located <a href="downloads.php">here</a>.</p>
 
+				<h3>Running a Game</h3>
 				<p>Once those are downloaded, unzip you starter package. If you are using a compiled language, please compile the <code>MyBot</code> file of the starter package. We are going to run a game between three instances of the provided starter bot, which simply moves all of its peices randomly. To do this, run the environment binary. It should promt you for the game's dimensions (40 by 40 is perfectly resonable) and the command to start your bot. Examples of these commands include:
 					<ul>
 						<li>Java - <code>cd PATH_TO_BOT; java MyBot</code></li>
