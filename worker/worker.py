@@ -112,8 +112,7 @@ def runGame(width, height, users, backend):
 		users[playerTag-1]["strengthAverage"] = float(components[3])
 		users[playerTag-1]["productionAverage"] = float(components[4])
 		users[playerTag-1]["stillPercentage"] = float(components[5])
-		users[playerTag-1]["allianceAverage"] = float(components[6])
-		users[playerTag-1]["turnTimeAverage"] = float(components[7])
+		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
 	# Update trueskill mu and sigma values
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]

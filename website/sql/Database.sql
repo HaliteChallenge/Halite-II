@@ -84,13 +84,11 @@ CREATE TABLE `UserExtraStats` (
   `strengthAverage` FLOAT(8, 5) NOT NULL,
   `productionAverage` FLOAT(8, 5) NOT NULL,
   `stillPercentage` FLOAT(8, 5) NOT NULL,
-  `allianceAverage` FLOAT(8, 5) NOT NULL,
   `turnTimeAverage` FLOAT(8, 5) NOT NULL,
   `territoryRanking` smallint(5) NOT NULL,
   `strengthRanking` smallint(5) NOT NULL,
   `productionRanking` smallint(5) NOT NULL,
   `stillRanking` smallint(5) NOT NULL,
-  `allianceRanking` smallint(5) NOT NULL,
   `turnTimeRanking` smallint(5) NOT NULL,
   PRIMARY KEY (`userID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

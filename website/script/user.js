@@ -75,7 +75,6 @@ $(function() {
 			"strengthRanking": {name: "Strength", mouseOverText: "", percentile: true},
 			"productionRanking": {name: "Production", mouseOverText: "", percentile: true},
 			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
-			"allianceRanking": {name: "Alliance Frequency", mouseOverText: "The number of turns you are in an alliance multiplied by the number of aliances you are in divided by the number of people in the game", percentile: true},
 			"turnTimeRanking": {name: "Time per Turn (ms)", mouseOverText: "", percentile: true}
 		};
 		var stats = [];
