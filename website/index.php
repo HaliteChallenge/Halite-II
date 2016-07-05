@@ -19,7 +19,7 @@
 		<div class="pageContent">
 			<div class="jumbotron" id="jumbotron">
 				<h1 id="jHeader">Halite</h1>
-				<p id="jParagraph">A multi-player turn-based strategy game</p>
+				<p id="jParagraph">A Two Sigma programming competition</p>
 				<p>
 					<a href="quickstart.php" class="btn btn-info jumbotron-btn" role="button">Quickstart</a>
 					<a href="tutorial.php" class="btn btn-info jumbotron-btn" role="button">Tutorial</a>
