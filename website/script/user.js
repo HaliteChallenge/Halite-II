@@ -98,9 +98,9 @@ $(function() {
 	$.extend(user, extraStats);
 	var numUsers = getNumActiveUsers();
 
-	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
+	$(document).prop('title', user.username);
 
-	console.log(statsFromUser(user, numUsers))
+	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
 	statTable.init(statsFromUser(user, numUsers));
 	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
