@@ -23,5 +23,5 @@ sudo make install
 echo "Done installing the visualizer's dependencies"
 
 cd ../..
-rm -r glfw
-rm glfw-3.2.zip
+sudo rm -r glfw
+sudo rm glfw-3.2.zip

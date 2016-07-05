@@ -30,6 +30,8 @@
 				The environment should then execute your game, outputting the turn number intermittently and finishing with a ranking of each of the instances of your bot.
 				</p>
 
+				<p>To visualize the game that you just ran, run the visualizer binary and drop the game's replay file, ending with <code>hlt</code> and located in the directory of you environment binary.</p>
+
 				<h3>Basic Bot</h3>
 				<p></p>
 
