@@ -1,4 +1,4 @@
-#version 150
+#version 330
 layout(location = 0) in vec2 vp;
 layout(location = 1) in vec3 vertexColor;
 layout(location = 2) in uint vertexStrength;
