@@ -116,6 +116,7 @@ def runGame(width, height, users, backend):
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
 	# Update trueskill mu and sigma values
+	users.sort(key=lambda user: user["rank"])
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
 	newRatings = trueskill.rate(teams)
 	for a in range(len(newRatings)):
