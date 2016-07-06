@@ -308,3 +308,6 @@ worker/environment
 git_pull.php
 
 *.zip
+!Debian.zip
+!Windows.zip
+!Mac.zip

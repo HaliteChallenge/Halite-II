@@ -17,16 +17,16 @@
 
 				<h3>Environment and Visualizer</h3>
 				<ul>
-					<li><a href="downloads/MacOSX.zip">Mac</a></li>
-					<li><a href="downloads/Debian.zip">Debian-based Linux</a></li>
+					<li><a href="downloads/Mac.zip">Mac</a></li>
+					<li><a href="downloads/Debian.zip">Ubuntu (64 bit)</a></li>
 					<li><a href="downloads/Windows.zip">Windows</a></li>
 				</ul>
 
 				<h3>Language Packages</h3>
 				<ul>
-					<li><a href="downloads/StarterPackages.zip">Python 3</a></li>
-					<li><a href="downloads/StarterPackages.zip">Java 6+</a></li>
-					<li><a href="downloads/StarterPackages.zip">C++ 11</a></li>
+					<li><a href="downloads/Python.zip">Python 3</a></li>
+					<li><a href="downloads/Java.zip">Java 6+</a></li>
+					<li><a href="downloads/C++.zip">C++ 11</a></li>
 				</ul>
 			</div>
 		</div>
