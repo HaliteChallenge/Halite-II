@@ -4,6 +4,8 @@ from networking import *
 playerTag, gameMap = getInit()
 sendInit("BasicBot"+str(playerTag))
 
+turtleFactor = random.randint(1, 20)
+
 while True:
 	moves = []
 	gameMap = getFrame()
@@ -13,7 +15,7 @@ while True:
 			site = gameMap.contents[y][x]
 			if site.owner == playerTag:
 				direction = random.randint(0, 5)
-				if site.strength < 5*site.production:
+				if site.strength < turtleFactor*site.production:
 					direction = STILL
 				else:
 					for d in CARDINALS:

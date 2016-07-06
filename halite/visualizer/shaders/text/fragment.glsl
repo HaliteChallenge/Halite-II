@@ -1,4 +1,4 @@
-#version 400
+#version 150
 uniform sampler2D textureSampler;
 uniform vec3 color;
 in vec2 UV;
