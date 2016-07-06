@@ -199,7 +199,7 @@ class WebsiteAPI extends API{
 			}
 			$this->insert("DELETE FROM GameUser WHERE userID=$userID");
 
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
+			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
 			return "Success";
 		}
