@@ -20,7 +20,7 @@
 
 				<h4>Initialization Input - getInit</h4>
 
-				<p>This function reads in the initial game state for the bot. Internally, it also receives and decodes the production map and game size and stores a local copy, but it only returns the player tag and game map (which itself contains the production map).</p>			
+				<p>This function reads in the initial game state for the bot. Internally, it also receives and decodes the production map and game size and stores a local copy, but it only returns the player tag and game map (which itself contains the production map).</p>
 
 				<h4>Initialization Output - sendInit</h4>
 
@@ -37,16 +37,6 @@
 			</div>
 		</div>
 	</div>
-
-	<footer class="footer pageContent">
-		<div class="container">
-			<div id="footer">
-				<ul class="pager">
-					<li class="previous"><a href="contest_rules.php"><span aria-hidden="true">&larr;</span> Game Rules</a></li>
-				</ul>
-			</div>
-		</div>
-	</footer>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
