@@ -170,7 +170,7 @@ class WebsiteAPI extends API{
 					unset($gameUserRow['gameID']);
 
 					// Add in user info
-					$userInfo = $this->select("SELECT * FROM User WHERE userID = {$gameUserRow['userID']}");
+					$userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
 					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
 				}
 				array_push($gameArrays, $gameArray);
