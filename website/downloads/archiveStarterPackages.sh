@@ -1,3 +1,5 @@
+rm Python.zip Java.zip C++.zip
+
 cd ../../airesources/
 
 cd Python
