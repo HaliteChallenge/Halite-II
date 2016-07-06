@@ -2,18 +2,14 @@ rm Python.zip Java.zip C++.zip
 
 cd ../../airesources/
 
-cd Python
-zip Python.zip ./*
+rm __pycache__
+zip -r Python.zip Python
 
-cd ../C++
-zip C++.zip ./*
+zip -r C++.zip C++
 
-cd ../Java
-zip Java.zip ./*
+zip -r Java.zip Java
 
-cd ..
-
-mv Java/Java.zip ../website/downloads
-mv Python/Python.zip ../website/downloads
-mv C++/C++.zip ../website/downloads
+mv Java.zip ../website/downloads
+mv Python.zip ../website/downloads
+mv C++.zip ../website/downloads
 
