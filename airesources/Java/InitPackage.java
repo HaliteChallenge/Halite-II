@@ -1,5 +1,5 @@
 
 public class InitPackage{
-    public short playerTag;
-    public Map map;
+  public short playerTag;
+  public Map map;
 }

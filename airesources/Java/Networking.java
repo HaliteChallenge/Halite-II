@@ -6,118 +6,118 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class Networking{
-    public static final int SIZE_OF_INTEGER_PREFIX = 4;
-    public static final int CHAR_SIZE = 1;
-    private static short _width, _height;
-    private static ArrayList< ArrayList<Short> > _productions;
+  public static final int SIZE_OF_INTEGER_PREFIX = 4;
+  public static final int CHAR_SIZE = 1;
+  private static short _width, _height;
+  private static ArrayList< ArrayList<Short> > _productions;
 
-    static void deserializeMapSize(String inputString) {
-        String[] inputStringComponents = inputString.split(" ");
+  static void deserializeMapSize(String inputString) {
+    String[] inputStringComponents = inputString.split(" ");
 
-        _width = Short.parseShort(inputStringComponents[0]);
-        _height = Short.parseShort(inputStringComponents[1]);
+    _width = Short.parseShort(inputStringComponents[0]);
+    _height = Short.parseShort(inputStringComponents[1]);
+  }
+
+
+  static void deserializeProductions(String inputString) {
+    String[] inputStringComponents = inputString.split(" ");
+
+    short index = 0;
+    _productions = new ArrayList< ArrayList<Short> >();
+    for(int a = 0; a < _height; a++) {
+      ArrayList<Short> row = new ArrayList<Short>();
+      for(int b = 0; b < _width; b++) {
+        row.add(Short.parseShort(inputStringComponents[index]));
+        index++;
+      }
+      _productions.add(row);
     }
+  }
 
+  static String serializeMoveList(ArrayList<Move> moves) {
+    String returnString = "";
+    for(Move move : moves) returnString += move.loc.x + " " + move.loc.y + " " + (short)move.dir + " ";
+    return returnString;
+  }
 
-    static void deserializeProductions(String inputString) {
-        String[] inputStringComponents = inputString.split(" ");
+  static Map deserializeMap(String inputString) {
+    String[] inputStringComponents = inputString.split(" ");
 
-        short index = 0;
-        _productions = new ArrayList< ArrayList<Short> >();
-        for(int a = 0; a < _height; a++) {
-            ArrayList<Short> row = new ArrayList<Short>();
-            for(int b = 0; b < _width; b++) {
-                row.add(Short.parseShort(inputStringComponents[index]));
-                index++;
-            }
-            _productions.add(row);
+    Map map = new Map(_width, _height);
+
+    // Run-length encode of owners
+    short y = 0, x = 0;
+    short counter = 0, owner = 0;
+    short currentIndex = 0;
+    while(y != map.map_height) {
+      counter = Short.parseShort(inputStringComponents[currentIndex]);
+      owner = Short.parseShort(inputStringComponents[currentIndex + 1]);
+      currentIndex += 2;
+      for(int a = 0; a < counter; ++a) {
+        map.contents.get(y).get(x).owner = owner;
+        ++x;
+        if(x == map.map_width) {
+          x = 0;
+          ++y;
         }
+      }
     }
 
-    static String serializeMoveList(ArrayList<Move> moves) {
-        String returnString = "";
-        for(Move move : moves) returnString += move.loc.x + " " + move.loc.y + " " + (short)move.dir + " ";
-        return returnString;
+    for (int a = 0; a < map.contents.size(); ++a) {
+      for (int b = 0; b < map.contents.get(a).size(); ++b) {
+        short strengthShort = Short.parseShort(inputStringComponents[currentIndex]);
+        currentIndex++;
+        map.contents.get(a).get(b).strength = strengthShort;
+        map.contents.get(a).get(b).production = _productions.get(a).get(b);
+      }
     }
 
-    static Map deserializeMap(String inputString) {
-        String[] inputStringComponents = inputString.split(" ");
+    return map;
+  }
 
-        Map map = new Map(_width, _height);
+  static void sendString(String sendString) {
+    System.out.print(sendString+'\n');
+    System.out.flush();
+  }
 
-        // Run-length encode of owners
-        short y = 0, x = 0;
-        short counter = 0, owner = 0;
-        short currentIndex = 0;
-        while(y != map.map_height) {
-            counter = Short.parseShort(inputStringComponents[currentIndex]);
-            owner = Short.parseShort(inputStringComponents[currentIndex + 1]);
-            currentIndex += 2;
-            for(int a = 0; a < counter; ++a) {
-                map.contents.get(y).get(x).owner = owner;
-                ++x;
-                if(x == map.map_width) {
-                    x = 0;
-                    ++y;
-                }
-            }
+  static String getString() {
+    try {
+      StringBuilder builder = new StringBuilder();
+      int buffer;
+      while ((buffer = System.in.read()) >= 0) {
+        if (buffer == '\n') {
+          break;
+        } else {
+          builder = builder.append((char)buffer);
         }
-
-        for (int a = 0; a < map.contents.size(); ++a) {
-            for (int b = 0; b < map.contents.get(a).size(); ++b) {
-                short strengthShort = Short.parseShort(inputStringComponents[currentIndex]);
-                currentIndex++;
-                map.contents.get(a).get(b).strength = strengthShort;
-                map.contents.get(a).get(b).production = _productions.get(a).get(b);
-            }
-        }
-
-        return map;
+      }
+      return builder.toString();
+    } catch(Exception e) {
+      System.exit(1);
+      return null; // the java compiler is stupid
     }
+  }
 
-    static void sendString(String sendString) {
-        System.out.print(sendString+'\n');
-        System.out.flush();
-    }
+  static InitPackage getInit() {
+    InitPackage initPackage = new InitPackage();
+    initPackage.playerTag = (short)Long.parseLong(getString());
+    deserializeMapSize(getString());
+    deserializeProductions(getString());
+    initPackage.map = deserializeMap(getString());
 
-    static String getString() {
-        try {
-            StringBuilder builder = new StringBuilder();
-            int buffer;
-            while ((buffer = System.in.read()) >= 0) {
-                if (buffer == '\n') {
-                    break;
-                } else {
-                    builder = builder.append((char)buffer);
-                }
-            }
-            return builder.toString();
-        } catch(Exception e) {
-            System.exit(1);
-            return null; // the java compiler is stupid
-        }
-    }
+    return initPackage;
+  }
 
-    static InitPackage getInit() {
-        InitPackage initPackage = new InitPackage();
-        initPackage.playerTag = (short)Long.parseLong(getString());
-        deserializeMapSize(getString());
-        deserializeProductions(getString());
-        initPackage.map = deserializeMap(getString());
+  static void sendInit(String name) {
+    sendString(name);
+  }
 
-        return initPackage;
-    }
+  static Map getFrame() {
+    return deserializeMap(getString());
+  }
 
-    static void sendInit(String name) {
-        sendString(name);
-    }
-
-    static Map getFrame() {
-        return deserializeMap(getString());
-    }
-
-    static void sendFrame(ArrayList<Move> moves) {
-        sendString(serializeMoveList(moves));
-    }
+  static void sendFrame(ArrayList<Move> moves) {
+    sendString(serializeMoveList(moves));
+  }
 
 }

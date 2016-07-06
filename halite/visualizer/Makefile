@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 CXXFLAGS += -g -DGLEW_STATIC -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/usr/include/freetype2 -std=c++11 `pkg-config --cflags glfw3`
+=======
+CXXFLAGS += -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/usr/include/freetype2 -std=c++11 `pkg-config --cflags glfw3`
+>>>>>>> 53ffe42cf718cfedaa3ec329b0688c093513683c
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=visualizer

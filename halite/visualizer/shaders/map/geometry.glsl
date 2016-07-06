@@ -1,4 +1,4 @@
-#version 400
+#version 330
 uniform float width;
 uniform float height;
 layout(points) in;

@@ -25,6 +25,7 @@
 					<a href="tutorial.php" class="btn btn-info jumbotron-btn" role="button">Tutorial</a>
 					<a href="contest_rules.php" class="btn btn-info jumbotron-btn" role="button">Game Rules</a>
 					<a href="downloads.php" class="btn btn-primary jumbotron-btn" role="button">Downloads</a>
+					<a href="http://forums.halite.io" class="btn btn-primary jumbotron-btn" role="button">Forums</a>
 				</p>
 			</div>
 			<div class="row">
