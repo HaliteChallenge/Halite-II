@@ -17,7 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<ul>
-					<li><a href="downloads/MacOSX.zip">Mac</a></li>
+					<li><a href="downloads/Mac.zip">Mac</a></li>
 					<li><a href="downloads/Debian.zip">Debian-based Linux</a></li>
 					<li><a href="downloads/Windows.zip">Windows</a></li>
 				</ul>
