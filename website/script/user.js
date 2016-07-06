@@ -74,6 +74,7 @@ $(function() {
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: ""},
 			"numGames": {name: "Number of Games Played", mouseOverText: ""},
 			"language": {name: "Language", mouseOverText: ""},
+			"territoryRanking": {name: "Territory", mouseOverText: "", percentile: true},
 			"strengthRanking": {name: "Strength", mouseOverText: "", percentile: true},
 			"productionRanking": {name: "Production", mouseOverText: "", percentile: true},
 			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
