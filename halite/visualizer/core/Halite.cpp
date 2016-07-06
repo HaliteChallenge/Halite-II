@@ -577,6 +577,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	unsigned char numPieces, presentOwner, strength;
 	const int totalTiles = m.map_height*m.map_width;
 	bool shouldLeave = false;
+	const int NUM_RENDER = 30;
+	int lastRender = 0;
 	for(short a = 0; a < numLines; a++) {
 		short x = 0, y = 0;
 		int tilesSoFar = 0;
@@ -606,23 +608,28 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 		for(int b = 0; b < number_of_players; b++) players_alive[a][b] = m.isAlive(b);
 
-		//Render the loading bar:
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
-		glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
-		glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
 
-		//glUseProgram(p);
-		glBindVertexArray(loadingAttributes);
-		glEnableVertexAttribArray(0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDrawArrays(GL_LINE_LOOP, 2, 4);
+		if(a - lastRender > float(numLines) / NUM_RENDER) {
+			lastRender = a;
 
-		util::renderText(LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, { 1, 1, 1 },  loadingText);
+			//Render the loading bar:
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glfwPollEvents();
-		glfwSwapBuffers(window);
+			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
+			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
+
+			//glUseProgram(p);
+			glBindVertexArray(loadingAttributes);
+			glEnableVertexAttribArray(0);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glDrawArrays(GL_LINE_LOOP, 2, 4);
+
+			util::renderText(LOADING_LEFT, LOADING_TOP + TEXT_OFFSET, TEXT_SIZE, { 1, 1, 1 },  loadingText);
+
+			glfwPollEvents();
+			glfwSwapBuffers(window);
+		}	
 	}
 
 	//Cleanup
