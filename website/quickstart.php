@@ -15,6 +15,11 @@
 			<div class="col-sm-12">
 				<h1>Quickstart</h1>
 
+				<iframe width="420" height="315" src="http://www.youtube.com/embed/2_N6ZcOioQI?autoplay=1"></iframe>
+
+				<iframe width="420" height="315"
+				src="http://www.youtube.com/embed/0dlrkXPPTdA?autoplay=1"></iframe>
+
 				<h3>Register</h3>
 				<p>Sign up for Halite with a Two Sigma email. Click on the link in the verification email that we sent you. Now log in to your account.</p>
 
