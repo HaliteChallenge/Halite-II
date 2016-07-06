@@ -1,8 +1,8 @@
-CXXFLAGS += -g -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/usr/include/freetype2 -std=c++11 `pkg-config --cflags glfw3`
+CXXFLAGS += -g -DGLEW_STATIC -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2 -I/usr/include/freetype2 -std=c++11 `pkg-config --cflags glfw3`
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=visualizer
-LDFLAGS= -lGLEW `pkg-config --static --libs glfw3` -lGL -lpthread -lfreetype
+LDFLAGS= ../../../glew/lib/libGLEW.a `pkg-config --static --libs glfw3` -lGL -lpthread -lfreetype
 
 .PHONY: alls
 all: $(TARGET)
