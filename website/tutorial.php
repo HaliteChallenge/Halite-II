@@ -23,7 +23,7 @@
 
 				<h3>Running a Game</h3>
 				<p>
-					Once those are downloaded, unzip you starter package. If you are using a compiled language, such as Java or C++, please compile the <code>MyBot</code> file of the starter package. This may be done in Java like so: <code>javac MyBot.java</code> and in C++ like so: <code>g++ -std=c++11 MyBot -o MyBot.o</code>). We are going to run a game between two instances of the provided starter bot, which simply moves all of its pieces randomly. To do this, run the environment binary. It should prompt you for the game's dimensions (20 by 20 is perfectly reasonable) and your bot's start command. Examples of these commands include:
+					Once those are downloaded, unzip your starter package. If you are using a compiled language, such as Java or C++, please compile the <code>MyBot</code> file of the starter package. This may be done in Java like so: <code>javac MyBot.java</code> and in C++ like so: <code>g++ -std=c++11 MyBot -o MyBot</code>). We are going to run a game between two instances of the provided starter bot, which simply moves all of its pieces randomly. To do this, run the environment binary. It should prompt you for the game's dimensions (20 by 20 is perfectly reasonable) and your bot's start command. Examples of these commands include:
 					<ul>
 						<li>Java - <code>cd PATH_TO_BOT; java MyBot</code></li>
 						<li>Python - <code>python3 PATH_TO_BOT/MyBot.py</code></li>
@@ -40,15 +40,15 @@
 				</p>
 
 				<p>
-					Once you have started the environment and provided it with the map's dimensions and your bots' start commands, the environment should then execute your game, outputting the turn number intermittently and ending with a ranking of each participant. You should find the game's replay file, ending with the <code>hlt</code> extension and named a very large number (your system's timestamp at the end of the game), in the same directory as the environment.
+					Once you have started the environment and provided it with the map's dimensions and your bots' start commands, the environment should then execute your game, outputting the turn number intermittently and ending with a ranking of each participant. You should find the game's replay file, ending with the <code>hlt</code> extension and named a very large number (your system's timestamp at the end of the game), in the same directory as the environment. You can also create a Replays folder within the environment folder for organization, and the environment will store the replays there.
 				</p>
 
 				<h3>Visualizing a Game</h3>
 				<p>
-					To visualize the game that you just ran, run the visualizer binary. Drag the game's replay file from your file explorer into the visualizer's window. Soon a grid filled with a few of brightly colored squares this is the map at the very start of the game.
+					To visualize the game that you just ran, run the visualizer binary. Drag the game's replay file from your file explorer into the visualizer's window. Soon a grid filled with a few of brightly colored squares this is the map at the very start of the game. For convenience, you can also run the visualizer from terminal with the path to the replay as its parameter, or set the visualizer as the default application to open hlt files.
 				</p>
 
-				<h3>Writing a Basic Bot</h3>
+				<h3>Writing a Basic Bot (in Java)</h3>
 				<p>
 					As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. This logic is encoded in these lines of the starter bot.
 					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
@@ -139,8 +139,8 @@ public class BasicBot{
 					<ul>
 						<li>At any given point, most of the bot's pieces are moving randomly inside the bot's territory. It would be much more efficient if those pieces would go straight towards the nearest opposing tile.</li>
 						<li>The bot expands very stupidly. It doesn't prioritize expanding to opposing territory with low strength and high production.</li>
-						<li>The bot decides to stop growing a piece and start moving it when that piece's strength is greater than its production times 5. That factor of 5 is completely arbitrary. Another value is probably more optimal.</li>
-						<li>When deciding whether to attack opposing tiles, neither the strength of the bot's piece nor the strength of its opponent are taken into account. It may be more optimal to refrain from attacking under some circumstances.</li>
+						<li>The bot decides to stop growing a piece and start moving it when that piece's strength is greater than its production times 5. That factor of 5 is completely arbitrary. The optimal value is likely not 5.</li>
+						<li>When deciding whether to attack opposing tiles, neither the strength of the bot's piece nor the strength of its opponent are taken into account. It may be a better strategy to refrain from attacking under some circumstances.</li>
 					</ul>
 				</p>
 			</div>
