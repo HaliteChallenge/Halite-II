@@ -309,5 +309,5 @@ git_pull.php
 
 *.zip
 !Debian.zip
-!Windows.ip
+!Windows.zip
 !Mac.zip
