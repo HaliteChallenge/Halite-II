@@ -98,7 +98,8 @@ def runGame(width, height, users, backend):
 		if line == None:
 			break
 		print(line)
-		lines.append(line)
+		if line.isspace() == False:
+			lines.append(line)
 
 	replayPath = lines[0]
 
