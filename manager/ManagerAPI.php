@@ -163,14 +163,20 @@ class ManagerAPI extends API{
 			chmod($targetPath, 0777);
 
 			// Check that we arent storing too many replay files
-			$fi = new FilesystemIterator(REPLAYS_DIR, FilesystemIterator::SKIP_DOTS);
-			$handle = opendir(REPLAYS_DIR);
-			while(iterator_count($fi) > 10000) {
-				$entry = NULL;
-				do {
-					$entry = readdir($handle);
-				} while($entry == "." || $entry == "..");
-			   unlink(REPLAYS_DIR.$entry);
+			$files = glob(REPLAYS_DIR.'*.*');
+			$exclude_files = array('.', '..');
+			if (!in_array($files, $exclude_files)) {
+				array_multisort(
+					array_map( 'filemtime', $files ),
+					SORT_NUMERIC,
+					SORT_ASC,
+					$files
+				);
+			}
+
+			while(count($files) > 10000) {
+				unlink($files[0]);
+				array_splice($files, 0, 1);
 			}
 
 			// Store game information in db
