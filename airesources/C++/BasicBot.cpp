@@ -16,7 +16,7 @@ int main() {
 	unsigned char my_tag;
 	hlt::Map present_map;
 	getInit(my_tag, present_map);
-	sendInitResponse("BasicBot" + std::to_string(my_tag));
+	sendInitResponse("BasicBot");
 
 	std::set<hlt::Move> moves;
 	while(true) {
