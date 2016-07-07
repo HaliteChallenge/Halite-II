@@ -88,7 +88,7 @@ namespace hlt{
 			}
 			return l;
 		}
-		Site& getSite(Location l, unsigned char direction) {
+		Site& getSite(Location l, unsigned char direction = STILL) {
 			l = getLocation(l, direction);
 			return contents[l.y][l.x];
 		}
