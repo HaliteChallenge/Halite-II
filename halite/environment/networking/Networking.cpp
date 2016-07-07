@@ -180,7 +180,6 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		}
 	}
 #endif
-
 	//Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
 

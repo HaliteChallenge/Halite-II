@@ -22,7 +22,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Stores the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, &player_moves[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, allowableTimesToRespond[a], a + 1, game_map, &player_moves[a]);
 			threadLocation++;
 		}
 	}
