@@ -1,6 +1,7 @@
 import os
 import os.path
 import stat
+import glob
 
 import platform
 import tempfile
@@ -58,7 +59,13 @@ def compile(user, backend):
 	makePath(workingPath)
 	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
 	zip.unpack(botPath)
-
+	
+	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
+		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
+		for filename in os.listdir(singleFolder):
+    			shutil.move(os.path.join(singleFolder, filename), os.path.join(workingPath, filename))
+		os.rmdir(singleFolder)
+	
 	language, errors = compile_anything(workingPath)
 	didCompile = True if errors == None else False
 
