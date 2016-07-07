@@ -16,6 +16,7 @@
 				<h1>Halite Downlods</h1>
 
 				<h3>Environment and Visualizer</h3>
+				<p>This set of binaries was uploaded at 3 pm on July 7th. We added a controls cheat-sheet to the visualizer and fixed the windows build.</p>
 				<ul>
 					<li><a href="downloads/Mac.zip">Mac</a></li>
 					<li><a href="downloads/Debian.zip">Ubuntu (64 bit)</a></li>
