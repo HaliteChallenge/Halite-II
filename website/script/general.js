@@ -9,8 +9,11 @@ function getGET(name) {
 var messageBox = {
 	$messageBox: $("#messageBox"),
 	alert: function(title, message, isSuccess) {
-		this.$messageBox.empty()
+		this.clear()
 		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+	},
+	clear: function() {
+		this.$messageBox.empty()
 	}
 };
 
@@ -37,6 +40,7 @@ $(function() {
 		$registerUsername: $("#register_user"),
 		$registerEmail: $("#register_email"),
 		$registerPassword: $("#register_pass"),
+		$registerConfirmPassword: $("#register_confirm_pass"),
 		$registerButton: $("#registerButton"),
 		$registerForm: $("#registerForm"),
 		$logInNav: $("#loginNav"),
@@ -57,7 +61,7 @@ $(function() {
 			buttonClicked: function() { this.$fileInput.click(); },
 			fileChanged: function() {
 				storeBotFile("submitForm");
-				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. You should show up on the leaderboard within a couple of minutes.", true)
+				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will recieve an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
 			}
 		},
 
@@ -77,12 +81,15 @@ $(function() {
 			this.render();
 		},
 		logIn: function() {
+			messageBox.clear();
+
 			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
 			if(user == null) {
 				messageBox.alert("Login failed", "That username/password combo does not exist", false);
 			} else if(user['isVerified'] == false) {
 				messageBox.alert("Login failed", "Your email needs to be verified", false);
 			} else {
+				messageBox.alert("Login successful", "You are now logged in as <b>"+user.username+"</b>.", true);
 				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
 				this.loggedIn = true;
 				this.user = user;
@@ -90,22 +97,29 @@ $(function() {
 			}
 		},
 		register: function() {
+			messageBox.clear();
+
 			var username = this.$registerUsername.val();
 			var email = this.$registerEmail.val();
 			var password = this.$registerPassword.val();
+			var confirmPassword = this.$registerConfirmPassword.val();
 
-			var resp = storeUserDatabase(email, username, password, false);
-			console.log(resp)
-			if (resp === "Success") {
-				storeUserSession(username, password, false);
-				messageBox.alert("Verify Your Email", "You may not log in until you verify your email.", true);
-			} else  {
-				if(resp.toLowerCase().indexOf("username") > -1) {
-					messageBox.alert("Registration failed", "That username is already taken", false);
-				} else if (resp.toLowerCase().indexOf("exists") > -1) {
-					messageBox.alert("Registration failed", "That email is already taken", false);
-				} else {
-					messageBox.alert("Registration failed", "That email is invalid", false);
+			if(password != confirmPassword) {
+				messageBox.alert("Passwords Don't Match", "Please type in your password correctly.", false);
+			} else {
+				var resp = storeUserDatabase(email, username, password, false);
+				console.log(resp)
+				if (resp === "Success") {
+					messageBox.alert("Verify Your Email", "You may not log in until you verify your email.", true);
+					storeUserSession(username, password, false);
+				} else  {
+					if(resp.toLowerCase().indexOf("username") > -1) {
+						messageBox.alert("Registration failed", "That username is already taken", false);
+					} else if (resp.toLowerCase().indexOf("exists") > -1) {
+						messageBox.alert("Registration failed", "That email is already taken", false);
+					} else {
+						messageBox.alert("Registration failed", "That email is invalid", false);
+					}
 				}
 			}
 		},

@@ -134,7 +134,7 @@ class WebsiteAPI extends API{
 
 				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
 
-				$message->setBody("To verify you email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
+				$message->setBody("To verify your email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
 				$result = $mailer->send($message);
 			} catch (Exception $e) {
 				return "Invalid email address";
@@ -170,7 +170,7 @@ class WebsiteAPI extends API{
 					unset($gameUserRow['gameID']);
 
 					// Add in user info
-					$userInfo = $this->select("SELECT * FROM User WHERE userID = {$gameUserRow['userID']}");
+					$userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
 					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
 				}
 				array_push($gameArrays, $gameArray);
@@ -199,7 +199,7 @@ class WebsiteAPI extends API{
 			}
 			$this->insert("DELETE FROM GameUser WHERE userID=$userID");
 
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
+			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
 			return "Success";
 		}
