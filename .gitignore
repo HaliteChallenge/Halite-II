@@ -308,6 +308,6 @@ worker/environment
 git_pull.php
 
 *.zip
-!Debian.zip
-!Windows.zip
-!Mac.zip
+!Halite-Debian.zip
+!Halite-Windows.zip
+!Halite-Mac.zip
