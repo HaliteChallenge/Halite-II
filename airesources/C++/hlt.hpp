@@ -11,8 +11,8 @@
 #define SOUTH 3
 #define WEST 4
 
-#define DIRECTIONS {STILL, NORTH, EAST, SOUTH, WEST}
-#define CARDINALS {NORTH, EAST, SOUTH, WEST}
+const int DIRECTIONS[] = {STILL, NORTH, EAST, SOUTH, WEST};
+const int CARDINALS[] = {NORTH, EAST, SOUTH, WEST};
 
 namespace hlt{
 	struct Location{
