@@ -9,46 +9,41 @@ define("INI_FILE", "../halite.ini");
 class ManagerAPI extends API{
 
 	private $mysqli = NULL;
+	private $apiKey = NULL;
 
 	// Init database, sanitize parameters, and check if worker is valid
 	public function __construct($request, $origin) {
 		$this->initDB();
 
-		//$this->sanitizeHTTPParameters();
-
 		if($this->isValidWorker() == false) {
 			echo "Not valid worker";
 			exit(1);
+		} else {
+			$this->insert("UPDATE Worker SET lastRequestTime = now() WHERE apiKey = {$this->apiKey}");
 		}
-
 		parent::__construct($request);
+	}
+	
+	private function getAPIKey() {
+		$this->apiKey = NULL;
+		if(isset($_GET['apiKey'])) $this->apiKey = $_GET['apiKey'];
+		else if(isset($_POST['apiKey'])) $this->apiKey = $_POST['apiKey'];
 	}
 
 	// Checks HTTP parameters and request IP to make sure that the client provided a valid API key
 	private function isValidWorker() {
 		// Get apiKey
-		$apiKey = NULL;
-		if(isset($_GET['apiKey'])) $apiKey = $_GET['apiKey'];
-		else if(isset($_POST['apiKey'])) $apiKey = $_POST['apiKey'];
-		else if(isset($_PUT['apiKey'])) $apiKey = $_PUT['apiKey'];
-		else if(isset($_DELETE['apiKey'])) $apiKey = $_DELETE['apiKey'];
-
-		if($apiKey == NULL) return false;
+		$this->getAPIKey();
+		if($this->apiKey == NULL) return false;
 
 		// Get ip
 		$ipAddress = $_SERVER['REMOTE_ADDR'];
 
-		if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '$ipAddress' and apiKey = $apiKey")) > 0) return true;
-		else return false;
-	}
-
-	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = escapeshellcmd($this->mysqli->real_escape_string($value));
-		}
-		foreach ($_POST as $key => $value) {
-			$_POST[$key] = escapeshellcmd($this->mysqli->real_escape_string($value));
-		}
+		if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '$ipAddress' and apiKey = $this->apiKey")) > 0) {
+			return true;
+		} else {
+			return false;
+		}	
 	}
 
 	// Returns the directory that holds a bot, given the bot's userID
@@ -112,7 +107,7 @@ class ManagerAPI extends API{
 			// Assign a run game tasks
 			$numPlayers = 2;
 			$players = $this->selectMultiple("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
-			$sizes = array(10, 20);
+			$sizes = array(30);
 			$size = $sizes[array_rand($sizes)];
 			if(count($players) == 2) {
 				return array(
@@ -129,6 +124,8 @@ class ManagerAPI extends API{
 	protected function compile() {
 		var_dump($_POST);
 		if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
+			$this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=$this->apiKey");
+
 			$userID = $_POST['userID'];
 			$didCompile = $_POST['didCompile'];
 
@@ -147,6 +144,7 @@ class ManagerAPI extends API{
 		var_dump($_POST);
 		// Each user in users must have a rank, playerIndex, mu, sigma, and userID
 		if(isset($_POST['users']) && count($_FILES) > 0) {
+			$this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=$this->apiKey");
 			$users = json_decode($_POST['users']);
 			var_dump($users);
 
@@ -191,7 +189,7 @@ class ManagerAPI extends API{
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage})");
 
 				// Cache raw game stats
-				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID} LIMIT 500");
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID}");
 				$totalGameStats = array();
 				foreach($gameStats as $oneGameStats) {
 					foreach($oneGameStats as $statName => $statValue) {
@@ -219,6 +217,7 @@ class ManagerAPI extends API{
 							break;
 						}
 					}
+					echo "UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}\n";
 					$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}");
 				}
 				
