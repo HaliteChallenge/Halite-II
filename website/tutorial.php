@@ -91,7 +91,7 @@ if(site.owner == playerTag) {
 					Here is the full basic bot:
 					<pre class="prettyprint">import java.util.ArrayList;
 
-public class BasicBot{
+public class MyBot{
   public static void main(String[] args) {
     InitPackage iPackage = Networking.getInit();
     short playerTag = iPackage.playerTag;
@@ -131,6 +131,8 @@ public class BasicBot{
 				</p>
 
 				<p>Try running a game between two basics and compare it to the game between two starter bots.</p>
+
+				<p><b>Note</b>: If you submit the basic bot to competition, please make sure that the main file is named <code>MyBot</code> not <code>BasicBot</code>.</p>
 
 				<h3>What's Next?</h3>
 				<p>
