@@ -1,8 +1,8 @@
 public class Move{
   public Location loc;
-  public byte dir;
+  public Direction dir;
 
-  public Move(Location loc_, byte dir_) {
+  public Move(Location loc_, Direction dir_) {
     loc = loc_;
     dir = dir_;
   }

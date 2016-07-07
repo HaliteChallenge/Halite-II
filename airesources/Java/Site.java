@@ -1,3 +1,3 @@
 public class Site{
-  public short owner, strength, production;
+  public int owner, strength, production;
 }
