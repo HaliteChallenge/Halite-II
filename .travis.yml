@@ -14,13 +14,17 @@ install:
 script:
   - cd ~/build/HaliteChallenge/Halite/airesources/Java
   - javac MyBot.java
+  - javac BasicBot.java
+
   - cd ../C++
   - g++ -std=c++11 MyBot.cpp -o MyBot.o
+  - g++ -std=c++11 BasicBot.cpp -o BasicBot.o
 
   - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
-  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot"
-  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "../../airesources/C++/MyBot.o"
+  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot" "../../airesources/C++/MyBot.o"
+
+  - ./environment 10 10 "python3 ../../airesources/Python/BasicBot.py" "cd ../../airesources/Java; java BasicBot" "../../airesources/C++/BasicBot.o"
 
   - cd  ~/build/HaliteChallenge/Halite/halite/visualizer
   - make
