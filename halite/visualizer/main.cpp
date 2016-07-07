@@ -335,11 +335,11 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 		if(graphZoom < 1) graphZoom = 1;
 	}
 	else if(code == '>' || code == '.') {
-		turnNumber++;
+		shiftPressed ? turnNumber += 5 : turnNumber++;
 		isPaused = true;
 	}
 	else if(code == '<' || code == ',') {
-		turnNumber--;
+		shiftPressed ? turnNumber -= 5 : turnNumber--;
 		isPaused = true;
 	}
 	else if(code == 'Z' || code == 'z') {
@@ -398,8 +398,16 @@ void renderLaunch() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int height; glfwGetWindowSize(window, NULL, &height);
-	util::renderText(-.85, 0.0, height / 8, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
-
+	util::renderText(-.85, 0.65, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
+	util::renderText(-.85, 0.45, height / 12, { 1, 1, 1 }, " - To pause or unpause the replay, press SPACE");
+	util::renderText(-.85, 0.3, height / 12, { 1, 1, 1 }, " - To move around in the replay, press LEFT ARROW or RIGHT ARROW");
+	util::renderText(-.85, 0.2, height / 16, { 1, 1, 1 }, "     - Hold shift to move around five times faster.");
+	util::renderText(-.85, 0.1, height / 16, { 1, 1, 1 }, "     - To change move and play speed, press UP ARROW or DOWN ARROW");
+	util::renderText(-.85, -0.05, height / 12, { 1, 1, 1 }, " - To move around in the replay by frame, press , or .");
+	util::renderText(-.85, -0.2, height / 12, { 1, 1, 1 }, " - To go to the beginning or end of the replay, press z or x");
+	util::renderText(-.85, -0.35, height / 12, { 1, 1, 1 }, " - To pan around in the map, use the w, a, s, and d keys");
+	util::renderText(-.85, -0.5, height / 12, { 1, 1, 1 }, " - To zoom in or out on the graphs, press + or -");
+	util::renderText(-.85, -0.65, height / 12, { 1, 1, 1 }, " - To reload a replay from file, press r");
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
