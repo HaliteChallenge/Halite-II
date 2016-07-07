@@ -23,7 +23,7 @@ public class Map{
   }
 
   public Location getLocation(Location loc, byte dir) {
-    Location l = loc; //Copy so no side effects:
+    Location l = new Location(loc);
     if(dir != Direction.STILL) {
       if(dir == Direction.NORTH) {
         if(l.y == 0) l.y = (short)(map_height - 1);
@@ -34,7 +34,7 @@ public class Map{
         else l.x++;
       }
       else if(dir == Direction.SOUTH) {
-        if(l.y == map_width - 1) l.y = 0;
+        if(l.y == map_height - 1) l.y = 0;
         else l.y++;
       }
       else if(dir == Direction.WEST) {
