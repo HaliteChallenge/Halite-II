@@ -488,7 +488,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	//Generate text for the loading bar:
 	std::string loadingText = "LOADING..........";
-	const int TEXT_SIZE = 64;
+	int screenHeight;
+	glfwGetWindowSize(window, NULL, &screenHeight);
+	const int TEXT_SIZE = screenHeight / 8;
 	const float TEXT_OFFSET = 0.025;
 
 	//Generate a buffer for the loading bar's inside. We'll delete this near the end of the function.
