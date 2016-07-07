@@ -71,12 +71,13 @@ $(function() {
 
 	function statsFromUser(user, numUsers) {
 		var statDetails = {
+			"score": {name: "Trueskill Rating", mouseOverText: ""},
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: ""},
 			"numGames": {name: "Number of Games Played", mouseOverText: ""},
 			"language": {name: "Language", mouseOverText: ""},
-			"territoryRanking": {name: "Territory", mouseOverText: "", percentile: true},
-			"strengthRanking": {name: "Strength", mouseOverText: "", percentile: true},
-			"productionRanking": {name: "Production", mouseOverText: "", percentile: true},
+			"territoryRanking": {name: "Territory Ranking", mouseOverText: "", percentile: true},
+			"strengthRanking": {name: "Strength Ranking", mouseOverText: "", percentile: true},
+			"productionRanking": {name: "Production Ranking", mouseOverText: "", percentile: true},
 			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
 			"turnTimeRanking": {name: "Time per Turn (ms)", mouseOverText: "", percentile: true}
 		};
@@ -94,9 +95,12 @@ $(function() {
 	}
 
 	var userID = getGET("userID");
+
 	var user = getUser(userID);
 	var extraStats = getExtraStats(userID);
 	$.extend(user, extraStats);
+	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
+
 	var numUsers = getNumActiveUsers();
 
 	$(document).prop('title', user.username);
