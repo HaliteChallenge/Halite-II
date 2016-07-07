@@ -18,16 +18,16 @@
 				<h3>Environment and Visualizer</h3>
 				<p>This set of binaries was uploaded at <b>3 pm on July 7th</b>. We added a controls cheat-sheet to the visualizer and fixed the windows build.</p>
 				<ul>
-					<li><a href="downloads/Mac.zip">Mac</a></li>
-					<li><a href="downloads/Debian.zip">Ubuntu (64 bit)</a></li>
-					<li><a href="downloads/Windows.zip">Windows</a></li>
+					<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
+					<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
+					<li><a href="downloads/Halite-Windows.zip">Windows</a></li>
 				</ul>
 
 				<h3>Language Packages</h3>
 				<ul>
-					<li><a href="downloads/Python.zip">Python 3</a></li>
-					<li><a href="downloads/Java.zip">Java 6+</a></li>
-					<li><a href="downloads/C++.zip">C++ 11</a></li>
+					<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
+					<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
+					<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
 				</ul>
 			</div>
 		</div>
