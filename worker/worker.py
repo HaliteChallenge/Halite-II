@@ -101,7 +101,7 @@ def runGame(width, height, users, backend):
 		if line.isspace() == False:
 			lines.append(line)
 
-	replayPath = lines[0]
+	replayPath = lines[len(lines) - (len(users)+1)]
 
 	# Get player ranks and scores by parsing shellOutput
 	for lineIndex in range(len(lines)-len(users), len(lines)):
