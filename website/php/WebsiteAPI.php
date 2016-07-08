@@ -205,6 +205,38 @@ class WebsiteAPI extends API{
 		}
 	}
 
+	protected function forums() {
+		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
+			$initialBase64Payload = $_GET['payload'];
+			$signature = $_GET['signature'];
+			$userID = $_GET['userID'];
+			$email = $_GET['email'];
+			$username = $_GET['username'];
+
+			if(hash_hmac("sha256", $initialBase64Payload, $this->config['encrypt']['ssoSecret']) != $signature) {
+				return null;
+			}
+
+			parse_str(base64_decode($initialBase64Payload), $initialPayload);
+			$nonce = $initialPayload["nonce"];
+
+			$finalBase64Payload = base64_encode(http_build_query(array(
+				"nonce" => $nonce,
+				"name" => $username,
+				"email" => $email,
+				"external_id" =>$userID
+			)));
+			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['encrypt']['secret']);
+
+			$finalQueryString = http_build_query(array(
+				"sso" => $finalBase64Payload,
+				"sig" => $finalSignature
+			));
+
+			return $this->config['encrypt']['secret']."?".$finalQueryString;
+		}
+	}
+
 	protected function session() {
 		session_start();
 		if($this->method == 'GET') {

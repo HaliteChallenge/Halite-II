@@ -142,3 +142,18 @@ function getExtraStats(userID) {
 		data: {userID: userID}
 	}).responseJSON;
 }
+
+function getForumSignInURL(payload, signature, userID, email, username) {
+	return $.ajax({
+		url: url+"forums",
+		async: false,
+		method: "GET",
+		data: {
+			payload: payload,
+			signature: signature,
+			userID: userID,
+			email: email,
+			username: username
+		}
+	}).responseJSON;
+}

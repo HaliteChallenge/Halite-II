@@ -1,4 +1,4 @@
-<form class="register-form">
+<div id="register_form">
   <div class="form-group label-floating is-empty">
     <label for="register_email" class="control-label">Email</label>
     <input id="register_email" class="form-control" type="email" size="30" >
@@ -16,6 +16,6 @@
     <input id="register_confirm_pass" class="form-control" type="password" size="30" >
   </div>
   <div>
-    <input id="registerButton" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Register" />
+    <input id="register_button" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Register" />
   </div>
-</form>
+</div>
