@@ -9,7 +9,7 @@
 	<title>Leaderboard</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
-	<link href="style/index.css" rel="stylesheet">
+	<link href="style/general.css" rel="stylesheet">
 </head>
 
 <body>
