@@ -2,6 +2,33 @@
 
 std::ofstream * debugstream;
 
+std::istream& util::getline(std::istream& is, std::string& t)
+{
+	t.clear();
+
+	std::istream::sentry se(is, true);
+	std::streambuf* sb = is.rdbuf();
+
+	while(true) {
+		int c = sb->sbumpc();
+		switch(c) {
+		case '\n':
+			return is;
+		case '\r':
+			if(sb->sgetc() == '\n')
+				sb->sbumpc();
+			return is;
+		case EOF:
+			// Also handle the case when the last line has no line ending
+			if(t.empty())
+				is.setstate(std::ios::eofbit);
+			return is;
+		default:
+			t += (char)c;
+		}
+	}
+}
+
 void util::initShaderHandler(std::ofstream * ds) {
 	debugstream = ds;
 }
@@ -12,19 +39,13 @@ bool util::shaderFromFile(GLuint shader, std::string filename, std::string shade
 		*debugstream << "File " << filename << " could not be opened, and consequently <<" << shadername << ">> couldn't be compiled." << std::endl;
 		return false;
 	}
-	in.seekg(0, std::ios::end);
-	int length = in.tellg();
-	in.seekg(0, std::ios::beg);
-	char * file = new char[length + 1];
-	file[length] = 0;
-	in.read(file, length);
+	std::string line, answer;
+	while(util::getline(in, line)) answer += line + "\n";
 	in.close();
-	char * end = std::remove_if(file, file + length + 1, [](const char & c) -> bool { return !(isprint(c) || isspace(c)); });
-	if(end != file + length + 1) *end = 0;
-	end = NULL; //Not valid as soon as file is deleted. Putting inside the #ifdef for convenience.
-	glShaderSource(shader, 1, (const char **)&file, NULL);
+	const char * c_str = answer.c_str();
+	GLint size = answer.size();
+	glShaderSource(shader, 1, &(c_str), &(size));
 	glCompileShader(shader);
-	delete[] file;
 	//Check for proper compilation:
 	GLint _compiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &_compiled);

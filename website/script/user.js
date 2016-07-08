@@ -28,7 +28,7 @@ $(function() {
 		},
 		getTableRow: function(stat) {
 			if(stat.mouseOverText != undefined && stat.mouseOverText != null) {
-				return "<tr><td><span title='"+stat.mouseOverText+"'>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
+				return "<tr><td><span title='"+stat.mouseOverText+"' class='has-hover-text'>"+stat.name+"</span></td><td><span title='"+stat.mouseOverText+"' class='has-hover-text'>"+stat.value+"</span></td></tr>";
 			} else {
 				return "<tr><td><span>"+stat.name+"</span></td><td>"+stat.value+"</td></tr>";
 			}
@@ -71,15 +71,15 @@ $(function() {
 
 	function statsFromUser(user, numUsers) {
 		var statDetails = {
-			"score": {name: "Trueskill Rating", mouseOverText: ""},
-			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: ""},
-			"numGames": {name: "Number of Games Played", mouseOverText: ""},
-			"language": {name: "Language", mouseOverText: ""},
-			"territoryRanking": {name: "Territory Ranking", mouseOverText: "", percentile: true},
-			"strengthRanking": {name: "Strength Ranking", mouseOverText: "", percentile: true},
-			"productionRanking": {name: "Production Ranking", mouseOverText: "", percentile: true},
-			"stillRanking": {name: "Still Move Frequency", mouseOverText: "", percentile: true},
-			"turnTimeRanking": {name: "Time per Turn (ms)", mouseOverText: "", percentile: true}
+			"score": {name: "Trueskill Rating", mouseOverText: null},
+			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
+			"numGames": {name: "Number of Games Played", mouseOverText: null},
+			"language": {name: "Language", mouseOverText: null},
+			"territoryRanking": {name: "Territory Ranking", mouseOverText: "(Your total territory * Number of players)/(Number of frames you were alive * Map area)", percentile: true},
+			"strengthRanking": {name: "Strength Ranking", mouseOverText: "(Your total strength * Number of players) / (Number of frames you were alive * Map area)", percentile: true},
+			"productionRanking": {name: "Production Ranking", mouseOverText: "(Total amount of strength that you produced * Number of players) / (Number of turns you were alive * Map area)", percentile: true},
+			"stillRanking": {name: "Still Move Frequency", mouseOverText: "(Number of still moves) / (Total number of moves)", percentile: true},
+			"turnTimeRanking": {name: "Time per Turn", mouseOverText: "Average latency per turn", percentile: true}
 		};
 		var stats = [];
 		for(var key in statDetails) {

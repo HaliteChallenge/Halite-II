@@ -1,17 +1,32 @@
 
 import java.util.Random;
 
-public class Direction{
-  public static final byte STILL = 0;
-  public static final byte NORTH = 1;
-  public static final byte EAST = 2;
-  public static final byte SOUTH = 3;
-  public static final byte WEST = 4;
+public enum Direction{
+  STILL, NORTH, EAST, SOUTH, WEST;
 
-  public static final byte[] DIRECTIONS = {STILL, NORTH, EAST, SOUTH, WEST};
-  public static final byte[] CARDINALS = {NORTH, EAST, SOUTH, WEST};
+  public static final Direction[] DIRECTIONS = new Direction[]{STILL, NORTH, EAST, SOUTH, WEST};
+  public static final Direction[] CARDINALS = new Direction[]{NORTH, EAST, SOUTH, WEST};
 
-  public static byte randomDirection() {
-    return (byte)new Random().nextInt(5);
+  private static Direction fromInteger(int value) {
+    if(value == 0) {
+      return STILL;
+    }
+    if(value == 1) {
+      return NORTH;
+    }
+    if(value == 2) {
+      return EAST;
+    }
+    if(value == 3) {
+      return SOUTH;
+    }
+    if(value == 4) {
+      return WEST;
+    }
+    return null;
+  }
+
+  public static Direction randomDirection() {
+    return fromInteger(new Random().nextInt(5));
   }
 }

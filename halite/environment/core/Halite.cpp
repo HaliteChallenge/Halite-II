@@ -22,7 +22,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Stores the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, networking, allowableTimesToRespond[a], a + 1, game_map, &player_moves[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, allowableTimesToRespond[a], a + 1, game_map, &player_moves[a]);
 			threadLocation++;
 		}
 	}
@@ -372,7 +372,7 @@ void Halite::init() {
 
 void Halite::output(std::string filename) {
 	std::ofstream gameFile;
-	gameFile.open(filename);
+	gameFile.open(filename, std::ios_base::binary);
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
@@ -382,8 +382,6 @@ void Halite::output(std::string filename) {
 		Color c = color_codes[a + 1];
 		gameFile << player_names[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
 	}
-	gameFile.close();
-	gameFile.open(filename, std::ios_base::binary | std::ios_base::app);
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
 	gameFile << F_NEWLINE; //Newline helps organize the file for me.
 	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);

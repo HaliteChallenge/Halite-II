@@ -180,7 +180,6 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		}
 	}
 #endif
-
 	//Python turns \n into \r\n
 	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
 
@@ -356,7 +355,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
 
-	if(!program_output_style) std::cout << "Player " << playerTag << " is dead\n";
+	if(!program_output_style) std::cout << "Player " << int(playerTag) << " is dead\n";
 	#else
 	kill(processes[playerTag - 1], SIGKILL);
 

@@ -474,10 +474,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	std::ifstream game_file;
 	hlt::Map m;
 	std::string in;
-	game_file.open(filename, std::ios_base::in);
+	game_file.open(filename, std::ios_base::in | std::ios_base::binary);
 	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
 
-	std::string format; std::getline(game_file, format);
+	std::string format;
+	util::getline(game_file, format);
 	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") throw std::runtime_error("File format no longer supported in file " + filename);
 	else if(format != "HLT 8") throw std::runtime_error("Unrecognized format in file " + filename);
 
@@ -487,7 +488,9 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	//Generate text for the loading bar:
 	std::string loadingText = "LOADING..........";
-	const int TEXT_SIZE = 64;
+	int screenHeight;
+	glfwGetWindowSize(window, NULL, &screenHeight);
+	const int TEXT_SIZE = screenHeight / 8;
 	const float TEXT_OFFSET = 0.025;
 
 	//Generate a buffer for the loading bar's inside. We'll delete this near the end of the function.
@@ -531,7 +534,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	map_width = width;
 	m.map_height = height;
 	map_height = height;
-	std::getline(game_file, in);
+	util::getline(game_file, in);
 	player_names.resize(number_of_players);
 	players_alive.resize(numLines);
 	for(int a = 0; a < numLines; a++) players_alive[a] = std::vector<bool>(number_of_players);
@@ -553,11 +556,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
 
-	//Reopen the file in binary format.
-	std::streampos pos = game_file.tellg();
-	game_file.close();
-	game_file.open(filename, std::ios_base::in | std::ios_base::binary);
-	game_file.seekg(pos);
 	std::ostringstream game_file_stream;
 	game_file_stream << game_file.rdbuf();
 	game_file.close();
@@ -577,7 +575,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	unsigned char numPieces, presentOwner, strength;
 	const int totalTiles = m.map_height*m.map_width;
 	bool shouldLeave = false;
-	const int NUM_RENDER = 30;
+	const int NUM_RENDER = 48;
 	int lastRender = 0;
 	for(short a = 0; a < numLines; a++) {
 		short x = 0, y = 0;
@@ -619,7 +617,6 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 			glBindBuffer(GL_ARRAY_BUFFER, loadingBuffer);
 			glBufferData(GL_ARRAY_BUFFER, loadingVertices.size() * sizeof(float), loadingVertices.data(), GL_DYNAMIC_DRAW);
 
-			//glUseProgram(p);
 			glBindVertexArray(loadingAttributes);
 			glEnableVertexAttribArray(0);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -647,7 +644,8 @@ bool Halite::isValid(std::string filename) {
 	std::ifstream game_file;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
-	std::string format; std::getline(game_file, format);
+	std::string format;
+	util::getline(game_file, format);
 	if(format != "HLT 8") return false;
 	return true;
 }
@@ -803,9 +801,9 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength) + " | Production: " + std::to_string(production);
 			}
-			else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
+			else labelText = "";
 		}
-		else labelText = "";// TEMP DEFENSE BONUS REMOVAL: "Defense Bonus: " + std::to_string(defense_bonus);
+		else labelText = "";
 		if(labelText != "") util::renderText(STAT_LEFT, STAT_TOP - LABEL_TEXT_HEIGHT, LABEL_TEXT_HEIGHT * height, TEXT_COLOR, labelText);
 
 		//Draw names:

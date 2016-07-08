@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class MyBot{
   public static void main(String[] args) {
     InitPackage iPackage = Networking.getInit();
-    short playerTag = iPackage.playerTag;
+    int playerTag = iPackage.playerTag;
     Map gameMap = iPackage.map;
 
     Networking.sendInit("JavaBot");
@@ -17,8 +17,8 @@ public class MyBot{
         for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
           Site site = gameMap.contents.get(y).get(x);
           if(site.owner == playerTag) {
-            byte dir = Direction.randomDirection();
-            moves.add(new Move(new Location((short)x, (short)y), dir));
+            Direction dir = Direction.randomDirection();
+            moves.add(new Move(new Location(x, y), dir));
           }
         }
       }

@@ -8,26 +8,26 @@ import java.nio.ByteOrder;
 public class Networking{
   public static final int SIZE_OF_INTEGER_PREFIX = 4;
   public static final int CHAR_SIZE = 1;
-  private static short _width, _height;
-  private static ArrayList< ArrayList<Short> > _productions;
+  private static int _width, _height;
+  private static ArrayList< ArrayList<Integer> > _productions;
 
   static void deserializeMapSize(String inputString) {
     String[] inputStringComponents = inputString.split(" ");
 
-    _width = Short.parseShort(inputStringComponents[0]);
-    _height = Short.parseShort(inputStringComponents[1]);
+    _width = Integer.parseInt(inputStringComponents[0]);
+    _height = Integer.parseInt(inputStringComponents[1]);
   }
 
 
   static void deserializeProductions(String inputString) {
     String[] inputStringComponents = inputString.split(" ");
 
-    short index = 0;
-    _productions = new ArrayList< ArrayList<Short> >();
+    int index = 0;
+    _productions = new ArrayList< ArrayList<Integer> >();
     for(int a = 0; a < _height; a++) {
-      ArrayList<Short> row = new ArrayList<Short>();
+      ArrayList<Integer> row = new ArrayList<Integer>();
       for(int b = 0; b < _width; b++) {
-        row.add(Short.parseShort(inputStringComponents[index]));
+        row.add(Integer.parseInt(inputStringComponents[index]));
         index++;
       }
       _productions.add(row);
@@ -36,7 +36,7 @@ public class Networking{
 
   static String serializeMoveList(ArrayList<Move> moves) {
     String returnString = "";
-    for(Move move : moves) returnString += move.loc.x + " " + move.loc.y + " " + (short)move.dir + " ";
+    for(Move move : moves) returnString += move.loc.x + " " + move.loc.y + " " + move.dir.ordinal() + " ";
     return returnString;
   }
 
@@ -46,12 +46,12 @@ public class Networking{
     Map map = new Map(_width, _height);
 
     // Run-length encode of owners
-    short y = 0, x = 0;
-    short counter = 0, owner = 0;
-    short currentIndex = 0;
+    int y = 0, x = 0;
+    int counter = 0, owner = 0;
+    int currentIndex = 0;
     while(y != map.map_height) {
-      counter = Short.parseShort(inputStringComponents[currentIndex]);
-      owner = Short.parseShort(inputStringComponents[currentIndex + 1]);
+      counter = Integer.parseInt(inputStringComponents[currentIndex]);
+      owner = Integer.parseInt(inputStringComponents[currentIndex + 1]);
       currentIndex += 2;
       for(int a = 0; a < counter; ++a) {
         map.contents.get(y).get(x).owner = owner;
@@ -65,9 +65,9 @@ public class Networking{
 
     for (int a = 0; a < map.contents.size(); ++a) {
       for (int b = 0; b < map.contents.get(a).size(); ++b) {
-        short strengthShort = Short.parseShort(inputStringComponents[currentIndex]);
+        int strengthInt = Integer.parseInt(inputStringComponents[currentIndex]);
         currentIndex++;
-        map.contents.get(a).get(b).strength = strengthShort;
+        map.contents.get(a).get(b).strength = strengthInt;
         map.contents.get(a).get(b).production = _productions.get(a).get(b);
       }
     }
@@ -100,7 +100,7 @@ public class Networking{
 
   static InitPackage getInit() {
     InitPackage initPackage = new InitPackage();
-    initPackage.playerTag = (short)Long.parseLong(getString());
+    initPackage.playerTag = (int)Long.parseLong(getString());
     deserializeMapSize(getString());
     deserializeProductions(getString());
     initPackage.map = deserializeMap(getString());
