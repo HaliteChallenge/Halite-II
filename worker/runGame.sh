@@ -28,7 +28,9 @@ chmod +x "$BOT2/$RUNFILE"
 
 docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q $WIDTH $HEIGHT 'cd $PWD/$BOT1 && ./$RUNFILE' 'cd $PWD/$BOT2 && ./$RUNFILE'"
 
-docker rm $(docker ps -aq) >/dev/null
+docker rm -v $(docker ps -aq) >/dev/null
+
+rm /run/network/ifstate.veth*
 
 mv *.hlt ../
 cd ..
