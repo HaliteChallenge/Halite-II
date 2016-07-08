@@ -16,7 +16,7 @@
 				<h1>Halite Downlods</h1>
 
 				<h3>Environment and Visualizer</h3>
-				<p>This set of binaries was uploaded at <b>3 pm on July 7th</b>. We added a controls cheat-sheet to the visualizer and fixed the windows build.</p>
+				<p>This set of binaries was uploaded at <b>4:45 pm EST on July 8th</b>. We fixed the killing of bot processes on Unix, refactored map generation, and cleaned up the output of the environment.</p>
 				<ul>
 					<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
 					<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
