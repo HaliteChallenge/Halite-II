@@ -143,7 +143,7 @@ function getExtraStats(userID) {
 	}).responseJSON;
 }
 
-function getForumsSignInURL(payload, signature, userID, email, username) {
+function getForumSignInURL(payload, signature, userID, email, username) {
 	return $.ajax({
 		url: url+"forums",
 		async: false,

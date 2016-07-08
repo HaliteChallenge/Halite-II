@@ -1,4 +1,4 @@
-<form class="register-form">
+<div id="register_form">
   <div class="form-group label-floating is-empty">
     <label for="register_email" class="control-label">Email</label>
     <input id="register_email" class="form-control" type="email" size="30" >
@@ -18,4 +18,4 @@
   <div>
     <input id="registerButton" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Register" />
   </div>
-</form>
+</div>

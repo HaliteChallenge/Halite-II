@@ -17,20 +17,20 @@ var messageBox = {
 	}
 };
 
-$(function() {
-	function SmartForm($submitButton, $form, onSubmit) {
-		$submitButton.click(function() {
-			console.log("CLICK");
+function SmartForm($submitButton, $form, onSubmit) {
+	$submitButton.click(function() {
+		console.log("CLICK");
+		onSubmit();
+	});
+	$form.keypress(function(event) {
+		if (event.which == 13) {
+			event.preventDefault();
 			onSubmit();
-		});
-		$form.keypress(function(event) {
-			if (event.which == 13) {
-				event.preventDefault();
-				onSubmit();
-			}
-		});
-	};
+		}
+	});
+};
 
+$(function() {
 	var navbar = {
 		loggedIn: false,
 		$logInUsername: $("#login_user"),

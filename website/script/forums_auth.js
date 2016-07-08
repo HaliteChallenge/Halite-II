@@ -1,5 +1,6 @@
-(function() {
+$(function() {
   var logInForm = {
+    $logInForm: $("#login_form"),
     $logInUsername: $("#login_user"),
 		$logInPassword: $("#login_pass"),
 		$logInButton: $("#loginButton"),
@@ -23,20 +24,29 @@
 
         this.onLogin();
 			}
-		},
-    logIntoForum: function() {
-
-    }
+		}
   };
+
+  function handleForumsSignIn(payload, signature, user) {
+    var url = getForumSignInURL(payload, signature, user.userID, user.email, user.username);
+    console.log(url);
+    if(url == null || url == undefined) {
+      messageBox.alert("Forums Login Failed", "An error occured while trying to log you into forums.halite.io", false);
+    } else {
+      window.location.href = url;
+    }
+  }
 
   var payload = getGET("sso");
   var signature = getGET("sig");
+  console.log(payload);
+  console.log(signature);
+
   var session = getSession();
-  if(session == null) {
-    logInForm.init(function() {
-      window.location.href = getForumSignInURL(payload, signature, logInForm.user.userID, logInForm.user.email, logInForm.user.username);
-    });
-  } else {
-    window.location.href = getForumSignInURL(payload, signature, logInForm.user.userID, logInForm.user.email, logInForm.user.username);
+  logInForm.init(function() {
+    handleForumsSignIn(payload, signature, logInForm.user);
+  });
+  if(session != null) {
+    handleForumsSignIn(payload, signature, session);
   }
 })

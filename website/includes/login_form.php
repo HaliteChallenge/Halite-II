@@ -1,4 +1,4 @@
-<form class="login-form">
+<div id="login_form">
   <div class="form-group">
     <label for="login_user" class="control-label">Username</label>
     <input type="username" class="form-control" id="login_user">
@@ -10,4 +10,4 @@
   <div>
     <input id="loginButton" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Login" />
   </div>
-</form>
+</div>
