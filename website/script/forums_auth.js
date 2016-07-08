@@ -3,7 +3,7 @@ $(function() {
     $logInForm: $("#login_form"),
     $logInUsername: $("#login_user"),
 		$logInPassword: $("#login_pass"),
-		$logInButton: $("#loginButton"),
+		$logInButton: $("#login_button"),
     user: null,
     init: function(onLogin) {
       this.onLogin = onLogin;

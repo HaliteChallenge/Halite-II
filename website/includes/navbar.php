@@ -14,14 +14,14 @@
 				<ul class="nav navbar-nav">
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Login<strong class="caret"></strong></a>
-						<ul id="loginForm" class="dropdown-menu" style="padding: 10px; padding-bottom: 15px;">
+						<ul class="dropdown-menu" style="padding: 10px; padding-bottom: 15px;">
 							<?php include 'includes/login_form.php'; ?>
 						</ul>
 					</li>
 
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Register<strong class="caret"></strong></a>
-						<ul id="registerForm" class="dropdown-menu" style="padding: 15px; padding-bottom: 15px;">
+						<ul class="dropdown-menu" style="padding: 15px; padding-bottom: 15px;">
 							<?php include 'includes/register_form.php'; ?>
 						</ul>
 					</li>

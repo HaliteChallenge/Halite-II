@@ -8,6 +8,6 @@
     <input id="login_pass" class="form-control" type="password" size="30" >
   </div>
   <div>
-    <input id="loginButton" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Login" />
+    <input id="login_button" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Login" />
   </div>
 </div>

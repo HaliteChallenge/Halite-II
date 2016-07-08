@@ -16,6 +16,6 @@
     <input id="register_confirm_pass" class="form-control" type="password" size="30" >
   </div>
   <div>
-    <input id="registerButton" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Register" />
+    <input id="register_button" class="btn btn-primary" style="width: 100%" type="submit" name="commit" value="Register" />
   </div>
 </div>
