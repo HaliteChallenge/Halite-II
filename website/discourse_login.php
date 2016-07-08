@@ -10,7 +10,6 @@
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
-	<link href="style/discourse_login.css" rel="stylesheet">
 </head>
 
 <body>
@@ -23,41 +22,13 @@
 						<div class="panel-heading">
 							<h3 class="panel-title">Login</h3>
 						</div>
-						<form>
-							<div class="form-group">
-								<label for="login_user" class="control-label">Username</label>
-								<input type="username" class="form-control" id="login_user">
-							</div>
-							<div class="form-group">
-								<label for="login_pass" class="control-label">Password</label>
-								<input id="login_pass" class="form-control" type="password" size="30" >
-							</div>
-							<div>
-								<input id="loginButton" class="btn btn-primary" type="submit" name="commit" value="Login" />
-							</div>
-						</form>
+						<?php include 'includes/login_form.php'; ?>
 					</div>
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<h3 class="panel-title">Register</h3>
 						</div>
-						<form>
-							<div class="form-group">
-								<label for="login_user" class="control-label">Username</label>
-								<input type="username" class="form-control" id="login_user">
-							</div>
-							<div class="form-group">
-								<label for="login_pass" class="control-label">Password</label>
-								<input id="login_pass" class="form-control" type="password" size="30" >
-							</div>
-							<div class="form-group">
-								<label for="login_pass" class="control-label">Confirm Password</label>
-								<input id="login_pass" class="form-control" type="password" size="30" >
-							</div>
-							<div>
-								<input id="loginButton" class="btn btn-primary" type="submit" name="commit" value="Login" />
-							</div>
-						</form>
+						<?php include 'includes/register_form.php'; ?>
 					</div>
 				</div>
 			</div>
