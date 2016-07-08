@@ -39,9 +39,7 @@ $(function() {
 
   var payload = getGET("sso");
   var signature = getGET("sig");
-  console.log(payload);
-  console.log(signature);
-
+  console.log(payload)
   var session = getSession();
   logInForm.init(function() {
     handleForumsSignIn(payload, signature, logInForm.user);

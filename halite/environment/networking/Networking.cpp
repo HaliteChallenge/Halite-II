@@ -270,6 +270,8 @@ void Networking::startAndConnectBot(std::string command) {
 	//Fork a child process
 	pid = fork();
 	if(pid == 0) { //This is the child
+		setpgid(getpid(), getpid());
+
 		dup2(writePipe[0], STDIN_FILENO);
 
 		dup2(readPipe[1], STDOUT_FILENO);
@@ -357,7 +359,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 
 	if(!program_output_style) std::cout << "Player " << int(playerTag) << " is dead\n";
 	#else
-	kill(processes[playerTag - 1], SIGKILL);
+	kill(-processes[playerTag - 1], SIGKILL);
 
 	processes[playerTag - 1] = -1;
 	connections[playerTag - 1].read = -1;

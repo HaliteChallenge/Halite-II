@@ -207,13 +207,15 @@ class WebsiteAPI extends API{
 
 	protected function forums() {
 		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
-			$initialBase64Payload = $_GET['payload'];
+			$initialBase64Payload = stripcslashes($_GET['payload']);
 			$signature = $_GET['signature'];
 			$userID = $_GET['userID'];
 			$email = $_GET['email'];
 			$username = $_GET['username'];
-
-			if(hash_hmac("sha256", $initialBase64Payload, $this->config['encrypt']['ssoSecret']) != $signature) {
+		
+			$correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
+			
+			if($correctSignature != $signature) {
 				return null;
 			}
 
@@ -226,14 +228,14 @@ class WebsiteAPI extends API{
 				"email" => $email,
 				"external_id" =>$userID
 			)));
-			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['encrypt']['secret']);
+			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['sso']['secret']);
 
 			$finalQueryString = http_build_query(array(
 				"sso" => $finalBase64Payload,
 				"sig" => $finalSignature
 			));
-
-			return $this->config['encrypt']['secret']."?".$finalQueryString;
+			$finalURL = $this->config['sso']['url']."?".$finalQueryString;
+			return $finalURL;
 		}
 	}
 

@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="google-site-verification" content="UzLAOvN92N2iaw_7HcFXSOc_M-WIe3KFXaozuaNsZo4" />
-	<title>Leaderboard</title>
+	<title>Forums Login</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -20,16 +20,14 @@
 				<div class="col-sm-12">
 					<div class="panel panel-primary">
 						<div class="panel-heading">
-							<h3 class="panel-title">Login</h3>
+							<h3 class="panel-title">Halite Forums Login</h3>
 						</div>
-						<?php include 'includes/login_form.php'; ?>
-					</div>
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h3 class="panel-title">Register</h3>
+						<div style="padding: 16px; padding-bottom: 24px;">
+							<?php include 'includes/login_form.php'; ?>
 						</div>
-						<?php include 'includes/register_form.php'; ?>
 					</div>
+
+					<span>Don't have an account? <a href="index.php">Register on our homepage</a>.</span>
 				</div>
 			</div>
 		</div>
