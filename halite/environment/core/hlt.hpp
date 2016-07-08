@@ -69,12 +69,12 @@ namespace hlt{
 			std::mt19937 prg(std::chrono::system_clock::now().time_since_epoch().count());
 			std::uniform_real_distribution<double> urd(0.0, 1.0);
 			//Generate the chunk with random values:
-			std::vector< std::vector<float> > chunk(ch, std::vector<float>(cw));
+			std::vector< std::vector<float> > prodChunk(ch, std::vector<float>(cw));
 			for(int a = 0; a < ch; a++) {
 				for(int b = 0; b < cw; b++) {
 					float d = urd(prg);
-					d = pow(d, 5) * 32;
-					chunk[a][b] = d;
+					d = pow(d, 5) * 36;
+					prodChunk[a][b] = d;
 				}
 			}
 			//Iterate over the map 6 times (found by experiment) to produce the chunk
@@ -85,16 +85,23 @@ namespace hlt{
 					for(unsigned short x = 0; x < cw; x++) {
 						Location l = { x, y };
 						Location n = getLocation(l, NORTH), e = getLocation(l, EAST), s = getLocation(l, SOUTH), w = getLocation(l, WEST);
-						newChunk[l.y][l.x] = OWN_WEIGHT * chunk[l.y][l.x];
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[n.y][n.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[e.y][e.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[s.y][s.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * chunk[w.y][w.x] / 4;
+						newChunk[l.y][l.x] = OWN_WEIGHT * prodChunk[l.y][l.x];
+						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[n.y][n.x] / 4;
+						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[e.y][e.x] / 4;
+						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[s.y][s.x] / 4;
+						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[w.y][w.x] / 4;
 						newChunk[l.y][l.x] -= 1.5 * urd(prg);
 						if(newChunk[l.y][l.x] < 0) newChunk[l.y][l.x] = 1;
 					}
 				}
-				chunk = newChunk;
+				prodChunk = newChunk;
+			}
+
+			std::vector< std::vector<float> > strengthChunk(ch, std::vector<float>(cw));
+			for(int c = 0; c < ch; c++) {
+				for(int d = 0; d < cw; d++) {
+					strengthChunk[c][d] = 10 * ((urd(prg) / 2) + 0.75) * round(prodChunk[c][d]);
+				}
 			}
 
 			map_width = cw * dw;
@@ -106,8 +113,8 @@ namespace hlt{
 				for(int b = 0; b < dw; b++) {
 					for(int c = 0; c < ch; c++) {
 						for(int d = 0; d < cw; d++) {
-							contents[a * ch + c][b * cw + d].production = round(chunk[c][d]); //Set production values.
-							contents[a * ch + c][b * cw + d].strength = 8 * ((urd(prg) / 2) + 0.75) * round(chunk[c][d]);
+							contents[a * ch + c][b * cw + d].production = round(prodChunk[c][d]); //Set production values.
+							contents[a * ch + c][b * cw + d].strength = round(strengthChunk[c][d]);
 						}
 					}
 					contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
