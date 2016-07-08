@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <functional>
 #include <chrono>
 #include <iostream>
 
@@ -59,48 +60,130 @@ namespace hlt{
 			//It is guaranteed to be smaller if not the same size, however.
 			int cw = width / dw;
 			int ch = height / dh;
-			//We're temporarily setting the map width and height to be that of the chunks,
-			//which lets us use the getLocation function with the chunks.
-			//We'll set it again later.
-			map_width = cw;
-			map_height = ch;
 
 			//Pseudorandom number generator.
 			std::mt19937 prg(std::chrono::system_clock::now().time_since_epoch().count());
 			std::uniform_real_distribution<double> urd(0.0, 1.0);
-			//Generate the chunk with random values:
-			std::vector< std::vector<float> > prodChunk(ch, std::vector<float>(cw));
-			for(int a = 0; a < ch; a++) {
-				for(int b = 0; b < cw; b++) {
-					float d = urd(prg);
-					d = pow(d, 5) * 36;
-					prodChunk[a][b] = d;
+
+			const std::function<double()> rud = [&]() -> double { return urd(prg); };
+
+			class Region {
+			private:
+				double factor;
+			public:
+				std::vector< std::vector<Region * > > children; //Tries to make it 4x4.
+				Region(int _w, int _h, double _min, double _max, const std::function<double()> & _rud) {
+					factor = pow(_rud(), 2) * (_max - _min) + _min;
+					children.clear();
+					const int CHUNK_SIZE = 4;
+					if(_w == 1 && _h == 1) return;
+					int cw = _w / CHUNK_SIZE, ch = _h / CHUNK_SIZE;
+					int difW = _w - CHUNK_SIZE * cw, difH = _h - CHUNK_SIZE * ch;
+					for(int a = 0; a < CHUNK_SIZE; a++) {
+						int tch = a < difH ? ch + 1 : ch;
+						if(tch > 0) {
+							children.push_back(std::vector<Region * >());
+							for(int b = 0; b < CHUNK_SIZE; b++) {
+								int tcw = b < difW ? cw + 1 : cw;
+								if(tcw > 0) {
+									children.back().push_back(new Region(tcw, tch, _min, _max, _rud));
+								}
+							}
+						}
+					}
+					const double OWN_WEIGHT = 0.75;
+					for(int a = 0; a < 2; a++) { //2 iterations found by experiment.
+						for(int a = 0; a < children.size(); a++) {
+							int mh = a - 1, ph = a + 1;
+							if(mh < 0) mh += children.size();
+							if(ph == children.size()) ph = 0;
+							for(int b = 0; b < children.front().size(); b++) {
+								int mw = b - 1, pw = b + 1;
+								if(mw < 0) mw += children.front().size();
+								if(pw == children.front().size()) pw = 0;
+								children[a][b]->factor *= OWN_WEIGHT;
+								children[a][b]->factor += children[mh][b]->factor * (1 - OWN_WEIGHT) / 4;
+								children[a][b]->factor += children[ph][b]->factor * (1 - OWN_WEIGHT) / 4;
+								children[a][b]->factor += children[a][mw]->factor * (1 - OWN_WEIGHT) / 4;
+								children[a][b]->factor += children[a][pw]->factor * (1 - OWN_WEIGHT) / 4;
+							}
+						}
+					}
+				 };
+				std::vector< std::vector<double> > getFactors() {
+					if(children.size() == 0) return std::vector< std::vector<double> >(1, std::vector<double>(1, factor));
+					std::vector< std::vector< std::vector< std::vector<double> > > > childrenFactors(children.size(), std::vector< std::vector< std::vector<double> > >(children.front().size()));
+					for(int a = 0; a < children.size(); a++) {
+						for(int b = 0; b < children.front().size(); b++) {
+							childrenFactors[a][b] = children[a][b]->getFactors();
+						}
+					}
+					int width = 0, height = 0;
+					for(int a = 0; a < children.size(); a++) height += childrenFactors[a].front().size();
+					for(int b = 0; b < children.front().size(); b++) width += childrenFactors.front()[b].front().size();
+					std::vector< std::vector<double> > factors(height, std::vector<double>(width));
+					int x = 0, y = 0;
+					for(int my = 0; my < children.size(); my++) {
+						for(int iy = 0; iy < childrenFactors[my].front().size(); iy++) {
+							for(int mx = 0; mx < children.front().size(); mx++) {
+								for(int ix = 0; ix < childrenFactors.front()[mx].front().size(); ix++) {
+									factors[y][x] = childrenFactors[my][mx][iy][ix] * factor;
+									x++;
+								}
+							}
+							y++;
+							x = 0;
+						}
+					}
+					return factors;
 				}
-			}
-			//Iterate over the map 6 times (found by experiment) to produce the chunk
-			for(int a = 0; a < 6; a++) {
-				std::vector< std::vector<float> > newChunk = std::vector< std::vector<float> >(ch, std::vector<float>(cw, 0));
-				const double OWN_WEIGHT = 0.667;
-				for(unsigned short y = 0; y < ch; y++) {
-					for(unsigned short x = 0; x < cw; x++) {
-						Location l = { x, y };
-						Location n = getLocation(l, NORTH), e = getLocation(l, EAST), s = getLocation(l, SOUTH), w = getLocation(l, WEST);
-						newChunk[l.y][l.x] = OWN_WEIGHT * prodChunk[l.y][l.x];
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[n.y][n.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[e.y][e.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[s.y][s.x] / 4;
-						newChunk[l.y][l.x] += (1 - OWN_WEIGHT) * prodChunk[w.y][w.x] / 4;
-						newChunk[l.y][l.x] -= 1.5 * urd(prg);
-						if(newChunk[l.y][l.x] < 0) newChunk[l.y][l.x] = 1;
+				~Region() { for(auto a = children.begin(); a != children.end(); a++) for(auto b = a->begin(); b != a->end(); b++) delete *b; }
+			};
+
+			//For final iteration
+			const double OWN_WEIGHT = 0.66667;
+
+			Region prodRegion(cw, ch, 0.5, 3, rud);
+			std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
+
+			//Iterate this region as well to produce better caverns:
+			for(int a = 0; a < 5; a++) { // 5 iterations found by experiment.
+				for(int a = 0; a < prodChunk.size(); a++) {
+					int mh = a - 1, ph = a + 1;
+					if(mh < 0) mh += prodChunk.size();
+					if(ph == prodChunk.size()) ph = 0;
+					for(int b = 0; b < prodChunk.front().size(); b++) {
+						int mw = b - 1, pw = b + 1;
+						if(mw < 0) mw += prodChunk.front().size();
+						if(pw == prodChunk.front().size()) pw = 0;
+						prodChunk[a][b] *= OWN_WEIGHT;
+						prodChunk[a][b] += prodChunk[mh][b] * (1 - OWN_WEIGHT) / 4;
+						prodChunk[a][b] += prodChunk[ph][b] * (1 - OWN_WEIGHT) / 4;
+						prodChunk[a][b] += prodChunk[a][mw] * (1 - OWN_WEIGHT) / 4;
+						prodChunk[a][b] += prodChunk[a][pw] * (1 - OWN_WEIGHT) / 4;
 					}
 				}
-				prodChunk = newChunk;
 			}
 
-			std::vector< std::vector<float> > strengthChunk(ch, std::vector<float>(cw));
-			for(int c = 0; c < ch; c++) {
-				for(int d = 0; d < cw; d++) {
-					strengthChunk[c][d] = 10 * ((urd(prg) / 2) + 0.75) * round(prodChunk[c][d]);
+			Region strengthRegion(cw, ch, 0.5, 2, rud);
+			std::vector< std::vector<double> > strengthChunk = strengthRegion.getFactors();
+
+			//Iterate this region as well to produce better caverns:
+			for(int a = 0; a < 3; a++) { // 3 iterations found by experiment.
+				for(int a = 0; a < strengthChunk.size(); a++) {
+					int mh = a - 1, ph = a + 1;
+					if(mh < 0) mh += strengthChunk.size();
+					if(ph == strengthChunk.size()) ph = 0;
+					for(int b = 0; b < strengthChunk.front().size(); b++) {
+						int mw = b - 1, pw = b + 1;
+						if(mw < 0) mw += strengthChunk.front().size();
+						if(pw == strengthChunk.front().size()) pw = 0;
+						strengthChunk[a][b] *= OWN_WEIGHT;
+						strengthChunk[a][b] += strengthChunk[mh][b] * (1 - OWN_WEIGHT) / 4;
+						strengthChunk[a][b] += strengthChunk[ph][b] * (1 - OWN_WEIGHT) / 4;
+						strengthChunk[a][b] += strengthChunk[a][mw] * (1 - OWN_WEIGHT) / 4;
+						strengthChunk[a][b] += strengthChunk[a][pw] * (1 - OWN_WEIGHT) / 4;
+					}
 				}
 			}
 
@@ -109,12 +192,13 @@ namespace hlt{
 			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
 
 			//Fill in with chunks.
+			const int MED_PROD = 1, MED_STR = 50;
 			for(int a = 0; a < dh; a++) {
 				for(int b = 0; b < dw; b++) {
 					for(int c = 0; c < ch; c++) {
 						for(int d = 0; d < cw; d++) {
-							contents[a * ch + c][b * cw + d].production = round(prodChunk[c][d]); //Set production values.
-							contents[a * ch + c][b * cw + d].strength = round(strengthChunk[c][d]);
+							contents[a * ch + c][b * cw + d].production = round(MED_PROD * prodChunk[c][d]); //Set production values.
+							contents[a * ch + c][b * cw + d].strength = round(MED_STR * strengthChunk[c][d]);
 						}
 					}
 					contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.

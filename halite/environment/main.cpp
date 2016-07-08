@@ -100,7 +100,7 @@ int main(int argc, char* args[]) {
 	}
 	catch(std::runtime_error e) {
 		filename = filename.substr(8);
-		if(!program_output_style) std::cout << e.what() << std::endl << "Failed to output to file. Opening a file at " << filename << std::endl;
+		if(!program_output_style) std::cout << e.what() << std::endl << "Opening a file at " << filename << std::endl;
 		my_game->output(filename);
 	}
 
