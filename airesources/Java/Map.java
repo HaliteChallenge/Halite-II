@@ -38,7 +38,10 @@ public class Map{
 
   public double getAngle(Location loc1, Location loc2) {
     int dx = loc1.x - loc2.x;
-    int dy = loc1.y - loc2.y;
+
+    // Flip order because 0,0 is top left
+    // and want atan2 to look as it would on the unit circle
+    int dy = loc2.y - loc1.y;
 
     if(dx > width - dx) dx -= width;
     if(-dx > width + dx) dx += width;
