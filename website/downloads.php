@@ -24,7 +24,7 @@
 				</ul>
 
 				<h3>Language Packages</h3>
-				<p>This set of starter packages was uploaded at <b>2:20 pm EST on July 9th</b>. We added the getAngle, inBounds, and getDistance functions to the Java starter package and fixed the inBounds function of the python starter package.</p>
+				<p>This set of starter packages was uploaded at <b>2:20 pm EST on July 9th</b>. We added the getAngle, inBounds, and getDistance functions to the Java starter package and fixed the inBounds function of the Python starter package.</p>
 				<ul>
 					<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
 					<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
