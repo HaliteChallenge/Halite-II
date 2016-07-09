@@ -171,10 +171,21 @@ class ManagerAPI extends API{
 					$files
 				);
 			}
-
 			while(count($files) > 10000) {
 				unlink($files[0]);
 				array_splice($files, 0, 1);
+			}
+
+			// Check that we arent stoing too many games in db
+			$res = mysqli_query($this->mysqli, "SELECT * FROM Game");
+			$numRows = $res->num_rows;
+			$numToDelete = $numRows - 10000;
+			if($numToDelete > 0) {
+				$gamesToDelete = $this->selectMultiple("SELECT gameID FROM Game ORDER BY gameID LIMIT $numToDelete");
+				foreach($gamesToDelete as $game) {
+					$this->insert("DELETE FROM GameUser WHERE gameID={$game['gameID']}");	
+					$this->insert("DELETE FROM Game WHERE gameID={$game['gameID']}");	
+				}
 			}
 
 			// Store game information in db
