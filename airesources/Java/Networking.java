@@ -49,14 +49,14 @@ public class Networking{
     int y = 0, x = 0;
     int counter = 0, owner = 0;
     int currentIndex = 0;
-    while(y != map.map_height) {
+    while(y != map.height) {
       counter = Integer.parseInt(inputStringComponents[currentIndex]);
       owner = Integer.parseInt(inputStringComponents[currentIndex + 1]);
       currentIndex += 2;
       for(int a = 0; a < counter; ++a) {
         map.contents.get(y).get(x).owner = owner;
         ++x;
-        if(x == map.map_width) {
+        if(x == map.width) {
           x = 0;
           ++y;
         }
