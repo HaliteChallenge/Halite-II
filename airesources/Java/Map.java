@@ -22,6 +22,32 @@ public class Map{
     }
   }
 
+  public boolean inBounds(Location loc) {
+     return loc.x < width && loc.x >= 0 && loc.y < height && loc.y >= 0;
+  }
+
+  public double getDistance(Location loc1, Location loc2) {
+    int dx = Math.abs(loc1.x - loc2.x);
+    int dy = Math.abs(loc1.y - loc2.y);
+
+    if(dx > width / 2.0) dx = width - dx;
+    if(dy > height / 2.0) dy = height - dy;
+
+    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+  }
+
+  public double getAngle(Location loc1, Location loc2) {
+    int dx = loc1.x - loc2.x;
+    int dy = loc1.y - loc2.y;
+
+    if(dx > width - dx) dx -= width;
+    if(-dx > width + dx) dx += width;
+
+    if(dy > height - dy) dy -= height;
+    if(-dy > height + dy) dy += height;
+
+    return Math.atan2(dy, dx);
+  }
   public Location getLocation(Location loc, Direction dir) {
     Location l = new Location(loc);
     if(dir != Direction.STILL) {
