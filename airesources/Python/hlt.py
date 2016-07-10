@@ -40,7 +40,7 @@ class Map:
 			self.contents.append(row)
 
 	def inBounds(self, l):
-		return l.x < self.map_width and l.y < self.map_height
+		return l.x >= 0 and l.x < self.map_width and l.y >= 0 and l.y < self.map_height
 
 	def getDistance(self, l1, l2):
 		dx = math.abs(l1.x - l2.x)
