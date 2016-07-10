@@ -105,13 +105,12 @@ def runGame(width, height, users, backend):
 		if line == None:
 			break
 		print(line)
-		if line.isspace() == False:
-			lines.append(line)
+		lines.append(line)
 
-	replayPath = lines[len(lines) - (len(users)+1)]
+	replayPath = lines[len(lines) - (len(users)+2)]
 
 	# Get player ranks and scores by parsing shellOutput
-	for lineIndex in range(len(lines)-len(users), len(lines)):
+	for lineIndex in range(len(lines)-(len(users)+1), len(lines)-1):
 		components = lines[lineIndex].split(" ")
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
@@ -121,6 +120,15 @@ def runGame(width, height, users, backend):
 		users[playerTag-1]["productionAverage"] = float(components[4])
 		users[playerTag-1]["stillPercentage"] = float(components[5])
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
+			
+	timeoutLine = lines[len(lines)-1]
+	print("TIMEOUT LINE: "+timeoutLine)
+	for user in users:
+		user["didTimeout"] = False
+	if timeoutLine.isspace() == False:
+		timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
+		for playerTag in timeoutTags:
+			users[playerTag-1]["didTimeout"] = True
 
 	# Update trueskill mu and sigma values
 	users.sort(key=lambda user: user["rank"])
