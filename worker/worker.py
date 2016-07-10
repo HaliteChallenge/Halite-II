@@ -59,13 +59,13 @@ def compile(user, backend):
 	makePath(workingPath)
 	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
 	zip.unpack(botPath)
-	
+
 	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
 		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
 		for filename in os.listdir(singleFolder):
     			shutil.move(os.path.join(singleFolder, filename), os.path.join(workingPath, filename))
 		os.rmdir(singleFolder)
-	
+
 	language, errors = compile_anything(workingPath)
 	didCompile = True if errors == None else False
 
@@ -80,11 +80,7 @@ def compile(user, backend):
 	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
-def runGame(width, height, users, backend):
-	"""Downloads compiled bots, runs a game, and posts the results of the game"""
-	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
-
-	# Download players to current directory
+def downloadUsers(users):
 	for user in users:
 		userDir = str(user["userID"])
 		if os.path.isdir(userDir):
@@ -92,8 +88,8 @@ def runGame(width, height, users, backend):
 		os.mkdir(userDir)
 		zip.unpack(backend.storeBotLocally(user["userID"], userDir))
 
-	# Run game within sandbox
-	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
+def getGameOutput(width, height, users):
+	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), ]+[a["userID"] for a in users])
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
@@ -108,6 +104,7 @@ def runGame(width, height, users, backend):
 		if line.isspace() == False:
 			lines.append(line)
 
+def parseGameOutput(lines, users):
 	replayPath = lines[len(lines) - (len(users)+1)]
 
 	# Get player ranks and scores by parsing shellOutput
@@ -122,6 +119,13 @@ def runGame(width, height, users, backend):
 		users[playerTag-1]["stillPercentage"] = float(components[5])
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
+def runGame(width, height, users, backend):
+	"""Downloads compiled bots, runs a game, and posts the results of the game"""
+	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+
+	downloadUsers(users)
+	parseGameOutput(getGameOutput(users), users)
+	
 	# Update trueskill mu and sigma values
 	users.sort(key=lambda user: user["rank"])
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
