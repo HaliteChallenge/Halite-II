@@ -21,6 +21,8 @@ from email.mime.text import MIMEText
 
 import configparser
 
+import copy
+
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
 
@@ -95,21 +97,23 @@ def getGameOutput(width, height, users):
 	sandbox = Sandbox(os.getcwd())
 	sandbox.start("sh -c '"+runGameCommand+"'")
 
-	lines = []
+	output = []
 	while True:
 		line = sandbox.read_line(200)
 		if line == None:
 			break
 		print(line)
-		if line.isspace() == False:
-			lines.append(line)
+		output.append(line)
+	return output
 
-def parseGameOutput(lines, users):
-	replayPath = lines[len(lines) - (len(users)+1)]
+def parseGameOutput(output, users):
+	users = copy.deepcopy(users)
+
+	replayPath = output[len(output) - (len(users)+2)]
 
 	# Get player ranks and scores by parsing shellOutput
-	for lineIndex in range(len(lines)-len(users), len(lines)):
-		components = lines[lineIndex].split(" ")
+	for lineIndex in range(len(output)-(len(users)+1), len(output)-1):
+		components = output[lineIndex].split(" ")
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
 		users[playerTag-1]["rank"] = int(components[1])
@@ -119,23 +123,37 @@ def parseGameOutput(lines, users):
 		users[playerTag-1]["stillPercentage"] = float(components[5])
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
-def runGame(width, height, users, backend):
-	"""Downloads compiled bots, runs a game, and posts the results of the game"""
-	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+	timeoutLine = output[len(output)-1]
+	print("TIMEOUT LINE: "+timeoutLine)
+	for user in users:
+		user["didTimeout"] = False
 
-	downloadUsers(users)
-	parseGameOutput(getGameOutput(users), users)
-	
-	# Update trueskill mu and sigma values
+	if timeoutLine.isspace() == False:
+		timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
+		for playerTag in timeoutTags:
+			users[playerTag-1]["didTimeout"] = True
+
+	return replayPath, users
+
+def updateRankings(users):
+	users = copy.deepcopy(users)
 	users.sort(key=lambda user: user["rank"])
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
 	newRatings = trueskill.rate(teams)
 	for a in range(len(newRatings)):
 		users[a]['mu'] = newRatings[a][0].mu
 		users[a]['sigma'] = newRatings[a][0].sigma
+	return users
+	
+def runGame(width, height, users, backend):
+	"""Downloads compiled bots, runs a game, and posts the results of the game"""
+	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+
+	downloadUsers(users)
+	replayPath, users = parseGameOutput(getGameOutput(users), users)
+	users = updateRankings(users)
 
 	backend.gameResult(users, replayPath)
-
 	os.remove(replayPath)
 
 if __name__ == "__main__":
