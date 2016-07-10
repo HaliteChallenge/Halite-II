@@ -55,8 +55,9 @@ $(function() {
 				this.$button.click(this, this.buttonClicked.bind(this));
 				this.$fileInput.change(this, this.fileChanged.bind(this));
 			},
-			setUserID: function(userID) {
+			setCredentials: function(userID, password) {
 				this.$form.append("<input type='hidden' name='userID' value='"+userID+"'>");
+				this.$form.append("<input type='hidden' name='password' value='"+password+"'>");
 			},
 			buttonClicked: function() { this.$fileInput.click(); },
 			fileChanged: function() {
@@ -133,7 +134,7 @@ $(function() {
 				this.$logInNav.css("display", "none");
 				this.$logOutNav.css("display", "inline");
 
-				this.uploadButton.setUserID(this.user.userID);
+				this.uploadButton.setCredentials(this.user.userID, this.user.password);
 			} else {
 				this.$logInNav.css("display", "inline");
 				this.$logOutNav.css("display", "none");
@@ -144,7 +145,7 @@ $(function() {
 	var doLogOff = getGET("forumsLogOut");
 	if(doLogOff != null && doLogOff != undefined) {
 		messageBox.alert("Logged Out", "You have been logged out of forums.halite.io and halite.io", true);
-		destroySession(false);
+		destroySession();
 	}
 
 	navbar.init();

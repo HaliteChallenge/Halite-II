@@ -195,10 +195,12 @@ class WebsiteAPI extends API{
 	}
 
 	protected function botFile() {
-		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
+		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			var_dump($_POST);
 			$userID = $_POST['userID'];
-
-			$user = $this->select("SELECT isVerified FROM User WHERE userID={$_POST['userID']}");
+			$password = $_POST['password'];
+			
+			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
