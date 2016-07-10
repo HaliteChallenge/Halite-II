@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ENVIRONMENT="environment"
 RUNFILE="run.sh"
 WORKINGPATH="workingPath"
@@ -16,17 +18,17 @@ HEIGHT=$2
 
 mkdir $WORKINGPATH
 cp $ENVIRONMENT $WORKINGPATH
-for BOT in $(eval echo {$3..$END});
+for BOT in ${@:3};
 	do mv $BOT $WORKINGPATH;
 done
 
 cd $WORKINGPATH
-for BOT in $(eval echo {$3..$END});
+for BOT in ${@:3};
 	do chmod +x "$BOT/$RUNFILE";
-done
+done;
 
-BOTSTARTCOMMANDS = ""
-for BOT in $(eval echo {$3..$END});
+BOTSTARTCOMMANDS=""
+for BOT in ${@:3};
 	do BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'cd $PWD/$BOT && ./$RUNFILE'";
 done
 

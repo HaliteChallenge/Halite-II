@@ -150,7 +150,7 @@ def executeGameTask(width, height, users, backend):
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
 	downloadUsers(users)
-	replayPath, users = parseGameOutput(getGameOutput(users), users)
+	replayPath, users = parseGameOutput(runGame(width, height, users), users)
 	users = updateRankings(users)
 
 	backend.gameResult(users, replayPath)
