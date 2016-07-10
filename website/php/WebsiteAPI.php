@@ -54,7 +54,6 @@ class WebsiteAPI extends API{
 	}
 
 	private function logOutForums($forumsID) {
-		$forums
 		$options = array('http' => array(
 						'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 						'method'  => 'POST',
@@ -280,7 +279,7 @@ class WebsiteAPI extends API{
 			return "Success";
 		} else if($this->method == 'DELETE') {
 			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
-				if(count($this->select("SELECT * FROM User WHERE username = '$_SESSION['username']' AND password = '$_SESSION['password']'")) != 0) {
+				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
 					logOutForums($_SESSION['userID']);
 				}
 			}
