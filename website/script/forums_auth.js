@@ -28,6 +28,7 @@ $(function() {
   };
 
   function handleForumsSignIn(payload, signature, user) {
+    messageBox.alert("Redirecting you", "You have sucessfully logged into halite.io and forums.halite.io. We are redirecting you to the forums right now.", true);
     var url = getForumSignInURL(payload, signature, user.userID, user.email, user.username);
     console.log(url);
     if(url == null || url == undefined) {
