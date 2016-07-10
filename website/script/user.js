@@ -47,11 +47,16 @@ $(function() {
 		transformGames: function() {
 			console.log(this.rawGames)
 			for(var a = 0; a < this.rawGames.length; a++) {
-				var opponent = this.rawGames[a].users[0].userID == this.userID ? this.rawGames[a].users[1] : this.rawGames[a].users[0];
-				var result = opponent.rank == "1" ? "Lost" : "Won";
+				var players = this.rawGames[a].users;
+				players.sort(function(p1, p2) {
+					return p1.rank > p2.rank;		
+				});
+				var userID = this.userID;
+				var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
+				var result = thisUser.rank + " of " + players.length;
 				var replayName = this.rawGames[a].replayName;
 				this.games.push({
-					opponent: opponent,
+					players: players,
 					result: result,
 					replayName: replayName
 				});
@@ -65,7 +70,17 @@ $(function() {
 			}
 		},
 		getTableRow: function(game) {
-			return "<tr><td><a href='user.php?userID="+game.opponent.userID+"'>"+game.opponent.username+"</a></td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
+			var playersList = "<ol>";
+			var userID = this.userID;
+			playersList += game.players.map(function(player) {
+				if(player.userID == userID) {
+					return "<li><a href='user.php?userID="+player.userID+"'><b>"+player.username+"</a></b></li>";
+				} else {
+					return "<li><a href='user.php?userID="+player.userID+"'>"+player.username+"</a></li>";
+				}
+			}).join(" ");
+			playersList += "</ol>";
+			return "<tr><td>"+playersList+"</td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
 		}
 	}
 
