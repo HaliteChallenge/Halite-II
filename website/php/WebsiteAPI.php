@@ -50,7 +50,9 @@ class WebsiteAPI extends API{
 	}
 
 	private function getForumsID($userID) {
-		return intval(json_decode(file_get_contents("http://forums.halite.io/users/by-external/$userID.json"))->user->id);
+		$url = "http://forums.halite.io/users/by-external/{$userID}.json/?".http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']));
+		$contents = file_get_contents($url);
+		return intval(json_decode($contents, true)['user']['id']);
 	}
 
 	private function logOutForums($forumsID) {
@@ -280,7 +282,7 @@ class WebsiteAPI extends API{
 		} else if($this->method == 'DELETE') {
 			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
 				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
-					logOutForums($_SESSION['userID']);
+					$this->logOutForums($this->getForumsID($_SESSION['userID']));
 				}
 			}
 			session_destroy();
