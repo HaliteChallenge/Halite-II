@@ -53,7 +53,7 @@ def sendEmail(subject, body, recipient):
 	s.quit()
 
 
-def compile(user, backend):
+def executeCompileTask(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
 	print("Compiling a bot with userID %s" % (user["userID"]))
 
@@ -90,7 +90,7 @@ def downloadUsers(users):
 		os.mkdir(userDir)
 		zip.unpack(backend.storeBotLocally(user["userID"], userDir))
 
-def getGameOutput(width, height, users):
+def runGame(width, height, users):
 	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), ]+[a["userID"] for a in users])
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
@@ -144,8 +144,8 @@ def updateRankings(users):
 		users[a]['mu'] = newRatings[a][0].mu
 		users[a]['sigma'] = newRatings[a][0].sigma
 	return users
-	
-def runGame(width, height, users, backend):
+
+def executeGameTask(width, height, users, backend):
 	"""Downloads compiled bots, runs a game, and posts the results of the game"""
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
@@ -164,9 +164,9 @@ if __name__ == "__main__":
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
-				compile(task["user"], backend)
+				executeCompileTask(task["user"], backend)
 			elif task["type"] == "game":
-				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
+				executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
 			else:
 				print("Unknown task")
 		else:
