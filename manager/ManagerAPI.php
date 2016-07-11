@@ -64,6 +64,24 @@ class ManagerAPI extends API{
 		return floatval($lines[0]);
 	}
 
+	private function updateRankings($rankingValues) {
+		usort($rankingValues, function($a, $b) {
+			return $a['rank'] < $b['rank'];
+		});
+		$rankings = array();
+		foreach($rankingValues as $user) {
+			array_push($rankings, $user['mu']);
+			array_push($rankings, $user['sigma']);
+		}
+		exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
+		for($a = 0; $a < count($rankingValues); $a++) {
+			$components = explode(' ', $lines[$a]);
+			$rankingValues[$a]['mu'] = $components[0];
+			$rankingValues[$a]['sigma'] = $components[1];
+		}
+		return $rankingValues;
+	}
+
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$config = parse_ini_file(INI_FILE, true);
@@ -269,21 +287,9 @@ class ManagerAPI extends API{
 				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 			// Update mu and sigma
-			usort($allUsers, function($a, $b) {
-				return $a['rank'] < $b['rank'];
-			});
-			$rankings = array();
+			$allUsers = $this->updateRankings($allUsers);
 			foreach($allUsers as $user) {
-				array_push($rankings, $user['mu']);
-				array_push($rankings, $user['sigma']);
-			}
-			exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
-			var_dump($lines);
-			for($a = 0; $a < count ($allUsers); $a++) {
-				$components = explode(' ', $lines[$a]);
-				$allUsers[$a]['mu'] = $components[0];
-				$allUsers[$a]['sigma'] = $components[1];
-				$this->insert("UPDATE User SET mu={$allUsers[$a]['mu']}, sigma={$allUsers[$a]['sigma']} WHERE userID={$allUsers[$a]['userID']}");
+				$this->insert("UPDATE User SET mu={$user['mu']}, sigma={$user['sigma']} WHERE userID={$user['userID']}");
 			}
 
 			// Update overall rank
