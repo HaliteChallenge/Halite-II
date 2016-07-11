@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>API Spec</title>
+	<title>Networking Spec</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 
-				<h3>API Overview:</h3>
+				<h3>Networking Overview</h3>
 
 				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Bots are expected to communicate using the format found below; any deviation from it will likely result in the bot being ejected from the game.</p>
 
@@ -28,7 +28,7 @@
 				 <p>Bots are initialized only once at the start of the game, before the first frame. Following initialization, bots follow the frame format until the end of the game, when the environment will automatically terminate them.</p>
 
 
-				<h3>Initialization Format:</h3>
+				<h3>Initialization Format</h3>
 
 				<p>Every bot is sent the following, with each item newline-terminated:
 					<ul>
@@ -41,15 +41,15 @@
 
 				 <p>Every bot is expected to respond with a string representing their name (newline-terminated) within three seconds.</p>
 
-				<h3>Frame Format:</h3>
+				<h3>Frame Format</h3>
 
 				<p>Every bot is sent the the present game map (newline-terminated).
 
 				<p>Every bot is expected to respond with a set of moves (newline-terminated) within one second.
 
-				<h3>Format Specifics:</h3>
+				<h3>Format Specifics</h3>
 
-				<h4>Input Game Map Format:</h4>
+				<h4>Input Game Map Format</h4>
 
 				<p>The state of the map (including owner and strength values, but excluding production values) is sent in the following way:
 				 	<ul>
@@ -68,13 +68,13 @@
 					1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0
 				</p>
 
-				<h4>Input Production Format:</h4>
+				<h4>Input Production Format</h4>
 
 				<p>The production values of the map are sent using <code>WIDTH</code> * <code>HEIGHT</code> integers which fill in the production values of the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code></p>
 
 				<p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
 
-				<h4>Output Move Set Format:</h4>
+				<h4>Output Move Set Format</h4>
 
 				<p>Bots should send their moves as a list of integers in sets of 3. In each set, every first integer is the x location (starting at 0) of the site the bot desires to move, every second integer is the y location (starting at 0) of the site the bot desires to move, and every third integer is the direction the bot wishes to move the site in. The order of the sets does not matter.<br>Valid directions include:
 				<ul>
@@ -90,6 +90,16 @@
 			</div>
 		</div>
 	</div>
+
+	<footer class="footer pageContent">
+		<div class="container">
+			<div id="footer">
+				<ul class="pager">
+					<li class="next"><a href="game_spec.php"><span aria-hidden="true">&larr;</span> Game Spec</a></li>
+				</ul>
+			</div>
+		</div>
+	</footer>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

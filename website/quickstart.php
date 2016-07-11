@@ -42,7 +42,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="tutorial.php">Tutorial <span aria-hidden="true">&rarr;</span></a></li>
+					<li class="next"><a href="basic.php">Tutorial <span aria-hidden="true">&rarr;</span></a></li>
 				</ul>
 			</div>
 		</div>

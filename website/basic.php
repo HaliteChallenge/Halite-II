@@ -154,7 +154,6 @@ public class MyBot{
 			<div id="footer">
 				<ul class="pager">
 					<li class="previous"><a href="quickstart.php"><span aria-hidden="true">&larr;</span> Quickstart</a></li>
-					<li class="next"><a href="game_spec.php">Game Spec<span aria-hidden="true">&rarr;</span></a></li>
 				</ul>
 			</div>
 		</div>
