@@ -124,7 +124,7 @@ class ManagerAPI extends API{
 
 			$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
 			$differenceInRank = rand(3, 10);
-			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
+			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE userID!={$seedPlayer['userID']} and status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
 			usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
 				return $this->getTrueskillMatchQuality(array($a, $seedPlayer)) < $this->getTrueskillMatchQuality(array($b, $seedPlayer));
 			});
@@ -272,7 +272,7 @@ class ManagerAPI extends API{
 
 			// Update mu and sigma
 			usort($users, function($a, $b) {
-				return $a->rank < $b->rank;
+				return $a->rank > $b->rank;
 			});
 			$rankings = array();
 			foreach($users as $user) {
@@ -283,10 +283,13 @@ class ManagerAPI extends API{
 			var_dump($lines);
 			for($a = 0; $a < count($users); $a++) {
 				$components = explode(' ', $lines[$a]);
+				$allUsers[$a]['mu'] = floatval($components[0]);
+				$allUsers[$a]['sigma'] = floatval($components[1]);
 				$this->insert("UPDATE User SET mu={$components[0]}, sigma={$components[1]} WHERE userID={$users[$a]->userID}");
 			}
 
 			// Update overall rank
+			$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
 			usort($allUsers, function($a, $b) {
 				return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
 			});
