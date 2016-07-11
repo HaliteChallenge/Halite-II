@@ -7,24 +7,41 @@
 #include <time.h>
 #include <set>
 #include <fstream>
-#include <unistd.h>
+#ifdef _WIN32
+	#include <windows.h>
+	#include <direct.h>
+#else
+	#include <unistd.h>
+#endif
 
 #include "hlt.hpp"
 #include "Networking.hpp"
 
 int main(int argc, const char ** argv) { //Ignore as main until needed.
 
+/*
 	char * path = new char[FILENAME_MAX];
+#ifdef _WIN32
+	_getcwd(path, sizeof(char) * FILENAME_MAX);
+#else
 	getcwd(path, sizeof(char) * FILENAME_MAX);
-	strcat(path, "/");
+#endif
+	strcat(path, "\\");
 	strcat(path, argv[0]);
 	std::string sPath(path);
-	while(sPath.back() != '/') sPath.pop_back();
+	while(sPath.back() != '\\') sPath.pop_back();
 	sPath.pop_back();
+	std::replace(sPath.begin(), sPath.end(), '\\', '/');
 
+#ifdef _WIN32
+	_chdir(sPath.c_str()); //Set working directory
+#else
 	chdir(sPath.c_str()); //Set working directory
+#endif
 	std::ofstream out("output.txt");
 	out << sPath.c_str() << std::endl;
+	out.close();
+*/
 
 	srand(time(NULL));
 
@@ -50,6 +67,5 @@ int main(int argc, const char ** argv) { //Ignore as main until needed.
 		detail::sendString(s);
 	}
 
-	out.close();
 	return 0;
 }
