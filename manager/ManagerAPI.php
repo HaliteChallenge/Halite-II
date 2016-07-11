@@ -51,6 +51,19 @@ class ManagerAPI extends API{
 		return BOTS_DIR."{$userID}.zip";
 	}
 
+	private function getTrueskillMatchQuality($rankingValues) {
+		usort($rankingValues, function($a, $b) {
+			return $a['rank'] < $b['rank'];
+		});
+		$rankings = array();
+		foreach($rankingValues as $user) {
+			array_push($rankings, $user['mu']);
+			array_push($rankings, $user['sigma']);
+		}
+		exec("python3 trueskillMatchQuality.py ".implode(' ', $rankings), $lines);
+		return floatval($lines[0]);
+	}
+
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$config = parse_ini_file(INI_FILE, true);
@@ -107,9 +120,24 @@ class ManagerAPI extends API{
 			// Assign a run game tasks
 			$possibleNumPlayers = array(2, 3, 4, 5);
 			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
-			$players = $this->selectMultiple("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
+
+			$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
+			$differenceInRank = rand(3, 10);
+			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
+			usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
+				return $this->getTrueskillMatchQuality(array($a, $seedPlayer)) < $this->getTrueskillMatchQuality(array($b, $seedPlayer));
+			});
+
+			$players = array($seedPlayer);
+			for($a = 0; $a < $numPlayers-1; $a++) {
+				array_push($players, $a);
+			}
+
+			// Pick map size
 			$sizes = array(10, 20, 30, 40, 50, 60);
 			$size = $sizes[array_rand($sizes)];
+
+			// Send game task
 			if(count($players) == $numPlayers) {
 				return array(
 					"type" => "game",
