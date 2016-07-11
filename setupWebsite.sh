@@ -1,5 +1,6 @@
-# Install LAMP
 sudo apt-get install -y lamp-server^
+sudo apt-get install -y python3 python3-pip 
+sudo pip3 install trueskill
 
 # File structure
 echo "Setting up file structure"

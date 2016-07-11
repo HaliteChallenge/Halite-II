@@ -8,8 +8,6 @@ import tempfile
 
 from time import sleep
 
-import trueskill
-
 import zip
 import backend
 
