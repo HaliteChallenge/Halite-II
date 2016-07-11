@@ -26,6 +26,7 @@ namespace hlt{
 		//These are statistics that are stored in the map so they don't have to be recalculated, since it's very little memory and it's expensive to recalculate.
 		std::vector<unsigned int> territory_count;
 		std::vector<unsigned int> strength_count;
+		std::vector<unsigned int> production_count;
 
 		Map() {
 			map_width = 0;
@@ -38,24 +39,28 @@ namespace hlt{
 			contents = otherMap.contents;
 			territory_count = otherMap.territory_count;
 			strength_count = otherMap.strength_count;
+			production_count = otherMap.production_count;
 		}
 		void getStatistics() {
 			territory_count = std::vector<unsigned int>(255, 0);
 			strength_count = std::vector<unsigned int>(255, 0);
+			production_count = std::vector<unsigned int>(255, 0);
 			for(unsigned short a = 0; a < map_height; a++) for(unsigned short b = 0; b < map_width; b++) if(contents[a][b].owner != 0) {
 				territory_count[contents[a][b].owner - 1]++;
 				strength_count[contents[a][b].owner - 1] += contents[a][b].strength;
+				production_count[contents[a][b].owner - 1] += contents[a][b].production;
 			}
 			while(territory_count.size() != 0 && territory_count.back() == 0) {
 				territory_count.pop_back();
 				strength_count.pop_back();
+				production_count.pop_back();
 			}
 			territory_count.shrink_to_fit();
 			strength_count.shrink_to_fit();
+			production_count.shrink_to_fit();
 		}
 		bool isAlive(int tag) {
-			if(tag >= territory_count.size()) return false;
-			if(territory_count[tag] == 0) return false;
+			if(tag >= territory_count.size() || territory_count[tag] == 0) return false;
 			return true;
 		}
 	};
