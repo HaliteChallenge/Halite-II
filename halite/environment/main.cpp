@@ -98,7 +98,7 @@ int main(int argc, char* args[]) {
 	try{
 		my_game->output(filename);
 	}
-	catch(std::runtime_error e) {
+	catch(std::runtime_error & e) {
 		filename = filename.substr(8);
 		if(!program_output_style) std::cout << "Opening a file at " << filename << std::endl;
 		my_game->output(filename);

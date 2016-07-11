@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include <cstdlib>
 #include <ctime>
+#include <stdio.h>
 #include <time.h>
 #include <set>
 #include <fstream>
@@ -10,9 +12,19 @@
 #include "hlt.hpp"
 #include "Networking.hpp"
 
-int main2(int argc, const char ** argv) { //Ignore as main until needed.
+int main(int argc, const char ** argv) { //Ignore as main until needed.
 
-	chdir(argv[0]); //Set working directory
+	char * path = new char[FILENAME_MAX];
+	getcwd(path, sizeof(char) * FILENAME_MAX);
+	strcat(path, "/");
+	strcat(path, argv[0]);
+	std::string sPath(path);
+	while(sPath.back() != '/') sPath.pop_back();
+	sPath.pop_back();
+
+	chdir(sPath.c_str()); //Set working directory
+	std::ofstream out("output.txt");
+	out << sPath.c_str() << std::endl;
 
 	srand(time(NULL));
 
@@ -22,11 +34,13 @@ int main2(int argc, const char ** argv) { //Ignore as main until needed.
 	hlt::Map present_map;
 	getInit(my_tag, present_map);
 
-	std::ifstream in("Responses.txt");
 	std::string s;
-	std::getline(in, s);
-
-	sendInitResponse(s + std::to_string(my_tag));
+	std::ifstream in("Responses.txt");
+	if(!in.is_open()) sendInitResponse("TestBot - Couldn't open file :(");
+	else {
+		std::getline(in, s);
+		sendInitResponse(s + std::to_string(my_tag));
+	}
 
 	while(true) {
 		getFrame(present_map);
@@ -36,5 +50,6 @@ int main2(int argc, const char ** argv) { //Ignore as main until needed.
 		detail::sendString(s);
 	}
 
+	out.close();
 	return 0;
 }
