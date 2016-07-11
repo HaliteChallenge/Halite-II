@@ -789,8 +789,10 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Generate text for the titles of the graphs
 		std::string territoryText = "Territory";
 		std::string strengthText = "Strength";
+		std::string productionText = "Production";
 		util::renderText(territory_graph_left, territory_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, territoryText);
 		util::renderText(strength_graph_left, strength_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, strengthText);
+		util::renderText(production_graph_left, production_graph_top + GRAPH_TEXT_OFFSET, GRAPH_TEXT_HEIGHT * height, TEXT_COLOR, productionText);
 
 		//Find name of replay:
 		char search = '/';
