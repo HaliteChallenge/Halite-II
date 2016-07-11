@@ -250,11 +250,12 @@ class ManagerAPI extends API{
 				array_push($rankings, $user['sigma']);
 			}
 			exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
-			foreach($lines as $line) {
-				$components = explode(' ', $line);
-				$allUsers['mu'] = $components[0];
-				$allUsers['sigma'] = $components[1];
-				$this->insert("UPDATE User SET mu={$allUsers['mu']}, sigma={$allUsers['sigma']} WHERE userID={$allUsers['userID']}");
+			var_dump($lines);
+			for($a = 0; $a < count ($allUsers); $a++) {
+				$components = explode(' ', $lines[$a]);
+				$allUsers[$a]['mu'] = $components[0];
+				$allUsers[$a]['sigma'] = $components[1];
+				$this->insert("UPDATE User SET mu={$allUsers[$a]['mu']}, sigma={$allUsers[$a]['sigma']} WHERE userID={$allUsers[$a]['userID']}");
 			}
 
 			// Update overall rank

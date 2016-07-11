@@ -1,4 +1,5 @@
 import sys
+import trueskill
 
 sys.argv.pop(0)
 
