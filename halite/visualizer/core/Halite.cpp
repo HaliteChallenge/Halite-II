@@ -813,16 +813,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 		std::string labelText = "";
 		if(mouseClick) {
-			if(mouseX <= strength_graph_right && mouseX >= strength_graph_left && mouseY <= strength_graph_top && mouseY >= strength_graph_bottom) {
-				//Find turn number:
-				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - strength_graph_left) / (strength_graph_right - strength_graph_left) + graph_turn_min;
-
-				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top- strength_graph_bottom);
-
-				labelText = "Turn: " + std::to_string(tn) + " | Strength: " + std::to_string(val);
-			}
-			//Else if mouse is in territory graph:
-			else if(mouseX <= territory_graph_right && mouseX >= territory_graph_left && mouseY <= territory_graph_top && mouseY >= territory_graph_bottom) {
+			//If mouse is in territory graph:
+			if(mouseX <= territory_graph_right && mouseX >= territory_graph_left && mouseY <= territory_graph_top && mouseY >= territory_graph_bottom) {
 				//Find turn number:
 				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - territory_graph_left) / (territory_graph_right - territory_graph_left) + graph_turn_min;
 
@@ -830,6 +822,25 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "Turn: " + std::to_string(tn) + " | Territory: " + std::to_string(val);
 			}
+			//Else if mouse is in strength graph
+			else if(mouseX <= strength_graph_right && mouseX >= strength_graph_left && mouseY <= strength_graph_top && mouseY >= strength_graph_bottom) {
+				//Find turn number:
+				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - strength_graph_left) / (strength_graph_right - strength_graph_left) + graph_turn_min;
+
+				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top - strength_graph_bottom);
+
+				labelText = "Turn: " + std::to_string(tn) + " | Strength: " + std::to_string(val);
+			}
+			//Else if mouse is in production graph
+			else if(mouseX <= production_graph_right && mouseX >= production_graph_left && mouseY <= production_graph_top && mouseY >= production_graph_bottom) {
+				//Find turn number:
+				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - production_graph_left) / (production_graph_right - production_graph_left) + graph_turn_min;
+
+				unsigned int val = graph_max_production * (mouseY - production_graph_bottom) / (production_graph_top - production_graph_bottom);
+
+				labelText = "Turn: " + std::to_string(tn) + " | Production: " + std::to_string(val);
+			}
+			//Else if mouse is in map
 			else if(mouseX <= MAP_RIGHT && mouseX >= MAP_LEFT && mouseY <= MAP_TOP && mouseY >= MAP_BOTTOM) {
 				//Get mouseDX and mouseDY
 				float mouseDX = mouseX - MAP_LEFT, mouseDY = mouseY - MAP_BOTTOM;
@@ -848,6 +859,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 
 				labelText = "X: " + std::to_string(xPos) + " | Y: " + std::to_string(yPos) + " | Strength: " + std::to_string(strength) + " | Production: " + std::to_string(production);
 			}
+			//Else display nothing,
 			else labelText = "";
 		}
 		else labelText = "";
