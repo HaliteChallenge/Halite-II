@@ -52,7 +52,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) {
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.getSite(b->loc, STILL).owner == a + 1) {
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.inBounds(b->loc) && game_map.getSite(b->loc, STILL).owner == a + 1) {
 			if(b->dir == STILL) {
 				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
 				else game_map.getSite(b->loc, STILL).strength = 255;
