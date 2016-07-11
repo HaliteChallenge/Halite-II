@@ -40,7 +40,7 @@ private:
   //Stats about the graph. This lets us know if we need to redo the setup for the graph.
   unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
   float graph_zoom;
-  unsigned int graph_max_territory, graph_max_strength;
+  unsigned int graph_max_territory, graph_max_strength, graph_max_production;
   float territory_graph_top, territory_graph_bottom, territory_graph_left, territory_graph_right;
   float strength_graph_top, strength_graph_bottom, strength_graph_left, strength_graph_right;
   float production_graph_top, production_graph_bottom, production_graph_left, production_graph_right;

@@ -237,9 +237,11 @@ void Halite::setupGraphGL() {
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
 	glDeleteBuffers(1, &graph_strength_vertex_buffer);
+	glDeleteBuffers(1, &graph_production_vertex_buffer);
 	glDeleteBuffers(1, &graph_color_buffer);
 	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
 	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_production_vertex_attributes);
 	//Ensure that shaders are deleted:
 	glDeleteShader(graph_vertex_shader);
 	glDeleteShader(graph_fragment_shader);
@@ -247,9 +249,11 @@ void Halite::setupGraphGL() {
 	//Generate buffers and vaos.
 	glGenBuffers(1, &graph_territory_vertex_buffer);
 	glGenBuffers(1, &graph_strength_vertex_buffer);
+	glGenBuffers(1, &graph_production_vertex_buffer);
 	glGenBuffers(1, &graph_color_buffer);
 	glGenVertexArrays(1, &graph_territory_vertex_attributes);
 	glGenVertexArrays(1, &graph_strength_vertex_attributes);
+	glGenVertexArrays(1, &graph_production_vertex_attributes);
 
 
 	//Setup shaders:
@@ -393,6 +397,38 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Setup production graph:
+
+	//Bind Vertex Array:
+	glBindVertexArray(graph_production_vertex_attributes);
+
+	//Find the greatest production_count existent.
+	graph_max_production = 0;
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) if(full_game[b]->production_count.size() > a && full_game[b]->production_count[a] > graph_max_production) graph_max_production = full_game[b]->production_count[a];
+
+	//Create vector of graph vertices.
+	std::vector<float> graphProductionVertices((unsigned int)number_of_players * (graph_turn_max + 1 - graph_turn_min) * 2);
+
+	//Set vertices by player:
+	unsigned int graphProductionVerticesLoc = 0; //Location in graphProductionVertices.
+	for(unsigned char a = 0; a < number_of_players; a++) for(unsigned short b = graph_turn_min; b <= graph_turn_max; b++) {
+		graphProductionVertices[graphProductionVerticesLoc] = (float(b - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (production_graph_right - production_graph_left) + production_graph_left;
+		if(full_game[b]->production_count.size() > a) graphProductionVertices[graphProductionVerticesLoc + 1] = (1 - (float(full_game[b]->production_count[a]) / graph_max_production)) * (production_graph_bottom - production_graph_top) + production_graph_top;
+		else graphProductionVertices[graphProductionVerticesLoc + 1] = production_graph_bottom;
+		graphProductionVerticesLoc += 2;
+	}
+
+	//Set vertices in buffer object
+	glBindBuffer(GL_ARRAY_BUFFER, graph_production_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, graphProductionVertices.size() * sizeof(float), graphProductionVertices.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	//Add in color buffer as well:
+	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 void Halite::setupBorders(short turnNumber) {
@@ -409,7 +445,7 @@ void Halite::setupBorders(short turnNumber) {
 	glBindVertexArray(border_vertex_attributes);
 
 	//Floats representing contents of the buffer.
-	std::vector<float> borderBufferValues(48);
+	std::vector<float> borderBufferValues(58);
 
 	//First 8 floats represent position vertices in game. Their values are undefined for now, since they're set every frame. Next 40 floats represent actual borders.
 
@@ -419,13 +455,16 @@ void Halite::setupBorders(short turnNumber) {
 	//Create strength borders:
 	borderBufferValues[18] = strength_graph_left; borderBufferValues[19] = strength_graph_top; borderBufferValues[20] = strength_graph_left; borderBufferValues[21] = strength_graph_bottom; borderBufferValues[22] = strength_graph_right; borderBufferValues[23] = strength_graph_bottom; borderBufferValues[24] = strength_graph_right; borderBufferValues[25] = strength_graph_top; borderBufferValues[26] = strength_graph_left; borderBufferValues[27] = strength_graph_top;
 
+	//Create production borders:
+	borderBufferValues[28] = production_graph_left; borderBufferValues[29] = production_graph_top; borderBufferValues[30] = production_graph_left; borderBufferValues[31] = production_graph_bottom; borderBufferValues[32] = production_graph_right; borderBufferValues[33] = production_graph_bottom; borderBufferValues[34] = production_graph_right; borderBufferValues[35] = production_graph_top; borderBufferValues[36] = production_graph_left; borderBufferValues[37] = production_graph_top;
+
 	//Create map borders:
-	borderBufferValues[28] = MAP_LEFT; borderBufferValues[29] = MAP_TOP; borderBufferValues[30] = MAP_LEFT; borderBufferValues[31] = MAP_BOTTOM; borderBufferValues[32] = MAP_RIGHT; borderBufferValues[33] = MAP_BOTTOM; borderBufferValues[34] = MAP_RIGHT; borderBufferValues[35] = MAP_TOP; borderBufferValues[36] = MAP_LEFT; borderBufferValues[37] = MAP_TOP;
+	borderBufferValues[38] = MAP_LEFT; borderBufferValues[39] = MAP_TOP; borderBufferValues[40] = MAP_LEFT; borderBufferValues[41] = MAP_BOTTOM; borderBufferValues[42] = MAP_RIGHT; borderBufferValues[43] = MAP_BOTTOM; borderBufferValues[44] = MAP_RIGHT; borderBufferValues[45] = MAP_TOP; borderBufferValues[46] = MAP_LEFT; borderBufferValues[47] = MAP_TOP;
 
 	//Create stat borders:
 	float statBottom = STAT_TOP - ((std::count(players_alive[turnNumber].begin(), players_alive[turnNumber].end(), true) * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-	borderBufferValues[38] = STAT_LEFT; borderBufferValues[39] = statBottom; borderBufferValues[40] = STAT_RIGHT; borderBufferValues[41] = statBottom; borderBufferValues[42] = STAT_RIGHT; borderBufferValues[43] = statTop; borderBufferValues[44] = STAT_LEFT; borderBufferValues[45] = statTop; borderBufferValues[46] = STAT_LEFT; borderBufferValues[47] = statBottom;
+	borderBufferValues[48] = STAT_LEFT; borderBufferValues[49] = statBottom; borderBufferValues[50] = STAT_RIGHT; borderBufferValues[51] = statBottom; borderBufferValues[52] = STAT_RIGHT; borderBufferValues[53] = statTop; borderBufferValues[54] = STAT_LEFT; borderBufferValues[55] = statTop; borderBufferValues[56] = STAT_LEFT; borderBufferValues[57] = statBottom;
 
 	//Bind graph border buffer
 	glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
@@ -666,13 +705,17 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		statPos -= GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET;
 		strength_graph_left = STAT_LEFT;
 		strength_graph_right = STAT_RIGHT;
-		strength_graph_bottom = STAT_BOTTOM;
 		territory_graph_left = STAT_LEFT;
 		territory_graph_right = STAT_RIGHT;
+		production_graph_left = STAT_LEFT;
+		production_graph_right = STAT_RIGHT;
+		strength_graph_bottom = STAT_BOTTOM;
 		territory_graph_top = statPos;
-		float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET)) / 2;
+		float graphHeight = ((statPos - STAT_BOTTOM) - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET) * 2) / 3;
 		strength_graph_top = strength_graph_bottom + graphHeight;
 		territory_graph_bottom = territory_graph_top - graphHeight;
+		production_graph_top = territory_graph_bottom - (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET);
+		production_graph_bottom = strength_graph_top + (GRAPH_TEXT_HEIGHT + GRAPH_TEXT_OFFSET);
 		setupBorders(turnNumber);
 
 		//Set window for rendering.
