@@ -165,7 +165,7 @@ namespace hlt{
 				}
 			}
 
-			Region strengthRegion(cw, ch, 0.5, 2, rud);
+			Region strengthRegion(cw, ch, 0.4, 2.25, rud);
 			std::vector< std::vector<double> > strengthChunk = strengthRegion.getFactors();
 
 			//Iterate this region as well to produce better caverns:
@@ -193,12 +193,14 @@ namespace hlt{
 
 			//Fill in with chunks.
 			const int MED_PROD = 1, MED_STR = 50;
+			bool reflectVertical = dh % 2 == 0, reflectHorizontal = dw % 2 == 0;
 			for(int a = 0; a < dh; a++) {
 				for(int b = 0; b < dw; b++) {
 					for(int c = 0; c < ch; c++) {
 						for(int d = 0; d < cw; d++) {
-							contents[a * ch + c][b * cw + d].production = round(MED_PROD * prodChunk[c][d]); //Set production values.
-							contents[a * ch + c][b * cw + d].strength = round(MED_STR * strengthChunk[c][d]);
+							int cc = reflectVertical && a % 2 != 0 ? ch - c - 1 : c, dd = reflectHorizontal && b % 2 != 0 ? cw - d - 1 : d;
+							contents[a * ch + c][b * cw + d].production = round(MED_PROD * prodChunk[cc][dd]); //Set production values.
+							contents[a * ch + c][b * cw + d].strength = round(MED_STR * strengthChunk[cc][dd]);
 						}
 					}
 					contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
