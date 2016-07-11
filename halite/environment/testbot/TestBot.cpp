@@ -17,31 +17,12 @@
 #include "hlt.hpp"
 #include "Networking.hpp"
 
-int main(int argc, const char ** argv) { //Ignore as main until needed.
+int main2(int argc, const char ** argv) { //Ignore as main until needed.
 
-/*
-	char * path = new char[FILENAME_MAX];
-#ifdef _WIN32
-	_getcwd(path, sizeof(char) * FILENAME_MAX);
-#else
-	getcwd(path, sizeof(char) * FILENAME_MAX);
-#endif
-	strcat(path, "\\");
-	strcat(path, argv[0]);
-	std::string sPath(path);
-	while(sPath.back() != '\\') sPath.pop_back();
-	sPath.pop_back();
-	std::replace(sPath.begin(), sPath.end(), '\\', '/');
-
-#ifdef _WIN32
-	_chdir(sPath.c_str()); //Set working directory
-#else
-	chdir(sPath.c_str()); //Set working directory
-#endif
-	std::ofstream out("output.txt");
-	out << sPath.c_str() << std::endl;
-	out.close();
-*/
+	std::string loc(argv[0]);
+	std::replace(loc.begin(), loc.end(), '\\', '/');
+	loc = loc.substr(0, loc.find_last_of('/'));
+	_chdir(loc.c_str());
 
 	srand(time(NULL));
 

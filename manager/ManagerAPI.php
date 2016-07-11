@@ -64,23 +64,6 @@ class ManagerAPI extends API{
 		return floatval($lines[0]);
 	}
 
-	private function updateRankings($rankingValues) {
-		usort($rankingValues, function($a, $b) {
-			return $a['rank'] < $b['rank'];
-		});
-		$rankings = array();
-		foreach($rankingValues as $user) {
-			array_push($rankings, $user['mu']);
-			array_push($rankings, $user['sigma']);
-		}
-		exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
-		for($a = 0; $a < count($rankingValues); $a++) {
-			$components = explode(' ', $lines[$a]);
-			$rankingValues[$a]['mu'] = $components[0];
-			$rankingValues[$a]['sigma'] = $components[1];
-		}
-		return $rankingValues;
-	}
 
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
@@ -141,14 +124,14 @@ class ManagerAPI extends API{
 
 			$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
 			$differenceInRank = rand(3, 10);
-			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
+			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE userID!={$seedPlayer['userID']} and status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
 			usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
 				return $this->getTrueskillMatchQuality(array($a, $seedPlayer)) < $this->getTrueskillMatchQuality(array($b, $seedPlayer));
 			});
 
 			$players = array($seedPlayer);
 			for($a = 0; $a < $numPlayers-1; $a++) {
-				array_push($players, $a);
+				array_push($players, $possiblePlayers[$a]);
 			}
 
 			// Pick map size
@@ -286,13 +269,27 @@ class ManagerAPI extends API{
 				// Add to other stats
 				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
+
 			// Update mu and sigma
-			$allUsers = $this->updateRankings($allUsers);
-			foreach($allUsers as $user) {
-				$this->insert("UPDATE User SET mu={$user['mu']}, sigma={$user['sigma']} WHERE userID={$user['userID']}");
+			usort($users, function($a, $b) {
+				return $a->rank > $b->rank;
+			});
+			$rankings = array();
+			foreach($users as $user) {
+				array_push($rankings, $user->mu);
+				array_push($rankings, $user->sigma);
+			}
+			exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
+			var_dump($lines);
+			for($a = 0; $a < count($users); $a++) {
+				$components = explode(' ', $lines[$a]);
+				$allUsers[$a]['mu'] = floatval($components[0]);
+				$allUsers[$a]['sigma'] = floatval($components[1]);
+				$this->insert("UPDATE User SET mu={$components[0]}, sigma={$components[1]} WHERE userID={$users[$a]->userID}");
 			}
 
 			// Update overall rank
+			$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
 			usort($allUsers, function($a, $b) {
 				return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
 			});
