@@ -40,7 +40,7 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 	unsigned short counter = 0;
 	for(int a = 0; a < map.contents.size(); ++a) {
 		for(int b = 0; b < map.contents[a].size(); ++b) {
-			if (map.contents[a][b].owner == currentOwner) {
+			if(map.contents[a][b].owner == currentOwner) {
 				counter++;
 			}
 			else {
@@ -80,24 +80,24 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 	//End message with newline character
 	sendString += '\n';
 
-	#ifdef _WIN32
+#ifdef _WIN32
 	WinConnection connection = connections[playerTag - 1];
 
 	DWORD charsWritten;
 	bool success;
 	success = WriteFile(connection.write, sendString.c_str(), sendString.length(), &charsWritten, NULL);
-	if (!success || charsWritten == 0) {
+	if(!success || charsWritten == 0) {
 		if(!program_output_style) std::cout << "Problem writing to pipe\n";
 		throw 1;
 	}
-	#else
+#else
 	UniConnection connection = connections[playerTag - 1];
 	ssize_t charsWritten = write(connection.write, sendString.c_str(), sendString.length());
 	if(charsWritten < sendString.length()) {
 		if(!program_output_style) std::cout << "Problem writing to pipe\n";
 		throw 1;
 	}
-	#endif
+#endif
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
@@ -118,20 +118,20 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		//Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
 		DWORD bytesAvailable = 0;
 		PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
-		if (bytesAvailable < 1) {
+		if(bytesAvailable < 1) {
 			clock_t initialTime = clock();
 			while (bytesAvailable < 1) {
-				if (((clock() - initialTime) * 1000 / CLOCKS_PER_SEC) > timeoutMillis) throw 1;
+				if(((clock() - initialTime) * 1000 / CLOCKS_PER_SEC) > timeoutMillis) throw 1;
 				PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
 			}
 		}
 
 		success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
-		if (!success || charsRead < 1) {
+		if(!success || charsRead < 1) {
 			if(!program_output_style) std::cout << "Pipe probably timed out\n";
 			throw 1;
 		}
-		if (buffer == '\n') break;
+		if(buffer == '\n') break;
 		else newString += buffer;
 	}
 #else
@@ -155,7 +155,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		if(selectionResult > 0) {
 			read(connection.read, &buffer, 1);
 
-			if (buffer == '\n') break;
+			if(buffer == '\n') break;
 			else newString += buffer;
 		} else {
 			if(!program_output_style) {
@@ -181,7 +181,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	}
 #endif
 	//Python turns \n into \r\n
-	if (newString.at(newString.size() - 1) == '\r') newString.pop_back();
+	if(newString.at(newString.size() - 1) == '\r') newString.pop_back();
 
 	playerLogs[playerTag-1].push_back(newString);
 
@@ -200,18 +200,18 @@ void Networking::startAndConnectBot(std::string command) {
 	saAttr.lpSecurityDescriptor = NULL;
 
 	//Child stdout pipe
-	if (!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
+	if(!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
 		if(!program_output_style) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
-	if (!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
+	if(!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
 	//Child stdin pipe
-	if (!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
+	if(!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
 		if(!program_output_style) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
-	if (!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
+	if(!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
 	//MAKE SURE THIS MEMORY IS ERASED
 	PROCESS_INFORMATION piProcInfo;
@@ -323,7 +323,7 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 
 unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::set<hlt::Move> * moves) {
 	try{
-		if (isProcessDead(playerTag)) return false;
+		if(isProcessDead(playerTag)) return false;
 
 		//Send this bot the game map and the messages addressed to this bot
 		std::string mapString = serializeMap(m);
@@ -348,8 +348,8 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 }
 
 void Networking::killPlayer(unsigned char playerTag) {
-	if (isProcessDead(playerTag)) return;
-	#ifdef _WIN32
+	if(isProcessDead(playerTag)) return;
+#ifdef _WIN32
 
 	HANDLE process = processes[playerTag - 1];
 
@@ -360,27 +360,27 @@ void Networking::killPlayer(unsigned char playerTag) {
 	connections[playerTag - 1].write = NULL;
 
 	if(!program_output_style) std::cout << "Player " << int(playerTag) << " is dead\n";
-	#else
+#else
 	kill(-processes[playerTag - 1], SIGKILL);
 
 	processes[playerTag - 1] = -1;
 	connections[playerTag - 1].read = -1;
 	connections[playerTag - 1].write = -1;
-	#endif
+#endif
 }
 
 bool Networking::isProcessDead(unsigned char playerTag) {
-	#ifdef _WIN32
+#ifdef _WIN32
 	return processes[playerTag - 1] == NULL;
-	#else
+#else
 	return processes[playerTag - 1] == -1;
-	#endif
+#endif
 }
 
 int Networking::numberOfPlayers() {
-	#ifdef _WIN32
+#ifdef _WIN32
 	return connections.size();
-	#else
+#else
 	return connections.size();
-	#endif
+#endif
 }
