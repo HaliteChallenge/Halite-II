@@ -784,7 +784,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Edit border buffer
 		float xPos = (float(graph_turn_number - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (territory_graph_right - territory_graph_left) + territory_graph_left;
 		glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
-		float positionVertices[8];
+		float positionVertices[12];
 		positionVertices[0] = xPos; positionVertices[1] = territory_graph_bottom; positionVertices[2] = xPos; positionVertices[3] = territory_graph_top; positionVertices[4] = xPos; positionVertices[5] = strength_graph_bottom; positionVertices[6] = xPos; positionVertices[7] = strength_graph_top;  positionVertices[8] = xPos; positionVertices[9] = production_graph_bottom; positionVertices[10] = xPos; positionVertices[11] = production_graph_top;
 		glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), positionVertices);
 
@@ -916,9 +916,11 @@ Halite::~Halite() {
 	glDeleteProgram(graph_shader_program);
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
 	glDeleteBuffers(1, &graph_strength_vertex_buffer);
+	glDeleteBuffers(1, &graph_production_vertex_buffer);
 	glDeleteBuffers(1, &graph_color_buffer);
-	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
 	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
+	glDeleteVertexArrays(1, &graph_production_vertex_attributes);
 
 	//Get rid of border OpenGL stuff
 	glDeleteBuffers(1, &border_vertex_buffer);
