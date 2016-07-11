@@ -145,7 +145,7 @@ $(function() {
 	var doLogOff = getGET("forumsLogOut");
 	if(doLogOff != null && doLogOff != undefined) {
 		messageBox.alert("Logged Out", "You have been logged out of forums.halite.io and halite.io", true);
-		destroySession();
+		destroySession(false);
 	}
 
 	navbar.init();
