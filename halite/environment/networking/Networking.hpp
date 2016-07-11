@@ -48,7 +48,7 @@ private:
 	#endif
 
 	std::string serializeMap(const hlt::Map & map);
-	std::set<hlt::Move> deserializeMoveSet(std::string & inputString);
+	std::set<hlt::Move> deserializeMoveSet(std::string & inputString, const hlt::Map & m);
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);

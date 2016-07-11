@@ -65,13 +65,13 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 	return returnString;
 }
 
-std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString) {
+std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
 	std::set<hlt::Move> moves = std::set<hlt::Move>();
 
 	std::stringstream iss(inputString);
 	hlt::Location l;
 	int d;
-	while (iss >> l.x >> l.y >> d) moves.insert({ l, (unsigned char)d });
+	while (iss >> l.x >> l.y >> d && m.inBounds(l)) moves.insert({ l, (unsigned char)d });
 
 	return moves;
 }
@@ -335,7 +335,7 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 		std::string movesString = getString(playerTag, timeoutMillis);
 		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
 
-		*moves = deserializeMoveSet(movesString);
+		*moves = deserializeMoveSet(movesString, m);
 
 		return millisTaken;
 	}

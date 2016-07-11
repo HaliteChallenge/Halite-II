@@ -1,4 +1,4 @@
-/*#include <stdlib.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <cstdlib>
@@ -7,22 +7,22 @@
 #include <time.h>
 #include <set>
 #include <fstream>
-#ifdef _WIN32
-	#include <windows.h>
-	#include <direct.h>
-#else
-	#include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include "hlt.hpp"
 #include "Networking.hpp"
 
 int main2(int argc, const char ** argv) { //Ignore as main until needed.
 
-	std::string loc(argv[0]);
-	std::replace(loc.begin(), loc.end(), '\\', '/');
-	loc = loc.substr(0, loc.find_last_of('/'));
-	_chdir(loc.c_str());
+	char * path = new char[FILENAME_MAX];
+	getcwd(path, sizeof(char) * FILENAME_MAX);
+	strcat(path, "/");
+	strcat(path, argv[0]);
+	std::string sPath(path);
+	while(sPath.back() != '/') sPath.pop_back();
+	sPath.pop_back();
+
+	chdir(sPath.c_str()); //Set working directory
 
 	srand(time(NULL));
 
@@ -34,7 +34,7 @@ int main2(int argc, const char ** argv) { //Ignore as main until needed.
 
 	std::string s;
 	std::ifstream in("Responses.txt");
-	if(!in.is_open()) sendInitResponse("TestBot - Couldn't Open File MORECHARACTERS");
+	if(!in.is_open()) sendInitResponse(sPath);
 	else {
 		std::getline(in, s);
 		sendInitResponse(s + std::to_string(my_tag));
@@ -49,4 +49,4 @@ int main2(int argc, const char ** argv) { //Ignore as main until needed.
 	}
 
 	return 0;
-}*/
+}
