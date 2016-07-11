@@ -864,6 +864,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		glDrawArrays(GL_LINE_STRIP, 9, 5);
 		glDrawArrays(GL_LINE_STRIP, 14, 5);
 		glDrawArrays(GL_LINE_STRIP, 19, 5);
+		glDrawArrays(GL_LINE_STRIP, 24, 5);
 		glDrawArrays(GL_LINES, 0, 4);
 	}
 
