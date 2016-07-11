@@ -23,7 +23,7 @@ class ManagerAPI extends API{
 		}
 		parent::__construct($request);
 	}
-	
+
 	private function getAPIKey() {
 		$this->apiKey = NULL;
 		if(isset($_GET['apiKey'])) $this->apiKey = $_GET['apiKey'];
@@ -43,7 +43,7 @@ class ManagerAPI extends API{
 			return true;
 		} else {
 			return false;
-		}	
+		}
 	}
 
 	// Returns the directory that holds a bot, given the bot's userID
@@ -106,7 +106,7 @@ class ManagerAPI extends API{
 
 			// Assign a run game tasks
 			$possibleNumPlayers = array(2, 3, 4, 5);
-			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)]; 
+			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 			$players = $this->selectMultiple("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
 			$sizes = array(10, 20, 30, 40, 50, 60);
 			$size = $sizes[array_rand($sizes)];
@@ -184,8 +184,8 @@ class ManagerAPI extends API{
 			if($numToDelete > 0) {
 				$gamesToDelete = $this->selectMultiple("SELECT gameID FROM Game ORDER BY gameID LIMIT $numToDelete");
 				foreach($gamesToDelete as $game) {
-					$this->insert("DELETE FROM GameUser WHERE gameID={$game['gameID']}");	
-					$this->insert("DELETE FROM Game WHERE gameID={$game['gameID']}");	
+					$this->insert("DELETE FROM GameUser WHERE gameID={$game['gameID']}");
+					$this->insert("DELETE FROM Game WHERE gameID={$game['gameID']}");
 				}
 			}
 
@@ -236,12 +236,28 @@ class ManagerAPI extends API{
 					echo "UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}\n";
 					$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}");
 				}
-				
+
 				// Add to other stats
 				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
+			// Update mu and sigma
+			usort($allUsers, function($a, $b) {
+				return $a['rank'] < $b['rank'];
+			});
+			$rankings = array();
+			foreach($allUsers as $user) {
+				array_push($rankings, $user['mu']);
+				array_push($rankings, $user['sigma']);
+			}
+			exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
+			foreach($lines as $line) {
+				$components = explode(' ', $line);
+				$allUsers['mu'] = $components[0];
+				$allUsers['sigma'] = $components[1];
+				$this->insert("UPDATE User SET mu={$allUsers['mu']}, sigma={$allUsers['sigma']} WHERE userID={$allUsers['userID']}");
+			}
 
-			// Update rank
+			// Update overall rank
 			usort($allUsers, function($a, $b) {
 				return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
 			});
@@ -287,6 +303,6 @@ class ManagerAPI extends API{
 			else return "Bot file does not exist";
 		}
 	}
- }
+}
 
  ?>

@@ -34,13 +34,16 @@ private:
   GLuint production_vertex_buffer, production_color_buffer, production_vertex_attributes, production_vertex_shader, production_geometry_shader, production_fragment_shader, production_shader_program;
 
   //Graph rendering
-  GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_color_buffer, graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_vertex_shader, graph_fragment_shader, graph_shader_program;
+  GLuint graph_territory_vertex_buffer, graph_strength_vertex_buffer, graph_production_vertex_buffer, graph_color_buffer,
+  graph_territory_vertex_attributes, graph_strength_vertex_attributes, graph_production_vertex_attributes,
+  graph_vertex_shader, graph_fragment_shader, graph_shader_program;
   //Stats about the graph. This lets us know if we need to redo the setup for the graph.
   unsigned short graph_frame_number, graph_turn_number, graph_turn_min, graph_turn_max;
   float graph_zoom;
   unsigned int graph_max_territory, graph_max_strength;
   float territory_graph_top, territory_graph_bottom, territory_graph_left, territory_graph_right;
   float strength_graph_top, strength_graph_bottom, strength_graph_left, strength_graph_right;
+  float production_graph_top, production_graph_bottom, production_graph_left, production_graph_right;
 
   //Statistics constants:
   const float STAT_LEFT, STAT_RIGHT, STAT_BOTTOM, STAT_TOP, NAME_TEXT_HEIGHT, NAME_TEXT_OFFSET, GRAPH_TEXT_HEIGHT, GRAPH_TEXT_OFFSET, LABEL_TEXT_HEIGHT, LABEL_TEXT_OFFSET, MAP_TEXT_HEIGHT, MAP_TEXT_OFFSET;
