@@ -49,6 +49,21 @@ class WebsiteAPI extends API{
 		}
 	}
 
+	private function getForumsID($userID) {
+		$url = "http://forums.halite.io/users/by-external/{$userID}.json/?".http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']));
+		$contents = file_get_contents($url);
+		return intval(json_decode($contents, true)['user']['id']);
+	}
+
+	private function logOutForums($forumsID) {
+		$options = array('http' => array(
+						'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+						'method'  => 'POST',
+						'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
+		));
+		file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
+	}
+
 	private function select($sql) {
 		$res = mysqli_query($this->mysqli, $sql);
 		return mysqli_fetch_array($res, MYSQLI_ASSOC);
@@ -180,10 +195,12 @@ class WebsiteAPI extends API{
 	}
 
 	protected function botFile() {
-		if(isset($_FILES['botFile']['name']) && isset($_POST['userID'])) {
+		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			var_dump($_POST);
 			$userID = $_POST['userID'];
-
-			$user = $this->select("SELECT isVerified FROM User WHERE userID={$_POST['userID']}");
+			$password = $_POST['password'];
+			
+			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
@@ -212,9 +229,9 @@ class WebsiteAPI extends API{
 			$userID = $_GET['userID'];
 			$email = $_GET['email'];
 			$username = $_GET['username'];
-		
+
 			$correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
-			
+
 			if($correctSignature != $signature) {
 				return null;
 			}
@@ -265,6 +282,11 @@ class WebsiteAPI extends API{
 			$_SESSION = $user;
 			return "Success";
 		} else if($this->method == 'DELETE') {
+			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
+				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
+					$this->logOutForums($this->getForumsID($_SESSION['userID']));
+				}
+			}
 			session_destroy();
 			return "Success";
 		}

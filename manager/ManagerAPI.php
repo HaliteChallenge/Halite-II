@@ -105,11 +105,12 @@ class ManagerAPI extends API{
 			}
 
 			// Assign a run game tasks
-			$numPlayers = 2;
+			$possibleNumPlayers = array(2, 3, 4, 5);
+			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)]; 
 			$players = $this->selectMultiple("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT $numPlayers");
-			$sizes = array(30);
+			$sizes = array(10, 20, 30, 40, 50, 60);
 			$size = $sizes[array_rand($sizes)];
-			if(count($players) == 2) {
+			if(count($players) == $numPlayers) {
 				return array(
 					"type" => "game",
 					"width" => $size,
@@ -171,10 +172,21 @@ class ManagerAPI extends API{
 					$files
 				);
 			}
-
 			while(count($files) > 10000) {
 				unlink($files[0]);
 				array_splice($files, 0, 1);
+			}
+
+			// Check that we arent stoing too many games in db
+			$res = mysqli_query($this->mysqli, "SELECT * FROM Game");
+			$numRows = $res->num_rows;
+			$numToDelete = $numRows - 10000;
+			if($numToDelete > 0) {
+				$gamesToDelete = $this->selectMultiple("SELECT gameID FROM Game ORDER BY gameID LIMIT $numToDelete");
+				foreach($gamesToDelete as $game) {
+					$this->insert("DELETE FROM GameUser WHERE gameID={$game['gameID']}");	
+					$this->insert("DELETE FROM Game WHERE gameID={$game['gameID']}");	
+				}
 			}
 
 			// Store game information in db
@@ -189,10 +201,11 @@ class ManagerAPI extends API{
 				array_push($allUserExtras, $this->select("SELECT * FROM UserExtraStats where userID={$user['userID']}"));
 			}
 			for($a = 0; $a < count($users); $a++) {
-				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage})");
+				$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
 
 				// Cache raw game stats
-				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage FROM GameUser WHERE userID={$users[$a]->userID}");
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameUser WHERE userID={$users[$a]->userID}");
 				$totalGameStats = array();
 				foreach($gameStats as $oneGameStats) {
 					foreach($oneGameStats as $statName => $statValue) {
@@ -208,7 +221,7 @@ class ManagerAPI extends API{
 				}
 
 				// Game game stat rankings
-				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "turnTimeAverage" => "turnTimeRanking");
+				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "turnTimeAverage" => "turnTimeRanking", "didTimeout" => "timeoutRanking");
 				foreach($statToRankedStat as $statName => $rankedStatName) {
 					usort($allUserExtras, function($a, $b) use ($statName) {
 						return $a[$statName] < $b[$statName];

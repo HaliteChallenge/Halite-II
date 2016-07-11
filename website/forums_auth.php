@@ -26,8 +26,7 @@
 							<?php include 'includes/login_form.php'; ?>
 						</div>
 					</div>
-
-					<span>Don't have an account? <a href="index.php">Register on our homepage</a>.</span>
+					<span>To access the forums, you must be logged into your Halite account or must log in above. <b>Don't have an account?</b> <a href="index.php">Register on our homepage</a>.</span>
 				</div>
 			</div>
 		</div>

@@ -35,7 +35,7 @@
 					<table class="table well well-sm" id="gameTable">
 						<thead>
 							<tr>
-								<th>Opponent</th>
+								<th>Participants</th>
 								<th>Result</th>
 								<th>Gamefile</th>
 							</tr>

@@ -21,6 +21,8 @@ from email.mime.text import MIMEText
 
 import configparser
 
+import copy
+
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
 
@@ -51,7 +53,7 @@ def sendEmail(subject, body, recipient):
 	s.quit()
 
 
-def compile(user, backend):
+def executeCompileTask(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
 	print("Compiling a bot with userID %s" % (user["userID"]))
 
@@ -59,13 +61,13 @@ def compile(user, backend):
 	makePath(workingPath)
 	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
 	zip.unpack(botPath)
-	
+
 	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
 		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
 		for filename in os.listdir(singleFolder):
     			shutil.move(os.path.join(singleFolder, filename), os.path.join(workingPath, filename))
 		os.rmdir(singleFolder)
-	
+
 	language, errors = compile_anything(workingPath)
 	didCompile = True if errors == None else False
 
@@ -80,11 +82,7 @@ def compile(user, backend):
 	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
-def runGame(width, height, users, backend):
-	"""Downloads compiled bots, runs a game, and posts the results of the game"""
-	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
-
-	# Download players to current directory
+def downloadUsers(users):
 	for user in users:
 		userDir = str(user["userID"])
 		if os.path.isdir(userDir):
@@ -92,27 +90,30 @@ def runGame(width, height, users, backend):
 		os.mkdir(userDir)
 		zip.unpack(backend.storeBotLocally(user["userID"], userDir))
 
-	# Run game within sandbox
-	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), users[0]["userID"], users[1]["userID"]])
+def runGame(width, height, users):
+	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), ]+[a["userID"] for a in users])
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
 	sandbox.start("sh -c '"+runGameCommand+"'")
 
-	lines = []
+	output = []
 	while True:
 		line = sandbox.read_line(200)
 		if line == None:
 			break
 		print(line)
-		if line.isspace() == False:
-			lines.append(line)
+		output.append(line)
+	return output
 
-	replayPath = lines[len(lines) - (len(users)+1)]
+def parseGameOutput(output, users):
+	users = copy.deepcopy(users)
+
+	replayPath = output[len(output) - (len(users)+2)]
 
 	# Get player ranks and scores by parsing shellOutput
-	for lineIndex in range(len(lines)-len(users), len(lines)):
-		components = lines[lineIndex].split(" ")
+	for lineIndex in range(len(output)-(len(users)+1), len(output)-1):
+		components = output[lineIndex].split(" ")
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
 		users[playerTag-1]["rank"] = int(components[1])
@@ -122,16 +123,37 @@ def runGame(width, height, users, backend):
 		users[playerTag-1]["stillPercentage"] = float(components[5])
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
-	# Update trueskill mu and sigma values
+	timeoutLine = output[len(output)-1]
+	print("TIMEOUT LINE: "+timeoutLine)
+	for user in users:
+		user["didTimeout"] = False
+
+	if timeoutLine.isspace() == False:
+		timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
+		for playerTag in timeoutTags:
+			users[playerTag-1]["didTimeout"] = True
+
+	return replayPath, users
+
+def updateRankings(users):
+	users = copy.deepcopy(users)
 	users.sort(key=lambda user: user["rank"])
 	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
 	newRatings = trueskill.rate(teams)
 	for a in range(len(newRatings)):
 		users[a]['mu'] = newRatings[a][0].mu
 		users[a]['sigma'] = newRatings[a][0].sigma
+	return users
+
+def executeGameTask(width, height, users, backend):
+	"""Downloads compiled bots, runs a game, and posts the results of the game"""
+	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+
+	downloadUsers(users)
+	replayPath, users = parseGameOutput(runGame(width, height, users), users)
+	users = updateRankings(users)
 
 	backend.gameResult(users, replayPath)
-
 	os.remove(replayPath)
 
 if __name__ == "__main__":
@@ -142,9 +164,9 @@ if __name__ == "__main__":
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
-				compile(task["user"], backend)
+				executeCompileTask(task["user"], backend)
 			elif task["type"] == "game":
-				runGame(int(task["width"]), int(task["height"]), task["users"], backend)
+				executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
 			else:
 				print("Unknown task")
 		else:

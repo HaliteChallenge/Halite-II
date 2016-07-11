@@ -16,7 +16,7 @@
 				<h1>Halite Downlods</h1>
 
 				<h3>Environment and Visualizer</h3>
-				<p>This set of binaries was uploaded at <b>3 pm on July 7th</b>. We added a controls cheat-sheet to the visualizer and fixed the windows build.</p>
+				<p>This set of binaries was uploaded at <b>5 pm EST on July 8th</b>. We fixed the killing of bot processes on Unix, refactored map generation, and cleaned up the output of the environment.</p>
 				<ul>
 					<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
 					<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
@@ -24,6 +24,7 @@
 				</ul>
 
 				<h3>Language Packages</h3>
+				<p>This set of starter packages was uploaded at <b>2:20 pm EST on July 9th</b>. We added the getAngle, inBounds, and getDistance functions to the Java starter package and fixed the inBounds function of the Python starter package.</p>
 				<ul>
 					<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
 					<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
