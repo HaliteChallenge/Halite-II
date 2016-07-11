@@ -1,4 +1,4 @@
-#include <stdlib.h>
+/*#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <cstdlib>
@@ -49,4 +49,4 @@ int main2(int argc, const char ** argv) { //Ignore as main until needed.
 	}
 
 	return 0;
-}
+}*/
