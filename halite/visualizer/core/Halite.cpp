@@ -445,26 +445,26 @@ void Halite::setupBorders(short turnNumber) {
 	glBindVertexArray(border_vertex_attributes);
 
 	//Floats representing contents of the buffer.
-	std::vector<float> borderBufferValues(58);
+	std::vector<float> borderBufferValues(62);
 
 	//First 8 floats represent position vertices in game. Their values are undefined for now, since they're set every frame. Next 40 floats represent actual borders.
 
 	//Create territory borders:
-	borderBufferValues[8] = territory_graph_left; borderBufferValues[9] = territory_graph_top; borderBufferValues[10] = territory_graph_left; borderBufferValues[11] = territory_graph_bottom; borderBufferValues[12] = territory_graph_right; borderBufferValues[13] = territory_graph_bottom; borderBufferValues[14] = territory_graph_right; borderBufferValues[15] = territory_graph_top; borderBufferValues[16] = territory_graph_left; borderBufferValues[17] = territory_graph_top;
+	borderBufferValues[12] = territory_graph_left; borderBufferValues[13] = territory_graph_top; borderBufferValues[14] = territory_graph_left; borderBufferValues[15] = territory_graph_bottom; borderBufferValues[16] = territory_graph_right; borderBufferValues[17] = territory_graph_bottom; borderBufferValues[18] = territory_graph_right; borderBufferValues[19] = territory_graph_top; borderBufferValues[20] = territory_graph_left; borderBufferValues[21] = territory_graph_top;
 
 	//Create strength borders:
-	borderBufferValues[18] = strength_graph_left; borderBufferValues[19] = strength_graph_top; borderBufferValues[20] = strength_graph_left; borderBufferValues[21] = strength_graph_bottom; borderBufferValues[22] = strength_graph_right; borderBufferValues[23] = strength_graph_bottom; borderBufferValues[24] = strength_graph_right; borderBufferValues[25] = strength_graph_top; borderBufferValues[26] = strength_graph_left; borderBufferValues[27] = strength_graph_top;
+	borderBufferValues[22] = strength_graph_left; borderBufferValues[23] = strength_graph_top; borderBufferValues[24] = strength_graph_left; borderBufferValues[25] = strength_graph_bottom; borderBufferValues[26] = strength_graph_right; borderBufferValues[27] = strength_graph_bottom; borderBufferValues[28] = strength_graph_right; borderBufferValues[29] = strength_graph_top; borderBufferValues[30] = strength_graph_left; borderBufferValues[31] = strength_graph_top;
 
 	//Create production borders:
-	borderBufferValues[28] = production_graph_left; borderBufferValues[29] = production_graph_top; borderBufferValues[30] = production_graph_left; borderBufferValues[31] = production_graph_bottom; borderBufferValues[32] = production_graph_right; borderBufferValues[33] = production_graph_bottom; borderBufferValues[34] = production_graph_right; borderBufferValues[35] = production_graph_top; borderBufferValues[36] = production_graph_left; borderBufferValues[37] = production_graph_top;
+	borderBufferValues[32] = production_graph_left; borderBufferValues[33] = production_graph_top; borderBufferValues[34] = production_graph_left; borderBufferValues[35] = production_graph_bottom; borderBufferValues[36] = production_graph_right; borderBufferValues[37] = production_graph_bottom; borderBufferValues[38] = production_graph_right; borderBufferValues[39] = production_graph_top; borderBufferValues[40] = production_graph_left; borderBufferValues[41] = production_graph_top;
 
 	//Create map borders:
-	borderBufferValues[38] = MAP_LEFT; borderBufferValues[39] = MAP_TOP; borderBufferValues[40] = MAP_LEFT; borderBufferValues[41] = MAP_BOTTOM; borderBufferValues[42] = MAP_RIGHT; borderBufferValues[43] = MAP_BOTTOM; borderBufferValues[44] = MAP_RIGHT; borderBufferValues[45] = MAP_TOP; borderBufferValues[46] = MAP_LEFT; borderBufferValues[47] = MAP_TOP;
+	borderBufferValues[42] = MAP_LEFT; borderBufferValues[43] = MAP_TOP; borderBufferValues[44] = MAP_LEFT; borderBufferValues[45] = MAP_BOTTOM; borderBufferValues[46] = MAP_RIGHT; borderBufferValues[47] = MAP_BOTTOM; borderBufferValues[48] = MAP_RIGHT; borderBufferValues[49] = MAP_TOP; borderBufferValues[50] = MAP_LEFT; borderBufferValues[51] = MAP_TOP;
 
 	//Create stat borders:
 	float statBottom = STAT_TOP - ((std::count(players_alive[turnNumber].begin(), players_alive[turnNumber].end(), true) * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
-	borderBufferValues[48] = STAT_LEFT; borderBufferValues[49] = statBottom; borderBufferValues[50] = STAT_RIGHT; borderBufferValues[51] = statBottom; borderBufferValues[52] = STAT_RIGHT; borderBufferValues[53] = statTop; borderBufferValues[54] = STAT_LEFT; borderBufferValues[55] = statTop; borderBufferValues[56] = STAT_LEFT; borderBufferValues[57] = statBottom;
+	borderBufferValues[52] = STAT_LEFT; borderBufferValues[53] = statBottom; borderBufferValues[54] = STAT_RIGHT; borderBufferValues[55] = statBottom; borderBufferValues[56] = STAT_RIGHT; borderBufferValues[57] = statTop; borderBufferValues[58] = STAT_LEFT; borderBufferValues[59] = statTop; borderBufferValues[60] = STAT_LEFT; borderBufferValues[61] = statBottom;
 
 	//Bind graph border buffer
 	glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
@@ -785,8 +785,8 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		float xPos = (float(graph_turn_number - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (territory_graph_right - territory_graph_left) + territory_graph_left;
 		glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
 		float positionVertices[8];
-		positionVertices[0] = xPos; positionVertices[1] = territory_graph_bottom; positionVertices[2] = xPos; positionVertices[3] = territory_graph_top; positionVertices[4] = xPos; positionVertices[5] = strength_graph_bottom; positionVertices[6] = xPos; positionVertices[7] = strength_graph_top;
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), positionVertices);
+		positionVertices[0] = xPos; positionVertices[1] = territory_graph_bottom; positionVertices[2] = xPos; positionVertices[3] = territory_graph_top; positionVertices[4] = xPos; positionVertices[5] = strength_graph_bottom; positionVertices[6] = xPos; positionVertices[7] = strength_graph_top;  positionVertices[8] = xPos; positionVertices[9] = production_graph_bottom; positionVertices[10] = xPos; positionVertices[11] = production_graph_top;
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), positionVertices);
 
 		//Generate text for the titles of the graphs
 		std::string territoryText = "Territory";
@@ -818,7 +818,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				//Find turn number:
 				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - territory_graph_left) / (territory_graph_right - territory_graph_left) + graph_turn_min;
 
-				unsigned int val = graph_max_territory * (mouseY - territory_graph_bottom) / (territory_graph_top - territory_graph_bottom);
+				unsigned int val = round(graph_max_territory * (mouseY - territory_graph_bottom) / (territory_graph_top - territory_graph_bottom));
 
 				labelText = "Turn: " + std::to_string(tn) + " | Territory: " + std::to_string(val);
 			}
@@ -827,7 +827,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				//Find turn number:
 				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - strength_graph_left) / (strength_graph_right - strength_graph_left) + graph_turn_min;
 
-				unsigned int val = graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top - strength_graph_bottom);
+				unsigned int val = round(graph_max_strength * (mouseY - strength_graph_bottom) / (strength_graph_top - strength_graph_bottom));
 
 				labelText = "Turn: " + std::to_string(tn) + " | Strength: " + std::to_string(val);
 			}
@@ -836,7 +836,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 				//Find turn number:
 				unsigned short tn = (graph_turn_max - graph_turn_min) * (mouseX - production_graph_left) / (production_graph_right - production_graph_left) + graph_turn_min;
 
-				unsigned int val = graph_max_production * (mouseY - production_graph_bottom) / (production_graph_top - production_graph_bottom);
+				unsigned int val = round(graph_max_production * (mouseY - production_graph_bottom) / (production_graph_top - production_graph_bottom));
 
 				labelText = "Turn: " + std::to_string(tn) + " | Production: " + std::to_string(val);
 			}
@@ -876,12 +876,12 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//Draw borders:
 		glUseProgram(border_shader_program);
 		glBindVertexArray(border_vertex_attributes);
-		glDrawArrays(GL_LINE_STRIP, 4, 5);
-		glDrawArrays(GL_LINE_STRIP, 9, 5);
-		glDrawArrays(GL_LINE_STRIP, 14, 5);
-		glDrawArrays(GL_LINE_STRIP, 19, 5);
-		glDrawArrays(GL_LINE_STRIP, 24, 5);
-		glDrawArrays(GL_LINES, 0, 4);
+		glDrawArrays(GL_LINE_STRIP, 6, 5);
+		glDrawArrays(GL_LINE_STRIP, 11, 5);
+		glDrawArrays(GL_LINE_STRIP, 16, 5);
+		glDrawArrays(GL_LINE_STRIP, 21, 5);
+		glDrawArrays(GL_LINE_STRIP, 26, 5);
+		glDrawArrays(GL_LINES, 0, 6);
 	}
 
 	//Update window
