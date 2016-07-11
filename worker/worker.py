@@ -135,23 +135,12 @@ def parseGameOutput(output, users):
 
 	return replayPath, users
 
-def updateRankings(users):
-	users = copy.deepcopy(users)
-	users.sort(key=lambda user: user["rank"])
-	teams = [[trueskill.Rating(mu=float(user['mu']), sigma=float(user['sigma']))] for user in users]
-	newRatings = trueskill.rate(teams)
-	for a in range(len(newRatings)):
-		users[a]['mu'] = newRatings[a][0].mu
-		users[a]['sigma'] = newRatings[a][0].sigma
-	return users
-
 def executeGameTask(width, height, users, backend):
 	"""Downloads compiled bots, runs a game, and posts the results of the game"""
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
 	downloadUsers(users)
 	replayPath, users = parseGameOutput(runGame(width, height, users), users)
-	users = updateRankings(users)
 
 	backend.gameResult(users, replayPath)
 	os.remove(replayPath)
