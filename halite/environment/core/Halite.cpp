@@ -380,7 +380,7 @@ void Halite::output(std::string filename) {
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << ' ' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
+		gameFile << player_names[a] << '\0' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
 	}
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
 	gameFile << F_NEWLINE; //Newline helps organize the file for me.

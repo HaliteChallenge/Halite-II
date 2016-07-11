@@ -309,7 +309,7 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!program_output_style) std::cout << outMessage;
 
-		*playerName = getString(playerTag, timeoutMillis);
+		*playerName = getString(playerTag, timeoutMillis).substr(0, 30);
 		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
 		if(!program_output_style) std::cout << inMessage;
 

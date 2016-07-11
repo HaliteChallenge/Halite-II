@@ -36,7 +36,7 @@ int main(int argc, const char ** argv) { //Ignore as main until needed.
 
 	std::string s;
 	std::ifstream in("Responses.txt");
-	if(!in.is_open()) sendInitResponse("TestBot - Couldn't open file :(");
+	if(!in.is_open()) sendInitResponse("TestBot - Couldn't Open File MORECHARACTERS");
 	else {
 		std::getline(in, s);
 		sendInitResponse(s + std::to_string(my_tag));

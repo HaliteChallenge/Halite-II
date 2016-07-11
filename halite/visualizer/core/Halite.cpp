@@ -582,9 +582,10 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		char c;
 		while(true) {
 			game_file.get(c);
-			if(c == ' ') break;
-			player_names[a].first += c;
+			if(c == 0) break;
+			if(isprint((unsigned char)(c))) player_names[a].first += c;
 		}
+		player_names[a].first = player_names[a].first.substr(0, 30); //Limit to 20 characters if environment fails to for some reason.
 
 		Color color;
 		game_file >> color.r >> color.g >> color.b;
