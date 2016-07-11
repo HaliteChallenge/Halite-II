@@ -207,16 +207,16 @@ namespace hlt{
 			}
 		}
 
-		bool inBounds(Location l) {
+		bool inBounds(Location l) const {
 			return l.x < map_width && l.y < map_height;
 		}
-		float getDistance(Location l1, Location l2) {
+		float getDistance(Location l1, Location l2) const {
 			short dx = abs(l1.x - l2.x), dy = abs(l1.y - l2.y);
 			if (dx > map_width / 2) dx = map_width - dx;
 			if (dy > map_height / 2) dy = map_height - dy;
 			return sqrt((dx*dx) + (dy*dy));
 		}
-		float getAngle(Location l1, Location l2) {
+		float getAngle(Location l1, Location l2) const {
 			short dx = l2.x - l1.x, dy = l2.y - l1.y;
 			if (dx > map_width - dx) dx -= map_width;
 			else if (-dx > map_width + dx) dx += map_width;
@@ -225,7 +225,7 @@ namespace hlt{
 			return atan2(dy, dx);
 		}
 
-		Location getLocation(Location l, unsigned char direction) {
+		Location getLocation(Location l, unsigned char direction) const {
 			if(direction != STILL) {
 				if(direction == NORTH) {
 					if(l.y == 0) l.y = map_height - 1;
