@@ -10,7 +10,7 @@
 #include "hlt.hpp"
 #include "Networking.hpp"
 
-int main(int argc, const char ** argv) {
+int main2(int argc, const char ** argv) { //Ignore as main until needed.
 
 	chdir(argv[0]); //Set working directory
 

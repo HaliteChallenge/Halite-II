@@ -340,7 +340,7 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 		return millisTaken;
 	}
 	catch(...) {
-		*moves = std::set<Move>();
+		*moves = std::set<hlt::Move>();
 		return timeoutMillis+1;
 
 	}
