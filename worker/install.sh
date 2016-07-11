@@ -2,12 +2,11 @@
 # Compiler tools
 #################
 sudo apt-get -y update 
-sudo apt-get install -y python3 python3-pip default-jdk clang++-3.5
+sudo apt-get install -y python3 default-jdk clang++-3.5
 
 #############
 # Worker
 #############
-sudo pip3 install trueskill
 sudo apt-get install -y zip
 
 ###########################
