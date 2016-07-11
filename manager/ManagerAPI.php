@@ -65,6 +65,7 @@ class ManagerAPI extends API{
 	}
 
 	private function updateRankings($rankingValues) {
+		var_dump($rankingValues);
 		usort($rankingValues, function($a, $b) {
 			return $a['rank'] < $b['rank'];
 		});
@@ -74,6 +75,7 @@ class ManagerAPI extends API{
 			array_push($rankings, $user['sigma']);
 		}
 		exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
+		var_dump($lines);
 		for($a = 0; $a < count($rankingValues); $a++) {
 			$components = explode(' ', $lines[$a]);
 			$rankingValues[$a]['mu'] = $components[0];
@@ -148,7 +150,7 @@ class ManagerAPI extends API{
 
 			$players = array($seedPlayer);
 			for($a = 0; $a < $numPlayers-1; $a++) {
-				array_push($players, $a);
+				array_push($players, $possiblePlayers[$a]);
 			}
 
 			// Pick map size
@@ -287,8 +289,12 @@ class ManagerAPI extends API{
 				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
 			}
 			// Update mu and sigma
-			$allUsers = $this->updateRankings($allUsers);
-			foreach($allUsers as $user) {
+			$rankingValues = array();
+			foreach($users as $user) { // Get up to date information
+				array_push($rankingValues, $this->select("SELECT userID, mu, sigma FROM User WHERE userID={$user->userID}"));
+			}
+			$rankingValues = $this->updateRankings($rankingValues);
+			foreach($rankingValues as $user) {
 				$this->insert("UPDATE User SET mu={$user['mu']}, sigma={$user['sigma']} WHERE userID={$user['userID']}");
 			}
 
