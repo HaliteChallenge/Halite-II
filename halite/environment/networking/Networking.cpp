@@ -315,7 +315,8 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 
 		return true;
 	}
-	catch (int e) {
+	catch(...) {
+		*playerName = "Bot #" + std::to_string(playerTag) + "; timed out during Init";
 		return false;
 	}
 }
@@ -338,7 +339,8 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 
 		return millisTaken;
 	}
-	catch (int e) {
+	catch(...) {
+		*moves = std::set<Move>();
 		return timeoutMillis+1;
 
 	}
