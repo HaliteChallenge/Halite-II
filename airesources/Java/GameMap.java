@@ -1,15 +1,15 @@
 import java.util.ArrayList;
-public class GameMap{
+public class GameGameMap{
   public ArrayList< ArrayList<Site> > contents;
   public int width, height;
 
-  public Map() {
+  public GameMap() {
     width = 0;
     height = 0;
     contents = new ArrayList< ArrayList<Site> >(0);
   }
 
-  public Map(int width_, int height_) {
+  public GameMap(int width_, int height_) {
     width = width_;
     height = height_;
     contents = new ArrayList< ArrayList<Site> >(0);

@@ -11,7 +11,7 @@ public class Networking {
   private static int _width, _height;
   private static ArrayList< ArrayList<Integer> > _productions;
 
-  static void deserializeMapSize(String inputString) {
+  static void deserializeGameMapSize(String inputString) {
     String[] inputStringComponents = inputString.split(" ");
 
     _width = Integer.parseInt(inputStringComponents[0]);
@@ -40,10 +40,10 @@ public class Networking {
     return returnString;
   }
 
-  static Map deserializeMap(String inputString) {
+  static GameMap deserializeGameMap(String inputString) {
     String[] inputStringComponents = inputString.split(" ");
 
-    Map map = new Map(_width, _height);
+    GameMap map = new GameMap(_width, _height);
 
     // Run-length encode of owners
     int y = 0, x = 0;
@@ -101,9 +101,9 @@ public class Networking {
   static InitPackage getInit() {
     InitPackage initPackage = new InitPackage();
     initPackage.playerTag = (int)Long.parseLong(getString());
-    deserializeMapSize(getString());
+    deserializeGameMapSize(getString());
     deserializeProductions(getString());
-    initPackage.map = deserializeMap(getString());
+    initPackage.map = deserializeGameMap(getString());
 
     return initPackage;
   }
@@ -112,8 +112,8 @@ public class Networking {
     sendString(name);
   }
 
-  static Map getFrame() {
-    return deserializeMap(getString());
+  static GameMap getFrame() {
+    return deserializeGameMap(getString());
   }
 
   static void sendFrame(ArrayList<Move> moves) {
