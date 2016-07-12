@@ -100,7 +100,7 @@ public class Networking {
 
   static InitPackage getInit() {
     InitPackage initPackage = new InitPackage();
-    initPackage.playerTag = (int)Long.parseLong(getString());
+    initPackage.myID = (int)Long.parseLong(getString());
     deserializeGameMapSize(getString());
     deserializeProductions(getString());
     initPackage.map = deserializeGameMap(getString());
