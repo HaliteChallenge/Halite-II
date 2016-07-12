@@ -12,29 +12,7 @@
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right loggedOut" id="loginNav">
 				<ul class="nav navbar-nav">
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<strong class="caret"></strong></a>
-						<ul class="dropdown-menu" style="padding: 10px;">
-							<li><a href="quickstart.php">Quickstart</a></li>
-							<li><a href="basic.php">Basic Bot</a></li>
-						</ul>
-					</li>
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Specs<strong class="caret"></strong></a>
-						<ul class="dropdown-menu" style="padding: 10px;">
-							<li><a href="game_spec.php">Game Spec</a></li>
-							<li><a href="networking_spec.php">Networking Spec</a></li>
-						</ul>
-					</li>
-					<li>
-						<a href="downloads.php">Downloads</a>
-					</li>
-					<li>
-						<a href="http://forums.halite.io">Forums</a>
-					</li>
-					<li>
-						<a href="#" style="cursor: default;"></a>
-					</li>
+					<?php include 'includes/dropdowns.php'; ?>
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Login<strong class="caret"></strong></a>
 						<ul class="dropdown-menu" style="padding: 10px; padding-bottom: 15px;">
@@ -52,6 +30,7 @@
 			</ul>
 			<form id="submitForm">
 				<ul class="nav navbar-nav navbar-right loggedIn" id="logoutNav">
+					<?php include 'includes/dropdowns.php'; ?>
 					<li><a href="#" id="submitButton">Submit To Competition</a><input type="file" id="myFile" name="botFile"></li>
 					<li><a href="#" id="logoutButton">Logout</a></li>
 				</ul>
