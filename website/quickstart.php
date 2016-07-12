@@ -33,7 +33,7 @@
 				<p>Users may submit their bots to Halite's website in order to qualify for the playoffs, to get their ranking, and to see their bot in match against others. In order to submit the random bot given in the starter packages, click the "Submit to Competition" button and upload a zip of the files inside your starter package's directory. Your bot should appear on the leaderboard within a couple of minutes.</p>
 
 				<h3>Need Help? Have Feedback?</h3>
-				<p>Don't hesitate to send us an email at <a href="mailto:halite@halite.io">halite@halite.io</a> or find either Michael Truell or Ben Spector on the 16th floor of 100 Avenue of the Americas. We work right next to the Hacker Lab.</p>
+				<p>Please post on <a href="http://forums.halite.io">the forums</a>. If want to keep communication private, send us an email at <a href="mailto:halite@halite.io">halite@halite.io</a> or find either Michael Truell or Ben Spector on the 16th floor of 100 Avenue of the Americas. We work right next to the Hacker Lab.</p>
 			</div>
 		</div>
 	</div>
