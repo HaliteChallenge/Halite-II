@@ -15,6 +15,7 @@ RUN apt-get install -y libstdc++6
 RUN apt-get install -y gcc
 RUN apt-get install -y g++
 RUN apt-get install -y python
+RUN apt-get install -y python3-pip
 
 #prepare for Java download
 RUN apt-get install -y python-software-properties
@@ -36,3 +37,6 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get -y dist-upgrade
+
+# Libraries
+RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.9.0-cp34-cp34m-linux_x86_64.whl
