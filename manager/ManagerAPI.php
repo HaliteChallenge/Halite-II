@@ -122,7 +122,7 @@ class ManagerAPI extends API{
 			$possibleNumPlayers = array(2, 3, 4, 5);
 			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-			$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
+			/*$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
 			$differenceInRank = rand(3, 10);
 			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE userID!={$seedPlayer['userID']} and status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
 			usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
@@ -132,10 +132,11 @@ class ManagerAPI extends API{
 			$players = array($seedPlayer);
 			for($a = 0; $a < $numPlayers-1; $a++) {
 				array_push($players, $possiblePlayers[$a]);
-			}
+			}*/
+			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
 
 			// Pick map size
-			$sizes = array(10, 20, 30, 40, 50, 60);
+			$sizes = array(20, 30, 40, 50);
 			$size = $sizes[array_rand($sizes)];
 
 			// Send game task
@@ -224,11 +225,7 @@ class ManagerAPI extends API{
 			$gameID = $gameIDArray['gameID'];
 
 			// Update each participant's stats
-			$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
-			$allUserExtras = array();
-			foreach($allUsers as $user) {
-				array_push($allUserExtras, $this->select("SELECT * FROM UserExtraStats where userID={$user['userID']}"));
-			}
+			$allUserExtras = $this->selectMultiple("SELECT * FROM UserExtraStats");
 			for($a = 0; $a < count($users); $a++) {
 				$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
@@ -283,8 +280,6 @@ class ManagerAPI extends API{
 			var_dump($lines);
 			for($a = 0; $a < count($users); $a++) {
 				$components = explode(' ', $lines[$a]);
-				$allUsers[$a]['mu'] = floatval($components[0]);
-				$allUsers[$a]['sigma'] = floatval($components[1]);
 				$this->insert("UPDATE User SET mu={$components[0]}, sigma={$components[1]} WHERE userID={$users[$a]->userID}");
 			}
 
