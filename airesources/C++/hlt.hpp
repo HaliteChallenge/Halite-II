@@ -56,7 +56,7 @@ namespace hlt{
 			short dx = abs(l1.x - l2.x), dy = abs(l1.y - l2.y);
 			if(dx > width / 2) dx = width - dx;
 			if(dy > height / 2) dy = height - dy;
-			return sqrt((dx*dx) + (dy*dy));
+			return dx + dy;
 		}
 		float getAngle(Location l1, Location l2) {
 			short dx = l2.x - l1.x, dy = l2.y - l1.y;

@@ -33,7 +33,7 @@ public class GameMap{
     if(dx > width / 2.0) dx = width - dx;
     if(dy > height / 2.0) dy = height - dy;
 
-    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    return dx + dy;
   }
 
   public double getAngle(Location loc1, Location loc2) {

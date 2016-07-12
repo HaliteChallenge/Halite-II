@@ -49,7 +49,7 @@ class Map:
 			dx = self.width - dx
 		if dy > self.height / 2:
 			dy = self.height - dy
-		return math.sqrt((dx*dx) + (dy*dy))
+		return dx + dy
 
 	def getAngle(self, l1, l2):
 		dx = l2.x - l1.x
