@@ -1,5 +1,5 @@
 
 public class InitPackage {
-  public int playerTag;
+  public int myID;
   public Map map;
 }

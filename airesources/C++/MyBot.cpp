@@ -13,9 +13,9 @@ int main() {
 
 	std::cout.sync_with_stdio(0);
 
-	unsigned char myTag;
+	unsigned char myID;
 	hlt::Map presentMap;
-	getInit(myTag, presentMap);
+	getInit(myID, presentMap);
 	sendInitResponse("MyBot");
 
 	std::set<hlt::Move> moves;
@@ -26,7 +26,7 @@ int main() {
 
 		for(unsigned short a = 0; a < presentMap.height; a++) {
 			for(unsigned short b = 0; b < presentMap.width; b++) {
-				if (presentMap.getSite({b, a}, STILL).owner == myTag) {
+				if (presentMap.getSite({b, a}, STILL).owner == myID) {
 					moves.insert({ { b, a }, (unsigned char)(rand() % 5)});
 				}
 			}

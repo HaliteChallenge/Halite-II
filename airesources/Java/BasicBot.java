@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class BasicBot {
 	public static void main(String[] args) {
 		InitPackage iPackage = Networking.getInit();
-		int playerTag = iPackage.playerTag;
+		int myID = iPackage.myID;
 		Map gameMap = iPackage.map;
 
 		Networking.sendInit("BasicJavaBot");
@@ -16,13 +16,13 @@ public class BasicBot {
 			for(int y = 0; y < gameMap.contents.size(); y++) {
 				for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
 					Site site = gameMap.contents.get(y).get(x);
-					if(site.owner == playerTag) {
+					if(site.owner == myID) {
 						Direction moveDirection = Direction.randomDirection();
 						if(site.strength < site.production*5) {
 							moveDirection = Direction.STILL;
 						} else {
 							for(Direction d : Direction.CARDINALS) {
-								if(gameMap.getSite(new Location(x, y), d).owner != playerTag) {
+								if(gameMap.getSite(new Location(x, y), d).owner != myID) {
 									moveDirection = d;
 									break;
 								}

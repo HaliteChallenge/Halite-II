@@ -13,9 +13,9 @@ int main() {
 
 	std::cout.sync_with_stdio(0);
 
-	unsigned char myTag;
+	unsigned char myID;
 	hlt::Map presentMap;
-	getInit(myTag, presentMap);
+	getInit(myID, presentMap);
 	sendInitResponse("BasicC++Bot");
 
 	std::set<hlt::Move> moves;
@@ -27,13 +27,13 @@ int main() {
 		for(unsigned short y = 0; y < presentMap.height; y++) {
 			for(unsigned short x = 0; x < presentMap.width; x++) {
 				hlt::Site site = presentMap.contents[y][x];
-				if (site.owner == myTag) {
+				if (site.owner == myID) {
 					unsigned char moveDirection = (unsigned char)(rand() % 5);
 					if(site.strength < site.production*5) {
 						moveDirection = STILL;
 					} else {
 						for(int d : CARDINALS) {
-							if(presentMap.getSite({x, y}, d).owner != myTag) {
+							if(presentMap.getSite({x, y}, d).owner != myID) {
 								moveDirection = d;
 							}
 						}
