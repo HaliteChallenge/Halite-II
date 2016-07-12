@@ -25,10 +25,14 @@ void handleResize(GLFWwindow * w, int width, int height);
 void setWindowed();
 void setFullscreen();
 void renderLaunch();
+void renderHelp(int height);
 
 Halite * my_game = NULL; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, tabPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true;
-bool verboseOutput = false;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false;
+bool wPressed = false, aPressed = false, sPressed = false, dPressed = false;
+bool shiftPressed = false, tabPressed = false, hPressed = false, mousePressed = false;
+bool newGame = false, isLaunch = true;
+bool isWindowed = true, verboseOutput = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
 int windowedWidth, windowedHeight, numTurns;
 
@@ -125,46 +129,68 @@ int main(int argc, const char ** argv) {
 	glfwSwapInterval(1);
 
 	clock_t c = clock();
-
-	disregardFullscreenAttempts = false;
 	
 	if(verboseOutput) debug << "Entering main render loop!" << std::endl;
 	while(!glfwWindowShouldClose(window)) {
-		//Limit render rate:
-		float delta = float(clock() - c) / CLOCKS_PER_SEC;
-		if(verboseOutput) debug << "Frame time of " << delta << ".\n";
-		c = clock();
+		if(hPressed) {
+			float delta = float(clock() - c) / CLOCKS_PER_SEC;
+			if(verboseOutput) debug << "[In help render loop] Frame time of " << delta << ".\n";
+			c = clock();
 
-		short turnNumberS = turnNumber;
-		if(verboseOutput) debug << "About to render at turn #" << turnNumberS << std::endl;
-		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, tabPressed, mousePressed, xOffset, yOffset);
-		if(verboseOutput) debug << "Just rendered turn #" << turnNumberS << std::endl;
-		if(abs(turnNumber - float(turnNumberS) >= 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
+			if(verboseOutput) debug << "About to clear color & depth buffer bits in render help loop" << std::endl;
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Poll events
-		glfwPollEvents();
-		if(verboseOutput) debug << "Polled events in main loop!" << std::endl;
+			if(verboseOutput) debug << "Getting window height from glfw in render help loop" << std::endl;
+			int height; glfwGetWindowSize(window, NULL, &height);
 
-		if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
-		else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
+			if(verboseOutput) debug << "Rendering text in render help loop" << std::endl;
+			util::renderText(-.85, 0.65, height / 6, { 1, 1, 1 }, "Halite Visualizer Help!");
 
-		if(leftPressed) {
-			if(shiftPressed) turnNumber -= 5 * maxFps * delta;
-			else turnNumber -= maxFps * delta;
+			renderHelp(height);
+
+			if(verboseOutput) debug << "Swapping buffers in render help loop" << std::endl;
+			glfwSwapBuffers(window);
+			if(verboseOutput) debug << "Polling events in render help loop" << std::endl;
+			glfwPollEvents();
+
 		}
-		else if(rightPressed) {
-			if(shiftPressed) turnNumber += 5 * maxFps * delta;
-			else turnNumber += maxFps * delta;
+		else {
+			//Limit render rate:
+			float delta = float(clock() - c) / CLOCKS_PER_SEC;
+			if(verboseOutput) debug << "[In game render loop] Frame time of " << delta << ".\n";
+			c = clock();
+
+			short turnNumberS = turnNumber;
+			if(verboseOutput) debug << "About to render at turn #" << turnNumberS << std::endl;
+			my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, tabPressed, mousePressed, xOffset, yOffset);
+			if(verboseOutput) debug << "Just rendered turn #" << turnNumberS << std::endl;
+			if(abs(turnNumber - float(turnNumberS) >= 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
+
+			//Poll events
+			glfwPollEvents();
+			if(verboseOutput) debug << "Polled events in render game loop!" << std::endl;
+
+			if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
+			else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
+
+			if(leftPressed) {
+				if(shiftPressed) turnNumber -= 5 * maxFps * delta;
+				else turnNumber -= maxFps * delta;
+			}
+			else if(rightPressed) {
+				if(shiftPressed) turnNumber += 5 * maxFps * delta;
+				else turnNumber += maxFps * delta;
+			}
+			else if(!isPaused && !tabPressed) turnNumber += maxFps * delta;
+			if(turnNumber < 0) turnNumber = 0;
+
+			if(wPressed) yOffset -= SHIFT;
+			if(aPressed) xOffset += SHIFT;
+			if(sPressed) yOffset += SHIFT;
+			if(dPressed) xOffset -= SHIFT;
+
+			if(verboseOutput) debug << "Finished iteration of render game loop!!" << std::endl;
 		}
-		else if(!isPaused && !tabPressed) turnNumber += maxFps * delta;
-		if(turnNumber < 0) turnNumber = 0;
-
-		if(wPressed) yOffset -= SHIFT;
-		if(aPressed) xOffset += SHIFT;
-		if(sPressed) yOffset += SHIFT;
-		if(dPressed) xOffset -= SHIFT;
-
-		if(verboseOutput) debug << "Finished iteration of render loop!!" << std::endl;
 	}
 
 	return EXIT_SUCCESS;
@@ -347,6 +373,12 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods) {
 	else if(key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
 		tabPressed = false;
 	}
+	else if(key == GLFW_KEY_H && action == GLFW_PRESS) {
+		hPressed = true;
+	}
+	else if(key == GLFW_KEY_H && action == GLFW_RELEASE) {
+		hPressed = false;
+	}
 	else if(key == GLFW_KEY_ESCAPE) {
 		exit(0);
 	}
@@ -384,7 +416,7 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 		}
 	}
 	else if(code == 'F' || code == 'f') {
-		if(!disregardFullscreenAttempts) isWindowed ? setFullscreen() : setWindowed();
+		isWindowed ? setFullscreen() : setWindowed();
 	}
 	else if(code == 'O' || code == 'o') {
 		xOffset = 0;
@@ -416,7 +448,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 }
 
 void handleErrors(int error, const char * description) {
-	if(verboseOutput) debug << "Handling an error via handleErrors - description is " << description << std::endl;
+	if(verboseOutput) debug << "Handling an error via handleErrors - description is:" << std::endl;
 	debug << description << std::endl;
 }
 
@@ -439,20 +471,28 @@ void renderLaunch() {
 
 	int height; glfwGetWindowSize(window, NULL, &height);
 	util::renderText(-.85, 0.65, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
-	util::renderText(-.85, 0.45, height / 12, { 1, 1, 1 }, " - To pause or unpause the replay, press SPACE");
-	util::renderText(-.85, 0.3, height / 12, { 1, 1, 1 }, " - To move around in the replay, press LEFT ARROW or RIGHT ARROW");
-	util::renderText(-.85, 0.2, height / 16, { 1, 1, 1 }, "     - Hold shift to move around five times faster.");
-	util::renderText(-.85, 0.1, height / 16, { 1, 1, 1 }, "     - To change move and play speed, press UP ARROW or DOWN ARROW");
-	util::renderText(-.85, -0.05, height / 12, { 1, 1, 1 }, " - To move around in the replay by frame, press , or .");
-	util::renderText(-.85, -0.2, height / 12, { 1, 1, 1 }, " - To go to the beginning or end of the replay, press z or x");
-	util::renderText(-.85, -0.35, height / 12, { 1, 1, 1 }, " - To pan around in the map, use the w, a, s, and d keys");
-	util::renderText(-.85, -0.5, height / 12, { 1, 1, 1 }, " - To zoom in or out on the graphs, press + or -");
-	util::renderText(-.85, -0.65, height / 12, { 1, 1, 1 }, " - To reload a replay from file, press r");
-
+	renderHelp(height);
+	util::renderText(-.85, -0.84, height / 12, { 1, 1, 1 }, " - To view this help panel, hold h");
+	
 	if(verboseOutput) debug << "renderLaunch - rendered necessary text!" << std::endl;
 
 	glfwSwapBuffers(window);
 	if(verboseOutput) debug << "renderLaunch - swapped buffers!" << std::endl;
 	glfwPollEvents();
 	if(verboseOutput) debug << "renderLaunch - polled events!" << std::endl;
+}
+
+void renderHelp(int height) {
+	util::renderText(-.85, 0.48, height / 12, { 1, 1, 1 }, " - To pause or unpause the replay, press SPACE");
+	util::renderText(-.85, 0.36, height / 12, { 1, 1, 1 }, " - To move around in the replay, press LEFT ARROW or RIGHT ARROW");
+	util::renderText(-.85, 0.28, height / 16, { 1, 1, 1 }, "     - Hold shift to move around five times faster.");
+	util::renderText(-.85, 0.20, height / 16, { 1, 1, 1 }, "     - To change move and play speed, press UP ARROW or DOWN ARROW");
+	util::renderText(-.85, 0.08, height / 12, { 1, 1, 1 }, " - To move around in the replay by frame, press , or .");
+	util::renderText(-.85, -0.04, height / 12, { 1, 1, 1 }, " - To go to the beginning or end of the replay, press z or x");
+	util::renderText(-.85, -0.16, height / 12, { 1, 1, 1 }, " - To pan around in the map, use the w, a, s, and d keys");
+	util::renderText(-.85, -0.24, height / 16, { 1, 1, 1 }, "     - To reset to the origin, press o");
+	util::renderText(-.85, -0.36, height / 12, { 1, 1, 1 }, " - To zoom in or out on the graphs, press + or -");
+	util::renderText(-.85, -0.48, height / 12, { 1, 1, 1 }, " - To view the production map, hold TAB");
+	util::renderText(-.85, -0.60, height / 12, { 1, 1, 1 }, " - To reload a replay from file, press r");
+	util::renderText(-.85, -0.72, height / 12, { 1, 1, 1 }, " - To toggle fullscreen mode, press f");
 }
