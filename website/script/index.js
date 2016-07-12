@@ -45,7 +45,7 @@ $(function() {
 		render: function() {
 			this.$table.find("tbody").remove();
 			this.submissions.sort(function(a, b) {
-				return a.rank > b.rank;
+				return parseInt(a.rank) > parseInt(b.rank);
 			});
 			console.log(this.submissions)
 			for(var a = 0; a < this.submissions.length; a++) {
