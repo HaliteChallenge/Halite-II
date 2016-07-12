@@ -98,9 +98,6 @@ int main(int argc, const char ** argv) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 1);
 
-	const char * glVersion = (const char * )glGetString(GL_VERSION);
-	debug << glVersion;
-	debug.flush();
 
 	my_game = new Halite();
 
@@ -124,6 +121,12 @@ int main(int argc, const char ** argv) {
 		while(isLaunch && !glfwWindowShouldClose(window)) {
 			renderLaunch();
 		}
+	}
+
+	if(verboseOutput) {
+		const char * glVersion = (const char * )glGetString(GL_VERSION);
+		debug << glVersion;
+		debug.flush();
 	}
 
 	glfwSwapInterval(1);

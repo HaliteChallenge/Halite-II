@@ -154,9 +154,9 @@ void Halite::setupMapRendering() {
 	glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
 	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL)
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
 
-	if(verboseOutput) debug << "Successfully filled the map strength buffer with (0s) data and bound the appropriate attribute." << std::endl;;
+	if(verboseOutput) debug << "Successfully filled the map strength buffer with (0s) data and bound the appropriate attribute." << std::endl;
 }
 
 void Halite::setupProductionGL() {
@@ -339,6 +339,7 @@ void Halite::setupGraphGL() {
 }
 
 void Halite::setupGraphRendering(float zoom, short turnNumber) {
+	if(verboseOutput) debug << "Setting up graph rendering" << std::endl;
 	//Set the number of frames the graph will handle. Also prevents race conditions with full_game by not using iterators, but rather up to a numeric frame.
 	graph_frame_number = full_game.size();
 	graph_zoom = zoom;
@@ -381,6 +382,8 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		}
 	}
 
+	if(verboseOutput) debug << "Figured out graph that turn min=" << graph_turn_min << " and max=" << graph_turn_max << std::endl;
+
 	//Setup territory graph:
 
 	//Bind vertex attribute object.
@@ -402,11 +405,15 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		graphTerritoryVerticesLoc += 2;
 	}
 
+	if(verboseOutput) debug << "Successfully created graphTerritoryVertices" << std::endl;
+
 	//Set vertices in buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, graph_territory_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, graphTerritoryVertices.size() * sizeof(float), graphTerritoryVertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully filled the graph territory vertex buffer with data and bound the appropriate vertex attribute" << std::endl;
 
 	//Create vector representing color data:
 	std::vector<float> graphColors((unsigned int)number_of_players * (graph_turn_max + 1 - graph_turn_min) * 3);
@@ -423,11 +430,15 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		}
 	}
 
+	if(verboseOutput) debug << "Successfully created graphColors" << std::endl;
+
 	//Set colors in buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glBufferData(GL_ARRAY_BUFFER, graphColors.size()*sizeof(float), graphColors.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully filled graph color buffer with data and bound the appropriate vertex attribute in the territory graph attribute object" << std::endl;
 
 	//Setup strength graph:
 
@@ -450,16 +461,22 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		graphStrengthVerticesLoc += 2;
 	}
 
+	if(verboseOutput) debug << "Successfully created graphStrengthVertices" << std::endl;
+
 	//Set vertices in buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, graph_strength_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, graphStrengthVertices.size() * sizeof(float), graphStrengthVertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	if(verboseOutput) debug << "Successfully filled the graph strength vertex buffer with data and bound the appropriate vertex attribute" << std::endl;
+
 	//Add in color buffer as well:
 	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully bound the graph color buffer to the strength graph attribute object" << std::endl;
 
 	//Setup production graph:
 
@@ -482,27 +499,40 @@ void Halite::setupGraphRendering(float zoom, short turnNumber) {
 		graphProductionVerticesLoc += 2;
 	}
 
+	if(verboseOutput) debug << "Successfully created graphProductionVertices" << std::endl;
+
 	//Set vertices in buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, graph_production_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, graphProductionVertices.size() * sizeof(float), graphProductionVertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	if(verboseOutput) debug << "Successfully filled the graph production vertex buffer with data and bound the appropriate vertex attribute" << std::endl;
+
 	//Add in color buffer as well:
 	glBindBuffer(GL_ARRAY_BUFFER, graph_color_buffer);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully bound the graph color buffer to the production graph attribute object" << std::endl;
 }
 
 void Halite::setupBorders(short turnNumber) {
+	if(verboseOutput) debug << "Setting up borders" << std::endl;
 	glDeleteBuffers(1, &border_vertex_buffer);
+	if(verboseOutput) debug << "Successfully deleted border buffer" << std::endl;
 	glDeleteVertexArrays(1, &border_vertex_attributes);
+	if(verboseOutput) debug << "Successfully deleted border attributes" << std::endl;
 	glDeleteProgram(border_shader_program);
+	if(verboseOutput) debug << "Successfully deleted border program" << std::endl;
 	glDeleteShader(border_vertex_shader);
 	glDeleteShader(border_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted border shaders" << std::endl;
 
 	glGenBuffers(1, &border_vertex_buffer);
+	if(verboseOutput) debug << "Successfully created border buffer" << std::endl;
 	glGenVertexArrays(1, &border_vertex_attributes);
+	if(verboseOutput) debug << "Successfully created border attributes" << std::endl;
 
 	//Bind vertex attribute object.
 	glBindVertexArray(border_vertex_attributes);
@@ -524,24 +554,34 @@ void Halite::setupBorders(short turnNumber) {
 	//Create map borders:
 	borderBufferValues[42] = MAP_LEFT; borderBufferValues[43] = MAP_TOP; borderBufferValues[44] = MAP_LEFT; borderBufferValues[45] = MAP_BOTTOM; borderBufferValues[46] = MAP_RIGHT; borderBufferValues[47] = MAP_BOTTOM; borderBufferValues[48] = MAP_RIGHT; borderBufferValues[49] = MAP_TOP; borderBufferValues[50] = MAP_LEFT; borderBufferValues[51] = MAP_TOP;
 
+	if(verboseOutput) debug << "Successfully created all of the static values for the borders" << std::endl;
+
 	//Create stat borders:
 	float statBottom = STAT_TOP - ((std::count(players_alive[turnNumber].begin(), players_alive[turnNumber].end(), true) * (NAME_TEXT_HEIGHT + NAME_TEXT_OFFSET)) + (1.5 * GRAPH_TEXT_OFFSET) + LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	float statTop = STAT_TOP - (LABEL_TEXT_HEIGHT + LABEL_TEXT_OFFSET);
 	borderBufferValues[52] = STAT_LEFT; borderBufferValues[53] = statBottom; borderBufferValues[54] = STAT_RIGHT; borderBufferValues[55] = statBottom; borderBufferValues[56] = STAT_RIGHT; borderBufferValues[57] = statTop; borderBufferValues[58] = STAT_LEFT; borderBufferValues[59] = statTop; borderBufferValues[60] = STAT_LEFT; borderBufferValues[61] = statBottom;
 
+	if(verboseOutput) debug << "Successfully created all of the partial-dynamic values for the borders" << std::endl;
+
 	//Bind graph border buffer
 	glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, borderBufferValues.size()*sizeof(float), borderBufferValues.data(), GL_DYNAMIC_DRAW);
 
+	if(verboseOutput) debug << "Successfully filled the border vertex buffer with data" << std::endl;
+
 	//Set attributes in Vertex Array Object
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if(verboseOutput) debug << "Successfully bound the appropriate vertex attribute to the vertex buffer" << std::endl;
 
 	//Create shaders
 	border_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	util::shaderFromFile(border_vertex_shader, "shaders/border/vertex.glsl", "Border Vertex Shader");
 	border_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	util::shaderFromFile(border_fragment_shader, "shaders/border/fragment.glsl", "Border Fragment Shader");
+
+	if(verboseOutput) debug << "Successfully created border shaders" << std::endl;
 
 	//Setup shader program
 	border_shader_program = glCreateProgram();
@@ -550,20 +590,25 @@ void Halite::setupBorders(short turnNumber) {
 	glLinkProgram(border_shader_program);
 	glDetachShader(border_shader_program, border_vertex_shader);
 	glDetachShader(border_shader_program, border_fragment_shader);
+	if(verboseOutput) debug << "Successfully created the border program" << std::endl;
 
 	//Cleanup - delete shaders
 	glDeleteShader(border_vertex_shader);
 	glDeleteShader(border_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted border shaders (2)" << std::endl;
 }
 
 void Halite::clearFullGame() {
+	if(verboseOutput) debug << "Clearing the full game!" << std::endl;
 	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
 	full_game.clear();
+	if(verboseOutput) debug << "Successfully cleared the full game" << std::endl;
 }
 
 //Public Functions -------------------
 
 Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TOP(0.98), NAME_TEXT_HEIGHT(0.035), NAME_TEXT_OFFSET(0.015), GRAPH_TEXT_HEIGHT(0.045), GRAPH_TEXT_OFFSET(.015), MAP_TEXT_HEIGHT(.05), MAP_TEXT_OFFSET(.02), LABEL_TEXT_HEIGHT(.045), LABEL_TEXT_OFFSET(.015) {
+	if(verboseOutput) debug << "Default-constructing a game visualizer object" << std::endl;
 	number_of_players = 0;
 	player_names = std::vector< std::pair<std::string, float> >();
 	full_game = std::vector<hlt::Map * >();
@@ -573,21 +618,32 @@ Halite::Halite(): STAT_LEFT(0.51), STAT_RIGHT(0.98), STAT_BOTTOM(-0.98), STAT_TO
 }
 
 short Halite::input(GLFWwindow * window, std::string filename, unsigned short& width, unsigned short& height) {
+	if(verboseOutput) debug << "Inputting file with name " << filename << std::endl;
 	std::ifstream game_file;
 	hlt::Map m;
 	std::string in;
 	game_file.open(filename, std::ios_base::in | std::ios_base::binary);
-	if(!game_file.is_open()) throw std::runtime_error("File at " + filename + " could not be opened");
+	if(!game_file.is_open()) {
+		if(verboseOutput) debug << "Failed to open file." << std::endl;
+		throw std::runtime_error("File at " + filename + " could not be opened");
+	}
 
 	std::string format;
 	util::getline(game_file, format);
-	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") throw std::runtime_error("File format no longer supported in file " + filename);
-	else if(format != "HLT 8") throw std::runtime_error("Unrecognized format in file " + filename);
+	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") {
+		if(verboseOutput) debug << "Outdated file format!" << std::endl;
+		throw std::runtime_error("File format no longer supported in file " + filename);
+	}
+	else if(format != "HLT 8") {
+		if(verboseOutput) debug << "Unrecognized file format!" << std::endl;
+		throw std::runtime_error("Unrecognized format in file " + filename);
+	}
 
 	present_file = filename;
 	//Clear previous game
 	clearFullGame();
 
+	if(verboseOutput) debug << "Creating loading GL." << std::endl;
 	//Generate text for the loading bar:
 	std::string loadingText = "LOADING..........";
 	int screenHeight;
@@ -613,6 +669,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glLinkProgram(p); glUseProgram(p);
 	glDetachShader(p, vs); glDetachShader(p, fs);
 	glDeleteShader(vs); glDeleteShader(fs);
+	if(verboseOutput) debug << "Created loading GL." << std::endl;
 
 	//Set window for rendering:
 	glfwMakeContextCurrent(window);
@@ -627,6 +684,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glfwPollEvents();
 	glfwSwapBuffers(window);
 
+	if(verboseOutput) debug << "Reading names and colors from file." << std::endl;
 	//Read in names and dimensions
 	int numLines;
 	m.map_width = 0;
@@ -655,22 +713,27 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		color_codes[a + 1] = color;
 		game_file.get(); //Get newline character
 	}
+	if(verboseOutput) debug << "Successfully read names and colors from file." << std::endl;
 
 	m.contents.resize(m.map_height);
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) a->resize(m.map_width);
 
+	if(verboseOutput) debug << "Reading the file into a string." << std::endl;
 	std::ostringstream game_file_stream;
 	game_file_stream << game_file.rdbuf();
 	game_file.close();
 	std::string game_file_string = game_file_stream.str();
+	if(verboseOutput) debug << "Successfully read the file into a string." << std::endl;
 	int loc = 0; //For getting characters from the file.
 	auto getChar = [&]() -> char { char c = game_file_string[loc]; loc++; return c; };
 
+	if(verboseOutput) debug << "Reading production values from file string." << std::endl;
 	//Get the productions from the next width * height characters of the file.
 	for(auto a = m.contents.begin(); a != m.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
 		b->production = getChar();
 	}
 	getChar(); //Get newline character.
+	if(verboseOutput) debug << "Successfully read production values from file string." << std::endl;
 
 	const float ADVANCE_FRAME = (LOADING_RIGHT - LOADING_LEFT) / numLines; //How far the loading bar moves each frame
 
@@ -681,6 +744,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	const int NUM_RENDER = 48;
 	int lastRender = 0;
 	for(short a = 0; a < numLines; a++) {
+		if(verboseOutput) debug << "Reading turn #" << a << " frome file string." << std::endl;
 		short x = 0, y = 0;
 		int tilesSoFar = 0;
 		while(tilesSoFar < totalTiles) {
@@ -712,6 +776,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 		loadingVertices[0] += ADVANCE_FRAME; loadingVertices[2] += ADVANCE_FRAME;
 
 		if(a - lastRender > float(numLines) / NUM_RENDER) {
+			if(verboseOutput) debug << "Rendering loading bar." << std::endl;
 			lastRender = a;
 
 			//Render the loading bar:
@@ -729,6 +794,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 			glfwPollEvents();
 			glfwSwapBuffers(window);
+			if(verboseOutput) debug << "Successfully rendered loading bar." << std::endl;
 		}	
 	}
 
@@ -737,6 +803,8 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	glDeleteVertexArrays(1, &loadingAttributes);
 	glDeleteProgram(p);
 
+	if(verboseOutput) debug << "Deleted loading GL" << std::endl;
+
 	//Create GL for rendering now.
 	recreateGL();
 
@@ -744,6 +812,7 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 }
 
 bool Halite::isValid(std::string filename) {
+	if(verboseOutput) debug << "Checking validity of file with name " << filename << std::endl;
 	std::ifstream game_file;
 	game_file.open(filename, std::ios_base::in);
 	if(!game_file.is_open()) return false;
@@ -756,6 +825,8 @@ bool Halite::isValid(std::string filename) {
 void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float mouseX, float mouseY, bool tab, bool mouseClick, short xOffset, short yOffset) {
 	if(turnNumber < 0) turnNumber = 0;
 	if(turnNumber >= full_game.size()) turnNumber = full_game.size() - 1;
+
+	if(verboseOutput) debug << "Rendering turn #" << turnNumber << std::endl;
 
 	if(!full_game.empty()) {
 		//Put the names in their places.
@@ -816,12 +887,14 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		setOffset(xOffset, yOffset);
 
 		if(tab) {
+			if(verboseOutput) debug << "Drawing production" << std::endl;
 			//Draw productions:
 			glUseProgram(production_shader_program);
 			glBindVertexArray(production_vertex_attributes);
 			glDrawArrays(GL_POINTS, 0, (unsigned int)map_width * map_height);
 		}
 		else {
+			if(verboseOutput) debug << "Drawing map" << std::endl;
 			glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 			glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 
@@ -837,6 +910,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		if(full_game.size() > graph_frame_number || zoom != graph_zoom || graph_turn_number != turnNumber) setupGraphRendering(zoom, turnNumber);
 
 		//Draw graphs:
+		if(verboseOutput) debug << "Drawing graphs" << std::endl;
 		glUseProgram(graph_shader_program);
 		glBindVertexArray(graph_territory_vertex_attributes);
 		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * (graph_turn_max + 1 - graph_turn_min), graph_turn_max + 1 - graph_turn_min);
@@ -846,11 +920,14 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		for(unsigned char a = 0; a < number_of_players; a++) glDrawArrays(GL_LINE_STRIP, a * (graph_turn_max + 1 - graph_turn_min), graph_turn_max + 1 - graph_turn_min);
 
 		//Edit border buffer
+		if(verboseOutput) debug << "Updating border buffer" << std::endl;
 		float xPos = (float(graph_turn_number - graph_turn_min) / (graph_turn_max - graph_turn_min)) * (territory_graph_right - territory_graph_left) + territory_graph_left;
 		glBindBuffer(GL_ARRAY_BUFFER, border_vertex_buffer);
 		float positionVertices[12];
 		positionVertices[0] = xPos; positionVertices[1] = territory_graph_bottom; positionVertices[2] = xPos; positionVertices[3] = territory_graph_top; positionVertices[4] = xPos; positionVertices[5] = strength_graph_bottom; positionVertices[6] = xPos; positionVertices[7] = strength_graph_top;  positionVertices[8] = xPos; positionVertices[9] = production_graph_bottom; positionVertices[10] = xPos; positionVertices[11] = production_graph_top;
 		glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), positionVertices);
+
+		if(verboseOutput) debug << "Rendering text" << std::endl;
 
 		//Generate text for the titles of the graphs
 		std::string territoryText = "Territory";
@@ -938,6 +1015,7 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		//util::renderAllText(window);
 
 		//Draw borders:
+		if(verboseOutput) debug << "Drawing borders" << std::endl;
 		glUseProgram(border_shader_program);
 		glBindVertexArray(border_vertex_attributes);
 		glDrawArrays(GL_LINE_STRIP, 6, 5);
@@ -948,11 +1026,15 @@ void Halite::render(GLFWwindow * window, short & turnNumber, float zoom, float m
 		glDrawArrays(GL_LINES, 0, 6);
 	}
 
+
+	if(verboseOutput) debug << "Swapping buffers" << std::endl;
+
 	//Update window
 	glfwSwapBuffers(window);
 }
 
 void Halite::recreateGL() {
+	if(verboseOutput) debug << "Recreating Halite GL" << std::endl;
 	setupBorders(0);
 	setupMapGL();
 	setupMapRendering();
@@ -961,9 +1043,11 @@ void Halite::recreateGL() {
 	setupProductionRendering(*full_game[0]);
 	setupGraphGL();
 	setupGraphRendering(1, 0);
+	if(verboseOutput) debug << "Finished recreating Halite GL" << std::endl;
 }
 
 Halite::~Halite() {
+	if(verboseOutput) debug << "Deleting all Halite GL" << std::endl;
 	//Get rid of map OpenGL stuff
 	glDeleteShader(map_vertex_shader);
 	glDeleteShader(map_geometry_shader);
@@ -989,6 +1073,7 @@ Halite::~Halite() {
 	//Get rid of border OpenGL stuff
 	glDeleteBuffers(1, &border_vertex_buffer);
 	glDeleteVertexArrays(1, &border_vertex_attributes);
+	if(verboseOutput) debug << "Finished Deleting all Halite GL" << std::endl;
 
 	//Get rid of dynamically allocated memory:
 	clearFullGame();
