@@ -49,16 +49,18 @@ $(function() {
 			for(var a = 0; a < this.rawGames.length; a++) {
 				var players = this.rawGames[a].users;
 				players.sort(function(p1, p2) {
-					return p1.rank > p2.rank;		
+					return p1.rank > p2.rank;
 				});
 				var userID = this.userID;
 				var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
 				var result = thisUser.rank + " of " + players.length;
-				var replayName = this.rawGames[a].replayName;
+
 				this.games.push({
 					players: players,
 					result: result,
-					replayName: replayName
+					mapWidth: this.rawGames[a].mapWidth,
+					mapHeight: this.rawGames[a].mapHeight,
+					replayName: this.rawGames[a].replayName
 				});
 			}
 		},
@@ -80,7 +82,7 @@ $(function() {
 				}
 			}).join(" ");
 			playersList += "</ol>";
-			return "<tr><td>"+playersList+"</td><td><span class='"+game.result.toLowerCase()+"'>"+game.result+"</span></td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
+			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
 		}
 	}
 
