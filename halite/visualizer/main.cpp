@@ -473,7 +473,7 @@ void renderLaunch() {
 	util::renderText(-.85, 0.65, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
 	renderHelp(height);
 	util::renderText(-.85, -0.84, height / 12, { 1, 1, 1 }, " - To view this help panel, hold h");
-	
+
 	if(verboseOutput) debug << "renderLaunch - rendered necessary text!" << std::endl;
 
 	glfwSwapBuffers(window);
@@ -483,6 +483,7 @@ void renderLaunch() {
 }
 
 void renderHelp(int height) {
+	if(verboseOutput) debug << "Entering renderHelp!" << std::endl;
 	util::renderText(-.85, 0.48, height / 12, { 1, 1, 1 }, " - To pause or unpause the replay, press SPACE");
 	util::renderText(-.85, 0.36, height / 12, { 1, 1, 1 }, " - To move around in the replay, press LEFT ARROW or RIGHT ARROW");
 	util::renderText(-.85, 0.28, height / 16, { 1, 1, 1 }, "     - Hold shift to move around five times faster.");
@@ -495,4 +496,5 @@ void renderHelp(int height) {
 	util::renderText(-.85, -0.48, height / 12, { 1, 1, 1 }, " - To view the production map, hold TAB");
 	util::renderText(-.85, -0.60, height / 12, { 1, 1, 1 }, " - To reload a replay from file, press r");
 	util::renderText(-.85, -0.72, height / 12, { 1, 1, 1 }, " - To toggle fullscreen mode, press f");
+	if(verboseOutput) debug << "Leaving renderHelp!" << std::endl;
 }

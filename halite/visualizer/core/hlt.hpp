@@ -2,7 +2,11 @@
 #define HLT_H
 
 #include <list>
+#include <fstream>
 #include <vector>
+
+extern bool verboseOutput;
+extern std::ofstream debug;
 
 namespace hlt{
 	struct Location{
@@ -29,11 +33,13 @@ namespace hlt{
 		std::vector<unsigned int> production_count;
 
 		Map() {
+			if(verboseOutput) debug << "Default constructing a map!" << std::endl;
 			map_width = 0;
 			map_height = 0;
 			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 1 }));
 		}
 		Map(const Map &otherMap) {
+			if(verboseOutput) debug << "Copy constructing a map!" << std::endl;
 			map_width = otherMap.map_width;
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
@@ -42,6 +48,7 @@ namespace hlt{
 			production_count = otherMap.production_count;
 		}
 		void getStatistics() {
+			if(verboseOutput) debug << "Getting map statistics!" << std::endl;
 			territory_count = std::vector<unsigned int>(255, 0);
 			strength_count = std::vector<unsigned int>(255, 0);
 			production_count = std::vector<unsigned int>(255, 0);
@@ -58,8 +65,10 @@ namespace hlt{
 			territory_count.shrink_to_fit();
 			strength_count.shrink_to_fit();
 			production_count.shrink_to_fit();
+			if(verboseOutput) debug << "Finished getting map statistics!" << std::endl;
 		}
 		bool isAlive(int tag) {
+			if(verboseOutput) debug << "Querying alive status of tag " << tag << std::endl;
 			if(tag >= territory_count.size() || territory_count[tag] == 0) return false;
 			return true;
 		}

@@ -17,32 +17,42 @@ const float MAP_TOP = 0.92, MAP_BOTTOM = -0.98, MAP_LEFT = -0.98, MAP_RIGHT = 0.
 //Private Functions ------------------
 
 void Halite::setOffset(signed short xOffset, signed short yOffset) {
+	if(verboseOutput) debug << "Setting the offset to be x=" << xOffset << " and y=" << yOffset << std::endl;
 	bool mustRedo = xOffset != x_offset || yOffset != y_offset;
 	x_offset = xOffset;
 	y_offset = yOffset;
 	if(mustRedo) {
+		if(verboseOutput) debug << "Redoing some rendering setup due to the setting of the offset!" << std::endl;
 		setupMapRendering();
 		assert(!full_game.empty());
 		setupProductionRendering(*full_game.front());
 	}
+	if(verboseOutput) debug << "Redoing some rendering setup due to the setting of the offset!" << std::endl;
 }
 
 void Halite::setupMapGL() {
+	if(verboseOutput) debug << "Setting up the map GL" << std::endl;
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &map_vertex_buffer);
 	glDeleteBuffers(1, &map_color_buffer);
 	glDeleteBuffers(1, &map_strength_buffer);
+	if(verboseOutput) debug << "Successfully deleted the map buffers" << std::endl;
 	glDeleteVertexArrays(1, &map_vertex_attributes);
+	if(verboseOutput) debug << "Successfully deleted the map attributes" << std::endl;
 	//Ensure that shaders are deleted:
 	glDeleteShader(map_vertex_shader);
 	glDeleteShader(map_geometry_shader);
 	glDeleteShader(map_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted the map shaders" << std::endl;
 	glDeleteProgram(map_shader_program);
+	if(verboseOutput) debug << "Successfully deleted the map program" << std::endl;
 	//Generate buffers and vaos.
 	glGenBuffers(1, &map_vertex_buffer);
 	glGenBuffers(1, &map_color_buffer);
 	glGenBuffers(1, &map_strength_buffer);
+	if(verboseOutput) debug << "Successfully created the map buffers" << std::endl;
 	glGenVertexArrays(1, &map_vertex_attributes);
+	if(verboseOutput) debug << "Successfully created the map attributes" << std::endl;
 
 	//Setup shaders:
 	map_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -51,6 +61,8 @@ void Halite::setupMapGL() {
 	util::shaderFromFile(map_geometry_shader, "shaders/map/geometry.glsl", "Map Geometry Shader");
 	map_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	util::shaderFromFile(map_fragment_shader, "shaders/map/fragment.glsl", "Map Fragment Shader");
+
+	if(verboseOutput) debug << "Successfully created the map shaders" << std::endl;
 
 	//Setup shader program:
 	map_shader_program = glCreateProgram();
@@ -62,6 +74,8 @@ void Halite::setupMapGL() {
 	glDetachShader(map_shader_program, map_geometry_shader);
 	glDetachShader(map_shader_program, map_fragment_shader);
 
+	if(verboseOutput) debug << "Successfully created the map shader program" << std::endl;
+
 	//Set uniforms:
 	glUseProgram(map_shader_program);
 	const float SPACE_FACTOR = 0.8;
@@ -69,13 +83,18 @@ void Halite::setupMapGL() {
 	glUniform1f(widthLoc, (MAP_RIGHT - MAP_LEFT) * SPACE_FACTOR * 0.5 / map_width);
 	glUniform1f(heightLoc, (MAP_TOP - MAP_BOTTOM) * SPACE_FACTOR * 0.5 / map_height);
 
+	if(verboseOutput) debug << "Successfully set the map program uniforms" << std::endl;
+
 	//Cleanup - delete shaders
 	glDeleteShader(map_vertex_shader);
 	glDeleteShader(map_geometry_shader);
 	glDeleteShader(map_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted the map shaders (2)" << std::endl;
 }
 
 void Halite::setupMapRendering() {
+	if(verboseOutput) debug << "Setting up the Map Rendering" << std::endl;
+
 	//Generate vertices of centers of squares.
 	std::vector<float> vertexLocations((unsigned int)map_width * map_height * 2); //2 because there are x and y values for every vertex.
 	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * map_height), dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
@@ -102,23 +121,31 @@ void Halite::setupMapRendering() {
 		}
 	}
 
+	if(verboseOutput) debug << "Successfully created vertexLocations" << std::endl;
+
+
 	//Bind vertex attribute object.
 	glBindVertexArray(map_vertex_attributes);
 
 	//Setup vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, vertexLocations.size() * sizeof(float), vertexLocations.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexLocations.size() * sizeof(float), vertexLocations.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	if(verboseOutput) debug << "Successfully filled the map vertex buffer with vertex data and bound the appropriate attribute." << std::endl;
+
+
 	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors((unsigned int)map_width * map_height * 3); //r, g, and b components.
+	std::vector<float> colors((unsigned int)map_width * map_height * 3, 0); //r, g, and b components.
 
 	//Setup color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, map_color_buffer);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully filled the map color buffer with (0s) data and bound the appropriate attribute." << std::endl;
 
 	//Create vector of unsigned ints (0) to reserve the memory for the strength buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
 	std::vector<unsigned int> strengths((unsigned int)map_width * map_height, 0); //r, g, and b components.
@@ -127,23 +154,32 @@ void Halite::setupMapRendering() {
 	glBindBuffer(GL_ARRAY_BUFFER, map_strength_buffer);
 	glBufferData(GL_ARRAY_BUFFER, strengths.size() * sizeof(GL_UNSIGNED_INT), strengths.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL);
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, 0, NULL)
+
+	if(verboseOutput) debug << "Successfully filled the map strength buffer with (0s) data and bound the appropriate attribute." << std::endl;;
 }
 
 void Halite::setupProductionGL() {
+	if(verboseOutput) debug << "Setting up production GL" << std::endl;
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &production_vertex_buffer);
 	glDeleteBuffers(1, &production_color_buffer);
+	if(verboseOutput) debug << "Successfully deleted production buffers" << std::endl;
 	glDeleteVertexArrays(1, &production_vertex_attributes);
+	if(verboseOutput) debug << "Successfully deleted production attributes" << std::endl;
 	//Ensure that shaders are deleted:
 	glDeleteShader(production_vertex_shader);
 	glDeleteShader(production_geometry_shader);
 	glDeleteShader(production_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted production shaders" << std::endl;
 	glDeleteProgram(production_shader_program);
+	if(verboseOutput) debug << "Successfully deleted production program" << std::endl;
 	//Generate buffers and vaos.
 	glGenBuffers(1, &production_vertex_buffer);
 	glGenBuffers(1, &production_color_buffer);
+	if(verboseOutput) debug << "Successfully created production buffers" << std::endl;
 	glGenVertexArrays(1, &production_vertex_attributes);
+	if(verboseOutput) debug << "Successfully created production attributes" << std::endl;
 
 	//Setup shaders:
 	production_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -152,6 +188,8 @@ void Halite::setupProductionGL() {
 	util::shaderFromFile(production_geometry_shader, "shaders/production/geometry.glsl", "Production Geometry Shader");
 	production_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	util::shaderFromFile(production_fragment_shader, "shaders/production/fragment.glsl", "Production Fragment Shader");
+
+	if(verboseOutput) debug << "Successfully created production shaders" << std::endl;
 
 	//Setup shader program:
 	production_shader_program = glCreateProgram();
@@ -163,6 +201,8 @@ void Halite::setupProductionGL() {
 	glDetachShader(production_shader_program, production_geometry_shader);
 	glDetachShader(production_shader_program, production_fragment_shader);
 
+	if(verboseOutput) debug << "Successfully created production program" << std::endl;
+
 	//Set uniforms:
 	glUseProgram(production_shader_program);
 	const float SPACE_FACTOR = 0.8;
@@ -170,13 +210,18 @@ void Halite::setupProductionGL() {
 	glUniform1f(widthLoc, (MAP_RIGHT - MAP_LEFT) * SPACE_FACTOR * 0.5 / map_width); //Note: eventually distinguish map size from production size.
 	glUniform1f(heightLoc, (MAP_TOP - MAP_BOTTOM) * SPACE_FACTOR * 0.5 / map_height);
 
+	if(verboseOutput) debug << "Successfully set production program uniforms" << std::endl;
+
 	//Cleanup - delete shaders
 	glDeleteShader(production_vertex_shader);
 	glDeleteShader(production_geometry_shader);
 	glDeleteShader(production_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted production shaders (2)" << std::endl;
 }
 
 void Halite::setupProductionRendering(const hlt::Map & map) {
+	if(verboseOutput) debug << "Setting up production rendering" << std::endl;
+
 	//Generate vertices of centers of squares.
 	std::vector<float> vertexLocations((unsigned int)map_width * map_height * 2); //2 because there are x and y values for every vertex.
 	float xLoc = MAP_LEFT + (MAP_RIGHT - MAP_LEFT) / (2 * map_width), yLoc = MAP_BOTTOM + (MAP_TOP - MAP_BOTTOM) / (2 * map_height), dX = (MAP_RIGHT - MAP_LEFT) / map_width, dY = (MAP_TOP - MAP_BOTTOM) / map_height;
@@ -203,6 +248,8 @@ void Halite::setupProductionRendering(const hlt::Map & map) {
 		}
 	}
 
+	if(verboseOutput) debug << "Successfully created vertexLocations" << std::endl;
+
 	//Bind vertex attribute object.
 	glBindVertexArray(production_vertex_attributes);
 
@@ -212,15 +259,17 @@ void Halite::setupProductionRendering(const hlt::Map & map) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
-	std::vector<float> colors((unsigned int)map_width * map_height); //Map to r, r, r
+	if(verboseOutput) debug << "Successfully filled the map vertex buffer with vertex data and bound the appropriate attribute." << std::endl;
 
-	unsigned char maxProduction = 0;
+	//Create vector of floats (0.0) to reserve the memory for the color buffer and allow us to set the mode to GL_DYNAMIC_DRAW.
+	std::vector<float> colors((unsigned int)map_width * map_height, 0); //Map to r, r, r
+
+	unsigned char maxProduction = 0; //Find max value
 	for(auto a = map.contents.begin(); a != map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
 		if(b->production > maxProduction) maxProduction = b->production;
 	}
 
-	int loc = 0;
+	int loc = 0; //Normalize
 	for(auto a = map.contents.begin(); a != map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
 		colors[loc] = float(b->production) / maxProduction;
 		loc++;
@@ -231,29 +280,38 @@ void Halite::setupProductionRendering(const hlt::Map & map) {
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	if(verboseOutput) debug << "Successfully filled the map color buffer with (0s) data and bound the appropriate attribute." << std::endl;
 }
 
 void Halite::setupGraphGL() {
+	if(verboseOutput) debug << "Setting up graph GL!" << std::endl;
 	//Delete buffers and vaos
 	glDeleteBuffers(1, &graph_territory_vertex_buffer);
 	glDeleteBuffers(1, &graph_strength_vertex_buffer);
 	glDeleteBuffers(1, &graph_production_vertex_buffer);
 	glDeleteBuffers(1, &graph_color_buffer);
+	if(verboseOutput) debug << "Successfully deleted the graph buffers" << std::endl;
 	glDeleteVertexArrays(1, &graph_territory_vertex_attributes);
 	glDeleteVertexArrays(1, &graph_strength_vertex_attributes);
 	glDeleteVertexArrays(1, &graph_production_vertex_attributes);
+	if(verboseOutput) debug << "Successfully deleted the graph attributes" << std::endl;
 	//Ensure that shaders are deleted:
 	glDeleteShader(graph_vertex_shader);
 	glDeleteShader(graph_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted the graph shaders" << std::endl;
 	glDeleteProgram(graph_shader_program);
+	if(verboseOutput) debug << "Successfully deleted the graph program" << std::endl;
 	//Generate buffers and vaos.
 	glGenBuffers(1, &graph_territory_vertex_buffer);
 	glGenBuffers(1, &graph_strength_vertex_buffer);
 	glGenBuffers(1, &graph_production_vertex_buffer);
 	glGenBuffers(1, &graph_color_buffer);
+	if(verboseOutput) debug << "Successfully created the graph buffers" << std::endl;
 	glGenVertexArrays(1, &graph_territory_vertex_attributes);
 	glGenVertexArrays(1, &graph_strength_vertex_attributes);
 	glGenVertexArrays(1, &graph_production_vertex_attributes);
+	if(verboseOutput) debug << "Successfully created the graph attributes" << std::endl;
 
 
 	//Setup shaders:
@@ -261,6 +319,8 @@ void Halite::setupGraphGL() {
 	util::shaderFromFile(graph_vertex_shader, "shaders/graph/vertex.glsl", "Graph Vertex Shader");
 	graph_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	util::shaderFromFile(graph_fragment_shader, "shaders/graph/fragment.glsl", "Graph Fragment Shader");
+
+	if(verboseOutput) debug << "Successfully created the graph shaders" << std::endl;
 
 	//Setup shader program:
 	graph_shader_program = glCreateProgram();
@@ -270,9 +330,12 @@ void Halite::setupGraphGL() {
 	glDetachShader(graph_shader_program, graph_vertex_shader);
 	glDetachShader(graph_shader_program, graph_fragment_shader);
 
+	if(verboseOutput) debug << "Successfully created the graph program" << std::endl;
+
 	//Cleanup - delete shaders
 	glDeleteShader(graph_vertex_shader);
 	glDeleteShader(graph_fragment_shader);
+	if(verboseOutput) debug << "Successfully deleted the graph shaders (2)" << std::endl;
 }
 
 void Halite::setupGraphRendering(float zoom, short turnNumber) {

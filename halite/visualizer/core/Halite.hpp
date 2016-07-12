@@ -14,6 +14,9 @@
 #include "hlt.hpp"
 #include "../rendering/OpenGL.hpp"
 
+extern bool verboseOutput;
+extern std::ofstream debug;
+
 class Halite {
 private:
   std::vector< std::pair<std::string, float> > player_names; //float represents rendering position
