@@ -97,7 +97,7 @@ def runGame(width, height, users):
 
 	output = []
 	while True:
-		line = sandbox.read_line(200)
+		line = sandbox.read_line()
 		if line == None:
 			break
 		print(line)
