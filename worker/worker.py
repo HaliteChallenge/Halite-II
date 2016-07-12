@@ -140,7 +140,7 @@ def executeGameTask(width, height, users, backend):
 	downloadUsers(users)
 	replayPath, users = parseGameOutput(runGame(width, height, users), users)
 
-	backend.gameResult(users, replayPath)
+	backend.gameResult(width, height, users, replayPath)
 	os.remove(replayPath)
 
 if __name__ == "__main__":

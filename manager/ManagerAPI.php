@@ -176,6 +176,9 @@ class ManagerAPI extends API{
 		// Each user in users must have a rank, playerIndex, mu, sigma, and userID
 		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=$this->apiKey");
+
+			$mapWidth = $_POST['mapWidth'];
+			$mapHeight = $_POST['mapHeight'];
 			$users = json_decode($_POST['users']);
 			var_dump($users);
 
@@ -220,7 +223,7 @@ class ManagerAPI extends API{
 			}
 
 			// Store game information in db
-			$this->insert("INSERT INTO Game (replayName) VALUES ('$name')");
+			$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$name', $mapWidth, $mapHeight)");
 			$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
 			$gameID = $gameIDArray['gameID'];
 
