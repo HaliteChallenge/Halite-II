@@ -1,15 +1,15 @@
 import java.util.ArrayList;
-public class Map{
+public class GameMap{
   public ArrayList< ArrayList<Site> > contents;
   public int width, height;
 
-  public Map() {
+  public GameMap() {
     width = 0;
     height = 0;
     contents = new ArrayList< ArrayList<Site> >(0);
   }
 
-  public Map(int width_, int height_) {
+  public GameMap(int width_, int height_) {
     width = width_;
     height = height_;
     contents = new ArrayList< ArrayList<Site> >(0);
@@ -33,7 +33,7 @@ public class Map{
     if(dx > width / 2.0) dx = width - dx;
     if(dy > height / 2.0) dy = height - dy;
 
-    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    return dx + dy;
   }
 
   public double getAngle(Location loc1, Location loc2) {

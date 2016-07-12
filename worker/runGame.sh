@@ -15,24 +15,32 @@ fi
 
 WIDTH=$1
 HEIGHT=$2
+NUMBOTS=$3
+BOTSTART=4
 
 mkdir $WORKINGPATH
 cp $ENVIRONMENT $WORKINGPATH
-for BOT in ${@:3};
+for BOT in ${@:$BOTSTART:$NUMBOTS};
 	do mv $BOT $WORKINGPATH;
 done
 
 cd $WORKINGPATH
-for BOT in ${@:3};
+for BOT in ${@:$BOTSTART:$NUMBOTS};
 	do chmod +x "$BOT/$RUNFILE";
 done;
 
 BOTSTARTCOMMANDS=""
-for BOT in ${@:3};
-	do BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'cd $PWD/$BOT && ./$RUNFILE'";
+for i in `seq $BOTSTART $((4+$NUMBOTS-1))`;
+do
+	BOT=${!i}
+	
+	BOTNAMEINDEX=$(($i+$NUMBOTS))
+	BOTNAME=${!BOTNAMEINDEX}
+
+	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'cd $PWD/$BOT && ./$RUNFILE' '$BOTNAME'";
 done
 
-docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
+docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -qs $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
 
 docker rm -v $(docker ps -aq) >/dev/null
 

@@ -12,7 +12,7 @@ _height = -1
 def serializeMoveSet(moves):
 	returnString = ""
 	for move in moves:
-		returnString += str(move.loc.x) + " " + str(move.loc.y) + " " + str(move.direction) + " " 
+		returnString += str(move.loc.x) + " " + str(move.loc.y) + " " + str(move.direction) + " "
 	return returnString
 
 def deserializeMapSize(inputString):
@@ -24,7 +24,7 @@ def deserializeMapSize(inputString):
 
 def deserializeProductions(inputString):
 	splitString = inputString.split(" ")
-	
+
 	for a in range(0, _height):
 		row = []
 		for b in range(0, _width):
@@ -35,22 +35,22 @@ def deserializeMap(inputString):
 	splitString = inputString.split(" ")
 
 	m = Map(_width, _height)
-	
+
 	y = 0
 	x = 0
 	counter = 0
 	owner = 0
-	while y != m.map_height:
+	while y != m.height:
 		counter = int(splitString.pop(0))
 		owner = int(splitString.pop(0))
 		for a in range(0, counter):
 			m.contents[y][x].owner = owner
 			x += 1
-			if x == m.map_width:
+			if x == m.width:
 				x = 0
 				y += 1
 
-	for a in range(0, _height): 
+	for a in range(0, _height):
 		for b in range(0, _width):
 			m.contents[a][b].strength = int(splitString.pop(0))
 			m.contents[a][b].production = _productions[a][b]

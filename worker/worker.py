@@ -89,11 +89,11 @@ def downloadUsers(users):
 		zip.unpack(backend.storeBotLocally(user["userID"], userDir))
 
 def runGame(width, height, users):
-	runGameCommand = " ".join(["./"+RUN_GAME_FILE_NAME, str(width), str(height), ]+[a["userID"] for a in users])
+	runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+"\"" for a in users])
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
 	sandbox = Sandbox(os.getcwd())
-	sandbox.start("sh -c '"+runGameCommand+"'")
+	sandbox.start("bash "+runGameCommand)
 
 	output = []
 	while True:
@@ -140,7 +140,7 @@ def executeGameTask(width, height, users, backend):
 	downloadUsers(users)
 	replayPath, users = parseGameOutput(runGame(width, height, users), users)
 
-	backend.gameResult(users, replayPath)
+	backend.gameResult(width, height, users, replayPath)
 	os.remove(replayPath)
 
 if __name__ == "__main__":

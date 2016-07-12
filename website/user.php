@@ -37,6 +37,7 @@
 							<tr>
 								<th>Participants</th>
 								<th>Result</th>
+								<th>Dimensions</th>
 								<th>Gamefile</th>
 							</tr>
 						</thead>

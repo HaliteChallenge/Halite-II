@@ -1,4 +1,4 @@
-public class Location{
+public class Location {
   public int x, y;
 
   public Location(int x_, int y_) {
