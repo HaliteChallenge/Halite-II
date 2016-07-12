@@ -38,3 +38,4 @@
 		</div>
 	</div>
 </nav>
+<div id="messageBox"></div>
