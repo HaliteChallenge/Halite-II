@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class MyBot{
+public class MyBot {
   public static void main(String[] args) {
     InitPackage iPackage = Networking.getInit();
     int playerTag = iPackage.playerTag;

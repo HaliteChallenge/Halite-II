@@ -5,7 +5,7 @@ import java.util.Scanner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Networking{
+public class Networking {
   public static final int SIZE_OF_INTEGER_PREFIX = 4;
   public static final int CHAR_SIZE = 1;
   private static int _width, _height;
