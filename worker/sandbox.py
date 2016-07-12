@@ -219,6 +219,7 @@ class Sandbox:
 		try:
 			return self.stdout_queue.get(block=True, timeout=timeout)
 		except Empty:
+			print("sandbox done")
 			return None
 
 	def read_error(self, timeout=0):
