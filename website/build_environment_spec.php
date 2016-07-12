@@ -28,10 +28,10 @@
 
 				<h3>Libraries</h3>
 				<p>
-					The following libraries will available at compiletime and runtime by our launch on Thursday:
+					The following libraries are available at compiletime and runtime:
 					<ul>
-						<li>Tensorflow</li>
-						<li>Numpy</li>
+						<li>Tensorflow 0.9.0</li>
+						<li>Numpy 1.11.1</li>
 					</ul>
 
 					If you would like to use a library that is not listed above, post on the forums. If a library is trivial to build, feel free to include its source with your bot submission.
