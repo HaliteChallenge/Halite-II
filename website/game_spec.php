@@ -102,7 +102,7 @@ The above is repeated until the sum of all COUNTERs is equal to WIDTH * HEIGHT. 
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="networking_spec.php">Networking Spec <span aria-hidden="true">&rarr;</span> </a></li>
+					<li class="next"><a href="build_environment_spec.php">Build Environment Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>
