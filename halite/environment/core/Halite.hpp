@@ -13,15 +13,6 @@
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
 
-//#define INFINITE_RESPOND_TIME
-#ifndef INFINITE_RESPOND_TIME
-	#define BOT_INITIALIZATION_TIMEOUT_MILLIS 3000
-	#define BOT_FRAME_TIMEOUT_MILLIS 1000
-#else
-	#define BOT_INITIALIZATION_TIMEOUT_MILLIS 2147483647
-	#define BOT_FRAME_TIMEOUT_MILLIS 2147483647
-#endif
-
 extern bool program_output_style;
 
 struct PlayerStatistics {

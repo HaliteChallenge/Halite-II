@@ -17,6 +17,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
 	std::vector<int> allowableTimesToRespond(number_of_players);
+	const int BOT_FRAME_TIMEOUT_MILLIS = 50 + ((game_map.map_width * game_map.map_height) / 2);
 	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = BOT_FRAME_TIMEOUT_MILLIS;
 
 	//Stores the messages sent by bots this frame
@@ -374,6 +375,7 @@ void Halite::init() {
 
 	//Send initial package
 	std::vector< std::future<bool> > initThreads(number_of_players);
+	const int BOT_INITIALIZATION_TIMEOUT_MILLIS = 50 + (game_map.map_width * game_map.map_height);
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 	}
