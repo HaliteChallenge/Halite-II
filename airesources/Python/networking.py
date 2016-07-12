@@ -34,7 +34,7 @@ def deserializeProductions(inputString):
 def deserializeMap(inputString):
 	splitString = inputString.split(" ")
 
-	m = Map(_width, _height)
+	m = GameMap(_width, _height)
 
 	y = 0
 	x = 0

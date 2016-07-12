@@ -14,7 +14,7 @@ int main() {
 	std::cout.sync_with_stdio(0);
 
 	unsigned char myID;
-	hlt::Map presentMap;
+	hlt::GameMap presentMap;
 	getInit(myID, presentMap);
 	sendInitResponse("BasicC++Bot");
 

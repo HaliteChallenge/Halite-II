@@ -54,10 +54,10 @@ static void deserializeProductions(const std::string & inputString) {
 	}
 }
 
-static hlt::Map deserializeMap(const std::string & inputString) {
+static hlt::GameMap deserializeMap(const std::string & inputString) {
 	std::stringstream iss(inputString);
 
-	hlt::Map map(width, height);
+	hlt::GameMap map(width, height);
 
 	//Set productions
 	for(int a = 0; a < map.height; a++) {
@@ -103,7 +103,7 @@ static std::string getString() {
 }
 }
 
-static void getInit(unsigned char& playerTag, hlt::Map& m) {
+static void getInit(unsigned char& playerTag, hlt::GameMap& m) {
 	playerTag = (unsigned char)std::stoi(detail::getString());
 	detail::deserializeMapSize(detail::getString());
 	detail::deserializeProductions(detail::getString());
@@ -115,7 +115,7 @@ static void sendInitResponse(std::string name) {
 	detail::sendString(name);
 }
 
-static void getFrame(hlt::Map& m) {
+static void getFrame(hlt::GameMap& m) {
 	m = detail::deserializeMap(detail::getString());
 }
 static void sendFrame(const std::set<hlt::Move> &moves) {

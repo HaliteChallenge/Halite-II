@@ -27,7 +27,7 @@ class Move:
 		self.loc = loc
 		self.direction = direction
 
-class Map:
+class GameMap:
 	def __init__(self, width = 0, height = 0, numberOfPlayers = 0):
 		self.width = width
 		self.height = height

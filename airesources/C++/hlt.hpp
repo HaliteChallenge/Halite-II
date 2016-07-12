@@ -28,22 +28,22 @@ namespace hlt{
 		unsigned char production;
 	};
 
-	class Map{
+	class GameMap{
 	public:
 		std::vector< std::vector<Site> > contents;
 		unsigned short width, height; //Number of rows & columns, NOT maximum index.
 
-		Map() {
+		GameMap() {
 			width = 0;
 			height = 0;
 			contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
 		}
-		Map(const Map &otherMap) {
+		GameMap(const GameMap &otherMap) {
 			width = otherMap.width;
 			height = otherMap.height;
 			contents = otherMap.contents;
 		}
-		Map(int width, int height) {
+		GameMap(int width, int height) {
 			width = width;
 			height = height;
 			contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
