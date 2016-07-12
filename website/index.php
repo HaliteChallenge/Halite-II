@@ -15,7 +15,6 @@
 <body>
 	<div class="container">
 		<?php include 'includes/navbar.php'; ?>
-		<div id="messageBox"></div>
 		<div class="pageContent">
 			<div class="jumbotron" id="jumbotron">
 				<h1 id="jHeader">Halite</h1>

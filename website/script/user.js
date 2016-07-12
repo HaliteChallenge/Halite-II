@@ -49,7 +49,7 @@ $(function() {
 			for(var a = 0; a < this.rawGames.length; a++) {
 				var players = this.rawGames[a].users;
 				players.sort(function(p1, p2) {
-					return parseInt(p1.rank) > parseInt(p2.rank);
+					return parseInt(p1.rank) - parseInt(p2.rank);
 				});
 				var userID = this.userID;
 				var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
