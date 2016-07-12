@@ -1,5 +1,3 @@
-//#define CONSOLE_DEBUG
-
 #include <iostream>
 #include <thread>
 #include <stdlib.h>
@@ -29,7 +27,8 @@ void setFullscreen();
 void renderLaunch();
 
 Halite * my_game = NULL; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true, tabPressed = false;
+bool isPaused = false, leftPressed = false, rightPressed = false, upPressed = false, downPressed = false, shiftPressed = false, tabPressed = false, newGame = false, isLaunch = true, mousePressed = false, isWindowed = true, wPressed = false, aPressed = false, sPressed = false, dPressed = false, disregardFullscreenAttempts = true;
+bool verboseOutput = false;
 float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
 int windowedWidth, windowedHeight, numTurns;
 
@@ -66,13 +65,9 @@ int main(int argc, const char ** argv) {
 #endif
 
 	//Open debug:
-	std::string debugfilename = "logs/debug.log";
-	debug.open(debugfilename, std::ios_base::out);
-	if(!debug.is_open()) { //If file couldn't be opened.
-		debug.open("DEBUG.log", std::ios_base::out);
-		debug << "I couldn't find the folder \"logs\" and consequently can't create multiple logs. Please create that folder for me in the future.\n";
-		debug.flush();
-	}
+	debug.open("logs/debug.log", std::ios_base::out | std::ios_base::binary);
+	if(!debug.is_open()) debug.open("debug.log", std::ios_base::out);
+	debug.flush();
 
 	//start GL context and O/S window using the GLFW helper library
 	if(!glfwInit()) {
@@ -105,8 +100,21 @@ int main(int argc, const char ** argv) {
 
 	my_game = new Halite();
 
-	if(argc == 2) {
-		handleDrop(window, 1, (const char **)(argv + 1));
+	if(argc > 1) {
+		if(strcmp(argv[1], "-v") == 0) {
+			verboseOutput = true;
+			if(argc == 3) {
+				debug << "About to handle the drop of the provided (arg 3) file!" << std::endl;
+				handleDrop(window, 1, (const char **)(argv + 2));
+			}
+			else {
+				while(isLaunch && !glfwWindowShouldClose(window)) {
+					debug << "About to enter renderLaunch!" << std::endl;
+					renderLaunch();
+				}
+			}
+		}
+		else if(argc == 2) handleDrop(window, 1, (const char **)(argv + 1));
 	}
 	else {
 		while(isLaunch && !glfwWindowShouldClose(window)) {
@@ -119,20 +127,23 @@ int main(int argc, const char ** argv) {
 	clock_t c = clock();
 
 	disregardFullscreenAttempts = false;
+	
+	if(verboseOutput) debug << "Entering main render loop!" << std::endl;
 	while(!glfwWindowShouldClose(window)) {
 		//Limit render rate:
 		float delta = float(clock() - c) / CLOCKS_PER_SEC;
-		#ifdef CONSOLE_DEBUG
-		std::cout << "Frame time of " << delta << ".\n";
-		#endif
+		if(verboseOutput) debug << "Frame time of " << delta << ".\n";
 		c = clock();
 
 		short turnNumberS = turnNumber;
+		if(verboseOutput) debug << "About to render at turn #" << turnNumberS << std::endl;
 		my_game->render(window, turnNumberS, graphZoom, mouseX, mouseY, tabPressed, mousePressed, xOffset, yOffset);
+		if(verboseOutput) debug << "Just rendered turn #" << turnNumberS << std::endl;
 		if(abs(turnNumber - float(turnNumberS) >= 1)) turnNumber = turnNumberS; //Means it's gone past the right edge
 
 		//Poll events
 		glfwPollEvents();
+		if(verboseOutput) debug << "Polled events in main loop!" << std::endl;
 
 		if(upPressed && maxFps <= 120) maxFps += maxFps * delta;
 		else if(downPressed && maxFps != 4) maxFps -= maxFps * delta;
@@ -152,15 +163,20 @@ int main(int argc, const char ** argv) {
 		if(aPressed) xOffset += SHIFT;
 		if(sPressed) yOffset += SHIFT;
 		if(dPressed) xOffset -= SHIFT;
+
+		if(verboseOutput) debug << "Finished iteration of render loop!!" << std::endl;
 	}
 
 	return EXIT_SUCCESS;
 }
 
 void setWindowed() {
+	if(verboseOutput) debug << "Swapping to windowed mode!" << std::endl;
 	GLFWwindow * w = glfwCreateWindow(windowedWidth, windowedHeight, "Halite", NULL, window);
+	if(verboseOutput) debug << "Successfully created a new window!" << std::endl;
 	glfwGetWindowSize(w, &windowedWidth, &windowedHeight);
 	if(window != NULL) glfwDestroyWindow(window);
+	if(verboseOutput) debug << "Successfully destroyed the old window!" << std::endl;
 	window = w;
 	//Set leopard handler.
 	glfwSetKeyCallback(window, handleKeys);
@@ -186,21 +202,27 @@ void setWindowed() {
 		if(glewInit() != GLEW_OK) exit(EXIT_FAILURE);
 	}
 	//If possible, fix the Halite's VAOs.
+	if(verboseOutput) debug << "Recreating all of the Halite GL objects" << std::endl;
 	if(my_game != NULL) my_game->recreateGL();
+	if(verboseOutput) debug << "Just recreated all of the Halite GL objects" << std::endl;
 	//Fix text.
 	if(my_game == NULL) {
 		util::initText();
 		util::setFont("fonts/FreeSans.ttf"); //Confirmed to be working
 	}
 	util::setScreenSize(windowedWidth, windowedHeight);
+	if(verboseOutput) debug << "Finished swapping to windowed mode!" << std::endl;
 }
 
 void setFullscreen() {
+	if(verboseOutput) debug << "Swapping to fullscreen mode!" << std::endl;
 	if(window != NULL) glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
 	GLFWmonitor * primary = glfwGetPrimaryMonitor();
 	const GLFWvidmode * mode = glfwGetVideoMode(primary);
 	GLFWwindow * w = glfwCreateWindow(mode->width, mode->height, "Halite", primary, window);
+	if(verboseOutput) debug << "Successfully created a new window!" << std::endl;
 	if(window != NULL) glfwDestroyWindow(window);
+	if(verboseOutput) debug << "Successfully destroyed the old window!" << std::endl;
 	window = w;
 	//Set leopard handler.
 	glfwSetKeyCallback(window, handleKeys);
@@ -219,28 +241,34 @@ void setFullscreen() {
 	//Make context current:
 	glfwMakeContextCurrent(window);
 	//If possible, fix the Halite's VAOs.
+	if(verboseOutput) debug << "Recreating all of the Halite GL objects" << std::endl;
 	if(my_game != NULL) my_game->recreateGL();
+	if(verboseOutput) debug << "Just recreated all of the Halite GL objects" << std::endl;
 	//It's now fullscreen.
 	isWindowed = false;
 	//Fix text.
 	util::setScreenSize(mode->width, mode->height);
 	//Viewport.
 	glViewport(0, 0, mode->width, mode->height);
+	if(verboseOutput) debug << "Finished swapping to fullscreen!" << std::endl;
 }
 
 void handleMouse(GLFWwindow * w, int button, int action, int mods) {
+	if(verboseOutput) debug << "I've detected a mouse action! The key has code " << button << " and action " << action << std::endl;
 	if(button == GLFW_MOUSE_BUTTON_1) {
 		mousePressed = action == GLFW_PRESS;
 	}
 }
 
 void handleCursor(GLFWwindow * w, double x, double y) {
+	if(verboseOutput) debug << "I've detected a cursor movement! The cursor is at location (" << x << ", " << y << ')' << std::endl;
 	int sx, sy; glfwGetWindowSize(window, &sx, &sy);
 	mouseX = (float(2 * x) / sx) - 1.0;
 	mouseY = (float(-2 * y) / sy) + 1.0;
 }
 
 void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods) {
+	if(verboseOutput) debug << "I've detected a key action! The key has code " << key << " and action " << action << std::endl;
 	if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
 		leftPressed = true;
 		isPaused = true;
@@ -325,6 +353,7 @@ void handleKeys(GLFWwindow * w, int key, int scancode, int action, int mods) {
 }
 
 void handleChars(GLFWwindow * w, unsigned int code) {
+	if(verboseOutput) debug << "A character has been pressed! Specifically, character #" << code << std::endl;
 	if(code == ' ') isPaused = !isPaused;
 	else if(code == '+') {
 		graphZoom *= 1.5;
@@ -364,11 +393,14 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths) {
+	if(verboseOutput) debug << "Handling a drop!" << std::endl;
 	unsigned short wi, he;
 	if(my_game->isValid(paths[0])) {
+		if(verboseOutput) debug << "The file seems to have a valid header." << std::endl;
 		delete my_game;
 		my_game = new Halite();
 		numTurns = my_game->input(w, paths[0], wi, he);
+		if(verboseOutput) debug << "Successfully inputted the file." << std::endl;
 		filename = paths[0];
 		xOffset = 0;
 		yOffset = 0;
@@ -380,22 +412,30 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 	isLaunch = false;
 	isPaused = false;
 	turnNumber = 0;
+	if(verboseOutput) debug << "Finished handleDrop." << std::endl;
 }
 
 void handleErrors(int error, const char * description) {
-	debug << description;
+	if(verboseOutput) debug << "Handling an error via handleErrors - description is " << description << std::endl;
+	debug << description << std::endl;
 }
 
 void handleResize(GLFWwindow * w, int width, int height) {
+	if(verboseOutput) debug << "Handling a screen resize with width " << width << " and height " << height << std::endl;
 	glViewport(0, 0, width, height);
 	util::setScreenSize(width, height);
 	windowedWidth = width;
 	windowedHeight = height;
 	util::removeAllFontSizes();
+	if(verboseOutput) debug << "Cleared font sizes in handleResize" << std::endl;
 }
 
 void renderLaunch() {
+	if(verboseOutput) debug << "Entered renderLaunch!" << std::endl;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if(verboseOutput) debug << "renderLaunch - cleared color and depth buffer bits!" << std::endl;
 
 	int height; glfwGetWindowSize(window, NULL, &height);
 	util::renderText(-.85, 0.65, height / 6, { 1, 1, 1 }, "Drop a replay on-screen to watch it!");
@@ -408,6 +448,11 @@ void renderLaunch() {
 	util::renderText(-.85, -0.35, height / 12, { 1, 1, 1 }, " - To pan around in the map, use the w, a, s, and d keys");
 	util::renderText(-.85, -0.5, height / 12, { 1, 1, 1 }, " - To zoom in or out on the graphs, press + or -");
 	util::renderText(-.85, -0.65, height / 12, { 1, 1, 1 }, " - To reload a replay from file, press r");
+
+	if(verboseOutput) debug << "renderLaunch - rendered necessary text!" << std::endl;
+
 	glfwSwapBuffers(window);
+	if(verboseOutput) debug << "renderLaunch - swapped buffers!" << std::endl;
 	glfwPollEvents();
+	if(verboseOutput) debug << "renderLaunch - polled events!" << std::endl;
 }
