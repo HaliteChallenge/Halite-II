@@ -291,6 +291,21 @@ Halite::Halite(unsigned short width_, unsigned short height_, Networking network
 	init();
 }
 
+
+Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_, std::vector<std::string> names_) {
+	networking = networking_;
+	number_of_players = networking.numberOfPlayers();
+
+	//Initialize map
+	game_map = hlt::Map(width_, height_, number_of_players);
+
+	//Perform initialization not specific to constructor
+	init();
+
+	//Override player names with the provided ones.
+	player_names = names_;
+}
+
 void Halite::init() {
 	//Add colors to possible colors:
 	possible_colors.clear();

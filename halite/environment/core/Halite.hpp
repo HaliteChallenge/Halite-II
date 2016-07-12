@@ -80,6 +80,7 @@ private:
 public:
 	Halite(unsigned short w, unsigned short h);
 	Halite(unsigned short width_, unsigned short height_, Networking networking_);
+	Halite(unsigned short width_, unsigned short height_, Networking networking_, std::vector<std::string> names_);
 
 	void init();
 	void output(std::string filename);

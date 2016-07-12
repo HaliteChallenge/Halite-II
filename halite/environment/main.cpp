@@ -8,8 +8,7 @@
 bool program_output_style;
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
-//Returns true if all the arguments required of a user to run a game of Halite are present
-//4 arguments are required width, height, name1, name2 in that order (though more names are welcome)
+//Returns true if all the arguments required of a user to run a game of Halite with the specified settings are present
 bool allArgumentsPresent(int argc, char* args[]) {
 	auto is_number = [](const std::string& s) {
 		return !s.empty() && std::find_if(s.begin(),
@@ -19,6 +18,10 @@ bool allArgumentsPresent(int argc, char* args[]) {
 	//Remember, the executable name counts as an argument
 	if(strcmp(args[1], "-q") == 0) {
 		if(argc < 6) return false;
+		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
+	}
+	else if(strcmp(args[1], "-qs") == 0) {
+		if(argc < 8 || argc % 2 != 0) return false;
 		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
 	}
 	else {
@@ -42,15 +45,27 @@ int main(int argc, char* args[]) {
 			mapWidth = atoi(args[2]);
 			mapHeight = atoi(args[3]);
 			for(int a = 4; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
+
+			my_game = new Halite(mapWidth, mapHeight, networking);
+		}
+		else if(strcmp(args[1], "-qs") == 0) {
+			program_output_style = true;
+			mapWidth = atoi(args[2]);
+			mapHeight = atoi(args[3]);
+			std::vector<std::string> names;
+			for(int a = 5; a < argc; a += 2) names.push_back(std::string(args[a]));
+			for(int a = 4; a < argc; a += 2) networking.startAndConnectBot(std::string(args[a]));
+
+			my_game = new Halite(mapWidth, mapHeight, networking, names);
 		}
 		else {
 			program_output_style = false;
 			mapWidth = atoi(args[1]);
 			mapHeight = atoi(args[2]);
 			for(int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
-		}
 
-		my_game = new Halite(mapWidth, mapHeight, networking);
+			my_game = new Halite(mapWidth, mapHeight, networking);
+		}
 	}
 
 	//Check if we should give output for the program or give output for the human.
