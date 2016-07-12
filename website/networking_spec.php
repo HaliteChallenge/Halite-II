@@ -96,7 +96,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="game_spec.php"><span aria-hidden="true">&larr;</span> Game Spec</a></li>
+					<li class="previous"><a href="build_environment_spec.php"><span aria-hidden="true">&larr;</span> Build Environment Spec</a></li>
 				</ul>
 			</div>
 		</div>
