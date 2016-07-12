@@ -13,6 +13,7 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div class="row">
 			<div class="col-sm-12">
+				<h1>Game Spec</h1>
 
 				<h3>Overview</h3>
 
@@ -20,7 +21,7 @@
 
 				<h3>Game Description</h3>
 
-				<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, it will permanently increase its Strength by the Production of the tile it sits on.</li>
+				<p>During a move, every piece you control can be given one of five moves: to move North, East, South, West, or to remain Still. When a piece remains where it is during a turn, it will permanently increase its Strength by the Production of the tile it sits on.</p>
 
 				<p>Players gain pieces by simply moving their own pieces over Sites on the map. When a piece moves off of a Site, it leaves behind a piece with an identical Owner and with a Strength of 0, in doing so expanding the size of their territory.</p>
 
@@ -39,9 +40,8 @@
 
 				<p>The number of turns is generally given to be high enough that only the best-matched of bots will reach the turn limit; the vast majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are deem to have tied within the game.</p>
 
-				<h3>Game Specification</h3>
 
-				<h4>Initialization</h4>
+				<h3>Bot Initialization</h3>
 
 				<p>At the start of the game, each bot is sent some information (accessed using getInit in the starter packages):
 					<ul>
@@ -52,7 +52,7 @@
 
 				<p>Bots are given three seconds at the start of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, and/or planning the bot's initial expansion strategy. Once bots are done initializing (before their three seconds are up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
 
-				<h4>Turns</h4>
+				<h3>Turns</h3>
 
 				<p>After all bots have finished setting up, the environment will do the following until endgame conditions are met.
 					<ol>
@@ -65,7 +65,7 @@
 				 	</ol>
 				</p>
 
-				<h4>Maps</h4>
+				<h3>Maps</h3>
 
 				<p>Maps are randomly generated at the start of each game. The generator does the following:
 					<ol>
@@ -76,7 +76,7 @@
 				 	</ol>
 				</p>
 
-				<h4>Files</h4>
+				<h3>Replay Files</h3>
 
 				<p>Once a game ends, the environment will output it as a file for replaying at high speed later. Presently, the file does not contain the decisions of the players; only the game states resolved by the environment. A sample file should look like:<br>
 					<pre><code>HLT 8 <-- A header to distinguish version and ensure that the file will be valid.
