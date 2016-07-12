@@ -13,23 +13,40 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div class="row">
 			<div class="col-sm-12">
-				<h1>Halite Downlods</h1>
+				<h1>Halite Downloads</h1>
 
 				<h3>Environment and Visualizer</h3>
-				<p>This set of binaries was uploaded at <b>5 pm EST on July 8th</b>. We fixed the killing of bot processes on Unix, refactored map generation, and cleaned up the output of the environment.</p>
-				<ul>
-					<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
-					<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
-					<li><a href="downloads/Halite-Windows.zip">Windows</a></li>
-				</ul>
+				<h4>Changelog</h4>
+				<p>
+					This set of binaries was uploaded at <b>noon EST on July 12th</b>. Changes include:
+					<ul>
+						<li>Dynamic timeouts: instead of getting a second per turn, you will get fifty milliseconds plus half a millisecond per tile per turn. Example: on a 40 by 40 map, you will get 850 milliseconds per turn.</li>
+						<li>A production graph in the visualizer</li>
+						<li>Extensive visualizer logging: if you have problems with the visualizer, run it with the <code>-v</code> argument and send us the <code>debug.log</code> file that it outputs.</li>
+					</ul>
+
+				</p>
+				<h4>Downloads</h4>
+				<p>
+						<ul>
+						<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
+						<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
+						<li><a href="downloads/Halite-Windows.zip">Windows</a></li>
+					</ul>
+				</p>
 
 				<h3>Language Packages</h3>
-				<p>This set of starter packages was uploaded at <b>2:20 pm EST on July 9th</b>. We added the getAngle, inBounds, and getDistance functions to the Java starter package and fixed the inBounds function of the Python starter package.</p>
-				<ul>
-					<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
-					<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
-					<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
-				</ul>
+				<h4>Changelog</h4>
+				<p>This set of starter packages was uploaded at <b>noon EST on July 12th</b>. We standardized the starter packages naming scheme and changed getDistance to consider Manhattan distance.</p>
+
+				<h4>Downloads</h4>
+				<p>
+					<ul>
+						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
+						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
+						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+					</ul>
+				</p>
 			</div>
 		</div>
 	</div>
