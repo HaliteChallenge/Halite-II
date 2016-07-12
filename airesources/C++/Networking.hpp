@@ -58,10 +58,10 @@ static hlt::Map deserializeMap(const std::string & inputString) {
 	std::stringstream iss(inputString);
 
 	hlt::Map map(width, height);
-	
+
 	//Set productions
-	for(int a = 0; a < map.map_height; a++) {
-		for(int b = 0; b < map.map_width; b++) {
+	for(int a = 0; a < map.height; a++) {
+		for(int b = 0; b < map.width; b++) {
 			map.contents[a][b].production = productions[a][b];
 		}
 	}
@@ -69,12 +69,12 @@ static hlt::Map deserializeMap(const std::string & inputString) {
 	//Run-length encode of owners
 	unsigned short y = 0, x = 0;
 	unsigned short counter = 0, owner = 0;
-	while(y != map.map_height) {
+	while(y != map.height) {
 		iss >> counter >> owner;
 		for(int a = 0; a < counter; a++) {
 			map.contents[y][x].owner = owner;
 			x++;
-			if(x == map.map_width) {
+			if(x == map.width) {
 				x = 0;
 				y++;
 			}

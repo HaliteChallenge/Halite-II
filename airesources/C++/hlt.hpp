@@ -31,58 +31,58 @@ namespace hlt{
 	class Map{
 	public:
 		std::vector< std::vector<Site> > contents;
-		unsigned short map_width, map_height; //Number of rows & columns, NOT maximum index.
+		unsigned short width, height; //Number of rows & columns, NOT maximum index.
 
 		Map() {
-			map_width = 0;
-			map_height = 0;
-			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+			width = 0;
+			height = 0;
+			contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
 		}
 		Map(const Map &otherMap) {
-			map_width = otherMap.map_width;
-			map_height = otherMap.map_height;
+			width = otherMap.width;
+			height = otherMap.height;
 			contents = otherMap.contents;
 		}
 		Map(int width, int height) {
-			map_width = width;
-			map_height = height;
-			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+			width = width;
+			height = height;
+			contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
 		}
 
 		bool inBounds(Location l) {
-			return l.x < map_width && l.y < map_height;
+			return l.x < width && l.y < height;
 		}
 		float getDistance(Location l1, Location l2) {
 			short dx = abs(l1.x - l2.x), dy = abs(l1.y - l2.y);
-			if(dx > map_width / 2) dx = map_width - dx;
-			if(dy > map_height / 2) dy = map_height - dy;
+			if(dx > width / 2) dx = width - dx;
+			if(dy > height / 2) dy = height - dy;
 			return sqrt((dx*dx) + (dy*dy));
 		}
 		float getAngle(Location l1, Location l2) {
 			short dx = l2.x - l1.x, dy = l2.y - l1.y;
-			if(dx > map_width - dx) dx -= map_width;
-			else if(-dx > map_width + dx) dx += map_width;
-			if(dy > map_height - dy) dy -= map_height;
-			else if(-dy > map_height + dy) dy += map_height;
+			if(dx > width - dx) dx -= width;
+			else if(-dx > width + dx) dx += width;
+			if(dy > height - dy) dy -= height;
+			else if(-dy > height + dy) dy += height;
 			return atan2(dy, dx);
 		}
 
 		Location getLocation(Location l, unsigned char direction) {
 			if(direction != STILL) {
 				if(direction == NORTH) {
-					if(l.y == 0) l.y = map_height - 1;
+					if(l.y == 0) l.y = height - 1;
 					else l.y--;
 				}
 				else if(direction == EAST) {
-					if(l.x == map_width - 1) l.x = 0;
+					if(l.x == width - 1) l.x = 0;
 					else l.x++;
 				}
 				else if(direction == SOUTH) {
-					if(l.y == map_height - 1) l.y = 0;
+					if(l.y == height - 1) l.y = 0;
 					else l.y++;
 				}
 				else if(direction == WEST) {
-					if(l.x == 0) l.x = map_width - 1;
+					if(l.x == 0) l.x = width - 1;
 					else l.x--;
 				}
 			}
