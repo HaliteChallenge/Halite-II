@@ -26,7 +26,7 @@ int main() {
 
 		for(unsigned short y = 0; y < presentMap.height; y++) {
 			for(unsigned short x = 0; x < presentMap.width; x++) {
-				hlt::Site site = presentMap.contents[y][x];
+				hlt::Site site = presentMap.getSite({x, y});
 				if (site.owner == myID) {
 					unsigned char moveDirection = (unsigned char)(rand() % 5);
 					if(site.strength < site.production*5) {

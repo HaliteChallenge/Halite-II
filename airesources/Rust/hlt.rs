@@ -1,5 +1,6 @@
 use std::hash;
 use std::cmp;
+use std::f64;
 
 static STILL: u8 = 0;
 static NORTH: u8 = 1;
@@ -31,17 +32,55 @@ struct GameMap {
 }
 
 trait GameMapUtils {
-	fn inBounds(&self) -> bool;
+	fn inBounds(&self, l: Location) -> bool;
 	fn getDistance(&self, l1: Location, l2: Location) -> u16;
 	fn getAngle(&self, l1: Location, l2: Location) -> f64;
 	fn getLocation(&self, l: Location, d: u8) -> Location;
-	fn getSite(&self, l: Location, d: u8) -> &Site {
-		let loc = self.getLocation(l, d);
-		return self.contents
-	}
+	fn getSite(&self, l: Location, d: u8) -> &Site;
 }
 
-macro_rules! getSite
+impl GameMapUtils for GameMap {
+    fn inBounds(&self, l: Location) -> bool {
+    	l.x < self.width && l.y < self.height
+    }
+    fn getDistance(&self, l: Location) -> u16 {
+		let mut dx = (l1.x - l2.x).abs();
+		let mut dy = (l1.y - l2.y).abs();
+		if dx > self.width / 2 { dx = self.width - dx; }
+		if dy > self.height / 2 { dy = self.height - dy; }
+		dx + dy
+    }
+    fn getAngle(&self, l1: Location, l2: Location) -> bool {
+		let mut dx = l2.x - l1.x;
+		let mut dy = l2.y - l1.y;
+		if dx > self.width - dx { dx -= self.width; }
+		else if-dx > self.width + dx { dx += self.width; }
+		if dy > self.height - dy { dy -= self.height; }
+		else if -dy > self.height + dy { dy += self.height; }
+		dy.atan2(dx)
+    }
+    fn getLocation(&self, l: Location, d: u8) -> Location {
+    	let mut loc = Location { x: l1.x, y: l1.y };
+    	if d == NORTH {
+    		if loc.y == 0 { loc.y = self.height - 1; }
+    		else loc.y -= 1;
+    	} else if d == EAST {
+    		if loc.x == self.width - 1 { loc.x = 0; }
+    		else loc.x += 1;
+    	} else if d == SOUTH {
+    		if loc.y == self.height - 1 { loc.y = 0; }
+    		else loc.y += 1;
+    	} else if d == WEST {
+    		if loc.x == 0 { loc.x = self.width - 1; }
+    		else loc.x -= 1;
+    	}
+    	loc
+    }
+    fn getSite(&self, l: Location, d: u8) -> &Site {
+    	let loc = self.getLocation(l, d);
+    	self.contents[l.y][l.x]
+    }
+}
 
 	GameMap() {
 		width = 0;

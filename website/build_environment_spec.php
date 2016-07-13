@@ -78,7 +78,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-          <li class="previous"><a href="game_spec.php"><span aria-hidden="true">&larr;</span> Game Spec</a></li>
+          <li class="previous"><a href="contest_spec.php"><span aria-hidden="true">&larr;</span> Contest Spec</a></li>
 					<li class="next"><a href="networking_spec.php">Networking Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
