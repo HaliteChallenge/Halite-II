@@ -35,8 +35,13 @@ trait GameMapUtils {
 	fn getDistance(&self, l1: Location, l2: Location) -> u16;
 	fn getAngle(&self, l1: Location, l2: Location) -> f64;
 	fn getLocation(&self, l: Location, d: u8) -> Location;
-	fn getSite(&mut self)
+	fn getSite(&self, l: Location, d: u8) -> &Site {
+		let loc = self.getLocation(l, d);
+		return self.contents
+	}
 }
+
+macro_rules! getSite
 
 	GameMap() {
 		width = 0;

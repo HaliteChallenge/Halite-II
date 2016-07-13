@@ -128,5 +128,25 @@ int main(int argc, char* args[]) {
 	}
 
 	delete my_game;
+
+	if(!program_output_style) {
+		std::cout << "Would you like to immediately visualize this game? Please enter y/n: ";
+		std::string in;
+		while(true) {
+			std::getline(std::cin, in);
+			std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+			if(in == "y" || in == "n") break;
+			std::cout << "That wasn't a valid input. Please enter y/n: 0: ";
+		}
+		if(in == "y") {
+#ifdef _WIN32
+			std::string command = ".\\visualizer " + filename;
+#else
+			std::string command = "./visualizer " + filename;
+#endif
+			system(command.c_str());
+		}
+	}
+
 	return 0;
 }
