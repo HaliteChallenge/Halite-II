@@ -40,3 +40,9 @@ RUN apt-get -y dist-upgrade
 
 # Libraries
 RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.9.0-cp34-cp34m-linux_x86_64.whl
+RUN apt-get install -y python3-numpy python3-scipy python3-dev python3-pip python3-nose g++ libblas-dev git
+RUN pip3 install Theano 
+RUN git clone https://github.com/fchollet/keras.git
+WORKDIR keras/
+RUN python3 setup.py install
+WORKDIR ../
