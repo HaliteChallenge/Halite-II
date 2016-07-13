@@ -120,6 +120,7 @@ $(function() {
 	var extraStats = getExtraStats(userID);
 	$.extend(user, extraStats);
 	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
+	user["didTimeout"] = Math.round(1000*(user["didTimeout"])/1000;
 
 	var numUsers = getNumActiveUsers();
 
