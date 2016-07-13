@@ -8,9 +8,9 @@ while True:
 	moves = []
 	gameMap = getFrame()
 
-	for y in range(0, len(gameMap.contents)):
-		for x in range(0, len(gameMap.contents[y])):
-			site = gameMap.contents[y][x]
+	for y in range(gameMap.height):
+		for x in range(gameMap.width):
+			site = gameMap.getSite(Location(x, y))
 			if site.owner == myID:
 				direction = random.randint(0, 5)
 				if site.strength < 5*site.production:

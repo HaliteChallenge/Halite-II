@@ -13,9 +13,9 @@ public class MyBot {
 
       gameMap = Networking.getFrame();
 
-      for(int y = 0; y < gameMap.contents.size(); y++) {
-        for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
-          Site site = gameMap.contents.get(y).get(x);
+      for(int y = 0; y < gameMap.height; y++) {
+        for(int x = 0; x < gameMap.width; x++) {
+          Site site = gameMap.getSite(new Location(x, y));
           if(site.owner == myID) {
             Direction dir = Direction.randomDirection();
             moves.add(new Move(new Location(x, y), dir));
