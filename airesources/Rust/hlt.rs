@@ -8,23 +8,23 @@ const DIRECTIONS: [u8; 5] = [STILL, NORTH, EAST, SOUTH, WEST];
 const CARDINALS: [u8; 4] = [NORTH, EAST, SOUTH, WEST];
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq, PartialOrd, Ord, Debug)]
-struct Location {
-	x: u16,
-	y: u16,
+pub struct Location {
+	pub x: u16,
+	pub y: u16,
 }
 
 #[derive(Copy, Clone, Eq, Debug, PartialEq)]
-struct Site {
-	owner: u8,
-	strength: u8,
-	production: u8,
+pub struct Site {
+	pub owner: u8,
+	pub strength: u8,
+	pub production: u8,
 }
 
 #[derive(Clone, Debug)]
-struct GameMap {
-	contents: Vec< Vec<Site> >,
-	width: u16, //Number of columns.
-	height: u16, //Number of rows.
+pub struct GameMap {
+	pub contents: Vec< Vec<Site> >,
+	pub width: u16, //Number of columns.
+	pub height: u16, //Number of rows.
 }
 
 trait GameMapUtils {
@@ -76,8 +76,4 @@ impl GameMapUtils for GameMap {
     	let loc = self.get_location(l, d);
     	&self.contents[l.y as usize][l.x as usize]
     }
-}
-
-fn main() {
-	println!("Hello World!");
 }
