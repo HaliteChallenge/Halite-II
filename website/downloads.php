@@ -43,7 +43,7 @@
 				<p>
 					<ul>
 						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
-						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 6+</a></li>
+						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7+</a></li>
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
 					</ul>
 				</p>
