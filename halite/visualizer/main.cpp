@@ -98,9 +98,6 @@ int main(int argc, const char ** argv) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 1);
 
-
-	my_game = new Halite();
-
 	if(argc > 1) {
 		if(strcmp(argv[1], "-v") == 0) {
 			verboseOutput = true;
@@ -430,6 +427,7 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 	if(verboseOutput) debug << "Handling a drop!" << std::endl;
 	unsigned short wi, he;
+    if(my_game == NULL) my_game = new Halite();
 	if(my_game->isValid(paths[0])) {
 		if(verboseOutput) debug << "The file seems to have a valid header." << std::endl;
 		delete my_game;
