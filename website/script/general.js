@@ -71,7 +71,7 @@ $(function() {
 			buttonClicked: function() { this.$fileInput.click(); },
 			fileChanged: function() {
 				storeBotFile("submitForm");
-				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will recieve an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
 			}
 		},
 
