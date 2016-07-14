@@ -124,7 +124,7 @@ def trainModel():
     testOutputs = correctOutputs[len(correctOutputs)//2:]
 
     model = Sequential()
-    model.add(Dense(24, input_shape=(24, )))
+    model.add(Dense(24, input_dim=24))
     model.add(Activation('tanh'))
     model.add(Dense(24))
     model.add(Activation('tanh'))
