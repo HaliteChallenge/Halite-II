@@ -4,6 +4,9 @@ from networking import *
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 
+from os import listdir, remove
+from os.path import join, isfile
+
 def bytesUntil(gameFile, endByte):
     byteArray = []
     byte = gameFile.read(1)
@@ -21,7 +24,6 @@ def stringUntil(gameFile, endChar):
     return returnString
 
 def loadGame(filename):
-    frames = []
     gameFile = open(filename, "rb")
     try:
         stringUntil(gameFile, "\n")
@@ -48,9 +50,12 @@ def loadGame(filename):
         productions = [int.from_bytes(gameFile.read(1), byteorder='big') for a in range(width*height)]
         gameFile.read(1)
 
-        # Get the frames
-        for frameIndex in range(numFrames):
+        # Get the frames and moves
+        frames = []
+        moves = []
+        for frameIndex in range(numFrames-1):
             print(frameIndex)
+            # Frames
             frames.append(GameMap(width=width, height=height, numberOfPlayers=numPlayers))
             x = 0
             y = 0
@@ -68,21 +73,39 @@ def loadGame(filename):
                         y += 1
                         if y == height:
                             break
+            # Moves
+            moves.append({Location(index % width, math.floor(index/width)):int.from_bytes(gameFile.read(1), byteorder='big') for index in range(width*height)})
     finally:
         gameFile.close()
-    return mattID, frames
-
-loadGame("../../../halite.io/storage/replays/1468435453402448.hlt")
-
-def getMoveData():
-    data = []
-    games = ["../../../halite.io/storage/replays/1468435453402448.hlt", "../../../halite.io/storage/replays/1468435453402448.hlt"]
-
-    for game in games:
-        mattID, frames = loadGame(game)
+    return mattID, frames, moves
 
 def getNNData():
+    inputs = []
+    correctOutputs = []
 
+    gamePath = "replays"
+
+    for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
+        mattID, frames, moves = loadGame(join(gamePath, filename))
+        maxProduction = 0
+        for y in range(frames[0].height):
+            for x in range(frames[0].width):
+                prod = frames[0].getSite(Location(x, y)).production
+                if prod > maxProduction:
+                    maxProduction = prod
+        for turnIndex in range(len(moves)):
+            gameMap = frames[turnIndex]
+            for y in range(gameMap.height):
+                for x in range(gameMap.width):
+                    loc = Location(x, y)
+                    if gameMap.getSite(loc).owner == mattID:
+                        box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
+                        nnInput = []
+                        for site in box:
+                            nnINput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
+                        inputs.append(nnINput)
+
+                        correctOutputs.append([1 if a == moves[frameIndex][loc] else 0 for a in range(5)])
 def trainModel():
     inputs, correctOutputs = getNNData()
 
@@ -95,3 +118,5 @@ def trainModel():
     model.add(Activation('softmax'))
 
     model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
+
+print(getNNData())
