@@ -14,38 +14,39 @@
 		<div class="row">
 		<div class="col-sm-12">
 
-		<h1>Tutorial: Breadth-First Search</h1>
+			<h1>Breadth-First Search Tutorial</h1>
 
-        <h3>Introduction</h3>
+      <h3>Introduction</h3>
 
-        <p>
-					The Basic Bot we wrote in the previous tutorial was certainly a big step up on the random bot provided in the starter packages, but we can do much better. The central issue with the Basic Bot is that although it utilizes pieces on its borders, pieces that are not on borders just move randomly once they have a fairly high strength. This is hugely inefficient for a few reasons:
-	        <ul>
-	        	<li>The bot will often accidentally move pieces whose strengths some to greater than 255 into each other. Due to the strength cap, this lowers the overall strength of the bot.</li>
-	        	<li>The bot doesn't effectively utilize its strength to expand or attack its opponents. It simply relies on a piece coming into a border by random chance, and when a piece is more than a few squares away from a border this very rarely happens. These pieces are not appreciably helping the bot to win the game.</li>
-	        	<li>The bot doesn't move pieces still as often as it could. To minimize overflow waste from the 255 cap, the bot limits how long it will have pieces remain still before it begins to move them randomly. An algorithm better at moving strength to the borders of a bot would allow the bot to make more still move, which translates to a higher production efficiency and more overall strength produced by the bot.</li>
-	        </ul>
-				</p>
+      <p>
+				The Basic Bot we wrote in the previous tutorial was certainly a big step up on the random bot provided in the starter packages, but we can do much better. The central issue with the Basic Bot is that although it utilizes pieces on its borders, pieces that are not on borders just move randomly once they have a fairly high strength. This is hugely inefficient for a few reasons:
+        <ul>
+        	<li>The bot will often accidentally move pieces whose strengths some to greater than 255 into each other. Due to the strength cap, this lowers the overall strength of the bot.</li>
+        	<li>The bot doesn't effectively utilize its strength to expand or attack its opponents. It simply relies on a piece coming into a border by random chance, and when a piece is more than a few squares away from a border this very rarely happens. These pieces are not appreciably helping the bot to win the game.</li>
+        	<li>The bot doesn't move pieces still as often as it could. To minimize overflow waste from the 255 cap, the bot limits how long it will have pieces remain still before it begins to move them randomly. An algorithm better at moving strength to the borders of a bot would allow the bot to make more still move, which translates to a higher production efficiency and more overall strength produced by the bot.</li>
+        </ul>
+			</p>
 
-        <p>There are many ways to solve these problems, and the one we'll be briefly going through is the use of the breadth-first search in efficiently routing pieces to the edges.</p>
+      <p>There are many ways to solve these problems, and the one we'll be briefly going through is the use of the breadth-first search in efficiently routing pieces to the edges.</p>
 
-        <h3>Algorithm</h3>
+      <h3>Algorithm</h3>
 
-        <p>Our algorithm will consist of a queue of locations. We'll initialize the queue to contain all of the pieces we don't own. Whenever we pop off of the queue, we'll add on all the pieces adjacent to it which haven't been visited yet and point those locations towards the location which we took off of the queue. Finally, we'll go through the game map and move the pieces we want to move those in the directions we found using the breadth-first search.</p>
+      <p>Our algorithm will consist of a queue of locations. We'll initialize the queue to contain all of the pieces we don't own. Whenever we pop off of the queue, we'll add on all the pieces adjacent to it which haven't been visited yet and point those locations towards the location which we took off of the queue. Finally, we'll go through the game map and move the pieces we want to move those in the directions we found using the breadth-first search.</p>
 
-        <p>Let's see what this bot will look like in Java!</p>
+      <p>Let's see what this bot will look like in Java!</p>
 
-        <p>First, we have the same declarations and objects as we had in the BasicBot.</p>
-        <pre><code>InitPackage iPackage = Networking.getInit();
+      <p>First, we have the same declarations and objects as we had in the BasicBot.</p>
+      <pre><code>InitPackage iPackage = Networking.getInit();
 int myID = iPackage.myID;
 GameMap gameMap = iPackage.map;
 
 Networking.sendInit("BfsBot");
 
 while(true) {
-ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
-gameMap = Networking.getFrame();
-		</code></pre>
+	ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
+	gameMap = Networking.getFrame();
+	...
+			</code></pre>
 
 		<p>Next we'll add the structures we'll need for our breadth-first search.</p>
 		<p>
