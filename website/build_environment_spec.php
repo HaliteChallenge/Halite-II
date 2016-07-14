@@ -31,6 +31,7 @@
 					The following libraries are available at compiletime and runtime:
 					<ul>
 						<li>Numpy 1.11.1</li>
+						<li>h5py 2.2.1</li>
 						<li>Tensorflow 0.9.0</li>
 						<li>Theano 0.8.2</li>
 						<li>Keras 1.0.5 (using Theano as a backend)</li>
