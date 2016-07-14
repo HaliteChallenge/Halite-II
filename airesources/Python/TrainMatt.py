@@ -85,12 +85,11 @@ def getNNData():
 
     gamePath = "replays"
 
-    num = 0
+    numFiles = 0
     for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
-        print(num)
-        num += 1
-        if num > 50:
-            break
+        numFiles += 1
+        if numFiles > 60: break
+        print("Loading " + filename)
 
         mattID, frames, moves = loadGame(join(gamePath, filename))
         maxProduction = 0
@@ -124,21 +123,23 @@ def trainModel():
     testOutputs = correctOutputs[len(correctOutputs)//2:]
 
     model = Sequential()
-    model.add(Dense(24, input_dim=24))
+    model.add(Dense(24, input_shape=(24, )))
     model.add(Activation('tanh'))
     model.add(Dense(24))
     model.add(Activation('tanh'))
     model.add(Dense(5))
     model.add(Activation('softmax'))
 
+    model.summary()
+
     model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
 
-    model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs), show_accuracy=True)
+    model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs))
     score = model.evaluate(testInputs, testOutputs, verbose=0)
     print(score)
 
     json_string = model.to_json()
     open('my_model_architecture.json', 'w').write(json_string)
-    model.save_weights('my_model_weights.h5')
+    model.save_weights('my_model_weights.h5', overwrite=True)
 
 trainModel()

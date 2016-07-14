@@ -1,15 +1,20 @@
 from hlt import *
 from networking import *
 
+
+
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Activation
 from keras.optimizers import SGD, Adam, RMSprop
+
+import numpy as np
 
 myID, gameMap = getInit()
 
 model = model_from_json(open('my_model_architecture.json').read())
 model.load_weights('my_model_weights.h5')
 model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
+
 
 maxProduction = 0
 for y in range(gameMap.height):
@@ -31,7 +36,15 @@ while True:
 				nnInput = []
 				for site in box:
 					nnInput += [1 if site.owner == myID else -1, float(site.strength / 255), float(site.production / maxProduction)]
-				print(len(nnInput))
+				nnInput = np.asarray(nnInput).reshape((1, 24))
+
 				output = model.predict(nnInput)[0]
-				moves.append(Move(loc, output.index(max(output))))
+
+				biggest = -222
+				direction = STILL
+				for d in range(len(output)):
+					if output[d] > biggest:
+						biggest = output[d]
+						direction = d
+				moves.append(Move(loc, direction))
 	sendFrame(moves)
