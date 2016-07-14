@@ -15,6 +15,8 @@
 			<div class="col-sm-12">
         <h1>Applying Machine Learning to Halite</h1>
 
+				<p>The source code for this tutorial is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/machinelearning/">here</a>.</p>
+
         <h3>Overview</h3>
         <p>We are going to show you a simple example of how machine learning applied to Halite. We will locally train a neural network to mimic Matt Aderth's current halite bot (as of July 13th) using the <a href="http://keras.io">Keras library</a>.</p>
 
@@ -307,7 +309,7 @@ while True:
 				</p>
 
 				<p>
-					We are now ready to submit our bot to the server! Though it's not perfect at mimicing Matt's bot, since he considers the entire board instead of just a 3 by 3 slice of it when moving a piece, it does beat a Basic Bot.
+					We are now ready to submit our bot to the server! Though it's not perfect at mimicing Matt's bot, since he considers the entire board instead of just a 3 by 3 slice of it when moving a piece, it does beat a Basic Bot. We hope that this tutorial helped to start you thinking about how to apply machine learning to Halite!
 				</p>
 
         <h3>Other Libraries</h3>
