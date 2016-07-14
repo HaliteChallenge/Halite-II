@@ -314,12 +314,7 @@ while True:
 
         <h3>Other Libraries</h3>
         <p>
-          In addition to keras, the following libraries are available on our servers:
-          <ul>
-            <li>Numpy 1.11.1</li>
-            <li>Tensorflow 0.9.0</li>
-            <li>Theano 0.8.2</li>
-          </ul>
+          In addition to keras, <a href="build_environment_spec.php#available-libraries">these libraries</a> are available on our servers.
         </p>
 			</div>
 		</div>

@@ -29,7 +29,7 @@
 				<h3>Libraries</h3>
 				<p>
 					The following libraries are available at compiletime and runtime:
-					<ul>
+					<ul id="available-libraries">
 						<li>Numpy 1.11.1</li>
 						<li>h5py 2.2.1</li>
 						<li>Tensorflow 0.9.0</li>
