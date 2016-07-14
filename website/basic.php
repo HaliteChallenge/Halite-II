@@ -100,7 +100,7 @@ public class MyBot{
     Networking.sendInit("JavaBot" + playerTag);
 
     while(true) {
-      ArrayList<Move> moves = new ArrayList<Move>();
+      ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
 
       gameMap = Networking.getFrame();
 
