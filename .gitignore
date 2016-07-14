@@ -291,6 +291,18 @@ docs/_build/
 # PyBuilder
 target/
 
+#############
+## Clojure ##
+#############
+pom.xml
+*jar
+airesources/Clojure/lib
+classes
+native
+.lein-failures
+checkouts
+.lein-deps-sum
+
 ############
 ## Halite ##
 ############
@@ -312,5 +324,5 @@ git_pull.php
 !Halite-Windows.zip
 !Halite-Mac.zip
 
-MyBot
-BasicBot
+airesources/C++/MyBot
+airesources/C++/BasicBot

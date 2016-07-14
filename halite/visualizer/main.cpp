@@ -33,7 +33,7 @@ bool wPressed = false, aPressed = false, sPressed = false, dPressed = false;
 bool shiftPressed = false, tabPressed = false, hPressed = false, mousePressed = false;
 bool newGame = false, isLaunch = true;
 bool isWindowed = true, verboseOutput = false;
-float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
+float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = -1;
 int windowedWidth, windowedHeight, numTurns;
 
 std::string filename;
@@ -420,7 +420,7 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 	}
 	else if(code == 'O' || code == 'o') {
 		xOffset = 0;
-		yOffset = 0;
+		yOffset = -1;
 	}
 }
 
@@ -436,7 +436,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 		if(verboseOutput) debug << "Successfully inputted the file." << std::endl;
 		filename = paths[0];
 		xOffset = 0;
-		yOffset = 0;
+		yOffset = -1;
 	}
 	else return;
 	const int MIN_POINTS_VISIBLE = 3;
