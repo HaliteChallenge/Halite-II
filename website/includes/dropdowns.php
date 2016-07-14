@@ -3,6 +3,8 @@
   <ul class="dropdown-menu" style="padding: 10px;">
     <li><a href="quickstart.php">Quickstart</a></li>
     <li><a href="basic.php">Basic Bot</a></li>
+    <li><a href="bfs_tutorial.php">BFS</a></li>
+    <li><a href="machine_learning_tutorial.php">Machine Learning</a></li>
   </ul>
 </li>
 <li class="dropdown">
