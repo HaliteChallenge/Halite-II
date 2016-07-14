@@ -1,4 +1,4 @@
-<html lang="en">
+a<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -69,8 +69,7 @@ for(int y = 0; y < gameMap.height; y++) {
 		dRow.add(Direction.STILL);
 	}
 	directions.add(dRow);
-}</code></pre>
-			</p>
+}</code></pre></p>
 
 			<p>
 				Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
@@ -84,34 +83,29 @@ for(int y = 0; y < gameMap.height; y++) {
 			visited.get(y).set(x, true);
 		}
 	}
-}</code></pre>
+}</code></pre></p>
 
-		</p>
+		<p>Here's a simple little helper function to tell us what the opposite direction of a given direction is.
+		<pre><code>private static Direction oppositeDirection(Direction d) {
+	if(d == Direction.STILL) return Direction.STILL;
+	if(d == Direction.NORTH) return Direction.SOUTH;
+	if(d == Direction.EAST) return Direction.WEST;
+	if(d == Direction.SOUTH) return Direction.NORTH;
+	if(d == Direction.WEST) return Direction.EAST;
+	return null;
+}</code></pre></p>
 
 		<p>Next we'll need to actually use this to direct our pieces. So, we'll continually pop off of the front of the queue, add the adjacent unvisited pieces, mark their directions and them as visited, and ensure that the queue isn't empty.
 		<pre><code>while(!toVisit.isEmpty()) {
 	Location l = toVisit.remove();
 	visited.get(l.y).set(l.x, true);
-	Location n = gameMap.getLocation(l, Direction.NORTH), e = gameMap.getLocation(l, Direction.EAST), s = gameMap.getLocation(l, Direction.SOUTH), w = gameMap.getLocation(l, Direction.WEST);
-	if(!visited.get(n.y).get(n.x)) {
-		toVisit.add(n);
-		visited.get(n.y).set(n.x, true);
-		directions.get(n.y).set(n.x, Direction.SOUTH);
-	}
-	if(!visited.get(e.y).get(e.x)) {
-		toVisit.add(e);
-		visited.get(e.y).set(e.x, true);
-		directions.get(e.y).set(e.x, Direction.WEST);
-	}
-	if(!visited.get(s.y).get(s.x)) {
-		toVisit.add(s);
-		visited.get(s.y).set(s.x, true);
-		directions.get(s.y).set(s.x, Direction.NORTH);
-	}
-	if(!visited.get(w.y).get(w.x)) {
-		toVisit.add(w);
-		visited.get(w.y).set(w.x, true);
-		directions.get(w.y).set(w.x, Direction.EAST);
+	for(Direction d : Direction.CARDINALS) {
+		Location t = gameMap.getLocation(l, d);
+		if(!visited.get(t.y).get(t.x)) {
+			toVisit.add(t);
+			visited.get(t.y).set(t.x, true);
+			directions.get(t.y).set(t.x, oppositeDirection(d));
+		}
 	}
 }</code></pre></p>
 
