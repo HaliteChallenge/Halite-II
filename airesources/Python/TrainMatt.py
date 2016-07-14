@@ -85,10 +85,7 @@ def getNNData():
 
     gamePath = "replays"
 
-    numFiles = 0
     for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
-        numFiles += 1
-        if numFiles > 60: break
         print("Loading " + filename)
 
         mattID, frames, moves = loadGame(join(gamePath, filename))

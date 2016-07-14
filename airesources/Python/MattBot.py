@@ -1,8 +1,6 @@
 from hlt import *
 from networking import *
 
-
-
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Activation
 from keras.optimizers import SGD, Adam, RMSprop
