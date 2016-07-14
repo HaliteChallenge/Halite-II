@@ -383,7 +383,7 @@ void Halite::init() {
 
 	//Send initial package
 	std::vector< std::future<bool> > initThreads(number_of_players);
-	const int BOT_INITIALIZATION_TIMEOUT_MILLIS = 50 + (game_map.map_width * game_map.map_height);
+	const int BOT_INITIALIZATION_TIMEOUT_MILLIS = 2000 + (game_map.map_width * game_map.map_height) * 2;
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
 	}
