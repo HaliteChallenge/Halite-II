@@ -186,7 +186,7 @@ model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momen
 
 model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs))
 score = model.evaluate(testInputs, testOutputs, verbose=0)
-print(score)</code></pre>
+print("Loss:" + str(score))</code></pre>
 				</p>
 
 				<p>
@@ -194,6 +194,59 @@ print(score)</code></pre>
 					<pre><code>json_string = model.to_json()
 open('my_model_architecture.json', 'w').write(json_string)
 model.save_weights('my_model_weights.h5')</code></pre>
+				</p>
+
+				<p>You should now be able to run the training script. The full copy of it is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/machinelearning/TrainMatt.py">here</a>. You should expect output similar to this:
+					<pre><code>Using Theano backend.
+Loading 1468472193187540.hlt
+Loading 1468471868771943.hlt
+Loading 1468462788126287.hlt
+Loading 1468472089094339.hlt
+Loading 1468467773230327.hlt
+Loading 1468459408179415.hlt
+Collected data
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to
+====================================================================================================
+dense_1 (Dense)                  (None, 24)            600         dense_input_1[0][0]
+____________________________________________________________________________________________________
+activation_1 (Activation)        (None, 24)            0           dense_1[0][0]
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 24)            600         activation_1[0][0]
+____________________________________________________________________________________________________
+activation_2 (Activation)        (None, 24)            0           dense_2[0][0]
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 5)             125         activation_2[0][0]
+____________________________________________________________________________________________________
+activation_3 (Activation)        (None, 5)             0           dense_3[0][0]
+====================================================================================================
+Total params: 1325
+____________________________________________________________________________________________________
+Train on 54556 samples, validate on 54556 samples
+Epoch 1/10
+54556/54556 [==============================] - 3s - loss: 0.0856 - val_loss: 0.0828
+Epoch 2/10
+54556/54556 [==============================] - 3s - loss: 0.0827 - val_loss: 0.0824
+Epoch 3/10
+54556/54556 [==============================] - 3s - loss: 0.0821 - val_loss: 0.0836
+Epoch 4/10
+54556/54556 [==============================] - 3s - loss: 0.0815 - val_loss: 0.0821
+Epoch 5/10
+54556/54556 [==============================] - 3s - loss: 0.0811 - val_loss: 0.0833
+Epoch 6/10
+54556/54556 [==============================] - 2s - loss: 0.0807 - val_loss: 0.0825
+Epoch 7/10
+54556/54556 [==============================] - 0s - loss: 0.0802 - val_loss: 0.0812
+Epoch 8/10
+54556/54556 [==============================] - 0s - loss: 0.0799 - val_loss: 0.0826
+Epoch 9/10
+54556/54556 [==============================] - 0s - loss: 0.0796 - val_loss: 0.0821
+Epoch 10/10
+54556/54556 [==============================] - 0s - loss: 0.0793 - val_loss: 0.0814
+Loss: 0.0814138701757</code></pre>
+				</p>
+
+				<p>If you do not want to wait for your bot to be trained, you can grab the <code>json</code> and <code>hd5</code> files for a model trained on ~50 games <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/machinelearning">here</a>.
 				</p>
 
 				<h3>Running the Model</h3>
