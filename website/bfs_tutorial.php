@@ -16,6 +16,8 @@
 
 			<h1>Breadth-First Search Tutorial</h1>
 
+			<p>The source code for this tutorial is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/bfs/">here</a>.</p>
+
       <h3>Introduction</h3>
 
       <p>
