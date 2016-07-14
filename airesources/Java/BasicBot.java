@@ -13,9 +13,9 @@ public class BasicBot {
 
 			gameMap = Networking.getFrame();
 
-			for(int y = 0; y < gameMap.contents.size(); y++) {
-				for(int x = 0; x < gameMap.contents.get(y).size(); x++) {
-					Site site = gameMap.contents.get(y).get(x);
+			for(int y = 0; y < gameMap.height; y++) {
+				for(int x = 0; x < gameMap.width; x++) {
+					Site site = gameMap.getSite(new Location(x, y));
 					if(site.owner == myID) {
 						Direction moveDirection = Direction.randomDirection();
 						if(site.strength < site.production*5) {

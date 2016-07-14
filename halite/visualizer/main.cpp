@@ -33,7 +33,7 @@ bool wPressed = false, aPressed = false, sPressed = false, dPressed = false;
 bool shiftPressed = false, tabPressed = false, hPressed = false, mousePressed = false;
 bool newGame = false, isLaunch = true;
 bool isWindowed = true, verboseOutput = false;
-float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = 0;
+float maxFps = 8, turnNumber = 0, graphZoom = 1.0, maxZoom, mouseX, mouseY, xOffset = 0, yOffset = -1;
 int windowedWidth, windowedHeight, numTurns;
 
 std::string filename;
@@ -97,9 +97,6 @@ int main(int argc, const char ** argv) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 1);
-
-
-	my_game = new Halite();
 
 	if(argc > 1) {
 		if(strcmp(argv[1], "-v") == 0) {
@@ -423,13 +420,14 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 	}
 	else if(code == 'O' || code == 'o') {
 		xOffset = 0;
-		yOffset = 0;
+		yOffset = -1;
 	}
 }
 
 void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 	if(verboseOutput) debug << "Handling a drop!" << std::endl;
 	unsigned short wi, he;
+    if(my_game == NULL) my_game = new Halite();
 	if(my_game->isValid(paths[0])) {
 		if(verboseOutput) debug << "The file seems to have a valid header." << std::endl;
 		delete my_game;
@@ -438,7 +436,7 @@ void handleDrop(GLFWwindow * w, int count, const char ** paths) {
 		if(verboseOutput) debug << "Successfully inputted the file." << std::endl;
 		filename = paths[0];
 		xOffset = 0;
-		yOffset = 0;
+		yOffset = -1;
 	}
 	else return;
 	const int MIN_POINTS_VISIBLE = 3;

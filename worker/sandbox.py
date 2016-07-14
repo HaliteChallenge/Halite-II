@@ -212,14 +212,13 @@ class Sandbox:
 
 		"""
 		# Wait to make sure that the process is alive
-		time.sleep(0.2)
+		time.sleep(0.02)
 		if not self.is_alive:
 			timeout=0
 
 		try:
 			return self.stdout_queue.get(block=True, timeout=timeout)
 		except Empty:
-			print("sandbox done")
 			return None
 
 	def read_error(self, timeout=0):

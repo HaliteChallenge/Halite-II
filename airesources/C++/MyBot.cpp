@@ -26,7 +26,7 @@ int main() {
 
 		for(unsigned short a = 0; a < presentMap.height; a++) {
 			for(unsigned short b = 0; b < presentMap.width; b++) {
-				if (presentMap.getSite({b, a}, STILL).owner == myID) {
+				if (presentMap.getSite({b, a}).owner == myID) {
 					moves.insert({ { b, a }, (unsigned char)(rand() % 5)});
 				}
 			}

@@ -630,11 +630,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 
 	std::string format;
 	util::getline(game_file, format);
-	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7") {
+	if(format == "HLT 1" || format == "HLT 2" || format == "HLT 3" || format == "HLT 4" || format == "HLT 5" || format == "HLT 6" || format == "HLT 7" || format == "HLT 8") {
 		if(verboseOutput) debug << "Outdated file format!" << std::endl;
 		throw std::runtime_error("File format no longer supported in file " + filename);
 	}
-	else if(format != "HLT 8") {
+	else if(format != "HLT 9") {
 		if(verboseOutput) debug << "Unrecognized file format!" << std::endl;
 		throw std::runtime_error("Unrecognized format in file " + filename);
 	}
@@ -745,6 +745,11 @@ short Halite::input(GLFWwindow * window, std::string filename, unsigned short& w
 	int lastRender = 0;
 	for(short a = 0; a < numLines; a++) {
 		if(verboseOutput) debug << "Reading turn #" << a << " frome file string." << std::endl;
+
+		if(a != 0) { //Don't read in productions on frame #1.
+			loc += m.map_height * m.map_width;
+		}
+
 		short x = 0, y = 0;
 		int tilesSoFar = 0;
 		while(tilesSoFar < totalTiles) {
@@ -818,7 +823,7 @@ bool Halite::isValid(std::string filename) {
 	if(!game_file.is_open()) return false;
 	std::string format;
 	util::getline(game_file, format);
-	if(format != "HLT 8") return false;
+	if(format != "HLT 9") return false;
 	return true;
 }
 

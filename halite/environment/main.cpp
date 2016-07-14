@@ -1,75 +1,82 @@
 #include <iostream>
 #include <cctype>
 #include <chrono>
+#include <list>
 #include <string.h>
 
 #include "core/Halite.hpp"
 
-bool program_output_style;
+bool program_output_style = false, watch_game = false, server_version = false;
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
-
-//Returns true if all the arguments required of a user to run a game of Halite with the specified settings are present
-bool allArgumentsPresent(int argc, char* args[]) {
-	auto is_number = [](const std::string& s) {
-		return !s.empty() && std::find_if(s.begin(),
-		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
-	};
-	if(argc == 1) return false;
-	//Remember, the executable name counts as an argument
-	if(strcmp(args[1], "-q") == 0) {
-		if(argc < 6) return false;
-		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
-	}
-	else if(strcmp(args[1], "-qs") == 0) {
-		if(argc < 8 || argc % 2 != 0) return false;
-		if(is_number(std::string(args[2])) && is_number(std::string(args[3]))) return true;
-	}
-	else {
-		if(argc < 5) return false;
-		if(is_number(std::string(args[1])) && is_number(std::string(args[2]))) return true;
-	}
-
-	return false;
-}
 
 int main(int argc, char* args[]) {
 	srand(time(NULL));
 
-	//Parse command line parameters
-	if(allArgumentsPresent(argc, args)) {
+	if(argc > 1) {
+		std::list<std::string> sArgs;
+		for(int a = 1; a < argc; a++) sArgs.push_back(args[a]);
+
+		for(auto a = sArgs.begin(); a != sArgs.end();) {
+			if(*a == "-w") {
+				watch_game = true;
+				a = sArgs.erase(a);
+			}
+			else if(*a == "-q") {
+				program_output_style = true;
+				a = sArgs.erase(a);
+			}
+			else if(*a == "-s") {
+				server_version = true;
+				a = sArgs.erase(a);
+			}
+			else a++;
+		}
+
 		unsigned short mapWidth, mapHeight;
 		Networking networking;
 
-		if(strcmp(args[1], "-q") == 0) {
-			program_output_style = true;
-			mapWidth = atoi(args[2]);
-			mapHeight = atoi(args[3]);
-			for(int a = 4; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
-
-			my_game = new Halite(mapWidth, mapHeight, networking);
+		try {
+			mapWidth = std::stoi(sArgs.front());
+			sArgs.pop_front();
+			mapHeight = std::stoi(sArgs.front());
+			sArgs.pop_front();
 		}
-		else if(strcmp(args[1], "-qs") == 0) {
-			program_output_style = true;
-			mapWidth = atoi(args[2]);
-			mapHeight = atoi(args[3]);
-			std::vector<std::string> names;
-			for(int a = 5; a < argc; a += 2) names.push_back(std::string(args[a]));
-			for(int a = 4; a < argc; a += 2) networking.startAndConnectBot(std::string(args[a]));
+		catch(...) {
+			std::cout << "Invalid map width and/or height - couldn't start game.\n";
+			return EXIT_FAILURE;
+		}
 
-			my_game = new Halite(mapWidth, mapHeight, networking, names);
+		if(server_version) {
+			try {
+				std::vector<std::string> names;
+				while(!sArgs.empty()) {
+					networking.startAndConnectBot(sArgs.front());
+					sArgs.pop_front();
+					names.push_back(sArgs.front());
+					sArgs.pop_front();
+				}
+				my_game = new Halite(mapWidth, mapHeight, networking, names);
+			}
+			catch(...) {
+				std::cout << "[Server Version] Invalid parameters - couldn't start game.\n";
+				return EXIT_FAILURE;
+			}
 		}
 		else {
-			program_output_style = false;
-			mapWidth = atoi(args[1]);
-			mapHeight = atoi(args[2]);
-			for(int a = 3; a < argc; a++)  networking.startAndConnectBot(std::string(args[a]));
-
-			my_game = new Halite(mapWidth, mapHeight, networking);
+			try {
+				while(!sArgs.empty()) {
+					std::cout << sArgs.front() << std::endl;
+					networking.startAndConnectBot(sArgs.front());
+					sArgs.pop_front();
+				}
+				my_game = new Halite(mapWidth, mapHeight, networking);
+			}
+			catch(...) {
+				std::cout << "[Local Version] Invalid parameters - couldn't start game.\n";
+				return EXIT_FAILURE;
+			}
 		}
 	}
-
-	//Check if we should give output for the program or give output for the human.
-
 	//The programs arguments were not passed in the run command.
 	//Instead, we will ask the user for them
 	else {
@@ -129,23 +136,13 @@ int main(int argc, char* args[]) {
 
 	delete my_game;
 
-	if(!program_output_style) {
-		std::cout << "Would you like to immediately visualize this game? Please enter y/n: ";
-		std::string in;
-		while(true) {
-			std::getline(std::cin, in);
-			std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-			if(in == "y" || in == "n") break;
-			std::cout << "That wasn't a valid input. Please enter y/n: 0: ";
-		}
-		if(in == "y") {
+	if(watch_game) {
 #ifdef _WIN32
-			std::string command = ".\\visualizer " + filename;
+		std::string command = ".\\visualizer " + filename;
 #else
-			std::string command = "./visualizer " + filename;
+		std::string command = "./visualizer " + filename;
 #endif
-			system(command.c_str());
-		}
+		system(command.c_str());
 	}
 
 	return 0;

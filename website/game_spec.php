@@ -81,10 +81,10 @@
 				<p>Once a game ends, the environment will output it as a file for replaying at high speed later. Presently, the file does not contain the decisions of the players; only the game states resolved by the environment. A sample file should look like:<br>
 					<pre><code>HLT 8 <-- A header to distinguish version and ensure that the file will be valid.
 WIDTH HEIGHT NUM_PLAYERS NUM_FRAMES <-- The number of frames is always one more than the number of turns.
-Name1 r1 g1 b1 <-- The player name and the color to map the player to.
-Name2 r2 g2 b2
+Name1'\0'r1 g1 b1 <-- The player name and the color to map the player to, separated by a null character.
+Name2'\0'r2 g2 b2
 ...
-NameU rU gU bU
+NameU'\0'rU gU bU
 [WIDTH * HEIGHT bytes] <-- Represents the production of the map. Fills in the map by row, and within a row by column, where each byte is the production of that square.
 FRAME(1)FRAME(2)FRAME(3)...FRAME(NUM_FRAMES)</code></pre>
 					An individual FRAME(#) consists of the following format:
@@ -102,7 +102,7 @@ The above is repeated until the sum of all COUNTERs is equal to WIDTH * HEIGHT. 
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="build_environment_spec.php">Build Environment Spec <span aria-hidden="true">&rarr;</span> </a></li>
+					<li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>

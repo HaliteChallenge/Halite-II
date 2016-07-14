@@ -40,7 +40,7 @@ do
 	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'cd $PWD/$BOT && ./$RUNFILE' '$BOTNAME'";
 done
 
-docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -qs $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
+docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q -s $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
 
 docker rm -v $(docker ps -aq) >/dev/null
 
