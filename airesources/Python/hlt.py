@@ -1,5 +1,6 @@
 import random
 import math
+import copy
 
 STILL = 0
 NORTH = 1
@@ -66,7 +67,8 @@ class GameMap:
 			dy += self.height
 		return math.atan2(dy, dx)
 
-	def getLocation(self, l, direction):
+	def getLocation(self, loc, direction):
+		l = copy.deepcopy(loc)
 		if direction != STILL:
 			if direction == NORTH:
 				if l.y == 0:
