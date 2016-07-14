@@ -1,6 +1,9 @@
 from hlt import *
 from networking import *
 
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+
 def bytesUntil(gameFile, endByte):
     byteArray = []
     byte = gameFile.read(1)
@@ -67,6 +70,28 @@ def loadGame(filename):
                             break
     finally:
         gameFile.close()
-    return frames
+    return mattID, frames
 
 loadGame("../../../halite.io/storage/replays/1468435453402448.hlt")
+
+def getMoveData():
+    data = []
+    games = ["../../../halite.io/storage/replays/1468435453402448.hlt", "../../../halite.io/storage/replays/1468435453402448.hlt"]
+
+    for game in games:
+        mattID, frames = loadGame(game)
+
+def getNNData():
+
+def trainModel():
+    inputs, correctOutputs = getNNData()
+
+    model = Sequential()
+    model.add(Dense(24))
+    model.add(Activation('tanh'))
+    model.add(Dense(24))
+    model.add(Activation('tanh'))
+    model.add(Dense(5))
+    model.add(Activation('softmax'))
+
+    model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
