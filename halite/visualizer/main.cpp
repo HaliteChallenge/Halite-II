@@ -415,9 +415,11 @@ void handleChars(GLFWwindow * w, unsigned int code) {
 			handleDrop(window, 1, &fn);
 		}
 	}
+#ifndef __APPLE__
 	else if(code == 'F' || code == 'f') {
 		isWindowed ? setFullscreen() : setWindowed();
 	}
+#endif
 	else if(code == 'O' || code == 'o') {
 		xOffset = 0;
 		yOffset = -1;
