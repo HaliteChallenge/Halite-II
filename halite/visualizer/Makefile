@@ -3,7 +3,6 @@ SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=visualizer
 LDFLAGS= libGLEW.a `pkg-config --static --libs glfw3` -lGL -lpthread -lfreetype
-
 .PHONY: alls
 all: $(TARGET)
 
