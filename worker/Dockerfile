@@ -3,7 +3,7 @@
 # Based on Ubuntu
 ############################################################
 
-FROM chug/ubuntu14.04x64 
+FROM chug/ubuntu14.04x64
 MAINTAINER ASAD MEMON, OSMAN ALI
 
 # Update the repository sources list
@@ -33,7 +33,7 @@ RUN apt-get install -y gnustep-devel &&  sed -i 's/#define BASE_NATIVE_OBJC_EXCE
 RUN apt-get install -y sudo
 RUN apt-get install -y bc
 
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test 
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get -y dist-upgrade
@@ -41,8 +41,9 @@ RUN apt-get -y dist-upgrade
 # Libraries
 RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.9.0-cp34-cp34m-linux_x86_64.whl
 RUN apt-get install -y python3-numpy python3-scipy python3-dev python3-pip python3-nose g++ libblas-dev git
-RUN pip3 install Theano 
+RUN pip3 install Theano
 RUN git clone https://github.com/fchollet/keras.git
 WORKDIR keras/
 RUN python3 setup.py install
 WORKDIR ../
+RUN apt-get install -y python3-h5py
