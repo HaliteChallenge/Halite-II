@@ -212,7 +212,7 @@ class Sandbox:
 
 		"""
 		# Wait to make sure that the process is alive
-		time.sleep(0.2)
+		time.sleep(0.02)
 		if not self.is_alive:
 			timeout=0
 
