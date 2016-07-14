@@ -25,7 +25,7 @@
 pip3 install Theano
 
 git clone https://github.com/fchollet/keras.git
-cd Keras
+cd keras
 python3 setup.py install
 
 apt-get install -y python3-h5py</code></pre>
@@ -125,32 +125,34 @@ apt-get install -y python3-h5py</code></pre>
 
 					<pre>
 						<code>def getNNData():
-  inputs = []
-  correctOutputs = []
+inputs = []
+correctOutputs = []
 
-  gamePath = "replays"
+gamePath = "replays"
 
-  for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
-      mattID, frames, moves = loadGame(join(gamePath, filename))
-      maxProduction = 0
-      for y in range(frames[0].height):
-          for x in range(frames[0].width):
-              prod = frames[0].getSite(Location(x, y)).production
-              if prod > maxProduction:
-                  maxProduction = prod
-      for turnIndex in range(len(moves)):
-          gameMap = frames[turnIndex]
-          for y in range(gameMap.height):
-              for x in range(gameMap.width):
-                  loc = Location(x, y)
-                  if gameMap.getSite(loc).owner == mattID:
-                      box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
-                      nnInput = []
-                      for site in box:
-                          nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
-                      inputs.append(nnInput)
-                      correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
-  return inputs, correctOutputs
+for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
+    print("Loading " + filename)
+
+    mattID, frames, moves = loadGame(join(gamePath, filename))
+    maxProduction = 0
+    for y in range(frames[0].height):
+        for x in range(frames[0].width):
+            prod = frames[0].getSite(Location(x, y)).production
+            if prod > maxProduction:
+                maxProduction = prod
+    for turnIndex in range(len(moves)):
+        gameMap = frames[turnIndex]
+        for y in range(gameMap.height):
+            for x in range(gameMap.width):
+                loc = Location(x, y)
+                if gameMap.getSite(loc).owner == mattID:
+                    box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
+                    nnInput = []
+                    for site in box:
+                        nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
+                    inputs.append(nnInput)
+                    correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
+return inputs, correctOutputs
 						</code>
 					</pre>
 				</p>
@@ -164,21 +166,9 @@ apt-get install -y python3-h5py</code></pre>
 				<p>
 					Our neural network will use the hyperbolic tangent activation function for its input and hidden layers. We will restrict it to just one hidden layer. Its output layer will use the softmax activation function. We will use stochastic gradient descent as our training algorithm.
 
-					<pre><code>model = Sequential()
-model.add(Dense(24, input_dim=24))
-model.add(Activation('tanh'))
-model.add(Dense(24))
-model.add(Activation('tanh'))
-model.add(Dense(5))
-model.add(Activation('softmax'))
+					<pre><code>inputs, correctOutputs = getNNData()
 
-model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))</code></pre>
-				</p>
-
-				<p>
-					Now lets train our bot and evaluate it using simple cross validation.
-					<pre>
-						<code>inputs, correctOutputs = getNNData()
+print("Collected data")
 
 trainingInputs = inputs[:len(inputs)//2]
 trainingOutputs = correctOutputs[:len(correctOutputs)//2]
@@ -187,20 +177,20 @@ testInputs = inputs[len(inputs)//2:]
 testOutputs = correctOutputs[len(correctOutputs)//2:]
 
 model = Sequential()
-model.add(Dense(24, input_dim=24))
+model.add(Dense(24, input_shape=(24, )))
 model.add(Activation('tanh'))
 model.add(Dense(24))
 model.add(Activation('tanh'))
 model.add(Dense(5))
 model.add(Activation('softmax'))
 
+model.summary()
+
 model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
 
-model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs), show_accuracy=True)
+model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs))
 score = model.evaluate(testInputs, testOutputs, verbose=0)
-print(score)
-						</code>
-					</pre>
+print(score)</code></pre>
 				</p>
 
 				<p>
@@ -225,11 +215,14 @@ from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Activation
 from keras.optimizers import SGD, Adam, RMSprop
 
+import numpy as np
+
 myID, gameMap = getInit()
 
 model = model_from_json(open('my_model_architecture.json').read())
 model.load_weights('my_model_weights.h5')
 model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
+
 
 maxProduction = 0
 for y in range(gameMap.height):
@@ -238,7 +231,7 @@ for y in range(gameMap.height):
 		if prod > maxProduction:
 			maxProduction = prod
 
-sendInit("PythonBot")
+sendInit("MattCopy")
 
 while True:
 	moves = []
@@ -251,9 +244,19 @@ while True:
 				nnInput = []
 				for site in box:
 					nnInput += [1 if site.owner == myID else -1, float(site.strength / 255), float(site.production / maxProduction)]
-				print(len(nnInput))
+				nnInput = np.asarray(nnInput).reshape((1, 24))
+
 				output = model.predict(nnInput)[0]
-				moves.append(Move(loc, output.index(max(output))))
+
+				biggest = -222
+				direction = STILL
+				for d in range(len(output)):
+					if output[d] > biggest:
+						biggest = output[d]
+						direction = d
+				moves.append(Move(loc, direction))
+	sendFrame(moves)
+
 	sendFrame(moves)</code></pre>
 				</p>
 
