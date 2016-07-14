@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Game Rules</title>
+	<title>Machine Learning Tutorial</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -16,7 +16,7 @@
         <h1>Applying Machine Learning to Halite</h1>
 
         <h3>Overview</h3>
-        <p>We are going to show you a simple example of how machine learning applied to Halite. We will locally train a neural network to mimic Matt Aderth's current halite bot (as of July 13th) using the <a>Keras library</a>.</p>
+        <p>We are going to show you a simple example of how machine learning applied to Halite. We will locally train a neural network to mimic Matt Aderth's current halite bot (as of July 13th) using the <a href="http://keras.io">Keras library</a>.</p>
 
 				<h3>Installation</h3>
 				<p>
@@ -33,9 +33,8 @@ apt-get install -y python3-h5py</code></pre>
 
         <h3>Data Aquisition</h3>
 	      <p>
-					Here is an archive of about 500 games that Matt's bot participates in. We want load and parse these files into lists of `GameMap` objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
-					<pre>
-						<code>def loadGame(filename):
+					<a href="tutorials/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. We want load and parse these files into lists of `GameMap` objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
+					<pre><code>def loadGame(filename):
 	def bytesUntil(gameFile, endByte):
 	    byteArray = []
 	    byte = gameFile.read(1)
@@ -85,7 +84,7 @@ apt-get install -y python3-h5py</code></pre>
 	        frames.append(GameMap(width=width, height=height, numberOfPlayers=numPlayers))
 	        x = 0
 	        y = 0
-	        while y < height:
+	        while y &lt; height:
 	            numTiles = int.from_bytes(gameFile.read(1), byteorder='big')
 	            ownerID = int.from_bytes(gameFile.read(1), byteorder='big')
 
@@ -123,38 +122,35 @@ apt-get install -y python3-h5py</code></pre>
 				<p>
 					Now lets take all of our games (assumed to be in a folder called replays) and transform them to the input and ouptut schemes that we specified above:
 
-					<pre>
-						<code>def getNNData():
-inputs = []
-correctOutputs = []
+					<pre><code>def getNNData():
+	inputs = []
+	correctOutputs = []
 
-gamePath = "replays"
+	gamePath = "replays"
 
-for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
-    print("Loading " + filename)
+	for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
+		print("Loading " + filename)
 
-    mattID, frames, moves = loadGame(join(gamePath, filename))
-    maxProduction = 0
-    for y in range(frames[0].height):
-        for x in range(frames[0].width):
-            prod = frames[0].getSite(Location(x, y)).production
-            if prod > maxProduction:
-                maxProduction = prod
-    for turnIndex in range(len(moves)):
-        gameMap = frames[turnIndex]
-        for y in range(gameMap.height):
-            for x in range(gameMap.width):
-                loc = Location(x, y)
-                if gameMap.getSite(loc).owner == mattID:
-                    box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
-                    nnInput = []
-                    for site in box:
-                        nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
-                    inputs.append(nnInput)
-                    correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
-return inputs, correctOutputs
-						</code>
-					</pre>
+		mattID, frames, moves = loadGame(join(gamePath, filename))
+		maxProduction = 0
+		for y in range(frames[0].height):
+			for x in range(frames[0].width):
+				prod = frames[0].getSite(Location(x, y)).production
+				if prod > maxProduction:
+					maxProduction = prod
+		for turnIndex in range(len(moves)):
+			gameMap = frames[turnIndex]
+			for y in range(gameMap.height):
+				for x in range(gameMap.width):
+					loc = Location(x, y)
+					if gameMap.getSite(loc).owner == mattID:
+						box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
+						nnInput = []
+						for site in box:
+							nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
+						inputs.append(nnInput)
+						correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
+	return inputs, correctOutputs</code></pre>
 				</p>
 
 
@@ -281,7 +277,7 @@ while True:
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
+					<li class="previous"><a href="bfs_tutorial.php"><span aria-hidden="true">&larr;</span> BFS Tutorial </a></li>
 				</ul>
 			</div>
 		</div>

@@ -136,7 +136,7 @@ class ManagerAPI extends API{
 			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
 
 			// Pick map size
-			$sizes = array(20, 30, 40, 50);
+			$sizes = array(20, 30);
 			$size = $sizes[array_rand($sizes)];
 
 			// Send game task

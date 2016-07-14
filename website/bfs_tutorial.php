@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Build Environment</title>
+	<title>BFS Tutorial</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -129,8 +129,8 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-          <li class="previous"><a href="contest_spec.php"><span aria-hidden="true">&larr;</span> Contest Spec</a></li>
-					<li class="next"><a href="networking_spec.php">Networking Spec <span aria-hidden="true">&rarr;</span> </a></li>
+          <li class="previous"><a href="basic.php"><span aria-hidden="true">&larr;</span> Basic Bot Tutorial</a></li>
+					<li class="next"><a href="machine_learning_tutorial.php">Machine Learning Tutorial <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>
