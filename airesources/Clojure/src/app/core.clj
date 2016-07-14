@@ -3,11 +3,11 @@
 (import [io.halite Direction GameMap InitPackage Location Move Networking Site])
 
 (defn -main [& args]
-	(let [iPackage (Networking/getInit) myID (.-myID iPackage) gameMap (.-gameMap iPackage)]
+	(let [iPackage (Networking/getInit)]
 		(do
-			(Networking/sendInit "ClojureBot")
+			(println "ClojureBot\n")
 			(while true
-				(let [gameMap (Networking/getFrame)]
+				(let [ myID (.-myID iPackage) gameMap (Networking/getFrame)]
 
 						(loop [y 0 moves #{}]
 							(if (< y (.-height gameMap))
