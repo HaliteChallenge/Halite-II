@@ -3,6 +3,7 @@ from networking import *
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.optimizers import SGD, Adam, RMSprop
 
 from os import listdir, remove
 from os.path import join, isfile
@@ -24,6 +25,10 @@ def stringUntil(gameFile, endChar):
     return returnString
 
 def loadGame(filename):
+    mattID = None
+    frames = []
+    moves = []
+
     gameFile = open(filename, "rb")
     try:
         stringUntil(gameFile, "\n")
@@ -38,12 +43,10 @@ def loadGame(filename):
         numFrames = int(components.pop(0))
 
         # Get matt's playerID
-        mattID = None
         for playerID in range(1, numPlayers+1):
             name = stringUntil(gameFile, "\0")
-            if name == "aderth":
+            if name == "adereth":
                 mattID = playerID
-            print(name)
             stringUntil(gameFile, "\n")
 
         # Get production
@@ -51,10 +54,7 @@ def loadGame(filename):
         gameFile.read(1)
 
         # Get the frames and moves
-        frames = []
-        moves = []
         for frameIndex in range(numFrames-1):
-            print(frameIndex)
             # Frames
             frames.append(GameMap(width=width, height=height, numberOfPlayers=numPlayers))
             x = 0
@@ -74,7 +74,7 @@ def loadGame(filename):
                         if y == height:
                             break
             # Moves
-            moves.append({Location(index % width, math.floor(index/width)):int.from_bytes(gameFile.read(1), byteorder='big') for index in range(width*height)})
+            moves.append({(index % width, math.floor(index/width)):int.from_bytes(gameFile.read(1), byteorder='big') for index in range(width*height)})
     finally:
         gameFile.close()
     return mattID, frames, moves
@@ -85,7 +85,13 @@ def getNNData():
 
     gamePath = "replays"
 
+    num = 0
     for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
+        print(num)
+        num += 1
+        if num > 50:
+            break
+
         mattID, frames, moves = loadGame(join(gamePath, filename))
         maxProduction = 0
         for y in range(frames[0].height):
@@ -102,15 +108,23 @@ def getNNData():
                         box = [gameMap.getSite(gameMap.getLocation(loc, NORTH), WEST), gameMap.getSite(loc, NORTH), gameMap.getSite(gameMap.getLocation(loc, NORTH), EAST), gameMap.getSite(loc, EAST), gameMap.getSite(gameMap.getLocation(loc, SOUTH), EAST), gameMap.getSite(loc, SOUTH), gameMap.getSite(gameMap.getLocation(loc, SOUTH), WEST), gameMap.getSite(loc, WEST)]
                         nnInput = []
                         for site in box:
-                            nnINput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
-                        inputs.append(nnINput)
-
-                        correctOutputs.append([1 if a == moves[frameIndex][loc] else 0 for a in range(5)])
+                            nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
+                        inputs.append(nnInput)
+                        correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
+    return inputs, correctOutputs
 def trainModel():
     inputs, correctOutputs = getNNData()
 
+    print("Collected data")
+
+    trainingInputs = inputs[:len(inputs)//2]
+    trainingOutputs = correctOutputs[:len(correctOutputs)//2]
+
+    testInputs = inputs[len(inputs)//2:]
+    testOutputs = correctOutputs[len(correctOutputs)//2:]
+
     model = Sequential()
-    model.add(Dense(24))
+    model.add(Dense(24, input_shape=(24, )))
     model.add(Activation('tanh'))
     model.add(Dense(24))
     model.add(Activation('tanh'))
@@ -119,4 +133,12 @@ def trainModel():
 
     model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True))
 
-print(getNNData())
+    model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs), show_accuracy=True)
+    score = model.evaluate(testInputs, testOutputs, verbose=0)
+    print(score)
+
+    json_string = model.to_json()
+    open('my_model_architecture.json', 'w').write(json_string)
+    model.save_weights('my_model_weights.h5')
+
+trainModel()
