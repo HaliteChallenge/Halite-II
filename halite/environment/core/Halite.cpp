@@ -28,6 +28,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
+	std::vector< std::vector<unsigned char> > moveDirections(game_map.map_height, std::vector<unsigned char>(game_map.map_width, 0));
+
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	std::vector<unsigned short> permissibleTime(number_of_players, false);
 	threadLocation = 0; //Represents place in frameThreads.
@@ -64,6 +66,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			}
 			//Update full caridnal count.
 			else full_cardinal_count[a]++;
+
+			//Update moves
+			moveDirections[b->loc.y][b->loc.x] = b->dir;
 
 			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
 			if(pieces[a].count(newLoc)) {
@@ -188,7 +193,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
+	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 2.25);
+	for(auto a = moveDirections.begin(); a != moveDirections.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+		turn->push_back(*b);
+	}
 	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
 	std::list<unsigned char> strengths;
 	short numPieces = 0;
@@ -393,7 +401,7 @@ void Halite::output(std::string filename) {
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
 	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 8" << F_NEWLINE;
+	gameFile << "HLT 9" << F_NEWLINE;
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		Color c = color_codes[a + 1];

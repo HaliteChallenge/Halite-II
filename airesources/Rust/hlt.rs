@@ -1,11 +1,11 @@
 
-const STILL: u8 = 0;
-const NORTH: u8 = 1;const EAST: u8 = 2;
-const SOUTH: u8 = 3;
-const WEST: u8 = 4;
+pub const STILL: u8 = 0;
+pub const NORTH: u8 = 1;const EAST: u8 = 2;
+pub const SOUTH: u8 = 3;
+pub const WEST: u8 = 4;
 
-const DIRECTIONS: [u8; 5] = [STILL, NORTH, EAST, SOUTH, WEST];
-const CARDINALS: [u8; 4] = [NORTH, EAST, SOUTH, WEST];
+pub const DIRECTIONS: [u8; 5] = [STILL, NORTH, EAST, SOUTH, WEST];
+pub const CARDINALS: [u8; 4] = [NORTH, EAST, SOUTH, WEST];
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq, PartialOrd, Ord, Debug)]
 pub struct Location {
@@ -22,17 +22,17 @@ pub struct Site {
 
 #[derive(Clone, Debug)]
 pub struct GameMap {
-	pub contents: Vec< Vec<Site> >,
 	pub width: u16, //Number of columns.
 	pub height: u16, //Number of rows.
+	pub contents: Vec< Vec<Site> >,
 }
 
-trait GameMapUtils {
+pub trait GameMapUtils {
 	fn in_bounds(&self, l: Location) -> bool;
 	fn get_distance(&self, l1: Location, l2: Location) -> u16;
 	fn get_angle(&self, l1: Location, l2: Location) -> f64;
 	fn get_location(&self, l: Location, d: u8) -> Location;
-	fn get_site(&self, l: Location, d: u8) -> &Site;
+	fn get_site(&mut self, l: Location, d: u8) -> &mut Site;
 }
 
 impl GameMapUtils for GameMap {
@@ -72,8 +72,8 @@ impl GameMapUtils for GameMap {
     	}
     	loc
     }
-    fn get_site(&self, l: Location, d: u8) -> &Site {
+    fn get_site(&mut self, l: Location, d: u8) -> &mut Site {
     	let loc = self.get_location(l, d);
-    	&self.contents[l.y as usize][l.x as usize]
+    	&mut self.contents[l.y as usize][l.x as usize]
     }
 }
