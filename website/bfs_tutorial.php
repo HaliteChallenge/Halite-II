@@ -130,8 +130,6 @@ for(int y = 0; y < gameMap.height; y++) {
 		<pre><code>Networking.sendFrame(moves);</code></pre>
 		</p>
 
-		<p>Click here to download the full source</p>
-
 	</div>
 
 	<footer class="footer pageContent">

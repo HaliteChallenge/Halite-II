@@ -203,8 +203,7 @@ model.save_weights('my_model_weights.h5')</code></pre>
 
 				<p>
 					Here is our complete bot source:
-					<pre>
-						<code>from hlt import *
+					<pre><code>from hlt import *
 from networking import *
 
 from keras.models import Sequential, model_from_json
@@ -251,8 +250,6 @@ while True:
 						biggest = output[d]
 						direction = d
 				moves.append(Move(loc, direction))
-	sendFrame(moves)
-
 	sendFrame(moves)</code></pre>
 				</p>
 
