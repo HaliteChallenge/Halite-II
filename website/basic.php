@@ -15,6 +15,8 @@
 			<div class="col-sm-12">
 				<h1>Basic Bot Tutorial</h1>
 
+				<p>The source code for each basic bot is located in the <a href="downloads.php">starter packages</a>.</p>
+
 				<h3>Prerequisites</h3>
 				<p>It is highly recommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a> before following this tutorial.</p>
 
