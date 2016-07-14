@@ -47,81 +47,88 @@ ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
 gameMap = Networking.getFrame();
 		</code></pre>
 
-		<p>Next we'll add the structures we'll need for our breadth-first search.
-		<ul>
-			<li>This is our map of which squares we've visited. Whenever we add another location to the queue, we'll mark it as visited here so we don't add squares multiple times.
-			<code>ArrayList&lt; ArrayList&lt;Boolean> > visited = new ArrayList&lt; ArrayList&lt;Boolean> >();
-			for(int y = 0; y < gameMap.height; y++) {
-				ArrayList&lt;Boolean> vRow = new ArrayList&lt;Boolean>();
-				for(int x = 0; x < gameMap.width; x++) {
-					vRow.add(false);
-				}
-				visited.add(vRow);
-			}</code></li>
-			<li>Here we initialize our map of directions. Whenever we add a location to the queue, we'll set the direction here to be the one that points towards the location we popped off of the queue that it was adjacent to.
-			<code>ArrayList&lt; ArrayList&lt;Direction> > directions = new ArrayList&lt;ArrayList&lt;Direction> >();
-			for(int y = 0; y < gameMap.height; y++) {
-				ArrayList&lt;Direction> dRow = new ArrayList&lt;Direction>();
-				for(int x = 0; x < gameMap.width; x++) {
-					dRow.add(Direction.STILL);
-				}
-				directions.add(dRow);
-			}</code></li>
-			<li>Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
-			<code>LinkedList<Location> toVisit = new LinkedList<Location>();</code><--- LinkedList just happens to be a structure which implements queue; there are others that would work as well.<code>
-			for(int y = 0; y < gameMap.height; y++) {
-				for(int x = 0; x < gameMap.width; x++) {
-					Location l = new Location(x, y);
-					Site site = gameMap.getSite(l);
-					if(site.owner != myID) {
-						toVisit.add(l);
-						visited.get(y).set(x, true);
-					}
-				}
-			}</code></li>
-		</ul>
+		<p>Next we'll add the structures we'll need for our breadth-first search.</p>
+		<p>
+			This is our map of which squares we've visited. Whenever we add another location to the queue, we'll mark it as visited here so we don't add squares multiple times.
+			<pre><code>ArrayList&lt; ArrayList&lt;Boolean> > visited = new ArrayList&lt; ArrayList&lt;Boolean> >();
+for(int y = 0; y < gameMap.height; y++) {
+	ArrayList&lt;Boolean> vRow = new ArrayList&lt;Boolean>();
+	for(int x = 0; x < gameMap.width; x++) {
+		vRow.add(false);
+	}
+	visited.add(vRow);
+}</code></pre>
+			</p>
+
+			<p>
+				Here we initialize our map of directions. Whenever we add a location to the queue, we'll set the direction here to be the one that points towards the location we popped off of the queue that it was adjacent to.
+				<pre><code>ArrayList&lt; ArrayList&lt;Direction> > directions = new ArrayList&lt;ArrayList&lt;Direction> >();
+for(int y = 0; y < gameMap.height; y++) {
+	ArrayList&lt;Direction> dRow = new ArrayList&lt;Direction>();
+	for(int x = 0; x < gameMap.width; x++) {
+		dRow.add(Direction.STILL);
+	}
+	directions.add(dRow);
+}</code></pre>
+			</p>
+
+			<p>
+				Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
+			<pre><code>LinkedList&lt;Location> toVisit = new LinkedList&lt;Location>(); // LinkedList just happens to be a structure which implements queue; there are others that would work as well.
+for(int y = 0; y < gameMap.height; y++) {
+	for(int x = 0; x < gameMap.width; x++) {
+		Location l = new Location(x, y);
+		Site site = gameMap.getSite(l);
+		if(site.owner != myID) {
+			toVisit.add(l);
+			visited.get(y).set(x, true);
+		}
+	}
+}</code></pre>
+
 		</p>
 
 		<p>Next we'll need to actually use this to direct our pieces. So, we'll continually pop off of the front of the queue, add the adjacent unvisited pieces, mark their directions and them as visited, and ensure that the queue isn't empty.
-		<code>while(!toVisit.isEmpty()) {
-			Location l = toVisit.remove();
-			visited.get(l.y).set(l.x, true);
-			Location n = gameMap.getLocation(l, Direction.NORTH), e = gameMap.getLocation(l, Direction.EAST), s = gameMap.getLocation(l, Direction.SOUTH), w = gameMap.getLocation(l, Direction.WEST);
-			if(!visited.get(n.y).get(n.x)) {
-				toVisit.add(n);
-				visited.get(n.y).set(n.x, true);
-				directions.get(n.y).set(n.x, Direction.SOUTH);
-			}
-			if(!visited.get(e.y).get(e.x)) {
-				toVisit.add(e);
-				visited.get(e.y).set(e.x, true);
-				directions.get(e.y).set(e.x, Direction.WEST);
-			}
-			if(!visited.get(s.y).get(s.x)) {
-				toVisit.add(s);
-				visited.get(s.y).set(s.x, true);
-				directions.get(s.y).set(s.x, Direction.NORTH);
-			}
-			if(!visited.get(w.y).get(w.x)) {
-				toVisit.add(w);
-				visited.get(w.y).set(w.x, true);
-				directions.get(w.y).set(w.x, Direction.EAST);
-			}
-		}</code></p>
+		<pre><code>while(!toVisit.isEmpty()) {
+	Location l = toVisit.remove();
+	visited.get(l.y).set(l.x, true);
+	Location n = gameMap.getLocation(l, Direction.NORTH), e = gameMap.getLocation(l, Direction.EAST), s = gameMap.getLocation(l, Direction.SOUTH), w = gameMap.getLocation(l, Direction.WEST);
+	if(!visited.get(n.y).get(n.x)) {
+		toVisit.add(n);
+		visited.get(n.y).set(n.x, true);
+		directions.get(n.y).set(n.x, Direction.SOUTH);
+	}
+	if(!visited.get(e.y).get(e.x)) {
+		toVisit.add(e);
+		visited.get(e.y).set(e.x, true);
+		directions.get(e.y).set(e.x, Direction.WEST);
+	}
+	if(!visited.get(s.y).get(s.x)) {
+		toVisit.add(s);
+		visited.get(s.y).set(s.x, true);
+		directions.get(s.y).set(s.x, Direction.NORTH);
+	}
+	if(!visited.get(w.y).get(w.x)) {
+		toVisit.add(w);
+		visited.get(w.y).set(w.x, true);
+		directions.get(w.y).set(w.x, Direction.EAST);
+	}
+}</code></pre></p>
 
 		<p>Next, we'll go through the map. If a piece's strength is too low, we won't move it; else we'll move it as given to by our directions map.
-		<code>for(int y = 0; y < gameMap.height; y++) {
-			for(int x = 0; x < gameMap.width; x++) {
-				Site site = gameMap.getSite(new Location(x, y));
-				if(site.owner == myID) {
-					if(site.strength > 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
-					else moves.add(new Move(new Location(x, y), Direction.STILL));
-				}
-			}
-		}</code></p>
+		<pre><code>for(int y = 0; y < gameMap.height; y++) {
+	for(int x = 0; x < gameMap.width; x++) {
+		Site site = gameMap.getSite(new Location(x, y));
+		if(site.owner == myID) {
+			if(site.strength > 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
+			else moves.add(new Move(new Location(x, y), Direction.STILL));
+		}
+	}
+}</code></pre></p>
 
 		<p>Finally, we'll send our moves.
-		<code>Networking.sendFrame(moves);</code></p>
+		<pre><code>Networking.sendFrame(moves);</code></pre>
+		</p>
 
 		<p>Click here to download the full source</p>
 
