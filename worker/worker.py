@@ -103,8 +103,6 @@ def runGame(width, height, users):
 		print(line)
 		output.append(line)
 
-	if output[-1].isspace() and output[-2].isspace():
-		output.pop(-1)
 	return output
 
 def parseGameOutput(output, users):
