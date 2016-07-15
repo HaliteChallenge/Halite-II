@@ -63,7 +63,7 @@
         <p>
           The following versions of each language are supported:
           <ul>
-            <li>Java 7+</li>
+            <li>Java 7</li>
             <li>Python 3.4.3</li>
             <li>C++ 11</li>
           </ul>

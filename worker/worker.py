@@ -76,7 +76,7 @@ def executeCompileTask(user, backend):
 	else:
 		print("Bot did not compile")
 		print(str(errors))
-		sendEmail("Halite Bot Compilation Error", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \""+language+".\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7+, and <code>py</code> for Python3. Please make sure that your <b>main file is named MyBot</b> (not main, not BasicBot).</p> <b>Here is a description of the compilation error</b>:<br><pre><code>"+"<br>".join(errors)+"</code></pre>", user["email"])
+		sendEmail("Halite Bot Compilation Error", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \""+language+".\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, and <code>py</code> for Python3. Please make sure that your <b>main file is named MyBot</b> (not main, not BasicBot).</p> <b>Here is a description of the compilation error</b>:<br><pre><code>"+"<br>".join(errors)+"</code></pre>", user["email"])
 	backend.compileResult(int(user["userID"]), didCompile, language)
 	shutil.rmtree(workingPath)
 
