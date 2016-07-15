@@ -64,6 +64,8 @@ def executeCompileTask(user, backend):
 	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
 		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
 		bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
+		os.mkdir(bufferFolder)
+
 		for filename in os.listdir(singleFolder):
     			shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
 		os.rmdir(singleFolder)
