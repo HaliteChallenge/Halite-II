@@ -18,13 +18,7 @@
 				<h3>Environment and Visualizer</h3>
 				<h4>Changelog</h4>
 				<p>
-					This set of binaries was uploaded at <b>noon EST on July 12th</b>. Changes include:
-					<ul>
-						<li>Dynamic timeouts: instead of getting a second per turn, you will get fifty milliseconds plus half a millisecond per tile per turn. Example: on a 40 by 40 map, you will get 850 milliseconds per turn.</li>
-						<li>A production graph in the visualizer</li>
-						<li>Extensive visualizer logging: if you have problems with the visualizer, run it with the <code>-v</code> argument and send us the <code>debug.log</code> file that it outputs.</li>
-					</ul>
-
+					This set of binaries was uploaded on <b>the morning of EST on July 14th</b>. We fixed the Mac binary.
 				</p>
 				<h4>Downloads</h4>
 				<p>
@@ -37,7 +31,7 @@
 
 				<h3>Language Packages</h3>
 				<h4>Changelog</h4>
-				<p>This set of starter packages was uploaded at <b>noon EST on July 12th</b>. We standardized the starter packages naming scheme and changed getDistance to consider Manhattan distance.</p>
+				<p>This set of starter packages was uploaded at <b>3:30 EST on July 15th</b>. We added the Rust starter package.</p>
 
 				<h4>Downloads</h4>
 				<p>
@@ -45,6 +39,7 @@
 						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
 						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7</a></li>
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.1</a></li>
 					</ul>
 				</p>
 			</div>
