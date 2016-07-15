@@ -195,7 +195,7 @@ class WebsiteAPI extends API {
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
-			$user = $this->select("SELECT * FROM User WHERE userID={$userID} and password='{$password}'");
+			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
@@ -205,7 +205,9 @@ class WebsiteAPI extends API {
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1 WHERE userID = $userID");
-			$this->insert("INSERT INTO Bot (userID, name) VALUES ($userID, '{$user['username']} v{$user['numSubmissions']}')");
+
+			$numSubmissionsArray = $this->select("SELECT numSubmissions FROM User WHERE userID = $userID");
+			$this->insert("INSERT INTO Bot (userID, versionNumber) VALUES ($userID, {$numSubmissionsArray['numSubmissions']})");
 
 			return "Success";
 		}

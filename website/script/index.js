@@ -27,6 +27,14 @@ $(function() {
 	};
 
 	var bots = getActiveBots();
+	var users = getVerifiedUsers();
+	for(var botIndex = 0; botIndex < bots.length; botIndex++) {
+		for(var userIndex = 0; userIndex < users.length; userIndex++) {
+			if(users[userIndex].userID == bots[botIndex].userID) {
+				bots[botIndex].name = users[userIndex].username + " v" + bots[botIndex].versionNumber;
+			}
+		}
+	}
 	table.init(bots);
 
 	if(getGET("userID") != null && getGET("verificationCode") != null) {
