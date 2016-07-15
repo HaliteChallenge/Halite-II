@@ -1,13 +1,7 @@
 use hlt::types;
 
-use hlt::types::Location;
-use hlt::types::Site;
-use hlt::types::GameMap;
-
 use std::io;
-use std::collections;
 use std::collections::HashMap;
-use std::string;
 use std::io::Write;
 use std::str::FromStr;
 
@@ -15,10 +9,10 @@ use std::str::FromStr;
 static mut _width: u16 = 0;
 static mut _height: u16 = 0;
 
-fn serialize_move_set(moves: HashMap<Location, u8>) -> String {
+fn serialize_move_set(moves: HashMap<types::Location, u8>) -> String {
 	let mut s: String = String::new();
 	for (l, d) in moves {
-		s = format!("{}{}{}{}{}{}{}", s, l.x.to_string(), " ", l.y.to_string(), " ", d.to_string(), " ");
+		s = format!("{}{} {} {} ", s, l.x, l.y, d);
 	}
 	s
 }
@@ -37,13 +31,13 @@ fn deserialize_productions(s: String) -> types::GameMap {
 	unsafe {
 		gmp.width = _width;
 		gmp.height= _height;
-		gmp.contents.resize(gmp.height as usize, Vec::new());
-		let mut loc = 0;
-		for y in 0.._height {
-			for x in 0.._width {
-				gmp.contents[y as usize].push(types::Site { owner: 0, strength: 0, production: u8::from_str(splt[loc]).unwrap() });
-				loc += 1;
-			}
+	}
+	gmp.contents.resize(gmp.height as usize, Vec::new());
+	let mut loc = 0;
+	for v in &mut gmp.contents {
+		for x in 0..gmp.width {
+			v.push(types::Site { owner: 0, strength: 0, production: u8::from_str(splt[loc]).unwrap() });
+			loc += 1;
 		}
 	}
 	gmp
@@ -58,7 +52,7 @@ fn deserialize_map(s: String, gmp: &mut types::GameMap) -> () {
 		for a in 0.._height {
 			for b in 0.._width {
 				if counter == 0 {
-					counter = u8::from_str(splt[loc]).unwrap();
+					counter = u16::from_str(splt[loc]).unwrap();
 					loc += 1;
 					owner = u8::from_str(splt[loc]).unwrap();
 					loc += 1;
@@ -83,10 +77,7 @@ fn send_string(s: String) -> () {
 }
 
 fn get_string() -> String {
-	let mut s = String::new();
-	io::stdin().read_line(&mut s);
-	s = s.trim().to_string();
-	s
+	read!("{}\n")
 }
 
 pub fn get_init() -> (u8, types::GameMap) {
