@@ -76,9 +76,18 @@ function getUser(userID, username, password) {
 	return result.responseJSON;
 }
 
-function getActiveUsers() {
-	var result = $.ajax({
+function getVerifiedUsers() {
+	return $.ajax({
 		url: url+"user",
+		async: false,
+		method: "GET",
+		data: {isVerified: 1}
+	});
+}
+
+function getActiveBots() {
+	var result = $.ajax({
+		url: url+"bot",
 		async: false,
 		method: "GET",
 		data: {active: 1}
@@ -88,12 +97,12 @@ function getActiveUsers() {
 	return result.responseJSON;
 }
 
-function getLatestGamesForUser(userID, limit) {
+function getLatestGamesForBot(botID, limit) {
 	var result = $.ajax({
 		url: url+"game",
 		async: false,
 		method: "GET",
-		data: {userID: userID, limit: limit}
+		data: {botID: botID, limit: limit}
 	});
 	return result.responseJSON;
 }
@@ -125,21 +134,21 @@ function verifyUser(userID, verificationCode) {
 	}).responseJSON;
 }
 
-function getNumActiveUsers() {
+function getNumActiveBots() {
 	return $.ajax({
-		url: url+"user",
+		url: url+"bot",
 		async: false,
 		method: "GET",
 		data: {numActive: 1}
 	}).responseJSON;
 }
 
-function getExtraStats(userID) {
+function getBot(botID) {
 	return $.ajax({
-		url: url+"extraStats",
+		url: url+"bot",
 		async: false,
 		method: "GET",
-		data: {userID: userID}
+		data: {botID: botID}
 	}).responseJSON;
 }
 
