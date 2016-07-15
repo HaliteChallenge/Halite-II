@@ -6,7 +6,7 @@ define("REPLAYS_DIR", "../storage/replays/");
 define("BOTS_DIR", "../storage/bots/");
 define("INI_FILE", "../halite.ini");
 
-class ManagerAPI extends API {
+class ManagerAPI extends API{
 
 	private $mysqli = NULL;
 	private $apiKey = NULL;
@@ -46,9 +46,9 @@ class ManagerAPI extends API {
 		}
 	}
 
-	// Returns the directory that holds a bot, given the bot's botID
-	private function getBotFile($botID) {
-		return BOTS_DIR."{$botID}.zip";
+	// Returns the directory that holds a bot, given the bot's userID
+	private function getBotFile($userID) {
+		return BOTS_DIR."{$userID}.zip";
 	}
 
 	private function getTrueskillMatchQuality($rankingValues) {
@@ -56,9 +56,9 @@ class ManagerAPI extends API {
 			return $a['rank'] < $b['rank'];
 		});
 		$rankings = array();
-		foreach($rankingValues as $bot) {
-			array_push($rankings, $bot['mu']);
-			array_push($rankings, $bot['sigma']);
+		foreach($rankingValues as $user) {
+			array_push($rankings, $user['mu']);
+			array_push($rankings, $user['sigma']);
 		}
 		exec("python3 trueskillMatchQuality.py ".implode(' ', $rankings), $lines);
 		return floatval($lines[0]);
@@ -110,18 +110,30 @@ class ManagerAPI extends API {
 	protected function task() {
 		if($this->method == 'GET') {
 			// Check for compile tasks
-			$needToBeCompiled = $this->select("SELECT * FROM Bot WHERE compileStatus = 0 ORDER BY botID ASC");
+			$needToBeCompiled = $this->select("SELECT * FROM User WHERE status = 1 ORDER BY userID ASC");
 			if(count($needToBeCompiled) > 0) {
-				$this->insert("UPDATE Bot SET compileStatus = 1 WHERE botID = {$needToBeCompiled['botID']}");
+				$this->insert("UPDATE User SET status = 2 WHERE userID = {$needToBeCompiled['userID']}");
 				return array(
 					"type" => "compile",
-					"bot" => $needToBeCompiled);
+					"user" => $needToBeCompiled);
 			}
 
 			// Assign a run game tasks
 			$possibleNumPlayers = array(2, 3, 4, 5);
 			$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
-			$players = $this->selectMultiple("SELECT * FROM Bot WHERE compileStatus = 2 ORDER BY rand() LIMIT $numPlayers");
+
+			/*$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
+			$differenceInRank = rand(3, 10);
+			$possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE userID!={$seedPlayer['userID']} and status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
+			usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
+				return $this->getTrueskillMatchQuality(array($a, $seedPlayer)) < $this->getTrueskillMatchQuality(array($b, $seedPlayer));
+			});
+
+			$players = array($seedPlayer);
+			for($a = 0; $a < $numPlayers-1; $a++) {
+				array_push($players, $possiblePlayers[$a]);
+			}*/
+			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
 
 			// Pick map size
 			$sizes = array(20, 30);
@@ -133,7 +145,7 @@ class ManagerAPI extends API {
 					"type" => "game",
 					"width" => $size,
 					"height" => $size,
-					"bots" => $players
+					"users" => $players
 				);
 			}
 		}
@@ -142,29 +154,33 @@ class ManagerAPI extends API {
 	// Allow worker to post the result of their compilation
 	protected function compile() {
 		var_dump($_POST);
-		if(isset($_POST['botID']) && isset($_POST['didCompile'])) {
+		if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
 			$this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=$this->apiKey");
 
-			$botID = $_POST['botID'];
+			$userID = $_POST['userID'];
 			$didCompile = $_POST['didCompile'];
 
 			if($didCompile == 1) {
 				$language = isset($_POST['language']) ? $_POST['language'] : "Other";
-				$this->insert("UPDATE Bot SET compileStatus = 2, language = '$language' WHERE botID = $botID");
+				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 			} else {
-				$this->insert("DELETE FROM Bot WHERE botID = $botID");
+				$this->insert("UPDATE User SET status = 0 WHERE userID = $userID");
 			}
 		}
 	}
 
 	// Allow workers to post the result of their game
 	protected function game() {
-		if(isset($_POST['bots']) && count($_FILES) > 0) {
+		var_dump($_FILES);
+		var_dump($_POST);
+		// Each user in users must have a rank, playerIndex, mu, sigma, and userID
+		if(isset($_POST['users']) && count($_FILES) > 0) {
 			$this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=$this->apiKey");
 
 			$mapWidth = $_POST['mapWidth'];
 			$mapHeight = $_POST['mapHeight'];
-			$bots = json_decode($_POST['bots']);
+			$users = json_decode($_POST['users']);
+			var_dump($users);
 
 			// Store replay file
 			$fileKey = array_keys($_FILES)[0];
@@ -201,24 +217,9 @@ class ManagerAPI extends API {
 			if($numToDelete > 0) {
 				$gamesToDelete = $this->selectMultiple("SELECT gameID FROM Game ORDER BY gameID LIMIT $numToDelete");
 				foreach($gamesToDelete as $game) {
-					$this->insert("DELETE FROM GameBot WHERE gameID={$game['gameID']}");
+					$this->insert("DELETE FROM GameUser WHERE gameID={$game['gameID']}");
 					$this->insert("DELETE FROM Game WHERE gameID={$game['gameID']}");
 				}
-			}
-
-			// Update mu and sigma
-			usort($bots, function($a, $b) { return $a->rank > $b->rank; });
-			$commandArgs = array();
-			foreach($bots as $bot) {
-				array_push($commandArgs, $bot->mu);
-				array_push($commandArgs, $bot->sigma);
-			}
-			exec("python3 updateTrueskill.py ".implode(' ', $commandArgs), $lines);
-			for($a = 0; $a < count($bots); $a++) {
-				$components = explode(' ', $lines[$a]);
-				$bots['mu'] = $components[0];
-				$bots['sigma'] = $components[1];
-				$this->insert("UPDATE Bot SET mu={$components[0]}, sigma={$components[1]} WHERE botID={$bots[$a]->botID}");
 			}
 
 			// Store game information in db
@@ -227,13 +228,13 @@ class ManagerAPI extends API {
 			$gameID = $gameIDArray['gameID'];
 
 			// Update each participant's stats
-			$allBots = $this->selectMultiple("SELECT * FROM Bot");
-			for($a = 0; $a < count($bots); $a++) {
-				$didTimeout = $bots[$a]->didTimeout ? 1 : 0;
-				$this->insert("INSERT INTO GameBot (gameID, botID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$bots[$a]->botID}, {$bots[$a]->rank}, {$bots[$a]->playerTag}, {$bots[$a]->territoryAverage}, {$bots[$a]->strengthAverage}, {$bots[$a]->productionAverage}, {$bots[$a]->stillPercentage}, {$bots[$a]->turnTimeAverage}, {$didTimeout})");
+			$allUserExtras = $this->selectMultiple("SELECT * FROM UserExtraStats");
+			for($a = 0; $a < count($users); $a++) {
+				$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
+				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
 
 				// Cache raw game stats
-				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameBot WHERE botID={$bots[$a]->botID}");
+				$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameUser WHERE userID={$users[$a]->userID}");
 				$totalGameStats = array();
 				foreach($gameStats as $oneGameStats) {
 					foreach($oneGameStats as $statName => $statValue) {
@@ -245,36 +246,54 @@ class ManagerAPI extends API {
 				}
 				foreach($totalGameStats as $statName => $totalStatValue) {
 					$averageStatValue = $totalStatValue / count($gameStats);
-					$this->insert("UPDATE Bot SET $statName=$averageStatValue WHERE botID = {$bots[$a]->botID}");
+					$this->insert("UPDATE UserExtraStats SET $statName=$averageStatValue WHERE userID = {$users[$a]->userID}");
 				}
 
 				// Game game stat rankings
 				$statToRankedStat = array("territoryAverage" => "territoryRanking", "strengthAverage" => "strengthRanking", "productionAverage" => "productionRanking", "stillPercentage" => "stillRanking", "turnTimeAverage" => "turnTimeRanking", "didTimeout" => "timeoutRanking");
 				foreach($statToRankedStat as $statName => $rankedStatName) {
-					usort($allBots, function($bot1, $bot2) use ($statName) {
-						return $bot1[$statName] < $bot2[$statName];
+					usort($allUserExtras, function($a, $b) use ($statName) {
+						return $a[$statName] < $b[$statName];
 					});
 					$rank = 100000;
-					for($b = 0; $b < count($allBots); $b++) {
-						if($allBots[$b]['botID'] == $bots[$a]->botID) {
+					for($b = 0; $b < count($allUserExtras); $b++) {
+						if($allUserExtras[$b]['userID'] == $users[$a]->userID) {
 							$rank = $b+1;
 							break;
 						}
 					}
-					$this->insert("UPDATE Bot SET {$rankedStatName}={$rank} WHERE botID = {$bots[$a]->botID}");
+					echo "UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}\n";
+					$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}");
 				}
 
 				// Add to other stats
-				$this->insert("UPDATE Bot SET numGames=numGames+1, mu = {$bots[$a]->mu}, sigma = {$bots[$a]->sigma} WHERE botID = {$bots[$a]->botID}");
+				$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
+			}
+
+			// Update mu and sigma
+			usort($users, function($a, $b) {
+				return $a->rank > $b->rank;
+			});
+			$rankings = array();
+			foreach($users as $user) {
+				array_push($rankings, $user->mu);
+				array_push($rankings, $user->sigma);
+			}
+			exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
+			var_dump($lines);
+			for($a = 0; $a < count($users); $a++) {
+				$components = explode(' ', $lines[$a]);
+				$this->insert("UPDATE User SET mu={$components[0]}, sigma={$components[1]} WHERE userID={$users[$a]->userID}");
 			}
 
 			// Update overall rank
-			usort($allBots, function($bot1, $bot2) {
-				return $bot1['mu']-3*$bot1['sigma'] < $bot2['mu']-3*$bot2['sigma'];
+			$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
+			usort($allUsers, function($a, $b) {
+				return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
 			});
-			for($botIndex = 0; $botIndex < count($allBots); $botIndex++) {
-				$rank = $botIndex+1;
-				$this->insert("UPDATE Bot SET rank={$rank} WHERE botID={$allBots[$botIndex]['botID']}");
+			for($userIndex = 0; $userIndex < count($allUsers); $userIndex++) {
+				$rank = $userIndex+1;
+				$this->insert("UPDATE User SET rank={$rank} WHERE userID={$allUsers[$userIndex]['userID']}");
 			}
 
 		}
@@ -282,22 +301,22 @@ class ManagerAPI extends API {
 
 	// Allow workers to download and post bot files
 	protected function botFile() {
-		if(isset($_GET['botID'])) {
-			$botID = $_GET['botID'];
+		if(isset($_GET['userID'])) {
+			$userID = $_GET['userID'];
 
-			header("Content-disposition: attachment; filename={$botID}.zip");
+			header("Content-disposition: attachment; filename={$userID}.zip");
 			header("Content-type: application/zip");
 
 			ob_clean();
 			flush();
-			readfile($this->getBotFile($botID));
+			readfile($this->getBotFile($userID));
 			exit;
-		} else if(isset($_POST['botID']) && count($_FILES) > 0) {
-			$botID = $_POST['botID'];
+		} else if(isset($_POST['userID']) && count($_FILES) > 0) {
+			$userID = $_POST['userID'];
 			$key = array_keys($_FILES)[0];
 			$name = basename($_FILES[$key]['name']);
 
-			$targetPath = BOTS_DIR."{$botID}.zip";
+			$targetPath = BOTS_DIR."{$userID}.zip";
 			move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 		} else {
 			return NULL;
@@ -308,9 +327,9 @@ class ManagerAPI extends API {
 
 	// Allow workers to get the hash of a bot file so that they know that they downloaded the file correctly
 	protected function botHash() {
-		if(isset($_GET['botID'])) {
-			$botID = $_GET['botID'];
-			if(file_exists($this->getBotFile($botID))) return array("hash" => md5_file($this->getBotFile($botID)));
+		if(isset($_GET['userID'])) {
+			$userID = $_GET['userID'];
+			if(file_exists($this->getBotFile($userID))) return array("hash" => md5_file($this->getBotFile($userID)));
 			else return "Bot file does not exist";
 		}
 	}
