@@ -35,12 +35,12 @@ CREATE TABLE `Game` (
 -- Table structure for table `GameUser`
 --
 
-DROP TABLE IF EXISTS `GameUser`;
+DROP TABLE IF EXISTS `GameBot`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `GameUser` (
+CREATE TABLE `GameBot` (
   `gameID` mediumint(8) unsigned NOT NULL,
-  `userID` mediumint(8) unsigned NOT NULL,
+  `botID` mediumint(8) unsigned NOT NULL,
   `rank` smallint(5) unsigned NOT NULL,
   `playerIndex` smallint(5) unsigned NOT NULL,
   `territoryAverage` float(8,5) NOT NULL,
@@ -63,29 +63,34 @@ CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(20) NOT NULL,
   `password` varchar(30) NOT NULL,
-  `status` smallint(5) unsigned NOT NULL,
   `email` varchar(32) NOT NULL,
   `verificationCode` varchar(32) DEFAULT NULL,
   `isVerified` tinyint(1) NOT NULL,
-  `language` varchar(16) DEFAULT NULL,
-  `mu` float unsigned NOT NULL,
-  `sigma` float unsigned NOT NULL,
-  `rank` smallint(5) DEFAULT NULL,
   `numSubmissions` smallint(5) NOT NULL,
-  `numGames` smallint(5) NOT NULL,
   PRIMARY KEY (`userID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=96 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `UserExtraStats`
+-- Table structure for table `Bot`
 --
 
-DROP TABLE IF EXISTS `UserExtraStats`;
+DROP TABLE IF EXISTS `Bot`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `UserExtraStats` (
+CREATE TABLE `Bot` (
+  `botID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `userID` mediumint(8) unsigned NOT NULL,
+
+  `versionNumber` smallint(5) unsigned NOT NULL,
+
+  `compileStatus` smallint(5) unsigned DEFAULT 1,
+  `language` varchar(16) DEFAULT NULL,
+  `mu` float unsigned DEFAULT 25.000,
+  `sigma` float unsigned DEFAULT 8.333,
+  `rank` smallint(5) DEFAULT NULL,
+  `numGames` smallint(5) DEFAULT 0,
+
   `territoryAverage` float(8,5) NOT NULL,
   `strengthAverage` float(8,5) NOT NULL,
   `productionAverage` float(8,5) NOT NULL,
@@ -96,9 +101,9 @@ CREATE TABLE `UserExtraStats` (
   `productionRanking` smallint(5) NOT NULL,
   `stillRanking` smallint(5) NOT NULL,
   `turnTimeRanking` smallint(5) NOT NULL,
-  `timeoutRanking` smallint(5) NOT NULL,
   `didTimeout` float(8,5) NOT NULL,
-  PRIMARY KEY (`userID`)
+  `timeoutRanking` smallint(5) NOT NULL,
+  PRIMARY KEY (`botID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
