@@ -16,7 +16,7 @@ int main() {
 	unsigned char myID;
 	hlt::GameMap presentMap;
 	getInit(myID, presentMap);
-	sendInitResponse("MyBot");
+	sendInit("C++Bot");
 
 	std::set<hlt::Move> moves;
 	while(true) {

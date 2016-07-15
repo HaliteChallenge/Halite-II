@@ -111,7 +111,7 @@ static void getInit(unsigned char& playerTag, hlt::GameMap& m) {
 
 }
 
-static void sendInitResponse(std::string name) {
+static void sendInit(std::string name) {
 	detail::sendString(name);
 }
 

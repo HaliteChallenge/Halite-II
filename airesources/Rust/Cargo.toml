@@ -1,0 +1,13 @@
+[package]
+name = "Rust"
+version = "0.1.0"
+authors = ["Benjamin Spector <benjaminfspector@gmail.com>"]
+
+publish = false
+vcs = "None"
+
+[dependencies]
+rand = "*"
+
+[[bin]]
+name = "MyBot"
