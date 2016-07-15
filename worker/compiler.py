@@ -296,6 +296,7 @@ comp_args = {
 	"Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
 	"Python"    : [["python3", "-c", PYTHON_EXT_COMPILER]],
 	"Python3"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
+	"Rust"      : [["cargo", "build", "--release"]],
 	"Scala"     : [["scalac"]],
 	}
 
@@ -473,6 +474,11 @@ languages = (
 		"ruby MyBot.rb",
 		[],
 		[(["*.rb"], ChmodCompiler("Ruby"))]
+	),
+        Language("Rust", "Cargo.toml", "MyBot.rs",
+		"release/target/MyBot",
+		[],
+		[([""], ExternalCompiler(comp_args["Rust"][0]))]
 	),
 	Language("Scala", BOT +".scala", "MyBot.scala",
 		'scala -J-Xmx'+ str(MEMORY_LIMIT) +'m -howtorun:object MyBot',
