@@ -1,7 +1,9 @@
-mod hlt;
+use hlt::types;
 
-use hlt::Location;
-use hlt::GameMap;
+use hlt::types::Location;
+use hlt::types::Site;
+use hlt::types::GameMap;
+
 use std::io;
 use std::collections;
 use std::collections::HashMap;
@@ -29,9 +31,9 @@ fn deserialize_map_size(s: String) -> () {
 	}
 }
 
-fn deserialize_productions(s: String) -> hlt::GameMap {
+fn deserialize_productions(s: String) -> types::GameMap {
 	let splt: Vec<&str> = s.split(" ").collect();
-	let mut gmp = hlt::GameMap { width: 0, height: 0, contents: Vec::new() };
+	let mut gmp = types::GameMap { width: 0, height: 0, contents: Vec::new() };
 	unsafe {
 		gmp.width = _width;
 		gmp.height= _height;
@@ -39,7 +41,7 @@ fn deserialize_productions(s: String) -> hlt::GameMap {
 		let mut loc = 0;
 		for y in 0.._height {
 			for x in 0.._width {
-				gmp.contents[y as usize].push(hlt::Site::new(u8::from_str(splt[loc]).unwrap()));
+				gmp.contents[y as usize].push(types::Site { owner: 0, strength: 0, production: u8::from_str(splt[loc]).unwrap() });
 				loc += 1;
 			}
 		}
@@ -47,7 +49,7 @@ fn deserialize_productions(s: String) -> hlt::GameMap {
 	gmp
 }
 
-fn deserialize_map(s: String, gmp: &mut hlt:: GameMap) -> () {
+fn deserialize_map(s: String, gmp: &mut types::GameMap) -> () {
 	let splt: Vec<&str> = s.split(" ").collect();
 	unsafe {
 		let mut counter = 0;
@@ -61,13 +63,13 @@ fn deserialize_map(s: String, gmp: &mut hlt:: GameMap) -> () {
 					owner = u8::from_str(splt[loc]).unwrap();
 					loc += 1;
 				}
-				gmp.get_site(hlt::Location { x: a, y: b }, hlt::STILL).owner = owner;
+				gmp.get_site(types::Location { x: a, y: b }, types::STILL).owner = owner;
 				counter -= 1;
 			}
 		}
 		for a in 0.._height {
 			for b in 0.._width {
-				gmp.get_site(hlt::Location { x: a, y: b }, hlt::STILL).strength = u8::from_str(splt[loc]).unwrap();
+				gmp.get_site(types::Location { x: a, y: b }, types::STILL).strength = u8::from_str(splt[loc]).unwrap();
 				loc += 1;
 			}
 		}
@@ -83,11 +85,11 @@ fn send_string(s: String) -> () {
 fn get_string() -> String {
 	let mut s = String::new();
 	io::stdin().read_line(&mut s);
-	s.trim();
+	s = s.trim().to_string();
 	s
 }
 
-fn get_init() -> (u8, hlt::GameMap) {
+pub fn get_init() -> (u8, types::GameMap) {
 	let playerTag: u8 = u8::from_str(&get_string()).unwrap();
 	deserialize_map_size(get_string());
 	let mut gmp = deserialize_productions(get_string());
@@ -95,18 +97,14 @@ fn get_init() -> (u8, hlt::GameMap) {
 	(playerTag, gmp)
 }
 
-fn send_init_response(name: String) -> () {
+pub fn send_init(name: String) -> () {
 	send_string(name);
 }
 
-fn get_frame(gmp: &mut hlt::GameMap) -> () {
+pub fn get_frame(gmp: &mut types::GameMap) -> () {
 	deserialize_map(get_string(), gmp);
 }
 
-fn send_frame(moves: HashMap<hlt::Location, u8>) -> () {
+pub fn send_frame(moves: HashMap<types::Location, u8>) -> () {
 	send_string(serialize_move_set(moves));
-}
-
-fn main() {
-	println!("Hello World!");
 }

@@ -1,4 +1,3 @@
-
 pub const STILL: u8 = 0;
 pub const NORTH: u8 = 1;const EAST: u8 = 2;
 pub const SOUTH: u8 = 3;
@@ -17,21 +16,7 @@ pub struct Location {
 pub struct Site {
 	pub owner: u8,
 	pub strength: u8,
-    production: u8,
-}
-
-/*
-trait GetProd {
-    fn get_production(&self) -> u8;
-}*/
-
-impl Site {
-    pub fn new(p: u8) -> Site {
-        Site { owner: 0, strength: 0, production: p }
-    }
-    pub fn get_production(&self) -> u8 {
-        self.production
-    }
+    pub production: u8,
 }
 
 #[derive(Clone, Debug)]
@@ -40,15 +25,6 @@ pub struct GameMap {
 	pub height: u16, //Number of rows.
 	pub contents: Vec< Vec<Site> >,
 }
-
-/*
-pub trait GameMapUtils {
-	fn in_bounds(&self, l: Location) -> bool;
-	fn get_distance(&self, l1: Location, l2: Location) -> u16;
-	fn get_angle(&self, l1: Location, l2: Location) -> f64;
-	fn get_location(&self, l: Location, d: u8) -> Location;
-	fn get_site(&mut self, l: Location, d: u8) -> &mut Site;
-}*/
 
 impl GameMap {
     pub fn in_bounds(&self, l: Location) -> bool {
