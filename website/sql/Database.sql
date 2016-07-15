@@ -82,8 +82,7 @@ CREATE TABLE `Bot` (
   `botID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `userID` mediumint(8) unsigned NOT NULL,
 
-  `versionNumber` smallint(5) unsigned NOT NULL,
-
+  `name` varchar(32) DEFAULT NULL,
   `compileStatus` smallint(5) unsigned DEFAULT 1,
   `language` varchar(16) DEFAULT NULL,
   `mu` float unsigned DEFAULT 25.000,
