@@ -1,5 +1,6 @@
-use hlt::types;
+#![allow(warnings)]
 
+use hlt::types;
 use std::io;
 use std::collections::HashMap;
 use std::io::Write;
