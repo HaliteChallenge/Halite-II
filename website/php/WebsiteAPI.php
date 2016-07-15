@@ -105,8 +105,6 @@ class WebsiteAPI extends API {
 				unset($fields["password"]);
 				return $fields;
 			}
-		} else if (isset($_GET["isVerified"])) {
-			return $this->selectMultiple("SELECT * FROM User WHERE isVerified = 1");
 		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
 			if($user['verificationCode'] == $_POST['verificationCode']) {
@@ -183,6 +181,11 @@ class WebsiteAPI extends API {
 				foreach($gameArray['bots'] as &$gameBotRow) {
 					// Get rid of gameID
 					unset($gameBotRow['gameID']);
+
+					// Add in username
+					$userIDArray = $this->select("SELECT userID FROM Bot WHERE botID = {$gameBotRow['botID']}");
+					$usernameArray = $this->select("SELECT username FROM User WHERE userID = {$userIDArray['userID']}");
+					$gameBotRow['username'] = $usernameArray['username'];
 				}
 				array_push($gameArrays, $gameArray);
 			}
