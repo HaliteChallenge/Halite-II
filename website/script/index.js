@@ -1,4 +1,34 @@
 $(function() {
+	var gameDisplay = {
+		isInitialized: false,
+		init: function() {
+			this.isInitialized = true;
+			this.cacheDOM();
+		},
+		cacheDOM: function() {
+			this.$modal = $("#gameModal");
+			this.$player1Field = $("#player1");
+			this.$player2Field = $("#player2");
+		},
+		setGame: function(player1Name, player2Name, replayContents) {
+			if(this.isInitialized == false) this.init();
+
+			this.player1Name = player1Name;
+			this.player2Name = player2Name;
+			this.replayContents = replayContents;
+			this.render();
+		},
+		render: function() {
+			this.$modal.modal('show');
+			this.$player1Field.html(this.player1Name);
+			this.$player2Field.html(this.player2Name);
+			begin(this.replayContents);
+		},
+		hide: function() {
+			this.$modal.modal('hide');
+		}
+	};
+
 	var table = {
 		init: function(submissions) {
 			this.cacheDOM();
@@ -17,25 +47,20 @@ $(function() {
 			this.submissions.sort(function(a, b) {
 				return parseInt(a.rank) - parseInt(b.rank);
 			});
-
+			console.log(this.submissions)
 			for(var a = 0; a < this.submissions.length; a++) {
-				var bot = this.submissions[a];
+				var user = this.submissions[a];
 				var score = Math.round((this.submissions[a].mu-(3*this.submissions[a].sigma))*100)/100;
-				this.$table.append("<tbody id='bot" + bot.botID + "'><tr><th scope='row'>"+(a+1)+"</th><td><a href='bot.php?botID="+bot.botID+"'>"+bot.name+"</a></td><td>"+bot.language+"</td><td>"+bot.numGames+"</td><td>"+score+"</td></tr></tbody>");
+				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td><a href='user.php?userID="+user.userID+"'>"+user.username+"</a></td><td>"+user.language+"</td><td>"+user.numSubmissions+"</td><td>"+user.numGames+"</td><td>"+score+"</td></tr></tbody>");
 			}
+		},
+		getUserWithID: function(userID) {
+			for(var a = 0; a < this.submissions.length; a++) if(this.submissions[a].userID == userID) return this.submissions[a];
+			return getUser(userID);
 		}
 	};
 
-	var bots = getActiveBots();
-	var users = getVerifiedUsers();
-	for(var botIndex = 0; botIndex < bots.length; botIndex++) {
-		for(var userIndex = 0; userIndex < users.length; userIndex++) {
-			if(users[userIndex].userID == bots[botIndex].userID) {
-				bots[botIndex].name = users[userIndex].username + " v" + bots[botIndex].versionNumber;
-			}
-		}
-	}
-	table.init(bots);
+	table.init(getActiveUsers());
 
 	if(getGET("userID") != null && getGET("verificationCode") != null) {
 		var res = verifyUser(parseInt(getGET("userID")), getGET("verificationCode"));
