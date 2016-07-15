@@ -17,7 +17,7 @@
 
         <h3>Schedule</h3>
         <ul>
-          <li>On Friday July 29th, participants who are not ranked higher than the "Basic Bot" user on the leaderboard will be disqualified from the playoffs.</li>
+          <li>On Friday July 29th, participants who are not ranked higher than the "Basic Bot" user on the leaderboard will not be eligable for the playoffs. All participants who are ranked higher than the "Basic Bot" user on the leaderboard will be eligable for the playoffs</li>
           <li>On Monday August 8th, the top 16 participants on the leaderboard will be invited to the playoffs, the leaderboard will be shutoff, and development will continue offline and in secret until the playoffs.</li>
           <li>The playoffs will take place on Thursday August 11th after market hours. The format of the playoffs will be specified beforehand.</li>
         </ul>
