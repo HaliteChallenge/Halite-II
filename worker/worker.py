@@ -77,6 +77,8 @@ def executeCompileTask(user, backend):
 		language, errors = compile_anything(workingPath)
 		didCompile = True if errors == None else False
 	except:
+		language = "Other"
+		errors = ["Your bot caused unexpected behavior in our servers"]
 		didCompile = False
 	if didCompile:
 		print("Bot did compile")
