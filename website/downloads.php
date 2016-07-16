@@ -16,13 +16,11 @@
 				<h1>Halite Downloads</h1>
 
 				<h3>Environment and Visualizer</h3>
-				<h4>Changelog</h4>
 				<p>
 					This set of binaries was uploaded on <b>the morning of EST on July 14th</b>. We fixed the Mac binary.
 				</p>
-				<h4>Downloads</h4>
 				<p>
-						<ul>
+					<ul>
 						<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
 						<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
 						<li><a href="downloads/Halite-Windows.zip">Windows</a></li>
@@ -30,15 +28,15 @@
 				</p>
 
 				<h3>Language Packages</h3>
-				<h4>Changelog</h4>
-				<p>This set of starter packages was uploaded at <b>3:30 EST on July 15th</b>. We added the Rust starter package.</p>
-
-				<h4>Downloads</h4>
+				<p>
+					This set of binaries was uploaded at <b>1:10pm EST on July 16th</b>. We added a Rust starter package!
+				</p>
 				<p>
 					<ul>
 						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
 						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7</a></li>
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.1</a></li>
 					</ul>
 				</p>
 			</div>
