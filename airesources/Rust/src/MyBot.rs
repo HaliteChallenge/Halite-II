@@ -1,3 +1,6 @@
+#![allow(non_snake_case)]
+#![allow(warnings)]
+
 extern crate rand;
 #[macro_use] extern crate text_io;
 

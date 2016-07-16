@@ -141,10 +141,11 @@ public class MyBot{
 					There are a number of problems with the basic bot. These include but definitely are not limited to:
 
 					<ul>
-						<li>At any given point, most of the bot's pieces are moving randomly inside the bot's territory. It would be much more efficient if those pieces would go straight towards the nearest opposing tile.</li>
+						<li>At any given point, most of the bot's pieces are moving randomly inside the bot's territory. It would be much more efficient if those pieces would go straight towards the nearest opposing tile. It would be even more efficient if those pieces considered the production loss from moving off a tile when routing themselves to the edges.</li>
 						<li>The bot expands very stupidly. It doesn't prioritize expanding to opposing territory with low strength and high production.</li>
 						<li>The bot decides to stop growing a piece and start moving it when that piece's strength is greater than its production times 5. That factor of 5 is completely arbitrary. The optimal value is likely not 5.</li>
 						<li>When deciding whether to attack opposing tiles, neither the strength of the bot's piece nor the strength of its opponent are taken into account. It may be a better strategy to refrain from attacking under some circumstances.</li>
+						<li>The basic bot loses a lot of strength to the strength cap of 255 (if two pieces combine to have a strength greater than 255, their strength is just considered to be 255).</li>
 					</ul>
 				</p>
 			</div>
