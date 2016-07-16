@@ -296,7 +296,7 @@ comp_args = {
 	"Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
 	"Python"    : [["python3", "-c", PYTHON_EXT_COMPILER]],
 	"Python3"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
-	"Rust"      : [["cargo", "build", "--release"]],
+	"Rust"      : [["cargo", "build", "--release", "-q"]],
 	"Scala"     : [["scalac"]],
 	}
 
@@ -475,8 +475,8 @@ languages = (
 		[],
 		[(["*.rb"], ChmodCompiler("Ruby"))]
 	),
-        Language("Rust", "Cargo.toml", "MyBot.rs",
-		"release/target/MyBot",
+        Language("Rust", "target/release/"+BOT, "Cargo.toml",
+		"target/release/MyBot",
 		[],
 		[([""], ExternalCompiler(comp_args["Rust"][0]))]
 	),
