@@ -28,7 +28,7 @@
 
 namespace detail{
 static std::vector< std::vector<unsigned char> > productions;
-int width, height;
+static int width, height;
 
 static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
 	std::ostringstream oss;
@@ -65,13 +65,12 @@ static hlt::GameMap deserializeMap(const std::string & inputString) {
 			map.contents[a][b].production = productions[a][b];
 		}
 	}
-
+	
 	//Run-length encode of owners
 	unsigned short y = 0, x = 0;
 	unsigned short counter = 0, owner = 0;
 	while(y != map.height) {
-		iss >> counter >> owner;
-		for(int a = 0; a < counter; a++) {
+		for(iss >> counter >> owner; counter; counter--) {
 			map.contents[y][x].owner = owner;
 			x++;
 			if(x == map.width) {

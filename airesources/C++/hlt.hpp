@@ -43,9 +43,9 @@ namespace hlt{
 			height = otherMap.height;
 			contents = otherMap.contents;
 		}
-		GameMap(int width, int height) {
-			width = width;
-			height = height;
+		GameMap(int w, int h) {
+			width = w;
+			height = h;
 			contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
 		}
 

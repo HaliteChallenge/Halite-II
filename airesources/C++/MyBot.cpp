@@ -4,12 +4,15 @@
 #include <ctime>
 #include <time.h>
 #include <set>
+#include <fstream>
 
 #include "hlt.hpp"
-#include "Networking.hpp"
+#include "networking.hpp"
 
 int main() {
 	srand(time(NULL));
+
+	std::ofstream dbg("dbg.log");
 
 	std::cout.sync_with_stdio(0);
 
@@ -26,8 +29,8 @@ int main() {
 
 		for(unsigned short a = 0; a < presentMap.height; a++) {
 			for(unsigned short b = 0; b < presentMap.width; b++) {
-				if (presentMap.getSite({b, a}).owner == myID) {
-					moves.insert({ { b, a }, (unsigned char)(rand() % 5)});
+				if (presentMap.getSite({ b, a }).owner == myID) {
+					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
 				}
 			}
 		}
