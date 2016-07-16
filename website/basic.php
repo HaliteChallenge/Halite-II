@@ -15,7 +15,7 @@
 			<div class="col-sm-12">
 				<h1>Basic Bot Tutorial</h1>
 
-				<p>The source code for each basic bot is located <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/basic">here</a>.</p>
+				<p>The source code for the basic bot in many languages is located <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/basic">here</a>.</p>
 
 				<h3>Prerequisites</h3>
 				<p>It is highly recommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a> before following this tutorial.</p>
