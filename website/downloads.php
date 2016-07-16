@@ -36,7 +36,7 @@
 						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
 						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7</a></li>
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
-						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.1</a></li>
+						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
 					</ul>
 				</p>
 			</div>
