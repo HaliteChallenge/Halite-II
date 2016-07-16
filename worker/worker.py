@@ -56,26 +56,30 @@ def executeCompileTask(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
 	print("Compiling a bot with userID %s" % (user["userID"]))
 
-	workingPath = "workingPath"
-	makePath(workingPath)
-	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
-	zip.unpack(botPath)
+	try:
+		workingPath = "workingPath"
+		makePath(workingPath)
+		botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
+		zip.unpack(botPath)
 
-	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
-		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
-		bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
-		os.mkdir(bufferFolder)
+		while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
+			singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
+			bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
+			os.mkdir(bufferFolder)
 
-		for filename in os.listdir(singleFolder):
-    			shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
-		os.rmdir(singleFolder)
-		
-		for filename in os.listdir(bufferFolder):
-    			shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
-
-	language, errors = compile_anything(workingPath)
-	didCompile = True if errors == None else False
-
+			for filename in os.listdir(singleFolder):
+				shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
+			os.rmdir(singleFolder)
+			
+			for filename in os.listdir(bufferFolder):
+				shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
+			os.rmdir(bufferFolder)
+		language, errors = compile_anything(workingPath)
+		didCompile = True if errors == None else False
+	except:
+		language = "Other"
+		errors = ["Your bot caused unexpected behavior in our servers"]
+		didCompile = False
 	if didCompile:
 		print("Bot did compile")
 		zip.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))

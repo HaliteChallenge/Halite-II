@@ -21,6 +21,7 @@ def getTask():
 def getBotHash(userID):
 	"""Gets the checksum of a user's bot's zipped source code"""
 	result = requests.get(MANAGER_URL+"botHash", params={"apiKey": API_KEY, "userID": userID})
+	print(result.text)
 	return json.loads(result.text).get("hash")
 
 def storeBotLocally(userID, storageDir):
