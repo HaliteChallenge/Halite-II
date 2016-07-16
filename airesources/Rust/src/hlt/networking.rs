@@ -58,13 +58,13 @@ fn deserialize_map(s: String, gmp: &mut types::GameMap) -> () {
 					owner = u8::from_str(splt[loc]).unwrap();
 					loc += 1;
 				}
-				gmp.get_site(types::Location { x: a, y: b }, types::STILL).owner = owner;
+				gmp.get_site(types::Location { x: b, y: a }, types::STILL).owner = owner;
 				counter -= 1;
 			}
 		}
 		for a in 0.._height {
 			for b in 0.._width {
-				gmp.get_site(types::Location { x: a, y: b }, types::STILL).strength = u8::from_str(splt[loc]).unwrap();
+				gmp.get_site(types::Location { x: b, y: a }, types::STILL).strength = u8::from_str(splt[loc]).unwrap();
 				loc += 1;
 			}
 		}

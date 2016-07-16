@@ -20,9 +20,9 @@ fn main() {
 	loop {
 		networking::get_frame(&mut game_map);
 		let mut moves = HashMap::new();
-		for y in 0..game_map.height {
-			for x in 0..game_map.width {
-				let l = hlt::types::Location { x: x, y: y };
+		for a in 0..game_map.height {
+			for b in 0..game_map.width {
+				let l = hlt::types::Location { x: b, y: a };
 				if game_map.get_site(l, types::STILL).owner == my_id {
 					moves.insert(l, (rng.gen::<u32>() % 5) as u8);
 				}
