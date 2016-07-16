@@ -8,7 +8,7 @@
 #include "hlt.hpp"
 #include "Networking.hpp"
 
-int main() {
+void run() {
 	srand(time(NULL));
 
 	std::cout.sync_with_stdio(0);
@@ -44,6 +44,4 @@ int main() {
 		}
 		sendFrame(moves);
 	}
-
-	return 0;
 }
