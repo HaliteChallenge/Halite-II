@@ -1,11 +1,15 @@
+#![allow(non_snake_case)]
+#![allow(warnings)]
+
 extern crate rand;
+#[macro_use] extern crate text_io;
 
 //Notice: due to Rust's extreme dislike of (even private!) global mutables, we do not reset the production values of each tile during get_frame.
 //If you change them, you may not be able to recover the actual production values of the map, so we recommend not editing them.
 //However, if your code calls for it, you're welcome to edit the production values of the sites of the map - just do so at your own risk.
 
 mod hlt;
-use hlt::{networking, types};
+use hlt::{ networking, types };
 use std::collections::HashMap;
 use rand::Rng;
 

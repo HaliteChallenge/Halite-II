@@ -38,8 +38,8 @@ $(function() {
 	var gameTable = {
 		$tableBody: $("#gameTableBody"),
 		games: [],
-		init: function(botID, rawGames) {
-			this.botID = botID;
+		init: function(userID, rawGames) {
+			this.userID = userID;
 			this.rawGames = rawGames;
 			this.transformGames();
 			this.render();
@@ -47,13 +47,13 @@ $(function() {
 		transformGames: function() {
 			console.log(this.rawGames)
 			for(var a = 0; a < this.rawGames.length; a++) {
-				var players = this.rawGames[a].bots;
+				var players = this.rawGames[a].users;
 				players.sort(function(p1, p2) {
 					return parseInt(p1.rank) - parseInt(p2.rank);
 				});
-				var botID = this.botID;
-				var thisBot = players.find(function(p){return parseInt(p.botID)==botID;});
-				var result = thisBot.rank + " of " + players.length;
+				var userID = this.userID;
+				var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
+				var result = thisUser.rank + " of " + players.length;
 
 				this.games.push({
 					players: players,
@@ -73,12 +73,12 @@ $(function() {
 		},
 		getTableRow: function(game) {
 			var playersList = "<ol>";
-			var botID = this.botID;
+			var userID = this.userID;
 			playersList += game.players.map(function(player) {
-				if(player.botID == botID) {
-					return "<li><a href='bot.php?botID="+player.botID+"'><b>"+player.name+"</a></b></li>";
+				if(player.userID == userID) {
+					return "<li><a href='user.php?userID="+player.userID+"'><b>"+player.username+"</a></b></li>";
 				} else {
-					return "<li><a href='bot.php?botID="+player.botID+"'>"+player.name+"</a></li>";
+					return "<li><a href='user.php?userID="+player.userID+"'>"+player.username+"</a></li>";
 				}
 			}).join(" ");
 			playersList += "</ol>";
@@ -86,7 +86,7 @@ $(function() {
 		}
 	}
 
-	function statsFromBot(bot, numBots) {
+	function statsFromUser(user, numUsers) {
 		var statDetails = {
 			"score": {name: "Trueskill Rating", mouseOverText: null},
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
@@ -101,31 +101,33 @@ $(function() {
 		};
 		var stats = [];
 		for(var key in statDetails) {
-			if(bot[key] != undefined && bot[key] != null) {
+			if(user[key] != undefined && user[key] != null) {
 				if(statDetails[key].percentile) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: bot[key]+" of "+numBots})
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" of "+numUsers})
 				} else if(statDetails[key].percentage) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: (100*bot[key])+"%"})
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: (100*user[key])+"%"})
 				} else {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: bot[key]})
+					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
 				}
 			}
 		}
 		return stats;
 	}
 
-	var botID = getGET("botID");
+	var userID = getGET("userID");
 
-	var bot = getBot(botID);
-	bot["score"] = Math.round(100*(bot["mu"]-3*bot["sigma"]))/100;
-	bot["didTimeout"] = Math.round(1000*bot["didTimeout"])/1000;
+	var user = getUser(userID);
+	var extraStats = getExtraStats(userID);
+	$.extend(user, extraStats);
+	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
+	user["didTimeout"] = Math.round(1000*user["didTimeout"])/1000;
 
-	var numBots = getNumActiveBots();
+	var numUsers = getNumActiveUsers();
 
-	$(document).prop('title', bot.name);
+	$(document).prop('title', user.username);
 
-	jumboTron.init(bot.name, "Ranked " + bot.rank + " of " + numBots);
-	statTable.init(statsFromBot(bot, numBots));
-	gameTable.init(botID, getLatestGamesForBot(botID, 10));
+	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
+	statTable.init(statsFromUser(user, numUsers));
+	gameTable.init(userID, getLatestGamesForUser(userID, 10));
 
 })

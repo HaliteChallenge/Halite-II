@@ -8,7 +8,7 @@ date_default_timezone_set('America/New_York');
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
-class WebsiteAPI extends API {
+class WebsiteAPI extends API{
 
 	// The database
 	private $mysqli = NULL;
@@ -105,8 +105,12 @@ class WebsiteAPI extends API {
 				unset($fields["password"]);
 				return $fields;
 			}
-		} else if (isset($_GET["isVerified"])) {
-			return $this->selectMultiple("SELECT * FROM User WHERE isVerified = 1");
+		} else if(isset($_GET['active'])) {
+			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
+			return $results;
+		} else if(isset($_GET['numActive'])) {
+			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
 		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
 			if($user['verificationCode'] == $_POST['verificationCode']) {
@@ -140,7 +144,7 @@ class WebsiteAPI extends API {
 					->setFrom(array($this->config['email']['email'] => "Halite Competition"))
 					->setTo(array($email));
 
-				$this->insert("INSERT INTO User (username, email, password, verificationCode) VALUES ('$username', '$email', '$password', '$verificationCode')");
+				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
 				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
 
 				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
@@ -155,22 +159,18 @@ class WebsiteAPI extends API {
 		}
 	}
 
-	protected function bot() {
+	protected function extraStats() {
 		if(isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM Bot WHERE userID={$_GET["userID"]}");
-		} else if(isset($_GET["active"])) {
-			return $this->select("SELECT * FROM Bot WHERE compileStatus=2");
-		} else if(isset($_GET["numActive"])) {
-			return mysqli_query($this->mysqli, "SELECT * FROM Bot WHERE compileStatus=2")->num_rows;
+			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
 		}
 	}
 
 	protected function game() {
-		if(isset($_GET['botID'])) {
+		if(isset($_GET['userID'])) {
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
-			$botID = $_GET['botID'];
+			$userID = $_GET['userID'];
 
-			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameBot WHERE botID = $botID ORDER BY gameID DESC LIMIT $limit");
+			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
 			$gameArrays = array();
 
 			// Get each game's info
@@ -178,11 +178,15 @@ class WebsiteAPI extends API {
 				$gameID = $gameIDArray['gameID'];
 				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
 
-				// Get information about bots
-				$gameArray['bots'] = $this->selectMultiple("SELECT botID, rank FROM GameBot WHERE gameID = $gameID");
-				foreach($gameArray['bots'] as &$gameBotRow) {
+				// Get information about users
+				$gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
+				foreach($gameArray['users'] as &$gameUserRow) {
 					// Get rid of gameID
-					unset($gameBotRow['gameID']);
+					unset($gameUserRow['gameID']);
+
+					// Add in user info
+					$userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
+					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
 				}
 				array_push($gameArrays, $gameArray);
 			}
@@ -192,20 +196,27 @@ class WebsiteAPI extends API {
 
 	protected function botFile() {
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			var_dump($_POST);
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
-
-			$user = $this->select("SELECT * FROM User WHERE userID={$userID} and password='{$password}'");
+			
+			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
 
 			$targetPath = "../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath) == true) unlink($targetPath);
+
 			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
 
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1 WHERE userID = $userID");
-			$this->insert("INSERT INTO Bot (userID, name) VALUES ($userID, '{$user['username']} v{$user['numSubmissions']}')");
+			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
+			foreach($oldGameUsers as $oldGameUser) {
+				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
+			}
+			$this->insert("DELETE FROM GameUser WHERE userID=$userID");
+
+			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
 			return "Success";
 		}

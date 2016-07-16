@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 pub const STILL: u8 = 0;
 pub const NORTH: u8 = 1;const EAST: u8 = 2;
 pub const SOUTH: u8 = 3;
@@ -65,6 +67,6 @@ impl GameMap {
     }
     pub fn get_site(&mut self, l: Location, d: u8) -> &mut Site {
     	let loc = self.get_location(l, d);
-    	&mut self.contents[l.y as usize][l.x as usize]
+    	&mut self.contents[loc.y as usize][loc.x as usize]
     }
 }

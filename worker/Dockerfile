@@ -16,6 +16,7 @@ RUN apt-get install -y gcc
 RUN apt-get install -y g++
 RUN apt-get install -y python
 RUN apt-get install -y python3-pip
+RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh 
 
 #prepare for Java download
 RUN apt-get install -y python-software-properties
