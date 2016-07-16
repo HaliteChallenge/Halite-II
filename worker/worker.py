@@ -56,26 +56,30 @@ def executeCompileTask(user, backend):
 	"""Downloads and compiles a bot. Posts the compiled bot files to the manager."""
 	print("Compiling a bot with userID %s" % (user["userID"]))
 
-	workingPath = "workingPath"
-	makePath(workingPath)
-	botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
-	zip.unpack(botPath)
+	try:
+		workingPath = "workingPath"
+		makePath(workingPath)
+		botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
+		zip.unpack(botPath)
 
-	while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
-		singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
-		bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
-		os.mkdir(bufferFolder)
+		while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
+			singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
+			bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
+			os.mkdir(bufferFolder)
 
-		for filename in os.listdir(singleFolder):
-    			shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
-		os.rmdir(singleFolder)
-		
-		for filename in os.listdir(bufferFolder):
-    			shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
-
-	language, errors = compile_anything(workingPath)
-	didCompile = True if errors == None else False
-
+			for filename in os.listdir(singleFolder):
+				shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
+			os.rmdir(singleFolder)
+			
+			for filename in os.listdir(bufferFolder):
+				shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
+			os.rmdir(bufferFolder)
+		language, errors = compile_anything(workingPath)
+		didCompile = True if errors == None else False
+	except:
+		language = "Other"
+		errors = ["Your bot caused unexpected behavior in our servers"]
+		didCompile = False
 	if didCompile:
 		print("Bot did compile")
 		zip.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
@@ -85,7 +89,8 @@ def executeCompileTask(user, backend):
 		print(str(errors))
 		sendEmail("Halite Bot Compilation Error", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \""+language+".\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, and <code>py</code> for Python3. Please make sure that your <b>main file is named MyBot</b> (not main, not BasicBot).</p> <b>Here is a description of the compilation error</b>:<br><pre><code>"+"<br>".join(errors)+"</code></pre>", user["email"])
 	backend.compileResult(int(user["userID"]), didCompile, language)
-	shutil.rmtree(workingPath)
+	if os.path.isdir(workingPath):
+		shutil.rmtree(workingPath)
 
 def downloadUsers(users):
 	for user in users:
