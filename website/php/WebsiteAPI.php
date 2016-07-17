@@ -133,6 +133,14 @@ class WebsiteAPI extends API{
 				return "Email already exists";
 			}
 
+			$explodedEmail = explode("@", $email);
+			if(count($explodedEmail) != 2) {
+				return "Invalid email address";
+			}
+			if(strcmp($explodedEmail[1], "twosigma.com") != 0) {
+				return "Email is not two sigma email";
+			}
+
 			// Send verification email
 			$verificationCode = rand(0, 9999999999);
 			try{
@@ -199,7 +207,7 @@ class WebsiteAPI extends API{
 			var_dump($_POST);
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
-			
+
 			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";

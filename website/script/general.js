@@ -127,6 +127,8 @@ $(function() {
 						messageBox.alert("Registration failed", "That username is already taken", false);
 					} else if (resp.toLowerCase().indexOf("exists") > -1) {
 						messageBox.alert("Registration failed", "That email is already taken", false);
+					} else if (resp.toLowerCase().indexOf("sigma") > -1) {
+						messageBox.alert("Registration failed", "That email does not end in twosigma.com", false);
 					} else {
 						messageBox.alert("Registration failed", "That email is invalid", false);
 					}
