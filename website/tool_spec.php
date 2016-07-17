@@ -16,7 +16,14 @@
 				<h1>Tools Specification</h1>
 
 				<h3>Environment</h3>
-
+				<p>
+					The environment may be passed a number of flags. These must be prefixed by its own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may not be combined like so: <code>-qst<code>. Flags include:
+					<ul>
+						<li></li>
+						<li></li>
+					</ul>
+				</p>
+				
 				<h3>Visualizer</h3>
 			</div>
 		</div>
