@@ -17,7 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<p>
-					This set of binaries was uploaded on <b>the morning of EST on July 14th</b>. We fixed the Mac binary.
+					This set of binaries was uploaded at <b>11am EST on July 17th</b>. We added the <code>-t</code> flag which disables timeouts.
 				</p>
 				<p>
 					<ul>
@@ -29,7 +29,7 @@
 
 				<h3>Language Packages</h3>
 				<p>
-					This set of binaries was uploaded at <b>10am EST on July 17th</b>. We added the <code>-t</code> flag on Mac and Debian which disables timeouts.
+					This set of binaries was uploaded at <b>1:10pm EST on July 16th</b>. We added a Rust starter package!
 				</p>
 				<p>
 					<ul>
