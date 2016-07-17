@@ -61,7 +61,7 @@
             <li>Rust - rustc 1.10.0</li>
           </ul>
         </p>
-		
+
 		<p>
           The following build automators are used:
           <ul>
@@ -91,8 +91,8 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-          <li class="previous"><a href="contest_spec.php"><span aria-hidden="true">&larr;</span> Contest Spec</a></li>
-					<li class="next"><a href="networking_spec.php">Networking Spec <span aria-hidden="true">&rarr;</span> </a></li>
+          <li class="previous"><a href="networking_spec.php"><span aria-hidden="true">&larr;</span> Networking Spec</a></li>
+					<li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>

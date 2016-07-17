@@ -96,7 +96,8 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="previous"><a href="build_environment_spec.php"><span aria-hidden="true">&larr;</span> Build Environment Spec</a></li>
+					<li class="previous"><a href="file_spec.php"><span aria-hidden="true">&larr;</span> File Spec</a></li>
+					<li class="next"><a href="build_environment_spec.php">Build Environment Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>
