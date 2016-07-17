@@ -43,26 +43,17 @@ Here is a simple bot written in Python 3 that utilizes our starter package and m
 from hlt import *
 from networking import *
 
-# Initialize
-playerTag, gameMap = getInit()
-sendInit("PythonBot"+str(playerTag))
+myID, gameMap = getInit()
+sendInit("MyName")
 
-# Game loop
 while True:
 	moves = []
-	
-	# Get state of play
-	gameMap, _ = getFrame()
-	
-	# Move all of our pieces randomly
-	for y in range(0, len(gameMap.contents)):
-		for x in range(0, len(gameMap.contents[y])):
-			site = gameMap.contents[y][x]
-			if site.owner == playerTag:
+	gameMap = getFrame()
+	for y in range(gameMap.height):
+		for x in range(gameMap.width):
+			if gameMap.getSite(Location(x, y)).owner == myID:
 				moves.append(Move(Location(x, y), int(random.random() * 5)))
-	
-	# Send moves to environment
-	sendFrame(moves, [])
+	sendFrame(moves)
 ```
 
 To test a bot, users must first run a game over the command line between two or more bots using Halite's environment. A replay file will be outputted by the environment and may be viewed using Halite's visualizer. 

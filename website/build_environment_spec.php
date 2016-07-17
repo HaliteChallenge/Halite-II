@@ -49,6 +49,7 @@
             <li>Java - .java</li>
             <li>Python - .py</li>
             <li>C++ - .cpp and .h</li>
+            <li>Rust - .toml (for your Cargo.toml) and .rs (for your Rust source)</li>
           </ul>
         </p>
 
@@ -57,6 +58,14 @@
           <ul>
             <li>Java - javac 1.7.0_101</li>
             <li>C++ - g++ 4.84</li>
+            <li>Rust - rustc 1.10.0</li>
+          </ul>
+        </p>
+		
+		<p>
+          The following build automators are used:
+          <ul>
+            <li>Rust - cargo 0.11.0</li>
           </ul>
         </p>
 
@@ -66,6 +75,7 @@
             <li>Java 7</li>
             <li>Python 3.4.3</li>
             <li>C++ 11</li>
+            <li>Rust 1.10</li>
           </ul>
         </p>
 
