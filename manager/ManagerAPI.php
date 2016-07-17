@@ -133,10 +133,12 @@ class ManagerAPI extends API{
 			for($a = 0; $a < $numPlayers-1; $a++) {
 				array_push($players, $possiblePlayers[$a]);
 			}*/
-			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
+			$initialPlayersNum = $numPlayers-1;
+			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $initialPlayersNum");
+			array_push($players, $this->select("SELECT * FROM User WHERE numGames=(SELECT MIN(numGames) FROM User WHERE status=3) LIMIT 1"));
 
 			// Pick map size
-			$sizes = array(20, 30);
+			$sizes = array(20, 20, 25, 25, 30, 30, 30, 35, 35, 40);
 			$size = $sizes[array_rand($sizes)];
 
 			// Send game task
@@ -228,7 +230,11 @@ class ManagerAPI extends API{
 			$gameID = $gameIDArray['gameID'];
 
 			// Update each participant's stats
-			$allUserExtras = $this->selectMultiple("SELECT * FROM UserExtraStats");
+			$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
+			$allUserExtras = array();
+			foreach($allUsers as $user) {
+				array_push($allUserExtras, $this->select("SELECT * FROM UserExtraStats WHERE userID = {$user['userID']}"));
+			}	
 			for($a = 0; $a < count($users); $a++) {
 				$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
 				$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
