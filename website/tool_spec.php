@@ -17,11 +17,20 @@
 
 				<h3>Environment</h3>
 				<p>
-					The environment may be passed a number of flags. These must be prefixed by its own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may not be combined like so: <code>-qst<code>. Flags include:
+					The environment may be passed a number of flags, including:
 					<ul>
-						<li></li>
-						<li></li>
-					</ul>
+						<li><code>-t</code>: disables timeouts for the duration of the game</li>
+						<li><code>-q</code>: turns on quiet output. Output will take the form of:
+							<ul>
+								<li>A line containing replay file name</li>
+								<li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID territoryValue strengthValue productionValue stillMovePercentage averageLatency</code></li>
+								<li>A line of space separated playerIDs of the players that timed out</li>
+							</ul>
+							the name of the replay file will be outputFor n players, the environment will output n lines like so: .</li>
+						<li><code>-s</code>: allows the overriding of names</li>
+						<li><code>-w</code>: after the current game ends, the environment will start a <code>visualizer</code> binary with the current game if a <code>visualizer</code> binary exists in the current directory.</li>
+					
+					Flags must be prefixed by their own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may not be combined like so: <code>-qst<code>.
 				</p>
 				
 				<h3>Visualizer</h3>
