@@ -133,7 +133,7 @@ for(int y = 0; y < gameMap.height; y++) {
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-          <li class="previous"><a href="basic.php"><span aria-hidden="true">&larr;</span> Basic Bot Tutorial</a></li>
+          <li class="previous"><a href="basic_tutorial.php"><span aria-hidden="true">&larr;</span> Basic Bot Tutorial</a></li>
 					<li class="next"><a href="machine_learning_tutorial.php">Machine Learning Tutorial <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
