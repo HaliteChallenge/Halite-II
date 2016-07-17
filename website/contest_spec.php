@@ -26,7 +26,7 @@
         <ul>
           <li>Though collaboration is highly encouraged, teams are not technically allowed. The email on an account will be used to identify the owner of a bot.</li>
           <li>Each participant may only have one halite account.</li>
-          <li>If you find a bug that is exploitable, email us at <a href="mailto:halite@halite.io">halite@halite.io</a>, do not post it on the forums, and do not exploit it.</li>
+          <li>If you find a bug that is exploitable, email us at <a href="mailto:halite@halite.io">halite@halite.io</a>, do not post it on the forums, and do not exploit it. You will be rewarded with a box of oreos.</li>
         </ul>
       </div>
 		</div>
