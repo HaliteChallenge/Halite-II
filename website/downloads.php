@@ -29,7 +29,7 @@
 
 				<h3>Language Packages</h3>
 				<p>
-					This set of binaries was uploaded at <b>1:10pm EST on July 16th</b>. We added a Rust starter package!
+					This set of binaries was uploaded at <b>10am EST on July 17th</b>. We added the <code>-t</code> flag on Mac and Debian which disables timeouts.
 				</p>
 				<p>
 					<ul>
