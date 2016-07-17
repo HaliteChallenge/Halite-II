@@ -133,7 +133,7 @@ class WebsiteAPI extends API{
 				return "Email already exists";
 			}
 
-			$explodedEmail = explode("@", $email)[1];
+			$explodedEmail = explode("@", $email);
 			if(count($explodedEmail) != 2) {
 				return "Invalid email address";
 			}
