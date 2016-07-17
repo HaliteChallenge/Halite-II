@@ -13,7 +13,7 @@
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
 
-extern bool program_output_style;
+extern bool program_output_style, ignore_timeout;
 
 struct PlayerStatistics {
 	int tag;

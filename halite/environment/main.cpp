@@ -6,7 +6,7 @@
 
 #include "core/Halite.hpp"
 
-bool program_output_style = false, watch_game = false, server_version = false;
+bool program_output_style = false, watch_game = false, server_version = false, ignore_timeout = false;
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
 int main(int argc, char* args[]) {
@@ -27,6 +27,10 @@ int main(int argc, char* args[]) {
 			}
 			else if(*a == "-s") {
 				server_version = true;
+				a = sArgs.erase(a);
+			}
+			else if(*a == "-t") {
+				ignore_timeout = true;
 				a = sArgs.erase(a);
 			}
 			else a++;
