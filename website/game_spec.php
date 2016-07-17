@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Game Rules</title>
+	<title>Game Spec</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -13,7 +13,7 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div class="row">
 			<div class="col-sm-12">
-				<h1>Game Spec</h1>
+				<h1>Game Specification</h1>
 
 				<h3>Overview</h3>
 
@@ -89,7 +89,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
+					<li class="next"><a href="file_spec.php">File Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>
