@@ -36,7 +36,7 @@ apt-get install -y python3-h5py</code></pre>
         <h3>Data Aquisition</h3>
 	      <p>
 					<a href="tutorials/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. We want load and parse these files into lists of `GameMap` objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
-					<pre><code>def loadGame(filename):
+					<pre class="prettyprint">def loadGame(filename):
 	def bytesUntil(gameFile, endByte):
 	    byteArray = []
 	    byte = gameFile.read(1)
@@ -104,7 +104,7 @@ apt-get install -y python3-h5py</code></pre>
 	        moves.append({(index % width, math.floor(index/width)):int.from_bytes(gameFile.read(1), byteorder='big') for index in range(width*height)})
 	finally:
 	    gameFile.close()
-	return mattID, frames, moves</code></pre>
+	return mattID, frames, moves</pre>
 				</p>
 
 				<p>
@@ -124,7 +124,7 @@ apt-get install -y python3-h5py</code></pre>
 				<p>
 					Now lets take all of our games (assumed to be in a folder called replays) and transform them to the input and ouptut schemes that we specified above:
 
-					<pre><code>def getNNData():
+					<pre class="prettyprint">def getNNData():
 	inputs = []
 	correctOutputs = []
 
@@ -152,7 +152,7 @@ apt-get install -y python3-h5py</code></pre>
 							nnInput += [1 if site.owner == mattID else -1, float(site.strength / 255), float(site.production / maxProduction)]
 						inputs.append(nnInput)
 						correctOutputs.append([1 if a == moves[turnIndex][(x, y)] else 0 for a in range(5)])
-	return inputs, correctOutputs</code></pre>
+	return inputs, correctOutputs</pre>
 				</p>
 
 
@@ -164,7 +164,7 @@ apt-get install -y python3-h5py</code></pre>
 				<p>
 					Our neural network will use the hyperbolic tangent activation function for its input and hidden layers. We will restrict it to just one hidden layer. Its output layer will use the softmax activation function. We will use stochastic gradient descent as our training algorithm.
 
-					<pre><code>inputs, correctOutputs = getNNData()
+					<pre class="prettyprint">inputs, correctOutputs = getNNData()
 
 print("Collected data")
 
@@ -188,14 +188,14 @@ model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.1, decay=1e-6, momen
 
 model.fit(trainingInputs, trainingOutputs, validation_data=(testInputs, testOutputs))
 score = model.evaluate(testInputs, testOutputs, verbose=0)
-print("Loss:" + str(score))</code></pre>
+print("Loss:" + str(score))</pre>
 				</p>
 
 				<p>
 					Once training has finished, we want to store our model so that we can use it to select moves.
-					<pre><code>json_string = model.to_json()
+					<pre class="prettyprint">json_string = model.to_json()
 open('my_model_architecture.json', 'w').write(json_string)
-model.save_weights('my_model_weights.h5')</code></pre>
+model.save_weights('my_model_weights.h5')</pre>
 				</p>
 
 				<p>You should now be able to run the training script. The full copy of it is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/machinelearning/TrainMatt.py">here</a>. You should expect output similar to this:
@@ -258,7 +258,7 @@ Loss: 0.0814138701757</code></pre>
 
 				<p>
 					Here is our complete bot source:
-					<pre><code>from hlt import *
+					<pre class="prettyprint">from hlt import *
 from networking import *
 
 from keras.models import Sequential, model_from_json
@@ -305,7 +305,7 @@ while True:
 						biggest = output[d]
 						direction = d
 				moves.append(Move(loc, direction))
-	sendFrame(moves)</code></pre>
+	sendFrame(moves)</pre>
 				</p>
 
 				<p>
@@ -332,6 +332,7 @@ while True:
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
 </body>
