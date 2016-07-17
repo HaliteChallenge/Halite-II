@@ -133,9 +133,7 @@ class ManagerAPI extends API{
 			for($a = 0; $a < $numPlayers-1; $a++) {
 				array_push($players, $possiblePlayers[$a]);
 			}*/
-			$initialPlayersNum = $numPlayers-1;
-			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $initialPlayersNum");
-			array_push($players, $this->select("SELECT * FROM User WHERE numGames=(SELECT MIN(numGames) FROM User WHERE status=3) LIMIT 1"));
+			$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $playersNum");
 
 			// Pick map size
 			$sizes = array(20, 20, 25, 25, 30, 30, 30, 35, 35, 40);
