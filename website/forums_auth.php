@@ -37,7 +37,6 @@
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
 	<script src="script/forums_auth.js"></script>
-	<script src="script/visualizer.js"></script>
 </body>
 
 </html>
