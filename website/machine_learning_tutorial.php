@@ -309,7 +309,7 @@ while True:
 				</p>
 
 				<p>
-					We are now ready to submit our bot to the server! Though it's not perfect at mimicing Matt's bot, since he considers the entire board instead of just a 3 by 3 slice of it when moving a piece, it does beat a Basic Bot. We hope that this tutorial helped to start you thinking about how to apply machine learning to Halite!
+					We are now ready to submit our bot to the server! Though it's not perfect at mimicking Matt's bot, since he considers the entire board instead of just a 3 by 3 slice of it when moving a piece, it does beat a Basic Bot. We hope that this tutorial helped to start you thinking about how to apply machine learning to Halite!
 				</p>
 
         <h3>Other Libraries</h3>
