@@ -21,7 +21,7 @@
 
 #include "../core/hlt.hpp"
 
-extern bool program_output_style;
+extern bool quiet_output;
 
 class Networking {
 public:

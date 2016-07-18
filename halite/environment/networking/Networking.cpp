@@ -87,14 +87,14 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 	bool success;
 	success = WriteFile(connection.write, sendString.c_str(), sendString.length(), &charsWritten, NULL);
 	if(!success || charsWritten == 0) {
-		if(!program_output_style) std::cout << "Problem writing to pipe\n";
+		if(!quiet_output) std::cout << "Problem writing to pipe\n";
 		throw 1;
 	}
 #else
 	UniConnection connection = connections[playerTag - 1];
 	ssize_t charsWritten = write(connection.write, sendString.c_str(), sendString.length());
 	if(charsWritten < sendString.length()) {
-		if(!program_output_style) std::cout << "Problem writing to pipe\n";
+		if(!quiet_output) std::cout << "Problem writing to pipe\n";
 		throw 1;
 	}
 #endif
@@ -128,7 +128,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 
 		success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
 		if(!success || charsRead < 1) {
-			if(!program_output_style) std::cout << "Pipe probably timed out\n";
+			if(!quiet_output) std::cout << "Pipe probably timed out\n";
 			throw 1;
 		}
 		if(buffer == '\n') break;
@@ -158,7 +158,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 			if(buffer == '\n') break;
 			else newString += buffer;
 		} else {
-			if(!program_output_style) {
+			if(!quiet_output) {
 				// Buffer error message output
 				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
 				// That looks really weird
@@ -201,14 +201,14 @@ void Networking::startAndConnectBot(std::string command) {
 
 	//Child stdout pipe
 	if(!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
-		if(!program_output_style) std::cout << "Could not create pipe\n";
+		if(!quiet_output) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
 	if(!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
 	//Child stdin pipe
 	if(!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
-		if(!program_output_style) std::cout << "Could not create pipe\n";
+		if(!quiet_output) std::cout << "Could not create pipe\n";
 		throw 1;
 	}
 	if(!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
@@ -241,7 +241,7 @@ void Networking::startAndConnectBot(std::string command) {
 		&piProcInfo
 	);  //receives PROCESS_INFORMATION
 	if(!success) {
-		if(!program_output_style) std::cout << "Could not start process\n";
+		if(!quiet_output) std::cout << "Could not start process\n";
 		throw 1;
 	}
 	else {
@@ -252,18 +252,18 @@ void Networking::startAndConnectBot(std::string command) {
 		connections.push_back(parentConnection);
 	}
 #else
-	if(!program_output_style) std::cout << command << "\n";
+	if(!quiet_output) std::cout << command << "\n";
 
 	pid_t pid = NULL;
 	int writePipe[2];
 	int readPipe[2];
 
 	if(pipe(writePipe)) {
-		if(!program_output_style) std::cout << "Error creating pipe\n";
+		if(!quiet_output) std::cout << "Error creating pipe\n";
 		throw 1;
 	}
 	if(pipe(readPipe)) {
-		if(!program_output_style) std::cout << "Error creating pipe\n";
+		if(!quiet_output) std::cout << "Error creating pipe\n";
 		throw 1;
 	}
 
@@ -283,7 +283,7 @@ void Networking::startAndConnectBot(std::string command) {
 
 		exit(1);
 	} else if(pid < 0) {
-		if(!program_output_style) std::cout << "Fork failed\n";
+		if(!quiet_output) std::cout << "Fork failed\n";
 		throw 1;
 	}
 
@@ -307,11 +307,11 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 		sendString(playerTag, prodString);
 		sendString(playerTag, mapString);
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
-		if(!program_output_style) std::cout << outMessage;
+		if(!quiet_output) std::cout << outMessage;
 
 		*playerName = getString(playerTag, timeoutMillis).substr(0, 30);
 		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
-		if(!program_output_style) std::cout << inMessage;
+		if(!quiet_output) std::cout << inMessage;
 
 		return true;
 	}
@@ -359,7 +359,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
 
-	if(!program_output_style) std::cout << "Player " << int(playerTag) << " is dead\n";
+	if(!quiet_output) std::cout << "Player " << int(playerTag) << " is dead\n";
 #else
 	kill(-processes[playerTag - 1], SIGKILL);
 
