@@ -2,8 +2,6 @@
 
 [![Travis Badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
 
-![Game gif](multimedia/ExampleGame.gif)
-
 ## Overview
 
 Halite is an original multi-player turn-based strategy game played on a rectangular grid. The objective of the game is for each player to take over the entire map, in competition with every other player in the game. Players use their territory to gain strength and their strength to gain territory; they must move intelligently on both the micro and macro scales to play effectively.
@@ -13,7 +11,6 @@ Halite is an original multi-player turn-based strategy game played on a rectangu
 - `airesources/` - The language-specific starter kits for writing bots
 - `halite/` - The halite game engine and visualizer
 - `manager/` - The API that manages worker servers
-- `multimedia/` - Photos and videos of a halite game
 - `website/` - The website that hosts the competition
 - `worker/` - The source for the worker servers that compiles bots and runs games safely
 
