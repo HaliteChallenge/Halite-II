@@ -157,7 +157,7 @@ class WebsiteAPI extends API{
 
 				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
 
-				$message->setBody("To verify your email, <a href='halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.", 'text/html');
+				$message->setBody("<html><body>To verify your email, <a href='http://halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.</body></html>", 'text/html');
 				$result = $mailer->send($message);
 			} catch (Exception $e) {
 				return "Invalid email address";
