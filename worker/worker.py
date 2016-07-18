@@ -76,9 +76,9 @@ def executeCompileTask(user, backend):
 			os.rmdir(bufferFolder)
 		language, errors = compile_anything(workingPath)
 		didCompile = True if errors == None else False
-        except Exception as e:
+	except Exception as e:
 		language = "Other"
-                errors = ["Your bot caused unexpected behavior in our servers. If you cannot figure out why this happened, please email us at halite@halite.io. We can help.", "For our reference, here is the trace of the error: " + str(e)]
+		errors = ["Your bot caused unexpected behavior in our servers. If you cannot figure out why this happened, please email us at halite@halite.io. We can help.", "For our reference, here is the trace of the error: " + str(e)]
 		didCompile = False
 	if didCompile:
 		print("Bot did compile")
