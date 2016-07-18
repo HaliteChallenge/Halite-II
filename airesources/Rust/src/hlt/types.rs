@@ -1,7 +1,8 @@
 #![allow(warnings)]
 
 pub const STILL: u8 = 0;
-pub const NORTH: u8 = 1;const EAST: u8 = 2;
+pub const NORTH: u8 = 1;
+pub const EAST: u8 = 2;
 pub const SOUTH: u8 = 3;
 pub const WEST: u8 = 4;
 
