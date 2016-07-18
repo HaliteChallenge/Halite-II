@@ -41,7 +41,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			}
 			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
 			else {
-				if(!program_output_style) std::cout << player_names[a] << " timed out\n";
+				if(!quiet_output) std::cout << player_names[a] << " timed out\n";
 				permissibleTime[a] = false;
 				networking.killPlayer(a + 1);
 			}
@@ -242,80 +242,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 }
 
 //Public Functions -------------------
-
-Halite::Halite(unsigned short w, unsigned short h) {
-	//Connect to players
-	number_of_players = 0;
-	player_names = std::vector<std::string>();
-
-	std::string in;
-
-	bool done = false;
-	while (!done) {
-		//If less than 2, bypass this step: Ask if the user like to add another AI
-		if (number_of_players >= 2) {
-			std::cout << "Would you like to add another player? Please enter Yes or No: ";
-			while (true) {
-				std::getline(std::cin, in);
-				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-				if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
-				std::cout << "That isn't a valid input. Please enter Yes or No: ";
-			}
-			if (in == "n" || in == "no" || in == "nope") break;
-		}
-
-		while (true) {
-			std::string startCommand;
-			std::cout << "What is the start command for this bot: ";
-			std::getline(std::cin, startCommand);
-
-			try{
-				networking.startAndConnectBot(startCommand);
-				break;
-			}
-			catch (int e) {
-				std::cout << "There was a problem with that start command. Please enter another one.\n";
-			}
-		}
-
-		std::cout << "Connected to player #" << int(number_of_players + 1) << std::endl;
-		number_of_players++;
-	}
-
-	//Initialize map
-	game_map = hlt::Map(w, h, number_of_players);
-
-	//Perform initialization not specific to constructor
-	init();
-}
-
-Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, std::vector<std::string> * names_) {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 
 	//Initialize map
-	game_map = hlt::Map(width_, height_, number_of_players);
+	game_map = hlt::Map(width_, height_, number_of_players, seed_);
 
-	//Perform initialization not specific to constructor
-	init();
-}
-
-
-Halite::Halite(unsigned short width_, unsigned short height_, Networking networking_, std::vector<std::string> names_) {
-	networking = networking_;
-	number_of_players = networking.numberOfPlayers();
-
-	//Initialize map
-	game_map = hlt::Map(width_, height_, number_of_players);
-
-	//Perform initialization not specific to constructor
-	init();
-
-	//Override player names with the provided ones.
-	player_names = names_;
-}
-
-void Halite::init() {
 	//Add colors to possible colors:
 	possible_colors.clear();
 	possible_colors.push_back({ 1.0f, 0.0f, 0.0f });
@@ -393,6 +326,12 @@ void Halite::init() {
 			networking.killPlayer(a + 1);
 		}
 	}
+
+	//Override player names with the provided ones if appropriate.
+	if(names_ != NULL) {
+		player_names.clear();
+		for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
+	}
 }
 
 void Halite::output(std::string filename) {
@@ -422,7 +361,7 @@ GameStatistics Halite::runGame() {
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber) {
 		//Increment turn number:
 		turn_number++;
-		if(!program_output_style) std::cout << "Turn " << turn_number << "\n";
+		if(!quiet_output) std::cout << "Turn " << turn_number << "\n";
 		//Frame logic.
 		std::vector<bool> newResult = processNextFrame(result);
 		//Add to vector of players that should be dead.
