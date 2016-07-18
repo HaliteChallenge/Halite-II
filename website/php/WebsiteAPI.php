@@ -221,8 +221,8 @@ class WebsiteAPI extends API{
 			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
 			foreach($oldGameUsers as $oldGameUser) {
 				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
+				$this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
 			}
-			$this->insert("DELETE FROM GameUser WHERE userID=$userID");
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
