@@ -37,35 +37,18 @@ $(function() {
 
 	var gameTable = {
 		$tableBody: $("#gameTableBody"),
+		$loadButton: $("#loadButton"),
 		games: [],
-		init: function(userID, rawGames) {
+		init: function(userID, getNextGames) {
 			this.userID = userID;
-			this.rawGames = rawGames;
-			this.transformGames();
+			this.getNextGames = getNextGames;
+			this.games = getNextGames(this.userID);
+
+			this.$loadButton.click(this, this.loadMore.bind(this));			
+
 			this.render();
 		},
-		transformGames: function() {
-			console.log(this.rawGames)
-			for(var a = 0; a < this.rawGames.length; a++) {
-				var players = this.rawGames[a].users;
-				players.sort(function(p1, p2) {
-					return parseInt(p1.rank) - parseInt(p2.rank);
-				});
-				var userID = this.userID;
-				var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
-				var result = thisUser.rank + " of " + players.length;
-
-				this.games.push({
-					players: players,
-					result: result,
-					mapWidth: this.rawGames[a].mapWidth,
-					mapHeight: this.rawGames[a].mapHeight,
-					replayName: this.rawGames[a].replayName
-				});
-			}
-		},
 		render: function() {
-
 			this.$tableBody.empty();
 			for(var a = 0; a < this.games.length; a++) {
 				this.$tableBody.append(this.getTableRow(this.games[a]));
@@ -83,6 +66,10 @@ $(function() {
 			}).join(" ");
 			playersList += "</ol>";
 			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
+		},
+		loadMore: function() {
+			this.games = this.games.concat(this.getNextGames(this.userID, this.games[this.games.length-1].gameID));
+			this.render();
 		}
 	}
 
@@ -128,6 +115,30 @@ $(function() {
 
 	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
 	statTable.init(statsFromUser(user, numUsers));
-	gameTable.init(userID, getLatestGamesForUser(userID, 10));
+	gameTable.init(userID, function(userID, startingID) {
+		console.log(startingID)
+		var rawGames = getLatestGamesForUser(userID, 10, startingID); 
+		console.log(rawGames);
+		var games = [];
+		for(var a = 0; a < rawGames.length; a++) {
+			var players = rawGames[a].users;
+			players.sort(function(p1, p2) {
+				return parseInt(p1.rank) - parseInt(p2.rank);
+			});
+			var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
+			var result = thisUser.rank + " of " + players.length;
+
+			games.push({
+				gameID: rawGames[a].gameID,
+				players: players,
+				result: result,
+				mapWidth: rawGames[a].mapWidth,
+				mapHeight: rawGames[a].mapHeight,
+				replayName: rawGames[a].replayName
+			});
+		}
+		console.log(games)
+		return games;
+	});
 
 })

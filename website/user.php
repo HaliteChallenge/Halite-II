@@ -44,6 +44,7 @@
 						<tbody id="gameTableBody">
 						</tbody>
 					</table>
+					<button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
 				</div>
 			</div>
 		</div>

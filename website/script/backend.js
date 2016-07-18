@@ -88,13 +88,15 @@ function getActiveUsers() {
 	return result.responseJSON;
 }
 
-function getLatestGamesForUser(userID, limit) {
+function getLatestGamesForUser(userID, limit, startingID) {
+	console.log(startingID)
 	var result = $.ajax({
 		url: url+"game",
 		async: false,
 		method: "GET",
-		data: {userID: userID, limit: limit}
+		data: {userID: userID, limit: limit, startingID: startingID}
 	});
+	console.log(startingID)
 	return result.responseJSON;
 }
 

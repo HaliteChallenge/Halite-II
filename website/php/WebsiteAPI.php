@@ -176,9 +176,10 @@ class WebsiteAPI extends API{
 	protected function game() {
 		if(isset($_GET['userID'])) {
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
+			$startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
 			$userID = $_GET['userID'];
 
-			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID ORDER BY gameID DESC LIMIT $limit");
+			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
 			$gameArrays = array();
 
 			// Get each game's info
