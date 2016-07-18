@@ -24,7 +24,16 @@ fn main() {
 			for b in 0..game_map.width {
 				let l = hlt::types::Location { x: b, y: a };
 				if game_map.get_site(l, types::STILL).owner == my_id {
-					moves.insert(l, (rng.gen::<u32>() % 5) as u8);
+					let mut dir: u8 = types::STILL;
+					if { game_map.get_site(l, types::STILL).strength } >= 5 * game_map.get_site(l, types::STILL).production {
+						dir = (rng.gen::<u32>() % 5) as u8;
+						for d in types::CARDINALS.iter() {
+							if game_map.get_site(l, *d).owner != my_id {
+								dir = *d;
+							}
+						}
+					}
+					moves.insert(l, dir);
 				}
 			}
 		}

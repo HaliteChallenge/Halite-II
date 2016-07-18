@@ -13,7 +13,7 @@
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
 
-extern bool program_output_style, ignore_timeout;
+extern bool quiet_output, ignore_timeout;
 
 struct PlayerStatistics {
 	int tag;
@@ -69,11 +69,8 @@ private:
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
-	Halite(unsigned short w, unsigned short h);
-	Halite(unsigned short width_, unsigned short height_, Networking networking_);
-	Halite(unsigned short width_, unsigned short height_, Networking networking_, std::vector<std::string> names_);
+	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, std::vector<std::string> * names_);
 
-	void init();
 	void output(std::string filename);
 	GameStatistics runGame();
 	std::string getName(unsigned char playerTag);

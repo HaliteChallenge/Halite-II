@@ -50,7 +50,7 @@ std::ofstream debug;
 #elif defined(__APPLE__)
 	#define SHIFT 2
 #else
-	#define SHIFT 0.025
+	#define SHIFT 0.05
 #endif
 
 #ifdef _WIN32

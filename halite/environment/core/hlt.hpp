@@ -4,8 +4,8 @@
 #include <vector>
 #include <random>
 #include <functional>
-#include <chrono>
 #include <iostream>
+#include <fstream>
 
 #define STILL 0
 #define NORTH 1
@@ -49,11 +49,26 @@ namespace hlt{
 			map_height = otherMap.map_height;
 			contents = otherMap.contents;
 		}
-		Map(short width, short height, unsigned char numberOfPlayers) {
+		Map(short width, short height, unsigned char numberOfPlayers, unsigned int seed) {
+			//Pseudorandom number generator.
+			std::mt19937 prg(seed);
+			std::uniform_real_distribution<double> urd(0.0, 1.0);
+
+			//Decides whether to put more players along the horizontal or the vertical.
+			bool preferHorizontal = prg() % 2;
+
+			int dw, dh;
 			//Find number closest to square that makes the match symmetric.
-			int dw = sqrt(numberOfPlayers);
-			while(numberOfPlayers % dw != 0) dw--;
-			int dh = numberOfPlayers / dw;
+			if(preferHorizontal) {
+				dh = sqrt(numberOfPlayers);
+				while(numberOfPlayers % dh != 0) dh--;
+				dw = numberOfPlayers / dh;
+			}
+			else {
+				dw = sqrt(numberOfPlayers);
+				while(numberOfPlayers % dw != 0) dw--;
+				dh = numberOfPlayers / dw;
+			}
 
 			//Figure out chunk width and height accordingly.
 			//Matches width and height as closely as it can, but is not guaranteed to match exactly.
@@ -61,9 +76,12 @@ namespace hlt{
 			int cw = width / dw;
 			int ch = height / dh;
 
-			//Pseudorandom number generator.
-			std::mt19937 prg(std::chrono::system_clock::now().time_since_epoch().count());
-			std::uniform_real_distribution<double> urd(0.0, 1.0);
+			//Ensure that we'll be able to move the tesselation by a uniform amount.
+			if(preferHorizontal) while(ch % numberOfPlayers != 0) ch--;
+			else while(cw % numberOfPlayers != 0) cw--;
+
+			map_width = cw * dw;
+			map_height = ch * dh;
 
 			const std::function<double()> rud = [&]() -> double { return urd(prg); };
 
@@ -72,8 +90,8 @@ namespace hlt{
 				double factor;
 			public:
 				std::vector< std::vector<Region * > > children; //Tries to make it 4x4.
-				Region(int _w, int _h, double _min, double _max, const std::function<double()> & _rud) {
-					factor = pow(_rud(), 2) * (_max - _min) + _min;
+				Region(int _w, int _h, const std::function<double()> & _rud) {
+					factor = pow(_rud(), 1.5);
 					children.clear();
 					const int CHUNK_SIZE = 4;
 					if(_w == 1 && _h == 1) return;
@@ -86,13 +104,13 @@ namespace hlt{
 							for(int b = 0; b < CHUNK_SIZE; b++) {
 								int tcw = b < difW ? cw + 1 : cw;
 								if(tcw > 0) {
-									children.back().push_back(new Region(tcw, tch, _min, _max, _rud));
+									children.back().push_back(new Region(tcw, tch, _rud));
 								}
 							}
 						}
 					}
 					const double OWN_WEIGHT = 0.75;
-					for(int a = 0; a < 2; a++) { //2 iterations found by experiment.
+					for(int z = 0; z < 1; z++) { //1 iterations found by experiment.
 						for(int a = 0; a < children.size(); a++) {
 							int mh = a - 1, ph = a + 1;
 							if(mh < 0) mh += children.size();
@@ -109,7 +127,7 @@ namespace hlt{
 							}
 						}
 					}
-				 };
+				}
 				std::vector< std::vector<double> > getFactors() {
 					if(children.size() == 0) return std::vector< std::vector<double> >(1, std::vector<double>(1, factor));
 					std::vector< std::vector< std::vector< std::vector<double> > > > childrenFactors(children.size(), std::vector< std::vector< std::vector<double> > >(children.front().size()));
@@ -143,11 +161,19 @@ namespace hlt{
 			//For final iteration
 			const double OWN_WEIGHT = 0.66667;
 
-			Region prodRegion(cw, ch, 0.5, 3, rud);
-			std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
+			int sCA = sqrt(cw * ch); //Average dim.
 
+			auto normalize = [](std::vector< std::vector<double> > & v) {
+				double highest = 0;
+				for(auto a = v.begin(); a != v.end(); a++) for(auto b = a->begin(); b != a->end(); b++) if(*b > highest) highest = *b;
+				for(auto a = v.begin(); a != v.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b /= highest;
+			};
+
+			Region prodRegion(cw, ch, rud);
+			std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
+			
 			//Iterate this region as well to produce better caverns:
-			for(int a = 0; a < 5; a++) { // 5 iterations found by experiment.
+			for(int z = 0; z < 2 + sCA / 10; z++) { // Found by experiment.
 				for(int a = 0; a < prodChunk.size(); a++) {
 					int mh = a - 1, ph = a + 1;
 					if(mh < 0) mh += prodChunk.size();
@@ -165,11 +191,13 @@ namespace hlt{
 				}
 			}
 
-			Region strengthRegion(cw, ch, 0.4, 2.25, rud);
+			normalize(prodChunk);
+
+			Region strengthRegion(cw, ch, rud);
 			std::vector< std::vector<double> > strengthChunk = strengthRegion.getFactors();
 
 			//Iterate this region as well to produce better caverns:
-			for(int a = 0; a < 3; a++) { // 3 iterations found by experiment.
+			for(int z = 0; z < 1 + sCA / 10; z++) { // Found by experiment.
 				for(int a = 0; a < strengthChunk.size(); a++) {
 					int mh = a - 1, ph = a + 1;
 					if(mh < 0) mh += strengthChunk.size();
@@ -187,24 +215,62 @@ namespace hlt{
 				}
 			}
 
-			map_width = cw * dw;
-			map_height = ch * dh;
-			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+			normalize(strengthChunk);
 
-			//Fill in with chunks.
-			const int MED_PROD = 1, MED_STR = 50;
-			bool reflectVertical = dh % 2 == 0, reflectHorizontal = dw % 2 == 0;
+			//We'll first tesselate the map; we'll apply our various translations and transformations later.
+			const int TOP_PROD = prg() % 16 + 10, TOP_STR = prg() % 106 + 150;
+			std::vector< std::vector<Site> > tesselation = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
 			for(int a = 0; a < dh; a++) {
 				for(int b = 0; b < dw; b++) {
 					for(int c = 0; c < ch; c++) {
 						for(int d = 0; d < cw; d++) {
-							int cc = reflectVertical && a % 2 != 0 ? ch - c - 1 : c, dd = reflectHorizontal && b % 2 != 0 ? cw - d - 1 : d;
-							contents[a * ch + c][b * cw + d].production = round(MED_PROD * prodChunk[cc][dd]); //Set production values.
-							contents[a * ch + c][b * cw + d].strength = round(MED_STR * strengthChunk[cc][dd]);
+							tesselation[a * ch + c][b * cw + d].production = round(TOP_PROD * prodChunk[c][d]);
+							tesselation[a * ch + c][b * cw + d].strength = round(TOP_STR * strengthChunk[c][d]);
 						}
 					}
-					contents[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
-					contents[a * ch + ch / 2][b * cw + cw / 2].strength = 255; //Set strengths
+					tesselation[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
+					tesselation[a * ch + ch / 2][b * cw + cw / 2].strength = 255; //Set strengths
+				}
+			}
+
+			//We'll now apply the reflections to the map.
+			bool reflectVertical = dh % 2 == 0, reflectHorizontal = dw % 2 == 0; //Am I going to reflect in the horizontal vertical directions at all?
+			std::vector< std::vector<Site> > reflections = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+			for(int a = 0; a < dh; a++) {
+				for(int b = 0; b < dw; b++) {
+					bool vRef = reflectVertical && a % 2 != 0, hRef = reflectHorizontal && b % 2 != 0; //Do I reflect this chunk at all?
+					for(int c = 0; c < ch; c++) {
+						for(int d = 0; d < cw; d++) {
+							reflections[a * ch + c][b * cw + d] = tesselation[a * ch + (vRef ? ch - c - 1 : c)][b * cw + (hRef ? cw - d - 1 : d)];
+						}
+					}
+				}
+			}
+
+			//Next, let's apply our shifts to create the contents map.
+			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+			if(preferHorizontal) {
+				int shift = (prg() % dh) * (height / dh); //A vertical shift.
+				for(int a = 0; a < dh; a++) {
+					for(int b = 0; b < dw; b++) {
+						for(int c = 0; c < ch; c++) {
+							for(int d = 0; d < cw; d++) {
+								contents[a * ch + c][b * cw + d] = reflections[(a * ch + b * shift + c) % map_height][b * cw + d];
+							}
+						}	
+					}
+				}
+			}
+			else {
+				int shift = (prg() % dw) * (width / dw); //A horizontal shift.
+				for(int a = 0; a < dh; a++) {
+					for(int b = 0; b < dw; b++) {
+						for(int c = 0; c < ch; c++) {
+							for(int d = 0; d < cw; d++) {
+								contents[a * ch + c][b * cw + d] = reflections[a * ch + c][(b * cw + a * shift + d) % map_width];
+							}
+						}
+					}
 				}
 			}
 		}
