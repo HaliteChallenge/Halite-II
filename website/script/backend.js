@@ -157,3 +157,14 @@ function getForumSignInURL(payload, signature, userID, email, username) {
 		}
 	}).responseJSON;
 }
+
+function getWorkers() {
+	return $.ajax({
+		url: url+"worker",
+		async: false,
+		method: "GET",
+		data: {}
+	}).responseJSON;
+}
+
+

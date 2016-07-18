@@ -263,6 +263,12 @@ class WebsiteAPI extends API{
 			return $finalURL;
 		}
 	}
+	
+	protected function worker() {
+		$workers = $this->selectMultiple("SELECT * FROM Worker");
+		return $workers;
+	}
+
 
 	protected function session() {
 		session_start();
