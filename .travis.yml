@@ -20,7 +20,7 @@ script:
 
   - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
-  - ./environment 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot" "../../airesources/C++/MyBot.o"
+  - ./environment -d 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot" "../../airesources/C++/MyBot.o"
 
   - cd  ~/build/HaliteChallenge/Halite/halite/visualizer
   - make
