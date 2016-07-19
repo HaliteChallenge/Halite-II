@@ -16,20 +16,11 @@
 	<div class="container">
 		<div class="pageContent">
 			<div class="row">
-				<div class="col-sm-12">
+				<div class="col-sm-11">
 					<h1>Halite.io Leaderboard</h1>
-					<table class="table well well-sm" id="leaderTable" style="margin-bottom: 20px;">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Username</th>
-								<th>Language</th>
-								<th>Submissions</th>
-								<th>Games Played</th>
-								<th>Score</th>
-							</tr>
-						</thead>
-					</table>
+					<div id="leaderboardDiv">
+						
+					</div>
 				</div>
 			</div>
 		</div>
@@ -40,6 +31,7 @@
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
 	<script src="script/index.js"></script>
+	<script src="script/leaderboard.js"></script>
 </body>
 
 </html>
