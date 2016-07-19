@@ -46,7 +46,7 @@ As with the productions, the frame fills in the map by row, and within a row by 
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="previous"><a href="game_spec.php"><span aria-hidden="true">&larr;</span> Game Spec</a></li>
+					<li class="previous"><a href="tool_spec.php"><span aria-hidden="true">&larr;</span> Tools Spec</a></li>
 					<li class="next"><a href="networking_spec.php">Networking Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
