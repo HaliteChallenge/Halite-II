@@ -3,7 +3,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Game Rules</title>
+	<title>Tools Spec</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
