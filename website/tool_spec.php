@@ -45,12 +45,12 @@
 					</ul>
 					Flags must be prefixed by their own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may <b>not</b> be combined like so: <code>-qst</code>.
 				</p>
-				
+
 				<p>
 					For help on the visualizer commands, we recommend pulling up the visualizer and pressing 'h' to show the help screen. In the event that something does not work (e.g. text rendering), the same commands are listed below:
 					<ul>
 						<li>To pause or unpause the replay, press SPACE</li>
-						<li>To move around in the replay, press LEFT ARROW or RIGHT ARROW
+						<li>To move around in the replay, press &#8592 or RIGHT ARROW
 						<ul>
 							<li>Hold shift to move around five times faster.</li>
 							<li>To change move and play speed, press UP ARROW or DOWN ARROW
