@@ -164,7 +164,7 @@ class ManagerAPI extends API{
 				$language = isset($_POST['language']) ? $_POST['language'] : "Other";
 				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 			} else {
-				$this->insert("UPDATE User SET status = 0 WHERE userID = $userID");
+				$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = $userID");
 			}
 		}
 	}
