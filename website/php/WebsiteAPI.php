@@ -205,6 +205,10 @@ class WebsiteAPI extends API{
 
 	protected function botFile() {
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			if(strcmp($_SERVER['REMOTE_ADDR'], "208.77.212.129") == 0) {
+				return "Cannot submit on Two Sigma desktop";
+			}
+
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
