@@ -17,7 +17,7 @@ int main(int argc, char* args[]) {
 	//Paramters to start up a game.
 	bool passed_dimensions = false, passed_seed = false, passed_bot_names = false;
 	unsigned short mapWidth, mapHeight;
-	unsigned int seed = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using milliseconds to prevent same maps from coming up due to multiple worker servers.
+	unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
 	Networking networking;
 	std::vector<std::string> * names = NULL;
 
@@ -138,7 +138,7 @@ int main(int argc, char* args[]) {
 	//Create game. Null parameters will be ignored.
 	my_game = new Halite(mapWidth, mapHeight, seed, networking, names);
 
-	std::string filename = "Replays/" + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
+	std::string filename = "Replays/" + std::to_string(seed) + '-' + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
 	GameStatistics stats = my_game->runGame();
 
