@@ -37,6 +37,34 @@
 				</p>
 				
 				<h3>Visualizer</h3>
+				<p>
+					The visualizer may be passed either one or two arguments:
+					<ul>
+						<li><code>-v</code>: (for now, must be first arg) The visualizer will write incredibly verbose output to its debug.log file. This is very useful for when things break or strange bugs occur, but can significantly slow down the visualizer due to the continual flushing of the output stream.</li>
+						<li><code>path/to/file.hlt</code>: Will automatically load in the file and start viewing it. Useful for when you don't want to drag a file onto screen.</li>
+					</ul>
+					Flags must be prefixed by their own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may <b>not</b> be combined like so: <code>-qst</code>.
+				</p>
+				
+				<p>
+					For help on the visualizer commands, we recommend pulling up the visualizer and pressing 'h' to show the help screen. In the event that something does not work (e.g. text rendering), the same commands are listed below:
+					<ul>
+						<li>To pause or unpause the replay, press SPACE</li>
+						<li>To move around in the replay, press LEFT ARROW or RIGHT ARROW
+						<ul>
+							<li>Hold shift to move around five times faster.</li>
+							<li>To change move and play speed, press UP ARROW or DOWN ARROW
+						</ul></li>
+						<li>To move around in the replay by frame, press , or .</li>
+						<li>To go to the beginning or end of the replay, press z or x</li>
+						<li>To pan around in the map, use the w, a, s, and d keys.</li>
+						<li>To zoom in or out on the graphs, press + or -</li>
+						<li>To view the production map, hold TAB</li>
+						<li>To reload a replay from file, press r</li>
+						<li>To toggle fullscreen mode, press f</li>
+						<li>To view this help panel, hold h</li>
+					</ul>
+				</p>
 			</div>
 		</div>
 	</div>
