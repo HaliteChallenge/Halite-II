@@ -70,8 +70,15 @@ $(function() {
 			},
 			buttonClicked: function() { this.$fileInput.click(); },
 			fileChanged: function() {
-				storeBotFile("submitForm");
-				messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+				var uploadOutput = storeBotFile("submitForm");
+				if(uploadOutput.indexOf("error") != -1) {
+					messageBox.alert("File Upload Error", "An error occurred while uploading your file. <b>Your file may have been too big</b>. Check to make sure that your file is under <b>1 megabyte</b>. Make sure that you haven't packaged some unnecessary, big binaries. If this persists, post of the forums or email us at halite@halite.io.", false);
+				} else if(uploadOutput.indexOf("large") != -1) {
+					messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 1 megabyte. Make sure you aren't packaging unnecessary binaries.", false);
+				} else {
+					messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+				}
+
 			}
 		},
 

@@ -205,7 +205,6 @@ class WebsiteAPI extends API{
 
 	protected function botFile() {
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			var_dump($_POST);
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
@@ -213,11 +212,17 @@ class WebsiteAPI extends API{
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
-
+			
+			if ($_FILES["botFile"]["size"] > 1000000) {
+				return "Sorry, your file is too large.";
+			}
+			
 			$targetPath = "../../storage/bots/{$userID}.zip";
-			if(file_exists($targetPath) == true) unlink($targetPath);
+			if(file_exists($targetPath) == true) unlink($targetPath);	
 
-			move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath);
+			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
+				return "File upload error";
+			}
 
 			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
 			foreach($oldGameUsers as $oldGameUser) {

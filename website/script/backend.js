@@ -53,6 +53,7 @@ function storeBotFile(formID) {
 			console.log(xhr.responseText)
 		}
 	})
+	console.log(result);
 	return result.responseJSON;
 }
 
