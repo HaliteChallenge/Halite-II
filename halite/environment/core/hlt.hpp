@@ -55,7 +55,7 @@ namespace hlt{
 			std::uniform_real_distribution<double> urd(0.0, 1.0);
 
 			//Decides whether to put more players along the horizontal or the vertical.
-			bool preferHorizontal = prg() % 2;
+			bool preferHorizontal = true;// prg() % 2;
 
 			int dw, dh;
 			//Find number closest to square that makes the match symmetric.
@@ -250,7 +250,7 @@ namespace hlt{
 			//Next, let's apply our shifts to create the contents map.
 			contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
 			if(preferHorizontal) {
-				int shift = (prg() % dh) * (height / dh); //A vertical shift.
+				int shift = (prg() % dw) * (height / dw); //A vertical shift.
 				for(int a = 0; a < dh; a++) {
 					for(int b = 0; b < dw; b++) {
 						for(int c = 0; c < ch; c++) {
@@ -262,7 +262,7 @@ namespace hlt{
 				}
 			}
 			else {
-				int shift = (prg() % dw) * (width / dw); //A horizontal shift.
+				int shift = (prg() % dh) * (width / dh); //A horizontal shift.
 				for(int a = 0; a < dh; a++) {
 					for(int b = 0; b < dw; b++) {
 						for(int c = 0; c < ch; c++) {
