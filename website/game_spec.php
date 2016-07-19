@@ -89,7 +89,7 @@
 		<div class="container">
 			<div id="footer">
 				<ul class="pager">
-					<li class="next"><a href="file_spec.php">File Spec <span aria-hidden="true">&rarr;</span> </a></li>
+					<li class="next"><a href="tool_spec.php">Tools Spec <span aria-hidden="true">&rarr;</span> </a></li>
 				</ul>
 			</div>
 		</div>
