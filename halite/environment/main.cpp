@@ -99,7 +99,7 @@ int main(int argc, char* args[]) {
 	}
 
 	if(override_names) {
-		if(sArgs.size() < 4 || sArgs.size() % 2 == 0) {
+		if(sArgs.size() < 4 || sArgs.size() % 2 != 0) {
 			std::cout << "Invalid player parameters (inferred from #) - couldn't start game." << std::endl;
 			return EXIT_FAILURE;
 		}
