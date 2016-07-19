@@ -19,13 +19,13 @@ $(function() {
 			});
 			
 			console.log(this.$tableDiv);
-			var chunkSize = Math.ceil(this.submissions.length/2);
+			var chunkSize = Math.ceil(this.submissions.length);
 			for(var a = 0; a < this.submissions.length; a+=chunkSize) {
 				this.$tableDiv.append(this.getTableWithSubmissions(a, this.submissions.slice(a, a+chunkSize)));
 			}
 		},
 		getTableWithSubmissions: function(startingRank, submissions) {
-			var $table = $("<table class='table well well-sm' id='leaderTable' style='float: left; width: 47%; margin: 5px;'></table>");
+			var $table = $("<table class='table well well-sm' id='leaderTable' style='float: left; width: 10%; margin: 5px;'></table>");
 			$table.append($("<thead><tr><th>#</th><th>Username</th><th>Language</th><th>Entries</th><th>Games Played</th><th>Score</th></tr></thead>"));
 
 			for(var a = 0; a < submissions.length; a++) {
