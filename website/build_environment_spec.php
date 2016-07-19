@@ -19,10 +19,9 @@
         <h3>Hardware</h3>
         <p>All compilation and game execution is done on Ubuntu 14.04 servers hosted by Digital Ocean with the following specs:
           <ul>
-            <li>512 MB of RAM</li>
-            <li>20 GB of disk spaces</li>
-            <li>512 MB of RAM</li>
-            <li>1 processor core</li>
+            <li>2 GB of RAM</li>
+            <li>40 GB of disk space</li>
+            <li>2 processor cores</li>
           </ul>
         </p>
 
