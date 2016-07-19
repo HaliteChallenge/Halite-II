@@ -365,14 +365,29 @@ GameStatistics Halite::runGame() {
 		//Frame logic.
 		std::vector<bool> newResult = processNextFrame(result);
 		//Add to vector of players that should be dead.
+		std::vector<unsigned int> newRankings;
 		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a]) {
-			rankings.push_back(a);
+			newRankings.push_back(a);
 		}
+		//Sort newRankings by full territory count.
+		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && full_territory_count[b] < full_territory_count[b - 1]; b--) {
+			unsigned char temp = newRankings[b];
+			newRankings[b] = newRankings[b - 1];
+			newRankings[b - 1] = temp;
+		}
+		for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
 		result = newResult;
 	}
-
-	for(int a = 0; a < number_of_players; a++) if(result[a]) rankings.push_back(a);
-	std::reverse(rankings.begin(), rankings.end());
+	std::vector<unsigned int> newRankings;
+	for(int a = 0; a < number_of_players; a++) if(result[a]) newRankings.push_back(a);
+	//Sort newRankings by full territory count.
+	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && full_territory_count[b] < full_territory_count[b - 1]; b--) {
+		unsigned char temp = newRankings[b];
+		newRankings[b] = newRankings[b - 1];
+		newRankings[b - 1] = temp;
+	}
+	for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
+	std::reverse(rankings.begin(), rankings.end()); //Best player first rather than last.
 	GameStatistics stats;
 	int chunkSize = game_map.map_width * game_map.map_height / number_of_players;
 	for(unsigned char a = 0; a < number_of_players; a++) {
