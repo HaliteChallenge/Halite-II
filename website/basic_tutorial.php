@@ -54,8 +54,8 @@
 				<p>
 					As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. This logic is encoded in these lines of the starter bot.
 					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
-if(site.owner == playerTag) {
-  byte dir = Direction.randomDirection();
+if(site.owner == myID) {
+  Direction dir = Direction.randomDirection();
   moves.add(new Move(new Location((short)x, (short)y), dir));
 }</pre>
 				</p>
@@ -73,13 +73,13 @@ if(site.owner == playerTag) {
 				<p>
 					This logic may easily be transferred to code like so:
 					<pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
-if(site.owner == playerTag) {
-  byte moveDirection = Direction.randomDirection();
-  if(site.strength < site.production*5) {
+if(site.owner == myID) {
+  Direction moveDirection = Direction.randomDirection();
+  if(site.strength &lt; site.production*5) {
     moveDirection = Direction.STILL;
   } else {
-    for(byte possibleDirection : Direction.CARDINALS) {
-      if(gameMap.getSite(new Location(x, y), possibleDirection).owner != playerTag) {
+    for(Direction possibleDirection : Direction.CARDINALS) {
+      if(gameMap.getSite(new Location(x, y), possibleDirection).owner != myID) {
         moveDirection = possibleDirection;
         break;
       }
@@ -96,26 +96,26 @@ if(site.owner == playerTag) {
 public class MyBot{
   public static void main(String[] args) {
     InitPackage iPackage = Networking.getInit();
-    short playerTag = iPackage.playerTag;
+    short myID = iPackage.myID;
     Map gameMap = iPackage.map;
 
-    Networking.sendInit("JavaBot" + playerTag);
+    Networking.sendInit("BasicJavaBot");
 
     while(true) {
       ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
 
       gameMap = Networking.getFrame();
 
-      for(short y = 0; y < gameMap.contents.size(); y++) {
-        for(short x = 0; x < gameMap.contents.get(y).size(); x++) {
+      for(short y = 0; y &lt; gameMap.contents.size(); y++) {
+        for(short x = 0; x &lt; gameMap.contents.get(y).size(); x++) {
           Site site = gameMap.contents.get(y).get(x);
-          if(site.owner == playerTag) {
-            byte moveDirection = Direction.randomDirection();
-            if(site.strength < site.production*5) {
+          if(site.owner == myID) {
+            Direction moveDirection = Direction.randomDirection();
+            if(site.strength &lt; site.production*5) {
               moveDirection = Direction.STILL;
             } else {
-              for(byte d : Direction.CARDINALS) {
-                if(gameMap.getSite(new Location(x, y), d).owner != playerTag) {
+              for(Direction d : Direction.CARDINALS) {
+                if(gameMap.getSite(new Location(x, y), d).owner != myID) {
                   moveDirection = d;
                   break;
                 }
@@ -132,9 +132,9 @@ public class MyBot{
 }</pre>
 				</p>
 
-				<p>Try running a game between two basics and compare it to the game between two starter bots.</p>
+				<p>The source code for the basic bot in other languages is located <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/basic">here</a>. <b>Note</b>: If you submit the basic bot to competition, please make sure that the main file is named <code>MyBot</code> not <code>BasicBot</code>.</p>
 
-				<p><b>Note</b>: If you submit the basic bot to competition, please make sure that the main file is named <code>MyBot</code> not <code>BasicBot</code>.</p>
+				<p>Try running a game between two basics and compare it to the game between two starter bots.</p>
 
 				<h3>What's Next?</h3>
 				<p>
