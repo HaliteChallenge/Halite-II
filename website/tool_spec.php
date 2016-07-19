@@ -50,10 +50,10 @@
 					For help on the visualizer commands, we recommend pulling up the visualizer and pressing 'h' to show the help screen. In the event that something does not work (e.g. text rendering), the same commands are listed below:
 					<ul>
 						<li>To pause or unpause the replay, press SPACE</li>
-						<li>To move around in the replay, press &#8592 or RIGHT ARROW
+						<li>To move around in the replay, press &#8592 or &#8594
 						<ul>
 							<li>Hold shift to move around five times faster.</li>
-							<li>To change move and play speed, press UP ARROW or DOWN ARROW
+							<li>To change move and play speed, press &#8593 or &#8595
 						</ul></li>
 						<li>To move around in the replay by frame, press , or .</li>
 						<li>To go to the beginning or end of the replay, press z or x</li>
