@@ -85,18 +85,22 @@ int main(int argc, char ** argv) {
 			std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
 			networking = promptNetworking();
 		}
-		try {
-			names = new std::vector<std::string>();
-			while(!sArgs.empty()) {
-				networking.startAndConnectBot(sArgs.front());
-				sArgs.pop_front();
-				names->push_back(sArgs.front());
-				sArgs.pop_front();
+		else {
+			try {
+				names = new std::vector<std::string>();
+				while(!sArgs.empty()) {
+					networking.startAndConnectBot(sArgs.front());
+					sArgs.pop_front();
+					names->push_back(sArgs.front());
+					sArgs.pop_front();
+				}
 			}
-		}
-		catch(...) {
-			std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
-			networking = promptNetworking();
+			catch(...) {
+				std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
+				networking = promptNetworking();
+				delete names;
+				names = NULL;
+			}
 		}
 	}
 	else {
@@ -119,6 +123,7 @@ int main(int argc, char ** argv) {
 
 	//Create game. Null parameters will be ignored.
 	my_game = new Halite(mapWidth, mapHeight, seed, networking, names);
+	if(names != NULL) delete names;
 
 	std::string filename = "Replays/" + std::to_string(seed) + '-' + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
