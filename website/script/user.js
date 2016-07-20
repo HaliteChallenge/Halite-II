@@ -81,7 +81,7 @@ $(function() {
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
 			"numGames": {name: "Number of Games Played", mouseOverText: null},
 			"language": {name: "Language", mouseOverText: null},
-			"didTimeout": {name: "Timeout Frequency", mouseOverText: null, percentage: true},
+			"didTimeout": {name: "Timeout Frequency", mouseOverText: null},
 			"territoryRanking": {name: "Territory Ranking", mouseOverText: "(Your total territory * Number of players)/(Number of frames you were alive * Map area)", percentile: true},
 			"strengthRanking": {name: "Strength Ranking", mouseOverText: "(Your total strength * Number of players) / (Number of frames you were alive * Map area)", percentile: true},
 			"productionRanking": {name: "Production Ranking", mouseOverText: "(Total amount of strength that you produced * Number of players) / (Number of turns you were alive * Map area)", percentile: true},
@@ -93,8 +93,6 @@ $(function() {
 			if(user[key] != undefined && user[key] != null) {
 				if(statDetails[key].percentile) {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" of "+numUsers})
-				} else if(statDetails[key].percentage) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: (100*user[key])+"%"})
 				} else {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
 				}
@@ -109,7 +107,7 @@ $(function() {
 	var extraStats = getExtraStats(userID);
 	$.extend(user, extraStats);
 	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-	user["didTimeout"] = Math.round(1000*user["didTimeout"])/1000;
+	user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
 	var numUsers = getNumActiveUsers();
 
