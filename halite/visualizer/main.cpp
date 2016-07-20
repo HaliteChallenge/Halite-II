@@ -1,14 +1,15 @@
 #include <iostream>
 #include <thread>
 #include <stdlib.h>
+#include <limits.h>
 #include <stdio.h>
 #include "core/Halite.hpp"
 
 #ifdef _WIN32
-	#include <Windows.h>
-	#include <direct.h>
+#include <Windows.h>
+#include <direct.h>
 #else
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 
 
@@ -59,6 +60,25 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstnace, PSTR lpCmdLine, INT nC
 int main(int argc, const char ** argv) {
 #endif
 
+	std::list<std::string> sArgs;
+	for(int a = 1; a < argc; a++) sArgs.push_back(std::string(argv[a]));
+
+	std::string * fn = NULL;
+	for(auto a = sArgs.begin(); a != sArgs.end(); a++) {
+		if(*a == "-v") verboseOutput = true;
+		else if(a->substr(a->find_last_of('.'), 4) == ".hlt") {
+			char * fp = new char[256];
+#ifdef _WIN32
+			GetFullPathName(a->c_str(), 256, fp, NULL);
+#else
+			realpath(a->c_str(), fp);
+#endif
+			fn = new std::string(fp);
+			std::cout << *fn << std::endl;
+			delete fp;
+		}
+	}
+
 	std::string loc(argv[0]);
 	std::replace(loc.begin(), loc.end(), '\\', '/');
 	loc = loc.substr(0, loc.find_last_of('/'));
@@ -98,23 +118,13 @@ int main(int argc, const char ** argv) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 1);
 
-	if(argc > 1) {
-		if(strcmp(argv[1], "-v") == 0) {
-			verboseOutput = true;
-			if(argc == 3) {
-				debug << "About to handle the drop of the provided (arg 3) file!" << std::endl;
-				handleDrop(window, 1, (const char **)(argv + 2));
-			}
-			else {
-				while(isLaunch && !glfwWindowShouldClose(window)) {
-					debug << "About to enter renderLaunch!" << std::endl;
-					renderLaunch();
-				}
-			}
-		}
-		else if(argc == 2) handleDrop(window, 1, (const char **)(argv + 1));
+	if(fn != NULL) {
+		if(verboseOutput) debug << "About to handle the drop of the provided file!" << std::endl;
+		const char * flnm = fn->c_str();
+		handleDrop(window, 1, &flnm);
 	}
 	else {
+		if(verboseOutput) debug << "About to enter renderLaunch!" << std::endl;
 		while(isLaunch && !glfwWindowShouldClose(window)) {
 			renderLaunch();
 		}
