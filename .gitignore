@@ -320,9 +320,6 @@ worker/environment
 git_pull.php
 
 *.zip
-!Halite-Debian.zip
-!Halite-Windows.zip
-!Halite-Mac.zip
 
 airesources/C++/MyBot
 airesources/C++/BasicBot
