@@ -9,6 +9,9 @@
 bool quiet_output = false, ignore_timeout = false; //Need to be passed to the game.
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
+Networking promptNetworking();
+void promptDimensions(unsigned short & w, unsigned short & h);
+
 int main(int argc, char* args[]) {
 	srand(time(NULL)); //For all non-seeded randomness.
 
@@ -35,7 +38,7 @@ int main(int argc, char* args[]) {
 				a = sArgs.erase(a);
 			}
 			catch(...) {
-				std::cout << "The dimension parameters were either not present or invalid." << std::endl;
+				std::cout << "The dimension parameters were either not present or invalid despite the flag having been given." << std::endl;
 				return EXIT_FAILURE;
 			}
 		}
@@ -59,7 +62,7 @@ int main(int argc, char* args[]) {
 				a = sArgs.erase(a);
 			}
 			catch(...) {
-				std::cout << "The seed parameter was either not present or invalid." << std::endl;
+				std::cout << "The seed parameter was either not present or invalid despite the flag having been given." << std::endl;
 				return EXIT_FAILURE;
 			}
 		}
@@ -71,37 +74,13 @@ int main(int argc, char* args[]) {
 	}
 
 	if(!passed_dimensions) {
-		std::string in;
-		std::cout << "Please enter the width of the map: ";
-		std::getline(std::cin, in);
-		while(true) {
-			try{
-				mapWidth = std::stoi(in);
-				break;
-			}
-			catch(std::exception e) {
-				std::cout << "That isn't a valid input. Please enter a positive integer width of the map: ";
-				std::getline(std::cin, in);
-			}
-		}
-		std::cout << "Please enter the height of the map: ";
-		std::getline(std::cin, in);
-		while(true) {
-			try{
-				mapHeight = std::stoi(in);
-				break;
-			}
-			catch(std::exception e) {
-				std::cout << "That isn't a valid input. Please enter a positive integer height of the map: ";
-				std::getline(std::cin, in);
-			}
-		}
+		promptDimensions(mapWidth, mapHeight);
 	}
 
 	if(override_names) {
 		if(sArgs.size() < 4 || sArgs.size() % 2 != 0) {
-			std::cout << "Invalid player parameters (inferred from #) - couldn't start game." << std::endl;
-			return EXIT_FAILURE;
+			std::cout << "Invalid player parameters from args. Prompting instead (override disabled):" << std::endl;
+			networking = promptNetworking();
 		}
 		try {
 			names = new std::vector<std::string>();
@@ -113,14 +92,14 @@ int main(int argc, char* args[]) {
 			}
 		}
 		catch(...) {
-			std::cout << "Invalid player parameters - couldn't start game." << std::endl;
-			return EXIT_FAILURE;
+			std::cout << "Invalid player parameters from args. Prompting instead (override disabled):" << std::endl;
+			networking = promptNetworking();
 		}
 	}
 	else {
 		if(sArgs.size() < 2) {
-			std::cout << "Invalid player parameters (inferred from #) - couldn't start game." << std::endl;
-			return EXIT_FAILURE;
+			std::cout << "Invalid player parameters from args. Prompting instead:" << std::endl;
+			networking = promptNetworking();
 		}
 		try {
 			while(!sArgs.empty()) {
@@ -130,8 +109,8 @@ int main(int argc, char* args[]) {
 			}
 		}
 		catch(...) {
-			std::cout << "Invalid  playerparameters - couldn't start game." << std::endl;
-			return EXIT_FAILURE;
+			std::cout << "Invalid player parameters from args. Prompting instead:" << std::endl;
+			networking = promptNetworking();
 		}
 	}
 
@@ -173,4 +152,68 @@ int main(int argc, char* args[]) {
 	}
 
 	return 0;
+}
+
+Networking promptNetworking() {
+	Networking n;
+	std::string in;
+	bool done = false;
+	for(int np = 0; !done; np++) {
+		//If less than 2, bypass this step: Ask if the user like to add another AI
+		if (np >= 2) {
+			std::cout << "Would you like to add another player? Please enter Yes or No: ";
+			while (true) {
+				std::getline(std::cin, in);
+				std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+				if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
+				std::cout << "That isn't a valid input. Please enter Yes or No: ";
+			}
+			if (in == "n" || in == "no" || in == "nope") break;
+		}
+
+		while (true) {
+			std::string startCommand;
+			std::cout << "What is the start command for this bot: ";
+			std::getline(std::cin, startCommand);
+
+			try{
+				n.startAndConnectBot(startCommand);
+				break;
+			}
+			catch (int e) {
+				std::cout << "There was a problem with that start command. Please enter another one.\n";
+			}
+		}
+
+		std::cout << "Connected to player #" << int(np + 1) << std::endl;
+	}
+	return n;
+}
+
+void promptDimensions(unsigned short & w, unsigned short & h) {
+	std::string in;
+	std::cout << "Please enter the width of the map: ";
+	std::getline(std::cin, in);
+	while(true) {
+		try{
+			w = std::stoi(in);
+			break;
+		}
+		catch(std::exception e) {
+			std::cout << "That isn't a valid input. Please enter a positive integer width of the map: ";
+			std::getline(std::cin, in);
+		}
+	}
+	std::cout << "Please enter the height of the map: ";
+	std::getline(std::cin, in);
+	while(true) {
+		try{
+			h = std::stoi(in);
+			break;
+		}
+		catch(std::exception e) {
+			std::cout << "That isn't a valid input. Please enter a positive integer height of the map: ";
+			std::getline(std::cin, in);
+		}
+	}
 }
