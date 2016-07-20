@@ -4,9 +4,9 @@ sudo pip3 install trueskill
 
 # File structure
 echo "Setting up file structure"
-mkdir storage storage/replays storage/bots
-sudo chown www-data:www-data storage storage/replays storage/bots
-sudo chmod 755 storage storage/replays storage/bots
+mkdir storage storage/replays storage/bots storage/cache
+sudo chown www-data:www-data storage storage/replays storage/bots storage/cache
+sudo chmod 755 storage storage/replays storage/bots storage/cache
 
 # Copy all files to the apache directory
 cp ./* /var/www/html
