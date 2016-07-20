@@ -277,9 +277,7 @@ comp_args = {
 							 ["gcc", "-O2", "-lm", "-o", BOT]],
 	"C#"            : [["gmcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
 	"VB"            : [["vbnc", "-out:%s.exe" % BOT]],
-	"C++"         : [["g++", "-O3", "-w", "-funroll-loops", "-c"],
-							 ["g++", "-O2", "-lm", "-o", BOT]],
-	"C++11"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
+	"C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
 							 ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
 	"D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
 	"Go"            : [["6g", "-o", "_go_.6"],
@@ -294,8 +292,7 @@ comp_args = {
 	"Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
 	"OCaml"     : [["ocamlbuild -lib unix", BOT + ".native"]],
 	"Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
-	"Python"    : [["python3", "-c", PYTHON_EXT_COMPILER]],
-	"Python3"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
+	"Python"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
 	"Rust"      : [["cargo", "build", "--release", "-q"]],
 	"Scala"     : [["scalac"]],
 	}
@@ -345,23 +342,13 @@ languages = (
 		[(["*.vb"],
 			ExternalCompiler(comp_args["VB"][0], out_files=['MyBot.exe']))]
 	),
-	# These two C++ variants should be combined after the ants contest
-	Language("C++", BOT, "MyBot.cc",
+	Language("C++", BOT, "MyBot.cpp",
 		"./MyBot",
 		["*.o", BOT],
 		[
 			(["*.c", "*.cpp", "*.cc"],
 				TargetCompiler(comp_args["C++"][0], targets["C++"])),
 			(["*.o"], ExternalCompiler(comp_args["C++"][1]))
-		]
-	),
-	Language("C++11", BOT, "MyBot.cpp",
-		"./MyBot",
-		["*.o", BOT],
-		[
-			(["*.c", "*.cpp", "*.cc"],
-				TargetCompiler(comp_args["C++11"][0], targets["C++"])),
-			(["*.o"], ExternalCompiler(comp_args["C++11"][1]))
 		]
 	),
 	Language("Clojure", BOT +".clj", "MyBot.clj",
@@ -454,16 +441,11 @@ languages = (
 		[],
 		[(["*.php"], ChmodCompiler("PHP"))]
 	),
-	Language("Python3", BOT +".py", "MyBot.py",
+	Language("Python", BOT +".py", "MyBot.py",
 		"python3 MyBot.py",
 		["*.pyc"],
-		[(["*.py"], ChmodCompiler("Python3")),
-		(["setup_exts"], ErrorFilterCompiler(comp_args["Python3"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
-	),
-	Language("PyPy", BOT +".pypy", "MyBot.pypy",
-		"pypy MyBot.pypy",
-		["*.pyc"],
-		[(["*.py"], ChmodCompiler("Python"))]
+		[(["*.py"], ChmodCompiler("Python")),
+		(["setup_exts"], ErrorFilterCompiler(comp_args["Python"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
 	),
 	Language("Racket", BOT +".rkt", "MyBot.rkt",
 		"racket MyBot.rkt",
