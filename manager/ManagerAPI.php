@@ -162,13 +162,28 @@ class ManagerAPI extends API{
 			$didCompile = $_POST['didCompile'];
 
 			if($didCompile == 1) {
+				// Cache a compilable bot
+				$targetPath = $this->getBotFile($userID);
+				$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
+				echo $cachedPath;
+				if(file_exists($cachedPath)) {
+					unlink($cachedPath);	
+				}
+				copy($targetPath, $cachedPath);
+				
 				$language = isset($_POST['language']) ? $_POST['language'] : "Other";
 				$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 			} else {
-				unlink($this->getBotFile($userID));
-				copy($CACHED_BOTS_DIR."{$userID}.zip", $this->getBotFile($userID));
-
-				$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = $userID");
+				$targetPath = $this->getBotFile($userID);
+				$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
+				echo $cachedPath;
+				unlink($targetPath);
+				if(file_exists($cachedPath)) {
+					copy($cachedPath, $targetPath);
+					$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = $userID");
+				} else {
+					$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = $userID");
+				}
 			}
 		}
 	}

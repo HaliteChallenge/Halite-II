@@ -222,12 +222,7 @@ class WebsiteAPI extends API{
 			}
 			
 			$targetPath = "../../storage/bots/{$userID}.zip";
-			$cachedPath = "../../storage/cache/{$userID}.zip"; 
 			if(file_exists($targetPath))  {
-				if(file_exists($cachedPath)) {
-					unlink($cachedPath);	
-				}
-				copy($targetPath, $cachedPath);
 				unlink($targetPath);	
 			}
 
