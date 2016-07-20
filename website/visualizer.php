@@ -17,9 +17,14 @@
 		<?php include 'includes/navbar.php'; ?>
 		<div id="pageContent" class="pageContent">
 
-			<div id="gameArea">
-			</div>
-			<div id="plots"></div>
+			<div class="row">
+				<div class="col-md-6">
+					<div id="gameArea" style="display: inline-block;">
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div id="plots" style="display: inline-block;"></div>
+				</div>
 		</div>
 	</div>
 

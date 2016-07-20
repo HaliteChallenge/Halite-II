@@ -75,8 +75,8 @@ $(function() {
 
 	addPlot = function(label, vals) {
 		var margin = {top: 20, right: 5, bottom: 20, left: 5},
-		width = 133 - margin.left - margin.right,
-		height = 133 - margin.top - margin.bottom;
+		width = 150 - margin.left - margin.right,
+		height = 150 - margin.top - margin.bottom;
 
 		var x = d3.scaleLinear()
 		.domain([0, vals.length])
@@ -89,6 +89,7 @@ $(function() {
 		var color = d3.scaleOrdinal(d3.schemeCategory10)
 
 		var svg = d3.select("#plots").append("svg")
+		.attr("display", "block")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
@@ -173,6 +174,12 @@ $(function() {
 		addPlot("Strength", getPlayerStrengthData(game));
 		addPlot("Territory", getPlayerTerritoryData(game));
 		addPlot("Production", getPlayerProductionData(game));
+		
+		var color = d3.scaleOrdinal(d3.schemeCategory10)
+		var playerHeading = game.players.map(function(d, i) {
+			return "<span style='color: "+color(i+1)+";'>"+d.name+"</span>"	
+		}).join(" vs ");
+		var playerList = d3.select("#pageContent").insert("h3", ":first-child").html(playerHeading);
 
 		var margin = {top: 20, right: 20, bottom: 20, left: 20},
 		width = 500 - margin.left - margin.right,
@@ -190,15 +197,6 @@ $(function() {
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g");
-
-		var color = d3.scaleOrdinal(d3.schemeCategory10)
-
-		var playerList = d3.select("#pageContent").append("ul").selectAll("li")
-		.data(game.players)
-		.enter()
-		.append("li")
-		.text(function (d) { return d.name })
-		.style("color", function (d, i) { return color(i+1) })
 
 		var squareSize = Math.abs(x(1) - x(2))
 
