@@ -42,7 +42,7 @@ int main(int argc, char* args[]) {
 				return EXIT_FAILURE;
 			}
 		}
-		if(*a == "-w") {
+		else if(*a == "-w") {
 			watch_game = true;
 			a = sArgs.erase(a);
 		}
