@@ -9,10 +9,10 @@ require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
 
-const TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
-const TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
 
 class WebsiteAPI extends API{
+	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
+	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
 
 	// The database
 	private $mysqli = NULL;
@@ -227,7 +227,7 @@ class WebsiteAPI extends API{
 
 	protected function botFile() {
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			if(in_array($_SERVER['REMOTE_ADDR'], TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], TS_WIFI_IPS)) {
+			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
 				return "Cannot submit on Two Sigma desktop";
 			}
 
