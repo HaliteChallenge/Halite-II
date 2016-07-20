@@ -297,7 +297,6 @@ target/
 pom.xml
 *jar
 airesources/Clojure/lib
-classes
 native
 .lein-failures
 checkouts
