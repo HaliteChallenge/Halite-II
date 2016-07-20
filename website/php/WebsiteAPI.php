@@ -8,7 +8,11 @@ date_default_timezone_set('America/New_York');
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
+
+
 class WebsiteAPI extends API{
+	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
+	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
 
 	// The database
 	private $mysqli = NULL;
@@ -57,11 +61,29 @@ class WebsiteAPI extends API{
 
 	private function logOutForums($forumsID) {
 		$options = array('http' => array(
-						'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-						'method'  => 'POST',
-						'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
+			'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+			'method'  => 'POST',
+			'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
 		));
 		file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
+	}
+
+	private function testUserIP($user_ip, $cidrs) {
+		$ipu = explode('.', $user_ip);
+		foreach ($ipu as &$v)
+			$v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
+		$ipu = join('', $ipu);
+		$res = false;
+		foreach ($cidrs as $cidr) {
+			$parts = explode('/', $cidr);
+			$ipc = explode('.', $parts[0]);
+			foreach ($ipc as &$v) $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
+			$ipc = substr(join('', $ipc), 0, $parts[1]);
+			$ipux = substr($ipu, 0, $parts[1]);
+			$res = ($ipc === $ipux);
+			if ($res) break;
+		}
+		return $res;
 	}
 
 	private function select($sql) {
@@ -145,8 +167,8 @@ class WebsiteAPI extends API{
 			$verificationCode = rand(0, 9999999999);
 			try{
 				$transport = Swift_SmtpTransport::newInstance("smtp.gmail.com", 465, "ssl")
-				->setUsername($this->config['email']['email'])
-				->setPassword($this->config['email']['password']);
+					->setUsername($this->config['email']['email'])
+					->setPassword($this->config['email']['password']);
 				$mailer = Swift_Mailer::newInstance($transport);
 				$message = Swift_Message::newInstance("Halite Email Verification")
 					->setFrom(array($this->config['email']['email'] => "Halite Competition"))
@@ -205,7 +227,7 @@ class WebsiteAPI extends API{
 
 	protected function botFile() {
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			if(strcmp($_SERVER['REMOTE_ADDR'], "208.77.212.129") == 0) {
+			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
 				return "Cannot submit on Two Sigma desktop";
 			}
 
@@ -216,11 +238,11 @@ class WebsiteAPI extends API{
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
-			
+
 			if ($_FILES["botFile"]["size"] > 1000000) {
 				return "Sorry, your file is too large.";
 			}
-			
+
 			$targetPath = "../../storage/bots/{$userID}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
@@ -275,7 +297,7 @@ class WebsiteAPI extends API{
 			return $finalURL;
 		}
 	}
-	
+
 	protected function worker() {
 		$workers = $this->selectMultiple("SELECT * FROM Worker");
 		return $workers;
