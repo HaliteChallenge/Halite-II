@@ -37,11 +37,14 @@ do
 	BOTNAMEINDEX=$(($i+$NUMBOTS))
 	BOTNAME=${!BOTNAMEINDEX}
 
-	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'cd $PWD/$BOT && ./$RUNFILE' '$BOTNAME'";
+	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS 'docker run -v $PWD/$BOT:$PWD/$BOT virtual_machine sh -c \"cd $PWD/$BOT && ./$RUNFILE\"' '$BOTNAME'";
 done
 
-docker run -v $PWD:$PWD virtual_machine sh -c "cd $PWD && chmod +x $ENVIRONMENT && ./$ENVIRONMENT -q -o -d $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
+chmod +x $ENVIRONMENT
 
+./$ENVIRONMENT -q -o -d $WIDTH $HEIGHT $BOTSTARTCOMMANDS
+
+docker stop -v $(docker ps -aq) >/dev/null
 docker rm -v $(docker ps -aq) >/dev/null
 
 rm /run/network/ifstate.veth*
