@@ -18,11 +18,11 @@
 		<div id="pageContent" class="pageContent">
 
 			<div class="row">
-				<div class="col-md-6">
+				<div class="col-md-5">
 					<div id="gameArea" style="display: inline-block;">
 					</div>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-7">
 					<div id="plots" style="display: inline-block;"></div>
 				</div>
 		</div>
