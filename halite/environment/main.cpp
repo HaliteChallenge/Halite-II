@@ -12,7 +12,7 @@ Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memo
 Networking promptNetworking();
 void promptDimensions(unsigned short & w, unsigned short & h);
 
-int main(int argc, char* args[]) {
+int main(int argc, char ** argv) {
 	srand(time(NULL)); //For all non-seeded randomness.
 
 	bool watch_game = false, override_names = false; //Extra parameters. 
@@ -25,7 +25,7 @@ int main(int argc, char* args[]) {
 	std::vector<std::string> * names = NULL;
 
 	std::list<std::string> sArgs;
-	for(int a = 1; a < argc; a++) sArgs.push_back(args[a]);
+	for(int a = 1; a < argc; a++) sArgs.push_back(argv[a]);
 
 	for(auto a = sArgs.begin(); a != sArgs.end();) {
 		if(*a == "-d") {
@@ -82,7 +82,7 @@ int main(int argc, char* args[]) {
 
 	if(override_names) {
 		if(sArgs.size() < 4 || sArgs.size() % 2 != 0) {
-			std::cout << "Invalid player parameters from args. Prompting instead (override disabled):" << std::endl;
+			std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
 			networking = promptNetworking();
 		}
 		try {
@@ -95,13 +95,13 @@ int main(int argc, char* args[]) {
 			}
 		}
 		catch(...) {
-			std::cout << "Invalid player parameters from args. Prompting instead (override disabled):" << std::endl;
+			std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
 			networking = promptNetworking();
 		}
 	}
 	else {
 		if(sArgs.size() < 2) {
-			std::cout << "Invalid player parameters from args. Prompting instead:" << std::endl;
+			std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
 			networking = promptNetworking();
 		}
 		try {
@@ -112,7 +112,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 		catch(...) {
-			std::cout << "Invalid player parameters from args. Prompting instead:" << std::endl;
+			std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
 			networking = promptNetworking();
 		}
 	}
