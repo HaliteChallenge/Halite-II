@@ -284,10 +284,10 @@ $(function() {
 			if (oReq.status != 404) {
 				var aBuffer = oReq.response;
 				var byteArray = new Uint8Array(aBuffer);
-				console.log(byteArrayToGame(byteArray))
 				showGame(byteArrayToGame(byteArray))
+			} else {
+				$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 			}
-			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 		}
 		oReq.send(null);
 	}
