@@ -222,7 +222,14 @@ class WebsiteAPI extends API{
 			}
 			
 			$targetPath = "../../storage/bots/{$userID}.zip";
-			if(file_exists($targetPath) == true) unlink($targetPath);	
+			$cachedPath = "../../storage/cache/{$userID}.zip"; 
+			if(file_exists($targetPath))  {
+				if(file_exists($cachedPath)) {
+					unlink($cachedPath);	
+				}
+				copy($targetPath, $cachedPath);
+				unlink($targetPath);	
+			}
 
 			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
 				return "File upload error";
