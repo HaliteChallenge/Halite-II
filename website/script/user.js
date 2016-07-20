@@ -65,7 +65,7 @@ $(function() {
 				}
 			}).join(" ");
 			playersList += "</ol>";
-			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
+			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td><td><a target='_blank' href='visualizer.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>";
 		},
 		loadMore: function() {
 			this.games = this.games.concat(this.getNextGames(this.userID, this.games[this.games.length-1].gameID));

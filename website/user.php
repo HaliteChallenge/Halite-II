@@ -38,7 +38,8 @@
 								<th>Participants</th>
 								<th>Result</th>
 								<th>Dimensions</th>
-								<th>Gamefile</th>
+								<th>Download</th>
+								<th>View</th>
 							</tr>
 						</thead>
 						<tbody id="gameTableBody">
