@@ -32,8 +32,10 @@ int main(int argc, char* args[]) {
 			passed_dimensions = true;
 			a = sArgs.erase(a);
 			try {
+				if(a == sArgs.end()) throw 0;
 				mapWidth = std::stoll(*a);
 				a = sArgs.erase(a);
+				if(a == sArgs.end()) throw 0;
 				mapHeight = std::stoll(*a);
 				a = sArgs.erase(a);
 			}
@@ -58,6 +60,7 @@ int main(int argc, char* args[]) {
 			passed_seed = true;
 			a = sArgs.erase(a);
 			try {
+				if(a == sArgs.end()) throw 0;
 				seed = std::stoll(*a);
 				a = sArgs.erase(a);
 			}
