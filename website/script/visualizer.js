@@ -75,8 +75,8 @@ $(function() {
 
 	addPlot = function(label, vals) {
 		var margin = {top: 20, right: 5, bottom: 20, left: 5},
-		width = 150 - margin.left - margin.right,
-		height = 150 - margin.top - margin.bottom;
+		width = 160 - margin.left - margin.right,
+		height = 160 - margin.top - margin.bottom;
 
 		var x = d3.scaleLinear()
 		.domain([0, vals.length])
@@ -227,7 +227,7 @@ $(function() {
 
 		setPlayerMarkers();
 		moveMarkers = function () {
-		var transitionDuration = 700;
+		var transitionDuration = 300;
 		var t = d3.transition()
 			.duration(transitionDuration)
 			.ease(d3.easeCubicInOut);
