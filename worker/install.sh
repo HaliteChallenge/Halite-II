@@ -3,6 +3,7 @@
 #################
 sudo apt-get -y update 
 sudo apt-get install -y python3 default-jdk clang++-3.5
+sudo curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
 #############
 # Worker
