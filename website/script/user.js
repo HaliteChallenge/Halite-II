@@ -76,6 +76,8 @@ $(function() {
 	function statsFromUser(user, numUsers) {
 		var statDetails = {
 			"score": {name: "Trueskill Rating", mouseOverText: null},
+			"mu": {name: "Trueskill Mu", mouseOverText: "Your estimated average skill discounting any uncertainty"},
+			"sigma": {name: "Trueskill Sigma", mouseOverText: "The uncertainty of your \"mu\" value"},
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
 			"numGames": {name: "Number of Games Played", mouseOverText: null},
 			"language": {name: "Language", mouseOverText: null},
