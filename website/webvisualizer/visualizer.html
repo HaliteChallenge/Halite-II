@@ -196,10 +196,11 @@
                     }
 
                     //Pan if desired.
-                    if(pressed[65]) xOffset--;
-                    if(pressed[68]) xOffset++;
-                    if(pressed[87]) yOffset--;
-                    if(pressed[83]) yOffset++;
+                    const PAN_SPEED = 0.5
+                    if(pressed[65]) xOffset -= PAN_SPEED;
+                    if(pressed[68]) xOffset += PAN_SPEED
+                    if(pressed[87]) yOffset -= PAN_SPEED;
+                    if(pressed[83]) yOffset += PAN_SPEED;
 
                     //Actually render.
                     renderer.render(stage);
