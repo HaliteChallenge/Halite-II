@@ -12,7 +12,6 @@ import zip
 import backend
 
 from compiler import *
-from sandbox import *
 
 import smtplib
 from email.mime.text import MIMEText
@@ -104,18 +103,9 @@ def runGame(width, height, users):
 	runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+"\"" for a in users])
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
-	sandbox = Sandbox(os.getcwd())
-	sandbox.start("bash "+runGameCommand)
-
-	output = []
-	while True:
-		line = sandbox.read_line(timeout=None)
-		if line == None:
-			break
-		print(line)
-		output.append(line)
-
-	return output
+	lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+	print("\n".join(lines))
+	return lines
 
 def parseGameOutput(output, users):
 	users = copy.deepcopy(users)

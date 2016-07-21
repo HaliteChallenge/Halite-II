@@ -17,7 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<p>
-					This set of binaries was uploaded at <b>11am EST on July 19th</b>. We redid map generation (including adding seeding), improved the flags, and added a territory tiebreaker feature.
+					This set of binaries was uploaded at <b>2:30pm EST on July 20th</b>. We added prompts for every possible environment arguement and a fixed a few bugs with the environment's flags. 
 				</p>
 				<p>
 					<ul>

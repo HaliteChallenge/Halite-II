@@ -254,7 +254,7 @@ void Networking::startAndConnectBot(std::string command) {
 #else
 	if(!quiet_output) std::cout << command << "\n";
 
-	pid_t pid = NULL;
+	pid_t pid = (pid_t)NULL;
 	int writePipe[2];
 	int readPipe[2];
 

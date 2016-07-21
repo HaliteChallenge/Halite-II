@@ -65,7 +65,7 @@ $(function() {
 				}
 			}).join(" ");
 			playersList += "</ol>";
-			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td></tr>";
+			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td><td><a target='_blank' href='visualizer.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>";
 		},
 		loadMore: function() {
 			this.games = this.games.concat(this.getNextGames(this.userID, this.games[this.games.length-1].gameID));
@@ -76,10 +76,12 @@ $(function() {
 	function statsFromUser(user, numUsers) {
 		var statDetails = {
 			"score": {name: "Trueskill Rating", mouseOverText: null},
+			"mu": {name: "Trueskill Mu", mouseOverText: "Your estimated average skill discounting any uncertainty"},
+			"sigma": {name: "Trueskill Sigma", mouseOverText: "The uncertainty of your \"mu\" value"},
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
 			"numGames": {name: "Number of Games Played", mouseOverText: null},
 			"language": {name: "Language", mouseOverText: null},
-			"didTimeout": {name: "Timeout Frequency", mouseOverText: null, percentage: true},
+			"didTimeout": {name: "Timeout Frequency", mouseOverText: null},
 			"territoryRanking": {name: "Territory Ranking", mouseOverText: "(Your total territory * Number of players)/(Number of frames you were alive * Map area)", percentile: true},
 			"strengthRanking": {name: "Strength Ranking", mouseOverText: "(Your total strength * Number of players) / (Number of frames you were alive * Map area)", percentile: true},
 			"productionRanking": {name: "Production Ranking", mouseOverText: "(Total amount of strength that you produced * Number of players) / (Number of turns you were alive * Map area)", percentile: true},
@@ -91,8 +93,6 @@ $(function() {
 			if(user[key] != undefined && user[key] != null) {
 				if(statDetails[key].percentile) {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" of "+numUsers})
-				} else if(statDetails[key].percentage) {
-					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: (100*user[key])+"%"})
 				} else {
 					stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
 				}
@@ -107,7 +107,7 @@ $(function() {
 	var extraStats = getExtraStats(userID);
 	$.extend(user, extraStats);
 	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-	user["didTimeout"] = Math.round(1000*user["didTimeout"])/1000;
+	user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
 	var numUsers = getNumActiveUsers();
 
