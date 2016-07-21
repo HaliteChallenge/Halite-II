@@ -86,6 +86,7 @@ class Sandbox:
         """Indicates whether a command is currently running in the sandbox"""
         if self._is_alive:
             sub_result = self.command_process.poll()
+            print(sub_result)
             if sub_result is None:
                 return True
             self.child_queue.put(None)
@@ -96,8 +97,11 @@ class Sandbox:
         """Start a command running in the sandbox"""
         if self.is_alive:
             raise SandboxError("Tried to run command with one in progress.")
-        working_directory = self.working_directory
+        working_directory = os.path.abspath(self.working_directory)
         self.child_queue = Queue()
+
+        shell_command = "docker run -i -v "+working_directory+":"+working_directory+" virtual_machine sh -c \"cd "+working_directory+" ; HOME='"+working_directory+"' ; echo 'teest'; echo 'test2'; [ -f install.sh ] || chmod +x install.sh && ./install.sh; "+shell_command+"\""
+        print(shell_command)
         shell_command = shlex.split(shell_command.replace('\\', '/'))
         try:
             self.command_process = subprocess.Popen(shell_command,
@@ -216,12 +220,16 @@ class Sandbox:
 
         """
         # Wait to make sure that the process is alive
-        time.sleep(0.2)
+        time.sleep(2)
         if not self.is_alive:
             timeout = 0
 
         try:
-            return self.stdout_queue.get(block=True, timeout=timeout)
+            print("waiting for line")
+            print(self.is_alive)
+            line = self.stdout_queue.get(block=True, timeout=timeout)
+            print("got line")
+            return line
         except Empty:
             return None
 
