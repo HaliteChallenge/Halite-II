@@ -207,7 +207,7 @@ class ManagerAPI extends API{
 			$targetPath = REPLAYS_DIR."{$name}";
 			move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
 			if(is_file($targetPath) == false) {
-				echo "Did not work";
+				return "Did not work";
 			} else {
 				echo "File transfer worked!!!!!!!!!!!";
 			}
