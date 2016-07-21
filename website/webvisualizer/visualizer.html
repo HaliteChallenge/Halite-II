@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Halite</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="file" id="files" name="file" />
+        
+        <script src="../lib/pixi.min.js"></script>
+        <script src="parsereplay.js"></script>
+        <script>
+
+            function readFiles(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var contents = event.target.result;
+                    showGame(byteArrayToGame(new Uint8Array(event.target.result)));
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            
+            document.getElementById('files').addEventListener('change', readFiles, false);
+
+            function showGame(game) {
+                var sw = 720, sh = 720;
+                var rw = sw / game.width, rh = sh / game.height; //Sizes of rectangles for rendering tiles.
+                console.log(rw, rh);
+
+                console.log(game.width, game.height);
+
+                var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x00000, antialias: true });
+                document.body.appendChild(renderer.view);
+
+                // create the root of the scene graph
+                var stage = new PIXI.Container();
+
+                // Initialize the pixi Graphics class
+                var graphics = new PIXI.Graphics();
+                 
+                // Add the graphics to the stage
+                stage.addChild(graphics);
+
+                requestAnimationFrame(animate);
+
+                var frame = 0;
+                var transit = 0;
+                var framespersec = 2.5;
+                var shouldplay = true;
+                var xOffset = 0, yOffset = 0;
+
+                var pressed={};
+                document.onkeydown=function(e){
+                     e = e || window.event;
+                     pressed[e.keyCode] = true;
+                     if(e.keyCode == 32) { //Space
+                         shouldplay = !shouldplay;
+                     }
+                     else if(e.keyCode == 90) { //z
+                         frame = 0;
+                         transit = 0;
+                     }
+                     else if(e.keyCode == 88) { //z
+                         frame = game.numFrames - 1;
+                         transit = 0;
+                     }
+                     else if(e.keyCode == 188) { //,
+                         if(transit == 0) frame--;
+                         else transit = 0;
+                         if(frame < 0) frame = 0;
+                         shouldplay = false;
+                     }
+                     else if(e.keyCode == 190) { //.
+                         frame++;
+                         transit = 0;
+                         if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+                         shouldplay = false;
+                     }
+                }
+
+                document.onkeyup=function(e){
+                     e = e || window.event;
+                     delete pressed[e.keyCode];
+                }
+
+                var lastTime = Date.now();
+
+                function interpolate(c1, c2, v) {
+                    var c = { r: v * c2.r + (1 - v) * c1.r, g: v * c2.g + (1 - v) * c1.g, b: v * c2.b + (1- v) * c1.b };
+                    function compToHex(c) { var hex = c.toString(16); return hex.length == 1 ? "0" + hex : hex; };
+                    return "0x" + compToHex(Math.round(c.r)) + compToHex(Math.round(c.g)) + compToHex(Math.round(c.b));
+                }
+
+                function animate() {
+
+                    //Clear graphics so that we can redraw freely.
+                    graphics.clear();
+
+                    if(pressed[9] || pressed[80]) { //Render productions. Don't update frames or transits. [Using tab or p now for testing]
+                        var loc = 0;
+                        var pY = Math.round(yOffset);
+                        while(pY < 0) pY += game.height;
+                        while(pY >= game.height) pY -= game.height;
+                        for(var a = 0; a < game.height; a++) {
+                            var pX = Math.round(xOffset);
+                            while(pX < 0) pX += game.width;
+                            while(pX >= game.width) pX -= game.width;
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                if(game.productionNormals[loc] < 0.33333) graphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
+                                else if(game.productionNormals[loc] < 0.66667) graphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[loc] * 3 - 1));
+                                else graphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[loc] * 3 - 2));
+                                graphics.drawRect(rw * pX, rh * pY, rw, rh);
+                                graphics.endFill();
+                                loc++;
+                                pX++;
+                                if(pX == game.width) pX = 0;
+                            }
+                            pY++;
+                            if(pY == game.height) pY = 0;
+                        }
+                    }
+                    else { //Render game and update frames and transits.
+                        var loc = 0;
+                        //var tX = 
+                        for(var a = 0; a < game.height; a++) {
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                graphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+                                graphics.drawRect(rw * b, rh * a, rw, rh);
+                                graphics.endFill();
+                                loc++;
+                            }
+                        }
+
+                        var loc = 0;
+                        for(var a = 0; a < game.height; a++) {
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                if(site.strength == 255) graphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+                                graphics.beginFill(game.players[site.owner].color);
+                                var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
+                                if(transit > 0) {
+                                    var move = game.moves[frame][loc];
+                                    var c = move == 1 ? a - 1 : move == 3 ? a + 1 : a;
+                                    var d = move == 2 ? b + 1 : move == 4 ? b - 1 : b;
+                                    graphics.drawRect(rw * ((transit * d + (1 - transit) * b) + 0.5) - pw / 2, rh * ((transit * c + (1 - transit) * a) + 0.5) - ph / 2, pw, ph);
+                                    graphics.endFill();
+                                }
+                                else graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
+                                graphics.endFill();
+                                if(site.strength == 255) graphics.lineStyle(0, '0x000000', 1);
+                                loc++;
+                            }
+                        }
+
+                        var time = Date.now();
+                        var dt = time - lastTime;
+                        lastTime = time;
+
+                        //Update frames per sec if up or down arrows are pressed.
+                        if(pressed[38]) {
+                            framespersec += 0.05;
+                        }
+                        else if(pressed[40]) {
+                            framespersec -= 0.05;
+                        }
+
+                        if(pressed[39]) {
+                            transit = 0;
+                            frame++;
+                        }
+                        else if(pressed[37]) {
+                            if(transit != 0) transit = 0;
+                            else frame--;
+                        }
+                        else if(shouldplay) {
+                            transit += dt / 1000 * framespersec;
+                        }
+
+                        //Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
+                        while(transit >= 1) {
+                            transit--;
+                            frame++;
+                        }
+                        if(frame >= game.numFrames - 1) {
+                            frame = game.numFrames - 1;
+                            transit = 0;
+                        }
+                        while(transit < 0) {
+                            transit++;
+                            frame--;
+                        }
+                        if(frame < 0) {
+                            frame = 0;
+                            transit = 0;
+                        }
+                    }
+
+                    //Pan if desired.
+                    const PAN_SPEED = 0.5
+                    if(pressed[65]) xOffset -= PAN_SPEED;
+                    if(pressed[68]) xOffset += PAN_SPEED
+                    if(pressed[87]) yOffset -= PAN_SPEED;
+                    if(pressed[83]) yOffset += PAN_SPEED;
+
+                    console.log("X and Y offsets: ", xOffset, yOffset);
+
+                    //Actually render.
+                    renderer.render(stage);
+
+                    //Of course, we want to render in the future as well.
+                    requestAnimationFrame(animate);
+                }
+            }
+        </script>
+    </body>
+</html>
