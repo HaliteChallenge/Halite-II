@@ -44,13 +44,13 @@ myID, gameMap = getInit()
 sendInit("MyName")
 
 while True:
-	moves = []
-	gameMap = getFrame()
-	for y in range(gameMap.height):
-		for x in range(gameMap.width):
-			if gameMap.getSite(Location(x, y)).owner == myID:
-				moves.append(Move(Location(x, y), int(random.random() * 5)))
-	sendFrame(moves)
+    moves = []
+    gameMap = getFrame()
+    for y in range(gameMap.height):
+        for x in range(gameMap.width):
+            if gameMap.getSite(Location(x, y)).owner == myID:
+                moves.append(Move(Location(x, y), int(random.random() * 5)))
+    sendFrame(moves)
 ```
 
 To test a bot, users must first run a game over the command line between two or more bots using Halite's environment. A replay file will be outputted by the environment and may be viewed using Halite's visualizer. 

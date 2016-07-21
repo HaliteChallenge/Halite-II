@@ -11,334 +11,334 @@ require_once '../lib/swiftmailer/lib/swift_required.php';
 
 
 class WebsiteAPI extends API{
-	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
-	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
+    private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
+    private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
 
-	// The database
-	private $mysqli = NULL;
+    // The database
+    private $mysqli = NULL;
 
-	public function __construct($request, $origin) {
-		$this->config = parse_ini_file("../../halite.ini", true);
+    public function __construct($request, $origin) {
+        $this->config = parse_ini_file("../../halite.ini", true);
 
-		$this->initDB();
+        $this->initDB();
 
-		$this->sanitizeHTTPParameters();
+        $this->sanitizeHTTPParameters();
 
-		parent::__construct($request);
-	}
+        parent::__construct($request);
+    }
 
-	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = $this->mysqli->real_escape_string($value);
-		}
-		foreach ($_POST as $key => $value) {
-			$_POST[$key] = $this->mysqli->real_escape_string($value);
-		}
-	}
+    private function sanitizeHTTPParameters() {
+        foreach ($_GET as $key => $value) {
+            $_GET[$key] = $this->mysqli->real_escape_string($value);
+        }
+        foreach ($_POST as $key => $value) {
+            $_POST[$key] = $this->mysqli->real_escape_string($value);
+        }
+    }
 
-	private function encryptPassword($password) {
-		return $this->mysqli->real_escape_string(crypt($password, $this->config['encrypt']['salt']));
-	}
+    private function encryptPassword($password) {
+        return $this->mysqli->real_escape_string(crypt($password, $this->config['encrypt']['salt']));
+    }
 
-	// Initializes and returns a mysqli object that represents our mysql database
-	private function initDB() {
-		$this->mysqli = new mysqli($this->config['database']['hostname'],
-			$this->config['database']['username'],
-			$this->config['database']['password'],
-			$this->config['database']['name']);
+    // Initializes and returns a mysqli object that represents our mysql database
+    private function initDB() {
+        $this->mysqli = new mysqli($this->config['database']['hostname'],
+            $this->config['database']['username'],
+            $this->config['database']['password'],
+            $this->config['database']['name']);
 
-		if (mysqli_connect_errno()) {
-			echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-			exit();
-		}
-	}
+        if (mysqli_connect_errno()) {
+            echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
+            exit();
+        }
+    }
 
-	private function getForumsID($userID) {
-		$url = "http://forums.halite.io/users/by-external/{$userID}.json/?".http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']));
-		$contents = file_get_contents($url);
-		return intval(json_decode($contents, true)['user']['id']);
-	}
+    private function getForumsID($userID) {
+        $url = "http://forums.halite.io/users/by-external/{$userID}.json/?".http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']));
+        $contents = file_get_contents($url);
+        return intval(json_decode($contents, true)['user']['id']);
+    }
 
-	private function logOutForums($forumsID) {
-		$options = array('http' => array(
-			'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-			'method'  => 'POST',
-			'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
-		));
-		file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
-	}
+    private function logOutForums($forumsID) {
+        $options = array('http' => array(
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
+        ));
+        file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
+    }
 
-	private function testUserIP($user_ip, $cidrs) {
-		$ipu = explode('.', $user_ip);
-		foreach ($ipu as &$v)
-			$v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
-		$ipu = join('', $ipu);
-		$res = false;
-		foreach ($cidrs as $cidr) {
-			$parts = explode('/', $cidr);
-			$ipc = explode('.', $parts[0]);
-			foreach ($ipc as &$v) $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
-			$ipc = substr(join('', $ipc), 0, $parts[1]);
-			$ipux = substr($ipu, 0, $parts[1]);
-			$res = ($ipc === $ipux);
-			if ($res) break;
-		}
-		return $res;
-	}
+    private function testUserIP($user_ip, $cidrs) {
+        $ipu = explode('.', $user_ip);
+        foreach ($ipu as &$v)
+            $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
+        $ipu = join('', $ipu);
+        $res = false;
+        foreach ($cidrs as $cidr) {
+            $parts = explode('/', $cidr);
+            $ipc = explode('.', $parts[0]);
+            foreach ($ipc as &$v) $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
+            $ipc = substr(join('', $ipc), 0, $parts[1]);
+            $ipux = substr($ipu, 0, $parts[1]);
+            $res = ($ipc === $ipux);
+            if ($res) break;
+        }
+        return $res;
+    }
 
-	private function select($sql) {
-		$res = mysqli_query($this->mysqli, $sql);
-		return mysqli_fetch_array($res, MYSQLI_ASSOC);
-	}
+    private function select($sql) {
+        $res = mysqli_query($this->mysqli, $sql);
+        return mysqli_fetch_array($res, MYSQLI_ASSOC);
+    }
 
-	private function selectMultiple($sql) {
-		$res = mysqli_query($this->mysqli, $sql);
-		$finalArray = array();
+    private function selectMultiple($sql) {
+        $res = mysqli_query($this->mysqli, $sql);
+        $finalArray = array();
 
-		while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
-			array_push($finalArray, $temp);
-		}
+        while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+            array_push($finalArray, $temp);
+        }
 
-		return $finalArray;
-	}
+        return $finalArray;
+    }
 
-	private function insert($sql) {
-		mysqli_query($this->mysqli, $sql);
-	}
+    private function insert($sql) {
+        mysqli_query($this->mysqli, $sql);
+    }
 
-	// API ENDPOINTS
-	// Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
-	protected function user() {
-		if(isset($_GET["username"])) {
-			if(isset($_GET["password"])) {
-				$password = $this->encryptPassword($_GET['password']);
-				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
-			} else {
-				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
-				unset($fields["password"]);
-				return $fields;
-			}
-		} else if (isset($_GET["userID"])) {
-			if(isset($_GET["password"])) {
-				$password = $this->encryptPassword($_GET['password']);
-				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$password}'");
-			} else {
-				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
-				unset($fields["password"]);
-				return $fields;
-			}
-		} else if(isset($_GET['active'])) {
-			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
-			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
-			return $results;
-		} else if(isset($_GET['numActive'])) {
-			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
-		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
-			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
-			if($user['verificationCode'] == $_POST['verificationCode']) {
-				$this->insert("UPDATE User SET isVerified=1 WHERE userID={$_POST['userID']}");
-				return "Success";
-			}
-			return "Fail";
-		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
-			$username = $_POST["username"];
-			$email = $_POST["email"];
-			$password = $this->encryptPassword($_POST["password"]);
+    // API ENDPOINTS
+    // Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
+    protected function user() {
+        if(isset($_GET["username"])) {
+            if(isset($_GET["password"])) {
+                $password = $this->encryptPassword($_GET['password']);
+                return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
+            } else {
+                $fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+                unset($fields["password"]);
+                return $fields;
+            }
+        } else if (isset($_GET["userID"])) {
+            if(isset($_GET["password"])) {
+                $password = $this->encryptPassword($_GET['password']);
+                return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$password}'");
+            } else {
+                $fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+                unset($fields["password"]);
+                return $fields;
+            }
+        } else if(isset($_GET['active'])) {
+            $results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+            foreach(array_keys($results) as $key) unset($results[$key]["password"]);
+            return $results;
+        } else if(isset($_GET['numActive'])) {
+            return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
+        } else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
+            $user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
+            if($user['verificationCode'] == $_POST['verificationCode']) {
+                $this->insert("UPDATE User SET isVerified=1 WHERE userID={$_POST['userID']}");
+                return "Success";
+            }
+            return "Fail";
+        } else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
+            $username = $_POST["username"];
+            $email = $_POST["email"];
+            $password = $this->encryptPassword($_POST["password"]);
 
-			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
-			if(isset($usernameArray['username'])) {
-				return "Username already exists";
-			}
+            $usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
+            if(isset($usernameArray['username'])) {
+                return "Username already exists";
+            }
 
-			$emailArray = $this->select("SELECT email FROM User WHERE email = '$email' LIMIT 1");
-			if(isset($emailArray['email'])) {
-				return "Email already exists";
-			}
+            $emailArray = $this->select("SELECT email FROM User WHERE email = '$email' LIMIT 1");
+            if(isset($emailArray['email'])) {
+                return "Email already exists";
+            }
 
-			$explodedEmail = explode("@", $email);
-			if(count($explodedEmail) != 2) {
-				return "Invalid email address";
-			}
-			if(strcmp($explodedEmail[1], "twosigma.com") != 0) {
-				return "Email is not two sigma email";
-			}
+            $explodedEmail = explode("@", $email);
+            if(count($explodedEmail) != 2) {
+                return "Invalid email address";
+            }
+            if(strcmp($explodedEmail[1], "twosigma.com") != 0) {
+                return "Email is not two sigma email";
+            }
 
-			// Send verification email
-			$verificationCode = rand(0, 9999999999);
-			try{
-				$transport = Swift_SmtpTransport::newInstance("smtp.gmail.com", 465, "ssl")
-					->setUsername($this->config['email']['email'])
-					->setPassword($this->config['email']['password']);
-				$mailer = Swift_Mailer::newInstance($transport);
-				$message = Swift_Message::newInstance("Halite Email Verification")
-					->setFrom(array($this->config['email']['email'] => "Halite Competition"))
-					->setTo(array($email));
+            // Send verification email
+            $verificationCode = rand(0, 9999999999);
+            try{
+                $transport = Swift_SmtpTransport::newInstance("smtp.gmail.com", 465, "ssl")
+                    ->setUsername($this->config['email']['email'])
+                    ->setPassword($this->config['email']['password']);
+                $mailer = Swift_Mailer::newInstance($transport);
+                $message = Swift_Message::newInstance("Halite Email Verification")
+                    ->setFrom(array($this->config['email']['email'] => "Halite Competition"))
+                    ->setTo(array($email));
 
-				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
-				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
+                $this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
+                $userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
 
-				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
+                $this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
 
-				$message->setBody("<html><body>To verify your email, <a href='http://halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.</body></html>", 'text/html');
-				$result = $mailer->send($message);
-			} catch (Exception $e) {
-				return "Invalid email address";
-			}
+                $message->setBody("<html><body>To verify your email, <a href='http://halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.</body></html>", 'text/html');
+                $result = $mailer->send($message);
+            } catch (Exception $e) {
+                return "Invalid email address";
+            }
 
-			return "Success";
-		}
-	}
+            return "Success";
+        }
+    }
 
-	protected function extraStats() {
-		if(isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
-		}
-	}
+    protected function extraStats() {
+        if(isset($_GET["userID"])) {
+            return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
+        }
+    }
 
-	protected function game() {
-		if(isset($_GET['userID'])) {
-			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
-			$startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
-			$userID = $_GET['userID'];
+    protected function game() {
+        if(isset($_GET['userID'])) {
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
+            $startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
+            $userID = $_GET['userID'];
 
-			$gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
-			$gameArrays = array();
+            $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
+            $gameArrays = array();
 
-			// Get each game's info
-			foreach ($gameIDArrays as $gameIDArray) {
-				$gameID = $gameIDArray['gameID'];
-				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
+            // Get each game's info
+            foreach ($gameIDArrays as $gameIDArray) {
+                $gameID = $gameIDArray['gameID'];
+                $gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
 
-				// Get information about users
-				$gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
-				foreach($gameArray['users'] as &$gameUserRow) {
-					// Get rid of gameID
-					unset($gameUserRow['gameID']);
+                // Get information about users
+                $gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
+                foreach($gameArray['users'] as &$gameUserRow) {
+                    // Get rid of gameID
+                    unset($gameUserRow['gameID']);
 
-					// Add in user info
-					$userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
-					foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
-				}
-				array_push($gameArrays, $gameArray);
-			}
-			return $gameArrays;
-		}
-	}
+                    // Add in user info
+                    $userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
+                    foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
+                }
+                array_push($gameArrays, $gameArray);
+            }
+            return $gameArrays;
+        }
+    }
 
-	protected function botFile() {
-		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
-				return "Cannot submit on Two Sigma desktop";
-			}
+    protected function botFile() {
+        if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
+            if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
+                return "Cannot submit on Two Sigma desktop";
+            }
 
-			$userID = $_POST['userID'];
-			$password = $_POST['password'];
+            $userID = $_POST['userID'];
+            $password = $_POST['password'];
 
-			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
-			if(count($user) == 0 || $user['isVerified'] == false) {
-				return "Unverified email";
-			}
+            $user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
+            if(count($user) == 0 || $user['isVerified'] == false) {
+                return "Unverified email";
+            }
 
-			if ($_FILES["botFile"]["size"] > 5000000) {
-				return "Sorry, your file is too large.";
-			}
+            if ($_FILES["botFile"]["size"] > 5000000) {
+                return "Sorry, your file is too large.";
+            }
 
-			$targetPath = "../../storage/bots/{$userID}.zip";
-			if(file_exists($targetPath))  {
-				unlink($targetPath);	
-			}
+            $targetPath = "../../storage/bots/{$userID}.zip";
+            if(file_exists($targetPath))  {
+                unlink($targetPath);    
+            }
 
-			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-				return "File upload error";
-			}
+            if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
+                return "File upload error";
+            }
 
-			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
-			foreach($oldGameUsers as $oldGameUser) {
-				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
-				$this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
-			}
+            $oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
+            foreach($oldGameUsers as $oldGameUser) {
+                $this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
+                $this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
+            }
 
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
+            $this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
-			return "Success";
-		}
-	}
+            return "Success";
+        }
+    }
 
-	protected function forums() {
-		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
-			$initialBase64Payload = stripcslashes($_GET['payload']);
-			$signature = $_GET['signature'];
-			$userID = $_GET['userID'];
-			$email = $_GET['email'];
-			$username = $_GET['username'];
+    protected function forums() {
+        if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
+            $initialBase64Payload = stripcslashes($_GET['payload']);
+            $signature = $_GET['signature'];
+            $userID = $_GET['userID'];
+            $email = $_GET['email'];
+            $username = $_GET['username'];
 
-			$correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
+            $correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
 
-			if($correctSignature != $signature) {
-				return null;
-			}
+            if($correctSignature != $signature) {
+                return null;
+            }
 
-			parse_str(base64_decode($initialBase64Payload), $initialPayload);
-			$nonce = $initialPayload["nonce"];
+            parse_str(base64_decode($initialBase64Payload), $initialPayload);
+            $nonce = $initialPayload["nonce"];
 
-			$finalBase64Payload = base64_encode(http_build_query(array(
-				"nonce" => $nonce,
-				"name" => $username,
-				"email" => $email,
-				"external_id" =>$userID
-			)));
-			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['sso']['secret']);
+            $finalBase64Payload = base64_encode(http_build_query(array(
+                "nonce" => $nonce,
+                "name" => $username,
+                "email" => $email,
+                "external_id" =>$userID
+            )));
+            $finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['sso']['secret']);
 
-			$finalQueryString = http_build_query(array(
-				"sso" => $finalBase64Payload,
-				"sig" => $finalSignature
-			));
-			$finalURL = $this->config['sso']['url']."?".$finalQueryString;
-			return $finalURL;
-		}
-	}
+            $finalQueryString = http_build_query(array(
+                "sso" => $finalBase64Payload,
+                "sig" => $finalSignature
+            ));
+            $finalURL = $this->config['sso']['url']."?".$finalQueryString;
+            return $finalURL;
+        }
+    }
 
-	protected function worker() {
-		$workers = $this->selectMultiple("SELECT * FROM Worker");
-		return $workers;
-	}
+    protected function worker() {
+        $workers = $this->selectMultiple("SELECT * FROM Worker");
+        return $workers;
+    }
 
 
-	protected function session() {
-		session_start();
-		if($this->method == 'GET') {
-			if(count($_SESSION) > 0) return $_SESSION;
-			else return NULL;
-		} else if(isset($_POST['username']) & isset($_POST['password'])) {
-			$username = $_POST['username'];
-			$password = $this->encryptPassword($_POST['password']);
+    protected function session() {
+        session_start();
+        if($this->method == 'GET') {
+            if(count($_SESSION) > 0) return $_SESSION;
+            else return NULL;
+        } else if(isset($_POST['username']) & isset($_POST['password'])) {
+            $username = $_POST['username'];
+            $password = $this->encryptPassword($_POST['password']);
 
-			$user = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
-		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
-			$userID = $_POST['userID'];
-			$password = $this->encryptPassword($_POST['password']);
+            $user = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
+            if($user['isVerified'] == false) {
+                return "Unverified user";
+            }
+            $_SESSION = $user;
+            return "Success";
+        } else if(isset($_POST['userID']) & isset($_POST['password'])) {
+            $userID = $_POST['userID'];
+            $password = $this->encryptPassword($_POST['password']);
 
-			$user = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
-		} else if($this->method == 'DELETE') {
-			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
-				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
-					$this->logOutForums($this->getForumsID($_SESSION['userID']));
-				}
-			}
-			session_destroy();
-			return "Success";
-		}
-	}
+            $user = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
+            if($user['isVerified'] == false) {
+                return "Unverified user";
+            }
+            $_SESSION = $user;
+            return "Success";
+        } else if($this->method == 'DELETE') {
+            if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
+                if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
+                    $this->logOutForums($this->getForumsID($_SESSION['userID']));
+                }
+            }
+            session_destroy();
+            return "Success";
+        }
+    }
  }
 
  ?>

@@ -2,29 +2,29 @@ $(function() {
   var logInForm = {
     $logInForm: $("#login_form"),
     $logInUsername: $("#login_user"),
-		$logInPassword: $("#login_pass"),
-		$logInButton: $("#login_button"),
+        $logInPassword: $("#login_pass"),
+        $logInButton: $("#login_button"),
     user: null,
     init: function(onLogin) {
       this.onLogin = onLogin;
       new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
     },
     logIn: function() {
-			messageBox.clear();
+            messageBox.clear();
 
-			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
-			if(user == null) {
-				messageBox.alert("Login failed", "That username/password combo does not exist", false);
-			} else if(user['isVerified'] == false) {
-				messageBox.alert("Login failed", "Your email needs to be verified", false);
-			} else {
-				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
-				this.loggedIn = true;
-				this.user = user;
+            var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
+            if(user == null) {
+                messageBox.alert("Login failed", "That username/password combo does not exist", false);
+            } else if(user['isVerified'] == false) {
+                messageBox.alert("Login failed", "Your email needs to be verified", false);
+            } else {
+                storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
+                this.loggedIn = true;
+                this.user = user;
 
         this.onLogin();
-			}
-		}
+            }
+        }
   };
 
   function handleForumsSignIn(payload, signature, user) {

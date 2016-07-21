@@ -6,7 +6,7 @@ public class Location {
     y = y_;
   }
   public Location(Location l) {
-  	x = l.x;
-  	y = l.y;
+      x = l.x;
+      y = l.y;
   }
 }

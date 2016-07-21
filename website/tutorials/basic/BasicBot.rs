@@ -14,29 +14,29 @@ use std::collections::HashMap;
 use rand::Rng;
 
 fn main() {
-	let (my_id, mut game_map) = networking::get_init();
-	let mut rng = rand::thread_rng();
-	networking::send_init(format!("{}{}", "RustBot".to_string(), my_id.to_string()));
-	loop {
-		networking::get_frame(&mut game_map);
-		let mut moves = HashMap::new();
-		for a in 0..game_map.height {
-			for b in 0..game_map.width {
-				let l = hlt::types::Location { x: b, y: a };
-				if game_map.get_site(l, types::STILL).owner == my_id {
-					let mut dir: u8 = types::STILL;
-					if { game_map.get_site(l, types::STILL).strength } >= 5 * game_map.get_site(l, types::STILL).production {
-						dir = (rng.gen::<u32>() % 5) as u8;
-						for d in types::CARDINALS.iter() {
-							if game_map.get_site(l, *d).owner != my_id {
-								dir = *d;
-							}
-						}
-					}
-					moves.insert(l, dir);
-				}
-			}
-		}
-		networking::send_frame(moves);
-	}
+    let (my_id, mut game_map) = networking::get_init();
+    let mut rng = rand::thread_rng();
+    networking::send_init(format!("{}{}", "RustBot".to_string(), my_id.to_string()));
+    loop {
+        networking::get_frame(&mut game_map);
+        let mut moves = HashMap::new();
+        for a in 0..game_map.height {
+            for b in 0..game_map.width {
+                let l = hlt::types::Location { x: b, y: a };
+                if game_map.get_site(l, types::STILL).owner == my_id {
+                    let mut dir: u8 = types::STILL;
+                    if { game_map.get_site(l, types::STILL).strength } >= 5 * game_map.get_site(l, types::STILL).production {
+                        dir = (rng.gen::<u32>() % 5) as u8;
+                        for d in types::CARDINALS.iter() {
+                            if game_map.get_site(l, *d).owner != my_id {
+                                dir = *d;
+                            }
+                        }
+                    }
+                    moves.insert(l, dir);
+                }
+            }
+        }
+        networking::send_frame(moves);
+    }
 }

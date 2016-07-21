@@ -7,62 +7,62 @@ in vec3 geoColor[];
 in uint strength[];
 out vec3 color;
 void main() {
-	uint s = strength[0];
-	vec4 position = gl_in[0].gl_Position;
-	vec3 c = 0.2 * geoColor[0];
+    uint s = strength[0];
+    vec4 position = gl_in[0].gl_Position;
+    vec3 c = 0.2 * geoColor[0];
 
-	//Find top left vertices.
-	vec4 tlBPosition = position + vec4(-width, height, 0.0, 0.0);
+    //Find top left vertices.
+    vec4 tlBPosition = position + vec4(-width, height, 0.0, 0.0);
 
-	//Find bottom left vertices.
-	vec4 blBPosition = position + vec4(-width, -height, 0.0, 0.0);
+    //Find bottom left vertices.
+    vec4 blBPosition = position + vec4(-width, -height, 0.0, 0.0);
 
-	//Find top right vertices.
-	vec4 trBPosition = position + vec4(width, height, 0.0, 0.0);
+    //Find top right vertices.
+    vec4 trBPosition = position + vec4(width, height, 0.0, 0.0);
 
-	//Find bottom right vertices.
-	vec4 brBPosition = position + vec4(width, -height, 0.0, 0.0);
+    //Find bottom right vertices.
+    vec4 brBPosition = position + vec4(width, -height, 0.0, 0.0);
 
-	//NEW METHOD:
+    //NEW METHOD:
 
-	//Create outer square:
-	color = c;
-	gl_Position = tlBPosition;
-	EmitVertex();
-	gl_Position = trBPosition;
-	EmitVertex();
-	gl_Position = blBPosition;
-	EmitVertex();
-	gl_Position = brBPosition;
-	EmitVertex();
+    //Create outer square:
+    color = c;
+    gl_Position = tlBPosition;
+    EmitVertex();
+    gl_Position = trBPosition;
+    EmitVertex();
+    gl_Position = blBPosition;
+    EmitVertex();
+    gl_Position = brBPosition;
+    EmitVertex();
 
-	float dialationfactor = sqrt(float(s) / 255.0);
+    float dialationfactor = sqrt(float(s) / 255.0);
 
-	//Find top left vertices.
-	vec4 tlLPosition = position + vec4(-width*dialationfactor, height*dialationfactor, 0.0, 0.0);
+    //Find top left vertices.
+    vec4 tlLPosition = position + vec4(-width*dialationfactor, height*dialationfactor, 0.0, 0.0);
 
-	//Find bottom left vertices.
-	vec4 blLPosition = position + vec4(-width*dialationfactor, -height*dialationfactor, 0.0, 0.0);
+    //Find bottom left vertices.
+    vec4 blLPosition = position + vec4(-width*dialationfactor, -height*dialationfactor, 0.0, 0.0);
 
-	//Find top right vertices.
-	vec4 trLPosition = position + vec4(width*dialationfactor, height*dialationfactor, 0.0, 0.0);
+    //Find top right vertices.
+    vec4 trLPosition = position + vec4(width*dialationfactor, height*dialationfactor, 0.0, 0.0);
 
-	//Find bottom right vertices.
-	vec4 brLPosition = position + vec4(width*dialationfactor, -height*dialationfactor, 0.0, 0.0);
+    //Find bottom right vertices.
+    vec4 brLPosition = position + vec4(width*dialationfactor, -height*dialationfactor, 0.0, 0.0);
 
-	//Degenerate triangles:
-	EmitVertex();
-	gl_Position = brLPosition;
-	EmitVertex();
+    //Degenerate triangles:
+    EmitVertex();
+    gl_Position = brLPosition;
+    EmitVertex();
 
-	color = geoColor[0];
-	EmitVertex();
-	gl_Position = blLPosition;
-	EmitVertex();
-	gl_Position = trLPosition;
-	EmitVertex();
-	gl_Position = tlLPosition;
-	EmitVertex();
+    color = geoColor[0];
+    EmitVertex();
+    gl_Position = blLPosition;
+    EmitVertex();
+    gl_Position = trLPosition;
+    EmitVertex();
+    gl_Position = tlLPosition;
+    EmitVertex();
 
-	EndPrimitive();
+    EndPrimitive();
 }
