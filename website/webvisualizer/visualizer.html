@@ -90,91 +90,112 @@
 
 				var lastTime = Date.now();
 
+				function interpolate(c1, c2, v) {
+					var c = { r: v * c2.r + (1 - v) * c1.r, g: v * c2.g + (1 - v) * c1.g, b: v * c2.b + (1- v) * c1.b };
+					function compToHex(c) { var hex = c.toString(16); return hex.length == 1 ? "0" + hex : hex; };
+					return "0x" + compToHex(Math.round(c.r)) + compToHex(Math.round(c.g)) + compToHex(Math.round(c.b));
+				}
+
 				function animate() {
 
 					//Clear graphics so that we can redraw freely.
 					graphics.clear();
 
-					var loc = 0;
-					for(var a = 0; a < game.height; a++) {
-						for(var b = 0; b < game.width; b++) {
-							var site = game.frames[frame][loc];
-							graphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
-							graphics.drawRect(rw * b, rh * a, rw, rh);
-							graphics.endFill();
-							loc++;
-						}
-					}
-
-					var loc = 0;
-					for(var a = 0; a < game.height; a++) {
-						for(var b = 0; b < game.width; b++) {
-							var site = game.frames[frame][loc];
-							if(site.strength == 255) graphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
-							graphics.beginFill(game.players[site.owner].color);
-							var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
-							if(transit > 0) {
-								var move = game.moves[frame][loc];
-								var c = move == 1 ? a - 1 : move == 3 ? a + 1 : a;
-								var d = move == 2 ? b + 1 : move == 4 ? b - 1 : b;
-								graphics.drawRect(rw * ((transit * d + (1 - transit) * b) + 0.5) - pw / 2, rh * ((transit * c + (1 - transit) * a) + 0.5) - ph / 2, pw, ph);
+					if(pressed[9] || pressed[80]) { //Render productions. Don't update frames or transits. [Using tab or p now for testing]
+						var loc = 0;
+						for(var a = 0; a < game.height; a++) {
+							for(var b = 0; b < game.width; b++) {
+								var site = game.frames[frame][loc];
+								if(game.productionNormals[loc] < 0.33333) graphics.beginFill(interpolate({ r: 80, g: 80, b: 80 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
+								else if(game.productionNormals[loc] < 0.66667) graphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[loc] * 3 - 1));
+								else graphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[loc] * 3 - 2));
+								graphics.drawRect(rw * b, rh * a, rw, rh);
 								graphics.endFill();
+								loc++;
 							}
-							else graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
-							graphics.endFill();
-							if(site.strength == 255) graphics.lineStyle(0, '0x000000', 1);
-							loc++;
 						}
 					}
+					else { //Render game and update frames and transits.
+						var loc = 0;
+						for(var a = 0; a < game.height; a++) {
+							for(var b = 0; b < game.width; b++) {
+								var site = game.frames[frame][loc];
+								graphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+								graphics.drawRect(rw * b, rh * a, rw, rh);
+								graphics.endFill();
+								loc++;
+							}
+						}
 
-				    // time to render the stage !
+						var loc = 0;
+						for(var a = 0; a < game.height; a++) {
+							for(var b = 0; b < game.width; b++) {
+								var site = game.frames[frame][loc];
+								if(site.strength == 255) graphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+								graphics.beginFill(game.players[site.owner].color);
+								var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
+								if(transit > 0) {
+									var move = game.moves[frame][loc];
+									var c = move == 1 ? a - 1 : move == 3 ? a + 1 : a;
+									var d = move == 2 ? b + 1 : move == 4 ? b - 1 : b;
+									graphics.drawRect(rw * ((transit * d + (1 - transit) * b) + 0.5) - pw / 2, rh * ((transit * c + (1 - transit) * a) + 0.5) - ph / 2, pw, ph);
+									graphics.endFill();
+								}
+								else graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
+								graphics.endFill();
+								if(site.strength == 255) graphics.lineStyle(0, '0x000000', 1);
+								loc++;
+							}
+						}
+
+						var time = Date.now();
+						var dt = time - lastTime;
+						lastTime = time;
+
+						//Update frames per sec if up or down arrows are pressed.
+					    if(pressed[38]) {
+					    	framespersec += 0.05;
+					    }
+					    else if(pressed[40]) {
+					    	framespersec -= 0.05;
+					    }
+
+					    if(pressed[39]) {
+					    	transit = 0;
+					    	frame++;
+					    }
+					    else if(pressed[37]) {
+					    	if(transit != 0) transit = 0;
+					    	else frame--;
+					    }
+					    else if(shouldplay) {
+						    transit += dt / 1000 * framespersec;
+						}
+
+						//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
+					    while(transit >= 1) {
+					    	transit--;
+					    	frame++;
+					    }
+					    if(frame >= game.numFrames - 1) {
+					    	frame = game.numFrames - 1;
+					    	transit = 0;
+					    }
+					    while(transit < 0) {
+					    	transit++;
+					    	frame--;
+					    }
+					    if(frame < 0) {
+					    	frame = 0;
+					    	transit = 0;
+					    }
+					}
+
+				    //Actually render.
 				    renderer.render(stage);
 
-				    // request another animation frame...
+				    //Of course, we want to render in the future as well.
 				    requestAnimationFrame(animate);
-
-
-					var time = Date.now();
-					var dt = time - lastTime;
-					lastTime = time;
-
-					//Update frames per sec if up or down arrows are pressed.
-				    if(pressed[38]) {
-				    	framespersec += 0.05;
-				    }
-				    else if(pressed[40]) {
-				    	framespersec -= 0.05;
-				    }
-
-				    if(pressed[39]) {
-				    	transit = 0;
-				    	frame++;
-				    }
-				    else if(pressed[37]) {
-				    	if(transit != 0) transit = 0;
-				    	else frame--;
-				    }
-				    else if(shouldplay) {
-					    transit += dt / 1000 * framespersec;
-					}
-
-					//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
-				    while(transit >= 1) {
-				    	transit--;
-				    	frame++;
-				    }
-				    if(frame >= game.numFrames - 1) {
-				    	frame = game.numFrames - 1;
-				    	transit = 0;
-				    }
-				    while(transit < 0) {
-				    	transit++;
-				    	frame--;
-				    }
-				    if(frame < 0) {
-				    	frame = 0;
-				    	transit = 0;
-				    }
 				}
 			}
 		</script>
