@@ -111,6 +111,7 @@ namespace hlt{
                     }
                     const double OWN_WEIGHT = 0.75;
                     for(int z = 0; z < 1; z++) { //1 iterations found by experiment.
+                        std::vector< std::vector<double> > blurredFactors(children.size(), std::vector<double>(children.front().size(), 0));
                         for(int a = 0; a < children.size(); a++) {
                             int mh = a - 1, ph = a + 1;
                             if(mh < 0) mh += children.size();
@@ -119,13 +120,14 @@ namespace hlt{
                                 int mw = b - 1, pw = b + 1;
                                 if(mw < 0) mw += children.front().size();
                                 if(pw == children.front().size()) pw = 0;
-                                children[a][b]->factor *= OWN_WEIGHT;
-                                children[a][b]->factor += children[mh][b]->factor * (1 - OWN_WEIGHT) / 4;
-                                children[a][b]->factor += children[ph][b]->factor * (1 - OWN_WEIGHT) / 4;
-                                children[a][b]->factor += children[a][mw]->factor * (1 - OWN_WEIGHT) / 4;
-                                children[a][b]->factor += children[a][pw]->factor * (1 - OWN_WEIGHT) / 4;
+                                blurredFactors[a][b] += children[a][b]->factor * OWN_WEIGHT;
+                                blurredFactors[a][b] += children[mh][b]->factor * (1 - OWN_WEIGHT) / 4;
+                                blurredFactors[a][b] += children[ph][b]->factor * (1 - OWN_WEIGHT) / 4;
+                                blurredFactors[a][b] += children[a][mw]->factor * (1 - OWN_WEIGHT) / 4;
+                                blurredFactors[a][b] += children[a][pw]->factor * (1 - OWN_WEIGHT) / 4;
                             }
                         }
+                         for(int a = 0; a < children.size(); a++) for(int b = 0; b < children.front().size(); b++) children[a][b]->factor = blurredFactors[a][b]; //Set factors.
                     }
                 }
                 std::vector< std::vector<double> > getFactors() {
@@ -158,84 +160,37 @@ namespace hlt{
                 ~Region() { for(auto a = children.begin(); a != children.end(); a++) for(auto b = a->begin(); b != a->end(); b++) delete *b; }
             };
 
-            //For final iteration
-            const double OWN_WEIGHT = 0.66667;
-
             int sCA = sqrt(cw * ch); //Average dim.
-
-            auto normalize = [](std::vector< std::vector<double> > & v) {
-                double highest = 0;
-                for(auto a = v.begin(); a != v.end(); a++) for(auto b = a->begin(); b != a->end(); b++) if(*b > highest) highest = *b;
-                for(auto a = v.begin(); a != v.end(); a++) for(auto b = a->begin(); b != a->end(); b++) *b /= highest;
-            };
 
             Region prodRegion(cw, ch, rud);
             std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
-            
-            //Iterate this region as well to produce better caverns:
-            for(int z = 0; z < 2 + sCA / 10; z++) { // Found by experiment.
-                for(int a = 0; a < prodChunk.size(); a++) {
-                    int mh = a - 1, ph = a + 1;
-                    if(mh < 0) mh += prodChunk.size();
-                    if(ph == prodChunk.size()) ph = 0;
-                    for(int b = 0; b < prodChunk.front().size(); b++) {
-                        int mw = b - 1, pw = b + 1;
-                        if(mw < 0) mw += prodChunk.front().size();
-                        if(pw == prodChunk.front().size()) pw = 0;
-                        prodChunk[a][b] *= OWN_WEIGHT;
-                        prodChunk[a][b] += prodChunk[mh][b] * (1 - OWN_WEIGHT) / 4;
-                        prodChunk[a][b] += prodChunk[ph][b] * (1 - OWN_WEIGHT) / 4;
-                        prodChunk[a][b] += prodChunk[a][mw] * (1 - OWN_WEIGHT) / 4;
-                        prodChunk[a][b] += prodChunk[a][pw] * (1 - OWN_WEIGHT) / 4;
-                    }
-                }
-            }
-
-            normalize(prodChunk);
 
             Region strengthRegion(cw, ch, rud);
             std::vector< std::vector<double> > strengthChunk = strengthRegion.getFactors();
 
-            //Iterate this region as well to produce better caverns:
-            for(int z = 0; z < 1 + sCA / 10; z++) { // Found by experiment.
-                for(int a = 0; a < strengthChunk.size(); a++) {
-                    int mh = a - 1, ph = a + 1;
-                    if(mh < 0) mh += strengthChunk.size();
-                    if(ph == strengthChunk.size()) ph = 0;
-                    for(int b = 0; b < strengthChunk.front().size(); b++) {
-                        int mw = b - 1, pw = b + 1;
-                        if(mw < 0) mw += strengthChunk.front().size();
-                        if(pw == strengthChunk.front().size()) pw = 0;
-                        strengthChunk[a][b] *= OWN_WEIGHT;
-                        strengthChunk[a][b] += strengthChunk[mh][b] * (1 - OWN_WEIGHT) / 4;
-                        strengthChunk[a][b] += strengthChunk[ph][b] * (1 - OWN_WEIGHT) / 4;
-                        strengthChunk[a][b] += strengthChunk[a][mw] * (1 - OWN_WEIGHT) / 4;
-                        strengthChunk[a][b] += strengthChunk[a][pw] * (1 - OWN_WEIGHT) / 4;
-                    }
-                }
-            }
-
-            normalize(strengthChunk);
+            struct SiteD {
+                unsigned char owner;
+                double strength;
+                double production;
+            };
 
             //We'll first tesselate the map; we'll apply our various translations and transformations later.
-            const int TOP_PROD = prg() % 16 + 10, TOP_STR = prg() % 106 + 150;
-            std::vector< std::vector<Site> > tesselation = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+            std::vector< std::vector<SiteD> > tesselation = std::vector< std::vector<SiteD> >(map_height, std::vector<SiteD>(map_width, { 0, 0, 0 }));
             for(int a = 0; a < dh; a++) {
                 for(int b = 0; b < dw; b++) {
                     for(int c = 0; c < ch; c++) {
                         for(int d = 0; d < cw; d++) {
-                            tesselation[a * ch + c][b * cw + d].production = round(TOP_PROD * prodChunk[c][d]);
-                            tesselation[a * ch + c][b * cw + d].strength = round(TOP_STR * strengthChunk[c][d]);
+                            tesselation[a * ch + c][b * cw + d].production = prodChunk[c][d];
+                            tesselation[a * ch + c][b * cw + d].strength = strengthChunk[c][d];
                         }
                     }
                     tesselation[a * ch + ch / 2][b * cw + cw / 2].owner = a * dw + b + 1; //Set owners.
-                    tesselation[a * ch + ch / 2][b * cw + cw / 2].strength = 255; //Set strengths
                 }
             }
 
             //We'll now apply the reflections to the map.
             bool reflectVertical = dh % 2 == 0, reflectHorizontal = dw % 2 == 0; //Am I going to reflect in the horizontal vertical directions at all?
-            std::vector< std::vector<Site> > reflections = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+            std::vector< std::vector<SiteD> > reflections = std::vector< std::vector<SiteD> >(map_height, std::vector<SiteD>(map_width, { 0, 0, 0 }));
             for(int a = 0; a < dh; a++) {
                 for(int b = 0; b < dw; b++) {
                     bool vRef = reflectVertical && a % 2 != 0, hRef = reflectHorizontal && b % 2 != 0; //Do I reflect this chunk at all?
@@ -247,31 +202,80 @@ namespace hlt{
                 }
             }
 
-            //Next, let's apply our shifts to create the contents map.
-            contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width, { 0, 0, 0 }));
+            //Next, let's apply our shifts to create the shifts map.
+            std::vector< std::vector<SiteD> > shifts = std::vector< std::vector<SiteD> >(map_height, std::vector<SiteD>(map_width, { 0, 0, 0 }));
             if(preferHorizontal) {
-                int shift = (prg() % dw) * (height / dw); //A vertical shift.
+                int shift = (prg() % dw) * (map_height / dw); //A vertical shift.
                 for(int a = 0; a < dh; a++) {
                     for(int b = 0; b < dw; b++) {
                         for(int c = 0; c < ch; c++) {
                             for(int d = 0; d < cw; d++) {
-                                contents[a * ch + c][b * cw + d] = reflections[(a * ch + b * shift + c) % map_height][b * cw + d];
+                                shifts[a * ch + c][b * cw + d] = reflections[(a * ch + b * shift + c) % map_height][b * cw + d];
                             }
                         }    
                     }
                 }
             }
             else {
-                int shift = (prg() % dh) * (width / dh); //A horizontal shift.
+                int shift = (prg() % dh) * (map_width / dh); //A horizontal shift.
                 for(int a = 0; a < dh; a++) {
                     for(int b = 0; b < dw; b++) {
                         for(int c = 0; c < ch; c++) {
                             for(int d = 0; d < cw; d++) {
-                                contents[a * ch + c][b * cw + d] = reflections[a * ch + c][(b * cw + a * shift + d) % map_width];
+                                shifts[a * ch + c][b * cw + d] = reflections[a * ch + c][(b * cw + a * shift + d) % map_width];
                             }
                         }
                     }
                 }
+            }
+
+            //Apply a final blur to create the blur map. This will fix the edges where our transformations have created jumps or gaps.
+            const double OWN_WEIGHT = 0.66667;
+            std::vector< std::vector<SiteD> > blur = shifts;
+            for(int z = 0; z <= 2 * sqrt(map_width * map_height) / 10; z++) {
+                std::vector< std::vector<SiteD> > newBlur = blur;
+                for(int a = 0; a < map_height; a++) {
+                    int mh = a - 1, ph = a + 1;
+                    if(mh < 0) mh += map_height;
+                    if(ph == map_height) ph = 0;
+                    for(int b = 0; b < map_width; b++) {
+                        int mw = b - 1, pw = b + 1;
+                        if(mw < 0) mw += map_width;
+                        if(pw == map_width) pw = 0;
+                        newBlur[a][b].production *= OWN_WEIGHT;
+                        newBlur[a][b].production += blur[mh][b].production * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].production += blur[ph][b].production * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].production += blur[a][mw].production * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].production += blur[a][pw].production * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].strength *= OWN_WEIGHT;
+                        newBlur[a][b].strength += blur[mh][b].strength * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].strength += blur[ph][b].strength * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].strength += blur[a][mw].strength * (1 - OWN_WEIGHT) / 4;
+                        newBlur[a][b].strength += blur[a][pw].strength * (1 - OWN_WEIGHT) / 4;
+                    }
+                }
+                blur = newBlur;
+            }
+
+            //Let's now normalize the map values.
+            double maxProd = 0, maxStr = 0;
+            std::vector< std::vector<SiteD> > normalized = blur;
+            for(auto a = normalized.begin(); a != normalized.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+                if(b->production > maxProd) maxProd = b->production;
+                if(b->strength > maxStr) maxStr = b->strength;
+            }
+            for(auto a = normalized.begin(); a != normalized.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
+                b->production /= maxProd;
+                b->strength /= maxStr;
+            }
+
+            //Finally, fill in the contents vector. 
+            const int TOP_PROD = prg() % 17 + 8, TOP_STR = prg() % 106 + 150;
+            contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width));
+            for(int a = 0; a < map_height; a++) for(int b = 0; b < map_width; b++) {
+                contents[a][b].owner = normalized[a][b].owner;
+                contents[a][b].strength = round(normalized[a][b].strength * TOP_STR);
+                contents[a][b].production = round(normalized[a][b].production * TOP_PROD);
             }
         }
 
