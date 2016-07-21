@@ -239,7 +239,7 @@ class WebsiteAPI extends API{
 				return "Unverified email";
 			}
 
-			if ($_FILES["botFile"]["size"] > 1000000) {
+			if ($_FILES["botFile"]["size"] > 5000000) {
 				return "Sorry, your file is too large.";
 			}
 
