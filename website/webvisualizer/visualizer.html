@@ -51,6 +51,7 @@
 
 				var frame = 0;
 				var transit = 0;
+				var framespersec = 2.5;
 				var shouldplay = true;
 
 				var pressed={};
@@ -68,6 +69,18 @@
 				     	frame = game.numFrames - 1;
 				     	transit = 0;
 				     }
+				     else if(e.keyCode == 188) { //,
+				     	if(transit == 0) frame--;
+				     	else transit = 0;
+				     	if(frame < 0) frame = 0;
+				     	shouldplay = false;
+				     }
+				     else if(e.keyCode == 190) { //.
+				     	frame++;
+				     	transit = 0;
+				     	if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+				     	shouldplay = false;
+				     }
 				}
 
 				document.onkeyup=function(e){
@@ -76,7 +89,6 @@
 				}
 
 				var lastTime = Date.now();
-				const FRAMES_PER_SEC = 4;
 
 				function animate() {
 
@@ -126,31 +138,41 @@
 					var dt = time - lastTime;
 					lastTime = time;
 
+					//Update frames per sec if up or down arrows are pressed.
+				    if(pressed[38]) {
+				    	framespersec += 0.05;
+				    }
+				    else if(pressed[40]) {
+				    	framespersec -= 0.05;
+				    }
+
 				    if(pressed[39]) {
 				    	transit = 0;
 				    	frame++;
 				    }
 				    else if(pressed[37]) {
-				    	transit = 0;
-				    	frame--;
+				    	if(transit != 0) transit = 0;
+				    	else frame--;
 				    }
 				    else if(shouldplay) {
-					    if(frame < game.numFrames - 1) transit += dt / 1000 * FRAMES_PER_SEC;
+					    transit += dt / 1000 * framespersec;
 					}
 
-					//Advance frame if transit moves far enough
+					//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
 				    while(transit >= 1) {
 				    	transit--;
 				    	frame++;
 				    }
-
-				    //Ensure all are within acceptable bounds.
-				    if(frame < 0) {
-				    	frame = 0;
-				    	transit = 0;
-				    }
 				    if(frame >= game.numFrames - 1) {
 				    	frame = game.numFrames - 1;
+				    	transit = 0;
+				    }
+				    while(transit < 0) {
+				    	transit++;
+				    	frame--;
+				    }
+				    if(frame < 0) {
+				    	frame = 0;
 				    	transit = 0;
 				    }
 				}
