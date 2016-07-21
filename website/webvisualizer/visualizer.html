@@ -28,17 +28,6 @@
 			
 			document.getElementById('files').addEventListener('change', readFiles, false);
 
-			var pressed={};
-			element.onkeydown=function(e){
-			     e = e || window.event;
-			     pressed[e.keyCode] = true;
-			}
-
-			element.onkeyup=function(e){
-			     e = e || window.event;
-			     delete pressed[e.keyCode];
-			}
-
 			function showGame(game) {
 				var sw = 640, sh = 480;
 				var rw = sw / game.width, rh = sh / game.height; //Sizes of rectangles for rendering tiles.
@@ -62,13 +51,34 @@
 
 				var frame = 0;
 				var transit = 0;
+				var shouldplay = true;
+
+				var pressed={};
+				document.onkeydown=function(e){
+				     e = e || window.event;
+				     pressed[e.keyCode] = true;
+				     if(e.keyCode == 32) { //Space
+				     	shouldplay = !shouldplay;
+				     }
+				     else if(e.keyCode == 90) { //z
+				     	frame = 0;
+				     	transit = 0;
+				     }
+				     else if(e.keyCode == 88) { //z
+				     	frame = game.numFrames - 1;
+				     	transit = 0;
+				     }
+				}
+
+				document.onkeyup=function(e){
+				     e = e || window.event;
+				     delete pressed[e.keyCode];
+				}
 
 				var lastTime = Date.now();
 				const FRAMES_PER_SEC = 4;
 
 				function animate() {
-
-					if(frame >= game.numFrames) frame = game.numFrames - 1; //Ensure frame is in range.
 
 					//Clear graphics so that we can redraw freely.
 					graphics.clear();
@@ -116,11 +126,32 @@
 					var dt = time - lastTime;
 					lastTime = time;
 
-				    if(frame < game.numFrames - 1) transit += dt / 1000 * FRAMES_PER_SEC;
-				    
+				    if(pressed[39]) {
+				    	transit = 0;
+				    	frame++;
+				    }
+				    else if(pressed[37]) {
+				    	transit = 0;
+				    	frame--;
+				    }
+				    else if(shouldplay) {
+					    if(frame < game.numFrames - 1) transit += dt / 1000 * FRAMES_PER_SEC;
+					}
+
+					//Advance frame if transit moves far enough
 				    while(transit >= 1) {
 				    	transit--;
 				    	frame++;
+				    }
+
+				    //Ensure all are within acceptable bounds.
+				    if(frame < 0) {
+				    	frame = 0;
+				    	transit = 0;
+				    }
+				    if(frame >= game.numFrames - 1) {
+				    	frame = game.numFrames - 1;
+				    	transit = 0;
 				    }
 				}
 			}
