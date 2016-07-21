@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Halite</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<input type="file" id="files" name="file" />
+		
+		<script src="../lib/pixi.min.js"></script>
+		<script src="parsereplay.js"></script>
+		<script>
+
+			function readFiles(e) {
+				var file = e.target.files[0];
+				var reader = new FileReader();
+				reader.onload = function(event) {
+				    var contents = event.target.result;
+					showGame(byteArrayToGame(new Uint8Array(event.target.result)));
+				};
+				reader.readAsArrayBuffer(file);
+			}
+			
+			document.getElementById('files').addEventListener('change', readFiles, false);
+
+			var pressed={};
+			element.onkeydown=function(e){
+			     e = e || window.event;
+			     pressed[e.keyCode] = true;
+			}
+
+			element.onkeyup=function(e){
+			     e = e || window.event;
+			     delete pressed[e.keyCode];
+			}
+
+			function showGame(game) {
+				var sw = 640, sh = 480;
+				var rw = sw / game.width, rh = sh / game.height; //Sizes of rectangles for rendering tiles.
+				console.log(rw, rh);
+
+				console.log(game.width, game.height);
+
+				var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x00000, antialias: true });
+				document.body.appendChild(renderer.view);
+
+				// create the root of the scene graph
+				var stage = new PIXI.Container();
+
+				// Initialize the pixi Graphics class
+				var graphics = new PIXI.Graphics();
+				 
+				// Add the graphics to the stage
+				stage.addChild(graphics);
+
+				requestAnimationFrame(animate);
+
+				var frame = 0;
+				var transit = 0;
+
+				var lastTime = Date.now();
+				const FRAMES_PER_SEC = 4;
+
+				function animate() {
+
+					if(frame >= game.numFrames) frame = game.numFrames - 1; //Ensure frame is in range.
+
+					//Clear graphics so that we can redraw freely.
+					graphics.clear();
+
+					var loc = 0;
+					for(var a = 0; a < game.height; a++) {
+						for(var b = 0; b < game.width; b++) {
+							var site = game.frames[frame][loc];
+							graphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+							graphics.drawRect(rw * b, rh * a, rw, rh);
+							graphics.endFill();
+							loc++;
+						}
+					}
+
+					var loc = 0;
+					for(var a = 0; a < game.height; a++) {
+						for(var b = 0; b < game.width; b++) {
+							var site = game.frames[frame][loc];
+							if(site.strength == 255) graphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+							graphics.beginFill(game.players[site.owner].color);
+							var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
+							if(transit > 0) {
+								var move = game.moves[frame][loc];
+								var c = move == 1 ? a - 1 : move == 3 ? a + 1 : a;
+								var d = move == 2 ? b + 1 : move == 4 ? b - 1 : b;
+								graphics.drawRect(rw * ((transit * d + (1 - transit) * b) + 0.5) - pw / 2, rh * ((transit * c + (1 - transit) * a) + 0.5) - ph / 2, pw, ph);
+								graphics.endFill();
+							}
+							else graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
+							graphics.endFill();
+							if(site.strength == 255) graphics.lineStyle(0, '0x000000', 1);
+							loc++;
+						}
+					}
+
+				    // time to render the stage !
+				    renderer.render(stage);
+
+				    // request another animation frame...
+				    requestAnimationFrame(animate);
+
+
+					var time = Date.now();
+					var dt = time - lastTime;
+					lastTime = time;
+
+				    if(frame < game.numFrames - 1) transit += dt / 1000 * FRAMES_PER_SEC;
+				    
+				    while(transit >= 1) {
+				    	transit--;
+				    	frame++;
+				    }
+				}
+			}
+		</script>
+	</body>
+</html>
