@@ -57,31 +57,39 @@
 
                 var pressed={};
                 document.onkeydown=function(e){
-                     e = e || window.event;
-                     pressed[e.keyCode] = true;
-                     if(e.keyCode == 32) { //Space
-                         shouldplay = !shouldplay;
-                     }
-                     else if(e.keyCode == 90) { //z
-                         frame = 0;
-                         transit = 0;
-                     }
-                     else if(e.keyCode == 88) { //z
-                         frame = game.numFrames - 1;
-                         transit = 0;
-                     }
-                     else if(e.keyCode == 188) { //,
-                         if(transit == 0) frame--;
-                         else transit = 0;
-                         if(frame < 0) frame = 0;
-                         shouldplay = false;
-                     }
-                     else if(e.keyCode == 190) { //.
-                         frame++;
-                         transit = 0;
-                         if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
-                         shouldplay = false;
-                     }
+                    e = e || window.event;
+                    pressed[e.keyCode] = true;
+                        if(e.keyCode == 32) { //Space
+                        shouldplay = !shouldplay;
+                    }
+                    else if(e.keyCode == 90) { //z
+                        frame = 0;
+                        transit = 0;
+                    }
+                    else if(e.keyCode == 88) { //x
+                        frame = game.numFrames - 1;
+                        transit = 0;
+                    }
+                    else if(e.keyCode == 188) { //,
+                        if(transit == 0) frame--;
+                        else transit = 0;
+                        if(frame < 0) frame = 0;
+                        shouldplay = false;
+                    }
+                    else if(e.keyCode == 190) { //.
+                        frame++;
+                        transit = 0;
+                        if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+                        shouldplay = false;
+                    }
+                    else if(e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 87 || e.keyCode == 83) { //wasd
+                        xOffset = Math.round(xOffset);
+                        yOffset = Math.round(yOffset);
+                    }
+                    else if(e.keyCode == 79) { //o
+                        xOffset = 0;
+                        yOffset = 0;
+                    }
                 }
 
                 document.onkeyup=function(e){
@@ -105,12 +113,8 @@
                     if(pressed[9] || pressed[80]) { //Render productions. Don't update frames or transits. [Using tab or p now for testing]
                         var loc = 0;
                         var pY = Math.round(yOffset);
-                        while(pY < 0) pY += game.height;
-                        while(pY >= game.height) pY -= game.height;
                         for(var a = 0; a < game.height; a++) {
                             var pX = Math.round(xOffset);
-                            while(pX < 0) pX += game.width;
-                            while(pX >= game.width) pX -= game.width;
                             for(var b = 0; b < game.width; b++) {
                                 var site = game.frames[frame][loc];
                                 if(game.productionNormals[loc] < 0.33333) graphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
@@ -151,9 +155,12 @@
                                     var c = move == 1 ? a - 1 : move == 3 ? a + 1 : a;
                                     var d = move == 2 ? b + 1 : move == 4 ? b - 1 : b;
                                     graphics.drawRect(rw * ((transit * d + (1 - transit) * b) + 0.5) - pw / 2, rh * ((transit * c + (1 - transit) * a) + 0.5) - ph / 2, pw, ph);
-                                    graphics.endFill();
+                                    //graphics.drawEllipse(rw * ((transit * d + (1 - transit) * b) + 0.5), rh * ((transit * c + (1 - transit) * a) + 0.5), pw / 2, ph / 2);
                                 }
-                                else graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
+                                else {
+                                    graphics.drawRect(rw * (b + 0.5) - pw / 2, rh * (a + 0.5) - ph / 2, pw, ph);
+                                    //graphics.drawEllipse(rw * b + 0.5, rh * a + 0.5, pw / 2, ph / 2);
+                                }
                                 graphics.endFill();
                                 if(site.strength == 255) graphics.lineStyle(0, '0x000000', 1);
                                 loc++;
@@ -204,13 +211,17 @@
                     }
 
                     //Pan if desired.
-                    const PAN_SPEED = 0.5
+                    const PAN_SPEED = 1;
                     if(pressed[65]) xOffset -= PAN_SPEED;
                     if(pressed[68]) xOffset += PAN_SPEED
                     if(pressed[87]) yOffset -= PAN_SPEED;
                     if(pressed[83]) yOffset += PAN_SPEED;
 
-                    console.log("X and Y offsets: ", xOffset, yOffset);
+                    //Reset pan to be in normal bounds:
+                    if(Math.round(xOffset) >= game.width) xOffset -= game.width;
+                    else if(Math.round(xOffset) < 0) xOffset += game.width;
+                    if(Math.round(yOffset) >= game.height) yOffset -= game.height;
+                    else if(Math.round(yOffset) < 0) yOffset += game.height;
 
                     //Actually render.
                     renderer.render(stage);
