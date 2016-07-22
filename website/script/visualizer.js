@@ -1,7 +1,7 @@
 function showGame(game) {
 
 	$("#pageContent").append($("<h1>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
-		return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
+		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
 	}).join(" vs ")+"</h1>"))
 
 	function resize() {
