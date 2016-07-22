@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Halite</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="file" id="files" name="file" />
+        
+        <script src="../lib/pixi.min.js"></script>
+        <script src="parsereplay.js"></script>
+        <script>
+
+            function readFiles(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var contents = event.target.result;
+                    showGame(byteArrayToGame(new Uint8Array(event.target.result)));
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            
+            document.getElementById('files').addEventListener('change', readFiles, false);
+
+            function showGame(game) {
+                var sw = 960, sh = 720;
+                var mw = 720, mh = 720;
+                var rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
+                console.log(rw, rh);
+
+                console.log(game.width, game.height);
+
+                var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x00000, antialias: true });
+                document.body.appendChild(renderer.view);
+
+                // create the root of the scene graph:
+                var stage = new PIXI.Container();
+
+                // Initialize the pixi graphics class for the map:
+                var mapGraphics = new PIXI.Graphics();
+
+                // Initialize the pixi graphics class for the graphs:
+                var graphGraphics = new PIXI.Graphics();
+                 
+                // Add the mapGraphics to the stage:
+                stage.addChild(mapGraphics);
+
+                requestAnimationFrame(animate);
+
+                var frame = 0;
+                var transit = 0;
+                var framespersec = 2.5;
+                var shouldplay = true;
+                var xOffset = 0, yOffset = 0;
+
+                var pressed={};
+                document.onkeydown=function(e){
+                    e = e || window.event;
+                    pressed[e.keyCode] = true;
+                        if(e.keyCode == 32) { //Space
+                        shouldplay = !shouldplay;
+                    }
+                    else if(e.keyCode == 90) { //z
+                        frame = 0;
+                        transit = 0;
+                    }
+                    else if(e.keyCode == 88) { //x
+                        frame = game.numFrames - 1;
+                        transit = 0;
+                    }
+                    else if(e.keyCode == 188) { //,
+                        if(transit == 0) frame--;
+                        else transit = 0;
+                        if(frame < 0) frame = 0;
+                        shouldplay = false;
+                    }
+                    else if(e.keyCode == 190) { //.
+                        frame++;
+                        transit = 0;
+                        if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+                        shouldplay = false;
+                    }
+                    else if(e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 87 || e.keyCode == 83) { //wasd
+                        xOffset = Math.round(xOffset);
+                        yOffset = Math.round(yOffset);
+                    }
+                    else if(e.keyCode == 79) { //o
+                        xOffset = 0;
+                        yOffset = 0;
+                    }
+                }
+
+                document.onkeyup=function(e){
+                     e = e || window.event;
+                     delete pressed[e.keyCode];
+                }
+
+                var lastTime = Date.now();
+
+                function interpolate(c1, c2, v) {
+                    var c = { r: v * c2.r + (1 - v) * c1.r, g: v * c2.g + (1 - v) * c1.g, b: v * c2.b + (1- v) * c1.b };
+                    function compToHex(c) { var hex = c.toString(16); return hex.length == 1 ? "0" + hex : hex; };
+                    return "0x" + compToHex(Math.round(c.r)) + compToHex(Math.round(c.g)) + compToHex(Math.round(c.b));
+                }
+
+                function animate() {
+
+                    //Clear mapGraphics so that we can redraw freely.
+                    mapGraphics.clear();
+
+                    if(pressed[9] || pressed[80]) { //Render productions. Don't update frames or transits. [Using tab or p now for testing]
+                        var loc = 0;
+                        var pY = Math.round(yOffset);
+                        for(var a = 0; a < game.height; a++) {
+                            var pX = Math.round(xOffset);
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                if(game.productionNormals[loc] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
+                                else if(game.productionNormals[loc] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[loc] * 3 - 1));
+                                else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[loc] * 3 - 2));
+                                mapGraphics.drawRect(rw * pX, rh * pY, rw, rh);
+                                mapGraphics.endFill();
+                                loc++;
+                                pX++;
+                                if(pX == game.width) pX = 0;
+                            }
+                            pY++;
+                            if(pY == game.height) pY = 0;
+                        }
+                    }
+                    else { //Render game and update frames and transits.
+                        var loc = 0;
+                        var tY = Math.round(yOffset);
+                        for(var a = 0; a < game.height; a++) {
+                            var tX = Math.round(xOffset);
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+                                mapGraphics.drawRect(rw * tX, rh * tY, rw, rh);
+                                mapGraphics.endFill();
+                                loc++;
+                                tX++;
+                                if(tX == game.width) tX = 0;
+                            }
+                            tY++;
+                            if(tY == game.height) tY = 0;
+                        }
+
+                        loc = 0;
+                        var sY = Math.round(yOffset);
+                        for(var a = 0; a < game.height; a++) {
+                            var sX = Math.round(xOffset);
+                            for(var b = 0; b < game.width; b++) {
+                                var site = game.frames[frame][loc];
+                                if(site.strength == 255) mapGraphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+                                mapGraphics.beginFill(game.players[site.owner].color);
+                                var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
+                                if(transit > 0) {
+                                    var move = game.moves[frame][loc];
+                                    var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
+                                    var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
+                                    mapGraphics.drawRect(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5) - pw / 2, rh * ((transit * sY2 + (1 - transit) * sY) + 0.5) - ph / 2, pw, ph);
+                                    //mapGraphics.drawEllipse(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5), rh * ((transit * sY2 + (1 - transit) * sY) + 0.5), pw / 2, ph / 2);
+                                }
+                                else {
+                                    mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
+                                    //mapGraphics.drawEllipse(rw * sX + 0.5, rh * sY + 0.5, pw / 2, ph / 2);
+                                }
+                                mapGraphics.endFill();
+                                if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000', 1);
+                                loc++;
+                                sX++;
+                                if(sX == game.width) sX = 0;
+                            }
+                            sY++;
+                            if(sY == game.height) sY = 0;
+                        }
+
+                        var time = Date.now();
+                        var dt = time - lastTime;
+                        lastTime = time;
+
+                        //Update frames per sec if up or down arrows are pressed.
+                        if(pressed[38]) {
+                            framespersec += 0.05;
+                        }
+                        else if(pressed[40]) {
+                            framespersec -= 0.05;
+                        }
+
+                        if(pressed[39]) {
+                            transit = 0;
+                            frame++;
+                        }
+                        else if(pressed[37]) {
+                            if(transit != 0) transit = 0;
+                            else frame--;
+                        }
+                        else if(shouldplay) {
+                            transit += dt / 1000 * framespersec;
+                        }
+
+                        //Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
+                        while(transit >= 1) {
+                            transit--;
+                            frame++;
+                        }
+                        if(frame >= game.numFrames - 1) {
+                            frame = game.numFrames - 1;
+                            transit = 0;
+                        }
+                        while(transit < 0) {
+                            transit++;
+                            frame--;
+                        }
+                        if(frame < 0) {
+                            frame = 0;
+                            transit = 0;
+                        }
+                    }
+
+                    //Pan if desired.
+                    const PAN_SPEED = 1;
+                    if(pressed[65]) xOffset += PAN_SPEED;
+                    if(pressed[68]) xOffset -= PAN_SPEED
+                    if(pressed[87]) yOffset += PAN_SPEED;
+                    if(pressed[83]) yOffset -= PAN_SPEED;
+
+                    //Reset pan to be in normal bounds:
+                    if(Math.round(xOffset) >= game.width) xOffset -= game.width;
+                    else if(Math.round(xOffset) < 0) xOffset += game.width;
+                    if(Math.round(yOffset) >= game.height) yOffset -= game.height;
+                    else if(Math.round(yOffset) < 0) yOffset += game.height;
+
+                    //Actually render.
+                    renderer.render(stage);
+
+                    //Of course, we want to render in the future as well.
+                    requestAnimationFrame(animate);
+                }
+            }
+        </script>
+    </body>
+</html>
