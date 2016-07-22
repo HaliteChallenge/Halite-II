@@ -37,7 +37,7 @@ do
 	BOTNAMEINDEX=$(($i+$NUMBOTS))
 	BOTNAME=${!BOTNAMEINDEX}
 
-	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS '/usr/bin/docker run -i -v $PWD/$BOT:$PWD/$BOT virtual_machine sh -c \"cd $PWD/$BOT && ./$RUNFILE\"' '$BOTNAME'";
+	BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS '/usr/bin/docker run --memory=\"256m\" --cpu-shares=1024 -i -v $PWD/$BOT:$PWD/$BOT virtual_machine sh -c \"cd $PWD/$BOT && ./$RUNFILE\"' '$BOTNAME'";
 done
 
 eval "chmod +x $ENVIRONMENT"
