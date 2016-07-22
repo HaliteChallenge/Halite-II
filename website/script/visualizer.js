@@ -7,25 +7,33 @@ function showGame(game) {
 	//Create the root of the scene: stage:
 	var stage = new PIXI.Container();
 
+	// Initialize the pixi graphics class for the map:
+	var mapGraphics = new PIXI.Graphics();
+
+	// Initialize the pixi graphics class for the graphs:
+	var graphGraphics = new PIXI.Graphics();
+
 	function resize() {
 		sw = $("#pageContent").width(), sh = sw*3/4;
 		mw = sh, mh = sh;
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
 		//Create the text for rendering the terrritory, strength, and prod graphs.
-		stage.removeChildren(0, 2);
+		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: '24px Arial' });
 		terText.anchor = new PIXI.Point(0, 1);
 		terText.position = new PIXI.Point(mw + 20, TER_TOP);
-		stage.addChild(terText, 2);
+		stage.addChild(terText);
 		prodText = new PIXI.Text('Production', { font: '24px Arial' });
 		prodText.anchor = new PIXI.Point(0, 1);
 		prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
-		stage.addChild(prodText, 3);
+		stage.addChild(prodText);
 		strText = new PIXI.Text('Strength', { font: '24px Arial' });
 		strText.anchor = new PIXI.Point(0, 1);
 		strText.position = new PIXI.Point(mw + 20, STR_TOP);
-		stage.addChildAt(strText, 4);
+		stage.addChild(strText);
+		stage.addChild(mapGraphics);
+		stage.addChild(graphGraphics);
 	}	
 	resize();
 
@@ -35,17 +43,6 @@ function showGame(game) {
 		resize();
 		renderer.resize(sw, sh);
 	}
-
-	// Initialize the pixi graphics class for the map:
-	var mapGraphics = new PIXI.Graphics();
-
-	// Initialize the pixi graphics class for the graphs:
-	var graphGraphics = new PIXI.Graphics();
-
-	
-	// Add the mapGraphics to the stage:
-	stage.addChildAt(mapGraphics, 1);
-	stage.addChildAt(graphGraphics, 2);
 
 	requestAnimationFrame(animate);
 
