@@ -59,14 +59,18 @@ def nukeglob(pattern):
 				raise
 
 def _run_cmd(cmd, working_dir, timelimit):
-	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-	start = time.time()
-	timelimit = timelimit - start
-	out, errors = process.communicate(timeout=timelimit)
+	try:
+		absoluteWorkingDir = os.path.abspath(working_dir)
+		process = subprocess.Popen("docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" virtual_machine sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\"", cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+		start = time.time()
+		timelimit = timelimit - start
+		out, errors = process.communicate(timeout=timelimit)
 
-	if time.time() - start > timelimit:
-		errors.append("Compilation timed out with command %s" % (cmd,))
-	return out, errors
+		if time.time() - start > timelimit:
+			errors.append("Compilation timed out with command %s" % (cmd,))
+		return out, errors
+	except Exception as e:
+		print(str(e))
 
 
 def check_path(path, errors):
