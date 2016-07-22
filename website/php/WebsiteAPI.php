@@ -303,6 +303,21 @@ class WebsiteAPI extends API{
 		return $workers;
 	}
 
+	protected function announcement() {
+		if(isset($_GET['userID'])) {
+			return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS (SELECT NULL FROM DoneWithAnnoucement d WHERE d.userID = 1 and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
+		} else if(isset($_POST['annoucementID']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			$annoucementID = $_POST['annoucementID'];
+			$userID = $_POST['userID'];
+			$password = $_POST['password'];
+
+			if(count($this->select("SELECT * FROM User WHERE userID=$userID and password='$password' LIMIT 1")) > 0) {
+				$this->insert("INSERT INTO DoneWithAnnoucement (userID, annoucementID) VALUES ($userID, '$password')");
+				return "Success";
+			}
+			return "Fail";
+		}
+	}
 
 	protected function session() {
 		session_start();
