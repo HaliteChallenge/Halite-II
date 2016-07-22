@@ -172,7 +172,10 @@ function showGame(game) {
 				if(tY == game.height) tY = 0;
 			}
 
-			var t = (-Math.cos(transit * Math.PI) + 1) / 2;
+			function smoothMovement(t) {
+				return (-Math.cos(t * Math.PI) + 1) / 2;
+			};
+			var t = smoothMovement(smoothMovement(transit));
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
