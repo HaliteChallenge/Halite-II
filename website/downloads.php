@@ -17,7 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<p>
-					This set of binaries was uploaded at <b>2:30pm EST on July 20th</b>. We added prompts for every possible environment arguement and a fixed a few bugs with the environment's flags. 
+					This set of binaries was uploaded at <b>2:30pm EST on July 22nd</b>. We further improved map generation, and made it so that players do not <b>always</b> start with 255 strength. 
 				</p>
 				<p>
 					<ul>
