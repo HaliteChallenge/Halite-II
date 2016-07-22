@@ -151,7 +151,7 @@
                     //Clear mapGraphics so that we can redraw freely.
                     mapGraphics.clear();
 
-                    if(pressed[9] || pressed[80]) { //Render productions. Don't update frames or transits. [Using tab or p now for testing]
+                    if(pressed[80]) { //Render productions. Don't update frames or transits. [Using p now for testing]
                         var loc = 0;
                         var pY = Math.round(yOffset);
                         for(var a = 0; a < game.height; a++) {
