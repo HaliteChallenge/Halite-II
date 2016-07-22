@@ -70,5 +70,46 @@ byteArrayToGame = function(bytes) {
 		    game.moves.push(moves);
 		}
     }
+
+    //Get game statistics:
+    for(var a = 1; a <= game.numPlayers; a++) {
+    	game.players[a].territories = [];
+    	game.players[a].productions = [];
+    	game.players[a].strengths = [];
+	    for(var b = 0; b < game.numFrames; b++) {
+    		var ter = 0, prod = 0, str = 0;
+    		for(var c = 0; c < game.height * game.width; c++) {
+    			if(game.frames[b][c].owner == a) {
+                    ter++;
+                    prod += game.productions[c];
+                    str += game.frames[b][c].strength;
+                }
+    		}
+            game.players[a].territories.push(ter);
+            game.players[a].productions.push(prod);
+            game.players[a].strengths.push(str);
+	    }
+	}
+
+    //Normalize game statistics for display
+    var maxPlayerTer = 0, maxPlayerProd = 0, maxPlayerStr = 0;
+    for(var a = 1; a <= game.numPlayers; a++) {
+        for(var b = 0; b < game.numFrames; b++) {
+            if(game.players[a].territories[b] > maxPlayerTer) maxPlayerTer = game.players[a].territories[b];
+            if(game.players[a].productions[b] > maxPlayerProd) maxPlayerProd = game.players[a].productions[b];
+            if(game.players[a].strengths[b] > maxPlayerStr) maxPlayerStr = game.players[a].strengths[b];
+        }
+    }
+    for(var a = 1; a <= game.numPlayers; a++) {
+        game.players[a].normTers = [];
+        game.players[a].normProds = [];
+        game.players[a].normStrs = [];
+        for(var b = 0; b < game.numFrames; b++) {
+            game.players[a].normTers.push(game.players[a].territories[b] / maxPlayerTer);
+            game.players[a].normProds.push(game.players[a].productions[b] / maxPlayerProd);
+            game.players[a].normStrs.push(game.players[a].strengths[b] / maxPlayerStr);
+        }
+    }
+
     return game
 }
