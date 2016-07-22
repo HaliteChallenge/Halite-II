@@ -91,5 +91,25 @@ byteArrayToGame = function(bytes) {
 	    }
 	}
 
+    //Normalize game statistics for display
+    var maxPlayerTer = 0, maxPlayerProd = 0, maxPlayerStr = 0;
+    for(var a = 1; a <= game.numPlayers; a++) {
+        for(var b = 0; b < game.numFrames; b++) {
+            if(game.players[a].territories[b] > maxPlayerTer) maxPlayerTer = game.players[a].territories[b];
+            if(game.players[a].productions[b] > maxPlayerProd) maxPlayerProd = game.players[a].productions[b];
+            if(game.players[a].strengths[b] > maxPlayerStr) maxPlayerStr = game.players[a].strengths[b];
+        }
+    }
+    for(var a = 1; a <= game.numPlayers; a++) {
+        game.players[a].normTers = [];
+        game.players[a].normProds = [];
+        game.players[a].normStrs = [];
+        for(var b = 0; b < game.numFrames; b++) {
+            game.players[a].normTers.push(game.players[a].territories[b] / maxPlayerTer);
+            game.players[a].normProds.push(game.players[a].productions[b] / maxPlayerProd);
+            game.players[a].normStrs.push(game.players[a].strengths[b] / maxPlayerStr);
+        }
+    }
+
     return game
 }
