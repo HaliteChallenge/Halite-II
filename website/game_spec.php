@@ -50,7 +50,7 @@
 				 	</ul>
 				</p>
 
-				<p>Bots are given three seconds at the start of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, and/or planning the bot's initial expansion strategy. Once bots are done initializing (before their three seconds are up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
+				<p>Bots are given two seconds plus two milliseconds per map tile at the start of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, planning the bot's initial expansion strategy, and/or compiling a model. Once bots are done initializing (before their time is up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
 
 				<h3>Turns</h3>
 
@@ -58,6 +58,7 @@
 					<ol>
 				 		<li>Send the present gamestate - map and messages - to all players.</li>
 				 		<li>Receive moves from the players.</li>
+				 		<li>Kill bots which do not respond within the allotted time, which is fifty milliseconds plus one-half of a millisecond per map tile.</li>
 				 		<li>Add strength to pieces which choose to remain where they are.</li>
 				 		<li>Simultaneously move all player's pieces.</li>
 				 		<li>Simultaneously damage (and remove if damage exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
