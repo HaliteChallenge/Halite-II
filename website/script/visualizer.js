@@ -5,7 +5,7 @@ function showGame(game) {
 	}).join(" vs ")+"</h1>"))
 
 	function resize() {
-		sw = $("#pageContent").width(), sh = sw*3/5;
+		sw = $("#pageContent").width(), sh = sw*3/4;
 		mw = sh, mh = sh;
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
