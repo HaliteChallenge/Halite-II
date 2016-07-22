@@ -70,5 +70,26 @@ byteArrayToGame = function(bytes) {
 		    game.moves.push(moves);
 		}
     }
+
+    //Get game statistics:
+    for(var a = 1; a <= game.numPlayers; a++) {
+    	game.players[a].territories = [];
+    	game.players[a].productions = [];
+    	game.players[a].strengths = [];
+	    for(var b = 0; b < game.numFrames; b++) {
+    		var ter = 0, prod = 0, str = 0;
+    		for(var c = 0; c < game.height * game.width; c++) {
+    			if(game.frames[b][c].owner == a) {
+                    ter++;
+                    prod += game.productions[c];
+                    str += game.frames[b][c].strength;
+                }
+    		}
+            game.players[a].territories.push(ter);
+            game.players[a].productions.push(prod);
+            game.players[a].strengths.push(str);
+	    }
+	}
+
     return game
 }
