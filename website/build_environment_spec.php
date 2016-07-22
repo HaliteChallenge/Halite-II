@@ -81,9 +81,9 @@
         </p>
 
         <h3>Games</h3>
+		<p>Currently, 20x20, 25x25, 30x30, 35x35, 40x40, 45x45, and 50x50 games are run. Games may be 2-6 player.</p>
         <p>Games are always run using <a href="downloads.php">the most recent environment build</a>.</p>
-
-				<p>Players interface with the environment from within a sandbox which limits memory, threads, execution time, and internet access. The sandbox is a docker container defined by <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/Dockerfile">this Dockerfile</a> and running on top of Docker 1.6.2. <a href="https://github.com/remoteinterview/compilebox">A version of the sandbox</a> is used by the coding interview company <a href="https://www.remoteinterview.io/">remoteinterview</a> to secure their web ide. <b>If you think that there is an issue with the sandbox, please email us at halite@halite.io</b>.</p>
+		<p>Players interface with the environment from within a sandbox which limits memory, threads, execution time, and internet access. The sandbox is a docker container defined by <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/Dockerfile">this Dockerfile</a> and running on top of Docker 1.6.2. <a href="https://github.com/remoteinterview/compilebox">A version of the sandbox</a> is used by the coding interview company <a href="https://www.remoteinterview.io/">remoteinterview</a> to secure their web ide. <b>If you think that there is an issue with the sandbox, please email us at halite@halite.io</b>.</p>
 			</div>
 		</div>
 	</div>
