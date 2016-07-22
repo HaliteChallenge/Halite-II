@@ -2,25 +2,9 @@ function showGame(game) {
 
 	$("#pageContent").append($("<h1>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
-	}).join(" vs ")+"</h1>"))
+	}).join(" vs ")+"</h1>"));
 
-	function resize() {
-		sw = $("#pageContent").width(), sh = sw*3/4;
-		mw = sh, mh = sh;
-		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
-	}	
-	resize();
-
-	var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
-	document.getElementById("pageContent").appendChild(renderer.view);
-
-	window.onresize = function() {
-		resize();
-		renderer.resize(sw, sh);
-	}
-
-	// create the root of the scene graph:
+	//Create the root of the scene: stage:
 	var stage = new PIXI.Container();
 
 	// Initialize the pixi graphics class for the map:
@@ -29,23 +13,36 @@ function showGame(game) {
 	// Initialize the pixi graphics class for the graphs:
 	var graphGraphics = new PIXI.Graphics();
 
-	//Create the text for rendering the terrritory, strength, and prod graphs.
-	var terText = new PIXI.Text('Territory', { font: '24px Arial' });
-	terText.anchor = new PIXI.Point(0, 1);
-	terText.position = new PIXI.Point(mw + 20, TER_TOP);
-	stage.addChild(terText);
-	var prodText = new PIXI.Text('Production', { font: '24px Arial' });
-	prodText.anchor = new PIXI.Point(0, 1);
-	prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
-	stage.addChild(prodText);
-	var strText = new PIXI.Text('Strength', { font: '24px Arial' });
-	strText.anchor = new PIXI.Point(0, 1);
-	strText.position = new PIXI.Point(mw + 20, STR_TOP);
-	stage.addChild(strText);
-	
-	// Add the mapGraphics to the stage:
-	stage.addChild(mapGraphics);
-	stage.addChild(graphGraphics);
+	function resize() {
+		sw = $("#pageContent").width(), sh = sw*3/4;
+		mw = sh, mh = sh;
+		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
+		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
+		//Create the text for rendering the terrritory, strength, and prod graphs.
+		stage.removeChildren();
+		terText = new PIXI.Text('Territory', { font: '24px Arial' });
+		terText.anchor = new PIXI.Point(0, 1);
+		terText.position = new PIXI.Point(mw + 20, TER_TOP);
+		stage.addChild(terText);
+		prodText = new PIXI.Text('Production', { font: '24px Arial' });
+		prodText.anchor = new PIXI.Point(0, 1);
+		prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
+		stage.addChild(prodText);
+		strText = new PIXI.Text('Strength', { font: '24px Arial' });
+		strText.anchor = new PIXI.Point(0, 1);
+		strText.position = new PIXI.Point(mw + 20, STR_TOP);
+		stage.addChild(strText);
+		stage.addChild(mapGraphics);
+		stage.addChild(graphGraphics);
+	}	
+	resize();
+
+	var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
+	document.getElementById("pageContent").appendChild(renderer.view);
+	window.onresize = function() {
+		resize();
+		renderer.resize(sw, sh);
+	}
 
 	requestAnimationFrame(animate);
 
@@ -172,10 +169,7 @@ function showGame(game) {
 				if(tY == game.height) tY = 0;
 			}
 
-			function smoothMovement(t) {
-				return (-Math.cos(t * Math.PI) + 1) / 2;
-			};
-			var t = smoothMovement(transit);
+			var t = (-Math.cos(transit * Math.PI) + 1) / 2;
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
