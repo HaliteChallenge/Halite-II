@@ -36,7 +36,7 @@
 
                 console.log(game.width, game.height);
 
-                var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x00000, antialias: true });
+                var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
                 document.body.appendChild(renderer.view);
 
                 // create the root of the scene graph:
@@ -50,6 +50,7 @@
                  
                 // Add the mapGraphics to the stage:
                 stage.addChild(mapGraphics);
+                stage.addChild(graphGraphics);
 
                 requestAnimationFrame(animate);
 
@@ -111,6 +112,32 @@
 
                 function animate() {
 
+                    //Clear graphGraphics so that we can redraw freely.
+                    graphGraphics.clear();
+
+                    //Draw the graphs.
+                    const TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
+
+                    var dw = (sw - mw) / game.numFrames;
+                    for(var a = 1; a <= game.numPlayers; a++) {
+                        graphGraphics.lineStyle(1, game.players[a].color);
+                        //Draw ter graph.
+                        graphGraphics.moveTo(mw, (TER_TOP - TER_BTM) * game.players[a].normTers[0] + TER_BTM);
+                        for(var b = 1; b < game.numFrames; b++) {
+                            graphGraphics.lineTo(mw + dw * b, (TER_TOP - TER_BTM) * game.players[a].normTers[b] + TER_BTM);
+                        }
+                        //Draw prod graph.
+                        graphGraphics.moveTo(mw, (PROD_TOP - PROD_BTM) * game.players[a].normProds[0] + PROD_BTM);
+                        for(var b = 1; b < game.numFrames; b++) {
+                            graphGraphics.lineTo(mw + dw * b, (PROD_TOP - PROD_BTM) * game.players[a].normProds[b] + PROD_BTM);
+                        }
+                        //Draw str graph.
+                        graphGraphics.moveTo(mw, (STR_TOP - STR_BTM) * game.players[a].normStrs[0] + STR_BTM);
+                        for(var b = 1; b < game.numFrames; b++) {
+                            graphGraphics.lineTo(mw + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
+                        }
+                    }
+
                     //Clear mapGraphics so that we can redraw freely.
                     mapGraphics.clear();
 
@@ -170,7 +197,7 @@
                                 }
                                 else {
                                     mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
-                                    //mapGraphics.drawEllipse(rw * sX + 0.5, rh * sY + 0.5, pw / 2, ph / 2);
+                                    //mapGraphics.drawEllipse(rw * (sX + 0.5), rh * (sY + 0.5), pw / 2, ph / 2);
                                 }
                                 mapGraphics.endFill();
                                 if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000', 1);
