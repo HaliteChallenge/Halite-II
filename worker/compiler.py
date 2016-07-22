@@ -59,6 +59,9 @@ def nukeglob(pattern):
 				raise
 
 def _run_cmd(cmd, working_dir, timelimit):
+	absoluteWorkingDir = os.path.abspath(working_dir)
+	cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" virtual_machine sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
+	print(cmd)
 	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 	start = time.time()
 	timelimit = timelimit - start
@@ -527,8 +530,10 @@ def get_run_lang(submission_dir):
 					if line[0] == '#':
 						return line[1:-1]
 
-def compile_anything(bot_dir, timelimit=600, max_error_len = 3072):
+def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
 	"""Autodetect the language of an entry and compile it."""
+	if os.path.exists(os.path.join(bot_dir, "install.sh")):
+		_, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, time.time() + installTimeLimit)
 	detected_language, errors = detect_language(bot_dir)
 	print("detected language")
 	if detected_language:
