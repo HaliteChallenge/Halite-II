@@ -35,6 +35,7 @@ class CD(object):
 def safeglob(pattern):
 	safepaths = []
 	for root, dirs, files in os.walk("."):
+		print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
 		files = fnmatch.filter(files, pattern)
 		for fname in files:
 			if SAFEPATH.match(fname):
@@ -58,16 +59,18 @@ def nukeglob(pattern):
 				raise
 
 def _run_cmd(cmd, working_dir, timelimit):
-	print(cmd)
 	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+	start = time.time()
+	timelimit = timelimit - start
 	out, errors = process.communicate(timeout=timelimit)
 
-	if time.time() > timelimit:
+	if time.time() - start > timelimit:
 		errors.append("Compilation timed out with command %s" % (cmd,))
 	return out, errors
 
 
 def check_path(path, errors):
+	print(path)
 	if not os.path.exists(path):
 		errors.append("Output file " + str(os.path.basename(path)) + " was not created.")
 		return False
@@ -116,20 +119,22 @@ class ExternalCompiler(Compiler):
 
 	def compile(self, bot_dir, globs, errors, timelimit):
 		with CD(bot_dir):
+			print("GLOBS: " + ", ".join(globs))
 			files = safeglob_multi(globs)
 
 		try:
 			if self.separate:
 				for filename in files:
+					print("file: " + filename)
 					cmdline = " ".join(self.args + [filename])
 					cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
 					cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
 					if not cmd_errors:
 						for ofile in self.out_files:
-							check_path(ofile, cmd_errors)
+							check_path(os.path.join(bot_dir, ofile), cmd_errors)
 						if self.out_ext:
 							oname = os.path.splitext(filename)[0] + self.out_ext
-							check_path(oname, cmd_errors)
+							check_path(os.path.join(bot_dir, oname), cmd_errors)
 						if cmd_errors:
 							cmd_errors += cmd_out
 					if cmd_errors:
@@ -137,15 +142,16 @@ class ExternalCompiler(Compiler):
 						return False
 			else:
 				cmdline = " ".join(self.args + files)
+				print("Files: " + " ".join(files))
 				cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
 				cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
 				if not cmd_errors:
 					for ofile in self.out_files:
-						check_path(ofile, cmd_errors)
+						check_path(os.path.join(bot_dir, ofile), cmd_errors)
 					if self.out_ext:
 						for filename in files:
 							oname = os.path.splitext(filename)[0] + self.out_ext
-							check_path(oname, cmd_errors)
+							check_path(os.path.join(bot_dir, oname), cmd_errors)
 					if cmd_errors:
 						cmd_errors += cmd_out
 				if cmd_errors:
