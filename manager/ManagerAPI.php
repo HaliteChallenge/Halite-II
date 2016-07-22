@@ -120,24 +120,12 @@ class ManagerAPI extends API{
             }
 
             // Assign a run game tasks
-            $possibleNumPlayers = array(2, 3, 4, 5);
+            $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
             $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
-
-            /*$seedPlayer = $this->select("SELECT * FROM User WHERE status = 3 ORDER BY rand() LIMIT 1");
-            $differenceInRank = rand(3, 10);
-            $possiblePlayers = $this->selectMultiple("SELECT * FROM User WHERE userID!={$seedPlayer['userID']} and status = 3 and ABS(rank-{$seedPlayer['rank']}) <= $differenceInRank");
-            usort($possiblePlayers, function($a, $b) use ($seedPlayer) {
-                return $this->getTrueskillMatchQuality(array($a, $seedPlayer)) < $this->getTrueskillMatchQuality(array($b, $seedPlayer));
-            });
-
-            $players = array($seedPlayer);
-            for($a = 0; $a < $numPlayers-1; $a++) {
-                array_push($players, $possiblePlayers[$a]);
-            }*/
             $players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
 
             // Pick map size
-            $sizes = array(20, 20, 25, 25, 30, 30, 30, 35, 35, 40);
+            $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40);
             $size = $sizes[array_rand($sizes)];
 
             // Send game task
