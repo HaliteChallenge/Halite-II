@@ -10,6 +10,10 @@ byteArrayToGame = function(bytes) {
 
     var game = {version: header};
     [game.width, game.height, game.numPlayers, game.numFrames] = details.split(" ");
+    game.width = parseInt(game.width);
+    game.height = parseInt(game.height);
+    game.numPlayers = parseInt(game.numPlayers);
+    game.numFrames = parseInt(game.numFrames);
     var cellCount = game.height * game.width;
 
     game.players = []
