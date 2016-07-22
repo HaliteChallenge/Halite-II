@@ -357,7 +357,7 @@ void Halite::output(std::string filename) {
 GameStatistics Halite::runGame() {
 	std::vector<bool> result(number_of_players, true);
 	std::vector<unsigned char> rankings;
-	const int maxTurnNumber = game_map.map_width * game_map.map_height;
+	const int maxTurnNumber = sqrt(game_map.map_width * game_map.map_height) * 10;
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber) {
 		//Increment turn number:
 		turn_number++;
