@@ -9,6 +9,9 @@ function showGame(game) {
 		mw = sh, mh = sh;
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
+		terText.position = new PIXI.Point(mw + 20, TER_TOP);
+		prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
+		strText.position = new PIXI.Point(mw + 20, STR_TOP);
 	}	
 	resize();
 
@@ -172,10 +175,7 @@ function showGame(game) {
 				if(tY == game.height) tY = 0;
 			}
 
-			function smoothMovement(t) {
-				return (-Math.cos(t * Math.PI) + 1) / 2;
-			};
-			var t = smoothMovement(transit);
+			var t = (-Math.cos(transit * Math.PI) + 1) / 2;
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
