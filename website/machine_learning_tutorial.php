@@ -37,21 +37,14 @@ apt-get install -y python3-h5py</code></pre>
           <p>
                     <a href="tutorials/machinelearning/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. We want load and parse these files into lists of `GameMap` objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
                     <pre class="prettyprint">def loadGame(filename):
-    def bytesUntil(gameFile, endByte):
-        byteArray = []
-        byte = gameFile.read(1)
-        while byte != endByte:
-            byteArray.append(byte)
-            byte = gameFile.read(1)
-        return byteArray
-
     def stringUntil(gameFile, endChar):
         returnString = ""
-        byte = gameFile.read(1)
-        while byte != endChar.encode("utf-8"):
-            returnString += byte.decode("utf-8")
-            byte = gameFile.read(1)
+        b = gameFile.read(1)
+        while b != endChar.encode("utf-8"):
+            returnString += b.decode("utf-8")
+            b = gameFile.read(1)
         return returnString
+
     mattID = None
     frames = []
     moves = []
