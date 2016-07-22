@@ -25,7 +25,7 @@
           </ul>
         </p>
 		
-		<p> Bots are given <b>256 MB of RAM</b> and equal amounts of CPU.</p>
+		<p> Bots are given <b>256 MB of RAM</b> and <b>equal amounts of CPU</b>.</p>
 
 		<h3>Libraries</h3>
 		<p>
