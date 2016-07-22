@@ -19,9 +19,9 @@ byteArrayToGame = function(bytes) {
     //Hardcoding colors:
     var colors = []
     colors.push('0xff0000');
-    colors.push('0x00ffff');
-    colors.push('0xff9900');
     colors.push('0x00cc00');
+    colors.push('0xff9900');
+    colors.push('0x993333');
     colors.push('0x9900ff');
     colors.push('0xff66ff');
 
