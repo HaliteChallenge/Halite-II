@@ -178,7 +178,7 @@ function showGame(game) {
 				var sX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
 					var site = game.frames[frame][loc];
-					if(site.strength == 255) mapGraphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
 					mapGraphics.beginFill(game.players[site.owner].color);
 					var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
 					if(transit > 0) {
