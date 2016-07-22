@@ -21,7 +21,7 @@ byteArrayToGame = function(bytes) {
     colors.push('0xff0000');
     colors.push('0x00cc00');
     colors.push('0xff9900');
-    colors.push('0x993333');
+    colors.push('0xaa4444');
     colors.push('0x9900ff');
     colors.push('0xff66ff');
 
