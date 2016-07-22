@@ -172,6 +172,7 @@ function showGame(game) {
 				if(tY == game.height) tY = 0;
 			}
 
+			var t = (-Math.cos(transit * Math.PI) + 1) / 2;
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
@@ -181,12 +182,12 @@ function showGame(game) {
 					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
 					mapGraphics.beginFill(game.players[site.owner].color);
 					var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
-					if(transit > 0) {
+					if(t > 0) {
 						var move = game.moves[frame][loc];
 						var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
 						var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
-						mapGraphics.drawRect(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5) - pw / 2, rh * ((transit * sY2 + (1 - transit) * sY) + 0.5) - ph / 2, pw, ph);
-						//mapGraphics.drawEllipse(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5), rh * ((transit * sY2 + (1 - transit) * sY) + 0.5), pw / 2, ph / 2);
+						mapGraphics.drawRect(rw * ((t * sX2 + (1 - t) * sX) + 0.5) - pw / 2, rh * ((t * sY2 + (1 - t) * sY) + 0.5) - ph / 2, pw, ph);
+						//mapGraphics.drawEllipse(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5), pw / 2, ph / 2);
 					}
 					else {
 						mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
