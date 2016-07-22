@@ -11,8 +11,6 @@ import sys
 import time
 from optparse import OptionParser
 
-from sandbox import get_sandbox
-
 try:
 	from server_info import server_info
 	MEMORY_LIMIT = server_info.get('memory_limit', 1500)
@@ -37,6 +35,7 @@ class CD(object):
 def safeglob(pattern):
 	safepaths = []
 	for root, dirs, files in os.walk("."):
+		print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
 		files = fnmatch.filter(files, pattern)
 		for fname in files:
 			if SAFEPATH.match(fname):
@@ -59,34 +58,19 @@ def nukeglob(pattern):
 			if e.errno != errno.ENOENT:
 				raise
 
-def _run_cmd(sandbox, cmd, timelimit):
-	out = []
-	errors = []
-	sandbox.start(cmd)
-	# flush stdout to keep stuff moving
-	try:
-		while (sandbox.is_alive and time.time() < timelimit):
-			out_ln = sandbox.read_line((timelimit - time.time()) + 1)
-			if out_ln:
-				out.append(out_ln)
-	finally:
-		sandbox.kill()
-	# capture final output for error reporting
-	tmp = sandbox.read_line(1)
-	while tmp:
-		out.append(tmp)
-		tmp = sandbox.read_line(1)
+def _run_cmd(cmd, working_dir, timelimit):
+	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+	start = time.time()
+	timelimit = timelimit - start
+	out, errors = process.communicate(timeout=timelimit)
 
-	if time.time() > timelimit:
-		errors.append("Compilation timed out with command %s"
-				% (cmd,))
-	err_line = sandbox.read_error()
-	while err_line is not None:
-		errors.append(err_line)
-		err_line = sandbox.read_error()
+	if time.time() - start > timelimit:
+		errors.append("Compilation timed out with command %s" % (cmd,))
 	return out, errors
 
+
 def check_path(path, errors):
+	print(path)
 	if not os.path.exists(path):
 		errors.append("Output file " + str(os.path.basename(path)) + " was not created.")
 		return False
@@ -135,21 +119,22 @@ class ExternalCompiler(Compiler):
 
 	def compile(self, bot_dir, globs, errors, timelimit):
 		with CD(bot_dir):
+			print("GLOBS: " + ", ".join(globs))
 			files = safeglob_multi(globs)
 
-		box = get_sandbox(bot_dir)
 		try:
 			if self.separate:
 				for filename in files:
+					print("file: " + filename)
 					cmdline = " ".join(self.args + [filename])
-					cmd_out, cmd_errors = _run_cmd(box, cmdline, timelimit)
+					cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
 					cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
 					if not cmd_errors:
 						for ofile in self.out_files:
-							box.check_path(ofile, cmd_errors)
+							check_path(os.path.join(bot_dir, ofile), cmd_errors)
 						if self.out_ext:
 							oname = os.path.splitext(filename)[0] + self.out_ext
-							box.check_path(oname, cmd_errors)
+							check_path(os.path.join(bot_dir, oname), cmd_errors)
 						if cmd_errors:
 							cmd_errors += cmd_out
 					if cmd_errors:
@@ -157,23 +142,23 @@ class ExternalCompiler(Compiler):
 						return False
 			else:
 				cmdline = " ".join(self.args + files)
-				cmd_out, cmd_errors = _run_cmd(box, cmdline, timelimit)
+				print("Files: " + " ".join(files))
+				cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
 				cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
 				if not cmd_errors:
 					for ofile in self.out_files:
-						box.check_path(ofile, cmd_errors)
+						check_path(os.path.join(bot_dir, ofile), cmd_errors)
 					if self.out_ext:
 						for filename in files:
 							oname = os.path.splitext(filename)[0] + self.out_ext
-							box.check_path(oname, cmd_errors)
+							check_path(os.path.join(bot_dir, oname), cmd_errors)
 					if cmd_errors:
 						cmd_errors += cmd_out
 				if cmd_errors:
 					errors += cmd_errors
 					return False
-			box.retrieve()
-		finally:
-			box.release()
+		except:
+			pass
 		return True
 
 	def cmd_error_filter(self, cmd_out, cmd_errors):
@@ -242,7 +227,6 @@ class TargetCompiler(Compiler):
 		with CD(bot_dir):
 			sources = safeglob_multi(globs)
 
-		box = get_sandbox(bot_dir)
 		try:
 			for source in sources:
 				head, ext = os.path.splitext(source)
@@ -252,13 +236,12 @@ class TargetCompiler(Compiler):
 					errors.append("Could not determine target for source file %s." % source)
 					return False
 				cmdline = " ".join(self.args + [self.outflag, target, source])
-				cmd_out, cmd_errors = _run_cmd(box, cmdline, timelimit)
+				cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
 				if cmd_errors:
 					errors += cmd_errors
 					return False
-			box.retrieve()
-		finally:
-			box.release()
+		except:
+			pass
 		return True
 
 PYTHON_EXT_COMPILER = '''"from distutils.core import setup
