@@ -175,7 +175,7 @@ function showGame(game) {
 			function smoothMovement(t) {
 				return (-Math.cos(t * Math.PI) + 1) / 2;
 			};
-			var t = smoothMovement(smoothMovement(transit));
+			var t = smoothMovement(transit);
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
