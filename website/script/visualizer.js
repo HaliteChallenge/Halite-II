@@ -1,276 +1,272 @@
-$(function() {
-	byteArrayToGame = function(bytes) {
-		var headerSplit = bytes.indexOf(10);
-		var header = String.fromCharCode.apply(null, bytes.slice(0, headerSplit))
-		if (header != "HLT 9") {
-		alert("Invalid header: " + header)
+function showGame(game) {
+
+	$("#pageContent").append($("<h1>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
+		return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
+	}).join(" vs ")+"</h1>"))
+
+	function resize() {
+		sw = $("#pageContent").width(), sh = sw*3/5;
+		mw = sh, mh = sh;
+		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
+		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
+	}	
+	resize();
+
+	var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
+	document.getElementById("pageContent").appendChild(renderer.view);
+
+	window.onresize = function() {
+		resize();
+		renderer.resize(sw, sh);
+	}
+
+	// create the root of the scene graph:
+	var stage = new PIXI.Container();
+
+	// Initialize the pixi graphics class for the map:
+	var mapGraphics = new PIXI.Graphics();
+
+	// Initialize the pixi graphics class for the graphs:
+	var graphGraphics = new PIXI.Graphics();
+
+	//Create the text for rendering the terrritory, strength, and prod graphs.
+	var terText = new PIXI.Text('Territory', { font: '24px Arial' });
+	terText.anchor = new PIXI.Point(0, 1);
+	terText.position = new PIXI.Point(mw + 20, TER_TOP);
+	stage.addChild(terText);
+	var prodText = new PIXI.Text('Production', { font: '24px Arial' });
+	prodText.anchor = new PIXI.Point(0, 1);
+	prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
+	stage.addChild(prodText);
+	var strText = new PIXI.Text('Strength', { font: '24px Arial' });
+	strText.anchor = new PIXI.Point(0, 1);
+	strText.position = new PIXI.Point(mw + 20, STR_TOP);
+	stage.addChild(strText);
+	
+	// Add the mapGraphics to the stage:
+	stage.addChild(mapGraphics);
+	stage.addChild(graphGraphics);
+
+	requestAnimationFrame(animate);
+
+	var frame = 0;
+	var transit = 0;
+	var framespersec = 2.5;
+	var shouldplay = true;
+	var xOffset = 0, yOffset = 0;
+
+	var pressed={};
+	document.onkeydown=function(e){
+		e = e || window.event;
+		pressed[e.keyCode] = true;
+			if(e.keyCode == 32) { //Space
+			shouldplay = !shouldplay;
 		}
-
-		var detailSplit = bytes.indexOf(10, headerSplit + 1);
-		var details = String.fromCharCode.apply(null, bytes.slice(headerSplit + 1, detailSplit))
-
-		var game = {version: header};
-		[game.width, game.height, game.numPlayers, game.numFrames] = details.split(" ");
-		var cellCount = game.height * game.width;
-
-		game.players = []
-		var playerSplit = detailSplit;
-		for (i = 0; i < game.numPlayers; i++) {
-		var nextPlayerSplit = bytes.indexOf(10, playerSplit + 1);
-		var playerLine = String.fromCharCode.apply(null, bytes.slice(playerSplit + 1, nextPlayerSplit));
-		var playerDetails = playerLine.split("\0");
-		game.players.push({name: playerDetails[0], color: playerDetails[1]});
-		playerSplit = nextPlayerSplit;
+		else if(e.keyCode == 90) { //z
+			frame = 0;
+			transit = 0;
 		}
-
-		game.productions = []
-		var offset = 0;
-		for (var i = 0; i < cellCount; ++i) {
-		game.productions.push(
-			{index: i, production: bytes[playerSplit + 1 + i]})
+		else if(e.keyCode == 88) { //x
+			frame = game.numFrames - 1;
+			transit = 0;
 		}
+		else if(e.keyCode == 188) { //,
+			if(transit == 0) frame--;
+			else transit = 0;
+			if(frame < 0) frame = 0;
+			shouldplay = false;
+		}
+		else if(e.keyCode == 190) { //.
+			frame++;
+			transit = 0;
+			if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+			shouldplay = false;
+		}
+		else if(e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 87 || e.keyCode == 83) { //wasd
+			xOffset = Math.round(xOffset);
+			yOffset = Math.round(yOffset);
+		}
+		else if(e.keyCode == 79) { //o
+			xOffset = 0;
+			yOffset = 0;
+		}
+	}
 
-		game.frames = []
-		game.moves = []
-		var currIndex = playerSplit + 1 + cellCount + 1;
-		for (var frameCount = 0; frameCount < game.numFrames; frameCount++) {
-		var cellsRead = 0;
-		var frame = [];
-		while (cellsRead < cellCount) {
-			var counter = bytes[currIndex++]
-			var owner = bytes[currIndex++];
-			if (counter + cellsRead <= cellCount) {
-			for (var i = 0; i < counter; i++) {
-				var strength = bytes[currIndex++]
-				frame.push({owner: owner, strength: strength});
+	document.onkeyup=function(e){
+		 e = e || window.event;
+		 delete pressed[e.keyCode];
+	}
+
+	var lastTime = Date.now();
+
+	function interpolate(c1, c2, v) {
+		var c = { r: v * c2.r + (1 - v) * c1.r, g: v * c2.g + (1 - v) * c1.g, b: v * c2.b + (1- v) * c1.b };
+		function compToHex(c) { var hex = c.toString(16); return hex.length == 1 ? "0" + hex : hex; };
+		return "0x" + compToHex(Math.round(c.r)) + compToHex(Math.round(c.g)) + compToHex(Math.round(c.b));
+	}
+
+	function animate() {
+
+		//Clear graphGraphics so that we can redraw freely.
+		graphGraphics.clear();
+
+		//Draw the graphs.
+		var dw = (sw - mw) / game.numFrames;
+		for(var a = 1; a <= game.numPlayers; a++) {
+			graphGraphics.lineStyle(1, game.players[a].color);
+			//Draw ter graph.
+			graphGraphics.moveTo(mw, (TER_TOP - TER_BTM) * game.players[a].normTers[0] + TER_BTM);
+			for(var b = 1; b < game.numFrames; b++) {
+				graphGraphics.lineTo(mw + dw * b, (TER_TOP - TER_BTM) * game.players[a].normTers[b] + TER_BTM);
 			}
-			cellsRead += counter;
-			} else {
-			console.log("Gonna read: " + counter);
-			cellsRead = cellCount
+			//Draw prod graph.
+			graphGraphics.moveTo(mw, (PROD_TOP - PROD_BTM) * game.players[a].normProds[0] + PROD_BTM);
+			for(var b = 1; b < game.numFrames; b++) {
+				graphGraphics.lineTo(mw + dw * b, (PROD_TOP - PROD_BTM) * game.players[a].normProds[b] + PROD_BTM);
+			}
+			//Draw str graph.
+			graphGraphics.moveTo(mw, (STR_TOP - STR_BTM) * game.players[a].normStrs[0] + STR_BTM);
+			for(var b = 1; b < game.numFrames; b++) {
+				graphGraphics.lineTo(mw + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
 			}
 		}
-		game.frames.push(frame);
 
-		if (frameCount < game.numFrames - 1) {
-			var moves = [];
-			for (var i = 0; i < cellCount; i++) {
-			moves.push(bytes[currIndex++])
+		//Clear mapGraphics so that we can redraw freely.
+		mapGraphics.clear();
+
+		if(pressed[80]) { //Render productions. Don't update frames or transits. [Using p now for testing]
+			var loc = 0;
+			var pY = Math.round(yOffset);
+			for(var a = 0; a < game.height; a++) {
+				var pX = Math.round(xOffset);
+				for(var b = 0; b < game.width; b++) {
+					var site = game.frames[frame][loc];
+					if(game.productionNormals[loc] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
+					else if(game.productionNormals[loc] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[loc] * 3 - 1));
+					else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[loc] * 3 - 2));
+					mapGraphics.drawRect(rw * pX, rh * pY, rw, rh);
+					mapGraphics.endFill();
+					loc++;
+					pX++;
+					if(pX == game.width) pX = 0;
+				}
+				pY++;
+				if(pY == game.height) pY = 0;
 			}
-			game.moves.push(moves);
 		}
-		}
-		return game
+		else { //Render game and update frames and transits.
+			var loc = 0;
+			var tY = Math.round(yOffset);
+			for(var a = 0; a < game.height; a++) {
+				var tX = Math.round(xOffset);
+				for(var b = 0; b < game.width; b++) {
+					var site = game.frames[frame][loc];
+					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+					mapGraphics.drawRect(rw * tX, rh * tY, rw, rh);
+					mapGraphics.endFill();
+					loc++;
+					tX++;
+					if(tX == game.width) tX = 0;
+				}
+				tY++;
+				if(tY == game.height) tY = 0;
+			}
 
+			loc = 0;
+			var sY = Math.round(yOffset);
+			for(var a = 0; a < game.height; a++) {
+				var sX = Math.round(xOffset);
+				for(var b = 0; b < game.width; b++) {
+					var site = game.frames[frame][loc];
+					if(site.strength == 255) mapGraphics.lineStyle(1, '0xffffff' ^ game.players[site.owner].color, 1);
+					mapGraphics.beginFill(game.players[site.owner].color);
+					var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
+					if(transit > 0) {
+						var move = game.moves[frame][loc];
+						var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
+						var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
+						mapGraphics.drawRect(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5) - pw / 2, rh * ((transit * sY2 + (1 - transit) * sY) + 0.5) - ph / 2, pw, ph);
+						//mapGraphics.drawEllipse(rw * ((transit * sX2 + (1 - transit) * sX) + 0.5), rh * ((transit * sY2 + (1 - transit) * sY) + 0.5), pw / 2, ph / 2);
+					}
+					else {
+						mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
+						//mapGraphics.drawEllipse(rw * (sX + 0.5), rh * (sY + 0.5), pw / 2, ph / 2);
+					}
+					mapGraphics.endFill();
+					if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000', 1);
+					loc++;
+					sX++;
+					if(sX == game.width) sX = 0;
+				}
+				sY++;
+				if(sY == game.height) sY = 0;
+			}
+
+			var time = Date.now();
+			var dt = time - lastTime;
+			lastTime = time;
+
+			//Update frames per sec if up or down arrows are pressed.
+			if(pressed[38]) {
+				framespersec += 0.05;
+			}
+			else if(pressed[40]) {
+				framespersec -= 0.05;
+			}
+
+			if(pressed[39]) {
+				transit = 0;
+				frame++;
+			}
+			else if(pressed[37]) {
+				if(transit != 0) transit = 0;
+				else frame--;
+			}
+			else if(shouldplay) {
+				transit += dt / 1000 * framespersec;
+			}
+
+			//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
+			while(transit >= 1) {
+				transit--;
+				frame++;
+			}
+			if(frame >= game.numFrames - 1) {
+				frame = game.numFrames - 1;
+				transit = 0;
+			}
+			while(transit < 0) {
+				transit++;
+				frame--;
+			}
+			if(frame < 0) {
+				frame = 0;
+				transit = 0;
+			}
+		}
+
+		//Pan if desired.
+		const PAN_SPEED = 1;
+		if(pressed[65]) xOffset += PAN_SPEED;
+		if(pressed[68]) xOffset -= PAN_SPEED
+		if(pressed[87]) yOffset += PAN_SPEED;
+		if(pressed[83]) yOffset -= PAN_SPEED;
+
+		//Reset pan to be in normal bounds:
+		if(Math.round(xOffset) >= game.width) xOffset -= game.width;
+		else if(Math.round(xOffset) < 0) xOffset += game.width;
+		if(Math.round(yOffset) >= game.height) yOffset -= game.height;
+		else if(Math.round(yOffset) < 0) yOffset += game.height;
+
+		//Actually render.
+		renderer.render(stage);
+
+		//Of course, we want to render in the future as well.
+		requestAnimationFrame(animate);
 	}
+}
 
-	endAll = function(transition, callback) {
-		if (!callback) callback = function(){};
-		if (transition.size() === 0) { callback() }
-		var n = 0;
-		transition
-		.on("start", function() { ++n; })
-			.on("end", function() { if (!--n) callback.apply(this, arguments); });
-	}
-
-	addPlot = function(label, vals) {
-		var margin = {top: 20, right: 5, bottom: 20, left: 5},
-		width = 160 - margin.left - margin.right,
-		height = 160 - margin.top - margin.bottom;
-
-		var x = d3.scaleLinear()
-		.domain([0, vals.length])
-		.range([0, width]);
-
-		var y = d3.scaleLinear()
-			.domain([0, d3.max(vals, function(vs) {return d3.max(d3.values(vs))})])
-		.range([height, 0]);
-
-		var color = d3.scaleOrdinal(d3.schemeCategory10)
-
-		var svg = d3.select("#plots").append("svg")
-		.attr("display", "block")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-		.append("g")
-		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
-
-		console.log(vals[0].length)
-		for (i = 0; i < vals[0].length; i++) {
-		var line = d3.line()
-			.x(function(d,i2) { return x(i2) })
-			.y(function(d) { return y(d[i]) })
-
-		svg.append("path")
-			.datum(vals)
-			.attr("class", "line")
-			.attr("d", line)
-			.attr("fill", "none")
-			.style("stroke", color(i))
-		}
-
-
-		svg.append("text")
-			.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-			.attr("transform", "translate("+ (width/2) +","+(height+10)+")")  // centre below axis
-		.text(label);
-
-
-	}
-
-	getPlayerStrengthData = function(game) {
-		var result = []
-		for (frame = 0; frame < game.frames.length; frame++) {
-		var frameResult = [];
-		for (p = 0; p < game.players.length; p++) {
-			frameResult.push(0);
-		}
-		for (i = 0; i < game.width * game.height; i++) {
-			var currPlayer = game.frames[frame][i].owner - 1;
-			frameResult[currPlayer] += game.frames[frame][i].strength
-		}
-		result.push(frameResult)
-		}
-		return result;
-	}
-
-	getPlayerProductionData = function(game) {
-		var result = []
-		for (frame = 0; frame < game.frames.length; frame++) {
-		var frameResult = [];
-		for (p = 0; p < game.players.length; p++) {
-			frameResult.push(0);
-		}
-		for (i = 0; i < game.width * game.height; i++) {
-			var currPlayer = game.frames[frame][i].owner - 1;
-			frameResult[currPlayer] += game.productions[i].production
-		}
-		result.push(frameResult)
-		}
-		return result;
-	}
-
-
-	getPlayerTerritoryData = function(game) {
-		var result = []
-		for (frame = 0; frame < game.frames.length; frame++) {
-		var frameResult = [];
-		for (p = 0; p < game.players.length; p++) {
-			frameResult.push(0);
-		}
-		for (i = 0; i < game.width * game.height; i++) {
-			var currPlayer = game.frames[frame][i].owner - 1;
-			frameResult[currPlayer]++
-		}
-		result.push(frameResult)
-		}
-		return result;
-	}
-
-
-	showGame = function(game) {
-		console.log(game)
-		console.log(getPlayerStrengthData(game))
-		addPlot("Strength", getPlayerStrengthData(game));
-		addPlot("Territory", getPlayerTerritoryData(game));
-		addPlot("Production", getPlayerProductionData(game));
-		
-		var color = d3.scaleOrdinal(d3.schemeCategory10)
-		var playerHeading = game.players.map(function(d, i) {
-			return "<span style='color: "+color(i+1)+";'>"+d.name+"</span>"	
-		}).join(" vs ");
-		var playerList = d3.select("#pageContent").insert("h3", ":first-child").html(playerHeading);
-
-		var margin = {top: 20, right: 20, bottom: 20, left: 20},
-		width = 500 - margin.left - margin.right,
-		height = 500 - margin.top - margin.bottom;
-
-		var x = d3.scaleLinear()
-		.domain([0, game.width])
-		.range([0, width]);
-
-		var y = d3.scaleLinear()
-		.domain([0, game.height])
-		.range([height, 0]);
-
-		var svg = d3.select("#gameArea").append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-		.append("g");
-
-		var squareSize = Math.abs(x(1) - x(2))
-
-		var playerMarkers;
-		setPlayerMarkers = function() {
-		playerMarkers = svg.selectAll("circle")
-			.data(game.frames[turn]).enter()
-			.append("circle")
-			.attr("cx", function(d, i) {return x(0.5 + (i % game.width))})
-			.attr("cy", function(d, i) {return y(-0.5 + ((i - (i % game.width)) / game.width))})
-			.attr("r", function(d) {return 0.5 * squareSize * Math.sqrt(d.strength / 255)})
-			.style("fill", function(d) {return (d.owner == 0 ? d3.rgb(1/2,1/2,1/2, 0.5) : color(d.owner))})
-			.style("stroke", function(d) {return d.strength == 255 ? "black" : null})}
-
-		var maxProduction = d3.max(game.productions, function(d) { return d.production })
-		var productionSquares = svg.selectAll("rect")
-		.data(game.productions).enter()
-			.append("rect")
-		.attr("x", function(d, i) {return x(i % game.width)})
-			.attr("y", function(d, i) {return y((i - (i % game.width)) / game.width)})
-		.attr("width", Math.abs(x(1) - x(2)))
-		.attr("height", Math.abs(y(1) - y(2)))
-		.style("fill", function(d) {return d3.rgb(0.5, 0.5, 0.5)})
-		.style("opacity", 0);
-
-		var turn = 0;
-
-
-		setPlayerMarkers();
-		moveMarkers = function () {
-		var transitionDuration = 300;
-		var t = d3.transition()
-			.duration(transitionDuration)
-			.ease(d3.easeCubicInOut);
-
-		var moveTransition = playerMarkers.transition(t)
-			.attr("cx", function(d, i) {
-			if (game.moves[turn][i] == 2) {
-				return x(1.5 + (i % game.width))
-			} else if (game.moves[turn][i] == 4) {
-				return x(-0.5 + (i % game.width))
-			} else {
-				return x(0.5 + (i % game.width))
-			}})
-			.attr("cy", function(d, i) {
-			if (game.moves[turn][i] == 3) {
-				return y(+0.5 + ((i - (i % game.width)) / game.width))
-			} else if (game.moves[turn][i] == 1) {
-				return y(-1.5 + ((i - (i % game.width)) / game.width))
-			} else {
-				return y(-0.5 + ((i - (i % game.width)) / game.width))
-			}})
-
-		var t2 = d3.transition()
-			.delay(transitionDuration / 2)
-			.duration(transitionDuration / 3)
-			.ease(d3.easeLinear);
-
-		var prodTransition = productionSquares.transition(t2)
-			.style("fill", function(d, i) {return (game.frames[turn + 1][i].owner == 0 ?
-							   d3.rgb(1/2,1/2,1/2) :
-							   color(game.frames[turn + 1][i].owner))})
-			.style("opacity", function(d, i) {return 0.5 * d.production / maxProduction})
-
-		endAll(moveTransition, function() {
-			turn++;
-			playerMarkers.remove()
-			setPlayerMarkers();
-			moveMarkers();
-		})
-		}
-		moveMarkers()
-	}
-
+$(function () {
 	var replayName = getGET("replay");
 
 	if(replayName != null) {
