@@ -29,12 +29,10 @@
             document.getElementById('files').addEventListener('change', readFiles, false);
 
             function showGame(game) {
-                var sw = 960, sh = 720;
-                var mw = 720, mh = 720;
-                var rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-                console.log(rw, rh);
-
-                console.log(game.width, game.height);
+                const sw = 960, sh = 720;
+                const mw = 720, mh = 720;
+                const rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
+                const TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
 
                 var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
                 document.body.appendChild(renderer.view);
@@ -47,7 +45,21 @@
 
                 // Initialize the pixi graphics class for the graphs:
                 var graphGraphics = new PIXI.Graphics();
-                 
+
+                //Create the text for rendering the terrritory, strength, and prod graphs.
+                var terText = new PIXI.Text('Territory', { font: '24px Arial' });
+                terText.anchor = new PIXI.Point(0, 1);
+                terText.position = new PIXI.Point(mw + 20, TER_TOP);
+                stage.addChild(terText);
+                var prodText = new PIXI.Text('Production', { font: '24px Arial' });
+                prodText.anchor = new PIXI.Point(0, 1);
+                prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
+                stage.addChild(prodText);
+                var strText = new PIXI.Text('Strength', { font: '24px Arial' });
+                strText.anchor = new PIXI.Point(0, 1);
+                strText.position = new PIXI.Point(mw + 20, STR_TOP);
+                stage.addChild(strText);
+                
                 // Add the mapGraphics to the stage:
                 stage.addChild(mapGraphics);
                 stage.addChild(graphGraphics);
@@ -116,8 +128,6 @@
                     graphGraphics.clear();
 
                     //Draw the graphs.
-                    const TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
-
                     var dw = (sw - mw) / game.numFrames;
                     for(var a = 1; a <= game.numPlayers; a++) {
                         graphGraphics.lineStyle(1, game.players[a].color);
