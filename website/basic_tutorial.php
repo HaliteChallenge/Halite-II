@@ -38,7 +38,7 @@
 				</p>
 
 				<p>
-					<code>./environment WIDTH HEIGHT "START_COMMAND_BOT_1" "START_COMMAND_BOT_2" ... "START_COMMAND_BOT_N"</code>
+					<code>./environment -d WIDTH HEIGHT "START_COMMAND_BOT_1" "START_COMMAND_BOT_2" ... "START_COMMAND_BOT_N"</code>
 				</p>
 
 				<p>
