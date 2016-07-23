@@ -156,7 +156,7 @@ apt-get install -y python3-h5py</code></pre>
                 </p>
 
                 <p>
-                    Our neural network will use the hyperbolic tangent activation function for its input and hidden layers. We will restrict it to just one hidden layer. Its output layer will use the softmax activation function. We will use stochastic gradient descent as our training algorithm.
+                    Our neural network will use the hyperbolic tangent activation function for its hidden layers. Its output layer will use the softmax activation function. We will use stochastic gradient descent as our training algorithm.
 
                     <pre class="prettyprint">inputs, correctOutputs = getNNData()
 
