@@ -21,7 +21,7 @@ for y in range(gameMap.height):
 		if prod > maxProduction:
 			maxProduction = prod
 
-sendInit("PythonBot")
+sendInit("MattCopy")
 
 while True:
 	moves = []
