@@ -1,6 +1,5 @@
 #include "Networking.hpp"
 
-#include <time.h>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -119,9 +118,9 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		DWORD bytesAvailable = 0;
 		PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
 		if(bytesAvailable < 1) {
-			clock_t initialTime = clock();
+			std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
 			while (bytesAvailable < 1) {
-				if(((clock() - initialTime) * 1000 / CLOCKS_PER_SEC) > timeoutMillis) throw 1;
+				if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > timeoutMillis) throw 1;
 				PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
 			}
 		}
@@ -309,9 +308,9 @@ void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & 
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!quiet_output) std::cout << outMessage;
 
-		clock_t initialTime = clock();
+		std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
 		*playerName = getString(playerTag, *playermillis).substr(0, 30);
-		unsigned millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+		unsigned int millisTaken = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count();
 		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
 		if(!quiet_output) std::cout << inMessage;
 
@@ -333,12 +332,13 @@ void Networking::handleFrameNetworking(unsigned char playerTag, const hlt::Map &
 
 		moves->clear();
 
-		clock_t initialTime = clock();
+		std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
 		std::string movesString = getString(playerTag, *playermillis);
-		unsigned millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
-		*playermillis -= millisTaken;
+		unsigned int millisTaken = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count();
 
 		*moves = deserializeMoveSet(movesString, m);
+		
+		*playermillis -= millisTaken;
 	}
 	catch(...) {
 		*moves = std::set<hlt::Move>();
