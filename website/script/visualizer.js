@@ -24,21 +24,21 @@ function showGame(game) {
 		mw = sh, mh = sh;
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw;
-		TER_TOP = sh * 0.095, TER_BTM = sh * 0.33, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.665, STR_TOP = sh * 0.765, STR_BTM = sh;
+		TER_TOP = sh * 0.095, TER_BTM = sh * 0.38, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.715, STR_TOP = sh * 0.765, STR_BTM = sh;
 		dw = (GRAPH_RIGHT - GRAPH_LEFT) / game.numFrames; //Graph step (w)
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
 		terText.anchor = new PIXI.Point(0, 1);
-		terText.position = new PIXI.Point(mw + sh / 32, TER_TOP);
+		terText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.005);
 		stage.addChild(terText);
 		prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial' });
 		prodText.anchor = new PIXI.Point(0, 1);
-		prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP);
+		prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP - sh * 0.005);
 		stage.addChild(prodText);
 		strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial' });
 		strText.anchor = new PIXI.Point(0, 1);
-		strText.position = new PIXI.Point(mw + sh / 32, STR_TOP);
+		strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
 		stage.addChild(strText);
 		infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial' });
 		infoText.anchor = new PIXI.Point(0, 1);
@@ -166,6 +166,36 @@ function showGame(game) {
 				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
 			}
 		}
+		//Draw borders.
+		graphGraphics.lineStyle(1, '0x000000');
+		//Draw ter border.
+		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, TER_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, TER_BTM);
+		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
+		graphGraphics.lineTo(GRAPH_LEFT, TER_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, TER_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, TER_BTM);
+		//Draw prod border.
+		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, PROD_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, PROD_BTM);
+		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
+		graphGraphics.lineTo(GRAPH_LEFT, PROD_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, PROD_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, PROD_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, PROD_BTM);
+		//Draw str border.
+		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, STR_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, STR_BTM);
+		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
+		graphGraphics.lineTo(GRAPH_LEFT, STR_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, STR_TOP);
+		graphGraphics.lineTo(GRAPH_RIGHT, STR_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, STR_BTM);
+		//Draw frame/ter text seperator.
+		graphGraphics.moveTo(GRAPH_LEFT, TER_TOP - sh * 0.045);
+		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP - sh * 0.045);
+
 
 		//Clear mapGraphics so that we can redraw freely.
 		mapGraphics.clear();
