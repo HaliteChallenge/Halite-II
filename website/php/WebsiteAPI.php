@@ -239,7 +239,7 @@ class WebsiteAPI extends API{
 				return "Unverified email";
 			}
 
-			if ($_FILES["botFile"]["size"] > 5000000) {
+			if ($_FILES["botFile"]["size"] > 20000000) {
 				return "Sorry, your file is too large.";
 			}
 
@@ -249,7 +249,7 @@ class WebsiteAPI extends API{
 			}
 
 			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-				return "File upload error";
+				return null;
 			}
 
 			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
