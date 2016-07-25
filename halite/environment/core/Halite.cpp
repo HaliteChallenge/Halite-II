@@ -11,42 +11,26 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Update alive frame counts
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) alive_frame_count[a]++;
 
-	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being sent.
-	std::vector< std::future<unsigned int> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being received.
+	std::vector< std::future<void> > frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
-	//Figure out how long each AI is permitted to respond without penalty in milliseconds.
-	std::vector<int> allowableTimesToRespond(number_of_players);
-	const int BOT_FRAME_TIMEOUT_MILLIS = ignore_timeout ? 99999999 : 50 + ((game_map.map_width * game_map.map_height) / 2);
-	for(unsigned char a = 0; a < number_of_players; a++) allowableTimesToRespond[a] = BOT_FRAME_TIMEOUT_MILLIS;
-
-	//Stores the messages sent by bots this frame
+	//Get the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, allowableTimesToRespond[a], a + 1, game_map, &player_moves[a]);
+			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, a + 1, game_map, &player_time_allowances[a], &player_moves[a]);
 			threadLocation++;
 		}
 	}
 
-	std::vector< std::vector<unsigned char> > moveDirections(game_map.map_height, std::vector<unsigned char>(game_map.map_width, 0));
+	std::vector< std::vector<unsigned char> > moveDirections(game_map.map_height, std::vector<unsigned char>(game_map.map_width, 0)); //For the replay - which directions pieces actually moved.
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
-	std::vector<unsigned short> permissibleTime(number_of_players, false);
 	threadLocation = 0; //Represents place in frameThreads.
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			unsigned short millis = frameThreads[threadLocation].get();
-			if(millis < BOT_FRAME_TIMEOUT_MILLIS) {
-				permissibleTime[a] = true;
-			}
-			//	There was an exception in the networking thread or the player timed out. Either way, kill their thread
-			else {
-				if(!quiet_output) std::cout << player_names[a] << " timed out\n";
-				permissibleTime[a] = false;
-				networking.killPlayer(a + 1);
-			}
+			frameThreads[threadLocation].get();
 			threadLocation++;
-			total_response_time[a] += millis;
 		}
 	}
 
@@ -233,16 +217,18 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	}
 
 	//Check for bots which have timed out.
-	for(unsigned char a = 0; a < permissibleTime.size(); a++) if(alive[a] && !permissibleTime[a]) {
+	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a] && player_time_allowances[a] < 0) {
 		stillAlive[a] = false;
+		networking.killPlayer(a + 1);
 		timeout_tags.insert(a + 1);
+		if(!quiet_output) std::cout << "Player " << player_names[a] << " timed out." << std::endl;
 	}
 
 	return stillAlive;
 }
 
 //Public Functions -------------------
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, std::vector<std::string> * names_) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout) {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 
@@ -304,6 +290,11 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
 
+	//Init player time allowances:
+	if(shouldIgnoreTimeout) time_allowance = 2147483647; //Signed int max
+	else time_allowance = width_ * height_ * (sqrt(width_ * height_) * 6.66666667);
+	player_time_allowances = std::vector<int>(number_of_players, time_allowance);
+
 	//Init statistics
 	alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1);
@@ -313,25 +304,6 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	full_cardinal_count = std::vector<unsigned int>(number_of_players);
 	total_response_time = std::vector<unsigned int>(number_of_players);
 	timeout_tags = std::set<unsigned short>();
-
-	//Send initial package
-	std::vector< std::future<bool> > initThreads(number_of_players);
-	const int BOT_INITIALIZATION_TIMEOUT_MILLIS = ignore_timeout ? 99999999 : 2000 + (game_map.map_width * game_map.map_height) * 2;
-	for(unsigned char a = 0; a < number_of_players; a++) {
-		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned int>(BOT_INITIALIZATION_TIMEOUT_MILLIS), static_cast<unsigned char>(a + 1), game_map, &player_names[a]);
-	}
-	for(unsigned char a = 0; a < number_of_players; a++) {
-		bool success = initThreads[a].get();
-		if (!success) {
-			networking.killPlayer(a + 1);
-		}
-	}
-
-	//Override player names with the provided ones if appropriate.
-	if(names_ != NULL) {
-		player_names.clear();
-		for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
-	}
 }
 
 void Halite::output(std::string filename) {
@@ -354,9 +326,28 @@ void Halite::output(std::string filename) {
 	gameFile.close();
 }
 
-GameStatistics Halite::runGame() {
+GameStatistics Halite::runGame(std::vector<std::string> * names_) {
+	//For rankings
 	std::vector<bool> result(number_of_players, true);
 	std::vector<unsigned char> rankings;
+	//Send initial package
+	std::vector< std::future<void> > initThreads(number_of_players);
+	for(unsigned char a = 0; a < number_of_players; a++) {
+		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned char>(a + 1), game_map, &player_time_allowances[a], &player_names[a]);
+	}
+	for(unsigned char a = 0; a < number_of_players; a++) {
+		initThreads[a].get();
+		if(player_time_allowances[a] < 0) {
+			networking.killPlayer(a + 1);
+			result[a] = false;
+			rankings.push_back(a);
+		}
+	}
+	//Override player names with the provided ones if appropriate.
+	if(names_ != NULL) {
+		player_names.clear();
+		for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
+	}
 	const int maxTurnNumber = sqrt(game_map.map_width * game_map.map_height) * 10;
 	while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber) {
 		//Increment turn number:
@@ -397,7 +388,7 @@ GameStatistics Halite::runGame() {
 		p.average_territory_count = full_territory_count[a] / double(chunkSize * alive_frame_count[a]);
 		p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
 		p.average_production_count = full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)); //For this, we want turns rather than frames.
-		p.average_response_time = total_response_time[a] / double(alive_frame_count[a]); //In milliseconds.
+		p.average_response_time = (time_allowance - player_time_allowances[a]) / double(alive_frame_count[a]); //In milliseconds.
 		p.still_percentage = full_still_count[a] / double(full_cardinal_count[a] + full_still_count[a]);
 		stats.player_statistics.push_back(p);
 	}

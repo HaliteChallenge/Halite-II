@@ -6,7 +6,7 @@
 
 #include "core/Halite.hpp"
 
-bool quiet_output = false, ignore_timeout = false; //Need to be passed to the game.
+bool quiet_output = false; //Need to be passed to the game.
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
 Networking promptNetworking();
@@ -18,7 +18,7 @@ int main(int argc, char ** argv) {
 	bool watch_game = false, override_names = false; //Extra parameters. 
 	
 	//Paramters to start up a game.
-	bool passed_dimensions = false, passed_seed = false, passed_bot_names = false;
+	bool passed_dimensions = false, passed_seed = false, passed_bot_names = false, ignore_timeout = false;
 	unsigned short mapWidth, mapHeight;
 	unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
 	Networking networking;
@@ -122,12 +122,12 @@ int main(int argc, char ** argv) {
 	}
 
 	//Create game. Null parameters will be ignored.
-	my_game = new Halite(mapWidth, mapHeight, seed, networking, names);
-	if(names != NULL) delete names;
+	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
 
 	std::string filename = "Replays/" + std::to_string(seed) + '-' + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
-	GameStatistics stats = my_game->runGame();
+	GameStatistics stats = my_game->runGame(names);
+	if(names != NULL) delete names;
 
 	try{
 		my_game->output(filename);

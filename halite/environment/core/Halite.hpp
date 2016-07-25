@@ -13,7 +13,7 @@
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
 
-extern bool quiet_output, ignore_timeout;
+extern bool quiet_output;
 
 struct PlayerStatistics {
 	int tag;
@@ -51,6 +51,8 @@ private:
 	hlt::Map game_map;
 	std::vector<std::string> player_names;
 	std::vector< std::set<hlt::Move> > player_moves;
+	int time_allowance;
+	std::vector<int> player_time_allowances;
 
 	//Statistics
 	std::vector<unsigned short> alive_frame_count;
@@ -69,10 +71,10 @@ private:
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 public:
-	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, std::vector<std::string> * names_);
+	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout);
 
 	void output(std::string filename);
-	GameStatistics runGame();
+	GameStatistics runGame(std::vector<std::string> * names_);
 	std::string getName(unsigned char playerTag);
 
 	~Halite();

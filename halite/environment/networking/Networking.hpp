@@ -26,8 +26,8 @@ extern bool quiet_output;
 class Networking {
 public:
 	void startAndConnectBot(std::string command);
-	bool handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName);
-	unsigned int handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::set<hlt::Move> * moves);
+	void handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playerMillis, std::string * playerName);
+	void handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves);
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();

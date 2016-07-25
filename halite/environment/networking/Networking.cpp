@@ -299,7 +299,7 @@ void Networking::startAndConnectBot(std::string command) {
 	playerLogs.push_back(std::vector<std::string>(0));
 }
 
-bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::string * playerName) {
+void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::string * playerName) {
 	try{
 		std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
 		sendString(playerTag, playerTagString);
@@ -309,21 +309,23 @@ bool Networking::handleInitNetworking(unsigned int timeoutMillis, unsigned char 
 		std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
 		if(!quiet_output) std::cout << outMessage;
 
-		*playerName = getString(playerTag, timeoutMillis).substr(0, 30);
+		clock_t initialTime = clock();
+		*playerName = getString(playerTag, *playermillis).substr(0, 30);
+		unsigned millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
 		std::string inMessage = "Init Message received from player " + std::to_string(int(playerTag)) + ", " + *playerName + ".\n";
 		if(!quiet_output) std::cout << inMessage;
 
-		return true;
+		*playermillis -= millisTaken;
 	}
 	catch(...) {
 		*playerName = "Bot #" + std::to_string(playerTag) + "; timed out during Init";
-		return false;
+		*playermillis = -1;
 	}
 }
 
-unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsigned char playerTag, const hlt::Map & m, std::set<hlt::Move> * moves) {
+void Networking::handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves) {
 	try{
-		if(isProcessDead(playerTag)) return false;
+		if(isProcessDead(playerTag)) return;
 
 		//Send this bot the game map and the messages addressed to this bot
 		std::string mapString = serializeMap(m);
@@ -332,17 +334,15 @@ unsigned int Networking::handleFrameNetworking(unsigned int timeoutMillis, unsig
 		moves->clear();
 
 		clock_t initialTime = clock();
-		std::string movesString = getString(playerTag, timeoutMillis);
-		unsigned  millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+		std::string movesString = getString(playerTag, *playermillis);
+		unsigned millisTaken = ((clock() - initialTime) * 1000 / CLOCKS_PER_SEC);
+		*playermillis -= millisTaken;
 
 		*moves = deserializeMoveSet(movesString, m);
-
-		return millisTaken;
 	}
 	catch(...) {
 		*moves = std::set<hlt::Move>();
-		return timeoutMillis+1;
-
+		*playermillis = -1;
 	}
 
 }
