@@ -239,7 +239,7 @@ class WebsiteAPI extends API{
 				return "Unverified email";
 			}
 
-			if ($_FILES["botFile"]["size"] > 5000000) {
+			if ($_FILES["botFile"]["size"] > 20000000) {
 				return "Sorry, your file is too large.";
 			}
 
@@ -249,7 +249,7 @@ class WebsiteAPI extends API{
 			}
 
 			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-				return "File upload error";
+				return null;
 			}
 
 			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
@@ -303,6 +303,21 @@ class WebsiteAPI extends API{
 		return $workers;
 	}
 
+	protected function announcement() {
+		if(isset($_GET['userID'])) {
+			return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = {$_GET['userID']} and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
+		} else if(isset($_POST['announcementID']) && isset($_POST['userID']) && isset($_POST['password'])) {
+			$announcementID = $_POST['announcementID'];
+			$userID = $_POST['userID'];
+			$password = $_POST['password'];
+
+			if(count($this->select("SELECT * FROM User WHERE userID=$userID and password='$password' LIMIT 1")) > 0) {
+				$this->insert("INSERT INTO DoneWithAnnouncement (userID, announcementID) VALUES ($userID, $announcementID)");
+				return "Success";
+			}
+			return "Fail";
+		}
+	}
 
 	protected function session() {
 		session_start();

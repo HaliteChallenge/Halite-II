@@ -17,9 +17,10 @@ function getGET(name) {
 // The message box should be accessible to all pages
 var messageBox = {
 	$messageBox: $("#messageBox"),
-	alert: function(title, message, isSuccess) {
+	alert: function(title, message, isSuccess, onClose) {
 		this.clear()
-		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' id='messageCloseButton' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+		if(onClose != null) $("#messageCloseButton").click(onClose);
 	},
 	clear: function() {
 		this.$messageBox.empty()
@@ -74,29 +75,30 @@ $(function() {
 					if(response.ip == "208.77.212.129") {
 						messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
 					} else {
-						var uploadOutput = storeBotFile("submitForm");
-						if(uploadOutput.indexOf("error") != -1) {
-							messageBox.alert("File Upload Error", "An error occurred while uploading your file. <b>Your file may have been too big</b>. Check to make sure that your file is under <b>5 megabytes</b>. Make sure that you haven't packaged some unnecessary, big binaries. If this persists, post of the forums or email us at halite@halite.io.", false);
-						} else if(uploadOutput.indexOf("desktop") != -1) {
-							messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
-						} else if(uploadOutput.indexOf("large") != -1) {
-							messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 5 megabytes. Make sure you aren't packaging unnecessary binaries.", false);
-						} else {
-							messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+						try {
+							var uploadOutput = storeBotFile("submitForm");
+							if(uploadOutput.indexOf("desktop") != -1) {
+								messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
+							} else if(uploadOutput.indexOf("large") != -1) {
+								messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 20 megabytes. Make sure you aren't packaging unnecessary binaries.", false);
+							} else {
+								messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+							}
+						} catch (err) {
+							messageBox.alert("File Upload Error", "An error occurred while uploading your file. <b>Your file may have been too big</b>. Check to make sure that your file is under <b>20 megabytes</b>. Make sure that you haven't packaged some unnecessary, big binaries. If this persists, post of the forums or email us at halite@halite.io.", false);
 						}
 					}
 				}, "jsonp");
 			}
 		},
 
-		init: function() {
+		init: function(session) {
 			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
 			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
 
 			this.uploadButton.init();
 			this.$logOutButton.click(this.logOut.bind(this));
 
-			var session = getSession();
 			if(session != null && session.userID != null) {
 				this.user = session;
 				this.loggedIn = true;
@@ -173,5 +175,15 @@ $(function() {
 		destroySession(false);
 	}
 
-	navbar.init();
+	var session = getSession();
+	navbar.init(session);
+	if(session != null) {
+		var announcement = getLatestAnnouncement(session.userID);
+		console.log(announcement)
+		if(announcement != null) {
+			messageBox.alert(announcement.header, announcement.body, true, function() {
+				closedAnnouncement(announcement.announcementID, session.userID, session.password);	
+			});
+		}
+	}
 })
