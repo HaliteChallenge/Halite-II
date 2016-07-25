@@ -36,6 +36,8 @@
 				<li>Tensorflow 0.9.0</li>
 				<li>Theano 0.8.2</li>
 				<li>Keras 1.0.5 (using Theano as a backend)</li>
+				<li>jsonpickle 0.9.3</li>
+				<li>pandas 0.18.1</li>
 			</ul>
 
 			If you would like to use a library that is not listed above, post on the forums. If a library is trivial to build, feel free to include its source with your bot submission.
