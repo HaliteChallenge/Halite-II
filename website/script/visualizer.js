@@ -13,11 +13,19 @@ function showGame(game) {
 	// Initialize the pixi graphics class for the graphs:
 	var graphGraphics = new PIXI.Graphics();
 
+	var frame = 0;
+	var transit = 0;
+	var framespersec = 2.5;
+	var shouldplay = true;
+	var xOffset = 0, yOffset = 0;
+
 	function resize() {
 		sw = $("#pageContent").width(), sh = sw*3/4;
 		mw = sh, mh = sh;
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
+		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw;
+		TER_TOP = sh * 0.095, TER_BTM = sh * 0.33, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.665, STR_TOP = sh * 0.765, STR_BTM = sh;
+		dw = (GRAPH_RIGHT - GRAPH_LEFT) / game.numFrames; //Graph step (w)
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
@@ -32,6 +40,10 @@ function showGame(game) {
 		strText.anchor = new PIXI.Point(0, 1);
 		strText.position = new PIXI.Point(mw + sh / 32, STR_TOP);
 		stage.addChild(strText);
+		infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial' });
+		infoText.anchor = new PIXI.Point(0, 1);
+		infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
+		stage.addChild(infoText);
 		stage.addChild(mapGraphics);
 		stage.addChild(graphGraphics);
 	}	
@@ -43,14 +55,17 @@ function showGame(game) {
 		resize();
 		renderer.resize(sw, sh);
 	}
-	
-	requestAnimationFrame(animate);
 
-	var frame = 0;
-	var transit = 0;
-	var framespersec = 2.5;
-	var shouldplay = true;
-	var xOffset = 0, yOffset = 0;
+	var manager = new PIXI.interaction.InteractionManager(renderer);
+	var mousePressed = false;
+	document.onmousedown = function(e) {
+		mousePressed = true;
+	};
+	document.onmouseup = function(e) {
+		mousePressed = false;
+	};
+
+	requestAnimationFrame(animate);
 
 	var pressed={};
 	document.onkeydown=function(e){
@@ -104,27 +119,51 @@ function showGame(game) {
 
 	function animate() {
 
+		//Update info text:
+		var mousepos = manager.mouse.global;
+		if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
+			infoText.text = 'Frame #' + frame.toString();
+		}
+		else { //Mouse is clicked and over renderer.
+			if(mousepos.x < mw && mousepos.y < mh) { //Over map:
+				var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
+				if(x < 0) x += game.width;
+				if(y < 0) y += game.height;
+				var loc = y * game.width + x;
+				str = game.frames[frame][loc].strength;
+				prod = game.productions[loc];
+				infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
+			}
+			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
+				frame = Math.round((mousepos.x - GRAPH_LEFT) / dw);
+				if(frame < 0) frame = 0;
+				if(frame >= game.numFrames) frame = game.numFrames - 1;
+				transit = 0;
+				if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
+				}
+			}
+		}
+
 		//Clear graphGraphics so that we can redraw freely.
 		graphGraphics.clear();
 
 		//Draw the graphs.
-		var dw = (sw - mw) / game.numFrames;
 		for(var a = 1; a <= game.numPlayers; a++) {
 			graphGraphics.lineStyle(1, game.players[a].color);
 			//Draw ter graph.
-			graphGraphics.moveTo(mw, (TER_TOP - TER_BTM) * game.players[a].normTers[0] + TER_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].normTers[0] + TER_BTM);
 			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(mw + dw * b, (TER_TOP - TER_BTM) * game.players[a].normTers[b] + TER_BTM);
+				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (TER_TOP - TER_BTM) * game.players[a].normTers[b] + TER_BTM);
 			}
 			//Draw prod graph.
-			graphGraphics.moveTo(mw, (PROD_TOP - PROD_BTM) * game.players[a].normProds[0] + PROD_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].normProds[0] + PROD_BTM);
 			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(mw + dw * b, (PROD_TOP - PROD_BTM) * game.players[a].normProds[b] + PROD_BTM);
+				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (PROD_TOP - PROD_BTM) * game.players[a].normProds[b] + PROD_BTM);
 			}
 			//Draw str graph.
-			graphGraphics.moveTo(mw, (STR_TOP - STR_BTM) * game.players[a].normStrs[0] + STR_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].normStrs[0] + STR_BTM);
 			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(mw + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
+				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
 			}
 		}
 
