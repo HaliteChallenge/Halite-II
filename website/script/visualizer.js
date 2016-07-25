@@ -43,7 +43,7 @@ function showGame(game) {
 		resize();
 		renderer.resize(sw, sh);
 	}
-
+	
 	requestAnimationFrame(animate);
 
 	var frame = 0;
@@ -183,12 +183,12 @@ function showGame(game) {
 						var move = game.moves[frame][loc];
 						var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
 						var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
-						mapGraphics.drawRect(rw * ((t * sX2 + (1 - t) * sX) + 0.5) - pw / 2, rh * ((t * sY2 + (1 - t) * sY) + 0.5) - ph / 2, pw, ph);
-						//mapGraphics.drawEllipse(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5), pw / 2, ph / 2);
+						//mapGraphics.drawRect(rw * ((t * sX2 + (1 - t) * sX) + 0.5) - pw / 2, rh * ((t * sY2 + (1 - t) * sY) + 0.5) - ph / 2, pw, ph);
+						mapGraphics.drawEllipse(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5), pw / 2, ph / 2);
 					}
 					else {
-						mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
-						//mapGraphics.drawEllipse(rw * (sX + 0.5), rh * (sY + 0.5), pw / 2, ph / 2);
+						//mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
+						mapGraphics.drawEllipse(rw * (sX + 0.5), rh * (sY + 0.5), pw / 2, ph / 2);
 					}
 					mapGraphics.endFill();
 					if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000', 1);

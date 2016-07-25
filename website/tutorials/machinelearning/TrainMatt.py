@@ -8,23 +8,15 @@ from keras.optimizers import SGD, Adam, RMSprop
 from os import listdir, remove
 from os.path import join, isfile
 
-def bytesUntil(gameFile, endByte):
-    byteArray = []
-    byte = gameFile.read(1)
-    while byte != endByte:
-        byteArray.append(byte)
-        byte = gameFile.read(1)
-    return byteArray
-
-def stringUntil(gameFile, endChar):
-    returnString = ""
-    byte = gameFile.read(1)
-    while byte != endChar.encode("utf-8"):
-        returnString += byte.decode("utf-8")
-        byte = gameFile.read(1)
-    return returnString
-
 def loadGame(filename):
+    def stringUntil(gameFile, endChar):
+        returnString = ""
+        byte = gameFile.read(1)
+        while byte != endChar.encode("utf-8"):
+            returnString += byte.decode("utf-8")
+            byte = gameFile.read(1)
+        return returnString
+        
     mattID = None
     frames = []
     moves = []
@@ -85,12 +77,8 @@ def getNNData():
 
     gamePath = "replays"
 
-    numGames = 0
     for filename in [f for f in listdir(gamePath) if isfile(join(gamePath, f))]:
         print("Loading " + filename)
-
-        numGames += 1
-        if numGames > 5: break
 
         mattID, frames, moves = loadGame(join(gamePath, filename))
         maxProduction = 0
