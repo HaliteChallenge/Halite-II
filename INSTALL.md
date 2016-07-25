@@ -32,6 +32,7 @@ If you have not already:
 * Execute: ```./install.sh```
 * Create a `halite.ini` file in the root directory of the project
 * Add the `apiKey` and the ip address of the worker to the `Worker` table
+* [Enable swap](https://docs.docker.com/engine/installation/linux/ubuntulinux/#/adjust-memory-and-swap-accounting)
 * Execute ```sudo python3 worker.py```
 
 ## Enable automatic pulling
