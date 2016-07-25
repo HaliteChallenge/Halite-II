@@ -118,13 +118,13 @@ CREATE TABLE `Announcement` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `DoneWithAnnoucement`
+-- Table structure for table `DoneWithAnnouncement`
 --
 
-DROP TABLE IF EXISTS `DoneWithAnnoucement`;
+DROP TABLE IF EXISTS `DoneWithAnnouncement`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `DoneWithAnnoucement` (
+CREATE TABLE `DoneWithAnnouncement` (
   `announcementID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

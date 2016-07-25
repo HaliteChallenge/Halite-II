@@ -170,4 +170,22 @@ function getWorkers() {
 	}).responseJSON;
 }
 
+function getLatestAnnouncement(userID) {
+	return $.ajax({
+		url: url+"announcement",
+		async: false,
+		method: "GET",
+		data: {userID: userID}
+	}).responseJSON;
+}
 
+function closedAnnouncement(announcementID, userID, password) {
+	var response = $.ajax({
+		url: url+"announcement",
+		async: false,
+		method: "POST",
+		data: {announcementID: announcementID, userID: userID, password: password}
+	});
+	console.log(response)
+	return response.responseJSON;
+}

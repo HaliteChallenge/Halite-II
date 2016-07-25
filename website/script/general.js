@@ -17,9 +17,10 @@ function getGET(name) {
 // The message box should be accessible to all pages
 var messageBox = {
 	$messageBox: $("#messageBox"),
-	alert: function(title, message, isSuccess) {
+	alert: function(title, message, isSuccess, onClose) {
 		this.clear()
-		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+		this.$messageBox.append($("<div class='alert "+(isSuccess ? "alert-success" : "alert-danger")+" alert-dismissible' role='alert'><button type='button' class='close' id='messageCloseButton' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button><strong>"+title+"</strong>&nbsp;&nbsp;"+message+"</div>"))
+		if(onClose != null) $("#messageCloseButton").click(onClose);
 	},
 	clear: function() {
 		this.$messageBox.empty()
@@ -89,14 +90,13 @@ $(function() {
 			}
 		},
 
-		init: function() {
+		init: function(session) {
 			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
 			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
 
 			this.uploadButton.init();
 			this.$logOutButton.click(this.logOut.bind(this));
 
-			var session = getSession();
 			if(session != null && session.userID != null) {
 				this.user = session;
 				this.loggedIn = true;
@@ -173,5 +173,15 @@ $(function() {
 		destroySession(false);
 	}
 
-	navbar.init();
+	var session = getSession();
+	navbar.init(session);
+	if(session != null) {
+		var announcement = getLatestAnnouncement(session.userID);
+		console.log(announcement)
+		if(announcement != null) {
+			messageBox.alert(announcement.header, announcement.body, true, function() {
+				closedAnnouncement(announcement.announcementID, session.userID, session.password);	
+			});
+		}
+	}
 })
