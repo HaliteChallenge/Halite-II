@@ -253,39 +253,38 @@ setup(ext_modules = read_setup_file('setup_exts'), script_args = ['-q', 'build_e
 
 comp_args = {
 	# lang : ([list of compilation arguments], ...)
-	#                If the compilation should output each source file to
-	#                its own object file, don't include the -o flags here,
-	#                and use the TargetCompiler in the languages dict.
-	"Ada"           : [["gcc-4.4", "-O3", "-funroll-loops", "-c"],
+	#				 If the compilation should output each source file to
+	#				 its own object file, don't include the -o flags here,
+	#				 and use the TargetCompiler in the languages dict.
+	"Ada"			: [["gcc-4.4", "-O3", "-funroll-loops", "-c"],
 							 ["gnatbind"],
 							 ["gnatlink", "-o", BOT]],
-	"C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
+	"C"				: [["gcc", "-O3", "-funroll-loops", "-c"],
 							 ["gcc", "-O2", "-lm", "-o", BOT]],
-	"C#"            : [["gmcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
-	"VB"            : [["vbnc", "-out:%s.exe" % BOT]],
-	"C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
+	"C#"			: [["gmcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
+	"VB"			: [["vbnc", "-out:%s.exe" % BOT]],
+	"C++"		  : [["g++", "-O3", "-w", "-std=c++11", "-c"],
 							 ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
-	"D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
-	"Go"            : [["6g", "-o", "_go_.6"],
+	"D"				: [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
+	"Go"			: [["6g", "-o", "_go_.6"],
 							 ["6l", "-o", BOT, "_go_.6"]],
-	"Groovy"    : [["groovyc"],
+	"Groovy"	: [["groovyc"],
 							 ["jar", "cfe", BOT + ".jar", BOT]],
 	# If we ever upgrade to GHC 7, we will need to add -rtsopts to this command
 	# in order for the maximum heap size RTS flag to work on the executable.
 	"Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-	"Java"        : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)],
-							 ["jar", "cfe", BOT + ".jar", BOT]],
-	"Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
-	"OCaml"     : [["ocamlbuild -lib unix", BOT + ".native"]],
-	"Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
+	"Java"		  : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
+	"Lisp"		: [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
+	"OCaml"		: [["ocamlbuild -lib unix", BOT + ".native"]],
+	"Pascal"	: [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
 	"Python"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
-	"Rust"      : [["cargo", "build", "--release", "-q"]],
-	"Scala"     : [["scalac"]],
+	"Rust"		: [["cargo", "build", "--release", "-q"]],
+	"Scala"		: [["scalac"]],
 	}
 
 targets = {
 	# lang : { old_ext : new_ext, ... }
-	"C"     : { ".c" : ".o" },
+	"C"		: { ".c" : ".o" },
 	"C++" : { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
 	}
 
@@ -296,14 +295,14 @@ Language = collections.namedtuple("Language",
 
 languages = (
 	# Language(name, output file,
-	#      main_code_file
-	#      command_line
-	#      [nukeglobs],
-	#      [(source glob, compiler), ...])
+	#	   main_code_file
+	#	   command_line
+	#	   [nukeglobs],
+	#	   [(source glob, compiler), ...])
 	#
 	# The compilers are run in the order given.
 	# If a source glob is "" it means the source is part of the compiler
-	#   arguments.
+	#	arguments.
 	Language("Ada", BOT, "MyBot.adb",
 		"./MyBot",
 		["*.ali"],
@@ -379,11 +378,10 @@ languages = (
 		[BOT],
 		[([""], ExternalCompiler(comp_args["Haskell"][0]))]
 	),
-	Language("Java", BOT +".jar", "MyBot.java",
-		"java -Xmx" + str(MEMORY_LIMIT) + "m -jar MyBot.jar",
+	Language("Java", BOT +".java", "MyBot.java",
+		"java MyBot",
 		["*.class", "*.jar"],
-		[(["*.java"], ExternalCompiler(comp_args["Java"][0])),
-			(["*.class"], ExternalCompiler(comp_args["Java"][1]))]
+		[(["*.java"], ExternalCompiler(comp_args["Java"][0]))]
 	),
 	Language("Javascript", BOT +".js", "MyBot.js",
 		"node MyBot.js",
@@ -443,7 +441,7 @@ languages = (
 		[],
 		[(["*.rb"], ChmodCompiler("Ruby"))]
 	),
-        Language("Rust", "target/release/"+BOT, "Cargo.toml",
+		Language("Rust", "target/release/"+BOT, "Cargo.toml",
 		"target/release/MyBot",
 		[],
 		[([""], ExternalCompiler(comp_args["Rust"][0]))]
