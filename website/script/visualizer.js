@@ -20,17 +20,17 @@ function showGame(game) {
 		TER_TOP = sh * 0.05, TER_BTM = sh * 0.3, PROD_TOP = sh * 0.4, PROD_BTM = sh * 0.65, STR_TOP = sh * 0.75, STR_BTM = sh;
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
-		terText = new PIXI.Text('Territory', { font: '24px Arial' });
+		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
 		terText.anchor = new PIXI.Point(0, 1);
-		terText.position = new PIXI.Point(mw + 20, TER_TOP);
+		terText.position = new PIXI.Point(mw + sh / 32, TER_TOP);
 		stage.addChild(terText);
-		prodText = new PIXI.Text('Production', { font: '24px Arial' });
+		prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial' });
 		prodText.anchor = new PIXI.Point(0, 1);
-		prodText.position = new PIXI.Point(mw + 20, PROD_TOP);
+		prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP);
 		stage.addChild(prodText);
-		strText = new PIXI.Text('Strength', { font: '24px Arial' });
+		strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial' });
 		strText.anchor = new PIXI.Point(0, 1);
-		strText.position = new PIXI.Point(mw + 20, STR_TOP);
+		strText.position = new PIXI.Point(mw + sh / 32, STR_TOP);
 		stage.addChild(strText);
 		stage.addChild(mapGraphics);
 		stage.addChild(graphGraphics);
