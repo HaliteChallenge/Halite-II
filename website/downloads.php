@@ -17,7 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<p>
-					This set of binaries was uploaded at <b>2:30pm EST on July 22nd</b>. We further improved map generation, and made it so that players do not <b>always</b> start with 255 strength. 
+					This set of binaries was uploaded at <b>2:20pm EST on July 25th</b>. We changed the timeout format so that deep learning is possible. Bots now are given a certain amount of computation time <b>total</b> for a game and can choose to allocate it between initialization and moves as they choose. The number of milliseconds bots are allowed is given by the formula 2 * WIDTH * HEIGHT * MAX_NUM_TURNS / 3.
 				</p>
 				<p>
 					<ul>
