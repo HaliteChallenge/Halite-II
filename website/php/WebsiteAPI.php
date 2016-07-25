@@ -299,7 +299,7 @@ class WebsiteAPI extends API{
 	}
 
 	protected function worker() {
-		$workers = $this->selectMultiple("SELECT * FROM Worker");
+		$workers = $this->selectMultiple("SELECT * FROM Worker ORDER BY apiKey");
 		return $workers;
 	}
 
