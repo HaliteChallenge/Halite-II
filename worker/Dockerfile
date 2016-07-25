@@ -48,3 +48,5 @@ WORKDIR keras/
 RUN python3 setup.py install
 WORKDIR ../
 RUN apt-get install -y --force-yes python3-h5py
+RUN pip3 install jsonpickle
+RUN pip3 install pandas
