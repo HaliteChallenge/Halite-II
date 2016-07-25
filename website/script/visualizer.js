@@ -178,20 +178,23 @@ function showGame(game) {
 					var site = game.frames[frame][loc];
 					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
 					mapGraphics.beginFill(game.players[site.owner].color);
-					var pw = rw * Math.sqrt(site.strength / 255), ph = rh * Math.sqrt(site.strength / 255);
-					if(t > 0) {
-						var move = game.moves[frame][loc];
-						var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
-						var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
-						mapGraphics.drawRect(rw * ((t * sX2 + (1 - t) * sX) + 0.5) - pw / 2, rh * ((t * sY2 + (1 - t) * sY) + 0.5) - ph / 2, pw, ph);
-						//mapGraphics.drawEllipse(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5), pw / 2, ph / 2);
-					}
-					else {
-						mapGraphics.drawRect(rw * (sX + 0.5) - pw / 2, rh * (sY + 0.5) - ph / 2, pw, ph);
-						//mapGraphics.drawEllipse(rw * (sX + 0.5), rh * (sY + 0.5), pw / 2, ph / 2);
-					}
+					var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
+					var move = t > 0 ? game.moves[frame][loc] : 0;
+					var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
+					var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
+					var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
+					var pts = new Array();
+					pts.push(new PIXI.Point(center.x + 0.92388 * pw, center.y + 0.38268 * ph));
+					pts.push(new PIXI.Point(center.x + 0.92388 * pw, center.y - 0.38268 * ph));
+					pts.push(new PIXI.Point(center.x + 0.38268 * pw, center.y - 0.92388 * ph));
+					pts.push(new PIXI.Point(center.x - 0.38268 * pw, center.y - 0.92388 * ph));
+					pts.push(new PIXI.Point(center.x - 0.92388 * pw, center.y - 0.38268 * ph));
+					pts.push(new PIXI.Point(center.x - 0.92388 * pw, center.y + 0.38268 * ph));
+					pts.push(new PIXI.Point(center.x - 0.38268 * pw, center.y + 0.92388 * ph));
+					pts.push(new PIXI.Point(center.x + 0.38268 * pw, center.y + 0.92388 * ph));
+					mapGraphics.drawPolygon(pts);
 					mapGraphics.endFill();
-					if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000', 1);
+					if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000');
 					loc++;
 					sX++;
 					if(sX == game.width) sX = 0;
