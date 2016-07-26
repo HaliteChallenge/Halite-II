@@ -35,8 +35,12 @@ apt-get install -y python3-h5py</code></pre>
 
         <h3>Data Aquisition</h3>
 
-          <p>
-                    <a href="tutorials/machinelearning/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. We want load and parse these files into lists of `GameMap` objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
+        	<p>
+				<a href="tutorials/machinelearning/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. You can download the last 10,000 games played by our servers with this command: <code>wget -e robots=off -r --no-parent http://halite.io/storage/replays/</code>.
+			</p>
+
+			<p>
+				We want load and parse the replay files into lists of <code>GameMap</code> objects and moves, so that we can use the data contained in them. We can load in the data we need from an HLT file with this code:
                     <pre class="prettyprint">def loadGame(filename):
     def stringUntil(gameFile, endChar):
         returnString = ""
