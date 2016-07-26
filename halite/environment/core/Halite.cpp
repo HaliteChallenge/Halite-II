@@ -12,13 +12,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) alive_frame_count[a]++;
 
 	//Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being received.
-	std::vector< std::future<void> > frameThreads(std::count(alive.begin(), alive.end(), true));
+	std::vector<std::thread> frameThreads(std::count(alive.begin(), alive.end(), true));
 	unsigned char threadLocation = 0; //Represents place in frameThreads.
 
 	//Get the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, a + 1, game_map, &player_time_allowances[a], &player_moves[a]);
+			frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, game_map, &player_time_allowances[a], &player_moves[a]);
 			threadLocation++;
 		}
 	}
@@ -29,7 +29,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	threadLocation = 0; //Represents place in frameThreads.
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation].get();
+			frameThreads[threadLocation].join();
 			threadLocation++;
 		}
 	}
@@ -331,12 +331,12 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_) {
 	std::vector<bool> result(number_of_players, true);
 	std::vector<unsigned char> rankings;
 	//Send initial package
-	std::vector< std::future<void> > initThreads(number_of_players);
+	std::vector<std::thread> initThreads(number_of_players);
 	for(unsigned char a = 0; a < number_of_players; a++) {
-		initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned char>(a + 1), game_map, &player_time_allowances[a], &player_names[a]);
+		initThreads[a] = std::thread(&Networking::handleInitNetworking, networking, static_cast<unsigned char>(a + 1), game_map, &player_time_allowances[a], &player_names[a]);
 	}
 	for(unsigned char a = 0; a < number_of_players; a++) {
-		initThreads[a].get();
+		initThreads[a].join();
 		if(player_time_allowances[a] < 0) {
 			networking.killPlayer(a + 1);
 			result[a] = false;
