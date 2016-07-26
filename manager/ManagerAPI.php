@@ -189,10 +189,10 @@ class ManagerAPI extends API{
 						var_dump($users);
 
 						foreach($users as $user) {
-							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID={$user['userID']}");
+							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID={$user->userID}");
 							var_dump($storedUser);
 							var_dump($user);
-							if(intval($storedUser['numSubmissions']) != intval($user['numSubmissions'])) {
+							if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
 								return null;
 							}
 						}
