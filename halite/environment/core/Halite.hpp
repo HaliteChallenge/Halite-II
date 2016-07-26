@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <iostream>
 #include <thread>
-#include <future>
 
 #include "hlt.hpp"
 #include "../networking/Networking.hpp"
