@@ -188,6 +188,15 @@ class ManagerAPI extends API{
 						$users = json_decode($_POST['users']);
 						var_dump($users);
 
+						foreach($users as $user) {
+							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID={$user->userID}");
+							var_dump($storedUser);
+							var_dump($user);
+							if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
+								return null;
+							}
+						}
+
 						// Store replay file
 						$fileKey = array_keys($_FILES)[0];
 						$name = basename($_FILES[$fileKey]['name']);
