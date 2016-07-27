@@ -416,10 +416,10 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 			file.close();
 			continue;
 		}
-		else file << networking.player_logs[*a - 1].front();
+		else file << networking.player_logs[*a - 1].front() << '\n';
 		for(int b = 1; b < networking.player_logs[*a - 1].size(); b++) {
 			file << "--- Frame #" << b << " ---\n";
-			file << networking.player_logs[*a - 1][b];
+			file << networking.player_logs[*a - 1][b] << '\n';
 		}
 		file.flush();
 		file.close();
