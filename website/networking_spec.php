@@ -19,6 +19,8 @@
 
 				<p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Bots are expected to communicate using the format found below; any deviation from it will likely result in the bot being ejected from the game.</p>
 
+				<p>Over the course of a game, every bot is given fifteen thousand milliseconds plus one-third of a millisecond per tile of the map per turn the game could go on. So, for example, on a 35x35 map, bots have 15000 + (35 * 35 * 350 / 3) = 157916 milliseconds to send their responses. The clock starts ticking as soon as the environment finishes sending its data to the pipe and stops ticking when a newline character is received from a bot; if the clock hits 0, the bot will be ejected from the game and deemed to have lost (against all live players which are alive at that time).</p>
+
 				<p>There are two separate formats of information that are sent between the environment and bots.
 					<ul>
 				 		<li>Initialization</li>

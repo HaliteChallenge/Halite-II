@@ -15,6 +15,7 @@ If you have not already:
  * [Allow .htaccess override](http://stackoverflow.com/questions/18740419/how-to-set-allowoverride-all)
  * Enable apache modules named mod_rewrite and php5_module, if not already enabled
  * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
+ * Tell apache to forbid access to the storage/errors and storage/bots folders and to the halite.ini file
  * Dont forget to restart apache: ```sudo service apache2 restart```
 
 ## Database server setup
