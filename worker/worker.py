@@ -126,14 +126,22 @@ def parseGameOutput(output, users):
 
 	for user in users:
 		user["didTimeout"] = False
+		user["errorLogName"] = None
+
+	errorLine = output[len(output)-1]
+	errorPaths = []
+	if errorLine.isspace() == False:
+		errorPaths = errorLine.strip().split(" ")
 
 	timeoutLine = output[len(output)-2]
 	if timeoutLine.isspace() == False:
 		timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
-		for playerTag in timeoutTags:
+		for index in range(len(timeoutTags)):
+			playerTag = timeoutTags[index]
 			users[playerTag-1]["didTimeout"] = True
+			users[playerTag-1]["errorLogName"] = os.path.basename(errorPaths[index])
 
-	errorPaths = output[len(output)-1].split(" ")
+	print(errorPaths)
 
 	return users, replayPath, errorPaths
 

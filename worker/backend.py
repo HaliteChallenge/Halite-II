@@ -75,5 +75,7 @@ def compileResult(userID, didCompile, language):
 def gameResult(width, height, users, replayPath, errorPaths):
 	"""Posts the result of a game task"""
 	files = {os.path.basename(replayPath): open(replayPath, "rb").read()}
-	files += {os.path.basename(path): open(path, "rb").read() for path in errorPaths}
+	for path in errorPaths:
+		files[os.path.basename(path)] = open(path, "rb").read()
 	r = requests.post(MANAGER_URL+"game", data={"apiKey": API_KEY, "mapWidth": str(width), "mapHeight": str(height), "users": json.dumps(users)}, files=files)
+	print(r.text)

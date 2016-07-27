@@ -196,13 +196,15 @@ class ManagerAPI extends API{
 						}
 
 						// Store replay file and error logs
+						$replayName = null;
 						foreach($_FILES as $fileKey => $file) {
 							$pathParts = pathinfo($file['name']);
 							$targetPath = null;
 							if(strcmp('hlt', $pathParts['extension']) == 0) {
-								$targetPath = REPLAYS_DIR."{$pathParts['name']}";
+								$replayName = $pathParts['basename'];
+								$targetPath = REPLAYS_DIR."{$pathParts['basename']}";
 							} else {
-								$targetPath = ERROR_LOGS_DIR."{$pathParts['name']}";
+								$targetPath = ERROR_LOGS_DIR."{$pathParts['basename']}";
 							}
 							move_uploaded_file($file['tmp_name'], $targetPath);
 							if(is_file($targetPath) == false) {
@@ -240,8 +242,8 @@ class ManagerAPI extends API{
 						}
 
 						// Store game information in db
-						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$name', $mapWidth, $mapHeight)");
-						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
+						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$replayName', $mapWidth, $mapHeight)");
+						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$replayName' LIMIT 1");
 						$gameID = $gameIDArray['gameID'];
 
 						// Update each participant's stats

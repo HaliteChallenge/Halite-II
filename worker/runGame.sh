@@ -50,5 +50,6 @@ docker rm -v $(docker ps -aq) >/dev/null
 rm /run/network/ifstate.veth*
 
 mv *.hlt ../
+mv *.log ../
 cd ..
 rm -r $WORKINGPATH
