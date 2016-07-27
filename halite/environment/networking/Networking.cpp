@@ -153,7 +153,6 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 		//if((WIFEXITED(status) || WIFSIGNALED(status) || WIFSTOPPED(status)) && playerTag == 1) std::cout << "Here " << int(playerTag) << std::endl;
 		if(waitpid(-processes[playerTag - 1], &status, WNOHANG) == processes[playerTag - 1] || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() >= timeoutMillis) {
 			killPlayer(playerTag);
-			std::cout << "I'm here right now!\n";
 			if(!quiet_output) {
 				// Buffer error message output
 				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
