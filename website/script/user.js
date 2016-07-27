@@ -118,8 +118,9 @@ $(function() {
 		return stats;
 	}
 
-	var userID = getGET("userID");
+	var session = getSession();
 
+	var userID = getGET("userID");
 	var user = getUser(userID);
 	var extraStats = getExtraStats(userID);
 	$.extend(user, extraStats);
@@ -132,7 +133,7 @@ $(function() {
 
 	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
 	statTable.init(statsFromUser(user, numUsers));
-	gameTable.init(userID, parseInt(getSession().userID) == userID, function(userID, startingID) {
+	gameTable.init(userID, session == null ? false : parseInt(session.userID) == userID, function(userID, startingID) {
 		console.log(startingID)
 		var rawGames = getLatestGamesForUser(userID, 10, startingID); 
 		console.log(rawGames);
