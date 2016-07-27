@@ -32,6 +32,8 @@ public:
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
 
+	std::vector< std::vector<std::string> > player_logs;
+
 private:
 	#ifdef _WIN32
 	struct WinConnection {
@@ -52,8 +54,6 @@ private:
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
-
-	std::vector< std::vector<std::string> > playerLogs;
 };
 
 #endif

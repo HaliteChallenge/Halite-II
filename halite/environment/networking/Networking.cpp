@@ -164,9 +164,9 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 				std::string errorMessage = "";
 				errorMessage += std::string("Unix bot timeout or error ") + std::to_string(selectionResult) + std::string("\n");
 
-				playerLogs[playerTag-1].push_back(newString);
+				player_logs[playerTag-1].push_back(newString);
 				errorMessage += "#---------ALL OF THE OUTPUT OF THE BOT THAT TIMED OUT----------#\n";
-				for(auto stringIter = playerLogs[playerTag-1].begin(); stringIter != playerLogs[playerTag-1].end(); stringIter++) {
+				for(auto stringIter = player_logs[playerTag-1].begin(); stringIter != player_logs[playerTag-1].end(); stringIter++) {
 					while(stringIter->size() < 60) stringIter->push_back(' ');
 					errorMessage += "# " + *stringIter + " #\n";
 				}
@@ -182,7 +182,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	//Python turns \n into \r\n
 	if(newString.at(newString.size() - 1) == '\r') newString.pop_back();
 
-	playerLogs[playerTag-1].push_back(newString);
+	player_logs[playerTag-1].push_back(newString);
 
 	return newString;
 }
@@ -295,7 +295,7 @@ void Networking::startAndConnectBot(std::string command) {
 
 #endif
 
-	playerLogs.push_back(std::vector<std::string>(0));
+	player_logs.push_back(std::vector<std::string>(0));
 }
 
 void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::string * playerName) {
