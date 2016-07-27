@@ -36,19 +36,23 @@ $(function() {
 	}
 
 	var gameTable = {
+		$tableHeader: $("#gameTableHeader"),
 		$tableBody: $("#gameTableBody"),
 		$loadButton: $("#loadButton"),
 		games: [],
-		init: function(userID, getNextGames) {
+		init: function(userID, isMe, getNextGames) {
 			this.userID = userID;
 			this.getNextGames = getNextGames;
 			this.games = getNextGames(this.userID);
+			this.isMe = isMe;
 
 			this.$loadButton.click(this, this.loadMore.bind(this));			
 
 			this.render();
 		},
 		render: function() {
+			this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
+			if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
 			this.$tableBody.empty();
 			for(var a = 0; a < this.games.length; a++) {
 				this.$tableBody.append(this.getTableRow(this.games[a]));
@@ -64,8 +68,21 @@ $(function() {
 					return "<li><a href='user.php?userID="+player.userID+"'>"+player.username+"</a></li>";
 				}
 			}).join(" ");
+
 			playersList += "</ol>";
-			return "<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a target='_blank' href='../storage/replays/"+game.replayName+"'><span class='glyphicon glyphicon-save-file'></span></a></td><td><a href='visualizer.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>";
+			var $row = $("<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='visualizer.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
+			if(this.isMe) {
+				var me = null;
+				for(var a = 0; a < game.players.length; a++) {
+					if(game.players[a].userID == this.userID) {
+						me = game.players[a];
+						break;
+					}
+				}
+				if(me.errorLogName != undefined && me.errorLogName != null) $row.append("<td><a target='_blank' href='php/errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a></td>");
+				else $row.append("<td>NA</td>");
+			}
+			return $row;
 		},
 		loadMore: function() {
 			this.games = this.games.concat(this.getNextGames(this.userID, this.games[this.games.length-1].gameID));
@@ -115,7 +132,7 @@ $(function() {
 
 	jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
 	statTable.init(statsFromUser(user, numUsers));
-	gameTable.init(userID, function(userID, startingID) {
+	gameTable.init(userID, parseInt(getSession().userID) == userID, function(userID, startingID) {
 		console.log(startingID)
 		var rawGames = getLatestGamesForUser(userID, 10, startingID); 
 		console.log(rawGames);

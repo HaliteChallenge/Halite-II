@@ -34,12 +34,7 @@
 					</div>
 					<table class="table well well-sm" id="gameTable">
 						<thead>
-							<tr>
-								<th>Participants</th>
-								<th>Result</th>
-								<th>Dimensions</th>
-								<th>Download</th>
-								<th>View</th>
+							<tr id="gameTableHeader">
 							</tr>
 						</thead>
 						<tbody id="gameTableBody">
