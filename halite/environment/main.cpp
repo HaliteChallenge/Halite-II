@@ -23,6 +23,7 @@ int main(int argc, char ** argv) {
 	unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
 	Networking networking;
 	std::vector<std::string> * names = NULL;
+	unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
 	std::list<std::string> sArgs;
 	for(int a = 1; a < argc; a++) sArgs.push_back(argv[a]);
@@ -124,25 +125,13 @@ int main(int argc, char ** argv) {
 	//Create game. Null parameters will be ignored.
 	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
 
-	std::string filename = "Replays/" + std::to_string(seed) + '-' + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count()) + ".hlt";
 
-	GameStatistics stats = my_game->runGame(names);
+	GameStatistics stats = my_game->runGame(names, seed, id);
 	if(names != NULL) delete names;
-
-	try{
-		my_game->output(filename);
-	}
-	catch(std::runtime_error & e) {
-		filename = filename.substr(8);
-		if(!quiet_output) {
-			std::cout << "Map seed is " << seed << std::endl << "Opening a file at " << filename << std::endl;
-		}
-		my_game->output(filename);
-	}
 
 	std::string victoryOut;
 	if(quiet_output) {
-		std::cout << filename << ' ' << seed << std::endl << stats;
+		std::cout << stats;
 	}
 	else {
 		for(unsigned int a = 0; a < stats.player_statistics.size(); a++) std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << "!\n";
@@ -152,9 +141,9 @@ int main(int argc, char ** argv) {
 
 	if(watch_game) {
 #ifdef _WIN32
-		std::string command = ".\\visualizer " + filename;
+		std::string command = ".\\visualizer " + stats.output_filename;
 #else
-		std::string command = "./visualizer " + filename;
+		std::string command = "./visualizer " + stats.output_filename;
 #endif
 		system(command.c_str());
 	}
