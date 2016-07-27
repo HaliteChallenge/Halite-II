@@ -8,8 +8,6 @@ date_default_timezone_set('America/New_York');
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
-
-
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
 	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
@@ -316,6 +314,24 @@ class WebsiteAPI extends API{
 				return "Success";
 			}
 			return "Fail";
+		}
+	}
+
+	protected function errorLog() {
+		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName={$_GET['errorLogName']} and userID={$_SESSION['userID']}"))) {
+			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
+			if(file_exists($targetPath) == false) {
+				return null;
+			}
+
+			header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+			header("Cache-Control: public"); // needed for internet explorer
+			header("Content-Type: application/zip");
+			header("Content-Transfer-Encoding: Binary");
+			header("Content-Length:".filesize($targetPath));
+			header("Content-Disposition: attachment; filename=file.zip");
+			readfile($targetPath);
+			die();
 		}
 	}
 
