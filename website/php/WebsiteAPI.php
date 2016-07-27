@@ -208,7 +208,7 @@ class WebsiteAPI extends API{
 				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
 
 				// Get information about users
-				$gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
+				$gameArray['users'] = $this->selectMultiple("SELECT userID, errorLogName, rank FROM GameUser WHERE gameID = $gameID");
 				foreach($gameArray['users'] as &$gameUserRow) {
 					// Get rid of gameID
 					unset($gameUserRow['gameID']);
@@ -318,7 +318,8 @@ class WebsiteAPI extends API{
 	}
 
 	protected function errorLog() {
-		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName={$_GET['errorLogName']} and userID={$_SESSION['userID']}"))) {
+		session_start();
+		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
 			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
 			if(file_exists($targetPath) == false) {
 				return null;
@@ -326,10 +327,10 @@ class WebsiteAPI extends API{
 
 			header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
 			header("Cache-Control: public"); // needed for internet explorer
-			header("Content-Type: application/zip");
+			header("Content-Type: application/txt");
 			header("Content-Transfer-Encoding: Binary");
 			header("Content-Length:".filesize($targetPath));
-			header("Content-Disposition: attachment; filename=file.zip");
+			header("Content-Disposition: attachment; filename=error.log");
 			readfile($targetPath);
 			die();
 		}
