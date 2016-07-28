@@ -39,6 +39,17 @@ RUN apt-get -y update
 RUN apt-get -y --force-yes upgrade
 RUN apt-get -y --force-yes dist-upgrade
 
+# Scala
+RUN apt-get install -y libjansi-java
+RUN wget www.scala-lang.org/files/archive/scala-2.10.4.deb
+RUN dpkg -i scala-2.10.4.deb
+RUN apt-get update -y
+RUN apt-get install -y scala
+RUN wget https://bintray.com/artifact/download/sbt/debian/sbt-0.13.6.deb
+RUN dpkg -i sbt-0.13.6.deb
+RUN apt-get update -y
+RUN apt-get install -y sbt
+
 # Libraries
 RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.9.0-cp34-cp34m-linux_x86_64.whl
 RUN apt-get install -y --force-yes python3-numpy python3-scipy python3-dev python3-pip python3-nose g++ libblas-dev git
