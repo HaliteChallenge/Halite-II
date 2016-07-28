@@ -294,7 +294,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 
 	//Init player time allowances:
 	if(shouldIgnoreTimeout) time_allowance = 2147483647; //Signed int max
-	else time_allowance = 15000 + (width_ * height_ * (sqrt(width_ * height_) * 3.33333333));
+	else time_allowance = 500;/*15000 + (width_ * height_ * (sqrt(width_ * height_) * 3.33333333))*/;
 	player_time_allowances = std::vector<int>(number_of_players, time_allowance);
 
 	//Init statistics
@@ -342,6 +342,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 		initThreads[a].join();
 		if(player_time_allowances[a] < 0) {
 			networking.killPlayer(a + 1);
+			timeout_tags.insert(a + 1);
 			result[a] = false;
 			rankings.push_back(a);
 		}
