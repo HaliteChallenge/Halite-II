@@ -336,7 +336,7 @@ function showGame(game, seconds) {
 	}
 }
 
-function startWithURL(replayName) {
+function byteArrayFromURL(replayName) {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", "../storage/replays/"+replayName, true);
 
@@ -345,7 +345,7 @@ function startWithURL(replayName) {
 		if (oReq.status != 404) {
 			var aBuffer = oReq.response;
 			var byteArray = new Uint8Array(aBuffer);
-			showGame(byteArrayToGame(byteArray))
+			return byteArrayToGame(byteArray);
 		} else {
 			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 		}
