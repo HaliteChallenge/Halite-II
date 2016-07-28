@@ -336,9 +336,9 @@ function showGame(game) {
 	}
 }
 
-function startWithURL(url) {
+function startWithURL(replayName) {
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", url, true);
+	oReq.open("GET", "../storage/replays/"+replayName, true);
 
 	oReq.responseType = "arraybuffer";
 	oReq.onload = function (oEvent) {
@@ -356,9 +356,9 @@ function startWithURL(url) {
 $(function () {
 	var replayName = getGET("replay");
 
-	if(replayName != null) {
-		startWithURL("../storage/replays/"+replayName);
+	if(replayName != null && replayName != undefined) {
+		startWithURL(replayName);
 	} else if(getGET("random") != null) {
-		startWithURL("../storage/replays/"+getRandomGameName());
+		startWithURL(getRandomGameName().replayName);
 	}
 })
