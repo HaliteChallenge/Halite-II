@@ -116,6 +116,7 @@ class WebsiteAPI extends API{
 			} else {
 				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
 				unset($fields["password"]);
+				unset($fields["email"]);
 				return $fields;
 			}
 		} else if (isset($_GET["userID"])) {
@@ -125,11 +126,15 @@ class WebsiteAPI extends API{
 			} else {
 				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
 				unset($fields["password"]);
+				unset($fields["email"]);
 				return $fields;
 			}
 		} else if(isset($_GET['active'])) {
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
-			foreach(array_keys($results) as $key) unset($results[$key]["password"]);
+			foreach(array_keys($results) as $key) {
+				unset($results[$key]["password"]);
+				unset($results[$key]["email"]);
+			}
 			return $results;
 		} else if(isset($_GET['numActive'])) {
 			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
