@@ -339,7 +339,6 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 		initThreads[a].join();
 		if(player_time_allowances[a] < 0) {
 			networking.killPlayer(a + 1);
-			timeout_tags.insert(a + 1);
 			result[a] = false;
 			rankings.push_back(a);
 		}
