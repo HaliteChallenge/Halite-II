@@ -417,6 +417,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 		if(networking.player_logs[*a - 1].empty()) {
 			file.flush();
 			file.close();
+			timeoutIndex++;
 			continue;
 		}
 		else file << networking.player_logs[*a - 1].front() << '\n';
