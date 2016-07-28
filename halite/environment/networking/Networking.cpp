@@ -92,7 +92,6 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
-	srand(time(NULL));
 
 	std::string newString;
 #ifdef _WIN32
@@ -141,18 +140,14 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	//The time we started at.
 	std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
 
-
-
 	//Keep reading char by char until a newline
 	bool shouldContinue = true;
 	while(shouldContinue) {
-	
 		//Check if process is dead.
 		int status;
-	//	;
-		//if((WIFEXITED(status) || WIFSIGNALED(status) || WIFSTOPPED(status)) && playerTag == 1) std::cout << "Here " << int(playerTag) << std::endl;
-		if(waitpid(-processes[playerTag - 1], &status, WNOHANG) == processes[playerTag - 1] || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() >= timeoutMillis) {
+		if(waitpid(processes[playerTag - 1], &status, WNOHANG) == processes[playerTag - 1] || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() >= timeoutMillis) {
 			killPlayer(playerTag);
+			std::cout << "Error!" << std::endl;
 			if(!quiet_output) {
 				// Buffer error message output
 				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
