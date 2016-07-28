@@ -60,6 +60,7 @@ private:
 
 	//Statistics
 	std::vector<unsigned short> alive_frame_count;
+	std::vector<unsigned int> last_territory_count;
 	std::vector<unsigned int> full_territory_count;
 	std::vector<unsigned int> full_strength_count;
 	std::vector<unsigned int> full_production_count;

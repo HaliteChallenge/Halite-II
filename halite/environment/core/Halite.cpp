@@ -207,8 +207,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
-
+	 	 
+	for(auto a = last_territory_count.begin(); a != last_territory_count.end(); a++) *a = 0;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0) {
+		last_territory_count[game_map.contents[a][b].owner - 1]++;
 		full_territory_count[game_map.contents[a][b].owner - 1]++;
 		full_strength_count[game_map.contents[a][b].owner - 1] += game_map.contents[a][b].strength;
 		full_production_count[game_map.contents[a][b].owner - 1] += game_map.contents[a][b].strength;
@@ -297,6 +299,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 
 	//Init statistics
 	alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
+	last_territory_count = std::vector<unsigned int>(number_of_players, 1);
 	full_territory_count = std::vector<unsigned int>(number_of_players, 1);
 	full_strength_count = std::vector<unsigned int>(number_of_players, 255);
 	full_production_count = std::vector<unsigned int>(number_of_players);
@@ -361,7 +364,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 			newRankings.push_back(a);
 		}
 		//Sort newRankings by full territory count.
-		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && full_territory_count[b] < full_territory_count[b - 1]; b--) {
+		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[b] < last_territory_count[b - 1]; b--) {
 			unsigned char temp = newRankings[b];
 			newRankings[b] = newRankings[b - 1];
 			newRankings[b - 1] = temp;
@@ -372,7 +375,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 	std::vector<unsigned int> newRankings;
 	for(int a = 0; a < number_of_players; a++) if(result[a]) newRankings.push_back(a);
 	//Sort newRankings by full territory count.
-	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && full_territory_count[b] < full_territory_count[b - 1]; b--) {
+	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[b] < last_territory_count[b - 1]; b--) {
 		unsigned char temp = newRankings[b];
 		newRankings[b] = newRankings[b - 1];
 		newRankings[b - 1] = temp;
