@@ -35,9 +35,9 @@ public class Networking {
   }
 
   static String serializeMoveList(ArrayList<Move> moves) {
-    String returnString = "";
-    for(Move move : moves) returnString += move.loc.x + " " + move.loc.y + " " + move.dir.ordinal() + " ";
-    return returnString;
+    StringBuilder builder = new StringBuilder();
+    for(Move move : moves) builder.append(move.loc.x + " " + move.loc.y + " " + move.dir.ordinal() + " ");
+    return builder.toString();
   }
 
   static GameMap deserializeGameMap(String inputString) {
