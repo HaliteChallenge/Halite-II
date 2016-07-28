@@ -3,28 +3,20 @@
 
 #include <iostream>
 #include <set>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <stdio.h>
-#include <chrono>
-#include <thread>
-#include <mutex>
 
 #ifdef _WIN32
-	#include <windows.h>
-	#include <tchar.h>
-	#include <stdio.h>
-	#include <strsafe.h>
+#include <windows.h>
+#include <tchar.h>
+#include <stdio.h>
+#include <strsafe.h>
 #else
-	#include <signal.h>
-	#include <time.h>
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <fcntl.h>
-	#include <sys/select.h>
-	#include <sys/wait.h>
-	#include <unistd.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/select.h>
+#include <unistd.h>
 #endif
 
 #include "../core/hlt.hpp"
@@ -39,6 +31,8 @@ public:
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
+
+	std::vector< std::vector<std::string> > player_logs;
 
 private:
 	#ifdef _WIN32
@@ -60,8 +54,6 @@ private:
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
-
-	std::vector< std::vector<std::string> > playerLogs;
 };
 
 #endif

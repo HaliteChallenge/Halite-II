@@ -110,10 +110,10 @@ def runGame(width, height, users):
 def parseGameOutput(output, users):
 	users = copy.deepcopy(users)
 
-	replayPath = output[len(output) - (len(users)+2)].split(" ")[0]
+	replayPath = output[len(output) - (len(users)+3)].split(" ")[0]
 
 	# Get player ranks and scores by parsing shellOutput
-	for lineIndex in range(len(output)-(len(users)+1), len(output)-1):
+	for lineIndex in range(len(output)-(len(users)+2), len(output)-2):
 		components = output[lineIndex].split(" ")
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
@@ -124,26 +124,35 @@ def parseGameOutput(output, users):
 		users[playerTag-1]["stillPercentage"] = float(components[5])
 		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
-	timeoutLine = output[len(output)-1]
-	print("TIMEOUT LINE: "+timeoutLine)
 	for user in users:
 		user["didTimeout"] = False
+		user["errorLogName"] = None
 
+	errorLine = output[len(output)-1]
+	errorPaths = []
+	if errorLine.isspace() == False:
+		errorPaths = errorLine.strip().split(" ")
+
+	timeoutLine = output[len(output)-2]
 	if timeoutLine.isspace() == False:
 		timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
-		for playerTag in timeoutTags:
+		for index in range(len(timeoutTags)):
+			playerTag = timeoutTags[index]
 			users[playerTag-1]["didTimeout"] = True
+			users[playerTag-1]["errorLogName"] = os.path.basename(errorPaths[index])
 
-	return replayPath, users
+	print(errorPaths)
+
+	return users, replayPath, errorPaths
 
 def executeGameTask(width, height, users, backend):
 	"""Downloads compiled bots, runs a game, and posts the results of the game"""
 	print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
 
 	downloadUsers(users)
-	replayPath, users = parseGameOutput(runGame(width, height, users), users)
+	users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
 
-	backend.gameResult(width, height, users, replayPath)
+	backend.gameResult(width, height, users, replayPath, errorPaths)
 	os.remove(replayPath)
 
 if __name__ == "__main__":

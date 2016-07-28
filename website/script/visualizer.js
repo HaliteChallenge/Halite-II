@@ -1,8 +1,8 @@
 function showGame(game) {
 
-	$("#pageContent").append($("<h1>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
+	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
-	}).join(" vs ")+"</h1>"));
+	}).join(" vs ")+"</h3>"));
 
 	//Create the root of the scene: stage:
 	var stage = new PIXI.Container();
@@ -336,23 +336,20 @@ function showGame(game) {
 	}
 }
 
-$(function () {
-	var replayName = getGET("replay");
+function startWithURL(replayName) {
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", "../storage/replays/"+replayName, true);
 
-	if(replayName != null) {
-		var oReq = new XMLHttpRequest();
-		oReq.open("GET", "../storage/replays/"+replayName, true);
-
-		oReq.responseType = "arraybuffer";
-		oReq.onload = function (oEvent) {
-			if (oReq.status != 404) {
-				var aBuffer = oReq.response;
-				var byteArray = new Uint8Array(aBuffer);
-				showGame(byteArrayToGame(byteArray))
-			} else {
-				$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
-			}
+	oReq.responseType = "arraybuffer";
+	oReq.onload = function (oEvent) {
+		if (oReq.status != 404) {
+			var aBuffer = oReq.response;
+			var byteArray = new Uint8Array(aBuffer);
+			showGame(byteArrayToGame(byteArray))
+		} else {
+			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 		}
-		oReq.send(null);
 	}
-})
+	oReq.send(null);
+}
+

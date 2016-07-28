@@ -72,6 +72,10 @@ def compileResult(userID, didCompile, language):
 	"""Posts the result of a compilation task"""
 	r = requests.post(MANAGER_URL+"compile", data={"apiKey": API_KEY, "userID": userID, "didCompile": int(didCompile), "language": language})
 
-def gameResult(width, height, users, replayPath):
+def gameResult(width, height, users, replayPath, errorPaths):
 	"""Posts the result of a game task"""
-	r = requests.post(MANAGER_URL+"game", data={"apiKey": API_KEY, "mapWidth": str(width), "mapHeight": str(height), "users": json.dumps(users)}, files={os.path.basename(replayPath): open(replayPath, "rb").read()})
+	files = {os.path.basename(replayPath): open(replayPath, "rb").read()}
+	for path in errorPaths:
+		files[os.path.basename(path)] = open(path, "rb").read()
+	r = requests.post(MANAGER_URL+"game", data={"apiKey": API_KEY, "mapWidth": str(width), "mapHeight": str(height), "users": json.dumps(users)}, files=files)
+	print(r.text)

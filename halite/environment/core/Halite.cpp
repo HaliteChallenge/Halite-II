@@ -326,7 +326,7 @@ void Halite::output(std::string filename) {
 	gameFile.close();
 }
 
-GameStatistics Halite::runGame(std::vector<std::string> * names_) {
+GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id) {
 	//For rankings
 	std::vector<bool> result(number_of_players, true);
 	std::vector<unsigned char> rankings;
@@ -339,7 +339,6 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_) {
 		initThreads[a].join();
 		if(player_time_allowances[a] < 0) {
 			networking.killPlayer(a + 1);
-			timeout_tags.insert(a + 1);
 			result[a] = false;
 			rankings.push_back(a);
 		}
@@ -394,6 +393,38 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_) {
 		stats.player_statistics.push_back(p);
 	}
 	stats.timeout_tags = timeout_tags;
+	stats.timeout_log_filenames = std::vector<std::string>(timeout_tags.size());
+	//Output gamefile. First try the replays folder; if that fails, just use the straight filename.
+	stats.output_filename = "Replays/" + std::to_string(seed) + '-' + std::to_string(id) + ".hlt";
+	try {
+		output(stats.output_filename);
+	}
+	catch(std::runtime_error & e) {
+		stats.output_filename = stats.output_filename.substr(8);
+		output(stats.output_filename);
+	}
+	if(!quiet_output) std::cout << "Map seed was " << seed << std::endl << "Opening a file at " << stats.output_filename << std::endl;
+	else std::cout << stats.output_filename << ' ' << seed << std::endl;
+	//Output logs for players that timed out or errored.
+	int timeoutIndex = 0;
+	for(auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
+		stats.timeout_log_filenames[timeoutIndex] = std::to_string(*a) + '-' + std::to_string(id) + ".log";
+		std::ofstream file(stats.timeout_log_filenames[timeoutIndex], std::ios_base::binary);
+		file << "--- Init ---\n";
+		if(networking.player_logs[*a - 1].empty()) {
+			file.flush();
+			file.close();
+			continue;
+		}
+		else file << networking.player_logs[*a - 1].front() << '\n';
+		for(int b = 1; b < networking.player_logs[*a - 1].size(); b++) {
+			file << "--- Frame #" << b << " ---\n";
+			file << networking.player_logs[*a - 1][b] << '\n';
+		}
+		file.flush();
+		file.close();
+		timeoutIndex++;
+	}
 	return stats;
 
 }

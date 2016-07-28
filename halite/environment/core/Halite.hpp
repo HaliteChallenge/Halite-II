@@ -30,12 +30,17 @@ static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
 
 struct GameStatistics {
 	std::vector<PlayerStatistics> player_statistics;
+	std::string output_filename;
 	std::set<unsigned short> timeout_tags;
+	std::vector<std::string> timeout_log_filenames;
 };
 static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
 	for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
 	for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << (*a) << ' ';
 	if(g.timeout_tags.empty()) o << ' ';
+	std::cout << std::endl;
+	for(auto a = g.timeout_log_filenames.begin(); a != g.timeout_log_filenames.end(); a++) o << (*a) << ' ';
+	if(g.timeout_log_filenames.empty()) o << ' ';
 	return o;
 }
 
@@ -69,11 +74,11 @@ private:
 	std::vector<std::vector<unsigned char> * > full_game;
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
+	void output(std::string filename);
 public:
 	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout);
 
-	void output(std::string filename);
-	GameStatistics runGame(std::vector<std::string> * names_);
+	GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id);
 	std::string getName(unsigned char playerTag);
 
 	~Halite();

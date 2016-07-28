@@ -7,8 +7,10 @@
 	<link href="style/general.css" rel="stylesheet">
 </head>
 <body>
-	<div class="container">
-		<?php include 'includes/navbar.php'; ?>
+	<div id="container" class="container">
+		<h1>Here is what a game of Halite looks like!</h1>
+		<h3>If you're interested, visit <u>halite.io</u>.</h3>
+		<hr>
 		<div id="pageContent" class="pageContent">
 		</div>
 	</div>
@@ -19,5 +21,6 @@
 	<script src="lib/pixi.min.js"></script>
 	<script src="script/parsereplay.js"></script>
 	<script src="script/visualizer.js"></script>
+	<script src="script/random_game.js"></script>
 </body>
 </html>

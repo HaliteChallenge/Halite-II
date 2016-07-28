@@ -189,3 +189,14 @@ function closedAnnouncement(announcementID, userID, password) {
 	console.log(response)
 	return response.responseJSON;
 }
+
+function getRandomGameName() {
+	var response = $.ajax({
+		url: url+"game",
+		async: false,
+		method: "GET",
+		data: {random: true}
+	});
+	console.log(response)
+	return response.responseJSON;
+}

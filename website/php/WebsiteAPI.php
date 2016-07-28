@@ -10,8 +10,6 @@ date_default_timezone_set('America/New_York');
 require_once 'API.class.php';
 require_once '../lib/swiftmailer/lib/swift_required.php';
 
-
-
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
 	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
@@ -212,7 +210,7 @@ class WebsiteAPI extends API{
 				$gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
 
 				// Get information about users
-				$gameArray['users'] = $this->selectMultiple("SELECT userID, rank FROM GameUser WHERE gameID = $gameID");
+				$gameArray['users'] = $this->selectMultiple("SELECT userID, errorLogName, rank FROM GameUser WHERE gameID = $gameID");
 				foreach($gameArray['users'] as &$gameUserRow) {
 					// Get rid of gameID
 					unset($gameUserRow['gameID']);
@@ -224,6 +222,9 @@ class WebsiteAPI extends API{
 				array_push($gameArrays, $gameArray);
 			}
 			return $gameArrays;
+		} else if(isset($_GET['random'])) {
+			return $this->select("SELECT replayName FROM (SELECT * FROM Game ORDER BY gameID DESC LIMIT 50) sub ORDER BY rand() LIMIT 1");
+
 		}
 	}
 
@@ -318,6 +319,25 @@ class WebsiteAPI extends API{
 				return "Success";
 			}
 			return "Fail";
+		}
+	}
+
+	protected function errorLog() {
+		session_start();
+		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
+			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
+			if(file_exists($targetPath) == false) {
+				return null;
+			}
+
+			header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+			header("Cache-Control: public"); // needed for internet explorer
+			header("Content-Type: application/txt");
+			header("Content-Transfer-Encoding: Binary");
+			header("Content-Length:".filesize($targetPath));
+			header("Content-Disposition: attachment; filename=error.log");
+			readfile($targetPath);
+			die();
 		}
 	}
 

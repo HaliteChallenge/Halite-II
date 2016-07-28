@@ -3,6 +3,7 @@
 require_once 'API.class.php';
 
 define("REPLAYS_DIR", "../storage/replays/");
+define("ERROR_LOGS_DIR", "../storage/errors/");
 define("BOTS_DIR", "../storage/bots/");
 define("CACHED_BOTS_DIR", "../storage/cache/");
 define("INI_FILE", "../halite.ini");
@@ -186,29 +187,32 @@ class ManagerAPI extends API{
 						$mapWidth = $_POST['mapWidth'];
 						$mapHeight = $_POST['mapHeight'];
 						$users = json_decode($_POST['users']);
-						var_dump($users);
 
 						foreach($users as $user) {
 							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID={$user->userID}");
-							var_dump($storedUser);
-							var_dump($user);
 							if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
 								return null;
 							}
 						}
 
-						// Store replay file
-						$fileKey = array_keys($_FILES)[0];
-						$name = basename($_FILES[$fileKey]['name']);
-						$targetPath = REPLAYS_DIR."{$name}";
-						move_uploaded_file($_FILES[$fileKey]['tmp_name'], $targetPath);
-						if(is_file($targetPath) == false) {
+						// Store replay file and error logs
+						$replayName = null;
+						foreach($_FILES as $fileKey => $file) {
+							$pathParts = pathinfo($file['name']);
+							$targetPath = null;
+							if(strcmp('hlt', $pathParts['extension']) == 0) {
+								$replayName = $pathParts['basename'];
+								$targetPath = REPLAYS_DIR."{$pathParts['basename']}";
+							} else {
+								$targetPath = ERROR_LOGS_DIR."{$pathParts['basename']}";
+							}
+							move_uploaded_file($file['tmp_name'], $targetPath);
+							if(is_file($targetPath) == false) {
 								return "Did not work";
-						} else {
-								echo "File transfer worked!!!!!!!!!!!";
+							} 
+							chmod($targetPath, 0777);
 						}
-						chmod($targetPath, 0777);
-
+						
 						// Check that we arent storing too many replay files
 						$files = glob(REPLAYS_DIR.'*.*');
 						$exclude_files = array('.', '..');
@@ -238,8 +242,8 @@ class ManagerAPI extends API{
 						}
 
 						// Store game information in db
-						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$name', $mapWidth, $mapHeight)");
-						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$name' LIMIT 1");
+						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$replayName', $mapWidth, $mapHeight)");
+						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$replayName' LIMIT 1");
 						$gameID = $gameIDArray['gameID'];
 
 						// Update each participant's stats
@@ -250,7 +254,8 @@ class ManagerAPI extends API{
 						}
 						for($a = 0; $a < count($users); $a++) {
 								$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
-								$this->insert("INSERT INTO GameUser (gameID, userID, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
+								$errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'{$users[$a]->errorLogName}'";
+								$this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, $errorLogName, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
 
 								// Cache raw game stats
 								$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameUser WHERE userID={$users[$a]->userID}");

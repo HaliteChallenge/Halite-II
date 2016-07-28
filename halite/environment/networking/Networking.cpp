@@ -1,5 +1,13 @@
 #include "Networking.hpp"
 
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <stdio.h>
+#include <chrono>
+#include <thread>
+#include <mutex>
+
 std::mutex coutMutex;
 
 std::string serializeMapSize(const hlt::Map & map) {
@@ -131,33 +139,33 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	FD_ZERO(&set); /* clear the set */
 	FD_SET(connection.read, &set); /* add our file descriptor to the set */
 
-	struct timeval timeout; //Non-blocking. We'll check every ten millisecond to get a result.
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 10000;
+	struct timeval timeout;
+	timeout.tv_sec = timeoutMillis / 1000.0;
+	timeout.tv_usec = (timeoutMillis % 1000)*1000;
 
 	char buffer;
-	
-	//The time we started at.
-	std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
 
 	//Keep reading char by char until a newline
-	bool shouldContinue = true;
-	while(shouldContinue) {
-		//Check if process is dead.
-		int status;
-		if(waitpid(processes[playerTag - 1], &status, WNOHANG) == processes[playerTag - 1] || std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() >= timeoutMillis) {
-			killPlayer(playerTag);
-			std::cout << "Error!" << std::endl;
+	while(true) {
+		//Check if there are bytes in the pipe
+		int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
+
+		if(selectionResult > 0) {
+			read(connection.read, &buffer, 1);
+
+			if(buffer == '\n') break;
+			else newString += buffer;
+		} else {
 			if(!quiet_output) {
 				// Buffer error message output
 				// If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
 				// That looks really weird
 				std::string errorMessage = "";
-				errorMessage += std::string("Unix bot timed out or errored.\n");
+				errorMessage += std::string("Unix bot timeout or error ") + std::to_string(selectionResult) + std::string("\n");
 
-				playerLogs[playerTag-1].push_back(newString);
+				player_logs[playerTag-1].push_back(newString);
 				errorMessage += "#---------ALL OF THE OUTPUT OF THE BOT THAT TIMED OUT----------#\n";
-				for(auto stringIter = playerLogs[playerTag-1].begin(); stringIter != playerLogs[playerTag-1].end(); stringIter++) {
+				for(auto stringIter = player_logs[playerTag-1].begin(); stringIter != player_logs[playerTag-1].end(); stringIter++) {
 					while(stringIter->size() < 60) stringIter->push_back(' ');
 					errorMessage += "# " + *stringIter + " #\n";
 				}
@@ -168,27 +176,12 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 			}
 			throw 1;
 		}
-
-		//Check if there are bytes in the pipe
-		for(int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout); selectionResult > 0; selectionResult--) {
-			read(connection.read, &buffer, 1);
-
-			if(buffer == '\n') {
-				shouldContinue = false;
-				break;
-			}
-			else newString += buffer;
-		}
-
-		//Reset timeout - we should consider it to be undefined.
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 10000;
 	}
 #endif
 	//Python turns \n into \r\n
 	if(newString.at(newString.size() - 1) == '\r') newString.pop_back();
 
-	playerLogs[playerTag-1].push_back(newString);
+	player_logs[playerTag-1].push_back(newString);
 
 	return newString;
 }
@@ -301,7 +294,7 @@ void Networking::startAndConnectBot(std::string command) {
 
 #endif
 
-	playerLogs.push_back(std::vector<std::string>(0));
+	player_logs.push_back(std::vector<std::string>(0));
 }
 
 void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::string * playerName) {
