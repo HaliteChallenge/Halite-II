@@ -1,8 +1,8 @@
 function showGame(game) {
 
-	$("#pageContent").append($("<h1>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
+	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
-	}).join(" vs ")+"</h1>"));
+	}).join(" vs ")+"</h3>"));
 
 	//Create the root of the scene: stage:
 	var stage = new PIXI.Container();

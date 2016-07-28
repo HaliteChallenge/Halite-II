@@ -8,8 +8,9 @@
 </head>
 <body>
 	<div id="container" class="container">
-		<?php include 'includes/navbar.php'; ?>
 		<h1>Here is what a game of Halite looks like!</h1>
+		<h3>If you're interested, visit <u>halite.io</u>.</h3>
+		<hr>
 		<div id="pageContent" class="pageContent">
 		</div>
 	</div>
