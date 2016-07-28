@@ -359,6 +359,7 @@ $(function () {
 	if(replayName != null && replayName != undefined) {
 		startWithURL(replayName);
 	} else if(getGET("random") != null) {
+		$("#container").prepend("<h1>Here is what a game of Halite looks like!</h1>");
 		startWithURL(getRandomGameName().replayName);
 	}
 })

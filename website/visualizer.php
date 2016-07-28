@@ -7,7 +7,7 @@
 	<link href="style/general.css" rel="stylesheet">
 </head>
 <body>
-	<div class="container">
+	<div id="container" class="container">
 		<?php include 'includes/navbar.php'; ?>
 		<div id="pageContent" class="pageContent">
 		</div>
