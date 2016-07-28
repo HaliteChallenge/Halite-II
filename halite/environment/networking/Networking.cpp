@@ -100,7 +100,6 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
-	srand(time(NULL));
 
 	std::string newString;
 #ifdef _WIN32
