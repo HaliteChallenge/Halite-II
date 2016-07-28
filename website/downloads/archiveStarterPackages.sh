@@ -13,6 +13,7 @@ cp -r Rust/* Halite-Rust-Starter-Package/
 
 cp -r Java/* Halite-Scala-Starter-Package/
 cp -r Scala/* Halite-Scala-Starter-Package/
+rm Halite-Scala-Starter-Package/MyBot.java
 
 zip -r Halite-Python-Starter-Package.zip Halite-Python-Starter-Package/ 
 zip -r Halite-C++-Starter-Package.zip Halite-C++-Starter-Package/

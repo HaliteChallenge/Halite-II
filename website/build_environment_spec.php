@@ -53,6 +53,7 @@
 					<li>Python - .py</li>
 					<li>C++ - .cpp and .h</li>
 					<li>Rust - .toml (for your Cargo.toml) and .rs (for your Rust source)</li>
+					<li>Scala - .scala</li>
 				  </ul>
 				</p>
 
@@ -62,6 +63,7 @@
 					<li>Java - javac 1.7.0_101</li>
 					<li>C++ - g++ 4.84</li>
 					<li>Rust - rustc 1.10.0</li>
+					<li>Scala - scalac 2.10.4</li>
 				  </ul>
 				</p>
 
@@ -79,6 +81,7 @@
 					<li>Python 3.4.3</li>
 					<li>C++ 11</li>
 					<li>Rust 1.10</li>
+					<li>Scala 2.10.4</li>
 				  </ul>
 				</p>
 
