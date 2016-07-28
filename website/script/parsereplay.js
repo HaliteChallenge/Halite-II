@@ -9,11 +9,11 @@ byteArrayToGame = function(bytes) {
     var details = String.fromCharCode.apply(null, bytes.slice(headerSplit + 1, detailSplit))
 
     var game = {version: header};
-    [game.width, game.height, game.numPlayers, game.numFrames] = details.split(" ");
-    game.width = parseInt(game.width);
-    game.height = parseInt(game.height);
-    game.numPlayers = parseInt(game.numPlayers);
-    game.numFrames = parseInt(game.numFrames);
+    details = details.split(" ");
+    game.width = parseInt(details[0]);
+    game.height = parseInt(details[1]);
+    game.numPlayers = parseInt(details[2]);
+    game.numFrames = parseInt(details[3]);
     var cellCount = game.height * game.width;
 
     //Hardcoding colors:
