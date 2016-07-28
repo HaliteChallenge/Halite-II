@@ -17,8 +17,7 @@
 
 				<h3>Environment and Visualizer</h3>
 				<p>
-					This set of binaries was uploaded at <b>2:20pm EST on July 25th</b>. We changed the timeout format so that deep learning is possible. Bots now are given a certain amount of computation time <b>total</b> for a game and can choose to allocate it between initialization and moves as they choose (simply by using time as needed). The number of milliseconds bots are allowed is given by the formula <code>2 * WIDTH * HEIGHT * MAX_NUM_TURNS / 3</code>. Bots which exceed the total given amount of time are deemed to have timed out and are ejected from the game.
-				</p>
+					This set of binaries was uploaded at <b>11:20am EST on July 28th</b>. We changed the timeout format to be a little quicker and fairer. The number of milliseconds bots are allowed is given by the formula <code>15000 + WIDTH * HEIGHT * MAX_NUM_TURNS / 3</code>. We also added error logging - if a bot times out, it will output an error log for the game with the player tag of the bot and id of the game in the filename (use -q to get the filename for certain from the environment).
 				<p>
 					<ul>
 						<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
