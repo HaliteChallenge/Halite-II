@@ -9,6 +9,7 @@
 <body>
 	<div id="container" class="container">
 		<?php include 'includes/navbar.php'; ?>
+		<h1>Here is what a game of Halite looks like!</h1>
 		<div id="pageContent" class="pageContent">
 		</div>
 	</div>
