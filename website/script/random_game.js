@@ -1,0 +1,3 @@
+$(function () {
+	startWithURL(getRandomGameName().replayName);
+})

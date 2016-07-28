@@ -19,5 +19,6 @@
 	<script src="lib/pixi.min.js"></script>
 	<script src="script/parsereplay.js"></script>
 	<script src="script/visualizer.js"></script>
+	<script src="script/game.js"></script>
 </body>
 </html>

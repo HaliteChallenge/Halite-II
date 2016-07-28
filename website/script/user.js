@@ -70,7 +70,7 @@ $(function() {
 			}).join(" ");
 
 			playersList += "</ol>";
-			var $row = $("<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='visualizer.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
+			var $row = $("<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
 			if(this.isMe) {
 				var me = null;
 				for(var a = 0; a < game.players.length; a++) {
