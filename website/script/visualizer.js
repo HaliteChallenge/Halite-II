@@ -336,23 +336,29 @@ function showGame(game) {
 	}
 }
 
+function startWithURL(url) {
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", url, true);
+
+	oReq.responseType = "arraybuffer";
+	oReq.onload = function (oEvent) {
+		if (oReq.status != 404) {
+			var aBuffer = oReq.response;
+			var byteArray = new Uint8Array(aBuffer);
+			showGame(byteArrayToGame(byteArray))
+		} else {
+			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
+		}
+	}
+	oReq.send(null);
+}
+
 $(function () {
 	var replayName = getGET("replay");
 
 	if(replayName != null) {
-		var oReq = new XMLHttpRequest();
-		oReq.open("GET", "../storage/replays/"+replayName, true);
-
-		oReq.responseType = "arraybuffer";
-		oReq.onload = function (oEvent) {
-			if (oReq.status != 404) {
-				var aBuffer = oReq.response;
-				var byteArray = new Uint8Array(aBuffer);
-				showGame(byteArrayToGame(byteArray))
-			} else {
-				$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
-			}
-		}
-		oReq.send(null);
+		startWithURL("../storage/replays/"+replayName);
+	} else if(getGET("random") != null) {
+		startWithURL("../storage/replays/"+getRandomGameName());
 	}
 })
