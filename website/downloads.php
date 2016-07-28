@@ -28,7 +28,7 @@
 
 				<h3>Language Packages</h3>
 				<p>
-					This set of binaries was uploaded at <b>1:10pm EST on July 16th</b>. We added a Rust starter package!
+					This set of binaries was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
 				</p>
 				<p>
 					<ul>
@@ -36,6 +36,7 @@
 						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7</a></li>
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
 						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
+						<li><a href="downloads/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
 					</ul>
 				</p>
 			</div>
