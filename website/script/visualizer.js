@@ -1,4 +1,4 @@
-function showGame(game) {
+function showGame(game, seconds) {
 
 	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
@@ -15,7 +15,7 @@ function showGame(game) {
 
 	var frame = 0;
 	var transit = 0;
-	var framespersec = 2.5;
+	var framespersec = seconds == null ? 2.5 : game.numFrames / seconds;
 	var shouldplay = true;
 	var xOffset = 0, yOffset = 0;
 
