@@ -3,20 +3,28 @@
 
 #include <iostream>
 #include <set>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <stdio.h>
+#include <chrono>
+#include <thread>
+#include <mutex>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <tchar.h>
-#include <stdio.h>
-#include <strsafe.h>
+	#include <windows.h>
+	#include <tchar.h>
+	#include <stdio.h>
+	#include <strsafe.h>
 #else
-#include <signal.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/select.h>
-#include <unistd.h>
+	#include <signal.h>
+	#include <time.h>
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
+	#include <sys/select.h>
+	#include <sys/wait.h>
+	#include <unistd.h>
 #endif
 
 #include "../core/hlt.hpp"

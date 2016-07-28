@@ -18,7 +18,7 @@
                 <p>The source code for this tutorial is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/machinelearning/">here</a>.</p>
 
         <h3>Overview</h3>
-        <p>We are going to show you a simple example of how machine learning applied to Halite. We will locally train a neural network to mimic Matt Aderth's current halite bot (as of July 13th) using the <a href="http://keras.io">Keras library</a>.</p>
+        <p>We are going to show you a simple example of how machine learning applied to Halite. We will locally train a neural network to mimic Matt Adereth's current halite bot (as of July 13th) using the <a href="http://keras.io">Keras library</a>.</p>
 
                 <h3>Installation</h3>
                 <p>

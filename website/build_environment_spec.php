@@ -19,9 +19,9 @@
 				<h3>Hardware</h3>
 				<p>All compilation and game execution is done on Ubuntu 14.04 servers hosted by Digital Ocean with the following specs:
 				  <ul>
-					<li>2 GB of RAM</li>
-					<li>40 GB of disk space</li>
-					<li>2 processor cores</li>
+					<li>8 GB of RAM</li>
+					<li>80 GB of disk space</li>
+					<li>4 processor cores</li>
 				  </ul>
 				</p>
 
@@ -83,7 +83,7 @@
 				</p>
 
 				<h3>Games</h3>
-				<p> Bots are given <b>256 MB of RAM</b> and <b>equal amounts of CPU</b>.</p>
+				<p> Bots are given <b>1 GB of RAM</b> and <b>equal amounts of CPU</b>.</p>
 				<p>Currently, 20x20, 25x25, 30x30, 35x35, 40x40, 45x45, and 50x50 games are run. Games may be 2-6 player.</p>
 				<p>Games are always run using <a href="downloads.php">the most recent environment build</a>.</p>
 				</p>

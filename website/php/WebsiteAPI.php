@@ -1,6 +1,8 @@
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+ini_set('session.gc_maxlifetime', 48*3600);
+
 error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
@@ -337,6 +339,7 @@ class WebsiteAPI extends API{
 	}
 
 	protected function session() {
+		session_set_cookie_params(48*3600);
 		session_start();
 		if($this->method == 'GET') {
 			if(count($_SESSION) > 0) return $_SESSION;
