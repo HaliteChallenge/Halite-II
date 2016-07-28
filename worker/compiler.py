@@ -449,7 +449,7 @@ languages = (
 	Language("Scala", BOT +".scala", "MyBot.scala",
 		'scala -J-Xmx'+ str(MEMORY_LIMIT) +'m -howtorun:object MyBot',
 		["*.scala, *.jar"],
-		[(["*.scala"], ExternalCompiler(comp_args["Scala"][0]))]
+		[(["*.java"], ExternalCompiler(comp_args["Java"][0])), (["*.scala"], ExternalCompiler(comp_args["Scala"][0]))]
 	),
 	Language("Scheme", BOT +".ss", "MyBot.ss",
 		"./MyBot",
