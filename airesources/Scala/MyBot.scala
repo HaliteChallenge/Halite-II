@@ -1,7 +1,7 @@
 /**
   * Created by snoe on 7/23/16.
   */
-class MyScalaBot(id: Int, gameMap:GameMap) extends HaliteBot(id, gameMap) {
+class MyBot(id: Int, gameMap:GameMap) extends HaliteBot(id, gameMap) {
 
   val log = new java.io.PrintWriter("/dev/tty")
   
@@ -26,12 +26,12 @@ class MyScalaBot(id: Int, gameMap:GameMap) extends HaliteBot(id, gameMap) {
 
 }
 
-object MyScalaBot {
+object MyBot {
 
   def main(args:Array[String]):Unit = {
 
     val maker = new HaliteBotMaker() {
-      override def makeBot(id:Int, gameMap:GameMap):HaliteBot = new MyScalaBot(id, gameMap)
+      override def makeBot(id:Int, gameMap:GameMap):HaliteBot = new MyBot(id, gameMap)
     }
 
     HaliteBot.run(args, maker)
