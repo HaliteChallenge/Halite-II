@@ -194,7 +194,7 @@ function getRandomGameName() {
 	var response = $.ajax({
 		url: url+"game",
 		async: false,
-		method: "POST",
+		method: "GET",
 		data: {random: true}
 	});
 	console.log(response)

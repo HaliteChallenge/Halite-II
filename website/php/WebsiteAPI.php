@@ -222,6 +222,8 @@ class WebsiteAPI extends API{
 				array_push($gameArrays, $gameArray);
 			}
 			return $gameArrays;
+		} else if(isset($_GET['random'])) {
+			return $this->select("SELECT replayName FROM Game WHERE gameID ORDER BY rand() LIMIT 1");
 		}
 	}
 
