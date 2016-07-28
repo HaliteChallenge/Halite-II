@@ -141,7 +141,7 @@ class WebsiteAPI extends API{
 			}
 			return "Fail";
 		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
-			$username = $_POST["username"];
+			$username = htmlspecialchars($_POST["username"]);
 			$email = $_POST["email"];
 			$password = $this->encryptPassword($_POST["password"]);
 
