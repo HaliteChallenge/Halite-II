@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-ini_set('session.gc_maxlifetime', 48*3600);
+ini_set('session.gc_maxlifetime', 7*24*3600);
 
 error_reporting(E_ALL);
 
@@ -359,7 +359,7 @@ class WebsiteAPI extends API{
 	}
 
 	protected function session() {
-		session_set_cookie_params(48*3600);
+		session_set_cookie_params(7*24*3600);
 		session_start();
 		if($this->method == 'GET') {
 			if(count($_SESSION) > 0) return $_SESSION;
