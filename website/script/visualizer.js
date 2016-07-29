@@ -1,4 +1,4 @@
-function showGame(game, seconds) {
+function showGame(game, showmovement, seconds) {
 
 	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
@@ -238,7 +238,7 @@ function showGame(game, seconds) {
 				if(tY == game.height) tY = 0;
 			}
 
-			var t = (-Math.cos(transit * Math.PI) + 1) / 2;
+			var t = showmovement ? (-Math.cos(transit * Math.PI) + 1) / 2 : 0;
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
