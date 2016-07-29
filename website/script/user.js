@@ -13,6 +13,30 @@ $(function() {
 		}
 	}
 
+	var historyTable = {
+		$panel: $("#historyPanel"),
+		$tableBody: $("#historyTableBody"),
+		init: function(name, histories) {
+			this.name = name;
+			this.histories = histories;
+			this.render();
+		},
+ 		render: function() {
+			if(this.histories.length == 0) {
+				this.$panel.css("display", "none");	
+			} else {
+				this.$panel.css("display", "block");	
+				this.$tableBody.empty();
+				for(var a = 0; a < this.histories.length; a++) {
+					this.$tableBody.append(this.getTableRow(this.histories[a]));
+				}
+			}
+		},
+		getTableRow: function(history) {
+			return "<tr><td>"+this.name+" v"+history.versionNumber+"</td><td>"+history.lastRank+" of "+history.lastNumPlayers+"</td></tr>";
+		}
+	}
+
 	var statTable = {
 		$tableBody: $("#statTableBody"),
 		stats: [],
@@ -158,5 +182,5 @@ $(function() {
 		console.log(games)
 		return games;
 	});
-
+	historyTable.init(user.username, getHistories(userID));
 })

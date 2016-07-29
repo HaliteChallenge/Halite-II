@@ -200,3 +200,14 @@ function getRandomGameName() {
 	console.log(response)
 	return response.responseJSON;
 }
+
+function getHistories(userID) {
+	var response = $.ajax({
+		url: url+"history",
+		async: false,
+		method: "GET",
+		data: {userID: userID}
+	});
+	console.log(response)
+	return response.responseJSON;
+}

@@ -26,6 +26,21 @@
 						</tbody>
 					</table>
 				</div>
+				<div id="historyPanel" class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">History</h3>
+					</div>
+					<table class="table well well-sm" id="historyTable">
+						<thead>
+							<tr id="historyTableHeader">
+								<th>Version</th>
+								<th>Final Ranking</th>
+							</tr>
+						</thead>
+						<tbody id="historyTableBody">
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div class="col-md-7">
 				<div class="panel panel-primary">
