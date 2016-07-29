@@ -200,6 +200,12 @@ class WebsiteAPI extends API{
 		}
 	}
 
+	protected function history() {
+		if(isset($_GET["userID"])) {
+			return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]}");
+		}
+	}
+
 	protected function game() {
 		if(isset($_GET['userID'])) {
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
@@ -242,7 +248,7 @@ class WebsiteAPI extends API{
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
-			$user = $this->select("SELECT isVerified FROM User WHERE userID={$userID} and password='{$password}'");
+			$user = $this->select("SELECT * FROM User WHERE userID={$userID} and password='{$password}'");
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
@@ -265,6 +271,9 @@ class WebsiteAPI extends API{
 				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
 				$this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
 			}
+			
+			$numPlayers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
+			$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers)");
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
