@@ -117,6 +117,7 @@ class WebsiteAPI extends API{
 				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
 				unset($fields["password"]);
 				unset($fields["email"]);
+				unset($fields["verificationCode"]);
 				return $fields;
 			}
 		} else if (isset($_GET["userID"])) {
@@ -127,6 +128,7 @@ class WebsiteAPI extends API{
 				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
 				unset($fields["password"]);
 				unset($fields["email"]);
+				unset($fields["verificationCode"]);
 				return $fields;
 			}
 		} else if(isset($_GET['active'])) {
@@ -134,6 +136,7 @@ class WebsiteAPI extends API{
 			foreach(array_keys($results) as $key) {
 				unset($results[$key]["password"]);
 				unset($results[$key]["email"]);
+				unset($results[$key]["verificationCode"]);
 			}
 			return $results;
 		} else if(isset($_GET['numActive'])) {
