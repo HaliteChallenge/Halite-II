@@ -9,7 +9,7 @@
 <body>
 	<div id="container" class="container">
 		<h1>Here is what a game of Halite looks like!</h1>
-		<h3>If you're interested, visit <u>halite.io</u>.</h3>
+		<h3>If you're interested, visit <u>halite.io</u> or come to our <u>hacknight</u> on floor 16 of 100 AOA.</h3>
 		<hr>
 		<div id="pageContent" class="pageContent">
 		</div>
