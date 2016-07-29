@@ -155,6 +155,10 @@ def executeGameTask(width, height, users, backend):
 	users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
 
 	backend.gameResult(width, height, users, replayPath, errorPaths)
+	filelist = glob.glob("*.log")
+	for f in filelist:
+		os.remove(f)
+
 	os.remove(replayPath)
 
 if __name__ == "__main__":
