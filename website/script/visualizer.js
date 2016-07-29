@@ -1,7 +1,12 @@
 function showGame(game, showmovement, seconds) {
 
 	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
-		return "<a href='user.php?userID="+getUser(null, p.name).userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
+		var user = getUser(null, p.name);
+		if(user) {
+			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
+		} else {
+			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
+		}
 	}).join(" vs ")+"</h3>"));
 
 	//Create the root of the scene: stage:
