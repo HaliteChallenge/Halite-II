@@ -5,7 +5,7 @@ $(function () {
 		var data = byteArrayFromURL(replayName, function(data) {
 			console.log(data)
 			if(data != null) {
-				showGame(data);
+				showGame(data, true);
 			}	
 		});
 	}
