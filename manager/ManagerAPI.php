@@ -125,7 +125,7 @@ class ManagerAPI extends API{
 						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
 
 						// Pick map size
-						$sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40);
+						$sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 40, 40, 45);
 						$size = $sizes[array_rand($sizes)];
 
 						// Send game task
@@ -242,7 +242,7 @@ class ManagerAPI extends API{
 						}
 
 						// Store game information in db
-						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$replayName', $mapWidth, $mapHeight)");
+						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('$replayName', $mapWidth, $mapHeight, NOW())");
 						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$replayName' LIMIT 1");
 						$gameID = $gameIDArray['gameID'];
 
