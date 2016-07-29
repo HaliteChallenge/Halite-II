@@ -242,7 +242,7 @@ class ManagerAPI extends API{
 						}
 
 						// Store game information in db
-						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight) VALUES ('$replayName', $mapWidth, $mapHeight)");
+						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('$replayName', $mapWidth, $mapHeight, NOW())");
 						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$replayName' LIMIT 1");
 						$gameID = $gameIDArray['gameID'];
 

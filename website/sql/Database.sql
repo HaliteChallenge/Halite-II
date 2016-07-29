@@ -27,6 +27,7 @@ CREATE TABLE `Game` (
   `replayName` varchar(64) NOT NULL,
   `mapWidth` smallint(5) NOT NULL,
   `mapHeight` smallint(5) NOT NULL,
+  `timestamp` datetime NOT NULL,
   PRIMARY KEY (`gameID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=407227 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
