@@ -14,8 +14,7 @@ RUN apt-get update
 RUN apt-get install -y libstdc++6
 RUN apt-get install -y gcc
 RUN apt-get install -y g++
-RUN apt-get install -y python
-RUN apt-get install -y python3-pip
+RUN apt-get install -y python3 python3-pip python3-dev
 RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh 
 
 #prepare for Java download
@@ -51,6 +50,7 @@ RUN apt-get update -y
 RUN apt-get install -y sbt
 
 # Libraries
+RUN pip3 install --upgrade numpy 
 RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.9.0-cp34-cp34m-linux_x86_64.whl
 RUN apt-get install -y --force-yes python3-numpy python3-scipy python3-dev python3-pip python3-nose g++ libblas-dev git
 RUN pip3 install Theano
