@@ -255,6 +255,10 @@ class WebsiteAPI extends API{
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
+			
+			if($user['status'] == 1 || $user['status'] == 2) {
+				return "Compiling";
+			}
 
 			if ($_FILES["botFile"]["size"] > 20000000) {
 				return "Sorry, your file is too large.";
