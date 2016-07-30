@@ -162,14 +162,16 @@ class ManagerAPI extends API{
 								$language = isset($_POST['language']) ? $_POST['language'] : "Other";
 								$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
 						} else {
+								$versionNumber = intval($this->select("SELECT * FROM User WHERE userID=$userID")['numSubmissions'])-1;
+								echo "DELETE FROM UserHistory WHERE userID=$userID and versionNumber=$versionNumber";
+								$this->insert("DELETE FROM UserHistory WHERE userID=$userID and versionNumber=$versionNumber");
+
 								$targetPath = $this->getBotFile($userID);
 								$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
 								echo $cachedPath;
 								unlink($targetPath);
 								if(file_exists($cachedPath)) {
 										copy($cachedPath, $targetPath);
-										$versionNumber = intval($this->select("SELECT * FROM User WHERE userID=$userID")['numSubmissions'])-1;
-										$this->insert("DELETE FROM UserHistory WHERE userID=$userID and versionNumber=$versionNumber");
 										$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = $userID");
 								} else {
 										$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = $userID");
