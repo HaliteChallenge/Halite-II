@@ -122,7 +122,20 @@ class ManagerAPI extends API{
 						// Assign a run game tasks
 						$possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
 						$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
-						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand() LIMIT $numPlayers");
+
+						$users = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand()");
+						$seedPlayer = NULL;
+						$oldestGameTime = time();
+						foreach($users as $user) {
+							$latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
+							if($latestGameTime < $oldestGameTime) {
+								$seedPlayer = $user;
+								$oldestGameTime = $latestGameTime;
+							}
+						}
+						$numLeft = $numPlayers-1;
+						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 and ABS(rank-{$seedPlayer['rank']}) < 6 and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT $numLeft");
+						array_push($players, $seedPlayer);
 
 						// Pick map size
 						$sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 40, 40, 45);
