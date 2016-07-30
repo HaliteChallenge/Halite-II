@@ -205,7 +205,7 @@ class WebsiteAPI extends API{
 
 	protected function history() {
 		if(isset($_GET["userID"])) {
-			return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]}");
+			return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]} ORDER BY versionNumber DESC");
 		}
 	}
 
