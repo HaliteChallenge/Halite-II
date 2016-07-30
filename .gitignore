@@ -302,7 +302,7 @@ native
 checkouts
 .lein-deps-sum
 
-############
+#############
 ## Halite ##
 ############
 Values.sql
