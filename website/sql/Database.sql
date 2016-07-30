@@ -115,7 +115,8 @@ CREATE TABLE `UserHistory` (
   `userID` mediumint(8) unsigned NOT NULL,
   `versionNumber` smallint(5) NOT NULL,
   `lastRank` smallint(5) NOT NULL,
-  `lastNumPlayers` smallint(5) NOT NULL
+  `lastNumPlayers` smallint(5) NOT NULL,
+  `lastNumGames` smallint(5) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

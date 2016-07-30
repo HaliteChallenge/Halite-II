@@ -276,7 +276,7 @@ class WebsiteAPI extends API{
 			}
 			
 			$numPlayers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
-			$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers)");
+			$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
