@@ -15,6 +15,8 @@ RUN apt-get install -y libstdc++6
 RUN apt-get install -y gcc
 RUN apt-get install -y g++
 RUN apt-get install -y python3 python3-pip python3-dev
+RUN apt-get install -y curl
+RUN apt-get install -y sudo
 RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh 
 
 #prepare for Java download
