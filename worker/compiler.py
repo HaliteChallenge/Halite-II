@@ -65,7 +65,13 @@ def _run_cmd(cmd, working_dir, timelimit):
 	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 	start = time.time()
 	timelimit = timelimit - start
-	out, errors = process.communicate(timeout=timelimit)
+	rawOut, rawErrors = process.communicate(timeout=timelimit)
+
+	outString = rawOut.decode("utf-8").strip()
+	out = outString.split("\n") if outString.isspace() == False else []
+
+	errorsString = rawErrors.decode("utf-8").strip()
+	errors = errorsString.split("\n") if errorsString.isspace() == False else []
 
 	if time.time() - start > timelimit:
 		errors.append("Compilation timed out with command %s" % (cmd,))
