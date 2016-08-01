@@ -139,15 +139,19 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	FD_ZERO(&set); /* clear the set */
 	FD_SET(connection.read, &set); /* add our file descriptor to the set */
 
-	struct timeval timeout;
-	timeout.tv_sec = timeoutMillis / 1000.0;
-	timeout.tv_usec = (timeoutMillis % 1000)*1000;
 
+	std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
 	char buffer;
 
 	//Keep reading char by char until a newline
 	while(true) {
+
 		//Check if there are bytes in the pipe
+		timeoutMillis -= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
+		tp = std::chrono::high_resolution_clock::now(); 
+		struct timeval timeout;
+		timeout.tv_sec = timeoutMillis / 1000.0;
+		timeout.tv_usec = (timeoutMillis % 1000)*1000;
 		int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
 
 		if(selectionResult > 0) {
