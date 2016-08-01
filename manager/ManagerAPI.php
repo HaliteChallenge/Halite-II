@@ -40,7 +40,7 @@ class ManagerAPI extends API{
 				// Get ip
 				$ipAddress = $_SERVER['REMOTE_ADDR'];
 
-				if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '$ipAddress' and apiKey = $this->apiKey")) > 0) {
+				if(count($this->select("SELECT ipAddress FROM Worker WHERE ipAddress = '".$this->mysqli->real_escape_string($ipAddress)."' and apiKey = ".$this->mysqli->real_escape_string($this->apiKey))) > 0) {
 						return true;
 				} else {
 						return false;
@@ -113,7 +113,7 @@ class ManagerAPI extends API{
 						// Check for compile tasks
 						$needToBeCompiled = $this->select("SELECT * FROM User WHERE status = 1 ORDER BY userID ASC");
 						if(count($needToBeCompiled) > 0) {
-								$this->insert("UPDATE User SET status = 2 WHERE userID = {$needToBeCompiled['userID']}");
+								$this->insert("UPDATE User SET status = 2 WHERE userID = ".$needToBeCompiled['userID']);
 								return array(
 										"type" => "compile",
 										"user" => $needToBeCompiled);
@@ -133,8 +133,7 @@ class ManagerAPI extends API{
 								$oldestGameTime = $latestGameTime;
 							}
 						}
-						$numLeft = $numPlayers-1;
-						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT $numLeft");
+						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
 						array_push($players, $seedPlayer);
 
 						// Pick map size
@@ -157,7 +156,7 @@ class ManagerAPI extends API{
 		protected function compile() {
 				var_dump($_POST);
 				if(isset($_POST['userID']) && isset($_POST['didCompile'])) {
-						$this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=$this->apiKey");
+						$this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
 
 						$userID = $_POST['userID'];
 						$didCompile = $_POST['didCompile'];
@@ -173,11 +172,10 @@ class ManagerAPI extends API{
 								copy($targetPath, $cachedPath);
 
 								$language = isset($_POST['language']) ? $_POST['language'] : "Other";
-								$this->insert("UPDATE User SET status = 3, language = '$language' WHERE userID = $userID");
+								$this->insert("UPDATE User SET status = 3, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
 						} else {
-								$versionNumber = intval($this->select("SELECT * FROM User WHERE userID=$userID")['numSubmissions'])-1;
-								echo "DELETE FROM UserHistory WHERE userID=$userID and versionNumber=$versionNumber";
-								$this->insert("DELETE FROM UserHistory WHERE userID=$userID and versionNumber=$versionNumber");
+								$versionNumber = intval($this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($userID))['numSubmissions'])-1;
+								$this->insert("DELETE FROM UserHistory WHERE userID=".$this->mysqli->real_escape_string($userID)." and versionNumber={$versionNumber}");
 
 								$targetPath = $this->getBotFile($userID);
 								$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
@@ -185,9 +183,9 @@ class ManagerAPI extends API{
 								if(file_exists($cachedPath)) {
 										unlink($targetPath);
 										copy($cachedPath, $targetPath);
-										$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = $userID");
+										$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = ".$this->mysqli->real_escape_string($userID));
 								} else {
-										$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = $userID");
+										$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = ".$this->mysqli->real_escape_string($userID));
 								}
 						}
 				}
@@ -199,14 +197,14 @@ class ManagerAPI extends API{
 				var_dump($_POST);
 				// Each user in users must have a rank, playerIndex, mu, sigma, and userID
 				if(isset($_POST['users']) && count($_FILES) > 0) {
-						$this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=$this->apiKey");
+						$this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
 
 						$mapWidth = $_POST['mapWidth'];
 						$mapHeight = $_POST['mapHeight'];
 						$users = json_decode($_POST['users']);
 
 						foreach($users as $user) {
-							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID={$user->userID}");
+							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
 							if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
 								return null;
 							}
@@ -226,10 +224,10 @@ class ManagerAPI extends API{
 							move_uploaded_file($file['tmp_name'], $targetPath);
 							if(is_file($targetPath) == false) {
 								return "Did not work";
-							} 
+							}
 							chmod($targetPath, 0777);
 						}
-						
+
 						// Check that we arent storing too many replay files
 						$files = glob(REPLAYS_DIR.'*.*');
 						$exclude_files = array('.', '..');
@@ -259,8 +257,8 @@ class ManagerAPI extends API{
 						}
 
 						// Store game information in db
-						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('$replayName', $mapWidth, $mapHeight, NOW())");
-						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '$replayName' LIMIT 1");
+						$this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('".$this->mysqli->real_escape_string($replayName)."', ".$this->mysqli->real_escape_string($mapWidth).", ".$this->mysqli->real_escape_string($mapHeight).", NOW())");
+						$gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '".$this->mysqli->real_escape_string($replayName)."' LIMIT 1");
 						$gameID = $gameIDArray['gameID'];
 
 						// Update each participant's stats
@@ -271,11 +269,11 @@ class ManagerAPI extends API{
 						}
 						for($a = 0; $a < count($users); $a++) {
 								$timeoutInt = $users[$a]->didTimeout ? 1 : 0;
-								$errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'{$users[$a]->errorLogName}'";
-								$this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, {$users[$a]->userID}, $errorLogName, {$users[$a]->rank}, {$users[$a]->playerTag}, {$users[$a]->territoryAverage}, {$users[$a]->strengthAverage}, {$users[$a]->productionAverage}, {$users[$a]->stillPercentage}, {$users[$a]->turnTimeAverage}, {$timeoutInt})");
+								$errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]->errorLogName)."'";
+								$this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", ".$this->mysqli->real_escape_string($users[$a]->territoryAverage).", ".$this->mysqli->real_escape_string($users[$a]->strengthAverage).", ".$this->mysqli->real_escape_string($users[$a]->productionAverage).", ".$this->mysqli->real_escape_string($users[$a]->stillPercentage).", ".$this->mysqli->real_escape_string($users[$a]->turnTimeAverage).", {$timeoutInt})");
 
 								// Cache raw game stats
-								$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameUser WHERE userID={$users[$a]->userID}");
+								$gameStats = $this->selectMultiple("SELECT territoryAverage, strengthAverage, productionAverage, stillPercentage, turnTimeAverage, didTimeout FROM GameUser WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
 								$totalGameStats = array();
 								foreach($gameStats as $oneGameStats) {
 										foreach($oneGameStats as $statName => $statValue) {
@@ -287,7 +285,7 @@ class ManagerAPI extends API{
 								}
 								foreach($totalGameStats as $statName => $totalStatValue) {
 										$averageStatValue = $totalStatValue / count($gameStats);
-										$this->insert("UPDATE UserExtraStats SET $statName=$averageStatValue WHERE userID = {$users[$a]->userID}");
+										$this->insert("UPDATE UserExtraStats SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
 								}
 
 								// Game game stat rankings
@@ -303,12 +301,11 @@ class ManagerAPI extends API{
 														break;
 												}
 										}
-										echo "UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}\n";
-										$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = {$users[$a]->userID}");
+										$this->insert("UPDATE UserExtraStats SET {$rankedStatName}={$rank} WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
 								}
 
 								// Add to other stats
-								$this->insert("UPDATE User SET numGames=numGames+1, mu = {$users[$a]->mu}, sigma = {$users[$a]->sigma} WHERE userID = {$users[$a]->userID}");
+								$this->insert("UPDATE User SET numGames=numGames+1, mu = ".$this->mysqli->real_escape_string($users[$a]->mu).", sigma = ".$this->mysqli->real_escape_string($users[$a]->sigma)." WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
 						}
 
 						// Update mu and sigma
@@ -324,7 +321,7 @@ class ManagerAPI extends API{
 						var_dump($lines);
 						for($a = 0; $a < count($users); $a++) {
 								$components = explode(' ', $lines[$a]);
-								$this->insert("UPDATE User SET mu={$components[0]}, sigma={$components[1]} WHERE userID={$users[$a]->userID}");
+								$this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
 						}
 
 						// Update overall rank
