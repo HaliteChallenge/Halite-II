@@ -239,7 +239,8 @@ class ManagerAPI extends API{
 										$files
 								);
 						}
-						while(count($files) > 10000) {
+						$numAllowed = 40000;
+						while(count($files) > $numAllowed) {
 								unlink($files[0]);
 								array_splice($files, 0, 1);
 						}
@@ -247,7 +248,7 @@ class ManagerAPI extends API{
 						// Check that we arent stoing too many games in db
 						$res = mysqli_query($this->mysqli, "SELECT * FROM Game");
 						$numRows = $res->num_rows;
-						$numToDelete = $numRows - 10000;
+						$numToDelete = $numRows - $numAllowed;
 						if($numToDelete > 0) {
 								$gamesToDelete = $this->selectMultiple("SELECT gameID FROM Game ORDER BY gameID LIMIT $numToDelete");
 								foreach($gamesToDelete as $game) {
