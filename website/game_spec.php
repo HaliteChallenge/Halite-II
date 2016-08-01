@@ -59,7 +59,7 @@
 				 		<li>Receive moves from the players.</li>
 				 		<li>Kill bots whose responses take longer than their remaining allotted time.</li>
 				 		<li>Add strength to pieces which choose to remain where they are.</li>
-				 		<li>Simultaneously move all player's pieces.</li>
+				 		<li>Simultaneously move (and combine if necessary) all player's pieces. The capping of strengths to 255 occurs here.</li>
 				 		<li>Simultaneously damage (and remove if damage exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
 				 		<li>Check if endgame conditions have been met.</li>
 				 	</ol>
