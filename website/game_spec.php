@@ -34,12 +34,11 @@
 				<p>The game ends if one of two conditions are met:
 					<ul>
 				 		<li>Only one player has any pieces left.</li>
-				 		<li>WIDTH * HEIGHT turns have been played. Consequently, a small map may end after a few hundred turns, whereas a large map may take up many thousands.</li>
+				 		<li>10 * sqrt(WIDTH * HEIGHT) turns have been played. Consequently, a small map may end after a few hundred turns, whereas a large map could take thousands.</li>
 				 	</ul>
 				</p>
 
-				<p>The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the vast majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are deem to have tied within the game.</p>
-
+				<p>The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are ranked based on their territory at that point in the game. If there is a tie in the amount of territory each bot possesses, the full territory integral is used as the tiebreaker, although this is a rare occurence.</p>
 
 				<h3>Bot Initialization</h3>
 
@@ -50,7 +49,7 @@
 				 	</ul>
 				</p>
 
-				<p>Bots are given two seconds plus two milliseconds per map tile at the start of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, planning the bot's initial expansion strategy, and/or compiling a model. Once bots are done initializing (before their time is up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
+				<p>Bots are permitted to use time at the beginning of the game to initialize. This initialization might include (but is in no way limited to) getting the initial map and player tag, identifying important, high-production regions on the map, identifying the locations of neighboring players, planning the bot's initial expansion strategy, and/or compiling a model. Once bots are done initializing (before their time is up), they should send a response (sendInit in the starter packages) with their own player name, used for human identification purposes.</p>
 
 				<h3>Turns</h3>
 
@@ -58,14 +57,18 @@
 					<ol>
 				 		<li>Send the present gamestate - map and messages - to all players.</li>
 				 		<li>Receive moves from the players.</li>
-				 		<li>Kill bots which do not respond within the allotted time, which is fifty milliseconds plus one-half of a millisecond per map tile.</li>
+				 		<li>Kill bots whose responses take longer than their remaining allotted time.</li>
 				 		<li>Add strength to pieces which choose to remain where they are.</li>
-				 		<li>Simultaneously move all player's pieces.</li>
+				 		<li>Simultaneously move (and combine if necessary) all player's pieces. The capping of strengths to 255 occurs here.</li>
 				 		<li>Simultaneously damage (and remove if damage exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
 				 		<li>Check if endgame conditions have been met.</li>
 				 	</ol>
 				One should note that because all pieces damage all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.
 				</p>
+
+				<h3>Timeouts</h3>
+
+				<p>Bots are given a total amount of time that they will work from during a game, and are permitted to use it as they choose. Bots are given 15000 + (10 * WIDTH * HEIGHT * sqrt(WIDTH * HEIGHT) / 3) milliseconds to play the entire game. Every bot's clock starts ticking once the environment sends its message (be it initialization or frame) to the bot and stops ticking once the environment receives the newline marking the end of the bot's response. Once a bot's clock hits zero, it is deemed to have lost and is ejected from the game.</p>
 
 				<h3>Maps</h3>
 

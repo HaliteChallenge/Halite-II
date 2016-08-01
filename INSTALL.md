@@ -30,7 +30,7 @@ If you have not already:
 
 ## Worker server setup
 
-* Execute: ```./install.sh```
+* Execute: ```apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite/worker; ./install.sh```
 * Create a `halite.ini` file in the root directory of the project
 * Add the `apiKey` and the ip address of the worker to the `Worker` table
 * [Enable swap](https://docs.docker.com/engine/installation/linux/ubuntulinux/#/adjust-memory-and-swap-accounting)
