@@ -34,11 +34,11 @@
 				<p>The game ends if one of two conditions are met:
 					<ul>
 				 		<li>Only one player has any pieces left.</li>
-				 		<li>WIDTH * HEIGHT turns have been played. Consequently, a small map may end after a few hundred turns, whereas a large map may take up many thousands.</li>
+				 		<li>10 * sqrt(WIDTH * HEIGHT) turns have been played. Consequently, a small map may end after a few hundred turns, whereas a large map could take thousands.</li>
 				 	</ul>
 				</p>
 
-				<p>The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the vast majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are deem to have tied within the game.</p>
+				<p>The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are ranked based on their territory at that point in the game. If there is a tie in the amount of territory each bot possesses, the full territory integral is used as the tiebreaker, although this is a rare occurence.</p>
 
 
 				<h3>Bot Initialization</h3>
