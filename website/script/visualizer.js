@@ -34,7 +34,15 @@ function showGame(game, showmovement, seconds) {
 	var xOffset = 0, yOffset = 0;
 
 	window.onresize = function() {
-		sw = $("#pageContent").width(), sh = sw*3/4;
+		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (10 + $("canvas").offset().top);
+		console.log(window.innerHeight)
+		console.log(allowedHeight)
+		var definingDimension = Math.min(allowedWidth, allowedHeight);
+		if(allowedWidth < allowedHeight*4/3) {
+			sw = allowedWidth, sh = allowedWidth*3/4;
+		} else {
+			sw = allowedHeight*4/3, sh = allowedHeight;
+		}
 		mw = sh, mh = sh;
 		renderer.resize(sw, sh);
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
@@ -59,8 +67,8 @@ function showGame(game, showmovement, seconds) {
 		infoText.anchor = new PIXI.Point(0, 1);
 		infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
 		stage.addChild(infoText);
-	stage.addChild(mapGraphics);
-	stage.addChild(graphGraphics);
+		stage.addChild(mapGraphics);
+		stage.addChild(graphGraphics);
 		console.log(renderer.width, renderer.height);
 	}
 	window.onresize();
