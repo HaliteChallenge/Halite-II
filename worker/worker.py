@@ -1,3 +1,5 @@
+import random
+
 import os
 import os.path
 import stat
@@ -103,6 +105,10 @@ def downloadUsers(users):
 
 def runGame(width, height, users):
 	runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+"\"" for a in users])
+
+	if width == 50 and height == 50 and random.uniform(0, 50) < 1:
+		runGameCommand += " --godmode"
+
 	print("Run game command: " + runGameCommand)
 	print("Game output:")
 	lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
