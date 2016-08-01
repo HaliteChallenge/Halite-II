@@ -313,8 +313,7 @@ halite.ini
 *.swp
 *.gch
 *.exe
-halite/environment/environment
-halite/visualizer/visualizer
+environment/environment
 worker/environment
 git_pull.php
 
@@ -326,3 +325,8 @@ airesources/C++/BasicBot
 leaderboard.png
 
 worker/[0-9]*
+
+environment/visualizer
+environment/shaders
+environment/fonts
+*.ppm

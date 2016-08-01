@@ -233,12 +233,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 }
 
 //Public Functions -------------------
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout, std::string * ppmFilename) {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 
 	//Initialize map
-	game_map = hlt::Map(width_, height_, number_of_players, seed_);
+	if(ppmFilename == NULL) game_map = hlt::Map(width_, height_, number_of_players, seed_);
+	else game_map = hlt::ppmToMap(*ppmFilename, number_of_players);
 
 	//Add colors to possible colors:
 	possible_colors.clear();

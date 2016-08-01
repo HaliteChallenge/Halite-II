@@ -77,7 +77,7 @@ private:
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 	void output(std::string filename);
 public:
-	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout);
+	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout, std::string * ppmFilename);
 
 	GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id);
 	std::string getName(unsigned char playerTag);
