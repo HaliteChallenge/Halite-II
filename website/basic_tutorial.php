@@ -47,7 +47,7 @@
 
 				<h3>Visualizing a Game</h3>
 				<p>
-					To visualize the game that you just ran, run the visualizer binary. Drag the game's replay file from your file explorer into the visualizer's window. Soon a grid filled with a few of brightly colored squares this is the map at the very start of the game. For convenience, you can also run the visualizer from terminal with the path to the replay as its parameter, or set the visualizer as the default application to open hlt files.
+					To visualize the game that you just ran, drag the game's replay file onto <a href="game.php">the visualizer</a>. Soon, you should see a grid filled with a few of brightly colored squares. This is the map at the very start of the game.
 				</p>
 
 				<h3>Writing a Basic Bot (in Java)</h3>
