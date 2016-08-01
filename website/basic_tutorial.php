@@ -20,8 +20,9 @@
 				<h3>Prerequisites</h3>
 				<p>It is highly recommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a> before following this tutorial.</p>
 
-				<h3>Download the Tools</h3>
-				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the game environment, which runs games and outputs replay files, and the desktop visualizer, which visualizes the environment's replay files. These are located <a href="downloads.php">here</a>.</p>
+				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the <a href="downloads.php">game environment</a>, which runs games and outputs replay files. 
+
+				</p>
 
 				<h3>Running a Game</h3>
 				<p>
