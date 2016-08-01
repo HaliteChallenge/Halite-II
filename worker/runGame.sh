@@ -6,11 +6,11 @@ WORKINGPATH="workingPath"
 
 if [ ! -f $ENVIRONMENT ]; then
 	echo "NO ENVIRONMENT!!"
-	cd ../halite/environment
+	cd ../environment
 	make clean
 	make
-	mv environment ../../worker
-	cd ../../worker
+	mv environment ../worker
+	cd ../worker
 fi
 
 WIDTH=$1
