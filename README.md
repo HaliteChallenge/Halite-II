@@ -11,7 +11,7 @@ For more information about the game, visit [our website](http://halite.io).
 ## Folder Contents
 
 - `airesources/` - The language-specific starter kits for writing bots
-- `halite/` - The halite game engine and visualizer
+- `environment/` - The halite game engine 
 - `manager/` - The API that manages worker servers
 - `website/` - The website that hosts the competition
 - `worker/` - The source for the worker servers that compiles bots and runs games safely
