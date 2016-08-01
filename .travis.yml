@@ -19,7 +19,7 @@ script:
 
   - cd ~/build/HaliteChallenge/Halite/environment
   - make
-  - ./environment -d 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot" "../../airesources/C++/MyBot.o"
+  - ./environment -d 10 10 "python3 ../airesources/Python/MyBot.py" "cd ../airesources/Java; java MyBot" "../airesources/C++/MyBot.o"
 
 notifications:
     slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
