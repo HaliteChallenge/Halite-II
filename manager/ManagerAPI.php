@@ -182,8 +182,8 @@ class ManagerAPI extends API{
 								$targetPath = $this->getBotFile($userID);
 								$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
 								echo $cachedPath;
-								unlink($targetPath);
 								if(file_exists($cachedPath)) {
+										unlink($targetPath);
 										copy($cachedPath, $targetPath);
 										$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = $userID");
 								} else {
