@@ -313,8 +313,7 @@ halite.ini
 *.swp
 *.gch
 *.exe
-halite/environment/environment
-halite/visualizer/visualizer
+environment/environment
 worker/environment
 git_pull.php
 
