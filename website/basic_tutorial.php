@@ -20,8 +20,9 @@
 				<h3>Prerequisites</h3>
 				<p>It is highly recommended that you have followed the directions listed in our <a href="quickstart.php">quickstart tutorial</a> before following this tutorial.</p>
 
-				<h3>Download the Tools</h3>
-				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the game environment, which runs games and outputs replay files, and the desktop visualizer, which visualizes the environment's replay files. These are located <a href="downloads.php">here</a>.</p>
+				<p>While working on your bot, you will want to run and visualize games locally. To do this, you will need the <a href="downloads.php">game environment</a>, which runs games and outputs replay files. 
+
+				</p>
 
 				<h3>Running a Game</h3>
 				<p>
@@ -47,7 +48,7 @@
 
 				<h3>Visualizing a Game</h3>
 				<p>
-					To visualize the game that you just ran, run the visualizer binary. Drag the game's replay file from your file explorer into the visualizer's window. Soon a grid filled with a few of brightly colored squares this is the map at the very start of the game. For convenience, you can also run the visualizer from terminal with the path to the replay as its parameter, or set the visualizer as the default application to open hlt files.
+					To visualize the game that you just ran, drag the game's replay file onto <a href="game.php">the visualizer</a>. Soon, you should see a grid filled with a few of brightly colored squares. This is the map at the very start of the game.
 				</p>
 
 				<h3>Writing a Basic Bot (in Java)</h3>
