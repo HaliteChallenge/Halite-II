@@ -7,8 +7,7 @@ language: cpp
 compiler: gcc
 
 install:
-  - ~/build/HaliteChallenge/Halite/halite/visualizer/debianInstall.sh
-  - sudo apt-get install -y python3 openjdk-7-jdk
+  - sudo apt-get install -y g++ python3 openjdk-7-jdk
   - export CXX="g++-4.8"
 
 script:
@@ -21,9 +20,6 @@ script:
   - cd ~/build/HaliteChallenge/Halite/halite/environment
   - make
   - ./environment -d 10 10 "python3 ../../airesources/Python/MyBot.py" "cd ../../airesources/Java; java MyBot" "../../airesources/C++/MyBot.o"
-
-  - cd  ~/build/HaliteChallenge/Halite/halite/visualizer
-  - make
 
 notifications:
     slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
