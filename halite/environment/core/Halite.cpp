@@ -36,6 +36,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 	std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
 
+	//Go through the players. If they are alive and just timed out, give their pieces to the neutral player.
+	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a] && player_time_allowances[a] < 0) for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == a + 1) game_map.contents[b][c].owner = 0;
+
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) {
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
@@ -345,6 +348,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 			timeout_tags.insert(a + 1);
 			result[a] = false;
 			rankings.push_back(a);
+			for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == a + 1) game_map.contents[b][c].owner = 0;
 		}
 	}
 	//Override player names with the provided ones if appropriate.
@@ -365,22 +369,20 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 			newRankings.push_back(a);
 		}
 		//Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
-		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && (last_territory_count[newRankings[b]] == last_territory_count[newRankings[b - 1]] ? full_territory_count[newRankings[b]] < full_territory_count[newRankings[b - 1]] : last_territory_count[newRankings[b]] < last_territory_count[newRankings[b - 1]]); b--) {
-			unsigned char temp = newRankings[b];
-			newRankings[b] = newRankings[b - 1];
-			newRankings[b - 1] = temp;
-		}
+		std::sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
+			if(last_territory_count[u1] == last_territory_count[u2]) return full_territory_count[u1] < full_territory_count[u2];
+			return last_territory_count[u1] < last_territory_count[u2];
+		});
 		for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
 		result = newResult;
 	}
 	std::vector<unsigned int> newRankings;
 	for(int a = 0; a < number_of_players; a++) if(result[a]) newRankings.push_back(a);
-	//Sort newRankings by full territory count.
-	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[newRankings[b]] < last_territory_count[newRankings[b - 1]]; b--) {
-		unsigned char temp = newRankings[b];
-		newRankings[b] = newRankings[b - 1];
-		newRankings[b - 1] = temp;
-	}
+	//Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
+	std::sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
+		if(last_territory_count[u1] == last_territory_count[u2]) return full_territory_count[u1] < full_territory_count[u2];
+		return last_territory_count[u1] < last_territory_count[u2];
+	});
 	for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
 	std::reverse(rankings.begin(), rankings.end()); //Best player first rather than last.
 	GameStatistics stats;
