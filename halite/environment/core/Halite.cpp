@@ -364,8 +364,8 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 		for(unsigned char a = 0; a < number_of_players; a++) if(result[a] && !newResult[a]) {
 			newRankings.push_back(a);
 		}
-		//Sort newRankings by full territory count.
-		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[b] < last_territory_count[b - 1]; b--) {
+		//Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
+		for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && (last_territory_count[newRankings[b]] == last_territory_count[newRankings[b - 1]] ? full_territory_count[newRankings[b]] < full_territory_count[newRankings[b - 1]] : last_territory_count[newRankings[b]] < last_territory_count[newRankings[b - 1]]); b--) {
 			unsigned char temp = newRankings[b];
 			newRankings[b] = newRankings[b - 1];
 			newRankings[b - 1] = temp;
@@ -376,7 +376,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 	std::vector<unsigned int> newRankings;
 	for(int a = 0; a < number_of_players; a++) if(result[a]) newRankings.push_back(a);
 	//Sort newRankings by full territory count.
-	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[b] < last_territory_count[b - 1]; b--) {
+	for(unsigned char a = 1; a < newRankings.size(); a++) for(unsigned char b = a; b > 0 && last_territory_count[newRankings[b]] < last_territory_count[newRankings[b - 1]]; b--) {
 		unsigned char temp = newRankings[b];
 		newRankings[b] = newRankings[b - 1];
 		newRankings[b - 1] = temp;
