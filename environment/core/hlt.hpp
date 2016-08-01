@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
+#include <assert.h>
 
 #define STILL 0
 #define NORTH 1
@@ -323,6 +324,25 @@ namespace hlt{
             return contents[l.y][l.x];
         }
     };
+
+    static Map ppmToMap(std::string filename, int numplayers) {
+        std::ifstream in(filename, std::ios_base::binary);
+        assert(in.is_open());
+        int width, height, max_color;
+        assert(in.get() == 'P');
+        assert(in.get() == '6');
+        in >> width >> height >> max_color;
+        assert(max_color < 256);
+        in.get(); //Get whitespace character.
+        hlt::Map m(width, height, numplayers, 0);
+        const unsigned char MAX_PROD = 15;//7 + rand() % 9;
+        for(int a = 0; a < height; a++) for(int b = 0; b < width; b++) {
+            m.contents[a][b].production = (in.get() + in.get() + in.get()) / 765.0 * MAX_PROD;
+            m.contents[a][b].strength = 15 * m.contents[a][b].production;
+        }
+        std::cout << "Loaded ppm" << std::endl;
+        return m;
+    }
 
     struct Move {
         Location loc; unsigned char dir;
