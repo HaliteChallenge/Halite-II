@@ -1,5 +1,22 @@
+var renderer;
+function initPixi() {
+	//Create the root of the scene: stage:
+	stage = new PIXI.Container();
+
+	// Initialize the pixi graphics class for the map:
+	mapGraphics = new PIXI.Graphics();
+
+	// Initialize the pixi graphics class for the graphs:
+	graphGraphics = new PIXI.Graphics();
+
+	renderer = PIXI.autoDetectRenderer(0, 0, { backgroundColor: 0x000000, antialias: true, transparent: true });
+}
+
 function showGame(game, showmovement, seconds) {
 
+	if(renderer == null) initPixi();
+
+	$("#pageContent").empty();
 	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
 		var user = getUser(null, p.name);
 		if(user) {
@@ -8,15 +25,7 @@ function showGame(game, showmovement, seconds) {
 			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
 		}
 	}).join(" vs ")+"</h3>"));
-
-	//Create the root of the scene: stage:
-	var stage = new PIXI.Container();
-
-	// Initialize the pixi graphics class for the map:
-	var mapGraphics = new PIXI.Graphics();
-
-	// Initialize the pixi graphics class for the graphs:
-	var graphGraphics = new PIXI.Graphics();
+	document.getElementById("pageContent").appendChild(renderer.view);
 
 	var frame = 0;
 	var transit = 0;
@@ -24,9 +33,10 @@ function showGame(game, showmovement, seconds) {
 	var shouldplay = true;
 	var xOffset = 0, yOffset = 0;
 
-	function resize() {
+	window.onresize = function() {
 		sw = $("#pageContent").width(), sh = sw*3/4;
 		mw = sh, mh = sh;
+		renderer.resize(sw, sh);
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw;
 		TER_TOP = sh * 0.095, TER_BTM = sh * 0.38, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.715, STR_TOP = sh * 0.765, STR_BTM = sh;
@@ -49,17 +59,11 @@ function showGame(game, showmovement, seconds) {
 		infoText.anchor = new PIXI.Point(0, 1);
 		infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
 		stage.addChild(infoText);
-		stage.addChild(mapGraphics);
-		stage.addChild(graphGraphics);
-	}	
-	resize();
-
-	var renderer = PIXI.autoDetectRenderer(sw, sh, { backgroundColor: 0x000000, antialias: true, transparent: true });
-	document.getElementById("pageContent").appendChild(renderer.view);
-	window.onresize = function() {
-		resize();
-		renderer.resize(sw, sh);
+	stage.addChild(mapGraphics);
+	stage.addChild(graphGraphics);
+		console.log(renderer.width, renderer.height);
 	}
+	window.onresize();
 
 	var manager = new PIXI.interaction.InteractionManager(renderer);
 	var mousePressed = false;
