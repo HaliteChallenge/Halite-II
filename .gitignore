@@ -326,3 +326,8 @@ airesources/C++/BasicBot
 leaderboard.png
 
 worker/[0-9]*
+
+environment/visualizer
+environment/shaders
+environment/fonts
+*.ppm
