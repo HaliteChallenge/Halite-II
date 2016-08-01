@@ -324,3 +324,5 @@ airesources/C++/MyBot
 airesources/C++/BasicBot
 
 leaderboard.png
+
+worker/[0-9]*

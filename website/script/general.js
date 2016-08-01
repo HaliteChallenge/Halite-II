@@ -81,6 +81,8 @@ $(function() {
 								messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
 							} else if(uploadOutput.indexOf("large") != -1) {
 								messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 20 megabytes. Make sure you aren't packaging unnecessary binaries.", false);
+							} else if(uploadOutput.indexOf("Compiling") != -1) {
+								messageBox.alert("Compiling", "We are compiling one of your bots. You have to wait until we have finished compiling your bot before you may submit another one.", false);
 							} else {
 								messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
 							}

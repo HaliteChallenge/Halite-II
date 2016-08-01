@@ -3,12 +3,7 @@
   */
 class MyBot(id: Int, gameMap:GameMap) extends HaliteBot(id, gameMap) {
 
-  val log = new java.io.PrintWriter("/dev/tty")
-  
   override def takeTurn(turn:BigInt, gameMap:GameMap): MoveList = {
-    log.append(s"This is a way to print debugging output")
-    log.flush()
-
     // Random moves
     val moves = new MoveList()
     for (y <- 0 to gameMap.height - 1) {
