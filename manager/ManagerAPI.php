@@ -16,8 +16,6 @@ class ManagerAPI extends API{
 		public function __construct($request, $origin) {
 				$this->initDB();
 
-				$this->sanitizeHTTPParameters();
-
 				if($this->isValidWorker() == false) {
 						echo "Not valid worker";
 						exit(1);
@@ -25,15 +23,6 @@ class ManagerAPI extends API{
 						$this->insert("UPDATE Worker SET lastRequestTime = now() WHERE apiKey = {$this->apiKey}");
 				}
 				parent::__construct($request);
-		}
-
-		private function sanitizeHTTPParameters() {
-			foreach ($_GET as $key => $value) {
-				$_GET[$key] = $this->mysqli->real_escape_string($value);
-			}
-			foreach ($_POST as $key => $value) {
-				$_POST[$key] = $this->mysqli->real_escape_string($value);
-			}
 		}
 
 		private function getAPIKey() {
@@ -237,10 +226,10 @@ class ManagerAPI extends API{
 							move_uploaded_file($file['tmp_name'], $targetPath);
 							if(is_file($targetPath) == false) {
 								return "Did not work";
-							}
+							} 
 							chmod($targetPath, 0777);
 						}
-
+						
 						// Check that we arent storing too many replay files
 						$files = glob(REPLAYS_DIR.'*.*');
 						$exclude_files = array('.', '..');
