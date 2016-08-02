@@ -27,7 +27,7 @@ class Networking {
 public:
 	void startAndConnectBot(std::string command);
 	void handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playerMillis, std::string * playerName);
-	void handleFrameNetworking(unsigned char playerTag, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves);
+	void handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves);
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();

@@ -18,7 +18,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Get the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, game_map, &player_time_allowances[a], &player_moves[a]);
+			frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, turn_number, game_map, &player_time_allowances[a], &player_moves[a]);
 			threadLocation++;
 		}
 	}
@@ -298,7 +298,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 
 	//Init player time allowances:
 	if(shouldIgnoreTimeout) time_allowance = 2147483647; //Signed int max
-	else time_allowance = 15000 + (width_ * height_ * (sqrt(width_ * height_) * 3.33333333));
+	else time_allowance = 750;//15000 + (width_ * height_ * (sqrt(width_ * height_) * 3.33333333));
 	player_time_allowances = std::vector<int>(number_of_players, time_allowance);
 
 	//Init statistics
@@ -417,24 +417,12 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 	for(auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
 		stats.timeout_log_filenames[timeoutIndex] = std::to_string(*a) + '-' + std::to_string(id) + ".log";
 		std::ofstream file(stats.timeout_log_filenames[timeoutIndex], std::ios_base::binary);
-		file << "--- Init ---\n";
-		if(networking.player_logs[*a - 1].empty()) {
-			file.flush();
-			file.close();
-			timeoutIndex++;
-			continue;
-		}
-		else file << networking.player_logs[*a - 1].front() << '\n';
-		for(int b = 1; b < networking.player_logs[*a - 1].size(); b++) {
-			file << "--- Frame #" << b << " ---\n";
-			file << networking.player_logs[*a - 1][b] << '\n';
-		}
+		file << networking.player_logs[*a - 1];
 		file.flush();
 		file.close();
 		timeoutIndex++;
 	}
 	return stats;
-
 }
 
 std::string Halite::getName(unsigned char playerTag) {
