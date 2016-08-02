@@ -68,7 +68,7 @@ def _run_cmd(cmd, working_dir, timelimit):
 	rawOut, rawErrors = process.communicate(timeout=timelimit)
 
 	outString = rawOut.decode("utf-8").strip()
-	out = outString.split("\n") if outString.isspace() == False and outString != "" else None 
+	out = outString.split("\n") if outString.isspace() == False and outString != "" else None
 
 	errorsString = rawErrors.decode("utf-8").strip()
 	errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
@@ -279,7 +279,7 @@ comp_args = {
 	# If we ever upgrade to GHC 7, we will need to add -rtsopts to this command
 	# in order for the maximum heap size RTS flag to work on the executable.
 	"Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-	"Java"		  : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT), "-Xlint:none"]],
+	"Java"		  : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
 	"Lisp"		: [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
 	"OCaml"		: [["ocamlbuild -lib unix", BOT + ".native"]],
 	"Pascal"	: [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
@@ -387,7 +387,7 @@ languages = (
 	Language("Java", BOT +".java", "MyBot.java",
 		"java MyBot",
 		["*.class", "*.jar"],
-		[(["*.java"], ExternalCompiler(comp_args["Java"][0]))]
+		[(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:"))]
 	),
 	Language("Javascript", BOT +".js", "MyBot.js",
 		"node MyBot.js",
@@ -447,10 +447,10 @@ languages = (
 		[],
 		[(["*.rb"], ChmodCompiler("Ruby"))]
 	),
-		Language("Rust", "target/release/"+BOT, "Cargo.toml",
+	Language("Rust", "target/release/"+BOT, "Cargo.toml",
 		"target/release/MyBot",
 		[],
-		[([""], ExternalCompiler(comp_args["Rust"][0]))]
+		[([""], ErrorFilterCompiler(comp_args["Rust"][0], filter_stderr="warning:"))]
 	),
 	Language("Scala", BOT +".scala", "MyBot.scala",
 		'scala -J-Xmx'+ str(MEMORY_LIMIT) +'m -howtorun:object MyBot',
