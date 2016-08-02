@@ -32,7 +32,7 @@ public:
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
 
-	std::vector< std::string> player_logs;
+	std::vector<std::string> player_logs;
 
 private:
 #ifdef _WIN32
