@@ -68,7 +68,7 @@ def _run_cmd(cmd, working_dir, timelimit):
 	rawOut, rawErrors = process.communicate(timeout=timelimit)
 
 	outString = rawOut.decode("utf-8").strip()
-	out = outString.split("\n") if outString.isspace() == False and outString != "" else None 
+	out = outString.split("\n") if outString.isspace() == False and outString != "" else None
 
 	errorsString = rawErrors.decode("utf-8").strip()
 	errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
@@ -447,10 +447,10 @@ languages = (
 		[],
 		[(["*.rb"], ChmodCompiler("Ruby"))]
 	),
-		Language("Rust", "target/release/"+BOT, "Cargo.toml",
+	Language("Rust", "target/release/"+BOT, "Cargo.toml",
 		"target/release/MyBot",
 		[],
-		[([""], ExternalCompiler(comp_args["Rust"][0]))]
+		[([""], ErrorFilterCompiler(comp_args["Rust"][0], filter_stder="warning:"))]
 	),
 	Language("Scala", BOT +".scala", "MyBot.scala",
 		'scala -J-Xmx'+ str(MEMORY_LIMIT) +'m -howtorun:object MyBot',
