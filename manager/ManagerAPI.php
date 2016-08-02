@@ -124,13 +124,15 @@ class ManagerAPI extends API{
 						$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
 						$users = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand()");
-						$seedPlayer = NULL;
-						$oldestGameTime = time();
-						foreach($users as $user) {
-							$latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
-							if($latestGameTime < $oldestGameTime) {
-								$seedPlayer = $user;
-								$oldestGameTime = $latestGameTime;
+						$seedPlayer = $this->select("select * from User where status=3 and (select COUNT(*) from GameUser where userID=User.userID) < 10 ORDER BY rand() LIMIT 1");
+						if(count($seedPlayer) < 1) {
+							$oldestGameTime = time();
+							foreach($users as $user) {
+								$latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
+								if($latestGameTime < $oldestGameTime) {
+									$seedPlayer = $user;
+									$oldestGameTime = $latestGameTime;
+								}
 							}
 						}
 						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
