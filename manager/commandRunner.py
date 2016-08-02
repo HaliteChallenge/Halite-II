@@ -1,11 +1,12 @@
 import configparser
+import sys
 import os
 
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
 WORKERS = dict(parser.items("workerIPs"))
 
-command = "pkill screen; cd Halite/worker; git pull; ls; docker stop $(docker ps -aq); docker rm $(docker ps -aq); screen -dmS test bash -c \"cd /root/Halite/worker; python3 worker.py\""
+command = sys.argv[1]
 print(command)
 for name in WORKERS:
     print("########"+name+"########")
