@@ -15,14 +15,14 @@
 			<div class="col-sm-12">
 				<h1>Halite Downloads</h1>
 
-				<h3>Environment and Visualizer</h3>
+				<h3>Halite Environment</h3>
 				<p>
-					This set of binaries was uploaded at <b>11:20am EST on July 28th</b>. We changed the timeout format to be a little quicker and fairer. The number of milliseconds bots are allowed is given by the formula <code>15000 + WIDTH * HEIGHT * MAX_NUM_TURNS / 3</code>. We also added error logging - if a bot times out, it will output an error log for the game with the player tag of the bot and id of the game in the filename (use -q to get the filename for certain from the environment). There are also a bunch of small bugfixes for the environment.
+					This set of binaries was uploaded at <b>10:55am EST on August 2nd</b>. We discontinued the desktop visualizer (see below), so consequently the environment executable is the only file in this download.
 				<p>
 					<ul>
-						<li><a href="downloads/Halite-Mac.zip">Mac</a></li>
-						<li><a href="downloads/Halite-Debian.zip">Ubuntu (64 bit)</a></li>
-						<li><a href="downloads/Halite-Windows.zip">Windows</a></li>
+						<li><a href="downloads/HaliteEnvironment-Mac">Mac</a></li>
+						<li><a href="downloads/HaliteEnvironment-Debian">Ubuntu (64 bit)</a></li>
+						<li><a href="downloads/HaliteEnvironment-Windows.exe">Windows</a></li>
 					</ul>
 				</p>
 
@@ -37,6 +37,18 @@
 						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
 						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
 						<li><a href="downloads/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
+					</ul>
+				</p>
+
+				<h3>Desktop Visualizer [DISCONTINUED]</h3>
+				<p>
+					This is the legacy desktop visualizer. We recommend preferential use of the web visualizer, but until an alternative desktop visualizer is available we will continue to offer this for download. These binaries are no longer supported and are unlikely to be updated.
+				</p>
+				<p>
+					<ul>
+						<li><a href="downloads/HaliteDesktopVis-Mac.zip">Mac</a></li>
+						<li><a href="downloads/HaliteDesktopVis-Debian.zip">Ubuntu (64 bit)</a></li>
+						<li><a href="downloads/HaliteDesktopVis-Windows.zip">Windows</a></li>
 					</ul>
 				</p>
 			</div>
