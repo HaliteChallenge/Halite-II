@@ -148,7 +148,7 @@ class WebsiteAPI extends API{
 				return "Success";
 			}
 			return "Fail";
-		} else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
+		} /*else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = htmlspecialchars($_POST["username"]);
 			$email = $_POST["email"];
 			$password = $this->encryptPassword($_POST["password"]);
@@ -194,7 +194,7 @@ class WebsiteAPI extends API{
 			}
 
 			return "Success";
-		}
+		}*/
 	}
 
 	protected function extraStats() {
@@ -255,9 +255,15 @@ class WebsiteAPI extends API{
 			if(count($user) == 0 || $user['isVerified'] == false) {
 				return "Unverified email";
 			}
+
 			
 			if($user['status'] == 1 || $user['status'] == 2) {
 				return "Compiling";
+			}
+			
+			if(intval($user["status"]) != 3) {
+				return "No new registrants";
+
 			}
 
 			if ($_FILES["botFile"]["size"] > 20000000) {

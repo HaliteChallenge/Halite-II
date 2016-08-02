@@ -47,12 +47,13 @@ $(function() {
 		$logInPassword: $("#login_pass"),
 		$logInButton: $("#login_button"),
 		$logInForm: $("#login_form"),
-		$registerUsername: $("#register_user"),
+		/*$registerUsername: $("#register_user"),
 		$registerEmail: $("#register_email"),
 		$registerPassword: $("#register_pass"),
 		$registerConfirmPassword: $("#register_confirm_pass"),
 		$registerButton: $("#register_button"),
 		$registerForm: $("#register_form"),
+		*/
 		$logInNav: $("#loginNav"),
 		$logOutNav: $("#logoutNav"),
 		$logOutButton: $("#logoutButton"),
@@ -96,7 +97,7 @@ $(function() {
 
 		init: function(session) {
 			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
-			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
+			//new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
 
 			this.uploadButton.init();
 			this.$logOutButton.click(this.logOut.bind(this));
