@@ -461,10 +461,16 @@ class WebsiteAPI extends API{
 	protected function session() {
 		session_set_cookie_params(7*24*3600);
 		session_start();
+
+		// Get the logged in user's info
 		if($this->method == 'GET') {
 			if(count($_SESSION) > 0) return $_SESSION;
 			else return NULL;
-		} else if(isset($_POST['username']) & isset($_POST['password'])) {
+		} 
+		
+		// Login a new user with a username and a password 
+		// TODO: take this out, functionality can be achieved by asking for its userID
+		else if(isset($_POST['username']) & isset($_POST['password'])) {
 			$username = $_POST['username'];
 			$password = $this->encryptPassword($_POST['password']);
 
@@ -474,7 +480,10 @@ class WebsiteAPI extends API{
 			}
 			$_SESSION = $user;
 			return "Success";
-		} else if(isset($_POST['userID']) & isset($_POST['password'])) {
+		} 
+		
+		// Login a new user with a userID and a password
+		else if(isset($_POST['userID']) & isset($_POST['password'])) {
 			$userID = $_POST['userID'];
 			$password = $this->encryptPassword($_POST['password']);
 
@@ -484,7 +493,10 @@ class WebsiteAPI extends API{
 			}
 			$_SESSION = $user;
 			return "Success";
-		} else if($this->method == 'DELETE') {
+		} 
+		
+		// Log out a user
+		else if($this->method == 'DELETE') {
 			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
 				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
 					$this->logOutForums($this->getForumsID($_SESSION['userID']));
