@@ -329,3 +329,6 @@ worker/[0-9]*
 environment/visualizer
 environment/shaders
 environment/fonts
+
+HaliteEnvironment-Mac
+HaliteEnvironment-Debian
