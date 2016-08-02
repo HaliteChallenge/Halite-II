@@ -279,7 +279,7 @@ comp_args = {
 	# If we ever upgrade to GHC 7, we will need to add -rtsopts to this command
 	# in order for the maximum heap size RTS flag to work on the executable.
 	"Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-	"Java"		  : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT), "-Xlint:none"]],
+	"Java"		  : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
 	"Lisp"		: [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
 	"OCaml"		: [["ocamlbuild -lib unix", BOT + ".native"]],
 	"Pascal"	: [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
@@ -387,7 +387,7 @@ languages = (
 	Language("Java", BOT +".java", "MyBot.java",
 		"java MyBot",
 		["*.class", "*.jar"],
-		[(["*.java"], ExternalCompiler(comp_args["Java"][0]))]
+		[(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:"))]
 	),
 	Language("Javascript", BOT +".js", "MyBot.js",
 		"node MyBot.js",
