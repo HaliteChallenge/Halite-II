@@ -26,7 +26,13 @@ class WebsiteAPI extends API{
 
 		parent::__construct($request);
 	}
-
+	
+	/* Apply MYSQL sanitization to all incoming parameters
+	 * 
+	 * TODO: take this out, switch to just sanitizing when necessary
+	 * Sanitizing everything breaks json parsing of params
+	 * Also, bad practice
+	 */
 	private function sanitizeHTTPParameters() {
 		foreach ($_GET as $key => $value) {
 			$_GET[$key] = $this->mysqli->real_escape_string($value);
@@ -35,7 +41,8 @@ class WebsiteAPI extends API{
 			$_POST[$key] = $this->mysqli->real_escape_string($value);
 		}
 	}
-
+	
+	// Encript our password as a salted hash
 	private function encryptPassword($password) {
 		return $this->mysqli->real_escape_string(crypt($password, $this->config['encrypt']['salt']));
 	}
@@ -52,13 +59,15 @@ class WebsiteAPI extends API{
 			exit();
 		}
 	}
-
+	
+	// Gets the id of one of our users in the discourse forums system
 	private function getForumsID($userID) {
 		$url = "http://forums.halite.io/users/by-external/{$userID}.json/?".http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']));
 		$contents = file_get_contents($url);
 		return intval(json_decode($contents, true)['user']['id']);
 	}
-
+	
+	// Log a users out of forums.halite.io
 	private function logOutForums($forumsID) {
 		$options = array('http' => array(
 			'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -67,7 +76,8 @@ class WebsiteAPI extends API{
 		));
 		file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
 	}
-
+	
+	// Returns true if an ip is in one of the specified cdir blocks
 	private function testUserIP($user_ip, $cidrs) {
 		$ipu = explode('.', $user_ip);
 		foreach ($ipu as &$v)
@@ -85,12 +95,14 @@ class WebsiteAPI extends API{
 		}
 		return $res;
 	}
-
+	
+	// Select one element from our MySQL db
 	private function select($sql) {
 		$res = mysqli_query($this->mysqli, $sql);
 		return mysqli_fetch_array($res, MYSQLI_ASSOC);
 	}
-
+	
+	// Select all available elements from our MySQL db
 	private function selectMultiple($sql) {
 		$res = mysqli_query($this->mysqli, $sql);
 		$finalArray = array();
@@ -101,14 +113,25 @@ class WebsiteAPI extends API{
 
 		return $finalArray;
 	}
-
+	
+	// Perform a non-select (insert, update, delete) query
+	// TODO: insert is a terrible name for this method
 	private function insert($sql) {
 		mysqli_query($this->mysqli, $sql);
 	}
 
-	// API ENDPOINTS
+	//------------------------------------- API ENDPOINTS ----------------------------------------\\
 	// Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
+	// -------------------------------------------------------------------------------------------\\
+
+	/* User Endpoint
+	 *
+	 * Encapsulates user information.
+	 * Hides a user's hashed password, email, and verificationCode,
+	 * if no authentication is provided.
+	 */	
 	protected function user() {
+		// Get a user's info with a username		
 		if(isset($_GET["username"])) {
 			if(isset($_GET["password"])) {
 				$password = $this->encryptPassword($_GET['password']);
@@ -120,7 +143,10 @@ class WebsiteAPI extends API{
 				unset($fields["verificationCode"]);
 				return $fields;
 			}
-		} else if (isset($_GET["userID"])) {
+		} 
+		
+		// Get a user's info with a userID
+		else if (isset($_GET["userID"])) {
 			if(isset($_GET["password"])) {
 				$password = $this->encryptPassword($_GET['password']);
 				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$password}'");
@@ -131,7 +157,10 @@ class WebsiteAPI extends API{
 				unset($fields["verificationCode"]);
 				return $fields;
 			}
-		} else if(isset($_GET['active'])) {
+		} 
+		
+		// Get all of the user's with active submissions
+		else if(isset($_GET['active'])) {
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 			foreach(array_keys($results) as $key) {
 				unset($results[$key]["password"]);
@@ -139,7 +168,10 @@ class WebsiteAPI extends API{
 				unset($results[$key]["verificationCode"]);
 			}
 			return $results;
-		} else if(isset($_GET['numActive'])) {
+		} 
+
+		// Get the number of active users
+		else if(isset($_GET['numActive'])) {
 			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
 		} else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
@@ -197,18 +229,38 @@ class WebsiteAPI extends API{
 		}*/
 	}
 
+	/* User Extra Stats Endpoint
+	 *
+	 * We store a number of agreggated stats about each bot.
+	 * These are currently not stored in the User table.
+	 * The original rationale was that putting all of these stats in the User table would make it too latent;
+	 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
+	 * It would be much nicer to decouple 'bot' information from 'user' information.
+	 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
+	 */
 	protected function extraStats() {
+		// Returns a user's extra stats
 		if(isset($_GET["userID"])) {
 			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
 		}
 	}
 
+	/* User History Endpoint
+	 *
+	 * We store the a history of user's bot submissions.
+	 * This mitigates the 'stealth' submission problem, 
+	 * where users submit a bot, wait for their rank to stabilize, and take it down for the sake of secrecy.
+	 */
 	protected function history() {
 		if(isset($_GET["userID"])) {
 			return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]} ORDER BY versionNumber DESC");
 		}
 	}
 
+	/* Game Endpoint
+	 *
+	 * Games are continuously run on our servers and exposed on our website
+	 */
 	protected function game() {
 		if(isset($_GET['userID'])) {
 			$limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
@@ -241,8 +293,13 @@ class WebsiteAPI extends API{
 
 		}
 	}
-
+	
+	/* Bot File Endpoint
+	 *
+	 * Handles the user's submission of a new bot
+	 */
 	protected function botFile() {
+		// Mark a new botfile for compilation if valid. Return error otherwise 
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
 			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
 				return "Cannot submit on Two Sigma desktop";
@@ -293,8 +350,13 @@ class WebsiteAPI extends API{
 			return "Success";
 		}
 	}
-
+	
+	/* Forums Endpoint
+	 *
+	 * Handle the Discourse forums (forums.halite.io) single sign on authentication.
+	 */
 	protected function forums() {
+		// Follows the Discource sso detailed here: https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
 		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
 			$initialBase64Payload = stripcslashes($_GET['payload']);
 			$signature = $_GET['signature'];
@@ -327,16 +389,32 @@ class WebsiteAPI extends API{
 			return $finalURL;
 		}
 	}
-
+	
+	/* Worker Endpoint
+	 *
+	 * Bots are compiled and run in games by a decentralized network of 'worker' servers.
+	 * A few stats about each worker are recorded by our 'manager' server.
+	 * These stats are exposed on our status page.
+	 */
 	protected function worker() {
 		$workers = $this->selectMultiple("SELECT * FROM Worker ORDER BY apiKey");
 		return $workers;
 	}
-
+	
+	/* Announcement Endpoint
+	 *
+	 * Annoucements are used as 'news blasts' without requiring email.
+	 * An alert with the annoucement's body and header is showed to users.
+	 * Once it has been closed, it is never shown to that user again
+	 */
 	protected function announcement() {
+		// Get the newest annoucement available to a user
 		if(isset($_GET['userID'])) {
 			return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = {$_GET['userID']} and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
-		} else if(isset($_POST['announcementID']) && isset($_POST['userID']) && isset($_POST['password'])) {
+		} 
+		
+		// Mark an annoucement as closed	
+		else if(isset($_POST['announcementID']) && isset($_POST['userID']) && isset($_POST['password'])) {
 			$announcementID = $_POST['announcementID'];
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
@@ -348,9 +426,17 @@ class WebsiteAPI extends API{
 			return "Fail";
 		}
 	}
-
+	
+	/* Error Log Endpoint
+	 *
+	 * When a users times-out or errors during a game of Halite on our server,
+	 * we store their stdout and stderr output and make it available to them.
+	 * Users may only see **their** error logs.
+	 */
 	protected function errorLog() {
 		session_start();
+
+		// Return the requested error log only if it belongs to the signed in user.
 		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
 			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
 			if(file_exists($targetPath) == false) {
@@ -367,7 +453,11 @@ class WebsiteAPI extends API{
 			die();
 		}
 	}
-
+	
+	/* Session Endpoint
+	 *
+	 * Encapsulates the logged in user's info
+	 */
 	protected function session() {
 		session_set_cookie_params(7*24*3600);
 		session_start();
