@@ -450,7 +450,7 @@ languages = (
 	Language("Rust", "target/release/"+BOT, "Cargo.toml",
 		"target/release/MyBot",
 		[],
-		[([""], ErrorFilterCompiler(comp_args["Rust"][0], filter_stder="warning:"))]
+		[([""], ErrorFilterCompiler(comp_args["Rust"][0], filter_stderr="warning:"))]
 	),
 	Language("Scala", BOT +".scala", "MyBot.scala",
 		'scala -J-Xmx'+ str(MEMORY_LIMIT) +'m -howtorun:object MyBot',
