@@ -199,7 +199,8 @@ class WebsiteAPI extends API{
 			return "Fail";
 		} 
 		
-		/*else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
+		// Register a new halite account. Send the verification email
+		else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = htmlspecialchars($_POST["username"]);
 			$email = $_POST["email"];
 			$password = $this->encryptPassword($_POST["password"]);
@@ -245,7 +246,7 @@ class WebsiteAPI extends API{
 			}
 
 			return "Success";
-		}*/
+		}
 	}
 
 	/* User History Endpoint
