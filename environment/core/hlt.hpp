@@ -56,7 +56,7 @@ namespace hlt{
             std::uniform_real_distribution<double> urd(0.0, 1.0);
 
             //Decides whether to put more players along the horizontal or the vertical.
-            bool preferHorizontal = true;// prg() % 2;
+            bool preferHorizontal = prg() % 2;
 
             int dw, dh;
             //Find number closest to square that makes the match symmetric.
