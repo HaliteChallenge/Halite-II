@@ -56,7 +56,7 @@ namespace hlt{
             std::uniform_real_distribution<double> urd(0.0, 1.0);
 
             //Decides whether to put more players along the horizontal or the vertical.
-            bool preferHorizontal = true;// prg() % 2;
+            bool preferHorizontal = prg() % 2;
 
             int dw, dh;
             //Find number closest to square that makes the match symmetric.
@@ -342,13 +342,5 @@ namespace hlt{
         }
         std::cout << "Loaded ppm" << std::endl;
         return m;
-    }
-
-    struct Move {
-        Location loc; unsigned char dir;
-    };
-    static bool operator<(const Move& m1, const Move& m2) {
-        unsigned int l1Prod = ((m1.loc.x + m1.loc.y)*((unsigned int)m1.loc.x + m1.loc.y + 1) / 2) + m1.loc.y, l2Prod = ((m2.loc.x + m2.loc.y)*((unsigned int)m2.loc.x + m2.loc.y + 1) / 2) + m2.loc.y;
-        return ((l1Prod + m1.dir)*(l1Prod + m1.dir + 1) / 2) + m1.dir < ((l2Prod + m2.dir)*(l2Prod + m2.dir + 1) / 2) + m2.dir;
     }
 }

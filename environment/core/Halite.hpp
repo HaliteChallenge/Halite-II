@@ -54,7 +54,7 @@ private:
 	unsigned short number_of_players;
 	hlt::Map game_map;
 	std::vector<std::string> player_names;
-	std::vector< std::set<hlt::Move> > player_moves;
+	std::vector< std::map<hlt::Location, unsigned char> > player_moves;
 	int time_allowance;
 	std::vector<int> player_time_allowances;
 

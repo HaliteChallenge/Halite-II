@@ -18,7 +18,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Get the messages sent by bots this frame
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		if(alive[a]) {
-			frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, game_map, &player_time_allowances[a], &player_moves[a]);
+			frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, turn_number, game_map, &player_time_allowances[a], &player_moves[a]);
 			threadLocation++;
 		}
 	}
@@ -42,38 +42,38 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) {
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.inBounds(b->loc) && game_map.getSite(b->loc, STILL).owner == a + 1) {
-			if(b->dir == STILL) {
-				if(game_map.getSite(b->loc, STILL).strength + game_map.getSite(b->loc, STILL).production <= 255) game_map.getSite(b->loc, STILL).strength += game_map.getSite(b->loc, STILL).production;
-				else game_map.getSite(b->loc, STILL).strength = 255;
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.inBounds(b->first) && game_map.getSite(b->first, STILL).owner == a + 1) {
+			if(b->second == STILL) {
+				if(game_map.getSite(b->first, STILL).strength + game_map.getSite(b->first, STILL).production <= 255) game_map.getSite(b->first, STILL).strength += game_map.getSite(b->first, STILL).production;
+				else game_map.getSite(b->first, STILL).strength = 255;
 				//Update full still count
 				full_still_count[a]++;
 				//Add to full production
-				full_production_count[a] += game_map.getSite(b->loc, STILL).production;
+				full_production_count[a] += game_map.getSite(b->first, STILL).production;
 			}
 			//Update full caridnal count.
 			else full_cardinal_count[a]++;
 
 			//Update moves
-			moveDirections[b->loc.y][b->loc.x] = b->dir;
+			moveDirections[b->first.y][b->first.x] = b->second;
 
-			hlt::Location newLoc = game_map.getLocation(b->loc, b->dir);
+			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
-				if(short(pieces[a][newLoc]) + game_map.getSite(b->loc, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->loc, STILL).strength;
+				if(short(pieces[a][newLoc]) + game_map.getSite(b->first, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->first, STILL).strength;
 				else pieces[a][newLoc] = 255;
 			}
 			else {
-				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->loc, STILL).strength));
+				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->first, STILL).strength));
 			}
 
 			//Add in a new piece with a strength of 0 if necessary.
-			if(!pieces[a].count(b->loc)) {
-				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->loc, 0));
+			if(!pieces[a].count(b->first)) {
+				pieces[a].insert(std::pair<hlt::Location, unsigned char>(b->first, 0));
 			}
 
 			//Erase from the game map so that the player can't make another move with the same piece.
-			game_map.getSite(b->loc, STILL).owner = 0;
-			game_map.getSite(b->loc, STILL).strength = 0;
+			game_map.getSite(b->first, STILL).owner = 0;
+			game_map.getSite(b->first, STILL).strength = 0;
 		}
 	}
 
@@ -263,7 +263,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	}
 
 	//Default initialize
-	player_moves = std::vector< std::set<hlt::Move> >();
+	player_moves = std::vector< std::map<hlt::Location, unsigned char> >();
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
 
@@ -417,24 +417,12 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 	for(auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
 		stats.timeout_log_filenames[timeoutIndex] = std::to_string(*a) + '-' + std::to_string(id) + ".log";
 		std::ofstream file(stats.timeout_log_filenames[timeoutIndex], std::ios_base::binary);
-		file << "--- Init ---\n";
-		if(networking.player_logs[*a - 1].empty()) {
-			file.flush();
-			file.close();
-			timeoutIndex++;
-			continue;
-		}
-		else file << networking.player_logs[*a - 1].front() << '\n';
-		for(int b = 1; b < networking.player_logs[*a - 1].size(); b++) {
-			file << "--- Frame #" << b << " ---\n";
-			file << networking.player_logs[*a - 1][b] << '\n';
-		}
+		file << networking.player_logs[*a - 1];
 		file.flush();
 		file.close();
 		timeoutIndex++;
 	}
 	return stats;
-
 }
 
 std::string Halite::getName(unsigned char playerTag) {
