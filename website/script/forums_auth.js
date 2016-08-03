@@ -1,15 +1,15 @@
 $(function() {
-  var logInForm = {
-    $logInForm: $("#login_form"),
-    $logInUsername: $("#login_user"),
+	var logInForm = {
+		$logInForm: $("#login_form"),
+		$logInUsername: $("#login_user"),
 		$logInPassword: $("#login_pass"),
 		$logInButton: $("#login_button"),
-    user: null,
-    init: function(onLogin) {
-      this.onLogin = onLogin;
-      new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
-    },
-    logIn: function() {
+		user: null,
+		init: function(onLogin) {
+			this.onLogin = onLogin;
+			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
+		},
+		logIn: function() {
 			messageBox.clear();
 
 			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
@@ -22,30 +22,29 @@ $(function() {
 				this.loggedIn = true;
 				this.user = user;
 
-        this.onLogin();
+				this.onLogin();
 			}
 		}
-  };
+	};
 
-  function handleForumsSignIn(payload, signature, user) {
-    messageBox.alert("Redirecting you", "You have sucessfully logged into halite.io and forums.halite.io. We are redirecting you to the forums right now.", true);
-    var url = getForumSignInURL(payload, signature, user.userID, user.email, user.username);
-    console.log(url);
-    if(url == null || url == undefined) {
-      messageBox.alert("Forums Login Failed", "An error occured while trying to log you into forums.halite.io", false);
-    } else {
-      window.location.href = url;
-    }
-  }
+	function handleForumsSignIn(payload, signature, user) {
+		messageBox.alert("Redirecting you", "You have sucessfully logged into halite.io and forums.halite.io. We are redirecting you to the forums right now.", true);
+		var url = getForumSignInURL(payload, signature, user.userID, user.email, user.username);
+		console.log(url);
+		if(url == null || url == undefined) {
+			messageBox.alert("Forums Login Failed", "An error occured while trying to log you into forums.halite.io", false);
+		} else {
+			window.location.href = url;
+		}
+	}
 
-  var payload = getGET("sso");
-  var signature = getGET("sig");
-  console.log(payload)
-  var session = getSession();
-  logInForm.init(function() {
-    handleForumsSignIn(payload, signature, logInForm.user);
-  });
-  if(session != null) {
-    handleForumsSignIn(payload, signature, session);
-  }
+	var payload = getGET("sso");
+	var signature = getGET("sig");
+	var session = getSession();
+	logInForm.init(function() {
+		handleForumsSignIn(payload, signature, logInForm.user);
+	});
+	if(session != null) {
+		handleForumsSignIn(payload, signature, session);
+	}
 })
