@@ -324,11 +324,6 @@ class WebsiteAPI extends API{
 				return "Compiling";
 			}
 			
-			if(intval($user["status"]) != 3) {
-				return "No new registrants";
-
-			}
-
 			if ($_FILES["botFile"]["size"] > 20000000) {
 				return "Sorry, your file is too large.";
 			}
