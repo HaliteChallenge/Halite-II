@@ -14,7 +14,9 @@
 #define SOUTH 3
 #define WEST 4
 
-struct Color{
+extern bool quiet_output;
+
+struct Color {
     float r, g, b;
 };
 
@@ -319,7 +321,7 @@ namespace hlt{
             }
             return l;
         }
-        Site& getSite(Location l, unsigned char direction) {
+        Site& getSite(Location l, unsigned char direction = STILL) {
             l = getLocation(l, direction);
             return contents[l.y][l.x];
         }
@@ -334,13 +336,21 @@ namespace hlt{
         in >> width >> height >> max_color;
         assert(max_color < 256);
         in.get(); //Get whitespace character.
-        hlt::Map m(width, height, numplayers, 0);
+        Map m;
+        m.map_width = width;
+        m.map_height = height;
+        m.contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
         const unsigned char MAX_PROD = 15;//7 + rand() % 9;
-        for(int a = 0; a < height; a++) for(int b = 0; b < width; b++) {
+        int counter = 1;
+        for(int a = 0; a < m.map_height; a++) for(int b = 0; b < m.map_width; b++) {
+            if(a == height / 2 && (b % (width / numplayers + 1) == 0)) {
+                m.contents[a][b].owner = counter;
+                counter++;
+            }
             m.contents[a][b].production = (in.get() + in.get() + in.get()) / 765.0 * MAX_PROD;
             m.contents[a][b].strength = 15 * m.contents[a][b].production;
         }
-        std::cout << "Loaded ppm" << std::endl;
+        if(!quiet_output) std::cout << "Loaded ppm" << std::endl;
         return m;
     }
 }
