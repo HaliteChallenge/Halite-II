@@ -27,7 +27,7 @@ $(function() {
 			} else {
 				this.$panel.css("display", "block");	
 				this.$tableBody.empty();
-				for(var a = 0; a < Math.min(4, this.histories.length); a++) {
+				for(var a = 0; a < Math.min(5, this.histories.length); a++) {
 					this.$tableBody.append(this.getTableRow(this.histories[a]));
 				}
 			}
