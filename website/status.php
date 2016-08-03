@@ -18,11 +18,20 @@
 		<div class="pageContent">
 			<div class="jumbotron" id="jumbotron">
 				<h1 id="jHeader">Halite Status</h1>
-				<p id="jParagraph">A Two Sigma programming competition</p>
 			</div>
 
 			<div class="row">
 				<div class="col-sm-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">General Stats</h3>
+						</div>
+
+						<table class="table well well-sm" id="statTable">
+							<tbody id="statTableBody">
+							</tbody>
+						</table>
+					</div>
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<h3 class="panel-title">Worker Servers</h3>

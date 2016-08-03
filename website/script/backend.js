@@ -130,7 +130,7 @@ function verifyUser(userID, verificationCode) {
 
 function getNumActiveUsers() {
 	return $.ajax({
-		url: url+"user",
+		url: url+"stats",
 		async: false,
 		method: "GET",
 		data: {numActive: 1}
@@ -210,4 +210,22 @@ function getHistories(userID) {
 	});
 	console.log(response)
 	return response.responseJSON;
+}
+
+function getThroughput() {
+	return $.ajax({
+		url: url+"stats",
+		async: false,
+		method: "GET",
+		data: {throughput: 1}
+	}).responseJSON;
+}
+
+function getNumSubmissions() {
+	return $.ajax({
+		url: url+"stats",
+		async: false,
+		method: "GET",
+		data: {numSubmissions: 1}
+	}).responseJSON;
 }

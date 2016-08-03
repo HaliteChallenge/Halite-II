@@ -186,11 +186,6 @@ class WebsiteAPI extends API{
 			return $results;
 		} 
 
-		// Get the number of active users
-		else if(isset($_GET['numActive'])) {
-			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
-		} 
-
 		// Verify an email
 		else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
@@ -402,6 +397,27 @@ class WebsiteAPI extends API{
 		return $workers;
 	}
 	
+	/* Stats endpoint
+	 *
+	 * Provides a number of statistics about the competition,
+	 * which would be expensive or impossible to determine using our generic endpoints.
+	 */ 
+	protected function stats() {
+		if(isset($_GET['throughput'])) {
+			return mysqli_query($this->mysqli, "SELECT * FROM Game WHERE TIMESTAMPDIFF(DAY, timestamp, NOW()) < 1")->num_rows;
+		}
+
+		// Get the number of active users
+		else if(isset($_GET['numSubmissions'])) {
+			return $this->select("SELECT SUM(numSubmissions) FROM User")["SUM(numSubmissions)"];
+		}
+
+		// Get the number of active users
+		else if(isset($_GET['numActive'])) {
+			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
+		} 
+	}
+
 	/* Announcement Endpoint
 	 *
 	 * Annoucements are used as 'news blasts' without requiring email.
