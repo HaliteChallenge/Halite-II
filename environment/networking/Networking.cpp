@@ -64,13 +64,13 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 	return returnString;
 }
 
-std::set<hlt::Move> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
-	std::set<hlt::Move> moves = std::set<hlt::Move>();
+std::map<hlt::Location, unsigned char> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
+	std::map<hlt::Location, unsigned char> moves = std::map<hlt::Location, unsigned char>();
 
 	std::stringstream iss(inputString);
 	hlt::Location l;
 	int d;
-	while (iss >> l.x >> l.y >> d && m.inBounds(l)) moves.insert({ l, (unsigned char)d });
+	while (iss >> l.x >> l.y >> d && m.inBounds(l)) moves[l] = d;
 
 	return moves;
 }
@@ -329,7 +329,7 @@ void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & 
 	}
 }
 
-void Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves) {
+void Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, int * playermillis, std::map<hlt::Location, unsigned char> * moves) {
 	std::string response;
 	try{
 		if(isProcessDead(playerTag)) return;
@@ -355,13 +355,13 @@ void Networking::handleFrameNetworking(unsigned char playerTag, const unsigned s
 	catch(std::string s) {
 		if(s.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
 		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + s;
-		*moves = std::set<hlt::Move>();
+		*moves = std::map<hlt::Location, unsigned char>();
 		*playermillis = -1;
 	}
 	catch(...) {
 		if(response.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
 		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + response;
-		*moves = std::set<hlt::Move>();
+		*moves = std::map<hlt::Location, unsigned char>();
 		*playermillis = -1;
 	}
 

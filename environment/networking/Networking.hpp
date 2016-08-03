@@ -2,7 +2,7 @@
 #define NETWORKING_H
 
 #include <iostream>
-#include <set>
+#include <map>
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -27,7 +27,7 @@ class Networking {
 public:
 	void startAndConnectBot(std::string command);
 	void handleInitNetworking(unsigned char playerTag, const hlt::Map & m, int * playerMillis, std::string * playerName);
-	void handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, int * playermillis, std::set<hlt::Move> * moves);
+	void handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, int * playermillis, std::map<hlt::Location, unsigned char> * moves);
 	void killPlayer(unsigned char playerTag);
 	bool isProcessDead(unsigned char playerTag);
 	int numberOfPlayers();
@@ -50,7 +50,7 @@ private:
 #endif
 
 	std::string serializeMap(const hlt::Map & map);
-	std::set<hlt::Move> deserializeMoveSet(std::string & inputString, const hlt::Map & m);
+	std::map<hlt::Location, unsigned char> deserializeMoveSet(std::string & inputString, const hlt::Map & m);
 
 	void sendString(unsigned char playerTag, std::string &sendString);
 	std::string getString(unsigned char playerTag, unsigned int timoutMillis);
