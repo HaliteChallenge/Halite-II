@@ -67,6 +67,16 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 std::map<hlt::Location, unsigned char> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
 	std::map<hlt::Location, unsigned char> moves = std::map<hlt::Location, unsigned char>();
 
+	if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return (c < '0' || c > '9') && c != ' '; }) != inputString.end()) {
+		if(!quiet_output) {
+			std::string errorMessage = "Bot sent an invalid character - ejecting from game.\n";
+
+			std::lock_guard<std::mutex> guard(coutMutex);
+			std::cout << errorMessage;
+		}
+		throw inputString;
+	}
+
 	std::stringstream iss(inputString);
 	hlt::Location l;
 	int d;
@@ -164,7 +174,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 				//Buffer error message output
 				//If a bunch of bots fail at onces, we dont want to be writing to cout at the same time
 				//That looks really weird
-				std::string errorMessage = "Unix bot timeout or error " + std::to_string(selectionResult) + '\n';
+				std::string errorMessage = "Bot #" + std::to_string(playerTag) + " timeout or error (Unix)" + std::to_string(selectionResult) + '\n';
 
 				std::lock_guard<std::mutex> guard(coutMutex);
 				std::cout << errorMessage;
@@ -174,7 +184,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 	}
 #endif
 	//Python turns \n into \r\n
-	if(newString.at(newString.size() - 1) == '\r') newString.pop_back();
+	if(newString.back() == '\r') newString.pop_back();
 
 	return newString;
 }
@@ -316,14 +326,14 @@ void Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & 
 		*playermillis -= millisTaken;
 	}
 	catch(std::string s) {
-		if(s.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
-		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + s;
+		if(s.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+		else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + s;
 		*playerName = "Bot #" + std::to_string(playerTag) + "; timed out during Init";
 		*playermillis = -1;
 	}
 	catch(...) {
-		if(response.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
-		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + response;
+		if(response.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+		else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + response;
 		*playerName = "Bot #" + std::to_string(playerTag) + "; timed out during Init";
 		*playermillis = -1;
 	}
@@ -353,14 +363,14 @@ void Networking::handleFrameNetworking(unsigned char playerTag, const unsigned s
 		*playermillis -= millisTaken;
 	}
 	catch(std::string s) {
-		if(s.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
-		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + s;
+		if(s.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+		else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + s;
 		*moves = std::map<hlt::Location, unsigned char>();
 		*playermillis = -1;
 	}
 	catch(...) {
-		if(response.empty()) player_logs[playerTag - 1] += "ERRORED!\nNo response received.";
-		else player_logs[playerTag - 1] += "ERRORED!\nResponse received (if any):\n" + response;
+		if(response.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+		else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + response;
 		*moves = std::map<hlt::Location, unsigned char>();
 		*playermillis = -1;
 	}
