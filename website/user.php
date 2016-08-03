@@ -28,7 +28,7 @@
 				</div>
 				<div id="historyPanel" class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">History</h3>
+						<h3 class="panel-title">Recent History</h3>
 					</div>
 					<table class="table well well-sm" id="historyTable">
 						<thead>
