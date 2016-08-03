@@ -3,6 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
 
+header('Access-Control-Allow-Origin: *');
+
 error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
@@ -184,11 +186,6 @@ class WebsiteAPI extends API{
 			return $results;
 		} 
 
-		// Get the number of active users
-		else if(isset($_GET['numActive'])) {
-			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
-		} 
-
 		// Verify an email
 		else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
 			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
@@ -199,7 +196,8 @@ class WebsiteAPI extends API{
 			return "Fail";
 		} 
 		
-		/*else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
+		// Register a new halite account. Send the verification email
+		else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
 			$username = htmlspecialchars($_POST["username"]);
 			$email = $_POST["email"];
 			$password = $this->encryptPassword($_POST["password"]);
@@ -245,7 +243,7 @@ class WebsiteAPI extends API{
 			}
 
 			return "Success";
-		}*/
+		}
 	}
 
 	/* User History Endpoint
@@ -321,11 +319,6 @@ class WebsiteAPI extends API{
 				return "Compiling";
 			}
 			
-			if(intval($user["status"]) != 3) {
-				return "No new registrants";
-
-			}
-
 			if ($_FILES["botFile"]["size"] > 20000000) {
 				return "Sorry, your file is too large.";
 			}
@@ -404,6 +397,27 @@ class WebsiteAPI extends API{
 		return $workers;
 	}
 	
+	/* Stats endpoint
+	 *
+	 * Provides a number of statistics about the competition,
+	 * which would be expensive or impossible to determine using our generic endpoints.
+	 */ 
+	protected function stats() {
+		if(isset($_GET['throughput'])) {
+			return mysqli_query($this->mysqli, "SELECT * FROM Game WHERE TIMESTAMPDIFF(DAY, timestamp, NOW()) < 1")->num_rows;
+		}
+
+		// Get the number of active users
+		else if(isset($_GET['numSubmissions'])) {
+			return $this->select("SELECT SUM(numSubmissions) FROM User")["SUM(numSubmissions)"];
+		}
+
+		// Get the number of active users
+		else if(isset($_GET['numActive'])) {
+			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
+		} 
+	}
+
 	/* Announcement Endpoint
 	 *
 	 * Annoucements are used as 'news blasts' without requiring email.
