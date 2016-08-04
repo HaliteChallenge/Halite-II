@@ -7,6 +7,7 @@ If you have not already:
 ## Website/Manager server setup
 
 * ```sudo apt-get install lamp-server^```
+* Checkt that you are on php 5.6: ```php -v```
 * Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
 * ```./setupWebsite.sh```
 * Create and write a halite.ini file in the root directory of the project
