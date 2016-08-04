@@ -1,6 +1,12 @@
+import os
 import subprocess
 import sys
 import re
+
+cwd = os.getcwd()
+os.chdir("../../environment")
+subprocess.call(["make"])
+os.chdir(cwd)
 
 genproc = subprocess.Popen('../../environment/environment -d 10 10 -q "python3 ModBot.py" "python3 ModBot.py" -s 1001', stdout=subprocess.PIPE, shell = True)
 genlines = genproc.stdout.read().decode('utf-8').split('\n');
