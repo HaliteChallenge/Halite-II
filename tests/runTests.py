@@ -10,4 +10,4 @@ parser.read("../halite.ini")
 os.system("mysql -u "+parser["database"]["username"]+" -p"+parser["database"]["password"]+" < ../website/sql/Database.sql")
 os.system("phpunit UserTest WebsiteTests.php")
 
-shutil.copyfile("../halite.ini", "temp.ini")
+shutil.copyfile("temp.ini", "../halite.ini")
