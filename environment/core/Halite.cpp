@@ -370,7 +370,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 			newRankings.push_back(a);
 		}
 		//Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
-		std::sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
+		std::stable_sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
 			if(last_territory_count[u1] == last_territory_count[u2]) return full_territory_count[u1] < full_territory_count[u2];
 			return last_territory_count[u1] < last_territory_count[u2];
 		});
@@ -380,7 +380,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 	std::vector<unsigned int> newRankings;
 	for(int a = 0; a < number_of_players; a++) if(result[a]) newRankings.push_back(a);
 	//Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
-	std::sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
+	std::stable_sort(newRankings.begin(), newRankings.end(), [&](const unsigned int & u1, const unsigned int & u2) -> bool {
 		if(last_territory_count[u1] == last_territory_count[u2]) return full_territory_count[u1] < full_territory_count[u2];
 		return last_territory_count[u1] < last_territory_count[u2];
 	});
