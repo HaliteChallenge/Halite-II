@@ -309,7 +309,7 @@ Values.sql
 storage/
 config.php
 workingPath/
-halite.ini
+*.ini
 *.swp
 *.gch
 *.exe
