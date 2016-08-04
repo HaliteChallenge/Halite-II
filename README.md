@@ -24,6 +24,6 @@ Send us a pull request! If you are looking for things to do, check out our [Trel
 
 ### Authors
 
-Halite was created by [Michael Truell](https://github.com/truell20)* and [Ben Spector](https://github.com/Sydriax)*.
+Halite was created by [Ben Spector](https://github.com/Sydriax)* and [Michael Truell](https://github.com/truell20)*.
 
 \* These authors contributed equally to this work
