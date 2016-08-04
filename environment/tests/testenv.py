@@ -7,7 +7,7 @@ genlines = genproc.stdout.read().decode('utf-8').split('\n');
 
 isGood = True
 
-if genlines[3].split()[1] != "21" or genlines[4].split()[1] != "2" or genlines[5] != " ":
+if genlines[3].split()[1] != "1" or genlines[4].split()[1] != "2" or genlines[5] != " ":
 	print('General environment test failed. Environment output:\n#######################################################')
 	print('\n'.join(genlines) + '\n#######################################################')
 	isGood = False
