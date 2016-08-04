@@ -3,6 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
 
+header('Access-Control-Allow-Origin: *');
 error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
