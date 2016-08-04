@@ -15,7 +15,7 @@
 			<div class="col-sm-12">
 				<h1>Halite Downloads</h1>
 
-				<h3>Halite Environment</h3>
+				<h3>Game Environment</h3>
 				<p>
 					This set of binaries was uploaded at <b>10:55am EST on August 2nd</b>. We discontinued the desktop visualizer (see below), so consequently the environment executable is the only file in this download.
 				<p>
@@ -28,7 +28,7 @@
 
 				<h3>Language Packages</h3>
 				<p>
-					This set of binaries was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
+					This set of language packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
 				</p>
 				<p>
 					<ul>
@@ -42,7 +42,7 @@
 
 				<h3>Desktop Visualizer [DISCONTINUED]</h3>
 				<p>
-					This is the legacy desktop visualizer. We recommend preferential use of the web visualizer, but until an alternative desktop visualizer is available we will continue to offer this for download. These binaries are no longer supported and are unlikely to be updated.
+					This is the legacy desktop visualizer. We recommend using the <a href="game.php">web visualizer</a>, but until an alternative desktop visualizer is available we will continue to offer this for download. These binaries are no longer supported and are unlikely to be updated.
 				</p>
 				<p>
 					<ul>
