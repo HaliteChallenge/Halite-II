@@ -7,7 +7,7 @@ If you have not already:
 ## Website/Manager server setup
 
 * ```sudo apt-get install mysql-sever-5.6; sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php; sudo apt-get install php5.6; sudo apt-get install lamp-server^; ```
-* Checkt that you are on php 5.6: ```php -v```
+* Checkt that you are on php >= 5.6 and mysql >= 5.6.6: ```php -v; mysql -V```
 * Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
 * ```./setupWebsite.sh```
 * Create and write a halite.ini file in the root directory of the project
