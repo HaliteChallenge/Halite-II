@@ -18,6 +18,10 @@ class APITest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	protected function tearDown() {
+		$this->mysqli->query("DROP DATABASE ".$this->config['database']['name']);
+	}
+
 	protected function insertObject($obj) {
 		var_dump($this->mysqli->query("INSERT INTO User (".implode(",", array_keys($obj)).") VALUES ('".implode("','", array_values($obj))."')"));
 	}
