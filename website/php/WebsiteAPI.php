@@ -9,8 +9,8 @@ error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
 
-require_once 'API.class.php';
-require_once '../lib/swiftmailer/lib/swift_required.php';
+include dirname(__FILE__).'/API.class.php';
+include dirname(__FILE__).'/../lib/swiftmailer/lib/swift_required.php';
 
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
@@ -19,7 +19,7 @@ class WebsiteAPI extends API{
 	// The database
 	private $mysqli = NULL;
 
-	public function __construct($request, $origin) {
+	public function __construct($request) {
 		$this->config = parse_ini_file("../../halite.ini", true);
 
 		$this->initDB();

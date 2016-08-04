@@ -8,7 +8,7 @@ if (!array_key_exists('HTTP_ORIGIN', $_SERVER)) {
 }
 
 try {
-    $API = new WebsiteAPI($_REQUEST['request'], $_SERVER['HTTP_ORIGIN']);
+    $API = new WebsiteAPI($_REQUEST['request']);
     echo $API->processAPI();
 } catch (Exception $e) {
     echo json_encode(Array('error' => $e->getMessage()));
