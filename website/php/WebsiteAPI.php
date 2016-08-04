@@ -3,14 +3,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
 
-header('Access-Control-Allow-Origin: *');
-
 error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/API.class.php';
 include dirname(__FILE__).'/../lib/swiftmailer/lib/swift_required.php';
+
+define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
+define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
+define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
+define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
 
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
@@ -20,7 +23,7 @@ class WebsiteAPI extends API{
 	private $mysqli = NULL;
 
 	public function __construct($request) {
-		$this->config = parse_ini_file("../../halite.ini", true);
+		$this->config = parse_ini_file(INI_PATH, true);
 
 		$this->initDB();
 
@@ -323,7 +326,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = "../../storage/bots/{$userID}.zip";
+			$targetPath = BOT_PATH."{$userID}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}
@@ -455,7 +458,7 @@ class WebsiteAPI extends API{
 
 		// Return the requested error log only if it belongs to the signed in user.
 		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
-			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
+			$targetPath = ERRORS_PATH."{$_GET['errorLogName']}"; 
 			if(file_exists($targetPath) == false) {
 				return null;
 			}
