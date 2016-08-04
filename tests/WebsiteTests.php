@@ -2,8 +2,8 @@
 include "../website/php/WebsiteAPI.php";
 
 class APITest extends PHPUnit_Framework_TestCase {
-	private $mysqli;
-	private $config;
+	protected $mysqli;
+	protected $config;
 
 	protected function setUp() {
 		$this->config = parse_ini_file("../halite.ini", true);
@@ -19,17 +19,27 @@ class APITest extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function insertObject($obj) {
-		$this->mysqli->query("INSERT INTO User ('".implode("','", array_keys($obj))."') VALUES ('".implode("','", array_values($obj))."')");	
+		var_dump($this->mysqli->query("INSERT INTO User (".implode(",", array_keys($obj)).") VALUES ('".implode("','", array_values($obj))."')"));
 	}
 }
 
-const TEST_USER = array("username" => "testUsername", "password" => "testedUnhashedPassword", "email" => "testEmail", "verificationCod" => "1234567");
+const TEST_USER = array("username" => "testUsername", "password" => "testedUnhashedPassword", "email" => "testEmail", "verificationCode" => "1234567");
 
 class UserTest extends APITest { 
 	public function testGET() {
 		$this->insertObject(TEST_USER);
-		echo "HII";
-		var_dump($this->mysqli->query("SELECT * FROM USER")->fetch_assoc);
+		$id = $this->mysqli->insert_id; 
+		
+		$_GET['userID'] = $id;
+		$_SERVER['REQUEST_METHOD'] = "GET";
+    	$returnedUser = json_decode((new WebsiteAPI("user"))->processAPI());
+		var_dump($returnedUser);
+
+		$this->assertObjectNotHasAttribute("email", $returnedUser);
+		$this->assertObjectNotHasAttribute("verificationCode", $returnedUser);
+		$this->assertObjectNotHasAttribute("password", $returnedUser);
+
+		$this->assertEquals($returnedUser->username, TEST_USER['username']);
 	}
 }
 ?>
