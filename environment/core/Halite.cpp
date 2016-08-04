@@ -42,14 +42,14 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//For each player, use their moves to create the pieces map.
 	for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) {
 		//Add in pieces according to their moves. Also add in a second piece corresponding to the piece left behind.
-		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.inBounds(b->first) && game_map.getSite(b->first, STILL).owner == a + 1) {
+		for(auto b = player_moves[a].begin(); b != player_moves[a].end(); b++) if(game_map.inBounds(b->first) && game_map.getSite(b->first).owner == a + 1) {
 			if(b->second == STILL) {
-				if(game_map.getSite(b->first, STILL).strength + game_map.getSite(b->first, STILL).production <= 255) game_map.getSite(b->first, STILL).strength += game_map.getSite(b->first, STILL).production;
-				else game_map.getSite(b->first, STILL).strength = 255;
+				if(game_map.getSite(b->first).strength + game_map.getSite(b->first).production <= 255) game_map.getSite(b->first).strength += game_map.getSite(b->first).production;
+				else game_map.getSite(b->first).strength = 255;
 				//Update full still count
 				full_still_count[a]++;
 				//Add to full production
-				full_production_count[a] += game_map.getSite(b->first, STILL).production;
+				full_production_count[a] += game_map.getSite(b->first).production;
 			}
 			//Update full caridnal count.
 			else full_cardinal_count[a]++;
@@ -59,11 +59,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
-				if(short(pieces[a][newLoc]) + game_map.getSite(b->first, STILL).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->first, STILL).strength;
+				if(short(pieces[a][newLoc]) + game_map.getSite(b->first).strength <= 255) pieces[a][newLoc] += game_map.getSite(b->first).strength;
 				else pieces[a][newLoc] = 255;
 			}
 			else {
-				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->first, STILL).strength));
+				pieces[a].insert(std::pair<hlt::Location, unsigned char>(newLoc, game_map.getSite(b->first).strength));
 			}
 
 			//Add in a new piece with a strength of 0 if necessary.
@@ -72,16 +72,16 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			}
 
 			//Erase from the game map so that the player can't make another move with the same piece.
-			game_map.getSite(b->first, STILL).owner = 0;
-			game_map.getSite(b->first, STILL).strength = 0;
+			game_map.getSite(b->first).owner = 0;
+			game_map.getSite(b->first).strength = 0;
 		}
 	}
 
 	//Add in all of the remaining pieces whose moves weren't specified.
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) {
-		hlt::Location l = { b, a };
-		hlt::Site & s = game_map.getSite(l, STILL);
+		hlt::Site & s = game_map.contents[a][b];
 		if(s.owner != 0) {
+			hlt::Location l = { b, a };
 			if(short(s.strength) + s.production <= 255) {
 				s.strength += s.production;
 			}
@@ -147,9 +147,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 					else toInjure[d].insert(std::pair<hlt::Location, unsigned short>(tempLoc, pieces[c][l]));
 				}
 			}
-			if(game_map.getSite(l, STILL).strength > 0) {
-				if(toInjure[c].count(l)) toInjure[c][l] += game_map.getSite(l, STILL).strength;
-				else toInjure[c].insert(std::pair<hlt::Location, unsigned short>(l, game_map.getSite(l, STILL).strength));
+			if(game_map.getSite(l).strength > 0) {
+				if(toInjure[c].count(l)) toInjure[c][l] += game_map.getSite(l).strength;
+				else toInjure[c].insert(std::pair<hlt::Location, unsigned short>(l, game_map.getSite(l).strength));
 				injureMap[l.y][l.x] += pieces[c][l];
 			}
 		}
@@ -175,8 +175,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 	//Add pieces back into the map.
 	for(unsigned char a = 0; a < number_of_players; a++) {
 		for(auto b = pieces[a].begin(); b != pieces[a].end(); b++) {
-			game_map.getSite(b->first, STILL).owner = a + 1;
-			game_map.getSite(b->first, STILL).strength = b->second;
+			game_map.getSite(b->first).owner = a + 1;
+			game_map.getSite(b->first).strength = b->second;
 		}
 	}
 
