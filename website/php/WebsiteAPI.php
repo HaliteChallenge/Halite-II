@@ -137,22 +137,8 @@ class WebsiteAPI extends API{
 	 * if no authentication is provided.
 	 */	
 	protected function user() {
-		/* Get a user's extra stats
-		 *
-		 * We store a number of agreggated stats about each bot.
-		 * These are currently not stored in the User table.
-		 * 
-		 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
-		 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
-		 * It would be much nicer to decouple 'bot' information from 'user' information.
-		 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
-		 */
-		if(isset($_GET["extraStats"]) && isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
-		}
-
 		// Get a user's info with a username		
-		else if(isset($_GET["username"])) {
+		if(isset($_GET["username"])) {
 			if(isset($_GET["password"])) {
 				$password = $this->encryptPassword($_GET['password']);
 				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
@@ -247,6 +233,22 @@ class WebsiteAPI extends API{
 			}
 
 			return "Success";
+		}
+	}
+
+	/* Extra Stats Endpoint
+	 *
+	 * We store a number of agreggated stats about each bot.
+	 * These are currently not stored in the User table.
+	 * 
+	 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
+	 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
+	 * It would be much nicer to decouple 'bot' information from 'user' information.
+	 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
+	 */
+	function extraStats() {
+		if(isset($_GET["userID"])) {
+			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
 		}
 	}
 
