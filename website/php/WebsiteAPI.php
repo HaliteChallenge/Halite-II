@@ -4,13 +4,17 @@ ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
 
 header('Access-Control-Allow-Origin: *');
-
 error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/API.class.php';
 include dirname(__FILE__).'/../lib/swiftmailer/lib/swift_required.php';
+
+define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
+define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
+define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
+define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
 
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
@@ -20,7 +24,7 @@ class WebsiteAPI extends API{
 	private $mysqli = NULL;
 
 	public function __construct($request) {
-		$this->config = parse_ini_file("../../halite.ini", true);
+		$this->config = parse_ini_file(INI_PATH, true);
 
 		$this->initDB();
 
@@ -133,22 +137,8 @@ class WebsiteAPI extends API{
 	 * if no authentication is provided.
 	 */	
 	protected function user() {
-		/* Get a user's extra stats
-		 *
-		 * We store a number of agreggated stats about each bot.
-		 * These are currently not stored in the User table.
-		 * 
-		 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
-		 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
-		 * It would be much nicer to decouple 'bot' information from 'user' information.
-		 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
-		 */
-		if(isset($_GET["extraStats"]) && isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
-		}
-
 		// Get a user's info with a username		
-		else if(isset($_GET["username"])) {
+		if(isset($_GET["username"])) {
 			if(isset($_GET["password"])) {
 				$password = $this->encryptPassword($_GET['password']);
 				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
@@ -246,6 +236,22 @@ class WebsiteAPI extends API{
 		}
 	}
 
+	/* Extra Stats Endpoint
+	 *
+	 * We store a number of agreggated stats about each bot.
+	 * These are currently not stored in the User table.
+	 * 
+	 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
+	 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
+	 * It would be much nicer to decouple 'bot' information from 'user' information.
+	 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
+	 */
+	function extraStats() {
+		if(isset($_GET["userID"])) {
+			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
+		}
+	}
+
 	/* User History Endpoint
 	 *
 	 * We store the a history of user's bot submissions.
@@ -323,7 +329,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = "../../storage/bots/{$userID}.zip";
+			$targetPath = BOTS_PATH."{$userID}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}
@@ -455,7 +461,7 @@ class WebsiteAPI extends API{
 
 		// Return the requested error log only if it belongs to the signed in user.
 		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
-			$targetPath = "../../storage/errors/{$_GET['errorLogName']}"; 
+			$targetPath = ERRORS_PATH."{$_GET['errorLogName']}"; 
 			if(file_exists($targetPath) == false) {
 				return null;
 			}
