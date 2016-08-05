@@ -394,9 +394,9 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
 		p.rank = std::distance(rankings.begin(), std::find(rankings.begin(), rankings.end(), a)) + 1;
 		p.average_territory_count = full_territory_count[a] / double(chunkSize * alive_frame_count[a]);
 		p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
-		p.average_production_count = full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)); //For this, we want turns rather than frames.
+		p.average_production_count = alive_frame_count[a] > 1 ? full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)) : 0; //For this, we want turns rather than frames.
+		p.still_percentage = full_cardinal_count[a] + full_still_count[a] > 0 ? full_still_count[a] / double(full_cardinal_count[a] + full_still_count[a]) : 0;
 		p.average_response_time = (time_allowance - player_time_allowances[a]) / double(alive_frame_count[a]); //In milliseconds.
-		p.still_percentage = full_still_count[a] / double(full_cardinal_count[a] + full_still_count[a]);
 		stats.player_statistics.push_back(p);
 	}
 	stats.timeout_tags = timeout_tags;
