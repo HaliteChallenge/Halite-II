@@ -139,10 +139,10 @@ function getNumActiveUsers() {
 
 function getExtraStats(userID) {
 	return $.ajax({
-		url: url+"user",
+		url: url+"extraStats",
 		async: false,
 		method: "GET",
-		data: {extraStats: 1, userID: userID}
+		data: {userID: userID}
 	}).responseJSON;
 }
 
