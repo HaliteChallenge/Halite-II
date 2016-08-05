@@ -327,7 +327,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = BOT_PATH."{$userID}.zip";
+			$targetPath = BOTS_PATH."{$userID}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}
