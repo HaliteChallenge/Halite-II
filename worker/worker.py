@@ -123,6 +123,9 @@ def parseGameOutput(output, users):
 	# Get player ranks and scores by parsing shellOutput
 	for lineIndex in range(len(output)-(len(users)+2), len(output)-2):
 		components = output[lineIndex].split(" ")
+		for cIndex in range(len(components)):
+			if components[cIndex] == "nan" or components[cIndex] == "-nan":
+				components[cIndex] = 0
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
 		users[playerTag-1]["rank"] = int(components[1])
