@@ -16,7 +16,7 @@ class GameTest extends APITest {
 		$this->insertObject(GAME_USER_TABLE, TEST_GAME_USER);
 		$this->insertObject(USER_TABLE, TEST_USER);
 		
-		$_POST['userID'] = TEST_USER_HISTORY['userID'];
+		$_GET['userID'] = TEST_USER_HISTORY['userID'];
 		$_SERVER['REQUEST_METHOD'] = "GET";
 
     	$returnedGames = json_decode((new WebsiteAPI("game"))->processAPI());
