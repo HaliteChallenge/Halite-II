@@ -1,4 +1,7 @@
-sudo apt-get install -y lamp-server^
+sudo apt-get install mysql-sever-5.6
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+sudo apt-get install php5.6 
+sudo apt-get install apache2 
 sudo apt-get install -y python3 python3-pip 
 sudo pip3 install trueskill
 
