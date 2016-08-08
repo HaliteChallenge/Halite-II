@@ -30,7 +30,6 @@ class APITest extends PHPUnit_Framework_TestCase {
 
 	protected function insertObject($table, $obj) {
 		$sql = "INSERT INTO $table (".implode(",", array_keys($obj)).") VALUES ('".implode("','", array_values($obj))."')";
-		echo $sql."\n";
 		$this->mysqli->query($sql);
 	}
 }
