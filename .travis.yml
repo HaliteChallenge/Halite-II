@@ -4,9 +4,15 @@ dist: trusty
 
 language: cpp
 
+services: 
+  - mysql
+
 compiler: gcc
 
 install:
+  - cd ~/build/HaliteChallenge/Halite/
+  - ./setupWebsite.sh
+
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./installBuildTools.sh
 
@@ -21,8 +27,8 @@ script:
   - make
   - ./environment -d 10 10 "python3 ../airesources/Python/MyBot.py" "cd ../airesources/Java; java MyBot" "../airesources/C++/MyBot.o"
     
-  - cd ~/build/HaliteChallenge/Halite/tests/environment
-  - python3 testenv.py
+  - cd ~/build/HaliteChallenge/Halite/tests/
+  - python3 runTests.py
 
 notifications:
     slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
