@@ -36,7 +36,7 @@ apt-get install -y python3-h5py</code></pre>
         <h3>Data Aquisition</h3>
 
         	<p>
-				<a href="downloads/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. You can download the last 10,000 games played by our servers with this command: <code>wget -e robots=off -r --no-parent http://halite.io/storage/replays/</code>.
+				<a href="downloads/Replays.zip">Here</a> is an archive of about 500 games that Matt's bot participates in. You can an archive of all of the games played on our servers with this command: <code>wget -e robots=off -r --no-parent http://192.241.158.114/</code>.
 			</p>
 
 			<p>
