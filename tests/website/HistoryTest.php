@@ -9,8 +9,8 @@ class HistoryTest extends APITest {
 	public function testGET() {
 		$this->insertObject(HISTORY_TABLE, TEST_USER_HISTORY);
 		
-		$_POST['userID'] = TEST_USER_HISTORY['userID'];
-		$_SERVER['REQUEST_METHOD'] = "POST";
+		$_GET['userID'] = TEST_USER_HISTORY['userID'];
+		$_GET['REQUEST_METHOD'] = "POST";
 
     	$returnedHistory = json_decode((new WebsiteAPI("history"))->processAPI());
 
