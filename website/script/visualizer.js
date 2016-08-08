@@ -18,7 +18,10 @@ function showGame(game, showmovement, seconds) {
 
 	$("#pageContent").empty();
 	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
-		var user = getUser(null, p.name);
+		var nameComponents = p.name.split(" ");
+		var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
+		console.log(name);
+		var user = getUser(null, name);
 		if(user) {
 			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
 		} else {
