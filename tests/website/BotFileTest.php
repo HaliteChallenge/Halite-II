@@ -11,14 +11,16 @@ class BotFileTests extends APITest {
 		$testUser['rank'] = 1;
 		$testUser['status'] = 3;
 		$this->insertObject(USER_TABLE, $testUser);
+
+		$botPath = BOTS_PATH.$testUser['userID'].".zip";
+		if(file_exists($botPath)) unlink($botPath);
 		
-		echo __DIR__ . '/foo.txt';
 		$_FILES = array(
 			'botFile' => array(
-				'name' => 'BotFileTests.php',
+				'name' => 'testFile.txt',
 				'type' => 'text',
 				'size' => 542,
-				'tmp_name' => __DIR__ . '/foo.txt',
+				'tmp_name' => __DIR__ . '/testFile.txt',
 				'error' => 0
 			)
         );
@@ -34,7 +36,7 @@ class BotFileTests extends APITest {
 
 		$this->assertEquals($newUser["status"], "1");
 		$this->assertTrue(count($userHistory) > 0);
-		$this->assertTrue(file_exists(BOTS_PATH.$testUser['userID'].".zip"));
+		$this->assertTrue(file_exists($botPath));
 	}
 }
 
