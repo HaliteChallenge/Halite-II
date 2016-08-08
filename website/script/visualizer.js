@@ -35,6 +35,9 @@ function showGame(game, showmovement, seconds) {
 	var framespersec = seconds == null ? 2.5 : game.numFrames / seconds;
 	var shouldplay = true;
 	var xOffset = 0, yOffset = 0;
+	var zoom = 8;
+	if(game.numFrames / zoom < 3) zoom = game.numFrames / 3;
+	if(zoom < 1) zoom = 1;
 
 	window.onresize = function() {
 		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (10 + $("canvas").offset().top);
@@ -49,9 +52,8 @@ function showGame(game, showmovement, seconds) {
 		mw = sh, mh = sh;
 		renderer.resize(sw, sh);
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw;
+		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
 		TER_TOP = sh * 0.095, TER_BTM = sh * 0.38, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.715, STR_TOP = sh * 0.765, STR_BTM = sh;
-		dw = (GRAPH_RIGHT - GRAPH_LEFT) / game.numFrames; //Graph step (w)
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
@@ -122,6 +124,14 @@ function showGame(game, showmovement, seconds) {
 			xOffset = 0;
 			yOffset = 0;
 		}
+		else if(e.keyCode == 187 || e.keyCode == 107) { //= or +
+			zoom *= 1.41421356237;
+			if(game.numFrames / zoom < 3) zoom = game.numFrames / 3;
+		}
+		else if(e.keyCode == 189 || e.keyCode == 109) { //- or - (dash or subtract)
+			zoom /= 1.41421356237;
+			if(zoom < 1) zoom = 1;
+		}
 	}
 
 	document.onkeyup=function(e){
@@ -139,83 +149,75 @@ function showGame(game, showmovement, seconds) {
 
 	function animate() {
 
-		//Update info text:
-		var mousepos = manager.mouse.global;
-		if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
-			infoText.text = 'Frame #' + frame.toString();
-		}
-		else { //Mouse is clicked and over renderer.
-			if(mousepos.x < mw && mousepos.y < mh) { //Over map:
-				var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
-				if(x < 0) x += game.width;
-				if(y < 0) y += game.height;
-				var loc = y * game.width + x;
-				str = game.frames[frame][loc].strength;
-				prod = game.productions[loc];
-				infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
-			}
-			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
-				frame = Math.round((mousepos.x - GRAPH_LEFT) / dw);
-				if(frame < 0) frame = 0;
-				if(frame >= game.numFrames) frame = game.numFrames - 1;
-				transit = 0;
-				if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
-				}
-			}
-		}
-
 		//Clear graphGraphics so that we can redraw freely.
 		graphGraphics.clear();
 
 		//Draw the graphs.
+		var nf = Math.round(game.numFrames / zoom), graphMidFrame = frame;
+		var nf2 = Math.floor(nf / 2);
+		if(graphMidFrame + nf2 >= game.numFrames) graphMidFrame -= ((nf2 + graphMidFrame) - game.numFrames);
+		else if(Math.ceil(graphMidFrame - nf2) < 0) graphMidFrame = nf2;
+		var firstFrame = graphMidFrame - nf2, lastFrame = graphMidFrame + nf2;
+		if(firstFrame < 0) firstFrame = 0;
+		if(lastFrame >= game.numFrames) lastFrame = game.numFrames - 1;
+		nf = lastFrame - firstFrame;
+		var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
+		//Normalize values with respect to the range of frames seen by the graph.
+		var maxTer = 0, maxProd = 0, maxStr = 0;
+		for(var a = 1; a <= game.numPlayers; a++) {
+			for(var b = firstFrame; b <= lastFrame; b++) {
+				if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
+				if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
+				if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
+			}
+		}
 		for(var a = 1; a <= game.numPlayers; a++) {
 			graphGraphics.lineStyle(1, game.players[a].color);
 			//Draw ter graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].normTers[0] + TER_BTM);
-			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (TER_TOP - TER_BTM) * game.players[a].normTers[b] + TER_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
+			for(var b = firstFrame + 1; b <= lastFrame; b++) {
+				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (TER_TOP - TER_BTM) * game.players[a].territories[b] / maxTer + TER_BTM);
 			}
 			//Draw prod graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].normProds[0] + PROD_BTM);
-			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (PROD_TOP - PROD_BTM) * game.players[a].normProds[b] + PROD_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].productions[firstFrame] / maxProd + PROD_BTM);
+			for(var b = firstFrame + 1; b <= lastFrame; b++) {
+				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (PROD_TOP - PROD_BTM) * game.players[a].productions[b] / maxProd + PROD_BTM);
 			}
 			//Draw str graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].normStrs[0] + STR_BTM);
-			for(var b = 1; b < game.numFrames; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * b, (STR_TOP - STR_BTM) * game.players[a].normStrs[b] + STR_BTM);
+			graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].strengths[firstFrame] / maxStr + STR_BTM);
+			for(var b = firstFrame + 1; b <= lastFrame; b++) {
+				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (STR_TOP - STR_BTM) * game.players[a].strengths[b] / maxStr + STR_BTM);
 			}
 		}
 		//Draw borders.
 		graphGraphics.lineStyle(1, '0x000000');
 		//Draw ter border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, TER_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, TER_BTM);
-		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
+		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
+		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
 		graphGraphics.lineTo(GRAPH_LEFT, TER_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, TER_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, TER_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
 		//Draw prod border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, PROD_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, PROD_BTM);
-		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
+		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
+		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
 		graphGraphics.lineTo(GRAPH_LEFT, PROD_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, PROD_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, PROD_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, PROD_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
 		//Draw str border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * frame, STR_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, STR_BTM);
-		if(frame > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
+		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_TOP);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
+		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
 		graphGraphics.lineTo(GRAPH_LEFT, STR_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, STR_TOP);
 		graphGraphics.lineTo(GRAPH_RIGHT, STR_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * frame, STR_BTM);
+		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
 		//Draw frame/ter text seperator.
 		graphGraphics.moveTo(GRAPH_LEFT, TER_TOP - sh * 0.045);
 		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP - sh * 0.045);
-
 
 		//Clear mapGraphics so that we can redraw freely.
 		mapGraphics.clear();
@@ -315,24 +317,49 @@ function showGame(game, showmovement, seconds) {
 			else if(shouldplay) {
 				transit += dt / 1000 * framespersec;
 			}
+		}
 
-			//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
-			while(transit >= 1) {
-				transit--;
-				frame++;
+		//Update info text:
+		var mousepos = manager.mouse.global;
+		if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
+			infoText.text = 'Frame #' + frame.toString();
+		}
+		else { //Mouse is clicked and over renderer.
+			if(mousepos.x < mw && mousepos.y < mh) { //Over map:
+				var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
+				if(x < 0) x += game.width;
+				if(y < 0) y += game.height;
+				var loc = y * game.width + x;
+				str = game.frames[frame][loc].strength;
+				prod = game.productions[loc];
+				infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
 			}
-			if(frame >= game.numFrames - 1) {
-				frame = game.numFrames - 1;
+			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
+				frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
+				if(frame < 0) frame = 0;
+				if(frame >= game.numFrames) frame = game.numFrames - 1;
 				transit = 0;
+				if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
+				}
 			}
-			while(transit < 0) {
-				transit++;
-				frame--;
-			}
-			if(frame < 0) {
-				frame = 0;
-				transit = 0;
-			}
+		}
+
+		//Advance frame if transit moves far enough. Ensure all are within acceptable bounds.
+		while(transit >= 1) {
+			transit--;
+			frame++;
+		}
+		if(frame >= game.numFrames - 1) {
+			frame = game.numFrames - 1;
+			transit = 0;
+		}
+		while(transit < 0) {
+			transit++;
+			frame--;
+		}
+		if(frame < 0) {
+			frame = 0;
+			transit = 0;
 		}
 
 		//Pan if desired.
