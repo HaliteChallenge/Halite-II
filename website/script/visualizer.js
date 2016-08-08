@@ -154,25 +154,25 @@ function showGame(game, showmovement, seconds) {
 
 		//Draw the graphs.
 		var nf = Math.round(game.numFrames / zoom), graphMidFrame = frame;
-		if(graphMidFrame + nf / 2 >= game.numFrames) graphMidFrame -= Math.round((nf / 2 + graphMidFrame) - game.numFrames);
-		else if(graphMidFrame - nf / 2 < 0) Math.round(graphMidFrame = nf / 2);
-		var firstFrame = Math.ceil(graphMidFrame - nf / 2), lastFrame = Math.floor(graphMidFrame + nf / 2);
+		var nf2 = Math.floor(nf / 2);
+		if(graphMidFrame + nf2 >= game.numFrames) graphMidFrame -= ((nf2 + graphMidFrame) - game.numFrames);
+		else if(Math.ceil(graphMidFrame - nf2) < 0) graphMidFrame = nf2;
+		var firstFrame = graphMidFrame - nf2, lastFrame = graphMidFrame + nf2;
 		if(firstFrame < 0) firstFrame = 0;
-		if(lastFrame >= game.numFrames) lastFrame = game.numFrames;
-		//nf = lastFrame - firstFrame;
-		var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf - 1);
+		if(lastFrame >= game.numFrames) lastFrame = game.numFrames - 1;
+		nf = lastFrame - firstFrame;
+		var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
 		//Normalize values with respect to the range of frames seen by the graph.
 		var maxTer = 0, maxProd = 0, maxStr = 0;
 		for(var a = 1; a <= game.numPlayers; a++) {
 			for(var b = firstFrame; b <= lastFrame; b++) {
-				if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.02;
-				if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.02;
-				if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.02;
+				if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
+				if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
+				if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
 			}
 		}
 		for(var a = 1; a <= game.numPlayers; a++) {
 			graphGraphics.lineStyle(1, game.players[a].color);
-			var graphNormTers = []
 			//Draw ter graph.
 			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
 			for(var b = firstFrame + 1; b <= lastFrame; b++) {
