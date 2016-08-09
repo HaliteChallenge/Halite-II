@@ -1,11 +1,14 @@
 import os
+import os.path
 import configparser
 import shutil
 import subprocess
 
 # Setup
 print("Setting up...")
-shutil.copyfile("../halite.ini", "temp.ini")
+if os.path.isfile("../halite.ini"):
+    shutil.copyfile("../halite.ini", "temp.ini")
+
 shutil.copyfile("tests.ini", "../halite.ini")
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
@@ -20,4 +23,5 @@ print(subprocess.Popen('cd environment; python3 testenv.py', stdout=subprocess.P
 
 # Tear down
 print("Almost done...")
-shutil.copyfile("temp.ini", "../halite.ini")
+if os.path.isfile("../temp.ini"):
+    shutil.copyfile("temp.ini", "../halite.ini")
