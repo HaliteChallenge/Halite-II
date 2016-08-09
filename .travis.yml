@@ -16,7 +16,7 @@ install:
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./installBuildTools.sh
 
-  - cp exampleTests.ini tests.ini
+  - cp travisTests.ini tests.ini
 
 script:
   - cd ~/build/HaliteChallenge/Halite/airesources/Java
