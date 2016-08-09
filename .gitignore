@@ -309,7 +309,10 @@ Values.sql
 storage/
 config.php
 workingPath/
+
 *.ini
+!travisTests.ini
+
 *.swp
 *.gch
 *.exe
