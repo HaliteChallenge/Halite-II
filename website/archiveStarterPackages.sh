@@ -21,7 +21,7 @@ zip -r Halite-Java-Starter-Package.zip Halite-Java-Starter-Package/
 zip -r Halite-Rust-Starter-Package.zip Halite-Rust-Starter-Package/ 
 zip -r Halite-Scala-Starter-Package.zip Halite-Scala-Starter-Package/ 
 
-mkdir -p ../website/downloads/starterPackages
-mv *.zip ../website/downloads/starterPackages
+mkdir -p ../website/downloads/starterpackages
+mv *.zip ../website/downloads/starterpackages
 
 rm -r *-Starter-Package
