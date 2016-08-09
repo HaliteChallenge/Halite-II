@@ -125,7 +125,7 @@ class ManagerAPI extends API{
 
 						$users = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand()");
 						//$seedPlayer = $this->select("select * from User where status=3 and (select COUNT(*) from GameUser where userID=User.userID) < 100 ORDER BY rand() LIMIT 1");
-						$seedPlayer = $this->select("select * from User inner join UserExtraStats on User.userID=UserExtraStats.userID where status=3 and (numGames < 40 or didTimeout < 0.9) order by rand()*-sigma");
+						$seedPlayer = $this->select("select * from User inner join UserExtraStats on User.userID=UserExtraStats.userID where status=3 and (numGames < 20 or didTimeout < 0.9) order by rand()*-pow(sigma, 2)");
 						if(count($seedPlayer) < 1) {
 							$oldestGameTime = time();
 							foreach($users as $user) {
