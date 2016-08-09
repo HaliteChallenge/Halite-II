@@ -1,6 +1,6 @@
 rm *-Starter-Package.zip
 
-cd ../../airesources/
+cd ../airesources/
 
 rm -r *-Starter-Package
 
