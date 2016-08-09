@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rsync -azvP /root/Halite/storage/bots/* root@192.241.158.114:/backup/web/storage/bots/
+rsync -azvP /root/Halite/halite.ini root@192.241.158.114:/backup/web/
