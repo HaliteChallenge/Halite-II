@@ -14,7 +14,7 @@ install:
   - ./setupWebsite.sh
 
   - cd ~/build/HaliteChallenge/Halite/tests
-  - sudo ./installBuildTools.sh
+  - sudo ./install.sh
 
   - cp travisTests.ini tests.ini
 
