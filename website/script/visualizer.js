@@ -249,7 +249,7 @@ function showGame(game, showmovement, seconds) {
 				var tX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
 					var site = game.frames[frame][loc];
-					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.5);
+					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.4 + 0.15);
 					mapGraphics.drawRect(rw * tX, rh * tY, rw, rh);
 					mapGraphics.endFill();
 					loc++;
