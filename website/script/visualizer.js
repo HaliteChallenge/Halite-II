@@ -23,9 +23,9 @@ function showGame(game, showmovement, seconds) {
 		console.log(name);
 		var user = getUser(null, name);
 		if(user) {
-			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
+			return "<div style='display: inline-block'><a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a></div>"	
 		} else {
-			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
+			return "<div style='display: inline-block'><span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span></div>"	
 		}
 	}).join(" vs ")+"</h3>"));
 	document.getElementById("pageContent").appendChild(renderer.view);
