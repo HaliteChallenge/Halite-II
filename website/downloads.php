@@ -20,9 +20,9 @@
 					This set of binaries was uploaded at <b>10:55am EST on August 2nd</b>. We discontinued the desktop visualizer (see below), so consequently the environment executable is the only file in this download.
 				<p>
 					<ul>
-						<li><a href="downloads/HaliteEnvironment-Mac">Mac</a></li>
-						<li><a href="downloads/HaliteEnvironment-Debian">Ubuntu (64 bit)</a></li>
-						<li><a href="downloads/HaliteEnvironment-Windows.exe">Windows</a></li>
+						<li><a href="downloads/environment/HaliteEnvironment-Mac">Mac</a></li>
+						<li><a href="downloads/environment/HaliteEnvironment-Debian">Ubuntu (64 bit)</a></li>
+						<li><a href="downloads/environment/HaliteEnvironment-Windows.exe">Windows</a></li>
 					</ul>
 				</p>
 
@@ -32,11 +32,11 @@
 				</p>
 				<p>
 					<ul>
-						<li><a href="downloads/Halite-Python-Starter-Package.zip">Python 3</a></li>
-						<li><a href="downloads/Halite-Java-Starter-Package.zip">Java 7</a></li>
-						<li><a href="downloads/Halite-C++-Starter-Package.zip">C++ 11</a></li>
-						<li><a href="downloads/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
-						<li><a href="downloads/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
+						<li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
+						<li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
+						<li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+						<li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
+						<li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
 					</ul>
 				</p>
 
@@ -46,9 +46,9 @@
 				</p>
 				<p>
 					<ul>
-						<li><a href="downloads/HaliteDesktopVis-Mac.zip">Mac</a></li>
-						<li><a href="downloads/HaliteDesktopVis-Debian.zip">Ubuntu (64 bit)</a></li>
-						<li><a href="downloads/HaliteDesktopVis-Windows.zip">Windows</a></li>
+						<li><a href="downloads/visualizer/HaliteDesktopVis-Mac.zip">Mac</a></li>
+						<li><a href="downloads/visualizer/HaliteDesktopVis-Debian.zip">Ubuntu (64 bit)</a></li>
+						<li><a href="downloads/visualizer/HaliteDesktopVis-Windows.zip">Windows</a></li>
 					</ul>
 				</p>
 			</div>

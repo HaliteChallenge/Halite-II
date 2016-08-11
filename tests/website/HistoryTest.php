@@ -10,11 +10,11 @@ class HistoryTest extends APITest {
 		$this->insertObject(HISTORY_TABLE, TEST_USER_HISTORY);
 		
 		$_GET['userID'] = TEST_USER_HISTORY['userID'];
-		$_GET['REQUEST_METHOD'] = "POST";
+		$_SERVER['REQUEST_METHOD'] = "POST";
 
-    	$returnedHistory = json_decode((new WebsiteAPI("history"))->processAPI());
+    	$returnedHistory = json_decode((new WebsiteAPI("history"))->processAPI(), true)[0];
 
-		$this->assertEquals($returnedHistory, TEST_USER_HISTORY);
+		$this->assertArraySubset(TEST_USER_HISTORY, $returnedHistory);
 	}
 }
 ?>

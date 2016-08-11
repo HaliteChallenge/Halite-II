@@ -19,7 +19,10 @@ class APITest extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function tearDown() {
-		$tables = array("User", "UserHistory");
+		$tables = array();
+		$res = $this->mysqli->query("SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA='Halite'");
+		while($row = $res->fetch_assoc()) array_push($tables, $row['TABLE_NAME']);
+
 		foreach($tables as $table) {
 			$this->mysqli->query("DELETE FROM ".$table);
 		}
@@ -27,7 +30,6 @@ class APITest extends PHPUnit_Framework_TestCase {
 
 	protected function insertObject($table, $obj) {
 		$sql = "INSERT INTO $table (".implode(",", array_keys($obj)).") VALUES ('".implode("','", array_values($obj))."')";
-		echo $sql."\n";
 		$this->mysqli->query($sql);
 	}
 }

@@ -10,6 +10,7 @@ curl -sSf https://static.rust-lang.org/rustup.sh | sh
 ##########
 apt-get install -y zip python3-pip
 pip3 install requests
+pip3 install zip
 
 ################
 # Docker SETUP #

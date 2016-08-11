@@ -335,7 +335,9 @@ class WebsiteAPI extends API{
 			}
 
 			if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-				return null;
+				if(!copy($_FILES['botFile']['tmp_name'], $targetPath)) {
+					return null;
+				}
 			}
 
 			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
@@ -345,7 +347,9 @@ class WebsiteAPI extends API{
 			}
 			
 			$numPlayers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
-			$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
+			if($user['status'] != 0) {
+				$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
+			}
 
 			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
 
