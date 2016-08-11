@@ -1,0 +1,5 @@
+#!/bin/bash
+ 
+TIMESTAMP=$(date +%s)
+mysqldump -u root Halite > "/etc/cron.hourly/dump/"$TIMESTAMP"_dump.sql"
+rsync -azvP /etc/cron.hourly/dump/* root@192.241.158.114:/backup/db

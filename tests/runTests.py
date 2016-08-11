@@ -1,23 +1,28 @@
 import os
+import os.path
 import configparser
 import shutil
 import subprocess
 
 # Setup
 print("Setting up...")
-shutil.copyfile("../halite.ini", "temp.ini")
+if os.path.isfile("../halite.ini"):
+    shutil.copyfile("../halite.ini", "temp.ini")
+
 shutil.copyfile("tests.ini", "../halite.ini")
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
 
 # Website tests
 print("Beginning website backend tests")
-os.system("mysql -u "+parser["database"]["username"]+" -p"+parser["database"]["password"]+" < ../website/sql/Database.sql")
+passwordField = "" if parser["database"]["password"] == "" else "-p"+parser["database"]["password"]
+os.system("mysql -u "+parser["database"]["username"]+" "+passwordField+" < ../website/sql/Database.sql")
 subprocess.call(["phpunit", "--stderr", "website/"])
 
 # Environment tests.
-# print(subprocess.Popen('cd environment; python3 testenv.py', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8'))
+print(subprocess.Popen('cd environment; python3 testenv.py', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8'))
 
 # Tear down
 print("Almost done...")
-shutil.copyfile("temp.ini", "../halite.ini")
+if os.path.isfile("../temp.ini"):
+    shutil.copyfile("temp.ini", "../halite.ini")

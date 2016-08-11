@@ -309,7 +309,10 @@ Values.sql
 storage/
 config.php
 workingPath/
+
 *.ini
+!travisTests.ini
+
 *.swp
 *.gch
 *.exe
@@ -332,3 +335,6 @@ environment/fonts
 
 HaliteEnvironment-Mac
 HaliteEnvironment-Debian
+
+downloads/
+starterpackages/
