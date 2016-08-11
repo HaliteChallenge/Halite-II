@@ -241,27 +241,6 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	if(ppmFilename == NULL) game_map = hlt::Map(width_, height_, number_of_players, seed_);
 	else game_map = hlt::ppmToMap(*ppmFilename, number_of_players);
 
-	//Add colors to possible colors:
-	possible_colors.clear();
-	possible_colors.push_back({ 1.0f, 0.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.0f, 0.0f });
-	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ .87f, .72f, .53f });
-	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
-	possible_colors.push_back({ 1.0f, .65f, 0.0f });
-
-	//Create color codes
-	std::vector<Color> newColors = possible_colors;
-	color_codes.clear();
-	for(int a = 0; a < number_of_players; a++) {
-		int index = rand() % newColors.size();
-		color_codes[a + 1] = newColors[index]; newColors.erase(newColors.begin() + index);
-	}
-
 	//Default initialize
 	player_moves = std::vector< std::map<hlt::Location, unsigned char> >();
 	turn_number = 0;
@@ -322,11 +301,9 @@ void Halite::output(std::string filename) {
 	gameFile << "HLT 9" << F_NEWLINE;
 	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
 	for(unsigned char a = 0; a < number_of_players; a++) {
-		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << '\0' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
+		gameFile << player_names[a] << F_NEWLINE;
 	}
 	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
-	gameFile << F_NEWLINE; //Newline helps organize the file for me.
 	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
 
 	gameFile.flush();

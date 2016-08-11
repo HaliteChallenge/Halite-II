@@ -71,9 +71,7 @@ private:
 	std::set<unsigned short> timeout_tags;
 
 	//Output
-	std::vector<Color> possible_colors;
-	std::map<unsigned char, Color> color_codes;
-	std::vector<std::vector<unsigned char> * > full_game;
+	std::vector<hlt::Map> full_game;
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 	void output(std::string filename);
