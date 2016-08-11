@@ -25,6 +25,14 @@ byteArrayToGame = function(bytes) {
     colors.push('0x9900ff');
     colors.push('0xff66ff');
 
+    var x, i;
+    for (i = colors.length; i; i--) {
+        var j = Math.floor(Math.random() * i);
+        x = colors[i - 1];
+        colors[i - 1] = colors[j];
+        colors[j] = x;
+    }
+
     game.players = []
     var playerSplit = detailSplit;
     game.players.push({name: 'NULL', color: "0x888888"});
