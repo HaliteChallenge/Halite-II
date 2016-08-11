@@ -20,3 +20,9 @@ wget https://bintray.com/artifact/download/sbt/debian/sbt-0.13.6.deb
 dpkg -i sbt-0.13.6.deb
 apt-get update -y
 apt-get install -y sbt
+
+# Php unit
+wget https://phar.phpunit.de/phpunit.phar
+chmod +x phpunit.phar
+mv phpunit.phar /usr/local/bin/phpunit
+phpunit --version

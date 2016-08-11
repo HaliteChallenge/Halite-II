@@ -15,7 +15,8 @@ parser.read("../halite.ini")
 
 # Website tests
 print("Beginning website backend tests")
-os.system("mysql -u "+parser["database"]["username"]+" -p"+parser["database"]["password"]+" < ../website/sql/Database.sql")
+passwordField = "" if parser["database"]["password"] == "" else "-p"+parser["database"]["password"]
+os.system("mysql -u "+parser["database"]["username"]+" "+passwordField+" < ../website/sql/Database.sql")
 subprocess.call(["phpunit", "--stderr", "website/"])
 
 # Environment tests.
