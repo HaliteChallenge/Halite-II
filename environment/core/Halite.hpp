@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "hlt.hpp"
+#include "json.hpp"
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;
