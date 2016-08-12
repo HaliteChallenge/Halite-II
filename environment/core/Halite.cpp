@@ -23,7 +23,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	full_moves.push_back(std::vector<int>(game_map.map_width * game_map.map_height, 0));
+	full_player_moves.push_back(std::vector<int>(game_map.map_width * game_map.map_height, 0));
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	threadLocation = 0; //Represents place in frameThreads.
@@ -55,7 +55,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			else full_cardinal_count[a]++;
 
 			//Update moves
-			full_moves.back()[b->first.y * game_map.map_width + b->first.x] = b->second;
+			full_player_moves.back()[b->first.y * game_map.map_width + b->first.x] = b->second;
 
 			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
@@ -255,7 +255,7 @@ void Halite::output(std::string filename) {
 	j["version"] = 11;
 
 	//Encode player names.
-	j["players"] = j_vec(player_names);
+	j["players"] = nlohmann::json(player_names);
 
 	//Encode the production map.
 	std::vector<int> productions;
@@ -265,7 +265,7 @@ void Halite::output(std::string filename) {
 			productions.push_back(b->production);
 		}
 	}
-	j["productions"] = j_vec(productions);
+	j["productions"] = nlohmann::json(productions);
 
 	//Encode the frames. Note that there is no moves field for the last frame.
 	std::vector<nlohmann::json> jsonFrames(full_frames.size());
@@ -274,19 +274,19 @@ void Halite::output(std::string filename) {
 		std::vector<int> strengths;
 		owners.reserve(game_map.map_width * game_map.map_height);
 		strengths.reserve(game_map.map_width * game_map.map_height);
-		for(auto b = full_frames[a]->contents.begin(); b != full_frames[a]->contents.end(); b++) {
+		for(auto b = full_frames[a].contents.begin(); b != full_frames[a].contents.end(); b++) {
 			for(auto c = b->begin(); c != b->end(); c++) {
 				owners.push_back(c->owner);
 				strengths.push_back(c->strength);
 			}
 		}
-		jsonFrames[a]["owners"] = j_vec(owners);
-		jsonFrames[a]["strengths"] = j_vec(strengths);
+		jsonFrames[a]["owners"] = nlohmann::json(owners);
+		jsonFrames[a]["strengths"] = nlohmann::json(strengths);
 		if(a < full_frames.size() - 1) {
-			jsonFrames[a]["moves"] = j_vec(full_moves[a]);
+			jsonFrames[a]["moves"] = nlohmann::json(full_player_moves[a]);
 		}
 	}
-	j["frames"] = j_vec(jsonFrames);
+	j["frames"] = nlohmann::json(jsonFrames);
 
 	gameFile << j;
 
@@ -392,6 +392,5 @@ std::string Halite::getName(unsigned char playerTag) {
 
 Halite::~Halite() {
 	//Get rid of dynamically allocated memory:
-	for(auto a = full_frames.begin(); a != full_frames.end(); a++) delete *a;
 	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
 }
