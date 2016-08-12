@@ -23,7 +23,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	std::vector< std::vector<unsigned char> > moveDirections(game_map.map_height, std::vector<unsigned char>(game_map.map_width, 0)); //For the replay - which directions pieces actually moved.
+	full_moves.push_back(std::vector<int>(game_map.map_width * game_map.map_height, 0));
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	threadLocation = 0; //Represents place in frameThreads.
@@ -55,7 +55,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			else full_cardinal_count[a]++;
 
 			//Update moves
-			moveDirections[b->first.y][b->first.x] = b->second;
+			full_moves.back()[b->first.y * game_map.map_width + b->first.x] = b->second;
 
 			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
@@ -180,33 +180,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 2.25);
-	for(auto a = moveDirections.begin(); a != moveDirections.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		turn->push_back(*b);
-	}
-	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
-	std::list<unsigned char> strengths;
-	short numPieces = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		if(numPieces == 255 || b->owner != presentOwner) {
-			turn->push_back(numPieces);
-			turn->push_back(presentOwner);
-			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-			strengths.clear();
-			numPieces = 0;
-			presentOwner = b->owner;
-		}
-		numPieces++;
-		strengths.push_back(b->strength);
-	}
-
-	//Final output set:
-	turn->push_back(numPieces);
-	turn->push_back(presentOwner);
-	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-	turn->shrink_to_fit();
 	//Add to full game:
-	full_game.push_back(turn);
+	full_frames.push_back(hlt::Map(game_map));
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
@@ -246,31 +221,8 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
 
-	//Output initial map to file
-	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
-	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
-	std::list<unsigned char> strengths;
-	short numPieces = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		if (numPieces == 255 || b->owner != presentOwner) {
-			turn->push_back(numPieces);
-			turn->push_back(presentOwner);
-			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-			strengths.clear();
-			numPieces = 0;
-			presentOwner = b->owner;
-		}
-		numPieces++;
-		strengths.push_back(b->strength);
-	}
-
-	//Final output set:
-	turn->push_back(numPieces);
-	turn->push_back(presentOwner);
-	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-	turn->shrink_to_fit();
 	//Add to full game:
-	full_game.push_back(turn);
+	full_frames.push_back(hlt::Map(game_map));
 
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
@@ -297,14 +249,46 @@ void Halite::output(std::string filename) {
 	gameFile.open(filename, std::ios_base::binary);
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
-	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 9" << F_NEWLINE;
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
-	for(unsigned char a = 0; a < number_of_players; a++) {
-		gameFile << player_names[a] << F_NEWLINE;
+	nlohmann::json j;
+
+	//This is version 11.
+	j["version"] = 11;
+
+	//Encode player names.
+	j["players"] = j_vec(player_names);
+
+	//Encode the production map.
+	std::vector<int> productions;
+	productions.reserve(game_map.map_width * game_map.map_height);
+	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) {
+		for(auto b = a->begin(); b != a->end(); b++) {
+			productions.push_back(b->production);
+		}
 	}
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
-	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
+	j["productions"] = j_vec(productions);
+
+	//Encode the frames. Note that there is no moves field for the last frame.
+	std::vector<nlohmann::json> jsonFrames(full_frames.size());
+	for(int a = 0; a < full_frames.size(); a++) {
+		std::vector<int> owners;
+		std::vector<int> strengths;
+		owners.reserve(game_map.map_width * game_map.map_height);
+		strengths.reserve(game_map.map_width * game_map.map_height);
+		for(auto b = full_frames[a]->contents.begin(); b != full_frames[a]->contents.end(); b++) {
+			for(auto c = b->begin(); c != b->end(); c++) {
+				owners.push_back(c->owner);
+				strengths.push_back(c->strength);
+			}
+		}
+		jsonFrames[a]["owners"] = j_vec(owners);
+		jsonFrames[a]["strengths"] = j_vec(strengths);
+		if(a < full_frames.size() - 1) {
+			jsonFrames[a]["moves"] = j_vec(full_moves[a]);
+		}
+	}
+	j["frames"] = j_vec(jsonFrames);
+
+	gameFile << j;
 
 	gameFile.flush();
 	gameFile.close();
@@ -408,6 +392,6 @@ std::string Halite::getName(unsigned char playerTag) {
 
 Halite::~Halite() {
 	//Get rid of dynamically allocated memory:
-	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
+	for(auto a = full_frames.begin(); a != full_frames.end(); a++) delete *a;
 	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
 }
