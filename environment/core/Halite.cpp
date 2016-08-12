@@ -23,7 +23,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	full_player_moves.push_back(std::vector<int>(game_map.map_width * game_map.map_height, 0));
+	full_player_moves.push_back(std::vector< std::vector<int> >(game_map.map_height, std::vector<int>(game_map.map_width, 0)));
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	threadLocation = 0; //Represents place in frameThreads.
@@ -55,7 +55,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			else full_cardinal_count[a]++;
 
 			//Update moves
-			full_player_moves.back()[b->first.y * game_map.map_width + b->first.x] = b->second;
+			full_player_moves.back()[b->first.y][b->first.x] = b->second;
 
 			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
@@ -254,15 +254,20 @@ void Halite::output(std::string filename) {
 	//This is version 11.
 	j["version"] = 11;
 
+	//Encode some details about the game that will make it convenient to parse.
+	j["width"] = game_map.map_width;
+	j["height"] = game_map.map_height;
+	j["num_players"] = player_names.size();
+	j["num_frames"] = full_frames.size();
+
 	//Encode player names.
 	j["players"] = nlohmann::json(player_names);
 
 	//Encode the production map.
-	std::vector<int> productions;
-	productions.reserve(game_map.map_width * game_map.map_height);
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) {
-		for(auto b = a->begin(); b != a->end(); b++) {
-			productions.push_back(b->production);
+	std::vector< std::vector<int> > productions(game_map.map_height, std::vector<int>(game_map.map_width));
+	for(int a = 0; a < game_map.map_height; a++) {
+		for(int b = 0; b < game_map.map_width; b++) {
+			productions[a][b] = (game_map.contents[a][b].production);
 		}
 	}
 	j["productions"] = nlohmann::json(productions);
@@ -270,14 +275,12 @@ void Halite::output(std::string filename) {
 	//Encode the frames. Note that there is no moves field for the last frame.
 	std::vector<nlohmann::json> jsonFrames(full_frames.size());
 	for(int a = 0; a < full_frames.size(); a++) {
-		std::vector<int> owners;
-		std::vector<int> strengths;
-		owners.reserve(game_map.map_width * game_map.map_height);
-		strengths.reserve(game_map.map_width * game_map.map_height);
-		for(auto b = full_frames[a].contents.begin(); b != full_frames[a].contents.end(); b++) {
-			for(auto c = b->begin(); c != b->end(); c++) {
-				owners.push_back(c->owner);
-				strengths.push_back(c->strength);
+		std::vector< std::vector<int> > owners(game_map.map_height, std::vector<int>(game_map.map_width));
+		std::vector< std::vector<int> > strengths(game_map.map_height, std::vector<int>(game_map.map_width));
+		for(int b = 0; b < game_map.map_height; b++) {
+			for(int c = 0; c < game_map.map_width; c++) {
+				owners[b][c] = full_frames[a].contents[b][c].owner;
+				strengths[b][c] = full_frames[a].contents[b][c].strength;
 			}
 		}
 		jsonFrames[a]["owners"] = nlohmann::json(owners);

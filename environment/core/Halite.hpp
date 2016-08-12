@@ -71,8 +71,9 @@ private:
 	std::set<unsigned short> timeout_tags;
 
 	//Full game
-	std::vector<hlt::Map> full_frames;
-	std::vector< std::vector<int> > full_player_moves;
+	std::vector<hlt::Map> full_frames; //All the maps!
+	std::vector< std::vector< std::vector<int> > > full_player_moves; //Each inner 2d array represents the moves across the map for the corresponding frame
+																	  //and is guaranteed to have an outer size of map_height and an inner size of map_width
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 	void output(std::string filename);
