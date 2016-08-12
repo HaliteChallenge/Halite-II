@@ -321,6 +321,7 @@ worker/environment
 git_pull.php
 
 *.zip
+*.7z
 
 airesources/C++/MyBot
 airesources/C++/BasicBot
