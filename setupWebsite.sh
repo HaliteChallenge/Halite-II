@@ -1,11 +1,8 @@
 sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
 sudo apt-get update
 
-sudo apt-get install -y mysql-sever-5.6
-sudo apt-get install -y php5.6 
-sudo apt-get install -y apache2 
-sudo apt-get install -y python3 python3-pip 
-sudo pip3 install -y trueskill
+sudo apt-get install -y mysql-sever-5.6 php5.6 php5.6-mysql apache2 
+sudo apt-get install -y python3 python3-pip trueskill
 
 # File structure
 echo "Setting up file structure"
