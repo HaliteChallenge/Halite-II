@@ -213,7 +213,6 @@ FakesAssemblies/
 hs_err_pid*
 
 #Doc Ordner
-**/doc
 *.class
 *.pkh
 *.ctxt
