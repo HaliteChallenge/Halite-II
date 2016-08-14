@@ -4,12 +4,11 @@ If you have not already:
 
 ```git clone https://github.com/HaliteChallenge/Halite.git```
 
-## Website/Manager server setup
+## Website/Manager Server Setup
 
-* ```sudo apt-get install mysql-sever-5.6; sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php; sudo apt-get install php5.6; sudo apt-get install lamp-server^; ```
+* Execute: ```website/install.sh```
 * Checkt that you are on php >= 5.6 and mysql >= 5.6.5: ```php -v; mysql -V```
 * Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
-* ```./setupWebsite.sh```
 * Create and write a halite.ini file in the root directory of the project
 * Apache setup
  * Allow the following of symlinks by apache
@@ -21,7 +20,7 @@ If you have not already:
 
 ## Database server setup
 
-* Execute: ```./setupDatabase.sh```
+* Execute: ```website/sql/install.sh```
 * Add a superuser by wildcarding its host and allowing remote login
  * ```CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';```
  * ```GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
@@ -37,7 +36,7 @@ If you have not already:
 * [Enable swap](https://docs.docker.com/engine/installation/linux/ubuntulinux/#/adjust-memory-and-swap-accounting)
 * Execute ```sudo python3 worker.py```
 
-## Enable automatic pulling
+## Optional: Enable automatic pulling
 
 Give apache pulling permission
 
