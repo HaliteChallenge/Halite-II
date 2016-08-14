@@ -19,8 +19,8 @@ compiler: gcc
 install:
   - mysql -u root -e 'create database Halite;'
  
-  - cd ~/build/HaliteChallenge/Halite/
-  - ./setupWebsite.sh
+  - cd ~/build/HaliteChallenge/Halite/website
+  - ./install.sh
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
