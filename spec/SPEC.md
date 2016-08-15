@@ -15,7 +15,7 @@ Users develop their bots locally using our game engine, zip and submit their sou
 
 ## Environment
 
-The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves.
+The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves. A switch to using sockets for bot communication is planned.
 
 ## Website
 
@@ -39,7 +39,7 @@ Worker servers query the manager server for tasks, either a compile task or a ga
 
 Once given the ID of the bot(s) that they are compiling/running, workers query the manager for the executables and source of each bot. These are removed from disk on a worker server on completion of a task.
 
-During both compilation and runtime, bots are run within their own Docker container. Networking, RAM, CPU, and disk access is limited. 
+During both compilation and runtime, bots are run within their own Docker container. Networking, RAM, CPU, and disk access is limited.
 
 ## Database
 
@@ -55,11 +55,13 @@ Backups are made hourly from the website/manager server and the database server 
 
 # Monitoring
 
-A status page located at `halite.io/website/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site. 
+A status page located at `halite.io/website/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site.
+
+We plan on using a cron job to alert us if one of the workers hasn't responded for a number of minutes and to alert us if there are any broken links on the site. 
 
 # Configuration
 
-An INI file, titled `halite.ini` and located in the root directory of the project, is are used for all of our project configurations. Here is a sample halite.ini file: 
+An INI file, titled `halite.ini` and located in the root directory of the project, is used for all of our project configurations. Here is a sample halite.ini file: 
 
 ```
 [hce]
