@@ -53,11 +53,15 @@ Replays, bot source and executables, and error logs are all currently stored on 
 
 Backups are made hourly from the website/manager server and the database server to a server using rsync and cron. Only the most recent data from the website/manager server data is kept, while all versions of the database data are stored.
 
-# Monitoring
+# Admin Tools
+
+A simple python script (`manager/commandRunner.py`) is used to run arbitrary commands on all of the workers listed in the `halite.ini` file.
 
 A status page located at `halite.io/website/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site.
 
-We plan on using a cron job to alert us if one of the workers hasn't responded for a number of minutes and to alert us if there are any broken links on the site. 
+We plan on using cron jobs to alert us if one of the workers hasn't responded for a number of minutes and to alert us if there are any broken links on the site.
+
+We plan on setting up pingdom to alert us of downtime.
 
 # Configuration
 
