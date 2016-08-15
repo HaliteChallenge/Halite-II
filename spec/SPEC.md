@@ -2,26 +2,27 @@
 
 Halite is an online programming challenge. Users write bots to play a simple, original game with the following rule set:
 
-* Bots may move their pieces either north, south, east, or west every turn or choose to remain still
-* If a piece moves onto a piece with the same owner, the strength of the two combines. This strength value is cut off at 255.
-* A piece inflicts damage equal to its strength onto all adjacent pices that are not maps squares but have a different owner and to all coinciding pieces that have a different owner (this includes map squares)
-* When a piece has a strength < 0, it dies
+* Bots may move their pieces either north, south, east, or west every turn or choose to remain still.
+* If a piece stays still, it gains strength equal to the production value of the current tile that it is on.
+* If a piece moves onto a piece with the same owner, their strengths combine. Strength values are cut off at 255.
+* A piece inflicts damage equal to its strength onto all adjacent pieces that are not maps squares but have a different owner and onto to all coinciding pieces that have a different owner (this includes map squares).
+* When a piece has a strength < 0, it dies.
 
 Users develop their bots locally using our game engine, zip and submit their source to our website when they are ready to test out their bot, and watch as their bot plays against others and is ranked on our leaderboard.
 
-**Note:** This spec details how the project currently fuctions. Changes will be made before the public launch
+**Note:** This spec details how the project currently fuctions. Changes will be made before the public launch.
 
 # Project Components
 
 ## Environment
 
-The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves. A switch to using sockets for bot communication is planned.
+The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves. A switch to using sockets for bot communication is planned. The environment outputs a replay file, with the `hlt` extension, which may be visualized [here](http://halite.io/website/game.php).
 
 ## Website
 
-The frontend of halite.io is written in HTML, CSS, and Javascript. The Bootstrap CSS library is used for styling. The Pixi javascript library is used for our game visualizer. The JQuery library is used for DOM manipulation and for AJAX calls. HTML files are classified as PHP files to allow the easy including of repeating HTML elements, for example the navigation bar. No templating is used at all on the frontend. All interactions with our backend are done through REST calls made through the JQuery AJAX library.
+The frontend of halite.io is written in HTML, CSS, and Javascript. The Bootstrap 3 CSS library is used for styling. The Pixi javascript library is used for our game visualizer. The JQuery library is used for DOM manipulation and for AJAX calls. HTML files are classified as PHP files to allow the easy including of repeating HTML elements (i.e. the navigation bar). No templating is used at all on the frontend. All interactions with our backend are done through REST calls made through the JQuery AJAX library.
 
-The backend is written in PHP. MYSQL is used as its database. Apache is used as its webserver.
+The backend is written in PHP. Apache is used as its webserver.
 
 The server on which the website is hosted also hosts the manager and is used for the storage of error logs, replays, and the source code of contestants.
 
@@ -29,7 +30,7 @@ The server on which the website is hosted also hosts the manager and is used for
 
 The "HCE"(Halite Competition Environment) is what we call the system of servers that compiles the source code of each contestant, runs games between bots, and ranks each submission. The system consists of many worker servers and one manager server. 
 
-Worker servers query the manager server for tasks, either a compile task or a game task. If there is any bot that needs to be compiled, the manager will respond with a compile task. If there are no compile tasks, the manager will respond with a game task, which are chosen like so:
+Worker servers query the manager server for tasks, either a compile task or a game task. If there is any bot that needs to be compiled, the manager will respond with a compile task. If there are no compile tasks, the manager will respond with a game task, which is chosen like so:
 
 * A seed plager is chosen by picking the bot with the highest `rand()*(sigma^2)`. "Sigma" is the level of uncertainty in the Trueskill score of a bot
 * An allowed rank difference `d` is computed as: `5 / rand()^0.65`
@@ -37,7 +38,7 @@ Worker servers query the manager server for tasks, either a compile task or a ga
 * The other `n-1` players are chosen at random from the players within `d`
 * The width and height of the map is chosen from a range of 20-50
 
-Once given the ID of the bot(s) that they are compiling/running, workers query the manager for the executables and source of each bot. These are removed from disk on a worker server on completion of a task.
+Once given the ID of the bot(s) that they are compiling/running, workers query the manager for the executables and source of each bot. After compilation, the resulting binary+source mix is posted to the manager. These are removed from the disk on the worker server on completion of a task.
 
 During both compilation and runtime, bots are run within their own Docker container. Networking, RAM, CPU, and disk access is limited.
 
