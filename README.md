@@ -13,8 +13,8 @@ For more information about the game, visit [our website](http://halite.io).
 - `airesources/` - The language-specific starter kits for writing bots
 - `environment/` - The halite game engine 
 - `manager/` - The API that manages worker servers
-- `spec/` - An overview of the project
-- `tests/` - All of the projects unit and integration tests
+- `spec/` - A technical overview of the project
+- `tests/` - All of the project's unit and integration tests
 - `website/` - The website that hosts the competition
 - `worker/` - The source for the worker servers that compiles bots and runs games safely
 
