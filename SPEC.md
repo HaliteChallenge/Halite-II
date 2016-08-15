@@ -34,11 +34,21 @@ Once given the ID of the bot(s) that they are compiling/running, workers query t
 
 During both compilation and runtime, bots are run within their own Docker container. Networking, RAM, CPU, and disk access is limited. 
 
-### Worker
+## Database
+
+A MySQL server is used as the database for the project. 
 
 ## Disk Storage
 
-## Backups
+Replays, bot source and executables, and error logs are all currently stored on the server that hosts the website and the manager.
+
+# Backups
+
+Backups are made hourly from the website and the database to a server using rsync. Only the most recent data from the webserver is kept, while all versions of the database are stored.
+
+# Monitoring
+
+A status page located at `halite.io/website/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site. 
 
 # Configuration
 
@@ -78,5 +88,3 @@ salt = abc123456789
 # Server Architecture
 
 * Insert diagram here
-
-# Installation
