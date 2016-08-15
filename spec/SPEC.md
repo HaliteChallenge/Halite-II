@@ -2,13 +2,20 @@
 
 Halite is an online programming challenge. Users write bots to play a simple, original game with the following rule set:
 
-* INSERT RULES HERE
+* Bots may move their pieces either north, south, east, or west every turn or choose to remain still
+* If a piece moves onto a piece with the same owner, the strength of the two combines. This strength value is cut off at 255.
+* A piece inflicts damage equal to its strength onto all adjacent pices that are not maps squares but have a different owner and to all coinciding pieces that have a different owner (this includes map squares)
+* When a piece has a strength < 0, it dies
 
 Users develop their bots locally using our game engine, zip and submit their source to our website when they are ready to test out their bot, and watch as their bot plays against others and is ranked on our leaderboard.
+
+**Note:** This spec details how the project currently fuctions. Changes will be before switiching to the public launch (i.e. switching to sockets from stdin and stdout)
 
 # Project Components
 
 ## Environment
+
+The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves.
 
 ## Website
 
