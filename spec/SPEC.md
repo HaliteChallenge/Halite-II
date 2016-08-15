@@ -85,6 +85,44 @@ apiKey = 1234567890
 salt = abc123456789
 ```
 
-# Server Architecture
+# Project Component Diagram
 
-* Insert diagram here
+![Server Architecture Diagram](https://github.com/HaliteChallenge/Halite/raw/master/spec/components.png)
+
+# Installation
+
+If you have not already:
+
+```git clone https://github.com/HaliteChallenge/Halite.git```
+
+## Website/Manager Server Setup
+
+* Execute: ```cd website && ./install.sh```
+* Check that you are on php >= 5.6 and mysql >= 5.6.5: ```php -v; mysql -V```
+* Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
+* Create and write a halite.ini file in the root directory of the project
+* Apache setup
+ * Allow the following of symlinks by apache
+ * [Allow .htaccess override](http://stackoverflow.com/questions/18740419/how-to-set-allowoverride-all)
+ * Enable apache modules named mod_rewrite and php5_module, if not already enabled
+ * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
+ * Tell apache to forbid access to the storage/errors and storage/bots folders and to the halite.ini file
+ * Dont forget to restart apache: ```sudo service apache2 restart```
+
+## Database server setup
+
+* Execute: ```cd website/sql && ./install.sh```
+* Add a superuser by wildcarding its host and allowing remote login
+ * ```CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';```
+ * ```GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
+ * ```FLUSH PRIVILEGES;```
+ * Comment out `bind-address = 127.0.0.1` in `/etc/mysql/my.cnf`
+ * ```sudo service mysql restart```
+
+## Worker server setup
+
+* Execute: ```cd worker && ./install.sh```
+* Create a `halite.ini` file in the root directory of the project
+* Add the `apiKey` and the ip address of the worker to the `Worker` table
+* [Enable swap](https://docs.docker.com/engine/installation/linux/ubuntulinux/#/adjust-memory-and-swap-accounting)
+* Execute ```sudo python3 worker.py```
