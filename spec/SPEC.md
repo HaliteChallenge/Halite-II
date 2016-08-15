@@ -9,7 +9,7 @@ Halite is an online programming challenge. Users write bots to play a simple, or
 
 Users develop their bots locally using our game engine, zip and submit their source to our website when they are ready to test out their bot, and watch as their bot plays against others and is ranked on our leaderboard.
 
-**Note:** This spec details how the project currently fuctions. Changes will be before switiching to the public launch (i.e. switching to sockets from stdin and stdout)
+**Note:** This spec details how the project currently fuctions. Changes will be made before the public launch
 
 # Project Components
 
