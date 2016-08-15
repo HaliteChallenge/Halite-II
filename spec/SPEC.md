@@ -51,7 +51,7 @@ Replays, bot source and executables, and error logs are all currently stored on 
 
 # Backups
 
-Backups are made hourly from the website and the database to a server using rsync. Only the most recent data from the webserver is kept, while all versions of the database are stored.
+Backups are made hourly from the website/manager server and the database server to a server using rsync and cron. Only the most recent data from the website/manager server data is kept, while all versions of the database data are stored.
 
 # Monitoring
 
