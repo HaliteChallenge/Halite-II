@@ -1,8 +1,8 @@
 dimensions = [(1, 20), (2, 25), (3, 30), (4, 35), (3, 40), (2, 45), (1, 50)]
 averagePlayersPerGame = 4
-playersPerServers = 6
-perServerCost = 5
-averagePlayers = 5000
+playersPerServers = 15.6
+perServerCost = 3*4.68
+averagePlayers = 4000
 totalTime = 0
 totalMatches = 0
 for dimension in dimensions:
