@@ -43,7 +43,7 @@ script:
   - cd ~/build/HaliteChallenge/Halite/tests/
   - cp tests.ini ../halite.ini
   - mysql -u root < ../website/sql/Database.sql
-  - phpunit --stderr website/
+  - sudo phpunit --stderr website/
   - cd environment
   - python3 testenv.py
 
