@@ -42,6 +42,7 @@ script:
     
   - cd ~/build/HaliteChallenge/Halite/tests/
 
+  - cp tests/tests.ini ./halite.ini
   - mysql -u root < ../website/sql/Database.sql
   - phpunit --stderr website/
 
