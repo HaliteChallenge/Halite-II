@@ -42,6 +42,7 @@ script:
     
   - cd ~/build/HaliteChallenge/Halite/tests/
 
+  - mysql -u root < ../website/sql/Database.sql
   - phpunit --stderr website/
 
   - python3 runTests.py
