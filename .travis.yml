@@ -27,6 +27,8 @@ install:
 
   - cp travisTests.ini tests.ini
 
+  - phpenv global 5.6
+
 script:
   - cd ~/build/HaliteChallenge/Halite/airesources/Java
   - javac MyBot.java
