@@ -4,7 +4,9 @@ set -e
 function finish {
 	echo "Cleaning up"
 	cd $WORKINGDIR
-	cp temp.ini ../halite.ini
+	if [ -e ../halite.ini ]
+		then cp temp.ini ../halite.ini;
+	fi
 }
 trap finish EXIT
 
