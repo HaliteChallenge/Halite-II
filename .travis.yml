@@ -18,10 +18,11 @@ compiler: gcc
 
 install:
   - mysql -u root -e 'create database Halite;'
-  - phpenv global 5.6
  
   - cd ~/build/HaliteChallenge/Halite/website
   - ./install.sh
+
+  - phpenv global 5.6
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
