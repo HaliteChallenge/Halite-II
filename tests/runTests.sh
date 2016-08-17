@@ -1,6 +1,6 @@
 #!/bin/bash
-
 set -e
+
 function finish {
 	echo "Cleaning up"
 	cd $WORKINGDIR
@@ -10,7 +10,9 @@ trap finish EXIT
 
 echo "Setting up"
 WORKINGDIR=$PWD
-cp ../halite.ini temp.ini
+if [ -e ../halite.ini ]
+	then cp ../halite.ini temp.ini;
+fi
 cp tests.ini ../halite.ini
 python3 setupMysql.py || python setupMysql.py
 
