@@ -1,6 +1,7 @@
 # Halite
 
 [![Travis Badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HaliteChallenge/Halite/master/LICENSE)
 
 ## Overview
 
