@@ -18,6 +18,7 @@ compiler: gcc
 
 install:
   - mysql -u root -e 'create database Halite;'
+  - phpenv global 5.6
  
   - cd ~/build/HaliteChallenge/Halite/website
   - ./install.sh
@@ -27,7 +28,6 @@ install:
 
   - cp travisTests.ini tests.ini
 
-  - phpenv global 5.6
 
 script:
   - cd ~/build/HaliteChallenge/Halite/airesources/Java
@@ -39,10 +39,6 @@ script:
   - cd ~/build/HaliteChallenge/Halite/environment
   - make
   - ./environment -d 10 10 "python3 ../airesources/Python/MyBot.py" "cd ../airesources/Java; java MyBot" "../airesources/C++/MyBot.o"
-    
-  - php -v
-  - mysql -V
-  - phpunit -version
 
   - cd ~/build/HaliteChallenge/Halite/tests/
   - ./runTests.sh
