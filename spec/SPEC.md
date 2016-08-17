@@ -116,12 +116,10 @@ If you have not already:
 * Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
 * Create and write a halite.ini file in the root directory of the project
 * Apache setup
- * Allow the following of symlinks by apache
- * [Allow .htaccess override](http://stackoverflow.com/questions/18740419/how-to-set-allowoverride-all)
- * Enable apache modules named mod_rewrite and php5_module, if not already enabled
+ * [Allow the following of symlinks by apache](http://superuser.com/questions/244245/how-do-i-get-apache-to-follow-symlinks)
+ * [Allow .htaccess override](http://stackoverflow.com/a/22526144)
  * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
  * Tell apache to forbid access to the storage/errors and storage/bots folders and to the halite.ini file
- * Dont forget to restart apache: ```sudo service apache2 restart```
 
 ## Database server setup
 
