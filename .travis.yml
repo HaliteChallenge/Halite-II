@@ -40,14 +40,12 @@ script:
   - make
   - ./environment -d 10 10 "python3 ../airesources/Python/MyBot.py" "cd ../airesources/Java; java MyBot" "../airesources/C++/MyBot.o"
     
-  - cd ~/build/HaliteChallenge/Halite/tests/
-  - cp tests.ini ../halite.ini
-  - mysql -u root < ../website/sql/Database.sql
-  - ls ../storage/bots
   - php -v
-  - sudo phpunit --stderr website/
-  - cd environment
-  - python3 testenv.py
+  - mysql -V
+  - phpunit -version
+
+  - cd ~/build/HaliteChallenge/Halite/tests/
+  - ./runTests.sh
 
 
 notifications:
