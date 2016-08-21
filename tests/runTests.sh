@@ -21,3 +21,7 @@ python3 setupMysql.py || python setupMysql.py
 echo "Environment tests"
 cd environment
 python3 testenv.py
+
+echo "Worker tests"
+cd ../worker
+python3 testWorker.py

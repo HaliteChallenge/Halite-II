@@ -18,22 +18,23 @@ compiler: gcc
 
 install:
   - mysql -u root -e 'create database Halite;'
+
+  - cd ~/build/HaliteChallenge/Halite/tests
+  - cp travisTests.ini tests.ini
+  - cp travisTests.ini ../halite.ini
  
   - cd ~/build/HaliteChallenge/Halite/website
-  - ./install.sh
+  - sudo ./install.sh
 
-  - phpenv global 5.6
+  - cd ~/build/HaliteChallenge/Halite/worker
+  - sudo ./install.sh
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
 
-  - cp travisTests.ini tests.ini
-
-
 script:
   - cd ~/build/HaliteChallenge/Halite/tests/
   - sudo ./runTests.sh
-
 
 notifications:
     slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
