@@ -22,7 +22,6 @@ echo "Website tests"
 phpunit --stderr website/
 
 echo "Worker tests"
-cat ../halite.ini
 cd worker
 python3 testWorker.py
 
