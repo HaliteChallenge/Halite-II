@@ -18,10 +18,11 @@ fi
 cp tests.ini ../halite.ini
 python3 setupMysql.py || python setupMysql.py
 
-echo "Environment tests"
-cd environment
-python3 testenv.py
-
 echo "Worker tests"
-cd ../worker
+cat ../halite.ini
+cd worker
 python3 testWorker.py
+
+echo "Environment tests"
+cd ../environment
+python3 testenv.py 

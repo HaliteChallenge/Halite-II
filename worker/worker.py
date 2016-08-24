@@ -10,7 +10,7 @@ import tempfile
 
 from time import sleep
 
-import zip
+import archive
 import backend
 
 from compiler import *
