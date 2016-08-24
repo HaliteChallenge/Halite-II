@@ -18,6 +18,9 @@ fi
 cp tests.ini ../halite.ini
 python3 setupMysql.py || python setupMysql.py
 
+echo "Website tests"
+phpunit --stderr website/
+
 echo "Worker tests"
 cat ../halite.ini
 cd worker
