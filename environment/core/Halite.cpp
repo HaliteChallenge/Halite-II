@@ -273,23 +273,22 @@ void Halite::output(std::string filename) {
 	j["productions"] = nlohmann::json(productions);
 
 	//Encode the frames. Note that there is no moves field for the last frame.
-	std::vector<nlohmann::json> jsonFrames(full_frames.size());
+	std::vector< std::vector< std::vector< std::vector<int> > > > frames;
+	frames.reserve(full_frames.size());
 	for(int a = 0; a < full_frames.size(); a++) {
-		std::vector< std::vector<int> > owners(game_map.map_height, std::vector<int>(game_map.map_width));
-		std::vector< std::vector<int> > strengths(game_map.map_height, std::vector<int>(game_map.map_width));
+		std::vector< std::vector< std::vector<int> > > frame(game_map.map_height, std::vector< std::vector<int> >(game_map.map_width));
 		for(int b = 0; b < game_map.map_height; b++) {
 			for(int c = 0; c < game_map.map_width; c++) {
-				owners[b][c] = full_frames[a].contents[b][c].owner;
-				strengths[b][c] = full_frames[a].contents[b][c].strength;
+				frame[b][c].push_back(full_frames[a].contents[b][c].owner);
+				frame[b][c].push_back(full_frames[a].contents[b][c].strength);
+				if(a < full_frames.size() - 1) {
+					frame[b][c].push_back(full_player_moves[a][b][c]);
+				}
 			}
 		}
-		jsonFrames[a]["owners"] = nlohmann::json(owners);
-		jsonFrames[a]["strengths"] = nlohmann::json(strengths);
-		if(a < full_frames.size() - 1) {
-			jsonFrames[a]["moves"] = nlohmann::json(full_player_moves[a]);
-		}
+		frames.push_back(frame);
 	}
-	j["frames"] = nlohmann::json(jsonFrames);
+	j["frames"] = nlohmann::json(frames);
 
 	gameFile << j;
 
