@@ -15,8 +15,8 @@ void promptDimensions(unsigned short & w, unsigned short & h);
 int main(int argc, char ** argv) {
 	srand(time(NULL)); //For all non-seeded randomness.
 
-	bool watch_game = false, override_names = false; //Extra parameters. 
-	
+	bool watch_game = false, override_names = false; //Extra parameters.
+
 	//Paramters to start up a game.
 	bool passed_dimensions = false, passed_seed = false, passed_bot_names = false, ignore_timeout = false;
 	unsigned short mapWidth, mapHeight;

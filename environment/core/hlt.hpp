@@ -163,8 +163,6 @@ namespace hlt{
                 ~Region() { for(auto a = children.begin(); a != children.end(); a++) for(auto b = a->begin(); b != a->end(); b++) delete *b; }
             };
 
-            int sCA = sqrt(cw * ch); //Average dim.
-
             Region prodRegion(cw, ch, rud);
             std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
 
@@ -215,7 +213,7 @@ namespace hlt{
                             for(int d = 0; d < cw; d++) {
                                 shifts[a * ch + c][b * cw + d] = reflections[(a * ch + b * shift + c) % map_height][b * cw + d];
                             }
-                        }    
+                        }
                     }
                 }
             }
@@ -272,7 +270,7 @@ namespace hlt{
                 b->strength /= maxStr;
             }
 
-            //Finally, fill in the contents vector. 
+            //Finally, fill in the contents vector.
             const int TOP_PROD = prg() % 9 + 7, TOP_STR = prg() % 106 + 150;
             contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width));
             for(int a = 0; a < map_height; a++) for(int b = 0; b < map_width; b++) {
