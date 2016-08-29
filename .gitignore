@@ -337,3 +337,5 @@ HaliteEnvironment-Debian
 
 downloads/
 starterpackages/
+
+*.pem
