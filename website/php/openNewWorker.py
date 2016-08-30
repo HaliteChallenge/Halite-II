@@ -18,9 +18,9 @@ instance = reservation.instances[0]
 
 status = instance.update()
 while status == "pending":
-    time.sleep(1)
-    status = instance.update()
-    print("Waiting for instance to start...")
+	time.sleep(1)
+	status = instance.update()
+	print("Waiting for instance to start...")
 
 ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
 configFileContents = open("../../halite.ini").read()
