@@ -38,20 +38,24 @@ while numRows != 0:
 	numRows = int(cursor.rowcount)
 cursor.execute("INSERT INTO Worker (apiKey, ipAddress) VALUES ("+str(apiKey)+", '"+str(ipAddress)+"')")
 
-# Wait for ssh to start accepting connections
-time.sleep(10)
+def runCommandOnInstance(instance, command):
+	# Connect to ssh
+	for a in range(100):
+		try:
+			ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
+			break
+		except Exception as e:
+			print("except")
+			print(str(e))
 
-# Connect to ssh
-for a in range(100):
-	try:
-		ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
-		break
-	except Exception as e:
-		print("except")
-		print(str(e))
+	# Run install script
+	status, stdout, stderr = ssh_client.run(command)
+	print(stdout)
+	print(stderr)
 
-# Run install script
 configFileContents = open("../../halite.ini").read()
-status, stdout, stderr = ssh_client.run("sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; git checkout aws; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey))
-print(stdout)
-print(stderr)
+runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; git checkout aws; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
+
+time.sleep(5)
+runCommandOnInstance(instance, "screen -dmS test bash -c \"cd ~/Halite/worker; sudo python3 worker.py\"")
+
