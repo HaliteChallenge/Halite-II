@@ -27,7 +27,7 @@ install:
   - sudo ./install.sh
 
   - cd ~/build/HaliteChallenge/Halite/worker
-  - sudo ./install.sh
+  - sudo ./install.sh 123
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
