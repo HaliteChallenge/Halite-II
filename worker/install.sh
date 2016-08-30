@@ -34,9 +34,17 @@ service docker.io restart
 echo "Pulling docker image"
 docker pull mntruell/halite_sandbox:latest
 echo "Retrieving Installed Docker Images"
-docker images
+
+###############
+# Swap Memory #
+###############
+# Replace line 12
+sed -i '12s/.*/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"/' /etc/default/grub
+update-grub
 
 ###########
 # API Key #
 ###########
 python3 changeAPIKey.py $1
+
+echo "A reboot is required to complete this installation!"
