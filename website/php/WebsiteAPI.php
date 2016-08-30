@@ -236,7 +236,7 @@ class WebsiteAPI extends API{
 			$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
 			$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
 			if($numWorkers > 0 && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
-				shell_exec("python3 openNewWorker.py");
+				shell_exec("python3 openNewWorker.py &");
 			}
 
 			return "Success";
