@@ -410,7 +410,7 @@ class WebsiteAPI extends API{
 	 * These stats are exposed on our status page.
 	 */
 	protected function worker() {
-		$workers = $this->selectMultiple("SELECT * FROM Worker ORDER BY apiKey");
+		$workers = $this->selectMultiple("SELECT * FROM Worker ORDER BY workerID");
 		return $workers;
 	}
 	
