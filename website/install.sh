@@ -4,7 +4,7 @@ sudo apt-get update
 sudo apt-get install -y mysql-server-5.6 php5.6 php5.6-mysql apache2 
 sudo apt-get install -y python3 python3-pip 
 
-sudo pip3 install trueskill boto paramiko
+sudo pip3 install trueskill boto paramiko pymysql
 
 # File structure
 cd ../
