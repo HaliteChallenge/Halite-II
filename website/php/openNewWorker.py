@@ -22,5 +22,8 @@ while status == "pending":
     status = instance.update()
     print("Waiting for instance to start...")
 
-ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]))
-status, stdout, stderr = ssh_client.run('ls -al')
+ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
+configFileContents = open("../../halite.ini").read()
+status, stdout, stderr = ssh_client.run("git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini")
+print(stdout)
+print(stderr)
