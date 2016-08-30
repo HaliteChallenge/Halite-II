@@ -1,3 +1,16 @@
+##########
+# Checks #
+##########
+if [ ! -f ../halite.ini ]; then
+	echo "FAIL\nCannot install worker until a halite.ini file is created."
+	return
+fi
+
+[ "$#" -eq 1 ] || {
+	echo "Please provide one arguement.";
+	return
+}
+
 ##################
 # Compiler tools #
 ##################
@@ -16,13 +29,14 @@ pip3 install zip
 # Docker SETUP #
 ################
 curl -sSL https://get.docker.com/ | sh
-
-################
-# Start Docker #
-################
 service docker.io restart
 
 echo "Pulling docker image"
 docker pull mntruell/halite_sandbox:latest
 echo "Retrieving Installed Docker Images"
 docker images
+
+###########
+# API Key #
+###########
+python3 changeAPIKey.py $1
