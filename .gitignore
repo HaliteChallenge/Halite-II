@@ -213,7 +213,6 @@ FakesAssemblies/
 hs_err_pid*
 
 #Doc Ordner
-**/doc
 *.class
 *.pkh
 *.ctxt
@@ -338,3 +337,5 @@ HaliteEnvironment-Debian
 
 downloads/
 starterpackages/
+
+*.pem

@@ -25,4 +25,8 @@ apt-get install -y sbt
 wget https://phar.phpunit.de/phpunit.phar
 chmod +x phpunit.phar
 mv phpunit.phar /usr/local/bin/phpunit
+
+
+php -v
+mysql -V
 phpunit --version
