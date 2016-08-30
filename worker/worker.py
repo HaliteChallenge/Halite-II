@@ -10,7 +10,7 @@ import tempfile
 
 from time import sleep
 
-import zip
+import archive
 import backend
 
 from compiler import *
@@ -63,7 +63,7 @@ def executeCompileTask(user, backend):
 		workingPath = "workingPath"
 		makePath(workingPath)
 		botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
-		zip.unpack(botPath)
+		archive.unpack(botPath)
 
 		while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
 			singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
@@ -101,7 +101,7 @@ def downloadUsers(users):
 		if os.path.isdir(userDir):
 			shutil.rmtree(userDir)
 		os.mkdir(userDir)
-		zip.unpack(backend.storeBotLocally(user["userID"], userDir))
+		archive.unpack(backend.storeBotLocally(user["userID"], userDir))
 
 def runGame(width, height, users):
 	runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+" v"+a["numSubmissions"]+"\"" for a in users])

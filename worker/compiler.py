@@ -60,7 +60,7 @@ def nukeglob(pattern):
 
 def _run_cmd(cmd, working_dir, timelimit):
 	absoluteWorkingDir = os.path.abspath(working_dir)
-	cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" virtual_machine sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
+	cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
 	print(cmd)
 	process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 	start = time.time()
