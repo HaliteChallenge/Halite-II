@@ -35,6 +35,7 @@ echo "Retrieving Installed Docker Images"
 ###############
 # Replace line 12
 sed -i '12s/.*/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"/' /etc/default/grub
+
 update-grub
 
 ###########
