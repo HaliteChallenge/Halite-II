@@ -6,11 +6,6 @@ if [ ! -f ../halite.ini ]; then
 	return
 fi
 
-[ "$#" -eq 1 ] || {
-	echo "Please provide one arguement.";
-	return
-}
-
 ##################
 # Compiler tools #
 ##################
@@ -45,6 +40,8 @@ update-grub
 ###########
 # API Key #
 ###########
-python3 changeAPIKey.py $1
+if [ "$#" -eq 1 ]; then
+	python3 changeAPIKey.py $1
+fi
 
 echo "A reboot is required to complete this installation!"
