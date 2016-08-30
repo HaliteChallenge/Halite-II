@@ -15,6 +15,7 @@ define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
+define("USER_TO_SERVER_RATIO", 20);
 
 class WebsiteAPI extends API{
 	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
@@ -230,6 +231,12 @@ class WebsiteAPI extends API{
 				$result = $mailer->send($message);
 			} catch (Exception $e) {
 				return "Invalid email address";
+			}
+
+			$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
+			$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
+			if($numWorkers > 0 && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
+				shell_exec("python3 openNewWorker.py");
 			}
 
 			return "Success";
