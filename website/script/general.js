@@ -43,17 +43,12 @@ function SmartForm($submitButton, $form, onSubmit) {
 $(function() {
 	var navbar = {
 		loggedIn: false,
-		$logInUsername: $("#login_user"),
-		$logInPassword: $("#login_pass"),
-		$logInButton: $("#login_button"),
-		$logInForm: $("#login_form"),
-		/*$registerUsername: $("#register_user"),
+		$registerUsername: $("#register_user"),
 		$registerEmail: $("#register_email"),
 		$registerPassword: $("#register_pass"),
 		$registerConfirmPassword: $("#register_confirm_pass"),
 		$registerButton: $("#register_button"),
 		$registerForm: $("#register_form"),
-		*/
 		$logInNav: $("#loginNav"),
 		$logOutNav: $("#logoutNav"),
 		$logOutButton: $("#logoutButton"),
@@ -96,8 +91,7 @@ $(function() {
 		},
 
 		init: function(session) {
-			new SmartForm(this.$logInButton, this.$logInForm, this.logIn.bind(this));
-			//new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
+			new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
 
 			this.uploadButton.init();
 			this.$logOutButton.click(this.logOut.bind(this));
@@ -108,22 +102,6 @@ $(function() {
 			}
 
 			this.render();
-		},
-		logIn: function() {
-			messageBox.clear();
-
-			var user = getUser(null, this.$logInUsername.val(), this.$logInPassword.val());
-			if(user == null) {
-				messageBox.alert("Login failed", "That username/password combo does not exist", false);
-			} else if(user['isVerified'] == false) {
-				messageBox.alert("Login failed", "Your email needs to be verified", false);
-			} else {
-				messageBox.alert("Login successful", "You are now logged in as <b>"+user.username+"</b>.", true);
-				storeUserSession(this.$logInUsername.val(), this.$logInPassword.val(), false);
-				this.loggedIn = true;
-				this.user = user;
-				this.render();
-			}
 		},
 		register: function() {
 			messageBox.clear();
