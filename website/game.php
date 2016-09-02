@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<?php include 'includes/header.php'; ?>
+
 	<title>Visualizer</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
