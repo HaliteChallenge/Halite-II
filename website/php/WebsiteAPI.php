@@ -176,6 +176,39 @@ class WebsiteAPI extends API{
 			}
 			return $results;
 		} 
+		
+		// Github calls this once a user has granted us access to their profile info
+		if(isset($_GET["githubCallback"]) && isset($_GET["code"])) {
+			$code = $_GET["code"];
+
+			$accessTokenResult = file_get_contents("https://github.com/login/oauth/access_token", false, stream_context_create(
+				array('http' => array(
+					'header'  => "Content-type: application/json; charset=utf-8",
+					'method'  => 'POST',
+					'content' => json_encode(array("code" => $code, "client_id" => $this->config['oauth']['githubClientID'], "client_secret" => $this->config['oauth']['githubClientSecret']))
+				))
+			));
+			if($accessTokenResult === FALSE) return "Error";
+			$accessToken = json_decode($accessTokenResult, true)["access_token"];
+
+			$userResult = file_get_contents("https://api.github.com/user", false, stream_context_create(
+				array('http' => array(
+					'header'  => "Content-type: application/json; charset=utf-8",
+					'method'  => 'POST',
+					'content' => json_encode(array("access_token" => accessToken))
+				))
+			));
+			$githubUser = json_decode($userResult, true);
+
+			$this->insert("INSERT INTO User (username, oauthID, oauthProvider) VALUES ('{$githubUser['username']}', {$githubUser['id']}, 1)");
+
+			session_set_cookie_params(7*24*3600);
+			session_start();
+			$_SESSION = $this->select("SELECT * FROM USER WHERE userID = {$this->mysqli->insert_id}");
+
+			header("Location: http://halite.io/website");
+			die();
+		} 
 
 		// Verify an email
 		else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
@@ -500,33 +533,6 @@ class WebsiteAPI extends API{
 		if($this->method == 'GET') {
 			if(count($_SESSION) > 0) return $_SESSION;
 			else return NULL;
-		} 
-		
-		// Login a new user with a username and a password 
-		// TODO: take this out, functionality can be achieved by asking for its userID
-		else if(isset($_POST['username']) & isset($_POST['password'])) {
-			$username = $_POST['username'];
-			$password = $this->encryptPassword($_POST['password']);
-
-			$user = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
-		} 
-		
-		// Login a new user with a userID and a password
-		else if(isset($_POST['userID']) & isset($_POST['password'])) {
-			$userID = $_POST['userID'];
-			$password = $this->encryptPassword($_POST['password']);
-
-			$user = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
 		} 
 		
 		// Log out a user
