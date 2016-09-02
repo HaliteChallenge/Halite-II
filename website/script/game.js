@@ -6,7 +6,7 @@ $(function () {
 			console.log(data)
 			if(data != null) {
 				showGame(data, true);
-			}	
+			}
 		});
 	} else {
 		var $dropZone = $("<div id='dropZone' style='width: 100%; padding: 10px; border: 1px solid #000; height: 300px'><h1 id='dropMessage'>Drop a replay file here!</h1></div>");
@@ -26,10 +26,10 @@ $(function () {
 
 				reader.onload = function(e2) { // finished reading file data.
 					$dropZone.remove();
-					showGame(byteArrayToGame(new Uint8Array(e2.target.result)), true);
+					showGame(textToGame(e2.target.result), true);
 				};
-				reader.readAsArrayBuffer(file); // start reading the file data.
+				reader.readAsText(file); // start reading the file data.
 			}
-		});	
+		});
 	}
 })

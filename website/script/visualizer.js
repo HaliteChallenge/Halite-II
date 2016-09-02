@@ -23,9 +23,9 @@ function showGame(game, showmovement, seconds) {
 		console.log(name);
 		var user = getUser(null, name);
 		if(user) {
-			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"	
+			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"
 		} else {
-			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"	
+			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"
 		}
 	}).join(" vs ")+"</h3>"));
 	document.getElementById("pageContent").appendChild(renderer.view);
@@ -228,10 +228,9 @@ function showGame(game, showmovement, seconds) {
 			for(var a = 0; a < game.height; a++) {
 				var pX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
-					var site = game.frames[frame][loc];
-					if(game.productionNormals[loc] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[loc] * 3));
-					else if(game.productionNormals[loc] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[loc] * 3 - 1));
-					else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[loc] * 3 - 2));
+					if(game.productionNormals[floor(loc / game.width)][loc % game.width] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3));
+					else if(game.productionNormals[floor(loc / game.width)][loc % game.width] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3 - 1));
+					else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3 - 2));
 					mapGraphics.drawRect(rw * pX, rh * pY, rw, rh);
 					mapGraphics.endFill();
 					loc++;
@@ -249,7 +248,7 @@ function showGame(game, showmovement, seconds) {
 				var tX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
 					var site = game.frames[frame][loc];
-					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[loc] * 0.4 + 0.15);
+					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[floor(loc / game.width)][loc % game.width] * 0.4 + 0.15);
 					mapGraphics.drawRect(rw * tX, rh * tY, rw, rh);
 					mapGraphics.endFill();
 					loc++;
@@ -266,11 +265,11 @@ function showGame(game, showmovement, seconds) {
 			for(var a = 0; a < game.height; a++) {
 				var sX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
-					var site = game.frames[frame][loc];
+					var site = game.frames[frame][floor(loc / game.width)][loc % game.width];
 					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
 					mapGraphics.beginFill(game.players[site.owner].color);
 					var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
-					var move = t > 0 ? game.moves[frame][loc] : 0;
+					var move = t > 0 ? game.moves[frame][floor(loc / game.width)][loc % game.width] : 0;
 					var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
 					var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
 					var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
@@ -390,13 +389,10 @@ function byteArrayFromURL(replayName, callback) {
 	oReq.responseType = "arraybuffer";
 	oReq.onload = function (oEvent) {
 		if (oReq.status != 404) {
-			var aBuffer = oReq.response;
-			var byteArray = new Uint8Array(aBuffer);
-			callback(byteArrayToGame(byteArray));
+			callback(textToGame(oReq.response));
 		} else {
 			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 		}
 	}
 	oReq.send(null);
 }
-
