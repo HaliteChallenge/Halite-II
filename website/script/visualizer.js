@@ -381,7 +381,7 @@ function showGame(game, showmovement, seconds) {
 	}
 }
 
-function byteArrayFromURL(replayName, callback) {
+function textFromURL(replayName, callback) {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", "../storage/replays/"+replayName, true);
 
