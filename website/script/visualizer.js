@@ -228,9 +228,9 @@ function showGame(game, showmovement, seconds) {
 			for(var a = 0; a < game.height; a++) {
 				var pX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
-					if(game.productionNormals[floor(loc / game.width)][loc % game.width] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3));
-					else if(game.productionNormals[floor(loc / game.width)][loc % game.width] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3 - 1));
-					else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[floor(loc / game.width)][loc % game.width] * 3 - 2));
+					if(game.productionNormals[Math.floor(loc / game.width)][loc % game.width] < 0.33333) mapGraphics.beginFill(interpolate({ r: 40, g: 40, b: 40 }, { r: 128, g: 80, b: 144 }, game.productionNormals[Math.floor(loc / game.width)][loc % game.width] * 3));
+					else if(game.productionNormals[Math.floor(loc / game.width)][loc % game.width] < 0.66667) mapGraphics.beginFill(interpolate({ r: 128, g: 80, b: 144 }, { r: 176, g: 48, b: 48 }, game.productionNormals[Math.floor(loc / game.width)][loc % game.width] * 3 - 1));
+					else mapGraphics.beginFill(interpolate({ r: 176, g: 48, b: 48 }, { r: 255, g: 240, b: 16 }, game.productionNormals[Math.floor(loc / game.width)][loc % game.width] * 3 - 2));
 					mapGraphics.drawRect(rw * pX, rh * pY, rw, rh);
 					mapGraphics.endFill();
 					loc++;
@@ -247,8 +247,8 @@ function showGame(game, showmovement, seconds) {
 			for(var a = 0; a < game.height; a++) {
 				var tX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
-					var site = game.frames[frame][loc];
-					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[floor(loc / game.width)][loc % game.width] * 0.4 + 0.15);
+					var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
+					mapGraphics.beginFill(game.players[site.owner].color, game.productionNormals[Math.floor(loc / game.width)][loc % game.width] * 0.4 + 0.15);
 					mapGraphics.drawRect(rw * tX, rh * tY, rw, rh);
 					mapGraphics.endFill();
 					loc++;
@@ -265,11 +265,11 @@ function showGame(game, showmovement, seconds) {
 			for(var a = 0; a < game.height; a++) {
 				var sX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
-					var site = game.frames[frame][floor(loc / game.width)][loc % game.width];
+					var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
 					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
 					mapGraphics.beginFill(game.players[site.owner].color);
 					var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
-					var move = t > 0 ? game.moves[frame][floor(loc / game.width)][loc % game.width] : 0;
+					var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
 					var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
 					var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
 					var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
@@ -328,9 +328,8 @@ function showGame(game, showmovement, seconds) {
 				var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
 				if(x < 0) x += game.width;
 				if(y < 0) y += game.height;
-				var loc = y * game.width + x;
-				str = game.frames[frame][loc].strength;
-				prod = game.productions[loc];
+				str = game.frames[frame][y][x].strength;
+				prod = game.productions[y][x];
 				infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
 			}
 			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {

@@ -15,13 +15,14 @@ textToGame = function(text) {
     colors.push('0xff66ff');
 
     game.players = []
-    var playerSplit = detailSplit;
     game.players.push({name: 'NULL', color: "0x888888"});
-    for(i = 0; i < game.numPlayers; i++) {
+    for(i = 0; i < game.num_players; i++) {
         game.players.push({name: game.player_names[0], color: colors[i] });
         console.log(game.players[game.players.length - 1].color);
     }
     delete game.player_names;
+
+	console.log(game.players);
 
     var maxProd = 0;
     for(var a = 0; a < game.height; a++) {
@@ -36,7 +37,7 @@ textToGame = function(text) {
         for(var b = 0; b < game.width; b++) {
             row.push(game.productions[a][b] / maxProd);
         }
-        productionNormals.push(row)
+        game.productionNormals.push(row)
     }
 
     for(var a = 0; a < game.num_frames; a++) {
@@ -49,11 +50,11 @@ textToGame = function(text) {
     }
 
     //Get game statistics:
-    for(var a = 1; a <= game.numPlayers; a++) {
+    for(var a = 1; a <= game.num_players; a++) {
         game.players[a].territories = [];
         game.players[a].productions = [];
         game.players[a].strengths = [];
-        for(var b = 0; b < game.numFrames; b++) {
+        for(var b = 0; b < game.num_frames; b++) {
             var ter = 0, prod = 0, str = 0;
             for(var c = 0; c < game.height; c++) for(var d = 0; d < game.width; d++) {
                 if(game.frames[b][c][d].owner == a) {
@@ -70,18 +71,18 @@ textToGame = function(text) {
 
     //Normalize game statistics for display
     var maxPlayerTer = 0, maxPlayerProd = 0, maxPlayerStr = 0;
-    for(var a = 1; a <= game.numPlayers; a++) {
-        for(var b = 0; b < game.numFrames; b++) {
+    for(var a = 1; a <= game.num_players; a++) {
+        for(var b = 0; b < game.num_frames; b++) {
             if(game.players[a].territories[b] > maxPlayerTer) maxPlayerTer = game.players[a].territories[b];
             if(game.players[a].productions[b] > maxPlayerProd) maxPlayerProd = game.players[a].productions[b];
             if(game.players[a].strengths[b] > maxPlayerStr) maxPlayerStr = game.players[a].strengths[b];
         }
     }
-    for(var a = 1; a <= game.numPlayers; a++) {
+    for(var a = 1; a <= game.num_players; a++) {
         game.players[a].normTers = [];
         game.players[a].normProds = [];
         game.players[a].normStrs = [];
-        for(var b = 0; b < game.numFrames; b++) {
+        for(var b = 0; b < game.num_frames; b++) {
             game.players[a].normTers.push(game.players[a].territories[b] / maxPlayerTer);
             game.players[a].normProds.push(game.players[a].productions[b] / maxPlayerProd);
             game.players[a].normStrs.push(game.players[a].strengths[b] / maxPlayerStr);
