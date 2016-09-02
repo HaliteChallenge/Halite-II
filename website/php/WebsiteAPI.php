@@ -163,15 +163,9 @@ class WebsiteAPI extends API{
 				))
 			));
 			if($accessTokenResult === FALSE) return "Error";
-			$accessToken = json_decode($accessTokenResult, true)["access_token"];
+			parse_str($accessTokenResult, $accessTokenArray);
 
-			$userResult = file_get_contents("https://api.github.com/user", false, stream_context_create(
-				array('http' => array(
-					'header'  => "Content-type: application/json; charset=utf-8",
-					'method'  => 'POST',
-					'content' => json_encode(array("access_token" => accessToken))
-				))
-			));
+			$userResult = file_get_contents("http://api.github.com/user?access_token={$accessTokenArray['access_token']}");
 			$githubUser = json_decode($userResult, true);
 
 			session_start();
@@ -191,8 +185,8 @@ class WebsiteAPI extends API{
 				}*/
 			}
 
-			header("Location: http://halite.io/website");
-			die();
+			//header("Location: http://halite.io/website");
+			//die();
 		} 
 	}
 
