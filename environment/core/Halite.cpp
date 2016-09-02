@@ -185,7 +185,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
-	 	 
+
 	for(auto a = last_territory_count.begin(); a != last_territory_count.end(); a++) *a = 0;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0) {
 		last_territory_count[game_map.contents[a][b].owner - 1]++;
@@ -261,7 +261,7 @@ void Halite::output(std::string filename) {
 	j["num_frames"] = full_frames.size();
 
 	//Encode player names.
-	j["players"] = nlohmann::json(player_names);
+	j["player_names"] = nlohmann::json(player_names);
 
 	//Encode the production map.
 	std::vector< std::vector<int> > productions(game_map.map_height, std::vector<int>(game_map.map_width));
@@ -274,21 +274,30 @@ void Halite::output(std::string filename) {
 
 	//Encode the frames. Note that there is no moves field for the last frame.
 	std::vector< std::vector< std::vector< std::vector<int> > > > frames;
+	std::vector< std::vector< std::vector<int> > > moves;
 	frames.reserve(full_frames.size());
+	moves.reserve(full_frames.size() - 1);
 	for(int a = 0; a < full_frames.size(); a++) {
 		std::vector< std::vector< std::vector<int> > > frame(game_map.map_height, std::vector< std::vector<int> >(game_map.map_width));
 		for(int b = 0; b < game_map.map_height; b++) {
 			for(int c = 0; c < game_map.map_width; c++) {
 				frame[b][c].push_back(full_frames[a].contents[b][c].owner);
 				frame[b][c].push_back(full_frames[a].contents[b][c].strength);
-				if(a < full_frames.size() - 1) {
-					frame[b][c].push_back(full_player_moves[a][b][c]);
-				}
 			}
 		}
 		frames.push_back(frame);
 	}
+	for(int a = 0; a < full_frames.size() - 1; a++) {
+		std::vector< std::vector<int> > move_frame(game_map.map_height, std::vector<int>(game_map.map_width));
+		for(int b = 0; b < game_map.map_height; b++) {
+			for(int c = 0; c < game_map.map_width; c++) {
+				move_frame[b][c] = full_player_moves[a][b][c];
+			}
+		}
+		moves.push_back(move_frame);
+	}
 	j["frames"] = nlohmann::json(frames);
+	j["moves"] = nlohmann::json(moves);
 
 	gameFile << j;
 
