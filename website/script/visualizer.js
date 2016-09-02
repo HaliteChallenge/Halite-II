@@ -17,7 +17,7 @@ function showGame(game, showmovement, seconds) {
 	if(renderer == null) initPixi();
 
 	$("#pageContent").empty();
-	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
+	$("#pageContent").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
 		var nameComponents = p.name.split(" ");
 		var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
 		console.log(name);
@@ -32,11 +32,11 @@ function showGame(game, showmovement, seconds) {
 
 	var frame = 0;
 	var transit = 0;
-	var framespersec = seconds == null ? 2.5 : game.numFrames / seconds;
+	var framespersec = seconds == null ? 2.5 : game.num_frames / seconds;
 	var shouldplay = true;
 	var xOffset = 0, yOffset = 0;
 	var zoom = 8;
-	if(game.numFrames / zoom < 3) zoom = game.numFrames / 3;
+	if(game.num_frames / zoom < 3) zoom = game.num_frames / 3;
 	if(zoom < 1) zoom = 1;
 
 	window.onresize = function() {
@@ -101,7 +101,7 @@ function showGame(game, showmovement, seconds) {
 			transit = 0;
 		}
 		else if(e.keyCode == 88) { //x
-			frame = game.numFrames - 1;
+			frame = game.num_frames - 1;
 			transit = 0;
 		}
 		else if(e.keyCode == 188) { //,
@@ -113,7 +113,7 @@ function showGame(game, showmovement, seconds) {
 		else if(e.keyCode == 190) { //.
 			frame++;
 			transit = 0;
-			if(frame >= game.numFrames - 1) frame = game.numFrames - 1;
+			if(frame >= game.num_frames - 1) frame = game.num_frames - 1;
 			shouldplay = false;
 		}
 		else if(e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 87 || e.keyCode == 83) { //wasd
@@ -126,7 +126,7 @@ function showGame(game, showmovement, seconds) {
 		}
 		else if(e.keyCode == 187 || e.keyCode == 107) { //= or +
 			zoom *= 1.41421356237;
-			if(game.numFrames / zoom < 3) zoom = game.numFrames / 3;
+			if(game.num_frames / zoom < 3) zoom = game.num_frames / 3;
 		}
 		else if(e.keyCode == 189 || e.keyCode == 109) { //- or - (dash or subtract)
 			zoom /= 1.41421356237;
@@ -153,25 +153,25 @@ function showGame(game, showmovement, seconds) {
 		graphGraphics.clear();
 
 		//Draw the graphs.
-		var nf = Math.round(game.numFrames / zoom), graphMidFrame = frame;
+		var nf = Math.round(game.num_frames / zoom), graphMidFrame = frame;
 		var nf2 = Math.floor(nf / 2);
-		if(graphMidFrame + nf2 >= game.numFrames) graphMidFrame -= ((nf2 + graphMidFrame) - game.numFrames);
+		if(graphMidFrame + nf2 >= game.num_frames) graphMidFrame -= ((nf2 + graphMidFrame) - game.num_frames);
 		else if(Math.ceil(graphMidFrame - nf2) < 0) graphMidFrame = nf2;
 		var firstFrame = graphMidFrame - nf2, lastFrame = graphMidFrame + nf2;
 		if(firstFrame < 0) firstFrame = 0;
-		if(lastFrame >= game.numFrames) lastFrame = game.numFrames - 1;
+		if(lastFrame >= game.num_frames) lastFrame = game.num_frames - 1;
 		nf = lastFrame - firstFrame;
 		var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
 		//Normalize values with respect to the range of frames seen by the graph.
 		var maxTer = 0, maxProd = 0, maxStr = 0;
-		for(var a = 1; a <= game.numPlayers; a++) {
+		for(var a = 1; a <= game.num_players; a++) {
 			for(var b = firstFrame; b <= lastFrame; b++) {
 				if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
 				if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
 				if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
 			}
 		}
-		for(var a = 1; a <= game.numPlayers; a++) {
+		for(var a = 1; a <= game.num_players; a++) {
 			graphGraphics.lineStyle(1, game.players[a].color);
 			//Draw ter graph.
 			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
@@ -335,7 +335,7 @@ function showGame(game, showmovement, seconds) {
 			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
 				frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
 				if(frame < 0) frame = 0;
-				if(frame >= game.numFrames) frame = game.numFrames - 1;
+				if(frame >= game.num_frames) frame = game.num_frames - 1;
 				transit = 0;
 				if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
 				}
@@ -347,8 +347,8 @@ function showGame(game, showmovement, seconds) {
 			transit--;
 			frame++;
 		}
-		if(frame >= game.numFrames - 1) {
-			frame = game.numFrames - 1;
+		if(frame >= game.num_frames - 1) {
+			frame = game.num_frames - 1;
 			transit = 0;
 		}
 		while(transit < 0) {
