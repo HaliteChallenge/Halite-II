@@ -1,4 +1,10 @@
 <?php
+
+use OAuth\OAuth2\Service\GitHub;
+use OAuth\Common\Storage\Session;
+use OAuth\Common\Consumer\Credentials;
+use OAuth\Common\Http\Uri\UriFactory;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
@@ -155,18 +161,10 @@ class WebsiteAPI extends API{
 		if(isset($_GET["githubCallback"]) && isset($_GET["code"])) {
 			$code = $_GET["code"];
 
-			$accessTokenResult = file_get_contents("https://github.com/login/oauth/access_token", false, stream_context_create(
-				array('http' => array(
-					'header'  => "Content-type: application/json; charset=utf-8",
-					'method'  => 'POST',
-					'content' => json_encode(array("code" => $code, "client_id" => $this->config['oauth']['githubClientID'], "client_secret" => $this->config['oauth']['githubClientSecret']))
-				))
-			));
-			if($accessTokenResult === FALSE) return "Error";
-			parse_str($accessTokenResult, $accessTokenArray);
-
-			$userResult = file_get_contents("http://api.github.com/user?access_token={$accessTokenArray['access_token']}");
-			$githubUser = json_decode($userResult, true);
+			$credentials = new Credentials($this->config['oauth']['githubClientID'], $this->config['oauth']['githubClientSecret'], NULL);
+			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user'));
+			$gitHub->requestAccessToken($code);
+			$githubUser = json_decode($gitHub->request('user/emails'), true);
 
 			session_start();
 			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) {
