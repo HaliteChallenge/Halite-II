@@ -34,7 +34,9 @@ class WebsiteAPI extends API{
 	private $mysqli = NULL;
 
 	public function __construct($request) {
-		session_start();
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
 
 		$this->config = parse_ini_file(INI_PATH, true);
 
@@ -131,6 +133,10 @@ class WebsiteAPI extends API{
 	// TODO: insert is a terrible name for this method
 	private function insert($sql) {
 		mysqli_query($this->mysqli, $sql);
+	}
+
+	private function isLoggedIn() {
+		return isset($_SESSION['userID']) && mysqli_query($this->mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']}")->num_rows == 1;
 	}
 
 	private function getLoggedInUser() {
@@ -264,7 +270,7 @@ class WebsiteAPI extends API{
 	 */
 	protected function botFile() {
 		// Mark a new botfile for compilation if valid. Return error otherwise 
-		if(isset($_FILES['botFile']['name'])) {
+		if($this->isLoggedIn() && isset($_FILES['botFile']['name'])) {
 			$user = $this->getLoggedInUser();
 			
 			if($user['status'] == 1 || $user['status'] == 2) {
@@ -275,7 +281,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = BOTS_PATH."{$userID}.zip";
+			$targetPath = BOTS_PATH."{$user['userID']}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}

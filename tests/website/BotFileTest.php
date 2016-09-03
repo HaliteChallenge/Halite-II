@@ -7,7 +7,6 @@ include_once "UserTest.php";
 class BotFileTests extends APITest { 
 	public function testPOST() {
 		$testUser = TEST_USER;
-		$testUser['isVerified'] = 1;
 		$testUser['rank'] = 1;
 		$testUser['status'] = 3;
 		$this->insertObject(USER_TABLE, $testUser);
@@ -24,14 +23,16 @@ class BotFileTests extends APITest {
 				'error' => 0
 			)
         );
-		$_POST['userID'] = $testUser['userID'];
-		$_POST['password'] = $testUser['password'];
 		$_SERVER['REMOTE_ADDR'] = "127.0.0.1";
 		$_SERVER['REQUEST_METHOD'] = "POST";
 
+		$this->assertEquals((new WebsiteAPI("botFile"))->processAPI(), "null");	
+
+		$_SESSION['userID'] = $testUser['userID'];
     	$result = (new WebsiteAPI("botFile"))->processAPI();
 
 		$newUser = $this->mysqli->query("SELECT * FROM User WHERE userID={$testUser['userID']}")->fetch_assoc();
+		var_dump($newUser);
 		$userHistory = $this->mysqli->query("SELECT * FROM UserHistory WHERE userID={$testUser['userID']}")->fetch_assoc();
 
 		$this->assertEquals($newUser["status"], "1");
