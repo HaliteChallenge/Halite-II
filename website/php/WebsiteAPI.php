@@ -313,10 +313,6 @@ class WebsiteAPI extends API{
 	protected function botFile() {
 		// Mark a new botfile for compilation if valid. Return error otherwise 
 		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
-				return "Cannot submit on Two Sigma desktop";
-			}
-
 			$userID = $_POST['userID'];
 			$password = $_POST['password'];
 
