@@ -301,7 +301,14 @@ native
 checkouts
 .lein-deps-sum
 
-#############
+##############
+## Composer ##
+##############
+composer.phar
+vendor/
+composer.lock
+
+############
 ## Halite ##
 ############
 Values.sql
