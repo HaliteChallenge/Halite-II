@@ -1,6 +1,9 @@
 <?php
 
+require __DIR__ . '/../vendor/autoload.php';
+
 use OAuth\OAuth2\Service\GitHub;
+use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Http\Uri\UriFactory;
@@ -31,6 +34,8 @@ class WebsiteAPI extends API{
 	private $mysqli = NULL;
 
 	public function __construct($request) {
+		session_start();
+
 		$this->config = parse_ini_file(INI_PATH, true);
 
 		$this->initDB();
@@ -129,7 +134,6 @@ class WebsiteAPI extends API{
 	}
 
 	private function getLoggedInUser() {
-		session_start();
 		return $this->select("SELECT * FROM User WHERE userID={$_SESSION['userID']}");
 	}
 
@@ -161,18 +165,19 @@ class WebsiteAPI extends API{
 		if(isset($_GET["githubCallback"]) && isset($_GET["code"])) {
 			$code = $_GET["code"];
 
+			$serviceFactory = new ServiceFactory();
 			$credentials = new Credentials($this->config['oauth']['githubClientID'], $this->config['oauth']['githubClientSecret'], NULL);
 			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user'));
 			$gitHub->requestAccessToken($code);
-			$githubUser = json_decode($gitHub->request('user/emails'), true);
+			$githubUser = json_decode($gitHub->request('user'), true);
+			var_dump($githubUser);
 
-			session_start();
 			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) {
 				// Already signed up
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}");
 			} else {
 				// New User
-				$this->insert("INSERT INTO User (username, oauthID, oauthProvider) VALUES ('{$githubUser['username']}', {$githubUser['id']}, 1)");
+				$this->insert("INSERT INTO User (username, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', {$githubUser['id']}, 1)");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
@@ -183,8 +188,8 @@ class WebsiteAPI extends API{
 				}*/
 			}
 
-			//header("Location: http://halite.io/website");
-			//die();
+			header("Location: http://halite.io/website");
+			die();
 		} 
 	}
 
@@ -401,7 +406,6 @@ class WebsiteAPI extends API{
 	 * Users may only see **their** error logs.
 	 */
 	protected function errorLog() {
-		session_start();
 
 		// Return the requested error log only if it belongs to the signed in user.
 		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
@@ -426,7 +430,6 @@ class WebsiteAPI extends API{
 	 * Encapsulates the logged in user's info
 	 */
 	protected function session() {
-		session_start();
 
 		// Get the logged in user's info
 		if($this->method == 'GET') {
