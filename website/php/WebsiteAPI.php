@@ -19,9 +19,6 @@ define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
-	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
-	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
-
 	// The database
 	private $mysqli = NULL;
 
