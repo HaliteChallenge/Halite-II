@@ -82,7 +82,7 @@ function getActiveUsers() {
 		url: url+"user",
 		async: false,
 		method: "GET",
-		data: {active: 1}
+		data: {field: "status", value: "3"}
 	});
 	console.log(result)
 	console.log(result.responseJSON)
@@ -228,4 +228,15 @@ function getNumSubmissions() {
 		method: "GET",
 		data: {numSubmissions: 1}
 	}).responseJSON;
+}
+
+function getFilteredUsers(field, value) {
+	var result = $.ajax({
+		url: url+"user",
+		async: false,
+		method: "GET",
+		data: {field: field, value: value}
+	});
+
+	return result.responseJSON;
 }

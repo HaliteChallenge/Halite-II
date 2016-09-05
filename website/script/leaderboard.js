@@ -21,7 +21,7 @@ $(function() {
 			for(var a = 0; a < this.submissions.length; a++) {
 				var user = this.submissions[a];
 				var score = Math.round((this.submissions[a].mu-(3*this.submissions[a].sigma))*100)/100;
-				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td><a href='user.php?userID="+user.userID+"'>"+user.username+"</a></td><td>"+user.language+"</td><td>"+user.numSubmissions+"</td><td>"+user.numGames+"</td><td>"+score+"</td></tr></tbody>");
+				this.$table.append("<tbody id='user" + user.userID + "'><tr><th scope='row'>"+(a+1)+"</th><td><a href='user.php?userID="+user.userID+"'>"+user.username+"</a></td><td><a href='leaderboard.php?field=language&value="+user.language+"&heading="+user.language+"'>"+user.language+"</a></td><td>"+user.numSubmissions+"</td><td>"+user.numGames+"</td><td>"+score+"</td></tr></tbody>");
 			}
 		},
 		getUserWithID: function(userID) {
@@ -30,14 +30,16 @@ $(function() {
 		}
 	};
 
-	table.init(getActiveUsers());
+	var field = getGET("field");
+	var value = getGET("value");
+	var heading = getGET("heading");
+	var $heading = $("#leaderHeading");
 
-	if(getGET("userID") != null && getGET("verificationCode") != null) {
-		var res = verifyUser(parseInt(getGET("userID")), getGET("verificationCode"));
-		if(res == "Success") {
-			messageBox.alert("Email Verification Successful", "You may now log into your Halite account and submit to the competition!", true);
-		} else {
-			messageBox.alert("Email Verification Error", "An error occured while trying to verfy your email. If this problem is persistent, please email halite@halite.io", false);
-		}
+	if(field != null && value != null && heading != null) {
+		$heading.html(heading + " Rankings");
+		table.init(getFilteredUsers(field, value));
+	} else {
+		$heading.html("Current Rankings");
+		table.init(getActiveUsers());
 	}
 })
