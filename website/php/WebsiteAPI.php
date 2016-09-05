@@ -164,6 +164,17 @@ class WebsiteAPI extends API{
 			}
 		} 
 		
+		// Get a set of filtered users
+		else if(isset($_GET['field']) && isset($_GET['value'])) {
+			$results = $this->selectMultiple("SELECT * FROM User WHERE {$_GET['field']} = '{$_GET['value']}'");
+			foreach(array_keys($results) as $key) {
+				unset($results[$key]["password"]);
+				unset($results[$key]["email"]);
+				unset($results[$key]["verificationCode"]);
+			}
+			return $results;
+		} 
+
 		// Get all of the user's with active submissions
 		else if(isset($_GET['active'])) {
 			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
