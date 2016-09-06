@@ -2,10 +2,10 @@ $(function () {
 	var replayName = getGET("replay");
 
 	if(replayName != null && replayName != undefined) {
-		var data = byteArrayFromURL(replayName, function(data) {
+		byteArrayFromURL("../storage/replays/"+replayName, function(data) {
 			console.log(data)
 			if(data != null) {
-				showGame(data, true);
+				showGame(data, "pageContent", true, true);
 			}	
 		});
 	} else {
@@ -26,7 +26,7 @@ $(function () {
 
 				reader.onload = function(e2) { // finished reading file data.
 					$dropZone.remove();
-					showGame(byteArrayToGame(new Uint8Array(e2.target.result)), true);
+					showGame(byteArrayToGame(new Uint8Array(e2.target.result)), "pageContent", true, true);
 				};
 				reader.readAsArrayBuffer(file); // start reading the file data.
 			}
