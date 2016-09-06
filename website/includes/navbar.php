@@ -13,25 +13,15 @@
 			<ul class="nav navbar-nav navbar-right loggedOut" id="loginNav">
 				<ul class="nav navbar-nav">
 					<?php include 'includes/dropdowns.php'; ?>
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Login<strong class="caret"></strong></a>
-						<ul class="dropdown-menu" style="padding: 10px; padding-bottom: 15px;">
-							<?php include 'includes/login_form.php'; ?>
-						</ul>
+					<li>
+					  <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login with Github</a>
 					</li>
-
-					<!--<li class="dropdown">
-						<a class="dropdown-toggle" href="#" data-toggle="dropdown">Register<strong class="caret"></strong></a>
-						<ul class="dropdown-menu" style="padding: 15px; padding-bottom: 15px;">
-							<?php //include 'includes/register_form.php'; ?>
-						</ul>
-					</li> -->
 				</ul>
 			</ul>
 			<form id="submitForm">
 				<ul class="nav navbar-nav navbar-right loggedIn" id="logoutNav">
 					<?php include 'includes/dropdowns.php'; ?>
-					<!--<li><a href="#" id="submitButton">Submit</a><input type="file" id="myFile" name="botFile"></li>-->
+					<li><a href="#" id="submitButton">Submit</a><input type="file" id="myFile" name="botFile"></li>
 					<li><a href="#" id="logoutButton">Logout</a></li>
 				</ul>
 			</form>

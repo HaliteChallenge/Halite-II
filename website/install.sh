@@ -6,6 +6,10 @@ sudo apt-get install -y python3 python3-pip
 
 sudo pip3 install trueskill boto paramiko pymysql
 
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+composer install
+
 # File structure
 cd ../
 echo "Setting up file structure"
