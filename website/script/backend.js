@@ -77,12 +77,12 @@ function getUser(userID, username, password) {
 	return result.responseJSON;
 }
 
-function getActiveUsers() {
+function getActiveUsers(limit, page) {
 	var result = $.ajax({
 		url: url+"user",
 		async: false,
 		method: "GET",
-		data: {active: 1}
+		data: {fields: ["status"], values: ["3"], limit: limit, page: page}
 	});
 	console.log(result)
 	console.log(result.responseJSON)
@@ -228,4 +228,17 @@ function getNumSubmissions() {
 		method: "GET",
 		data: {numSubmissions: 1}
 	}).responseJSON;
+}
+
+function getFilteredUsers(filters, orderBy, limit, page) {
+	var fields = Object.keys(filters);
+	var values = fields.map(function(a) {return filters[a];});
+	var result = $.ajax({
+		url: url+"user",
+		async: false,
+		method: "GET",
+		data: {fields: fields, values: values, orderBy: orderBy, limit: limit, page: page}
+	});
+
+	return result.responseJSON;
 }

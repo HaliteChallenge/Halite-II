@@ -25,11 +25,9 @@ define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
 define("USER_TO_SERVER_RATIO", 20);
+define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
-	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
-	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
-
 	// The database
 	private $mysqli = NULL;
 
@@ -54,9 +52,6 @@ class WebsiteAPI extends API{
 	 * Also, bad practice
 	 */
 	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = $this->mysqli->real_escape_string($value);
-		}
 		foreach ($_POST as $key => $value) {
 			$_POST[$key] = $this->mysqli->real_escape_string($value);
 		}
@@ -162,6 +157,22 @@ class WebsiteAPI extends API{
 			return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
 		} 
 		
+		// Get a set of filtered users
+		else if(isset($_GET['fields']) && isset($_GET['values'])) {
+			$limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+			$whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
+			$orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
+			$page = isset($_GET['page']) ? $_GET['page'] : 0;
+
+			$results = $this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
+			foreach(array_keys($results) as $key) {
+				unset($results[$key]["password"]);
+				unset($results[$key]["email"]);
+				unset($results[$key]["verificationCode"]);
+			}
+			return $results;
+		} 
+
 		// Get all of the user's with active submissions
 		else if(isset($_GET['active'])) {
 			return $this->selectMultiple("SELECT * FROM User WHERE status = 3");
@@ -189,7 +200,7 @@ class WebsiteAPI extends API{
 				// AWS auto scaling
 				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
 				$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
-				if($numWorkers > 0 && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
+				if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
 					shell_exec("python3 openNewWorker.py &");
 				}*/
 			}

@@ -1,34 +1,4 @@
 $(function() {
-	var gameDisplay = {
-		isInitialized: false,
-		init: function() {
-			this.isInitialized = true;
-			this.cacheDOM();
-		},
-		cacheDOM: function() {
-			this.$modal = $("#gameModal");
-			this.$player1Field = $("#player1");
-			this.$player2Field = $("#player2");
-		},
-		setGame: function(player1Name, player2Name, replayContents) {
-			if(this.isInitialized == false) this.init();
-
-			this.player1Name = player1Name;
-			this.player2Name = player2Name;
-			this.replayContents = replayContents;
-			this.render();
-		},
-		render: function() {
-			this.$modal.modal('show');
-			this.$player1Field.html(this.player1Name);
-			this.$player2Field.html(this.player2Name);
-			begin(this.replayContents);
-		},
-		hide: function() {
-			this.$modal.modal('hide');
-		}
-	};
-
 	var table = {
 		init: function(submissions) {
 			this.cacheDOM();
@@ -70,4 +40,11 @@ $(function() {
 			messageBox.alert("Email Verification Error", "An error occured while trying to verfy your email. If this problem is persistent, please email halite@halite.io", false);
 		}
 	}
+
+
+	byteArrayFromURL("assets/interestingGame.hlt", function(data) {
+		if(data != null) {
+			showGame(data, "gameArea", false, true);
+		}	
+	});
 })
