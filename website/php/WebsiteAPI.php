@@ -191,7 +191,7 @@ class WebsiteAPI extends API{
 
 			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) {
 				// Already signed up
-				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}");
+				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
 			} else {
 				// New User
 				$this->insert("INSERT INTO User (username, email, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', {$githubUser['id']}, 1)");
@@ -205,7 +205,8 @@ class WebsiteAPI extends API{
 				}*/
 			}
 
-			header("Location: http://halite.io/website");
+			if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
+			else header("Location: http://halite.io/website");
 			die();
 		} 
 	}
@@ -326,12 +327,18 @@ class WebsiteAPI extends API{
 	 */
 	protected function forums() {
 		// Follows the Discource sso detailed here: https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
-		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
-			$initialBase64Payload = stripcslashes($_GET['payload']);
-			$signature = $_GET['signature'];
-			$userID = $_GET['userID'];
-			$email = $_GET['email'];
-			$username = $_GET['username'];
+		if(isset($_GET['sso']) && isset($_GET['sig'])) {
+			if(!$this->isLoggedIn()) {
+				$forumsCallbackURL = urlencode("http://halite.io/website/php/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
+				$githubCallbackURL = urlencode("http://halite.io/website/php/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
+				header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
+				die();
+			}
+
+			$user = $this->getLoggedInUser();
+
+			$initialBase64Payload = stripcslashes($_GET['sso']);
+			$signature = $_GET['sig'];
 
 			$correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
 
@@ -344,9 +351,9 @@ class WebsiteAPI extends API{
 
 			$finalBase64Payload = base64_encode(http_build_query(array(
 				"nonce" => $nonce,
-				"name" => $username,
-				"email" => $email,
-				"external_id" =>$userID
+				"name" => $user['username'],
+				"email" => $user['email'],
+				"external_id" => $user['userID']
 			)));
 			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['sso']['secret']);
 
@@ -355,7 +362,9 @@ class WebsiteAPI extends API{
 				"sig" => $finalSignature
 			));
 			$finalURL = $this->config['sso']['url']."?".$finalQueryString;
-			return $finalURL;
+
+			header("Location: ".$this->config['sso']['url']."?".$finalQueryString);
+			die();
 		}
 	}
 	

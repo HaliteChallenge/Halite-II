@@ -80,7 +80,7 @@ CREATE TABLE `User` (
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   `updateTime` datetime ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`)
-) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

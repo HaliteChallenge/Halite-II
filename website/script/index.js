@@ -41,7 +41,6 @@ $(function() {
 		}
 	}
 
-
 	byteArrayFromURL("assets/interestingGame.hlt", function(data) {
 		if(data != null) {
 			showGame(data, "gameArea", false, true);
