@@ -195,9 +195,6 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-#Halite replays
-*.hlt
-
 #Java
 *.class
 
@@ -339,3 +336,6 @@ downloads/
 starterpackages/
 
 *.pem
+
+*.hlt
+!interestingGame.hlt
