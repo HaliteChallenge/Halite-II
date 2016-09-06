@@ -40,4 +40,11 @@ $(function() {
 			messageBox.alert("Email Verification Error", "An error occured while trying to verfy your email. If this problem is persistent, please email halite@halite.io", false);
 		}
 	}
+
+
+	byteArrayFromURL("assets/interestingGame.hlt", function(data) {
+		if(data != null) {
+			showGame(data, "gameArea", false, true);
+		}	
+	});
 })

@@ -39,9 +39,6 @@ class WebsiteAPI extends API{
 	 * Also, bad practice
 	 */
 	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = $this->mysqli->real_escape_string($value);
-		}
 		foreach ($_POST as $key => $value) {
 			$_POST[$key] = $this->mysqli->real_escape_string($value);
 		}
@@ -165,8 +162,13 @@ class WebsiteAPI extends API{
 		} 
 		
 		// Get a set of filtered users
-		else if(isset($_GET['field']) && isset($_GET['value'])) {
-			$results = $this->selectMultiple("SELECT * FROM User WHERE {$_GET['field']} = '{$_GET['value']}'");
+		else if(isset($_GET['fields']) && isset($_GET['values'])) {
+			$limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+			$whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
+			$orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
+			$page = isset($_GET['page']) ? $_GET['page'] : 0;
+
+			$results = $this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
 			foreach(array_keys($results) as $key) {
 				unset($results[$key]["password"]);
 				unset($results[$key]["email"]);
