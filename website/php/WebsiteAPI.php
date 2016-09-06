@@ -194,7 +194,7 @@ class WebsiteAPI extends API{
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}");
 			} else {
 				// New User
-				$this->insert("INSERT INTO User (username, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', {$githubUser['id']}, 1)");
+				$this->insert("INSERT INTO User (username, email, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', {$githubUser['id']}, 1)");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
