@@ -114,7 +114,7 @@ keyfilepath = NameOfKeyFile.pem
 
 # Project Component Diagram
 
-![Server Architecture Diagram](https://github.com/HaliteChallenge/Halite/raw/master/spec/components.png)
+![Server Architecture Diagram](components.png)
 
 # Installation
 
