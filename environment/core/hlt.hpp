@@ -215,7 +215,7 @@ namespace hlt{
                             for(int d = 0; d < cw; d++) {
                                 shifts[a * ch + c][b * cw + d] = reflections[(a * ch + b * shift + c) % map_height][b * cw + d];
                             }
-                        }    
+                        }
                     }
                 }
             }
@@ -272,7 +272,7 @@ namespace hlt{
                 b->strength /= maxStr;
             }
 
-            //Finally, fill in the contents vector. 
+            //Finally, fill in the contents vector.
             const int TOP_PROD = prg() % 9 + 7, TOP_STR = prg() % 106 + 150;
             contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width));
             for(int a = 0; a < map_height; a++) for(int b = 0; b < map_width; b++) {
@@ -326,31 +326,4 @@ namespace hlt{
             return contents[l.y][l.x];
         }
     };
-
-    static Map ppmToMap(std::string filename, int numplayers) {
-        std::ifstream in(filename, std::ios_base::binary);
-        assert(in.is_open());
-        int width, height, max_color;
-        assert(in.get() == 'P');
-        assert(in.get() == '6');
-        in >> width >> height >> max_color;
-        assert(max_color < 256);
-        in.get(); //Get whitespace character.
-        Map m;
-        m.map_width = width;
-        m.map_height = height;
-        m.contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
-        const unsigned char MAX_PROD = 15;//7 + rand() % 9;
-        int counter = 1;
-        for(int a = 0; a < m.map_height; a++) for(int b = 0; b < m.map_width; b++) {
-            if(a == height / 2 && (b % (width / numplayers + 1) == 0)) {
-                m.contents[a][b].owner = counter;
-                counter++;
-            }
-            m.contents[a][b].production = (in.get() + in.get() + in.get()) / 765.0 * MAX_PROD;
-            m.contents[a][b].strength = 15 * m.contents[a][b].production;
-        }
-        if(!quiet_output) std::cout << "Loaded ppm" << std::endl;
-        return m;
-    }
 }
