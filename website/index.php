@@ -1,3 +1,5 @@
+<?php if(isset($_SESSION['userID'])) header("Location: user.php");?>
+
 <!DOCTYPE html>
 <html lang="en">
 
