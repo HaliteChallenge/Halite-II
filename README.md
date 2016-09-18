@@ -25,6 +25,4 @@ Send us a pull request! If you are looking for things to do, check out our [Trel
 
 ### Authors
 
-Halite was created by [Ben Spector](https://github.com/Sydriax)* and [Michael Truell](https://github.com/truell20)*.
-
-\* These authors contributed equally to this work
+Halite was primarily created by [Ben Spector](https://github.com/Sydriax) and [Michael Truell](https://github.com/truell20) for Two Sigma during their summer 2016 internship. However, many TSers contributed to Halite's developement, including [Matt Adereth](https://github.com/adereth), [Trammel Hudson](https://github.com/osresearch), [Brian Wignall](https://github.com/bwignall).
