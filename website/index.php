@@ -1,4 +1,7 @@
-<?php if(isset($_SESSION['userID'])) header("Location: user.php");?>
+<?php 
+session_start();
+if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?userID=".$_SESSION['userID']))->status) == 3) header("Location: user.php");
+?>
 
 <!DOCTYPE html>
 <html lang="en">
