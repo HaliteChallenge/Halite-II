@@ -26,9 +26,12 @@ pip3 install zip
 curl -sSL https://get.docker.com/ | sh
 service docker.io restart
 
-echo "Pulling docker image"
-docker pull mntruell/halite_sandbox:latest
-echo "Retrieving Installed Docker Images"
+if [[ "$(docker images -q mntruell/halite_sandbox:latest 2> /dev/null)" == "" ]]; then
+	echo "Pulling remote docker image"
+	docker pull mntruell/halite_sandbox:latest
+else
+	echo "Attention: local halite sandbox already exists. Not pulling remote."
+fi
 
 ###############
 # Swap Memory #

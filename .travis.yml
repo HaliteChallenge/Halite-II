@@ -24,6 +24,7 @@ install:
 
   - cd ~/build/HaliteChallenge/Halite/worker
   - sudo ./install.sh 123
+  - sudo docker build -t 'mntruell/halite_sandbox:latest' - < Dockerfile
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
