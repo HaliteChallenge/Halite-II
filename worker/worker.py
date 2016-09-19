@@ -126,11 +126,6 @@ def parseGameOutput(output, users):
 		playerTag = int(components[0])
 		users[playerTag-1]["playerTag"] = playerTag
 		users[playerTag-1]["rank"] = int(components[1])
-		users[playerTag-1]["territoryAverage"] = float(components[2])
-		users[playerTag-1]["strengthAverage"] = float(components[3])
-		users[playerTag-1]["productionAverage"] = float(components[4])
-		users[playerTag-1]["stillPercentage"] = float(components[5])
-		users[playerTag-1]["turnTimeAverage"] = float(components[6])
 
 	for user in users:
 		user["didTimeout"] = False
