@@ -4,6 +4,16 @@ dist: trusty
 
 language: generic
 
+services: 
+  - mysql
+
+addons:
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
+
 install:
   - cd ~/build/HaliteChallenge/Halite/tests
   - cp travisTests.ini tests.ini
