@@ -29,18 +29,7 @@
 					<h1>Top Rankings</h1>
 					<p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
 					<div class="panel panel-primary">
-						<table class="table well well-sm" id="leaderTable">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Username</th>
-									<th>Language</th>
-									<th>Submissions</th>
-									<th>Games Played</th>
-									<th>Score</th>
-								</tr>
-							</thead>
-						</table>
+						<?php include 'includes/leaderTable.php'; ?>
 					</div>
 				</div>
 			</div>
@@ -54,6 +43,7 @@
 	<script src="lib/pixi.min.js"></script>
 	<script src="script/parsereplay.js"></script>
 	<script src="script/visualizer.js"></script>
+	<script src="script/leaderTable.js"></script>
 	<script src="script/index.js"></script>
 </body>
 

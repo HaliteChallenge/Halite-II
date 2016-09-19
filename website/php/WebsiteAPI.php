@@ -189,12 +189,22 @@ class WebsiteAPI extends API{
 			$githubUser = json_decode($gitHub->request('user'), true);
 			var_dump($githubUser);
 
-			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) {
-				// Already signed up
+			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) { // Already signed up
+				
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
-			} else {
-				// New User
-				$this->insert("INSERT INTO User (username, email, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', {$githubUser['id']}, 1)");
+			} else { // New User
+				$emailDomain = explode('@', $githubUser['email'])[1];
+				$organization = "Other";
+				$rows = explode("\n", file_get_contents('path/to/file.txt'));
+				foreach($rows as $row) {
+					$components = explode(" - ", $row);
+					if(strcmp($components[1], $emailDomain) == 0) {
+						$organization = $components[0];
+						break;
+					}
+				}
+
+				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1)");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
