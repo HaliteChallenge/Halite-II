@@ -4,7 +4,7 @@
 <head>
 	<?php include 'includes/header.php'; ?>
 
-	<title>Secret Registration</title>
+	<title>Leaderboard</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
 	<link href="style/general.css" rel="stylesheet">
@@ -12,17 +12,14 @@
 
 <body>
 	<div class="container">
-		<div id="messageBox"></div>
+		<?php include 'includes/navbar.php'; ?>
 		<div class="pageContent">
 			<div class="row">
 				<div class="col-sm-12">
+					<h1 id="leaderHeading">Leaderboard</h1>
+					<p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="quickstart.php">quickstart guide</a>.</p>
 					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<h3 class="panel-title">Halite Secret Registration</h3>
-						</div>
-						<div style="padding: 16px; padding-bottom: 24px;">
-							<?php include 'includes/register_form.php'; ?>
-						</div>
+						<?php include 'includes/leaderTable.php'; ?>
 					</div>
 				</div>
 			</div>
@@ -33,7 +30,8 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
-	<script src="script/secret_registration.js"></script>
+	<script src="script/leaderTable.js"></script>
+	<script src="script/leaderboard.js"></script>
 </body>
 
 </html>

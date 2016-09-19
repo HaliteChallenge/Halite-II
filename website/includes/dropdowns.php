@@ -22,11 +22,11 @@
   <a href="downloads.php">Downloads</a>
 </li>
 <li>
+  <a href="leaderboard.php">Rankings</a>
+</li>
+<li>
   <a href="http://forums.halite.io">Forums</a>
 </li>
 <li class="dropdown">
 	<a class="dropdown-toggle" href="game.php">Visualize</a>
-</li>
-<li>
-  <a href="#" style="cursor: default;"></a>
 </li>

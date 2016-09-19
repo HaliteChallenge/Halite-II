@@ -195,9 +195,6 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-#Halite replays
-*.hlt
-
 #Java
 *.class
 
@@ -301,7 +298,19 @@ native
 checkouts
 .lein-deps-sum
 
-#############
+##############
+## Composer ##
+##############
+composer.phar
+vendor/
+composer.lock
+
+##########
+## Atom ##
+##########
+.atom-build.yml
+
+############
 ## Halite ##
 ############
 Values.sql
@@ -339,3 +348,6 @@ downloads/
 starterpackages/
 
 *.pem
+
+*.hlt
+!interestingGame.hlt

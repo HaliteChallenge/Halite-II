@@ -6,7 +6,7 @@ Halite is an online programming challenge. Users write bots to play a simple, or
 * If a piece stays still, it gains strength equal to the production value of the current tile that it is on.
 * If a piece moves onto a piece with the same owner, their strengths combine. Strength values are cut off at 255.
 * A piece inflicts damage equal to its strength onto all adjacent pieces that are not maps squares but have a different owner and onto to all coinciding pieces that have a different owner (this includes map squares).
-* When a piece has a strength < 0, it dies.
+* When a piece has a strength &lt; 0, it dies.
 
 Users develop their bots locally using our game engine, zip and submit their source to our website when they are ready to test out their bot, and watch as their bot plays against others and is ranked on our leaderboard.
 
@@ -49,6 +49,10 @@ A MySQL server is used as the database for the project.
 ## Disk Storage
 
 Replays, bot source and executables, and error logs are all currently stored on the server that hosts the website and the manager.
+
+## Forums
+
+[The discourse forum software](https://www.discourse.org/) is used. User authentication is handled on our end through [discourse's sso](https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045). The forums are run on their own server (2 GB of RAM, Ubuntu 14.04 64 bit). Automated emails are sent through halite@halite.io, using gmail as a service provider. We will migrate away from gmail for the public launch since they have quite a low cap on the number of messages per day.
 
 # Backups
 
@@ -97,23 +101,34 @@ apiKey = 1234567890
 
 [encrypt]
 salt = abc123456789
+
+[aws]
+accesskey = 1234556
+secretaccesskey = 1234561238378
+amiid = ami-2d39803a
+keyname = RandomKeyName
+instancetype = t2.nano
+securitygroupname = security-group-name 
+keyfilepath = NameOfKeyFile.pem
 ```
 
 # Project Component Diagram
 
-![Server Architecture Diagram](https://github.com/HaliteChallenge/Halite/raw/master/spec/components.png)
+![Server Architecture Diagram](components.png)
 
 # Installation
 
 If you have not already:
 
-```git clone https://github.com/HaliteChallenge/Halite.git```
+```
+git clone https://github.com/HaliteChallenge/Halite.git
+```
 
 ## Website/Manager Server Setup
 
-* Execute: ```cd website && ./install.sh```
-* Check that you are on php >= 5.6 and mysql >= 5.6.5: ```php -v; mysql -V```
-* Symlink the repo to /var/www: ```ln -s ~/Halite /var/www```
+* Execute: `cd website && ./install.sh`
+* Check that you are on php >= 5.6 and mysql >= 5.6.5: `php -v; mysql -V`
+* Symlink the repo to /var/www: `ln -s ~/Halite /var/www`
 * Create and write a halite.ini file in the root directory of the project
 * Apache setup
  * [Allow the following of symlinks by apache](http://superuser.com/questions/244245/how-do-i-get-apache-to-follow-symlinks)
@@ -123,18 +138,14 @@ If you have not already:
 
 ## Database server setup
 
-* Execute: ```cd website/sql && ./install.sh```
+* Execute: `cd website/sql && ./install.sh`
 * Add a superuser by wildcarding its host and allowing remote login
- * ```CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';```
- * ```GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;```
- * ```FLUSH PRIVILEGES;```
+ * `CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';`
+ * `GRANT ALL PRIVILEGES ON *.* TO 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD' WITH GRANT OPTION;`
+ * `FLUSH PRIVILEGES;`
  * Comment out `bind-address = 127.0.0.1` in `/etc/mysql/my.cnf`
- * ```sudo service mysql restart```
+ * `sudo service mysql restart`
 
 ## Worker server setup
 
-* Execute: ```cd worker && ./install.sh```
-* Create a `halite.ini` file in the root directory of the project
-* Add the `apiKey` and the ip address of the worker to the `Worker` table
-* [Enable swap](https://docs.docker.com/engine/installation/linux/ubuntulinux/#/adjust-memory-and-swap-accounting)
-* Execute ```sudo python3 worker.py```
+Run: `cd website/php && python3 openNewWorker.py`. Make sure that you have the proper AWS key pair.

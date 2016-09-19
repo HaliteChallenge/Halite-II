@@ -1,4 +1,13 @@
 <?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use OAuth\OAuth2\Service\GitHub;
+use OAuth\ServiceFactory;
+use OAuth\Common\Storage\Session;
+use OAuth\Common\Consumer\Credentials;
+use OAuth\Common\Http\Uri\UriFactory;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('session.gc_maxlifetime', 7*24*3600);
@@ -15,16 +24,19 @@ define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
+define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
-	private $TS_CDIRS = array("213.86.80.152/29", "208.77.212.0/22");
-	private $TS_WIFI_IPS = array("213.86.80.153", "208.77.215.155", "208.77.214.155");
-
 	// The database
 	private $mysqli = NULL;
 
 	public function __construct($request) {
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start();
+		}
+
 		$this->config = parse_ini_file(INI_PATH, true);
 
 		$this->initDB();
@@ -41,19 +53,11 @@ class WebsiteAPI extends API{
 	 * Also, bad practice
 	 */
 	private function sanitizeHTTPParameters() {
-		foreach ($_GET as $key => $value) {
-			$_GET[$key] = $this->mysqli->real_escape_string($value);
-		}
 		foreach ($_POST as $key => $value) {
 			$_POST[$key] = $this->mysqli->real_escape_string($value);
 		}
 	}
 	
-	// Encript our password as a salted hash
-	private function encryptPassword($password) {
-		return $this->mysqli->real_escape_string(crypt($password, $this->config['encrypt']['salt']));
-	}
-
 	// Initializes and returns a mysqli object that represents our mysql database
 	private function initDB() {
 		$this->mysqli = new mysqli($this->config['database']['hostname'],
@@ -127,48 +131,41 @@ class WebsiteAPI extends API{
 		mysqli_query($this->mysqli, $sql);
 	}
 
+	private function isLoggedIn() {
+		return isset($_SESSION['userID']) && mysqli_query($this->mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']}")->num_rows == 1;
+	}
+
+	private function getLoggedInUser() {
+		return $this->select("SELECT * FROM User WHERE userID={$_SESSION['userID']}");
+	}
+
 	//------------------------------------- API ENDPOINTS ----------------------------------------\\
-	// Endpoint associated with a users credentials (everything in the User table; i.e. name, email, firstname, etc.)
+	// Endpoint associated with a users credentials (everything in the User table; i.e. name, oauthID, etc.)
 	// -------------------------------------------------------------------------------------------\\
 
 	/* User Endpoint
 	 *
 	 * Encapsulates user information.
-	 * Hides a user's hashed password, email, and verificationCode,
-	 * if no authentication is provided.
 	 */	
 	protected function user() {
 		// Get a user's info with a username		
 		if(isset($_GET["username"])) {
-			if(isset($_GET["password"])) {
-				$password = $this->encryptPassword($_GET['password']);
-				return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}' AND password = '$password'");
-			} else {
-				$fields = $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
-				unset($fields["password"]);
-				unset($fields["email"]);
-				unset($fields["verificationCode"]);
-				return $fields;
-			}
+			return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
 		} 
 		
 		// Get a user's info with a userID
 		else if (isset($_GET["userID"])) {
-			if(isset($_GET["password"])) {
-				$password = $this->encryptPassword($_GET['password']);
-				return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}' AND password = '{$password}'");
-			} else {
-				$fields = $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
-				unset($fields["password"]);
-				unset($fields["email"]);
-				unset($fields["verificationCode"]);
-				return $fields;
-			}
+			return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
 		} 
 		
-		// Get all of the user's with active submissions
-		else if(isset($_GET['active'])) {
-			$results = $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+		// Get a set of filtered users
+		else if(isset($_GET['fields']) && isset($_GET['values'])) {
+			$limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+			$whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
+			$orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
+			$page = isset($_GET['page']) ? $_GET['page'] : 0;
+
+			$results = $this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
 			foreach(array_keys($results) as $key) {
 				unset($results[$key]["password"]);
 				unset($results[$key]["email"]);
@@ -177,70 +174,52 @@ class WebsiteAPI extends API{
 			return $results;
 		} 
 
-		// Verify an email
-		else if(isset($_POST['verificationCode']) && isset($_POST['userID'])) {
-			$user = $this->select("SELECT verificationCode FROM User WHERE userID={$_POST['userID']} LIMIT 1");
-			if($user['verificationCode'] == $_POST['verificationCode']) {
-				$this->insert("UPDATE User SET isVerified=1 WHERE userID={$_POST['userID']}");
-				return "Success";
-			}
-			return "Fail";
+		// Get all of the user's with active submissions
+		else if(isset($_GET['active'])) {
+			return $this->selectMultiple("SELECT * FROM User WHERE status = 3");
 		} 
 		
-		// Register a new halite account. Send the verification email
-		else if (isset($_POST["username"]) && isset($_POST["email"]) && isset($_POST["password"])) {
-			$username = htmlspecialchars($_POST["username"]);
-			$email = $_POST["email"];
-			$password = $this->encryptPassword($_POST["password"]);
+		// Github calls this once a user has granted us access to their profile info
+		if(isset($_GET["githubCallback"]) && isset($_GET["code"])) {
+			$code = $_GET["code"];
 
-			$usernameArray = $this->select("SELECT username FROM User WHERE username = '$username' LIMIT 1");
-			if(isset($usernameArray['username'])) {
-				return "Username already exists";
+			$serviceFactory = new ServiceFactory();
+			$credentials = new Credentials($this->config['oauth']['githubClientID'], $this->config['oauth']['githubClientSecret'], NULL);
+			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user'));
+			$gitHub->requestAccessToken($code);
+			$githubUser = json_decode($gitHub->request('user'), true);
+			var_dump($githubUser);
+
+			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) { // Already signed up
+				
+				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
+			} else { // New User
+				$emailDomain = explode('@', $githubUser['email'])[1];
+				$organization = "Other";
+				$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
+				foreach($rows as $row) {
+					$components = explode(" - ", $row);
+					if(strcmp($components[1], $emailDomain) == 0) {
+						$organization = $components[0];
+						break;
+					}
+				}
+
+				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1)");
+				$_SESSION['userID'] = $this->mysqli->insert_id;
+
+				// AWS auto scaling
+				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
+				$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
+				if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
+					shell_exec("python3 openNewWorker.py &");
+				}*/
 			}
 
-			$emailArray = $this->select("SELECT email FROM User WHERE email = '$email' LIMIT 1");
-			if(isset($emailArray['email'])) {
-				return "Email already exists";
-			}
-
-			$explodedEmail = explode("@", $email);
-			if(count($explodedEmail) != 2) {
-				return "Invalid email address";
-			}
-			if(strcmp($explodedEmail[1], "twosigma.com") != 0) {
-				return "Email is not two sigma email";
-			}
-
-			// Send verification email
-			$verificationCode = rand(0, 9999999999);
-			try{
-				$transport = Swift_SmtpTransport::newInstance("smtp.gmail.com", 465, "ssl")
-					->setUsername($this->config['email']['email'])
-					->setPassword($this->config['email']['password']);
-				$mailer = Swift_Mailer::newInstance($transport);
-				$message = Swift_Message::newInstance("Halite Email Verification")
-					->setFrom(array($this->config['email']['email'] => "Halite Competition"))
-					->setTo(array($email));
-
-				$this->insert("INSERT INTO User (username, email, password, mu, sigma, status, verificationCode) VALUES ('$username', '$email', '$password', 25.000, 8.333, 0, '$verificationCode')");
-				$userID = $this->select("SELECT userID FROM User WHERE email='$email' LIMIT 1")['userID'];
-
-				$this->insert("INSERT INTO UserExtraStats (userID) VALUES ({$userID})");
-
-				$message->setBody("<html><body>To verify your email, <a href='http://halite.io/website/index.php?verificationCode={$verificationCode}&userID={$userID}'>click here</a>.</body></html>", 'text/html');
-				$result = $mailer->send($message);
-			} catch (Exception $e) {
-				return "Invalid email address";
-			}
-
-			$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
-			$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
-			if($numWorkers > 0 && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
-				shell_exec("python3 openNewWorker.py &");
-			}
-
-			return "Success";
-		}
+			if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
+			else header("Location: http://halite.io/website");
+			die();
+		} 
 	}
 
 	/* Extra Stats Endpoint
@@ -314,19 +293,8 @@ class WebsiteAPI extends API{
 	 */
 	protected function botFile() {
 		// Mark a new botfile for compilation if valid. Return error otherwise 
-		if(isset($_FILES['botFile']['name']) && isset($_POST['userID']) && isset($_POST['password'])) {
-			if($this->testUserIP($_SERVER['REMOTE_ADDR'], $this->TS_CDIRS) && !in_array($_SERVER['REMOTE_ADDR'], $this->TS_WIFI_IPS)) {
-				return "Cannot submit on Two Sigma desktop";
-			}
-
-			$userID = $_POST['userID'];
-			$password = $_POST['password'];
-
-			$user = $this->select("SELECT * FROM User WHERE userID={$userID} and password='{$password}'");
-			if(count($user) == 0 || $user['isVerified'] == false) {
-				return "Unverified email";
-			}
-
+		if($this->isLoggedIn() && isset($_FILES['botFile']['name'])) {
+			$user = $this->getLoggedInUser();
 			
 			if($user['status'] == 1 || $user['status'] == 2) {
 				return "Compiling";
@@ -336,7 +304,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = BOTS_PATH."{$userID}.zip";
+			$targetPath = BOTS_PATH."{$user['userID']}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}
@@ -347,7 +315,7 @@ class WebsiteAPI extends API{
 				}
 			}
 
-			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID=$userID");
+			$oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID={$user['userID']}");
 			foreach($oldGameUsers as $oldGameUser) {
 				$this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
 				$this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
@@ -355,10 +323,10 @@ class WebsiteAPI extends API{
 			
 			$numPlayers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
 			if($user['status'] != 0) {
-				$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ($userID, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
+				$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
 			}
 
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = $userID");
+			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = {$user['userID']}");
 
 			return "Success";
 		}
@@ -370,12 +338,18 @@ class WebsiteAPI extends API{
 	 */
 	protected function forums() {
 		// Follows the Discource sso detailed here: https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
-		if(isset($_GET['payload']) && isset($_GET['signature']) && isset($_GET['userID']) && isset($_GET['email']) && isset($_GET['username'])) {
-			$initialBase64Payload = stripcslashes($_GET['payload']);
-			$signature = $_GET['signature'];
-			$userID = $_GET['userID'];
-			$email = $_GET['email'];
-			$username = $_GET['username'];
+		if(isset($_GET['sso']) && isset($_GET['sig'])) {
+			if(!$this->isLoggedIn()) {
+				$forumsCallbackURL = urlencode("http://halite.io/website/php/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
+				$githubCallbackURL = urlencode("http://halite.io/website/php/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
+				header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
+				die();
+			}
+
+			$user = $this->getLoggedInUser();
+
+			$initialBase64Payload = stripcslashes($_GET['sso']);
+			$signature = $_GET['sig'];
 
 			$correctSignature = hash_hmac("sha256", $initialBase64Payload, $this->config['sso']['secret']);
 
@@ -388,9 +362,9 @@ class WebsiteAPI extends API{
 
 			$finalBase64Payload = base64_encode(http_build_query(array(
 				"nonce" => $nonce,
-				"name" => $username,
-				"email" => $email,
-				"external_id" =>$userID
+				"name" => $user['username'],
+				"email" => $user['email'],
+				"external_id" => $user['userID']
 			)));
 			$finalSignature = hash_hmac("sha256", $finalBase64Payload, $this->config['sso']['secret']);
 
@@ -399,7 +373,9 @@ class WebsiteAPI extends API{
 				"sig" => $finalSignature
 			));
 			$finalURL = $this->config['sso']['url']."?".$finalQueryString;
-			return $finalURL;
+
+			header("Location: ".$this->config['sso']['url']."?".$finalQueryString);
+			die();
 		}
 	}
 	
@@ -448,13 +424,12 @@ class WebsiteAPI extends API{
 		} 
 		
 		// Mark an annoucement as closed	
-		else if(isset($_POST['announcementID']) && isset($_POST['userID']) && isset($_POST['password'])) {
+		else if(isset($_POST['announcementID'])) {
 			$announcementID = $_POST['announcementID'];
-			$userID = $_POST['userID'];
-			$password = $_POST['password'];
+			$user = $this->getLoggedInUser();
 
-			if(count($this->select("SELECT * FROM User WHERE userID=$userID and password='$password' LIMIT 1")) > 0) {
-				$this->insert("INSERT INTO DoneWithAnnouncement (userID, announcementID) VALUES ($userID, $announcementID)");
+			if(count($this->select("SELECT * FROM User WHERE user={$user['userID']} LIMIT 1")) > 0) {
+				$this->insert("INSERT INTO DoneWithAnnouncement (userID, announcementID) VALUES ({$user['userID']}, $announcementID)");
 				return "Success";
 			}
 			return "Fail";
@@ -468,7 +443,6 @@ class WebsiteAPI extends API{
 	 * Users may only see **their** error logs.
 	 */
 	protected function errorLog() {
-		session_start();
 
 		// Return the requested error log only if it belongs to the signed in user.
 		if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
@@ -493,8 +467,6 @@ class WebsiteAPI extends API{
 	 * Encapsulates the logged in user's info
 	 */
 	protected function session() {
-		session_set_cookie_params(7*24*3600);
-		session_start();
 
 		// Get the logged in user's info
 		if($this->method == 'GET') {
@@ -502,39 +474,10 @@ class WebsiteAPI extends API{
 			else return NULL;
 		} 
 		
-		// Login a new user with a username and a password 
-		// TODO: take this out, functionality can be achieved by asking for its userID
-		else if(isset($_POST['username']) & isset($_POST['password'])) {
-			$username = $_POST['username'];
-			$password = $this->encryptPassword($_POST['password']);
-
-			$user = $this->select("SELECT * FROM User WHERE username = '$username' AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
-		} 
-		
-		// Login a new user with a userID and a password
-		else if(isset($_POST['userID']) & isset($_POST['password'])) {
-			$userID = $_POST['userID'];
-			$password = $this->encryptPassword($_POST['password']);
-
-			$user = $this->select("SELECT * FROM User WHERE userID = $userID AND password = '$password'");
-			if($user['isVerified'] == false) {
-				return "Unverified user";
-			}
-			$_SESSION = $user;
-			return "Success";
-		} 
-		
 		// Log out a user
 		else if($this->method == 'DELETE') {
-			if(isset($_SESSION['userID']) && isset($_SESSION['password'])) {
-				if(count($this->select("SELECT * FROM User WHERE username = '{$_SESSION['username']}' AND password = '{$_SESSION['password']}'")) != 0) {
-					$this->logOutForums($this->getForumsID($_SESSION['userID']));
-				}
+			if(isset($_SESSION['userID'])) {
+				$this->logOutForums($this->getForumsID($_SESSION['userID']));
 			}
 			session_destroy();
 			return "Success";

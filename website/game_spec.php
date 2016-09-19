@@ -1,8 +1,7 @@
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<?php include 'includes/header.php'; ?>
+
 	<title>Game Spec</title>
 
 	<link href="lib/bootstrap.min.css" rel="stylesheet">
@@ -77,7 +76,7 @@
 				 		<li>Try to match the given width and height as closely as it can while still creating a symmetric map. Maps are guaranteed to be the given size or smaller in each dimension; never larger.</li>
 				 		<li>Try to create interesting maps in which there are patches of high production squares and patches of low production squares, with fairly low noise on the small scale.</li>
 				 		<li>Try to relatively match the production of tiles on the map with their starting strengths. That is, a square with a production of 3 will likely not have a strength of 3, but rather will usually have a higher strength than a tile with a production of 2 and a lower strength than a tile with a production of 4.</li>
-				 		<li>Always creates symmetric maps. Specifically, the generator generates a chunk of the map and then tesselates it to produce the entire map.</li>
+				 		<li>Always creates symmetric maps. Specifically, the generator generates a chunk of the map and then tesselates, reflects, and shifts it to produce the entire map.</li>
 				 	</ol>
 				</p>
 

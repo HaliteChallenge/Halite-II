@@ -43,10 +43,6 @@ done
 eval "chmod +x $ENVIRONMENT"
 
 RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
-if [[ $* == *--godmode* ]]; then
-	ls ../ppm |sort -R |tail -$N |read file; PPM_FILE_NAME="$file"
-	RUN_GAME_COMMAND="$RUN_GAME_COMMAND --godmode ../ppm/DavidS.ppm"
-fi
 eval "$RUN_GAME_COMMAND"
 
 docker stop  $(docker ps -aq) >/dev/null

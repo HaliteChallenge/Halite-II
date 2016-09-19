@@ -12,23 +12,25 @@ function initPixi() {
 	renderer = PIXI.autoDetectRenderer(0, 0, { backgroundColor: 0x000000, antialias: true, transparent: true });
 }
 
-function showGame(game, showmovement, seconds) {
+function showGame(game, divID, showTitles, showMovement, seconds) {
 
 	if(renderer == null) initPixi();
 
-	$("#pageContent").empty();
-	$("#pageContent").append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
-		var nameComponents = p.name.split(" ");
-		var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
-		console.log(name);
-		var user = getUser(null, name);
-		if(user) {
-			return "<div style='display: inline-block'><a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a></div>"	
-		} else {
-			return "<div style='display: inline-block'><span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span></div>"	
-		}
-	}).join(" vs ")+"</h3>"));
-	document.getElementById("pageContent").appendChild(renderer.view);
+	$("#"+divID).empty();
+	if(showTitles) {
+		$("#"+divID).append($("<h3>"+game.players.slice(1, game.numPlayers+1).map(function(p) {
+			var nameComponents = p.name.split(" ");
+			var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
+			console.log(name);
+			var user = getUser(null, name);
+			if(user) {
+				return "<div style='display: inline-block'><a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a></div>"	
+			} else {
+				return "<div style='display: inline-block'><span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span></div>"	
+			}
+		}).join(" vs ")+"</h3>"));
+	}
+	document.getElementById(divID).appendChild(renderer.view);
 
 	var frame = 0;
 	var transit = 0;
@@ -40,7 +42,7 @@ function showGame(game, showmovement, seconds) {
 	if(zoom < 1) zoom = 1;
 
 	window.onresize = function() {
-		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (10 + $("canvas").offset().top);
+		var allowedWidth = $("#"+divID).width(), allowedHeight = window.innerHeight - (10 + $("canvas").offset().top);
 		console.log(window.innerHeight)
 		console.log(allowedHeight)
 		var definingDimension = Math.min(allowedWidth, allowedHeight);
@@ -260,7 +262,7 @@ function showGame(game, showmovement, seconds) {
 				if(tY == game.height) tY = 0;
 			}
 
-			var t = showmovement ? (-Math.cos(transit * Math.PI) + 1) / 2 : 0;
+			var t = showMovement ? (-Math.cos(transit * Math.PI) + 1) / 2 : 0;
 			loc = 0;
 			var sY = Math.round(yOffset);
 			for(var a = 0; a < game.height; a++) {
@@ -383,9 +385,9 @@ function showGame(game, showmovement, seconds) {
 	}
 }
 
-function byteArrayFromURL(replayName, callback) {
+function byteArrayFromURL(url, callback) {
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", "../storage/replays/"+replayName, true);
+	oReq.open("GET", url, true);
 
 	oReq.responseType = "arraybuffer";
 	oReq.onload = function (oEvent) {
@@ -394,7 +396,7 @@ function byteArrayFromURL(replayName, callback) {
 			var byteArray = new Uint8Array(aBuffer);
 			callback(byteArrayToGame(byteArray));
 		} else {
-			$("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
+			$("#"+divID).html("<h1>Gamefile not found</h1><p>The gamefile uhat you requested could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
 		}
 	}
 	oReq.send(null);

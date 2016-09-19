@@ -61,23 +61,22 @@ DROP TABLE IF EXISTS `User`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(20) NOT NULL,
-  `password` varchar(30) NOT NULL,
-  `status` smallint(5) unsigned NOT NULL,
-  `email` varchar(32) NOT NULL,
-  `verificationCode` varchar(32) DEFAULT NULL,
-  `isVerified` tinyint(1) NOT NULL,
+  `oauthID` mediumint(8) unsigned NOT NULL,
+  `oauthProvider` tinyint(3) unsigned NOT NULL,
+  `username` varchar(32) NOT NULL,
+  `email` varchar(64) NOT NULL,
+  `organization` varchar(64) NOT NULL,
+  `status` smallint(5) unsigned NOT NULL DEFAULT 0,
   `language` varchar(16) DEFAULT NULL,
-  `mu` float unsigned NOT NULL,
-  `sigma` float unsigned NOT NULL,
+  `mu` float unsigned NOT NULL DEFAULT 25.000,
+  `sigma` float unsigned NOT NULL DEFAULT 8.333,
   `rank` smallint(5) DEFAULT NULL,
-  `numSubmissions` smallint(5) NOT NULL,
-  `numGames` smallint(5) NOT NULL,
-  `didTimeout` float(8,5) NOT NULL,
+  `numSubmissions` smallint(5) NOT NULL DEFAULT 0,
+  `numGames` smallint(5) NOT NULL DEFAULT 0,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   `updateTime` datetime ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`)
-) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
