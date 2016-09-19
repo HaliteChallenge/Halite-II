@@ -24,6 +24,7 @@ define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 
@@ -195,7 +196,7 @@ class WebsiteAPI extends API{
 			} else { // New User
 				$emailDomain = explode('@', $githubUser['email'])[1];
 				$organization = "Other";
-				$rows = explode("\n", file_get_contents('path/to/file.txt'));
+				$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
 				foreach($rows as $row) {
 					$components = explode(" - ", $row);
 					if(strcmp($components[1], $emailDomain) == 0) {
