@@ -222,22 +222,6 @@ class WebsiteAPI extends API{
 		} 
 	}
 
-	/* Extra Stats Endpoint
-	 *
-	 * We store a number of agreggated stats about each bot.
-	 * These are currently not stored in the User table.
-	 * 
-	 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
-	 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
-	 * It would be much nicer to decouple 'bot' information from 'user' information.
-	 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
-	 */
-	function extraStats() {
-		if(isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
-		}
-	}
-
 	/* User History Endpoint
 	 *
 	 * We store the a history of user's bot submissions.
