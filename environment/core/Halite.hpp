@@ -24,7 +24,7 @@ struct PlayerStatistics {
 	double average_response_time;
 };
 static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
-	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
+	o << p.tag << ' ' << p.rank;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
 	return o;
 }
 
