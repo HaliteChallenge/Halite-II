@@ -34,7 +34,7 @@ class UserTest extends APITest {
 		$activeUser["userID"] = "478371";
 		$this->insertObject(USER_TABLE, $activeUser);
 		$activeID = $activeUser['userID'];
-		$this->mysqli->query("UPDATE User SET status=3 where userID=$activeID");
+		$this->mysqli->query("UPDATE User SET isRunning=1 where userID=$activeID");
 		
 		$_GET['active'] = 1;
 		$_SERVER['REQUEST_METHOD'] = "GET";

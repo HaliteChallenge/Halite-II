@@ -21,6 +21,7 @@ include dirname(__FILE__).'/API.class.php';
 include dirname(__FILE__).'/../lib/swiftmailer/lib/swift_required.php';
 
 define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
+define("COMPILE_PATH", dirname(__FILE__)."/../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
@@ -175,7 +176,7 @@ class WebsiteAPI extends API{
 
 		// Get all of the user's with active submissions
 		else if(isset($_GET['active'])) {
-			return $this->selectMultiple("SELECT * FROM User WHERE status = 3");
+			return $this->selectMultiple("SELECT * FROM User WHERE isRunning=1");
 		} 
 		
 		// Github calls this once a user has granted us access to their profile info
@@ -198,7 +199,7 @@ class WebsiteAPI extends API{
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
-				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
+				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
 				$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
 				if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
 					shell_exec("python3 openNewWorker.py &");
@@ -285,7 +286,7 @@ class WebsiteAPI extends API{
 		if($this->isLoggedIn() && isset($_FILES['botFile']['name'])) {
 			$user = $this->getLoggedInUser();
 			
-			if($user['status'] == 1 || $user['status'] == 2) {
+			if($user['compileStatus'] != 0) {
 				return "Compiling";
 			}
 			
@@ -293,7 +294,7 @@ class WebsiteAPI extends API{
 				return "Sorry, your file is too large.";
 			}
 
-			$targetPath = BOTS_PATH."{$user['userID']}.zip";
+			$targetPath = COMPILE_PATH."{$user['userID']}.zip";
 			if(file_exists($targetPath))  {
 				unlink($targetPath);	
 			}
@@ -310,12 +311,7 @@ class WebsiteAPI extends API{
 				$this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
 			}
 			
-			$numPlayers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
-			if($user['status'] != 0) {
-				$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
-			}
-
-			$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, status = 1, mu = 25.000, sigma = 8.333 WHERE userID = {$user['userID']}");
+			$this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
 			return "Success";
 		}
@@ -396,7 +392,7 @@ class WebsiteAPI extends API{
 
 		// Get the number of active users
 		else if(isset($_GET['numActive'])) {
-			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status = 3")->num_rows;
+			return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
 		} 
 	}
 

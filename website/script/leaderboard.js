@@ -39,7 +39,7 @@ $(function() {
 		$heading.html(heading + " Rankings");
 
 		var filters = {};
-		filters["status"] = 3;
+		filters["isRunning"] = 1;
 		filters[field] = value;
 		console.log(filters)
 		table.init(getFilteredUsers(filters, "rank"));

@@ -24,13 +24,16 @@ def getBotHash(userID):
 	print(result.text)
 	return json.loads(result.text).get("hash")
 
-def storeBotLocally(userID, storageDir):
+def storeBotLocally(userID, storageDir, isCompile=False):
 	"""Downloads and store's a bot's zip file locally
 	Checks the file's checksum to make sure the file was downloaded properly
 	"""
 	iterations = 0
 	while iterations < 100:
-		remoteZip = urllib.request.urlopen(MANAGER_URL+"botFile?apiKey="+str(API_KEY)+"&userID="+str(userID))
+		url = MANAGER_URL+"botFile?apiKey="+str(API_KEY)+"&userID="+str(userID)
+		if isCompile: url += "&isCompile=1"
+
+		remoteZip = urllib.request.urlopen(url)
 		zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
 		zipPath = os.path.join(storageDir, zipFilename)
 		if os.path.exists(zipPath):

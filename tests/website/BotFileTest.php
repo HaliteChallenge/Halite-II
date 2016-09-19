@@ -8,10 +8,10 @@ class BotFileTests extends APITest {
 	public function testPOST() {
 		$testUser = TEST_USER;
 		$testUser['rank'] = 1;
-		$testUser['status'] = 3;
+		$testUser['isRunning'] = 1;
 		$this->insertObject(USER_TABLE, $testUser);
 
-		$botPath = BOTS_PATH.$testUser['userID'].".zip";
+		$botPath = COMPILE_PATH.$testUser['userID'].".zip";
 		if(file_exists($botPath)) unlink($botPath);
 		
 		$_FILES = array(
@@ -35,8 +35,9 @@ class BotFileTests extends APITest {
 		var_dump($newUser);
 		$userHistory = $this->mysqli->query("SELECT * FROM UserHistory WHERE userID={$testUser['userID']}")->fetch_assoc();
 
-		$this->assertEquals($newUser["status"], "1");
-		$this->assertTrue(count($userHistory) > 0);
+		$this->assertEquals($newUser["compileStatus"], "1");
+		$this->assertEquals($newUser["isRunning"], "1");
+		$this->assertEquals(count($userHistory), 0);
 		$this->assertTrue(file_exists($botPath));
 	}
 }

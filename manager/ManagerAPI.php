@@ -2,10 +2,10 @@
 
 require_once 'API.class.php';
 
-define("REPLAYS_DIR", "../storage/replays/");
-define("ERROR_LOGS_DIR", "../storage/errors/");
-define("BOTS_DIR", "../storage/bots/");
-define("CACHED_BOTS_DIR", "../storage/cache/");
+define("REPLAYS_PATH", "../storage/replays/");
+define("ERROR_LOGS_PATH", "../storage/errors/");
+define("COMPILE_PATH", "/../../storage/compile/");
+define("BOTS_PATH", "../storage/bots/");
 define("INI_FILE", "../halite.ini");
 
 class ManagerAPI extends API{
@@ -45,11 +45,6 @@ class ManagerAPI extends API{
 				} else {
 						return false;
 				}
-		}
-
-		// Returns the directory that holds a bot, given the bot's userID
-		private function getBotFile($userID) {
-				return BOTS_DIR."{$userID}.zip";
 		}
 
 		private function getTrueskillMatchQuality($rankingValues) {
@@ -111,9 +106,9 @@ class ManagerAPI extends API{
 		protected function task() {
 				if($this->method == 'GET') {
 						// Check for compile tasks
-						$needToBeCompiled = $this->select("SELECT * FROM User WHERE status = 1 ORDER BY userID ASC");
+						$needToBeCompiled = $this->select("SELECT * FROM User WHERE compileStatus=1 ORDER BY userID ASC");
 						if(count($needToBeCompiled) > 0) {
-								$this->insert("UPDATE User SET status = 2 WHERE userID = ".$needToBeCompiled['userID']);
+								$this->insert("UPDATE User SET compileStatus = 2 WHERE userID = ".$needToBeCompiled['userID']);
 								return array(
 										"type" => "compile",
 										"user" => $needToBeCompiled);
@@ -123,9 +118,8 @@ class ManagerAPI extends API{
 						$possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
 						$numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-						$users = $this->selectMultiple("SELECT * FROM User WHERE status=3 ORDER BY rand()");
-						//$seedPlayer = $this->select("select * from User where status=3 and (select COUNT(*) from GameUser where userID=User.userID) < 100 ORDER BY rand() LIMIT 1");
-						$seedPlayer = $this->select("select * from User inner join UserExtraStats on User.userID=UserExtraStats.userID where status=3 and (numGames < 20 or didTimeout < 0.9) order by rand()*-pow(sigma, 2)");
+						$users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
+						$seedPlayer = $this->select("select * from User inner join UserExtraStats on User.userID=UserExtraStats.userID where isRunning=1 and (numGames < 20 or didTimeout < 0.9) order by rand()*-pow(sigma, 2)");
 						if(count($seedPlayer) < 1) {
 							$oldestGameTime = time();
 							foreach($users as $user) {
@@ -136,7 +130,7 @@ class ManagerAPI extends API{
 								}
 							}
 						}
-						$players = $this->selectMultiple("SELECT * FROM User WHERE status=3 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
+						$players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
 						array_push($players, $seedPlayer);
 
 						// Pick map size
@@ -164,32 +158,14 @@ class ManagerAPI extends API{
 						$userID = $_POST['userID'];
 						$didCompile = $_POST['didCompile'];
 
-						if($didCompile == 1) {
-								// Cache a compilable bot
-								$targetPath = $this->getBotFile($userID);
-								$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
-								echo $cachedPath;
-								if(file_exists($cachedPath)) {
-										unlink($cachedPath);
-								}
-								copy($targetPath, $cachedPath);
-
+						if($didCompile == 1) { // Did succeed
 								$language = isset($_POST['language']) ? $_POST['language'] : "Other";
-								$this->insert("UPDATE User SET status = 3, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
-						} else {
-								$versionNumber = intval($this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($userID))['numSubmissions'])-1;
-								$this->insert("DELETE FROM UserHistory WHERE userID=".$this->mysqli->real_escape_string($userID)." and versionNumber={$versionNumber}");
+								$user = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($userID));
 
-								$targetPath = $this->getBotFile($userID);
-								$cachedPath = CACHED_BOTS_DIR."{$userID}.zip";
-								echo $cachedPath;
-								if(file_exists($cachedPath)) {
-										unlink($targetPath);
-										copy($cachedPath, $targetPath);
-										$this->insert("UPDATE User SET status = 3, numSubmissions=numSubmissions-1 WHERE userID = ".$this->mysqli->real_escape_string($userID));
-								} else {
-										$this->insert("UPDATE User SET status = 0, numSubmissions=numSubmissions-1 WHERE userID = ".$this->mysqli->real_escape_string($userID));
-								}
+								$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, mu = 25.000, sigma = 8.333, compileStatus = 0, isRunning = 1, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
+								$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
+						} else { // Didnt succeed
+								$this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
 						}
 				}
 		}
@@ -220,9 +196,9 @@ class ManagerAPI extends API{
 							$targetPath = null;
 							if(strcmp('hlt', $pathParts['extension']) == 0) {
 								$replayName = $pathParts['basename'];
-								$targetPath = REPLAYS_DIR."{$pathParts['basename']}";
+								$targetPath = REPLAYS_PATH."{$pathParts['basename']}";
 							} else {
-								$targetPath = ERROR_LOGS_DIR."{$pathParts['basename']}";
+								$targetPath = ERROR_LOGS_PATH."{$pathParts['basename']}";
 							}
 							move_uploaded_file($file['tmp_name'], $targetPath);
 							if(is_file($targetPath) == false) {
@@ -232,7 +208,7 @@ class ManagerAPI extends API{
 						}
 
 						// Check that we arent storing too many replay files
-						$files = glob(REPLAYS_DIR.'*.*');
+						$files = glob(REPLAYS_PATH.'*.*');
 						$exclude_files = array('.', '..');
 						if (!in_array($files, $exclude_files)) {
 								array_multisort(
@@ -266,7 +242,7 @@ class ManagerAPI extends API{
 						$gameID = $gameIDArray['gameID'];
 
 						// Update each participant's stats
-						$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
+						$allUsers = $this->selectMultiple("SELECT * FROM User where isRunning=1");
 						$allUserExtras = array();
 						foreach($allUsers as $user) {
 								array_push($allUserExtras, $this->select("SELECT * FROM UserExtraStats WHERE userID = {$user['userID']}"));
@@ -329,7 +305,7 @@ class ManagerAPI extends API{
 						}
 
 						// Update overall rank
-						$allUsers = $this->selectMultiple("SELECT * FROM User where status=3");
+						$allUsers = $this->selectMultiple("SELECT * FROM User where isRunning=1");
 						usort($allUsers, function($a, $b) {
 								return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
 						});
@@ -351,14 +327,15 @@ class ManagerAPI extends API{
 
 						ob_clean();
 						flush();
-						readfile($this->getBotFile($userID));
+						if(isset($_GET['compile'])) readfile(COMPILE_PATH."{$userID}.zip");
+						else readfile(BOTS_PATH."{$userID}.zip");
 						exit;
 				} else if(isset($_POST['userID']) && count($_FILES) > 0) {
 						$userID = $_POST['userID'];
 						$key = array_keys($_FILES)[0];
 						$name = basename($_FILES[$key]['name']);
 
-						$targetPath = BOTS_DIR."{$userID}.zip";
+						$targetPath = BOTS_PATH."{$userID}.zip";
 						move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
 				} else {
 						return NULL;
@@ -371,7 +348,7 @@ class ManagerAPI extends API{
 		protected function botHash() {
 				if(isset($_GET['userID'])) {
 						$userID = $_GET['userID'];
-						if(file_exists($this->getBotFile($userID))) return array("hash" => md5_file($this->getBotFile($userID)));
+						if(file_exists(BOTS_PATH."{$userID}.zip")) return array("hash" => md5_file(BOTS_PATH."{$userID}.zip"));
 						else return "Bot file does not exist";
 				}
 		}

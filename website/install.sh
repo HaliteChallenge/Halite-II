@@ -13,9 +13,9 @@ composer install
 # File structure
 cd ../
 echo "Setting up file structure"
-mkdir storage storage/replays storage/bots storage/cache storage/errors
-sudo chown www-data:www-data storage storage/replays storage/bots storage/cache storage/errors
-sudo chmod 755 storage storage/replays storage/bots storage/cache storage/errors
+mkdir storage storage/replays storage/bots storage/compile storage/errors
+sudo chown www-data:www-data storage storage/replays storage/bots storage/compile  storage/errors
+sudo chmod 755 storage storage/replays storage/bots storage/compile storage/errors
 cp ./* /var/www/html
 
-echo "Please follow the directions in the INSTALL.md file!!!!!"
+echo "Attention: Please follow the directions in the install section of our technical spec! This is located inside of of git repo."

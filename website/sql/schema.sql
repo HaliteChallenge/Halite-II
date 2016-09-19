@@ -53,7 +53,7 @@ CREATE TABLE `GameUser` (
   `strengthAverage` float(8,5) NOT NULL,
   `stillPercentage` float(8,5) NOT NULL,
   `turnTimeAverage` float(8,5) NOT NULL,
-  `didTimeout` tinyint(1) NOT NULL
+  `didTimeout` tinyint(1) unsigned NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,10 +67,11 @@ DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `oauthID` mediumint(8) unsigned NOT NULL,
-  `oauthProvider` tinyint(3) unsigned NOT NULL,
+  `oauthProvider` tinyint(1) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
   `email` varchar(64) NOT NULL,
-  `status` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `language` varchar(16) DEFAULT NULL,
   `mu` float unsigned NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
