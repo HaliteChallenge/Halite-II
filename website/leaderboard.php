@@ -19,18 +19,7 @@
 					<h1 id="leaderHeading">Leaderboard</h1>
 					<p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="quickstart.php">quickstart guide</a>.</p>
 					<div class="panel panel-primary">
-						<table class="table well well-sm" id="leaderTable">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Username</th>
-									<th>Language</th>
-									<th>Submissions</th>
-									<th>Games Played</th>
-									<th>Score</th>
-								</tr>
-							</thead>
-						</table>
+						<?php include 'includes/leaderTable.php'; ?>
 					</div>
 				</div>
 			</div>
@@ -41,6 +30,7 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="script/backend.js"></script>
 	<script src="script/general.js"></script>
+	<script src="script/leaderTable.js"></script>
 	<script src="script/leaderboard.js"></script>
 </body>
 

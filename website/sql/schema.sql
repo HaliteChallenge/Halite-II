@@ -70,6 +70,7 @@ CREATE TABLE `User` (
   `oauthProvider` tinyint(3) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `organization` varchar(64) NOT NULL,
   `status` smallint(5) unsigned NOT NULL DEFAULT 0,
   `language` varchar(16) DEFAULT NULL,
   `mu` float unsigned NOT NULL DEFAULT 25.000,
