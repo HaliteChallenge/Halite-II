@@ -1,6 +1,6 @@
 <?php 
 session_start();
-if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?userID=".$_SESSION['userID']))->status) == 3) header("Location: user.php");
+if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?userID=".$_SESSION['userID']))->isRunning) == 1) header("Location: user.php");
 ?>
 
 <!DOCTYPE html>
