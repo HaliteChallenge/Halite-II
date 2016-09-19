@@ -158,7 +158,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 
 		//Check if there are bytes in the pipe
 		timeoutMillis -= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
-		tp = std::chrono::high_resolution_clock::now(); 
+		tp = std::chrono::high_resolution_clock::now();
 		struct timeval timeout;
 		timeout.tv_sec = timeoutMillis / 1000.0;
 		timeout.tv_usec = (timeoutMillis % 1000)*1000;
@@ -359,7 +359,7 @@ void Networking::handleFrameNetworking(unsigned char playerTag, const unsigned s
 		player_logs[playerTag - 1] += response + "\n --- Bot used " + std::to_string(millisTaken) + " milliseconds ---";
 
 		*moves = deserializeMoveSet(response, m);
-		
+
 		*playermillis -= millisTaken;
 	}
 	catch(std::string s) {
@@ -389,7 +389,8 @@ void Networking::killPlayer(unsigned char playerTag) {
 	connections[playerTag - 1].read = NULL;
 	connections[playerTag - 1].write = NULL;
 
-	if(!quiet_output) std::cout << "Player " << int(playerTag) << " is dead\n";
+	std::string deadMessage = "Player " + std::to_string(playerTag) + " is dead\n";
+	if(!quiet_output) std::cout << deadMessage;
 #else
 	kill(-processes[playerTag - 1], SIGKILL);
 
