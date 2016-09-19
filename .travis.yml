@@ -5,8 +5,6 @@ dist: trusty
 language: generic
 
 install:
-  - mysql -u root -e 'create database Halite;'
-
   - cd ~/build/HaliteChallenge/Halite/tests
   - cp travisTests.ini tests.ini
   - cp travisTests.ini ../halite.ini
