@@ -194,23 +194,25 @@ class WebsiteAPI extends API{
 				
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
 			} else { // New User
-				$emailDomain = explode('@', $githubUser['email'])[1];
 				$organization = "Other";
-				$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
-				foreach($rows as $row) {
-					$components = explode(" - ", $row);
-					if(strcmp($components[1], $emailDomain) == 0) {
-						$organization = $components[0];
-						break;
+				if($github['email'] != NULL) {
+					$emailDomain = explode('@', $githubUser['email'])[1];
+					$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
+					foreach($rows as $row) {
+						$components = explode(" - ", $row);
+						if(strcmp($components[1], $emailDomain) == 0) {
+							$organization = $components[0];
+							break;
+						}
 					}
 				}
 
-				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1)");
+				$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows + 1; // Add once since this user hasnt been inserted into the db
+				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
-				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE status=3")->num_rows;
-				$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
+				/*$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
 				if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
 					shell_exec("python3 openNewWorker.py &");
 				}*/
