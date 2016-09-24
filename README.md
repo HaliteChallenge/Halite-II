@@ -19,7 +19,7 @@ Halite is a programming competition. Contestants write bots to play an original 
 
 If you find a bug or a feature request, please open an issue. We are happy to help you out.
 
-For a technical overview of the project, check out our [spec](https://github.com/HaliteChallenge/Halite/blob/master/admin/spec/SPEC.md).
+For a technical overview of the project, check out our [spec](https://github.com/HaliteChallenge/Halite/blob/master/admin/SPEC.md).
 
 Send us a pull request! If you are looking for things to do, check out our [Trello](https://trello.com/b/z8jUXTA0/halite) or [our open issues](https://github.com/HaliteChallenge/Halite/issues). We will be happy to add you as a contributor and credit you in the README.
 
