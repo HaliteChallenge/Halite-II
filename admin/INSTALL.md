@@ -41,6 +41,16 @@ To finish superuser setup, comment out `bind-address = 127.0.0.1` in `/etc/mysql
  
     $ sudo service mysql restart
 
+For ease of use of the mysql on the command line and for install scripts to be guranteed to run smoothly, please edit your `~/.my.cnf` to include these lines:
+
+    [mysqldump]
+    user=MYSQL_USERNAME
+    password=MYSQL_PASSWORD
+
+    [client]
+    user=MYSQL_USERNAME
+    password=MYSQL_PASSWORD
+
 ### Worker server setup
 
     $ cd website/php && python3 openNewWorker.py
