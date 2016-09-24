@@ -17,7 +17,7 @@ Halite is a programming competition. Contestants write bots to play an original 
 
 ## Documentation
 
-See the mardown files in [the admin folder](/admin) for more information. 
+See the markdown files in [the admin folder](/admin) for more information. 
 
 **Note:** this documentation is aimed at administrators of our setup of Halite. Much of this documentation isn't general and is quite technical.
 
