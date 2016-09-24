@@ -85,7 +85,7 @@ def executeCompileTask(user, backend):
 		didCompile = False
 	if didCompile:
 		print("Bot did compile")
-		zip.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
+		archive.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
 		backend.storeBotRemotely(int(user["userID"]), os.path.join(workingPath, user["userID"]+".zip"))
 	else:
 		print("Bot did not compile")
