@@ -48,11 +48,6 @@ CREATE TABLE `GameUser` (
   `errorLogName` varchar(64) DEFAULT NULL,
   `rank` smallint(5) unsigned NOT NULL,
   `playerIndex` smallint(5) unsigned NOT NULL,
-  `territoryAverage` float(8,5) NOT NULL,
-  `productionAverage` float(8,5) NOT NULL,
-  `strengthAverage` float(8,5) NOT NULL,
-  `stillPercentage` float(8,5) NOT NULL,
-  `turnTimeAverage` float(8,5) NOT NULL,
   `didTimeout` tinyint(1) unsigned NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -72,41 +67,18 @@ CREATE TABLE `User` (
   `email` varchar(64) NOT NULL,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `organization` varchar(64) NOT NULL,
   `language` varchar(16) DEFAULT NULL,
   `mu` float unsigned NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
   `rank` smallint(5) DEFAULT NULL,
+  `didTimeout` float DEFAULT 0.000,
   `numSubmissions` smallint(5) NOT NULL DEFAULT 0,
   `numGames` smallint(5) NOT NULL DEFAULT 0,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   `updateTime` datetime ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `UserExtraStats`
---
-
-DROP TABLE IF EXISTS `UserExtraStats`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `UserExtraStats` (
-  `userID` mediumint(8) unsigned NOT NULL,
-  `territoryAverage` float(8,5) NOT NULL,
-  `strengthAverage` float(8,5) NOT NULL,
-  `productionAverage` float(8,5) NOT NULL,
-  `stillPercentage` float(8,5) NOT NULL,
-  `turnTimeAverage` float(8,5) NOT NULL,
-  `territoryRanking` smallint(5) NOT NULL,
-  `strengthRanking` smallint(5) NOT NULL,
-  `productionRanking` smallint(5) NOT NULL,
-  `stillRanking` smallint(5) NOT NULL,
-  `turnTimeRanking` smallint(5) NOT NULL,
-  `timeoutRanking` smallint(5) NOT NULL,
-  `didTimeout` float(8,5) NOT NULL,
-  PRIMARY KEY (`userID`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

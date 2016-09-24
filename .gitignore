@@ -305,6 +305,11 @@ composer.phar
 vendor/
 composer.lock
 
+##########
+## Atom ##
+##########
+.atom-build.yml
+
 ############
 ## Halite ##
 ############

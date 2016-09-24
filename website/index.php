@@ -31,23 +31,10 @@ if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?
 					<h1>Introducing Halite</h1>
 					<p>Halite is a multiplayer turn-based game that is played by computer programs. (Insert longer description here).</p>
 					<p>Interested? Visit our <a href="quickstart.php">quickstart tutorial</a>. The simplest Halite bot is just 14 lines of code.</p>
-					<p>Computer programs duking it out in Halite:</p>
-					<div id="gameArea"></div>
 					<h1>Top Rankings</h1>
 					<p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
 					<div class="panel panel-primary">
-						<table class="table well well-sm" id="leaderTable">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Username</th>
-									<th>Language</th>
-									<th>Submissions</th>
-									<th>Games Played</th>
-									<th>Score</th>
-								</tr>
-							</thead>
-						</table>
+						<?php include 'includes/leaderTable.php'; ?>
 					</div>
 				</div>
 			</div>
@@ -61,6 +48,7 @@ if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?
 	<script src="lib/pixi.min.js"></script>
 	<script src="script/parsereplay.js"></script>
 	<script src="script/visualizer.js"></script>
+	<script src="script/leaderTable.js"></script>
 	<script src="script/index.js"></script>
 </body>
 

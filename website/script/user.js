@@ -122,9 +122,7 @@ $(function() {
 			"numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
 			"numGames": {name: "Number of Games Played", mouseOverText: null},
 			"language": {name: "Language", mouseOverText: null},
-			"didTimeout": {name: "Timeout Frequency", mouseOverText: null},
-			"stillRanking": {name: "Still Move Frequency", mouseOverText: "(Number of still moves) / (Total number of moves)", percentile: true},
-			"turnTimeRanking": {name: "Time per Turn", mouseOverText: "Average latency per turn", percentile: true}
+			"organization": {name: "Organization", mouseOverText: null}
 		};
 		var stats = [];
 		for(var key in statDetails) {
@@ -145,8 +143,6 @@ $(function() {
 	if(userID == null || userID == undefined) userID = parseInt(session.userID);
 
 	var user = getUser(userID);
-	var extraStats = getExtraStats(userID);
-	$.extend(user, extraStats);
 	user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
 	user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 

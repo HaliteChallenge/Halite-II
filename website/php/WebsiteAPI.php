@@ -25,6 +25,7 @@ define("COMPILE_PATH", dirname(__FILE__)."/../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
 define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 
@@ -190,16 +191,29 @@ class WebsiteAPI extends API{
 			$githubUser = json_decode($gitHub->request('user'), true);
 			var_dump($githubUser);
 
-			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) {
-				// Already signed up
+			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) { // Already signed up
+				
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
-			} else {
-				// New User
-				$this->insert("INSERT INTO User (username, email, oauthID, oauthProvider) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', {$githubUser['id']}, 1)");
+			} else { // New User
+				$organization = "Other";
+				if($github['email'] != NULL) {
+					$emailDomain = explode('@', $githubUser['email'])[1];
+					$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
+					foreach($rows as $row) {
+						$components = explode(" - ", $row);
+						if(strcmp($components[1], $emailDomain) == 0) {
+							$organization = $components[0];
+							break;
+						}
+					}
+				}
+
+				$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows + 1; // Add once since this user hasnt been inserted into the db
+				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
-				/*$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
+				/*
 				$numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
 				if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
 					shell_exec("python3 openNewWorker.py &");
@@ -210,22 +224,6 @@ class WebsiteAPI extends API{
 			else header("Location: http://halite.io/website");
 			die();
 		} 
-	}
-
-	/* Extra Stats Endpoint
-	 *
-	 * We store a number of agreggated stats about each bot.
-	 * These are currently not stored in the User table.
-	 * 
-	 * TODO:The original rationale was that putting all of these stats in the User table would make it too latent;
-	 * However, the separation of the extra stats and the user's base info is kind of an arbitrary one.
-	 * It would be much nicer to decouple 'bot' information from 'user' information.
-	 * This would allow for the quick addition of mutiple bots per user and is less arbitrary.
-	 */
-	function extraStats() {
-		if(isset($_GET["userID"])) {
-			return $this->select("SELECT * FROM UserExtraStats WHERE userID={$_GET["userID"]}");
-		}
 	}
 
 	/* User History Endpoint

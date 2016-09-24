@@ -15,15 +15,18 @@ void promptDimensions(unsigned short & w, unsigned short & h);
 int main(int argc, char ** argv) {
 	srand(time(NULL)); //For all non-seeded randomness.
 
-	bool watch_game = false, override_names = false; //Extra parameters. 
-	
+	if(argc == 1) {
+		std::cout << "As no parameters passed, assuming default parameters and prompting where necessary. For help on using the Halite environment, please run this program again with the --help flag enabled.\n";
+	}
+
+	bool watch_game = false, override_names = false; //Extra parameters.
+
 	//Paramters to start up a game.
 	bool passed_dimensions = false, passed_seed = false, passed_bot_names = false, ignore_timeout = false;
 	unsigned short mapWidth, mapHeight;
 	unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
 	Networking networking;
 	std::vector<std::string> * names = NULL;
-	std::string * ppmFilename = NULL;
 	unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
 	std::list<std::string> sArgs;
@@ -71,20 +74,17 @@ int main(int argc, char ** argv) {
 				return EXIT_FAILURE;
 			}
 		}
-		else if(*a == "--godmode") {
-			a = sArgs.erase(a);
-			try {
-				ppmFilename = new std::string(*a);
-				a = sArgs.erase(a);
-			}
-			catch(...) {
-				std::cout << "The godmode parameter was either not present or invalid despite the flag having been given." << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
 		else if(*a == "-t") {
 			ignore_timeout = true;
 			a = sArgs.erase(a);
+		}
+		else if(*a == "--help") { //Opens tool spec in browser. Temporary fix.
+#ifdef _WIN32
+			system("explorer http://halite.io/website/tool_spec.php");
+#else
+			system("sensible-browser http://halite.io/website/tool_spec.php");
+#endif
+			return EXIT_SUCCESS;
 		}
 		else a++;
 	}
@@ -135,7 +135,7 @@ int main(int argc, char ** argv) {
 	}
 
 	//Create game. Null parameters will be ignored.
-	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout, ppmFilename);
+	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
 
 
 	GameStatistics stats = my_game->runGame(names, seed, id);
@@ -145,8 +145,8 @@ int main(int argc, char ** argv) {
 	if(quiet_output) {
 		std::cout << stats;
 	}
-	else {
-		for(unsigned int a = 0; a < stats.player_statistics.size(); a++) std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << "!\n";
+	else for(unsigned int a = 0; a < stats.player_statistics.size(); a++) {
+		std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << ".\n";
 	}
 
 	delete my_game;

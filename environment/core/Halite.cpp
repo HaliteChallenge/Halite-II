@@ -210,7 +210,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
-	 	 
+
 	for(auto a = last_territory_count.begin(); a != last_territory_count.end(); a++) *a = 0;
 	for(unsigned short a = 0; a < game_map.map_height; a++) for(unsigned short b = 0; b < game_map.map_width; b++) if(game_map.contents[a][b].owner != 0) {
 		last_territory_count[game_map.contents[a][b].owner - 1]++;
@@ -233,13 +233,12 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 }
 
 //Public Functions -------------------
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout, std::string * ppmFilename) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout) {
 	networking = networking_;
 	number_of_players = networking.numberOfPlayers();
 
 	//Initialize map
-	if(ppmFilename == NULL) game_map = hlt::Map(width_, height_, number_of_players, seed_);
-	else game_map = hlt::ppmToMap(*ppmFilename, number_of_players);
+	game_map = hlt::Map(width_, height_, number_of_players, seed_);
 
 	//Add colors to possible colors:
 	possible_colors.clear();

@@ -24,7 +24,7 @@ struct PlayerStatistics {
 	double average_response_time;
 };
 static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
-	o << p.tag << ' ' << p.rank << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
+	o << p.tag << ' ' << p.rank;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
 	return o;
 }
 
@@ -77,7 +77,7 @@ private:
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 	void output(std::string filename);
 public:
-	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout, std::string * ppmFilename);
+	Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout);
 
 	GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id);
 	std::string getName(unsigned char playerTag);
