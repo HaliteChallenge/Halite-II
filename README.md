@@ -13,7 +13,7 @@ Halite is a programming competition. Contestants write bots to play an original 
 - `manager/` - The API that manages worker servers
 - `tests/` - All of the project's unit and integration tests
 - `website/` - The website that hosts the competition
-- `worker/` - The source for the worker servers that compiles bots and runs games safely
+- `worker/` - The source for the worker servers that compile bots and run games safely
 
 ## Documentation
 

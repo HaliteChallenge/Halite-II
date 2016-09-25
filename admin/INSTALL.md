@@ -12,7 +12,7 @@ Check that you are on php >= 5.6 and mysql >= 5.6.5:
 
     $ `php -v; mysql -V
 
-	
+    
 Symlink the repo to /var/www:
 
     ln -s ~/Halite /var/www
@@ -30,13 +30,13 @@ Finish Apache setup:
 To setup automatic backups on the website server, copy the `backupWebsite` file in the `Halite/website/cron` folder into the server's `/etc/cron.hourly` folder, change the IP address in the file to that of the backup server, and make sure that the ssh key of the website server is in the `~/.ssh/authorized_keys` file on the backup server. Once copied, mark the `backupWebsite` file as executable and give cron permission to execute it like so:
 
     cd /etc/cron.hourly
-	chmod +x backupWebsite
-	chmod 755 backupWebsite
+    chmod +x backupWebsite
+    chmod 755 backupWebsite
 
 ### Database server setup
 
     $ cd website/sql && ./install.sh
-	
+    
 Add a superuser by wildcarding its host and allowing remote login. In the MySQL shell:
 
     CREATE USER 'superuser'@'%' IDENTIFIED BY 'SOME_RANDOM_PASSWORD';
@@ -60,8 +60,8 @@ For ease of use of the mysql on the command line and for install scripts to be g
 To setup automatic backups on the db server, copy the `backupDatabase` file in the `Halite/website/cron` folder into the server's `/etc/cron.hourly` folder, change the IP address in the file to the one of the backup server, and make sure that the ssh key of the db server is in the `~/.ssh/authorized_keys` file on the backup server. Once copied, mark the `backupDatabase` file as executable and give anyone permission to execute it like so:
 
     cd /etc/cron.hourly
-	chmod +x backupDatabase
-	chmod 755 backupDatabase
+    chmod +x backupDatabase
+    chmod 755 backupDatabase
 
 ### Worker server setup
 ***Note:*** Make sure that your `halite.ini` file points to the proper AWS key pair.

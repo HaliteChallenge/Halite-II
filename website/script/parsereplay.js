@@ -30,7 +30,7 @@ textToGame = function(text) {
     }
     delete game.player_names;
 
-	console.log(game.players);
+    console.log(game.players);
 
     var maxProd = 0;
     for(var a = 0; a < game.height; a++) {
