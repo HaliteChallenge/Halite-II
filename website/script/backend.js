@@ -82,7 +82,7 @@ function getActiveUsers(limit, page) {
 		url: url+"user",
 		async: false,
 		method: "GET",
-		data: {fields: ["status"], values: ["3"], limit: limit, page: page}
+		data: {fields: ["isRunning"], values: ["1"], limit: limit, page: page}
 	});
 	console.log(result)
 	console.log(result.responseJSON)

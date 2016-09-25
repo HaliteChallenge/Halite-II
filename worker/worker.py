@@ -62,7 +62,7 @@ def executeCompileTask(user, backend):
 	try:
 		workingPath = "workingPath"
 		makePath(workingPath)
-		botPath = backend.storeBotLocally(int(user["userID"]), workingPath)
+		botPath = backend.storeBotLocally(int(user["userID"]), workingPath, isCompile=True)
 		archive.unpack(botPath)
 
 		while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:

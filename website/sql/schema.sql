@@ -61,7 +61,7 @@ DROP TABLE IF EXISTS `User`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `oauthID` mediumint(8) unsigned NOT NULL,
+  `oauthID` int(12) unsigned NOT NULL,
   `oauthProvider` tinyint(1) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
   `email` varchar(64) NOT NULL,

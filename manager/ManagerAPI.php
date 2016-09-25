@@ -131,6 +131,7 @@ class ManagerAPI extends API{
 								}
 							}
 						}
+						if(count($seedPlayer) < 1) return null;
 						$players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
 						array_push($players, $seedPlayer);
 
@@ -164,7 +165,9 @@ class ManagerAPI extends API{
 								$user = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($userID));
 
 								$this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, mu = 25.000, sigma = 8.333, compileStatus = 0, isRunning = 1, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
-								$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numPlayers, {$user['numGames']})");
+
+								$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows + 1; // Add once since this user hasnt been inserted into the db
+								$this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
 						} else { // Didnt succeed
 								$this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
 						}
@@ -184,7 +187,7 @@ class ManagerAPI extends API{
 						$users = json_decode($_POST['users']);
 
 						foreach($users as $user) {
-							$storedUser = $this->select("SELECT status, numSubmissions FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
+							$storedUser = $this->select("SELECT numSubmissions FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
 							if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
 								return null;
 							}

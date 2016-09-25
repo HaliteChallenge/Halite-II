@@ -191,12 +191,13 @@ class WebsiteAPI extends API{
 			$githubUser = json_decode($gitHub->request('user'), true);
 			var_dump($githubUser);
 
-			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows == 1) { // Already signed up
+			echo "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}";
+			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
 				
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
 			} else { // New User
 				$organization = "Other";
-				if($github['email'] != NULL) {
+				if($githubUser['email'] != NULL) {
 					$emailDomain = explode('@', $githubUser['email'])[1];
 					$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
 					foreach($rows as $row) {
