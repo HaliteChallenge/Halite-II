@@ -14,20 +14,20 @@ use std::collections::HashMap;
 use rand::Rng;
 
 fn main() {
-	let (my_id, mut game_map) = networking::get_init();
-	let mut rng = rand::thread_rng();
-	networking::send_init(format!("{}{}", "RustBot".to_string(), my_id.to_string()));
-	loop {
-		networking::get_frame(&mut game_map);
-		let mut moves = HashMap::new();
-		for a in 0..game_map.height {
-			for b in 0..game_map.width {
-				let l = hlt::types::Location { x: b, y: a };
-				if game_map.get_site(l, types::STILL).owner == my_id {
-					moves.insert(l, (rng.gen::<u32>() % 5) as u8);
-				}
-			}
-		}
-		networking::send_frame(moves);
-	}
+    let (my_id, mut game_map) = networking::get_init();
+    let mut rng = rand::thread_rng();
+    networking::send_init(format!("{}{}", "RustBot".to_string(), my_id.to_string()));
+    loop {
+        networking::get_frame(&mut game_map);
+        let mut moves = HashMap::new();
+        for a in 0..game_map.height {
+            for b in 0..game_map.width {
+                let l = hlt::types::Location { x: b, y: a };
+                if game_map.get_site(l, types::STILL).owner == my_id {
+                    moves.insert(l, (rng.gen::<u32>() % 5) as u8);
+                }
+            }
+        }
+        networking::send_frame(moves);
+    }
 }

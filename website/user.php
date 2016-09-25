@@ -1,70 +1,70 @@
 <html lang="en">
 <head>
-	<?php include 'includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
-	<title></title>
+    <title></title>
 
-	<link href="lib/bootstrap.min.css" rel="stylesheet">
-	<link href="style/general.css" rel="stylesheet">
+    <link href="lib/bootstrap.min.css" rel="stylesheet">
+    <link href="style/general.css" rel="stylesheet">
 </head>
 <body>
-	<div class="container">
-		<?php include 'includes/navbar.php'; ?>
-		<div class="jumbotron" id="jumbotron">
-			<h1 id="jHeader"></h1>
-			<p id="jBody"></p>
-		</div>
-		<div class="row">
-			<div class="col-md-5">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Detailed Statistics</h3>
-					</div>
-					<table class="table well well-sm" id="statTable">
-						<tbody id="statTableBody">
-						</tbody>
-					</table>
-				</div>
-				<div id="historyPanel" class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Recent History</h3>
-					</div>
-					<table class="table well well-sm" id="historyTable">
-						<thead>
-							<tr id="historyTableHeader">
-								<th>Version</th>
-								<th>Final Ranking</th>
-								<th>Games Played</th>
-							</tr>
-						</thead>
-						<tbody id="historyTableBody">
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="col-md-7">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Past Games</h3>
-					</div>
-					<table class="table well well-sm" id="gameTable">
-						<thead>
-							<tr id="gameTableHeader">
-							</tr>
-						</thead>
-						<tbody id="gameTableBody">
-						</tbody>
-					</table>
-					<button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <?php include 'includes/navbar.php'; ?>
+        <div class="jumbotron" id="jumbotron">
+            <h1 id="jHeader"></h1>
+            <p id="jBody"></p>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Detailed Statistics</h3>
+                    </div>
+                    <table class="table well well-sm" id="statTable">
+                        <tbody id="statTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="historyPanel" class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Recent History</h3>
+                    </div>
+                    <table class="table well well-sm" id="historyTable">
+                        <thead>
+                            <tr id="historyTableHeader">
+                                <th>Version</th>
+                                <th>Final Ranking</th>
+                                <th>Games Played</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Past Games</h3>
+                    </div>
+                    <table class="table well well-sm" id="gameTable">
+                        <thead>
+                            <tr id="gameTableHeader">
+                            </tr>
+                        </thead>
+                        <tbody id="gameTableBody">
+                        </tbody>
+                    </table>
+                    <button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script src="script/backend.js"></script>
-	<script src="script/general.js"></script>
-	<script src="script/user.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="script/backend.js"></script>
+    <script src="script/general.js"></script>
+    <script src="script/user.js"></script>
 </body>
 </html>

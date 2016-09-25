@@ -52,7 +52,7 @@ For ease of use of the mysql on the command line and for install scripts to be g
     password=MYSQL_PASSWORD
 
 ### Worker server setup
+***Note:*** Make sure that your `halite.ini` file points to the proper AWS key pair.
 
     $ cd website/php && python3 openNewWorker.py
-	
-***Note:*** Make sure that your `halite.ini` file points to the proper AWS key pair.
+To 

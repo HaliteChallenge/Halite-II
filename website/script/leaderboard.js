@@ -1,20 +1,20 @@
 $(function() {
 
-	var field = getGET("field");
-	var value = getGET("value");
-	var heading = getGET("heading");
-	var $heading = $("#leaderHeading");
+    var field = getGET("field");
+    var value = getGET("value");
+    var heading = getGET("heading");
+    var $heading = $("#leaderHeading");
 
-	if(field != null && value != null && heading != null) {
-		$heading.html(heading + " Rankings");
+    if(field != null && value != null && heading != null) {
+        $heading.html(heading + " Rankings");
 
-		var filters = {};
-		filters["isRunning"] = 1;
-		filters[field] = value;
-		console.log(filters)
-		leaderTable.init(getFilteredUsers(filters, "rank"));
-	} else {
-		$heading.html("Current Rankings");
-		leaderTable.init(getActiveUsers());
-	}
+        var filters = {};
+        filters["isRunning"] = 1;
+        filters[field] = value;
+        console.log(filters)
+        leaderTable.init(getFilteredUsers(filters, "rank"));
+    } else {
+        $heading.html("Current Rankings");
+        leaderTable.init(getActiveUsers());
+    }
 })

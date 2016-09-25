@@ -10,33 +10,33 @@
 #include "networking.hpp"
 
 int main() {
-	srand(time(NULL));
+    srand(time(NULL));
 
-	std::ofstream dbg("dbg.log");
+    std::ofstream dbg("dbg.log");
 
-	std::cout.sync_with_stdio(0);
+    std::cout.sync_with_stdio(0);
 
-	unsigned char myID;
-	hlt::GameMap presentMap;
-	getInit(myID, presentMap);
-	sendInit("C++Bot");
+    unsigned char myID;
+    hlt::GameMap presentMap;
+    getInit(myID, presentMap);
+    sendInit("C++Bot");
 
-	std::set<hlt::Move> moves;
-	while(true) {
-		moves.clear();
+    std::set<hlt::Move> moves;
+    while(true) {
+        moves.clear();
 
-		getFrame(presentMap);
+        getFrame(presentMap);
 
-		for(unsigned short a = 0; a < presentMap.height; a++) {
-			for(unsigned short b = 0; b < presentMap.width; b++) {
-				if (presentMap.getSite({ b, a }).owner == myID) {
-					moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
-				}
-			}
-		}
+        for(unsigned short a = 0; a < presentMap.height; a++) {
+            for(unsigned short b = 0; b < presentMap.width; b++) {
+                if (presentMap.getSite({ b, a }).owner == myID) {
+                    moves.insert({ { b, a }, (unsigned char)(rand() % 5) });
+                }
+            }
+        }
 
-		sendFrame(moves);
-	}
+        sendFrame(moves);
+    }
 
-	return 0;
+    return 0;
 }

@@ -1,108 +1,108 @@
 body {
-	padding-top: 20px;
+    padding-top: 20px;
 }
 
 .navbar {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .jumbotron {
-	padding: 0.9em 0.9em;
+    padding: 0.9em 0.9em;
 }
 
 #navvy {
-	-moz-border-radius: 2px;
-	border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
 
 #jHeader {
-	font-size: 50px;
+    font-size: 50px;
 }
 
 #myFile {
-	display:none;
+    display:none;
 }
 
 #gameFile {
-	display:none;
+    display:none;
 }
 
 #navCont {
-	margin:0 auto;
-	width:90%;
+    margin:0 auto;
+    width:90%;
 }
 
 #loginNav {
-	display:inline;
+    display:inline;
 }
 
 #logoutNav {
-	display:none;
+    display:none;
 }
 
 #archivedTag {
-	display:none;
+    display:none;
 }
 
 .gameRow {
-	display:none;
+    display:none;
 }
 
 #leaderTable {
-	padding-bottom:0px;
-	margin-bottom:0px;
+    padding-bottom:0px;
+    margin-bottom:0px;
 }
 
 .gameRow {
-	background-color:#F8F8F8;
+    background-color:#F8F8F8;
 }
 
 .arrow {
-	height: 16px;
-	width: 16px;
-	cursor: pointer;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
 }
 
 .file-icon {
-	height: 16px;
-	width: 16px;
+    height: 16px;
+    width: 16px;
 }
 
 .won {
-	color: green;
+    color: green;
 }
 
 .lost {
-	color: red;
+    color: red;
 }
 
 code {
-	font-family: monospace;
+    font-family: monospace;
 }
 
 .jumbotron-btn {
-	margin-top: 2px;
-	margin-bottom: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 .videoWrapper {
-	position: relative;
-	padding-bottom: 56.25%; /* 16:9 */
-	padding-top: 25px;
-	height: 0;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
 }
 .videoWrapper iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .has-hover-text {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 table a:not(.btn), .table a:not(.btn) {
-	text-decoration: none;
+    text-decoration: none;
 }

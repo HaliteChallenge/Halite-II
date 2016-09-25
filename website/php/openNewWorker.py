@@ -20,9 +20,9 @@ instance = reservation.instances[0]
 # Wait to start
 status = instance.update()
 while status == "pending":
-	time.sleep(1)
-	status = instance.update()
-	print("Waiting for instance to start...")
+    time.sleep(1)
+    status = instance.update()
+    print("Waiting for instance to start...")
 
 # Add worker to db
 db = pymysql.connect(host=DB_CONFIG["hostname"], user=DB_CONFIG['username'], passwd=DB_CONFIG['password'], db=DB_CONFIG['name'])
@@ -33,25 +33,25 @@ print(ipAddress)
 
 numRows = 9999
 while numRows != 0:
-	apiKey = random.randrange(0, 10000000)
-	cursor.execute("SELECT * FROM Worker WHERE apiKey="+str(apiKey))
-	numRows = int(cursor.rowcount)
+    apiKey = random.randrange(0, 10000000)
+    cursor.execute("SELECT * FROM Worker WHERE apiKey="+str(apiKey))
+    numRows = int(cursor.rowcount)
 cursor.execute("INSERT INTO Worker (apiKey, ipAddress) VALUES ("+str(apiKey)+", '"+str(ipAddress)+"')")
 
 def runCommandOnInstance(instance, command):
-	# Connect to ssh
-	for a in range(100):
-		try:
-			ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
-			break
-		except Exception as e:
-			print("except")
-			print(str(e))
+    # Connect to ssh
+    for a in range(100):
+        try:
+            ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
+            break
+        except Exception as e:
+            print("except")
+            print(str(e))
 
-	# Run install script
-	status, stdout, stderr = ssh_client.run(command)
-	print(stdout)
-	print(stderr)
+    # Run install script
+    status, stdout, stderr = ssh_client.run(command)
+    print(stdout)
+    print(stderr)
 
 configFileContents = open("../../halite.ini").read()
 runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; git checkout aws; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
