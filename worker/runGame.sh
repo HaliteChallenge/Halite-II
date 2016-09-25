@@ -56,4 +56,4 @@ rm /run/network/ifstate.veth*
 mv *.hlt ../
 mv *.log ../
 cd ..
-#rm -r $WORKINGPATH
+rm -r $WORKINGPATH
