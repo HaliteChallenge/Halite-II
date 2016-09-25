@@ -21,9 +21,13 @@ def getTask():
 	else:
 		return json.loads(content)
 
-def getBotHash(userID):
+def getBotHash(userID, isCompile=False):
 	"""Gets the checksum of a user's bot's zipped source code"""
-	result = requests.get(MANAGER_URL+"botHash", params={"apiKey": API_KEY, "userID": userID})
+	params = {"apiKey": API_KEY, "userID": userID}
+	if isCompile:
+            params["compile"] = 1
+
+	result = requests.get(MANAGER_URL+"botHash", params=params)
 
 	print("Getting bot hash:")
 	print(result.text)
@@ -36,7 +40,8 @@ def storeBotLocally(userID, storageDir, isCompile=False):
 	iterations = 0
 	while iterations < 100:
 		url = MANAGER_URL+"botFile?apiKey="+str(API_KEY)+"&userID="+str(userID)
-		if isCompile: url += "&isCompile=1"
+		if isCompile: url += "&compile=1"
+		print(url)
 
 		remoteZip = urllib.request.urlopen(url)
 		zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
@@ -51,7 +56,7 @@ def storeBotLocally(userID, storageDir, isCompile=False):
 		localZip.write(remoteZipContents)
 		localZip.close()
 
-		if md5(remoteZipContents).hexdigest() != getBotHash(userID):
+		if md5(remoteZipContents).hexdigest() != getBotHash(userID, isCompile):
 			iterations += 1
 			continue
 

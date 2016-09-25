@@ -166,10 +166,7 @@ if __name__ == "__main__":
 	print("Starting up worker...")
 
 	while True:
-		try:
-			task = backend.getTask()
-		except:
-			continue
+		task = backend.getTask()
 		if task != None:
 			print("Got new task: " + str(task))
 			if task["type"] == "compile":
