@@ -27,6 +27,12 @@ Finish Apache setup:
  * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
  * Tell apache to forbid access to the storage/errors and storage/bots folders and to the halite.ini file
 
+To setup automatic backups on the website server, copy the `backupWebsite` file in the `Halite/website/cron` folder into the server's `/etc/cron.hourly` folder, change the IP address in the file to that of the backup server, and make sure that the ssh key of the website server is in the `~/.ssh/authorized_keys` file on the backup server. Once copied, mark the `backupWebsite` file as executable and give cron permission to execute it like so:
+
+    cd /etc/cron.hourly
+	chmod +x backupWebsite
+	chmod 755 backupWebsite
+
 ### Database server setup
 
     $ cd website/sql && ./install.sh
@@ -51,8 +57,14 @@ For ease of use of the mysql on the command line and for install scripts to be g
     user=MYSQL_USERNAME
     password=MYSQL_PASSWORD
 
+To setup automatic backups on the db server, copy the `backupDatabase` file in the `Halite/website/cron` folder into the server's `/etc/cron.hourly` folder, change the IP address in the file to the one of the backup server, and make sure that the ssh key of the db server is in the `~/.ssh/authorized_keys` file on the backup server. Once copied, mark the `backupDatabase` file as executable and give anyone permission to execute it like so:
+
+    cd /etc/cron.hourly
+	chmod +x backupDatabase
+	chmod 755 backupDatabase
+
 ### Worker server setup
 ***Note:*** Make sure that your `halite.ini` file points to the proper AWS key pair.
 
     $ cd website/php && python3 openNewWorker.py
-To 
+
