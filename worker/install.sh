@@ -11,8 +11,12 @@ fi
 ##################
 # Compiler tools #
 ##################
+add-apt-repository -y ppa:ubuntu-toolchain-r/test
 apt-get -y update 
-apt-get install -y curl build-essential python3 default-jdk clang++-3.5
+apt-get install -y g++-4.9
+export CXX="g++-4.9"
+
+apt-get install -y curl build-essential python3 default-jdk
 curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
 ##########
