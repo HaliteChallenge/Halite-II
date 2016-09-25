@@ -1,3 +1,6 @@
+add-apt-repository -y ppa:ubuntu-toolchain-r/test
+apt-get update
+
 # Python
 apt-get install -y python3 
 
@@ -8,8 +11,8 @@ apt-get install -y openjdk-7-jdk libjansi-java
 curl -sSf https://static.rust-lang.org/rustup.sh | sh 
 
 # C++
-apt-get install -y g++ 
-export CXX="g++-4.8"
+apt-get install -y g++-4.9
+export CXX="g++-4.9"
 
 # Scala
 wget www.scala-lang.org/files/archive/scala-2.10.4.deb
