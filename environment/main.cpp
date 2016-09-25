@@ -23,7 +23,6 @@ int main(int argc, char ** argv) {
 	unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
 	Networking networking;
 	std::vector<std::string> * names = NULL;
-	std::string * ppmFilename = NULL;
 	unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
 	std::list<std::string> sArgs;
@@ -68,17 +67,6 @@ int main(int argc, char ** argv) {
 			}
 			catch(...) {
 				std::cout << "The seed parameter was either not present or invalid despite the flag having been given." << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		else if(*a == "--godmode") {
-			a = sArgs.erase(a);
-			try {
-				ppmFilename = new std::string(*a);
-				a = sArgs.erase(a);
-			}
-			catch(...) {
-				std::cout << "The godmode parameter was either not present or invalid despite the flag having been given." << std::endl;
 				return EXIT_FAILURE;
 			}
 		}
@@ -135,7 +123,7 @@ int main(int argc, char ** argv) {
 	}
 
 	//Create game. Null parameters will be ignored.
-	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout, ppmFilename);
+	my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
 
 
 	GameStatistics stats = my_game->runGame(names, seed, id);
