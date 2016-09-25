@@ -37,7 +37,7 @@ do
     BOTNAMEINDEX=$(($i+$NUMBOTS))
     BOTNAME=${!BOTNAMEINDEX}
 
-    BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS '/usr/bin/docker run --net=none --memory=\"512m\" --cpu-shares=1024 -i -v $PWD/$BOT:$PWD/$BOT mntruell/halite_sandbox:latest sh -c \"cd $PWD/$BOT && ./$RUNFILE\"' '$BOTNAME'";
+    BOTSTARTCOMMANDS="$BOTSTARTCOMMANDS '/usr/bin/docker run --net=none --memory=\"512m\" --cpu-shares=1024 --storage-opt size=10G -i -v $PWD/$BOT:$PWD/$BOT mntruell/halite_sandbox:latest sh -c \"cd $PWD/$BOT && ./$RUNFILE\"' '$BOTNAME'";
 done
 
 eval "chmod +x $ENVIRONMENT"
