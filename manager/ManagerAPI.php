@@ -4,7 +4,7 @@ require_once 'API.class.php';
 
 define("REPLAYS_PATH", "../storage/replays/");
 define("ERROR_LOGS_PATH", "../storage/errors/");
-define("COMPILE_PATH", "/../../storage/compile/");
+define("COMPILE_PATH", "../storage/compile/");
 define("BOTS_PATH", "../storage/bots/");
 define("INI_FILE", "../halite.ini");
 
@@ -329,7 +329,8 @@ class ManagerAPI extends API{
 		protected function botHash() {
 				if(isset($_GET['userID'])) {
 						$userID = $_GET['userID'];
-						if(file_exists(BOTS_PATH."{$userID}.zip")) return array("hash" => md5_file(BOTS_PATH."{$userID}.zip"));
+						if(isset($_GET['compile']) && file_exists(COMPILE_PATH."{$userID}.zip")) return array("hash" => md5_file(COMPILE_PATH."{$userID}.zip"));
+						else if(!isset($_GET['compile']) && file_exists(BOTS_PATH."{$userID}.zip")) return array("hash" => md5_file(BOTS_PATH."{$userID}.zip"));
 						else return "Bot file does not exist";
 				}
 		}
