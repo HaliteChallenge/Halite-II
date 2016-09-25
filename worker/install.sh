@@ -4,8 +4,8 @@
 # Checks #
 ##########
 if [ ! -f ../halite.ini ]; then
-	echo "FAIL\nCannot install worker until a halite.ini file is created."
-	return
+    echo "FAIL\nCannot install worker until a halite.ini file is created."
+    return
 fi
 
 ##################
@@ -29,10 +29,10 @@ curl -sSL https://get.docker.com/ | sh
 service docker.io restart
 
 if [[ "$(docker images -q mntruell/halite_sandbox:latest 2> /dev/null)" == "" ]]; then
-	echo "Pulling remote docker image"
-	docker pull mntruell/halite_sandbox:latest
+    echo "Pulling remote docker image"
+    docker pull mntruell/halite_sandbox:latest
 else
-	echo "Attention: local halite sandbox already exists. Not pulling remote."
+    echo "Attention: local halite sandbox already exists. Not pulling remote."
 fi
 
 ###############
@@ -47,7 +47,7 @@ update-grub
 # API Key #
 ###########
 if [ "$#" -eq 1 ]; then
-	python3 changeAPIKey.py $1
+    python3 changeAPIKey.py $1
 fi
 
 echo "A reboot is required to complete this installation!"
