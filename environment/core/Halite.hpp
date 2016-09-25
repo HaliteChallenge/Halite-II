@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "hlt.hpp"
+#include "json.hpp"
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;
@@ -69,10 +70,10 @@ private:
 	std::vector<unsigned int> total_response_time;
 	std::set<unsigned short> timeout_tags;
 
-	//Output
-	std::vector<Color> possible_colors;
-	std::map<unsigned char, Color> color_codes;
-	std::vector<std::vector<unsigned char> * > full_game;
+	//Full game
+	std::vector<hlt::Map> full_frames; //All the maps!
+	std::vector< std::vector< std::vector<int> > > full_player_moves; //Each inner 2d array represents the moves across the map for the corresponding frame
+																	  //and is guaranteed to have an outer size of map_height and an inner size of map_width
 
 	std::vector<bool> processNextFrame(std::vector<bool> alive);
 	void output(std::string filename);

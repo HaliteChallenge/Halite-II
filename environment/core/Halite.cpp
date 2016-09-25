@@ -23,7 +23,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	std::vector< std::vector<unsigned char> > moveDirections(game_map.map_height, std::vector<unsigned char>(game_map.map_width, 0)); //For the replay - which directions pieces actually moved.
+	full_player_moves.push_back(std::vector< std::vector<int> >(game_map.map_height, std::vector<int>(game_map.map_width, 0)));
 
 	//Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
 	threadLocation = 0; //Represents place in frameThreads.
@@ -55,7 +55,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 			else full_cardinal_count[a]++;
 
 			//Update moves
-			moveDirections[b->first.y][b->first.x] = b->second;
+			full_player_moves.back()[b->first.y][b->first.x] = b->second;
 
 			hlt::Location newLoc = game_map.getLocation(b->first, b->second);
 			if(pieces[a].count(newLoc)) {
@@ -180,33 +180,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 		}
 	}
 
-	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 2.25);
-	for(auto a = moveDirections.begin(); a != moveDirections.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		turn->push_back(*b);
-	}
-	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
-	std::list<unsigned char> strengths;
-	short numPieces = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		if(numPieces == 255 || b->owner != presentOwner) {
-			turn->push_back(numPieces);
-			turn->push_back(presentOwner);
-			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-			strengths.clear();
-			numPieces = 0;
-			presentOwner = b->owner;
-		}
-		numPieces++;
-		strengths.push_back(b->strength);
-	}
-
-	//Final output set:
-	turn->push_back(numPieces);
-	turn->push_back(presentOwner);
-	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-	turn->shrink_to_fit();
 	//Add to full game:
-	full_game.push_back(turn);
+	full_frames.push_back(hlt::Map(game_map));
 
 	//Check if the game is over:
 	std::vector<bool> stillAlive(number_of_players, false);
@@ -240,57 +215,13 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 	//Initialize map
 	game_map = hlt::Map(width_, height_, number_of_players, seed_);
 
-	//Add colors to possible colors:
-	possible_colors.clear();
-	possible_colors.push_back({ 1.0f, 0.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 0.0f });
-	possible_colors.push_back({ 0.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.0f, 0.0f });
-	possible_colors.push_back({ 1.0f, 0.0f, 1.0f });
-	possible_colors.push_back({ 0.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ 1.0f, 1.0f, 1.0f });
-	possible_colors.push_back({ .87f, .72f, .53f });
-	possible_colors.push_back({ 1.0f, 0.5f, 0.5f });
-	possible_colors.push_back({ 1.0f, .65f, 0.0f });
-
-	//Create color codes
-	std::vector<Color> newColors = possible_colors;
-	color_codes.clear();
-	for(int a = 0; a < number_of_players; a++) {
-		int index = rand() % newColors.size();
-		color_codes[a + 1] = newColors[index]; newColors.erase(newColors.begin() + index);
-	}
-
 	//Default initialize
 	player_moves = std::vector< std::map<hlt::Location, unsigned char> >();
 	turn_number = 0;
 	player_names = std::vector< std::string >(number_of_players);
 
-	//Output initial map to file
-	std::vector<unsigned char> * turn = new std::vector<unsigned char>; turn->reserve(game_map.map_height * game_map.map_width * 1.25);
-	unsigned char presentOwner = game_map.contents.begin()->begin()->owner;
-	std::list<unsigned char> strengths;
-	short numPieces = 0;
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) {
-		if (numPieces == 255 || b->owner != presentOwner) {
-			turn->push_back(numPieces);
-			turn->push_back(presentOwner);
-			for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-			strengths.clear();
-			numPieces = 0;
-			presentOwner = b->owner;
-		}
-		numPieces++;
-		strengths.push_back(b->strength);
-	}
-
-	//Final output set:
-	turn->push_back(numPieces);
-	turn->push_back(presentOwner);
-	for(auto b = strengths.begin(); b != strengths.end(); b++) turn->push_back(*b);
-	turn->shrink_to_fit();
 	//Add to full game:
-	full_game.push_back(turn);
+	full_frames.push_back(hlt::Map(game_map));
 
 	//Initialize player moves vector
 	player_moves.resize(number_of_players);
@@ -317,16 +248,57 @@ void Halite::output(std::string filename) {
 	gameFile.open(filename, std::ios_base::binary);
 	if(!gameFile.is_open()) throw std::runtime_error("Could not open file for replay");
 
-	//Output game information to file, such as header, map dimensions, number of players, their names, and the first frame.
-	gameFile << "HLT 9" << F_NEWLINE;
-	gameFile << game_map.map_width << ' ' << game_map.map_height << ' ' << number_of_players << ' ' << int(full_game.size()) << F_NEWLINE;
-	for(unsigned char a = 0; a < number_of_players; a++) {
-		Color c = color_codes[a + 1];
-		gameFile << player_names[a] << '\0' << c.r << ' ' << c.g << ' ' << c.b << F_NEWLINE;
+	nlohmann::json j;
+
+	//This is version 11.
+	j["version"] = 11;
+
+	//Encode some details about the game that will make it convenient to parse.
+	j["width"] = game_map.map_width;
+	j["height"] = game_map.map_height;
+	j["num_players"] = player_names.size();
+	j["num_frames"] = full_frames.size();
+
+	//Encode player names.
+	j["player_names"] = nlohmann::json(player_names);
+
+	//Encode the production map.
+	std::vector< std::vector<int> > productions(game_map.map_height, std::vector<int>(game_map.map_width));
+	for(int a = 0; a < game_map.map_height; a++) {
+		for(int b = 0; b < game_map.map_width; b++) {
+			productions[a][b] = (game_map.contents[a][b].production);
+		}
 	}
-	for(auto a = game_map.contents.begin(); a != game_map.contents.end(); a++) for(auto b = a->begin(); b != a->end(); b++) gameFile.put(b->production);
-	gameFile << F_NEWLINE; //Newline helps organize the file for me.
-	for(auto a = full_game.begin(); a != full_game.end(); a++) for(auto b = (*a)->begin(); b != (*a)->end(); b++) gameFile.put(*b);
+	j["productions"] = nlohmann::json(productions);
+
+	//Encode the frames. Note that there is no moves field for the last frame.
+	std::vector< std::vector< std::vector< std::vector<int> > > > frames;
+	std::vector< std::vector< std::vector<int> > > moves;
+	frames.reserve(full_frames.size());
+	moves.reserve(full_frames.size() - 1);
+	for(int a = 0; a < full_frames.size(); a++) {
+		std::vector< std::vector< std::vector<int> > > frame(game_map.map_height, std::vector< std::vector<int> >(game_map.map_width));
+		for(int b = 0; b < game_map.map_height; b++) {
+			for(int c = 0; c < game_map.map_width; c++) {
+				frame[b][c].push_back(full_frames[a].contents[b][c].owner);
+				frame[b][c].push_back(full_frames[a].contents[b][c].strength);
+			}
+		}
+		frames.push_back(frame);
+	}
+	for(int a = 0; a < full_frames.size() - 1; a++) {
+		std::vector< std::vector<int> > move_frame(game_map.map_height, std::vector<int>(game_map.map_width));
+		for(int b = 0; b < game_map.map_height; b++) {
+			for(int c = 0; c < game_map.map_width; c++) {
+				move_frame[b][c] = full_player_moves[a][b][c];
+			}
+		}
+		moves.push_back(move_frame);
+	}
+	j["frames"] = nlohmann::json(frames);
+	j["moves"] = nlohmann::json(moves);
+
+	gameFile << j;
 
 	gameFile.flush();
 	gameFile.close();
@@ -430,6 +402,5 @@ std::string Halite::getName(unsigned char playerTag) {
 
 Halite::~Halite() {
 	//Get rid of dynamically allocated memory:
-	for(auto a = full_game.begin(); a != full_game.end(); a++) delete *a;
 	for(int a = 0; a < number_of_players; a++) networking.killPlayer(a+1);
 }

@@ -163,8 +163,6 @@ namespace hlt{
                 ~Region() { for(auto a = children.begin(); a != children.end(); a++) for(auto b = a->begin(); b != a->end(); b++) delete *b; }
             };
 
-            int sCA = sqrt(cw * ch); //Average dim.
-
             Region prodRegion(cw, ch, rud);
             std::vector< std::vector<double> > prodChunk = prodRegion.getFactors();
 
@@ -326,4 +324,31 @@ namespace hlt{
             return contents[l.y][l.x];
         }
     };
+
+    static Map ppmToMap(std::string filename, int numplayers) {
+        std::ifstream in(filename, std::ios_base::binary);
+        assert(in.is_open());
+        int width, height, max_color;
+        assert(in.get() == 'P');
+        assert(in.get() == '6');
+        in >> width >> height >> max_color;
+        assert(max_color < 256);
+        in.get(); //Get whitespace character.
+        Map m;
+        m.map_width = width;
+        m.map_height = height;
+        m.contents = std::vector< std::vector<Site> >(height, std::vector<Site>(width, { 0, 0, 0 }));
+        const unsigned char MAX_PROD = 15;//7 + rand() % 9;
+        int counter = 1;
+        for(int a = 0; a < m.map_height; a++) for(int b = 0; b < m.map_width; b++) {
+            if(a == height / 2 && (b % (width / numplayers + 1) == 0)) {
+                m.contents[a][b].owner = counter;
+                counter++;
+            }
+            m.contents[a][b].production = (in.get() + in.get() + in.get()) / 765.0 * MAX_PROD;
+            m.contents[a][b].strength = 15 * m.contents[a][b].production;
+        }
+        if(!quiet_output) std::cout << "Loaded ppm" << std::endl;
+        return m;
+    }
 }
