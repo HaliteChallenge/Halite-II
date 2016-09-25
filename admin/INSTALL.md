@@ -66,5 +66,7 @@ To setup automatic backups on the db server, copy the `backupDatabase` file in t
 ### Worker server setup
 ***Note:*** Make sure that your `halite.ini` file points to the proper AWS key pair.
 
+On your local machine:
+
     $ cd website/php && python3 openNewWorker.py
 
