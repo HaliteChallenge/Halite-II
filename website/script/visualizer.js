@@ -384,8 +384,6 @@ function showGame(game, showmovement, seconds) {
 function textFromURL(replayName, callback) {
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", "../storage/replays/"+replayName, true);
-
-	oReq.responseType = "arraybuffer";
 	oReq.onload = function (oEvent) {
 		if (oReq.status != 404) {
 			callback(textToGame(oReq.response));
