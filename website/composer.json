@@ -1,5 +1,5 @@
 {
-	"require": {
-		"lusitanian/oauth": "~0.3"
-	}
+    "require": {
+        "lusitanian/oauth": "~0.3"
+    }
 }
