@@ -1,5 +1,6 @@
 # Linguist ignore
 website/lib/* linguist-vendored
+environment/core/json.hpp linguist-vendored
 
 # Auto detect text files and perform LF normalization
 * text=auto
