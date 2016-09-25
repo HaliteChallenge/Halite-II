@@ -1,6 +1,20 @@
 <?php 
 session_start();
-if(isset($_SESSION['userID']) && intval(json_decode(file_get_contents("php/user?userID=".$_SESSION['userID']))->isRunning) == 1) header("Location: user.php");
+if(isset($_SESSION['userID'])) {
+	$config = parse_ini_file("../halite.ini", true);
+	$mysqli = new mysqli($config['database']['hostname'],
+		$config['database']['username'],
+		$config['database']['password'],
+		$config['database']['name']);
+
+	if (mysqli_connect_errno()) {
+		echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
+		exit();
+	}
+	if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isRunning=1"))) > 0) {
+		header("Location: user.php");
+	}
+}
 ?>
 
 <!DOCTYPE html>
