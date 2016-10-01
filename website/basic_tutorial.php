@@ -9,7 +9,8 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-            <div class="col-sm-12">
+        	<?php include 'includes/learn_sidebar.php'; ?>
+            <div class="col-sm-9">
                 <h1>Basic Bot Tutorial</h1>
 
                 <p>The source code for the basic bot in many languages is located <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/basic">here</a>.</p>

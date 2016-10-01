@@ -1,25 +1,8 @@
-<li class="dropdown">
-  <a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<strong class="caret"></strong></a>
-  <ul class="dropdown-menu" style="padding: 10px;">
-    <li><a href="quickstart.php">Quickstart</a></li>
-    <li><a href="basic_tutorial.php">Basic Bot</a></li>
-    <li><a href="bfs_tutorial.php">BFS</a></li>
-    <li><a href="machine_learning_tutorial.php">Machine Learning</a></li>
-  </ul>
-</li>
-<li class="dropdown">
-  <a class="dropdown-toggle" href="#" data-toggle="dropdown">Specs<strong class="caret"></strong></a>
-  <ul class="dropdown-menu" style="padding: 10px;">
-    <li><a href="game_spec.php">Game</a></li>
-    <li><a href="tool_spec.php">Tools</a></li>
-    <li><a href="file_spec.php">File</a></li>
-    <li><a href="networking_spec.php">Networking</a></li>
-    <li><a href="build_environment_spec.php">Build Environment</a></li>
-    <li><a href="contest_spec.php">Contest</a></li>
-  </ul>
+<li>
+  <a href="quickstart.php">Learn</a>
 </li>
 <li>
-  <a href="downloads.php">Downloads</a>
+  <a href="downloads.php">Download</a>
 </li>
 <li>
   <a href="leaderboard.php">Rankings</a>

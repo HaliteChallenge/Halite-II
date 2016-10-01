@@ -11,7 +11,8 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-            <div class="col-sm-12">
+        	<?php include 'includes/learn_sidebar.php'; ?>
+            <div class="col-sm-9">
                 <h1>Machine Learning Tutorial</h1>
 
                 <p>The source code for this tutorial is located <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/tutorials/machinelearning/">here</a>.</p>

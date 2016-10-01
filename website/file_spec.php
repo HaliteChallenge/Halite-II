@@ -11,7 +11,8 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-            <div class="col-sm-12">
+        	<?php include 'includes/learn_sidebar.php'; ?>
+            <div class="col-sm-9">
                 <h1>File Specification</h1>
                 <p>A sample file should look like:<br>
                     <pre><code>HLT 9 <-- A header to distinguish version and ensure that the file will be valid. This is followed by a newline.

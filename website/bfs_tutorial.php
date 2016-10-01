@@ -11,7 +11,8 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-            <div class="col-sm-12">
+        	<?php include 'includes/learn_sidebar.php'; ?>
+            <div class="col-sm-9">
 
                 <h1>Breadth-First Search Tutorial</h1>
 
