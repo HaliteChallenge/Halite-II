@@ -28,7 +28,6 @@
 	.bs-docs-sidebar .nav>li>a:focus {
 		text-decoration: none;          
 		background-color: transparent;  
-		border-left-color: #18bc9c; 
 	}
 	/* all active links */
 	.bs-docs-sidebar .nav>.active>a, 
@@ -40,6 +39,7 @@
 	.bs-docs-sidebar .nav .nav>.active>a, 
 	.bs-docs-sidebar .nav .nav>.active:hover>a,
 	.bs-docs-sidebar .nav .nav>.active:focus>a {
+		border-left-color: #18bc9c; 
 		font-weight: 500;
 	}
 
@@ -48,7 +48,7 @@
 <nav class="col-sm-3 bs-docs-sidebar">
 	<ul id="sidebar" class="nav nav-stacked">
 		<li class="">
-			<a href="#">Tutorials</a>
+			<a>Tutorials</a>
 			<ul class="nav nav-stacked">
 				<li id="quickstart">
 					<a href="quickstart.php">Quickstart</a>
@@ -65,7 +65,7 @@
 			</ul>
 		</li>
 		<li class="">
-			<a href="#">Specifications</a>
+			<a>Specifications</a>
 			<ul class="nav nav-stacked">
 				<li id="game_spec">
 					<a href="game_spec.php">Game Rules</a>
