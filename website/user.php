@@ -12,14 +12,14 @@
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
             <div class="col-md-5">
-                <div class="panel panel-default">
+                <div class="panel panel-primary">
 					<div class="panel-body text-center">
 						<h1 id="name" style=""></h1>
 						<h4 id="primary-info" style=""></h4>
 						<div id="secondary-info" style="color: gray;"></div>
 					</div>
                 </div>
-                <div id="historyPanel" class="panel panel-default">
+                <div id="historyPanel" class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Recent History</h3>
                     </div>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="col-md-7">
-                <div class="panel panel-default">
+                <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Game Feed</h3>
                     </div>
@@ -49,7 +49,7 @@
                         <tbody id="gameTableBody">
                         </tbody>
                     </table>
-                    <button type="button" id="loadButton" class="btn btn-default" style="width: 100%;">Load More</button>
+                    <button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
                 </div>
             </div>
         </div>
