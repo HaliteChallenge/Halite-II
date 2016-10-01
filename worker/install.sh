@@ -16,6 +16,8 @@ apt-get -qq update
 apt-get -qq install g++-4.9
 update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.3 10
 
+export CXX="g++-4.9"
+
 apt-get install -y curl build-essential python3 default-jdk
 curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
