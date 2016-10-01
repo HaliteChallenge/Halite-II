@@ -123,13 +123,18 @@ $(function() {
     user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
     user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
-    var numUsers = getNumActiveUsers();
+    var numUsers = parseInt(getNumActiveUsers());
+    var percentile = parseInt(user['rank']) / numUsers;
+    var tier = "Bronze";
+    if(percentile < 1/32) tier = "Diamond";
+    if(percentile < 1/16) tier = "Gold";
+    if(percentile < 1/4) tier = "Silver";
 
     $(document).prop('title', user.username);
 
-	$("#name").html(user['username']);
-	$("#primary-info").html(user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-	$("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" bots submitted<br>"+user['numGames']+" games played");
+    $("#name").html(user['username']);
+    $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+    $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" bots submitted<br>"+user['numGames']+" games played");
 
     gameTable.init(userID, session != null && parseInt(session.userID) == userID, function(userID, startingID) {
         console.log(startingID)
