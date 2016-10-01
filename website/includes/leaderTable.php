@@ -7,7 +7,7 @@
             <th>Organization</th>
             <th>Submissions</th>
             <th>Games Played</th>
-            <th>Score</th>
+            <th>Points</th>
         </tr>
     </thead>
 </table>
