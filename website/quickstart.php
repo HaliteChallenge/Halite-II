@@ -38,15 +38,6 @@
         </div>
     </div>
 
-    <footer class="footer pageContent">
-        <div class="container">
-            <div id="footer">
-                <ul class="pager">
-                    <li class="next"><a href="basic_tutorial.php">Tutorial <span aria-hidden="true">&rarr;</span></a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
