@@ -2,7 +2,7 @@ sudo: required
 
 dist: trusty
 
-language: generic
+language: cpp
 
 services: 
   - mysql
@@ -28,6 +28,8 @@ install:
 
   - cd ~/build/HaliteChallenge/Halite/tests
   - sudo ./install.sh
+
+  - export CXX="g++-4.9"
 
 script:
   - cd ~/build/HaliteChallenge/Halite/tests/

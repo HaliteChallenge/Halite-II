@@ -12,7 +12,6 @@ curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
 # C++
 apt-get install -y g++-4.9
-export CXX="g++-4.9"
 
 # Scala
 wget www.scala-lang.org/files/archive/scala-2.10.4.deb
