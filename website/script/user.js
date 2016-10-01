@@ -114,27 +114,6 @@ $(function() {
         }
     }
 
-    function statsFromUser(user, numUsers) {
-        var statDetails = {
-            "score": {name: "Trueskill Rating", mouseOverText: null},
-            "numSubmissions": {name: "Number of Bots Submitted", mouseOverText: null},
-            "numGames": {name: "Number of Games Played", mouseOverText: null},
-            "language": {name: "Language", mouseOverText: null},
-            "organization": {name: "Organization", mouseOverText: null}
-        };
-        var stats = [];
-        for(var key in statDetails) {
-            if(user[key] != undefined && user[key] != null) {
-                if(statDetails[key].percentile) {
-                    stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]+" of "+numUsers})
-                } else {
-                    stats.push({name: statDetails[key].name, mouseOverText: statDetails[key].mouseOverText, value: user[key]})
-                }
-            }
-        }
-        return stats;
-    }
-
     var session = getSession();
 
     var userID = getGET("userID");
@@ -148,8 +127,10 @@ $(function() {
 
     $(document).prop('title', user.username);
 
-    jumboTron.init(user.username, "Ranked " + user.rank + " of " + numUsers);
-    statTable.init(statsFromUser(user, numUsers));
+	$("#name").html(user['username']);
+	$("#primary-info").html(user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+	$("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" bots submitted<br>"+user['numGames']+" games played");
+
     gameTable.init(userID, session != null && parseInt(session.userID) == userID, function(userID, startingID) {
         console.log(startingID)
         var rawGames = getLatestGamesForUser(userID, 10, startingID); 
