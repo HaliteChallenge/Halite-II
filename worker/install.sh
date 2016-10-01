@@ -14,9 +14,6 @@ fi
 add-apt-repository -y ppa:ubuntu-toolchain-r/test 
 apt-get -qq update
 apt-get -qq install g++-4.9
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
-
-export CXX="g++-4.9"
 
 apt-get install -y curl build-essential python3 default-jdk
 curl -sSf https://static.rust-lang.org/rustup.sh | sh
@@ -63,4 +60,10 @@ if [ "$#" -eq 1 ]; then
     python3 changeAPIKey.py $1
 fi
 
+#################
+# Force g++ 4.9 #
+#################
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
+
 echo "A reboot is required to complete this installation!"
+
