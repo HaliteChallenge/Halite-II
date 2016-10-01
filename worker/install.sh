@@ -14,7 +14,7 @@ fi
 add-apt-repository -y ppa:ubuntu-toolchain-r/test 
 apt-get -qq update
 apt-get -qq install g++-4.9
-update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.3 10
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
 
 export CXX="g++-4.9"
 
