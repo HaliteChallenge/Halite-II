@@ -43,6 +43,7 @@ def runCommandOnInstance(instance, command):
     for a in range(100):
         try:
             ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
+            print("Connected to server")
             break
         except Exception as e:
             print("except")
@@ -54,8 +55,8 @@ def runCommandOnInstance(instance, command):
     print(stderr)
 
 configFileContents = open("../../halite.ini").read()
-runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; git checkout aws; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
+runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
 
-time.sleep(5)
-runCommandOnInstance(instance, "screen -dmS test bash -c \"cd ~/Halite/worker; sudo python3 worker.py\"")
+time.sleep(10)
+runCommandOnInstance(instance, 'screen -dmS test bash -c "cd ~/Halite/worker; sudo python3 worker.py"')
 
