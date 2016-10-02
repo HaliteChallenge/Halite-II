@@ -1,4 +1,4 @@
-# Halite
+# Halite Specification
 
 Halite is an online programming challenge. Users write bots to play a simple, original game with the following rule set:
 
