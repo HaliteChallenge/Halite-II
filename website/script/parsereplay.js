@@ -33,7 +33,7 @@ textToGame = function(text) {
 	game.players = []
 	game.players.push({name: 'NULL', color: "0x888888"});
 	for(i = 0; i < game.num_players; i++) {
-		game.players.push({name: game.player_names[0], color: colors[i] });
+		game.players.push({name: game.player_names[i], color: colors[i] });
 		console.log(game.players[game.players.length - 1].color);
 	}
 	delete game.player_names;
