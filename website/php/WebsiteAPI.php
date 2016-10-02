@@ -89,25 +89,6 @@ class WebsiteAPI extends API{
         file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
     }
     
-    // Returns true if an ip is in one of the specified cdir blocks
-    private function testUserIP($user_ip, $cidrs) {
-        $ipu = explode('.', $user_ip);
-        foreach ($ipu as &$v)
-            $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
-        $ipu = join('', $ipu);
-        $res = false;
-        foreach ($cidrs as $cidr) {
-            $parts = explode('/', $cidr);
-            $ipc = explode('.', $parts[0]);
-            foreach ($ipc as &$v) $v = str_pad(decbin($v), 8, '0', STR_PAD_LEFT);
-            $ipc = substr(join('', $ipc), 0, $parts[1]);
-            $ipux = substr($ipu, 0, $parts[1]);
-            $res = ($ipc === $ipux);
-            if ($res) break;
-        }
-        return $res;
-    }
-    
     // Select one element from our MySQL db
     private function select($sql) {
         $res = mysqli_query($this->mysqli, $sql);
@@ -136,9 +117,16 @@ class WebsiteAPI extends API{
         return isset($_SESSION['userID']) && mysqli_query($this->mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']}")->num_rows == 1;
     }
 
-    private function getLoggedInUser() {
-        return $this->select("SELECT * FROM User WHERE userID={$_SESSION['userID']}");
+    private function getUsers($query) {
+        $users = $this->selectMultiple($query);
+        foreach($users as &$user) unset($user['email']);
+		return $users;
     }
+
+    private function getLoggedInUser() {
+        return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}")[0];
+    }
+
 
     //------------------------------------- API ENDPOINTS ----------------------------------------\\
     // Endpoint associated with a users credentials (everything in the User table; i.e. name, oauthID, etc.)
@@ -151,12 +139,12 @@ class WebsiteAPI extends API{
     protected function user() {
         // Get a user's info with a username        
         if(isset($_GET["username"])) {
-            return $this->select("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+            return $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'")[0];
         } 
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            return $this->select("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+            return $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'")[0];
         } 
         
         // Get a set of filtered users
@@ -166,8 +154,8 @@ class WebsiteAPI extends API{
             $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
             $page = isset($_GET['page']) ? $_GET['page'] : 0;
 
-            $results = $this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
-            $isNextPage = count($this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT 1 OFFSET ".($limit*($page+1)))) > 0;
+            $results = $this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
+            $isNextPage = count($this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT 1 OFFSET ".($limit*($page+1)))) > 0;
 
             foreach(array_keys($results) as $key) unset($results[$key]["email"]);
 
@@ -176,7 +164,7 @@ class WebsiteAPI extends API{
 
         // Get all of the user's with active submissions
         else if(isset($_GET['active'])) {
-            return $this->selectMultiple("SELECT * FROM User WHERE isRunning=1");
+            return $this->getUsers("SELECT * FROM User WHERE isRunning=1");
         } 
         
         // Github calls this once a user has granted us access to their profile info
@@ -190,7 +178,6 @@ class WebsiteAPI extends API{
             $githubUser = json_decode($gitHub->request('user'), true);
             var_dump($githubUser);
 
-            echo "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}";
             if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
