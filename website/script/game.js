@@ -1,6 +1,5 @@
 $(function () {
     var replayName = getGET("replay");
-
     if(replayName != null && replayName != undefined) {
         var data = textFromURL(replayName, function(data) {
             console.log(data)
@@ -9,8 +8,8 @@ $(function () {
             }
         });
     } else {
-        var $dropZone = $("#dropZone");
-        $("#pageContent").append($dropZone);
+    var $dropZone = $("#dropZone");
+    $("#pageContent").append($dropZone);
 
         $dropZone.on('dragover', function(e) {
             e.stopPropagation();
@@ -26,7 +25,7 @@ $(function () {
 
                 reader.onload = function(e2) { // finished reading file data.
                     $dropZone.remove();
-                    showGame(textToGame(e2.target.result), true);
+                    showGame(textToGame(e2.target.result, file.name), true);
                 };
                 reader.readAsText(file); // start reading the file data.
             }
