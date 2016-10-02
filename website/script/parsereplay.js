@@ -6,6 +6,7 @@ textToGame = function(text, seed) {
 	}
 
 	//Adds determinism (when used with https://github.com/davidbau/seedrandom) to color scramble.
+	console.log(seed);
 	Math.seedrandom(seed);
 
 	//Hardcoding colors:
