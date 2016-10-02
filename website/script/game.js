@@ -5,7 +5,7 @@ $(function () {
 		var data = textFromURL(replayName, function(data) {
 			console.log(data)
 			if(data != null) {
-				showGame(data, replayName);
+				showGame(data);
 			}
 		});
 	} else {
