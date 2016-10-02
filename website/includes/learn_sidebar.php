@@ -39,7 +39,7 @@
 	.bs-docs-sidebar .nav .nav>.active>a, 
 	.bs-docs-sidebar .nav .nav>.active:hover>a,
 	.bs-docs-sidebar .nav .nav>.active:focus>a {
-		border-left-color: #18bc9c; 
+		border-left-color: #009aa6; 
 		font-weight: 500;
 	}
 
