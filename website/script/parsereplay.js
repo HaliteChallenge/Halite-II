@@ -5,6 +5,11 @@ textToGame = function(text) {
 		alert("Invalid version number: " + json_game.version);
 	}
 
+	//Adds determinism (when used with https://github.com/davidbau/seedrandom) to color scramble.
+	var all_player_names = "";
+	for(var i = 0; i < game.player_names.length; i++) all_player_names += game.player_names[i];
+	Math.seedrandom(all_player_names);
+
 	//Hardcoding colors:
 	var colors = [];
 	colors.push('0xe37222'); //TS Orange
