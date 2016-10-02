@@ -6,8 +6,10 @@
 		margin-bottom: 20px;
 	}
 
-	/* all links */
+	/* all links and spans */
+	.bs-docs-sidebar .nav>li>span,
 	.bs-docs-sidebar .nav>li>a {
+		color: #009aa6;
 		border-left: 2px solid transparent;
 		padding: 4px 20px;
 		font-size: 18px;
@@ -29,16 +31,12 @@
 		text-decoration: none;          
 		background-color: transparent;  
 	}
-	/* all active links */
-	.bs-docs-sidebar .nav>.active>a, 
-	.bs-docs-sidebar .nav>.active:hover>a,
-	.bs-docs-sidebar .nav>.active:focus>a {
-		font-weight: 700;
-	}
+
 	/* nested active links */
 	.bs-docs-sidebar .nav .nav>.active>a, 
 	.bs-docs-sidebar .nav .nav>.active:hover>a,
 	.bs-docs-sidebar .nav .nav>.active:focus>a {
+		font-weight: 700;
 		border-left-color: #009aa6; 
 		font-weight: 500;
 	}
@@ -48,7 +46,7 @@
 <nav class="col-sm-3 bs-docs-sidebar">
 	<ul id="sidebar" class="nav nav-stacked">
 		<li class="">
-			<a>Tutorials</a>
+			<span>Tutorials</span>
 			<ul class="nav nav-stacked">
 				<li id="quickstart">
 					<a href="quickstart.php">Quickstart</a>
@@ -65,7 +63,7 @@
 			</ul>
 		</li>
 		<li class="">
-			<a>Specifications</a>
+			<span>Specifications</span>
 			<ul class="nav nav-stacked">
 				<li id="game_spec">
 					<a href="game_spec.php">Game Rules</a>
