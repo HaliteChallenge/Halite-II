@@ -274,10 +274,11 @@ function showGame(game, showmovement, seconds) {
 					var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
 					var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
 					var pts = new Array();
-					pts.push(new PIXI.Point(center.x + 0.8 * pw, center.y + 0.8 * ph));
-					pts.push(new PIXI.Point(center.x + 0.8 * pw, center.y - 0.8 * ph));
-					pts.push(new PIXI.Point(center.x - 0.8 * pw, center.y - 0.8 * ph));
-					pts.push(new PIXI.Point(center.x - 0.8 * pw, center.y + 0.8 * ph));
+					const squarescale = 0.7;
+					pts.push(new PIXI.Point(center.x + squarescale * pw, center.y + squarescale * ph));
+					pts.push(new PIXI.Point(center.x + squarescale * pw, center.y - squarescale * ph));
+					pts.push(new PIXI.Point(center.x - squarescale * pw, center.y - squarescale * ph));
+					pts.push(new PIXI.Point(center.x - squarescale * pw, center.y + squarescale * ph));
 					mapGraphics.drawPolygon(pts);
 					mapGraphics.endFill();
 					if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000');
