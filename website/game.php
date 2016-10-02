@@ -12,6 +12,10 @@
     <div id="container" class="container">
         <?php include 'includes/navbar.php'; ?>
         <div  id="pageContent" class="pageContent">
+			<div id='dropZone' class="col-sm-12 text-center">
+				<span class="glyphicon glyphicon-cloud-upload" style="font-size: 10em;"></span>
+				<h1>Drop a replay file here</h1>
+			</div>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

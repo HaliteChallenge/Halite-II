@@ -9,7 +9,7 @@ $(function () {
             }
         });
     } else {
-        var $dropZone = $("<div id='dropZone' style='width: 100%; padding: 10px; border: 1px solid #000; height: 300px'><h1 id='dropMessage'>Drop a replay file here!</h1></div>");
+        var $dropZone = $("#dropZone");
         $("#pageContent").append($dropZone);
 
         $dropZone.on('dragover', function(e) {
