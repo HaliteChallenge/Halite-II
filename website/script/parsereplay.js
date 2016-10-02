@@ -1,4 +1,4 @@
-textToGame = function(text) {
+textToGame = function(text, seed) {
 	var game = JSON.parse(text)
 
 	if (game.version != 11) {
@@ -6,9 +6,7 @@ textToGame = function(text) {
 	}
 
 	//Adds determinism (when used with https://github.com/davidbau/seedrandom) to color scramble.
-	var all_player_names = "";
-	for(var i = 0; i < game.player_names.length; i++) all_player_names += game.player_names[i];
-	Math.seedrandom(all_player_names);
+	Math.seedrandom(seed);
 
 	//Hardcoding colors:
 	var colors = [];
