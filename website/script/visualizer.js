@@ -274,7 +274,7 @@ function showGame(game, showmovement, seconds) {
 					var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
 					var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
 					var pts = new Array();
-					const squarescale = 0.7;
+					const squarescale = 0.4;
 					pts.push(new PIXI.Point(center.x + squarescale * pw, center.y + squarescale * ph));
 					pts.push(new PIXI.Point(center.x + squarescale * pw, center.y - squarescale * ph));
 					pts.push(new PIXI.Point(center.x - squarescale * pw, center.y - squarescale * ph));
