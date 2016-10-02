@@ -23,10 +23,12 @@ $(function () {
                 console.log(file)
                 var reader = new FileReader();
 
-                reader.onload = function(e2) { // finished reading file data.
-                    $dropZone.remove();
-                    showGame(textToGame(e2.target.result, file.name), true);
-                };
+                reader.onload = (function(filename) { // finished reading file data.
+                    return function(e2) {
+                        $dropZone.remove();
+                        showGame(textToGame(e2.target.result, filename), true);
+                    };
+                })(file.name);
                 reader.readAsText(file); // start reading the file data.
             }
         });
