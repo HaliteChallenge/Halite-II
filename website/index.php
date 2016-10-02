@@ -47,7 +47,7 @@ if(isset($_SESSION['userID'])) {
                     <p>Interested? Visit our <a href="quickstart.php">quickstart tutorial</a>. The simplest Halite bot is just 14 lines of code.</p>
                     <h1>Top Rankings</h1>
                     <p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>
                 </div>

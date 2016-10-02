@@ -21,6 +21,11 @@
                     <div class="panel panel-primary">
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>
+
+					<hr>
+
+					<div id="footer">
+					</div>
                 </div>
             </div>
         </div>

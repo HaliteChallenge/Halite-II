@@ -1,4 +1,4 @@
-<table class="table well well-sm" id="leaderTable">
+<table class="table" id="leaderTable">
     <thead>
         <tr>
             <th>#</th>
@@ -10,4 +10,6 @@
             <th>Points</th>
         </tr>
     </thead>
+	<tbody id="leaderTableBody">
+	</tbody>
 </table>

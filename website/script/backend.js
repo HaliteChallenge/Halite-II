@@ -239,6 +239,7 @@ function getFilteredUsers(filters, orderBy, limit, page) {
         method: "GET",
         data: {fields: fields, values: values, orderBy: orderBy, limit: limit, page: page}
     });
+	console.log(result)
 
     return result.responseJSON;
 }

@@ -167,12 +167,11 @@ class WebsiteAPI extends API{
             $page = isset($_GET['page']) ? $_GET['page'] : 0;
 
             $results = $this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
-            foreach(array_keys($results) as $key) {
-                unset($results[$key]["password"]);
-                unset($results[$key]["email"]);
-                unset($results[$key]["verificationCode"]);
-            }
-            return $results;
+            $isNextPage = count($this->selectMultiple("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT 1 OFFSET ".($limit*($page+1)))) > 0;
+
+            foreach(array_keys($results) as $key) unset($results[$key]["email"]);
+
+            return array("isNextPage" => $isNextPage, "users" => $results);
         } 
 
         // Get all of the user's with active submissions
