@@ -165,12 +165,7 @@ class ManagerAPI extends API{
                     $pathParts = pathinfo($file['name']);
                     $targetPath = null;
                     if(strcmp('hlt', $pathParts['extension']) == 0) {
-						$s3Client = $this->loadS3SDK()->createS3();
-						$result = $s3Client->putObject([
-							'Bucket' => REPLAY_BUCKET,
-							'Key'    => $pathParts['basename'],
-							'Body'   => file_get_contents($file['tmp_name']) 
-						]);
+						$targetPath = REPLAYS_PATH."{$pathParts['basename']}";
                     } else {
                         $targetPath = ERROR_LOGS_PATH."{$pathParts['basename']}";
                     }
