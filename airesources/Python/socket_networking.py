@@ -61,24 +61,26 @@ def deserializeMap(inputString):
 def sendString(toBeSent):
 	global _connection
 	toBeSent += '\n'
-	_connection.sendall(toBeSent)
+	_connection.sendall(bytes(toBeSent, 'ascii'))
 
 def getString():
 	global _connection
 	newString = ""
 	buffer = '\0'
 	while True:
-		buffer = _connection.recv(1)
+		buffer = _connection.recv(1).decode('ascii')
 		if buffer != '\n':
 			newString += str(buffer)
 		else:
 			return newString
 
-def getInit(port):
+def getInit():
 	# Connect to environment.
 	global _connection
 	_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	port = int(input('Please enter the port to connect on: '))
 	_connection.connect(('localhost', port))
+	print('Connected to intermediary on port #' + str(port))
 
 	playerTag = int(getString())
 	deserializeMapSize(getString())
