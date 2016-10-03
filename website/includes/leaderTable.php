@@ -5,8 +5,6 @@
             <th>Username</th>
             <th>Language</th>
             <th>Organization</th>
-            <th>Submissions</th>
-            <th>Games Played</th>
             <th>Points</th>
         </tr>
     </thead>
