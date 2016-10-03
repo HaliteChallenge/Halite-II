@@ -14,11 +14,11 @@ ini_set('max_input_time', 90);
 ini_set('max_execution_time', 90);
 
 class ManagerAPI extends API{
-    private $mysqli = NULL;
     private $apiKey = NULL;
 
     // Init database, sanitize parameters, and check if worker is valid
     public function __construct($request, $origin) {
+        $this->loadConfig();
         $this->initDB();
 
         if($this->isValidWorker() == false) {
@@ -65,45 +65,6 @@ class ManagerAPI extends API{
         return floatval($lines[0]);
     }
 
-
-    // Initializes and returns a mysqli object that represents our mysql database
-    private function initDB() {
-        $config = parse_ini_file(INI_FILE, true);
-        $this->mysqli = new mysqli($config['database']['hostname'],
-        $config['database']['username'],
-        $config['database']['password'],
-        $config['database']['name']);
-
-        if (mysqli_connect_errno()) {
-            echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-            exit();
-        }
-    }
-
-    private function select($sql) {
-        try {
-            $res = mysqli_query($this->mysqli, $sql);
-            $array = mysqli_fetch_array($res, MYSQLI_ASSOC);
-            return $array;
-        } catch(Exception $e) {
-            return array();
-        }
-    }
-
-    private function selectMultiple($sql) {
-        $res = mysqli_query($this->mysqli, $sql);
-        $finalArray = array();
-
-        while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
-            array_push($finalArray, $temp);
-        }
-
-        return $finalArray;
-    }
-
-    private function insert($sql) {
-        mysqli_query($this->mysqli, $sql);
-    }
 
     /////////////////////////API ENDPOINTS\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
@@ -204,8 +165,12 @@ class ManagerAPI extends API{
                     $pathParts = pathinfo($file['name']);
                     $targetPath = null;
                     if(strcmp('hlt', $pathParts['extension']) == 0) {
-                        $replayName = $pathParts['basename'];
-                        $targetPath = REPLAYS_PATH."{$pathParts['basename']}";
+						$s3Client = $this->loadS3SDK()->createS3();
+						$result = $s3Client->putObject([
+							'Bucket' => REPLAY_BUCKET,
+							'Key'    => $pathParts['basename'],
+							'Body'   => file_get_contents($file['tmp_name']) 
+						]);
                     } else {
                         $targetPath = ERROR_LOGS_PATH."{$pathParts['basename']}";
                     }

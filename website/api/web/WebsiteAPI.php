@@ -1,7 +1,5 @@
 <?php
 
-require __DIR__ . '/../../vendor/autoload.php';
-
 use OAuth\OAuth2\Service\GitHub;
 use OAuth\ServiceFactory;
 use OAuth\Common\Storage\Session;
@@ -20,7 +18,6 @@ date_default_timezone_set('America/New_York');
 include dirname(__FILE__).'/../API.class.php';
 include dirname(__FILE__).'/../../lib/swiftmailer/lib/swift_required.php';
 
-define("INI_PATH", dirname(__FILE__)."/../../../halite.ini");
 define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
 define("ERRORS_PATH", dirname(__FILE__)."/../../../storage/errors/");
@@ -30,18 +27,13 @@ define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
-    // The database
-    private $mysqli = NULL;
-
     public function __construct($request) {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
 
-        $this->config = parse_ini_file(INI_PATH, true);
-
+        $this->loadConfig();
         $this->initDB();
-
         $this->sanitizeHTTPParameters();
 
         parent::__construct($request);
@@ -56,19 +48,6 @@ class WebsiteAPI extends API{
     private function sanitizeHTTPParameters() {
         foreach ($_POST as $key => $value) {
             $_POST[$key] = $this->mysqli->real_escape_string($value);
-        }
-    }
-    
-    // Initializes and returns a mysqli object that represents our mysql database
-    private function initDB() {
-        $this->mysqli = new mysqli($this->config['database']['hostname'],
-            $this->config['database']['username'],
-            $this->config['database']['password'],
-            $this->config['database']['name']);
-
-        if (mysqli_connect_errno()) {
-            echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-            exit();
         }
     }
     
@@ -87,30 +66,6 @@ class WebsiteAPI extends API{
             'content' => http_build_query(array('api_key' => $this->config['forums']['apiKey'], 'api_username' => $this->config['forums']['apiUsername']))
         ));
         file_get_contents("http://forums.halite.io/admin/users/{$forumsID}/log_out", false, stream_context_create($options));
-    }
-    
-    // Select one element from our MySQL db
-    private function select($sql) {
-        $res = mysqli_query($this->mysqli, $sql);
-        return mysqli_fetch_array($res, MYSQLI_ASSOC);
-    }
-    
-    // Select all available elements from our MySQL db
-    private function selectMultiple($sql) {
-        $res = mysqli_query($this->mysqli, $sql);
-        $finalArray = array();
-
-        while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
-            array_push($finalArray, $temp);
-        }
-
-        return $finalArray;
-    }
-    
-    // Perform a non-select (insert, update, delete) query
-    // TODO: insert is a terrible name for this method
-    private function insert($sql) {
-        mysqli_query($this->mysqli, $sql);
     }
 
     private function isLoggedIn() {
@@ -256,10 +211,7 @@ class WebsiteAPI extends API{
                 array_push($gameArrays, $gameArray);
             }
             return $gameArrays;
-        } else if(isset($_GET['random'])) {
-            return $this->select("SELECT replayName FROM (SELECT * FROM Game ORDER BY gameID DESC LIMIT 50) sub ORDER BY rand() LIMIT 1");
-
-        }
+        } 
     }
     
     /* Bot File Endpoint

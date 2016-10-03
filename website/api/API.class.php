@@ -1,5 +1,10 @@
 <?php
 
+require __DIR__ . '/../vendor/autoload.php';
+
+define("INI_PATH", dirname(__FILE__)."/../../../halite.ini");
+define("REPLAY_BUCKET", "halitereplaybucket");
+
 abstract class API{
     /**
      * Property: method
@@ -28,7 +33,61 @@ abstract class API{
      * Property: file
      * Stores the input of the PUT request
      */
-     protected $file = Null;
+    protected $file = Null;
+
+    protected function select($sql) {
+        try {
+            $res = mysqli_query($this->mysqli, $sql);
+            $array = mysqli_fetch_array($res, MYSQLI_ASSOC);
+            return $array;
+        } catch(Exception $e) {
+            return array();
+        }
+    }
+
+    protected function selectMultiple($sql) {
+        $res = mysqli_query($this->mysqli, $sql);
+        $finalArray = array();
+
+        while($temp = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+            array_push($finalArray, $temp);
+        }
+
+        return $finalArray;
+    }
+
+    protected function insert($sql) {
+        mysqli_query($this->mysqli, $sql);
+    }
+
+    protected function loadConfig() {
+        if(!property_exists($this, "config")) $this->config = parse_ini_file(INI_PATH, true);
+    }
+
+    protected function loadS3SDK() {
+        $this->loadConfig();
+        putenv("$AWS_ACCESS_KEY_ID=".$config["aws"]["accesskey"]);
+        putenv("$AWS_SECRET_ACCESS_KEY=".$config["aws"]["secretaccesskey"]);
+        return new Aws\Sdk([
+            'region'   => 'us-west-2',
+            'version'  => 'latest'
+        ]);
+    }
+
+    protected function initDB() {
+        $this->loadConfig();
+        
+        $this->mysqli = NULL;
+        $this->mysqli = new mysqli($this->config['database']['hostname'],
+            $this->config['database']['username'],
+            $this->config['database']['password'],
+            $this->config['database']['name']);
+
+        if (mysqli_connect_errno()) {
+            echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
+            exit();
+        }
+    }
 
     /**
      * Constructor: __construct
