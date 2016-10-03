@@ -8,6 +8,11 @@ define("COMPILE_PATH", "../storage/compile/");
 define("BOTS_PATH", "../storage/bots/");
 define("INI_FILE", "../halite.ini");
 
+ini_set('upload_max_filesize', '50M');
+ini_set('post_max_size', '50M');
+ini_set('max_input_time', 90);
+ini_set('max_execution_time', 90);
+
 class ManagerAPI extends API{
     private $mysqli = NULL;
     private $apiKey = NULL;
