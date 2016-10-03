@@ -165,15 +165,18 @@ def executeGameTask(width, height, users, backend):
 if __name__ == "__main__":
     print("Starting up worker...")
     while True:
-        task = backend.getTask()
-        if task != None:
+        try:
+            task = backend.getTask()
+        except:
+            print("Error on get task. Sleeping...")
+            sleep(2)
+
+        if "type" in task and (task["type"] == "compile" or task["type"] == "game"):
             print("Got new task: " + str(task))
             if task["type"] == "compile":
                 executeCompileTask(task["user"], backend)
-            elif task["type"] == "game":
-                executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
             else:
-                print("Unknown task")
+                executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
         else:
-            print("No task available. Sleeping for 2 seconds")
+            print("No task available. Sleeping...")
             sleep(2)
