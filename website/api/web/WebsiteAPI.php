@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use OAuth\OAuth2\Service\GitHub;
 use OAuth\ServiceFactory;
@@ -17,15 +17,15 @@ error_reporting(E_ALL);
 
 date_default_timezone_set('America/New_York');
 
-include dirname(__FILE__).'/API.class.php';
-include dirname(__FILE__).'/../lib/swiftmailer/lib/swift_required.php';
+include dirname(__FILE__).'/../API.class.php';
+include dirname(__FILE__).'/../../lib/swiftmailer/lib/swift_required.php';
 
-define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
-define("COMPILE_PATH", dirname(__FILE__)."/../../storage/compile/");
-define("BOTS_PATH", dirname(__FILE__)."/../../storage/bots/");
-define("ERRORS_PATH", dirname(__FILE__)."/../../storage/errors/");
-define("REPLAYS_PATH", dirname(__FILE__)."/../../storage/replays/");
-define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
+define("INI_PATH", dirname(__FILE__)."/../../../halite.ini");
+define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
+define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
+define("ERRORS_PATH", dirname(__FILE__)."/../../../storage/errors/");
+define("REPLAYS_PATH", dirname(__FILE__)."/../../../storage/replays/");
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 

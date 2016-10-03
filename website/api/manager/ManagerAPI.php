@@ -1,12 +1,12 @@
 <?php
 
-require_once 'API.class.php';
+require_once '../API.class.php';
 
-define("REPLAYS_PATH", "../storage/replays/");
-define("ERROR_LOGS_PATH", "../storage/errors/");
-define("COMPILE_PATH", "../storage/compile/");
-define("BOTS_PATH", "../storage/bots/");
-define("INI_FILE", "../halite.ini");
+define("REPLAYS_PATH", "../../../storage/replays/");
+define("ERROR_LOGS_PATH", "../../../storage/errors/");
+define("COMPILE_PATH", "../../../storage/compile/");
+define("BOTS_PATH", "../../../storage/bots/");
+define("INI_FILE", "../../../halite.ini");
 
 ini_set('upload_max_filesize', '50M');
 ini_set('post_max_size', '50M');
