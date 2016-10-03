@@ -1,5 +1,8 @@
 <?php
 
+use Aws\Sdk;
+require __DIR__ . '/../../vendor/autoload.php';
+
 require_once '../API.class.php';
 
 define("REPLAYS_PATH", "../../../storage/replays/");
@@ -12,12 +15,14 @@ ini_set('upload_max_filesize', '50M');
 ini_set('post_max_size', '50M');
 ini_set('max_input_time', 90);
 ini_set('max_execution_time', 90);
+ini_set('display_errors', 1);
+error_reporting(E_ALL ^ E_NOTICE);
 
 class ManagerAPI extends API{
     private $apiKey = NULL;
 
     // Init database, sanitize parameters, and check if worker is valid
-    public function __construct($request, $origin) {
+    public function __construct($request) {
         $this->loadConfig();
         $this->initDB();
 
@@ -102,7 +107,7 @@ class ManagerAPI extends API{
                 array_push($players, $seedPlayer);
 
                 // Pick map size
-                $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
+                $sizes = array(10);//array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
                 $size = $sizes[array_rand($sizes)];
 
                 // Send game task
@@ -160,17 +165,25 @@ class ManagerAPI extends API{
                 }
 
                 // Store replay file and error logs
+				echo "nofile";
                 $replayName = null;
                 foreach($_FILES as $fileKey => $file) {
                     $pathParts = pathinfo($file['name']);
                     $targetPath = null;
                     if(strcmp('hlt', $pathParts['extension']) == 0) {
-						$s3Client = $this->loadS3SDK()->createS3();
+						echo "replay2";
+						$sdk = $this->loadS3SDK();
+						echo "sdk";
+						$s3Client = $sdk->createS3();
+						echo "create";
 						$result = $s3Client->putObject([
 							'Bucket' => REPLAY_BUCKET,
 							'Key'    => $pathParts['basename'],
 							'Body'   => file_get_contents($file['tmp_name']) 
 						]);
+						echo "res";
+						var_dump($result);
+						echo "afterres";
                     } else {
                         $targetPath = ERROR_LOGS_PATH."{$pathParts['basename']}";
                     }

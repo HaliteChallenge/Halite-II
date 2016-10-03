@@ -262,8 +262,8 @@ class WebsiteAPI extends API{
         // Follows the Discource sso detailed here: https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
         if(isset($_GET['sso']) && isset($_GET['sig'])) {
             if(!$this->isLoggedIn()) {
-                $forumsCallbackURL = urlencode("http://halite.io/website/php/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
-                $githubCallbackURL = urlencode("http://halite.io/website/php/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
+                $forumsCallbackURL = urlencode("http://halite.io/website/api/web/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
+                $githubCallbackURL = urlencode("http://halite.io/website/api/web/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
                 header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
                 die();
             }
