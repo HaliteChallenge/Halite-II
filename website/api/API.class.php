@@ -2,7 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-define("INI_PATH", dirname(__FILE__)."/../../../halite.ini");
+define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("REPLAY_BUCKET", "halitereplaybucket");
 
 abstract class API{
