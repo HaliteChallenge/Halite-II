@@ -165,6 +165,7 @@ class ManagerAPI extends API{
                     $pathParts = pathinfo($file['name']);
                     $targetPath = null;
                     if(strcmp('hlt', $pathParts['extension']) == 0) {
+						$replayName = $pathParts['basename'];
 						$targetPath = REPLAYS_PATH."{$pathParts['basename']}";
                     } else {
                         $targetPath = ERROR_LOGS_PATH."{$pathParts['basename']}";
