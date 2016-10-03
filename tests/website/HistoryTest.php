@@ -1,5 +1,5 @@
 <?php
-include_once "../website/php/WebsiteAPI.php";
+include_once "../website/api/web/WebsiteAPI.php";
 include_once "APITest.php";
 include_once "UserTest.php";
 
