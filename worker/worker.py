@@ -167,16 +167,18 @@ if __name__ == "__main__":
     while True:
         try:
             task = backend.getTask()
-        except:
-            print("Error on get task. Sleeping...")
+            if "type" in task and (task["type"] == "compile" or task["type"] == "game"):
+                print("Got new task: " + str(task))
+                if task["type"] == "compile":
+                    executeCompileTask(task["user"], backend)
+                else:
+                    executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
+            else:
+                print("No task available. Sleeping...")
+                sleep(2)
+        except Exception as e:
+            print("Error on get task:")
+            print(e)
+            print("Sleeping...")
             sleep(2)
 
-        if "type" in task and (task["type"] == "compile" or task["type"] == "game"):
-            print("Got new task: " + str(task))
-            if task["type"] == "compile":
-                executeCompileTask(task["user"], backend)
-            else:
-                executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
-        else:
-            print("No task available. Sleeping...")
-            sleep(2)
