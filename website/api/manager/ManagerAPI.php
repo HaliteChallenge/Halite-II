@@ -107,7 +107,7 @@ class ManagerAPI extends API{
 				array_push($players, $seedPlayer);
 
 				// Pick map size
-				$sizes = array(10);//array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
+				$sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
 				$size = $sizes[array_rand($sizes)];
 
 				// Send game task
