@@ -101,16 +101,6 @@ function getLatestGamesForUser(userID, limit, startingID) {
     return result.responseJSON;
 }
 
-function getGameFile(filename) {
-    var result = $.ajax({
-		url: "http://s3-us-east-1.amazonaws.com/halitereplaybucket/"+filename, 
-        async: false,
-        method: "GET"
-    });
-    console.log(result.responseText)
-    return result.responseText;
-}
-
 function destroySession(async) {
     $.ajax({
         url: url+"session",
