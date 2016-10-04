@@ -103,7 +103,7 @@ $(function() {
                         break;
                     }
                 }
-                if(me.errorLogName != undefined && me.errorLogName != null) $row.append("<td><a target='_blank' href='php/errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a></td>");
+                if(me.errorLogName != undefined && me.errorLogName != null) $row.append("<td><a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a></td>");
                 else $row.append("<td>NA</td>");
             }
             return $row;
