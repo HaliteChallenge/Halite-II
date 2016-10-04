@@ -60,7 +60,7 @@
                                 <li>One integer, <code>COUNTER</code>, representing the number of tiles with the same owner consecutively.</li>
                                 <li>One integer, <code>OWNER</code>, representing the owner of the tiles <code>COUNTER</code> encodes.</li>
                             </ul>
-                            The above repeats until the <code>COUNTER</code> total is equal to the area of the map. It fills in the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code>.<br>
+                            The above repeats until the <code>COUNTER</code> total is equal to the area of the map. It fills in the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code>. <b>Please be aware that the top row is the first row, as Halite uses screen-type coordinates.</b><br>
                             This is then followed by <code>WIDTH</code> * <code>HEIGHT</code> integers, representing the strength values of the tiles in the map. It fills in the map in the same way owner values fill in the map.
                         </p>
 
