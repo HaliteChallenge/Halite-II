@@ -22,7 +22,7 @@ The frontend of halite.io is written in HTML, CSS, and Javascript. The Bootstrap
 
 The backend is written in PHP. Apache is used as its webserver.
 
-The server on which the website is hosted also hosts the manager and is used for the storage of error logs, replays, and the source code of contestants.
+The server on which the website is hosted also hosts the manager and is used for the storage of the source code of contestants.
 
 ### HCE
 
@@ -44,9 +44,11 @@ During both compilation and runtime, bots are run within their own Docker contai
 
 A MySQL server is used as the database for the project. 
 
-### Disk Storage
+### File Storage
 
-Replays, bot source and executables, and error logs are all currently stored on the server that hosts the website and the manager.
+Bot source and executables are currently stored on the server that hosts the website and the manager.
+
+Error logs and replay files are hosted on AWS S3 standard storage.
 
 ### Forums
 
@@ -116,10 +118,10 @@ keyfilepath = NameOfKeyFile.pem
 
 Each of our servers run Ubuntu 14.04. A brief textual description of our server setup:
 
-* One server runs the website and manager and stores replays, bot source, and error logs.
+* One server runs the website and manager and stores bot source.
 * Another server runs the database.
 * Another server runs the forums.
-* Another server houses backups of bots, error logs, replays, and the database.
+* Another server houses backups of bots and the database.
 * Another server runs a series of cron jobs that check for broken links or downed workers.
 * Each worker runs is on its own server.
 
