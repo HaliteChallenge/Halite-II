@@ -13,13 +13,13 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Networking Specification</h1>
+                <h1>IO Specification</h1>
 
                 <h3>Overview</h3>
 
                 <p>To make the interaction of bots with the Halite environment as simple as possible, bots communicate via stdin and stdout, sending strings of space-separated integers ended with a newline. Bots are expected to communicate using the format found below; any deviation from it will likely result in the bot being ejected from the game.</p>
 
-                <p>Over the course of a game, every bot is given fifteen thousand milliseconds plus one-third of a millisecond per tile of the map per turn the game could go on. So, for example, on a 35x35 map, bots have 15000 + (35 * 35 * 350 / 3) = 157916 milliseconds to send their responses. The clock starts ticking as soon as the environment finishes sending its data to the pipe and stops ticking when a newline character is received from a bot; if the clock hits 0, the bot will be ejected from the game and deemed to have lost (against all live players which are alive at that time).</p>
+                <p>Over the course of a game, every bot is given fifteen thousand milliseconds plus one-third of a millisecond per tile of the map per turn the game could go on. So, for example, on a 35x35 map (which can have at most 350 turns), bots have 15000 + (35 * 35 * 350 / 3) = 157916 milliseconds to send their responses. The clock starts ticking as soon as the environment finishes sending its data to the pipe and stops ticking when a newline character is received from a bot; if the clock hits 0, the bot will be ejected from the game and deemed to have lost (against all live players which are alive at that time).</p>
 
                 <p>There are two separate formats of information that are sent between the environment and bots.
                     <ul>
@@ -87,9 +87,12 @@
                                     <li>3 - <code>SOUTH</code></li>
                                     <li>4 - <code>WEST</code></li>
                                 </ul>
-                                Please note that these directions correspond most directly to screen coordinates; that is, <code>NORTH</code> decrements the y value of the site by 1 and <code>SOUTH</code> increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
+                            Please note that these directions correspond most directly to screen coordinates; that is, <code>NORTH</code> decrements the y value of the site by 1 and <code>SOUTH</code> increments the value by 1. Attempts to move nonexistant or enemy pieces or to move pieces in nonexistant directions will be ignored. If multiple separate moves are issued for the same piece, the lower direction value will be preferred.</p>
 
-                                <p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain <code>STILL</code>, and a piece located at (4, 5) to move <code>NORTH</code>.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
+                            <p>Consider the following case as an example:<br>I wish to order a piece located at (3, 4) to the East, a piece located at (4, 0) to remain <code>STILL</code>, and a piece located at (4, 5) to move <code>NORTH</code>.<br>This would be encoded with the following string:<br>3 4 2 4 0 0 4 5 1</p>
+
+                            <p>Note: if you would like an alternate way of communicating with the environment, please see [INSERT LINK HERE] for how to communicate with the environment over sockets instead of pipes if you need to use a debugger or similar to work on your bot.</p>
+
                             </div>
                         </div>
                     </div>
