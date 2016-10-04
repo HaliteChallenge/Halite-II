@@ -20,8 +20,6 @@ include dirname(__FILE__).'/../../lib/swiftmailer/lib/swift_required.php';
 
 define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
-define("ERRORS_PATH", dirname(__FILE__)."/../../../storage/errors/");
-define("REPLAYS_PATH", dirname(__FILE__)."/../../../storage/replays/");
 define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);

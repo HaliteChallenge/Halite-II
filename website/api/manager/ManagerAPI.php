@@ -5,8 +5,6 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 require_once '../API.class.php';
 
-define("REPLAYS_PATH", "../../../storage/replays/");
-define("ERROR_LOGS_PATH", "../../../storage/errors/");
 define("COMPILE_PATH", "../../../storage/compile/");
 define("BOTS_PATH", "../../../storage/bots/");
 define("INI_FILE", "../../../halite.ini");
