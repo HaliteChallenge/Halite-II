@@ -66,7 +66,7 @@ abstract class API{
         if(!property_exists($this, "config")) $this->config = parse_ini_file(INI_PATH, true);
     }
 
-    protected function loadS3SDK() {
+    protected function loadAwsSdk() {
         $this->loadConfig();
         putenv("AWS_ACCESS_KEY_ID=".$this->config["aws"]["accesskey"]);
         putenv("AWS_SECRET_ACCESS_KEY=".$this->config["aws"]["secretaccesskey"]);

@@ -166,7 +166,7 @@ class ManagerAPI extends API{
 
 			// Store replay file and error logs
 			$replayName = null;
-			$s3Client = $this->loadS3SDK()->createS3();
+			$s3Client = $this->loadAwsSdk()->createS3();
 			foreach($_FILES as $fileKey => $file) {
 				$pathParts = pathinfo($file['name']);
 				$bucket = NULL;
