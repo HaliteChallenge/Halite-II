@@ -12,8 +12,6 @@
 int main() {
     srand(time(NULL));
 
-    std::ofstream dbg("dbg.log");
-
     std::cout.sync_with_stdio(0);
 
     unsigned char myID;

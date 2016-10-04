@@ -32,7 +32,7 @@
 
 #include "hlt.hpp"
 
-namespace detail{
+namespace detail {
 static std::vector< std::vector<unsigned char> > productions;
 static int width, height;
 #ifdef _WIN32
