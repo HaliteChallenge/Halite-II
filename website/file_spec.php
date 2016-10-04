@@ -14,7 +14,7 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>File Specification</h1>
+                <h1>File Reference</h1>
                 <p>A sample file should look like:<br>
                     <pre><code>HLT 9 <-- A header to distinguish version and ensure that the file will be valid. This is followed by a newline.
 WIDTH HEIGHT NUM_PLAYERS NUM_FRAMES <-- The number of frames is always one more than the number of turns. Note that NUM_FRAMES is always 1 more than NUM_TURNS. This is followed by a newline.

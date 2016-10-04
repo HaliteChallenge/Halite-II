@@ -14,7 +14,7 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>IO Specification</h1>
+                <h1>IO Reference</h1>
 
                 <h3>Overview</h3>
 
