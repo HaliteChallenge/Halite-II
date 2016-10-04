@@ -64,7 +64,7 @@
                             This is then followed by <code>WIDTH</code> * <code>HEIGHT</code> integers, representing the strength values of the tiles in the map. It fills in the map in the same way owner values fill in the map.
                         </p>
 
-                        <p>Consider the following 3x3 map as an example (where <pre><code>[O=x,S=y]</code></pre> represents a tile owned by player x with strength y):<br>
+                        <p>Consider the following 3x3 map as an example (where <code>[O=x,S=y]</code> represents a tile owned by player x with strength y):<br>
                             <pre><code>[O=0,S=122] [O=1,S=25] [O=1,S=18]
                                        [O=0, S=13] [O=0,S=45] [O=1,S=22]
                                        [O=2,S=255] [O=2,S=85] [O=0, S=0]</code></pre>
@@ -76,7 +76,7 @@
 
                             <p>The production values of the map are sent using <code>WIDTH</code> * <code>HEIGHT</code> integers which fill in the production values of the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code></p>
 
-                            <p>Consider the following 3x3 production map as an example (where <pre><code>[x]</code></pre> represents a tile with x production):<br>
+                            <p>Consider the following 3x3 production map as an example (where <code>[x]</code> represents a tile with x production):<br>
                             <pre><code>[2][3][4]
 [1][2][3]
 [0][1][2]</code></pre>
