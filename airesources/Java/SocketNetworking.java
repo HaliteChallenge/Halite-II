@@ -5,7 +5,7 @@ import java.util.Scanner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Networking {
+public class SocketNetworking {
     public static final int SIZE_OF_INTEGER_PREFIX = 4;
     public static final int CHAR_SIZE = 1;
     private static BufferedReader _in;
@@ -86,9 +86,13 @@ public class Networking {
         return _in.readLine();
     }
 
-    public static InitPackage getInit(int port) throws java.io.IOException {
+    public static InitPackage getInit() throws java.io.IOException {
         //Set up connection
+        System.out.print("Enter the port on which to connect: ");
+        Scanner in = new Scanner(System.in);
+        int port = in.nextInt();
         Socket connection = new Socket("127.0.0.1", port);
+        System.out.println("Connected to intermediary on port #" + port);
         _in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         _out = new PrintWriter(connection.getOutputStream(), false);
 
