@@ -13,7 +13,7 @@ textToGame = function(text, seed) {
 	var colors = [];
 	colors.push('0xe37222'); //TS Orange
 	colors.push('0x63ceca'); //TS Mid Teal
-	colors.push('0x002226'); //TS Midnight Teal
+	//colors.push('0x002226'); //TS Midnight Teal
 	colors.push('0xffbe00'); //TS Yellow
 	colors.push('0xff0000');
 	colors.push('0x00cc00');
