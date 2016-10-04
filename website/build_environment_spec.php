@@ -98,7 +98,7 @@
         <div class="container">
             <div id="footer">
                 <ul class="pager">
-                    <li class="previous"><a href="networking_spec.php"><span aria-hidden="true">&larr;</span> Networking Spec</a></li>
+                    <li class="previous"><a href="io_spec.php"><span aria-hidden="true">&larr;</span> IO Spec</a></li>
                     <li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
                 </ul>
             </div>
