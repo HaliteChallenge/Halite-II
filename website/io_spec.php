@@ -68,7 +68,7 @@
 [O=0,S=13]  [O=0,S=45]  [O=1,S=182]
 [O=2,S=255] [O=2,S=85]  [O=0,S=0]</code></pre>
                                 This map would be encoded using the following string:<br>
-                                1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0
+                                <pre><code>1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0</code></pre>
                             </p>
 
                             <h4>Input Production Format</h4>
@@ -79,7 +79,7 @@
                             <pre><code>[2][3][4]
 [1][2][3]
 [0][1][2]</code></pre>
-                            This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
+                            This map would be encoded using the following string:<br><pre><code>2 3 4 1 2 3 0 1 2</code></pre></p>
 
                             <h4>Output Move Set Format</h4>
 
