@@ -103,7 +103,7 @@ function getLatestGamesForUser(userID, limit, startingID) {
 
 function getGameFile(filename) {
     var result = $.ajax({
-        url: "http://s3-us-east-1.amazonaws.com/halitereplaybucket/"+filename, 
+		url: "http://s3-us-east-1.amazonaws.com/halitereplaybucket/"+filename, 
         async: false,
         method: "GET"
     });
