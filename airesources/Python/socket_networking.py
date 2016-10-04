@@ -78,7 +78,7 @@ def getInit():
     # Connect to environment.
     global _connection
     _connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    port = int(input('Please enter the port to connect on: '))
+    port = int(input('Enter the port on which to connect: '))
     _connection.connect(('localhost', port))
     print('Connected to intermediary on port #' + str(port))
 
