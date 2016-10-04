@@ -1,15 +1,24 @@
+import pymysql
 import configparser
 import sys
 import os
+import os.path
 
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
-WORKERS = dict(parser.items("workerIPs"))
+DB_CONFIG = parser["database"]
+
+keyPath = os.path.join("../", parser["aws"]["keyfilepath"])
+
+db = pymysql.connect(host=DB_CONFIG["hostname"], user=DB_CONFIG['username'], passwd=DB_CONFIG['password'], db=DB_CONFIG['name'], cursorclass=pymysql.cursors.DictCursor)
+cursor = db.cursor()
+
+cursor.execute("select * from Worker")
+workers = cursor.fetchall()
+
 
 command = sys.argv[1]
-print(command)
-for name in WORKERS:
-    print("########"+name+"########")
-    print(WORKERS[name])
-    os.system("ssh root@"+WORKERS[name]+" '"+command+"'")
+for worker in workers:
+    print("########"+worker['ipAddress']+"########")
+    os.system("ssh -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
     print("################\n")

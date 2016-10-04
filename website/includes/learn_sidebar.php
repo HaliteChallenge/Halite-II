@@ -6,10 +6,12 @@
 		margin-bottom: 20px;
 	}
 
-	/* all links and spans */
+	.bs-docs-sidebar .nav>li>span {
+		color: #009aa6;
+	}
+
 	.bs-docs-sidebar .nav>li>span,
 	.bs-docs-sidebar .nav>li>a {
-		color: #009aa6;
 		border-left: 2px solid transparent;
 		padding: 4px 20px;
 		font-size: 18px;

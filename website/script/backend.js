@@ -1,4 +1,4 @@
-var url = "php/";
+var url = "api/web/";
 // Attempts to store the username/password combo given
 // Returns false if the username is already taken
 // If async returns null
@@ -99,16 +99,6 @@ function getLatestGamesForUser(userID, limit, startingID) {
     });
     console.log(startingID)
     return result.responseJSON;
-}
-
-function getGameFile(filename) {
-    var result = $.ajax({
-        url: "../storage/replays/"+filename,
-        async: false,
-        method: "GET"
-    });
-    console.log(result.responseText)
-    return result.responseText;
 }
 
 function destroySession(async) {

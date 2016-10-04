@@ -10,9 +10,8 @@ Halite is a programming competition. Contestants write bots to play an original 
 - `admin/` - A collection of administrative resources (ex. a technical specification)
 - `airesources/` - The language-specific starter kits for writing bots
 - `environment/` - The halite game engine 
-- `manager/` - The API that manages worker servers
 - `tests/` - All of the project's unit and integration tests
-- `website/` - The website that hosts the competition
+- `website/` - The website that hosts the competition. Includes the API that manages the game servers.
 - `worker/` - The source for the worker servers that compile bots and run games safely
 
 ## Documentation

@@ -1,5 +1,5 @@
 <?php
-include_once "../website/php/WebsiteAPI.php";
+include_once "../website/api/web/WebsiteAPI.php";
 
 class APITest extends PHPUnit_Framework_TestCase {
     protected $mysqli;

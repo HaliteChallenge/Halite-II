@@ -11,5 +11,5 @@
   <a href="http://forums.halite.io">Forums</a>
 </li>
 <li class="dropdown">
-    <a class="dropdown-toggle" href="game.php">Visualize</a>
+    <a class="dropdown-toggle" href="local_visualizer.php">Visualize</a>
 </li>
