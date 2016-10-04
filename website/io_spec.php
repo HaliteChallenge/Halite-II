@@ -66,8 +66,8 @@
 
                         <p>Consider the following 3x3 map as an example (where <code>[O=x,S=y]</code> represents a tile owned by player x with strength y):<br>
                             <pre><code>[O=0,S=122] [O=1,S=25] [O=1,S=18]
-                                       [O=0, S=13] [O=0,S=45] [O=1,S=22]
-                                       [O=2,S=255] [O=2,S=85] [O=0, S=0]</code></pre>
+[O=0, S=13] [O=0,S=45] [O=1,S=22]
+[O=2,S=255] [O=2,S=85] [O=0, S=0]</code></pre>
                                 This map would be encoded using the following string:<br>
                                 <pre><code>1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 22 255 85 0</code></pre>
                             </p>
