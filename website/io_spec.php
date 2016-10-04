@@ -75,7 +75,11 @@
 
                             <p>The production values of the map are sent using <code>WIDTH</code> * <code>HEIGHT</code> integers which fill in the production values of the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code></p>
 
-                            <p>Consider the following production map as an example:<br>[2] [3] [4]<br>[1] [2] [3]<br>[0] [1] [2]<br>This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
+                            <p>Consider the following production map as an example:<br>
+                            <pre><code>[2][3][4]
+[1][2][3]
+[0][1][2]</code></pre><br>
+                            This map would be encoded using the following string:<br>2 3 4 1 2 3 0 1 2</p>
 
                             <h4>Output Move Set Format</h4>
 
