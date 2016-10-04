@@ -76,8 +76,8 @@
 				<li id="file_spec">
 					<a href="file_spec.php">Replay File Spec</a>
 				</li>
-				<li id="networking_spec">
-					<a href="networking_spec.php">Networking Spec</a>
+				<li id="io_spec">
+					<a href="io_spec.php">IO Spec</a>
 				</li>
 				<li id="contest_spec">
 					<a href="contest_spec.php">Contest Details</a>

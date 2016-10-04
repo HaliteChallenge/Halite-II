@@ -23,7 +23,7 @@
 
                 <h4>Initialization Output - sendInit</h4>
 
-                <p>This function sends the desired player name back to the game environment. In sending the name, it effectively signals the environment that the player is ready for the start of the game, and the player should be prepared to immediately receive the first frame of the game (which will incidentally contain the same map as was received in getInit). sendInit is a separate function from getInit to give players time to initialize potential strategies after receiving the initial map, and should at latest be called three seconds after calling getInit, although probably earlier to provide a networking buffer.</p>
+                <p>This function sends the desired player name back to the game environment. In sending the name, it effectively signals the environment that the player is ready for the start of the game, and the player should be prepared to immediately receive the first frame of the game (which will incidentally contain the same map as was received in getInit). sendInit is a separate function from getInit to give players time to initialize potential strategies after receiving the initial map. Be aware that this time does eat into your time for computation during the game.</p>
 
                 <h4>Frame Input - getFrame</h4>
 
@@ -31,8 +31,7 @@
 
                 <h4>Frame Output - sendFrame</h4>
 
-                <p>This function encodes and sends the moves from the player. This function will send all of the moves it is given, so it is recommended that the player carefully compile their list of moves before sending them with this function. This function should at latest be called one seconds after calling getFrame, although probably earlier to provide a networking buffer.</p>
-
+                <p>This function encodes and sends the moves from the player. This function will send all of the moves it is given, so it is recommended that the player carefully compile their list of moves before sending them with this function.</p>
             </div>
         </div>
     </div>
