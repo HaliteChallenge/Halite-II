@@ -1,3 +1,7 @@
 p {
 	line-height: 1.8em;
 }
+
+ul:not(.nav) {
+	line-height: 1.8em;
+}

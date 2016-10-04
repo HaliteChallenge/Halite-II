@@ -60,23 +60,23 @@
                                 <li>One integer, <code>COUNTER</code>, representing the number of tiles with the same owner consecutively.</li>
                                 <li>One integer, <code>OWNER</code>, representing the owner of the tiles <code>COUNTER</code> encodes.</li>
                             </ul>
-                            The above repeats until the <code>COUNTER</code> total is equal to the area of the map. It fills in the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code>.<br>
+                            The above repeats until the <code>COUNTER</code> total is equal to the area of the map. It fills in the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code>. <b>Please be aware that the top row is the first row, as Halite uses screen-type coordinates.</b><br>
                             This is then followed by <code>WIDTH</code> * <code>HEIGHT</code> integers, representing the strength values of the tiles in the map. It fills in the map in the same way owner values fill in the map.
                         </p>
 
-                        <p>Consider the following map as an example:<br>
-                            <pre><code>[O=0,S=122] [O=1,S=25]  [O=1,S=18]
-[O=0,S=13]  [O=0,S=45]  [O=1,S=182]
-[O=2,S=255] [O=2,S=85]  [O=0,S=0]</code></pre>
+                        <p>Consider the following 3x3 map as an example (where <code>[O=x,S=y]</code> represents a tile owned by player x with strength y):<br>
+                            <pre><code>[O=0,S=122] [O=1,S=25] [O=1,S=18]
+[O=0, S=13] [O=0,S=45] [O=1,S=22]
+[O=2,S=255] [O=2,S=85] [O=0, S=0]</code></pre>
                                 This map would be encoded using the following string:<br>
-                                <pre><code>1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 182 255 85 0</code></pre>
+                                <pre><code>1 0 2 1 2 0 1 1 2 2 1 0 122 25 18 13 45 22 255 85 0</code></pre>
                             </p>
 
                             <h4>Input Production Format</h4>
 
                             <p>The production values of the map are sent using <code>WIDTH</code> * <code>HEIGHT</code> integers which fill in the production values of the map from row 1 to row <code>HEIGHT</code> and within a row from column 1 to column <code>WIDTH</code></p>
 
-                            <p>Consider the following production map as an example:<br>
+                            <p>Consider the following 3x3 production map as an example (where <code>[x]</code> represents a tile with x production):<br>
                             <pre><code>[2][3][4]
 [1][2][3]
 [0][1][2]</code></pre>
