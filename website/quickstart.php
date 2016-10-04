@@ -22,7 +22,7 @@
                 <h3>Download a Language Package</h3>
 				<p>Halite is language agnostic. Bots talk to the game environment using stdin and stdout. We provide that a wrapper around that networking code the networking code necessary to talk to the game environment, some game constructs, and a basic Halite bots for several languages.</p>
 
-				<p>Navigate <a href="downloads.php">here</a> to download a language package for your preferred language. The MyBot.py file contains the bot's <code>main()</code> function.
+				<p>Navigate <a href="downloads.php">here</a> to download a language package for your preferred language. The package's MyBot file contains the bot's <code>main()</code> function. Take a look at it!
 
                 <h3>Submit the Starter Bot</h3>
 				<p>You can submit a zip file of your bot's source code to halite.io to be ranked and to see yourself in match against other contestants. The highest ranked bot at the end of the competition wins!</p>
