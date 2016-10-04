@@ -383,7 +383,7 @@ function showGame(game, showmovement, seconds) {
 
 function textFromURL(replayName, callback) {
 	var oReq = new XMLHttpRequest();
-	oReq.open("GET", "http://s3-us-east-1.amazonaws.com/halitereplaybucket/"+replayName, true);
+	oReq.open("GET", "http://s3.amazonaws.com/halitereplaybucket/"+replayName, true);
 	oReq.onload = function (oEvent) {
 		if (oReq.status != 404) {
 			callback(textToGame(oReq.response, replayName));
