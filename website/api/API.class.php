@@ -1,9 +1,11 @@
 <?php
 
+use Aws\Sdk;
 require __DIR__ . '/../vendor/autoload.php';
 
 define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("REPLAY_BUCKET", "halitereplaybucket");
+define("ERROR_LOG_BUCKET", "haliteerrorlogbucket");
 
 abstract class API{
     /**
@@ -64,14 +66,16 @@ abstract class API{
         if(!property_exists($this, "config")) $this->config = parse_ini_file(INI_PATH, true);
     }
 
-    protected function loadS3SDK() {
+    protected function loadAwsSdk() {
         $this->loadConfig();
-        putenv("$AWS_ACCESS_KEY_ID=".$config["aws"]["accesskey"]);
-        putenv("$AWS_SECRET_ACCESS_KEY=".$config["aws"]["secretaccesskey"]);
-        return new Aws\Sdk([
-            'region'   => 'us-west-2',
+        putenv("AWS_ACCESS_KEY_ID=".$this->config["aws"]["accesskey"]);
+        putenv("AWS_SECRET_ACCESS_KEY=".$this->config["aws"]["secretaccesskey"]);
+
+        $sdk = new Aws\Sdk([
+            'region'   => 'us-east-1',
             'version'  => 'latest'
         ]);
+		return $sdk;
     }
 
     protected function initDB() {

@@ -101,16 +101,6 @@ function getLatestGamesForUser(userID, limit, startingID) {
     return result.responseJSON;
 }
 
-function getGameFile(filename) {
-    var result = $.ajax({
-        url: "../storage/replays/"+filename, 
-        async: false,
-        method: "GET"
-    });
-    console.log(result.responseText)
-    return result.responseText;
-}
-
 function destroySession(async) {
     $.ajax({
         url: url+"session",
