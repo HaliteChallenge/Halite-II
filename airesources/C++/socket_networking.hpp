@@ -16,7 +16,6 @@
     #include <sys/types.h>
     #include <Winsock2.h>
     #include <Ws2tcpip.h>
-    #define WINSOCKVERSION MAKEWORD(2,2)
 #else
     #include <sys/socket.h>
     #include <sys/ioctl.h>
@@ -35,7 +34,12 @@
 
 namespace detail{
 static std::vector< std::vector<unsigned char> > productions;
-static int width, height, connection;
+static int width, height;
+#ifdef _WIN32
+static SOCKET connection = INVALID_SOCKET;
+#else
+static int connection;
+#endif
 
 static std::string serializeMoveSet(const std::set<hlt::Move> &moves) {
     std::ostringstream oss;
@@ -99,7 +103,11 @@ static hlt::GameMap deserializeMap(const std::string & inputString) {
 }
 static void sendString(std::string & sendString) {
     sendString.push_back('\n');
+#ifdef _WIN32
+
+#else
     write(connection, sendString.c_str(), sendString.size());
+#endif
     sendString.pop_back(); //Remove newline.
 }
 
@@ -107,14 +115,24 @@ static std::string getString() {
     std::string newString;
     char buffer = 0;
     while(buffer != '\n') {
+#ifdef _WIN32
+
+#else
         assert(read(connection, &buffer, 1) >= 0);
+#endif
         newString.push_back(buffer);
     }
     return newString;
 }
 }
 
-static void getInit(int port, unsigned char& playerTag, hlt::GameMap& m) {
+static void getInit(unsigned char& playerTag, hlt::GameMap& m) {
+    int port;
+    std::cout << "Enter the port on which to connect: ";
+    std::cin >> port;
+#ifdef _WIN32
+
+#else
     //Connect to port
     detail::connection = socket(AF_INET, SOCK_STREAM, 0);
     assert(detail::connection >= 0);
@@ -127,11 +145,11 @@ static void getInit(int port, unsigned char& playerTag, hlt::GameMap& m) {
     bcopy((char *)server->h_addr, (char *)&serverAddr.sin_addr.s_addr, server->h_length);
     serverAddr.sin_port = htons(port);
     assert(connect(detail::connection, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) >= 0);
+#endif
     playerTag = (unsigned char)std::stoi(detail::getString());
     detail::deserializeMapSize(detail::getString());
     detail::deserializeProductions(detail::getString());
     m = detail::deserializeMap(detail::getString());
-
 }
 
 static void sendInit(std::string name) {
