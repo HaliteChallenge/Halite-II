@@ -51,7 +51,7 @@
 			<span>Tutorials</span>
 			<ul class="nav nav-stacked">
 				<li id="quickstart">
-					<a href="quickstart.php">Quickstart</a>
+					<a href="quickstart.php">Getting Started</a>
 				</li>
 				<li id="basic_tutorial">
 					<a href="basic_tutorial.php">Basic Bot</a>
@@ -65,22 +65,27 @@
 			</ul>
 		</li>
 		<li class="">
-			<span>Specifications</span>
+			<span>Rules</span>
 			<ul class="nav nav-stacked">
 				<li id="game_spec">
-					<a href="game_spec.php">Game Rules</a>
-				</li>
-				<li id="tool_spec">
-					<a href="tool_spec.php">Environment Spec</a>
-				</li>
-				<li id="file_spec">
-					<a href="file_spec.php">Replay File Spec</a>
-				</li>
-				<li id="io_spec">
-					<a href="io_spec.php">IO Spec</a>
+					<a href="game_spec.php">Game</a>
 				</li>
 				<li id="contest_spec">
-					<a href="contest_spec.php">Contest Details</a>
+					<a href="contest_spec.php">Contest</a>
+				</li>
+			</ul>
+		</li>
+		<li class="">
+			<span>References</span>
+			<ul class="nav nav-stacked">
+				<li id="tool_spec">
+					<a href="tool_spec.php">Environment</a>
+				</li>
+				<li id="file_spec">
+					<a href="file_spec.php">Replay File</a>
+				</li>
+				<li id="io_spec">
+					<a href="io_spec.php">IO</a>
 				</li>
 			</ul>
 		</li>

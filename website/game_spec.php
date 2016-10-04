@@ -14,7 +14,7 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Game Specification</h1>
+                <h1>Game Rules</h1>
 
                 <h3>Overview</h3>
 
