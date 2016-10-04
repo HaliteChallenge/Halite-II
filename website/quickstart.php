@@ -14,7 +14,7 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Quickstart</h1>
+                <h1>Getting Started</h1>
 
                 <h3>Register</h3>
                 <p>Sign up for Halite by clicking "Login with Github" at the top right of this page.</p>
@@ -22,7 +22,7 @@
                 <h3>Download a Language Package</h3>
 				<p>Halite is language agnostic. Bots talk to the game environment using stdin and stdout. We provide that a wrapper around that networking code the networking code necessary to talk to the game environment, some game constructs, and a basic Halite bots for several languages.</p>
 
-				<p>Navigate <a href="downloads.php">here</a> to download a language package for your preferred language. The package's MyBot file contains the bot's <code>main()</code> function. Take a look at it!
+				<p>Navigate <a href="downloads.php">here</a> to download a language package for your preferred language. The package's MyBot file contains all of the bot's logic. Take a look at it!
 
                 <h3>Submit the Starter Bot</h3>
 				<p>You can submit a zip file of your bot's source code to halite.io to be ranked and to see yourself in match against other contestants. The highest ranked bot at the end of the competition wins!</p>
