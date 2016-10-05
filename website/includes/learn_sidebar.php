@@ -59,9 +59,6 @@
 				<li id="bfs_tutorial">
 					<a href="bfs_tutorial.php">Breadth First Search Bot</a>
 				</li>
-				<li id="machine_learning_tutorial">
-					<a href="machine_learning_tutorial.php">Machine Learning Bot</a>
-				</li>
 			</ul>
 		</li>
 		<li class="">
