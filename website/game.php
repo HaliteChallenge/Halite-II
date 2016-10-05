@@ -14,6 +14,10 @@
 		<div  id="pageContent" class="pageContent">
 		</div>
 	</div>
+	<div>
+		<h2>Keys that do something: WASDZX+-\<\>P[UP][DOWN][LEFT][RIGHT][SPACE]</h2>
+	</div>
+	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
