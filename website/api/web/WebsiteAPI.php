@@ -128,7 +128,7 @@ class WebsiteAPI extends API{
 			$credentials = new Credentials($this->config['oauth']['githubClientID'], $this->config['oauth']['githubClientSecret'], NULL);
 			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user'));
 			$gitHub->requestAccessToken($code);
-			$githubUser = json_decode($gitHub->request('user'), true);
+			$githubUser = json_decode($gitHub->request('user:email'), true);
 			var_dump($githubUser);
 
 			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
