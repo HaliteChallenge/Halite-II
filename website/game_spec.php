@@ -84,7 +84,7 @@
 
                 <h3>Replay Files</h3>
 
-                <p>Once a game ends, the environment will output a replay file. See <a href="file_spec.php">here</a> for more information regarding the replay file format.</p>
+                <p>Once a game ends, the environment will output a replay file. See <a href="replay_file_spec.php">here</a> for more information regarding the replay file format.</p>
 
             </div>
         </div>

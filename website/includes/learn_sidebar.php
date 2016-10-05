@@ -81,8 +81,8 @@
 				<li id="tool_spec">
 					<a href="tool_spec.php">Environment</a>
 				</li>
-				<li id="file_spec">
-					<a href="file_spec.php">Replay File</a>
+				<li id="replay_file_spec">
+					<a href="replay_file_spec.php">Replay File</a>
 				</li>
 				<li id="io_spec">
 					<a href="io_spec.php">IO</a>
