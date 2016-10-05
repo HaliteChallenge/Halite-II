@@ -101,7 +101,7 @@ public class MyBot{
         Networking.sendInit("BasicJavaBot");
 
         while(true) {
-            ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
+            ArrayList&lt;Move&rt; moves = new ArrayList&lt;Move&rt;();
 
             gameMap = Networking.getFrame();
 
@@ -113,8 +113,8 @@ public class MyBot{
                         if(site.strength &lt; site.production*5) {
                             moveDirection = Direction.STILL;
                         } else {
-							for(Direction d : Direction.CARDINALS) { 
-								if(gameMap.getSite(new Location(x, y), d).owner != myID) {
+                            for(Direction d : Direction.CARDINALS) { 
+                                if(gameMap.getSite(new Location(x, y), d).owner != myID) {
                                     moveDirection = d;
                                     break;
                                 }
