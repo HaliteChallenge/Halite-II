@@ -12,7 +12,7 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-        	<?php include 'includes/learn_sidebar.php'; ?>
+            <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
 
                 <h1>Breadth-First Search Tutorial</h1>
@@ -40,102 +40,107 @@
 
                 <p>First, we have the same declarations and objects as we had in the BasicBot.</p>
                 <pre class="prettyprint">InitPackage iPackage = Networking.getInit();
-                    int myID = iPackage.myID;
-                    GameMap gameMap = iPackage.map;
+int myID = iPackage.myID;
+GameMap gameMap = iPackage.map;
 
-                    Networking.sendInit("BfsBot");
+Networking.sendInit("BfsBot");
 
-                    while(true) {
-                        ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
-                        gameMap = Networking.getFrame();
-                        ...</pre>
+while(true) {
+    ArrayList&lt;Move&rt; moves = new ArrayList&lt;Move&rt;();
+    gameMap = Networking.getFrame();
+    ...</pre>
+                </p>
 
-                        <p>Next we'll add the structures we'll need for our breadth-first search.</p>
-                        <p>
-                            This is our map of which squares we've visited. Whenever we add another location to the queue, we'll mark it as visited here so we don't add squares multiple times.
-                            <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Boolean> > visited = new ArrayList&lt; ArrayList&lt;Boolean> >();
-                                for(int y = 0; y < gameMap.height; y++) {
-                                    ArrayList&lt;Boolean> vRow = new ArrayList&lt;Boolean>();
-                                    for(int x = 0; x < gameMap.width; x++) {
-                                        vRow.add(false);
-                                    }
-                                    visited.add(vRow);
-                                }</pre>
-                            </p>
+                <p>Next we'll add the structures we'll need for our breadth-first search.</p>
+                <p>
+                    This is our map of which squares we've visited. Whenever we add another location to the queue, we'll mark it as visited here so we don't add squares multiple times.
+                <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Boolean&rt; &rt; visited = new ArrayList&lt; ArrayList&lt;Boolean&rt; &rt;();
+for(int y = 0; y &lt; gameMap.height; y++) {
+    ArrayList&lt;Boolean&rt; vRow = new ArrayList&lt;Boolean&rt;();
+    for(int x = 0; x &lt; gameMap.width; x++) {
+        vRow.add(false);
+    }
+    visited.add(vRow);
+}</pre>
+                </p>
 
-                            <p>
-                                Here we initialize our map of directions. Whenever we add a location to the queue, we'll set the direction here to be the one that points towards the location we popped off of the queue that it was adjacent to.
-                                <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Direction> > directions = new ArrayList&lt;ArrayList&lt;Direction> >();
-                                    for(int y = 0; y < gameMap.height; y++) {
-                                        ArrayList&lt;Direction> dRow = new ArrayList&lt;Direction>();
-                                        for(int x = 0; x < gameMap.width; x++) {
-                                            dRow.add(Direction.STILL);
-                                        }
-                                        directions.add(dRow);
-                                    }</pre>
-							</p>
+                <p>
+                    Here we initialize our map of directions. Whenever we add a location to the queue, we'll set the direction here to be the one that points towards the location we popped off of the queue that it was adjacent to.
+                    <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Direction&rt; &rt; directions = new ArrayList&lt;ArrayList&lt;Direction&rt; &rt;();
+for(int y = 0; y &lt; gameMap.height; y++) {
+    ArrayList&lt;Direction&rt; dRow = new ArrayList&lt;Direction&rt;();
+    for(int x = 0; x &lt; gameMap.width; x++) {
+        dRow.add(Direction.STILL);
+    }
+    directions.add(dRow);
+}</pre>
+                </p>
 
-                                    <p>
-                                        Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
-                                        <pre class="prettyprint">// LinkedList just happens to be a structure which implements queue; there are others that would work as well.
-                                            LinkedList&lt;Location> toVisit = new LinkedList&lt;Location>();
-                                            for(int y = 0; y < gameMap.height; y++) {
-                                                for(int x = 0; x < gameMap.width; x++) {
-                                                    Location l = new Location(x, y);
-                                                    Site site = gameMap.getSite(l);
-                                                    if(site.owner != myID) {
-                                                        toVisit.add(l);
-                                                        visited.get(y).set(x, true);
-                                                    }
-                                                }
-                                            }</pre></p>
+                <p>
+                    Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
+            <pre class="prettyprint">// LinkedList just happens to be a structure which implements queue; there are others that would work as well.
+LinkedList&lt;Location&rt; toVisit = new LinkedList&lt;Location&rt;();
+for(int y = 0; y &lt; gameMap.height; y++) {
+    for(int x = 0; x &lt; gameMap.width; x++) {
+        Location l = new Location(x, y);
+        Site site = gameMap.getSite(l);
+        if(site.owner != myID) {
+            toVisit.add(l);
+            visited.get(y).set(x, true);
+        }
+    }
+}</pre>
+                </p>
 
-                                            <p>Here's a simple little helper function to tell us what the opposite direction of a given direction is.
-                                                <pre class="prettyprint">private static Direction oppositeDirection(Direction d) {
-                                                    if(d == Direction.STILL) return Direction.STILL;
-                                                    if(d == Direction.NORTH) return Direction.SOUTH;
-                                                    if(d == Direction.EAST) return Direction.WEST;
-                                                    if(d == Direction.SOUTH) return Direction.NORTH;
-                                                    if(d == Direction.WEST) return Direction.EAST;
-                                                    return null;
-                                                }</pre></p>
+                <p>Here's a simple little helper function to tell us what the opposite direction of a given direction is.
+                    <pre class="prettyprint">private static Direction oppositeDirection(Direction d) {
+    if(d == Direction.STILL) return Direction.STILL;
+    if(d == Direction.NORTH) return Direction.SOUTH;
+    if(d == Direction.EAST) return Direction.WEST;
+    if(d == Direction.SOUTH) return Direction.NORTH;
+    if(d == Direction.WEST) return Direction.EAST;
+    return null;
+}</pre>
+                </p>
 
-                                                <p>Next we'll need to actually use this to direct our pieces. So, we'll continually pop off of the front of the queue, add the adjacent unvisited pieces, mark their directions and them as visited, and ensure that the queue isn't empty.
-                                                    <pre class="prettyprint">while(!toVisit.isEmpty()) {
-                                                        Location l = toVisit.remove();
-                                                        visited.get(l.y).set(l.x, true);
-                                                        for(Direction d : Direction.CARDINALS) {
-                                                            Location t = gameMap.getLocation(l, d);
-                                                            if(!visited.get(t.y).get(t.x)) {
-                                                                toVisit.add(t);
-                                                                visited.get(t.y).set(t.x, true);
-                                                                directions.get(t.y).set(t.x, oppositeDirection(d));
-                                                            }
-                                                        }
-                                                    }</pre></p>
+                <p>Next we'll need to actually use this to direct our pieces. So, we'll continually pop off of the front of the queue, add the adjacent unvisited pieces, mark their directions and them as visited, and ensure that the queue isn't empty.
+                    <pre class="prettyprint">while(!toVisit.isEmpty()) {
+    Location l = toVisit.remove();
+    visited.get(l.y).set(l.x, true);
+    for(Direction d : Direction.CARDINALS) {
+        Location t = gameMap.getLocation(l, d);
+        if(!visited.get(t.y).get(t.x)) {
+            toVisit.add(t);
+            visited.get(t.y).set(t.x, true);
+            directions.get(t.y).set(t.x, oppositeDirection(d));
+        }
+    }
+}</pre>
+                </p>
 
-                                                    <p>Next, we'll go through the map. If a piece's strength is too low, we won't move it; else we'll move it as given to by our directions map.
-                                                        <pre class="prettyprint">for(int y = 0; y < gameMap.height; y++) {
-                                                            for(int x = 0; x < gameMap.width; x++) {
-                                                                Site site = gameMap.getSite(new Location(x, y));
-                                                                if(site.owner == myID) {
-                                                                    if(site.strength > 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
-                                                                    else moves.add(new Move(new Location(x, y), Direction.STILL));
-                                                                }
-                                                            }
-                                                        }</pre></p>
+                <p>Next, we'll go through the map. If a piece's strength is too low, we won't move it; else we'll move it as given to by our directions map.
+                    <pre class="prettyprint">for(int y = 0; y &lt; gameMap.height; y++) {
+    for(int x = 0; x &lt; gameMap.width; x++) {
+        Site site = gameMap.getSite(new Location(x, y));
+        if(site.owner == myID) {
+            if(site.strength &rt; 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
+            else moves.add(new Move(new Location(x, y), Direction.STILL));
+        }
+    }
+}</pre>
+                </p>
 
-                                                        <p>Finally, we'll send our moves.
-                                                            <pre class="prettyprint">Networking.sendFrame(moves);</pre>
-                                                        </p>
+                <p>Finally, we'll send our moves.
+                    <pre class="prettyprint">Networking.sendFrame(moves);</pre>
+                </p>
+        </div>
+    </div>
 
-                                                    </div>
 
-
-                                                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-                                                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-                                                    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-                                                    <script src="script/backend.js"></script>
-                                                    <script src="script/general.js"></script>
-                                                </body>
-                                                </html>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <script src="script/backend.js"></script>
+    <script src="script/general.js"></script>
+</body>
+</html>

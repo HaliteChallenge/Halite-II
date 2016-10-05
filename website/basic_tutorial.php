@@ -10,7 +10,7 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-        	<?php include 'includes/learn_sidebar.php'; ?>
+            <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
                 <h1>Basic Bot Tutorial</h1>
 
@@ -54,11 +54,10 @@
                 <p>
                     As you can see, the included starter bot is pretty bad at playing Halite. It just moves each of its pieces randomly each turn. This logic is encoded in these lines of the starter bot.
                     <pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
-                        if(site.owner == myID) {
-                            Direction dir = Direction.randomDirection();
-                            moves.add(new Move(new Location((short)x, (short)y), dir));
-                        }
-                    </pre>
+if(site.owner == myID) {
+    Direction dir = Direction.randomDirection();
+    moves.add(new Move(new Location((short)x, (short)y), dir));
+}</pre>
                 </p>
 
                 <p>
@@ -74,63 +73,61 @@
                 <p>
                     This logic may easily be transferred to code like so:
                     <pre class="prettyprint">Site site = gameMap.contents.get(y).get(x);
-                        if(site.owner == myID) {
-                            Direction moveDirection = Direction.randomDirection();
-                            if(site.strength &lt; site.production*5) {
-                                moveDirection = Direction.STILL;
-                            } else {
-                                for(Direction possibleDirection : Direction.CARDINALS) {
-                                    if(gameMap.getSite(new Location(x, y), possibleDirection).owner != myID) {
-                                        moveDirection = possibleDirection;
-                                        break;
-                                    }
-                                }
-                            }
-                            moves.add(new Move(new Location(x, y), moveDirection));
-                        }
-                    </pre>
+if(site.owner == myID) {
+    Direction moveDirection = Direction.randomDirection();
+    if(site.strength &lt; site.production*5) {
+        moveDirection = Direction.STILL;
+    } else {
+        for(Direction possibleDirection : Direction.CARDINALS) {
+            if(gameMap.getSite(new Location(x, y), possibleDirection).owner != myID) {
+                moveDirection = possibleDirection;
+                break;
+            }
+        }
+    }
+    moves.add(new Move(new Location(x, y), moveDirection));
+}</pre>
                 </p>
 
                 <p>
                     Here is the full basic bot:
                     <pre class="prettyprint">import java.util.ArrayList;
+public class MyBot{
+    public static void main(String[] args) {
+        InitPackage iPackage = Networking.getInit();
+        short myID = iPackage.myID;
+        Map gameMap = iPackage.map;
 
-                        public class MyBot{
-                            public static void main(String[] args) {
-                                InitPackage iPackage = Networking.getInit();
-                                short myID = iPackage.myID;
-                                Map gameMap = iPackage.map;
+        Networking.sendInit("BasicJavaBot");
 
-                                Networking.sendInit("BasicJavaBot");
+        while(true) {
+            ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
 
-                                while(true) {
-                                    ArrayList&lt;Move> moves = new ArrayList&lt;Move>();
+            gameMap = Networking.getFrame();
 
-                                    gameMap = Networking.getFrame();
-
-                                    for(short y = 0; y &lt; gameMap.contents.size(); y++) {
-                                        for(short x = 0; x &lt; gameMap.contents.get(y).size(); x++) {
-                                            Site site = gameMap.contents.get(y).get(x);
-                                            if(site.owner == myID) {
-                                                Direction moveDirection = Direction.randomDirection();
-                                                if(site.strength &lt; site.production*5) {
-                                                    moveDirection = Direction.STILL;
-                                                } else {
-                                                    for(Direction d : Direction.CARDINALS) { if(gameMap.getSite(new Location(x, y), d).owner != myID) {
-                                                            moveDirection = d;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                moves.add(new Move(new Location(x, y), moveDirection));
-                                            }
-                                        }
-                                    }
-
-                                    Networking.sendFrame(moves);
+            for(short y = 0; y &lt; gameMap.contents.size(); y++) {
+                for(short x = 0; x &lt; gameMap.contents.get(y).size(); x++) {
+                    Site site = gameMap.contents.get(y).get(x);
+                    if(site.owner == myID) {
+                        Direction moveDirection = Direction.randomDirection();
+                        if(site.strength &lt; site.production*5) {
+                            moveDirection = Direction.STILL;
+                        } else {
+                            for(Direction d : Direction.CARDINALS) { if(gameMap.getSite(new Location(x, y), d).owner != myID) {
+                                    moveDirection = d;
+                                    break;
                                 }
                             }
-                        }</pre>
+                        }
+                        moves.add(new Move(new Location(x, y), moveDirection));
+                    }
+                }
+            }
+
+            Networking.sendFrame(moves);
+        }
+    }
+}</pre>
                     </p>
 
                     <p>The source code for the basic bot in other languages is located <a href="https://github.com/HaliteChallenge/Halite/tree/master/website/tutorials/basic">here</a>. <b>Note</b>: If you submit the basic bot to competition, please make sure that the main file is named <code>MyBot</code> not <code>BasicBot</code>.</p>
