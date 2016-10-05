@@ -17,19 +17,22 @@
                 <h1>Getting Started</h1>
 
                 <h3>Register</h3>
+
                 <p>Sign up for Halite by clicking "Login with Github" at the top right of this page.</p>
 
-                <h3>Download a Language Package</h3>
-				<p>Halite is language agnostic. Bots talk to the game environment using stdin and stdout. We provide that a wrapper around that networking code the networking code necessary to talk to the game environment, some game constructs, and a basic Halite bots for several languages.</p>
+                <h3>Download a Starter Package</h3>
 
-				<p>Navigate <a href="downloads.php">here</a> to download a language package for your preferred language. The package's MyBot file contains all of the bot's logic. Take a look at it!
+				<p>Navigate <a href="downloads.php">here</a> and download the starter package for your preferred language. Each starter package includes a simple bot and an API for talking with the game environment. 
 
-                <h3>Submit the Starter Bot</h3>
-				<p>You can submit a zip file of your bot's source code to halite.io to be ranked and to see yourself in match against other contestants. The highest ranked bot at the end of the competition wins!</p>
+                <h3>Submit the Starter Package</h3>
 
-				<p>Click the "Submit to Competition" button in the navigation bar and upload the language package zip file that you just downloaded. Your bot should appear on the leaderboard within a couple of minutes.</p>
+				<p>Click the "Submit" button in the navigation bar and upload the starter package zip file that you just downloaded. Our servers will compile your source and continuously play your bot against other contestants, ranking you in the process. To track your bot's progress and view its latest games, navigate to <a href="index.php">your homepage</a>. Want to put up another bot? Just submit new source code.</p>
+
+				<p><b>Note:</b> If compilation of your source code fails, we will email you.</p>
+
 
                 <h3>Need Help? Have Feedback?</h3>
+
                 <p>Please post on <a href="http://forums.halite.io">the forums</a>.</p>
             </div>
         </div>
