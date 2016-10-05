@@ -38,18 +38,6 @@
                             <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
                         </ul>
                     </p>
-
-                    <h3>Desktop Visualizer [DISCONTINUED]</h3>
-                    <p>
-                        This is the legacy desktop visualizer. We recommend using the <a href="game.php">web visualizer</a>, but until an alternative desktop visualizer is available we will continue to offer this for download. These binaries are no longer supported and are unlikely to be updated.
-                    </p>
-                    <p>
-                        <ul>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Mac.zip">Mac</a></li>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Debian.zip">Ubuntu (64 bit)</a></li>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Windows.zip">Windows</a></li>
-                        </ul>
-                    </p>
                 </div>
             </div>
         </div>
