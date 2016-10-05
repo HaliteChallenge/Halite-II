@@ -126,18 +126,18 @@ class WebsiteAPI extends API{
 
 			$serviceFactory = new ServiceFactory();
 			$credentials = new Credentials($this->config['oauth']['githubClientID'], $this->config['oauth']['githubClientSecret'], NULL);
-			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user'));
+			$gitHub = $serviceFactory->createService('GitHub', $credentials, new Session(), array('user', 'user:email'));
 			$gitHub->requestAccessToken($code);
-			$githubUser = json_decode($gitHub->request('user:email'), true);
-			var_dump($githubUser);
+			$githubUser = json_decode($gitHub->request('user'), true);
+			$email = json_decode($gitHub->request('user/emails'), true)[0];
 
 			if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
 				
 				$_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
 			} else { // New User
 				$organization = "Other";
-				if($githubUser['email'] != NULL) {
-					$emailDomain = explode('@', $githubUser['email'])[1];
+				if($email != NULL) {
+					$emailDomain = explode('@', $email)[1];
 					$rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
 					foreach($rows as $row) {
 						$components = explode(" - ", $row);
@@ -149,7 +149,7 @@ class WebsiteAPI extends API{
 				}
 
 				$numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows + 1; // Add once since this user hasnt been inserted into the db
-				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$githubUser['email']}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
+				$this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
 				$_SESSION['userID'] = $this->mysqli->insert_id;
 
 				// AWS auto scaling
