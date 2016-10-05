@@ -14,7 +14,7 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Contest Specification</h1>
+                <h1>Contest Rules</h1>
 
                 <h3>Schedule</h3>
                 <ul>

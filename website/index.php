@@ -27,13 +27,12 @@ if(isset($_SESSION['userID'])) {
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
-    <style>
-    canvas {
-        border: 1px solid #000;
-        border-radius: 5px;
-        padding: 5px;
-    }
-    </style>
+	<style>
+		p {
+			line-height: 1.6em;
+		}
+
+	</style>
 </head>
 
 <body>
@@ -43,8 +42,9 @@ if(isset($_SESSION['userID'])) {
             <div class="row">
                 <div class="col-sm-12">
                     <h1>Introducing Halite</h1>
-                    <p>Halite is a multiplayer turn-based game that is played by computer programs. (Insert longer description here).</p>
-                    <p>Interested? Visit our <a href="quickstart.php">quickstart tutorial</a>. The simplest Halite bot is just 14 lines of code.</p>
+					<p>Halite is a multiplayer turn-based strategy game played by computer programs on a rectangular grid. Each player’s objective in Halite is to take over the entire map and eliminate the other players in the game.</p>
+					<p>Bots must use their territory to gain strength and their strength to gain territory, move intelligently on both the micro and macro scales, and brave a branching factor of ~10<sup>1750</sup> to play effectively.</p>
+                    <p>The simplest halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. Interested? <a href="quickstart.php">Get started building a bot</a> and <a href="game_spec.php">learn more about the game's rules</a>.</p>
                     <h1>Top Rankings</h1>
                     <p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
                     <div class="panel panel-default">
@@ -59,9 +59,6 @@ if(isset($_SESSION['userID'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
-    <script src="lib/pixi.min.js"></script>
-    <script src="script/parsereplay.js"></script>
-    <script src="script/visualizer.js"></script>
     <script src="script/leaderTable.js"></script>
     <script src="script/index.js"></script>
 </body>
