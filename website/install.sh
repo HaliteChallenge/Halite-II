@@ -16,6 +16,5 @@ echo "Setting up file structure"
 mkdir storage storage/bots storage/compile
 sudo chown www-data:www-data storage storage/bots storage/compile 
 sudo chmod 755 storage storage/bots storage/compile 
-cp ./* /var/www/html
 
 echo "Attention: Please follow the directions in the install section of our technical spec! This is located inside of of git repo."
