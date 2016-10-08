@@ -7,7 +7,7 @@ import os.path
 import configparser
 
 parser = configparser.ConfigParser()
-parser.read("../../halite.ini")
+parser.read("../../../halite.ini")
 AWS_CONFIG = parser["aws"]
 DB_CONFIG = parser["database"]
 
@@ -42,7 +42,7 @@ def runCommandOnInstance(instance, command):
     # Connect to ssh
     for a in range(100):
         try:
-            ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
+            ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
             print("Connected to server")
             break
         except Exception as e:
@@ -54,7 +54,7 @@ def runCommandOnInstance(instance, command):
     print(stdout)
     print(stderr)
 
-configFileContents = open("../../halite.ini").read()
+configFileContents = open("../../../halite.ini").read()
 runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
 
 time.sleep(10)
