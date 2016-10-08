@@ -58,5 +58,5 @@ configFileContents = open("../../../halite.ini").read()
 runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
 
 time.sleep(10)
-runCommandOnInstance(instance, 'screen -dmS test bash -c "cd ~/Halite/worker; sudo python3 worker.py"')
+runCommandOnInstance(instance, 'cd ~/Halite/worker; ./startWorkerScreen.sh')
 
