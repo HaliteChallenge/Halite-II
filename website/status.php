@@ -14,28 +14,26 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="pageContent">
-            <div class="jumbotron" id="jumbotron">
-                <h1 id="jHeader">Halite Status</h1>
-            </div>
-
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <h3 class="panel-title">General Stats</h3>
                         </div>
 
-                        <table class="table well well-sm" id="statTable">
+                        <table class="table" id="statTable">
                             <tbody id="statTableBody">
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="col-sm-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <h3 class="panel-title">Worker Servers</h3>
                         </div>
 
-                        <table class="table well well-sm" id="workerTable">
+                        <table class="table" id="workerTable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
