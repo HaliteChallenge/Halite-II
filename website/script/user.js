@@ -114,12 +114,10 @@ $(function() {
         }
     }
 
-    var session = getSession();
+    var userIDGET = getGET("userID");
+    var isSession = userIDGET == null || userIDGET == undefined;
 
-    var userID = getGET("userID");
-    if(userID == null || userID == undefined) userID = parseInt(session.userID);
-
-    var user = getUser(userID);
+    var user = isSession ? getSession() : getUser(userIDGET);
     user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
     user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
@@ -136,10 +134,8 @@ $(function() {
     $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
     $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played");
 
-    gameTable.init(userID, session != null && parseInt(session.userID) == userID, function(userID, startingID) {
-        console.log(startingID)
+    gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
         var rawGames = getLatestGamesForUser(userID, 10, startingID); 
-        console.log(rawGames);
         var games = [];
         for(var a = 0; a < rawGames.length; a++) {
             var players = rawGames[a].users;
@@ -158,8 +154,7 @@ $(function() {
                 replayName: rawGames[a].replayName
             });
         }
-        console.log(games)
         return games;
     });
-    historyTable.init(user.username, getHistories(userID));
+    historyTable.init(user.username, getHistories(user["userID"]));
 })
