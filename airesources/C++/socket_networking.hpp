@@ -104,9 +104,11 @@ static hlt::GameMap deserializeMap(const std::string & inputString) {
 static void sendString(std::string & sendString) {
     sendString.push_back('\n');
 #ifdef _WIN32
-
+	int result = send(connection, sendString.c_str(), sendString.size(), 0);
+	assert(result != SOCKET_ERROR);
 #else
-    write(connection, sendString.c_str(), sendString.size());
+    int result = write(connection, sendString.c_str(), sendString.size());
+	assert(result >= 1); //Should be at least 1, as at least a newline should get written.
 #endif
     sendString.pop_back(); //Remove newline.
 }
@@ -116,9 +118,11 @@ static std::string getString() {
     char buffer = 0;
     while(buffer != '\n') {
 #ifdef _WIN32
-
+		int result = recv(connection, &buffer, 1, 0);
+		assert(result != SOCKET_ERROR);
 #else
-        assert(read(connection, &buffer, 1) >= 0);
+		int result = read(connection, &buffer, 1);
+        assert(result >= 0);
 #endif
         newString.push_back(buffer);
     }
@@ -131,10 +135,24 @@ static void getInit(unsigned char& playerTag, hlt::GameMap& m) {
     std::cout << "Enter the port on which to connect: ";
     std::cin >> port;
 #ifdef _WIN32
-
+	WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+	assert(iResult == 0); //Confirms that Winsock started up correctly.
+	struct addrinfo hints, * result;
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+	iResult = getaddrinfo("127.0.0.1", std::to_string(port).c_str(), &hints, &result);
+	assert(iResult == 0); //Confirms that getaddrinfo did not fail.
+	detail::connection = socket(result->ai_family, result->ai_socktype, result->ai_protocol); //Creates socket.
+	assert(detail::connection != INVALID_SOCKET); //Confirms connection is a valid socket.
+	iResult = connect(detail::connection, result->ai_addr, int(result->ai_addrlen));
+	assert(iResult != SOCKET_ERROR); //Confirms that there was a successful connection.
+	freeaddrinfo(result);
 #else
     //Connect to port
-    detail::connection = socket(AF_INET, SOCK_STREAM, 0);
+    connection = socket(AF_INET, SOCK_STREAM, 0);
     assert(detail::connection >= 0);
     struct hostent *server;
     server = gethostbyname("127.0.0.1");
@@ -146,6 +164,7 @@ static void getInit(unsigned char& playerTag, hlt::GameMap& m) {
     serverAddr.sin_port = htons(port);
     assert(connect(detail::connection, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) >= 0);
 #endif
+	std::cout << "Connected to intermediary on port #" << port << std::endl;
     playerTag = (unsigned char)std::stoi(detail::getString());
     detail::deserializeMapSize(detail::getString());
     detail::deserializeProductions(detail::getString());
