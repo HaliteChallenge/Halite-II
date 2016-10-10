@@ -25,9 +25,9 @@
                         </ul>
                     </p>
 
-                    <h3>Language Packages</h3>
+                    <h3>Starter Packages</h3>
                     <p>
-                        This set of language packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
+                        This set of starter packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
                     </p>
                     <p>
                         <ul>
