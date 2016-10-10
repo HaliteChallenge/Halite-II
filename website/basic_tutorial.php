@@ -2,6 +2,8 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
+    <title>Basic Bot Tutorial</title>
+
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
     <link href="style/learn.css" rel="stylesheet">
