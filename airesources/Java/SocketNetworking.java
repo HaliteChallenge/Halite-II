@@ -5,13 +5,15 @@ import java.util.Scanner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Networking {
+public class SocketNetworking {
     public static final int SIZE_OF_INTEGER_PREFIX = 4;
     public static final int CHAR_SIZE = 1;
+    private static BufferedReader _in;
+    private static PrintWriter _out;
     private static int _width, _height;
     private static ArrayList< ArrayList<Integer> > _productions;
 
-    static void deserializeGameMapSize(String inputString) {
+    private static void deserializeGameMapSize(String inputString) {
         String[] inputStringComponents = inputString.split(" ");
 
         _width = Integer.parseInt(inputStringComponents[0]);
@@ -19,7 +21,7 @@ public class Networking {
     }
 
 
-    static void deserializeProductions(String inputString) {
+    private static void deserializeProductions(String inputString) {
         String[] inputStringComponents = inputString.split(" ");
 
         int index = 0;
@@ -34,13 +36,13 @@ public class Networking {
         }
     }
 
-    static String serializeMoveList(ArrayList<Move> moves) {
+    private static String serializeMoveList(ArrayList<Move> moves) {
         StringBuilder builder = new StringBuilder();
         for(Move move : moves) builder.append(move.loc.x + " " + move.loc.y + " " + move.dir.ordinal() + " ");
         return builder.toString();
     }
 
-    static GameMap deserializeGameMap(String inputString) {
+    private static GameMap deserializeGameMap(String inputString) {
         String[] inputStringComponents = inputString.split(" ");
 
         GameMap map = new GameMap(_width, _height);
@@ -75,33 +77,27 @@ public class Networking {
         return map;
     }
 
-    static void sendString(String sendString) {
-        System.out.print(sendString+'\n');
-        System.out.flush();
+    private static void sendString(String sendString) throws java.io.IOException {
+        _out.println(sendString);
+        _out.flush();
     }
 
-    static String getString() {
-        try {
-            StringBuilder builder = new StringBuilder();
-            int buffer;
-            while ((buffer = System.in.read()) >= 0) {
-                if (buffer == '\n') {
-                    break;
-                } else {
-                    builder = builder.append((char)buffer);
-                }
-            }
-	    if(builder.charAt(builder.length()-1) == '\r') builder.setLength(builder.length()-1); //Removes a carriage return if on windows for manual testing.
-            return builder.toString();
-        } catch(Exception e) {
-            System.exit(1);
-            return null; // the java compiler is stupid
-        }
+    private static String getString() throws java.io.IOException {
+        return _in.readLine();
     }
 
-    static InitPackage getInit() {
+    public static InitPackage getInit() throws java.io.IOException {
+        //Set up connection
+        System.out.print("Enter the port on which to connect: ");
+        Scanner in = new Scanner(System.in);
+        int port = in.nextInt();
+        Socket connection = new Socket("127.0.0.1", port);
+        System.out.println("Connected to intermediary on port #" + port);
+        _in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        _out = new PrintWriter(connection.getOutputStream(), false);
+
         InitPackage initPackage = new InitPackage();
-        initPackage.myID = (int)Integer.parseInt(getString());
+        initPackage.myID = (int)Long.parseLong(getString());
         deserializeGameMapSize(getString());
         deserializeProductions(getString());
         initPackage.map = deserializeGameMap(getString());
@@ -109,15 +105,15 @@ public class Networking {
         return initPackage;
     }
 
-    static void sendInit(String name) {
+    public static void sendInit(String name) throws java.io.IOException {
         sendString(name);
     }
 
-    static GameMap getFrame() {
+    public static GameMap getFrame() throws java.io.IOException {
         return deserializeGameMap(getString());
     }
 
-    static void sendFrame(ArrayList<Move> moves) {
+    public static void sendFrame(ArrayList<Move> moves) throws java.io.IOException {
         sendString(serializeMoveList(moves));
     }
 
