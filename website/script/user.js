@@ -115,9 +115,9 @@ $(function() {
     }
 
     var userIDGET = getGET("userID");
-    var isSession = userIDGET == null || userIDGET == undefined;
+    var isSession = (userIDGET == null || userIDGET == undefined);
 
-    var user = isSession ? getSession() : getUser(userIDGET);
+    var user = isSession ? getUser(getSession()['userID']) : getUser(userIDGET);
     user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
     user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
