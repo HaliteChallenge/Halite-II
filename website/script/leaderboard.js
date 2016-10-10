@@ -9,7 +9,12 @@ $(function() {
     // Where are we in the rankings?
     var userID = getGET("userID");
     var page = getGET("page");
-    if((page == undefined || page == null) && (userID != undefined && userID != null)) page = Math.floor((parseInt(getUser(userID)["rank"]) - 1) / USERS_PER_PAGE);
+    if(page == null) {
+        if (userID != null) page = Math.floor((parseInt(getUser(userID)["rank"]) - 1) / USERS_PER_PAGE);
+        else page = 0;
+    } else {
+        page = parseInt(page);
+    }
 
     // Create leaderboard filters from get params
     var $heading = $("#leaderHeading");
@@ -39,9 +44,9 @@ $(function() {
     var baseURL = location.pathname.substring(location.pathname.lastIndexOf("/") + 1)+"?";
     if(field != null) baseURL += "field="+field;
     if(value != null) baseURL += "&value="+value;
-    if(heading != null) baseURL += +"&heading="+heading;
+    if(heading != null) baseURL += "&heading="+heading;
 
-    if(page != null && page != undefined && page != 0) {
+    if(page != 0) {
         $previous = $("<a/>");
         $previous.attr("href", baseURL+"&page="+(page-1));
     } else {
