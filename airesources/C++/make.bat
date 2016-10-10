@@ -1,0 +1,1 @@
+cd C:\Programming\Halite\airesources\C++ & g++ -std=c++11 MyBot.cpp -o MyBot.exe -lws2_32
