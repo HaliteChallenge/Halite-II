@@ -87,6 +87,8 @@
 			</ul>
 		</li>
 	</ul>
+    <hr>
+    <p class="text-muted" style="line-height: 1.5em; font-size: 13px;">This documentation is <a href="https://github.com/HaliteChallenge/Halite">open source</a>. Contribute to it by sending a pull request.</p>
 </nav>
 
 <script>
