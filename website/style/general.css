@@ -10,11 +10,6 @@ body {
     padding: 0.9em 0.9em;
 }
 
-#navvy {
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-}
-
 #jHeader {
     font-size: 50px;
 }
