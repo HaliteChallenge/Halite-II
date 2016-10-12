@@ -12,7 +12,7 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-        	<?php include 'includes/learn_sidebar.php'; ?>
+            <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
                 <h1>Contest Rules</h1>
 

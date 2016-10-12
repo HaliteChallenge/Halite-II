@@ -22,10 +22,10 @@
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>
 
-					<hr>
+                    <hr>
 
-					<div id="footer">
-					</div>
+                    <div id="footer">
+                    </div>
                 </div>
             </div>
         </div>
