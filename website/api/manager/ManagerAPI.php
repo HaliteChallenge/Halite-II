@@ -168,19 +168,21 @@ class ManagerAPI extends API{
             $s3Client = $this->loadAwsSdk()->createS3();
             foreach($_FILES as $fileKey => $file) {
                 $pathParts = pathinfo($file['name']);
-                $bucket = NULL;
-                if(strcmp('hlt', $pathParts['extension']) == 0) {
-                    $replayName = $pathParts['basename'];
-                    $bucket = REPLAY_BUCKET;
-                } else {
-                    $bucket = ERROR_LOG_BUCKET;
-                }
-
-                $s3Client->putObject([
-                    'Bucket' => $bucket,
+                $args = [
                     'Key'    => $pathParts['basename'],
                     'Body'   => file_get_contents($file['tmp_name']) 
-                ]);
+                ];
+
+                if(strcmp('hlt', $pathParts['extension']) == 0) {
+                    $replayName = $pathParts['basename'];
+                    $args["Bucket"] = REPLAY_BUCKET;
+                    $args["ContentEncoding"] = "gzip";
+                } else {
+                    $args["Bucket"] = ERROR_LOG_BUCKET;
+                }
+
+
+                $s3Client->putObject($args);
             }
 
 
