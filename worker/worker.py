@@ -158,17 +158,18 @@ def executeGameTask(width, height, users, backend):
     downloadUsers(users)
     users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
 
-    replayArchivePath = replayPath+".gz"
+    replayArchivePath = "ar"+replayPath
     fIn = open(replayPath, 'rb')
     fOut = gzip.open(replayArchivePath, 'wb')
     shutil.copyfileobj(fIn, fOut)
 
-    backend.gameResult(width, height, users, replayPath, errorPaths)
+    backend.gameResult(width, height, users, replayArchivePath, errorPaths)
     filelist = glob.glob("*.log")
     for f in filelist:
         os.remove(f)
 
     os.remove(replayPath)
+    os.remove(replayArchivePath)
 
 if __name__ == "__main__":
     print("Starting up worker...")
