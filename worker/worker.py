@@ -162,6 +162,8 @@ def executeGameTask(width, height, users, backend):
     fIn = open(replayPath, 'rb')
     fOut = gzip.open(replayArchivePath, 'wb')
     shutil.copyfileobj(fIn, fOut)
+    fIn.close()
+    fOut.close()
 
     backend.gameResult(width, height, users, replayArchivePath, errorPaths)
     filelist = glob.glob("*.log")
