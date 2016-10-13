@@ -1,3 +1,6 @@
+import archive
+import backend
+
 import random
 
 import os
@@ -10,9 +13,6 @@ import tempfile
 
 from time import sleep
 
-import archive
-import backend
-
 from compiler import *
 
 import smtplib
@@ -23,6 +23,9 @@ import configparser
 import copy
 
 import traceback
+
+import shutil
+import gzip
 
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
@@ -155,12 +158,20 @@ def executeGameTask(width, height, users, backend):
     downloadUsers(users)
     users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
 
-    backend.gameResult(width, height, users, replayPath, errorPaths)
+    replayArchivePath = "ar"+replayPath
+    fIn = open(replayPath, 'rb')
+    fOut = gzip.open(replayArchivePath, 'wb')
+    shutil.copyfileobj(fIn, fOut)
+    fIn.close()
+    fOut.close()
+
+    backend.gameResult(width, height, users, replayArchivePath, errorPaths)
     filelist = glob.glob("*.log")
     for f in filelist:
         os.remove(f)
 
     os.remove(replayPath)
+    os.remove(replayArchivePath)
 
 if __name__ == "__main__":
     print("Starting up worker...")
