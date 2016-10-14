@@ -75,7 +75,7 @@ abstract class API{
             'region'   => 'us-east-1',
             'version'  => 'latest'
         ]);
-		return $sdk;
+        return $sdk;
     }
 
     protected function initDB() {

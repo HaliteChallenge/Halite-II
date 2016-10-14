@@ -8,6 +8,6 @@
             <th>Points</th>
         </tr>
     </thead>
-	<tbody id="leaderTableBody">
-	</tbody>
+    <tbody id="leaderTableBody">
+    </tbody>
 </table>

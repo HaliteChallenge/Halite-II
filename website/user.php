@@ -13,11 +13,11 @@
         <div class="row">
             <div class="col-md-5">
                 <div class="panel panel-primary">
-					<div class="panel-body text-center">
-						<h1 id="name" style=""></h1>
-						<h4 id="primary-info" style=""></h4>
-						<div id="secondary-info" style="color: gray;"></div>
-					</div>
+                    <div class="panel-body text-center">
+                        <h1 id="name" style=""></h1>
+                        <h4 id="primary-info" style=""></h4>
+                        <div id="secondary-info" style="color: gray;"></div>
+                    </div>
                 </div>
                 <div id="historyPanel" class="panel panel-primary">
                     <div class="panel-heading">

@@ -25,9 +25,9 @@
                         </ul>
                     </p>
 
-                    <h3>Language Packages</h3>
+                    <h3>Starter Packages</h3>
                     <p>
-                        This set of language packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
+                        This set of starter packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
                     </p>
                     <p>
                         <ul>
@@ -36,18 +36,6 @@
                             <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
                             <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
                             <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
-                        </ul>
-                    </p>
-
-                    <h3>Desktop Visualizer [DISCONTINUED]</h3>
-                    <p>
-                        This is the legacy desktop visualizer. We recommend using the <a href="game.php">web visualizer</a>, but until an alternative desktop visualizer is available we will continue to offer this for download. These binaries are no longer supported and are unlikely to be updated.
-                    </p>
-                    <p>
-                        <ul>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Mac.zip">Mac</a></li>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Debian.zip">Ubuntu (64 bit)</a></li>
-                            <li><a href="downloads/visualizer/HaliteDesktopVis-Windows.zip">Windows</a></li>
                         </ul>
                     </p>
                 </div>

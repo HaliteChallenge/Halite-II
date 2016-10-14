@@ -353,6 +353,7 @@ downloads/
 starterpackages/
 
 *.pem
+*.ppk
 
 *.hlt
 !interestingGame.hlt

@@ -22,11 +22,9 @@ See the markdown files in [the admin folder](/admin/md) for more information.
 
 ## Contributing
 
-If you find a bug or a feature request, please open an issue. We are happy to help you out.
+If you find a bug or have a feature request, please [open an issue](https://github.com/HaliteChallenge/Halite/issues/new).
 
-For a technical overview of the project, check out our [spec](/admin/md/SPEC.md).
-
-Send us a pull request! If you are looking for things to do, check out our [Trello](https://trello.com/b/z8jUXTA0/halite) or [our open issues](https://github.com/HaliteChallenge/Halite/issues). We will be happy to add you as a contributor and credit you in the README.
+Want to help out? Have you implemented a patch or a new feature? Send us a pull request! If you are looking for things to do, check out [our open issues](https://github.com/HaliteChallenge/Halite/issues) or [our project board](https://github.com/HaliteChallenge/Halite/projects/1).
 
 ### Authors
 

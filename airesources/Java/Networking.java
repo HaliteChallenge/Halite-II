@@ -91,6 +91,7 @@ public class Networking {
                     builder = builder.append((char)buffer);
                 }
             }
+	    if(builder.charAt(builder.length()-1) == '\r') builder.setLength(builder.length()-1); //Removes a carriage return if on windows for manual testing.
             return builder.toString();
         } catch(Exception e) {
             System.exit(1);
@@ -100,7 +101,7 @@ public class Networking {
 
     static InitPackage getInit() {
         InitPackage initPackage = new InitPackage();
-        initPackage.myID = (int)Long.parseLong(getString());
+        initPackage.myID = (int)Integer.parseInt(getString());
         deserializeGameMapSize(getString());
         deserializeProductions(getString());
         initPackage.map = deserializeGameMap(getString());
