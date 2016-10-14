@@ -67,8 +67,11 @@
 		<li class="">
 			<span>Rules</span>
 			<ul class="nav nav-stacked">
+				<li id="game_guide">
+					<a href="game_guide.php">Game Guide</a>
+				</li>
 				<li id="game_spec">
-					<a href="game_spec.php">Game</a>
+					<a href="game_spec.php">Game Specification</a>
 				</li>
 				<li id="contest_spec">
 					<a href="contest_spec.php">Contest</a>

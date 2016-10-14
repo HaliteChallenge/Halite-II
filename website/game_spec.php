@@ -14,13 +14,13 @@
         <div class="row">
         	<?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Game Rules</h1>
+                <h1>Game Specification</h1>
 
                 <h3>Overview</h3>
 
-                <p>Halite is a multi-player turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire map, in competition with every other player in the game. Players use their territory to gain strength, and their strength to gain territory; they must move intelligently on both the micro and macro scales to play effectively.</p>
+                <p>This guide gives a detailed description of how the precise rules of the Halite game work. It is highly recommended that you have already read the <a href="http://halite.io/website/game_guide.php">game guide</a> before reading this document.</p>
 
-                <h3>Game Description</h3>
+                <h3>The Game</h3>
 
                 <p>During a move, every piece you control can be given one of five moves: to move NORTH, EAST, SOUTH, WEST, or to remain STILL. When a piece move STILL for a turn, it will permanently increase its Strength by the Production of the tile it sits on.</p>
 
@@ -61,7 +61,7 @@
                         <li>Kill bots whose responses take longer than their remaining allotted time.</li>
                         <li>Add strength to pieces which choose to remain where they are.</li>
                         <li>Simultaneously move (and combine if necessary) all player's pieces. The capping of strengths to 255 occurs here.</li>
-                        <li>Simultaneously damage (and remove if damage exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
+                        <li>Simultaneously damage (and remove if damage equals or exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
                         <li>Check if endgame conditions have been met.</li>
                     </ol>
                     One should note that because all pieces damage all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.
