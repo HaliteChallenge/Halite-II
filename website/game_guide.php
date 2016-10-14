@@ -20,7 +20,7 @@
 
                 <p>Halite is a multiplayer turn-based strategy game designed to have simple rules which are easy to learn but yield complex behaviors. This guide will give a description of the Halite game as well as some basic strategies useful for playing the game.</p>
 
-                <p>
+                <p></p>
 
                 <h3>Strategy Guide</h3>
 
