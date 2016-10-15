@@ -91,10 +91,13 @@
         </li>
     </ul>
     <hr>
-    <p class="text-muted" style="line-height: 1.5em; font-size: 13px;">This documentation is <a href="https://github.com/HaliteChallenge/Halite">open source</a>. Contribute to it by sending a pull request.</p>
+    <p class="text-muted" style="line-height: 1.5em; font-size: 13px;">You can <a id="githubLink" href="">edit this content on GitHub</a> and send us a pull request!</p>
 </nav>
 
 <script>
-    var name = location.pathname.substring(location.pathname.lastIndexOf("/") + 1).split(".")[0];
+    var fileName = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
+    document.getElementById("githubLink").href = "https://github.com/HaliteChallenge/Halite/blob/master/website/"+fileName;
+
+    var name = fileName.split(".")[0];
     document.getElementById(name).className = "active";
 </script>
