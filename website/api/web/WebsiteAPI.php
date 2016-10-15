@@ -16,7 +16,6 @@ error_reporting(E_ALL);
 date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
-include dirname(__FILE__).'/../../lib/swiftmailer/lib/swift_required.php';
 
 define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
