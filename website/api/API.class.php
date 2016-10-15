@@ -1,9 +1,6 @@
 <?php
 
 use Aws\Sdk;
-use Swift_SmtpTransport;
-use Swift_Mailer;
-use Swift_Message;
 
 require __DIR__ . '/../vendor/autoload.php';
 
