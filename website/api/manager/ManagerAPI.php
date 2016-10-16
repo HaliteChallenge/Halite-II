@@ -158,6 +158,7 @@ class ManagerAPI extends API{
             $mapHeight = $_POST['mapHeight'];
             $users = json_decode($_POST['users']);
 
+            // Throw out the game if it is using an old version of a person's bot
             foreach($users as $user) {
                 $storedUser = $this->select("SELECT numSubmissions FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
                 if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
@@ -229,8 +230,18 @@ class ManagerAPI extends API{
                     $this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
                 }
             }
+            
+            // Email user if its their third game 
+            // Increment their number of games
+            foreach($users as $user) {
+                $storedUser = $this->select("SELECT numGames,email FROM User WHERE userID=".$user->userID);
+                if(intval($storedUser['numGames']) == 2) {
+                    $this->sendEmail($email, "Leaderboard Update", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='https://halite.io/website/user.php?userID={$user->userID}'></a>");
+                } 
+                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$user->$userID);
+            }
 
-            // Update mu and sigma
+            // Update mu and sigma for the players
             usort($users, function($a, $b) {
                 return $a->rank > $b->rank;
             });
@@ -243,10 +254,10 @@ class ManagerAPI extends API{
             var_dump($lines);
             for($a = 0; $a < count($users); $a++) {
                 $components = explode(' ', $lines[$a]);
-                $this->insert("UPDATE User SET numGames=numGames+1, mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
+                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
             }
 
-            // Update overall rank
+            // Update overall rank of everyone
             $allUsers = $this->selectMultiple("SELECT * FROM User where isRunning=1");
             usort($allUsers, function($a, $b) {
                 return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
