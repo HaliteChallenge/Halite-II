@@ -7,6 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
 define("REPLAY_BUCKET", "halitereplaybucket");
 define("ERROR_LOG_BUCKET", "haliteerrorlogbucket");
+define("WEB_DOMAIN", "https://halite.io/website/");
 
 abstract class API{
     /**

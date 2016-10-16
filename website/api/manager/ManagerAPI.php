@@ -132,7 +132,7 @@ class ManagerAPI extends API{
             $user = $this->select("SELECT * FROM User WHERE userID={$userID}")['email'];
 
             if($didCompile == 1) { // Did succeed
-                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: http://halite.io/website/user.php?userID={$userID}");
+                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: {$WEB_DOMAIN}user.php?userID={$userID}");
 
                 $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
                 
@@ -231,14 +231,28 @@ class ManagerAPI extends API{
                 }
             }
             
-            // Email user if its their third game 
-            // Increment their number of games
+            // Increment number of games
+            foreach($users as $user) $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$user->$userID); 
+
+            // Send first game email and first timeout email
             foreach($users as $user) {
                 $storedUser = $this->select("SELECT numGames,email FROM User WHERE userID=".$user->userID);
-                if(intval($storedUser['numGames']) == 2) {
-                    $this->sendEmail($email, "Leaderboard Update", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='https://halite.io/website/user.php?userID={$user->userID}'></a>");
+                if(intval($storedUser['numGames']) == 3) {
+                    $this->sendEmail($email, "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='{$WEB_DOMAIN}user.php?userID={$user->userID}'></a>");
                 } 
-                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$user->$userID);
+
+                if($user->didTimeout && mysqli_query("SELECT * from GameUser WHERE didTimeout = 1 and userID={$user->userID}")->num_rows == 1) {
+                    $errorLogContents = NULL;
+                    foreach($_FILES as $file) {
+                        if($file['name'] == $user->errorLogName) {
+                            $errorLogContents = file_get_contents($file['tmp_name']);
+                            break;
+                        }
+                    }
+                    if($errorLogContents == NULL) continue;
+
+                    $this->sendEmail($email, "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='{$WEB_DOMAIN}game.php?replayName={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='{$WEB_DOMAIN}user.php?userID={$user->userID}'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
+                }
             }
 
             // Update mu and sigma for the players
