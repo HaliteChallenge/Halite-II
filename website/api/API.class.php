@@ -84,10 +84,11 @@ abstract class API{
             ->setUsername($this->config['email']['email'])
             ->setPassword($this->config['email']['password']);
         $mailer = Swift_Mailer::newInstance($transporter); 
-        $message = Swift_Message::newInstance('Wonderful Subject')
+        $message = Swift_Message::newInstance($subject)
             ->setFrom(array($this->config['email']['email'] => 'Halite'))
             ->setTo(array($to))
-            ->setBody($message);
+            ->setBody($message)
+            ->setContentType("text/html");
 
         $mailer->send($message);
     }
