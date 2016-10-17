@@ -155,9 +155,10 @@ class ManagerAPI extends API{
             $mapWidth = $_POST['mapWidth'];
             $mapHeight = $_POST['mapHeight'];
             $users = json_decode($_POST['users']);
+            $storedUsers = array();
 
             foreach($users as $user) {
-                $storedUser = $this->select("SELECT numSubmissions FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
+                array_push($storedUsers, $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID)));
                 if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
                     return null;
                 }
@@ -208,7 +209,7 @@ class ManagerAPI extends API{
             for($a = 0; $a < count($users); $a++) {
                 $timeoutInt = $users[$a]->didTimeout ? 1 : 0;
                 $errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]->errorLogName)."'";
-                $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", {$timeoutInt})");
+                $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout, versionNumber) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", {$timeoutInt}, {$storedUsers[$a]['numSubmissions']})");
 
                 // Cache didTimeout
                 // Note: this is written to be agnostic of the number of stats in each row of $gameStats, just in case we want to add more stats

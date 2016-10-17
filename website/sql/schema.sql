@@ -45,6 +45,7 @@ DROP TABLE IF EXISTS `GameUser`;
 CREATE TABLE `GameUser` (
   `gameID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL,
+  `versionNumber` mediumint(8) unsigned NOT NULL,
   `errorLogName` varchar(64) DEFAULT NULL,
   `rank` smallint(5) unsigned NOT NULL,
   `playerIndex` smallint(5) unsigned NOT NULL,
