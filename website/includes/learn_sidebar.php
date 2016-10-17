@@ -52,11 +52,11 @@
                 <li id="basics_quickstart">
                     <a href="basics_quickstart.php">Getting Started</a>
                 </li>
+                <li id="basics_intro_halite">
+                    <a href="basics_intro_halite.php">Introducing Halite</a>
+                </li>
                 <li id="basics_improve_random">
                     <a href="basics_improve_random.php">Improving the Random Bot</a>
-                </li>
-                <li id="basics_submit_leaderboard">
-                    <a href="basics_submit_leaderboard.php">Submitting to the Leaderboard</a>
                 </li>
             </ul>
         </li>
@@ -96,6 +96,9 @@
                 </li>
                 <li id="advanced_replay_file">
                     <a href="advanced_replay_file.php">Replay File Reference</a>
+                </li>
+                <li id="advanced_game_server">
+                    <a href="advanced_game_server.php">Game Server Reference</a>
                 </li>
                 <li id="advanced_writing_sp">
                     <a href="advanced_writing_sp.php">Writing Your Own Starter Package</a>
