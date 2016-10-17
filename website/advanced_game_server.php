@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Build Environment</title>
+    <title>Game Server Reference</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -15,7 +15,7 @@
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
 
-                <h1>Build Environment Specification</h1>
+                <h1>Game Server Reference</h1>
 
                 <h3>Hardware</h3>
                 <p>All compilation and game execution is done on Ubuntu 14.04 servers hosted by Digital Ocean with the following specs:

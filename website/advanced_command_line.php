@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Tools Spec</title>
+    <title>Environment Command Reference</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -14,7 +14,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Environment Reference</h1>
+                <h1>Environment Command Reference</h1>
 
                 <p>
                     The environment may be passed a number of flags, including:
