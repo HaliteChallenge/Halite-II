@@ -129,7 +129,7 @@ class ManagerAPI extends API{
             $userID = $_POST['userID'];
             $didCompile = $_POST['didCompile'];
             $language = isset($_POST['language']) ? $_POST['language'] : "Other";
-            $user = $this->select("SELECT * FROM User WHERE userID={$userID}")['email'];
+            $user = $this->select("SELECT * FROM User WHERE userID={$userID}");
 
             if($didCompile == 1) { // Did succeed
                 $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php?userID={$userID}");
