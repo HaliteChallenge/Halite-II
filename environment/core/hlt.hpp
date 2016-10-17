@@ -271,7 +271,7 @@ namespace hlt{
             }
 
             //Finally, fill in the contents vector.
-            const int TOP_PROD = prg() % 9 + 7, TOP_STR = prg() % 106 + 150;
+            const int TOP_PROD = prg() % 10 + 6, TOP_STR = prg() % 106 + 150;
             contents = std::vector< std::vector<Site> >(map_height, std::vector<Site>(map_width));
             for(int a = 0; a < map_height; a++) for(int b = 0; b < map_width; b++) {
                 contents[a][b].owner = normalized[a][b].owner;

@@ -186,8 +186,9 @@ class WebsiteAPI extends API{
             $limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
             $startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
             $userID = $_GET['userID'];
+            $versionNumber = isset($_GET['versionNumber']) ? $_GET['versionNumber'] : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
-            $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
+            $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and versionNumber = $versionNumber and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
             $gameArrays = array();
 
             // Get each game's info
@@ -241,12 +242,6 @@ class WebsiteAPI extends API{
                 }
             }
 
-            $oldGameUsers = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID={$user['userID']}");
-            foreach($oldGameUsers as $oldGameUser) {
-                $this->insert("DELETE FROM Game WHERE gameID={$oldGameUser['gameID']}");
-                $this->insert("DELETE FROM GameUser WHERE gameID={$oldGameUser['gameID']}");
-            }
-            
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
             $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");

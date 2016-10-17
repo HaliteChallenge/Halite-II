@@ -24,6 +24,10 @@
                             <li><a href="downloads/environment/HaliteEnvironment-Windows.exe">Windows</a></li>
                         </ul>
                     </p>
+                    <h4>Building from Source</h4>
+                    <p>
+                        Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>. If you are on Unix, run <code>make</code> inside the environment directory from the command line. If you are on Windows, run the "make.bat" file. The file named "environment" or "environment.exe" is your new environment binary.
+                    </p>
 
                     <h3>Starter Packages</h3>
                     <p>
