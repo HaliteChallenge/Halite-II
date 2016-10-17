@@ -158,7 +158,8 @@ class ManagerAPI extends API{
             $storedUsers = array();
 
             foreach($users as $user) {
-                array_push($storedUsers, $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID)));
+                $storedUser = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
+                array_push($storedUsers, $storedUser);
                 if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
                     return null;
                 }
