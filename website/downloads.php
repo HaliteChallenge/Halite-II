@@ -26,7 +26,7 @@
                     </p>
                     <h4>Building from Source</h4>
                     <p>
-                        Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a> and run <code>make</code> from the command line. Your environment binary is a newly-created file called "envrionment".
+                        Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>. If you are on Unix, run <code>make</code> inside the environment directory from the command line. If you are on Windows, run the "make.bat" file. The file named "environment" or "environment.exe" is your new environment binary.
                     </p>
 
                     <h3>Starter Packages</h3>

@@ -1,3 +1,4 @@
-zip -r HaliteEnvironment-Source ../environment/
-mkdir downloads/environment
-mv HaliteEnvironment-Source.zip downloads/environment/
+cd ../
+zip -r HaliteEnvironment-Source environment/
+mkdir website/downloads/environment
+mv HaliteEnvironment-Source.zip website/downloads/environment/
