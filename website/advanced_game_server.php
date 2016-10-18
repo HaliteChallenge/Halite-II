@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Build Environment</title>
+    <title>Game Server Reference</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -12,9 +12,10 @@
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
-            <div class="col-sm-12">
+            <?php include 'includes/learn_sidebar.php'; ?>
+            <div class="col-sm-9">
 
-                <h1>Build Environment Specification</h1>
+                <h1>Game Server Reference</h1>
 
                 <h3>Hardware</h3>
                 <p>All compilation and game execution is done on Ubuntu 14.04 servers hosted by Digital Ocean with the following specs:
@@ -93,17 +94,6 @@
             </div>
         </div>
     </div>
-
-    <footer class="footer pageContent">
-        <div class="container">
-            <div id="footer">
-                <ul class="pager">
-                    <li class="previous"><a href="io_spec.php"><span aria-hidden="true">&larr;</span> IO Spec</a></li>
-                    <li class="next"><a href="contest_spec.php">Contest Spec <span aria-hidden="true">&rarr;</span> </a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

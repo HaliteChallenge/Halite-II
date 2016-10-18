@@ -2,7 +2,8 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Game Spec</title>
+
+   <title>Game Rules</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -14,7 +15,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Game Specification</h1>
+                <h1>Game Rules</h1>
 
                 <h3>Overview</h3>
 
