@@ -15,6 +15,11 @@
                 <h1><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h1>
             </div>
         </div>
+        <div class="row" id="noBotMessage" style="display: none;">
+            <div class="col-md-12">
+                <h1>You don't have a bot on the leaderboard!</h1>
+            </div>
+        </div>
         <div class="row" id="normalBody">
             <div class="col-md-5">
                 <div class="panel panel-primary">
