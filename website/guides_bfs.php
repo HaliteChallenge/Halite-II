@@ -46,7 +46,7 @@ GameMap gameMap = iPackage.map;
 Networking.sendInit("BfsBot");
 
 while(true) {
-    ArrayList&lt;Move&rt; moves = new ArrayList&lt;Move&rt;();
+    ArrayList&lt;Move&gt; moves = new ArrayList&lt;Move&gt;();
     gameMap = Networking.getFrame();
     ...</pre>
                 </p>
@@ -54,9 +54,9 @@ while(true) {
                 <p>Next we'll add the structures we'll need for our breadth-first search.</p>
                 <p>
                     This is our map of which squares we've visited. Whenever we add another location to the queue, we'll mark it as visited here so we don't add squares multiple times.
-                <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Boolean&rt; &rt; visited = new ArrayList&lt; ArrayList&lt;Boolean&rt; &rt;();
+                <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Boolean&gt; &gt; visited = new ArrayList&lt; ArrayList&lt;Boolean&gt; &gt;();
 for(int y = 0; y &lt; gameMap.height; y++) {
-    ArrayList&lt;Boolean&rt; vRow = new ArrayList&lt;Boolean&rt;();
+    ArrayList&lt;Boolean&gt; vRow = new ArrayList&lt;Boolean&gt;();
     for(int x = 0; x &lt; gameMap.width; x++) {
         vRow.add(false);
     }
@@ -66,9 +66,9 @@ for(int y = 0; y &lt; gameMap.height; y++) {
 
                 <p>
                     Here we initialize our map of directions. Whenever we add a location to the queue, we'll set the direction here to be the one that points towards the location we popped off of the queue that it was adjacent to.
-                    <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Direction&rt; &rt; directions = new ArrayList&lt;ArrayList&lt;Direction&rt; &rt;();
+                    <pre class="prettyprint">ArrayList&lt; ArrayList&lt;Direction&gt; &gt; directions = new ArrayList&lt;ArrayList&lt;Direction&gt; &gt;();
 for(int y = 0; y &lt; gameMap.height; y++) {
-    ArrayList&lt;Direction&rt; dRow = new ArrayList&lt;Direction&rt;();
+    ArrayList&lt;Direction&gt; dRow = new ArrayList&lt;Direction&gt;();
     for(int x = 0; x &lt; gameMap.width; x++) {
         dRow.add(Direction.STILL);
     }
@@ -79,7 +79,7 @@ for(int y = 0; y &lt; gameMap.height; y++) {
                 <p>
                     Now we can add the queue for our search! We'll initialize it with the locations that we don't own, as it's those that we're trying to reach.
             <pre class="prettyprint">// LinkedList just happens to be a structure which implements queue; there are others that would work as well.
-LinkedList&lt;Location&rt; toVisit = new LinkedList&lt;Location&rt;();
+LinkedList&lt;Location&gt; toVisit = new LinkedList&lt;Location&gt;();
 for(int y = 0; y &lt; gameMap.height; y++) {
     for(int x = 0; x &lt; gameMap.width; x++) {
         Location l = new Location(x, y);
@@ -123,7 +123,7 @@ for(int y = 0; y &lt; gameMap.height; y++) {
     for(int x = 0; x &lt; gameMap.width; x++) {
         Site site = gameMap.getSite(new Location(x, y));
         if(site.owner == myID) {
-            if(site.strength &rt; 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
+            if(site.strength &gt; 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
             else moves.add(new Move(new Location(x, y), Direction.STILL));
         }
     }
