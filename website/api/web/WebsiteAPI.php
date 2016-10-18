@@ -244,7 +244,7 @@ class WebsiteAPI extends API{
 
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
-            $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
+            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
 
             return "Success";
         }
