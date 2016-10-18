@@ -131,7 +131,7 @@ class ManagerAPI extends API{
             $user = $this->select("SELECT * FROM User WHERE userID={$userID}");
 
             if($didCompile == 1) { // Did succeed
-                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php?userID={$userID}");
+                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php");
 
                 $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
                 
@@ -240,7 +240,7 @@ class ManagerAPI extends API{
                 $storedUser = $this->select("SELECT numSubmissions,numGames,email FROM User WHERE userID=".$user->userID);
                 var_dump($storedUser);
                 if(intval($storedUser['numGames']) == 3) {
-                    $this->sendEmail($storedUser['email'], "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'></a>");
+                    $this->sendEmail($storedUser['email'], "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php'></a>");
                 } 
 
                 if($user->didTimeout && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$storedUser['numSubmissions']} and userID={$user->userID}")->num_rows == 1) {
@@ -253,7 +253,7 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $this->sendEmail($storedUser['email'], "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
+                    $this->sendEmail($storedUser['email'], "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
                 }
             }
 
