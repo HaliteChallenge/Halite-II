@@ -71,7 +71,7 @@ def storeBotRemotely(userID, zipFilePath):
 
     while iterations < 100:
         r = requests.post(MANAGER_URL+"botFile", data={"apiKey": API_KEY, "userID": str(userID)}, files={"bot.zip": zipContents})
-        print("Posting compile result")
+        print("Posting compiled bot archive")
         print(r.text)
 
         # Try again if local and remote hashes differ
@@ -83,9 +83,9 @@ def storeBotRemotely(userID, zipFilePath):
         return
     raise ValueError
 
-def compileResult(userID, didCompile, language):
+def compileResult(userID, didCompile, language, errors=None):
     """Posts the result of a compilation task"""
-    r = requests.post(MANAGER_URL+"compile", data={"apiKey": API_KEY, "userID": userID, "didCompile": int(didCompile), "language": language})
+    r = requests.post(MANAGER_URL+"compile", data={"apiKey": API_KEY, "userID": userID, "didCompile": int(didCompile), "language": language, "errors": errors})
     print("Posting compile result")
     print(r.text)
 

@@ -4,7 +4,7 @@ include_once "../website/api/web/WebsiteAPI.php";
 include_once "APITest.php";
 
 define("USER_TABLE", "User");
-const TEST_USER = array("userID" => "124", "username" => "testUsername");
+const TEST_USER = array("userID" => "124", "username" => "testUsername", "email" => "halite@halite.io");
 
 class UserTest extends APITest {
     public function testGetUser() {

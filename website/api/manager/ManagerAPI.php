@@ -2,7 +2,6 @@
 
 use Aws\Sdk;
 require __DIR__ . '/../../vendor/autoload.php';
-
 require_once '../API.class.php';
 
 define("COMPILE_PATH", "../../../storage/compile/");
@@ -128,10 +127,11 @@ class ManagerAPI extends API{
 
             $userID = $_POST['userID'];
             $didCompile = $_POST['didCompile'];
+            $language = isset($_POST['language']) ? $_POST['language'] : "Other";
+            $user = $this->select("SELECT * FROM User WHERE userID={$userID}");
 
             if($didCompile == 1) { // Did succeed
-                $language = isset($_POST['language']) ? $_POST['language'] : "Other";
-                $user = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($userID));
+                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php");
 
                 $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
                 
@@ -139,6 +139,7 @@ class ManagerAPI extends API{
 
                 $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
             } else { // Didnt succeed
+                $this->sendEmail($user['email'], "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['output']}</code></pre>");
                 $this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
             }
         }
@@ -157,6 +158,7 @@ class ManagerAPI extends API{
             $users = json_decode($_POST['users']);
             $storedUsers = array();
 
+            // Throw out the game if it is using an old version of a person's bot
             foreach($users as $user) {
                 $storedUser = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
                 array_push($storedUsers, $storedUser);
@@ -228,9 +230,34 @@ class ManagerAPI extends API{
                     $averageStatValue = $totalStatValue / count($gameStats);
                     $this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
                 }
+                // Increment number of games
+                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]->userID); 
+            }
+            
+
+            // Send first game email and first timeout email
+            foreach($users as $user) {
+                $storedUser = $this->select("SELECT numSubmissions,numGames,email FROM User WHERE userID=".$user->userID);
+                var_dump($storedUser);
+                if(intval($storedUser['numGames']) == 3) {
+                    $this->sendEmail($storedUser['email'], "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php'></a>");
+                } 
+
+                if($user->didTimeout && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$storedUser['numSubmissions']} and userID={$user->userID}")->num_rows == 1) {
+                    $errorLogContents = NULL;
+                    foreach($_FILES as $file) {
+                        if($file['name'] == $user->errorLogName) {
+                            $errorLogContents = file_get_contents($file['tmp_name']);
+                            break;
+                        }
+                    }
+                    if($errorLogContents == NULL) continue;
+
+                    $this->sendEmail($storedUser['email'], "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
+                }
             }
 
-            // Update mu and sigma
+            // Update mu and sigma for the players
             usort($users, function($a, $b) {
                 return $a->rank > $b->rank;
             });
@@ -243,10 +270,10 @@ class ManagerAPI extends API{
             var_dump($lines);
             for($a = 0; $a < count($users); $a++) {
                 $components = explode(' ', $lines[$a]);
-                $this->insert("UPDATE User SET numGames=numGames+1, mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
+                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
             }
 
-            // Update overall rank
+            // Update overall rank of everyone
             $allUsers = $this->selectMultiple("SELECT * FROM User where isRunning=1");
             usort($allUsers, function($a, $b) {
                 return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
