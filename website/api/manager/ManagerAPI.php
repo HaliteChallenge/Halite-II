@@ -2,7 +2,6 @@
 
 use Aws\Sdk;
 require __DIR__ . '/../../vendor/autoload.php';
-
 require_once '../API.class.php';
 
 define("COMPILE_PATH", "../../../storage/compile/");
@@ -231,19 +230,20 @@ class ManagerAPI extends API{
                     $averageStatValue = $totalStatValue / count($gameStats);
                     $this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
                 }
+                // Increment number of games
+                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]->userID); 
             }
             
-            // Increment number of games
-            foreach($users as $user) $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$user->userID); 
 
             // Send first game email and first timeout email
             foreach($users as $user) {
-                $storedUser = $this->select("SELECT numGames,email FROM User WHERE userID=".$user->userID);
+                $storedUser = $this->select("SELECT numSubmissions,numGames,email FROM User WHERE userID=".$user->userID);
+                var_dump($storedUser);
                 if(intval($storedUser['numGames']) == 3) {
-                    $this->sendEmail($email, "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'></a>");
+                    $this->sendEmail($storedUser['email'], "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'></a>");
                 } 
 
-                if($user->didTimeout && mysqli_query("SELECT * from GameUser WHERE didTimeout = 1 and userID={$user->userID}")->num_rows == 1) {
+                if($user->didTimeout && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$storedUser['numSubmissions']} and userID={$user->userID}")->num_rows == 1) {
                     $errorLogContents = NULL;
                     foreach($_FILES as $file) {
                         if($file['name'] == $user->errorLogName) {
@@ -253,7 +253,7 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $this->sendEmail($email, "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replayName={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
+                    $this->sendEmail($storedUser['email'], "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php?userID={$user->userID}'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
                 }
             }
 
