@@ -115,46 +115,55 @@ $(function() {
     }
 
     var userIDGET = getGET("userID");
-    var isSession = (userIDGET == null || userIDGET == undefined);
+    if(userIDGET != null || (session = getSession())) {
+        var isSession = (userIDGET == null || userIDGET == undefined);
+        var user = isSession ? getUser(session['userID']) : getUser(userIDGET);
+        if(user['isRunning'] == 0) {
+            $("#normalBody").css("display", "none");
+            $("#noBotMessage").css("display", "block");
+        } else {
+            user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
+            user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
-    var user = isSession ? getUser(getSession()['userID']) : getUser(userIDGET);
-    user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-    user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
+            var numUsers = parseInt(getNumActiveUsers());
+            var percentile = parseInt(user['rank']) / numUsers;
+            var tier = "Bronze";
+            if(percentile < 1/32) tier = "Diamond";
+            if(percentile < 1/16) tier = "Gold";
+            if(percentile < 1/4) tier = "Silver";
 
-    var numUsers = parseInt(getNumActiveUsers());
-    var percentile = parseInt(user['rank']) / numUsers;
-    var tier = "Bronze";
-    if(percentile < 1/32) tier = "Diamond";
-    if(percentile < 1/16) tier = "Gold";
-    if(percentile < 1/4) tier = "Silver";
+            $(document).prop('title', user.username);
 
-    $(document).prop('title', user.username);
+            $("#name").html(user['username']);
+            $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played<br><a href='leaderboard.php?userID="+user["userID"]+"'>Find on leaderboard</a>");
 
-    $("#name").html(user['username']);
-    $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-    $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played<br><a href='leaderboard.php?userID="+user["userID"]+"'>Find on leaderboard</a>");
+            gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
+                var rawGames = getLatestGamesForUser(userID, 10, startingID); 
+                var games = [];
+                for(var a = 0; a < rawGames.length; a++) {
+                    var players = rawGames[a].users;
+                    players.sort(function(p1, p2) {
+                        return parseInt(p1.rank) - parseInt(p2.rank);
+                    });
+                    var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
+                    var result = thisUser.rank + " of " + players.length;
 
-    gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
-        var rawGames = getLatestGamesForUser(userID, 10, startingID); 
-        var games = [];
-        for(var a = 0; a < rawGames.length; a++) {
-            var players = rawGames[a].users;
-            players.sort(function(p1, p2) {
-                return parseInt(p1.rank) - parseInt(p2.rank);
+                    games.push({
+                        gameID: rawGames[a].gameID,
+                        players: players,
+                        result: result,
+                        mapWidth: rawGames[a].mapWidth,
+                        mapHeight: rawGames[a].mapHeight,
+                        replayName: rawGames[a].replayName
+                    });
+                }
+                return games;
             });
-            var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
-            var result = thisUser.rank + " of " + players.length;
-
-            games.push({
-                gameID: rawGames[a].gameID,
-                players: players,
-                result: result,
-                mapWidth: rawGames[a].mapWidth,
-                mapHeight: rawGames[a].mapHeight,
-                replayName: rawGames[a].replayName
-            });
+            historyTable.init(user.username, getHistories(user["userID"]));
         }
-        return games;
-    });
-    historyTable.init(user.username, getHistories(user["userID"]));
+    } else {
+        $("#normalBody").css("display", "none");
+        $("#loginMessage").css("display", "block");
+    }
 })

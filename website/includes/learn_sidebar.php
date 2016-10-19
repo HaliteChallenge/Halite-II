@@ -11,8 +11,7 @@
     }
 
     .bs-docs-sidebar .nav>li>span,
-    .bs-docs-sidebar .nav>li>a {
-        border-left: 2px solid transparent;
+    .bs-docs-sidebar .nav>li>a { border-left: 2px solid transparent;
         padding: 4px 20px;
         font-size: 18px;
         font-weight: 400;
@@ -48,44 +47,61 @@
 <nav class="col-sm-3 bs-docs-sidebar">
     <ul id="sidebar" class="nav nav-stacked">
         <li class="">
-            <span>Tutorials</span>
+            <span>The Basics</span>
             <ul class="nav nav-stacked">
-                <li id="quickstart">
-                    <a href="quickstart.php">Getting Started</a>
+                <li id="basics_quickstart">
+                    <a href="basics_quickstart.php">Getting Started</a>
                 </li>
-                <li id="basic_tutorial">
-                    <a href="basic_tutorial.php">Basic Bot</a>
+                <li id="basics_intro_halite">
+                    <a href="basics_intro_halite.php">Introducing Halite</a>
                 </li>
-                <li id="bfs_tutorial">
-                    <a href="bfs_tutorial.php">Breadth First Search Bot</a>
+                <li id="basics_improve_random">
+                    <a href="basics_improve_random.php">Improving the Random Bot</a>
+                </li>
+            </ul>
+        </li>
+        <li class="">
+            <span>Guides</span>
+            <ul class="nav nav-stacked">
+                <li id="guides_strategy">
+                    <a href="guides_strategy.php">Strategy Considerations</a>
+                </li>
+                <li id="guides_bfs">
+                    <a href="guides_bfs.php">Breadth-First-Search Bot</a>
+                </li>
+                <li id="guides_machine_learning">
+                    <a href="guides_machine_learning.php">Machine-Learning Bot</a>
+                </li>
+                <li id="guides_ide">
+                    <a href="guides_ide.php">Debugging with an IDE</a>
                 </li>
             </ul>
         </li>
         <li class="">
             <span>Rules</span>
             <ul class="nav nav-stacked">
-                <li id="game_guide">
-                    <a href="game_guide.php">Game Guide</a>
+                <li id="rules_game">
+                    <a href="rules_game.php">Game Rules</a>
                 </li>
-                <li id="game_spec">
-                    <a href="game_spec.php">Game</a>
-                </li>
-                <li id="contest_spec">
-                    <a href="contest_spec.php">Contest</a>
+                <li id="rules_contest">
+                    <a href="rules_contest.php">Contest Rules</a>
                 </li>
             </ul>
         </li>
         <li class="">
-            <span>References</span>
+            <span>Advanced</span>
             <ul class="nav nav-stacked">
-                <li id="tool_spec">
-                    <a href="tool_spec.php">Environment</a>
+                <li id="advanced_command_line">
+                    <a href="advanced_command_line.php">Environment Command Reference</a>
                 </li>
-                <li id="replay_file_spec">
-                    <a href="replay_file_spec.php">Replay File</a>
+                <li id="advanced_replay_file">
+                    <a href="advanced_replay_file.php">Replay File Reference</a>
                 </li>
-                <li id="io_spec">
-                    <a href="io_spec.php">IO</a>
+                <li id="advanced_game_server">
+                    <a href="advanced_game_server.php">Game Server Reference</a>
+                </li>
+                <li id="advanced_writing_sp">
+                    <a href="advanced_writing_sp.php">Writing Your Own Starter Package</a>
                 </li>
             </ul>
         </li>

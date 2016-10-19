@@ -16,7 +16,6 @@ error_reporting(E_ALL);
 date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
-include dirname(__FILE__).'/../../lib/swiftmailer/lib/swift_required.php';
 
 define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
 define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
@@ -161,7 +160,7 @@ class WebsiteAPI extends API{
             }
 
             if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
-            else header("Location: http://halite.io/website");
+            else header("Location: ".WEB_DOMAIN);
             die();
         } 
     }
@@ -227,6 +226,8 @@ class WebsiteAPI extends API{
             }
             
             if ($_FILES["botFile"]["size"] > 20000000) {
+                $megabytes = $_FILES["botFile"]["size"]/1000000;
+                $this->sendEmail($user['email'], "Bot TOO LARGE", "Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.");
                 return "Sorry, your file is too large.";
             }
 
@@ -243,6 +244,8 @@ class WebsiteAPI extends API{
 
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
+            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
+
             return "Success";
         }
     }
@@ -255,8 +258,8 @@ class WebsiteAPI extends API{
         // Follows the Discource sso detailed here: https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
         if(isset($_GET['sso']) && isset($_GET['sig'])) {
             if(!$this->isLoggedIn()) {
-                $forumsCallbackURL = urlencode("https://halite.io/website/api/web/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
-                $githubCallbackURL = urlencode("https://halite.io/website/api/web/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
+                $forumsCallbackURL = urlencode(WEB_DOMAIN."api/web/forums?".http_build_query(array("sig" => $_GET['sig'], "sso" => $_GET['sso'])));
+                $githubCallbackURL = urlencode(WEB_DOMAIN."api/web/user?githubCallback=1&redirectURL={$forumsCallbackURL}");
                 header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
                 die();
             }
