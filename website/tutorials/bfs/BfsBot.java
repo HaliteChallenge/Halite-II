@@ -9,28 +9,24 @@ class BfsBot {
         int myID = iPackage.myID;
         GameMap gameMap = iPackage.map;
 
-        Networking.sendInit("BfsBot");
+        Networking.sendInit("BfsBot #" + myID);
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();
             gameMap = Networking.getFrame();
 
-            ArrayList< ArrayList<Boolean> > visited = new ArrayList< ArrayList<Boolean> >();
+            boolean [][] visited = new boolean[gameMap.height][gameMap.width];
             for(int y = 0; y < gameMap.height; y++) {
-                ArrayList<Boolean> vRow = new ArrayList<Boolean>();
                 for(int x = 0; x < gameMap.width; x++) {
-                    vRow.add(false);
+                    visited[y][x] = false;
                 }
-                visited.add(vRow);
             }
 
-            ArrayList< ArrayList<Direction> > directions = new ArrayList<ArrayList<Direction> >();
+            Direction [][] directions = new Direction[gameMap.height][gameMap.width];
             for(int y = 0; y < gameMap.height; y++) {
-                ArrayList<Direction> dRow = new ArrayList<Direction>();
                 for(int x = 0; x < gameMap.width; x++) {
-                    dRow.add(Direction.STILL);
+                    directions[y][x] = Direction.STILL;
                 }
-                directions.add(dRow);
             }
 
             LinkedList<Location> toVisit = new LinkedList<Location>();
@@ -40,20 +36,20 @@ class BfsBot {
                     Site site = gameMap.getSite(l);
                     if(site.owner != myID) {
                         toVisit.add(l);
-                        visited.get(y).set(x, true);
+                        visited[y][x] = true;
                     }
                 }
             }
 
             while(!toVisit.isEmpty()) {
                 Location l = toVisit.remove();
-                visited.get(l.y).set(l.x, true);
+                visited[l.y][l.x] = true;
                 for(Direction d : Direction.CARDINALS) {
                     Location t = gameMap.getLocation(l, d);
-                    if(!visited.get(t.y).get(t.x)) {
+                    if(!visited[t.y][t.x]) {
                         toVisit.add(t);
-                        visited.get(t.y).set(t.x, true);
-                        directions.get(t.y).set(t.x, oppositeDirection(d));
+                        visited[t.y][t.x] = true;
+                        directions[t.y][t.x] = oppositeDirection(d);
                     }
                 }
             }
@@ -62,7 +58,7 @@ class BfsBot {
                 for(int x = 0; x < gameMap.width; x++) {
                     Site site = gameMap.getSite(new Location(x, y));
                     if(site.owner == myID) {
-                        if(site.strength > 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions.get(y).get(x)));
+                        if(site.strength > 5 * site.production || site.strength == 255) moves.add(new Move(new Location(x, y), directions[y][x]));
                         else moves.add(new Move(new Location(x, y), Direction.STILL));
                     }
                 }
