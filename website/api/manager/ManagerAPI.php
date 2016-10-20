@@ -133,11 +133,12 @@ class ManagerAPI extends API{
             if($didCompile == 1) { // Did succeed
                 $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php");
 
-                $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
-                
                 $this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, mu = 25.000, sigma = 8.333, compileStatus = 0, isRunning = 1, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
 
-                $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
+                if(intval($user['numSubmissions']) == 0) {
+                    $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
+                    $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
+                }
             } else { // Didnt succeed
                 $this->sendEmail($user['email'], "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['output']}</code></pre>");
                 $this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
