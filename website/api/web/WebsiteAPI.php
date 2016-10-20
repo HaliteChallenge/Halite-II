@@ -17,8 +17,7 @@ date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
 
-define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
-define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
+define("COMPILE_BUCKET", "halitecompilebucket");
 define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
@@ -231,17 +230,11 @@ class WebsiteAPI extends API{
                 return "Sorry, your file is too large.";
             }
 
-            $targetPath = COMPILE_PATH."{$user['userID']}.zip";
-            if(file_exists($targetPath))  {
-                unlink($targetPath);    
-            }
-
-            if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-                if(!copy($_FILES['botFile']['tmp_name'], $targetPath)) {
-                    return null;
-                }
-            }
-
+            $this->loadAwsSdk()->createS3()->putObject([
+                'Key'    => "{$user['userID']}.zip",
+                'Body'   => file_get_contents($_FILES['botFile']['tmp_name']),
+                'Bucket' => COMPILE_BUCKET
+            ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
             if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
