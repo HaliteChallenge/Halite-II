@@ -350,6 +350,7 @@ HaliteEnvironment-Mac
 HaliteEnvironment-Debian
 
 downloads/
+keys/
 starterpackages/
 
 *.pem
