@@ -61,6 +61,22 @@
 
                 <p>When pieces from opposing players try to occupy either the same or adjacent sites, the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the Strength of every adjacent or coinciding opposing piece by its own Strength.</p>
 
+                <p>At the end of the turn, pieces with a strength of 0 or less are removed from the game, excepting pieces with a strength of 0 which have not engaged in combat during that turn.</p>
+
+                <p>The map is initialized by the environment to have productions and strengths. Combat with map squares works identically to combat with other players except only applies on that square; empty map squares neither apply damage to nor take damage from adjacent squares. Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).</p>
+
+                <p>Players are scored according to the reverse of the order in which they are destroyed. The player last standing wins, whereas the player which was destroyed first comes in last. Bots are scored relatively; in a game with many players it is far better to come in second than to come in last.</p>
+
+                <p>The game ends if one of two conditions are met:
+                <ul>
+                    <li>Only one player has any pieces left.</li>
+                    <li>10 * sqrt(WIDTH * HEIGHT) turns have been played. This means larger maps may take many more moves to complete than small maps.</li>
+                </ul>
+                The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are ranked based on their territory at that point in the game. If there is a tie in the amount of territory each bot possesses, the full territory integral is used as the tiebreaker, although this is a rare occurence.</p>
+
+                <p>Whew! Seems like a lot, doesn't it? Really though, after you familiarize yourselves with the rules they'll actually seem quite simple, because they are. The challenge is in building a bot which can navigate them.</p>
+
+                <h3>Running a local game</h3>
 
             </div>
         </div>
