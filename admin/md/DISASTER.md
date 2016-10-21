@@ -29,9 +29,7 @@ Let's go over that last line. The `commandRunner.py` script uses ssh to run arbi
 
 ### Account DDOS
 
-### Restarting from backup 
-
-#### MySQL database backup
+### Restarting from MySQL database backup
 
 ***These steps will delete all data in the production db***
 
@@ -43,9 +41,3 @@ SSH into the db server, and:
 
     $ echo "drop database Halite; create database Halite;" | mysql -u root -p
     $ mysql -u root -p Halite < NAME_OF_THE_SQL_FILE.sql
-
-#### Disk storage backup
-
-Login to the backup server over SFTP using your favorite SFTP client ([Filezilla](https://filezilla-project.org/) is quite good). Navigate into the `/backup/web` folder. This should contain the `halite.ini` file and the `storage` folder of the webserver.
-
-Transfer the file or folder that you need to recover to its proper place within the `~/Halite` folder on the webserver. You may do this directly or by downloading it to your local computer and then uploading it to the web server. ***Note:*** the storage folder will be quite large, so you should transfer that directly to the webserver.
