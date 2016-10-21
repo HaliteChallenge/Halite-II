@@ -11,9 +11,6 @@ class BotFileTests extends APITest {
         $testUser['isRunning'] = 1;
         $this->insertObject(USER_TABLE, $testUser);
 
-        $botPath = COMPILE_PATH.$testUser['userID'].".zip";
-        if(file_exists($botPath)) unlink($botPath);
-
         $_FILES = array(
             'botFile' => array(
                 'name' => 'testFile.txt',
