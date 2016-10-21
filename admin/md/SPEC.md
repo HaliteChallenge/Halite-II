@@ -42,13 +42,11 @@ During both compilation and runtime, bots are run within their own Docker contai
 
 ### Database
 
-A MySQL server is used as the database for the project. 
+A MySQL server (5.7.1) is used as the database for the project. Our MySQL server runs on RDS. 
 
 ### File Storage
 
-Bot source and executables are currently stored on the server that hosts the website and the manager.
-
-Error logs and replay files are hosted on AWS S3 standard storage.
+Error logs, replay files, and bot source are hosted on AWS S3 standard storage.
 
 ### Forums
 
@@ -56,7 +54,7 @@ Error logs and replay files are hosted on AWS S3 standard storage.
 
 ### Backups
 
-Backups are made hourly from the website/manager server and the database server to a separate, backup server using rsync and cron. Only the most recent data from the website/manager server data is kept, while all versions of the database data are stored.
+RDS backups are turned on.
 
 ### Admin Tools
 
@@ -118,10 +116,9 @@ keyfilepath = NameOfKeyFile.pem
 
 Each of our servers run Ubuntu 14.04. A brief textual description of our server setup:
 
-* One server runs the website and manager and stores bot source.
+* One server runs the website and manager.
 * Another server runs the database.
 * Another server runs the forums.
-* Another server houses backups of bots and the database.
 * Another server runs a series of cron jobs that check for broken links or downed workers.
 * Each worker runs is on its own server.
 
