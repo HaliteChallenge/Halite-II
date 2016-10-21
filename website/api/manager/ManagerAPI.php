@@ -302,7 +302,7 @@ class ManagerAPI extends API{
             echo $this->loadAwsSdk()->createS3()->getObject([
                 'Bucket' => $bucket,
                 'Key'    => "$userID" 
-            ]);
+            ])['Body'];
 
             exit;
         } else if(isset($_POST['userID']) && count($_FILES) > 0) {
@@ -311,7 +311,7 @@ class ManagerAPI extends API{
             $name = basename($_FILES[$key]['name']);
 
             $this->loadAwsSdk()->createS3()->putObject([
-                'Key'    => "{$user['userID']}",
+                'Key'    => "{$userID}",
                 'Body'   => file_get_contents($_FILES[$key]['tmp_name']),
                 'Bucket' => BOT_BUCKET
             ]);
@@ -327,10 +327,10 @@ class ManagerAPI extends API{
         if(isset($_GET['userID'])) {
             $userID = $_GET['userID'];
             $s3Client = $this->loadAwsSdk()->createS3();            
-            if(isset($_GET['compile']) && file_exists($s3Client->doesObjectExist(COMPILE_BUCKET, "$userID"))) {
-                return array("hash" => md5_file($s3Client->getObject(['Bucket' => COMPILE_BUCKET, 'Key'    => "$userID"])));
-            } else if(!isset($_GET['compile']) && file_exists($s3Client->doesObjectExist(BOT_BUCKET, "$userID"))) {
-                return array("hash" => md5_file($s3Client->getObject(['Bucket' => BOT_BUCKET, 'Key'    => "$userID"])));
+            if(isset($_GET['compile']) && $s3Client->doesObjectExist(COMPILE_BUCKET, "$userID")) {
+                return array("hash" => md5($s3Client->getObject(['Bucket' => COMPILE_BUCKET, 'Key'    => "$userID"])['Body']));
+            } else if(!isset($_GET['compile']) && $s3Client->doesObjectExist(BOT_BUCKET, "$userID")) {
+                return array("hash" => md5($s3Client->getObject(['Bucket' => BOT_BUCKET, 'Key'    => "$userID"])['Body']));
             } else {
                 return "Bot file does not exist";
             }
