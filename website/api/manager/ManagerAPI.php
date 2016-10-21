@@ -4,8 +4,6 @@ use Aws\Sdk;
 require __DIR__ . '/../../vendor/autoload.php';
 require_once '../API.class.php';
 
-define("COMPILE_PATH", "../../../storage/compile/");
-define("BOTS_PATH", "../../../storage/bots/");
 define("INI_FILE", "../../../halite.ini");
 
 ini_set('upload_max_filesize', '50M');
@@ -296,16 +294,27 @@ class ManagerAPI extends API{
 
             ob_clean();
             flush();
-            if(isset($_GET['compile'])) readfile(COMPILE_PATH."{$userID}.zip");
-            else readfile(BOTS_PATH."{$userID}.zip");
+
+            $bucket = null;
+            if(isset($_GET['compile'])) $bucket = COMPILE_BUCKET; 
+            else $bucket = BOT_BUCKET; 
+
+            echo $this->loadAwsSdk()->createS3()->getObject([
+                'Bucket' => $bucket,
+                'Key'    => "$userID" 
+            ]);
+
             exit;
         } else if(isset($_POST['userID']) && count($_FILES) > 0) {
             $userID = $_POST['userID'];
             $key = array_keys($_FILES)[0];
             $name = basename($_FILES[$key]['name']);
 
-            $targetPath = BOTS_PATH."{$userID}.zip";
-            move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
+            $this->loadAwsSdk()->createS3()->putObject([
+                'Key'    => "{$user['userID']}",
+                'Body'   => file_get_contents($_FILES[$key]['tmp_name']),
+                'Bucket' => BOT_BUCKET
+            ]);
         } else {
             return NULL;
         }
@@ -317,9 +326,14 @@ class ManagerAPI extends API{
     protected function botHash() {
         if(isset($_GET['userID'])) {
             $userID = $_GET['userID'];
-            if(isset($_GET['compile']) && file_exists(COMPILE_PATH."{$userID}.zip")) return array("hash" => md5_file(COMPILE_PATH."{$userID}.zip"));
-            else if(!isset($_GET['compile']) && file_exists(BOTS_PATH."{$userID}.zip")) return array("hash" => md5_file(BOTS_PATH."{$userID}.zip"));
-            else return "Bot file does not exist";
+            $s3Client = $this->loadAwsSdk()->createS3();            
+            if(isset($_GET['compile']) && file_exists($s3Client->doesObjectExist(COMPILE_BUCKET, "$userID"))) {
+                return array("hash" => md5_file($s3Client->getObject(['Bucket' => COMPILE_BUCKET, 'Key'    => "$userID"])));
+            } else if(!isset($_GET['compile']) && file_exists($s3Client->doesObjectExist(BOT_BUCKET, "$userID"))) {
+                return array("hash" => md5_file($s3Client->getObject(['Bucket' => BOT_BUCKET, 'Key'    => "$userID"])));
+            } else {
+                return "Bot file does not exist";
+            }
         }
     }
 }

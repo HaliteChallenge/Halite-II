@@ -17,7 +17,6 @@ date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
 
-define("COMPILE_BUCKET", "halitecompilebucket");
 define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
@@ -231,7 +230,7 @@ class WebsiteAPI extends API{
             }
 
             $this->loadAwsSdk()->createS3()->putObject([
-                'Key'    => "{$user['userID']}.zip",
+                'Key'    => "{$user['userID']}",
                 'Body'   => file_get_contents($_FILES['botFile']['tmp_name']),
                 'Bucket' => COMPILE_BUCKET
             ]);

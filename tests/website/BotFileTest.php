@@ -38,7 +38,6 @@ class BotFileTests extends APITest {
         $this->assertEquals($newUser["compileStatus"], "1");
         $this->assertEquals($newUser["isRunning"], "1");
         $this->assertEquals(count($userHistory), 0);
-        $this->assertTrue(file_exists($botPath));
     }
 }
 

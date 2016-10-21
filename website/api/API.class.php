@@ -5,6 +5,8 @@ use Aws\Sdk;
 require __DIR__ . '/../vendor/autoload.php';
 
 define("INI_PATH", dirname(__FILE__)."/../../halite.ini");
+define("COMPILE_BUCKET", "halitecompilebucket");
+define("BOT_BUCKET", "halitebotbucket");
 define("REPLAY_BUCKET", "halitereplaybucket");
 define("ERROR_LOG_BUCKET", "haliteerrorlogbucket");
 define("WEB_DOMAIN", "https://halite.io/website/");
