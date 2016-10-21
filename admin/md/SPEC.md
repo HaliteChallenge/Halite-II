@@ -14,7 +14,7 @@ Users develop their bots locally using our game engine, zip and submit their sou
 
 
 ### Environment
-The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves. A switch to using sockets for bot communication is planned. The environment outputs a replay file, with the `hlt` extension, which may be visualized [here](http://halite.io/website/game.php).
+The environment is written in C++ with no dependencies. The environment starts bot processes using the start commands given to it through the command line. It then communicates with bots over stdin and stdout, sending them the map and recieving their moves. A switch to using sockets for bot communication is planned. The environment outputs a replay file, with the `hlt` extension, which may be visualized [here](http://halite.io/game.php).
 
 ### Website
 
@@ -26,7 +26,7 @@ The server on which the website is hosted also hosts the manager and is used for
 
 ### HCE
 
-The "HCE"(Halite Competition Environment) is what we call the system of servers that compiles the source code of each contestant, runs games between bots, and ranks each submission. The system consists of many worker servers and one manager server. 
+The "HCE"(Halite Competition Environment) is what we call the system of servers that compiles the source code of each contestant, runs games between bots, and ranks each submission. The system consists of many worker servers and one manager server.
 
 Worker servers query the manager server for tasks, either a compile task or a game task. If there is any bot that needs to be compiled, the manager will respond with a compile task. If there are no compile tasks, the manager will respond with a game task, which is chosen like so:
 
@@ -42,7 +42,7 @@ During both compilation and runtime, bots are run within their own Docker contai
 
 ### Database
 
-A MySQL server is used as the database for the project. 
+A MySQL server is used as the database for the project.
 
 ### File Storage
 
@@ -62,7 +62,7 @@ Backups are made hourly from the website/manager server and the database server 
 
 A simple python script (`manager/commandRunner.py`) is used to run arbitrary commands on all of the workers listed in the `halite.ini` file.
 
-A status page located at `halite.io/website/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site.
+A status page located at `halite.io/status.php` includes the time since every worker has queried the manager, the throughput of the HCE, and general stats about our user base. Google analytics is included on the site.
 
 ### Monitoring Tools
 
@@ -72,12 +72,12 @@ We plan on setting up pingdom/pagerduty to alert us of downtime.
 
 ### Configuration Files
 
-An INI file, titled `halite.ini` and located in the root directory of the project, is used for all of our project configurations. Here is a sample halite.ini file: 
+An INI file, titled `halite.ini` and located in the root directory of the project, is used for all of our project configurations. Here is a sample halite.ini file:
 
 ```
 [hce]
 managerURl = http://localhost/manager/
-apiKey = 1234 
+apiKey = 1234
 secretFolder = FAKE_FOLDER_NAME
 
 [workerIPs]
@@ -110,7 +110,7 @@ secretaccesskey = 1234561238378
 amiid = ami-2d39803a
 keyname = RandomKeyName
 instancetype = t2.nano
-securitygroupname = security-group-name 
+securitygroupname = security-group-name
 keyfilepath = NameOfKeyFile.pem
 ```
 
@@ -128,4 +128,3 @@ Each of our servers run Ubuntu 14.04. A brief textual description of our server 
 Below is a basic diagram of our server setup.
 
 ![Server Architecture Diagram](components.png)
-

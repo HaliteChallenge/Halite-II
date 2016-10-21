@@ -19,7 +19,7 @@
 
                 <h3>Overview</h3>
 
-                <p>This guide gives a detailed description of how the precise rules of the Halite game work. It is highly recommended that you have already read the <a href="http://halite.io/website/game_guide.php">game guide</a> before reading this document.</p>
+                <p>This guide gives a detailed description of how the precise rules of the Halite game work. It is highly recommended that you have already read the <a href="game_guide.php">game guide</a> before reading this document.</p>
 
                 <h3>The Game</h3>
 

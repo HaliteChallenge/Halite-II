@@ -9,7 +9,7 @@ define("COMPILE_BUCKET", "halitecompilebucket");
 define("BOT_BUCKET", "halitebotbucket");
 define("REPLAY_BUCKET", "halitereplaybucket");
 define("ERROR_LOG_BUCKET", "haliteerrorlogbucket");
-define("WEB_DOMAIN", "https://halite.io/website/");
+define("WEB_DOMAIN", "https://halite.io/");
 
 abstract class API{
     /**
@@ -86,7 +86,7 @@ abstract class API{
         $transporter = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
             ->setUsername($this->config['email']['email'])
             ->setPassword($this->config['email']['password']);
-        $mailer = Swift_Mailer::newInstance($transporter); 
+        $mailer = Swift_Mailer::newInstance($transporter);
         $message = Swift_Message::newInstance($subject)
             ->setFrom(array($this->config['email']['email'] => 'Halite'))
             ->setTo(array($to))
@@ -98,7 +98,7 @@ abstract class API{
 
     protected function initDB() {
         $this->loadConfig();
-        
+
         $this->mysqli = NULL;
         $this->mysqli = new mysqli($this->config['database']['hostname'],
             $this->config['database']['username'],
@@ -121,7 +121,7 @@ abstract class API{
         header("Content-Type: application/json");
 
         $this->loadConfig();
-        
+
         $this->args = explode('/', rtrim($request, '/'));
         $this->endpoint = array_shift($this->args);
         if (array_key_exists(0, $this->args) && !is_numeric($this->args[0])) {
@@ -156,7 +156,7 @@ abstract class API{
             break;
         }
     }
-    
+
     public function processAPI() {
         if (method_exists($this, $this->endpoint)) {
             return $this->_response($this->{$this->endpoint}($this->args));
@@ -182,13 +182,13 @@ abstract class API{
     }
 
     private function _requestStatus($code) {
-        $status = array(  
+        $status = array(
             200 => 'OK',
-            404 => 'Not Found',   
+            404 => 'Not Found',
             405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
-        ); 
-        return ($status[$code])?$status[$code]:$status[500]; 
+        );
+        return ($status[$code])?$status[$code]:$status[500];
     }
 }
 
