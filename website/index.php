@@ -23,7 +23,7 @@ if(isset($_SESSION['userID'])) {
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Leaderboard</title>
+    <title>Homepage</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
