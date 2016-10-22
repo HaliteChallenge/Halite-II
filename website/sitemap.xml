@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url>
+  <loc>https://halite.io/</loc>
+</url>
+<url>
+  <loc>https://halite.io/index.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/basics_quickstart.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/downloads.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/leaderboard.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/local_visualizer.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/basics_intro_halite.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/basics_improve_random.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/basics_faqs.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/guides_strategy.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/guides_bfs.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/guides_machine_learning.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/guides_ide.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/rules_game.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/rules_contest.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/advanced_command_line.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/advanced_replay_file.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/advanced_game_server.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/advanced_writing_sp.php</loc>
+</url>
+<url>
+  <loc>https://halite.io/user.php</loc>
+</url>
+</urlset>
