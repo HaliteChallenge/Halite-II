@@ -122,19 +122,11 @@ $(function() {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
-            user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-
-            var numUsers = parseInt(getNumActiveUsers());
-            var percentile = parseInt(user['rank']) / numUsers;
-            var tier = "Bronze";
-            if(percentile < 1/32) tier = "Diamond";
-            if(percentile < 1/16) tier = "Gold";
-            if(percentile < 1/4) tier = "Silver";
-
             $(document).prop('title', user.username);
 
+            var vr = "<span style='color: #0092a1;'>|</span>";
             $("#name").html(user['username']);
-            $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+            $("#primary-info").html(user['tier'] + " Tier "+vr+" " + user['rank']+" of "+getNumActiveUsers()+" "+vr+" "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
             $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played<br><a href='leaderboard.php?userID="+user["userID"]+"'>Find on leaderboard</a>");
 
             gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {

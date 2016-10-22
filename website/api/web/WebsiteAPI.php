@@ -67,14 +67,25 @@ class WebsiteAPI extends API{
         return isset($_SESSION['userID']) && mysqli_query($this->mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']}")->num_rows == 1;
     }
 
-    private function getUsers($query) {
+    private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
-        foreach($users as &$user) unset($user['email']);
+        foreach($users as &$user) {
+            if($privateInfo == false) unset($user['email']);
+            
+            $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
+            if($percentile < 1/32) $user['tier'] = "Diamond";
+            else if($percentile < 1/16) $user['tier'] = "Gold";
+            else if($percentile < 1/4) $user['tier'] = "Silver";
+            else $user['tier'] = "Bronze";
+            
+
+            $user['score'] = round(floatval($user['mu']) - 3*floatval($user['sigma']), 2);
+        }
         return $users;
     }
 
     private function getLoggedInUser() {
-        if(isset($_SESSION['userID'])) return $this->select("SELECT * FROM User WHERE userID={$_SESSION['userID']}");
+        if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
     }
 
 
@@ -128,7 +139,7 @@ class WebsiteAPI extends API{
             $githubUser = json_decode($gitHub->request('user'), true);
             $email = json_decode($gitHub->request('user/emails'), true)[0];
 
-            if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
+            if($this->numRows("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
@@ -145,7 +156,7 @@ class WebsiteAPI extends API{
                     }
                 }
 
-                $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows + 1; // Add once since this user hasnt been inserted into the db
+                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1") + 1; // Add once since this user hasnt been inserted into the db
                 $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 

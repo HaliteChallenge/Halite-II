@@ -41,6 +41,10 @@ abstract class API{
      */
     protected $file = Null;
 
+    protected function numRows($sql) {
+        return mysqli_query($this->mysqli, $sql)->num_rows;
+    }
+
     protected function select($sql) {
         try {
             $res = mysqli_query($this->mysqli, $sql);
