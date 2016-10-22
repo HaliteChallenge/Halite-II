@@ -125,9 +125,10 @@ $(function() {
             $(document).prop('title', user.username);
 
             var vr = "<span style='color: #0092a1;'>|</span>";
+            $("#profileImage").attr("src", "https://avatars.githubusercontent.com/u/"+user["oauthID"]);
             $("#name").html(user['username']);
-            $("#primary-info").html(user['tier'] + " Tier "+vr+" " + user['rank']+" of "+getNumActiveUsers()+" "+vr+" "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played<br><a href='leaderboard.php?userID="+user["userID"]+"'>Find on leaderboard</a>");
+            $("#primary-info").html(user['tier'] + " Tier<br><a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played");
 
             gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
                 var rawGames = getLatestGamesForUser(userID, 10, startingID); 
