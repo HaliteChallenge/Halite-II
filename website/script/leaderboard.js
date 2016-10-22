@@ -17,11 +17,13 @@ $(function() {
     }
 
     // Create leaderboard filters from get params
+    // Set page title 
     var $heading = $("#leaderHeading");
     var filters = {};
     filters["isRunning"] = 1;
     if(field != null && value != null && heading != null) {
         $heading.html(heading + " Rankings");
+        document.title = heading + " Rankings";
         filters[field] = value;
     } else {
         $heading.html("Current Rankings");
