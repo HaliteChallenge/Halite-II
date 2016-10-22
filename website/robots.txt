@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /api
+Disallow: /cron
+Disallow: /fonts
+Disallow: /includes
+Disallow: /lib
+Disallow: /script
+Disallow: /sql
+Disallow: /style
+Disallow: /vendor
+Allow: /
