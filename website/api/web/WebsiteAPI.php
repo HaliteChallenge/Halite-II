@@ -17,7 +17,7 @@ date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
 
-define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
 define("USER_TO_SERVER_RATIO", 20);
 define("WORKER_LIMIT", 50);
 
