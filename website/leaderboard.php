@@ -17,7 +17,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <h1 id="leaderHeading">Leaderboard</h1>
-                    <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="quickstart.php">quickstart guide</a>.</p>
+                    <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
                     <div class="panel panel-primary">
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>
