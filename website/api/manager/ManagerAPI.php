@@ -84,7 +84,7 @@ class ManagerAPI extends API{
                 $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
                 $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-                $seedPlayer = $this->select("select * from User where isRunning=1 and (numGames < 20 or didTimeout < 0.5) order by rand()*-pow(sigma, 2) LIMIT 1");
+                $seedPlayer = $this->select("select * from User u where isRunning=1 and (numGames < 20 or (select AVG(gu.didTimeout) FROM (select didTimeout from GameUser where userID = u.userID LIMIT 50) gu) < 0.5) order by rand()*-pow(sigma, 2) LIMIT 1");
 
                 if(count($seedPlayer) < 1) {
                     $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
@@ -213,22 +213,6 @@ class ManagerAPI extends API{
                 $errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]->errorLogName)."'";
                 $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout, versionNumber) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", {$timeoutInt}, {$storedUsers[$a]['numSubmissions']})");
 
-                // Cache didTimeout
-                // Note: this is written to be agnostic of the number of stats in each row of $gameStats, just in case we want to add more stats
-                $gameStats = $this->selectMultiple("SELECT didTimeout FROM GameUser WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
-                $totalGameStats = array();
-                foreach($gameStats as $oneGameStats) {
-                    foreach($oneGameStats as $statName => $statValue) {
-                        if(!array_key_exists($statName, $totalGameStats)) {
-                            $totalGameStats[$statName] = 0;
-                        }
-                        $totalGameStats[$statName] += $statValue;
-                    }
-                }
-                foreach($totalGameStats as $statName => $totalStatValue) {
-                    $averageStatValue = $totalStatValue / count($gameStats);
-                    $this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
-                }
                 // Increment number of games
                 $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]->userID); 
             }

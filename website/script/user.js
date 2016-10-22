@@ -123,7 +123,6 @@ $(function() {
             $("#noBotMessage").css("display", "block");
         } else {
             user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-            user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
 
             var numUsers = parseInt(getNumActiveUsers());
             var percentile = parseInt(user['rank']) / numUsers;
