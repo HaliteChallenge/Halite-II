@@ -84,10 +84,10 @@ class ManagerAPI extends API{
                 $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
                 $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-                $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
-                $seedPlayer = $this->select("select * from User where isRunning=1 and (numGames < 20 or didTimeout < 0.9) order by rand()*-pow(sigma, 2)");
+                $seedPlayer = $this->select("select * from User where isRunning=1 and (numGames < 20 or didTimeout < 0.5) order by rand()*-pow(sigma, 2) LIMIT 1");
 
                 if(count($seedPlayer) < 1) {
+                    $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
                     $oldestGameTime = time();
                     foreach($users as $user) {
                         $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
