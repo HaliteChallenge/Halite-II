@@ -19,7 +19,7 @@
 
                 <h3>Overview</h3>
 
-                <p>This guide gives a detailed description of how the precise rules of the Halite game work. It is highly recommended that you have already read the <a href="game_guide.php">game guide</a> before reading this document.</p>
+                <p>This guide gives a detailed description of how the precise rules of the Halite game work. It is highly recommended that you have already read <a href="basics_intro_halite.php">Introducing Halite</a> before reading this document.</p>
 
                 <h3>The Game</h3>
 
@@ -85,7 +85,7 @@
 
                 <h3>Replay Files</h3>
 
-                <p>Once a game ends, the environment will output a replay file. See <a href="replay_file_spec.php">here</a> for more information regarding the replay file format.</p>
+                <p>Once a game ends, the environment will output a replay file. See <a href="advanced_replay_file.php">here</a> for more information regarding the replay file format.</p>
 
             </div>
         </div>
