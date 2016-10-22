@@ -358,3 +358,5 @@ starterpackages/
 
 *.hlt
 !interestingGame.hlt
+
+google*.html
