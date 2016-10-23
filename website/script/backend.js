@@ -169,12 +169,12 @@ function getLatestAnnouncement(userID) {
     }).responseJSON;
 }
 
-function closedAnnouncement(announcementID, userID, password) {
+function closedAnnouncement(announcementID) {
     var response = $.ajax({
         url: url+"announcement",
         async: false,
         method: "POST",
-        data: {announcementID: announcementID, userID: userID, password: password}
+        data: {announcementID: announcementID}
     });
     console.log(response)
     return response.responseJSON;

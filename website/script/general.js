@@ -157,7 +157,7 @@ $(function() {
         console.log(announcement)
         if(announcement != null) {
             messageBox.alert(announcement.header, announcement.body, true, function() {
-                closedAnnouncement(announcement.announcementID, session.userID, session.password);  
+                closedAnnouncement(announcement.announcementID);  
             });
         }
     }
