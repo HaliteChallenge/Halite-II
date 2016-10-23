@@ -57,37 +57,50 @@ $(function() {
             $button: $("#submitButton"),
             $form: $("#submitForm"),
             $fileInput: $("#myFile"),
-            init: function() {
+            $submitModal: $("#submitModal"),
+            init: function(session) {
+                this.session = session;
                 this.$button.click(this, this.buttonClicked.bind(this));
+                this.$submitModal.on("hidden.bs.modal", this, this.modalClosed.bind(this));
                 this.$fileInput.change(this, this.fileChanged.bind(this));
             },
             setCredentials: function(userID, password) {
                 this.$form.append("<input type='hidden' name='userID' value='"+userID+"'>");
                 this.$form.append("<input type='hidden' name='password' value='"+password+"'>");
             },
-            buttonClicked: function() { this.$fileInput.click(); },
+            buttonClicked: function() { 
+                var user = getUser(this.session.userID);
+                if(parseInt(user.isRunning) == 1) {
+                    this.$fileInput.click(); 
+                } else {
+                    this.$submitModal.modal("show");
+                }
+            },
+            modalClosed: function() { 
+                this.$fileInput.click(); 
+            },
             fileChanged: function() {
-		try {
-		    var uploadOutput = storeBotFile("submitForm");
-		    if(uploadOutput.indexOf("desktop") != -1) {
-			messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
-		    } else if(uploadOutput.indexOf("large") != -1) {
-			messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 20 megabytes. Make sure you aren't packaging unnecessary binaries.", false);
-		    } else if(uploadOutput.indexOf("Compiling") != -1) {
-			messageBox.alert("Compiling", "We are compiling one of your bots. You have to wait until we have finished compiling your bot before you may submit another one.", false);
-		    } else {
-			messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
-		    }
-		} catch (err) {
-		    messageBox.alert("File Upload Error", "An error occurred while uploading your file. <b>Your file may have been too big</b>. Check to make sure that your file is under <b>20 megabytes</b>. Make sure that you haven't packaged some unnecessary, big binaries. If this persists, post of the forums or email us at halite@halite.io.", false);
-		}
-	    }
+                try {
+                    var uploadOutput = storeBotFile("submitForm");
+                    if(uploadOutput.indexOf("desktop") != -1) {
+                        messageBox.alert("Restricted Access", "You are not allowed to submit code to Halite from a Two Sigma Desktop. Please use a personal computer on Two Sigma Wifi instead.", false);
+                    } else if(uploadOutput.indexOf("large") != -1) {
+                        messageBox.alert("File Size Error", "Your bot file was too big. We only allow submissions less than 20 megabytes. Make sure you aren't packaging unnecessary binaries.", false);
+                    } else if(uploadOutput.indexOf("Compiling") != -1) {
+                        messageBox.alert("Compiling", "We are compiling one of your bots. You have to wait until we have finished compiling your bot before you may submit another one.", false);
+                    } else {
+                        messageBox.alert("Bot Submitted", "Your bot was successfully uploaded to our servers. <b>If your bot does not compile, you will receive an email in a couple of minutes.</b> Otherwise, you will show up on the leaderboard very soon.", true)
+                    }
+                } catch (err) {
+                    messageBox.alert("File Upload Error", "An error occurred while uploading your file. <b>Your file may have been too big</b>. Check to make sure that your file is under <b>20 megabytes</b>. Make sure that you haven't packaged some unnecessary, big binaries. If this persists, post of the forums or email us at halite@halite.io.", false);
+                }
+            }
         },
 
         init: function(session) {
             new SmartForm(this.$registerButton, this.$registerForm, this.register.bind(this));
 
-            this.uploadButton.init();
+            this.uploadButton.init(session);
             this.$logOutButton.click(this.logOut.bind(this));
 
             if(session != null && session.userID != null) {
@@ -161,4 +174,5 @@ $(function() {
             });
         }
     }
+
 })

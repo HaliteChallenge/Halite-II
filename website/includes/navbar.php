@@ -28,4 +28,22 @@
         </div>
     </div>
 </nav>
+
 <div id="messageBox"></div>
+
+<div class="modal fade" id="submitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h1 class="modal-title" id="myModalLabel">Halite Submission Instructions</h1>
+            </div>
+            <div class="modal-body">
+                <h3>Upload a <b>zip file</b> of your source code.</h3>
+                <h3>Name your main file <b>MyBot</b> with an appropriate file extension (e.g. MyBot.java).</h3>
+                <h3>Once we have compile your code, you will get an email notification.</h3>
+                <h3>Now, close this popup and submit your code!</h3>
+            </div>
+        </div>
+    </div>
+</div>
