@@ -84,7 +84,7 @@ class ManagerAPI extends API{
                 $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
                 $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-                $seedPlayer = $this->select("SELECT * FROM User u JOIN GameUser gu ON gu.userID=u.userID WHERE u.isRunning=1 GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 0.5 or COUNT(gu.userID) < 20 order by rand()*-pow(sigma, 2) LIMIT 1");
+                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and userID in (SELECT gu.userID FROM GameUser gu GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 0.5 or COUNT(gu.userID) < 20) order by rand()*-pow(sigma, 2) LIMIT 1");
 
                 if(count($seedPlayer) < 1) {
                     $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
