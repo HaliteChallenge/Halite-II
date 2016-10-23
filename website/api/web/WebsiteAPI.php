@@ -18,7 +18,7 @@ date_default_timezone_set('America/New_York');
 include dirname(__FILE__).'/../API.class.php';
 
 define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
-define("USER_TO_SERVER_RATIO", 20);
+define("USER_TO_SERVER_RATIO", 30);
 define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
@@ -158,16 +158,9 @@ class WebsiteAPI extends API{
                     }
                 }
 
-                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1") + 1; // Add once since this user hasnt been inserted into the db
                 $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 
-                // AWS auto scaling
-                /*
-                $numWorkers = $this->numRows("SELECT workerID FROM Worker");
-                if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
-                    shell_exec("python3 openNewWorker.py &");
-                }*/
             }
 
             if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
@@ -250,6 +243,13 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
             if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
+
+            // AWS auto scaling
+            $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
+            $numWorkers = $this->numRows("SELECT workerID FROM Worker");
+            if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
+                echo shell_exec("python3 openNewWorker.py > /dev/null 2>/dev/null &");
+            }
 
             return "Success";
         }
