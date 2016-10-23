@@ -1,5 +1,5 @@
 $(function() {
-    var USERS_PER_PAGE = 50;
+    var USERS_PER_PAGE = 20;
 
     // What criteria are we using for ranking?
     var field = getGET("field");
