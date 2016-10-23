@@ -37,10 +37,12 @@ while numRows != 0:
     cursor.execute("SELECT * FROM Worker WHERE apiKey="+str(apiKey))
     numRows = int(cursor.rowcount)
 cursor.execute("INSERT INTO Worker (apiKey, ipAddress) VALUES ("+str(apiKey)+", '"+str(ipAddress)+"')")
+db.commit()
 
 def runCommandOnInstance(instance, command):
     # Connect to ssh
-    for a in range(100):
+    ssh_client = None 
+    for a in range(1000):
         try:
             ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
             print("Connected to server")

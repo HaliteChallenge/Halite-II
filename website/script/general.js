@@ -58,10 +58,11 @@ $(function() {
             $form: $("#submitForm"),
             $fileInput: $("#myFile"),
             $submitModal: $("#submitModal"),
+            $submitModalButton: $("#submitModalButton"),
             init: function(session) {
                 this.session = session;
                 this.$button.click(this, this.buttonClicked.bind(this));
-                this.$submitModal.on("hidden.bs.modal", this, this.modalClosed.bind(this));
+                this.$submitModalButton.click(this, this.submitModal.bind(this));
                 this.$fileInput.change(this, this.fileChanged.bind(this));
             },
             setCredentials: function(userID, password) {
@@ -76,10 +77,11 @@ $(function() {
                     this.$submitModal.modal("show");
                 }
             },
-            modalClosed: function() { 
+            submitModal: function() { 
                 this.$fileInput.click(); 
             },
             fileChanged: function() {
+                this.$submitModal.modal("hide");
                 try {
                     var uploadOutput = storeBotFile("submitForm");
                     if(uploadOutput.indexOf("desktop") != -1) {

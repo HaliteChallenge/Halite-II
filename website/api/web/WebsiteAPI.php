@@ -114,7 +114,7 @@ class WebsiteAPI extends API{
         else if(isset($_GET['fields']) && isset($_GET['values'])) {
             $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
             $whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
-            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
+            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'rank';
             $page = isset($_GET['page']) ? $_GET['page'] : 0;
 
             $results = $this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
@@ -164,8 +164,8 @@ class WebsiteAPI extends API{
 
                 // AWS auto scaling
                 /*
-                $numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
-                if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
+                $numWorkers = $this->numRows("SELECT workerID FROM Worker");
+                if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
                     shell_exec("python3 openNewWorker.py &");
                 }*/
             }
