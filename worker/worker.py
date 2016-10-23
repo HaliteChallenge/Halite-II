@@ -95,7 +95,7 @@ def executeCompileTask(user, backend):
         print("Bot did not compile")
         print(str(errors))
 
-    backend.compileResult(int(user["userID"]), didCompile, language, errors if didCompile else None)
+    backend.compileResult(int(user["userID"]), didCompile, language, errors=(None if didCompile else "\n".join(errors)))
     if os.path.isdir(workingPath):
         shutil.rmtree(workingPath)
 
