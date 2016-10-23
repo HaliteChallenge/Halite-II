@@ -60,6 +60,9 @@ $(function() {
     }
 
     var gameTable = {
+        $alternateMessage: $("#noGameMessage"),
+        $panel: $("#gamePanel"),
+        $table: $("#gameTable"),
         $tableHeader: $("#gameTableHeader"),
         $tableBody: $("#gameTableBody"),
         $loadButton: $("#loadButton"),
@@ -75,11 +78,16 @@ $(function() {
             this.render();
         },
         render: function() {
-            this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
-            if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
-            this.$tableBody.empty();
-            for(var a = 0; a < this.games.length; a++) {
-                this.$tableBody.append(this.getTableRow(this.games[a]));
+            if(this.games.length == 0) {
+                this.$alternateMessage.css("display", "block");
+                this.$panel.css("display", "none");
+            } else {
+                this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
+                if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
+                this.$tableBody.empty();
+                for(var a = 0; a < this.games.length; a++) {
+                    this.$tableBody.append(this.getTableRow(this.games[a]));
+                }
             }
         },
         getTableRow: function(game) {
