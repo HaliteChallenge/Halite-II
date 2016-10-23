@@ -28,4 +28,4 @@ Want to help out? Have you implemented a patch or a new feature? Send us a pull 
 
 ### Authors
 
-Halite was primarily created by [Ben Spector](https://github.com/Sydriax) and [Michael Truell](https://github.com/truell20) for Two Sigma during their summer 2016 internship. However, many TSers contributed to Halite's developement, including [Matt Adereth](https://github.com/adereth), [Trammell Hudson](https://github.com/osresearch), and [Brian Wignall](https://github.com/bwignall).
+Halite was primarily created by [Ben Spector](https://github.com/Sydriax) and [Michael Truell](https://github.com/truell20) for Two Sigma during their summer 2016 internship. However, many others contributed to Halite's developement, including [Matt Adereth](https://github.com/adereth) and [Trammell Hudson](https://github.com/osresearch) from Two Sigma and [Arnaud Sahuguet](https://github.com/sahuguet) and [Scot Spinner](https://github.com/awesomescot) from Cornell Tech.
