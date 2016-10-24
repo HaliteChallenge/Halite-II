@@ -75,6 +75,8 @@ def _run_cmd(cmd, working_dir, timelimit):
 
     if time.time() - start > timelimit:
         errors.append("Compilation timed out with command %s" % (cmd,))
+    os.system("docker stop $(docker ps -aq)")
+    os.system("docker rm $(docker ps -aq)")
     return out, errors
 
 
