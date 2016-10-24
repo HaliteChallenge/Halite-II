@@ -50,11 +50,7 @@
 
                 <p>Players own pieces, with each piece occupying a given site and having its own strength.</p>
 
-<<<<<<< HEAD
                 <!-- <img src="http://halite.io/website/assets/basic_intro_territory_labels.png" style="width:100%;height:100%"> -->
-=======
-                <img src="assets/basic_intro_territory_labels.png" style="width:100%;height:100%">
->>>>>>> b2e6a0bfa17279589792844afcbb8b3903e2ec4c
 
                 <p>At each round, players (bots playing on behalf of players, to be precise) decide how to move the pieces they own. Valid moves are: STILL, NORTH, EAST, SOUTH, WEST.
                 <ul>
