@@ -73,7 +73,6 @@ CREATE TABLE `User` (
   `mu` float unsigned NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
   `rank` smallint(5) DEFAULT NULL,
-  `didTimeout` float DEFAULT 0.000,
   `numSubmissions` smallint(5) NOT NULL DEFAULT 0,
   `numGames` smallint(5) NOT NULL DEFAULT 0,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,

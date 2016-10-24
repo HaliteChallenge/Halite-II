@@ -14,11 +14,4 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 composer install
 
-# File structure
-cd ../
-echo "Setting up file structure"
-mkdir storage storage/bots storage/compile
-chown www-data:www-data storage storage/bots storage/compile 
-chmod 755 storage storage/bots storage/compile 
-
 echo "Attention: Please follow the directions in the install section of our technical spec! This is located inside of of git repo."

@@ -58,6 +58,9 @@
                 <li id="basics_improve_random">
                     <a href="basics_improve_random.php">Improving the Random Bot</a>
                 </li>
+                <li id="basics_faqs">
+                    <a href="basics_faqs.php">FAQs</a>
+                </li>
             </ul>
         </li>
         <li class="">

@@ -1,5 +1,5 @@
 $(function() {
-    var USERS_PER_PAGE = 50;
+    var USERS_PER_PAGE = 20;
 
     // What criteria are we using for ranking?
     var field = getGET("field");
@@ -17,11 +17,13 @@ $(function() {
     }
 
     // Create leaderboard filters from get params
+    // Set page title 
     var $heading = $("#leaderHeading");
     var filters = {};
     filters["isRunning"] = 1;
     if(field != null && value != null && heading != null) {
         $heading.html(heading + " Rankings");
+        document.title = heading + " Rankings";
         filters[field] = value;
     } else {
         $heading.html("Current Rankings");

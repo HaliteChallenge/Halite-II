@@ -22,11 +22,14 @@
         </div>
         <div class="row" id="normalBody">
             <div class="col-md-5">
-                <div class="panel panel-primary">
-                    <div class="panel-body text-center">
-                        <h1 id="name" style=""></h1>
-                        <h4 id="primary-info" style=""></h4>
-                        <div id="secondary-info" style="color: gray;"></div>
+                <div style="margin-bottom: 21px;" class="row">
+                    <div class="col-md-5">
+                        <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 233px;">
+                    </div>
+                    <div class="col-md-7 ">
+                        <h1 id="name" style="margin-top: 0px"></h1>
+                        <h4 id="primary-info" style="line-height: 1.2em;"></h4>
+                        <h5 id="secondary-info" style="line-height 1.2em; color: gray;"></h5>
                     </div>
                 </div>
                 <div id="historyPanel" class="panel panel-primary">
@@ -47,7 +50,11 @@
                 </div>
             </div>
             <div class="col-md-7">
-                <div class="panel panel-primary">
+                <div class="text-center" style="display: none;" id="noGameMessage">
+                    <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
+                    <h3>There are no games recorded yet.</h3>
+                </div>
+                <div id="gamePanel" class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Game Feed</h3>
                     </div>

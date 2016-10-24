@@ -17,10 +17,8 @@ date_default_timezone_set('America/New_York');
 
 include dirname(__FILE__).'/../API.class.php';
 
-define("COMPILE_PATH", dirname(__FILE__)."/../../../storage/compile/");
-define("BOTS_PATH", dirname(__FILE__)."/../../../storage/bots/");
-define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../../organizationWhitelist.txt");
-define("USER_TO_SERVER_RATIO", 20);
+define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
+define("USER_TO_SERVER_RATIO", 30);
 define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
@@ -69,14 +67,27 @@ class WebsiteAPI extends API{
         return isset($_SESSION['userID']) && mysqli_query($this->mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']}")->num_rows == 1;
     }
 
-    private function getUsers($query) {
+    private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
-        foreach($users as &$user) unset($user['email']);
+        foreach($users as &$user) {
+            if($privateInfo == false) unset($user['email']);
+            
+            if(intval($user['isRunning']) == 1) {
+                $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
+                if($percentile < 1/32) $user['tier'] = "Diamond";
+                else if($percentile < 1/16) $user['tier'] = "Gold";
+                else if($percentile < 1/4) $user['tier'] = "Silver";
+                else $user['tier'] = "Bronze";
+                
+
+                $user['score'] = round(floatval($user['mu']) - 3*floatval($user['sigma']), 2);
+            }
+        }
         return $users;
     }
 
     private function getLoggedInUser() {
-        if(isset($_SESSION['userID'])) return $this->select("SELECT * FROM User WHERE userID={$_SESSION['userID']}");
+        if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
     }
 
 
@@ -103,7 +114,7 @@ class WebsiteAPI extends API{
         else if(isset($_GET['fields']) && isset($_GET['values'])) {
             $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
             $whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
-            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'userID';
+            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'rank';
             $page = isset($_GET['page']) ? $_GET['page'] : 0;
 
             $results = $this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
@@ -130,7 +141,7 @@ class WebsiteAPI extends API{
             $githubUser = json_decode($gitHub->request('user'), true);
             $email = json_decode($gitHub->request('user/emails'), true)[0];
 
-            if(mysqli_query($this->mysqli, "SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")->num_rows > 0) { // Already signed up
+            if($this->numRows("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
@@ -147,16 +158,9 @@ class WebsiteAPI extends API{
                     }
                 }
 
-                $numActiveUsers = mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows + 1; // Add once since this user hasnt been inserted into the db
                 $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 
-                // AWS auto scaling
-                /*
-                $numWorkers = mysqli_query($this->mysqli, "SELECT workerID FROM Worker")->num_rows;
-                if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / (float)$numWorkers < USER_TO_SERVER_RATIO) {
-                    shell_exec("python3 openNewWorker.py &");
-                }*/
             }
 
             if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
@@ -231,20 +235,21 @@ class WebsiteAPI extends API{
                 return "Sorry, your file is too large.";
             }
 
-            $targetPath = COMPILE_PATH."{$user['userID']}.zip";
-            if(file_exists($targetPath))  {
-                unlink($targetPath);    
-            }
-
-            if(!move_uploaded_file($_FILES['botFile']['tmp_name'], $targetPath)) {
-                if(!copy($_FILES['botFile']['tmp_name'], $targetPath)) {
-                    return null;
-                }
-            }
-
+            $this->loadAwsSdk()->createS3()->putObject([
+                'Key'    => "{$user['userID']}",
+                'Body'   => file_get_contents($_FILES['botFile']['tmp_name']),
+                'Bucket' => COMPILE_BUCKET
+            ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
             if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
+
+            // AWS auto scaling
+            $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
+            $numWorkers = $this->numRows("SELECT workerID FROM Worker");
+            if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
+                echo shell_exec("python3 openNewWorker.py > /dev/null 2>/dev/null &");
+            }
 
             return "Success";
         }

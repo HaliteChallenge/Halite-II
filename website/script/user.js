@@ -60,6 +60,9 @@ $(function() {
     }
 
     var gameTable = {
+        $alternateMessage: $("#noGameMessage"),
+        $panel: $("#gamePanel"),
+        $table: $("#gameTable"),
         $tableHeader: $("#gameTableHeader"),
         $tableBody: $("#gameTableBody"),
         $loadButton: $("#loadButton"),
@@ -75,11 +78,16 @@ $(function() {
             this.render();
         },
         render: function() {
-            this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
-            if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
-            this.$tableBody.empty();
-            for(var a = 0; a < this.games.length; a++) {
-                this.$tableBody.append(this.getTableRow(this.games[a]));
+            if(this.games.length == 0) {
+                this.$alternateMessage.css("display", "block");
+                this.$panel.css("display", "none");
+            } else {
+                this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
+                if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
+                this.$tableBody.empty();
+                for(var a = 0; a < this.games.length; a++) {
+                    this.$tableBody.append(this.getTableRow(this.games[a]));
+                }
             }
         },
         getTableRow: function(game) {
@@ -122,21 +130,13 @@ $(function() {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
-            user["score"] = Math.round(100*(user["mu"]-3*user["sigma"]))/100;
-            user["didTimeout"] = (Math.round(1000*user["didTimeout"])/10) + "%";
-
-            var numUsers = parseInt(getNumActiveUsers());
-            var percentile = parseInt(user['rank']) / numUsers;
-            var tier = "Bronze";
-            if(percentile < 1/32) tier = "Diamond";
-            if(percentile < 1/16) tier = "Gold";
-            if(percentile < 1/4) tier = "Silver";
-
             $(document).prop('title', user.username);
 
+            var vr = "<span style='color: #0092a1;'>|</span>";
+            $("#profileImage").attr("src", "https://avatars.githubusercontent.com/u/"+user["oauthID"]);
             $("#name").html(user['username']);
-            $("#primary-info").html(tier + " Tier | " + user['rank']+" of "+numUsers+" | "+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played<br><a href='leaderboard.php?userID="+user["userID"]+"'>Find on leaderboard</a>");
+            $("#primary-info").html(user['tier'] + " Tier<br><a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played");
 
             gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
                 var rawGames = getLatestGamesForUser(userID, 10, startingID); 

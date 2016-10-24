@@ -21,7 +21,7 @@
                 <p>A Halite replay file is a JSON object which describes what occurred during the game. Halite replay files are easy to parse and reasonably compact (and extremely compact when compressed), making them ideal for both using machine learning on Halite as well as sharing interesting games. The extension .hlt is used to distinguish Halite replay files.</p>
 
                 <h2>Detailed Specification</h2>
-                
+
                 <p>A Halite replay file contains only a single JSON object. This object has the following attributes:
                 <ul>
                     <li><code>version</code> - Describes the version of the replay file. The present version is 11, which is expected to be stable for a while.</li>
@@ -38,7 +38,7 @@
                         <li>The following array has length <code>width</code>, and it contains individual sites of the frame. The first element is the first (leftmost) column and the last is the rightmost row.</li>
                         <li>The innermost array has length 2 and contains integers. Its contents represent the attributes of a given site. The first element is always the owner of the site and the second element is the strength of the site.</li>
                     </ul></li>
-                    <li><code>moves</code> - A 3D arrays of integers. The outermost array has length <code>num_frames - 1</code> and contains the moves for an individual frame. Each element is a 2D array of integers which represent the directions chosen to move for every site on the map. As always, the outer layer of the 2D array fills in the rows from top to bottom and the inside layer fills in individual rows from left to right. The integer values for each site are the same as those outlined in the <a href="http://halite.io/website/io_spec.php">IO Spec</a>; that is, <code>STILL</code> = 0, <code>NORTH</code> = 1, <code>EAST</code> = 2, <code>SOUTH</code> = 3, and <code>WEST</code> = 4. Sites not owned by any player are assigned the value of 0.</li>
+                    <li><code>moves</code> - A 3D arrays of integers. The outermost array has length <code>num_frames - 1</code> and contains the moves for an individual frame. Each element is a 2D array of integers which represent the directions chosen to move for every site on the map. As always, the outer layer of the 2D array fills in the rows from top to bottom and the inside layer fills in individual rows from left to right. The integer values for each site are: <code>STILL</code> = 0, <code>NORTH</code> = 1, <code>EAST</code> = 2, <code>SOUTH</code> = 3, and <code>WEST</code> = 4. Sites not owned by any player are assigned the value of 0.</li>
                 </ul></p>
 
                         </div>

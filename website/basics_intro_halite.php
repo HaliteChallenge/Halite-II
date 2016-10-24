@@ -38,7 +38,7 @@
 
                 <p>The first thing we're going to go through is how to submit a bot to the Halite competition. The bot will be rather bad at playing the game, making only random moves, but that's okay, because what's more important is that it provides a base from which to work up to a competition-winning bot. The reason we're showing you how to submit first is that the servers take time to run games; the goal is that by the time you finish the rest of this tutorial, some results will be up for you to check on afterwards.</p>
 
-                <p>Let's start by heading over to the <a href="http://halite.io/website/downloads.php">downloads page</a>. You'll notice a list of starter packages; this is a set of prewritten random bots that give players some boilerplate code to start off with. You're welcome to rewrite them yourself (and many people eventually do), but for now we'll just use them as they are.</p>
+                <p>Let's start by heading over to the <a href="downloads.php">downloads page</a>. You'll notice a list of starter packages; this is a set of prewritten random bots that give players some boilerplate code to start off with. You're welcome to rewrite them yourself (and many people eventually do), but for now we'll just use them as they are.</p>
 
                 <p>Next, download a package in your preferred language. If you're new to programming and don't know which to choose, we recommend Python 3, as it's the easiest to learn and use of the bunch. Then, click on <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">this link</a> (alternatively found at the top right of the page) to log into Halite using your GitHub account. If you don't have an account, that's OK; just head on over to <a href="https://github.com">here</a> to make one first.</p>
 
@@ -50,7 +50,11 @@
 
                 <p>Players own pieces, with each piece occupying a given site and having its own strength.</p>
 
+<<<<<<< HEAD
                 <!-- <img src="http://halite.io/website/assets/basic_intro_territory_labels.png" style="width:100%;height:100%"> -->
+=======
+                <img src="assets/basic_intro_territory_labels.png" style="width:100%;height:100%">
+>>>>>>> b2e6a0bfa17279589792844afcbb8b3903e2ec4c
 
                 <p>At each round, players (bots playing on behalf of players, to be precise) decide how to move the pieces they own. Valid moves are: STILL, NORTH, EAST, SOUTH, WEST.
                 <ul>

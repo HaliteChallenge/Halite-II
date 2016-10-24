@@ -4,8 +4,6 @@ use Aws\Sdk;
 require __DIR__ . '/../../vendor/autoload.php';
 require_once '../API.class.php';
 
-define("COMPILE_PATH", "../../../storage/compile/");
-define("BOTS_PATH", "../../../storage/bots/");
 define("INI_FILE", "../../../halite.ini");
 
 ini_set('upload_max_filesize', '50M');
@@ -74,50 +72,51 @@ class ManagerAPI extends API{
     protected function task() {
         if($this->method == 'GET') {
             // Check for compile tasks
-            $needToBeCompiled = $this->select("SELECT * FROM User WHERE compileStatus=1 ORDER BY userID ASC");
+            $needToBeCompiled = $this->select("SELECT * FROM User WHERE compileStatus=1 ORDER BY userID ASC LIMIT 1");
             if(count($needToBeCompiled) > 0) {
                 $this->insert("UPDATE User SET compileStatus = 2 WHERE userID = ".$needToBeCompiled['userID']);
                 return array(
                     "type" => "compile",
-                    "user" => $needToBeCompiled);
-                }
+                    "user" => $needToBeCompiled
+                );
+            }
 
-                // Assign a run game tasks
-                $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
-                $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
+            // Assign a run game tasks
+            $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
+            $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
+            $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and (userID in (SELECT gu.userID FROM GameUser gu GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 1) or numGames < 20) order by rand()*-pow(sigma, 2) LIMIT 1");
+
+            if(count($seedPlayer) < 1) {
                 $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
-                $seedPlayer = $this->select("select * from User where isRunning=1 and (numGames < 20 or didTimeout < 0.9) order by rand()*-pow(sigma, 2)");
-
-                if(count($seedPlayer) < 1) {
-                    $oldestGameTime = time();
-                    foreach($users as $user) {
-                        $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
-                        if($latestGameTime < $oldestGameTime) {
-                            $seedPlayer = $user;
-                            $oldestGameTime = $latestGameTime;
-                        }
+                $oldestGameTime = time();
+                foreach($users as $user) {
+                    $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
+                    if($latestGameTime < $oldestGameTime) {
+                        $seedPlayer = $user;
+                        $oldestGameTime = $latestGameTime;
                     }
                 }
-                if(count($seedPlayer) < 1) return null;
-                $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
-                array_push($players, $seedPlayer);
+            }
+            if(count($seedPlayer) < 1) return null;
+            $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
+            array_push($players, $seedPlayer);
 
-                // Pick map size
-                $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
-                $size = $sizes[array_rand($sizes)];
+            // Pick map size
+            $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
+            $size = $sizes[array_rand($sizes)];
 
-                // Send game task
-                if(count($players) == $numPlayers) {
-                    return array(
-                        "type" => "game",
-                        "width" => $size,
-                        "height" => $size,
-                        "users" => $players
-                    );
-                }
+            // Send game task
+            if(count($players) == $numPlayers) {
+                return array(
+                    "type" => "game",
+                    "width" => $size,
+                    "height" => $size,
+                    "users" => $players
+                );
             }
         }
+    }
 
     // Allow worker to post the result of their compilation
     protected function compile() {
@@ -140,7 +139,7 @@ class ManagerAPI extends API{
                     $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
                 }
             } else { // Didnt succeed
-                $this->sendEmail($user['email'], "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['output']}</code></pre>");
+                $this->sendEmail($user['email'], "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['errors']}</code></pre>");
                 $this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
             }
         }
@@ -215,22 +214,6 @@ class ManagerAPI extends API{
                 $errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]->errorLogName)."'";
                 $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout, versionNumber) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", {$timeoutInt}, {$storedUsers[$a]['numSubmissions']})");
 
-                // Cache didTimeout
-                // Note: this is written to be agnostic of the number of stats in each row of $gameStats, just in case we want to add more stats
-                $gameStats = $this->selectMultiple("SELECT didTimeout FROM GameUser WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
-                $totalGameStats = array();
-                foreach($gameStats as $oneGameStats) {
-                    foreach($oneGameStats as $statName => $statValue) {
-                        if(!array_key_exists($statName, $totalGameStats)) {
-                            $totalGameStats[$statName] = 0;
-                        }
-                        $totalGameStats[$statName] += $statValue;
-                    }
-                }
-                foreach($totalGameStats as $statName => $totalStatValue) {
-                    $averageStatValue = $totalStatValue / count($gameStats);
-                    $this->insert("UPDATE User SET $statName=$averageStatValue WHERE userID = ".$this->mysqli->real_escape_string($users[$a]->userID));
-                }
                 // Increment number of games
                 $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]->userID); 
             }
@@ -296,16 +279,27 @@ class ManagerAPI extends API{
 
             ob_clean();
             flush();
-            if(isset($_GET['compile'])) readfile(COMPILE_PATH."{$userID}.zip");
-            else readfile(BOTS_PATH."{$userID}.zip");
+
+            $bucket = null;
+            if(isset($_GET['compile'])) $bucket = COMPILE_BUCKET; 
+            else $bucket = BOT_BUCKET; 
+
+            echo $this->loadAwsSdk()->createS3()->getObject([
+                'Bucket' => $bucket,
+                'Key'    => "$userID" 
+            ])['Body'];
+
             exit;
         } else if(isset($_POST['userID']) && count($_FILES) > 0) {
             $userID = $_POST['userID'];
             $key = array_keys($_FILES)[0];
             $name = basename($_FILES[$key]['name']);
 
-            $targetPath = BOTS_PATH."{$userID}.zip";
-            move_uploaded_file($_FILES[$key]['tmp_name'], $targetPath);
+            $this->loadAwsSdk()->createS3()->putObject([
+                'Key'    => "{$userID}",
+                'Body'   => file_get_contents($_FILES[$key]['tmp_name']),
+                'Bucket' => BOT_BUCKET
+            ]);
         } else {
             return NULL;
         }
@@ -317,9 +311,14 @@ class ManagerAPI extends API{
     protected function botHash() {
         if(isset($_GET['userID'])) {
             $userID = $_GET['userID'];
-            if(isset($_GET['compile']) && file_exists(COMPILE_PATH."{$userID}.zip")) return array("hash" => md5_file(COMPILE_PATH."{$userID}.zip"));
-            else if(!isset($_GET['compile']) && file_exists(BOTS_PATH."{$userID}.zip")) return array("hash" => md5_file(BOTS_PATH."{$userID}.zip"));
-            else return "Bot file does not exist";
+            $s3Client = $this->loadAwsSdk()->createS3();            
+            if(isset($_GET['compile']) && $s3Client->doesObjectExist(COMPILE_BUCKET, "$userID")) {
+                return array("hash" => md5($s3Client->getObject(['Bucket' => COMPILE_BUCKET, 'Key'    => "$userID"])['Body']));
+            } else if(!isset($_GET['compile']) && $s3Client->doesObjectExist(BOT_BUCKET, "$userID")) {
+                return array("hash" => md5($s3Client->getObject(['Bucket' => BOT_BUCKET, 'Key'    => "$userID"])['Body']));
+            } else {
+                return "Bot file does not exist";
+            }
         }
     }
 }

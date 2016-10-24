@@ -4,7 +4,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Leaderboard</title>
+    <title>Rankings</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -17,8 +17,8 @@
             <div class="row">
                 <div class="col-sm-12">
                     <h1 id="leaderHeading">Leaderboard</h1>
-                    <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="quickstart.php">quickstart guide</a>.</p>
-                    <div class="panel panel-primary">
+                    <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
+                    <div class="panel panel-default">
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>
 
