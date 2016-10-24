@@ -38,6 +38,8 @@
 
                 <p>The first thing we're going to go through is how to submit a bot to the Halite competition. The bot will be rather bad at playing the game, making only random moves, but that's okay, because what's more important is that it provides a base from which to work up to a competition-winning bot. The reason we're showing you how to submit first is that the servers take time to run games; the goal is that by the time you finish the rest of this tutorial, some results will be up for you to check on afterwards.</p>
 
+                <p>In Halite, rankings are determined by games played on the servers. To get your bot played on the server, it needs to be submitted properly, and this means that you submit your source code to the servers. In short, to ensure successful submission ensure that your code will compile and run on Ubuntu 14.04 LTS and that you've included all relevant files in your zip. For this demonstration, though, you won't need to worry about that because we've confirmed that our starter packages will work with our servers.</p>
+
                 <p>Let's start by heading over to the <a href="downloads.php">downloads page</a>. You'll notice a list of starter packages; this is a set of prewritten random bots that give players some boilerplate code to start off with. You're welcome to rewrite them yourself (and many people eventually do), but for now we'll just use them as they are.</p>
 
                 <p>Next, download a package in your preferred language. If you're new to programming and don't know which to choose, we recommend Python 3, as it's the easiest to learn and use of the bunch. Then, click on <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">this link</a> (alternatively found at the top right of the page) to log into Halite using your GitHub account. If you don't have an account, that's OK; just head on over to <a href="https://github.com">here</a> to make one first.</p>
@@ -76,9 +78,27 @@
                 </ul>
                 The maximum number of turns is generally high enough that only the best-matched of bots will reach the turn limit; the majority of games will end before the turn limit is reached. In the event that the turn limit is reached or multiple bots are destroyed on the same turn, they are ranked based on their territory at that point in the game. If there is a tie in the amount of territory each bot possesses, the full territory integral is used as the tiebreaker, although this is a rare occurence.</p>
 
-                <p>Whew! Seems like a lot, doesn't it? Really though, after you familiarize yourselves with the rules they'll actually seem quite simple, because they are. The challenge is in building a bot which can navigate them.</p>
+                <p>Whew! Seems like a lot, doesn't it? Even though they're a bit non-intuitive, after you familiarize yourselves with the rules they'll actually seem quite simple, because they are. The challenge is in building a bot which can navigate them.</p>
 
                 <h3>Running a local game</h3>
+
+                <p>So, we now know how to submit a bot and generally understand the rules of the game. What next?</p>
+
+                <p>In order to work on your bot, you'll probably want to do a lot of testing in order to see which ideas work and which don't, and be able to select and combine those which do as effectively as possible. If you had to submit to the servers and wait for results every time, development would get quite tedious and slow. Luckily, you can instead run games locally on your computer as you wish, allowing you to better and more quickly evaluate your bots as you'd like. This section of the introduction will show you how.</p>
+
+                <p>Let's start by revisiting the <a href="downloads.php">downloads page</a>. You'll notice the section entitled "Game Environment"; this contains precompiled binaries of the game environment with which to run games on your computer. This environment is indentical to the environment used on the servers, so you can be confident that you can get repeatable behaviors between local testing and submission. Additionally, if you'd like to compile an environment for yourself, you can find the source code on our <a href="https://github.com/HaliteChallenge/Halite">github repo</a>. Download or compile the appropriate environment for your OS, and put it in a clean directory to work within.</p>
+
+                <p>The following instructions are designed to work with Python 3. If you downloaded a different starter package in an earlier part of this tutorial, please either download the Python package as well or be prepared to compile and run the language of your choice.</p>
+
+                <P>Next, if you are using the Python starter package, please ensure that you have Python 3 installed on your computer and added to your PATH. Then, extract the contents of the starter package to your newly created directory.</p>
+
+                <p>Open up a new terminal or command prompt and navigate to the new directory. If on windows, run the command <code>.\environment.exe -d 30 30 "python MyBot.py" "python MyBot.py"</code>; if on a Unix-based system, first run the command <code>chmod +x environment</code>, which marks the environment as executable, and then run the command <code>./environment -d 30 30 "python3 MyBot.py" "python3 MyBot.py"</code> to run the game. This will run a game between two random bots on a 30x30 random map. For more detail on how to use the environment, please visit <a href="advanced_command_line.php">this guide</a> or run it with the <code>--help</code> [COMING] flag. As the environment runs the game, it should output a stream of information about the game, ending with the final results of the game<./p>
+
+                <p>A new file with the file extension <code>.hlt</code> should have just been created in the directory. This is a replay file, and it contains all of the data of the game in the format specified <a href="advanced_replay_file.php">here</a>. In order to visualize the game you just played locally, visit <a href="local_visualizer.php">this visualization page</a> and drag and drop your newly created file onto the page to view the game. Congratulations! You now know how to run a local game of Halite!</p>
+
+                <h3>Conclusion</h3>
+
+                <p>Thanks for sticking with us until now! By this time, assuming you didn't just scroll past all of the above, the servers should have had enough time to run a few games. Find yourself on the rankings, take a look at some of our other tutorials, and start work on your bot!</p>
 
             </div>
         </div>
