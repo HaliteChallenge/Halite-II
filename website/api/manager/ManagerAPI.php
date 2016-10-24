@@ -72,50 +72,51 @@ class ManagerAPI extends API{
     protected function task() {
         if($this->method == 'GET') {
             // Check for compile tasks
-            $needToBeCompiled = $this->select("SELECT * FROM User WHERE compileStatus=1 ORDER BY userID ASC");
+            $needToBeCompiled = $this->select("SELECT * FROM User WHERE compileStatus=1 ORDER BY userID ASC LIMIT 1");
             if(count($needToBeCompiled) > 0) {
                 $this->insert("UPDATE User SET compileStatus = 2 WHERE userID = ".$needToBeCompiled['userID']);
                 return array(
                     "type" => "compile",
-                    "user" => $needToBeCompiled);
-                }
+                    "user" => $needToBeCompiled
+                );
+            }
 
-                // Assign a run game tasks
-                $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
-                $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
+            // Assign a run game tasks
+            $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
+            $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and (userID in (SELECT gu.userID FROM GameUser gu GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 1) or numGames < 20) order by rand()*-pow(sigma, 2) LIMIT 1");
+            $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and (userID in (SELECT gu.userID FROM GameUser gu GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 1) or numGames < 20) order by rand()*-pow(sigma, 2) LIMIT 1");
 
-                if(count($seedPlayer) < 1) {
-                    $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
-                    $oldestGameTime = time();
-                    foreach($users as $user) {
-                        $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
-                        if($latestGameTime < $oldestGameTime) {
-                            $seedPlayer = $user;
-                            $oldestGameTime = $latestGameTime;
-                        }
+            if(count($seedPlayer) < 1) {
+                $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
+                $oldestGameTime = time();
+                foreach($users as $user) {
+                    $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
+                    if($latestGameTime < $oldestGameTime) {
+                        $seedPlayer = $user;
+                        $oldestGameTime = $latestGameTime;
                     }
                 }
-                if(count($seedPlayer) < 1) return null;
-                $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
-                array_push($players, $seedPlayer);
+            }
+            if(count($seedPlayer) < 1) return null;
+            $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
+            array_push($players, $seedPlayer);
 
-                // Pick map size
-                $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
-                $size = $sizes[array_rand($sizes)];
+            // Pick map size
+            $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
+            $size = $sizes[array_rand($sizes)];
 
-                // Send game task
-                if(count($players) == $numPlayers) {
-                    return array(
-                        "type" => "game",
-                        "width" => $size,
-                        "height" => $size,
-                        "users" => $players
-                    );
-                }
+            // Send game task
+            if(count($players) == $numPlayers) {
+                return array(
+                    "type" => "game",
+                    "width" => $size,
+                    "height" => $size,
+                    "users" => $players
+                );
             }
         }
+    }
 
     // Allow worker to post the result of their compilation
     protected function compile() {
