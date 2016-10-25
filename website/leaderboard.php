@@ -16,8 +16,20 @@
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
-                    <h1 id="leaderHeading">Leaderboard</h1>
-                    <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
+                    <div class="row" style="margin-top: 21px; margin-bottom: 10px;">
+                        <div class="col-sm-9">
+                            <h1 id="leaderHeading" style="margin-top: 0px;">Leaderboard</h1>
+                            <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                               <input type="text" id="usernameField" class="form-control" placeholder="Username">
+                               <span class="input-group-btn">
+                                    <button class="btn btn-default" id="usernameSubmitButton" type="button">Submit</button>
+                               </span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="panel panel-default">
                         <?php include 'includes/leaderTable.php'; ?>
                     </div>

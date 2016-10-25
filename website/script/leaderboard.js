@@ -1,4 +1,26 @@
 $(function() {
+    var userSearch = {
+        $usernameField: $("#usernameField"),
+        $submitButton: $("#usernameSubmitButton"),
+        init: function() {
+            this.$submitButton.click(this, this.onSubmit.bind(this));         
+            this.$usernameField.keypress(this, this.inputKeypress.bind(this));         
+        },
+        inputKeypress: function(e) {
+            if(e.which == 13) this.onSubmit();
+        },
+        onSubmit: function() {
+            var username = this.$usernameField.val();
+            var user = getUser(null, username);
+            if(user == null) {
+                messageBox.alert("Invalid User", "The user "+username+" does not exist.", false, null);
+            } else {
+                window.location.href="leaderboard.php?userID="+user.userID;
+            }
+        }
+    }
+    userSearch.init();
+
     var USERS_PER_PAGE = 20;
 
     // What criteria are we using for ranking?
