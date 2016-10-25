@@ -22,7 +22,7 @@ public class MyBot {
                     }
                 }
             }
-	    Networking.sendFrame(moves);
+            Networking.sendFrame(moves);
         }
     }
 }
