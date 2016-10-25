@@ -23,9 +23,9 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group">
-                               <input type="text" class="form-control" placeholder="Username">
+                               <input type="text" id="usernameField" class="form-control" placeholder="Username">
                                <span class="input-group-btn">
-                                    <button class="btn btn-default" id="userNameSubmitButton" type="button">Submit</button>
+                                    <button class="btn btn-default" id="usernameSubmitButton" type="button">Submit</button>
                                </span>
                             </div>
                         </div>

@@ -102,12 +102,16 @@ class WebsiteAPI extends API{
     protected function user() {
         // Get a user's info with a username        
         if(isset($_GET["username"])) {
-            return $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'")[0];
+            $results = $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+            if(count($results) > 0) return $results[0];
+            else return null;
         } 
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            return $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'")[0];
+            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+            if(count($results) > 0) return $results[0];
+            else return null;
         } 
         
         // Get a set of filtered users
