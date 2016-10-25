@@ -1,12 +1,12 @@
 import java.util.ArrayList;
 
-public class MyBot {
+public class RandomBot {
     public static void main(String[] args) throws java.io.IOException {
         InitPackage iPackage = Networking.getInit();
         int myID = iPackage.myID;
         GameMap gameMap = iPackage.map;
 
-        Networking.sendInit("MyJavaBot");
+        Networking.sendInit("RandomJavaBot");
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();
@@ -22,7 +22,7 @@ public class MyBot {
                     }
                 }
             }
-            Networking.sendFrame(moves);
+        Networking.sendFrame(moves);
         }
     }
 }

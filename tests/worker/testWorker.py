@@ -31,6 +31,9 @@ class CompilerTests(unittest.TestCase):
 
             folderName = os.path.splitext(os.path.basename(f))[0]
             folder = os.path.join(SP_DIR, os.path.splitext(os.path.basename(f))[0])
+            for filename in os.listdir(folder):
+                if os.path.splittext(filename)[0] == "RandomBot":
+                   os.remove(os.path.join(folder, filename))
             expectedLanguage = folderName.split("-")[1]
             language, errors = compiler.compile_anything(folder)
             print(errors)

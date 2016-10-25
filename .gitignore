@@ -310,6 +310,13 @@ composer.lock
 ##########
 .atom-build.yml
 
+##########
+## Rust ##
+##########
+target/
+Cargo.lock
+**/*.rs.bk
+
 ############
 ## Halite ##
 ############
