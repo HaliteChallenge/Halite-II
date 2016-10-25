@@ -40,7 +40,7 @@ function showGame(game, showmovement, seconds) {
 	if(zoom < 1) zoom = 1;
 
 	window.onresize = function() {
-		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (10 + $("canvas").offset().top);
+		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (30 + $("canvas").offset().top);
 		console.log(window.innerHeight)
 		console.log(allowedHeight)
 		var definingDimension = Math.min(allowedWidth, allowedHeight);
@@ -53,7 +53,7 @@ function showGame(game, showmovement, seconds) {
 		renderer.resize(sw, sh);
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
-		TER_TOP = sh * 0.095, TER_BTM = sh * 0.38, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.715, STR_TOP = sh * 0.765, STR_BTM = sh;
+		TER_TOP = sh * 0.095, TER_BTM = sh * 0.36, PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675, STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });

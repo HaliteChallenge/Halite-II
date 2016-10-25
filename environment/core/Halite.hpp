@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include <thread>
+#include <future>
 
 #include "hlt.hpp"
 #include "json.hpp"
@@ -22,7 +23,8 @@ struct PlayerStatistics {
     double average_strength_count;
     double average_production_count;
     double still_percentage;
-    double average_response_time;
+    int init_response_time;
+    double average_frame_response_time;
 };
 static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
     o << p.tag << ' ' << p.rank;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
@@ -53,11 +55,10 @@ private:
     //Game state
     unsigned short turn_number;
     unsigned short number_of_players;
+    bool ignore_timeout;
     hlt::Map game_map;
     std::vector<std::string> player_names;
     std::vector< std::map<hlt::Location, unsigned char> > player_moves;
-    int time_allowance;
-    std::vector<int> player_time_allowances;
 
     //Statistics
     std::vector<unsigned short> alive_frame_count;
@@ -67,7 +68,8 @@ private:
     std::vector<unsigned int> full_production_count;
     std::vector<unsigned int> full_still_count;
     std::vector<unsigned int> full_cardinal_count;
-    std::vector<unsigned int> total_response_time;
+    std::vector<unsigned int> init_response_times;
+    std::vector<unsigned int> total_frame_response_times;
     std::set<unsigned short> timeout_tags;
 
     //Full game
