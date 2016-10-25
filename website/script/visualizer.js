@@ -53,7 +53,7 @@ function showGame(game, showmovement, seconds) {
 		renderer.resize(sw, sh);
 		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
-		TER_TOP = sh * 0.095, TER_BTM = sh * 0.38, PROD_TOP = sh * 0.43, PROD_BTM = sh * 0.715, STR_TOP = sh * 0.765, STR_BTM = sh;
+		TER_TOP = sh * 0.095, TER_BTM = sh * 0.355, PROD_TOP = sh * 0.405, PROD_BTM = sh * 0.665, STR_TOP = sh * 0.715, STR_BTM = sh * 0.975;
 		//Create the text for rendering the terrritory, strength, and prod graphs.
 		stage.removeChildren();
 		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
