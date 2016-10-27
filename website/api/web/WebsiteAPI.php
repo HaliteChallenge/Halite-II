@@ -152,7 +152,7 @@ class WebsiteAPI extends API{
                 $organization = "Other";
                 if($email != NULL) {
                     $emailDomain = explode('@', $email)[1];
-                    $rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
+                    $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
                     foreach($rows as $row) {
                         $components = explode(" - ", $row);
                         if(strcmp($components[1], $emailDomain) == 0) {
@@ -162,6 +162,7 @@ class WebsiteAPI extends API{
                     }
                 }
 
+                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
                 $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 
