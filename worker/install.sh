@@ -35,7 +35,7 @@ apt-get install -y docker-engine
 
 # Use devicemapper storage driver, so that we can limit storage space of containers
 service docker stop
-dockerd --storage-driver=devicemapper &
+dockerd --storage-driver=devicemapper --icc=false &
 service docker start
 
 if [[ "$(docker images -q mntruell/halite_sandbox:latest)" == "" ]]; then
