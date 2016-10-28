@@ -15,11 +15,6 @@ WORKINGDIR=$PWD
 if [ -e ../halite.ini ]
     then cp ../halite.ini temp.ini;
 fi
-cp tests.ini ../halite.ini
-python3 setupMysql.py || python setupMysql.py
-
-echo "Website tests"
-phpunit --stderr website/
 
 echo "Worker tests"
 cd worker
