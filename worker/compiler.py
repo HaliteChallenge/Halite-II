@@ -60,7 +60,7 @@ def nukeglob(pattern):
 
 def _run_cmd(cmd, working_dir, timelimit):
     absoluteWorkingDir = os.path.abspath(working_dir)
-    cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; useradd -r gamerunner; su -m gamerunner -c '"+cmd+"'\""
+    cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; useradd -r gamerunner; chown gamerunner -R '"+absoluteWorkingDir+"'; su -m gamerunner -c '"+cmd+"'\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     start = time.time()
@@ -124,6 +124,7 @@ class ExternalCompiler(Compiler):
         self.separate = separate
         self.out_files = out_files
         self.out_ext = out_ext
+        self.stderr_re = re.compile("WARNING: IPv4 forwarding is disabled")
 
     def __str__(self):
         return "ExternalCompiler: %s" % (' '.join(self.args),)
@@ -174,6 +175,7 @@ class ExternalCompiler(Compiler):
 
     def cmd_error_filter(self, cmd_out, cmd_errors):
         """Default implementation doesn't filter"""
+        cmd_errors = [line for line in cmd_errors if line is None or not self.stderr_re.search(line)]
         return cmd_errors
 
 
@@ -210,6 +212,8 @@ class ErrorFilterCompiler(ExternalCompiler):
         return "ErrorFilterCompiler: %s" % (' '.join(self.args),)
 
     def cmd_error_filter(self, cmd_out, cmd_errors):
+        cmd_errors = ExternalCompiler.cmd_error_filter(cmd_out, cmd_errors)
+
         """Skip and filter lines"""
         if self.skip_stdout > 0:
             del cmd_out[:self.skip_stdout]
