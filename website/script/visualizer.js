@@ -12,22 +12,24 @@ function initPixi() {
 	renderer = PIXI.autoDetectRenderer(0, 0, { backgroundColor: 0x000000, antialias: true, transparent: true });
 }
 
-function showGame(game, showmovement, seconds) {
+function showGame(game, showmovement, isminimal, seconds) {
 
 	if(renderer == null) initPixi();
 
-	$("#pageContent").empty();
-	$("#pageContent").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
-		var nameComponents = p.name.split(" ");
-		var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
-		console.log(name);
-		var user = getUser(null, name);
-		if(user) {
-			return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"
-		} else {
-			return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"
-		}
-	}).join(" vs ")+"</h3>"));
+	if(!isminimal) {
+		$("#pageContent").empty();
+		$("#pageContent").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
+			var nameComponents = p.name.split(" ");
+			var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
+			console.log(name);
+			var user = getUser(null, name);
+			if(user) {
+				return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"
+			} else {
+				return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"
+			}
+		}).join(" vs ")+"</h3>"));
+	}
 	document.getElementById("pageContent").appendChild(renderer.view);
 	$("#pageContent").append($("<br>"));
 	$("#pageContent").append($("<button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div>"));
@@ -46,36 +48,48 @@ function showGame(game, showmovement, seconds) {
 		console.log(window.innerHeight)
 		console.log(allowedHeight)
 		var definingDimension = Math.min(allowedWidth, allowedHeight);
-		if(allowedWidth < allowedHeight*4/3) {
-			sw = allowedWidth, sh = allowedWidth*3/4;
-		} else {
-			sw = allowedHeight*4/3, sh = allowedHeight;
+		if(isminimal) {
+			if(allowedWidth < allowedHeight) {
+				sw = allowedWidth, sh = allowedWidth;
+			} else {
+				sw = allowedHeight, sh = allowedHeight;
+			}
+			mw = sh, mh = sh;
+			renderer.resize(sw, sh);
+			rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
 		}
-		mw = sh, mh = sh;
-		renderer.resize(sw, sh);
-		rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-		GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
-		TER_TOP = sh * 0.095, TER_BTM = sh * 0.36, PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675, STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
-		//Create the text for rendering the terrritory, strength, and prod graphs.
-		stage.removeChildren();
-		terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
-		terText.anchor = new PIXI.Point(0, 1);
-		terText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.005);
-		stage.addChild(terText);
-		prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial' });
-		prodText.anchor = new PIXI.Point(0, 1);
-		prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP - sh * 0.005);
-		stage.addChild(prodText);
-		strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial' });
-		strText.anchor = new PIXI.Point(0, 1);
-		strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
-		stage.addChild(strText);
-		infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial' });
-		infoText.anchor = new PIXI.Point(0, 1);
-		infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
-		stage.addChild(infoText);
+		else {
+			if(allowedWidth < allowedHeight*4/3) {
+				sw = allowedWidth, sh = allowedWidth*3/4;
+			} else {
+				sw = allowedHeight*4/3, sh = allowedHeight;
+			}
+			mw = sh, mh = sh;
+			renderer.resize(sw, sh);
+			rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
+			GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
+			TER_TOP = sh * 0.095, TER_BTM = sh * 0.36, PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675, STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
+			//Create the text for rendering the terrritory, strength, and prod graphs.
+			stage.removeChildren();
+			terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
+			terText.anchor = new PIXI.Point(0, 1);
+			terText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.005);
+			stage.addChild(terText);
+			prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial' });
+			prodText.anchor = new PIXI.Point(0, 1);
+			prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP - sh * 0.005);
+			stage.addChild(prodText);
+			strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial' });
+			strText.anchor = new PIXI.Point(0, 1);
+			strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
+			stage.addChild(strText);
+			infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial' });
+			infoText.anchor = new PIXI.Point(0, 1);
+			infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
+			stage.addChild(infoText);
+			stage.addChild(graphGraphics);
+		}
 		stage.addChild(mapGraphics);
-		stage.addChild(graphGraphics);
 		console.log(renderer.width, renderer.height);
 	}
 	window.onresize();
@@ -151,75 +165,77 @@ function showGame(game, showmovement, seconds) {
 
 	function animate() {
 
-		//Clear graphGraphics so that we can redraw freely.
-		graphGraphics.clear();
+		if(!isminimal) {
+			//Clear graphGraphics so that we can redraw freely.
+			graphGraphics.clear();
 
-		//Draw the graphs.
-		var nf = Math.round(game.num_frames / zoom), graphMidFrame = frame;
-		var nf2 = Math.floor(nf / 2);
-		if(graphMidFrame + nf2 >= game.num_frames) graphMidFrame -= ((nf2 + graphMidFrame) - game.num_frames);
-		else if(Math.ceil(graphMidFrame - nf2) < 0) graphMidFrame = nf2;
-		var firstFrame = graphMidFrame - nf2, lastFrame = graphMidFrame + nf2;
-		if(firstFrame < 0) firstFrame = 0;
-		if(lastFrame >= game.num_frames) lastFrame = game.num_frames - 1;
-		nf = lastFrame - firstFrame;
-		var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
-		//Normalize values with respect to the range of frames seen by the graph.
-		var maxTer = 0, maxProd = 0, maxStr = 0;
-		for(var a = 1; a <= game.num_players; a++) {
-			for(var b = firstFrame; b <= lastFrame; b++) {
-				if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
-				if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
-				if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
+			//Draw the graphs.
+			var nf = Math.round(game.num_frames / zoom), graphMidFrame = frame;
+			var nf2 = Math.floor(nf / 2);
+			if(graphMidFrame + nf2 >= game.num_frames) graphMidFrame -= ((nf2 + graphMidFrame) - game.num_frames);
+			else if(Math.ceil(graphMidFrame - nf2) < 0) graphMidFrame = nf2;
+			var firstFrame = graphMidFrame - nf2, lastFrame = graphMidFrame + nf2;
+			if(firstFrame < 0) firstFrame = 0;
+			if(lastFrame >= game.num_frames) lastFrame = game.num_frames - 1;
+			nf = lastFrame - firstFrame;
+			var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
+			//Normalize values with respect to the range of frames seen by the graph.
+			var maxTer = 0, maxProd = 0, maxStr = 0;
+			for(var a = 1; a <= game.num_players; a++) {
+				for(var b = firstFrame; b <= lastFrame; b++) {
+					if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
+					if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
+					if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
+				}
 			}
+			for(var a = 1; a <= game.num_players; a++) {
+				graphGraphics.lineStyle(1, game.players[a].color);
+				//Draw ter graph.
+				graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
+				for(var b = firstFrame + 1; b <= lastFrame; b++) {
+					graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (TER_TOP - TER_BTM) * game.players[a].territories[b] / maxTer + TER_BTM);
+				}
+				//Draw prod graph.
+				graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].productions[firstFrame] / maxProd + PROD_BTM);
+				for(var b = firstFrame + 1; b <= lastFrame; b++) {
+					graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (PROD_TOP - PROD_BTM) * game.players[a].productions[b] / maxProd + PROD_BTM);
+				}
+				//Draw str graph.
+				graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].strengths[firstFrame] / maxStr + STR_BTM);
+				for(var b = firstFrame + 1; b <= lastFrame; b++) {
+					graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (STR_TOP - STR_BTM) * game.players[a].strengths[b] / maxStr + STR_BTM);
+				}
+			}
+			//Draw borders.
+			graphGraphics.lineStyle(1, '0x000000');
+			//Draw ter border.
+			graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_TOP);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
+			if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
+			graphGraphics.lineTo(GRAPH_LEFT, TER_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, TER_BTM);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
+			//Draw prod border.
+			graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_TOP);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
+			if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
+			graphGraphics.lineTo(GRAPH_LEFT, PROD_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, PROD_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, PROD_BTM);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
+			//Draw str border.
+			graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_TOP);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
+			if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
+			graphGraphics.lineTo(GRAPH_LEFT, STR_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, STR_TOP);
+			graphGraphics.lineTo(GRAPH_RIGHT, STR_BTM);
+			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
+			//Draw frame/ter text seperator.
+			graphGraphics.moveTo(GRAPH_LEFT, TER_TOP - sh * 0.045);
+			graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP - sh * 0.045);
 		}
-		for(var a = 1; a <= game.num_players; a++) {
-			graphGraphics.lineStyle(1, game.players[a].color);
-			//Draw ter graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
-			for(var b = firstFrame + 1; b <= lastFrame; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (TER_TOP - TER_BTM) * game.players[a].territories[b] / maxTer + TER_BTM);
-			}
-			//Draw prod graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].productions[firstFrame] / maxProd + PROD_BTM);
-			for(var b = firstFrame + 1; b <= lastFrame; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (PROD_TOP - PROD_BTM) * game.players[a].productions[b] / maxProd + PROD_BTM);
-			}
-			//Draw str graph.
-			graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].strengths[firstFrame] / maxStr + STR_BTM);
-			for(var b = firstFrame + 1; b <= lastFrame; b++) {
-				graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (STR_TOP - STR_BTM) * game.players[a].strengths[b] / maxStr + STR_BTM);
-			}
-		}
-		//Draw borders.
-		graphGraphics.lineStyle(1, '0x000000');
-		//Draw ter border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
-		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
-		graphGraphics.lineTo(GRAPH_LEFT, TER_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, TER_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
-		//Draw prod border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
-		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
-		graphGraphics.lineTo(GRAPH_LEFT, PROD_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, PROD_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, PROD_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
-		//Draw str border.
-		graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_TOP);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
-		if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
-		graphGraphics.lineTo(GRAPH_LEFT, STR_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, STR_TOP);
-		graphGraphics.lineTo(GRAPH_RIGHT, STR_BTM);
-		graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
-		//Draw frame/ter text seperator.
-		graphGraphics.moveTo(GRAPH_LEFT, TER_TOP - sh * 0.045);
-		graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP - sh * 0.045);
 
 		//Clear mapGraphics so that we can redraw freely.
 		mapGraphics.clear();
@@ -317,26 +333,28 @@ function showGame(game, showmovement, seconds) {
 			}
 		}
 
-		//Update info text:
-		var mousepos = manager.mouse.global;
-		if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
-			infoText.text = 'Frame #' + frame.toString();
-		}
-		else { //Mouse is clicked and over renderer.
-			if(mousepos.x < mw && mousepos.y < mh) { //Over map:
-				var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
-				if(x < 0) x += game.width;
-				if(y < 0) y += game.height;
-				str = game.frames[frame][y][x].strength;
-				prod = game.productions[y][x];
-				infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
+		if(!isminimal) {
+			//Update info text:
+			var mousepos = manager.mouse.global;
+			if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
+				infoText.text = 'Frame #' + frame.toString();
 			}
-			else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
-				frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
-				if(frame < 0) frame = 0;
-				if(frame >= game.num_frames) frame = game.num_frames - 1;
-				transit = 0;
-				if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
+			else { //Mouse is clicked and over renderer.
+				if(mousepos.x < mw && mousepos.y < mh) { //Over map:
+					var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
+					if(x < 0) x += game.width;
+					if(y < 0) y += game.height;
+					str = game.frames[frame][y][x].strength;
+					prod = game.productions[y][x];
+					infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
+				}
+				else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
+					frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
+					if(frame < 0) frame = 0;
+					if(frame >= game.num_frames) frame = game.num_frames - 1;
+					transit = 0;
+					if(mousepos.y > TER_TOP & mousepos.y < TER_BTM) {
+					}
 				}
 			}
 		}

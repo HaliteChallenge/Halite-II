@@ -89,7 +89,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
     //End message with newline character
     sendString += '\n';
 
-    #ifdef _WIN32
+#ifdef _WIN32
     WinConnection connection = connections[playerTag - 1];
 
     DWORD charsWritten;
@@ -99,20 +99,20 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
         if(!quiet_output) std::cout << "Problem writing to pipe\n";
         throw 1;
     }
-    #else
+#else
     UniConnection connection = connections[playerTag - 1];
     ssize_t charsWritten = write(connection.write, sendString.c_str(), sendString.length());
     if(charsWritten < sendString.length()) {
         if(!quiet_output) std::cout << "Problem writing to pipe\n";
         throw 1;
     }
-    #endif
+#endif
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
 
     std::string newString;
-    #ifdef _WIN32
+#ifdef _WIN32
     WinConnection connection = connections[playerTag - 1];
 
     DWORD charsRead;
@@ -146,7 +146,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
         if(buffer == '\n') break;
         else newString += buffer;
     }
-    #else
+#else
     UniConnection connection = connections[playerTag - 1];
 
     fd_set set;
@@ -182,7 +182,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
             throw newString;
         }
     }
-    #endif
+#endif
     //Python turns \n into \r\n
     if(newString.back() == '\r') newString.pop_back();
 
@@ -190,7 +190,8 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
 }
 
 void Networking::startAndConnectBot(std::string command) {
-    #ifdef _WIN32
+#ifdef _WIN32
+
     command = "/C " + command;
 
     WinConnection parentConnection, childConnection;
@@ -252,7 +253,9 @@ void Networking::startAndConnectBot(std::string command) {
         processes.push_back(piProcInfo.hProcess);
         connections.push_back(parentConnection);
     }
-    #else
+
+#else
+
     if(!quiet_output) std::cout << command << "\n";
 
     pid_t pid = (pid_t)NULL;
@@ -295,7 +298,7 @@ void Networking::startAndConnectBot(std::string command) {
     connections.push_back(connection);
     processes.push_back(pid);
 
-    #endif
+#endif
 
     player_logs.push_back(std::string());
 }
@@ -384,7 +387,42 @@ int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned sh
 
 void Networking::killPlayer(unsigned char playerTag) {
     if(isProcessDead(playerTag)) return;
-    #ifdef _WIN32
+
+    std::string newString;
+    const int PER_CHAR_WAIT = 10; //millis
+    const int MAX_READ_TIME = 1000; //millis
+
+#ifdef _WIN32
+
+    //Try to read entire contents of pipe.
+    WinConnection connection = connections[playerTag - 1];
+    DWORD charsRead;
+    bool success;
+    char buffer;
+    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count() < MAX_READ_TIME) {
+        DWORD bytesAvailable = 0;
+        PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
+        if(bytesAvailable < 1) {
+            std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
+            while(bytesAvailable < 1) {
+                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > PER_CHAR_WAIT) break;
+                PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
+            }
+            if(bytesAvailable < 1) break; //Took too long to get a character; breaking.
+        }
+
+        success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
+        if(!success || charsRead < 1) {
+            if(!quiet_output) {
+                std::string errorMessage = "Bot #" + std::to_string(playerTag) + " timed out or errored (Windows)\n";
+                std::lock_guard<std::mutex> guard(coutMutex);
+                std::cout << errorMessage;
+            }
+            break;
+        }
+        newString += buffer;
+    }
 
     HANDLE process = processes[playerTag - 1];
 
@@ -396,27 +434,50 @@ void Networking::killPlayer(unsigned char playerTag) {
 
     std::string deadMessage = "Player " + std::to_string(playerTag) + " is dead\n";
     if(!quiet_output) std::cout << deadMessage;
-    #else
+
+#else
+
+    //Try to read entire contents of pipe.
+    UniConnection connection = connections[playerTag - 1];
+    fd_set set;
+    FD_ZERO(&set); /* clear the set */
+    FD_SET(connection.read, &set); /* add our file descriptor to the set */
+    char buffer;
+    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count() < MAX_READ_TIME) {
+        struct timeval timeout;
+        timeout.tv_sec = PER_CHAR_WAIT / 1000;
+        timeout.tv_usec = (PER_CHAR_WAIT % 1000)*1000;
+        int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
+        if(selectionResult > 0) {
+            read(connection.read, &buffer, 1);
+            newString += buffer;
+        }
+        else break;
+    }
+
     kill(-processes[playerTag - 1], SIGKILL);
 
     processes[playerTag - 1] = -1;
     connections[playerTag - 1].read = -1;
     connections[playerTag - 1].write = -1;
-    #endif
+#endif
+
+    if(!newString.empty()) player_logs[playerTag - 1] += "\n --- Bot was killed. Below is the rest of its output (if any): ---\n" + newString + "\n --- End bot output ---";
 }
 
 bool Networking::isProcessDead(unsigned char playerTag) {
-    #ifdef _WIN32
+#ifdef _WIN32
     return processes[playerTag - 1] == NULL;
-    #else
+#else
     return processes[playerTag - 1] == -1;
-    #endif
+#endif
 }
 
 int Networking::numberOfPlayers() {
-    #ifdef _WIN32
+#ifdef _WIN32
     return connections.size();
-    #else
+#else
     return connections.size();
-    #endif
+#endif
 }
