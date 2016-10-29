@@ -21,16 +21,12 @@
             </div>
         </div>
         <div class="row" id="normalBody">
-            <div class="col-md-5">
-                <div style="margin-bottom: 21px;" class="row">
-                    <div class="col-md-5">
-                        <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 233px;">
-                    </div>
-                    <div class="col-md-7 ">
-                        <h1 id="name" style="margin-top: 0px"></h1>
-                        <h4 id="primary-info" style="line-height: 1.2em;"></h4>
-                        <h5 id="secondary-info" style="line-height 1.2em; color: gray;"></h5>
-                    </div>
+            <div class="col-lg-4 col-md-12">
+                <div id="profileCard" class="text-center" style="padding: 21px; margin-bottom: 21px; border: 1px solid #0092a1;">
+                    <img id="profileImage" style="border-radius: 100%; width: 100%; max-width: 200px;">
+                    <h1 id="name" style="margin-top: 12px"></h1>
+                    <h4 id="primary-info" style="line-height: 1.2em;"></h4>
+                    <h5 id="secondary-info" style="line-height 1.2em; margin-bottom: 0px; color: gray;"></h5>
                 </div>
                 <div id="historyPanel" class="panel panel-primary">
                     <div class="panel-heading">
@@ -49,7 +45,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-lg-8 col-md-12">
                 <div class="text-center" style="display: none;" id="noGameMessage">
                     <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
                     <h3>There are no games recorded yet.</h3>

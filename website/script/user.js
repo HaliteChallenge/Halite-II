@@ -70,8 +70,10 @@ $(function() {
         init: function(userID, isMe, getNextGames) {
             this.userID = userID;
             this.getNextGames = getNextGames;
-            this.games = getNextGames(this.userID);
             this.isMe = isMe;
+
+            this.games = getNextGames(this.userID);
+            for(var a = 0; a < this.games.length; a++) this.games[a].users.sort(function(p1, p2) { return parseInt(p1.rank) - parseInt(p2.rank); });
 
             this.$loadButton.click(this, this.loadMore.bind(this));         
 
@@ -82,7 +84,7 @@ $(function() {
                 this.$alternateMessage.css("display", "block");
                 this.$panel.css("display", "none");
             } else {
-                this.$tableHeader.html("<th>Participants</th><th>Result</th><th>Dimensions</th><th>View</th>");
+                this.$tableHeader.html("<th>Time</th><th>Opponents</th><th>Result</th><th>Dimensions</th><th>View</th>");
                 if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
                 this.$tableBody.empty();
                 for(var a = 0; a < this.games.length; a++) {
@@ -91,18 +93,21 @@ $(function() {
             }
         },
         getTableRow: function(game) {
-            var playersList = "<ol>";
             var userID = this.userID;
-            playersList += game.players.map(function(player) {
-                if(player.userID == userID) {
-                    return "<li><a href='user.php?userID="+player.userID+"'><b>"+player.username+"</a></b></li>";
-                } else {
-                    return "<li><a href='user.php?userID="+player.userID+"'>"+player.username+"</a></li>";
-                }
-            }).join(" ");
 
-            playersList += "</ol>";
-            var $row = $("<tr><td>"+playersList+"</td><td>"+game.result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
+            playersList = game.users.filter(function(player) {
+                return player.userID != userID;
+            }).map(function(player) {
+                    return "<a href='user.php?userID="+player.userID+"'>"+player.username+"</a>";
+            }).join(", ");
+
+            var thisUser = game.users.find(function(p){return parseInt(p.userID)==userID;});
+            var result = thisUser.rank + " of " + game.users.length;
+
+            var dateComponents = game.timestamp.split(/[- :]/);
+            var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
+
+            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td style='width: 33%; height: 4em; overflow: hidden;'>"+playersList+"</td><td>"+result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             if(this.isMe) {
                 var me = null;
                 for(var a = 0; a < game.players.length; a++) {
@@ -142,21 +147,7 @@ $(function() {
                 var rawGames = getLatestGamesForUser(userID, 10, startingID); 
                 var games = [];
                 for(var a = 0; a < rawGames.length; a++) {
-                    var players = rawGames[a].users;
-                    players.sort(function(p1, p2) {
-                        return parseInt(p1.rank) - parseInt(p2.rank);
-                    });
-                    var thisUser = players.find(function(p){return parseInt(p.userID)==userID;});
-                    var result = thisUser.rank + " of " + players.length;
-
-                    games.push({
-                        gameID: rawGames[a].gameID,
-                        players: players,
-                        result: result,
-                        mapWidth: rawGames[a].mapWidth,
-                        mapHeight: rawGames[a].mapHeight,
-                        replayName: rawGames[a].replayName
-                    });
+                    games.push(rawGames[a]);
                 }
                 return games;
             });
