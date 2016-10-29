@@ -89,7 +89,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
     //End message with newline character
     sendString += '\n';
 
-    #ifdef _WIN32
+#ifdef _WIN32
     WinConnection connection = connections[playerTag - 1];
 
     DWORD charsWritten;
@@ -99,14 +99,14 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
         if(!quiet_output) std::cout << "Problem writing to pipe\n";
         throw 1;
     }
-    #else
+#else
     UniConnection connection = connections[playerTag - 1];
     ssize_t charsWritten = write(connection.write, sendString.c_str(), sendString.length());
     if(charsWritten < sendString.length()) {
         if(!quiet_output) std::cout << "Problem writing to pipe\n";
         throw 1;
     }
-    #endif
+#endif
 }
 
 std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
