@@ -29,7 +29,8 @@ function showGame(game, showmovement, seconds) {
 		}
 	}).join(" vs ")+"</h3>"));
 	document.getElementById("pageContent").appendChild(renderer.view);
-	$("#pageContent").append($("<h3>Using the visualizer</h3><p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p>"));
+	$("#pageContent").append($("<br>"));
+	$("#pageContent").append($("<button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div>"));
 
 	var frame = 0;
 	var transit = 0;
@@ -41,7 +42,7 @@ function showGame(game, showmovement, seconds) {
 	if(zoom < 1) zoom = 1;
 
 	window.onresize = function() {
-		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (30 + $("canvas").offset().top);
+		var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (60 + $("canvas").offset().top);
 		console.log(window.innerHeight)
 		console.log(allowedHeight)
 		var definingDimension = Math.min(allowedWidth, allowedHeight);
