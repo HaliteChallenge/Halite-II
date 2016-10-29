@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="row" id="normalBody">
-            <div class="col-lg-4 col-md-12">
+            <div class="col-xl-6 col-lg-5 col-md-12">
                 <div id="profileCard" class="text-center" style="padding: 21px; margin-bottom: 21px; border: 1px solid #0092a1;">
                     <img id="profileImage" style="border-radius: 100%; width: 100%; max-width: 200px;">
                     <h1 id="name" style="margin-top: 12px"></h1>
@@ -45,7 +45,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-lg-8 col-md-12">
+            <div class="col-xl-6 col-lg-7 col-md-12">
                 <div class="text-center" style="display: none;" id="noGameMessage">
                     <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
                     <h3>There are no games recorded yet.</h3>

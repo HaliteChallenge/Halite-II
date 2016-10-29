@@ -110,9 +110,9 @@ $(function() {
             var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td style='width: 33%; height: 4em; overflow: hidden;'>"+playersList+"</td><td>"+result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             if(this.isMe) {
                 var me = null;
-                for(var a = 0; a < game.players.length; a++) {
-                    if(game.players[a].userID == this.userID) {
-                        me = game.players[a];
+                for(var a = 0; a < game.users.length; a++) {
+                    if(game.users[a].userID == this.userID) {
+                        me = game.users[a];
                         break;
                     }
                 }
