@@ -306,7 +306,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
     //Send initial package
     std::vector< std::future<int> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++) {
-        initThreads[a] = std::async(&Networking::handleInitNetworking, networking, static_cast<unsigned char>(a + 1), game_map, ignore_timeout, &player_names[a]);
+        initThreads[a] = std::async(&Networking::handleInitNetworking, &networking, static_cast<unsigned char>(a + 1), game_map, ignore_timeout, &player_names[a]);
     }
     for(unsigned char a = 0; a < number_of_players; a++) {
         int time = initThreads[a].get();
