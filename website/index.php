@@ -55,7 +55,7 @@ if(isset($_SESSION['userID'])) {
                     </div>
 
                     <h1>Creators</h1>
-                    <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
+                    <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
                     
                     <div class="row">
                         <div class="col-sm-6">
