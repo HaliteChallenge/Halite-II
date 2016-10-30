@@ -34,14 +34,14 @@ int main(int argc, char ** argv) {
     if(argc == 1) {
         std::cout << "You've provided the environment with no arguments.\n"
         << "If this was intentional, please ignore this message.\n"
-        << "Else, please use the -h (--help) flag for usage details.\n";
+        << "Else, please use the --help flag for usage details.\n";
     }
     
     Networking networking;
     std::vector<std::string> * names = NULL;
     unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
-    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.0");
+    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.0.1");
 
     //Switch Args.
     TCLAP::SwitchArg quietSwitch("q", "quiet", "Runs game in quiet mode, producing machine-parsable output.", cmd, false);
