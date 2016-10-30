@@ -43,13 +43,30 @@ if(isset($_SESSION['userID'])) {
                 <div class="col-sm-12">
                     <h1>Introducing Halite</h1>
                     <b><p>Disclaimer: Halite will be launching on November 2nd. The site is currently in beta.</p></b>
-                    <p>Halite is a multiplayer turn-based strategy game played by computer programs on a rectangular grid. Each player’s objective in Halite is to take over the entire map and eliminate the other players in the game.</p>
-                    <p>Bots must use their territory to gain strength and their strength to gain territory, move intelligently on both the micro and macro scales, and brave a branching factor of ~10<sup>1750</sup> to play effectively.</p>
-                    <p>The simplest halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. Interested? <a href="basics_quickstart.php">Get started building a bot</a>.</p>
+                    <p>Halite is a multiplayer turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire grid and eliminate the other players in the game.</p>
+                    <p>Halite is really a programming game. As a human player, you don't interact with the game directly. Rather, you program a bot that will play games on your behalf.</p>
+                    <p>Halite continuously and randomly organizes "games" between bots and uses the outcome to rank bots and create a leaderboard for players.</p>
+                    <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
+
                     <h1>Top Rankings</h1>
                     <p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
                     <div class="panel panel-default">
                         <?php include 'includes/leaderTable.php'; ?>
+                    </div>
+
+                    <h1>Creators</h1>
+                    <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
+                    
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="text-center"><a href="https://twosigma.com"><img src="assets/two_sigma.png" style="max-height: 288px;"></a></div>
+                            <p>Two Sigma is a highly-innovative, technological investment firm based in New York City</p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="text-center"><a href="https://tech.cornell.edu"><img src="assets/cornell_tech.png" style="max-height: 288px"></a></div>
+                            <p>Cornell Tech is a new graduate school that brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
+                        </div>
                     </div>
                 </div>
             </div>
