@@ -237,7 +237,7 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $this->sendEmail($storedUser['email'], "First Bot Timeout", "Your bot timed out in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>. We will <b>not</b> send you emails about subsequent timeouts of your bot. Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>");
+                    $this->sendEmail($storedUser['email'], "First Bot Timeout/Error", "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_dev.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>");
                 }
             }
 
