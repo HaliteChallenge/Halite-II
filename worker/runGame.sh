@@ -1,16 +1,16 @@
 #!/bin/bash
 
-ENVIRONMENT="environment"
+ENVIRONMENT="halite"
 RUNFILE="run.sh"
 WORKINGPATH="workingPath"
 
 if [ ! -f $ENVIRONMENT ]; then
-	echo "NO ENVIRONMENT!!"
-	cd ../environment
-	make clean
-	make 
-	mv environment ../worker
-	cd ../worker
+    echo "NO ENVIRONMENT!!"
+    cd ../environment
+    make clean
+    make 
+    mv halite ../worker
+    cd ../worker
 fi
 
 WIDTH=$1
