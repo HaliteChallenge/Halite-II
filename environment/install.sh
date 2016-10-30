@@ -1,5 +1,5 @@
 # Install tclap
-curl "http://downloads.sourceforge.net/project/tclap/tclap-1.2.1.tar.gz" -o "tclap-1.2.1.tar.gz"
+curl "https://github.com/mirror/tclap/archive/tclap-1-2-1-release-final.tar.gz" -o "tclap-1.2.1.tar.gz"
 tar -xvzf tclap-1.2.1.tar.gz
 rm -r tclap-1.2.1.tar.gz
 cd tclap-1.2.1
