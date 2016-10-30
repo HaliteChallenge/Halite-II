@@ -1,5 +1,5 @@
 # Install tclap
-wget http://downloads.sourceforge.net/project/tclap/tclap-1.2.1.tar.gz
+curl "http://downloads.sourceforge.net/project/tclap/tclap-1.2.1.tar.gz" -o "tclap-1.2.1.tar.gz"
 tar -xvzf tclap-1.2.1.tar.gz
 rm -r tclap-1.2.1.tar.gz
 cd tclap-1.2.1
@@ -11,7 +11,7 @@ cd ../
 rm -r tclap-1.2.1
 
 # Install Halite environment
-wget https://halite.io/downloads/environment/HaliteEnvironment-Source.zip 
+curl "https://halite.io/downloads/environment/HaliteEnvironment-Source.zip" -o "HaliteEnvironment-Source.zip"
 mkdir HaliteEnvironment-Source
 unzip HaliteEnvironment-Source.zip -d HaliteEnvironment-Source
 rm HaliteEnvironment-Source.zip
