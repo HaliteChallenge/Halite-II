@@ -19,7 +19,7 @@
                 <p>
                     The environment may be passed a number of flags, including:
                     <ul>
-                        <li><code>-d</code>: allows the automatic input of the dimensions of the map. The following two arguments are expected to be width and height.</li>
+                        <li><code>-d</code>: allows the automatic input of the dimensions of the map. The following two argument is expected to be a string containing the width and height (space-separated).</li>
                             <li><code>-q</code>: turns on quiet output. Output will take the form of:
                                 <ul>
                                     <li>A line containing the replay file name, a space, and the map seed.</li>
