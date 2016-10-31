@@ -4,9 +4,25 @@
 #include <list>
 #include <string.h>
 
+#include <tclap/CmdLine.h>
+
 #include "core/Halite.hpp"
 
-bool quiet_output = false; //Need to be passed to the game.
+inline std::istream & operator>>(std::istream & i, std::pair<signed int, signed int> & p) {
+    i >> p.first >> p.second;
+    return i;
+}
+inline std::ostream & operator<<(std::ostream & o, const std::pair<signed int, signed int> & p) {
+    o << p.first << ' ' << p.second;
+    return o;
+}
+namespace TCLAP {
+template<> struct ArgTraits< std::pair<signed int, signed int> > {
+    typedef TCLAP::ValueLike ValueCategory;
+};
+}
+
+bool quiet_output = false; //Need to be passed to a bunch of classes; extern is cleaner.
 Halite * my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
 Networking promptNetworking();
@@ -15,85 +31,66 @@ void promptDimensions(unsigned short & w, unsigned short & h);
 int main(int argc, char ** argv) {
     srand(time(NULL)); //For all non-seeded randomness.
 
-    bool watch_game = false, override_names = false; //Extra parameters.
-
-    //Paramters to start up a game.
-    bool passed_dimensions = false, passed_seed = false, passed_bot_names = false, ignore_timeout = false;
-    unsigned short mapWidth, mapHeight;
-    unsigned int seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295); //Using microseconds to prevent same maps from coming up due to multiple worker servers.
+    if(argc == 1) {
+        std::cout << "You've provided the environment with no arguments.\n"
+        << "If this was intentional, please ignore this message.\n"
+        << "Else, please use the --help flag for usage details.\n";
+    }
+    
     Networking networking;
     std::vector<std::string> * names = NULL;
     unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
-    std::list<std::string> sArgs;
-    for(int a = 1; a < argc; a++) sArgs.push_back(argv[a]);
+    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.0.1");
 
-    for(auto a = sArgs.begin(); a != sArgs.end();) {
-        if(*a == "-d") {
-            passed_dimensions = true;
-            a = sArgs.erase(a);
-            try {
-                if(a == sArgs.end()) throw 0;
-                mapWidth = std::stoll(*a);
-                a = sArgs.erase(a);
-                if(a == sArgs.end()) throw 0;
-                mapHeight = std::stoll(*a);
-                a = sArgs.erase(a);
-            }
-            catch(...) {
-                std::cout << "The dimension parameters were either not present or invalid despite the flag having been given." << std::endl;
-                return EXIT_FAILURE;
-            }
-        }
-        else if(*a == "-w") {
-            watch_game = true;
-            a = sArgs.erase(a);
-        }
-        else if(*a == "-q") {
-            quiet_output = true;
-            a = sArgs.erase(a);
-        }
-        else if(*a == "-o") {
-            override_names = true;
-            a = sArgs.erase(a);
-        }
-        else if(*a == "-s") {
-            passed_seed = true;
-            a = sArgs.erase(a);
-            try {
-                if(a == sArgs.end()) throw 0;
-                seed = std::stoll(*a);
-                a = sArgs.erase(a);
-            }
-            catch(...) {
-                std::cout << "The seed parameter was either not present or invalid despite the flag having been given." << std::endl;
-                return EXIT_FAILURE;
-            }
-        }
-        else if(*a == "-t") {
-            ignore_timeout = true;
-            a = sArgs.erase(a);
-        }
-        else a++;
+    //Switch Args.
+    TCLAP::SwitchArg quietSwitch("q", "quiet", "Runs game in quiet mode, producing machine-parsable output.", cmd, false);
+    TCLAP::SwitchArg overrideSwitch("o", "override", "Overrides player-sent names using cmd args [SERVER ONLY].", cmd, false);
+    TCLAP::SwitchArg timeoutSwitch("t", "timeout", "Causes game environment to ignore timeouts (give all bots infinite time).", cmd, false);
+
+    //Value Args
+    TCLAP::ValueArg< std::pair<signed int, signed int> > dimensionArgs("d", "dimensions", "The dimensions of the map.", false, { 0, 0 }, "a string containing two space-seprated positive integers", cmd);
+    TCLAP::ValueArg<unsigned int> seedArg("s", "seed", "The seed for the map generator.", false, 0, "positive integer", cmd);
+
+    //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
+    TCLAP::UnlabeledMultiArg<std::string> otherArgs("NonspecifiedArgs", "Start commands for bots.", false, "Array of strings", cmd);
+
+    cmd.parse(argc, argv);
+
+    unsigned short mapWidth = dimensionArgs.getValue().first;
+    unsigned short mapHeight = dimensionArgs.getValue().second;
+
+    unsigned int seed;
+    if(seedArg.getValue() != 0) seed = seedArg.getValue();
+    else seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295);
+
+    quiet_output = quietSwitch.getValue();
+    bool override_names = overrideSwitch.getValue();
+    bool ignore_timeout = timeoutSwitch.getValue();
+
+    std::vector<std::string> unlabeledArgsVector = otherArgs.getValue();
+    std::list<std::string> unlabeledArgs;
+    for(auto a = unlabeledArgsVector.begin(); a != unlabeledArgsVector.end(); a++) {
+        unlabeledArgs.push_back(*a);
     }
 
-    if(!passed_dimensions) {
+    if(mapWidth == 0 && mapHeight == 0) {
         promptDimensions(mapWidth, mapHeight);
     }
 
     if(override_names) {
-        if(sArgs.size() < 4 || sArgs.size() % 2 != 0) {
+        if(unlabeledArgs.size() < 4 || unlabeledArgs.size() % 2 != 0) {
             std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
             networking = promptNetworking();
         }
         else {
             try {
                 names = new std::vector<std::string>();
-                while(!sArgs.empty()) {
-                    networking.startAndConnectBot(sArgs.front());
-                    sArgs.pop_front();
-                    names->push_back(sArgs.front());
-                    sArgs.pop_front();
+                while(!unlabeledArgs.empty()) {
+                    networking.startAndConnectBot(unlabeledArgs.front());
+                    unlabeledArgs.pop_front();
+                    names->push_back(unlabeledArgs.front());
+                    unlabeledArgs.pop_front();
                 }
             }
             catch(...) {
@@ -105,15 +102,15 @@ int main(int argc, char ** argv) {
         }
     }
     else {
-        if(sArgs.size() < 2) {
+        if(unlabeledArgs.size() < 2) {
             std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
             networking = promptNetworking();
         }
         try {
-            while(!sArgs.empty()) {
-                std::cout << sArgs.front() << std::endl;
-                networking.startAndConnectBot(sArgs.front());
-                sArgs.pop_front();
+            while(!unlabeledArgs.empty()) {
+                std::cout << unlabeledArgs.front() << std::endl;
+                networking.startAndConnectBot(unlabeledArgs.front());
+                unlabeledArgs.pop_front();
             }
         }
         catch(...) {
@@ -124,7 +121,6 @@ int main(int argc, char ** argv) {
 
     //Create game. Null parameters will be ignored.
     my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
-
 
     GameStatistics stats = my_game->runGame(names, seed, id);
     if(names != NULL) delete names;
@@ -138,15 +134,6 @@ int main(int argc, char ** argv) {
     }
 
     delete my_game;
-
-    if(watch_game) {
-#ifdef _WIN32
-        std::string command = ".\\visualizer " + stats.output_filename;
-#else
-        std::string command = "./visualizer " + stats.output_filename;
-#endif
-        system(command.c_str());
-    }
 
     return 0;
 }

@@ -331,8 +331,8 @@ workingPath/
 *.swp
 *.gch
 *.exe
-environment/environment
-worker/environment
+environment/halite
+worker/halite
 git_pull.php
 
 *.zip

@@ -1,16 +1,16 @@
 #!/bin/bash
 
-ENVIRONMENT="environment"
+ENVIRONMENT="halite"
 RUNFILE="run.sh"
 WORKINGPATH="workingPath"
 
 if [ ! -f $ENVIRONMENT ]; then
-	echo "NO ENVIRONMENT!!"
-	cd ../environment
-	make clean
-	make 
-	mv environment ../worker
-	cd ../worker
+    echo "NO ENVIRONMENT!!"
+    cd ../environment
+    make clean
+    make 
+    mv halite ../worker
+    cd ../worker
 fi
 
 WIDTH=$1
@@ -44,7 +44,7 @@ done
 
 eval "chmod +x $ENVIRONMENT"
 
-RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d $WIDTH $HEIGHT $BOTSTARTCOMMANDS"
+RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d \"$WIDTH $HEIGHT\" $BOTSTARTCOMMANDS"
 echo $RUN_GAME_COMMAND;
 eval $RUN_GAME_COMMAND;
 

@@ -1,7 +1,7 @@
-CXXFLAGS += -std=c++11 -pthread
+CXXFLAGS += -std=c++11 -pthread -I ./
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
-TARGET=environment
+TARGET=halite
 
 .PHONY: all
 all: $(TARGET)
@@ -12,3 +12,7 @@ $(TARGET): $(OBJECTS)
 .PHONY: clean
 clean:
 	rm -f $(TARGET) $(OBJECTS)
+
+.PHONY: install
+install:
+	install -m 0755 halite $(prefix)/bin
