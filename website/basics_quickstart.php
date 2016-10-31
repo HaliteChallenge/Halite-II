@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Hello, Halite! (part 1)</title>
+    <title>Getting Started</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -14,7 +14,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Hello, Halite! (part 1)</h1>
+                <h1>Getting Started</h1>
                 <p>In this short tutorial, we will explain how to submit your first bot and get your name on the Halite leaderboard.</p>
                 
                 <h3>Register using Github</h3>
@@ -36,7 +36,7 @@
 
                 <h3>Next Steps</h3>
                 <p>Congratulations. You are now an official contestant!</p>
-                <p>It may be up to <b>10 minutes</b> before your bot has played a few games. In the meantime, move onto <a href="basics_intro_halite.php">Hello Halite (part 2)</a>.</p>
+                <p>It may be up to <b>10 minutes</b> before your bot has played a few games. In the meantime, move onto <a href="basics_intro_halite.php">Introducing Halite</a>.</p>
 
                 <h3>Need Help? Have Feedback?</h3>
                 <p>Please post on <a href="http://forums.halite.io">the forums</a>.</p>

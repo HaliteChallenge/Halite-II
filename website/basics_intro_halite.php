@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Hello, Halite! (part 2)</title>
+    <title>Introducing Halite</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -14,8 +14,8 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Hello, Halite! (part 2)</h1>
-                In part 1, we showed how to submit to the leaderboard the demo bot included with the starter kit. In this short tutorial, we will explain how to write your first bot, test it locally and submit it.
+                <h1>Introducing Halite</h1>
+                <p>In part 1, we showed how to submit to the leaderboard the demo bot included with the starter kit. In this short tutorial, we will explain how to write your first bot, test it locally and submit it.</p>
                 <h3>Making changes to the demo bot</h3>
                 <p>Depending of the language you chose – Python (.py), Java (.java) or C++ (.cpp) – , you should get these files when you expand your starter bot.</p>
                 <!-- TODO: add in table that describes files -->
