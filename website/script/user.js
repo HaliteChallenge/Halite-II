@@ -98,8 +98,8 @@ $(function() {
             playersList = game.users.filter(function(player) {
                 return player.userID != userID;
             }).map(function(player) {
-                    return "<a href='user.php?userID="+player.userID+"'>"+player.username+"</a>";
-            }).join(", ");
+                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;'></a>";
+            }).join(" ");
 
             var thisUser = game.users.find(function(p){return parseInt(p.userID)==userID;});
             var result = thisUser.rank + " of " + game.users.length;
@@ -107,7 +107,7 @@ $(function() {
             var dateComponents = game.timestamp.split(/[- :]/);
             var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
 
-            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td style='width: 33%; height: 4em; overflow: hidden;'>"+playersList+"</td><td>"+result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
+            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             if(this.isMe) {
                 var me = null;
                 for(var a = 0; a < game.users.length; a++) {
