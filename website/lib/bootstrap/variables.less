@@ -8,16 +8,17 @@
 //## Gray and brand colors for use across Bootstrap.
 
 @ts-dark-teal: rgb(0, 34, 33);
-@ts-teal: rgb(0,146,161); //rgb(99, 206, 202);
+@ts-teal: rgb(99, 206, 202); //rgb(0,146,161); 
 @ts-orange: rgb(227, 114, 34);
 @ts-yellow: rgb(255, 190, 0);
 
-@gray-base:              #000;
-@gray-darker:            lighten(@gray-base, 13.5%); // #222
-@gray-dark:              #7b8a8b;   // #333
-@gray:                   #95a5a6; // #555
-@gray-light:             #b4bcc2;   // #999
-@gray-lighter:           #ecf0f1; // #eee
+@gray-base:              @ts-dark-teal;
+@gray-darker:            lighten(@ts-dark-teal, 13.5%); // #222
+@gray-dark:              rgb(0, 40, 39);   // #333
+@gray:                   rgb(0, 45, 44); // #555
+@gray-light:             rgb(0, 50, 49);   // #999
+@gray-lighter:           rgb(0, 55, 54); // #eee
+@gray-lightest:           rgb(0, 65, 64); // #eee
 
 @brand-primary:         @ts-teal;
 @brand-success:         @ts-teal;
@@ -31,9 +32,9 @@
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-@body-bg:               #FFFFFF;
+@body-bg:               @ts-dark-teal;
 //** Global text color on `<body>`.
-@text-color:            @ts-dark-teal;
+@text-color:            #FFF;
 
 //** Global textual link color.
 @link-color:            @ts-teal;
@@ -132,9 +133,9 @@
 @table-condensed-cell-padding:  5px;
 
 //** Default background color used for all tables.
-@table-bg:                      transparent;
+@table-bg:                      @gray-lighter;
 //** Background color used for `.table-striped`.
-@table-bg-accent:               #f9f9f9;
+@table-bg-accent:               @gray-lighter;
 //** Background color used for `.table-hover`.
 @table-bg-hover:                @gray-lighter;
 @table-bg-active:               @table-bg-hover;
@@ -370,11 +371,11 @@
 @navbar-collapse-max-height:       340px;
 
 @navbar-default-color:             #fff;
-@navbar-default-bg:                @brand-primary;
+@navbar-default-bg:                @gray-lighter;
 @navbar-default-border:            transparent;
 
 // Navbar links
-@navbar-default-link-color:                #fff;
+@navbar-default-link-color:                @ts-orange;
 @navbar-default-link-hover-color:          @navbar-default-link-color;
 @navbar-default-link-hover-bg:             transparent;
 @navbar-default-link-active-color:         #fff;
