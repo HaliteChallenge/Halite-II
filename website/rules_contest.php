@@ -16,18 +16,15 @@
             <div class="col-sm-9">
                 <h1>Contest Rules</h1>
 
-                <h3>Schedule</h3>
-                <ul>
-                    <li>On Monday August 1th, participants who are not ranked higher than the "Basic Bot" user on the leaderboard will not be eligible for the playoffs. All participants who are ranked higher than the "Basic Bot" user on the leaderboard will be eligible for the playoffs</li>
-                    <li>On Monday August 8th, the top 16 participants on the leaderboard will be invited to the playoffs, the leaderboard will be shutoff, and development will continue offline and in secret until the playoffs.</li>
-                    <li>The playoffs will take place on Thursday August 11th after market hours. The format of the playoffs will be specified beforehand.</li>
-                </ul>
+                <h3>End Date</h3>
+                
+                <p>The Halite contest will officially end on February 2. Submit early and often!</p>
 
                 <h3>Rules</h3>
                 <ul>
                     <li>Though collaboration is highly encouraged, teams are not technically allowed. The email on an account will be used to identify the owner of a bot.</li>
-                    <li>Each participant may only have one halite account.</li>
-                    <li>If you find a bug that is exploitable, email us at <a href="mailto:halite@halite.io">halite@halite.io</a>, do not post it on the forums, and do not exploit it. You will be rewarded with a box of oreos.</li>
+                    <li>Each participant may only have one halite account. Participants found to be in control of multiple accounts will be banned forever.</li>
+                    <li>If you find a bug that is exploitable, email us at <a href="mailto:halite@halite.io">halite@halite.io</a>, do not post it on the forums, and do not exploit it.</li>
                 </ul>
             </div>
         </div>
