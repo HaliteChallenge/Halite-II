@@ -7,7 +7,7 @@
     }
 
     .bs-docs-sidebar .nav>li>span {
-        color: #009aa6;
+        color: #63ceca;
     }
 
     .bs-docs-sidebar .nav>li>span,
@@ -38,7 +38,7 @@
     .bs-docs-sidebar .nav .nav>.active:hover>a,
     .bs-docs-sidebar .nav .nav>.active:focus>a {
         font-weight: 700;
-        border-left-color: #009aa6; 
+        border-left-color: #63ceca; 
         font-weight: 500;
     }
 
@@ -113,7 +113,7 @@
         </li>
     </ul>
     <hr>
-    <p class="text-muted" style="line-height: 1.5em; font-size: 13px;">You can <a id="githubLink" href="">edit this content on GitHub</a> and send us a pull request!</p>
+    <p style="line-height: 1.5em; font-size: 13px;">You can <a id="githubLink" href="">edit this content on GitHub</a> and send us a pull request!</p>
 </nav>
 
 <script>
