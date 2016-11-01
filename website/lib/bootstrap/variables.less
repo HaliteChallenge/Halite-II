@@ -18,7 +18,7 @@
 @gray:                   rgb(0, 45, 44); // #555
 @gray-light:             rgb(0, 50, 49);   // #999
 @gray-lighter:           rgb(0, 55, 54); // #eee
-@gray-lightest:           rgb(0, 65, 64); // #eee
+@gray-lightest:          rgb(0, 105, 104); // #eee
 
 @brand-primary:         @ts-teal;
 @brand-success:         @ts-teal;
@@ -708,7 +708,7 @@
 //
 //##
 
-@panel-bg:                    #fff;
+@panel-bg:                    @gray-lighter;
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
@@ -720,7 +720,7 @@
 
 @panel-default-text:          @text-color;
 @panel-default-border:        @gray-lighter;
-@panel-default-heading-bg:    @gray-lighter;
+@panel-default-heading-bg:    @gray-light;
 
 @panel-primary-text:          #fff;
 @panel-primary-border:        @brand-primary;
@@ -835,15 +835,15 @@
 //
 //##
 
-@code-color:                  #c7254e;
-@code-bg:                     #f9f2f4;
+@code-color:                  lighten(#c7254e, 5%);
+@code-bg:                     @body-bg;
 
 @kbd-color:                   #fff;
 @kbd-bg:                      #333;
 
 @pre-bg:                      @gray-lighter;
-@pre-color:                   @gray-dark;
-@pre-border-color:            #ccc;
+@pre-color:                   @text-color;
+@pre-border-color:            transparent;
 @pre-scrollable-max-height:   340px;
 
 
@@ -854,7 +854,7 @@
 //** Horizontal offset for forms and lists.
 @component-offset-horizontal: 180px;
 //** Text muted color
-@text-muted:                  @gray-light;
+@text-muted:                  @gray-lightest; // #222
 //** Abbreviations and acronyms border color
 @abbr-border-color:           @gray-light;
 //** Headings small color
