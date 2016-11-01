@@ -41,6 +41,7 @@ if(isset($_SESSION['userID'])) {
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
+                    <img src="assets/hero.png" style="width: 100%">
                     <h1>Introducing Halite</h1>
                     <b><p>Disclaimer: Halite will be launching on November 2nd. The site is currently in beta.</p></b>
                     <p>Halite is a multiplayer turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire grid and eliminate the other players in the game.</p>
