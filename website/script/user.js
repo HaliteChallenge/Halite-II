@@ -140,8 +140,16 @@ $(function() {
             var vr = "<span style='color: #0092a1;'>|</span>";
             $("#profileImage").attr("src", "https://avatars.githubusercontent.com/u/"+user["oauthID"]);
             $("#name").html(user['username']);
-            $("#primary-info").html(user['tier'] + " Tier<br><a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-            $("#secondary-info").html("Made in "+user['language']+"<br>"+(user['organization']=='Other' ? "" : "Member of " + user['organization'] + "<br>")+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted<br>"+user['numGames']+" games played");
+            $("#primary-info").html("<a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>" + user['tier'] + " Tier<br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
+            $("#secondary-info").append($("<span>Made in <a href='leaderboard.php?field=language&heading="+user['language']+"&value="+user['language']+"'>"+user['language']+ "</a></span>"));
+            $("#secondary-info").append($("<br>"));
+            if(user['organization']!='Other') {
+                $("#secondary-info").append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+user['organization']+"&value="+user['organization']+"'>"+user['organization']+ "</a></span>"));
+                $("#secondary-info").append($("<br>"));
+            } 
+            $("#secondary-info").append($("<span>"+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted</span>"));
+            $("#secondary-info").append($("<br>"));
+            $("#secondary-info").append($("<span>"+user['numGames']+" games played</span>"));
 
             gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
                 var rawGames = getLatestGamesForUser(userID, 10, startingID); 
