@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-    <?php include 'includes/header.php'; ?>
+    <?php include 'includes/header.php' ?>
 
     <title>Improving the Random Bot</title>
 
@@ -9,12 +9,97 @@
     <link href="style/learn.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <?php include 'includes/navbar.php'; ?>
-        <div class="row">
-            <?php include 'includes/learn_sidebar.php'; ?>
-            <div class="col-sm-9">
-                <h1>Improving the Random Bot</h1>
+    <div
+        <?php include 'includes/navbar.php' ?>
+        <div
+            <?php include 'includes/learn_sidebar.php' ?>
+            <div
+                <h1Improving the Random Bot</h1>
+                <p>In this tutorial, we'll go through the code that powers the random bot and add a couple heuristics to it. This will hopefully help you fully understand Halite and set you on your way to leaderboard domination.</p>
+                <h3>Prerequisites</h3>
+                <p>Make sure that you have read <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a> and followed the setup procedures described there.</p>
+                <p>Now open up the MyBot file in your favorite editor and let's get started!</p>
+                <h3>A Look At the Random Bot</h3>
+                <p>Now that you know how the game works, how do the two random starter bots work? How does one code a Halite bot? Here is the source from the main file of our python starter bot:</p>
+                
+                <pre><code>from hlt import *
+from networking import *
+                
+myID, gameMap = getInit()
+sendInit("PythonBot")
+                
+while True:
+    moves = []
+    gameMap = getFrame()
+    for y in range(gameMap.height):
+        for x in range(gameMap.width):
+            if gameMap.getSite(Location(x, y)).owner == myID:
+                moves.append(Move(Location(x, y), int(random.random() * 5)))
+        sendFrame(moves)</code></pre>
+                
+                <p>Let's walk through it line by line.</p>
+                
+                <p>First we import a couple of helper files that handle communicating with the environment binary and a couple of game constructs:</p>
+                
+                <pre><code>from hlt import *
+from networking import *</code></pre>
+                
+                <p>Then we get our ID and the initial map from the environment. Each player has a unique identifier (starting from one and going up) that is associated with their pieces:</p>
+                
+                <pre><code>myID, gameMap = getInit()
+sendInit("PythonBot")</code></pre>
+                
+                <p>Now we start our game loop:</p>
+
+                <pre><code>while True:</code></pre>
+
+                <p>Each frame let's clear our set of moves and get the current map:</p>
+
+                <pre><code>    moves = []
+    gameMap = getFrame()</code></pre>
+
+                <p>and cycle through all of the pieces on the map:</p>
+                
+                <pre><code>    for y in range(gameMap.height):
+        for x in range(gameMap.width):<</code></pre>
+                
+                <p>Move all of our pieces randomly:</p>
+                
+                <pre><code>            if gameMap.getSite(Location(x, y)).owner == myID:
+            moves.append(Move(Location(x, y), ;int(random.random() * 5)))</code></pre>
+                
+                <p>And send all of our moves to the environment:</p>
+                
+                <pre><code>    sendFrame(moves)</code></pre>
+
+                <p>And that's a random bot!</p>
+
+                <h3>Utilizing Our Production</h3>
+
+                <p>From the rules outlined in <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a>, we know that when a piece moves, it gains no strength and leaves behind a piece with zero strength. It easily follows from this that moving zero strength pieces is a terrible idea since your piece will necessarily stay at zero strength, and  ;zero-strength pieces cannot conquer territory. Let's make sure that we tell all of our zero strength pieces to remain still.</p>
+                <p>See supplement 1 for code samples.</p>
+
+                <hr>
+                
+                <p>Our bot still moves its pieces around a lot (only a bit over one out of five turns will a piece stay still). This costs us a lot of strength (since a piece doesn't gain any strength on turns that it moves). To increase our utilization of our production, let's have pieces only move once their strength equals their production times some factor X. We're using 5 as the value of X in this example, but this is arbitrary.</p>
+                <p>See supplement 2 for code samples.</p>
+
+                <hr>
+                
+                <h3>Moving to Our Borders</h3>
+                <p>When building a Halite bot, one of our goals should be moving strength out of your territory quickly and with little production loss. Our current bot is terrible at this. Its pieces move randomly around our territory, going nowhere, costing us production, and often losing strength to the strength cap. </p>
+                <p>To improve this, let's just mandate that our pieces move only north and west. Since the map is wrap-around, we can still capture all of the board with this strategy! </p>
+                <p>See supplement 3 for code samples.</p>
+
+                <hr>
+                
+                <h3>Improving our Attack</h3>
+                <p>Once our pieces get to our borders, we don't want them to randomly attack just any square (or worse, move back into our territory), as we do now. One problem with this random strategy is that we may attack a map square that has more strength than us. This is unproductive (pun implied) since moving onto the map square costs us a turn of production and we don't actually gain anything. We just diminish the squares strength.</p>
+                <p>To improve on our current combat, if there is an enemy or map square that is adjacent to one of our pieces with less strength than our piece, let's take it.</p>
+                <p>See supplement 4 for code samples.</p>
+
+                <p>Supplemental code samples can be found at the following links for <a href="https://gist.github.com/Sydriax/73cd76d10de7e5147d7e0b49eb65f288">Python</a>, <a href="https://gist.github.com/Sydriax/a2b8b88c940abe8f346df62a77e23441">Java</a>, and <a hrfer="https://gist.github.com/Sydriax/3aaabd3ecbc03ff997c720e7c5840a9a">C++</a>.</p>
+
             </div>
         </div>
     </div>
