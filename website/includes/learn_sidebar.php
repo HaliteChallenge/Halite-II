@@ -69,6 +69,9 @@
                 <li id="guides_strategy">
                     <a href="guides_strategy.php">Strategy Considerations</a>
                 </li>
+                <li id="guides_development">
+                    <a href="guides_development.php">Bot Development</a>
+                </li>
                 <li id="guides_bfs">
                     <a href="guides_bfs.php">Breadth-First-Search Bot</a>
                 </li>
