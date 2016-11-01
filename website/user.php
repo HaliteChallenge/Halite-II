@@ -25,8 +25,8 @@
                 <div id="profileCard" class="panel panel-default text-center" style="padding: 21px; margin-bottom: 21px;">
                     <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 200px;">
                     <h1 id="name" style="margin-top: 12px"></h1>
-                    <h4 id="primary-info" style="line-height: 1.2em;"></h4>
-                    <h5 id="secondary-info" style="line-height 1.2em; margin-bottom: 0px; color: gray;"></h5>
+                    <p id="primary-info" style="line-height: 1.2em; font-size: 20px;"></p>
+                    <p id="secondary-info" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
                 </div>
                 <div id="historyPanel" class="panel panel-default">
                     <div class="panel-heading">
