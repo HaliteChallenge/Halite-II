@@ -71,19 +71,19 @@ function showGame(game, showmovement, isminimal, seconds) {
 			TER_TOP = sh * 0.095, TER_BTM = sh * 0.36, PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675, STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
 			//Create the text for rendering the terrritory, strength, and prod graphs.
 			stage.removeChildren();
-			terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial' });
+			terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
 			terText.anchor = new PIXI.Point(0, 1);
 			terText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.005);
 			stage.addChild(terText);
-			prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial' });
+			prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
 			prodText.anchor = new PIXI.Point(0, 1);
 			prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP - sh * 0.005);
 			stage.addChild(prodText);
-			strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial' });
+			strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
 			strText.anchor = new PIXI.Point(0, 1);
 			strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
 			stage.addChild(strText);
-			infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial' });
+			infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
 			infoText.anchor = new PIXI.Point(0, 1);
 			infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
 			stage.addChild(infoText);
@@ -207,7 +207,7 @@ function showGame(game, showmovement, isminimal, seconds) {
 				}
 			}
 			//Draw borders.
-			graphGraphics.lineStyle(1, '0x000000');
+			graphGraphics.lineStyle(1, '0xffffff');
 			//Draw ter border.
 			graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_TOP);
 			graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
