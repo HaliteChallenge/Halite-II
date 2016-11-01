@@ -41,6 +41,7 @@ if(isset($_SESSION['userID'])) {
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
+                    <img src="assets/hero.png" style="width: 100%">
                     <h1>Introducing Halite</h1>
                     <b><p>Disclaimer: Halite will be launching on November 2nd. The site is currently in beta.</p></b>
                     <p>Halite is a multiplayer turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire grid and eliminate the other players in the game.</p>
@@ -59,12 +60,12 @@ if(isset($_SESSION['userID'])) {
                     
                     <div class="row">
                         <div class="col-sm-6">
-                            <div class="text-center"><a href="https://twosigma.com"><h3>IMG HERE</h3></a></div>
+                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://twosigma.com"><img src="assets/two_sigma.png" style="height: 70px;"></a></div>
                             <p>Two Sigma is a technology company dedicated to finding value in the world’s data. Since its founding in 2001, Two Sigma has built an innovative platform that combines extraordinary computing power, vast amounts of information, and advanced data science to produce breakthroughs in investment management, insurance and related fields.</p>
                         </div>
 
                         <div class="col-sm-6">
-                            <div class="text-center"><a href="https://tech.cornell.edu"><h3>IMG HERE</h3></a></div>
+                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://tech.cornell.edu"><img src="assets/cornell_tech.png" style="height: 70px"></a></div>
                             <p>Cornell Tech brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
                         </div>
                     </div>
