@@ -35,10 +35,10 @@
                 <h3>Who is running the tournament?</h3>
                 <p>The Halite game has been designed and implemented by <a href="https://www.twosigma.com/">Two Sigma</a>, a highly-innovative, technological investment firm based in New York City.<br>The Halite tournament is jointly run with <a href="http://tech.cornell.edu/">Cornell Tech</a>, a new graduate school that brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
 
-                <h3>How long is the tournament?<h3>
+                <h3>How long is the tournament?</h3>
                 <p>The tournament will run from November 2, 2016 to February 2, 2017.</p>
 
-                <h3>How are rankings computed?<h3>
+                <h3>How are rankings computed?</h3>
                 <p>Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating system</a> used for chess.<br>More precisely, rankings are computed using a Bayesian algorithm variant of the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system">Glicko system</a>, specifically using the TrueSkill Python library available <a href="https://github.com/sublee/trueskill">here</a>.</p>
 
                 <h3>How are the winners decided?<h3>
