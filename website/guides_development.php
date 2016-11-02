@@ -17,7 +17,7 @@
                 <h1>Bot Development Guide</h1>
 
                 <h1>Development Guide</h1>
-                <p>In this guide, we will detail a couple of best practices to follow when building your Halite bot.</p>
+                <p>In this guide, we will detail a couple of useful practices to follow when building your Halite bot.</p>
                 <h3>Using a Log File</h3>
                 <p>Stdout and stdin in are used to communicate with the game environment. As such, you cannot use functions like System.out.println, print(), or std::cout. Instead, print debugging information to a log file.</p>
                 <h3>Local Bot Evaluation</h3>
