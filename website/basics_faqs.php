@@ -52,10 +52,10 @@
 
                 <h2>Bot Programming</h2>
 
-                <h3>Do I need to be a programmer to play the game?<h3>
+                <h3>Do I need to be a programmer to play the game?</h3>
                 <p>Yes. Halite is a programming competition. You need to program a bot that will play the game in the Halite tournament.<br>However, you definitely don’t have to be a very good programmer to play Halite effectively. Success is more about coming up with a good strategy to play the game than coding this strategy expertly.</p>
 
-                <h3>What languages does the game support?<h3>
+                <h3>What languages does the game support?</h3>
                 <p>Any and all! If the language can read from stdin and print to stdout, we can support it.<br>We provide out-of-the-box starter packages for the following languages: Python, Java and C++. See <a href="https://halite.io/downloads.php">here</a> for our growing list of starter packages.<br>We’re counting on the community to add support for as many languages as people want. Visit <a href="https://halite.io/advanced_writing_sp.php">this page</a> for more information on writing your own starter package and the protocol used by the game environment to talk to your bot.
 
                 <h3>How do I submit my bot?</h3>
@@ -63,7 +63,7 @@
 
                 <h2>The Code behind the Tournament</h2>
 
-                <h3>Is the code open source?<h3>
+                <h3>Is the code open source?</h3>
                 <p>Yes.<br>Check out our <a href="https://github.com/HaliteChallenge/Halite">Github repo</a> and you are also welcome (even encouraged) to open issues and/or submit pull requests.</p>
 
                 <h3>How do I contribute to the game and/or report an issue?</h3>
@@ -73,11 +73,10 @@
 
                 <h3>I cannot find an answer to my question, what do I do?</h3>
                 <p>Please check/post on the <a href="forums.halite.io">Halite forums</a> or contact-us at <a href="mailto:halite@halite.io">halite@halite.io</a>.
-                
+
             </div>
         </div>
     </div>
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
