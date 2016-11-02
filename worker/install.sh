@@ -45,9 +45,6 @@ else
     echo "Attention: local halite sandbox already exists. Not pulling remote."
 fi
 
-# Turn off ip forwarding (and so internet access)
-sysctl -w net.ipv4.ip_forward=0
-
 ###############
 # Swap Memory #
 ###############
