@@ -4,6 +4,7 @@ import fnmatch
 import glob
 import json
 import os
+import os.path
 import re
 import shutil
 import subprocess
@@ -38,7 +39,8 @@ def safeglob(pattern):
         print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
         files = fnmatch.filter(files, pattern)
         for fname in files:
-            if SAFEPATH.match(fname):
+            print(os.path.splitext(fname)[0])
+            if SAFEPATH.match(fname) and os.path.splitext(fname)[0] != "RandomBot":
                 safepaths.append(os.path.join(root, fname))
     return safepaths
 
@@ -75,7 +77,7 @@ def _run_cmd(cmd, working_dir, timelimit):
 
     if time.time() - start > timelimit:
         errors.append("Compilation timed out with command %s" % (cmd,))
-    os.system("docker stop $(docker ps -aq)")
+    os.system("docker kill $(docker ps -aq)")
     os.system("docker rm $(docker ps -aq)")
     return out, errors
 
