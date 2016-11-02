@@ -20,20 +20,17 @@
                     The environment may be passed a number of flags, including:
                     <ul>
                         <li><code>-d</code>: allows the automatic input of the dimensions of the map. The following argument is expected to be a string containing the width and height (space-separated).</li>
-                            <li><code>-q</code>: turns on quiet output. Output will take the form of:
-                                <ul>
-                                    <li>A line containing the replay file name, a space, and the map seed.</li>
-                                    <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID territoryValue strengthValue productionValue stillMovePercentage averageLatency</code></li>
-                                    <li>A line of space separated playerIDs of the players that timed out.</li>
-                                </ul>
-                            </li>
-                            <li><code>-o</code>: allows the overriding of names. Once all of the flags and their arguments have been removed from the list of arguments, this will assume that every second argument is an override name. For example, <code>"python3 MyBot.py" -q -o -d 30 30 "This is a python bot!" "cd somedirectory; java MyBot" -w "This is a java bot!"</code> is a perfectly valid set of arguments.</li>
-                            <li><code>-s</code>: provides the seed to the map generator. If this is not provided, it will use a time-based seed.</li>
-                            <li><code>-w</code>: after the current game ends, the environment will start a <code>visualizer</code> binary with the current game if a <code>visualizer</code> binary exists in the current directory.</li>
-                            <li><code>-t</code>: disables timeouts for the duration of the game.</li>
-                        </ul>
-
-                        Flags must be prefixed by their own dash (<code>-</code>) and must be separated by other flags/arguements by a space. They may <b>not</b> be combined like so: <code>-qst</code>.
+                        <li><code>-q</code>: turns on quiet output. Output will take the form of:
+                            <ul>
+                                <li>A line containing the replay file name, a space, and the map seed.</li>
+                                <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID territoryValue strengthValue productionValue stillMovePercentage averageLatency</code></li>
+                                <li>A line of space separated playerIDs of the players that timed out.</li>
+                            </ul>
+                        </li>
+                        <li><code>-s</code>: provides the seed to the map generator. If this is not provided, it will use a time-based seed.</li>
+                        <li><code>-t</code>: disables timeouts for the duration of the game.</li>
+                        <li><code>-o</code>: overrides provided names of bots. This is only used on the servers; we see no reason for a bot developer to have occasion to use this flag.</li>
+                    </ul>
                 </p>
 
             </div>
