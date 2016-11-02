@@ -66,6 +66,7 @@ CREATE TABLE `User` (
   `oauthProvider` tinyint(1) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `onEmailList` tinyint(1) NOT NULL DEFAULT 1,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `organization` varchar(64) NOT NULL,
