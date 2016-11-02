@@ -43,17 +43,8 @@ if(isset($_SESSION['userID'])) {
                 <div class="col-sm-12">
                     <img src="assets/hero.png" style="width: 100%">
                     <h1>Introducing Halite</h1>
-                    <b><p>Disclaimer: Halite will be launching on November 2nd. The site is currently in beta.</p></b>
-                    <p>Halite is a multiplayer turn-based strategy game played on a rectangular grid. The objective of the game is to take over the entire grid and eliminate the other players in the game.</p>
-                    <p>Halite is really a programming game. As a human player, you don't interact with the game directly. Rather, you program a bot that will play games on your behalf.</p>
-                    <p>Halite continuously and randomly organizes "games" between bots and uses the outcome to rank bots and create a leaderboard for players.</p>
+                    <p>Halite is a artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2d grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                     <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
-
-                    <h1>Top Rankings</h1>
-                    <p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
-                    <div class="panel panel-default">
-                        <?php include 'includes/leaderTable.php'; ?>
-                    </div>
 
                     <h1>Creators</h1>
                     <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
