@@ -89,7 +89,7 @@ abstract class API{
     protected function sendEmail($recipientUser, $subject, $message) {
         if($recipientUser['onEmailList'] == 0) return;
 
-        $message .= "<hr><p>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/unsubscribe'>here</a>.</p>";
+        $message .= "<hr><p style='color: gray; font-size: 10px;'>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/unsubscribe'>here</a>.</p>";
 
         $transporter = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
             ->setUsername($this->config['email']['email'])

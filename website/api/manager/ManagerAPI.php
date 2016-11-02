@@ -130,7 +130,7 @@ class ManagerAPI extends API{
             $user = $this->select("SELECT * FROM User WHERE userID={$userID}");
 
             if($didCompile == 1) { // Did succeed
-                $this->sendEmail($user, "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php");
+                $this->sendEmail($user, "Compilation Success", "<p>Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your <a href='".WEB_DOMAIN."user.php'>homepage</a>.</p>");
 
                 $this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, mu = 25.000, sigma = 8.333, compileStatus = 0, isRunning = 1, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
 
