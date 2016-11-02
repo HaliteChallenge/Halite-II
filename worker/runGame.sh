@@ -48,7 +48,7 @@ RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d \"$WIDTH $HEIGHT\" $BOTSTARTCOMMANDS"
 echo $RUN_GAME_COMMAND;
 eval $RUN_GAME_COMMAND;
 
-docker stop  $(docker ps -aq) >/dev/null
+docker kill  $(docker ps -aq) >/dev/null
 docker rm -v $(docker ps -aq) >/dev/null
 
 rm /run/network/ifstate.veth*
