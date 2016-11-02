@@ -25,7 +25,7 @@
                             <div class="input-group">
                                <input type="text" id="usernameField" class="form-control" placeholder="Username">
                                <span class="input-group-btn">
-                                    <button class="btn btn-default" id="usernameSubmitButton" type="button">Find</button>
+                                    <button class="btn btn-default" style="border-width: 2px;" id="usernameSubmitButton" type="button">Find</button>
                                </span>
                             </div>
                         </div>
