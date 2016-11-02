@@ -12,7 +12,7 @@ if(isset($_SESSION['userID'])) {
         exit();
     }
     if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isRunning=1"))) > 0) {
-        header("Location: user.php");
+        header("Location: user.php?".$_SERVER['QUERY_STRING']);
     }
 }
 ?>

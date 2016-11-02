@@ -86,14 +86,18 @@ abstract class API{
         return $sdk;
     }
 
-    protected function sendEmail($to, $subject, $message) {
+    protected function sendEmail($recipientUser, $subject, $message) {
+        if($recipientUser['onEmailList'] == 0) return;
+
+        $message .= "<hr><p style='color: gray; font-size: 14px;'>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/unsubscribe'>here</a>.</p>";
+
         $transporter = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
             ->setUsername($this->config['email']['email'])
             ->setPassword($this->config['email']['password']);
         $mailer = Swift_Mailer::newInstance($transporter);
         $message = Swift_Message::newInstance($subject)
             ->setFrom(array($this->config['email']['email'] => 'Halite'))
-            ->setTo(array($to))
+            ->setTo(array($recipientUser['email']))
             ->setBody($message)
             ->setContentType("text/html");
 

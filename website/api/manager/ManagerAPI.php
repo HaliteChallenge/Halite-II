@@ -130,7 +130,7 @@ class ManagerAPI extends API{
             $user = $this->select("SELECT * FROM User WHERE userID={$userID}");
 
             if($didCompile == 1) { // Did succeed
-                $this->sendEmail($user['email'], "Compilation Success", "Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your homepage: ".WEB_DOMAIN."user.php");
+                $this->sendEmail($user, "Compilation Success", "<p>Your bot was sucessfully compiled on our servers as a program written in {$language}. Within a few minutes, your bot will begin playing games against other contestant's programs. Replays of these games will show up on your <a href='".WEB_DOMAIN."user.php'>homepage</a>.</p>");
 
                 $this->insert("UPDATE User SET numSubmissions=numSubmissions+1, numGames=0, mu = 25.000, sigma = 8.333, compileStatus = 0, isRunning = 1, language = '".$this->mysqli->real_escape_string($language)."' WHERE userID = ".$this->mysqli->real_escape_string($userID));
 
@@ -139,7 +139,7 @@ class ManagerAPI extends API{
                     $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
                 }
             } else { // Didnt succeed
-                $this->sendEmail($user['email'], "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['errors']}</code></pre>");
+                $this->sendEmail($user, "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2> <p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b> If that is incorrect, please change your code's file extensions to <code>cpp</code> and <code>h</code> for C++11, <code>java</code> for Java 7, <code>py</code> for Python3, and <code>rs</code> for Rust 1.10. Make sure to include a <code>Cargo.toml</code> file if you are using Rust. Please make sure that your <b>main file is named MyBot</b>.</p> <b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['errors']}</code></pre>");
                 $this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
             }
         }
@@ -221,12 +221,7 @@ class ManagerAPI extends API{
 
             // Send first game email and first timeout email
             foreach($users as $user) {
-                $storedUser = $this->select("SELECT numSubmissions,numGames,email FROM User WHERE userID=".$user->userID);
-                var_dump($storedUser);
-                if(intval($storedUser['numGames']) == 3) {
-                    $this->sendEmail($storedUser['email'], "First Leaderboard Games", "Your bot has played a couple of games against other contestants' bots. To see them, head over to your homepage <a href='".WEB_DOMAIN."user.php'></a>");
-                } 
-
+                $storedUser = $this->select("SELECT * FROM User WHERE userID=".$user->userID);
                 if($user->didTimeout && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$storedUser['numSubmissions']} and userID={$user->userID}")->num_rows == 1) {
                     $errorLogContents = NULL;
                     foreach($_FILES as $file) {
@@ -237,7 +232,7 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $this->sendEmail($storedUser['email'], "First Bot Timeout/Error", "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_dev.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>");
+                    $this->sendEmail($storedUser, "First Bot Timeout/Error", "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_dev.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>");
                 }
             }
 
