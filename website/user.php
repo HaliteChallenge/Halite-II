@@ -22,13 +22,13 @@
         </div>
         <div class="row" id="normalBody">
             <div class="col-xl-6 col-lg-5 col-md-12">
-                <div id="profileCard" class="text-center" style="padding: 21px; margin-bottom: 21px; border: 1px solid #0092a1;">
-                    <img id="profileImage" style="border-radius: 100%; width: 100%; max-width: 200px;">
+                <div id="profileCard" class="panel panel-default text-center" style="padding: 21px; margin-bottom: 21px;">
+                    <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 200px;">
                     <h1 id="name" style="margin-top: 12px"></h1>
                     <p id="primary-info" style="line-height: 1.2em; font-size: 20px;"></p>
                     <p id="secondary-info" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
                 </div>
-                <div id="historyPanel" class="panel panel-primary">
+                <div id="historyPanel" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Recent History</h3>
                     </div>
@@ -50,7 +50,7 @@
                     <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
                     <h3>There are no games recorded yet.</h3>
                 </div>
-                <div id="gamePanel" class="panel panel-primary">
+                <div id="gamePanel" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Game Feed</h3>
                     </div>
@@ -62,7 +62,7 @@
                         <tbody id="gameTableBody">
                         </tbody>
                     </table>
-                    <button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
+                    <button type="button" id="loadButton" class="btn btn-default" style="width: 100%;">Load More</button>
                 </div>
             </div>
         </div>

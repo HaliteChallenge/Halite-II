@@ -9,12 +9,12 @@
     <link href="style/learn.css" rel="stylesheet">
 </head>
 <body>
-    <div
-        <?php include 'includes/navbar.php' ?>
-        <div
+    <div class="container">
+        <?php include 'includes/navbar.php'; ?>
+        <div class="row">
             <?php include 'includes/learn_sidebar.php' ?>
-            <div
-                <h1Improving the Random Bot</h1>
+            <div class="col-sm-9">
+                <h1>Improving the Random Bot</h1>
                 <p>In this tutorial, we'll go through the code that powers the random bot and add a couple heuristics to it. This will hopefully help you fully understand Halite and set you on your way to leaderboard domination.</p>
                 <h3>Prerequisites</h3>
                 <p>Make sure that you have read <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a> and followed the setup procedures described there.</p>
@@ -61,7 +61,7 @@ sendInit("PythonBot")</code></pre>
                 <p>and cycle through all of the pieces on the map:</p>
                 
                 <pre><code>    for y in range(gameMap.height):
-        for x in range(gameMap.width):<</code></pre>
+        for x in range(gameMap.width):</code></pre>
                 
                 <p>Move all of our pieces randomly:</p>
                 

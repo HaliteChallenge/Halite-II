@@ -7,17 +7,17 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-@ts-dark-teal: rgb(0, 34, 33);
-@ts-teal: rgb(0,146,161); //rgb(99, 206, 202);
+@ts-dark-teal: rgb(0, 34, 38);
+@ts-teal: rgb(99, 206, 202); //rgb(0,146,161); 
 @ts-orange: rgb(227, 114, 34);
 @ts-yellow: rgb(255, 190, 0);
 
-@gray-base:              #000;
-@gray-darker:            lighten(@gray-base, 13.5%); // #222
-@gray-dark:              #7b8a8b;   // #333
-@gray:                   #95a5a6; // #555
-@gray-light:             #b4bcc2;   // #999
-@gray-lighter:           #ecf0f1; // #eee
+@gray-base:              @ts-dark-teal;
+@gray-darker:            lighten(@ts-dark-teal, 13.5%); // #222
+@gray-dark:              rgb(0, 40, 39);   // #333
+@gray:                   rgb(0, 45, 44); // #555
+@gray-light:             rgb(0, 50, 49);   // #999
+@gray-lighter:           rgb(0, 55, 54); // #eee
 
 @brand-primary:         @ts-teal;
 @brand-success:         @ts-teal;
@@ -31,9 +31,9 @@
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-@body-bg:               #FFFFFF;
+@body-bg:               @ts-dark-teal;
 //** Global text color on `<body>`.
-@text-color:            @ts-dark-teal;
+@text-color:            #FFF;
 
 //** Global textual link color.
 @link-color:            @ts-teal;
@@ -132,9 +132,9 @@
 @table-condensed-cell-padding:  5px;
 
 //** Default background color used for all tables.
-@table-bg:                      transparent;
+@table-bg:                      @gray-lighter;
 //** Background color used for `.table-striped`.
-@table-bg-accent:               #f9f9f9;
+@table-bg-accent:               @gray-lighter;
 //** Background color used for `.table-hover`.
 @table-bg-hover:                @gray-lighter;
 @table-bg-active:               @table-bg-hover;
@@ -191,7 +191,7 @@
 @input-bg-disabled:              @gray-lighter;
 
 //** Text color for `<input>`s
-@input-color:                    @text-color;
+@input-color:                    @ts-dark-teal;
 //** `<input>` border color
 @input-border:                   #dce4ec;
 
@@ -370,11 +370,11 @@
 @navbar-collapse-max-height:       340px;
 
 @navbar-default-color:             #fff;
-@navbar-default-bg:                @brand-primary;
+@navbar-default-bg:                @gray-lighter;
 @navbar-default-border:            transparent;
 
 // Navbar links
-@navbar-default-link-color:                #fff;
+@navbar-default-link-color:                @ts-orange;
 @navbar-default-link-hover-color:          @navbar-default-link-color;
 @navbar-default-link-hover-bg:             transparent;
 @navbar-default-link-active-color:         #fff;
@@ -390,7 +390,7 @@
 // Navbar toggle
 @navbar-default-toggle-hover-bg:           darken(@navbar-default-bg, 10%);
 @navbar-default-toggle-icon-bar-bg:        #fff;
-@navbar-default-toggle-border-color:       darken(@navbar-default-bg, 10%);
+@navbar-default-toggle-border-color:       transparent;
 
 
 //=== Inverted navbar
@@ -601,7 +601,7 @@
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             #fff;
+@modal-content-bg:                             @gray-lighter;
 //** Modal content border color
 @modal-content-border-color:                   rgba(0,0,0,.2);
 //** Modal content border color **for IE8**
@@ -612,7 +612,7 @@
 //** Modal backdrop opacity
 @modal-backdrop-opacity:      .5;
 //** Modal header border color
-@modal-header-border-color:   #e5e5e5;
+@modal-header-border-color:   #fff;
 //** Modal footer border color
 @modal-footer-border-color:   @modal-header-border-color;
 
@@ -707,7 +707,7 @@
 //
 //##
 
-@panel-bg:                    #fff;
+@panel-bg:                    @gray-lighter;
 @panel-body-padding:          15px;
 @panel-heading-padding:       10px 15px;
 @panel-footer-padding:        @panel-heading-padding;
@@ -719,7 +719,7 @@
 
 @panel-default-text:          @text-color;
 @panel-default-border:        @gray-lighter;
-@panel-default-heading-bg:    @gray-lighter;
+@panel-default-heading-bg:    @gray-light;
 
 @panel-primary-text:          #fff;
 @panel-primary-border:        @brand-primary;
@@ -834,15 +834,15 @@
 //
 //##
 
-@code-color:                  #c7254e;
-@code-bg:                     #f9f2f4;
+@code-color:                  lighten(#c7254e, 5%);
+@code-bg:                     @body-bg;
 
 @kbd-color:                   #fff;
 @kbd-bg:                      #333;
 
 @pre-bg:                      @gray-lighter;
-@pre-color:                   @gray-dark;
-@pre-border-color:            #ccc;
+@pre-color:                   @text-color;
+@pre-border-color:            transparent;
 @pre-scrollable-max-height:   340px;
 
 
@@ -853,7 +853,7 @@
 //** Horizontal offset for forms and lists.
 @component-offset-horizontal: 180px;
 //** Text muted color
-@text-muted:                  @gray-light;
+@text-muted:                  rgb(100, 100, 100); // #222
 //** Abbreviations and acronyms border color
 @abbr-border-color:           @gray-light;
 //** Headings small color

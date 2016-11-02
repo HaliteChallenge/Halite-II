@@ -7,7 +7,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.php">Halite</a>
+            <a class="navbar-brand" style="padding: 10px" href="index.php"><img src="assets/full_logo.png" style="height: 100%;"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right loggedOut" id="loginNav">
@@ -40,7 +40,7 @@
             <div class="modal-body">
                 <h3>Upload a <b>zip file</b> of your source code.</h3>
                 <h3>Name your main file <b>MyBot</b> with an appropriate file extension (e.g. MyBot.java).</h3>
-                <h3>Once we have compile your code, you will get an email notification.</h3>
+                <h3>Once we have compiled your code, you will get an email notification.</h3>
                 <button id="submitModalButton" type="button" class="btn btn-primary">Submit!</button>
             </div>
         </div>
