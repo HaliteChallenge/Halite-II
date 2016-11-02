@@ -187,7 +187,7 @@ class WebsiteAPI extends API{
 
         $this->insert("UPDATE User SET onEmailList=0 WHERE userID = {$user['userID']}");
 
-        header("Location: index.php?unsubscribeEmails=1");
+        header("Location: ../../index.php?unsubscribeEmails=1");
         die();
     }
 
