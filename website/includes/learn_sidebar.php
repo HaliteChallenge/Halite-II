@@ -72,15 +72,6 @@
                 <li id="guides_development">
                     <a href="guides_development.php">Bot Development</a>
                 </li>
-                <li id="guides_bfs">
-                    <a href="guides_bfs.php">Breadth-First-Search Bot</a>
-                </li>
-                <li id="guides_machine_learning">
-                    <a href="guides_machine_learning.php">Machine-Learning Bot</a>
-                </li>
-                <li id="guides_ide">
-                    <a href="guides_ide.php">Debugging with an IDE</a>
-                </li>
             </ul>
         </li>
         <li class="">
