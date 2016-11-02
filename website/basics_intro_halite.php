@@ -50,7 +50,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <h3>Visualizing a game</h3>
                 <p>This output gives only the outcome of the game. If you want to learn more and replay the game, you can use the .hlt file.</p>
                 <p>Drag and drop the file to https://halite.io/local_visualizer.php to get a visualization like this one:</p>
-                <!-- TODO: add in image -->
+                <div class="text-center"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
 
                 <h3>Halite Game Overview</h3>
                 <p>What do all of these pretty squares mean?</p>
