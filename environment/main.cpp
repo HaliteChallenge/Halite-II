@@ -4,8 +4,6 @@
 #include <list>
 #include <string.h>
 
-#include <tclap/CmdLine.h>
-
 #include "core/Halite.hpp"
 
 inline std::istream & operator>>(std::istream & i, std::pair<signed int, signed int> & p) {
@@ -16,6 +14,8 @@ inline std::ostream & operator<<(std::ostream & o, const std::pair<signed int, s
     o << p.first << ' ' << p.second;
     return o;
 }
+#include <tclap/CmdLine.h>
+
 namespace TCLAP {
 template<> struct ArgTraits< std::pair<signed int, signed int> > {
     typedef TCLAP::ValueLike ValueCategory;
