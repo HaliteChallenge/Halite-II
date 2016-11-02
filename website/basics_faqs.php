@@ -14,7 +14,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-           	<h1>Frequently Asked Questions</h1>
+            <h1>Frequently Asked Questions</h1>
         
                 <h2>About</h2>
         
@@ -72,7 +72,7 @@
                 <h2>Other</h2>
 
                 <h3>I cannot find an answer to my question, what do I do?</h3>
-                <p>Please check/post on the <a href="forums.halite.io">Halite forums</a> or contact-us at <a href="mailto:halite@halite.io">halite@halite.io</a>.
+                <p>Please check/post on the <a href="http://forums.halite.io">Halite forums</a> or contact-us at <a href="mailto:halite@halite.io">halite@halite.io</a>.
 
             </div>
         </div>
