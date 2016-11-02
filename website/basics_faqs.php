@@ -41,10 +41,10 @@
                 <h3>How are rankings computed?</h3>
                 <p>Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating system</a> used for chess.<br>More precisely, rankings are computed using a Bayesian algorithm variant of the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system">Glicko system</a>, specifically using the TrueSkill Python library available <a href="https://github.com/sublee/trueskill">here</a>.</p>
 
-                <h3>How are the winners decided?<h3>
+                <h3>How are the winners decided?</h3>
                 <p>Winners are simply the highest ranked players on the <a href="https://halite.io/leaderboard.php">leaderboard</a> at the end of the competition. So, submit early and often!</p>
 
-                <h3>Is there a prize for the winners?<h3>
+                <h3>Is there a prize for the winners?</h3>
                 <p>Pride! Bragging rights! Internet royalty!<br>The results of the competition will be officially announced with link to best players Github profiles.</p>
 
                 <h3>What information do you store about me?</h3> 
