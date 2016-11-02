@@ -4,6 +4,7 @@ import fnmatch
 import glob
 import json
 import os
+import os.path
 import re
 import shutil
 import subprocess
@@ -38,7 +39,8 @@ def safeglob(pattern):
         print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
         files = fnmatch.filter(files, pattern)
         for fname in files:
-            if SAFEPATH.match(fname):
+            print(os.path.splitext(fname)[0])
+            if SAFEPATH.match(fname) and os.path.splitext(fname)[0] != "RandomBot":
                 safepaths.append(os.path.join(root, fname))
     return safepaths
 
@@ -60,7 +62,7 @@ def nukeglob(pattern):
 
 def _run_cmd(cmd, working_dir, timelimit):
     absoluteWorkingDir = os.path.abspath(working_dir)
-    cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"useradd -r gamerunner; chown gamerunner -R "+absoluteWorkingDir+"; chown gamerunner -R "+os.path.join(absoluteWorkingDir, "*")+"; su -m gamerunner -c 'cd "+absoluteWorkingDir+"; "+cmd+"'\""
+    cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     start = time.time()
@@ -75,7 +77,7 @@ def _run_cmd(cmd, working_dir, timelimit):
 
     if time.time() - start > timelimit:
         errors.append("Compilation timed out with command %s" % (cmd,))
-    os.system("docker stop $(docker ps -aq)")
+    os.system("docker kill $(docker ps -aq)")
     os.system("docker rm $(docker ps -aq)")
     return out, errors
 

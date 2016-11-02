@@ -35,7 +35,7 @@ apt-get install -y docker-engine
 
 # Use devicemapper storage driver, so that we can limit storage space of containers
 service docker stop
-dockerd --storage-driver=devicemapper --icc=false &
+dockerd --storage-driver=devicemapper &
 service docker start
 
 if [[ "$(docker images -q mntruell/halite_sandbox:latest)" == "" ]]; then
@@ -44,9 +44,6 @@ if [[ "$(docker images -q mntruell/halite_sandbox:latest)" == "" ]]; then
 else
     echo "Attention: local halite sandbox already exists. Not pulling remote."
 fi
-
-# Turn off ip forwarding (and so internet access)
-sysctl -w net.ipv4.ip_forward=0
 
 ###############
 # Swap Memory #
