@@ -16,8 +16,10 @@
             <div class="col-sm-9">
                 <h1>Environment Command Reference</h1>
 
+                <p>The Halite environment is responsible for running games between bots and outputting appropriate data and files upon the end of a game. The downloadable version is the same version used on the servers.</p>
+
                 <p>
-                    The environment may be passed a number of flags, including:
+                    It may be passed a number of flags, including:
                     <ul>
                         <li><code>-d</code>: allows the automatic input of the dimensions of the map. The following argument is expected to be a string containing the width and height (space-separated).</li>
                         <li><code>-q</code>: turns on quiet output. Output will take the form of:
