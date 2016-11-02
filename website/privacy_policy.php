@@ -14,7 +14,7 @@
         <div class="row">
             <div class="col-sm-12">
 
-            	<h1>Ahalite Privacy Policy</h1>
+            	<h1>Halite Privacy Policy</h1>
 
             	<p>Effective Date November 2, 2016 (last updated November 2, 2016).</p>
 
