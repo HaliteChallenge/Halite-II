@@ -15,7 +15,7 @@
                 <h1>Downloads</h1>
 
                 <h2>Game Environment</h2>
-                <p>This version of the environment was updated on <b>4:45pm EST on November 2nd</b>.</p>
+                <p>The environment is on version <b>1.0</b>. This version of the environment was posted on November 2nd.</p>
 
                 <h3>Linux/macOS</h3>
                 <p>Execute:</p>
@@ -32,7 +32,7 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    This set of starter packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
+                    This set of starter packages was uploaded on November 2nd. 
                 </p>
                 <p>
                     <ul>
