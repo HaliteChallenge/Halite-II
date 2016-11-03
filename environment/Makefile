@@ -16,4 +16,4 @@ clean:
 
 .PHONY: install
 install:
-	install -m 0755 halite $(prefix)/bin
+	install -m 0755 halite $(INSTALL_PATH)/bin
