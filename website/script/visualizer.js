@@ -17,10 +17,8 @@ function showGame(game, showmovement, isminimal, seconds) {
     if(renderer == null) initPixi();
 
     if(!isminimal) {
-        console.log("is min");
         $("#pageContent").empty();
-        $("#pageContent").append($("<button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div>"));
-        $("#pageContent").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
+        $("#pageContent").append($("<div class='col-md-11'></div>").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
             var nameComponents = p.name.split(" ");
             var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
             console.log(name);
@@ -30,7 +28,8 @@ function showGame(game, showmovement, isminimal, seconds) {
             } else {
                 return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"
             }
-        }).join(" vs ")+"</h3>"));
+        }).join(" vs ")+"</h3>")));
+        $("#pageContent").append($("<div class='col-md-1'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
     }
     document.getElementById("pageContent").appendChild(renderer.view);
     $("#pageContent").append($("<br>"));
