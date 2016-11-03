@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Halite
 {
@@ -36,7 +37,7 @@ namespace Halite
 					}
 				}
 
-				Game.SendMoves(moves);
+				Game.SendMoves(moves); // Send moves
 			}
 		}
 	}

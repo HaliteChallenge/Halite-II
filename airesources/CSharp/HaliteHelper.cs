@@ -1,9 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Halite
 {
+	/// <summary>
+	/// Helpful for debugging.
+	/// </summary>
+	public static class Log
+	{
+		private static string _logPath;
+
+		/// <summary>
+		/// File must exist
+		/// </summary>
+		public static void Setup(string logPath) {
+			_logPath = logPath;
+		}
+
+		public static void Information(string message) {
+			if (!string.IsNullOrEmpty(_logPath))
+				File.AppendAllLines(_logPath, new[] {$"{DateTime.Now.ToShortTimeString()}: {message}"});
+		}
+		
+		public static void Error(Exception exception) {
+			Log.Information($"ERROR: {exception.Message} {exception.StackTrace}");
+		}
+	}
+
 	public static class Game
 	{
 		/// <summary>
@@ -114,7 +139,7 @@ namespace Halite
 		public ushort Height => (ushort)_sites.GetLength(1);
 
 		#region Implementation
-		
+
 		private readonly Site[,] _sites;
 
 		private Map(ushort width, ushort height) {
@@ -141,7 +166,7 @@ namespace Halite
 
 		private static Tuple<ushort, ushort> ParseMapSize(string mapSizeStr) {
 			ushort width, height;
-			var parts = mapSizeStr.Split(' ');
+			var parts = mapSizeStr.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
 			if (parts.Length != 2 || !ushort.TryParse(parts[0], out width) || !ushort.TryParse(parts[1], out height))
 				throw new ApplicationException("Could not get map size from stdin during init");
 			return Tuple.Create(width, height);
@@ -151,7 +176,7 @@ namespace Halite
 			var mapSize = ParseMapSize(mapSizeStr);
 			var map = new Map(mapSize.Item1, mapSize.Item2);
 
-			var productionValues = new Queue<string>(productionMapStr.Split(' '));
+			var productionValues = new Queue<string>(productionMapStr.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
 
 			ushort x, y;
 			for (x = 0; x < map.Width; x++) {
@@ -164,12 +189,12 @@ namespace Halite
 			}
 
 			map.Update(gameMapStr);
-			
+
 			return map;
 		}
 
 		private void Update(string gameMapStr) {
-			var gameMapValues = new Queue<string>(gameMapStr.Split(' '));
+			var gameMapValues = new Queue<string>(gameMapStr.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
 
 			ushort x = 0, y = 0;
 			while (y < Height) {
