@@ -17,7 +17,7 @@
         </div>
         <div class="row" id="noBotMessage" style="display: none;">
             <div class="col-md-12">
-                <h1>You don't have a bot on the leaderboard!</h1>
+                <h1>This user doesn't currently have a bot on the leaderboard!</h1>
             </div>
         </div>
         <div class="row" id="normalBody">
