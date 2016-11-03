@@ -1,4 +1,5 @@
 CXXFLAGS += -std=c++11 -pthread -I ./
+INSTALL_PATH?=/usr/local
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=halite
@@ -15,4 +16,4 @@ clean:
 
 .PHONY: install
 install:
-	install -m 0755 halite $(prefix)/bin
+	install -m 0755 halite $(INSTALL_PATH)/bin

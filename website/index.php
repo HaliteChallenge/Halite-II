@@ -28,10 +28,6 @@ if(isset($_SESSION['userID'])) {
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
     <style>
-        p {
-            line-height: 1.6em;
-        }
-
     </style>
 </head>
 
@@ -42,8 +38,12 @@ if(isset($_SESSION['userID'])) {
             <div class="row">
                 <div class="col-sm-12">
                     <img src="assets/hero.png" style="margin-bottom: 21px; width: 100%">
-                    <p>Halite is a artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2d grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
-                    <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
+                    <div id="intro_blurb">
+                        <h1>Halite is an artificial intelligence programming challenge.</h1>
+                        <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2d grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                        <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
+                        <p>This site is in beta. If you see any problems, please post on the <a href="http://forums.halite.io">forums</a>.</p>
+                    </div>
 
                     <h1>Creators</h1>
                     <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
