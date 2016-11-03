@@ -139,7 +139,7 @@ $(function() {
 
             var vr = "<span style='color: #0092a1;'>|</span>";
             $("#profileImage").attr("src", "https://avatars.githubusercontent.com/u/"+user["oauthID"]);
-            $("#name").html(user['username']);
+            $("#name").html("<a href='https://github.com/" + user['username'] + "'>" + user['username'] + "</a>");
             $("#primary-info").html("<a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>" + user['tier'] + " Tier<br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
             $("#secondary-info").append($("<span>Made in <a href='leaderboard.php?field=language&heading="+user['language']+"&value="+user['language']+"'>"+user['language']+ "</a></span>"));
             $("#secondary-info").append($("<br>"));
