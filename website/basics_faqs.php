@@ -50,6 +50,10 @@
                 <h3>What information do you store about me?</h3> 
                 <p>We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth.</p>
 
+                <h3>How do you determine my organization?</h3>
+                <p>We check to see if the domain of the email associated with your Github account is on our <a href="https://github.com/HaliteChallenge/Halite/blob/master/website/organizationWhitelist.txt">whitelist</a>.</p>
+                <p>Is your organization not on there? <a href="https://github.com/HaliteChallenge/Halite/edit/master/website/organizationWhitelist.txt">Edit the whitelist</a> and send us a pull request! We'll make sure to tag all members of your organization who have already signed up.</p>
+
                 <h2>Bot Programming</h2>
 
                 <h3>Do I need to be a programmer to play the game?</h3>

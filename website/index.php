@@ -43,17 +43,17 @@ if(isset($_SESSION['userID'])) {
                     <img src="assets/hero.png" style="margin-bottom: 21px; width: 100%">
                     <div id="intro_blurb">
                         <h1>Halite is an artificial intelligence programming challenge.</h1>
-                        <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2d grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                        <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                         <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
                         <p>This site is in beta. If you see any problems, please post on the <a href="http://forums.halite.io">forums</a>.</p>
                     </div>
 
                     <h1>Creators</h1>
-                    <p>The Halite game was designed and implemented by <a href="https://twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
+                    <p>The Halite game was designed and implemented by <a href="https://www.twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
                     
                     <div class="row">
                         <div class="col-sm-6">
-                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://twosigma.com"><img src="assets/two_sigma.png" style="max-width: 100%; max-height: 70px;"></a></div>
+                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://www.twosigma.com"><img src="assets/two_sigma.png" style="max-width: 100%; max-height: 70px;"></a></div>
                             <p>Two Sigma is a technology company dedicated to finding value in the world’s data. Since its founding in 2001, Two Sigma has built an innovative platform that combines extraordinary computing power, vast amounts of information, and advanced data science to produce breakthroughs in investment management, insurance and related fields.</p>
                         </div>
 

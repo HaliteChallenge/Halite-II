@@ -12,12 +12,12 @@
         <?php include 'includes/navbar.php'; ?>
         <div class="row" id="loginMessage" style="display: none;">
             <div class="col-md-12">
-                <h1><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h1>
+                <h2><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h2>
             </div>
         </div>
         <div class="row" id="noBotMessage" style="display: none;">
             <div class="col-md-12">
-                <h1>You don't have a bot on the leaderboard!</h1>
+                <h2>This user doesn't currently have a bot on the leaderboard!</h2>
             </div>
         </div>
         <div class="row" id="normalBody">
