@@ -28,15 +28,9 @@ if(isset($_SESSION['userID'])) {
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
     <style>
-        p {
-            font-size: 1.2em;
-        }
-
         #intro_blurb p {
             font-size: 1.6em;
         }
-
-
     </style>
 </head>
 
