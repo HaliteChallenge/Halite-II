@@ -14,23 +14,23 @@
             <div class="col-sm-12">
                 <h1>Halite Downloads</h1>
 
-                <h3>Game Environment</h3>
+                <h2>Game Environment</h2>
                 <p>This version of the environment was updated on <b>4:45pm EST on November 2nd</b>.</p>
 
-                <h4>Linux/macOS</h4>
+                <h3>Linux/macOS</h3>
                 <p>Execute:</p>
                 <pre><code>sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/HaliteChallenge/Halite/master/environment/install.sh)"</code></pre>
                 <p>Now, the <code>halite</code> command will run the environment.</p>
 
-                <h4>Windows</h4>
+                <h3>Windows</h3>
                 <p>Download <a href="downloads/environment/HaliteEnvironment-Windows.exe">halite.exe</a>.</p>
                 
-                <h4>Building from Source</h4>
+                <h3>Building from Source</h3>
                 <p>
                     Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>. If you are on Unix, run <code>make</code> inside the extracted folder. If you are on Windows, run the "make.bat" file. The file named "halite" or "halite.exe" is your new environment binary.
                 </p>
 
-                <h3>Starter Packages</h3>
+                <h2>Starter Packages</h2>
                 <p>
                     This set of starter packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
                 </p>
