@@ -23,7 +23,7 @@
                 <p>Now, the <code>halite</code> command will run the environment.</p>
 
                 <h3>Windows</h3>
-                <p>Download <a href="downloads/environment/HaliteEnvironment-Windows.exe">halite.exe</a>.</p>
+                <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>.</p>
                 
                 <h3>Building from Source</h3>
                 <p>

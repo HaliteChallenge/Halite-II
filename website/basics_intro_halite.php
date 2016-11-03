@@ -56,7 +56,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
                 <h3>Visualizing a game</h3>
                 <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a> to get a visualization like this one:</p>
-                <div class="text-center"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
+                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
 
                 <h3>Halite game overview</h3>
                 <p>What do all of these pretty squares mean?</p>
