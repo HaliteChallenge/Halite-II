@@ -58,7 +58,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a> to get a visualization like this one:</p>
                 <div class="text-center" style="margin-bottom: 18px;"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
 
-                <h3>Halite game overview</h3>
+                <h3>Halite game rules</h3>
                 <p>What do all of these pretty squares mean?</p>
                 <p>Halite is played on a rectangular grid. Players own pieces on this grid. Some pieces are unowned and so belong to the map until claimed by players. Each piece has a strength value associated with it.</p>
                 <p>At each turn, bots decide how to move the pieces they own. Valid moves are: STILL, NORTH, EAST, SOUTH, WEST. When a piece remains STILL, its strength is increased by the production value of the site it is on. When a piece moves, it leaves behind a piece with the same owner and a strength of zero.</p>
