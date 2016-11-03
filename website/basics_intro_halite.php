@@ -15,7 +15,7 @@
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
                 <h1>Introducing Halite</h1>
-                <p>In Getting Started, we showed how to submit a demo bot to the leaderboard. In this short tutorial, we will explain the files included in your starter package, how to run a game of halite, and the rules of halite.</p>
+                <p>In <a href="basics_quickstart.php">the last tutorial</a>, we showed how to submit a demo bot to the leaderboard. In this short tutorial, we will explain the files included in your starter package, how to run a game of halite, and the rules of halite.</p>
                 <h3>A look at the starter package</h3>
                 <p>Your starter package should contain these files.</p>
 
