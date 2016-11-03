@@ -2,7 +2,6 @@
     /* sidebar */
     .bs-docs-sidebar {
         padding-left: 20px;
-        margin-top: 20px;
         margin-bottom: 20px;
     }
 

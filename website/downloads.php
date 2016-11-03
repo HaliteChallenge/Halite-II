@@ -12,7 +12,7 @@
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
             <div class="col-sm-12">
-                <h1>Halite Downloads</h1>
+                <h1>Downloads</h1>
 
                 <h2>Game Environment</h2>
                 <p>This version of the environment was updated on <b>4:45pm EST on November 2nd</b>.</p>
