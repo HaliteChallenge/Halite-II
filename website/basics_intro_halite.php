@@ -15,7 +15,7 @@
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
                 <h1>Introducing Halite</h1>
-                <p>In <a href="basics_quickstart.php">the last tutorial</a>, we showed how to submit a demo bot to the leaderboard. In this short tutorial, we will explain the files included in your starter package, how to run a game of halite, and the rules of halite.</p>
+                <p>In <a href="basics_quickstart.php">the last tutorial</a>, we showed how to submit a demo bot to the leaderboard. In this short tutorial, we will go over the files included in a starter package, running a game of halite, and the rules of halite.</p>
                 <h3>A look at the starter package</h3>
                 <p>Your starter package should contain these files.</p>
 
@@ -61,12 +61,9 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <h3>Halite game overview</h3>
                 <p>What do all of these pretty squares mean?</p>
                 <p>Halite is played on a rectangular grid. Players own pieces on this grid. Some pieces are unowned and so belong to the map until claimed by players. Each piece has a strength value associated with it.</p>
-                <p>At each turn, bots decide how to move the pieces they own. Valid moves are: STILL, NORTH, EAST, SOUTH, WEST.</p>
-                <p>When a piece remains STILL, its strength is increased by the production value of the site it is on.</p>
-                <p>When a piece moves, it leaves behind a piece with the same owner and a strength of zero.</p>
+                <p>At each turn, bots decide how to move the pieces they own. Valid moves are: STILL, NORTH, EAST, SOUTH, WEST. When a piece remains STILL, its strength is increased by the production value of the site it is on. When a piece moves, it leaves behind a piece with the same owner and a strength of zero.</p>
                 <p>When two or more pieces from the same player try to occupy the same site, the resultant piece gets the sum of their strengths (this strength is capped at 255).</p>
-                <p>When pieces with different owners move onto the same site or cardinally adjacent sites, the pieces are forced to fight, and each piece loses strength equal to the strength of its opponent.</p>  
-                <p>When a player's piece moves onto an unowned site, that piece and the unowned piece fight, and each piece loses strength equal to the strength of its opponent. </p>
+                <p>When pieces with different owners move onto the same site or cardinally adjacent sites, the pieces are forced to fight, and each piece loses strength equal to the strength of its opponent. When a player's piece moves onto an unowned site, that piece and the unowned piece fight, and each piece loses strength equal to the strength of its opponent. </p>
                 <p>When a piece loses all of its strength, it dies and is removed from the grid.</p>
                 
                 <h3>How do we program a bot?</h3>
