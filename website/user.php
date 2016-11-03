@@ -24,7 +24,7 @@
             <div class="col-xl-6 col-lg-5 col-md-12">
                 <div id="profileCard" class="panel panel-default text-center" style="padding: 21px; margin-bottom: 21px;">
                     <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 200px;">
-                    <h1 id="name" style="margin-top: 12px"></h1>
+                    <h2 id="name" style="margin-top: 12px"></h2>
                     <p id="primary-info" style="line-height: 1.2em; font-size: 20px;"></p>
                     <p id="secondary-info" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
                 </div>
