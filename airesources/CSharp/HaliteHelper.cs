@@ -21,11 +21,11 @@ namespace Halite
 
 		public static void Information(string message) {
 			if (!string.IsNullOrEmpty(_logPath))
-				File.AppendAllLines(_logPath, new[] {$"{DateTime.Now.ToShortTimeString()}: {message}"});
+				File.AppendAllLines(_logPath, new[] {string.Format("{0}: {1}", DateTime.Now.ToShortTimeString(), message)});
 		}
 		
 		public static void Error(Exception exception) {
-			Log.Information($"ERROR: {exception.Message} {exception.StackTrace}");
+			Log.Information(string.Format("ERROR: {0} {1}", exception.Message, exception.StackTrace));
 		}
 	}
 
@@ -80,7 +80,7 @@ namespace Halite
 		public Direction Direction;
 
 		internal static string MovesToString(IEnumerable<Move> moves) {
-			return string.Join(" ", moves.Select(m => $"{m.Location.X} {m.Location.Y} {(int)m.Direction}"));
+			return string.Join(" ", moves.Select(m => string.Format("{0} {1} {2}", m.Location.X, m.Location.Y, (int)m.Direction)));
 		}
 	}
 
@@ -116,9 +116,9 @@ namespace Halite
 		public Site this[ushort x, ushort y] {
 			get {
 				if (x >= Width)
-					throw new IndexOutOfRangeException($"Cannot get site at ({x},{y}) beacuse width is only {Width}");
+					throw new IndexOutOfRangeException(string.Format("Cannot get site at ({0},{1}) beacuse width is only {2}", x, y, Width));
 				if (y >= Height)
-					throw new IndexOutOfRangeException($"Cannot get site at ({x},{y}) beacuse height is only {Height}");
+					throw new IndexOutOfRangeException(string.Format("Cannot get site at ({0},{1}) beacuse height is only {2}", x, y, Height));
 				return _sites[x, y];
 			}
 		}
