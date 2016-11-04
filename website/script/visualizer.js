@@ -20,7 +20,7 @@ function showGame(game, showmovement, isminimal, seconds) {
         $("#pageContent").empty();
 
         var $row = $("<div class='row'></div>");
-        $row.append($("<div class='col-md-11'></div>").append($("<h3>"+game.players.slice(1, game.num_players+1).map(function(p) {
+        $row.append($("<div class='col-md-11'></div>").append($("<h3 style='margin-top: 0px;'>"+game.players.slice(1, game.num_players+1).map(function(p) {
             var nameComponents = p.name.split(" ");
             var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
             console.log(name);
