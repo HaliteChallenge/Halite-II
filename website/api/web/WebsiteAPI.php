@@ -264,7 +264,7 @@ class WebsiteAPI extends API{
             ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
-            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user, "Bot Recieved", "<p>We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>");
+            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>");
 
             // AWS auto scaling
             $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
