@@ -14,17 +14,13 @@ Halite is a programming competition. Contestants write bots to play an original 
 - `website/` - The website that hosts the competition. Includes the API that manages the game servers.
 - `worker/` - The source for the worker servers that compile bots and run games safely
 
-## Documentation
-
-See the markdown files in [the admin folder](/admin/md) for more information. 
-
-**Note:** this documentation is aimed at administrators of our setup of Halite. Much of this documentation isn't general and is quite technical.
-
 ## Contributing
 
 If you find a bug or have a feature request, please [open an issue](https://github.com/HaliteChallenge/Halite/issues/new).
 
 Want to help out? Have you implemented a patch or a new feature? Send us a pull request! If you are looking for things to do, check out [our open issues](https://github.com/HaliteChallenge/Halite/issues) or [our project board](https://github.com/HaliteChallenge/Halite/projects/1).
+
+If you'd like to write a starter package for a new language, see this [guide](https://halite.io/advanced_writing_sp.php).
 
 ### Authors
 
