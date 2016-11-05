@@ -105,7 +105,7 @@ $(function() {
             $title = $("<td><b>"+notif.title+"</b></td>");
             $title.css("color", titleColor);
 
-            var dateComponents = notif.timestamp.split(/[- :]/);
+            var dateComponents = notif.creationTime.split(/[- :]/);
             var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
             var dateString = gameDate.toLocaleString();
 
