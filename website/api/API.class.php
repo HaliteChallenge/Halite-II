@@ -87,23 +87,23 @@ abstract class API{
     }
 
     protected function sendNotification($recipientUser, $subject, $message, $mood) {
-        if($recipientUser['onEmailList'] == 0) return;
-
         $this->insert("INSERT INTO UserNotification (userID, title, body, mood) VALUES ({$recipientUser['userID']}, '{$subject}', '{$message}', {$mood})");
 
-        $emailMessage = $message."<hr><p style='color: gray; font-size: 14px;'>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/emailList?unsubscribe=1'>here</a>. To resubscribe, click <a href='".WEB_DOMAIN."api/web/emailList?subscribe=1'>here</a>.</p>";
+        if($recipientUser['onEmailList'] == 1) {
+            $emailMessage = $message."<hr><p style='color: gray; font-size: 14px;'>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/emailList?unsubscribe=1'>here</a>. To resubscribe, click <a href='".WEB_DOMAIN."api/web/emailList?subscribe=1'>here</a>.</p>";
 
-        $transporter = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
-            ->setUsername($this->config['email']['email'])
-            ->setPassword($this->config['email']['password']);
-        $mailer = Swift_Mailer::newInstance($transporter);
-        $emailMessage = Swift_Message::newInstance($subject)
-            ->setFrom(array($this->config['email']['email'] => 'Halite'))
-            ->setTo(array($recipientUser['email']))
-            ->setBody($emailMessage)
-            ->setContentType("text/html");
+            $transporter = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
+                ->setUsername($this->config['email']['email'])
+                ->setPassword($this->config['email']['password']);
+            $mailer = Swift_Mailer::newInstance($transporter);
+            $emailMessage = Swift_Message::newInstance($subject)
+                ->setFrom(array($this->config['email']['email'] => 'Halite'))
+                ->setTo(array($recipientUser['email']))
+                ->setBody($emailMessage)
+                ->setContentType("text/html");
 
-        $mailer->send($emailMessage);
+            $mailer->send($emailMessage);
+        }
     }
 
     protected function initDB() {
