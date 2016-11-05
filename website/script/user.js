@@ -79,10 +79,16 @@ $(function() {
             }
         },
         getTableRow: function(notif) {
-            $row = $("<tr><td><b>"+notif.title+"</b></td></tr>");
-            if(parseInt(notif.mood) == -1) $row.css("color", "#d9534f");
-            if(parseInt(notif.mood) == 1) $row.css("color", "#5cb85c");
-            return $row;
+            var titleColor = null;
+            if(parseInt(notif.mood) == -1) titleColor = "#d9534f";
+            if(parseInt(notif.mood) == 0) titleColor = "#5bc0de";
+            if(parseInt(notif.mood) == 1) titleColor = "#5cb85c";
+
+            var dateComponents = notif.timestamp.split(/[- :]/);
+            var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
+            var dateString = gameDate.toLocaleString();
+
+            return "<tr><td><b>"+notif.title+"</b></td><td>"+dateString+"</td></tr>";
         }
     }
 
