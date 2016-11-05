@@ -30,7 +30,6 @@ CREATE TABLE `Game` (
   `replayName` varchar(64) NOT NULL,
   `mapWidth` smallint(5) NOT NULL,
   `mapHeight` smallint(5) NOT NULL,
-  `workerID` mediumint(8) unsigned NOT NULL,
   `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`gameID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=407227 DEFAULT CHARSET=latin1;
@@ -95,8 +94,7 @@ CREATE TABLE `UserHistory` (
   `versionNumber` smallint(5) NOT NULL,
   `lastRank` smallint(5) NOT NULL,
   `lastNumPlayers` smallint(5) NOT NULL,
-  `lastNumGames` smallint(5) DEFAULT NULL,
-  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
+  `lastNumGames` smallint(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -123,7 +121,7 @@ DROP TABLE IF EXISTS `DoneWithAnnouncement`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `DoneWithAnnouncement` (
-  `announcementID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `announcementID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
