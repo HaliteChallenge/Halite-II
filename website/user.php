@@ -10,6 +10,16 @@
 <body>
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
+        <div class="modal fade" id="notifModal" tabindex="-1" role="dialog" aria-labelledby="notifModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" id="notifModalHeader">
+                    </div>
+                    <div class="modal-body" id="notifModalBody">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row" id="loginMessage" style="display: none;">
             <div class="col-md-12">
                 <h2><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h2>
@@ -25,8 +35,17 @@
                 <div id="profileCard" class="panel panel-default text-center" style="padding: 21px; margin-bottom: 21px;">
                     <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 200px;">
                     <h2 id="name" style="margin-top: 12px"></h2>
-                    <p id="primary-info" style="line-height: 1.2em; font-size: 20px;"></p>
-                    <p id="secondary-info" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
+                    <p id="primaryInfo" style="line-height: 1.2em; font-size: 20px;"></p>
+                    <p id="secondaryInfo" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
+                </div>
+                <div id="notifsPanel" style='display: none;' class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Events</h3>
+                    </div>
+                    <table class="table" id="notifsTable">
+                        <tbody id="notifsTableBody">
+                        </tbody>
+                    </table>
                 </div>
                 <div id="historyPanel" class="panel panel-default">
                     <div class="panel-heading">
