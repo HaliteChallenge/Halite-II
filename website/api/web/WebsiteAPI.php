@@ -174,20 +174,25 @@ class WebsiteAPI extends API{
         } 
     }
 
-    /* Unsubscribe Endpoint
+    /* Email List Endpoint
      *
-     * Hitting this endpoint allows a user to unsubscribe from all Halite emails. 
+     * Hitting this endpoint allows a user to subscribe and unsubscribe from all Halite emails. 
      */
-    protected function unsubscribe() {
+    protected function emailList() {
         $user = $this->getLoggedInUser();
         if($user == null) {
             $callbackURL = urlencode(WEB_DOMAIN."api/web/unsubscribe");
             header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
         }
 
-        $this->insert("UPDATE User SET onEmailList=0 WHERE userID = {$user['userID']}");
+        if(isset($_GET['unsubscribe'])) {
+            $this->insert("UPDATE User SET onEmailList=0 WHERE userID = {$user['userID']}");
+            header("Location: ../../index.php?unsubscribeEmails=1");
+        } else if(isset($_GET['subscribe'])) {
+            $this->insert("UPDATE User SET onEmailList=1 WHERE userID = {$user['userID']}");
+            header("Location: ../../index.php?subscribeEmails=1");
+        } 
 
-        header("Location: ../../index.php?unsubscribeEmails=1");
         die();
     }
 
