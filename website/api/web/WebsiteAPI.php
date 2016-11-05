@@ -269,7 +269,7 @@ class WebsiteAPI extends API{
             
             if ($_FILES["botFile"]["size"] > 20000000) {
                 $megabytes = $_FILES["botFile"]["size"]/1000000;
-                $this->sendEmail($user, "Bot TOO LARGE", "<p>Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.</p>", -1);
+                $this->sendNotification($user, "Bot TOO LARGE", "<p>Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.</p>", -1);
                 return "Sorry, your file is too large.";
             }
 
@@ -280,7 +280,7 @@ class WebsiteAPI extends API{
             ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
-            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
+            if(intval($this->config['test']['isTest']) == 0) $this->sendNotification($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
 
             // AWS auto scaling
             $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
