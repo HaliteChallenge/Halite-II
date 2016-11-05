@@ -52,7 +52,7 @@
 
                 <h2>5. Privacy Policy</h2>
 
-                <p>Two Sigma’s Privacy Policy posted on this website applies to use of this Site, and its terms are made a part of these Terms by this reference. Please read our Privacy Policy [hyperlink] for more information about our information collection and use practices.</p>
+                <p>Two Sigma’s Privacy Policy posted on this website applies to use of this Site, and its terms are made a part of these Terms by this reference. Please read our <a href="privacy_policy.php">Privacy Policy</a> for more information about our information collection and use practices.</p>
 
                 <h2>6. No Reliance</h2>
 
