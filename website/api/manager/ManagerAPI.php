@@ -139,7 +139,7 @@ class ManagerAPI extends API{
                     $this->insert("INSERT INTO UserHistory (userID, versionNumber, lastRank, lastNumPlayers, lastNumGames) VALUES ({$user['userID']}, {$user['numSubmissions']}, {$user['rank']}, $numActiveUsers, {$user['numGames']})");
                 }
             } else { // Didnt succeed
-                $this->sendNotification($user, "Compilation FAILURE", "<h2>The bot that you recently submitted to the Halite competition would not compile on our servers.</h2><p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b>.</p><b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['errors']}</code></pre>", -1);
+                $this->sendNotification($user, "Compilation Failure", "<p>The bot that you recently submitted to the Halite competition would not compile on our servers.</p><p>Our autocompile script <b>thought that your bot was written in \"{$language}\"</b>.</p><b>Here is a description of the compilation error</b>:<br><pre><code><br>{$_POST['errors']}</code></pre>", -1);
                 $this->insert("UPDATE User SET compileStatus = 0 WHERE userID = ".$this->mysqli->real_escape_string($userID));
             }
         }
@@ -232,7 +232,9 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $this->sendNotification($storedUser, "First Bot Timeout/Error", "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>", -1, "<p>Your bot timed out or errored in a game for the first time.</p>");
+                    $emailMessage = "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>";
+                    $webMessage = "<p>Your bot timed out or errored in a game for the first time.</p <p><a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game.</p>. <p><a href='api/web/errorLog?errorLogName={$user->errorLogName}'>Here</a> is your bot's error log. An error log contains your bot's output (from stdout and stderr) for the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p>";
+                    $this->sendNotification($storedUser, "First Bot Timeout/Error", $emailMessage, -1, $webMessage);
                 }
             }
 
