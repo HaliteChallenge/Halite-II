@@ -208,6 +208,17 @@ class WebsiteAPI extends API{
         }
     }
 
+    /* User Notification Endpoint
+     *
+     * Allows the downloading of all of the notifications a user has recieved over email.
+     * Notifications include "Compilation Success", "Bot received", etc
+     */
+    protected function notification() {
+        if(isset($_GET["userID"])) {
+            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$_GET["userID"]} ORDER BY userNotificationID DESC");
+        }
+    }
+
     /* Game Endpoint
      *
      * Games are continuously run on our servers and exposed on our website
@@ -258,7 +269,7 @@ class WebsiteAPI extends API{
             
             if ($_FILES["botFile"]["size"] > 20000000) {
                 $megabytes = $_FILES["botFile"]["size"]/1000000;
-                $this->sendEmail($user, "Bot TOO LARGE", "<p>Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.</p>");
+                $this->sendEmail($user, "Bot TOO LARGE", "<p>Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.</p>", -1);
                 return "Sorry, your file is too large.";
             }
 
@@ -269,7 +280,7 @@ class WebsiteAPI extends API{
             ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
-            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>");
+            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
 
             // AWS auto scaling
             $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 

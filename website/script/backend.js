@@ -233,3 +233,12 @@ function getFilteredUsers(filters, orderBy, limit, page) {
 
     return result.responseJSON;
 }
+
+function getUserNotifications(userID) {
+    return $.ajax({
+        url: url+"notification",
+        async: false,
+        method: "GET",
+        data: {userID: userID}
+    }).responseJSON;
+}
