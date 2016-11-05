@@ -214,8 +214,9 @@ class WebsiteAPI extends API{
      * Notifications include "Compilation Success", "Bot received", etc
      */
     protected function notification() {
-        if(isset($_GET["userID"])) {
-            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$_GET["userID"]} ORDER BY userNotificationID DESC");
+        if($this->isLoggedIn()) {
+            $userID = $this->getLoggedInUser();
+            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC");
         }
     }
 

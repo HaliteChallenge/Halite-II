@@ -202,8 +202,9 @@ $(function() {
                 return games;
             });
             historyTable.init(user.username, getHistories(user["userID"]));
+
             if(isMe) {
-                notifsTable.init(getUserNotifications(user["userID"]));
+                notifsTable.init(getNotifications(user["userID"]));
                 notifsTable.show();
             }
         }
