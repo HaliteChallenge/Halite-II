@@ -166,6 +166,9 @@ $(function() {
     if(getGET("unsubscribeEmails")) {
         messageBox.alert("Unsubscribed", "You have unsubscribed from all halite emails.", true)
     }
+    if(getGET("subscribeEmails")) {
+        messageBox.alert("Subscribed", "You have subscribed to all halite emails!", true)
+    }
 
     var session = getSession();
     navbar.init(session);
