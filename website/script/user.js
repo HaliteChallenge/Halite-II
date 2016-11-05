@@ -79,7 +79,10 @@ $(function() {
             }
         },
         getTableRow: function(notifs) {
-            return "<tr><td><b>"+notifs.title+"</b></td></tr>";
+            $row = $("<tr><td><b>"+notifs.title+"</b></td></tr>");
+            if(notifs.mood == -1) $row.attr("background-color", "#d9534f");
+            if(notifs.mood == 1) $row.attr("background-color", "#5cb85c");
+            return $row;
         }
     }
 
