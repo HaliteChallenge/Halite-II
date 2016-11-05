@@ -40,7 +40,8 @@
                 <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>.</p>
                 
                 <h3>Building from Source</h3>
-                <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>. If you are on Unix, run <code>make</code> and <code>sudo make install</code> inside the extracted folder. The <code>halite</code> command will now run the environment.</p>
+                <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
+                <p>If you are on Unix, run <code>make</code> and <code>sudo make install</code> inside the extracted folder. The <code>halite</code> command will now run the environment.</p>
                 <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
             </div>
         </div>
