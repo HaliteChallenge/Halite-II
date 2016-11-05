@@ -10,6 +10,16 @@
 <body>
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
+        <div class="modal fade" id="notifModal" tabindex="-1" role="dialog" aria-labelledby="notifModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" id="notifModalHeader">
+                    </div>
+                    <div class="modal-body" id="notifModalBody">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row" id="loginMessage" style="display: none;">
             <div class="col-md-12">
                 <h2><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h2>

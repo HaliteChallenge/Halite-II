@@ -59,6 +59,24 @@ $(function() {
     var notifsTable = {
         $panel: $("#notifsPanel"),
         $tableBody: $("#notifsTableBody"),
+        modal: {
+            $modal: $("notifModal"),
+            $title: $("notifModalHeader"),
+            $body: $("notifModalBody"),
+            init: function(title, body) {
+                this.title = title;
+                this.body = body;
+
+                this.render();
+            },
+            render: function() {
+                this.$title.html("<h2>"+this.title+"</h2>");
+                this.$body.html(this.body);
+            },
+            show: function() {
+                this.$modal.modal("show");
+            }
+        },
         show: function() {
             this.$panel.attr("display", "block");
         },
@@ -84,11 +102,23 @@ $(function() {
             if(parseInt(notif.mood) == 0) titleColor = "#5bc0de";
             if(parseInt(notif.mood) == 1) titleColor = "#5cb85c";
 
+            $title = $("<td><b>"+notif.title+"</b></td>");
+            $title.css("color", titleColor);
+
             var dateComponents = notif.timestamp.split(/[- :]/);
             var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
             var dateString = gameDate.toLocaleString();
 
-            return "<tr><td><b>"+notif.title+"</b></td><td>"+dateString+"</td></tr>";
+            $row = $("<tr></tr>");
+            $row.append($title);
+            $row.append("<td>"+dateString+"</td>");
+            $row.click(this, this.notifClicked.bind(this, notif));
+
+            return $row;
+        },
+        notifClicked: function(notif) {
+            this.modal.init(notif.title, notif.body);
+            this.modal.show();
         }
     }
 
