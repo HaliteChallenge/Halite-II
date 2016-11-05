@@ -216,7 +216,8 @@ class WebsiteAPI extends API{
     protected function notification() {
         if($this->isLoggedIn()) {
             $userID = $this->getLoggedInUser()['userID'];
-            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC");
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC LIMIT $limit");
         }
     }
 
