@@ -18,7 +18,7 @@ Halite is a programming competition. Contestants write bots to play an original 
 
 If you find a bug or have a feature request, please [open an issue](https://github.com/HaliteChallenge/Halite/issues/new).
 
-Want to help out? Have you implemented a patch or a new feature? Send us a pull request! If you are looking for things to do, check out [our open issues](https://github.com/HaliteChallenge/Halite/issues) or [our project board](https://github.com/HaliteChallenge/Halite/projects/1).
+Want to help out? Have you implemented a patch or a new feature? Send us a pull request! If you are looking for things to do, check out [our open issues](https://github.com/HaliteChallenge/Halite/issues).
 
 If you'd like to write a starter package for a new language, see this [guide](https://halite.io/advanced_writing_sp.php).
 
