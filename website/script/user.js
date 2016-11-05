@@ -60,9 +60,9 @@ $(function() {
         $panel: $("#notifsPanel"),
         $tableBody: $("#notifsTableBody"),
         modal: {
-            $modal: $("notifModal"),
-            $title: $("notifModalHeader"),
-            $body: $("notifModalBody"),
+            $modal: $("#notifModal"),
+            $title: $("#notifModalHeader"),
+            $body: $("#notifModalBody"),
             init: function(title, body) {
                 this.title = title;
                 this.body = body;
@@ -70,7 +70,7 @@ $(function() {
                 this.render();
             },
             render: function() {
-                this.$title.html("<h2>"+this.title+"</h2>");
+                this.$title.html("<h3>"+this.title+"</h3>");
                 this.$body.html(this.body);
             },
             show: function() {
@@ -91,7 +91,7 @@ $(function() {
             } else {
                 this.$panel.css("display", "block");    
                 this.$tableBody.empty();
-                for(var a = 0; a < Math.min(5, this.notifs.length); a++) {
+                for(var a = 0; a < Math.min(10, this.notifs.length); a++) {
                     this.$tableBody.append(this.getTableRow(this.notifs[a]));
                 }
             }
@@ -112,11 +112,13 @@ $(function() {
             $row = $("<tr></tr>");
             $row.append($title);
             $row.append("<td>"+dateString+"</td>");
+            $row.css("cursor", "pointer");
             $row.click(this, this.notifClicked.bind(this, notif));
 
             return $row;
         },
         notifClicked: function(notif) {
+            console.log(this);
             this.modal.init(notif.title, notif.body);
             this.modal.show();
         }
