@@ -78,10 +78,10 @@ $(function() {
                 }
             }
         },
-        getTableRow: function(notifs) {
-            $row = $("<tr><td><b>"+notifs.title+"</b></td></tr>");
-            if(notifs.mood == -1) $row.attr("background-color", "#d9534f");
-            if(notifs.mood == 1) $row.attr("background-color", "#5cb85c");
+        getTableRow: function(notif) {
+            $row = $("<tr><td><b>"+notif.title+"</b></td></tr>");
+            if(parseInt(notif.mood) == -1) $row.css("color", "#d9534f");
+            if(parseInt(notif.mood) == 1) $row.css("color", "#5cb85c");
             return $row;
         }
     }

@@ -87,7 +87,7 @@ abstract class API{
     }
 
     protected function sendNotification($recipientUser, $subject, $message, $mood, $notificationMessage=NULL) {
-        if($notificationMessage == NULL) $notificationMessage = $notificationMessage;
+        if($notificationMessage == NULL) $notificationMessage = $message;
         $notificationMessage = $this->mysqli->real_escape_string($notificationMessage);
 
         $this->insert("INSERT INTO UserNotification (userID, title, body, mood) VALUES ({$recipientUser['userID']}, '{$subject}', '{$notificationMessage}', {$mood})");
