@@ -94,7 +94,8 @@ CREATE TABLE `UserHistory` (
   `versionNumber` smallint(5) NOT NULL,
   `lastRank` smallint(5) NOT NULL,
   `lastNumPlayers` smallint(5) NOT NULL,
-  `lastNumGames` smallint(5) DEFAULT NULL
+  `lastNumGames` smallint(5) DEFAULT NULL,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
