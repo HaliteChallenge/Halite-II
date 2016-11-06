@@ -284,7 +284,7 @@ function showGame(game, showmovement, isminimal, seconds) {
 				var sX = Math.round(xOffset);
 				for(var b = 0; b < game.width; b++) {
 					var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
-					if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
+					if(site.strength == 255) mapGraphics.lineStyle(1, '0xffffff');
 					mapGraphics.beginFill(game.players[site.owner].color);
 					var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
 					var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
