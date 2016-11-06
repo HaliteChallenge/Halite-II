@@ -47,7 +47,7 @@ function showGame(game, showmovement, isminimal, seconds) {
     if(zoom < 1) zoom = 1;
 
     window.onresize = function() {
-        var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (60 + $("canvas").offset().top);
+        var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (20 + $("canvas").offset().top);
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);
@@ -287,7 +287,7 @@ function showGame(game, showmovement, isminimal, seconds) {
                 var sX = Math.round(xOffset);
                 for(var b = 0; b < game.width; b++) {
                     var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
-                    if(site.strength == 255) mapGraphics.lineStyle(1, '0x000000');
+                    if(site.strength == 255) mapGraphics.lineStyle(1, '0xfffff0');
                     mapGraphics.beginFill(game.players[site.owner].color);
                     var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
                     var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
@@ -302,7 +302,7 @@ function showGame(game, showmovement, isminimal, seconds) {
                     pts.push(new PIXI.Point(center.x - squarescale * pw, center.y + squarescale * ph));
                     mapGraphics.drawPolygon(pts);
                     mapGraphics.endFill();
-                    if(site.strength == 255) mapGraphics.lineStyle(0, '0x000000');
+                    if(site.strength == 255) mapGraphics.lineStyle(0, '0xffffff');
                     loc++;
                     sX++;
                     if(sX == game.width) sX = 0;
