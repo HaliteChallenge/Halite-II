@@ -16,7 +16,7 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    This set of starter packages was uploaded on November 2nd. 
+                    This set of starter packages was uploaded on November 6nd. We fixed a minor bug with the getDistance() method in the Python starter package.
                 </p>
                 <p>
                     <ul>
