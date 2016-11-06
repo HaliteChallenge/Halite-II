@@ -47,7 +47,7 @@ function showGame(game, showmovement, isminimal, seconds) {
     if(zoom < 1) zoom = 1;
 
     window.onresize = function() {
-        var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (60 + $("canvas").offset().top);
+        var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (20 + $("canvas").offset().top);
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);
