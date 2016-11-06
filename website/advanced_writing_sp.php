@@ -109,7 +109,7 @@ Consider the following 3x3 production map as an example (where <code>[x]</code> 
 
                 <h2>Submitting Your New Starter Package</h2>
 
-                <p>Fork our repo, place your starter package in the airesources/ folder, and send us a pull request! If we accept your PR, your starter package will be added to the site.<br>Note: please include the runGame.sh and runGame.bat scripts (each run a 30 by 30 game between MyBot and RandomBot) and the MyBot and RandomBot files (both just random bots).</p>
+            <p><a href="https://github.com/HaliteChallenge/Halite">Fork our repo</a>, place your starter package in the airesources/ folder, and send us a pull request! If we accept your PR, your starter package will be added to the site.<br>Note: please include the runGame.sh and runGame.bat scripts (each run a 30 by 30 game between MyBot and RandomBot) and the MyBot and RandomBot files (both just random bots).</p>
 
             </div>
         </div>
