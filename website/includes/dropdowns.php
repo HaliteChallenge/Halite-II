@@ -8,8 +8,8 @@
   <a href="leaderboard.php">Rankings</a>
 </li>
 <li>
-  <a href="http://forums.halite.io">Forums</a>
+    <a href="local_visualizer.php">Visualize</a>
 </li>
-<li class="dropdown">
-    <a class="dropdown-toggle" href="local_visualizer.php">Visualize</a>
+<li>
+  <a href="http://forums.halite.io">Forums</a>
 </li>
