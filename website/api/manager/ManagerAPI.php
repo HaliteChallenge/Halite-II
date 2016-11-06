@@ -232,9 +232,8 @@ class ManagerAPI extends API{
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $emailMessage = "<p>Your bot timed out or errored in a game for the first time. <a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game. The game should also be listed in your recent games feed on your <a href='".WEB_DOMAIN."user.php'>page</a>.</p> <p>Here is your bot's error log: <br> <pre><code>{$errorLogContents}</code></pre>. This will log your bot's output (from stdout and stderr) and the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p> <p>We will <b>not</b> send you emails about subsequent timeouts of your bot.</p>";
-                    $webMessage = "<p>Your bot timed out or errored in a game for the first time.</p> <p><a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game.</p> <p><a href='api/web/errorLog?errorLogName={$user->errorLogName}'>Here</a> is your bot's error log. An error log contains your bot's output (from stdout and stderr) and the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p>";
-                    $this->sendNotification($storedUser, "First Bot Timeout/Error", $emailMessage, -1, $webMessage);
+                    $message = "<p>Your bot timed out in a game for the first time. This happens when your bot doesn't respond in 15 seconds of a game's start or 1 second of a turn's start. A timeout may be the result of a runtime error in your bot. When your bot times out, its pieces become part of the map and it is ejected from the game.</p> <p><a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game in which your bot timed out.</p> <p><a href='api/web/errorLog?errorLogName={$user->errorLogName}'>Here</a> is your bot's error log. An error log contains your bot's output (from stdout and stderr) and the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p>";
+                    $this->sendNotification($storedUser, "First Bot Timeout/Error", $message, -1);
                 }
             }
 

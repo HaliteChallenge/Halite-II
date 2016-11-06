@@ -78,7 +78,7 @@
 
                 <h3>Timeouts</h3>
 
-                <p>Bots are given a total amount of time that they will work from during a game, and are permitted to use it as they choose. Bots are given 15 seconds to initialize and 1 second for every subsequent turn. Every bot's clock starts ticking once the environment sends its message (be it initialization or frame) to the bot and resets once the environment receives the newline character marking the end of the bot's response. If a bot's clock hits zero, it is ejected from the game and deemed to have lost.</p>
+                <p>Bots are given a total amount of time that they will work from during a game, and are permitted to use it as they choose. Bots are given 15 seconds to initialize and 1 second for every subsequent turn. Every bot's clock starts ticking once the environment sends its message (be it initialization or frame) to the bot and resets once the environment receives the newline character marking the end of the bot's response. If a bot's clock hits zero, it is ejected from the game and deemed to have lost. It's pieces become part of the map.</p>
 
                 <h3>Maps</h3>
 
