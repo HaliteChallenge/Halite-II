@@ -30,7 +30,7 @@
                 <h3>Getting on the Leaderboard</h3>
 
                 <p>To get on the leaderboard, you need to submit a bot to the Halite tournament.</p>
-                <p>Click the "Submit" button in the navigation bar. In general, you need to package your submission as a zip file that contains everything needed to run your bot (your bot’s source code, any supplemental libraries, etc.). For your first submission, you can simply upload the zipped starter package that you just downloaded. You will receive an email notification that your submission has been received.</p>
+                <p>Click the "Submit" button in the navigation bar. In general, you need to package your submission as a zip file that contains everything needed to run your bot (your bot’s source code, starter package source files, supplemental libraries, etc.). For your first submission, you can simply upload the zipped starter package that you just downloaded. You will receive an email notification that your submission has been received.</p>
                 <p>The Halite servers will compile the source code of your submission and continuously play your bot against other contestants, which will generate your leaderboard ranking. If the compilation of your source code fails, we will email you.</p>
                 <p>To track your bot's progress, navigate to your <a href="user.php">homepage</a>.</p>
 

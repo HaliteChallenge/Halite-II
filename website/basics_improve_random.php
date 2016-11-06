@@ -26,35 +26,27 @@
                 <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-file="Random.py"></span> 
                 <p>Let's walk through it line by line.</p>
                 
-                <p>First we import a couple of helper files that handle communicating with the environment binary and a couple of game constructs:</p>
+                <p>First we import a couple of helper files that are included in the starter packages:</p>
 
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="3-4" data-gist-file="Random.py"></span> 
+                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="3-4" data-gist-file="Random.py"></span> 
 
-                <p>Then we get our ID (each player has a unique identifier that is associated with their pieces) and the initial map from the environment. We send back the name of our bot (used when displaying a replay of a game).</p>
+                <p>Then we get our ID (each player has a unique identifier that is associated with their pieces) and the game initial map from the environment.</p>
+                <p>We send back the name of our bot. This is used in game replays.</p>
                 
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="6-7" data-gist-file="Random.py"></span> 
+                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="6-7" data-gist-file="Random.py"></span> 
                 
-                <p>Now we start our game loop:</p>
+                <p>Now we start our game loop. Each frame let's initialize a list of moves and get the current map:</p>
+                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="9-11" data-gist-file="Random.py"></span> 
 
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="9" data-gist-file="Random.py"></span> 
+                <p>Let's cycle through all of the pieces on the map. If a piece is owned by us, let's order it to move in a random direction.</p>
+                
+                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="12-15" data-gist-file="Random.py"></span> 
+                
+                <p>Finally, let's send all of our moves to the environment:</p>
+                
+                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="16" data-gist-file="Random.py"></span> 
 
-                <p>Each frame let's clear our set of moves and get the current map:</p>
-
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="10-11" data-gist-file="Random.py"></span> 
-
-                <p>and cycle through all of the pieces on the map:</p>
-                
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="12-13" data-gist-file="Random.py"></span> 
-                
-                <p>Move all of our pieces randomly:</p>
-                
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="14-15" data-gist-file="Random.py"></span> 
-                
-                <p>And send all of our moves to the environment:</p>
-                
-                <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-line="16" data-gist-file="Random.py"></span> 
-
-                <p>And that's a random bot!</p>
+                <p>And that's that's random bot!</p>
 
                 <h3>Utilizing Our Production</h3>
 
@@ -83,7 +75,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
 </body>

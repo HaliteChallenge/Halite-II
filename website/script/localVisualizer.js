@@ -17,7 +17,7 @@ $(function () {
             reader.onload = (function(filename) { // finished reading file data.
                 return function(e2) {
                     $dropZone.remove();
-                    showGame(textToGame(e2.target.result, filename), true, true); //testing isminimal.
+                    showGame(textToGame(e2.target.result, filename), true, false); 
                 };
             })(file.name);
             reader.readAsText(file); // start reading the file data.

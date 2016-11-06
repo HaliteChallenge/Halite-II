@@ -22,6 +22,7 @@
                     It may be passed a number of flags, including:
                     <ul>
                         <li><code>-d</code>: allows the automatic input of the dimensions of the map. The following argument is expected to be a string containing the width and height (space-separated).</li>
+                        <li><code>-t</code>: disables timeouts for the duration of the game.</li>
                         <li><code>-q</code>: turns on quiet output. Output will take the form of:
                             <ul>
                                 <li>A line containing the replay file name, a space, and the map seed.</li>
@@ -30,11 +31,24 @@
                             </ul>
                         </li>
                         <li><code>-s</code>: provides the seed to the map generator. If this is not provided, it will use a time-based seed.</li>
-                        <li><code>-t</code>: disables timeouts for the duration of the game.</li>
-                        <li><code>-o</code>: overrides provided names of bots. This is only used on the servers; we see no reason for a bot developer to have occasion to use this flag.</li>
                     </ul>
                 </p>
 
+                <h3>Examples</h3>
+                <p>To run your bot against itself on a 40 by 40 map with no timeouts, run: 
+                    <ul>
+                        <li>Linux/macOS: <code>halite -d “40 40” -t “python3 MyBot.py” “python3 MyBot.py”</code></li>
+                        <li>Windows: <code>.\halite.exe -d “40 40” -t “python3 MyBot.py” “python3 MyBot.py”</code></li>
+                    </ul>
+                </p>
+
+
+                <p>To run your python bot against a java bot (assuming it’s been compiled) on a 25 by 25 map with a predefined seed (2168), run:
+                    <ul>
+                        <li>Linux/macOS: <code>halite -d “25 25” -s 2168 “python3 PythonBot.py” “java JavaBot”</code></li>
+                        <li>Windows: <code>.\halite.exe -d “25 25” -s 2168 “python3 PythonBot.py” “java JavaBot”</code></li>
+                    </ul>
+                </p>
             </div>
         </div>
     </div>

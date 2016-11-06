@@ -2,7 +2,6 @@
     /* sidebar */
     .bs-docs-sidebar {
         padding-left: 20px;
-        margin-top: 20px;
         margin-bottom: 20px;
     }
 
@@ -66,11 +65,14 @@
         <li class="">
             <span>Guides</span>
             <ul class="nav nav-stacked">
-                <li id="guides_strategy">
-                    <a href="guides_strategy.php">Strategy Considerations</a>
-                </li>
                 <li id="guides_development">
                     <a href="guides_development.php">Bot Development</a>
+                </li>
+                <li id="guides_libraries">
+                    <a href="guides_libraries.php">Using 3rd Party Libraries</a>
+                </li>
+                <li id="guides_strategy">
+                    <a href="guides_strategy.php">Strategy Considerations</a>
                 </li>
             </ul>
         </li>

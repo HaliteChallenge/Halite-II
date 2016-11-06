@@ -233,3 +233,11 @@ function getFilteredUsers(filters, orderBy, limit, page) {
 
     return result.responseJSON;
 }
+
+function getNotifications() {
+    return $.ajax({
+        url: url+"notification",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}

@@ -1,17 +1,36 @@
 $(function() {
-    var jumboTron = {
-        $headerField: $("#jHeader"),
-        $bodyField: $("#jBody"),
-        init: function(header, body) {
-            this.header = header;
-            this.body = body;
+    var profileCard = {
+        $profileImage: $("#profileImage"),
+        $name: $("#name"),
+        $primaryInfo: $("#primaryInfo"),
+        $secondaryInfo: $("#secondaryInfo"),
+        init: function(user) {
+            this.user = user;
+
             this.render();
         },
         render: function() {
-            this.$headerField.html(this.header);
-            this.$bodyField.html(this.body);
+            var vr = "<span style='color: #0092a1;'>|</span>";
+            this.$profileImage.attr("src", "https://avatars.githubusercontent.com/u/"+this.user["oauthID"]);
+            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + this.user['username'] + "</a>");
+
+            this.$primaryInfo.append("<a href='leaderboard.php?userID="+this.user["userID"]+"'>Rank " + this.user['rank']+"</a>");
+            this.$primaryInfo.append("<br>");
+            this.$primaryInfo.append("<span>" + this.user['tier'] + " Tier</span>");
+            this.$primaryInfo.append("<br>");
+            this.$primaryInfo.append("<span>"+(Math.round((this.user['mu']-this.user['sigma']*3)*100)/100)+" points</span>");
+
+            this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+this.user['language']+"&value="+this.user['language']+"'>"+this.user['language']+ "</a></span>"));
+            this.$secondaryInfo.append($("<br>"));
+            if(this.user['organization'] != 'Other') {
+                this.$secondaryInfo.append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+this.user['organization']+"&value="+this.user['organization']+"'>"+this.user['organization']+ "</a></span>"));
+                this.$secondaryInfo.append($("<br>"));
+            } 
+            this.$secondaryInfo.append($("<span>"+this.user['numSubmissions']+" "+(parseInt(this.user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted</span>"));
+            this.$secondaryInfo.append($("<br>"));
+            this.$secondaryInfo.append($("<span>"+this.user['numGames']+" games played</span>"));
         }
-    }
+    };
 
     var historyTable = {
         $panel: $("#historyPanel"),
@@ -34,6 +53,74 @@ $(function() {
         },
         getTableRow: function(history) {
             return "<tr><td>"+this.name+" v"+history.versionNumber+"</td><td>"+history.lastRank+" of "+history.lastNumPlayers+"</td><td>"+(history.lastNumGames != null ? history.lastNumGames : "Not Recorded")+"</td></tr>";
+        }
+    }
+
+    var notifsTable = {
+        $panel: $("#notifsPanel"),
+        $tableBody: $("#notifsTableBody"),
+        modal: {
+            $modal: $("#notifModal"),
+            $title: $("#notifModalHeader"),
+            $body: $("#notifModalBody"),
+            init: function(title, body) {
+                this.title = title;
+                this.body = body;
+
+                this.render();
+            },
+            render: function() {
+                this.$title.html("<h3>"+this.title+"</h3>");
+                this.$body.html(this.body);
+            },
+            show: function() {
+                this.$modal.modal("show");
+            }
+        },
+        show: function() {
+            this.$panel.attr("display", "block");
+        },
+        init: function(notifs) {
+            this.name = name;
+            this.notifs = notifs;
+            this.render();
+        },
+        render: function() {
+            if(this.notifs.length == 0) {
+                this.$panel.css("display", "none"); 
+            } else {
+                this.$panel.css("display", "block");    
+                this.$tableBody.empty();
+                for(var a = 0; a < Math.min(10, this.notifs.length); a++) {
+                    this.$tableBody.append(this.getTableRow(this.notifs[a]));
+                }
+            }
+        },
+        getTableRow: function(notif) {
+            var titleColor = null;
+            if(parseInt(notif.mood) == -1) titleColor = "#d9534f";
+            if(parseInt(notif.mood) == 0) titleColor = "#5bc0de";
+            if(parseInt(notif.mood) == 1) titleColor = "#5cb85c";
+
+            $title = $("<td><b>"+notif.title+"</b></td>");
+            $title.css("color", titleColor);
+
+            var dateComponents = notif.creationTime.split(/[- :]/);
+            var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
+            var dateString = gameDate.toLocaleString();
+
+            $row = $("<tr></tr>");
+            $row.append($title);
+            $row.append("<td>"+dateString+"</td>");
+            $row.css("cursor", "pointer");
+            $row.click(this, this.notifClicked.bind(this, notif));
+
+            return $row;
+        },
+        notifClicked: function(notif) {
+            console.log(this);
+            this.modal.init(notif.title, notif.body);
+            this.modal.show();
         }
     }
 
@@ -129,29 +216,16 @@ $(function() {
 
     var userIDGET = getGET("userID");
     if(userIDGET != null || (session = getSession())) {
-        var isSession = (userIDGET == null || userIDGET == undefined);
-        var user = isSession ? getUser(session['userID']) : getUser(userIDGET);
+        var isMe = (userIDGET == null || userIDGET == undefined);
+        var user = isMe ? getUser(session['userID']) : getUser(userIDGET);
         if(user['isRunning'] == 0) {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
             $(document).prop('title', user.username);
 
-            var vr = "<span style='color: #0092a1;'>|</span>";
-            $("#profileImage").attr("src", "https://avatars.githubusercontent.com/u/"+user["oauthID"]);
-            $("#name").html(user['username']);
-            $("#primary-info").html("<a href='leaderboard.php?userID="+user["userID"]+"'>Rank " + user['rank']+"</a><br>" + user['tier'] + " Tier<br>"+(Math.round((user['mu']-user['sigma']*3)*100)/100)+" points");
-            $("#secondary-info").append($("<span>Made in <a href='leaderboard.php?field=language&heading="+user['language']+"&value="+user['language']+"'>"+user['language']+ "</a></span>"));
-            $("#secondary-info").append($("<br>"));
-            if(user['organization']!='Other') {
-                $("#secondary-info").append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+user['organization']+"&value="+user['organization']+"'>"+user['organization']+ "</a></span>"));
-                $("#secondary-info").append($("<br>"));
-            } 
-            $("#secondary-info").append($("<span>"+user['numSubmissions']+" "+(parseInt(user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted</span>"));
-            $("#secondary-info").append($("<br>"));
-            $("#secondary-info").append($("<span>"+user['numGames']+" games played</span>"));
-
-            gameTable.init(parseInt(user["userID"]), isSession, function(userID, startingID) {
+            profileCard.init(user);
+            gameTable.init(parseInt(user["userID"]), isMe, function(userID, startingID) {
                 var rawGames = getLatestGamesForUser(userID, 10, startingID); 
                 var games = [];
                 for(var a = 0; a < rawGames.length; a++) {
@@ -160,6 +234,11 @@ $(function() {
                 return games;
             });
             historyTable.init(user.username, getHistories(user["userID"]));
+
+            if(isMe) {
+                notifsTable.init(getNotifications(user["userID"]));
+                notifsTable.show();
+            }
         }
     } else {
         $("#normalBody").css("display", "none");

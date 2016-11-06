@@ -27,12 +27,11 @@
                 </p>
 
                 <h3>Sandbox</h3>
-                <p>During compilation and games, players are run as unprivileged users in a sandbox which limits memory, processing power, execution time, disk space, and internet access. The sandbox is a docker container defined by this <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/Dockerfile">Dockerfile</a>, running on top of Docker 1.6.2. If you think that there is an issue with the sandbox, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</b>.
+                <p>During compilation and games, players are run as unprivileged users in a sandbox which limits memory, processing power, execution time, disk space, and internet access. The sandbox is a docker container defined by this <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/Dockerfile">Dockerfile</a>, running on top of Docker 1.6.2. If you think that there is an issue with the sandbox, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a></b>.
 
                     <h3>Compilation</h3>
                     <p>Bot compilation is done using <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/compiler.py">this autocompile script</a>.</p>
-                    <p>To facilitate the installation of custom software, we allow users to include an install script. If a file named <code>install.sh</code> exists in your submission, it is run as a bash script under the root user in a sandbox with internet access and 10 minutes of runtime. Bots may only read and write to their current directory, so all files that you want to be available at runtime must be installed locally.</p>
-                    <p>For example, if your bot required the trueskill python library, you would only need to include the command: <code>pip3 install trueskill -t ./</code> in your <code>install.sh</code> file to have it available at runtime.</p>
+                    <p>To facilitate the installation of custom software, we allow users to include an install script. If a file named <code>install.sh</code> exists in your submission, it is run as a bash script under the root user in a sandbox with internet access and 10 minutes of runtime. Bots may only read and write to their current directory, so all files that you want to be available at runtime must be installed locally. For more on using 3rd party libraries, click <a href="guides_libraries.php">here</a>.</p>
                     <p>
                         Your main file must be called <code>MyBot</code>. Your language is recognized using the file extension of your <code>MyBot</code> file. The appropriate file extensions for each language are:
                         <ul>
@@ -73,7 +72,7 @@
                     </p>
 
                     <h3>Games</h3>
-                    <p>Bots are given <b>512 MB of RAM</b> and <b>equal amounts of CPU</b>.</p>
+                    <p>Bots are given <b>150 MB of RAM</b> and <b>equal amounts of CPU</b>.</p>
                     <p>Currently, 20x20, 25x25, 30x30, 35x35, 40x40, 45x45, and 50x50 games are run. Games may be 2-6 player.</p>
                     <p>Games are always run using <a href="downloads.php">the most recent environment build</a>.</p>
                 </p>
