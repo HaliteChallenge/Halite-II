@@ -62,6 +62,14 @@ if(isset($_SESSION['userID'])) {
                             <p>Cornell Tech brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
                         </div>
                     </div>
+
+                    <h1>Sponsors</h1>
+                    <p>The Halite game was publicized with the help of these great companies!</p>
+                    
+                    <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;">
+                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px;"></a>
+                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 70px;"></a>
+                    </div>
                 </div>
             </div>
         </div>
