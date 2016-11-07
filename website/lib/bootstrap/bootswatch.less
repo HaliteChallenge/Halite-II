@@ -38,7 +38,7 @@
 // Buttons ====================================================================
 
 .btn {
-  border-width: 2px;
+  border-width: 0px;
 }
 
 .btn:active {
@@ -316,6 +316,7 @@ a.list-group-item {
 }
 
 .panel {
+  border-width: 0px;
   &-default {
     .close {
       color: @text-color;
@@ -331,4 +332,36 @@ a.list-group-item {
 
 .popover {
   color: @text-color;
+}
+
+h1 {
+    color: @ts-teal; 
+    display: inline-block;
+    padding-bottom: 6px;
+    border-bottom: 8px solid #000;
+}
+
+p {
+    font-size: 1.2em;
+}
+
+body {
+    margin-bottom: 10px; 
+    padding-top: 20px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.jumbotron {
+    padding: 0.9em 0.9em;
+}
+
+code {
+    font-family: monospace;
+}
+
+table a:not(.btn), .table a:not(.btn) {
+    text-decoration: none;
 }

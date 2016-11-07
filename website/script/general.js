@@ -159,10 +159,15 @@ $(function() {
         }
     }
 
-    var doLogOff = getGET("forumsLogOut");
-    if(doLogOff != null && doLogOff != undefined) {
+    if(getGET("forumsLogOut") != null) {
         messageBox.alert("Logged Out", "You have been logged out of forums.halite.io and halite.io", true);
         destroySession(false);
+    }
+    if(getGET("unsubscribeEmails")) {
+        messageBox.alert("Unsubscribed", "You have unsubscribed from all halite emails.", true)
+    }
+    if(getGET("subscribeEmails")) {
+        messageBox.alert("Subscribed", "You have subscribed to all halite emails!", true)
     }
 
     var session = getSession();

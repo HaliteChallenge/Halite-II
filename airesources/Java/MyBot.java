@@ -6,7 +6,7 @@ public class MyBot {
         int myID = iPackage.myID;
         GameMap gameMap = iPackage.map;
 
-        Networking.sendInit("JavaBot");
+        Networking.sendInit("MyJavaBot");
 
         while(true) {
             ArrayList<Move> moves = new ArrayList<Move>();
@@ -22,7 +22,7 @@ public class MyBot {
                     }
                 }
             }
-	    Networking.sendFrame(moves);
+            Networking.sendFrame(moves);
         }
     }
 }

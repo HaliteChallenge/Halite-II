@@ -1,15 +1,3 @@
-body {
-    padding-top: 20px;
-}
-
-.navbar {
-    margin-bottom: 20px;
-}
-
-.jumbotron {
-    padding: 0.9em 0.9em;
-}
-
 #jHeader {
     font-size: 50px;
 }
@@ -63,17 +51,6 @@ body {
     width: 16px;
 }
 
-.won {
-    color: green;
-}
-
-.lost {
-    color: red;
-}
-
-code {
-    font-family: monospace;
-}
 
 .jumbotron-btn {
     margin-top: 2px;
@@ -97,12 +74,3 @@ code {
 .has-hover-text {
     cursor: pointer;
 }
-
-table a:not(.btn), .table a:not(.btn) {
-    text-decoration: none;
-}
-
-body {
-   margin-bottom: 20px; 
-}
-

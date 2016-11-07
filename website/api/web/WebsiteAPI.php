@@ -102,12 +102,16 @@ class WebsiteAPI extends API{
     protected function user() {
         // Get a user's info with a username        
         if(isset($_GET["username"])) {
-            return $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'")[0];
+            $results = $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+            if(count($results) > 0) return $results[0];
+            else return null;
         } 
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            return $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'")[0];
+            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+            if(count($results) > 0) return $results[0];
+            else return null;
         } 
         
         // Get a set of filtered users
@@ -148,7 +152,7 @@ class WebsiteAPI extends API{
                 $organization = "Other";
                 if($email != NULL) {
                     $emailDomain = explode('@', $email)[1];
-                    $rows = explode("\n", file_get_contents(ORGANIZATION_WHITELIST_PATH));
+                    $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
                     foreach($rows as $row) {
                         $components = explode(" - ", $row);
                         if(strcmp($components[1], $emailDomain) == 0) {
@@ -158,6 +162,7 @@ class WebsiteAPI extends API{
                     }
                 }
 
+                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
                 $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 
@@ -169,6 +174,28 @@ class WebsiteAPI extends API{
         } 
     }
 
+    /* Email List Endpoint
+     *
+     * Hitting this endpoint allows a user to subscribe and unsubscribe from all Halite emails. 
+     */
+    protected function emailList() {
+        $user = $this->getLoggedInUser();
+        if($user == null) {
+            $callbackURL = urlencode(WEB_DOMAIN."api/web/unsubscribe");
+            header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+        }
+
+        if(isset($_GET['unsubscribe'])) {
+            $this->insert("UPDATE User SET onEmailList=0 WHERE userID = {$user['userID']}");
+            header("Location: ../../index.php?unsubscribeEmails=1");
+        } else if(isset($_GET['subscribe'])) {
+            $this->insert("UPDATE User SET onEmailList=1 WHERE userID = {$user['userID']}");
+            header("Location: ../../index.php?subscribeEmails=1");
+        } 
+
+        die();
+    }
+
     /* User History Endpoint
      *
      * We store the a history of user's bot submissions.
@@ -178,6 +205,19 @@ class WebsiteAPI extends API{
     protected function history() {
         if(isset($_GET["userID"])) {
             return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]} ORDER BY versionNumber DESC");
+        }
+    }
+
+    /* User Notification Endpoint
+     *
+     * Allows the downloading of all of the notifications a user has recieved over email.
+     * Notifications include "Compilation Success", "Bot received", etc
+     */
+    protected function notification() {
+        if($this->isLoggedIn()) {
+            $userID = $this->getLoggedInUser()['userID'];
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC LIMIT $limit");
         }
     }
 
@@ -207,7 +247,7 @@ class WebsiteAPI extends API{
                     unset($gameUserRow['gameID']);
 
                     // Add in user info
-                    $userInfo = $this->select("SELECT username FROM User WHERE userID = {$gameUserRow['userID']}");
+                    $userInfo = $this->select("SELECT username, oauthID FROM User WHERE userID = {$gameUserRow['userID']}");
                     foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
                 }
                 array_push($gameArrays, $gameArray);
@@ -231,7 +271,7 @@ class WebsiteAPI extends API{
             
             if ($_FILES["botFile"]["size"] > 20000000) {
                 $megabytes = $_FILES["botFile"]["size"]/1000000;
-                $this->sendEmail($user['email'], "Bot TOO LARGE", "Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.");
+                $this->sendNotification($user, "Bot TOO LARGE", "<p>Your bot archive was {$megabytes} Megabytes. Our limit on bot zip files is 20 Megabytes.</p>", -1);
                 return "Sorry, your file is too large.";
             }
 
@@ -242,7 +282,7 @@ class WebsiteAPI extends API{
             ]);
             $this->insert("UPDATE User SET compileStatus = 1 WHERE userID = {$user['userID']}");
 
-            if(intval($this->config['test']['isTest']) == 0) $this->sendEmail($user['email'], "Bot Recieved", "We have recieved and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.");
+            if(intval($this->config['test']['isTest']) == 0) $this->sendNotification($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
 
             // AWS auto scaling
             $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 

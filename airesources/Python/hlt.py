@@ -44,8 +44,8 @@ class GameMap:
         return l.x >= 0 and l.x < self.width and l.y >= 0 and l.y < self.height
 
     def getDistance(self, l1, l2):
-        dx = math.abs(l1.x - l2.x)
-        dy = math.abs(l1.y - l2.y)
+        dx = abs(l1.x - l2.x)
+        dy = abs(l1.y - l2.y)
         if dx > self.width / 2:
             dx = self.width - dx
         if dy > self.height / 2:

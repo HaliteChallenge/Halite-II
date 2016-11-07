@@ -2,7 +2,7 @@ from hlt import *
 from networking import *
 
 myID, gameMap = getInit()
-sendInit("PythonBot")
+sendInit("MyPythonBot")
 
 while True:
     moves = []

@@ -2,12 +2,11 @@
     /* sidebar */
     .bs-docs-sidebar {
         padding-left: 20px;
-        margin-top: 20px;
         margin-bottom: 20px;
     }
 
     .bs-docs-sidebar .nav>li>span {
-        color: #009aa6;
+        color: #63ceca;
     }
 
     .bs-docs-sidebar .nav>li>span,
@@ -38,7 +37,7 @@
     .bs-docs-sidebar .nav .nav>.active:hover>a,
     .bs-docs-sidebar .nav .nav>.active:focus>a {
         font-weight: 700;
-        border-left-color: #009aa6; 
+        border-left-color: #63ceca; 
         font-weight: 500;
     }
 
@@ -66,17 +65,14 @@
         <li class="">
             <span>Guides</span>
             <ul class="nav nav-stacked">
+                <li id="guides_development">
+                    <a href="guides_development.php">Bot Development</a>
+                </li>
+                <li id="guides_libraries">
+                    <a href="guides_libraries.php">Using 3rd Party Libraries</a>
+                </li>
                 <li id="guides_strategy">
                     <a href="guides_strategy.php">Strategy Considerations</a>
-                </li>
-                <li id="guides_bfs">
-                    <a href="guides_bfs.php">Breadth-First-Search Bot</a>
-                </li>
-                <li id="guides_machine_learning">
-                    <a href="guides_machine_learning.php">Machine-Learning Bot</a>
-                </li>
-                <li id="guides_ide">
-                    <a href="guides_ide.php">Debugging with an IDE</a>
                 </li>
             </ul>
         </li>
@@ -110,7 +106,7 @@
         </li>
     </ul>
     <hr>
-    <p class="text-muted" style="line-height: 1.5em; font-size: 13px;">You can <a id="githubLink" href="">edit this content on GitHub</a> and send us a pull request!</p>
+    <p style="line-height: 1.5em; font-size: 13px;">You can <a id="githubLink" href="">edit this content on GitHub</a> and send us a pull request!</p>
 </nav>
 
 <script>

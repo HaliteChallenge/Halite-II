@@ -1,6 +1,6 @@
 var leaderTable = {
     init: function(submissions, startingIndex) {
-		this.startingIndex = startingIndex == null ? 1 : startingIndex;
+        this.startingIndex = startingIndex == null ? 1 : startingIndex;
         this.cacheDOM();
         this.setSubmissions(submissions);
     },
@@ -26,8 +26,8 @@ var leaderTable = {
             $tableRow.append("<th scope='row'>"+(this.startingIndex+a)+"</th>");
             $tableRow.append("<td><a class='username' href='user.php?userID="+user.userID+"'>"+user.username+"</a></td>");
             $tableRow.append("<td>"+user.tier+"</td>");
-            $tableRow.append("<td><a href='leaderboard.php?field=language&value="+user.language+"&heading="+user.language+"'>"+user.language+"</a></td>");
-            $tableRow.append("<td><a href='leaderboard.php?field=organization&value="+user.organization+"&heading="+user.organization+"'>"+user.organization+"</a></td>");
+            $tableRow.append("<td><a href='leaderboard.php?field=language&value="+encodeURIComponent(user.language)+"&heading="+encodeURIComponent(user.language)+"'>"+user.language+"</a></td>");
+            $tableRow.append("<td><a href='leaderboard.php?field=organization&value="+encodeURIComponent(user.organization)+"&heading="+encodeURIComponent(user.organization)+"'>"+user.organization+"</a></td>");
             $tableRow.append("<td>"+score+"</td>");
 
             this.$tableBody.append($tableRow);

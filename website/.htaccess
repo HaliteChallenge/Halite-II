@@ -12,5 +12,5 @@ ErrorDocument 404 /404.php
 
 <IfModule mod_expires.c>
 ExpiresActive on
-ExpiresDefault "access plus 30 days"
+ExpiresDefault "access plus 2 days"
 </IfModule>

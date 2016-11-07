@@ -38,12 +38,7 @@ service docker stop
 dockerd --storage-driver=devicemapper &
 service docker start
 
-if [[ "$(docker images -q mntruell/halite_sandbox:latest)" == "" ]]; then
-    echo "Pulling remote docker image"
-    docker pull mntruell/halite_sandbox:latest
-else
-    echo "Attention: local halite sandbox already exists. Not pulling remote."
-fi
+./buildDocker.sh
 
 ###############
 # Swap Memory #

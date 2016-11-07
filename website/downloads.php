@@ -12,43 +12,45 @@
         <?php include 'includes/navbar.php'; ?>
         <div class="row">
             <div class="col-sm-12">
-                <h1>Halite Downloads</h1>
+                <h1>Downloads</h1>
 
-                <h3>Game Environment</h3>
+                <h2>Starter Packages</h2>
                 <p>
-                    This set of binaries was uploaded at <b>10:55am EST on August 2nd</b>. We discontinued the desktop visualizer (see below), so consequently the environment executable is the only file in this download.
-                    <p>
-                        <ul>
-                            <li><a href="downloads/environment/HaliteEnvironment-Mac">Mac</a></li>
-                            <li><a href="downloads/environment/HaliteEnvironment-Debian">Ubuntu (64 bit)</a></li>
-                            <li><a href="downloads/environment/HaliteEnvironment-Windows.exe">Windows</a></li>
-                        </ul>
-                    </p>
-                    <h4>Building from Source</h4>
-                    <p>
-                        Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>. If you are on Unix, run <code>make</code> inside the environment directory from the command line. If you are on Windows, run the "make.bat" file. The file named "environment" or "environment.exe" is your new environment binary.
-                    </p>
+                    This set of starter packages was uploaded on November 6nd. We fixed a minor bug with the getDistance() method in the Python starter package.
+                </p>
+                <p>
+                    <ul>
+                        <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
+                        <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
+                        <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+                        <li><a href="downloads/starterpackages/Halite-C%23-Starter-Package.zip">C# 6.0</a></li>
+                        <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
+                        <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
+                    </ul>
+                </p>
 
-                    <h3>Starter Packages</h3>
-                    <p>
-                        This set of starter packages was uploaded at <b>12:45pm EST on July 28th</b>. We added a Scala starter package!
-                    </p>
-                    <p>
-                        <ul>
-                            <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
-                            <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
-                            <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
-                            <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
-                            <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
-                        </ul>
-                    </p>
-                </div>
+                <h2>Game Environment</h2>
+                <p>The environment is on version <b>1.0</b>. This version of the environment was posted on November 2nd.</p>
+
+                <h3>Linux/macOS</h3>
+                <p>Execute:</p>
+                <pre><code>sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/HaliteChallenge/Halite/master/environment/install.sh)"</code></pre>
+                <p>Now, the <code>halite</code> command will run the environment.</p>
+
+                <h3>Windows</h3>
+                <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>.</p>
+                
+                <h3>Building from Source</h3>
+                <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
+                <p>If you are on Unix, run <code>make</code> and <code>sudo make install</code> inside the extracted folder. The <code>halite</code> command will now run the environment.</p>
+                <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
             </div>
         </div>
+    </div>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script src="script/backend.js"></script>
-        <script src="script/general.js"></script>
-    </body>
-    </html>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="script/backend.js"></script>
+    <script src="script/general.js"></script>
+</body>
+</html>

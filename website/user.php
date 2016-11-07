@@ -10,29 +10,44 @@
 <body>
     <div class="container">
         <?php include 'includes/navbar.php'; ?>
+        <div class="modal fade" id="notifModal" tabindex="-1" role="dialog" aria-labelledby="notifModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" id="notifModalHeader">
+                    </div>
+                    <div class="modal-body" id="notifModalBody">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row" id="loginMessage" style="display: none;">
             <div class="col-md-12">
-                <h1><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h1>
+                <h2><a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a> to see this page.</h2>
             </div>
         </div>
         <div class="row" id="noBotMessage" style="display: none;">
             <div class="col-md-12">
-                <h1>You don't have a bot on the leaderboard!</h1>
+                <h2>This user doesn't currently have a bot on the leaderboard!</h2>
             </div>
         </div>
         <div class="row" id="normalBody">
-            <div class="col-md-5">
-                <div style="margin-bottom: 21px;" class="row">
-                    <div class="col-md-5">
-                        <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 233px;">
-                    </div>
-                    <div class="col-md-7 ">
-                        <h1 id="name" style="margin-top: 0px"></h1>
-                        <h4 id="primary-info" style="line-height: 1.2em;"></h4>
-                        <h5 id="secondary-info" style="line-height 1.2em; color: gray;"></h5>
-                    </div>
+            <div class="col-xl-6 col-lg-5 col-md-12">
+                <div id="profileCard" class="panel panel-default text-center" style="padding: 21px; margin-bottom: 21px;">
+                    <img id="profileImage" style="border-radius: 4px; width: 100%; max-width: 200px;">
+                    <h2 id="name" style="margin-top: 12px"></h2>
+                    <p id="primaryInfo" style="line-height: 1.2em; font-size: 20px;"></p>
+                    <p id="secondaryInfo" style="line-height 1em; margin-bottom: 0px; font-size: 15px;"></p>
                 </div>
-                <div id="historyPanel" class="panel panel-primary">
+                <div id="notifsPanel" style='display: none;' class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Events</h3>
+                    </div>
+                    <table class="table" id="notifsTable">
+                        <tbody id="notifsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="historyPanel" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Recent History</h3>
                     </div>
@@ -49,12 +64,12 @@
                     </table>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-xl-6 col-lg-7 col-md-12">
                 <div class="text-center" style="display: none;" id="noGameMessage">
                     <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
                     <h3>There are no games recorded yet.</h3>
                 </div>
-                <div id="gamePanel" class="panel panel-primary">
+                <div id="gamePanel" class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Game Feed</h3>
                     </div>
@@ -66,7 +81,7 @@
                         <tbody id="gameTableBody">
                         </tbody>
                     </table>
-                    <button type="button" id="loadButton" class="btn btn-primary" style="width: 100%;">Load More</button>
+                    <button type="button" id="loadButton" class="btn btn-default" style="width: 100%;">Load More</button>
                 </div>
             </div>
         </div>

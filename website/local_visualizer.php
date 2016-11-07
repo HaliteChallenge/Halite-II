@@ -11,10 +11,10 @@
 <body>
     <div id="container" class="container">
         <?php include 'includes/navbar.php'; ?>
-        <div  id="pageContent" class="pageContent">
+        <div id="pageContent" class="pageContent">
             <div id='dropZone' class="col-sm-12 text-center">
                 <span class="glyphicon glyphicon-cloud-upload" style="font-size: 10em;"></span>
-                <h1>Drop a replay file here</h1>
+                <h2 style="margin-top: 20px;">Drop a replay file here</h2>
             </div>
         </div>
     </div>

@@ -66,6 +66,7 @@ CREATE TABLE `User` (
   `oauthProvider` tinyint(1) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `onEmailList` tinyint(1) NOT NULL DEFAULT 1,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `organization` varchar(64) NOT NULL,
@@ -93,7 +94,8 @@ CREATE TABLE `UserHistory` (
   `versionNumber` smallint(5) NOT NULL,
   `lastRank` smallint(5) NOT NULL,
   `lastNumPlayers` smallint(5) NOT NULL,
-  `lastNumGames` smallint(5) DEFAULT NULL
+  `lastNumGames` smallint(5) DEFAULT NULL,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -122,6 +124,24 @@ DROP TABLE IF EXISTS `DoneWithAnnouncement`;
 CREATE TABLE `DoneWithAnnouncement` (
   `announcementID` mediumint(8) unsigned NOT NULL,
   `userID` mediumint(8) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `UserNotification`
+--
+
+DROP TABLE IF EXISTS `UserNotification`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `UserNotification` (
+  `userNotificationID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `userID` mediumint(8) unsigned NOT NULL,
+  `title` varchar(64) NOT NULL,
+  `body` varchar(2048) NOT NULL,
+  `mood` tinyint(1) NOT NULL,
+  `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`userNotificationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

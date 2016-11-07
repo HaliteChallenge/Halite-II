@@ -12,13 +12,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) alive_frame_count[a]++;
 
     //Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being received.
-    std::vector<std::thread> frameThreads(std::count(alive.begin(), alive.end(), true));
+    std::vector< std::future<int> > frameThreads(std::count(alive.begin(), alive.end(), true));
     unsigned char threadLocation = 0; //Represents place in frameThreads.
 
     //Get the messages sent by bots this frame
     for(unsigned char a = 0; a < number_of_players; a++) {
         if(alive[a]) {
-            frameThreads[threadLocation] = std::thread(&Networking::handleFrameNetworking, &networking, a + 1, turn_number, game_map, &player_time_allowances[a], &player_moves[a]);
+            frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, a + 1, turn_number, game_map, ignore_timeout, &player_moves[a]);
             threadLocation++;
         }
     }
@@ -29,15 +29,19 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     threadLocation = 0; //Represents place in frameThreads.
     for(unsigned char a = 0; a < number_of_players; a++) {
         if(alive[a]) {
-            frameThreads[threadLocation].join();
+            int time = frameThreads[threadLocation].get();
+            if(time == -1) {
+                networking.killPlayer(a + 1);
+                timeout_tags.insert(a + 1);
+                //Give their pieces to the neutral player.
+                for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == a + 1) game_map.contents[b][c].owner = 0;
+            }
+            else total_frame_response_times[a] += time;
             threadLocation++;
         }
     }
 
     std::vector< std::map<hlt::Location, unsigned char> > pieces(number_of_players);
-
-    //Go through the players. If they are alive and just timed out, give their pieces to the neutral player.
-    for(unsigned char a = 0; a < number_of_players; a++) if(alive[a] && player_time_allowances[a] < 0) for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == a + 1) game_map.contents[b][c].owner = 0;
 
     //For each player, use their moves to create the pieces map.
     for(unsigned char a = 0; a < number_of_players; a++) if(alive[a]) {
@@ -196,14 +200,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         stillAlive[game_map.contents[a][b].owner - 1] = true;
     }
 
-    //Check for bots which have timed out.
-    for(unsigned char a = 0; a < number_of_players; a++) if(alive[a] && player_time_allowances[a] < 0) {
-        stillAlive[a] = false;
-        networking.killPlayer(a + 1);
-        timeout_tags.insert(a + 1);
-        if(!quiet_output) std::cout << "Player " << player_names[a] << " timed out." << std::endl;
-    }
-
     return stillAlive;
 }
 
@@ -226,10 +222,8 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
     //Initialize player moves vector
     player_moves.resize(number_of_players);
 
-    //Init player time allowances:
-    if(shouldIgnoreTimeout) time_allowance = 2147483647; //Signed int max
-    else time_allowance = 15000 + (width_ * height_ * (sqrt(width_ * height_) * 3.33333333));
-    player_time_allowances = std::vector<int>(number_of_players, time_allowance);
+    //Check if timeout should be ignored.
+    ignore_timeout = shouldIgnoreTimeout;
 
     //Init statistics
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
@@ -239,7 +233,8 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
     full_production_count = std::vector<unsigned int>(number_of_players);
     full_still_count = std::vector<unsigned int>(number_of_players);
     full_cardinal_count = std::vector<unsigned int>(number_of_players);
-    total_response_time = std::vector<unsigned int>(number_of_players);
+    init_response_times = std::vector<unsigned int>(number_of_players);
+    total_frame_response_times = std::vector<unsigned int>(number_of_players);
     timeout_tags = std::set<unsigned short>();
 }
 
@@ -309,19 +304,20 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
     std::vector<bool> result(number_of_players, true);
     std::vector<unsigned char> rankings;
     //Send initial package
-    std::vector<std::thread> initThreads(number_of_players);
+    std::vector< std::future<int> > initThreads(number_of_players);
     for(unsigned char a = 0; a < number_of_players; a++) {
-        initThreads[a] = std::thread(&Networking::handleInitNetworking, networking, static_cast<unsigned char>(a + 1), game_map, &player_time_allowances[a], &player_names[a]);
+        initThreads[a] = std::async(&Networking::handleInitNetworking, &networking, static_cast<unsigned char>(a + 1), game_map, ignore_timeout, &player_names[a]);
     }
     for(unsigned char a = 0; a < number_of_players; a++) {
-        initThreads[a].join();
-        if(player_time_allowances[a] < 0) {
+        int time = initThreads[a].get();
+        if(time == -1) {
             networking.killPlayer(a + 1);
             timeout_tags.insert(a + 1);
             result[a] = false;
             rankings.push_back(a);
             for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == a + 1) game_map.contents[b][c].owner = 0;
         }
+        else init_response_times[a] = time;
     }
     //Override player names with the provided ones if appropriate.
     if(names_ != NULL) {
@@ -367,7 +363,8 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
         p.average_production_count = alive_frame_count[a] > 1 ? full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)) : 0; //For this, we want turns rather than frames.
         p.still_percentage = full_cardinal_count[a] + full_still_count[a] > 0 ? full_still_count[a] / double(full_cardinal_count[a] + full_still_count[a]) : 0;
-        p.average_response_time = (time_allowance - player_time_allowances[a]) / double(alive_frame_count[a]); //In milliseconds.
+        p.init_response_time = init_response_times[a];
+        p.average_frame_response_time = total_frame_response_times[a] / double(alive_frame_count[a]); //In milliseconds.
         stats.player_statistics.push_back(p);
     }
     stats.timeout_tags = timeout_tags;

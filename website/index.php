@@ -12,7 +12,7 @@ if(isset($_SESSION['userID'])) {
         exit();
     }
     if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isRunning=1"))) > 0) {
-        header("Location: user.php");
+        header("Location: user.php?".$_SERVER['QUERY_STRING']);
     }
 }
 ?>
@@ -28,10 +28,9 @@ if(isset($_SESSION['userID'])) {
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
     <style>
-        p {
-            line-height: 1.6em;
+        #intro_blurb p {
+            font-size: 1.5em;
         }
-
     </style>
 </head>
 
@@ -41,14 +40,35 @@ if(isset($_SESSION['userID'])) {
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
-                    <h1>Introducing Halite</h1>
-                    <p>Halite is a multiplayer turn-based strategy game played by computer programs on a rectangular grid. Each player’s objective in Halite is to take over the entire map and eliminate the other players in the game.</p>
-                    <p>Bots must use their territory to gain strength and their strength to gain territory, move intelligently on both the micro and macro scales, and brave a branching factor of ~10<sup>1750</sup> to play effectively.</p>
-                    <p>The simplest halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. Interested? <a href="basics_quickstart.php">Get started building a bot</a>.</p>
-                    <h1>Top Rankings</h1>
-                    <p>Here are some of the best bots playing Halite right now. Click on their usernames to see some of their recent games. Watching them might just give you some stratagy ideas.</p>
-                    <div class="panel panel-default">
-                        <?php include 'includes/leaderTable.php'; ?>
+                    <img src="assets/hero.png" style="margin-bottom: 21px; width: 100%">
+                    <div id="intro_blurb">
+                        <h1>Halite is an artificial intelligence programming challenge.</h1>
+                        <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                        <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
+                        <p>This site is in beta. If you see any problems, please post on the <a href="http://forums.halite.io">forums</a>.</p>
+                    </div>
+
+                    <h1>Creators</h1>
+                    <p>The Halite game was designed and implemented by <a href="https://www.twosigma.com">Two Sigma</a> for their annual summer programming competition. The current version of the competition is run with the help of <a href="http://tech.cornell.edu/">Cornell Tech</a>.</p>
+                    
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://www.twosigma.com"><img src="assets/two_sigma.png" style="max-width: 100%; max-height: 70px;"></a></div>
+                            <p>Two Sigma is a technology company dedicated to finding value in the world’s data. Since its founding in 2001, Two Sigma has built an innovative platform that combines extraordinary computing power, vast amounts of information, and advanced data science to produce breakthroughs in investment management, insurance and related fields.</p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://tech.cornell.edu"><img src="assets/cornell_tech.png" style="max-width: 100%; max-height: 70px"></a></div>
+                            <p>Cornell Tech brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
+                        </div>
+                    </div>
+
+                    <h1>Sponsors</h1>
+                    <p>Halite is grateful for the support of many strong tech partners!</p>
+                    
+                    <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;">
+                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px;"></a>
+                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 70px;"></a>
                     </div>
                 </div>
             </div>

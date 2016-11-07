@@ -27,9 +27,17 @@
 
                 <p>Players gain pieces by simply moving their own pieces over Sites on the map. When a piece moves off of a Site, it leaves behind a piece with an identical Owner and with a Strength of 0, in doing so expanding the size of their territory.</p>
 
-                <p>When pieces from the same player try to occupy the same site, the resultant piece has the sum of their strengths. Strengths are capped at 255, so if two pieces with a strength of 150 were to both attempt to occupy the same square, the resultant piece would still have a strength of 255. When pieces from opposing players try to occupy either the same or adjacent sites, the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the Strength of every adjacent or coinciding opposing piece by its own Strength. Pieces with a strength of 0 or less are removed from the game, excepting pieces with a strength of 0 which have not engaged in combat during that turn.</p>
+                <p>When pieces from the same player try to occupy the same site, the resultant piece has the sum of their strengths. Strengths are capped at 255, so if two pieces with a strength of 150 were to both attempt to occupy the same square, the resultant piece would still have a strength of 255.</p>
 
-                <p>The map is initialized by the environment to have productions and strengths. Combat with map squares works identically to combat with other players except only applies on that square; empty map squares neither apply damage to nor take damage from adjacent squares. Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).</p>
+                <p>When pieces from opposing players try to occupy either the same or cardinally adjacent sites (diagonals are not included), the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the strength of every adjacent or coinciding opposing piece by its own strength. Pieces with a strength of 0 or less are removed from the game, excepting pieces with a strength of 0 which have not engaged in combat during that turn.</p>
+
+                <p>Because a piece damages all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.</p>
+
+                <p>The map is initialized by the environment to have productions and strengths. Combat with map squares works identically to combat with other players except only applies on that square; empty map squares neither apply damage to nor take damage from adjacent squares.</p>
+
+                <p>Players should note that the map does wrap around; if a piece at the top of the map moves North, it will reappear on the bottom of the map, and pieces on the top and bottom of the map will engage in combat (provided that they are in the same column).</p>
+
+                <p>The origin of the map (the point at coordinates (0, 0)) is the north west (top left) corner of the map.</p>
 
                 <p>Players are scored according to the reverse of the order in which they are destroyed. The player last standing wins, whereas the player which was destroyed first comes in last. Bots are scored relatively; in a game with many players it is far better to come in second than to come in last.</p>
 
@@ -70,15 +78,14 @@
 
                 <h3>Timeouts</h3>
 
-                <p>Bots are given a total amount of time that they will work from during a game, and are permitted to use it as they choose. Bots are given 15000 + (10 * WIDTH * HEIGHT * sqrt(WIDTH * HEIGHT) / 3) milliseconds to play the entire game. Every bot's clock starts ticking once the environment sends its message (be it initialization or frame) to the bot and stops ticking once the environment receives the newline marking the end of the bot's response. Once a bot's clock hits zero, it is deemed to have lost and is ejected from the game.</p>
+                <p>Bots are given a total amount of time that they will work from during a game, and are permitted to use it as they choose. Bots are given 15 seconds to initialize and 1 second for every subsequent turn. Every bot's clock starts ticking once the environment sends its message (be it initialization or frame) to the bot and resets once the environment receives the newline character marking the end of the bot's response. If a bot's clock hits zero, it is ejected from the game and deemed to have lost. It's pieces become part of the map.</p>
 
                 <h3>Maps</h3>
 
                 <p>Maps are randomly generated at the start of each game. The generator does the following:
                     <ol>
-                        <li>Try to match the given width and height as closely as it can while still creating a symmetric map. Maps are guaranteed to be the given size or smaller in each dimension; never larger.</li>
-                        <li>Try to create interesting maps in which there are patches of high production squares and patches of low production squares, with fairly low noise on the small scale.</li>
-                        <li>Try to relatively match the production of tiles on the map with their starting strengths. That is, a square with a production of 3 will likely not have a strength of 3, but rather will usually have a higher strength than a tile with a production of 2 and a lower strength than a tile with a production of 4.</li>
+                        <li>Tries to match the given width and height as closely as it can while still creating a symmetric map. Maps are guaranteed to be the given size or smaller in each dimension; never larger.</li>
+                        <li>Tries to create interesting maps in which there are patches of high production squares and patches of low production squares, with fairly low noise on the small scale.</li>
                         <li>Always creates symmetric maps. Specifically, the generator generates a chunk of the map and then tesselates, reflects, and shifts it to produce the entire map.</li>
                     </ol>
                 </p>

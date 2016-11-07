@@ -41,7 +41,7 @@ db.commit()
 
 def runCommandOnInstance(instance, command):
     # Connect to ssh
-    ssh_client = None 
+    ssh_client = None
     for a in range(1000):
         try:
             ssh_client = boto.manage.cmdshell.sshclient_from_instance(instance, os.path.join("../../../", AWS_CONFIG["keyFilePath"]), user_name="ubuntu")
@@ -57,8 +57,8 @@ def runCommandOnInstance(instance, command):
     print(stderr)
 
 configFileContents = open("../../../halite.ini").read()
-runCommandOnInstance(instance, "sudo apt-get install -y git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
+runCommandOnInstance(instance, "sudo apt-get update; sudo apt-get upgrade -y; sudo apt-get install -f; sudo rm -rf /var/lib/apt/lists/*; sudo apt-get update")
+runCommandOnInstance(instance, "sudo apt-get install -y --force-yes git; git clone https://github.com/HaliteChallenge/Halite.git; cd Halite; echo '"+configFileContents+"' > halite.ini; cd worker; sudo ./install.sh "+str(apiKey)+"; sudo reboot")
 
 time.sleep(10)
 runCommandOnInstance(instance, 'cd ~/Halite/worker; ./startWorkerScreen.sh')
-
