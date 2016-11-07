@@ -38,8 +38,9 @@
                 <h1 class="modal-title" id="myModalLabel">Halite Submission Instructions</h1>
             </div>
             <div class="modal-body">
-                <h3>Upload a <b>zip file</b> of your source code.</h3>
                 <h3>Name your main file <b>MyBot</b> with an appropriate file extension (e.g. MyBot.java).</h3>
+                <h3>Make sure that you aren't using stdout or stdin (print, cout, System.out.print, etc), which will cause your bot to fail. Instead, use <a href="guides_development.php">a log file</a>.</h3>
+                <h3>Upload a <b>zip file</b> of your source code.</h3>
                 <h3>Once we have compiled your code, you will get an email notification.</h3>
                 <button id="submitModalButton" type="button" class="btn btn-primary">Submit!</button>
             </div>
