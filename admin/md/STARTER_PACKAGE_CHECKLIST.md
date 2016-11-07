@@ -5,6 +5,5 @@ Starter Package Checklist
 * Test on game servers
 * Add to archive script
 * Add to downloads
-* Add to automated tests
 * Update game server reference
 * Update any language specific reminders in the emails (or other mentions of the languages we support)
