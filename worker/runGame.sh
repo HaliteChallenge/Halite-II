@@ -38,7 +38,7 @@ do
 	BOTNAMEINDEX=$(($i+$NUMBOTS));
 	BOTNAME=${!BOTNAMEINDEX};
 
-	BOTSTARTCOMMANDS+="\"/usr/bin/docker run --net=none --memory='150m' --cpu-shares=1024 --storage-opt size=10G -i -v $PWD/$BOT:$PWD/$BOT mntruell/halite_sandbox:latest sh -c 'useradd -r gamerunner && su -m gamerunner -c \\\"cd $PWD/$BOT && ./$RUNFILE\\\"'\" "
+	BOTSTARTCOMMANDS+="\"/usr/bin/docker run --net=none --memory='150m' --cpu-shares=1024 --storage-opt size=10G -i -v $PWD/$BOT:$PWD/$BOT mntruell/halite_sandbox:latest sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
 	BOTSTARTCOMMANDS+="\"$BOTNAME\" ";
 done
 
