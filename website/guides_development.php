@@ -29,8 +29,7 @@
                 <p>Each frame your bots output and the time that it took is shown:</p>
                 <p>If the game environment kills your bot (likely due to timeout or error), we dump whatever is left in stdout and stderr.</p>
                 <h3>Debugging with an IDE</h3>
-                <p>There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found here on the forums. </p>
-
+                <p>There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found <a href="http://forums.halite.io/t/running-your-halite-bot-from-a-debugger/70">here on the forums</a>. </p>
             </div>
         </div>
     </div>
