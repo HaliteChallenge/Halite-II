@@ -20,10 +20,10 @@ $(function() {
             this.$primaryInfo.append("<br>");
             this.$primaryInfo.append("<span>"+(Math.round((this.user['mu']-this.user['sigma']*3)*100)/100)+" points</span>");
 
-            this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+this.user['language']+"&value="+this.user['language']+"'>"+this.user['language']+ "</a></span>"));
+            this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+encodeURIComponent(this.user['language'])+"&value="+encodeURIComponent(this.user['language'])+"'>"+this.user['language']+ "</a></span>"));
             this.$secondaryInfo.append($("<br>"));
             if(this.user['organization'] != 'Other') {
-                this.$secondaryInfo.append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+this.user['organization']+"&value="+this.user['organization']+"'>"+this.user['organization']+ "</a></span>"));
+                this.$secondaryInfo.append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+encodeURIComponent(this.user['organization'])+"&value="+encodeURIComponent(this.user['organization'])+"'>"+this.user['organization']+ "</a></span>"));
                 this.$secondaryInfo.append($("<br>"));
             } 
             this.$secondaryInfo.append($("<span>"+this.user['numSubmissions']+" "+(parseInt(this.user['numSubmissions']) == 1 ? "bot" : "bots")+" submitted</span>"));
