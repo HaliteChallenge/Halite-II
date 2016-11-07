@@ -11,7 +11,7 @@
 <body>
     <div id="container" class="container">
         <?php include 'includes/navbar.php'; ?>
-        <div  id="pageContent" class="pageContent">
+        <div id="pageContent" class="pageContent text-center">
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
