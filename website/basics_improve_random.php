@@ -50,7 +50,12 @@
 
                 <h3>Utilizing Our Production</h3>
 
-                <p>From the rules outlined in <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a>, we know that when a piece moves, it gains no strength and leaves behind a piece with zero strength. It easily follows from this that moving zero strength pieces is a terrible idea since your piece will necessarily stay at zero strength, and  ;zero-strength pieces cannot conquer territory. Let's make sure that we tell all of our zero strength pieces to remain still.</p>
+                <p>From the rules outlined in <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a>, we know that when a piece moves, it gains no strength and leaves behind a piece with zero strength. It easily follows from this that moving zero strength pieces is a terrible idea, since:</p>
+                <ul>
+                    <li>A zero strength piece that moves will necessarily stay at zero strength, because pieces don't gain strength for any turn that they move.</li>
+                    <li>A zero strength piece won't ever conqueror any territory, because it has no strength with which to damage other pieces.</li>
+                </ul>
+                <p>Let's improve our bot by making sure that we tell all of our zero strength pieces to remain still.</p>
                 <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-file="Revision1.py"></span> 
 
                 
