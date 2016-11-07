@@ -64,7 +64,7 @@ if(isset($_SESSION['userID'])) {
                     </div>
 
                     <h1>Sponsors</h1>
-                    <p>The Halite game was publicized with the help of these great companies!</p>
+                    <p>Halite is grateful for the support of many strong tech partners!</p>
                     
                     <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;">
                         <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px;"></a>
