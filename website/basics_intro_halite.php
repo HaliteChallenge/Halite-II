@@ -30,7 +30,7 @@
                 <p>The file you need to change is MyBot. Regardless of what you do with your code, MyBot will be considered your main file on our game servers.</p>
 
                 <h3>Testing your bot</h3>
-                <p>For your convenience, we provide a game simulator that lets you play locally one bot against another. As of this writing we support Windows, Linux and OSX platforms. You can download the game simulator <a href="downloads.php">here</a>. If you are on windows, place the downloaded binary in your starter kit folder.</p>
+                <p>To play games of Halite locally, you will need the game environment. As of this writing we support Windows, Linux and OSX platforms. You can download the game environment <a href="downloads.php">here</a>. If you are on windows, place the downloaded binary in your starter kit folder.</p>
                 <p>To simulate a game, simply runGame.sh (Linux and macOS) or runGame.bat (Windows). This comand will run a game between my MyBot and RandomBot (both are just copies of each other at this point) on a grid of size 30x30.</p>
                 <p>The output should like this and the details of the game will be stored in a file with the "hlt" extension (35538-124984302.hlt in the example below).</p>
 
