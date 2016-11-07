@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Halite
 {
-    public class MyBot
+    public class RandomBot
     {
-        public const string MyBotName = "MyCSharpBot";
+        public const string RandomBotName = "RandomCSharpBot";
 
         public static void Main(string[] args) {
             Console.SetIn(Console.In);
@@ -15,15 +15,11 @@ namespace Halite
             ushort myID;
             var map = Game.GetInitialMap(out myID);
 
-            /* ------
-                Do more prep work, see rules for time limit
-            ------ */
-
-            Game.SendInit(MyBotName); // Acknoweldge the init and begin the game
+            Game.SendInit(RandomBotName); 
 
             var random = new Random();
             while (true) {
-                map.NextTurn(); // Update the map to reflect the moves before this turn
+                map.NextTurn(); 
 
                 var moves = new List<Move>();
                 for (ushort x = 0; x < map.Width; x++) {
