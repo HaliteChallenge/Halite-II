@@ -10,8 +10,8 @@ cp -r Python/* Halite-Python-Starter-Package/
 cp -r Java/* Halite-Java-Starter-Package/
 cp -r C++/* Halite-C++-Starter-Package/
 cp -r Rust/* Halite-Rust-Starter-Package/
-cp -r Java/*.java Halite-Scala-Starter-Package/
-cp -r CSharp/*.java Halite-CSharp-Starter-Package/
+cp -r Java/* Halite-Scala-Starter-Package/
+cp -r CSharp/* Halite-CSharp-Starter-Package/
 
 cp -r Scala/* Halite-Scala-Starter-Package/
 rm Halite-Scala-Starter-Package/MyBot.java
