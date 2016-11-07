@@ -23,6 +23,7 @@
                         <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
                         <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
                         <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+                        <li><a href="downloads/starterpackages/Halite-Rust-CSharp-Package.zip">C# 6.0</a></li>
                         <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
                         <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
                     </ul>
