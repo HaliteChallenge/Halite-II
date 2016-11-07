@@ -25,7 +25,7 @@
                 <p>The Halite game was created by <a href="https://github.com/Sydriax">Benjamin Spector</a> and <a href="https://github.com/truell20">Michael Truell</a> during a summer internship at Two Sigma in 2016.<br>The game format is inspired by the 2011 Ants AI Challenge sponsored by Google.</p>
 
                 <h3>Why did you invent it?</h3>
-                <p>Halite’s creators heard about the Ants AI Challenge a few years too late :-(<br>The couldn’t find any other competitions quite like it, so they decided to create one.</p>
+                <p>Halite’s creators heard about the Ants AI Challenge a few years too late :-(<br>They couldn’t find any other competitions quite like it, so they decided to create one.</p>
 
                 <h2>About the Tournament</h2>
 
@@ -45,7 +45,7 @@
                 <p>Winners are simply the highest ranked players on the <a href="https://halite.io/leaderboard.php">leaderboard</a> at the end of the competition. So, submit early and often!</p>
 
                 <h3>Is there a prize for the winners?</h3>
-                <p>Pride! Bragging rights! Internet royalty!<br>The results of the competition will be officially announced with link to best players Github profiles.</p>
+                <p>Pride! Bragging rights! Internet royalty!<br>The results of the competition will be officially announced with a link to best players Github profiles.</p>
 
                 <h3>What information do you store about me?</h3> 
                 <p>We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth.</p>
