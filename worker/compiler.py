@@ -1,3 +1,6 @@
+# compiler.py
+# Original Author: Jeff Cameron (jeff@jpcameron.com)
+
 import collections
 import errno
 import fnmatch
@@ -53,7 +56,6 @@ def safeglob_multi(patterns):
 def nukeglob(pattern):
     paths = safeglob(pattern)
     for path in paths:
-        # Ought to be all files, not folders
         try:
             os.unlink(path)
         except OSError as e:
@@ -112,16 +114,6 @@ class ChmodCompiler(Compiler):
 
 class ExternalCompiler(Compiler):
     def __init__(self, args, separate=False, out_files=[], out_ext=None):
-        """Compile files using an external compiler.
-
-        args, is a list of the compiler command and any arguments to run.
-        separate, controls whether all input files are sent to the compiler
-            in one command or one file per compiler invocation.
-        out_files, is a list of files that should exist after each invocation
-        out_ext, is an extension that is replaced on each input file and should
-            exist after each invocation.
-        """
-
         self.args = args
         self.separate = separate
         self.out_files = out_files
@@ -176,28 +168,12 @@ class ExternalCompiler(Compiler):
         return True
 
     def cmd_error_filter(self, cmd_out, cmd_errors):
-        """Default implementation doesn't filter"""
         cmd_errors = [line for line in cmd_errors if line is None or not self.stderr_re.search(line)]
         return cmd_errors
 
 
-# An external compiler with some stdout/sdtderr post-processing power
 class ErrorFilterCompiler(ExternalCompiler):
     def __init__(self, args, separate=False, out_files=[], out_ext=None, stdout_is_error=False, skip_stdout=0, filter_stdout=None, filter_stderr=None):
-        """Compile files using an external compiler.
-
-        args, is a list of the compiler command and any arguments to run.
-        separate, controls whether all input files are sent to the compiler
-            in one command or one file per compiler invocation.
-        out_files, is a list of files that should exist after each invocation
-        out_ext, is an extension that is replaced on each input file and should
-            exist after each invocation.
-        stdout_is_error, controls if stdout contains error compiler error messages
-        skip_stdout, controls how many lines at the start of stdout are ignored
-        filter_stdout, is a regex that filters out lines from stdout that are no errors
-        filter_stderr, is a regex that filters out lines from stderr that are no errors
-        """
-
         ExternalCompiler.__init__(self, args, separate, out_files, out_ext)
         self.stdout_is_error = stdout_is_error
         self.skip_stdout = skip_stdout;
@@ -216,7 +192,6 @@ class ErrorFilterCompiler(ExternalCompiler):
     def cmd_error_filter(self, cmd_out, cmd_errors):
         cmd_errors = ExternalCompiler.cmd_error_filter(cmd_out, cmd_errors)
 
-        """Skip and filter lines"""
         if self.skip_stdout > 0:
             del cmd_out[:self.skip_stdout]
         # Somehow there are None values in the output
@@ -230,7 +205,6 @@ class ErrorFilterCompiler(ExternalCompiler):
             return [line for line in cmd_out if line is not None] + cmd_errors
         return cmd_errors
 
-# Compiles each file to its own output, based on the replacements dict.
 class TargetCompiler(Compiler):
     def __init__(self, args, replacements, outflag="-o"):
         self.args = args
@@ -266,10 +240,6 @@ from distutils.extension import read_setup_file
 setup(ext_modules = read_setup_file('setup_exts'), script_args = ['-q', 'build_ext', '-i'])"'''
 
 comp_args = {
-    # lang : ([list of compilation arguments], ...)
-    #                If the compilation should output each source file to
-    #                its own object file, don't include the -o flags here,
-    #                and use the TargetCompiler in the languages dict.
     "Ada"           : [["gcc-4.4", "-O3", "-funroll-loops", "-c"],
                              ["gnatbind"],
                              ["gnatlink", "-o", BOT]],
@@ -284,8 +254,6 @@ comp_args = {
                              ["6l", "-o", BOT, "_go_.6"]],
     "Groovy"    : [["groovyc"],
                              ["jar", "cfe", BOT + ".jar", BOT]],
-    # If we ever upgrade to GHC 7, we will need to add -rtsopts to this command
-    # in order for the maximum heap size RTS flag to work on the executable.
     "Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
     "Java"        : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
     "Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
@@ -297,7 +265,6 @@ comp_args = {
     }
 
 targets = {
-    # lang : { old_ext : new_ext, ... }
     "C"     : { ".c" : ".o" },
     "C++" : { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
     }
@@ -308,15 +275,6 @@ Language = collections.namedtuple("Language",
         )
 
 languages = (
-    # Language(name, output file,
-    #      main_code_file
-    #      command_line
-    #      [nukeglobs],
-    #      [(source glob, compiler), ...])
-    #
-    # The compilers are run in the order given.
-    # If a source glob is "" it means the source is part of the compiler
-    #   arguments.
     Language("Ada", BOT, "MyBot.adb",
         "./MyBot",
         ["*.ali"],
@@ -367,9 +325,7 @@ languages = (
     ),
     Language("Dart", BOT +".dart", "MyBot.dart",
         "frogsh MyBot.dart",
-        [],
-        [(["*.dart"], ChmodCompiler("Dart"))]
-    ),
+        [], [(["*.dart"], ChmodCompiler("Dart"))]),
     Language("Erlang", "my_bot.beam", "my_bot.erl",
         "erl -hms"+ str(MEMORY_LIMIT) +"m -smp disable -noshell -s my_bot start -s init stop",
         ["*.beam"],
@@ -479,7 +435,6 @@ languages = (
 
 
 def compile_function(language, bot_dir, timelimit):
-    """Compile submission in the current directory with a specified language."""
     with CD(bot_dir):
         print("cd")
         for glob in language.nukeglobs:
@@ -507,14 +462,10 @@ Please add one of the following filenames to your zip file:
 %s"""
 
 def detect_language(bot_dir):
-    """Try and detect what language a submission is using"""
     with CD(bot_dir):
-        # Autodetects the language of the entry in the current working directory
         detected_langs = [
             lang for lang in languages if os.path.exists(lang.main_code_file)
         ]
-
-        # If no language was detected
         if len(detected_langs) > 1:
             return None, ['Found multiple MyBot.* files: \n'+
                           '\n'.join([l.main_code_file for l in detected_langs])]
@@ -525,7 +476,6 @@ def detect_language(bot_dir):
             return detected_langs[0], None
 
 def get_run_cmd(submission_dir):
-    """Get the command to run a submission"""
     with CD(submission_dir):
         if os.path.exists('run.sh'):
             with open('run.sh') as f:
@@ -534,7 +484,6 @@ def get_run_cmd(submission_dir):
                         return line.rstrip('\r\n')
 
 def get_run_lang(submission_dir):
-    """Get the language of a submission"""
     with CD(submission_dir):
         if os.path.exists('run.sh'):
             with open('run.sh') as f:
@@ -543,14 +492,11 @@ def get_run_lang(submission_dir):
                         return line[1:-1]
 
 def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
-    """Autodetect the language of an entry and compile it."""
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
         _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, time.time() + installTimeLimit)
     detected_language, errors = detect_language(bot_dir)
     print("detected language")
     if detected_language:
-        # If we get this far, then we have successfully auto-detected
-        # the language that this entry is using.
         print("compiling")
         compiled, errors = compile_function(detected_language, bot_dir,
                 timelimit)
@@ -597,29 +543,3 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     else:
         return "Unknown", errors
 
-def main(argv=sys.argv):
-    parser = OptionParser(usage="Usage: %prog [options] [directory]")
-    parser.add_option("-j", "--json", action="store_true", dest="json",
-            default=False,
-            help="Give compilation results in json format")
-    options, args = parser.parse_args(argv)
-    print("here1")
-    if len(args) == 1:
-        detected_lang, errors = compile_anything(os.getcwd())
-    elif len(args) == 2:
-        detected_lang, errors = compile_anything(args[1])
-    else:
-        parser.error("Extra arguments found, use --help for usage")
-    print("here2")
-
-    if options.json:
-        import json
-        print(json.dumps([detected_lang, errors]))
-    else:
-        print("Detected language:", detected_lang)
-        if errors != None and len(errors) != 0:
-            for error in errors:
-                print(error)
-
-if __name__ == "__main__":
-    main()
