@@ -46,7 +46,7 @@
                 
                 <span data-gist-id="73cd76d10de7e5147d7e0b49eb65f288" data-gist-hide-footer="true" data-gist-line="16" data-gist-file="Random.py"></span> 
 
-                <p>And that's that's random bot!</p>
+                <p>And that's random bot!</p>
 
                 <h3>Utilizing Our Production</h3>
 
