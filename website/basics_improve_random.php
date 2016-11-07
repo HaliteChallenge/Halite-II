@@ -23,7 +23,7 @@
                 <p>Now open up the MyBot file in your favorite editor and let's get started!</p>
 
                 <h3>Import Considerations</h3>
-                <p>When writing a halite bot, be sure to stay away from functions like <code>System.out.print</code>, <code>cout</code>, <code>print</code>, etc. Bots use stdout and stdin to communicate with the game environment, and you will be ejected from a game of Halite if you use them to print debugging info. Instead, print to a log file.</p>
+                <p>When writing a halite bot, be sure to stay away from functions like <code>System.out.print</code>, <code>cout</code>, <code>print</code>, etc. Bots use stdout and stdin to communicate with the game environment. You will be ejected from a game of Halite if you print debugging info to stdout. Instead, print to a log file.</p>
 
                 <h3>A Look At the Random Bot</h3>
                 <p>Now that you know how the game works, how do the two random starter bots work? How does one code a Halite bot? Here is the source from the main file of our python starter bot:</p>
