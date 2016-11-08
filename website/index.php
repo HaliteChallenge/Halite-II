@@ -45,7 +45,6 @@ if(isset($_SESSION['userID'])) {
                         <h1>Halite is an artificial intelligence programming challenge.</h1>
                         <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                         <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
-                        <p>This site is in beta. If you see any problems, please post on the <a href="http://forums.halite.io">forums</a>.</p>
                     </div>
 
                     <h1>Creators</h1>
