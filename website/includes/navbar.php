@@ -14,7 +14,7 @@
                 <ul class="nav navbar-nav">
                     <?php include 'includes/dropdowns.php'; ?>
                     <li>
-                      <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login with Github</a>
+                      <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3">Login</a>
                     </li>
                 </ul>
             </ul>
