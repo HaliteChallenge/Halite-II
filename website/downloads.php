@@ -34,15 +34,15 @@
 
                 <h3>Linux/macOS</h3>
                 <p>Execute:</p>
-                <pre><code>sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/HaliteChallenge/Halite/master/environment/install.sh)"</code></pre>
-                <p>Now, the <code>halite</code> command will run the environment.</p>
+                <pre><code>sh -c "$(curl -fsSL https://raw.githubusercontent.com/HaliteChallenge/Halite/master/environment/install.sh)"</code></pre>
+                <p>Now, the halite binary will run the environment.</p>
 
                 <h3>Windows</h3>
                 <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>.</p>
                 
                 <h3>Building from Source</h3>
                 <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
-                <p>If you are on Unix, run <code>make</code> and <code>sudo make install</code> inside the extracted folder. The <code>halite</code> command will now run the environment.</p>
+                <p>If you are on Unix, run <code>make</code> inside the extracted folder. The halite binary will now run the environment.</p>
                 <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
             </div>
         </div>

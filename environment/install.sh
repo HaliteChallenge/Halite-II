@@ -5,6 +5,6 @@ unzip HaliteEnvironment-Source.zip -d HaliteEnvironment-Source
 rm HaliteEnvironment-Source.zip
 cd HaliteEnvironment-Source
 make
-make install
+mv halite ../
 cd ../
 rm -r HaliteEnvironment-Source 
