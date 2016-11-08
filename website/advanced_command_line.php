@@ -37,7 +37,7 @@
                 <h3>Examples</h3>
                 <p>To run your bot against itself on a 40 by 40 map with no timeouts, run: 
                     <ul>
-                        <li>Linux/macOS: <code>halite -d “40 40” -t “python3 MyBot.py” “python3 MyBot.py”</code></li>
+                        <li>Linux/macOS: <code>./halite -d “40 40” -t “python3 MyBot.py” “python3 MyBot.py”</code></li>
                         <li>Windows: <code>.\halite.exe -d “40 40” -t “python3 MyBot.py” “python3 MyBot.py”</code></li>
                     </ul>
                 </p>
@@ -45,7 +45,7 @@
 
                 <p>To run your python bot against a java bot (assuming it’s been compiled) on a 25 by 25 map with a predefined seed (2168), run:
                     <ul>
-                        <li>Linux/macOS: <code>halite -d “25 25” -s 2168 “python3 PythonBot.py” “java JavaBot”</code></li>
+                        <li>Linux/macOS: <code>./halite -d “25 25” -s 2168 “python3 PythonBot.py” “java JavaBot”</code></li>
                         <li>Windows: <code>.\halite.exe -d “25 25” -s 2168 “python3 PythonBot.py” “java JavaBot”</code></li>
                     </ul>
                 </p>
