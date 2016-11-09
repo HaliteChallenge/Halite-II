@@ -35,7 +35,7 @@
                 <h3>Linux/macOS</h3>
                 <p>Execute:</p>
                 <pre><code>sh -c "$(curl -fsSL https://raw.githubusercontent.com/HaliteChallenge/Halite/master/environment/install.sh)"</code></pre>
-                <p>You should see a file "titled" halie in your current directory. This is the game environment. Put it in the root directory of your starter package.</p>
+                <p>You should see a file titled "halite" in your current directory. This is the game environment. Put it in the root directory of your starter package.</p>
 
                 <h3>Windows</h3>
                 <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>. Put it in the root directory of your starter package.</p>
