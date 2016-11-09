@@ -12,8 +12,8 @@ $(function() {
         onSubmit: function() {
             var username = this.$usernameField.val();
             var user = getUser(null, username);
-            if(user == null) {
-                messageBox.alert("Invalid User", "The user "+username+" does not exist.", false, null);
+            if(user == null || parseInt(user.isRunning) == 0) {
+                messageBox.alert("Invalid User", "The user "+username+" is not on the leaderboard.", false, null);
             } else {
                 window.location.href="leaderboard.php?userID="+user.userID;
             }
