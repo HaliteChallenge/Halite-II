@@ -63,7 +63,7 @@
 
                 <h3>Turns</h3>
 
-                <p>After all bots have finished setting up, the environment will do the following until endgame conditions are met.
+                <p>After all bots have finished setting up, the environment will do the following until endgame conditions are met.</p>
                     <ol>
                         <li>Send the present gamestate - map and messages - to all players.</li>
                         <li>Receive moves from the players.</li>
@@ -73,8 +73,7 @@
                         <li>Simultaneously damage (and remove if damage equals or exceeds strength) all player's pieces. All pieces will output damage equivalent to their strength when starting this phase, and the damage will apply to all coinciding or adjacent enemy squares.</li>
                         <li>Check if endgame conditions have been met.</li>
                     </ol>
-                    One should note that because all pieces damage all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.
-                </p>
+                <p>One should note that because all pieces damage all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.</p>
 
                 <h3>Timeouts</h3>
 
