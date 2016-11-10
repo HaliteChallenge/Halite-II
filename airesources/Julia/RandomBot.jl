@@ -2,7 +2,7 @@ include("hlt.jl")
 include("networking.jl")
 
 myID, gameMap = getInit()
-sendInit("RandomPythonBot")
+sendInit("RandomJuliaBot")
 
 while true
   moves = Vector{Move}()
