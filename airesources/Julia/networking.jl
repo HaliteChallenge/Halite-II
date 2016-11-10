@@ -1,6 +1,6 @@
 _productions = Vector{Vector{Int64}}()
-_width = -1
-_height = -1
+local _width
+local _height
 
 function serializeMoveSet(moves::Vector{Move})
   returnString = ""
@@ -13,6 +13,7 @@ end
 function deserializeMapSize(inputString::String)
   splitString = reverse(split(inputString, " "))
 
+  global _width, _height
   _width = parse(pop!(splitString))
   _height = parse(pop!(splitString))
 end
@@ -41,10 +42,10 @@ function deserializeMap(inputString::String)
   while ~(y > m.height)
     counter = parse(pop!(splitString))
     owner = parse(pop!(splitString))
-    for a in 1:counter
+    for a in 0:counter-1
       m.contents[y][x].owner = owner
       x += 1
-      if x == m.width
+      if x > m.width
         x = 1
         y += 1
       end
