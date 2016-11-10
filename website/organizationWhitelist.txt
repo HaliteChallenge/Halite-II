@@ -11,3 +11,5 @@ Columbia - columbia.edu
 UPenn - upenn.edu
 Brown - brown.edu
 Dartmouth - dartmouth.edu
+MIT - mit.edu
+CMU - andrew.cmu.edu
