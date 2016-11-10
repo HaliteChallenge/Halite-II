@@ -13,3 +13,4 @@ Brown - brown.edu
 Dartmouth - dartmouth.edu
 MIT - mit.edu
 CMU - andrew.cmu.edu
+RIT - rit.edu
