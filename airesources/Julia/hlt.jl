@@ -55,12 +55,15 @@ isBounds(gm::GameMap, l::Location) = l.x >= 0 && l.x < gm.width && l.y >= 0 && l
 function getDistance(gm::GameMap, l1::Location, l2::Location)
   dx = abs(l1.x - l2.x)
   dy = abs(l1.y - l2.y)
+
   if dx > gm.width / 2
     dx = gm.width - dx
   end
+  
   if dy > gm.height / 2
     dy = gm.height - dy
   end
+  
   dx + dy
 end
 
@@ -79,6 +82,7 @@ function getAngle(gm::GameMap, l1::Location, l2::Location)
   elseif -dy > gm.height + dy
     dy += gm.height
   end
+  
   atan2(dy, dx)
 end
 
