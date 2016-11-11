@@ -105,7 +105,11 @@ abstract class API{
                 ->setBody($emailMessage)
                 ->setContentType("text/html");
 
-            $mailer->send($emailMessage);
+            try {
+                $mailer->send($emailMessage);
+            } catch (Exception $e) {
+            } finally {
+            }
         }
     }
 
