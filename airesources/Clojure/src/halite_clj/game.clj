@@ -17,7 +17,7 @@
                 :north (mod (dec (:y site)) height)
                 :south (mod (inc (:y site)) height)
                 (:y site))]
-    (get-in game-map new-y new-x)))
+    (get-in game-map [new-y new-x])))
 
 (defn single-dimension-distance
   "Computes the distance between two integers mod m"
