@@ -25,9 +25,6 @@
                 <h3>Understanding Game Logs</h3>
                 <p>When your bot times out or errors on our game servers, we save and display a log file with debugging information including the time your bot took each turn, its output each turn, and its final output from stdout and stderr.</p>
                 <p>To find these log files, visit your homepage: <a href="https://halite.io/user.php">https://halite.io/user.php</a>. Just click the download log button to grab your error log for a game:</p>
-                <p>Here is an example error log:<br></p>
-                <p>Each frame your bots output and the time that it took is shown:</p>
-                <p>If the game environment kills your bot (likely due to timeout or error), we dump whatever is left in stdout and stderr.</p>
                 <h3>Debugging with an IDE</h3>
                 <p>There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found <a href="http://forums.halite.io/t/running-your-halite-bot-from-a-debugger/70">here on the forums</a>. </p>
             </div>
