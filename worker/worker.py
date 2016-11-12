@@ -65,10 +65,11 @@ def executeCompileTask(user, backend):
     try:
         workingPath = "workingPath"
         makePath(workingPath)
+
         botPath = backend.storeBotLocally(int(user["userID"]), workingPath, isCompile=True)
         archive.unpack(botPath)
 
-        while len([name for name in os.listdir(workingPath) if os.path.isfile(name)]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
+        while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
             singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
             bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
             os.mkdir(bufferFolder)
