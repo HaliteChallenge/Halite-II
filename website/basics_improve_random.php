@@ -17,7 +17,7 @@
                 <h1>Improving the Random Bot</h1>
                 <p>In this tutorial, we'll go through the code that powers the random bot and add a couple heuristics to it. This will hopefully help you fully understand Halite and set you on your way to leaderboard domination.</p>
 
-                <p>The code in this tutorial can be found at the following links for <a href="https://gist.github.com/Sydriax/73cd76d10de7e5147d7e0b49eb65f288">Python</a>, <a href="https://gist.github.com/Sydriax/a2b8b88c940abe8f346df62a77e23441">Java</a>, and <a href="https://gist.github.com/Sydriax/3aaabd3ecbc03ff997c720e7c5840a9a">C++</a>.</p>
+                <p>The code in this tutorial can be found at the following links for <a href="https://gist.github.com/JCGrant/5ea767bae8a725f738d75649e5f2c91a">Python</a>, <a href="https://gist.github.com/Sydriax/a2b8b88c940abe8f346df62a77e23441">Java</a>, and <a href="https://gist.github.com/Sydriax/3aaabd3ecbc03ff997c720e7c5840a9a">C++</a>.</p>
                 <h3>Prerequisites</h3>
                 <p>Make sure that you have read <a href="https://halite.io/basics_intro_halite.php">Introducing Halite</a> and followed the setup procedures described there.</p>
                 <p>Now open up the MyBot file in your favorite editor and let's get started!</p>
