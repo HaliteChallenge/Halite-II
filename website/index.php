@@ -40,6 +40,7 @@ if(isset($_SESSION['userID'])) {
                         <h1>Halite is an artificial intelligence programming challenge.</h1>
                         <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid and the bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                         <p>The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
+                        <div id="gameReplay" class="text-center"></div>
                     </div>
 
                     <h1>Creators</h1>
@@ -71,9 +72,12 @@ if(isset($_SESSION['userID'])) {
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="script/backend.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
     <script src="script/general.js"></script>
-    <script src="script/leaderTable.js"></script>
+    <script src="script/backend.js"></script>
+    <script src="lib/pixi.min.js"></script>
+    <script src="script/parsereplay.js"></script>
+    <script src="script/visualizer.js"></script>
     <script src="script/index.js"></script>
 </body>
 
