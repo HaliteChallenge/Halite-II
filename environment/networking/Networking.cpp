@@ -390,7 +390,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 
     std::string newString;
     const int PER_CHAR_WAIT = 10; //millis
-    const int MAX_READ_TIME = 1000; //millis
+    const int MAX_READ_TIME = 1500; //millis
 
 #ifdef _WIN32
 
