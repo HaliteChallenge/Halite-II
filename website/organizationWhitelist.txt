@@ -12,5 +12,9 @@ UPenn - upenn.edu
 Brown - brown.edu
 Dartmouth - dartmouth.edu
 MIT - mit.edu
+MIT - alum.mit.edu
 CMU - andrew.cmu.edu
 RIT - rit.edu
+NJU - lamda.nju.edu.cn
+Chalmers - student.chalmers.se
+McGill - mail.mcgill.ca
