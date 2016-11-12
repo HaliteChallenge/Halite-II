@@ -1,10 +1,10 @@
 $(function () {
     var replayName = getGET("replay");
     if(replayName != null && replayName != undefined) {
-        var data = textFromURL(replayName, function(data) {
+        var data = textFromURL(replayName, $("#pageContent"), function(data) {
             console.log(data)
             if(data != null) {
-                showGame(data, true, false);
+                showGame(data, $("#pageContent"), null, null, true, false);
             }
         });
     } else {

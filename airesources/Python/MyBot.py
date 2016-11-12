@@ -9,6 +9,7 @@ while True:
     gameMap = getFrame()
     for y in range(gameMap.height):
         for x in range(gameMap.width):
-            if gameMap.getSite(Location(x, y)).owner == myID:
-                moves.append(Move(Location(x, y), int(random.random() * 5)))
+            location = Location(x, y)
+            if gameMap.getSite(location).owner == myID:
+                moves.append(Move(location, random.choice(DIRECTIONS)))
     sendFrame(moves)
