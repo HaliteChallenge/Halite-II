@@ -52,14 +52,6 @@ class Networking
     logger.send(severity, msg)
   end
 
-  def log_array(msgs, severity = :info)
-    Array(msgs).each { |msg| log(msg, severity) }
-  end
-
-  def log_output(msgs, severity = :info)
-    log_array(msgs.split("\n"), severity)
-  end
-
   private
 
   def init_player_tag
@@ -75,7 +67,6 @@ class Networking
 
   def init_map_production
     @production = read_ints_from_input.each_slice(width).to_a
-    log("production: #{@production}")
   end
 
   def init_map
@@ -87,9 +78,6 @@ class Networking
       owner = data.shift
       owners_map += [owner] * counter
     end
-
-    log("owners: #{owners_map}")
-    log("strenghts: #{data}")
 
     @map = GameMap.new( width: width,
                         height: height,
