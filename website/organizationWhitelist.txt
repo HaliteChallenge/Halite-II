@@ -19,5 +19,5 @@ NJU - lamda.nju.edu.cn
 Chalmers - student.chalmers.se
 McGill - mail.mcgill.ca
 Purdue - purdue.edu
-Imperial - ic.ac.uk
-Imperial - imperial.ac.uk
+Imperial College - ic.ac.uk
+Imperial College - imperial.ac.uk
