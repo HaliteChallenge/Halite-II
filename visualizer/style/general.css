@@ -1,0 +1,76 @@
+#jHeader {
+    font-size: 50px;
+}
+
+#myFile {
+    display:none;
+}
+
+#gameFile {
+    display:none;
+}
+
+#navCont {
+    margin:0 auto;
+    width:90%;
+}
+
+#loginNav {
+    display:inline;
+}
+
+#logoutNav {
+    display:none;
+}
+
+#archivedTag {
+    display:none;
+}
+
+.gameRow {
+    display:none;
+}
+
+#leaderTable {
+    padding-bottom:0px;
+    margin-bottom:0px;
+}
+
+.gameRow {
+    background-color:#F8F8F8;
+}
+
+.arrow {
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+}
+
+.file-icon {
+    height: 16px;
+    width: 16px;
+}
+
+
+.jumbotron-btn {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.videoWrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+.videoWrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.has-hover-text {
+    cursor: pointer;
+}
