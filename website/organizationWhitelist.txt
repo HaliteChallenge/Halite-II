@@ -16,3 +16,4 @@ MIT - alum.mit.edu
 CMU - andrew.cmu.edu
 RIT - rit.edu
 NJU - lamda.nju.edu.cn
+Chalmers - student.chalmers.se
