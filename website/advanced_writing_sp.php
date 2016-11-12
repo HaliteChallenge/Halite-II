@@ -25,7 +25,7 @@
                             <li>getInit</li>
                             <li>sendInit</li>
                             <li>getFrame</li>
-                            <li>sendMoves</li>
+                            <li>sendFrame</li>
                         </ul>
                     </li>
                     <li>Classes/Structs
