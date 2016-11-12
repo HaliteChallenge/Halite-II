@@ -12,7 +12,7 @@ function initPixi() {
     renderer = PIXI.autoDetectRenderer(0, 0, { backgroundColor: 0x000000, antialias: true, transparent: true });
 }
 
-function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal, seconds) {
+function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal, offline, seconds) {
     if(renderer == null) initPixi();
 
     $container.empty();
@@ -24,7 +24,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             var nameComponents = p.name.split(" ");
             var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
             console.log(name);
-            var user = getUser(null, name);
+            var user = offline ? null : getUser(null, name);
             if(user) {
                 return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"
             } else {
