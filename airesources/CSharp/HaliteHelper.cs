@@ -138,8 +138,8 @@ public class Map
         }
 
         var strengthValues = gameMapValues; // Referencing same queue, but using a name that is more clear
-        for (x = 0; x < Width; x++) {
-            for (y = 0; y < Height; y++) {
+        for (y = 0; y < Height; y++) {
+            for (x = 0; x < Width; x++) {
                 ushort strength;
                 if (!ushort.TryParse(strengthValues.Dequeue(), out strength))
                     throw new ApplicationException("Could not get some strength value from stdin");
@@ -204,8 +204,8 @@ public class Map
         var productionValues = new Queue<string>(productionMapStr.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
 
         ushort x, y;
-        for (x = 0; x < map.Width; x++) {
-            for (y = 0; y < map.Height; y++) {
+        for (y = 0; y < map.Height; y++) {
+            for (x = 0; x < map.Width; x++) {
                 ushort production;
                 if (!ushort.TryParse(productionValues.Dequeue(), out production))
                     throw new ApplicationException("Could not get some production value from stdin");

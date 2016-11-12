@@ -26,7 +26,7 @@
                         <li><code>-q</code>: turns on quiet output. Output will take the form of:
                             <ul>
                                 <li>A line containing the replay file name, a space, and the map seed.</li>
-                                <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID territoryValue strengthValue productionValue stillMovePercentage averageLatency</code></li>
+                                <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID</code></li>
                                 <li>A line of space separated playerIDs of the players that timed out.</li>
                             </ul>
                         </li>

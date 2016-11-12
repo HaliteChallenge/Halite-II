@@ -3,9 +3,14 @@ Cornell - cornell.edu
 NYU - nyu.edu
 Stanford - stanford.edu
 Harvard - harvard.edu
+Harvard - g.harvard.edu
+Harvard - fas.harvard.edu
 Princeton - princeton.edu
 Yale - yale.edu
 Columbia - columbia.edu
 UPenn - upenn.edu
 Brown - brown.edu
 Dartmouth - dartmouth.edu
+MIT - mit.edu
+CMU - andrew.cmu.edu
+RIT - rit.edu

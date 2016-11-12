@@ -1,23 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class RandomBot
+public class MyBot
 {
-    public const string RandomBotName = "RandomCSharpBot";
+    public const string RandomBotName = "RandomC#Bot";
 
     public static void Main(string[] args) {
         Console.SetIn(Console.In);
         Console.SetOut(Console.Out);
 
         ushort myID;
-        var map = Game.GetInitialMap(out myID);
-
-        Game.SendInit(RandomBotName); 
+        var map = Networking.getInit(out myID);
+        
+        Networking.SendInit(RandomBotName);
 
         var random = new Random();
         while (true) {
-            map.NextTurn(); 
+            Networking.getFrame(ref map);
 
             var moves = new List<Move>();
             for (ushort x = 0; x < map.Width; x++) {
@@ -31,7 +31,7 @@ public class RandomBot
                 }
             }
 
-            Game.SendMoves(moves); // Send moves
+            Networking.SendMoves(moves); // Send moves
         }
     }
 }

@@ -13,3 +13,6 @@
 <li>
   <a href="http://forums.halite.io">Forums</a>
 </li>
+<li>
+  <a href="about.php">About</a>
+</li>
