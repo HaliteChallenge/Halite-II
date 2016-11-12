@@ -14,10 +14,13 @@
         <div id="pageContent" class="pageContent text-center">
             <div id='dropZone' class="col-sm-12 text-center">
                 <span class="glyphicon glyphicon-cloud-upload" style="font-size: 10em;"></span>
-                <h2 style="margin-top: 20px;">Drop a replay file here</h2>
+                <h2 style="margin-top: 20px;">Drop a replay file here, or pick a file</h2>
+                <input type="file" id="filePicker" title=" " style="margin-left: auto; margin-right: auto;" multiple/>
             </div>
         </div>
     </div>
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
