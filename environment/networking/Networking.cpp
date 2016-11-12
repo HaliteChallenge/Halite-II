@@ -348,7 +348,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
 
 int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves) {
 
-    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 2000;
+    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
     
     std::string response;
     try {
@@ -390,7 +390,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 
     std::string newString;
     const int PER_CHAR_WAIT = 10; //millis
-    const int MAX_READ_TIME = 1500; //millis
+    const int MAX_READ_TIME = 1000; //millis
 
 #ifdef _WIN32
 
