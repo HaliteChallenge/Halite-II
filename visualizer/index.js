@@ -10,35 +10,35 @@ const app = electron.app;
 let mainWindow;
 
 function onClosed() {
-	// dereference the window
-	// for multiple windows store them in an array
-	mainWindow = null;
+    // dereference the window
+    // for multiple windows store them in an array
+    mainWindow = null;
 }
 
 function createMainWindow() {
-	const win = new electron.BrowserWindow({
-		width: 1200,
-		height: 800
-	});
+    const win = new electron.BrowserWindow({
+        width: 1200,
+        height: 800
+    });
 
-	win.loadURL(`file://${__dirname}/index.html`);
-	win.on('closed', onClosed);
+    win.loadURL(`file://${__dirname}/index.html`);
+    win.on('closed', onClosed);
 
-	return win;
+    return win;
 }
 
 app.on('window-all-closed', () => {
-	if (process.platform !== 'darwin') {
-		app.quit();
-	}
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
 app.on('activate', () => {
-	if (!mainWindow) {
-		mainWindow = createMainWindow();
-	}
+    if (!mainWindow) {
+        mainWindow = createMainWindow();
+    }
 });
 
 app.on('ready', () => {
-	mainWindow = createMainWindow();
+    mainWindow = createMainWindow();
 });
