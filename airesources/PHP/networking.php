@@ -80,8 +80,15 @@ function sendString($toBeSent)
 
 function getString()
 {
-    return rtrim(fgets(STDIN), "\n");
+    $input = fgets(STDIN);
+
+    if ($input === false) {
+        exit;
+    }
+
+    return rtrim($input, "\n");
 }
+
 
 function getInit()
 {
