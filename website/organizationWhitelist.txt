@@ -24,4 +24,5 @@ Imperial College - imperial.ac.uk
 Ecole Polytechnique - polytechnique.edu
 NTU - ntu.edu.sg
 NTU - e.ntu.edu.sg
+Waterloo - edu.uwaterloo.ca
 Waterloo - uwaterloo.ca
