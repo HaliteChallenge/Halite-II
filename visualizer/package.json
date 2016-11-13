@@ -14,7 +14,7 @@
   "scripts": {
     "test": "xo",
     "start": "electron .",
-    "build": "./node_modules/electron-packager/cli.js . --out=dist --asar --overwrite --all"
+    "build": "mkdir -p downloads/ && cd downloads/ && electron-packager ../ --all --overwrite"
   },
   "files": [
     "main.js",
@@ -33,8 +33,8 @@
   },
   "devDependencies": {
     "devtron": "^1.1.0",
-    "electron-packager": "^8.0.0",
     "electron": "^1.0.1",
+    "electron-packager": "^8.2.0",
     "xo": "^0.16.0"
   },
   "xo": {
