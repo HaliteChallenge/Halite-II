@@ -21,3 +21,4 @@ McGill - mail.mcgill.ca
 Purdue - purdue.edu
 Imperial College - ic.ac.uk
 Imperial College - imperial.ac.uk
+Ecole Polytechnique - polytechnique.edu
