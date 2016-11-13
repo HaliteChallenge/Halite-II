@@ -372,3 +372,6 @@ google*.html
 screenlog.*
 
 *.dll
+
+node_modules
+/dist
