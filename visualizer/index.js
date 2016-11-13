@@ -22,6 +22,11 @@ function createMainWindow() {
     });
 
     win.loadURL(`file://${__dirname}/index.html`);
+    if (process.argv.length>2) {
+        mainWindow.webContents.on('did-finish-load', function() {
+            mainWindow.webContents.executeJavaScript(loadGame(proccess.argv[2])); // write the loadGame function later – may need to read file contents into stream
+        });
+    }
     win.on('closed', onClosed);
 
     return win;
