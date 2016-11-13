@@ -85,20 +85,11 @@ class ManagerAPI extends API{
             $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
             $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
-            $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and (userID in (SELECT gu.userID FROM GameUser gu GROUP BY gu.userID HAVING AVG(gu.didTimeout) < 1) or numGames < 20) order by rand()*-pow(sigma, 2) LIMIT 1");
-
-            if(count($seedPlayer) < 1) {
-                $users = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 ORDER BY rand()");
-                $oldestGameTime = time();
-                foreach($users as $user) {
-                    $latestGameTime = strtotime($this->select("select timestamp from Game inner join GameUser on Game.gameID = GameUser.gameID and GameUser.userID={$user['userID']} order by timestamp DESC limit 1")['timestamp']);
-                    if($latestGameTime < $oldestGameTime) {
-                        $seedPlayer = $user;
-                        $oldestGameTime = $latestGameTime;
-                    }
-                }
-            }
+            $seedPlayer = null;
+            if((mt_rand() / mt_getrandmax()) > 0.5) $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
+            else $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand() LIMIT 1");
             if(count($seedPlayer) < 1) return null;
+
             $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
             array_push($players, $seedPlayer);
 
