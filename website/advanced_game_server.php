@@ -43,6 +43,7 @@
                             <li>Scala - .scala</li>
                             <li>Ruby - .rb</li>
                             <li>Go - .go</li>
+                            <li>JavaScript - .js</li>
                         </ul>
                     </p>
 
@@ -75,6 +76,7 @@
                             <li>Scala 2.10.4</li>
                             <li>Ruby 2.3.1</li>
                             <li>Go 1.6</li>
+                            <li>Node.js (JavaScript) 7.1.0</li>
                         </ul>
                     </p>
 

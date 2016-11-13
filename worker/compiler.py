@@ -350,10 +350,10 @@ languages = (
         ["*.class", "*.jar"],
         [(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:", out_files=["MyBot.class"]))]
     ),
-    Language("Javascript", BOT +".js", "MyBot.js",
+    Language("JavaScript", BOT +".js", "MyBot.js",
         "node MyBot.js",
         [],
-        [(["*.js"], ChmodCompiler("Javascript"))]
+        [(["*.js"], ChmodCompiler("JavaScript"))]
     ),
     Language("Lisp", BOT, "MyBot.lisp",
         "./MyBot --dynamic-space-size " + str(MEMORY_LIMIT),

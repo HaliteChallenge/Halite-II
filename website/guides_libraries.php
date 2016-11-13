@@ -23,13 +23,14 @@
                     <ul>
                         <li>pip3</li>
                         <li>bundler</li>
+                        <li>npm</li>
                     </ul>
                 <p>
-                    If you would like us to add another package manager to this list, post on the <a href="http://forums.halite.io">forums</a>. 
+                    If you would like us to add another package manager to this list, post on the <a href="http://forums.halite.io">forums</a>.
                 </p>
 
                 <p>Here is an example install.sh file for a bot that uses <a href="http://www.numpy.org/">the numpy library</a>:</p>
-                <span data-gist-id="039bb1e4916ffb012d1ef83b36572dee"></span> 
+                <span data-gist-id="039bb1e4916ffb012d1ef83b36572dee"></span>
                 <p>It's just one line!</p>
 
                 <h3>Compilation</h3>

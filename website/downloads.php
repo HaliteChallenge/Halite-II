@@ -31,6 +31,7 @@
                     <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
                     <li><a href="downloads/starterpackages/Halite-Ruby-Starter-Package.zip">Ruby 2.3.1</a></li>
                     <li><a href="downloads/starterpackages/Halite-Go-Starter-Package.zip">Go 1.6</a></li>
+                    <li><a href="downloads/starterpackages/Halite-JavaScript-Starter-Package.zip">Node.js (JavaScript) 7.1.0</a></li>
                 </ul>
                 </p>
 
@@ -44,7 +45,7 @@
 
                 <h3>Windows</h3>
                 <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>. Put it in the root directory of your starter package.</p>
-                
+
                 <h3>Building from Source</h3>
                 <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
                 <p>If you are on Unix, run <code>make</code> inside the extracted folder. The halite binary will now run the environment.</p>
