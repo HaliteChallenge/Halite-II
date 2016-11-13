@@ -86,8 +86,12 @@ class ManagerAPI extends API{
             $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
             $seedPlayer = null;
-            if((mt_rand() / mt_getrandmax()) > 0.5) $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
-            else $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand() LIMIT 1");
+            if((mt_rand() / mt_getrandmax()) > 0.5) {
+                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
+            } else {
+                $seedID = $this->select("SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID ORDER BY maxTime ASC LIMIT 1")['userID'];
+                $seedPlayer = $this->select("SELECT * FROM User where userID={$seedID}");
+            }
             if(count($seedPlayer) < 1) return null;
 
             $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$seedPlayer['rank']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
