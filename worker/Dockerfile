@@ -11,7 +11,6 @@ RUN apt-get install -y g++
 RUN apt-get install -y python3 python3-pip python3-dev python3-numpy
 RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh 
 RUN apt-get install -y python-software-properties
-RUN apt-get install -y ruby
 
 RUN apt-get install -y software-properties-common
 RUN apt-get install -y openjdk-8-jdk
@@ -21,3 +20,5 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
 RUN echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
 RUN apt-get update
 RUN apt-get install -y mono-devel
+
+RUN apt-get install -y ruby
