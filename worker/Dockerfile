@@ -22,3 +22,4 @@ RUN apt-get update
 RUN apt-get install -y mono-devel
 
 RUN apt-get install -y ruby
+RUN gem install bundler 

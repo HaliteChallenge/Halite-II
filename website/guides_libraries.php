@@ -22,6 +22,7 @@
                 <p>The following package managers are installed ahead of time on the Halite game servers:</p>
                     <ul>
                         <li>pip3</li>
+                        <li>bundler</li>
                     </ul>
                 <p>
                     If you would like us to add another package manager to this list, post on the <a href="http://forums.halite.io">forums</a>. 
