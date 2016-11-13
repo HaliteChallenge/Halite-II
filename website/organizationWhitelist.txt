@@ -22,3 +22,5 @@ Purdue - purdue.edu
 Imperial College - ic.ac.uk
 Imperial College - imperial.ac.uk
 Ecole Polytechnique - polytechnique.edu
+NTU - ntu.edu.sg
+NTU - e.ntu.edu.sg
