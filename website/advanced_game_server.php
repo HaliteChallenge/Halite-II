@@ -41,6 +41,7 @@
                             <li>C# - .cs</li>
                             <li>Rust - .toml (for your Cargo.toml) and .rs (for your Rust source)</li>
                             <li>Scala - .scala</li>
+                            <li>Ruby - .rb</li>
                         </ul>
                     </p>
 
@@ -71,6 +72,7 @@
                             <li>C# 6.0</li>
                             <li>Rust 1.10</li>
                             <li>Scala 2.10.4</li>
+                            <li>Ruby 2.3.1</li>
                         </ul>
                     </p>
 
