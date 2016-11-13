@@ -44,6 +44,20 @@
                 <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
                 <p>If you are on Unix, run <code>make</code> inside the extracted folder. The halite binary will now run the environment.</p>
                 <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
+
+                <h2>Local Visualizer</h2>
+                <p>The visualizer is on version <b>1.0</b>. This version of the visualizer was posted on November 12th.</p>
+                <p>
+                    <ul>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-win32-x64.zip">Windows 64 bit</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-mas-x64.zip">Mac 64 bit</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-linux-x64.zip">Linux 64 bit</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-darwin-x64.zip">Darwin 64 bit</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-linux-armv7l.zip">Linux armv7l</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-linux-ia32.zip">Linux 32 bit</a></li>
+                        <li><a href="downloads/visualizer/Halite-Visualizer-win32-ia32.zip">Win 32 bit</a></li>
+                    </ul>
+                </p>
             </div>
         </div>
     </div>
