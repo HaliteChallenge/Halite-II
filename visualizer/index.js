@@ -1,49 +1,47 @@
-'use strict';
-const electron = require('electron');
-
-const app = electron.app;
-
-// adds debug features like hotkeys for triggering dev tools and reload
-// require('electron-debug')();
-
-// prevent window being garbage collected
-let mainWindow;
-
-function onClosed() {
-    // dereference the window
-    // for multiple windows store them in an array
-    mainWindow = null;
-}
-
-function createMainWindow() {
-    const win = new electron.BrowserWindow({
-        width: 1200,
-        height: 800
-    });
-
-    win.loadURL(`file://${__dirname}/index.html`);
-    if (process.argv.length>2) {
-        mainWindow.webContents.on('did-finish-load', function() {
-            mainWindow.webContents.executeJavaScript(loadGame(proccess.argv[2])); // write the loadGame function later – may need to read file contents into stream
+$(function () {
+    const fs = require('fs');
+    var args = require('electron').remote.process.argv;
+    if (args.length > 2) {
+        fs.readFile(args[2], 'utf-8', function (err, data) {
+            if(err){
+              alert("An error ocurred reading the file :" + err.message);
+              return;
+            }
+            console.log(data)
+            showGame(textToGame(data, args[2]), $("#pageContent"), null, null, true, false, true);
         });
     }
-    win.on('closed', onClosed);
 
-    return win;
-}
+    var $dropZone = $("#dropZone");
+    var $filePicker = $("#filePicker");
+    function handleFiles(files) {
+        for(var i=0, file; file=files[i]; i++) {
+            console.log(file)
+            var reader = new FileReader();
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
+            reader.onload = (function(filename) { // finished reading file data.
+                return function(e2) {
+                    $dropZone.remove();
+                    showGame(textToGame(e2.target.result, filename), $("#pageContent"), null, null, true, false, true);
+                };
+            })(file.name);
+            reader.readAsText(file); // start reading the file data.
+        }
     }
-});
+    $("#pageContent").append($dropZone);
 
-app.on('activate', () => {
-    if (!mainWindow) {
-        mainWindow = createMainWindow();
-    }
-});
-
-app.on('ready', () => {
-    mainWindow = createMainWindow();
-});
+    $dropZone.on('dragover', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $dropZone.on('drop', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var files = e.originalEvent.dataTransfer.files; // Array of all files
+        handleFiles(files)
+    });
+    $filePicker.on('change', function(e) {
+        var files = e.target.files
+        handleFiles(files)
+    });
+})

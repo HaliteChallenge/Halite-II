@@ -1,4 +1,5 @@
 $(function () {
+    console.log(process)
     var $dropZone = $("#dropZone");
     var $filePicker = $("#filePicker");
     function handleFiles(files) {

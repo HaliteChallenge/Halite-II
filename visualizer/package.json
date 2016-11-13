@@ -1,5 +1,6 @@
 {
   "name": "hailte-visualizer",
+  "main": "main.js",
   "productName": "Halite-Visualizer",
   "version": "1.0.0",
   "description": "",
@@ -16,7 +17,7 @@
     "build": "./node_modules/electron-packager/cli.js . --out=dist --asar --overwrite --all"
   },
   "files": [
-    "index.js",
+    "main.js",
     "index.html",
     "./style/",
     "./script/",
