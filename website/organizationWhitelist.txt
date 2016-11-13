@@ -21,3 +21,5 @@ McGill - mail.mcgill.ca
 Purdue - purdue.edu
 Imperial College - ic.ac.uk
 Imperial College - imperial.ac.uk
+NTU - ntu.edu.sg
+NTU - e.ntu.edu.sg
