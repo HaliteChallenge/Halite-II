@@ -14,7 +14,7 @@
   "scripts": {
     "test": "xo",
     "start": "electron .",
-    "build": "mkdir -p downloads/ && cd downloads/ && electron-packager ../ --all --overwrite"
+    "build": "mkdir -p downloads/ && cd downloads/ && electron-packager ../ --all --overwrite && for i in */; do zip -r \"${i%/}.zip\" \"$i\"; done"
   },
   "files": [
     "main.js",
