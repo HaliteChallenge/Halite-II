@@ -1,4 +1,17 @@
 $(function () {
+    const fs = require('fs');
+    var args = require('electron').remote.process.argv;
+    if (args.length > 2) {
+        fs.readFile(args[2], 'utf-8', function (err, data) {
+            if(err){
+              alert("An error ocurred reading the file :" + err.message);
+              return;
+            }
+            console.log(data)
+            showGame(textToGame(data, args[2]), $("#pageContent"), null, null, true, false, true);
+        });
+    }
+
     var $dropZone = $("#dropZone");
     var $filePicker = $("#filePicker");
     function handleFiles(files) {
