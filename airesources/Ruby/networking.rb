@@ -66,7 +66,7 @@ class Networking
   end
 
   def init_map_production
-    @production = read_ints_from_input.each_slice(width).to_a
+    @production = read_ints_from_input
   end
 
   def init_map
