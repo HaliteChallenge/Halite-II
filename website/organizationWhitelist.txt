@@ -27,3 +27,4 @@ NTU - e.ntu.edu.sg
 Waterloo - edu.uwaterloo.ca
 Waterloo - uwaterloo.ca
 UC Berkeley - berkeley.edu
+EPFL - epfl.ch
