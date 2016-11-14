@@ -250,7 +250,7 @@ comp_args = {
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
                              ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
     "D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
-    "Go"            : [["6g", "-o", "_go_.6"],
+    "Go"            : [["go", "tool", "compile", "-o", "_go_.6"],
                              ["6l", "-o", BOT, "_go_.6"]],
     "Groovy"    : [["groovyc"],
                              ["jar", "cfe", BOT + ".jar", BOT]],
