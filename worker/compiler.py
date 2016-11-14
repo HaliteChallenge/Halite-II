@@ -330,7 +330,7 @@ languages = (
         [(["*.erl"], ExternalCompiler(["erlc"], out_ext=".beam"))]
     ),
     Language("Go", BOT +".go", "MyBot.go",
-        "go run MyBot.go",
+        "export GOPATH=\"$(pwd)\"; go run MyBot.go",
         [],
         [(["*.go"], ChmodCompiler("Go"))]
     ),
