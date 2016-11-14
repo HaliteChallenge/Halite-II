@@ -250,8 +250,6 @@ comp_args = {
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
                              ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
     "D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
-    "Go"            : [["go", "tool", "compile", "-o", "_go_.6"],
-                             ["go", "tool", "link", "-o", BOT, "_go_.6"]],
     "Groovy"    : [["groovyc"],
                              ["jar", "cfe", BOT + ".jar", BOT]],
     "Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
@@ -331,11 +329,10 @@ languages = (
         ["*.beam"],
         [(["*.erl"], ExternalCompiler(["erlc"], out_ext=".beam"))]
     ),
-    Language("Go", BOT, "MyBot.go",
-        "./MyBot",
-        ["*.8", "*.6", BOT],
-        [(["*.go"], ExternalCompiler(comp_args["Go"][0], out_files=['_go_.6'])),
-            ([""], ExternalCompiler(comp_args["Go"][1], out_files=['_go_.6']))]
+    Language("Go", BOT +".go", "MyBot.go",
+        "go run MyBot.go",
+        [],
+        [(["*.go"], ChmodCompiler("Go"))]
     ),
     Language("Groovy", BOT +".jar", "MyBot.groovy",
         "java -Xmx" + str(MEMORY_LIMIT) + "m -cp MyBot.jar:/usr/share/groovy/embeddable/groovy-all-1.7.5.jar MyBot",
