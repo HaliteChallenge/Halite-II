@@ -42,6 +42,7 @@
                             <li>Rust - .toml (for your Cargo.toml) and .rs (for your Rust source)</li>
                             <li>Scala - .scala</li>
                             <li>Ruby - .rb</li>
+                            <li>Go - .go</li>
                         </ul>
                     </p>
 
@@ -73,6 +74,7 @@
                             <li>Rust 1.10</li>
                             <li>Scala 2.10.4</li>
                             <li>Ruby 2.3.1</li>
+                            <li>Go 1.6</li>
                         </ul>
                     </p>
 
