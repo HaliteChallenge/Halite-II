@@ -78,6 +78,7 @@ CREATE TABLE `User` (
   `numGames` smallint(5) NOT NULL DEFAULT 0,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   `updateTime` datetime ON UPDATE CURRENT_TIMESTAMP,
+  `lastCompileTime` datetime DEFAULT NULL,
   PRIMARY KEY (`userID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
