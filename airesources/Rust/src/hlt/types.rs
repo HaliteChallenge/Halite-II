@@ -70,4 +70,8 @@ impl GameMap {
         let loc = self.get_location(l, d);
         &mut self.contents[loc.y as usize][loc.x as usize]
     }
+    pub fn get_site_ref(&self, l: Location, d: u8) -> &Site {
+        let loc = self.get_location(l, d);
+        &self.contents[loc.y as usize][loc.x as usize]
+    }
 }
