@@ -134,14 +134,14 @@ let init_size state tokens =
     let s = 
       List.fold_left (fun acc t -> acc ^ " " ^ t) " " tokens 
     in
-    failwith ("incorrect input for init_size " ^ s ^ "\n")
+    Debug.error ("incorrect input for init_size " ^ s ^ "\n")
 ;;
 
 let init_my_id state tokens =
   match tokens with
   | id :: [] ->
     state.my_id <- int_of_string id
-  | _ -> failwith ("incorrect input for init_my_id\n")
+  | _ -> Debug.error ("incorrect input for init_my_id\n")
 ;;
 
 let process_line bot state line =
