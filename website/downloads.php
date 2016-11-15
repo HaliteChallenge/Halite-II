@@ -21,7 +21,7 @@
                 <h3>Official Packages</h3>
                 <ul>
                     <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
-                    <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 8</a></li>
                     <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
                 </ul>
                 <h3>Community Packages</h3>

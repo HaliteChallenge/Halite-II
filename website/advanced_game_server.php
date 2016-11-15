@@ -49,7 +49,7 @@
                     <p>
                         The following compilers are used:
                         <ul>
-                            <li>Java - javac 1.7.0_101</li>
+                            <li>Java - javac 1.8.0_111</li>
                             <li>C++ - g++ 4.84</li>
                             <li>C# - mcs 4.6.1.0</li>
                             <li>Rust - rustc 1.10.0</li>
@@ -67,7 +67,7 @@
                     <p>
                         The following versions of each language are supported:
                         <ul>
-                            <li>Java 7</li>
+                            <li>Java 8</li>
                             <li>Python 3.4.3</li>
                             <li>C++ 11</li>
                             <li>C# 6.0</li>
