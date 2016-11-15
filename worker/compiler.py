@@ -253,7 +253,7 @@ comp_args = {
     "Groovy"    : [["groovyc"],
                              ["jar", "cfe", BOT + ".jar", BOT]],
     "Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-    "Java"        : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
+    "Java"        : [["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
     "Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
     "OCaml"     : [["ocamlbuild -lib unix", BOT + ".native"]],
     "Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
@@ -348,7 +348,7 @@ languages = (
     Language("Java", BOT +".java", "MyBot.java",
         "java MyBot",
         ["*.class", "*.jar"],
-        [(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:"))]
+        [(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:", out_files=["MyBot.class"]))]
     ),
     Language("Javascript", BOT +".js", "MyBot.js",
         "node MyBot.js",
