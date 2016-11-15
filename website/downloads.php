@@ -16,7 +16,7 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    This set of starter packages was uploaded on November 6th. We fixed a minor bug with the getDistance() method in the Python starter package.
+                    This set of starter packages was uploaded on November 13th. We uploaded a Go starter package.
                 </p>
                 <h3>Official Packages</h3>
                 <ul>
