@@ -199,13 +199,8 @@ let send_frame moves =
   List.iter (fun move ->
     Printf.printf "%s " (serialize_move move)
   ) moves;
-  Debug.debug "Moves: ";
-  List.iter (fun move ->
-    Debug.debug (Printf.sprintf "%s " (serialize_move move))
-  ) moves;
   Printf.printf "\n";
   flush stdout;
-  Debug.debug "\n";
 ;;
 
 let send_init name =
