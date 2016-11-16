@@ -23,17 +23,18 @@
                 <div class="col-sm-12">
                     <div id="forms">
                         <h1>One Last Step...</h1>
-                        <h4>You need to select your preferred email. We use your email to identify your organization (your university or your employer), using the domain of your email. We also send notifications about compilation errors to that email address.</h4>
+                        <h4>You need to select your preferred email.</h4>
+                        <h4>We use the domain of your email to identify your "Organization" (your university or your employer). We will email you about events like compilation errors. You can opt out of these at any time.</h4>
 
                         <div style="margin-top: 20px; margin-bottom: 20px;">
-                            <h4>Option 1: use your github's email, <b><span id="emailLoc"></span></b></h4>
-                            <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
+                            <h4><b>Option 1:</b> use your github's email, <b><span id="emailLoc"></span></b></h4>
+                            <button id="githubSubmitButton" class="btn btn-primary">Select</button>
                         </div>
 
                         <div>
-                            <h4>Option 2: choose a new email</h4>
-                            <input class="form-control" type="email" placeholder="Email" style="margin-bottom: 0px" id="firstField">
-                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10px" id="secondField">
+                            <h4><b>Option 2:</b> choose a new email</h4>
+                            <input class="form-control" type="email" placeholder="Email" style="margin-bottom: 0px; max-width: 400px;" id="firstField">
+                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10px; max-width: 400px;" id="secondField">
                             <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
