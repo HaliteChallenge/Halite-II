@@ -8,6 +8,11 @@
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
+    <style>
+        h4 {
+            font-weight: 400;
+        }
+    </style>
 </head>
 
 <body>
@@ -17,18 +22,24 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div id="forms">
-                        <h1>Email Selection</h1>
-                        <h3>Use your github's email: <b><span id="emailLoc"></span></b>?</h3>
-                        <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
+                        <h1>One Last Step...</h1>
+                        <h4>You need to select your preferred email. We use your email to identify your organization (your university or your employer), using the domain of your email. We also send notifications about compilation errors to that email address.</h4>
 
-                        <h3>Or, choose a custom email:</h3>
-                        <input class="form-control" type="email" placeholder="Email" id="firstField">
-                        <input class="form-control" type="email" placeholder="Confirm Email" id="secondField">
-                        <button id="customSubmitButton" class="btn btn-primary">Submit</button>
+                        <div style="margin-top: 20px; margin-bottom: 20px;">
+                            <h4>Option 1: use your github's email, <b><span id="emailLoc"></span></b></h4>
+                            <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
+                        </div>
+
+                        <div>
+                            <h4>Option 2: choose a new email</h4>
+                            <input class="form-control" type="email" placeholder="Email" style="margin-bottom: 0px" id="firstField">
+                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10px" id="secondField">
+                            <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
                     <div id="waitMessage" style="display: none;">
-                        <h2>We are waiting for you to verify your email. If you have already verified your email, head to our <a href="index.php">hompeage</a>.</h2>
+                        <h2>We've sent you a verification email and are waiting for you to click the link in it. If you've already verified your email, head to our <a href="index.php">homepage</a>.</h2>
+                        <h4>If you are having problems with registration, please email us at halite@halite.io.</h4>
                     </div>
                 </div>
             </div>
