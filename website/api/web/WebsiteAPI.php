@@ -124,7 +124,7 @@ class WebsiteAPI extends API{
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'", $_GET['userID'] == $_SESSION['userID']);
             if(count($results) > 0) return $results[0];
             else return null;
         } 

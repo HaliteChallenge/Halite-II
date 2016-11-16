@@ -6,6 +6,8 @@ $(function() {
             this.email = email;
             this.submitCallback = submitCallback;
             this.$submitButton.click(this, this.submitCallback.bind(this));         
+
+            this.render();
         },
         render: function() {
             this.$emailLoc.html(this.email);
@@ -16,6 +18,7 @@ $(function() {
         $firstField: $("#firstField"),
         $secondField: $("#secondField"),
         $messageBox: $("#messageBox"),
+        $submitButton: $("#customSubmitButton"),
         init: function(submitCallback) {
             this.submitCallback = submitCallback;
             this.$submitButton.click(this, this.onClick.bind(this));         
@@ -37,11 +40,12 @@ $(function() {
         }
     }
 
-    var user = getUser(getSession());
+    var user = getUser(getSession()['userID']);
+    console.log(user);
     //if(user == null) window.location.href = "index.php";
     if(parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
-        $("#forms").style("display", "none");
-        $("#waitMessage").style("display", "block");
+        $("#forms").css("display", "none");
+        $("#waitMessage").css("display", "block");
     }
 
     githubEmailForm.init(user.email, function() {
