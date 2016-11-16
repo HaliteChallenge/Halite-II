@@ -164,11 +164,9 @@ class WebsiteAPI extends API{
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
-
                 $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
                 $this->insert("INSERT INTO User (username, email, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
-
             }
 
             if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
@@ -212,7 +210,7 @@ class WebsiteAPI extends API{
     protected function emailList() {
         $user = $this->getLoggedInUser();
         if($user == null) {
-            $callbackURL = urlencode(WEB_DOMAIN."api/web/unsubscribe");
+            $callbackURL = urlencode(WEB_DOMAIN."api/web/emailList".$_SERVER['QUERY_STRING']);
             header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
         }
 

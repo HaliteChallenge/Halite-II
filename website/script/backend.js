@@ -247,7 +247,7 @@ function validateEmail() {
         url: url+"email",
         async: false,
         method: "GET",
-        {validate: 1}
+        data: {validate: 1}
     }).responseJSON;
 }
 
@@ -256,6 +256,6 @@ function newEmail(email) {
         url: url+"email",
         async: false,
         method: "GET",
-        {newEmail: email}
+        data: {newEmail: email}
     }).responseJSON;
 }

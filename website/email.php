@@ -16,13 +16,19 @@
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
-                    <h1>Email Selection</h1>
-                    <p>Use the email <span id="emailLoc"></span>?<p/>
-                    <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
+                    <div id="forms">
+                        <h1>Email Selection</h1>
+                        <h3>Use the email <span id="emailLoc"></span>?</h3>
+                        <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
 
-                    <input class="form-control" type="email" placeholder="Email" id="firstField">
-                    <input class="form-control" type="email" placeholder="Confirm Email" id="secondField">
-                    <button id="customSubmitButton" class="btn btn-primary">Submit</button>
+                        <h3>Or, choose a custom email:</h3>
+                        <input class="form-control" type="email" placeholder="Email" id="firstField">
+                        <input class="form-control" type="email" placeholder="Confirm Email" id="secondField">
+                        <button id="customSubmitButton" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                    <div id="waitMessage" style="display: none;">
+                        <h2>We are waiting for you to verify your email. If you have already verified your email, head to our <a href="index.php">hompeage</a>.</h2>
                     </div>
                 </div>
             </div>

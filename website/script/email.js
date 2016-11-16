@@ -38,11 +38,15 @@ $(function() {
     }
 
     var user = getUser(getSession());
-    //TODO: if(user == null) window.location.href = "index.php";
+    //if(user == null) window.location.href = "index.php";
+    if(parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
+        $("#forms").style("display", "none");
+        $("#waitMessage").style("display", "block");
+    }
 
     githubEmailForm.init(user.email, function() {
         validateEmail();
-        window.location.href = "index.php";
+        //window.location.href = "index.php";
     });
     customEmailForm.init(function(email) {
         newEmail(email);
