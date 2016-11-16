@@ -27,9 +27,9 @@ $(function() {
             this.$emailLoc.html(this.email);
         },
         onClick: function() {
-            if(this.$firstField.val() != this.secondField.val()) {
+            if(this.$firstField.val() != this.$secondField.val()) {
                 this.displayMessage("Email Mismatch", "The two emails that you entered do not match.", false);
-            } else if(this.$firstField.val() == "" || this.secondField.val() == "") {
+            } else if(this.$firstField.val() == "" || this.$secondField.val() == "") {
                 this.displayMessage("Empty Fields", "Please fill your email twice in the boxes below.", false);
             } else {
                 this.submitCallback(this.$firstField.val());
@@ -48,9 +48,9 @@ $(function() {
         $("#waitMessage").css("display", "block");
     }
 
-    githubEmailForm.init(user.email, function() {
+    githubEmailForm.init(user.githubEmail, function() {
         validateEmail();
-        //window.location.href = "index.php";
+        window.location.href = "index.php?emailSelect=1";
     });
     customEmailForm.init(function(email) {
         newEmail(email);

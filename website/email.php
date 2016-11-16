@@ -18,7 +18,7 @@
                 <div class="col-sm-12">
                     <div id="forms">
                         <h1>Email Selection</h1>
-                        <h3>Use the email <span id="emailLoc"></span>?</h3>
+                        <h3>Use your github's email: <b><span id="emailLoc"></span></b>?</h3>
                         <button id="githubSubmitButton" class="btn btn-primary">Yes</button>
 
                         <h3>Or, choose a custom email:</h3>
