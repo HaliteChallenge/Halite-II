@@ -179,6 +179,16 @@ let read_lines bot state =
   done
 ;;
 
+let get_init bot state =
+  let finished = ref false in
+  while not !finished do
+    let line = read_line () in
+      process_line bot state line;
+      if !all_init_done then
+        finished := true
+  done
+;;
+
 (* End input section *)
 
 (* output section *)
@@ -381,6 +391,7 @@ let run_bot bot =
 
   begin try
    (
+     get_init bot game_state;
      read_lines bot game_state
    )
   with exc ->
