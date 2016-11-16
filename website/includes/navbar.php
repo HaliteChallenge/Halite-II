@@ -1,21 +1,3 @@
-<?php
-session_start();
-if(isset($_SESSION['userID'])) {
-    $config = parse_ini_file("../halite.ini", true);
-    $mysqli = new mysqli($config['database']['hostname'],
-        $config['database']['username'],
-        $config['database']['password'],
-        $config['database']['name']);
-
-    if (mysqli_connect_errno()) {
-        echo "<br><br>There seems to be a problem with our database. Reload the page or try again later.";
-        exit();
-    }
-    if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isEmailGood=0"))) > 0) {
-        header("Location: email.php");
-    }
-}
-?>
 <nav class="navbar navbar-default" id="navvy">
     <div class="container-fluid">
         <div class="navbar-header">
