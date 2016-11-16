@@ -34,7 +34,7 @@
                         <div>
                             <h4><b>Option 2:</b> choose a new email</h4>
                             <input class="form-control" type="email" placeholder="Email" style="margin-bottom: 0px; max-width: 400px;" id="firstField">
-                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10px; max-width: 400px;" id="secondField">
+                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10.5px; max-width: 400px;" id="secondField">
                             <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
