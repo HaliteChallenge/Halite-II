@@ -65,7 +65,7 @@ CREATE TABLE `User` (
   `oauthID` int(12) unsigned NOT NULL,
   `oauthProvider` tinyint(1) unsigned NOT NULL,
   `username` varchar(32) NOT NULL,
-  `email` varchar(64) NOT NULL,
+  `email` varchar(64),
   `githubEmail` varchar(64),
   `verificationCode` varchar(64),
   `onEmailList` tinyint(1) NOT NULL DEFAULT 1,
