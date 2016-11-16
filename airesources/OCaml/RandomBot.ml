@@ -5,10 +5,10 @@
 open Td;;
 
 let mybot_function state =
-  if not !Halite.sent_init then
+  if not !Halite.sent_init then (
     (* Setup turn, put setup logic here *)
     Halite.send_init "RandomOCamlBot"
-  else (
+  ) else (
     (* put normal game logic here, replacing the random-bot code below *)
     let moves = ref [] in
     Array.iteri (fun ir row -> Array.iteri (fun ic site ->
