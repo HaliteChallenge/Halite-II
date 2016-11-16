@@ -241,3 +241,21 @@ function getNotifications() {
         method: "GET"
     }).responseJSON;
 }
+
+function validateEmail() {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        {validate: 1}
+    }).responseJSON;
+}
+
+function newEmail(email) {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        {newEmail: email}
+    }).responseJSON;
+}

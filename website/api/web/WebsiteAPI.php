@@ -70,7 +70,11 @@ class WebsiteAPI extends API{
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
         foreach($users as &$user) {
-            if($privateInfo == false) unset($user['email']);
+            if($privateInfo == false) {
+                unset($user['email']);
+                unset($user['githubEmail']);
+                unset($user['verificationCode']);
+            }
             
             if(intval($user['isRunning']) == 1) {
                 $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
@@ -88,6 +92,17 @@ class WebsiteAPI extends API{
 
     private function getLoggedInUser() {
         if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
+    }
+
+    private function getOrganizationForEmail($email) {
+        $emailDomain = explode('@', $email)[1];
+        $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
+        foreach($rows as $row) {
+            $components = explode(" - ", $row);
+            if(strcmp($components[1], $emailDomain) == 0) {
+                return $components[0];
+            }
+        }
     }
 
 
@@ -149,21 +164,9 @@ class WebsiteAPI extends API{
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
-                $organization = "Other";
-                if($email != NULL) {
-                    $emailDomain = explode('@', $email)[1];
-                    $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
-                    foreach($rows as $row) {
-                        $components = explode(" - ", $row);
-                        if(strcmp($components[1], $emailDomain) == 0) {
-                            $organization = $components[0];
-                            break;
-                        }
-                    }
-                }
 
                 $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-                $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
+                $this->insert("INSERT INTO User (username, email, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
 
             }
@@ -172,6 +175,34 @@ class WebsiteAPI extends API{
             else header("Location: ".WEB_DOMAIN);
             die();
         } 
+    }
+
+    /* Email Endpoint
+     *
+     * Hitting this endpoint allows a user to handle the choosing of their email. 
+     */
+    protected function email() {
+        $user = $this->getLoggedInUser();
+
+        if($user != null && isset($_GET['validate'])) {
+            $organization = $this->getOrganizationForEmail($user["githubEmail"]);
+            $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
+        } else if($user != null && isset($_GET['newEmail'])) {
+            $verificationCode = rand(0, 9999999999);
+            $this->insert("UPDATE User SET email='{$_GET['newEmail']}', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+
+            $sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
+        } else if(isset($_GET['verificationCode'])) {
+            if($user == null) {
+                $callbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
+                header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+            }
+
+            $organization = $this->getOrganizationForEmail($user["email"]);
+            $this->insert("UPDATE User SET isEmailGood=1, organization='$organization' WHERE userID = {$user['userID']}");
+        } 
+
+        die();
     }
 
     /* Email List Endpoint
