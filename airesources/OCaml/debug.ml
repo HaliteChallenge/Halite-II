@@ -14,7 +14,7 @@ let error s =
   flush out_chan
 ;;
 
-(* Replace the functions above with these to silence all output 
+(* Replace the functions above with these to silence all logging
 
 let debug s = () ;;
 

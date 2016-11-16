@@ -189,6 +189,13 @@ let get_init bot state =
   done
 ;;
 
+let get_frame bot state =
+  (* This function is not needed - the bot function is supplied with an 
+     up-to-date game state when it's called at the start of every turn.
+  *)
+  state
+;;
+
 (* End input section *)
 
 (* output section *)
