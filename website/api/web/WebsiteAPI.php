@@ -190,7 +190,7 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email='{$_GET['newEmail']}', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
             $user["email"] = $_GET["newEmail"];
 
-            $sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
+            $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
                 $callbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
