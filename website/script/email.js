@@ -26,7 +26,7 @@ $(function() {
     }
 
     var user = getUser(getSession()['userID']);
-    //if(user == null) window.location.href = "index.php";
+    if(user == null) window.location.href = "index.php";
     if(parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
         $("#forms").css("display", "none");
         $("#waitMessage").css("display", "block");
