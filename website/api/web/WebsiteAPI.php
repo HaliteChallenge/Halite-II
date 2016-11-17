@@ -194,8 +194,9 @@ class WebsiteAPI extends API{
             $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
-                $callbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
-                header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+                $emailCallbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
+                $githubCallbackURL = urlencode(WEB_DOMAIN."api/web/user?githubCallback=1&redirectURL={$emailCallbackURL}");
+                header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
                 die();
             }
 
@@ -218,8 +219,9 @@ class WebsiteAPI extends API{
     protected function emailList() {
         $user = $this->getLoggedInUser();
         if($user == null) {
-            $callbackURL = urlencode(WEB_DOMAIN."api/web/emailList".$_SERVER['QUERY_STRING']);
-            header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+            $emailCallbackURL = urlencode(WEB_DOMAIN."api/web/emailList?".$_SERVER['QUERY_STRING']);
+            $githubCallbackURL = urlencode(WEB_DOMAIN."api/web/user?githubCallback=1&redirectURL={$emailCallbackURL}");
+            header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
         }
 
         if(isset($_GET['unsubscribe'])) {
