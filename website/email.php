@@ -17,12 +17,12 @@
 
 <body>
     <div class="container">
-        <div id="messageBox"></div>
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
                     <div id="forms">
                         <h1>One Last Step...</h1>
+                        <div id="messageBox"></div>
                         <h4>You need to enter your preferred email.</h4>
                         <h4>We use the domain of your email to identify your "Organization" (your university or your employer). We will email you about events like compilation errors. You can opt out of these at any time.</h4>
 
@@ -31,8 +31,8 @@
                         <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                     </div>
                     <div id="waitMessage" style="display: none;">
-                        <h2>We've sent you a verification email and are waiting for you to click the link in it. If you've already verified your email, head to our <a href="index.php">homepage</a>.</h2>
-                        <h4>If you are having problems with registration, please email us at halite@halite.io.</h4>
+                        <h2>We've sent you a verification email and are waiting for you to click the link in it.</h2>
+                        <h4>If you've already verified your email, head to our <a href="index.php">homepage</a>. If you're having problems with registration, please email us at halite@halite.io.</h4>
                     </div>
                 </div>
             </div>
