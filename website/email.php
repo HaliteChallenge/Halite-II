@@ -24,7 +24,7 @@
                         <h1>One Last Step...</h1>
                         <div id="messageBox"></div>
                         <h4>You need to enter your preferred email.</h4>
-                        <h4>We use the domain of your email to identify your "Organization" (your university or your employer). We will email you about events like compilation errors. You can opt out of these at any time.</h4>
+                        <h4>We’ll use the domain of your email address to identify your university or company so you can easily see how you rank against others in your organization. We’ll also email you about bot submission events like compilation errors. You can opt out of these at any time.</h4>
 
                         <input class="form-control" type="email" placeholder="Email" style="margin-top: 20px; max-width: 400px;" id="firstField">
                         <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10.5px; max-width: 400px;" id="secondField">
