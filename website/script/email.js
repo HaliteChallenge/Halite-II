@@ -1,19 +1,4 @@
 $(function() {
-    var githubEmailForm = {
-        $submitButton: $("#githubSubmitButton"),
-        $emailLoc: $("#emailLoc"),
-        init: function(email, submitCallback) {
-            this.email = email;
-            this.submitCallback = submitCallback;
-            this.$submitButton.click(this, this.submitCallback.bind(this));         
-
-            this.render();
-        },
-        render: function() {
-            this.$emailLoc.html(this.email);
-        }
-    }
-
     var customEmailForm = {
         $firstField: $("#firstField"),
         $secondField: $("#secondField"),
@@ -41,17 +26,12 @@ $(function() {
     }
 
     var user = getUser(getSession()['userID']);
-    console.log(user);
     //if(user == null) window.location.href = "index.php";
     if(parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
         $("#forms").css("display", "none");
         $("#waitMessage").css("display", "block");
     }
 
-    githubEmailForm.init(user.githubEmail, function() {
-        validateEmail();
-        window.location.href = "index.php?emailSelect=1";
-    });
     customEmailForm.init(function(email) {
         newEmail(email);
         location.reload();

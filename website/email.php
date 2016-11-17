@@ -23,20 +23,12 @@
                 <div class="col-sm-12">
                     <div id="forms">
                         <h1>One Last Step...</h1>
-                        <h4>You need to select your preferred email.</h4>
+                        <h4>You need to enter your preferred email.</h4>
                         <h4>We use the domain of your email to identify your "Organization" (your university or your employer). We will email you about events like compilation errors. You can opt out of these at any time.</h4>
 
-                        <div style="margin-top: 20px; margin-bottom: 20px;">
-                            <h4><b>Option 1:</b> use your github's email, <b><span id="emailLoc"></span></b></h4>
-                            <button id="githubSubmitButton" class="btn btn-primary">Select</button>
-                        </div>
-
-                        <div>
-                            <h4><b>Option 2:</b> choose a new email</h4>
-                            <input class="form-control" type="email" placeholder="Email" style="margin-bottom: 0px; max-width: 400px;" id="firstField">
-                            <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10.5px; max-width: 400px;" id="secondField">
-                            <button id="customSubmitButton" class="btn btn-primary">Submit</button>
-                        </div>
+                        <input class="form-control" type="email" placeholder="Email" style="margin-top: 20px; max-width: 400px;" id="firstField">
+                        <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10.5px; max-width: 400px;" id="secondField">
+                        <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                     </div>
                     <div id="waitMessage" style="display: none;">
                         <h2>We've sent you a verification email and are waiting for you to click the link in it. If you've already verified your email, head to our <a href="index.php">homepage</a>.</h2>
