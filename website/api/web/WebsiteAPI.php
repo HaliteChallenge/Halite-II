@@ -165,7 +165,7 @@ class WebsiteAPI extends API{
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
                 $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-                $this->insert("INSERT INTO User (username, email, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
+                $this->insert("INSERT INTO User (username, email, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
             }
 
@@ -188,6 +188,7 @@ class WebsiteAPI extends API{
         } else if($user != null && isset($_GET['newEmail'])) {
             $verificationCode = rand(0, 9999999999);
             $this->insert("UPDATE User SET email='{$_GET['newEmail']}', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            $user["email"] = $_GET["newEmail"];
 
             $sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
         } else if(isset($_GET['verificationCode'])) {
