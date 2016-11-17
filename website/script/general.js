@@ -169,8 +169,8 @@ $(function() {
     if(getGET("subscribeEmails")) {
         messageBox.alert("Subscribed", "You have subscribed to all halite emails!", true)
     }
-    if(getGET("emailSelect")) {
-        messageBox.alert("Email Selection", "You have successfully selected your email.", true)
+    if(getGET("emailVerification")) {
+        messageBox.alert("Email Verification", "You have successfully verified your email.", true)
     }
 
     var session = getSession();
