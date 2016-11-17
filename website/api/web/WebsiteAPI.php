@@ -103,6 +103,7 @@ class WebsiteAPI extends API{
                 return $components[0];
             }
         }
+        return "Other";
     }
 
 
