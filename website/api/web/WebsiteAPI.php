@@ -165,7 +165,7 @@ class WebsiteAPI extends API{
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
                 $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-                $this->insert("INSERT INTO User (username, email, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
+                $this->insert("INSERT INTO User (username, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
             }
 
