@@ -196,6 +196,7 @@ class WebsiteAPI extends API{
             if($user == null) {
                 $callbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
                 header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+                die();
             }
 
             if(strcmp($user['verificationCode'], $_GET['verificationCode']) != 0) {
@@ -206,9 +207,8 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET isEmailGood=1, organization='$organization' WHERE userID = {$user['userID']}");
 
             header("Location: ".WEB_DOMAIN."index.php?emailVerification=1");
+            die();
         } 
-
-        die();
     }
 
     /* Email List Endpoint
