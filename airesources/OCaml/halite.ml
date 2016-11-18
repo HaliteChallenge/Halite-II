@@ -144,11 +144,10 @@ let init_my_id state tokens =
   | _ -> Debug.error ("incorrect input for init_my_id\n")
 ;;
 
-let process_line bot state line =
+let process_line state line =
   let tokens = split_char ' ' (String.trim line) in
     if !all_init_done then (
       deserialize_map state tokens;
-      bot state;
     ) else if not !init_my_id_done then (
       init_my_id state tokens;
       init_my_id_done := true;
@@ -165,35 +164,32 @@ let process_line bot state line =
       deserialize_map state tokens;
       init_map_done := true;
       all_init_done := true;
-      bot state;
     )
 
     else Debug.error "Impossible condition: all_init_done not set when all init done"
 
 ;;
 
+let get_frame state =
+  let line = read_line () in
+    process_line state line
+;;
+
 let read_lines bot state =
   while true do
     let line = read_line () in
-      process_line bot state line;
+      process_line state line;
   done
 ;;
 
-let get_init bot state =
+let get_init state =
   let finished = ref false in
   while not !finished do
     let line = read_line () in
-      process_line bot state line;
+      process_line state line;
       if !all_init_done then
         finished := true
   done
-;;
-
-let get_frame bot state =
-  (* This function is not needed - the bot function is supplied with an 
-     up-to-date game state when it's called at the start of every turn.
-  *)
-  state
 ;;
 
 (* End input section *)
@@ -320,18 +316,6 @@ let direction_of_int = function
 | n -> failwith ("Invalid direction_of_int: " ^ (string_of_int n) ^ "\n")
 ;;
 
-let random_move state row col =
-  let dir = direction_of_int (Random.int 5) in
-  let loc = {
-    row = row;
-    col = col;
-  } in
-    {
-      loc = loc;
-      direction = dir;
-    }
-;;
-
 let debug_block state f =
   Array.iter (fun row ->
     Debug.debug "\n";
@@ -387,28 +371,6 @@ let init () =
    }
   in
     state 
-;;
-
-let feed_bot bot state line =
-  process_line bot state line;
-;;
-
-let run_bot bot =
-  let game_state = init () in
-
-  begin try
-   (
-     get_init bot game_state;
-     read_lines bot game_state
-   )
-  with exc ->
-   (
-    debug (Printf.sprintf
-       "Exception in turn %d :\n" game_state.round);
-    debug (Printexc.to_string exc);
-    raise exc
-   )
-  end;
 ;;
 
 
