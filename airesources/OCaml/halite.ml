@@ -174,6 +174,7 @@ let process_line state line =
 ;;
 
 let get_frame state =
+  state.round <- state.round + 1;
   let line = read_line () in
     process_line state line
 ;;
