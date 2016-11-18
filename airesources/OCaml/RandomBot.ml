@@ -41,7 +41,7 @@ let mybot_function state =
     Debug.debug (Printf.sprintf
        "Exception in turn %d :\n" state.round);
     Debug.debug (Printexc.to_string exc);
-    raise exc (* remove this to make it try to continue after an exception *)
+    raise exc
    )
   end;
 ;;
