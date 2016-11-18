@@ -66,21 +66,24 @@ let split_char sep str =
   aux 0 []
 ;;
 
-let set_owner state coord owner =
+let 2d_of_1d state coord =
   let row = coord / state.game_map.width in
   let col = coord mod state.game_map.width in
+    row, col
+;;
+
+let set_owner state coord owner =
+  let row, col = 2d_of_1d state coord in
     state.game_map.contents.(row).(col).owner <- owner
 ;;
 
 let set_strength state coord v =
-  let row = coord / state.game_map.width in
-  let col = coord mod state.game_map.width in
+  let row, col = 2d_of_1d state coord in
     state.game_map.contents.(row).(col).strength <- v
 ;;
 
 let set_production state coord v =
-  let row = coord / state.game_map.width in
-  let col = coord mod state.game_map.width in
+  let row, col = 2d_of_1d state coord in
     state.game_map.contents.(row).(col).production <- v
 ;;
 

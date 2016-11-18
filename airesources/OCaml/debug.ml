@@ -2,7 +2,7 @@
    This code is public domain. There is no warranty.
  *)
 
-let out_chan = (* stderr *) open_out "mybot_err.log" ;;
+let out_chan = open_out "mybot_err.log" ;;
 
 let debug s = 
   output_string out_chan s; 
@@ -16,9 +16,11 @@ let error s =
 
 (* Replace the functions above with these to silence all logging
 
+let out_chan = stdout;;
+
 let debug s = () ;;
 
 let error s = () ;;
 
-*)
+* )
 
