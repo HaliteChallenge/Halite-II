@@ -288,11 +288,13 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                 for(var b = 0; b < game.width; b++) {
                     var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
                     if(site.strength == 255) mapGraphics.lineStyle(1, '0xfffff0');
-                    mapGraphics.beginFill(game.players[site.owner].color);
-                    var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
+                    if(site.strength != 0) mapGraphics.beginFill(game.players[site.owner].color);
+                    var pw = rw * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2
+                    var ph = rh * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2;
                     var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
                     var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
                     var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
+                    if(site.strength == 0 && move != 0) mapGraphics.lineStyle(1, '0x888888')
                     var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
                     var pts = new Array();
                     const squarescale = 0.75;
@@ -301,8 +303,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     pts.push(new PIXI.Point(center.x - squarescale * pw, center.y - squarescale * ph));
                     pts.push(new PIXI.Point(center.x - squarescale * pw, center.y + squarescale * ph));
                     mapGraphics.drawPolygon(pts);
-                    mapGraphics.endFill();
-                    if(site.strength == 255) mapGraphics.lineStyle(0, '0xffffff');
+                    if(site.strength != 0) mapGraphics.endFill();
+                    mapGraphics.lineStyle(0, '0xffffff');
                     loc++;
                     sX++;
                     if(sX == game.width) sX = 0;
