@@ -224,7 +224,7 @@ $(function() {
 
             profileCard.init(user);
             gameTable.init(parseInt(user["userID"]), isMe, function(userID, startingID) {
-                var rawGames = getLatestGamesForUser(userID, 10, startingID); 
+                var rawGames = getLatestGamesForUser(userID, 5, startingID); 
                 var games = [];
                 for(var a = 0; a < rawGames.length; a++) {
                     games.push(rawGames[a]);
