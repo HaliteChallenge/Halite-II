@@ -64,4 +64,5 @@ California Polytechnic - calpoly.edu
 Grand Valley State University - gvsu.edu
 UC Santa Cruz - ucsc.edu
 UT San Antonio - utsa.edu
+UT San Antonio - my.utsa.edu
 UC Davis - ucdavis.edu
