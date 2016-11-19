@@ -280,15 +280,7 @@ class WebsiteAPI extends API{
                 $gameID = $gameArray['gameID'];
 
                 // Get information about users
-                $gameArray['users'] = $this->selectMultiple("SELECT userID, errorLogName, rank FROM GameUser WHERE gameID = $gameID");
-                foreach($gameArray['users'] as &$gameUserRow) {
-                    // Get rid of gameID
-                    unset($gameUserRow['gameID']);
-
-                    // Add in user info
-                    $userInfo = $this->select("SELECT username, oauthID FROM User WHERE userID = {$gameUserRow['userID']}");
-                    foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
-                }
+                $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
             }
             return $gameArrays;
         } 
