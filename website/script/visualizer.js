@@ -291,10 +291,11 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     if(site.strength != 0) mapGraphics.beginFill(game.players[site.owner].color);
                     var pw = rw * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2
                     var ph = rh * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2;
-                    var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
+                    var direction = game.moves[frame][Math.floor(loc / game.width)][loc % game.width]
+                    var move = t > 0 ? direction : 0;
                     var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
                     var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
-                    if(site.strength == 0 && move != 0) mapGraphics.lineStyle(1, '0x888888')
+                    if(site.strength == 0 && direction != 0) mapGraphics.lineStyle(1, '0x888888')
                     var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
                     var pts = new Array();
                     const squarescale = 0.75;
