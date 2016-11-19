@@ -2,9 +2,7 @@ $(function() {
     var profileCard = {
         $profileImage: $("#profileImage"),
         $name: $("#name"),
-        $primaryInfo: $("#primaryInfo"),
-        $secondaryInfo: $("#secondaryInfo"),
-        init: function(user) {
+        $primaryInfo: $("#primaryInfo"), $secondaryInfo: $("#secondaryInfo"), init: function(user) {
             this.user = user;
 
             this.render();

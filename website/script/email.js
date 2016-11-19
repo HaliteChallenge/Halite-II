@@ -19,7 +19,7 @@ $(function() {
             } else if(this.$firstField.val() == "" || this.$secondField.val() == "") {
                 this.displayMessage("Empty Fields", "Please fill your email twice in the boxes below.", false);
             } else {
-                this.displayMessage("Success", "We've sent a verification email to "+this.$firstField.val()+".", false);
+                this.displayMessage("Success", "We've sent a verification email to "+this.$firstField.val()+".", true);
                 this.submitCallback(this.$firstField.val());
             }
         },
