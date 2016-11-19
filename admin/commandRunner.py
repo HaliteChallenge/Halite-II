@@ -16,7 +16,6 @@ cursor = db.cursor()
 cursor.execute("select * from Worker")
 workers = cursor.fetchall()
 
-
 command = sys.argv[1]
 for worker in workers:
     print("########"+worker['ipAddress']+"########")
