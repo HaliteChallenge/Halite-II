@@ -86,7 +86,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             strText.anchor = new PIXI.Point(0, 1);
             strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
             stage.addChild(strText);
-            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
+            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 40).toString() + 'px Arial', fill: 0xffffff });
             infoText.anchor = new PIXI.Point(0, 1);
             infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
             stage.addChild(infoText);
@@ -354,6 +354,10 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     str = game.frames[frame][y][x].strength;
                     prod = game.productions[y][x];
                     infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
+                    if(game.frames[frame][y][x].owner != 0) {
+                        move = "0NESW"[game.moves[frame][y][x]];
+                        infoText.text += ' | Mv: ' + move.toString();
+                    }
                 }
                 else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
                     frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
