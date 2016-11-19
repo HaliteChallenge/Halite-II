@@ -67,3 +67,11 @@ UT San Antonio - utsa.edu
 UT San Antonio - my.utsa.edu
 UC Davis - ucdavis.edu
 Exeter College - exe-coll.ac.uk
+Quantworks - quantworks.com
+Epitech - epitech.eu
+IST - tecnico.ulisboa.pt
+Amazon - amazon.de
+Amazon - amazon.com
+Academy for Science and Design - asdnh.org
+KTH - kth.se
+Horace Mann - horacemann.org
