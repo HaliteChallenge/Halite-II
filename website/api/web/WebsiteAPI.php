@@ -273,13 +273,11 @@ class WebsiteAPI extends API{
             $userID = intval($_GET['userID']);
             $versionNumber = isset($_GET['versionNumber']) ? intval($_GET['versionNumber']) : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
-            $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and versionNumber = $versionNumber and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
-            $gameArrays = array();
+            $gameArrays = $this->selectMultiple("SELECT g.* FROM GameUser gu INNER JOIN Game g ON g.gameID = gu.gameID WHERE gu.userID = $userID and gu.versionNumber = $versionNumber and gu.gameID < $startingID ORDER BY gu.gameID DESC LIMIT $limit");
 
             // Get each game's info
-            foreach ($gameIDArrays as $gameIDArray) {
-                $gameID = $gameIDArray['gameID'];
-                $gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
+            foreach ($gameArrays as &$gameArray) {
+                $gameID = $gameArray['gameID'];
 
                 // Get information about users
                 $gameArray['users'] = $this->selectMultiple("SELECT userID, errorLogName, rank FROM GameUser WHERE gameID = $gameID");
@@ -291,7 +289,6 @@ class WebsiteAPI extends API{
                     $userInfo = $this->select("SELECT username, oauthID FROM User WHERE userID = {$gameUserRow['userID']}");
                     foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
                 }
-                array_push($gameArrays, $gameArray);
             }
             return $gameArrays;
         } 
