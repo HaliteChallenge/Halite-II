@@ -1,8 +1,14 @@
 import pymysql
+import threading
 import configparser
 import sys
 import os
 import os.path
+
+def runOnWorker(worker, keyPath, command):
+    print("########"+worker['ipAddress']+"########")
+    os.system("ssh -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
+    print("################\n")
 
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
@@ -17,7 +23,19 @@ cursor.execute("select * from Worker")
 workers = cursor.fetchall()
 
 command = sys.argv[1]
-for worker in workers:
-    print("########"+worker['ipAddress']+"########")
-    os.system("ssh -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
-    print("################\n")
+
+isAsync = False if len(sys.argv) < 3 else int(sys.argv[2]) == 1
+
+if isAsync:
+    threads = []
+    for worker in workers:
+        t = threading.Thread(target=runOnWorker, args = (worker, keyPath, command))
+        t.daemon = True
+        t.start()
+        threads.append(t)
+
+    for t in threads:
+        t.join()
+else:
+    for worker in workers:
+        runOnWorker(worker, keyPath, command)
