@@ -40,3 +40,28 @@ Chapman - chapman.edu
 UC - mail.uc.edu
 University of Arnkansas - uark.edu
 National Research - nationalresearch.com
+NUS - u.nus.edu
+Chapman - mail.chapman.edu
+University of Illinois - illinois.edu
+Punahou - punahou.edu
+University of Alabama - crimson.ua.edu
+University of Florida - ufl.edu
+Stonybrook - stonybrook.edu
+Arizona State - asu.edu
+Rockefeller University - rockefeller.edu
+Virginia Tech - vt.edu
+Worcester Polytechnic - wpi.edu
+NC State - ncsu.edu
+Georgia Tech - gatech.edu
+University of Virginia - virginia.edu
+Bowdoin - bowdoin.edu
+University of Iowa - uiowa.edu
+University of Texas - utexas.edu
+University of Minnesota - umn.edu
+Boston University - bu.edu
+University of Washington - uw.edu
+California Polytechnic - calpoly.edu
+Grand Valley State University - gvsu.edu
+UC Santa Cruz - ucsc.edu
+UT San Antonio - utsa.edu
+UC Davis - ucdavis.edu
