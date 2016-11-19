@@ -66,3 +66,4 @@ UC Santa Cruz - ucsc.edu
 UT San Antonio - utsa.edu
 UT San Antonio - my.utsa.edu
 UC Davis - ucdavis.edu
+Exeter College - exe-coll.ac.uk
