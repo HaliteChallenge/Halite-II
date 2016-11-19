@@ -20,12 +20,19 @@
         <div class="pageContent">
             <div class="row">
                 <div class="col-sm-12">
-                    <div id="forms">
+                    <div id="messageBox"></div>
+                    <div id="firstMessage">
                         <h1>One Last Step...</h1>
-                        <div id="messageBox"></div>
                         <h4>You need to enter your preferred email.</h4>
                         <h4>We’ll use the domain of your email address to identify your university or company so you can easily see how you rank against others in your organization. We’ll also email you about bot submission events like compilation errors. You can opt out of these at any time.</h4>
+                    </div>
+                    <div id="returningMessage">
+                        <h1>Email Change</h1>
+                        <h4>Please enter your preferred email.</h4>
+                        <h4>We’ll use the domain of your email address to identify your university or company so you can easily see how you rank against others in your organization. We’ll also email you about bot submission events like compilation errors. You can opt out of these at any time.</h4>
+                    </div>
 
+                    <div id="forms">
                         <input class="form-control" type="email" placeholder="Email" style="margin-top: 20px; max-width: 400px;" id="firstField">
                         <input class="form-control" type="email" placeholder="Confirm Email" style="margin-bottom: 10.5px; max-width: 400px;" id="secondField">
                         <button id="customSubmitButton" class="btn btn-primary">Submit</button>
