@@ -86,13 +86,13 @@ abstract class API{
         return $sdk;
     }
 
-    protected function sendNotification($recipientUser, $subject, $message, $mood, $notificationMessage=NULL) {
+    protected function sendNotification($recipientUser, $subject, $message, $mood, $doSendEmail=true, $notificationMessage=NULL) {
         if($notificationMessage == NULL) $notificationMessage = $message;
         $notificationMessage = $this->mysqli->real_escape_string($notificationMessage);
 
         $this->insert("INSERT INTO UserNotification (userID, title, body, mood) VALUES ({$recipientUser['userID']}, '{$subject}', '{$notificationMessage}', {$mood})");
 
-        if($recipientUser['onEmailList'] == 1) {
+        if($recipientUser['onEmailList'] == 1 && $doSendEmail) {
             try {
                 $emailMessage = $message."<hr><p style='color: gray; font-size: 14px;'>To unsubscribe to these emails, click <a href='".WEB_DOMAIN."api/web/emailList?unsubscribe=1'>here</a>. To resubscribe, click <a href='".WEB_DOMAIN."api/web/emailList?subscribe=1'>here</a>.</p>";
 
