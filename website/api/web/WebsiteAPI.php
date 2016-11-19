@@ -118,7 +118,7 @@ class WebsiteAPI extends API{
     protected function user() {
         // Get a user's info with a username        
         if(isset($_GET["username"])) {
-            $results = $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+            $results = $this->getUsers("SELECT * FROM User WHERE username = '".$this->mysqli->real_escape_string($_GET['username'])."'");
             if(count($results) > 0) return $results[0];
             else return null;
         } 
@@ -188,7 +188,7 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
         } else if($user != null && isset($_GET['newEmail'])) {
             $verificationCode = rand(0, 9999999999);
-            $this->insert("UPDATE User SET email='{$_GET['newEmail']}', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
             $user["email"] = $_GET["newEmail"];
 
             $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0);
