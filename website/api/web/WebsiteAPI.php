@@ -125,17 +125,19 @@ class WebsiteAPI extends API{
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'", isset($_SESSION['userID']) && $_GET['userID'] == $_SESSION['userID']);
+            $results = $this->getUsers("SELECT * FROM User WHERE userID = ".intval($_GET['userID']), isset($_SESSION['userID']) && $_GET['userID'] == $_SESSION['userID']);
             if(count($results) > 0) return $results[0];
             else return null;
         } 
         
         // Get a set of filtered users
         else if(isset($_GET['fields']) && isset($_GET['values'])) {
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
-            $whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
-            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'rank';
-            $page = isset($_GET['page']) ? $_GET['page'] : 0;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+            $whereClauses = array_map(function($a) {
+                return $this->mysqli->real_escape_string($_GET['fields'][$a])." = '".$this->mysqli->real_escape_string($_GET['values'][$a])."'";
+            }, range(0, count($_GET['fields'])-1));
+            $orderBy = isset($_GET['orderBy']) ? $this->mysqli->real_escape_string($_GET['orderBy']) : 'rank';
+            $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
 
             $results = $this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
             $isNextPage = count($this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT 1 OFFSET ".($limit*($page+1)))) > 0;
@@ -243,7 +245,7 @@ class WebsiteAPI extends API{
      */
     protected function history() {
         if(isset($_GET["userID"])) {
-            return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]} ORDER BY versionNumber DESC");
+            return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID=".intval($_GET["userID"])." ORDER BY versionNumber DESC");
         }
     }
 
@@ -255,7 +257,7 @@ class WebsiteAPI extends API{
     protected function notification() {
         if($this->isLoggedIn()) {
             $userID = $this->getLoggedInUser()['userID'];
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
             return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC LIMIT $limit");
         }
     }
@@ -266,10 +268,10 @@ class WebsiteAPI extends API{
      */
     protected function game() {
         if(isset($_GET['userID'])) {
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
-            $startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
-            $userID = $_GET['userID'];
-            $versionNumber = isset($_GET['versionNumber']) ? $_GET['versionNumber'] : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 5;
+            $startingID = isset($_GET['startingID']) ? intval($_GET['startingID']) : PHP_INT_MAX;
+            $userID = intval($_GET['userID']);
+            $versionNumber = isset($_GET['versionNumber']) ? intval($_GET['versionNumber']) : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
             $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and versionNumber = $versionNumber and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
             $gameArrays = array();
@@ -423,7 +425,7 @@ class WebsiteAPI extends API{
     protected function announcement() {
         // Get the newest annoucement available to a user
         if(isset($_GET['userID'])) {
-            return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = {$_GET['userID']} and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
+            return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = ".intval($_GET['userID'])." and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
         } 
         
         // Mark an annoucement as closed    
