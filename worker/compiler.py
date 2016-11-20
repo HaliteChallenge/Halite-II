@@ -355,6 +355,11 @@ languages = (
         [],
         [(["*.js"], ChmodCompiler("Javascript"))]
     ),
+    Language("JAR", BOT +".jar", "MyBot.jar",
+        "java -jar MyBot.jar",
+        [],
+        [(["*.jar"], ChmodCompiler("JAR"))]
+    ),
     Language("Lisp", BOT, "MyBot.lisp",
         "./MyBot --dynamic-space-size " + str(MEMORY_LIMIT),
         [BOT],
@@ -540,3 +545,7 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     else:
         return "Unknown", errors
 
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        workingPath = sys.argv[1]
+        print(compile_anything(workingPath))
