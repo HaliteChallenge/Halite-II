@@ -86,11 +86,13 @@ abstract class API{
         return $sdk;
     }
 
-    protected function sendNotification($recipientUser, $subject, $message, $mood, $notificationMessage=NULL) {
+    protected function sendNotification($recipientUser, $subject, $message, $mood, $doSendNotif=true, $notificationMessage=NULL) {
         if($notificationMessage == NULL) $notificationMessage = $message;
         $notificationMessage = $this->mysqli->real_escape_string($notificationMessage);
 
-        $this->insert("INSERT INTO UserNotification (userID, title, body, mood) VALUES ({$recipientUser['userID']}, '{$subject}', '{$notificationMessage}', {$mood})");
+        if($doSendNotif) {
+            $this->insert("INSERT INTO UserNotification (userID, title, body, mood) VALUES ({$recipientUser['userID']}, '{$subject}', '{$notificationMessage}', {$mood})");
+        }
 
         if($recipientUser['onEmailList'] == 1) {
             try {

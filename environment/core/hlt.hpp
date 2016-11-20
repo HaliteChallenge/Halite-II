@@ -277,6 +277,7 @@ namespace hlt{
                 contents[a][b].owner = normalized[a][b].owner;
                 contents[a][b].strength = round(normalized[a][b].strength * TOP_STR);
                 contents[a][b].production = round(normalized[a][b].production * TOP_PROD);
+                if(contents[a][b].owner != 0 && contents[a][b].production == 0) contents[a][b].production = 1;
             }
         }
 

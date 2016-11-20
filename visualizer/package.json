@@ -1,0 +1,47 @@
+{
+  "name": "hailte-visualizer",
+  "main": "main.js",
+  "productName": "Halite-Visualizer",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "repository": "https://github.com/HaliteChallenge/Halite",
+  "author": {
+    "name": "Henry Wildermuth",
+    "email": "hmwildermuth@gmail.com",
+    "url": "https://github.com/FlyingGraysons"
+  },
+  "scripts": {
+    "test": "xo",
+    "start": "electron .",
+    "build": "mkdir -p downloads/ && cd downloads/ && electron-packager ../ --all --overwrite && for i in */; do zip -r \"${i%/}.zip\" \"$i\"; done"
+  },
+  "files": [
+    "main.js",
+    "index.html",
+    "./style/",
+    "./script/",
+    "./lib/"
+  ],
+  "keywords": [
+    "electron-app",
+    "electron",
+    "halite"
+  ],
+  "dependencies": {
+    "electron-debug": "^1.0.0"
+  },
+  "devDependencies": {
+    "devtron": "^1.1.0",
+    "electron": "^1.0.1",
+    "electron-packager": "^8.2.0",
+    "xo": "^0.16.0"
+  },
+  "xo": {
+    "esnext": true,
+    "envs": [
+      "node",
+      "browser"
+    ]
+  }
+}
