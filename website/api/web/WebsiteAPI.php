@@ -438,7 +438,7 @@ class WebsiteAPI extends API{
      */
     protected function errorLog() {
         // Return the requested error log only if it belongs to the signed in user.
-        if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
+        if(isset($_GET['errorLogName']) && isset($_SESSION['userID']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
             $result = $this->loadAwsSdk()->createS3()->getObject([
                 'Bucket' => ERROR_LOG_BUCKET,
                 'Key'    => $_GET['errorLogName']
