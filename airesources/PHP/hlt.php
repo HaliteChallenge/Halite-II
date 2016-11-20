@@ -6,8 +6,8 @@ define('EAST', 2);
 define('SOUTH', 3);
 define('WEST', 4);
 
-define('DIRECTIONS', range(0, 4));
-define('CARDINALS', range(1, 4));
+const DIRECTIONS = array(0, 1, 2, 3, 4);
+const CARDINALS = array(1, 2, 3, 4);
 
 define('ATTACK', 0);
 define('STOP_ATTACK', 1);
