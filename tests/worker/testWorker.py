@@ -54,8 +54,8 @@ class GameTests(unittest.TestCase):
         if os.path.isdir(os.path.join(WORKER_PATH, LOSE_BOT_PATH)):
             shutil.rmtree(os.path.join(WORKER_PATH, LOSE_BOT_PATH))
 
-        shutil.move(os.path.join(OUR_PATH, WIN_BOT_PATH), os.path.join(WORKER_PATH, WIN_BOT_PATH))
-        shutil.move(os.path.join(OUR_PATH, LOSE_BOT_PATH), os.path.join(WORKER_PATH, LOSE_BOT_PATH))
+        shutil.copytree(os.path.join(OUR_PATH, WIN_BOT_PATH), os.path.join(WORKER_PATH, WIN_BOT_PATH))
+        shutil.copytree(os.path.join(OUR_PATH, LOSE_BOT_PATH), os.path.join(WORKER_PATH, LOSE_BOT_PATH))
         os.chdir(WORKER_PATH)
         output = worker.runGame(20, 20, [{"userID": WIN_BOT_PATH, "username": WIN_BOT_PATH, "numSubmissions": "1"}, {"userID": LOSE_BOT_PATH, "username": LOSE_BOT_PATH, "numSubmissions": "1"}])
         os.chdir(OUR_PATH)
