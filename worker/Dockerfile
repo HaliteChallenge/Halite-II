@@ -26,6 +26,8 @@ RUN gem install bundler
 
 RUN apt-get install -y golang
 
+RUN apt-get install -y php
+
 RUN apt-get install -y build-essential
 RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
 RUN apt-get install -y nodejs

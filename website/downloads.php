@@ -31,6 +31,7 @@
                     <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
                     <li><a href="downloads/starterpackages/Halite-Ruby-Starter-Package.zip">Ruby 2.3.1</a></li>
                     <li><a href="downloads/starterpackages/Halite-Go-Starter-Package.zip">Go 1.6</a></li>
+                    <li><a href="downloads/starterpackages/Halite-PHP-Starter-Package.zip">PHP 7.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-JavaScript-Starter-Package.zip">Node.js (JavaScript) 7.1.0</a></li>
                 </ul>
                 </p>

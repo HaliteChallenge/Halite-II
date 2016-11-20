@@ -43,7 +43,11 @@
                             <li>Scala - .scala</li>
                             <li>Ruby - .rb</li>
                             <li>Go - .go</li>
+<<<<<<< HEAD
                             <li>JavaScript - .js</li>
+=======
+                            <li>PHP - .php</li>
+>>>>>>> master
                         </ul>
                     </p>
 
@@ -76,7 +80,11 @@
                             <li>Scala 2.10.4</li>
                             <li>Ruby 2.3.1</li>
                             <li>Go 1.6</li>
+<<<<<<< HEAD
                             <li>Node.js (JavaScript) 7.1.0</li>
+=======
+                            <li>PHP 7.0</li>
+>>>>>>> master
                         </ul>
                     </p>
 

@@ -12,6 +12,7 @@ mkdir Halite-Python-Starter-Package \
       Halite-Scala-Starter-Package \
       Halite-Ruby-Starter-Package \
       Halite-Go-Starter-Package \
+      Halite-PHP-Starter-Package \
       Halite-JavaScript-Starter-Package
 
 cp -r Python/* Halite-Python-Starter-Package/
@@ -22,6 +23,7 @@ cp -r Java/* Halite-Scala-Starter-Package/
 cp -r CSharp/* Halite-C#-Starter-Package/
 cp -r Ruby/* Halite-Ruby-Starter-Package/
 cp -r Go/* Halite-Go-Starter-Package/
+cp -r PHP/* Halite-PHP-Starter-Package/
 cp -r JavaScript/* Halite-JavaScript-Starter-Package/
 
 cp -r Scala/* Halite-Scala-Starter-Package/
@@ -35,6 +37,7 @@ zip -r Halite-C#-Starter-Package.zip Halite-C#-Starter-Package/
 zip -r Halite-Scala-Starter-Package.zip Halite-Scala-Starter-Package/ 
 zip -r Halite-Ruby-Starter-Package.zip Halite-Ruby-Starter-Package/ 
 zip -r Halite-Go-Starter-Package.zip Halite-Go-Starter-Package/ 
+zip -r Halite-PHP-Starter-Package.zip Halite-PHP-Starter-Package/ 
 zip -r Halite-JavaScript-Starter-Package.zip Halite-JavaScript-Starter-Package/
 
 mkdir -p ../website/downloads/starterpackages

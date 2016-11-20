@@ -33,9 +33,49 @@ Harvey Mudd - cs.hmc.edu
 William and Mary - email.wm.edu
 Pomona - pomona.edu
 California Colleges - californiacolleges.edu
-University of Colorado- colorado.edu
+University of Colorado - colorado.edu
 University of Charlotte - uncc.edu 
 Missouri S&T - mst.edu
 Chapman - chapman.edu
 UC - mail.uc.edu
 University of Arnkansas - uark.edu
+National Research - nationalresearch.com
+NUS - u.nus.edu
+Chapman - mail.chapman.edu
+University of Illinois - illinois.edu
+Punahou - punahou.edu
+University of Alabama - crimson.ua.edu
+University of Florida - ufl.edu
+Stonybrook - stonybrook.edu
+Arizona State - asu.edu
+Rockefeller University - rockefeller.edu
+Virginia Tech - vt.edu
+Worcester Polytechnic - wpi.edu
+NC State - ncsu.edu
+Georgia Tech - gatech.edu
+University of Virginia - virginia.edu
+Bowdoin - bowdoin.edu
+University of Iowa - uiowa.edu
+University of Texas - utexas.edu
+University of Minnesota - umn.edu
+Boston University - bu.edu
+University of Washington - uw.edu
+California Polytechnic - calpoly.edu
+Grand Valley State University - gvsu.edu
+UC Santa Cruz - ucsc.edu
+UT San Antonio - utsa.edu
+UT San Antonio - my.utsa.edu
+UC Davis - ucdavis.edu
+Exeter College - exe-coll.ac.uk
+Quantworks - quantworks.com
+Epitech - epitech.eu
+IST - tecnico.ulisboa.pt
+Amazon - amazon.de
+Amazon - amazon.com
+Academy for Science and Design - asdnh.org
+KTH - kth.se
+Horace Mann - horacemann.org
+Shaw - shaw.ca
+Futurice - futurice.com
+Seznam - seznam.cz
+Boopsie - boopsie.com

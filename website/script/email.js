@@ -19,6 +19,7 @@ $(function() {
             } else if(this.$firstField.val() == "" || this.$secondField.val() == "") {
                 this.displayMessage("Empty Fields", "Please fill your email twice in the boxes below.", false);
             } else {
+                this.displayMessage("Success", "We've sent a verification email to "+this.$firstField.val()+".", true);
                 this.submitCallback(this.$firstField.val());
             }
         },
@@ -30,15 +31,41 @@ $(function() {
         }
     }
 
-    var user = getUser(getSession()['userID']);
-    if(user == null) window.location.href = "index.php";
-    if(parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
-        $("#forms").css("display", "none");
-        $("#waitMessage").css("display", "block");
+    function render() {
+        if(parseInt(user.isEmailGood) == 0) {
+            if(user.email != null && user.email != undefined) {
+                $("#waitMessage").css("display", "block");
+
+                $("#forms").css("display", "none");
+                $("#firstMessage").css("display", "none");
+                $("#returningMessage").css("display", "none");
+            } else {
+                $("#forms").css("display", "block");
+                $("#firstMessage").css("display", "block");
+
+                $("#waitMessage").css("display", "none");
+                $("#returningMessage").css("display", "none");
+            }
+        } else {
+                $("#forms").css("display", "block");
+                $("#returningMessage").css("display", "block");
+
+                $("#waitMessage").css("display", "none");
+                $("#firstMessage").css("display", "none");
+        }
     }
+
+    var session = getSession();
+    if(session == null) window.location.href = "index.php";
+    var user = getUser(session['userID']);
+    if(user == null) window.location.href = "index.php";
+
+    render(user);
 
     customEmailForm.init(function(email) {
         newEmail(email);
-        location.reload();
+
+        user.email = email;
+        render(user);
     });
 });
