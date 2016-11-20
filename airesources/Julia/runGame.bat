@@ -1,1 +1,1 @@
-.\halite.exe -d "30 30" "julia MyJuliaBot.jl" "julia RandomBot.jl"
+.\halite.exe -d "30 30" "julia MyBot.jl" "julia RandomBot.jl"
