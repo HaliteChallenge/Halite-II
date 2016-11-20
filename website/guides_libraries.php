@@ -18,18 +18,19 @@
                 <p>If you add a bash file named install.sh to the same directory as your bot source, it will be run with internet access and write access to its current directory before any bot compilation. It may run for a maximum of 10 minutes.</p>
 
                 <h3>Package Managers</h3>
-                <p>You must install all libraries locally, even if through a package manager. Because of this, package managers that only support local installation (such as apt-get) may not be used.</p>
+                <p>You must install all libraries locally, even if through a package manager. Because of this, package managers that only support global installation (such as apt-get) may not be used.</p>
                 <p>The following package managers are installed ahead of time on the Halite game servers:</p>
                     <ul>
                         <li>pip3</li>
                         <li>bundler</li>
+                        <li>npm</li>
                     </ul>
                 <p>
-                    If you would like us to add another package manager to this list, post on the <a href="http://forums.halite.io">forums</a>. 
+                    If you would like us to add another package manager to this list, post on the <a href="http://forums.halite.io">forums</a>.
                 </p>
 
                 <p>Here is an example install.sh file for a bot that uses <a href="http://www.numpy.org/">the numpy library</a>:</p>
-                <span data-gist-id="039bb1e4916ffb012d1ef83b36572dee"></span> 
+                <span data-gist-id="039bb1e4916ffb012d1ef83b36572dee"></span>
                 <p>It's just one line!</p>
 
                 <h3>Compilation</h3>

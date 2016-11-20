@@ -186,7 +186,7 @@ class ManagerAPI extends API{
 
 
             // Check that we arent stoing too many games in db
-            $numAllowed = 50000;
+            $numAllowed = 100000;
             $res = mysqli_query($this->mysqli, "SELECT * FROM Game");
             $numRows = $res->num_rows;
             $numToDelete = $numRows - $numAllowed;

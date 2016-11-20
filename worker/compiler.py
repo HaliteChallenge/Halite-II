@@ -69,16 +69,18 @@ def _run_cmd(cmd, working_dir, timelimit):
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     start = time.time()
     timelimit = timelimit - start
-    rawOut, rawErrors = process.communicate(timeout=timelimit)
 
-    outString = rawOut.decode("utf-8").strip()
-    out = outString.split("\n") if outString.isspace() == False and outString != "" else None
+    try:
+        rawOut, rawErrors = process.communicate(timeout=timelimit)
+        outString = rawOut.decode("utf-8").strip()
+        out = outString.split("\n") if outString.isspace() == False and outString != "" else None
 
-    errorsString = rawErrors.decode("utf-8").strip()
-    errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
+        errorsString = rawErrors.decode("utf-8").strip()
+        errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
+    except TimeoutExpired as e:
+        out = []
+        errors = ["Compilation timed out with command %s" % (cmd,)]
 
-    if time.time() - start > timelimit:
-        errors.append("Compilation timed out with command %s" % (cmd,))
     os.system("docker kill $(docker ps -aq)")
     os.system("docker rm $(docker ps -aq)")
     return out, errors
@@ -253,7 +255,7 @@ comp_args = {
     "Groovy"    : [["groovyc"],
                              ["jar", "cfe", BOT + ".jar", BOT]],
     "Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-    "Java"        : [["javac", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
+    "Java"        : [["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
     "Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
     "OCaml"     : [["ocamlbuild -lib unix", BOT + ".native"]],
     "Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
@@ -348,12 +350,17 @@ languages = (
     Language("Java", BOT +".java", "MyBot.java",
         "java MyBot",
         ["*.class", "*.jar"],
-        [(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:"))]
+        [(["*.java"], ErrorFilterCompiler(comp_args["Java"][0], filter_stderr="Note:", out_files=["MyBot.class"]))]
     ),
-    Language("Javascript", BOT +".js", "MyBot.js",
+    Language("JavaScript", BOT +".js", "MyBot.js",
         "node MyBot.js",
         [],
-        [(["*.js"], ChmodCompiler("Javascript"))]
+        [(["*.js"], ChmodCompiler("JavaScript"))]
+    ),
+    Language("JAR", BOT +".jar", "MyBot.jar",
+        "java -jar MyBot.jar",
+        [],
+        [(["*.jar"], ChmodCompiler("JAR"))]
     ),
     Language("Lisp", BOT, "MyBot.lisp",
         "./MyBot --dynamic-space-size " + str(MEMORY_LIMIT),
@@ -540,3 +547,7 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     else:
         return "Unknown", errors
 
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        workingPath = sys.argv[1]
+        print(compile_anything(workingPath))
