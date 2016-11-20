@@ -45,6 +45,7 @@
                             <li>Go - .go</li>
                             <li>PHP - .php</li>
                             <li>JavaScript - .js</li>
+                            <li>OCaml - .ml</li>
                         </ul>
                     </p>
 
@@ -79,6 +80,7 @@
                             <li>Go 1.6</li>
                             <li>PHP 7.0</li>
                             <li>Node.js (JavaScript) 7.1.0</li>
+                            <li>OCaml 4.01.0</li>
                         </ul>
                     </p>
 
