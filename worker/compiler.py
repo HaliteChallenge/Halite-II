@@ -362,6 +362,11 @@ languages = (
         [],
         [(["*.jar"], ChmodCompiler("JAR"))]
     ),
+    Language("Julia", BOT +".jl", "MyBot.jl",
+        "julia MyBot.jl",
+        [],
+        [(["*.jl"], ChmodCompiler("Julia"))]
+    ),
     Language("Lisp", BOT, "MyBot.lisp",
         "./MyBot --dynamic-space-size " + str(MEMORY_LIMIT),
         [BOT],
