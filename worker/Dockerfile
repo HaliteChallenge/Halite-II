@@ -25,3 +25,5 @@ RUN apt-get install -y ruby
 RUN gem install bundler 
 
 RUN apt-get install -y golang
+
+RUN apt-get install -y php
