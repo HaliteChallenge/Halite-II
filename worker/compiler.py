@@ -69,16 +69,18 @@ def _run_cmd(cmd, working_dir, timelimit):
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     start = time.time()
     timelimit = timelimit - start
-    rawOut, rawErrors = process.communicate(timeout=timelimit)
 
-    outString = rawOut.decode("utf-8").strip()
-    out = outString.split("\n") if outString.isspace() == False and outString != "" else None
+    try:
+        rawOut, rawErrors = process.communicate(timeout=timelimit)
+        outString = rawOut.decode("utf-8").strip()
+        out = outString.split("\n") if outString.isspace() == False and outString != "" else None
 
-    errorsString = rawErrors.decode("utf-8").strip()
-    errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
+        errorsString = rawErrors.decode("utf-8").strip()
+        errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
+    except TimeoutExpired as e:
+        out = []
+        errors = ["Compilation timed out with command %s" % (cmd,)]
 
-    if time.time() - start > timelimit:
-        errors.append("Compilation timed out with command %s" % (cmd,))
     os.system("docker kill $(docker ps -aq)")
     os.system("docker rm $(docker ps -aq)")
     return out, errors
