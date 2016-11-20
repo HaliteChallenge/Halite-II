@@ -453,6 +453,7 @@ class WebsiteAPI extends API{
             echo $result['Body'];
             die();
         }
+        return "You aren't logged into your Halite account or are trying to access the error log of another contestant.";
     }
     
     /* Session Endpoint
