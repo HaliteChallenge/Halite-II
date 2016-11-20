@@ -16,17 +16,22 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    This set of starter packages was uploaded on November 6th. We fixed a minor bug with the getDistance() method in the Python starter package.
+                    This set of starter packages was uploaded on November 13th. We uploaded a Go starter package.
                 </p>
-                <p>
-                    <ul>
-                        <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
-                        <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 7</a></li>
-                        <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
-                        <li><a href="downloads/starterpackages/Halite-C%23-Starter-Package.zip">C# 6.0</a></li>
-                        <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
-                        <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
-                    </ul>
+                <h3>Official Packages</h3>
+                <ul>
+                    <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Java-Starter-Package.zip">Java 8</a></li>
+                    <li><a href="downloads/starterpackages/Halite-C++-Starter-Package.zip">C++ 11</a></li>
+                </ul>
+                <h3>Community Packages</h3>
+                <ul>
+                    <li><a href="downloads/starterpackages/Halite-C%23-Starter-Package.zip">C# 6.0</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Rust-Starter-Package.zip">Rust 1.10</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Scala-Starter-Package.zip">Scala 2.10.4</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Ruby-Starter-Package.zip">Ruby 2.3.1</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Go-Starter-Package.zip">Go 1.6</a></li>
+                </ul>
                 </p>
 
                 <h2>Game Environment</h2>

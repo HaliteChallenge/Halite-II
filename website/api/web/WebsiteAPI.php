@@ -70,7 +70,11 @@ class WebsiteAPI extends API{
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
         foreach($users as &$user) {
-            if($privateInfo == false) unset($user['email']);
+            if($privateInfo == false) {
+                unset($user['email']);
+                unset($user['githubEmail']);
+                unset($user['verificationCode']);
+            }
             
             if(intval($user['isRunning']) == 1) {
                 $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
@@ -90,6 +94,18 @@ class WebsiteAPI extends API{
         if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
     }
 
+    private function getOrganizationForEmail($email) {
+        $emailDomain = explode('@', $email)[1];
+        $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
+        foreach($rows as $row) {
+            $components = explode(" - ", $row);
+            if(strcmp($components[1], $emailDomain) == 0) {
+                return $components[0];
+            }
+        }
+        return "Other";
+    }
+
 
     //------------------------------------- API ENDPOINTS ----------------------------------------\\
     // Endpoint associated with a users credentials (everything in the User table; i.e. name, oauthID, etc.)
@@ -102,24 +118,26 @@ class WebsiteAPI extends API{
     protected function user() {
         // Get a user's info with a username        
         if(isset($_GET["username"])) {
-            $results = $this->getUsers("SELECT * FROM User WHERE username = '{$_GET['username']}'");
+            $results = $this->getUsers("SELECT * FROM User WHERE username = '".$this->mysqli->real_escape_string($_GET['username'])."'");
             if(count($results) > 0) return $results[0];
             else return null;
         } 
         
         // Get a user's info with a userID
         else if (isset($_GET["userID"])) {
-            $results = $this->getUsers("SELECT * FROM User WHERE userID = '{$_GET['userID']}'");
+            $results = $this->getUsers("SELECT * FROM User WHERE userID = ".intval($_GET['userID']), isset($_SESSION['userID']) && $_GET['userID'] == $_SESSION['userID']);
             if(count($results) > 0) return $results[0];
             else return null;
         } 
         
         // Get a set of filtered users
         else if(isset($_GET['fields']) && isset($_GET['values'])) {
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
-            $whereClauses = array_map(function($a) {return $_GET['fields'][$a]." = '".$_GET['values'][$a]."'";}, range(0, count($_GET['fields'])-1));
-            $orderBy = isset($_GET['orderBy']) ? $_GET['orderBy'] : 'rank';
-            $page = isset($_GET['page']) ? $_GET['page'] : 0;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+            $whereClauses = array_map(function($a) {
+                return $this->mysqli->real_escape_string($_GET['fields'][$a])." = '".$this->mysqli->real_escape_string($_GET['values'][$a])."'";
+            }, range(0, count($_GET['fields'])-1));
+            $orderBy = isset($_GET['orderBy']) ? $this->mysqli->real_escape_string($_GET['orderBy']) : 'rank';
+            $page = isset($_GET['page']) ? intval($_GET['page']) : 0;
 
             $results = $this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT ".$limit." OFFSET ".($limit*$page));
             $isNextPage = count($this->getUsers("SELECT * FROM User WHERE ".implode(" and ", $whereClauses)." ORDER BY ".$orderBy." LIMIT 1 OFFSET ".($limit*($page+1)))) > 0;
@@ -149,27 +167,49 @@ class WebsiteAPI extends API{
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
-                $organization = "Other";
-                if($email != NULL) {
-                    $emailDomain = explode('@', $email)[1];
-                    $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
-                    foreach($rows as $row) {
-                        $components = explode(" - ", $row);
-                        if(strcmp($components[1], $emailDomain) == 0) {
-                            $organization = $components[0];
-                            break;
-                        }
-                    }
-                }
-
                 $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-                $this->insert("INSERT INTO User (username, email, organization, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', '{$organization}', {$githubUser['id']}, 1, {$numActiveUsers})");
+                $this->insert("INSERT INTO User (username, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
-
             }
 
             if(isset($_GET['redirectURL'])) header("Location: {$_GET['redirectURL']}");
             else header("Location: ".WEB_DOMAIN);
+            die();
+        } 
+    }
+
+    /* Email Endpoint
+     *
+     * Hitting this endpoint allows a user to handle the choosing of their email. 
+     */
+    protected function email() {
+        $user = $this->getLoggedInUser();
+
+        if($user != null && isset($_GET['validate'])) {
+            $organization = $this->getOrganizationForEmail($user["githubEmail"]);
+            $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
+        } else if($user != null && isset($_GET['newEmail'])) {
+            $verificationCode = rand(0, 9999999999);
+            $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            $user["email"] = $_GET["newEmail"];
+
+            $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false);
+        } else if(isset($_GET['verificationCode'])) {
+            if($user == null) {
+                $emailCallbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
+                $githubCallbackURL = urlencode(WEB_DOMAIN."api/web/user?githubCallback=1&redirectURL={$emailCallbackURL}");
+                header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
+                die();
+            }
+
+            if(strcmp($user['verificationCode'], $_GET['verificationCode']) != 0) {
+                return "Invalid verification code";
+            }
+
+            $organization = $this->getOrganizationForEmail($user["email"]);
+            $this->insert("UPDATE User SET isEmailGood=1, organization='$organization' WHERE userID = {$user['userID']}");
+
+            header("Location: ".WEB_DOMAIN."index.php?emailVerification=1");
             die();
         } 
     }
@@ -181,8 +221,9 @@ class WebsiteAPI extends API{
     protected function emailList() {
         $user = $this->getLoggedInUser();
         if($user == null) {
-            $callbackURL = urlencode(WEB_DOMAIN."api/web/unsubscribe");
-            header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$callbackURL}");
+            $emailCallbackURL = urlencode(WEB_DOMAIN."api/web/emailList?".$_SERVER['QUERY_STRING']);
+            $githubCallbackURL = urlencode(WEB_DOMAIN."api/web/user?githubCallback=1&redirectURL={$emailCallbackURL}");
+            header("Location: https://github.com/login/oauth/authorize?scope=user:email&client_id=2b713362b2f331e1dde3&redirect_uri={$githubCallbackURL}");
         }
 
         if(isset($_GET['unsubscribe'])) {
@@ -204,7 +245,7 @@ class WebsiteAPI extends API{
      */
     protected function history() {
         if(isset($_GET["userID"])) {
-            return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID={$_GET["userID"]} ORDER BY versionNumber DESC");
+            return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID=".intval($_GET["userID"])." ORDER BY versionNumber DESC");
         }
     }
 
@@ -216,7 +257,7 @@ class WebsiteAPI extends API{
     protected function notification() {
         if($this->isLoggedIn()) {
             $userID = $this->getLoggedInUser()['userID'];
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
             return $this->selectMultiple("SELECT * FROM UserNotification WHERE userID={$userID} ORDER BY userNotificationID DESC LIMIT $limit");
         }
     }
@@ -227,30 +268,19 @@ class WebsiteAPI extends API{
      */
     protected function game() {
         if(isset($_GET['userID'])) {
-            $limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
-            $startingID = isset($_GET['startingID']) ? $_GET['startingID'] : PHP_INT_MAX;
-            $userID = $_GET['userID'];
-            $versionNumber = isset($_GET['versionNumber']) ? $_GET['versionNumber'] : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 5;
+            $startingID = isset($_GET['startingID']) ? intval($_GET['startingID']) : PHP_INT_MAX;
+            $userID = intval($_GET['userID']);
+            $versionNumber = isset($_GET['versionNumber']) ? intval($_GET['versionNumber']) : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
-            $gameIDArrays = $this->selectMultiple("SELECT gameID FROM GameUser WHERE userID = $userID and versionNumber = $versionNumber and gameID < $startingID ORDER BY gameID DESC LIMIT $limit");
-            $gameArrays = array();
+            $gameArrays = $this->selectMultiple("SELECT g.* FROM GameUser gu INNER JOIN Game g ON g.gameID = gu.gameID WHERE gu.userID = $userID and gu.versionNumber = $versionNumber and gu.gameID < $startingID ORDER BY gu.gameID DESC LIMIT $limit");
 
             // Get each game's info
-            foreach ($gameIDArrays as $gameIDArray) {
-                $gameID = $gameIDArray['gameID'];
-                $gameArray = $this->select("SELECT * FROM Game WHERE gameID = $gameID");
+            foreach ($gameArrays as &$gameArray) {
+                $gameID = $gameArray['gameID'];
 
                 // Get information about users
-                $gameArray['users'] = $this->selectMultiple("SELECT userID, errorLogName, rank FROM GameUser WHERE gameID = $gameID");
-                foreach($gameArray['users'] as &$gameUserRow) {
-                    // Get rid of gameID
-                    unset($gameUserRow['gameID']);
-
-                    // Add in user info
-                    $userInfo = $this->select("SELECT username, oauthID FROM User WHERE userID = {$gameUserRow['userID']}");
-                    foreach($userInfo as $key => $value) $gameUserRow[$key] = $value;
-                }
-                array_push($gameArrays, $gameArray);
+                $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
             }
             return $gameArrays;
         } 
@@ -384,7 +414,7 @@ class WebsiteAPI extends API{
     protected function announcement() {
         // Get the newest annoucement available to a user
         if(isset($_GET['userID'])) {
-            return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = {$_GET['userID']} and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
+            return $this->select("SELECT a.* FROM Announcement a WHERE NOT EXISTS(SELECT NULL FROM DoneWithAnnouncement d WHERE d.userID = ".intval($_GET['userID'])." and d.announcementID = a.announcementID) ORDER BY announcementID LIMIT 1;");
         } 
         
         // Mark an annoucement as closed    
@@ -408,7 +438,7 @@ class WebsiteAPI extends API{
      */
     protected function errorLog() {
         // Return the requested error log only if it belongs to the signed in user.
-        if(isset($_GET['errorLogName']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
+        if(isset($_GET['errorLogName']) && isset($_SESSION['userID']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
             $result = $this->loadAwsSdk()->createS3()->getObject([
                 'Bucket' => ERROR_LOG_BUCKET,
                 'Key'    => $_GET['errorLogName']
@@ -423,6 +453,7 @@ class WebsiteAPI extends API{
             echo $result['Body'];
             die();
         }
+        return "You aren't logged into your Halite account or are trying to access the error log of another contestant.";
     }
     
     /* Session Endpoint
