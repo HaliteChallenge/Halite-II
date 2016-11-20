@@ -82,3 +82,4 @@ Boopsie - boopsie.com
 HCM - hubcitymedia.com
 Paderborn University - mail.upb.de
 Technical University of Dresden - tu-dresden.de
+Altassian - atlassian.com
