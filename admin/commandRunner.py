@@ -8,7 +8,7 @@ import os.path
 def runOnWorker(worker, keyPath, command):
     print("########"+worker['ipAddress']+"########")
     os.system("ssh -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
-    print("################\n")
+    print("########"+worker['ipAddress']+"########")
 
 parser = configparser.ConfigParser()
 parser.read("../halite.ini")
