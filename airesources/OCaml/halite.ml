@@ -175,6 +175,7 @@ let process_line state line =
 
 let get_frame state =
   state.round <- state.round + 1;
+  state.last_update <- get_time();
   let line = read_line () in
     process_line state line
 ;;
