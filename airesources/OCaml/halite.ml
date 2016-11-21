@@ -288,9 +288,9 @@ let get_location state loc direction =
     match direction with
     | `Still -> (0, 0)
     | `North -> (-1, 0)
-    | `East -> (1, 0)
-    | `South -> (0, -1)
-    | `West -> (0, 1)
+    | `East -> (0, 1)
+    | `South -> (1, 0)
+    | `West -> (0, -1)
   in
   let row = loc.row + o_row in
   let col = loc.col + o_col in
