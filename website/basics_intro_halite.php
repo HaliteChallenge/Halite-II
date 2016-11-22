@@ -70,6 +70,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <p>Move on to <a href="basics_improve_random.php">Improving the Random Bot</a>.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 

@@ -54,6 +54,7 @@
                 <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

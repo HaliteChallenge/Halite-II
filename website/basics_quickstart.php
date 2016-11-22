@@ -42,6 +42,7 @@
                 <p>Please post on <a href="http://forums.halite.io">the forums</a>.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 

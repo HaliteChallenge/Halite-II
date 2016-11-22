@@ -20,6 +20,8 @@
                 <input type="file" id="filePicker" style="display: none;">
             </div>
         </div>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 

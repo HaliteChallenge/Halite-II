@@ -37,6 +37,7 @@
                 <p>If your library isn't on a package manager that supports local installation, you are going to have to compile it on our game servers. Include the source of you library in your bot's zip file and put compilation instructions in the install.sh file.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 
