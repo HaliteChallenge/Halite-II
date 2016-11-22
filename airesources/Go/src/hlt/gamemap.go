@@ -49,7 +49,7 @@ func (m *GameMap) GetDistance(loc1, loc2 Location) int {
 	if dy > m.Width/2 {
 		dy = m.Height - dy
 	}
-	return dx - dy
+	return dx + dy
 }
 
 func (m *GameMap) GetAngle(loc1, loc2 Location) float64 {
