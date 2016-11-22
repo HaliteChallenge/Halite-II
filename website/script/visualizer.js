@@ -357,7 +357,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     str = game.frames[frame][y][x].strength;
                     prod = game.productions[y][x];
                     infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
-                    if(game.frames[frame][y][x].owner != 0) {
+                    if(frame < game.moves.length && game.frames[frame][y][x].owner != 0) {
                         move = game.moves[frame][y][x];
                         if(move > 0 && move < 5) {
                             move = "0NESW"[move];
