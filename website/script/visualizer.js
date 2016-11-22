@@ -346,8 +346,17 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         if(!isminimal) {
             //Update info text:
             var mousepos = manager.mouse.global;
-            if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
+            if(mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
                 infoText.text = 'Frame #' + frame.toString();
+            }
+            else if(!mousePressed) {
+                infoText.text = 'Frame #' + frame.toString();
+                if(mousepos.x < mw && mousepos.y < mh) { //Over map
+                    var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
+                    if(x < 0) x += game.width;
+                    if(y < 0) y += game.height;
+                    infoText.text += ' | Loc: ' + x.toString() + ',' + y.toString();
+                }
             }
             else { //Mouse is clicked and over renderer.
                 if(mousepos.x < mw && mousepos.y < mh) { //Over map:
