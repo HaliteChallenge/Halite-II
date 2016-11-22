@@ -358,7 +358,10 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     prod = game.productions[y][x];
                     infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
                     if(game.frames[frame][y][x].owner != 0) {
-                        move = "0NESW"[game.moves[frame][y][x]];
+                        move = game.moves[frame][y][x];
+                        if(move > 0 && move < 5) {
+                            move = "0NESW"[move];
+                        }
                         infoText.text += ' | Mv: ' + move.toString();
                     }
                 }
