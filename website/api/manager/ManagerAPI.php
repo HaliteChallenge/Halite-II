@@ -94,7 +94,11 @@ class ManagerAPI extends API{
             }
             if(count($seedPlayer) < 1) return null;
 
-            $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(mu-{$seedPlayer['mu']}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
+            $matchMakingRank = $seedPlayer['rank']
+            if ($seedPlayer['numGames'] < 25) {
+                $matchMakingRank /= 2
+            }
+            $players = $this->selectMultiple("SELECT * FROM User WHERE isRunning=1 and ABS(rank-{$matchMatchingRank}) < (5 / pow(rand(), 0.65)) and userID <> {$seedPlayer['userID']} ORDER BY rand() LIMIT ".($numPlayers-1));
             array_push($players, $seedPlayer);
 
             // Pick map size
