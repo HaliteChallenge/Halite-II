@@ -271,10 +271,23 @@ void Networking::startAndConnectBot(std::string command) {
         throw 1;
     }
 
+    pid_t ppid_before_fork = getpid();
+
     //Fork a child process
     pid = fork();
     if(pid == 0) { //This is the child
         setpgid(getpid(), getpid());
+
+        // install a parent death signal
+        // http://stackoverflow.com/a/36945270
+        int r = prctl(PR_SET_PDEATHSIG, SIGTERM);
+        if (r == -1)
+        {
+            if(!quiet_output) std::cout << "Error installing parent death signal\n";
+            throw 1;
+        }
+        if (getppid() != ppid_before_fork)
+            exit(1);
 
         dup2(writePipe[0], STDIN_FILENO);
 
