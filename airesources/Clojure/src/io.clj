@@ -1,6 +1,7 @@
-(ns halite-clj.io
+(ns io
   (:require clojure.string
-            halite-clj.game))
+            game)
+  (:gen-class))
 
 (defn create-game-map
   "Parses the run-length encoded format of the map into a 2D vector of Sites"
@@ -17,7 +18,7 @@
                     (mapcat #(repeat (first %) (second %))))
         strengths (->> compressed-map
                        (drop (* 2 owner-pair-count)))
-        flat-sites (map halite-clj.game/->Site
+        flat-sites (map game/->Site
                         (cycle (range width))
                         (mapcat #(repeat width %) (range))
                         productions
@@ -41,7 +42,7 @@
     {:my-id my-id :width width :height height :productions productions :game-map game-map}))
 
 
-(def direction->int (zipmap halite-clj.game/directions (range)))
+(def direction->int (zipmap game/directions (range)))
 
 (defn- format-moves-for-output [moves]
   (clojure.string/join " "

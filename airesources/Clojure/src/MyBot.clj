@@ -1,6 +1,6 @@
-(ns halite-clj.bot
-  (:require    [halite-clj.game :as game]
-               [halite-clj.io :as io])
+(ns MyBot
+  (:require [game]
+            [io])
   (:gen-class))
 
 (def bot-name "MyFirstClojureBot")

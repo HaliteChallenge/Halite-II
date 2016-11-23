@@ -1,4 +1,5 @@
-(ns halite-clj.game)
+(ns game
+  (:gen-class))
 
 ;; The map is represented by a 2D vector of Sites
 (defrecord Site [^int x ^int y ^int production ^int strength ^int owner])
@@ -17,7 +18,7 @@
                 :north (mod (dec (:y site)) height)
                 :south (mod (inc (:y site)) height)
                 (:y site))]
-    (get-in game-map new-y new-x)))
+    (get-in game-map [new-y new-x])))
 
 (defn single-dimension-distance
   "Computes the distance between two integers mod m"
