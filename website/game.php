@@ -13,7 +13,6 @@
         <?php include 'includes/navbar.php'; ?>
         <div id="pageContent" class="pageContent text-center">
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
