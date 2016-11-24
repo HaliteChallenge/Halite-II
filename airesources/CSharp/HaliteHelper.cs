@@ -127,7 +127,7 @@ public class Map
             if (!ushort.TryParse(gameMapValues.Dequeue(), out owner))
                 throw new ApplicationException("Could not get some owner from stdin");
             while (counter > 0) {
-                _sites[x, y] = new Site {Owner = owner};
+                _sites[x, y].Owner = owner;
                 x++;
                 if (x == Width) {
                     x = 0;

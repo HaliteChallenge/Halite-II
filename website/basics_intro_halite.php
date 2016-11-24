@@ -31,8 +31,8 @@
 
                 <h3>Testing your bot</h3>
                 <p>To play games of Halite locally, you will need the game environment. As of this writing we support Windows, Linux and OSX platforms. You can download the game environment <a href="downloads.php">here</a>. Place the downloaded binary (halite or halite.exe) in your starter kit folder.</p>
-                <p>To simulate a game, simply runGame.sh (Linux and macOS) or runGame.bat (Windows). This comand will run a game between my MyBot and RandomBot (both are just copies of each other at this point) on a grid of size 30x30.</p>
-                <p>The output should like this and the details of the game will be stored in a file with the "hlt" extension (35538-124984302.hlt in the example below).</p>
+                <p>To simulate a game, simply runGame.sh (Linux and macOS) or runGame.bat (Windows). This command will run a game between my MyBot and RandomBot (both are just copies of each other at this point) on a grid of size 30x30.</p>
+                <p>The output should look like this and the details of the game will be stored in a file with the "hlt" extension (35538-124984302.hlt in the example below).</p>
 
                 <pre><code>$ . runGame.sh 
 python3 MyBot.py
@@ -70,6 +70,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <p>Move on to <a href="basics_improve_random.php">Improving the Random Bot</a>.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 

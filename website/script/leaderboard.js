@@ -66,9 +66,9 @@ $(function() {
     var $next = null;
 
     var baseURL = location.pathname.substring(location.pathname.lastIndexOf("/") + 1)+"?";
-    if(field != null) baseURL += "field="+field;
-    if(value != null) baseURL += "&value="+value;
-    if(heading != null) baseURL += "&heading="+heading;
+    if(field != null) baseURL += "field="+encodeURIComponent(field);
+    if(value != null) baseURL += "&value="+encodeURIComponent(value);
+    if(heading != null) baseURL += "&heading="+encodeURIComponent(heading);
 
     if(page != 0) {
         $previous = $("<a/>");

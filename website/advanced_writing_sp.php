@@ -25,7 +25,7 @@
                             <li>getInit</li>
                             <li>sendInit</li>
                             <li>getFrame</li>
-                            <li>sendMoves</li>
+                            <li>sendFrame</li>
                         </ul>
                     </li>
                     <li>Classes/Structs
@@ -113,6 +113,7 @@ Consider the following 3x3 production map as an example (where <code>[x]</code> 
 
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

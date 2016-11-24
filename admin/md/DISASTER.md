@@ -29,6 +29,14 @@ Let's go over that last line. The `commandRunner.py` script uses ssh to run arbi
 
 ### Account DDOS
 
+### Renew/Reinstall SSL
+
+Run:
+
+    $ certbot-auto --apache -d halite.io -d www.halite.io
+    
+You will be presented with a couple of cursese menus. Renewing the certificate should be tried first. "Easy" (both http and https) should be picked instead of "Secure."
+
 ### Restarting from MySQL database backup
 
 ***These steps will delete all data in the production db***

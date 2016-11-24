@@ -35,6 +35,7 @@ class CompilerTests(unittest.TestCase):
                 if os.path.splitext(filename)[0] == "RandomBot":
                    os.remove(os.path.join(folder, filename))
             expectedLanguage = folderName.split("-")[1]
+            print("Expected Language: " + expectedLanguage)
             language, errors = compiler.compile_anything(folder)
             print(errors)
             print(language)

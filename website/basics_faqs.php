@@ -71,7 +71,7 @@
                 <p>Yes.<br>Check out our <a href="https://github.com/HaliteChallenge/Halite">Github repo</a> and you are also welcome (even encouraged) to open issues and/or submit pull requests.</p>
 
                 <h3>How do I contribute to the game and/or report an issue?</h3>
-                <p>You can open an issue or submit a pull request on our <a href="https://github.com/HaliteChallenge/Halite">Github Repo</a>. If you are looking for things to do, checkout our <a href="https://github.com/HaliteChallenge/Halite/issues">open issues</a> or our <a href="https://github.com/HaliteChallenge/Halite/projects/1">project board</a>.</p>
+                <p>You can open an issue or submit a pull request on our <a href="https://github.com/HaliteChallenge/Halite">Github Repo</a>. If you are looking for things to do, checkout our <a href="https://github.com/HaliteChallenge/Halite/issues">open issues</a>.</p>
 
                 <h2>Other</h2>
 
@@ -80,6 +80,7 @@
 
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

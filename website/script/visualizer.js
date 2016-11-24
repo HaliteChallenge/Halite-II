@@ -12,31 +12,30 @@ function initPixi() {
     renderer = PIXI.autoDetectRenderer(0, 0, { backgroundColor: 0x000000, antialias: true, transparent: true });
 }
 
-function showGame(game, showmovement, isminimal, seconds) {
-
+function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal, offline, seconds) {
     if(renderer == null) initPixi();
 
-    if(!isminimal) {
-        $("#pageContent").empty();
+    $container.empty();
 
+    if(!isminimal) {
         var $row = $("<div class='row'></div>");
         $row.append($("<div class='col-md-1'></div>"));
         $row.append($("<div class='col-md-10'></div>").append($("<h3 style='margin-top: 0px;'>"+game.players.slice(1, game.num_players+1).map(function(p) {
             var nameComponents = p.name.split(" ");
             var name = nameComponents.slice(0, nameComponents.length-1).join(" ").trim();
             console.log(name);
-            var user = getUser(null, name);
+            var user = offline ? null : getUser(null, name);
             if(user) {
                 return "<a href='user.php?userID="+user.userID+"' style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</a>"
             } else {
                 return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+p.name+"</span>"
             }
         }).join(" vs ")+"</h3>")));
-        $row.append($("<div class='col-md-1'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
-        $("#pageContent").append($row);
+        $row.append($("<div class='col-md-1' style='text-align: left;'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
+        $container.append($row);
     }
-    document.getElementById("pageContent").appendChild(renderer.view);
-    $("#pageContent").append($("<br>"));
+    $container.append(renderer.view);
+    $container.append($("<br>"));
 
     var frame = 0;
     var transit = 0;
@@ -48,7 +47,7 @@ function showGame(game, showmovement, isminimal, seconds) {
     if(zoom < 1) zoom = 1;
 
     window.onresize = function() {
-        var allowedWidth = $("#pageContent").width(), allowedHeight = window.innerHeight - (20 + $("canvas").offset().top);
+        var allowedWidth = (maxWidth == null ? $container.width() : maxWidth), allowedHeight = (maxHeight == null ? window.innerHeight - (20 + $("canvas").offset().top) : maxHeight);
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);
@@ -315,13 +314,17 @@ function showGame(game, showmovement, isminimal, seconds) {
             var time = Date.now();
             var dt = time - lastTime;
             lastTime = time;
-
-            //Update frames per sec if up or down arrows are pressed.
-            if(pressed[38]) {
-                framespersec += 0.05;
-            }
-            else if(pressed[40]) {
-                framespersec -= 0.05;
+            
+            // If we are embedding a game,
+            // we want people to be able to scroll with
+            // the arrow keys
+            if(!isminimal) {
+                //Update frames per sec if up or down arrows are pressed.
+                if(pressed[38]) {
+                    framespersec += 0.05;
+                } else if(pressed[40]) {
+                    framespersec -= 0.05;
+                }
             }
 
             if(pressed[39]) {
@@ -402,14 +405,14 @@ function showGame(game, showmovement, isminimal, seconds) {
     }
 }
 
-function textFromURL(replayName, callback) {
+function textFromURL(replayName, $container, callback) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", "https://s3.amazonaws.com/halitereplaybucket/"+replayName, true);
     oReq.onload = function (oEvent) {
         if (oReq.status != 404) {
             callback(textToGame(oReq.response, replayName));
         } else {
-            $("#pageContent").html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
+            $container.html("<h1>Gamefile not found</h1><p>The gamefile titled \""+replayName+"\" could not be found. If this problem persists, post of the forums or email us at halite@halite.io.</h1>");
         }
     }
     oReq.send(null);
