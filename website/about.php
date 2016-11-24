@@ -32,6 +32,7 @@
 
                 <p>May the best bot win!</p>
 
+            </div>
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
