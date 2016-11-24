@@ -22,7 +22,11 @@ The frontend of halite.io is written in HTML, CSS, and Javascript. The Bootstrap
 
 The backend is written in PHP. Apache is used as its webserver.
 
-The server on which the website is hosted also hosts the manager and is used for the storage of the source code of contestants.
+The server on which the website is hosted also hosts the manager.
+
+To update the version of the site on the server, just: 
+
+    cd ~/Halite && git pull
 
 ### HCE
 
