@@ -67,8 +67,6 @@ def _run_cmd(cmd, working_dir, timelimit):
     cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    start = time.time()
-    timelimit = timelimit - start
 
     try:
         rawOut, rawErrors = process.communicate(timeout=timelimit)
@@ -446,10 +444,9 @@ def compile_function(language, bot_dir, timelimit):
             nukeglob(glob)
 
     errors = []
-    stop_time = time.time() + timelimit
     for globs, compiler in language.compilers:
         try:
-            if not compiler.compile(bot_dir, globs, errors, stop_time):
+            if not compiler.compile(bot_dir, globs, errors, timelimit):
                 return False, errors
         except Exception as exc:
             raise
@@ -497,13 +494,12 @@ def get_run_lang(submission_dir):
 
 def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
-        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, time.time() + installTimeLimit)
+        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
     detected_language, errors = detect_language(bot_dir)
     print("detected language")
     if detected_language:
         print("compiling")
-        compiled, errors = compile_function(detected_language, bot_dir,
-                timelimit)
+        compiled, errors = compile_function(detected_language, bot_dir, timelimit)
         print("done compiling")
         if compiled:
             name = detected_language.name
