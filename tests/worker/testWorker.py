@@ -37,8 +37,8 @@ class CompilerTests(unittest.TestCase):
             expectedLanguage = folderName.split("-")[1]
             print("Expected Language: " + expectedLanguage)
             language, errors = compiler.compile_anything(folder)
-            print(errors)
-            print(language)
+            if errors is not None: print("Errors: " + "\n".join(errors))
+            print("Language: " + language)
 
             assert language == expectedLanguage
             assert errors == None
