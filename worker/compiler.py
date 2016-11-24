@@ -246,6 +246,7 @@ comp_args = {
     "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
                              ["gcc", "-O2", "-lm", "-o", BOT]],
     "C#"            : [["mcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
+    "Clojure"     : [["lein", "uberjar"]],
     "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
                              ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
@@ -306,10 +307,10 @@ languages = (
             (["*.o"], ExternalCompiler(comp_args["C++"][1]))
         ]
     ),
-    Language("Clojure", BOT +".clj", "MyBot.clj",
-        "java -Xmx%sm -cp /usr/share/java/clojure.jar:. clojure.main MyBot.clj" % (MEMORY_LIMIT,),
+    Language("Clojure", "target/"+BOT +".jar", "project.clj",
+        "target/MyBot.jar",
         [],
-        [(["*.clj"], ChmodCompiler("Clojure"))]
+        [([""], ErrorFilterCompiler(comp_args["Clojure"][0], filter_stderr="(Retrieving|Compiling)"))]
     ),
     Language("CoffeeScript", BOT +".coffee", "MyBot.coffee",
         "coffee MyBot.coffee",
