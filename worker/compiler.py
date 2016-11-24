@@ -308,7 +308,7 @@ languages = (
         ]
     ),
     Language("Clojure", "target/"+BOT +".jar", "project.clj",
-        "target/MyBot.jar",
+        "java -cp target/MyBot.jar MyBot",
         [],
         [([""], ErrorFilterCompiler(comp_args["Clojure"][0], filter_stderr="(Retrieving|Compiling)"))]
     ),
