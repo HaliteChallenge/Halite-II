@@ -46,6 +46,7 @@
                             <li>PHP - .php</li>
                             <li>JavaScript - .js</li>
                             <li>OCaml - .ml</li>
+                            <li>Clojure - .clj</li>
                         </ul>
                     </p>
 
@@ -64,6 +65,7 @@
                         The following build automators are used:
                         <ul>
                             <li>Rust - cargo 0.11.0</li>
+                            <li>Clojure - lein 2.7.0</li>
                         </ul>
                     </p>
 
@@ -81,6 +83,7 @@
                             <li>PHP 7.0</li>
                             <li>Node.js (JavaScript) 7.1.0</li>
                             <li>OCaml 4.01.0</li>
+                            <li>Clojure 1.8.0</li>
                         </ul>
                     </p>
 
