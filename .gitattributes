@@ -1,6 +1,7 @@
 # Linguist ignore
 website/lib/* linguist-vendored
 json.hpp linguist-vendored=false
+environment/tclap/* linguist-vendored
 
 # Auto detect text files and perform LF normalization
 * text=auto
