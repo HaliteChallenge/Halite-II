@@ -419,7 +419,7 @@ class WebsiteAPI extends API{
         
         // Mark an annoucement as closed    
         else if(isset($_POST['announcementID'])) {
-            $announcementID = $_POST['announcementID'];
+            $announcementID = intval($_POST['announcementID']);
             $user = $this->getLoggedInUser();
 
             if(count($this->select("SELECT * FROM User WHERE user={$user['userID']} LIMIT 1")) > 0) {
