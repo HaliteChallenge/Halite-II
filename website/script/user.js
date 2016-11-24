@@ -10,7 +10,7 @@ $(function() {
         render: function() {
             var vr = "<span style='color: #0092a1;'>|</span>";
             this.$profileImage.attr("src", "https://avatars.githubusercontent.com/u/"+this.user["oauthID"]);
-            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + this.user['username'] + "</a>");
+            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + filterXSS(this.user['username']) + "</a>");
 
             this.$primaryInfo.append("<a href='leaderboard.php?userID="+this.user["userID"]+"'>Rank " + this.user['rank']+"</a>");
             this.$primaryInfo.append("<br>");
@@ -220,7 +220,7 @@ $(function() {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
-            $(document).prop('title', user.username);
+            $(document).prop('title', filterXSS(user.username));
 
             profileCard.init(user);
             gameTable.init(parseInt(user["userID"]), isMe, function(userID, startingID) {
