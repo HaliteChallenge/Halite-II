@@ -67,8 +67,6 @@ def _run_cmd(cmd, working_dir, timelimit):
     cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    start = time.time()
-    timelimit = timelimit - start
 
     try:
         rawOut, rawErrors = process.communicate(timeout=timelimit)
@@ -248,6 +246,7 @@ comp_args = {
     "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
                              ["gcc", "-O2", "-lm", "-o", BOT]],
     "C#"            : [["mcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
+    "Clojure"     : [["lein", "uberjar"]],
     "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
                              ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
@@ -308,10 +307,10 @@ languages = (
             (["*.o"], ExternalCompiler(comp_args["C++"][1]))
         ]
     ),
-    Language("Clojure", BOT +".clj", "MyBot.clj",
-        "java -Xmx%sm -cp /usr/share/java/clojure.jar:. clojure.main MyBot.clj" % (MEMORY_LIMIT,),
+    Language("Clojure", "target/"+BOT +".jar", "project.clj",
+        "java -cp target/MyBot.jar MyBot",
         [],
-        [(["*.clj"], ChmodCompiler("Clojure"))]
+        [([""], ErrorFilterCompiler(comp_args["Clojure"][0], filter_stderr="(Retrieving|Compiling)"))]
     ),
     Language("CoffeeScript", BOT +".coffee", "MyBot.coffee",
         "coffee MyBot.coffee",
@@ -451,10 +450,9 @@ def compile_function(language, bot_dir, timelimit):
             nukeglob(glob)
 
     errors = []
-    stop_time = time.time() + timelimit
     for globs, compiler in language.compilers:
         try:
-            if not compiler.compile(bot_dir, globs, errors, stop_time):
+            if not compiler.compile(bot_dir, globs, errors, timelimit):
                 return False, errors
         except Exception as exc:
             raise
@@ -502,13 +500,12 @@ def get_run_lang(submission_dir):
 
 def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
-        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, time.time() + installTimeLimit)
+        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
     detected_language, errors = detect_language(bot_dir)
     print("detected language")
     if detected_language:
         print("compiling")
-        compiled, errors = compile_function(detected_language, bot_dir,
-                timelimit)
+        compiled, errors = compile_function(detected_language, bot_dir, timelimit)
         print("done compiling")
         if compiled:
             name = detected_language.name

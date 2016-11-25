@@ -33,6 +33,8 @@
                     <li><a href="downloads/starterpackages/Halite-Go-Starter-Package.zip">Go 1.6</a></li>
                     <li><a href="downloads/starterpackages/Halite-PHP-Starter-Package.zip">PHP 7.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-JavaScript-Starter-Package.zip">Node.js (JavaScript) 7.1.0</a></li>
+                    <li><a href="downloads/starterpackages/Halite-OCaml-Starter-Package.zip">OCaml 4.01.0</a></li>
+                    <li><a href="downloads/starterpackages/Halite-Clojure-Starter-Package.zip">Clojure 1.8.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-Julia-Starter-Package.zip">Julia 0.5.0</a></li>
                 </ul>
                 </p>
@@ -54,6 +56,7 @@
                 <p>If you are on Windows, run the "make.bat" file. The file named "halite.exe" is your new environment binary.</p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

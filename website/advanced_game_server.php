@@ -45,6 +45,8 @@
                             <li>Go - .go</li>
                             <li>PHP - .php</li>
                             <li>JavaScript - .js</li>
+                            <li>OCaml - .ml</li>
+                            <li>Clojure - .clj</li>
                             <li>Julia - .jl</li>
                         </ul>
                     </p>
@@ -64,6 +66,7 @@
                         The following build automators are used:
                         <ul>
                             <li>Rust - cargo 0.11.0</li>
+                            <li>Clojure - lein 2.7.0</li>
                         </ul>
                     </p>
 
@@ -80,6 +83,8 @@
                             <li>Go 1.6</li>
                             <li>PHP 7.0</li>
                             <li>Node.js (JavaScript) 7.1.0</li>
+                            <li>OCaml 4.01.0</li>
+                            <li>Clojure 1.8.0</li>
                             <li>Julia 0.5.0</li>
                         </ul>
                     </p>
@@ -91,11 +96,13 @@
                 </p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
+
 </body>
 </html>

@@ -29,6 +29,7 @@
                 <p>There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found <a href="http://forums.halite.io/t/running-your-halite-bot-from-a-debugger/70">here on the forums</a>. </p>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 

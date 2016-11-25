@@ -34,7 +34,7 @@ William and Mary - email.wm.edu
 Pomona - pomona.edu
 California Colleges - californiacolleges.edu
 University of Colorado - colorado.edu
-University of Charlotte - uncc.edu 
+University of Charlotte - uncc.edu
 Missouri S&T - mst.edu
 Chapman - chapman.edu
 UC - mail.uc.edu
@@ -79,3 +79,15 @@ Shaw - shaw.ca
 Futurice - futurice.com
 Seznam - seznam.cz
 Boopsie - boopsie.com
+HCM - hubcitymedia.com
+Paderborn University - mail.upb.de
+Technical University of Dresden - tu-dresden.de
+Altassian - atlassian.com
+Asimmetric - asimmetric.com
+Binghamton - binghamton.edu
+National Research University - edu.hse.ru
+Proekspert - proekspert.ee
+Carleton University - carleton.ca
+DoubleDutch - doubledutch.me
+RWTH Aachen - rwth-aachen.de
+University of Aveiro - ua.pt

@@ -193,7 +193,7 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
             $user["email"] = $_GET["newEmail"];
 
-            $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false);
+            $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false, true);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
                 $emailCallbackURL = urlencode(WEB_DOMAIN."api/web/email?".$_SERVER['QUERY_STRING']);
@@ -419,7 +419,7 @@ class WebsiteAPI extends API{
         
         // Mark an annoucement as closed    
         else if(isset($_POST['announcementID'])) {
-            $announcementID = $_POST['announcementID'];
+            $announcementID = intval($_POST['announcementID']);
             $user = $this->getLoggedInUser();
 
             if(count($this->select("SELECT * FROM User WHERE user={$user['userID']} LIMIT 1")) > 0) {
@@ -438,7 +438,7 @@ class WebsiteAPI extends API{
      */
     protected function errorLog() {
         // Return the requested error log only if it belongs to the signed in user.
-        if(isset($_GET['errorLogName']) && isset($_SESSION['userID']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='{$_GET['errorLogName']}' and userID={$_SESSION['userID']}"))) {
+        if(isset($_GET['errorLogName']) && isset($_SESSION['userID']) && count($this->select("SELECT * FROM GameUser WHERE errorLogName='".$this->mysqli->real_escape_string($_GET['errorLogName'])."' and userID={$_SESSION['userID']}"))) {
             $result = $this->loadAwsSdk()->createS3()->getObject([
                 'Bucket' => ERROR_LOG_BUCKET,
                 'Key'    => $_GET['errorLogName']

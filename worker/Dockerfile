@@ -32,4 +32,12 @@ RUN apt-get install -y build-essential
 RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
 RUN apt-get install -y nodejs
 
+RUN apt-get install -y ocaml
+
+RUN sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
+RUN chmod a+x /usr/bin/lein
+RUN lein
+
+RUN pip3 install virtualenv
+
 RUN apt-get install -y julia

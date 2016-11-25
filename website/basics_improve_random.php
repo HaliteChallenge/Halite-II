@@ -59,7 +59,7 @@
                     <li>A zero strength piece that moves will necessarily stay at zero strength, because pieces don't gain strength for any turn that they move.</li>
                     <li>A zero strength piece won't ever conqueror any territory, because it has no strength with which to damage other pieces.</li>
                 </ul>
-                <p>Let's wrap the movement logic inside a function of it's own. This function will take the location of a piece and will return the piece's movement.</p>
+                <p>Let's wrap the movement logic inside a function of its own. This function will take the location of a piece and will return the piece's movement.</p>
                 <p>Now we can improve our bot by making sure that we tell all of our zero strength pieces to remain still.</p>
                 <span data-gist-id="5ea767bae8a725f738d75649e5f2c91a" data-gist-file="Revision1.py"></span>
 
@@ -79,6 +79,7 @@
 
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
 
