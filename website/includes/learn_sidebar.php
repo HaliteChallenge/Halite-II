@@ -69,7 +69,7 @@
                     <a href="guides_development.php">Bot Development</a>
                 </li>
                 <li id="guides_libraries">
-                    <a href="guides_libraries.php">Using Package Managers</a>
+                    <a href="guides_libraries.php">Using 3rd Party Libraries</a>
                 </li>
                 <li id="guides_strategy">
                     <a href="guides_strategy.php">Strategy Considerations</a>

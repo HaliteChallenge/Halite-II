@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Using Package Managers</title>
+    <title>Using 3rd Party Libraries</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
