@@ -1,6 +1,6 @@
 _productions = Vector{Vector{Int64}}()
-local _width
-local _height
+_width = nothing
+_height = nothing
 
 function serializeMoveSet(moves::Vector{Move})
   returnString = ""
