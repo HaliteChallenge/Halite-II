@@ -37,3 +37,5 @@ RUN apt-get install -y ocaml
 RUN sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
 RUN chmod a+x /usr/bin/lein
 RUN lein
+
+RUN pip3 install virtualenv
