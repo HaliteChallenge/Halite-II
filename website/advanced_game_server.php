@@ -18,7 +18,7 @@
                 <h1>Game Server Reference</h1>
 
                 <h3>Hardware</h3>
-                <p>All compilation and game execution is done on AWS EC2 t2.small servers running Ubuntu. They have the following specs:
+                <p>All compilation and game execution is done on AWS EC2 m3.medium servers running Ubuntu 14.04. They have the following specs:
                     <ul>
                         <li>3.5 GB of RAM</li>
                         <li>~10 GB of disk space</li>
