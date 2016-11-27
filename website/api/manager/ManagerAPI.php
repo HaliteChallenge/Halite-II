@@ -90,6 +90,7 @@ class ManagerAPI extends API{
                 $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
             } else {
                 $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 250 order by maxTime ASC limit 1");
+                if(count($seedPlayer) < 1) $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID order by maxTime ASC limit 1");
             }
             if(count($seedPlayer) < 1) return null;
 
