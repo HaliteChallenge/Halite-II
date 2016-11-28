@@ -76,6 +76,10 @@
                 <p>To improve on our current combat, if there is an enemy or map square that is adjacent to one of our pieces with less strength than our piece, let's take it.</p>
                 <span data-gist-id="5ea767bae8a725f738d75649e5f2c91a" data-gist-file="Revision4.py"></span>
 
+                <h3>What Next?</h3>
+                <p>That's really up to you! How you improve your bot from here is where you step into the competition.</p>
+                <p>That said, if you're looking for more ideas or a stronger starting base, <a href="https://halite.io/user.php?userID=2697">nmlaguti</a> wrote a tutorial <a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">here</a> that we highly recommend.</p>
+                <p>Good luck!</p>
 
             </div>
         </div>
