@@ -8,6 +8,10 @@ $(function() {
             this.render();
         },
         render: function() {
+            var mu = Math.round(this.user.mu*100)/100;
+            var sigma = Math.round(this.user.sigma*100)/100;
+            var score = Math.round((this.user.mu-(3*this.user.sigma))*100)/100;
+
             var vr = "<span style='color: #0092a1;'>|</span>";
             this.$profileImage.attr("src", "https://avatars.githubusercontent.com/u/"+this.user["oauthID"]);
             this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + filterXSS(this.user['username']) + "</a>");
@@ -16,7 +20,7 @@ $(function() {
             this.$primaryInfo.append("<br>");
             this.$primaryInfo.append("<span>" + this.user['tier'] + " Tier</span>");
             this.$primaryInfo.append("<br>");
-            this.$primaryInfo.append("<span>"+(Math.round((this.user['mu']-this.user['sigma']*3)*100)/100)+" points</span>");
+            this.$primaryInfo.append("<span title='mu: "+ mu +" sigma: "+ sigma +"'>"+ score +" points</span>");
 
             this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+encodeURIComponent(this.user['language'])+"&value="+encodeURIComponent(this.user['language'])+"'>"+this.user['language']+ "</a></span>"));
             this.$secondaryInfo.append($("<br>"));
