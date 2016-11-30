@@ -78,7 +78,7 @@ class WebsiteAPI extends API{
             
             if(intval($user['isRunning']) == 1) {
                 $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
-                if($percentile < 1/32) $user['tier'] = "Diamond";
+                if($percentile < 1/64) $user['tier'] = "Diamond";
                 else if($percentile < 1/16) $user['tier'] = "Gold";
                 else if($percentile < 1/4) $user['tier'] = "Silver";
                 else $user['tier'] = "Bronze";

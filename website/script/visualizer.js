@@ -47,7 +47,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
     if(zoom < 1) zoom = 1;
 
     window.onresize = function() {
-        var allowedWidth = (maxWidth == null ? $container.width() : maxWidth), allowedHeight = (maxHeight == null ? window.innerHeight - (20 + $("canvas").offset().top) : maxHeight);
+        var allowedWidth = (maxWidth == null ? $container.width() : maxWidth), allowedHeight = (maxHeight == null ? window.innerHeight - (25 + $("canvas").offset().top) : maxHeight);
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);
