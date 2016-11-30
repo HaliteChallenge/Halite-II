@@ -401,7 +401,10 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         renderer.render(stage);
 
         //Of course, we want to render in the future as well.
-        requestAnimationFrame(animate);
+        var idle = (Object.keys(pressed).length === 0) && !shouldplay;
+        setTimeout(function() {
+            requestAnimationFrame(animate);
+        }, 1000 / (idle ? 6.0 : 60.0));
     }
 }
 
