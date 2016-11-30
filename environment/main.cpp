@@ -102,7 +102,7 @@ int main(int argc, char ** argv) {
         }
     }
     else {
-        if(unlabeledArgs.size() < 2) {
+        if(unlabeledArgs.size() < 1) {
             std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
             networking = promptNetworking();
         }

@@ -55,6 +55,7 @@ private:
     //Game state
     unsigned short turn_number;
     unsigned short number_of_players;
+    unsigned short productive_squares_remaining;
     bool ignore_timeout;
     hlt::Map game_map;
     std::vector<std::string> player_names;
