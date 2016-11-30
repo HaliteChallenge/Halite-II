@@ -6,7 +6,7 @@
 
         GAME GetInit()
         void SendInit(char *botname)
-        GAME GetFrame(GAME game)
+        void GetFrame(GAME game)
         void SetMove(GAME game, int x, int y, int direction)
         void SendFrame(GAME game)
 
@@ -95,7 +95,7 @@ int __getnextint() {
     return 54321;       // Never get here.
 }
 
-GAME __parseproduction(GAME game) {
+void __parseproduction(GAME game) {
 
     int x, y;
 
@@ -104,10 +104,10 @@ GAME __parseproduction(GAME game) {
             game.production[x][y] = __getnextint();
         }
     }
-    return game;
+    return;
 }
 
-GAME __parsemap(GAME game) {
+void __parsemap(GAME game) {
 
     int x, y;
     int run;
@@ -143,7 +143,7 @@ GAME __parsemap(GAME game) {
         }
     }
 
-    return game;
+    return;
 }
 
 GAME GetInit() {
@@ -159,8 +159,8 @@ GAME GetInit() {
     game.production = __new_2d_int_array(game.width, game.height);
     game.strength = __new_2d_int_array(game.width, game.height);
 
-    game = __parseproduction(game);
-    game = __parsemap(game);
+    __parseproduction(game);
+    __parsemap(game);
 
     return game;
 }
@@ -170,11 +170,11 @@ void SendInit(char *botname) {
     fflush(stdout);
 }
 
-GAME GetFrame(GAME game) {
+void GetFrame(GAME game) {
 
     int x, y;
 
-    game = __parsemap(game);
+    __parsemap(game);
 
     // Reset the moves array while we're at it.
 
@@ -184,7 +184,7 @@ GAME GetFrame(GAME game) {
         }
     }
 
-    return game;
+    return;
 }
 
 int __sanitise_x(GAME game, int x) {
