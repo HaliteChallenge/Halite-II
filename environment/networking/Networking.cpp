@@ -278,6 +278,7 @@ void Networking::startAndConnectBot(std::string command) {
     if(pid == 0) { //This is the child
         setpgid(getpid(), getpid());
 
+#ifdef __linux__
         // install a parent death signal
         // http://stackoverflow.com/a/36945270
         int r = prctl(PR_SET_PDEATHSIG, SIGTERM);
@@ -288,6 +289,7 @@ void Networking::startAndConnectBot(std::string command) {
         }
         if (getppid() != ppid_before_fork)
             exit(1);
+#endif
 
         dup2(writePipe[0], STDIN_FILENO);
 
@@ -317,9 +319,9 @@ void Networking::startAndConnectBot(std::string command) {
 }
 
 int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, bool ignoreTimeout, std::string * playerName) {
-    
+
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 15000;
-    
+
     std::string response;
     try {
         std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
@@ -362,7 +364,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
 int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves) {
 
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
-    
+
     std::string response;
     try {
         if(isProcessDead(playerTag)) return -1;
