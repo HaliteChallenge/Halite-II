@@ -1,4 +1,5 @@
 Two Sigma - twosigma.com
+Auburn - auburn.edu
 Cornell - cornell.edu
 NYU - nyu.edu
 Stanford - stanford.edu
