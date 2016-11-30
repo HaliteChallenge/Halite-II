@@ -93,5 +93,5 @@ DoubleDutch - doubledutch.me
 RWTH Aachen - rwth-aachen.de
 University of Aveiro - ua.pt
 Allstate - allstate.com
-KU Leuven - kuleuven.be
 Dreamix - dreamix.eu
+KU Leuven - student.kuleuven.be
