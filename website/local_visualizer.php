@@ -20,7 +20,6 @@
                 <input type="file" id="filePicker" style="display: none;">
             </div>
         </div>
-        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
