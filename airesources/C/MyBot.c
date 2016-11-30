@@ -18,7 +18,7 @@ int main(void) {
 
     while (1) {
 
-        game = GetFrame(game);
+        GetFrame(game);
 
         for (x = 0 ; x < game.width ; x++) {
             for (y = 0 ; y < game.height ; y++) {
