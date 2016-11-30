@@ -91,4 +91,5 @@ Carleton University - carleton.ca
 DoubleDutch - doubledutch.me
 RWTH Aachen - rwth-aachen.de
 University of Aveiro - ua.pt
-Allstate - allstate.com 
+Allstate - allstate.com
+KU Leuven - kuleuven.be
