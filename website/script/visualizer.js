@@ -404,7 +404,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         var idle = (Object.keys(pressed).length === 0) && !shouldplay;
         setTimeout(function() {
             requestAnimationFrame(animate);
-        }, 1000 / (idle ? 6.0 : 60.0));
+        }, 1000 / (idle ? 6.0 : 80.0));
     }
 }
 
