@@ -364,6 +364,10 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         PlayerStatistics p;
         p.tag = a + 1;
         p.rank = std::distance(rankings.begin(), std::find(rankings.begin(), rankings.end(), a)) + 1;
+        // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
+        // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
+        // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but #1 finisher, who still only needs -1
+        p.last_frame_alive = alive_frame_count[a] - ((p.rank == 1) ? 1 : 2);
         p.average_territory_count = full_territory_count[a] / double(chunkSize * alive_frame_count[a]);
         p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
         p.average_production_count = alive_frame_count[a] > 1 ? full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)) : 0; //For this, we want turns rather than frames.
