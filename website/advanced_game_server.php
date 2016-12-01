@@ -47,6 +47,7 @@
                             <li>JavaScript - .js</li>
                             <li>OCaml - .ml</li>
                             <li>Clojure - .clj</li>
+                            <li>C - .c</li>
                         </ul>
                     </p>
 
@@ -54,10 +55,11 @@
                         The following compilers are used:
                         <ul>
                             <li>Java - javac 1.8.0_111</li>
-                            <li>C++ - g++ 4.84</li>
+                            <li>C++ - g++ 4.8</li>
                             <li>C# - mcs 4.6.1.0</li>
                             <li>Rust - rustc 1.10.0</li>
                             <li>Scala - scalac 2.10.4</li>
+                            <li>C - gcc 4.8</li>
                         </ul>
                     </p>
 
