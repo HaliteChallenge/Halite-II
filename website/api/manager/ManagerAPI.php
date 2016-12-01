@@ -86,13 +86,16 @@ class ManagerAPI extends API{
             $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
             $seedPlayer = null;
-            if((mt_rand() / mt_getrandmax()) > 0.5) {
+            $randValue = mt_rand() / mt_getrandmax();
+            if($randValue > 0.5) {
                 $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
-            } else {
-                $seedPlayer = $this->select("SELECT * FROM (SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 400 order by maxTime ASC limit 15) orderedTable order by rand() limit 1;");
-                if(count($seedPlayer) < 1) $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID order by maxTime ASC limit 1");
             }
-            if(count($seedPlayer) < 1) return null;
+            if ($randValue > 0.25 && $randValue <= 0.5) {
+                $seedPlayer = $this->select("SELECT * FROM (SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 400 order by maxTime ASC limit 15) orderedTable order by rand() limit 1;");
+            } 
+            if($randValue <= 0.25 || count($seedPlayer) < 1) {
+                $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID order by maxTime ASC limit 1");
+            }
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));
             $players = $this->selectMultiple("SELECT * FROM (SELECT * FROM User WHERE isRunning=1 and userID <> {$seedPlayer['userID']} ORDER BY ABS(mu-{$seedPlayer['mu']}) LIMIT $muRankLimit) muRankTable ORDER BY rand() LIMIT ".($numPlayers-1));

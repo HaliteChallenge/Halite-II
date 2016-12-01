@@ -1,4 +1,5 @@
 Two Sigma - twosigma.com
+Auburn - auburn.edu
 Cornell - cornell.edu
 NYU - nyu.edu
 Stanford - stanford.edu
@@ -91,4 +92,6 @@ Carleton University - carleton.ca
 DoubleDutch - doubledutch.me
 RWTH Aachen - rwth-aachen.de
 University of Aveiro - ua.pt
-Allstate - allstate.com 
+Allstate - allstate.com
+Dreamix - dreamix.eu
+KU Leuven - student.kuleuven.be
