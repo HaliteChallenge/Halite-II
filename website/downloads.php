@@ -35,6 +35,7 @@
                     <li><a href="downloads/starterpackages/Halite-JavaScript-Starter-Package.zip">Node.js (JavaScript) 7.1.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-OCaml-Starter-Package.zip">OCaml 4.01.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-Clojure-Starter-Package.zip">Clojure 1.8.0</a></li>
+                    <li><a href="downloads/starterpackages/Halite-C-Starter-Package.zip">C</a></li>
                 </ul>
                 </p>
 
