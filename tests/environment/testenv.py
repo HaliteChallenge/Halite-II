@@ -47,13 +47,16 @@ else:
     print('General environment test succeeded.')
 
 # Ensures that the environment can run a basic game where a bot wins. Confirm that the bot expected to win does indeed win.
-splines = subprocess.Popen('../../environment/halite -d "10 10" -q "../../airesources/C++/MyBot" "cd ../../airesources/Java; java MyBot" "python3 ../../airesources/Python/MyBot.py" "../../airesources/Rust/target/release/MyBot" -s 1000', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
+splines = subprocess.Popen('../../environment/halite -d "10 10" -q "../../airesources/C++/MyBot" "java -cp ../../airesources/Java MyBot" "python3 ../../airesources/Python/MyBot.py" "../../airesources/Rust/target/release/MyBot" -s 1000', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
 if splines[9] != " " or splines[10] != " ":
     print('Starter package test failed. Environment output:\n#######################################################')
     print('\n'.join(splines) + '\n#######################################################')
     isGood = False
 else:
     print('Starter package test succeeded.')
+
+splines = subprocess.Popen('cat *.log', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
+print('\n'.join(splines))
 
 # Ensures that tie evaluation is correct. Confirm that the bot expected to win does indeed win.
 tielines = subprocess.Popen('../../environment/halite -d "10 10" -q "python3 ModBot.py" "python3 ModBot.py" -s 998', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')

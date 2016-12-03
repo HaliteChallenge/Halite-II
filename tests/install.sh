@@ -2,13 +2,13 @@ add-apt-repository -y ppa:ubuntu-toolchain-r/test
 apt-get update
 
 # Python
-apt-get install -y python3 
+apt-get install -y python3
 
 # Java
-apt-get install -y openjdk-7-jdk libjansi-java
+apt-get install -y openjdk-8-jdk libjansi-java
 
 # Rust
-curl -sSf https://static.rust-lang.org/rustup.sh | sh 
+curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
 # C++
 apt-get install -y g++-4.9
@@ -32,3 +32,10 @@ mv phpunit.phar /usr/local/bin/phpunit
 php -v
 mysql -V
 phpunit --version
+
+update-alternatives --set java $(update-alternatives --list java | grep java-8-openjdk)
+update-alternatives --set javac $(update-alternatives --list javac | grep java-8-openjdk)
+update-alternatives --display java
+update-alternatives --display javac
+java -version
+javac -version
