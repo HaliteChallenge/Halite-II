@@ -226,6 +226,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
     ignore_timeout = shouldIgnoreTimeout;
 
     //Init statistics
+    productive_squares_remaining = 1;   // just more than zero to get through the game_loop the first time
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
     last_territory_count = std::vector<unsigned int>(number_of_players, 1);
     full_territory_count = std::vector<unsigned int>(number_of_players, 1);
@@ -325,7 +326,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
     }
     const int maxTurnNumber = sqrt(game_map.map_width * game_map.map_height) * 10;
-    while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber) {
+    while(turn_number < maxTurnNumber && (std::count(result.begin(), result.end(), true) > 1 || (number_of_players == 1 && productive_squares_remaining > 0))) {
         //Increment turn number:
         turn_number++;
         if(!quiet_output) std::cout << "Turn " << turn_number << "\n";
@@ -342,6 +343,10 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
             return last_territory_count[u1] < last_territory_count[u2];
         });
         for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
+
+        //Count productive squares remaining for Halite single-player game
+        productive_squares_remaining = 0;
+        for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == 0 && game_map.contents[b][c].production > 0) productive_squares_remaining++;
         result = newResult;
     }
     std::vector<unsigned int> newRankings;

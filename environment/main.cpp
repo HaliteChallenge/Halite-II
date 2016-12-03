@@ -102,7 +102,7 @@ int main(int argc, char ** argv) {
         }
     }
     else {
-        if(unlabeledArgs.size() < 2) {
+        if(unlabeledArgs.size() < 1) {
             std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
             networking = promptNetworking();
         }
@@ -144,7 +144,7 @@ Networking promptNetworking() {
     bool done = false;
     for(int np = 0; !done; np++) {
         //If less than 2, bypass this step: Ask if the user like to add another AI
-        if (np >= 2) {
+        if (np >= 1) {
             std::cout << "Would you like to add another player? Please enter Yes or No: ";
             while (true) {
                 std::getline(std::cin, in);
