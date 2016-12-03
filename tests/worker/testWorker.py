@@ -43,6 +43,20 @@ class CompilerTests(unittest.TestCase):
             assert language == expectedLanguage
             assert errors == None
 
+    def testLanguageOverride(self):
+        '''Use a LANGUAGE file to override the detected language'''
+        LANGUAGE_BOT_PATH = "languageBot"
+
+        bot_dir = os.path.join(OUR_PATH, LANGUAGE_BOT_PATH)
+        expectedLanguage = "TestLanguage"
+
+        language, errors = compiler.compile_anything(bot_dir)
+        if errors is not None: print("Errors: " + "\n".join(errors))
+        print("Language: " + language)
+
+        assert language == expectedLanguage
+        assert errors == None
+
 class GameTests(unittest.TestCase):
     def testNormalGame(self):
         '''Test the parsing of the output of runGame.sh'''
