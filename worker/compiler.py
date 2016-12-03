@@ -22,6 +22,7 @@ except ImportError:
     MEMORY_LIMIT = 1500
 
 BOT = "MyBot"
+LANGUAGE_FILE = "LANGUAGE"
 SAFEPATH = re.compile('[a-zA-Z0-9_.$-]+$')
 
 class CD(object):
@@ -477,6 +478,20 @@ def detect_language(bot_dir):
         else:
             return detected_langs[0], None
 
+def detect_language_file(bot_dir):
+    with CD(bot_dir):
+        try:
+            with open(LANGUAGE_FILE, 'r') as lang_file:
+                print("detected %s file" % LANGUAGE_FILE)
+                language_name = lang_file.readline().strip()
+
+                if not language_name:
+                    return None
+                else:
+                    return language_name
+        except IOError:
+            return None
+
 def get_run_cmd(submission_dir):
     with CD(submission_dir):
         if os.path.exists('run.sh'):
@@ -518,6 +533,11 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
             except Exception as e:
                 print("error")
                 print(e.strerror)
+
+            # allow LANGUAGE file to override language name
+            override_name = detect_language_file(bot_dir)
+            if override_name:
+                name = override_name
             return name, None
         else:
             # limit length of reported errors

@@ -1,0 +1,1 @@
+../../../airesources/Python/MyBot.py
