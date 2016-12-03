@@ -78,7 +78,7 @@
 
                 <h3>What Next?</h3>
                 <p>That's really up to you! How you improve your bot from here is where you step into the competition.</p>
-                <p>That said, if you're looking for more ideas or a stronger starting base, <a href="https://halite.io/user.php?userID=2697">nmlaguti</a> wrote a tutorial <a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">here</a> that we highly recommend.</p>
+                <p>That said, if you're looking for more ideas or a stronger starting base, <a href="https://halite.io/user.php?userID=2697">nmalaguti</a> wrote a tutorial <a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">here</a> that we highly recommend.</p>
                 <p>Good luck!</p>
 
             </div>
