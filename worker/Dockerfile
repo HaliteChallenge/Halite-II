@@ -37,3 +37,9 @@ RUN apt-get install -y ocaml
 RUN sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
 RUN chmod a+x /usr/bin/lein
 RUN lein
+
+RUN apt-get install -y git
+
+RUN pip3 install numpy scipy scikit-learn pillow h5py
+RUN pip3 install --upgrade --no-deps git+git://github.com/Theano/Theano.git
+RUN pip3 install keras
