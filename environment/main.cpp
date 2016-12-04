@@ -75,13 +75,15 @@ int main(int argc, char ** argv) {
     }
 
     if(mapWidth == 0 && mapHeight == 0) {
-        promptDimensions(mapWidth, mapHeight);
+        std::vector<unsigned short> mapSizeChoices = {20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50};
+        mapWidth = mapSizeChoices[rand() % mapSizeChoices.size()];
+        mapHeight = mapWidth;
     }
 
     if(override_names) {
         if(unlabeledArgs.size() < 4 || unlabeledArgs.size() % 2 != 0) {
-            std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
-            networking = promptNetworking();
+            std::cout << "Invalid number of player parameters with override switch enabled.  Override intended for server use only." << std::endl;
+            exit(1);
         }
         else {
             try {
@@ -94,17 +96,17 @@ int main(int argc, char ** argv) {
                 }
             }
             catch(...) {
-                std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
-                networking = promptNetworking();
+                std::cout << "Invalid player parameters with override switch enabled.  Override intended for server use only." << std::endl;
                 delete names;
                 names = NULL;
+                exit(1);
             }
         }
     }
     else {
         if(unlabeledArgs.size() < 1) {
-            std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
-            networking = promptNetworking();
+            std::cout << "Please provide the launch command string for at least one bot." << std::endl;
+            exit(1);
         }
         try {
             while(!unlabeledArgs.empty()) {
@@ -114,8 +116,8 @@ int main(int argc, char ** argv) {
             }
         }
         catch(...) {
-            std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
-            networking = promptNetworking();
+            std::cout << "One or more of your bot launch command strings failed.  Please check for correctness and try again." << std::endl;
+            exit(1);
         }
     }
 
@@ -136,68 +138,4 @@ int main(int argc, char ** argv) {
     delete my_game;
 
     return 0;
-}
-
-Networking promptNetworking() {
-    Networking n;
-    std::string in;
-    bool done = false;
-    for(int np = 0; !done; np++) {
-        //If less than 2, bypass this step: Ask if the user like to add another AI
-        if (np >= 1) {
-            std::cout << "Would you like to add another player? Please enter Yes or No: ";
-            while (true) {
-                std::getline(std::cin, in);
-                std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-                if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
-                std::cout << "That isn't a valid input. Please enter Yes or No: ";
-            }
-            if (in == "n" || in == "no" || in == "nope") break;
-        }
-
-        while (true) {
-            std::string startCommand;
-            std::cout << "What is the start command for this bot: ";
-            std::getline(std::cin, startCommand);
-
-            try{
-                n.startAndConnectBot(startCommand);
-                break;
-            }
-            catch (int e) {
-                std::cout << "There was a problem with that start command. Please enter another one.\n";
-            }
-        }
-
-        std::cout << "Connected to player #" << int(np + 1) << std::endl;
-    }
-    return n;
-}
-
-void promptDimensions(unsigned short & w, unsigned short & h) {
-    std::string in;
-    std::cout << "Please enter the width of the map: ";
-    std::getline(std::cin, in);
-    while(true) {
-        try{
-            w = std::stoi(in);
-            break;
-        }
-        catch(std::exception e) {
-            std::cout << "That isn't a valid input. Please enter a positive integer width of the map: ";
-            std::getline(std::cin, in);
-        }
-    }
-    std::cout << "Please enter the height of the map: ";
-    std::getline(std::cin, in);
-    while(true) {
-        try{
-            h = std::stoi(in);
-            break;
-        }
-        catch(std::exception e) {
-            std::cout << "That isn't a valid input. Please enter a positive integer height of the map: ";
-            std::getline(std::cin, in);
-        }
-    }
 }
