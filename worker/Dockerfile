@@ -41,6 +41,5 @@ RUN lein
 RUN apt-get install -y git
 
 RUN pip3 install numpy scipy scikit-learn pillow h5py
-RUN export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.0rc0-cp34-cp34m-linux_x86_64.whl
-RUN pip3 install --upgrade $TF_BINARY_URL
+RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.0rc0-cp35-cp35m-linux_x86_64.whl 
 RUN pip3 install keras
