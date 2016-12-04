@@ -11,6 +11,8 @@ AddOutputFilterByType DEFLATE application/x-javascript
 ErrorDocument 404 /404.php
 
 <IfModule mod_expires.c>
-ExpiresActive on
-ExpiresDefault "access plus 2 days"
+    <FilesMatch "\.(jpg|jpeg|png|gif|js|css)$">
+        ExpiresActive on
+        ExpiresDefault "access plus 2 days"
+    </FilesMatch>
 </IfModule>
