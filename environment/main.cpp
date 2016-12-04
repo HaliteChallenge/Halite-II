@@ -31,12 +31,6 @@ void promptDimensions(unsigned short & w, unsigned short & h);
 int main(int argc, char ** argv) {
     srand(time(NULL)); //For all non-seeded randomness.
 
-    if(argc == 1) {
-        std::cout << "You've provided the environment with no arguments.\n"
-        << "If this was intentional, please ignore this message.\n"
-        << "Else, please use the --help flag for usage details.\n";
-    }
-    
     Networking networking;
     std::vector<std::string> * names = NULL;
     unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
@@ -105,7 +99,8 @@ int main(int argc, char ** argv) {
     }
     else {
         if(unlabeledArgs.size() < 1) {
-            std::cout << "Please provide the launch command string for at least one bot." << std::endl;
+            std::cout << "Please provide the launch command string for at least one bot." << std::endl
+            << "Use the --help flag for usage details.\n";
             exit(1);
         }
         try {
