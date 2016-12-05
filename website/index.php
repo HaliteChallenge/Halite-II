@@ -27,6 +27,15 @@ if(isset($_SESSION['userID'])) {
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
+    <style>
+        p:not(.featurette) {
+            font-size: 21px;
+            font-weight: 400;
+        }
+        .featurette {
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
@@ -49,12 +58,12 @@ if(isset($_SESSION['userID'])) {
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://www.twosigma.com"><img src="assets/two_sigma.png" style="max-width: 100%; max-height: 70px;"></a></div>
-                            <p>Two Sigma is a technology company dedicated to finding value in the world’s data. Since its founding in 2001, Two Sigma has built an innovative platform that combines extraordinary computing power, vast amounts of information, and advanced data science to produce breakthroughs in investment management, insurance and related fields.</p>
+                            <p class="featurette">Two Sigma is a technology company dedicated to finding value in the world’s data. Since its founding in 2001, Two Sigma has built an innovative platform that combines extraordinary computing power, vast amounts of information, and advanced data science to produce breakthroughs in investment management, insurance and related fields.</p>
                         </div>
 
                         <div class="col-sm-6">
                             <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;"><a href="https://tech.cornell.edu"><img src="assets/cornell_tech.png" style="max-width: 100%; max-height: 70px"></a></div>
-                            <p>Cornell Tech brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
+                            <p class="featurette">Cornell Tech brings together faculty, business leaders, tech entrepreneurs, and students in a catalytic environment to produce visionary results grounded in significant needs that will reinvent the way we live in the digital age.</p>
                         </div>
                     </div>
 

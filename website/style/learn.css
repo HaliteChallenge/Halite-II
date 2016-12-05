@@ -1,7 +1,14 @@
-p {
+ul:not(.nav) {
 	line-height: 1.7em;
 }
 
-ul:not(.nav) {
-	line-height: 1.7em;
+h1 {
+    margin: 0 0 1em;
+}
+
+h2 {
+    display: block;
+    margin: 45px 0 0.8em;
+    padding-bottom: 0.7em;
+    border-bottom: 1px solid #555;
 }
