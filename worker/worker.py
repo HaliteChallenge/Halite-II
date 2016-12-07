@@ -141,8 +141,8 @@ def parseGameOutput(output, users):
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
-    print("Running game with width %d, height %d\n")
-    print("Users objects %s\n" % (width, height, str(users)))
+    print("Running game with width %d, height %d\n" % (width, height))
+    print("Users objects %s\n" % (str(users)))
 
     downloadUsers(users)
     users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
