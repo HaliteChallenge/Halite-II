@@ -13,5 +13,3 @@ apt-get install -y zip
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 composer install
-
-echo "Attention: Please follow the directions in the install section of our technical spec! This is located inside of of git repo."
