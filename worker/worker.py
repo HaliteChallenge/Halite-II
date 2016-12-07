@@ -102,7 +102,9 @@ def runGame(width, height, users):
     print("Run game command %s\n" % runGameCommand)
     print("Waiting for game output...\n")
     lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
-    print("Here is game output: \n".join(lines))
+    print("\n-----Here is game output: -----")
+    print("\n".join(lines))
+    print("--------------------------------\n")
     return lines
 
 def parseGameOutput(output, users):
