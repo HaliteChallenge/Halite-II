@@ -74,7 +74,7 @@ CREATE TABLE `User` (
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `organization` varchar(64) NOT NULL,
   `language` varchar(16) DEFAULT NULL,
-  `mu` float unsigned NOT NULL DEFAULT 25.000,
+  `mu` float NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
   `rank` smallint(5) DEFAULT NULL,
   `numSubmissions` smallint(5) NOT NULL DEFAULT 0,
