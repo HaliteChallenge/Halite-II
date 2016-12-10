@@ -102,7 +102,9 @@ def runGame(width, height, users):
     print("Run game command %s\n" % runGameCommand)
     print("Waiting for game output...\n")
     lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
-    print("Here is game output: \n".join(lines))
+    print("\n-----Here is game output: -----")
+    print("\n".join(lines))
+    print("--------------------------------\n")
     return lines
 
 def parseGameOutput(output, users):
@@ -141,8 +143,8 @@ def parseGameOutput(output, users):
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
-    print("Running game with width %d, height %d\n")
-    print("Users objects %s\n" % (width, height, str(users)))
+    print("Running game with width %d, height %d\n" % (width, height))
+    print("Users objects %s\n" % (str(users)))
 
     downloadUsers(users)
     users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)

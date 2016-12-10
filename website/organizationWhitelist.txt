@@ -18,6 +18,7 @@ CMU - andrew.cmu.edu
 CMU - cmu.edu
 RIT - rit.edu
 NJU - lamda.nju.edu.cn
+Chalmers - chalmers.se
 Chalmers - student.chalmers.se
 McGill - mail.mcgill.ca
 Purdue - purdue.edu
