@@ -15,9 +15,6 @@
                 <h1>Downloads</h1>
 
                 <h2>Starter Packages</h2>
-                <p>
-                    This set of starter packages was uploaded on November 13th. We uploaded a Go starter package.
-                </p>
                 <h3>Official Packages</h3>
                 <ul>
                     <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
