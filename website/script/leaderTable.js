@@ -7,9 +7,16 @@ var leaderTable = {
     cacheDOM: function() {
         this.$tableBody = $("#leaderTableBody")
     },
+    sanitize: function() {
+        for(var a = 0; a < this.submissions.length; a++) {
+            this.submissions[a]["username"] = escapeHtml(filterXSS(this.submissions[a]["username"]));
+            this.submissions[a]["language"] = escapeHtml(filterXSS(this.submissions[a]["language"]));
+console.log(this.submissions[a]["language"])
+        }
+    },
     setSubmissions: function(submissions) {
         this.submissions = submissions;
-
+        this.sanitize();
         this.render();
     },
     render: function() {
