@@ -203,9 +203,11 @@ namespace hlt{
                 }
             }
 
+            
             //Next, let's apply our shifts to create the shifts map.
             std::vector< std::vector<SiteD> > shifts = std::vector< std::vector<SiteD> >(map_height, std::vector<SiteD>(map_width, { 0, 0, 0 }));
-            if(preferHorizontal) {
+            if(numberOfPlayers == 6) shifts = reflections;
+            else if(preferHorizontal) {
                 int shift = (prg() % dw) * (map_height / dw); //A vertical shift.
                 for(int a = 0; a < dh; a++) {
                     for(int b = 0; b < dw; b++) {

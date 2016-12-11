@@ -11,7 +11,7 @@ import glob
 import platform
 import tempfile
 
-from time import sleep
+from time import sleep, gmtime, strftime
 
 from compiler import *
 
@@ -42,25 +42,9 @@ def makePath(path):
     os.makedirs(path)
     os.chmod(path, 0o777)
 
-def sendEmail(subject, body, recipient):
-    print("Sending email")
-
-    msg = MIMEText(body, "html")
-    msg['Subject'] = subject
-    msg['From'] = HALITE_EMAIL
-    msg['To'] = recipient
-
-    s = smtplib.SMTP('smtp.gmail.com:587')
-    s.ehlo()
-    s.starttls();
-    s.login(HALITE_EMAIL, HALITE_EMAIL_PASSWORD)
-    s.sendmail(HALITE_EMAIL, [recipient], msg.as_string())
-    s.quit()
-
-
 def executeCompileTask(user, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
-    print("Compiling a bot with userID %s" % (user["userID"]))
+    print("Compiling a bot with userID %s\n" % str(user["userID"]))
 
     try:
         workingPath = "workingPath"
@@ -93,12 +77,12 @@ def executeCompileTask(user, backend):
         didCompile = False
 
     if didCompile:
-        print("Bot did compile")
+        print("Bot did compile\n")
         archive.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
         backend.storeBotRemotely(int(user["userID"]), os.path.join(workingPath, user["userID"]+".zip"))
     else:
-        print("Bot did not compile")
-        print(str(errors))
+        print("Bot did not compile\n")
+        print("Bot errors %s\n" % str(errors))
 
     backend.compileResult(int(user["userID"]), didCompile, language, errors=(None if didCompile else "\n".join(errors)))
     if os.path.isdir(workingPath):
@@ -115,10 +99,12 @@ def downloadUsers(users):
 def runGame(width, height, users):
     runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+" v"+a["numSubmissions"]+"\"" for a in users])
 
-    print("Run game command: " + runGameCommand)
-    print("Game output:")
+    print("Run game command %s\n" % runGameCommand)
+    print("Waiting for game output...\n")
     lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+    print("\n-----Here is game output: -----")
     print("\n".join(lines))
+    print("--------------------------------\n")
     return lines
 
 def parseGameOutput(output, users):
@@ -153,13 +139,12 @@ def parseGameOutput(output, users):
             users[playerTag-1]["didTimeout"] = True
             users[playerTag-1]["errorLogName"] = os.path.basename(errorPaths[index])
 
-    print(errorPaths)
-
     return users, replayPath, errorPaths
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
-    print("Running game with width %d, height %d, and users %s" % (width, height, str(users)))
+    print("Running game with width %d, height %d\n" % (width, height))
+    print("Users objects %s\n" % (str(users)))
 
     downloadUsers(users)
     users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
@@ -180,22 +165,25 @@ def executeGameTask(width, height, users, backend):
     os.remove(replayArchivePath)
 
 if __name__ == "__main__":
-    print("Starting up worker...")
+    print("\n\n\n\nStarting up worker...\n\n\n")
     while True:
         try:
+            print("\n\n\nQuerying for new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
             task = backend.getTask()
             if "type" in task and (task["type"] == "compile" or task["type"] == "game"):
-                print("Got new task: " + str(task))
+                print("Got new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
+                print("Task object %s\n" % str(task))
                 if task["type"] == "compile":
+                    print("Running a compilation task...\n")
                     executeCompileTask(task["user"], backend)
                 else:
+                    print("Running a game task...\n")
                     executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
             else:
-                print("No task available. Sleeping...")
+                print("No task available at time %s (GMT). Sleeping...\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
                 sleep(2)
         except Exception as e:
-            print("Error on get task:")
-            print(e)
-            print("Sleeping...")
+            print("Error on get task %s\n" % str(e))
+            print("Sleeping...\n")
             sleep(2)
 

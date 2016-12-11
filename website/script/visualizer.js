@@ -31,7 +31,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                 return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+filterXSS(p.name)+"</span>"
             }
         }).join(" vs ")+"</h3>")));
-        $row.append($("<div class='col-md-1' style='text-align: left;'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
+        $row.append($("<div class='col-md-1' style='text-align: left;'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback, as do the digits keys 1-5.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
         $container.append($row);
     }
     $container.append(renderer.view);
@@ -39,7 +39,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
 
     var frame = 0;
     var transit = 0;
-    var framespersec = seconds == null ? 2.5 : game.num_frames / seconds;
+    var framespersec = seconds == null ? 3 : game.num_frames / seconds;
     var shouldplay = true;
     var xOffset = 0, yOffset = 0;
     var zoom = 8;
@@ -150,6 +150,21 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         else if(e.keyCode == 189 || e.keyCode == 109) { //- or - (dash or subtract)
             zoom /= 1.41421356237;
             if(zoom < 1) zoom = 1;
+        }
+        else if(e.keyCode == 49) { //1
+            framespersec = 1;
+        }
+        else if(e.keyCode == 50) { //2
+            framespersec = 3;
+        }
+        else if(e.keyCode == 51) { //3
+            framespersec = 6;
+        }
+        else if(e.keyCode == 52) { //4
+            framdspersec = 10;
+        }
+        else if(e.keyCode == 53) { //5
+            framespersec = 15;
         }
     }
 
