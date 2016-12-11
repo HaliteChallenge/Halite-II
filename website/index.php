@@ -70,9 +70,9 @@ if(isset($_SESSION['userID'])) {
                     <h1>Sponsors</h1>
                     <p>Halite is grateful for the support of many strong tech partners!</p>
                     
-                    <div class="text-center" style="margin-top: 10px; margin-bottom: 20.5px;">
-                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px;"></a>
-                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 70px;"></a>
+                    <div class="text-center">
+                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px; margin-top: 10px; margin-bottom: 20.5px;"></a>
+                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 70px; margin-top: 10px; margin-bottom: 20.5px;"></a>
                     </div>
                 </div>
             </div>
