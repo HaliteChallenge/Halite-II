@@ -11,7 +11,7 @@ See [the Contributing Guide](CONTRIBUTING.md).
 
 ## Questions
 
-See [the Forums](https://forums.halite.io) and [our Discord chat](https://discordapp.com/invite/rbVDB4n).
+See [the Forums](http://forums.halite.io) and [our Discord chat](https://discordapp.com/invite/rbVDB4n).
 
 ## Authors
 
