@@ -7,11 +7,11 @@ Halite is a programming competition. Contestants write bots to play an original 
 
 ## Contributing
 
-See [the contributing guide](CONTRIBUTING.md).
+See [the Contributing Guide](CONTRIBUTING.md).
 
 ## Questions
 
-See [the forums](https://forums.halite.io) and [our discord chat](https://discordapp.com/invite/rbVDB4n);
+See [the Forums](https://forums.halite.io) and [our Discord chat](https://discordapp.com/invite/rbVDB4n).
 
 ## Authors
 
