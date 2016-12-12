@@ -15,9 +15,6 @@
                 <h1>Downloads</h1>
 
                 <h2>Starter Packages</h2>
-                <p>
-                    This set of starter packages was uploaded on November 13th. We uploaded a Go starter package.
-                </p>
                 <h3>Official Packages</h3>
                 <ul>
                     <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>
@@ -40,7 +37,7 @@
                 </p>
 
                 <h2>Game Environment</h2>
-                <p>The environment is on version <b>1.0</b>. This version of the environment was posted on November 2nd.</p>
+                <p>The environment is on version <b>1.1</b>. This version of the environment was posted on December 9th.</p>
 
                 <h3>Linux/macOS</h3>
                 <p>Execute:</p>
