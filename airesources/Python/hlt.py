@@ -1,12 +1,3 @@
-"""
-A Python-based Halite starter-bot framework.
-
-This module contains a Pythonic implementation of a Halite starter-bot framework.
-In addition to a class (GameMap) containing all information about the game world
-and some helper methods, the module also imeplements the functions necessary for
-communicating with the Halite game environment.
-"""
-
 import sys
 from collections import namedtuple
 from itertools import chain, zip_longest
@@ -18,12 +9,9 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
-# Because Python uses zero-based indexing, the cardinal directions have a different mapping in this Python starterbot
-# framework than that used by the Halite game environment.  This simplifies code in several places.  To accommodate
-# this difference, the translation to the indexing system used by the game environment is done automatically by
-# the send_frame function when communicating with the Halite game environment.
 
 NORTH, EAST, SOUTH, WEST, STILL = range(5)
+
 
 def opposite_cardinal(direction):
     "Returns the opposing cardinal direction."
@@ -89,9 +77,9 @@ class GameMap:
         dy = min(abs(sq1.y - sq2.y), sq1.y + self.height - sq2.y, sq2.y + self.height - sq1.y)
         return dx + dy
 
-#####################################################################################################################
-# Functions for communicating with the Halite game environment (formerly contained in separate module networking.py #
-#####################################################################################################################
+#################################################################
+# Functions for communicating with the Halite game environment  #
+#################################################################
 
 
 def send_string(s):
@@ -116,12 +104,6 @@ def send_init(name):
 
 def translate_cardinal(direction):
     "Translate direction constants used by this Python-based bot framework to that used by the official Halite game environment."
-    # Cardinal indexing used by this bot framework is
-    #~ NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, STILL = 4
-    # Cardinal indexing used by official Halite game environment is
-    #~ STILL = 0, NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4
-    #~ >>> list(map(lambda x: (x+1) % 5, range(5)))
-    #~ [1, 2, 3, 4, 0]
     return (direction + 1) % 5
 
 
