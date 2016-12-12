@@ -74,8 +74,8 @@ class GameTests(unittest.TestCase):
         output = worker.runGame(20, 20, [{"userID": WIN_BOT_PATH, "username": WIN_BOT_PATH, "numSubmissions": "1"}, {"userID": LOSE_BOT_PATH, "username": LOSE_BOT_PATH, "numSubmissions": "1"}])
         os.chdir(OUR_PATH)
 
-        assert int(output[len(output)-4].split(" ")[0]) == 1
-        assert int(output[len(output)-3].split(" ")[0]) == 2
+        assert int(output[len(output)-4].split(" ")[1]) == 1
+        assert int(output[len(output)-3].split(" ")[1]) == 2
 
     def testParsing(self):
         '''Test the parsing of the output of runGame.sh'''
