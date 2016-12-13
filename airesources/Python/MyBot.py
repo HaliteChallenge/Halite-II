@@ -1,15 +1,12 @@
-from hlt import *
-from networking import *
+import hlt
+from hlt import NORTH, EAST, SOUTH, WEST, STILL, Move, Square
+import random
 
-myID, gameMap = getInit()
-sendInit("MyPythonBot")
+
+myID, game_map = hlt.get_init()
+hlt.send_init("MyPythonBot")
 
 while True:
-    moves = []
-    gameMap = getFrame()
-    for y in range(gameMap.height):
-        for x in range(gameMap.width):
-            location = Location(x, y)
-            if gameMap.getSite(location).owner == myID:
-                moves.append(Move(location, random.choice(DIRECTIONS)))
-    sendFrame(moves)
+    game_map.get_frame()
+    moves = [Move(square, random.choice((NORTH, EAST, SOUTH, WEST, STILL))) for square in game_map if square.owner == myID]
+    hlt.send_frame(moves)

@@ -56,7 +56,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
                 <h3>Visualizing a game</h3>
                 <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a> to get a visualization like this one:</p>
-                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
+                <div id="gameReplay" class="text-center"></div>
 
                 <h3>Halite game rules</h3>
                 <p>What do all of these pretty squares mean?</p>
@@ -76,7 +76,12 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
+    <script src="lib/pixi.min.js"></script>
+    <script src="script/parsereplay.js"></script>
+    <script src="script/visualizer.js"></script>
+    <script src="script/basics_intro_halite.js"></script>
 </body>
 </html>

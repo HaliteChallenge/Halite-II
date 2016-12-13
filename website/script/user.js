@@ -14,7 +14,7 @@ $(function() {
 
             var vr = "<span style='color: #0092a1;'>|</span>";
             this.$profileImage.attr("src", "https://avatars.githubusercontent.com/u/"+this.user["oauthID"]);
-            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + filterXSS(this.user['username']) + "</a>");
+            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + this.user['username'] + "</a>");
 
             this.$primaryInfo.append("<a href='leaderboard.php?userID="+this.user["userID"]+"'>Rank " + this.user['rank']+"</a>");
             this.$primaryInfo.append("<br>");
@@ -220,11 +220,14 @@ $(function() {
     if(userIDGET != null || (session = getSession())) {
         var isMe = (userIDGET == null || userIDGET == undefined);
         var user = isMe ? getUser(session['userID']) : getUser(userIDGET);
+        user["username"] = escapeHtml(filterXSS(user["username"]));
+        user["language"] = escapeHtml(filterXSS(user["language"]));
+
         if(user['isRunning'] == 0) {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
-            $(document).prop('title', filterXSS(user.username));
+            $(document).prop('title', user["username"]);
 
             profileCard.init(user);
             gameTable.init(parseInt(user["userID"]), isMe, function(userID, startingID) {

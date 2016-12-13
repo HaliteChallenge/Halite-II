@@ -15,6 +15,9 @@
                 <h1>Downloads</h1>
 
                 <h2>Starter Packages</h2>
+                <p>
+                    We radically changed the Python starter package on December 11.
+                </p>
                 <h3>Official Packages</h3>
                 <ul>
                     <li><a href="downloads/starterpackages/Halite-Python-Starter-Package.zip">Python 3</a></li>

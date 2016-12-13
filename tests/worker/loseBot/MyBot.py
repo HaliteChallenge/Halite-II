@@ -1,25 +1,12 @@
-from hlt import *
-from networking import *
+import hlt
+from hlt import NORTH, EAST, SOUTH, WEST, STILL, Move, Square
+import random
 
-myID, gameMap = getInit()
-sendInit("BasicPythonBot")
+
+myID, game_map = hlt.get_init()
+hlt.send_init("MyPythonBot")
 
 while True:
-    moves = []
-    gameMap = getFrame()
-
-    for y in range(gameMap.height):
-        for x in range(gameMap.width):
-            site = gameMap.getSite(Location(x, y))
-            if site.owner == myID:
-                direction = random.randint(0, 5)
-                if site.strength < 5*site.production:
-                    direction = STILL
-                else:
-                    for d in CARDINALS:
-                        if gameMap.getSite(Location(x, y), d).owner != myID:
-                            direction = d
-                            break
-                moves.append(Move(Location(x, y), direction))
-
-    sendFrame(moves)
+    game_map.get_frame()
+    moves = [Move(square, random.choice((NORTH, EAST, SOUTH, WEST, STILL))) for square in game_map if square.owner == myID]
+    hlt.send_frame(moves)
