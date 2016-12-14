@@ -78,9 +78,10 @@
                 <p>To improve on our current combat, if there is an enemy or map square that is adjacent to one of our pieces with less strength than our piece, let's take it.</p>
                 <span data-gist-id="cd964cd3513066b7ff28b7aa5481333b" data-gist-file="Revision4.py"></span>
 
-                <h3>What Next?</h3>
+                <h3>What's Next?</h3>
                 <p>That's really up to you! How you improve your bot from here is where you step into the competition.</p>
-                <p>That said, if you're looking for more ideas or a stronger starting base, <a href="https://halite.io/user.php?userID=2697">nmalaguti</a> wrote a tutorial <a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">here</a> that we highly recommend.</p>
+                <p>That said, if you're looking for more ideas or a stronger starting base, <a href="https://halite.io/user.php?userID=2697">nmalaguti</a> wrote <a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">a tutorial</a> that walks you through improving your combat, piece management, and expansion.</p>
+                <p>If you're interested in machine learning, Two Sigma's own <a href="https://halite.io/user.php?userID=1669">Brian van Leeuwen</a> authored <a href="http://forums.halite.io/t/ml-starter-bot-tutorial/616">an introductory deep learning tutorial</a>.</p>
                 <p>Good luck!</p>
 
             </div>
