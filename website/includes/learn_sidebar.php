@@ -82,6 +82,9 @@
                 <li id="advanced_libraries">
                     <a href="advanced_libraries.php">Submitting A Bot</a>
                 </li>
+                <li id="advanced_third_party">
+                    <a href="advanced_third_party.php">Third Party Resources</a>
+                </li>
                 <li id="advanced_writing_sp">
                     <a href="advanced_writing_sp.php">Writing Your Own Starter Package</a>
                 </li>
