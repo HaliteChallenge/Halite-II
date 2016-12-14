@@ -38,6 +38,9 @@
 
                 <p>If your library isn't on a package manager that supports local installation and you can’t download it with <code>curl</code>, you are going to have to compile it on our game servers. Include the source of you library in your bot's zip file and put compilation instructions in the <code>install.sh</code> file.</p>
 
+                <h4>Preinstalled Libraries</h4>
+                <p>For convenience's sake, we include <code>tensorflow</code>, <code>keras</code> (using a <code>tensorflow</code> backend), <code>numpy</code>, <code>scipy</code>, <code>scikit-learn</code>, <code>pillow</code>, and <code>h5py</code> on our game servers. Just import these libraries from your python files like normal!</p>
+
                 <h3>Compilation</h3>
 
                 <p>Bot compilation is done using <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/compiler.py">this autocompile script</a>. Many languages will be properly autodetected and compiled if needed without the need for an <code>install.sh</code> script.</p>
