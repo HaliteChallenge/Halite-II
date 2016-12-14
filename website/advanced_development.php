@@ -14,17 +14,14 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Bot Development Guide</h1>
+                <h1>Best Practices</h1>
                 <p>In this guide, we will detail a couple of useful practices to follow when building your Halite bot.</p>
                 <h3>Using a Log File</h3>
-                <p>Stdout and stdin in are used to communicate with the game environment. As such, you cannot use functions like System.out.println, print(), or std::cout. Instead, print debugging information to a log file.</p>
+                <p>Stdout and stdin in are used to communicate with the game environment. As such, you cannot use functions like <code>System.out.println</code>, <code>print()</code>, or <code>std::cout</code>. Instead, print debugging information to a log file.</p>
                 <h3>Local Bot Evaluation</h3>
                 <p>Before submitting a new bot to the online leaderboard, we recommend running some games against the version of your bot that is currently on the leaderboard. If your new bot consistently wins, then put it up!</p>
                 <h3>Disabling the Timeout Flag</h3>
-                <p>When debugging latency issues with your bot, it can be helpful to disable game environment timeouts. To do so, append the -t flag to your environment command (e.g. ./environment -d "30 30" "python3 MyBot.py" "python3 RandomBot.py" -t).</p>
-                <h3>Understanding Game Logs</h3>
-                <p>When your bot times out or errors on our game servers, we save and display a log file with debugging information including the time your bot took each turn, its output each turn, and its final output from stdout and stderr.</p>
-                <p>To find these log files, visit your homepage: <a href="https://halite.io/user.php">https://halite.io/user.php</a>. Just click the download log button to grab your error log for a game:</p>
+                <p>When debugging latency issues with your bot, it can be helpful to disable game environment timeouts. To do so, append the <code>-t</code> flag to your environment command (e.g. <code>./environment -d "30 30" "python3 MyBot.py" "python3 RandomBot.py" -t</code>).</p>
                 <h3>Debugging with an IDE</h3>
                 <p>There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found <a href="http://forums.halite.io/t/running-your-halite-bot-from-a-debugger/70">here on the forums</a>. </p>
             </div>

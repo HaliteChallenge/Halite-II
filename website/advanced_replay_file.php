@@ -14,7 +14,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Replay File Reference</h1>
+                <h1>Replay Files</h1>
 
                 <h2>Overview</h2>
 
