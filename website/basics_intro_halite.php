@@ -65,6 +65,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <p>When two or more pieces from the same player try to occupy the same site, the resultant piece gets the sum of their strengths (this strength is capped at 255).</p>
                 <p>When pieces with different owners move onto the same site or cardinally adjacent sites, the pieces are forced to fight, and each piece loses strength equal to the strength of its opponent. When a player's piece moves onto an unowned site, that piece and the unowned piece fight, and each piece loses strength equal to the strength of its opponent. </p>
                 <p>When a piece loses all of its strength, it dies and is removed from the grid.</p>
+                <p>For the full rules, see <a href="rules_game.php">here</a>.</p>
                 
                 <h3>How do we program a bot?</h3>
                 <p>Move on to <a href="basics_improve_random.php">Improving the Random Bot</a>.</p>
