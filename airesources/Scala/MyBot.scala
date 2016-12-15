@@ -1,33 +1,20 @@
-/**
-  * Created by snoe on 7/23/16.
-  */
-class MyBot(id: Int, gameMap:GameMap) extends HaliteBot(id, gameMap) {
+import scala.util.Random
 
-  override def takeTurn(turn:BigInt, gameMap:GameMap): MoveList = {
-    // Random moves
-    val moves = new MoveList()
-    for (y <- 0 to gameMap.height - 1) {
-      for (x <- 0 to gameMap.width - 1) {
-        val site: Site = gameMap.getSite(new Location(x, y))
-        if (site.owner == id) {
-          val dir: Direction = Direction.randomDirection
-          moves.add(new Move(new Location(x, y), dir))
-        }
-      }
-    }
-    moves
+object MyBot extends BotFactory {
+  def main(args: Array[String]): Unit = {
+    Runner.run("scalaMyBot", this)
   }
 
+  override def make(id: Int): Bot = new MyBot(id)
 }
 
-object MyBot {
+class MyBot(id: Int) extends Bot {
+  val random = new Random()
 
-  def main(args:Array[String]):Unit = {
-
-    val maker = new HaliteBotMaker() {
-      override def makeBot(id:Int, gameMap:GameMap):HaliteBot = new MyBot(id, gameMap)
-    }
-
-    HaliteBot.run(args, maker)
+  override def getMoves(grid: Grid): IndexedSeq[Move] = {
+    for {
+      space <- grid.getSpaces
+      if space.occupant.id == id
+    } yield Move(space.location.x, space.location.y, random.nextInt(5))
   }
 }
