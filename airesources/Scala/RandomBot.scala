@@ -15,6 +15,6 @@ class RandomBot(id: Int) extends Bot {
     for {
       space <- grid.getSpaces
       if space.occupant.id == id
-    } yield Move(space.location.x, space.location.y, random.nextInt(5))
+    } yield Move(space.location.x, space.location.y, Direction.getRandomDir)
   }
 }

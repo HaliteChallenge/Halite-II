@@ -55,19 +55,15 @@ class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occup
     Math.atan2(dy, dx)
   }
 
-  def neighbor(location: Location, direction: Int): Location = {
+  def neighbor(location: Location, direction: Direction): Location = {
     val x = location.x
     val y = location.y
-    if (direction == Direction.NORTH) {
-      locations(x)(if (y == 0) height - 1 else y - 1)
-    } else if (direction == Direction.EAST) {
-      locations(if (x == width - 1) 0 else x + 1)(y)
-    } else if(direction == Direction.SOUTH) {
-      locations(x)(if (y == height - 1) 0 else y + 1)
-    } else if (direction == Direction.WEST) {
-      locations(if (x == 0) width - 1 else x - 1)(y)
-    } else {
-      location
+    direction match {
+      case North => locations(x)(if (y == 0) height - 1 else y - 1)
+      case East => locations(if (x == width - 1) 0 else x + 1)(y)
+      case South => locations(x)(if (y == height - 1) 0 else y + 1)
+      case West => locations(if (x == 0) width - 1 else x - 1)(y)
+      case Still => location
     }
   }
 }

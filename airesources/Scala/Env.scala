@@ -59,7 +59,7 @@ object Env {
       builder.append(" ")
       builder.append(m.y)
       builder.append(" ")
-      builder.append(m.direction)
+      builder.append(m.direction.getValue)
       builder.append(" ")
     }
     writeString(builder.toString())
