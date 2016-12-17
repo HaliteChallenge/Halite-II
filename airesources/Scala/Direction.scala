@@ -1,6 +1,6 @@
 import scala.util.Random
 
-case object Direction {
+object Direction {
   private val random = new Random()
   val CARDINALS = Seq(North, East, South, West)
   val ALL = Seq(Still, North, East, South, West)

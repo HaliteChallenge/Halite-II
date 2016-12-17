@@ -1,19 +1,18 @@
-class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occupants: Array[Array[Site]]) {
-  def update(occupants: Array[Array[Site]]) = this.occupants = occupants
+class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occupants: Array[Array[Occupant]]) {
+  def update(occupants: Array[Array[Occupant]]) = this.occupants = occupants
 
-  def getOccupants = occupants
-  def getLocations = locations
   def getWidth = width
   def getHeight = height
 
-  def getOccupant(x: Int, y: Int): Site = occupants(y)(x)
+  def getOccupant(x: Int, y: Int): Occupant = occupants(y)(x)
   def getLocation(x: Int, y: Int): Location = locations(y)(x)
+  def getSite(x: Int, y: Int): Site = Site(getLocation(x, y), getOccupant(x, y))
 
-  def getSpaces: IndexedSeq[Space] = {
+  def getSites: IndexedSeq[Site] = {
     for {
       x <- 0 until width
       y <- 0 until height
-    } yield Space(getLocation(x, y), getOccupant(x, y))
+    } yield getSite(x, y)
   }
 
   def distance(first: Location, second: Location): Int = {
@@ -69,5 +68,5 @@ class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occup
 }
 
 case class Location(x: Int, y: Int, production: Int)
-case class Site(id: Int, strength: Int)
-case class Space(location: Location, occupant: Site)
+case class Occupant(id: Int, strength: Int)
+case class Site(location: Location, occupant: Occupant)

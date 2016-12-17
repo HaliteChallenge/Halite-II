@@ -13,7 +13,7 @@ class RandomBot(id: Int) extends Bot {
 
   override def getMoves(grid: Grid): IndexedSeq[Move] = {
     for {
-      space <- grid.getSpaces
+      space <- grid.getSites
       if space.occupant.id == id
     } yield Move(space.location.x, space.location.y, Direction.getRandomDir)
   }

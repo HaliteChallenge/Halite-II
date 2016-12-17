@@ -23,17 +23,17 @@ object Env {
     new Grid(width, height, locations, occupants)
   }
 
-  def readFrame(width: Int, height: Int): Array[Array[Site]] = {
+  def readFrame(width: Int, height: Int): Array[Array[Occupant]] = {
     val ownersStrengths = in.readLine().split(" ")
     val strengthsIndex = ownersStrengths.length - width * height
 
     var y, x, count = 0
     var owner, cur, i = 0
 
-    val occupants = Array.ofDim[Site](width, height)
+    val occupants = Array.ofDim[Occupant](width, height)
     while (y < height) {
       if (cur < count) {
-        occupants(y)(x) = Site(owner, ownersStrengths(strengthsIndex + y * width + x).toInt)
+        occupants(y)(x) = Occupant(owner, ownersStrengths(strengthsIndex + y * width + x).toInt)
         if (x == width - 1) {
           x = 0
           y += 1
