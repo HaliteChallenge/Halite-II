@@ -3,11 +3,10 @@ $(function() {
         $alternateMessage: $("#noGameMessage"),
         $panel: $("#gamePanel"),
         $table: $("#gameTable"),
-        $tableHeader: $("#gameTableHeader"),
         $tableBody: $("#gameTableBody"),
         lastID: 0,
         init: function() {
-            var games = this.getGames();
+            var games = getGames();
             games.forEach(function(game) {
                 game.date = new Date(game.timestamp + "Z");
             });
@@ -29,25 +28,11 @@ $(function() {
             }
             window.setTimeout(this.loadMore.bind(this), delay);
         },
-        getGames: function(previousID) {
-            requestData = {};
-            if(typeof(previousID) !== 'undefined') {
-                requestData['previousID'] = previousID;
-            }
-            var result = $.ajax({
-                url: "api/web/game",
-                async: false,
-                method: "GET",
-                data: requestData
-            });
-            return result.responseJSON;
-        },
         render: function(games) {
             if(games.length == 0) {
                 this.$alternateMessage.css("display", "block");
                 this.$panel.css("display", "none");
             } else {
-                this.$tableHeader.html("<th>Time</th><th>Players</th><th>Dimensions</th><th>View</th>");
                 this.$tableBody.empty();
                 for(var a = 0; a < games.length; a++) {
                     this.$tableBody.append(this.getTableRow(games[a]));
@@ -100,7 +85,7 @@ $(function() {
             return delay;
         },
         loadMore: function() {
-            var newgames = this.getGames(this.lastID);
+            var newgames = getGames(this.lastID);
             if(newgames.length == 0) {
                 console.log("No more games available.");
                 window.setTimeout(this.loadMore.bind(this), 60000);

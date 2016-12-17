@@ -15,7 +15,7 @@
         <?php include 'includes/navbar.php'; ?>
         <div class="pageContent">
           <div class="row">
-            <div class="col-xl-6 col-lg-7 col-md-12">
+            <div class="col-xl-12 col-lg-12 col-md-12">
                 <div class="text-center" style="display: none;" id="noGameMessage">
                     <span class="glyphicon glyphicon-warning-sign" style="font-size: 8em;"></span>
                     <h3>There are no games recorded yet.</h3>
@@ -27,6 +27,7 @@
                     <table class="table" id="gameTable">
                         <thead>
                             <tr id="gameTableHeader">
+                                <th>Time</th><th>Players</th><th>Dimensions</th><th>View</th>
                             </tr>
                         </thead>
                         <tbody id="gameTableBody">
