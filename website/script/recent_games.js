@@ -7,10 +7,7 @@ $(function() {
         lastID: 0,
         init: function() {
             var games = getGames();
-            games.forEach(function(game) {
-                game.date = new Date(game.timestamp + "Z");
-            });
-            for(var a = 0; a < games.length; a++) games[a].users.sort(function(p1, p2) { return parseInt(p1.rank) - parseInt(p2.rank); });
+            games = this.prepGames(games);
             this.lastID = games[0].gameID;
 
             var schedCutoff = 0;
@@ -27,6 +24,14 @@ $(function() {
                 delay = this.scheduleGames(games.slice(0, schedCutoff));
             }
             window.setTimeout(this.loadMore.bind(this), delay);
+        },
+        prepGames: function(games) {
+            games.forEach(function(game) {
+                var dateComponents = game.timestamp.split(/[- :]/);
+                game.date = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
+            });
+            for(var a = 0; a < games.length; a++) games[a].users.sort(function(p1, p2) { return parseInt(p1.rank) - parseInt(p2.rank); });
+            return games;
         },
         render: function(games) {
             if(games.length == 0) {
@@ -91,9 +96,7 @@ $(function() {
                 window.setTimeout(this.loadMore.bind(this), 60000);
                 return
             }
-            newgames.forEach(function(game) {
-                game.date = new Date(game.timestamp +"Z");
-            });
+            newgames = this.prepGames(newgames);
             var nextGet = this.scheduleGames(newgames);
             nextGet = Math.max(nextGet, 60000);
             this.lastID = newgames[0].gameID;
