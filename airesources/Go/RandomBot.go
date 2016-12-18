@@ -8,7 +8,7 @@ import (
 
 func main() {
 	conn, gameMap := hlt.NewConnection()
-	conn.SendName("MyBot")
+	conn.SendName("RandomBot")
 	for {
 		var moves hlt.MoveSet
 		gameMap = conn.GetFrame()
