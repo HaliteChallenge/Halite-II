@@ -46,7 +46,7 @@ $(function() {
         },
         getTableRow: function(game) {
             playersList = game.users.map(function(player) {
-                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;' title='"+player.username+"'></a>";
+                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;' title='("+player.userRank+") "+player.username+"'></a>";
             }).join(" ");
 
             var $row = $("<tr><td>"+game.date.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
