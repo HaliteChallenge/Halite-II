@@ -204,8 +204,7 @@ class ManagerAPI extends API{
 
             // Store game information in db
             $this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('".$this->mysqli->real_escape_string($replayName)."', ".$this->mysqli->real_escape_string($mapWidth).", ".$this->mysqli->real_escape_string($mapHeight).", NOW())");
-            $gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '".$this->mysqli->real_escape_string($replayName)."' LIMIT 1");
-            $gameID = $gameIDArray['gameID'];
+            $gameID = $this->mysqli->insert_id;
 
             // Update each participant's stats
             for($a = 0; $a < count($users); $a++) {
