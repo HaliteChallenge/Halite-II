@@ -128,8 +128,8 @@ class ExternalCompiler(Compiler):
         with CD(bot_dir):
             print("GLOBS: " + ", ".join(globs))
             files = safeglob_multi(globs)
-            if (len(files) == 0):
-                # nothing to do
+            if (len("".join(globs)) != 0 and len(files) == 0):
+                # no files to compile
                 return True
 
         try:
