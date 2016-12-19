@@ -24,7 +24,7 @@
                    <li><a href="http://forums.halite.io/t/running-your-halite-bot-from-an-ide/70/10">Running Your Halite Bot from an IDE</a></li> 
                    <li><a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">So you've Improved the Random Bot. Now what?</a></li>
                    <li><a href="http://forums.halite.io/t/early-mid-and-late-game/703">Early, Mid, and Late Game Strategy</a></li> 
-
+                   <li><a href="http://forums.halite.io/t/perimeter-optimization-during-expansion/723">Perimeter Optimization during Expansion</a></li> 
                 </ul>
 
                 <h3>Tools</h3>
