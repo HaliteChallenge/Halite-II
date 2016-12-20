@@ -79,7 +79,7 @@ class GameTests(unittest.TestCase):
 
     def testParsing(self):
         '''Test the parsing of the output of runGame.sh'''
-        MAP_SIZE = (34, 34)
+        MAP_SIZE = (35, 35)
         REPLAY_FILE = "123456.hlt"
         SEED = 123
         USERS = [{"playerTag": 1, "rank": 2, "territoryAverage": 0.5, "strengthAverage": 0.6, "productionAverage": 0.7, "stillPercentage": 0.8, "turnTimeAverage": 0.9, "didTimeout": True, "errorLogName": "errorLog.log"}, {"playerTag": 2, "rank": 1, "territoryAverage": 1.5, "strengthAverage": 1.6, "productionAverage": 1.7, "stillPercentage": 1.8, "turnTimeAverage": 1.9, "didTimeout": False, "errorLogName": None}]
@@ -92,7 +92,9 @@ class GameTests(unittest.TestCase):
         lines += [str(user['playerTag']) for user in USERS if user["didTimeout"] == True]
         lines += ERROR_LOGS
 
-        outputUsers, outputReplay, outputErrorLogs = worker.parseGameOutput(lines, USERS)
+        outputWidth, outputHeight, outputUsers, outputReplay, outputErrorLogs = worker.parseGameOutput(lines, USERS)
+        assert outputWidth <= MAP_SIZE[0]
+        assert outputHeight <= MAP_SIZE[1]
         assert outputUsers == USERS
         assert outputReplay == REPLAY_FILE
         assert outputErrorLogs == ERROR_LOGS
