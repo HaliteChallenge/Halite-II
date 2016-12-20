@@ -281,6 +281,7 @@ namespace hlt{
                 contents[a][b].production = round(normalized[a][b].production * TOP_PROD);
                 if(contents[a][b].owner != 0 && contents[a][b].production == 0) contents[a][b].production = 1;
             }
+            std::cout << "Final map size: " << map_width << " " << map_height << std::endl;
         }
 
         bool inBounds(Location l) const {

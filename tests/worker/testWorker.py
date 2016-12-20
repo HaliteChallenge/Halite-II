@@ -79,12 +79,14 @@ class GameTests(unittest.TestCase):
 
     def testParsing(self):
         '''Test the parsing of the output of runGame.sh'''
+        MAP_SIZE = (34, 34)
         REPLAY_FILE = "123456.hlt"
         SEED = 123
         USERS = [{"playerTag": 1, "rank": 2, "territoryAverage": 0.5, "strengthAverage": 0.6, "productionAverage": 0.7, "stillPercentage": 0.8, "turnTimeAverage": 0.9, "didTimeout": True, "errorLogName": "errorLog.log"}, {"playerTag": 2, "rank": 1, "territoryAverage": 1.5, "strengthAverage": 1.6, "productionAverage": 1.7, "stillPercentage": 1.8, "turnTimeAverage": 1.9, "didTimeout": False, "errorLogName": None}]
         ERROR_LOGS = [str(user['errorLogName']) for user in USERS if user["didTimeout"] == True]
 
-        lines = ["%s %d" % (REPLAY_FILE, SEED)]
+        lines = ["Final map size: %d %d" % MAP_SIZE]
+        lines += ["%s %d" % (REPLAY_FILE, SEED)]
         for user in USERS:
             lines += ["%d %d %f %f %f %f %f" % (user['playerTag'], user['rank'], user['territoryAverage'], user['strengthAverage'], user['productionAverage'], user['stillPercentage'], user['turnTimeAverage'])]
         lines += [str(user['playerTag']) for user in USERS if user["didTimeout"] == True]
