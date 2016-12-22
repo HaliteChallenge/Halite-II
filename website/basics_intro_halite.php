@@ -55,8 +55,10 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
 
                 <h3>Visualizing a game</h3>
-                <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a> to get a visualization like this one:</p>
+                <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a>. Since the starter pack is very bad at playing Halite, your visualization will be quite dull.</p>
+                <p>Here's a taste of what some very good Halite bots look like:</p>
                 <div id="gameReplay" class="text-center"></div>
+                <div id="gameReplayTwo" class="text-center"></div>
 
                 <h3>Halite game rules</h3>
                 <p>What do all of these pretty squares mean?</p>
