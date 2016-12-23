@@ -109,9 +109,12 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 #endif
 }
 
-std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
+std::string Networking::getString(unsigned char playerTag, const unsigned int timeoutMillis) {
 
     std::string newString;
+    unsigned int timeoutMillisRemaining = timeoutMillis;
+    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
+    
 #ifdef _WIN32
     WinConnection connection = connections[playerTag - 1];
 
@@ -120,7 +123,8 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     char buffer;
 
     //Keep reading char by char until a newline
-    while(newString.size() < 24000) {
+    while(true) {
+        timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
         //Check to see that there are bytes in the pipe before reading
         //Throw error if no bytes in alloted time
         //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
@@ -129,7 +133,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
         if(bytesAvailable < 1) {
             std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
             while (bytesAvailable < 1) {
-                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > timeoutMillis) throw newString;
+                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > timeoutMillisRemaining) throw newString;
                 PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
             }
         }
@@ -152,20 +156,16 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     fd_set set;
     FD_ZERO(&set); /* clear the set */
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
-
-
-    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
     char buffer;
 
     //Keep reading char by char until a newline
-    while(newString.size() < 24000) {
+    while(true) {
 
         //Check if there are bytes in the pipe
-        timeoutMillis -= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
-        tp = std::chrono::high_resolution_clock::now();
+        timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
         struct timeval timeout;
-        timeout.tv_sec = timeoutMillis / 1000.0;
-        timeout.tv_usec = (timeoutMillis % 1000)*1000;
+        timeout.tv_sec = timeoutMillisRemaining / 1000.0;
+        timeout.tv_usec = (timeoutMillisRemaining % 1000)*1000;
         int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
 
         if(selectionResult > 0) {
