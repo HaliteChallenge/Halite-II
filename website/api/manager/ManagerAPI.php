@@ -188,7 +188,6 @@ class ManagerAPI extends API{
                 $s3Client->putObject($args);
             }
 
-
             // Check that we arent stoing too many games in db
             $numAllowed = 100000;
             $res = mysqli_query($this->mysqli, "SELECT * FROM Game");
@@ -256,10 +255,13 @@ class ManagerAPI extends API{
             usort($allUsers, function($a, $b) {
                 return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
             });
+            $query = "UPDATE User set rank = CASE";
             for($userIndex = 0; $userIndex < count($allUsers); $userIndex++) {
                 $rank = $userIndex+1;
-                $this->insert("UPDATE User SET rank={$rank} WHERE userID={$allUsers[$userIndex]['userID']}");
+                $query .= " WHEN userID = {$allUsers[$userIndex]['userID']} THEN {$rank}";
             }
+            $query .= " ELSE rank END;";
+            $this->insert($query);
         }
     }
 
