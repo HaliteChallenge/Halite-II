@@ -93,8 +93,7 @@ class GameTests(unittest.TestCase):
         lines += ERROR_LOGS
 
         outputWidth, outputHeight, outputUsers, outputReplay, outputErrorLogs = worker.parseGameOutput(lines, USERS)
-        assert outputWidth <= MAP_SIZE[0]
-        assert outputHeight <= MAP_SIZE[1]
+        assert outputWidth == MAP_SIZE[0]
         assert outputHeight == MAP_SIZE[1]
         assert outputUsers == USERS
         assert outputReplay == REPLAY_FILE
