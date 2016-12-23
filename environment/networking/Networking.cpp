@@ -112,7 +112,7 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 std::string Networking::getString(unsigned char playerTag, const unsigned int timeoutMillis) {
 
     std::string newString;
-    unsigned int timeoutMillisRemaining = timeoutMillis;
+    int timeoutMillisRemaining = timeoutMillis;
     std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
     
 #ifdef _WIN32
@@ -125,6 +125,7 @@ std::string Networking::getString(unsigned char playerTag, const unsigned int ti
     //Keep reading char by char until a newline
     while(true) {
         timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
+        if(timeoutMillisRemaining < 0) throw newString;
         //Check to see that there are bytes in the pipe before reading
         //Throw error if no bytes in alloted time
         //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
@@ -163,6 +164,7 @@ std::string Networking::getString(unsigned char playerTag, const unsigned int ti
 
         //Check if there are bytes in the pipe
         timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
+        if(timeoutMillisRemaining < 0) throw newString;
         struct timeval timeout;
         timeout.tv_sec = timeoutMillisRemaining / 1000.0;
         timeout.tv_usec = (timeoutMillisRemaining % 1000)*1000;
