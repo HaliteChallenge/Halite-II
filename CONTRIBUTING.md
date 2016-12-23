@@ -1,4 +1,4 @@
-# Contributing
+# Halite Contributing Guide
 
 If you find a bug or have a feature request, please [open an issue](https://github.com/HaliteChallenge/Halite/issues/new).
 
@@ -13,6 +13,15 @@ If you'd like to write a starter package for a new language, see this [guide](ht
 ### Adding Your Company or University
 
 Edit [this whitelist](https://github.com/HaliteChallenge/Halite/edit/master/website/organizationWhitelist.txt) and send us a pull request. If you need to change your email, head [here](https://halite.io/email.php). We'll make sure to tag all members of your organization who have already signed up.
+
+## Folder Contents
+
+- `admin/` - A collection of administrative resources (ex. a technical specification)
+- `airesources/` - The language-specific starter kits for writing bots
+- `environment/` - The halite game engine 
+- `tests/` - All of the project's unit and integration tests
+- `website/` - The website that hosts the competition. Includes the API that manages the game servers.
+- `worker/` - The source for the worker servers that compile bots and run games safely
 
 ## Installing the website on Ubuntu
 

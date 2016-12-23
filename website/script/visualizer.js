@@ -161,7 +161,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             framespersec = 6;
         }
         else if(e.keyCode == 52) { //4
-            framdspersec = 10;
+            framespersec = 10;
         }
         else if(e.keyCode == 53) { //5
             framespersec = 15;

@@ -46,7 +46,7 @@
 <nav class="col-sm-3 bs-docs-sidebar">
     <ul id="sidebar" class="nav nav-stacked">
         <li class="">
-            <span>The Basics</span>
+            <span>Basics</span>
             <ul class="nav nav-stacked">
                 <li id="basics_quickstart">
                     <a href="basics_quickstart.php">Getting Started</a>
@@ -59,20 +59,6 @@
                 </li>
                 <li id="basics_faqs">
                     <a href="basics_faqs.php">FAQs</a>
-                </li>
-            </ul>
-        </li>
-        <li class="">
-            <span>Guides</span>
-            <ul class="nav nav-stacked">
-                <li id="guides_development">
-                    <a href="guides_development.php">Bot Development</a>
-                </li>
-                <li id="guides_libraries">
-                    <a href="guides_libraries.php">Using 3rd Party Libraries</a>
-                </li>
-                <li id="guides_strategy">
-                    <a href="guides_strategy.php">Strategy Considerations</a>
                 </li>
             </ul>
         </li>
@@ -90,17 +76,26 @@
         <li class="">
             <span>Advanced</span>
             <ul class="nav nav-stacked">
-                <li id="advanced_command_line">
-                    <a href="advanced_command_line.php">Environment Command Reference</a>
+                <li id="advanced_development">
+                    <a href="advanced_development.php">Best Practices</a>
                 </li>
-                <li id="advanced_replay_file">
-                    <a href="advanced_replay_file.php">Replay File Reference</a>
+                <li id="advanced_libraries">
+                    <a href="advanced_libraries.php">Submitting A Bot</a>
                 </li>
-                <li id="advanced_game_server">
-                    <a href="advanced_game_server.php">Game Server Reference</a>
+                <li id="advanced_third_party">
+                    <a href="advanced_third_party.php">Third Party Resources</a>
                 </li>
                 <li id="advanced_writing_sp">
                     <a href="advanced_writing_sp.php">Writing Your Own Starter Package</a>
+                </li>
+                <li id="advanced_command_line">
+                    <a href="advanced_command_line.php">Halite Environment CLI</a>
+                </li>
+                <li id="advanced_replay_file">
+                    <a href="advanced_replay_file.php">Replay Files</a>
+                </li>
+                <li id="advanced_game_server">
+                    <a href="advanced_game_server.php">Game Servers</a>
                 </li>
             </ul>
         </li>

@@ -187,7 +187,7 @@ $(function() {
             playersList = game.users.filter(function(player) {
                 return player.userID != userID;
             }).map(function(player) {
-                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;'></a>";
+                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;' title='("+player.userRank+") "+player.username+"'></a>";
             }).join(" ");
 
             var thisUser = game.users.find(function(p){return parseInt(p.userID)==userID;});

@@ -4,6 +4,7 @@ import json
 from hashlib import md5
 import configparser
 import os
+from time import gmtime, strftime
 
 config = configparser.ConfigParser()
 config.read("../halite.ini")
@@ -87,8 +88,12 @@ def compileResult(userID, didCompile, language, errors=None):
 
 def gameResult(width, height, users, replayPath, errorPaths):
     """Posts the result of a game task"""
+    print("Posting game result %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
     files = {os.path.basename(replayPath): open(replayPath, "rb").read()}
     for path in errorPaths:
         files[os.path.basename(path)] = open(path, "rb").read()
     r = requests.post(MANAGER_URL+"game", data={"apiKey": API_KEY, "mapWidth": str(width), "mapHeight": str(height), "users": json.dumps(users)}, files=files)
-    print("Posting game result %s\n" % r.text)
+    print("Got game result %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
+    print("\n-------Game result:-----")
+    print(r.text)
+    print("------------------------\n")

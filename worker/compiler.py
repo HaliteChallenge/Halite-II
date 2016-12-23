@@ -247,7 +247,7 @@ comp_args = {
                              ["gnatlink", "-o", BOT]],
     "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
                              ["gcc", "-O2", "-lm", "-o", BOT]],
-    "C#"            : [["mcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
+    "C#"            : [["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT]],
     "Clojure"     : [["lein", "uberjar"]],
     "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],

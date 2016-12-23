@@ -31,8 +31,10 @@ $(function() {
 
         },
         getTableRow: function(worker) {
-            console.log(worker.lastRequestTime)
-            var timeSinceCommunication = Math.round(100*((new Date() - new Date(worker.lastRequestTime)) / (1000*60))) / 100;
+            console.log(worker.lastRequestTime);
+            var dateComponents = worker.lastRequestTime.split(/[- :]/);
+            var lastRequestDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
+            var timeSinceCommunication = Math.round(100*((new Date() - lastRequestDate) / (1000*60))) / 100;
             return "<tr><td>"+worker.workerID+"</td><td>"+timeSinceCommunication+" min</td></tr>";  
         }
     };

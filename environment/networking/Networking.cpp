@@ -120,7 +120,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     char buffer;
 
     //Keep reading char by char until a newline
-    while (true) {
+    while(newString.size() < 24000) {
         //Check to see that there are bytes in the pipe before reading
         //Throw error if no bytes in alloted time
         //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
@@ -158,7 +158,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     char buffer;
 
     //Keep reading char by char until a newline
-    while(true) {
+    while(newString.size() < 24000) {
 
         //Check if there are bytes in the pipe
         timeoutMillis -= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();

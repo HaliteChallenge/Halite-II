@@ -259,3 +259,12 @@ function newEmail(email) {
         data: {newEmail: email}
     }).responseJSON;
 }
+
+function getGames(previousID) {
+    return $.ajax({
+        url: "api/web/game",
+        async: false,
+        method: "GET",
+        data: {previousID: previousID}
+    }).responseJSON;
+}
