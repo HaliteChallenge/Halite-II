@@ -10,16 +10,15 @@ textToGame = function(text, seed) {
 	Math.seedrandom(seed);
 
 	//Hardcoding colors:
-	var colors = [];
-	colors.push('0xe37222'); //TS Orange
-	colors.push('0x63ceca'); //TS Mid Teal
-	//colors.push('0x002226'); //TS Midnight Teal
-	colors.push('0xffbe00'); //TS Yellow
-	colors.push('0xff0000');
-	colors.push('0x00cc00');
-	colors.push('0xaa4444');
-	colors.push('0x9900ff');
-	colors.push('0xff66ff');
+    var colors = ['0x6DB6FF',
+                  '0x490092',
+                  '0x24ff24',
+                  '0x009292',
+                  '0xFFB677',
+                  '0xffff6d',
+                  '0xB66DFF',
+                  '0x924900',
+                 ];
 
 	var x, i;
 	for (i = colors.length; i; i--) {
