@@ -110,6 +110,7 @@ def runGame(width, height, users):
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
 
+    width, height = [int(sz) for sz in output[len(output) - (len(users)+4)].split(" ")]
     replayPath = output[len(output) - (len(users)+3)].split(" ")[0]
 
     # Get player ranks and scores by parsing shellOutput
@@ -139,7 +140,7 @@ def parseGameOutput(output, users):
             users[playerTag-1]["didTimeout"] = True
             users[playerTag-1]["errorLogName"] = os.path.basename(errorPaths[index])
 
-    return users, replayPath, errorPaths
+    return width, height, users, replayPath, errorPaths
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
@@ -147,7 +148,7 @@ def executeGameTask(width, height, users, backend):
     print("Users objects %s\n" % (str(users)))
 
     downloadUsers(users)
-    users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
+    width, height, users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
 
     replayArchivePath = "ar"+replayPath
     fIn = open(replayPath, 'rb')
