@@ -110,7 +110,7 @@ def runGame(width, height, users):
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
 
-    width, height = [int(sz) for sz in output[len(output) - (len(users)+4)].split(" ")[-2:]]
+    width, height = [int(sz) for sz in output[len(output) - (len(users)+4)].split(" ")]
     replayPath = output[len(output) - (len(users)+3)].split(" ")[0]
 
     # Get player ranks and scores by parsing shellOutput
