@@ -21,7 +21,6 @@ textToGame = function(text, seed) {
                   '0x006DDB', // 7 Blue
                  ];
 
-/*
 	var x, i;
 	for (i = colors.length; i; i--) {
 		var j = Math.floor(Math.random() * i);
@@ -29,7 +28,6 @@ textToGame = function(text, seed) {
 		colors[i - 1] = colors[j];
 		colors[j] = x;
 	}
-*/
 
 	game.players = []
 	game.players.push({name: 'NULL', color: "0x888888"});
