@@ -27,11 +27,12 @@
                 <p>If you find a bug that is exploitable, email us at <a href="mailto:halite@halite.io">halite@halite.io</a>, do not post it on the forums, and do not exploit it.</p>
                 <p>Otherwise, feel free to let us know on <a href="http://forums.halite.io">the forums</a>.</p>
 
-                <h3>Winning</h3>
-                <p>Winners are the highest ranked players on the leaderboard at the end of the competition.</p>
+                <h3>Rankings</h3>
                 <p>Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating system</a> used for chess.</p>
                 <p>More precisely, rankings are computed using a Bayesian algorithm variant of the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system">Glicko system</a>, specifically using the <a href="https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/">TrueSkill</a> Python library available <a href="https://github.com/sublee/trueskill">here</a>.</p>
-                <p>Is there a prize? Well... There's pride! Bragging rights! Internet royalty! The results of the competition will be officially announced with a link to best players Github profiles and/or blogs (we hope for some great postmortems).</b>
+                <h3>Prizes</h3>
+                <p><a href="https://www.twosigma.com">Two Sigma</a> (the company that developed Halite) will waive first round interviews for all users ranked as Gold or Diamond (the top 1/16 of contestants). Just give us a shout at referrals@twosigma.com with the subject line "Halite."</b>
+                <p>There's also pride! Bragging rights! Internet royalty! The results of the competition will be officially announced with a link to best players Github profiles and/or blogs (we hope for some great postmortems).</b>
                 </ul>
             </div>
         </div>
