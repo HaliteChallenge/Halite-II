@@ -12,7 +12,7 @@ textToGame = function(text, seed) {
 	//Hardcoding colors:
     var colors = [
                   '0x24ff24', // 14 Green
-                  '0x6DB6FF', // 9 Cyan
+                  '0xB6DBFF', // 10 Cyan
                   '0xDB6D00', // 13 Orange
                   '0xB66DFF', // 8 Lavender
                   '0xffff6d', // 15 Yellow
@@ -21,6 +21,7 @@ textToGame = function(text, seed) {
                   '0x006DDB', // 7 Blue
                  ];
 
+/*
 	var x, i;
 	for (i = colors.length; i; i--) {
 		var j = Math.floor(Math.random() * i);
@@ -28,6 +29,7 @@ textToGame = function(text, seed) {
 		colors[i - 1] = colors[j];
 		colors[j] = x;
 	}
+*/
 
 	game.players = []
 	game.players.push({name: 'NULL', color: "0x888888"});
