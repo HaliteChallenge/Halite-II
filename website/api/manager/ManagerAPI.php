@@ -99,7 +99,7 @@ class ManagerAPI extends API{
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));
             $players = $this->selectMultiple("SELECT * FROM (SELECT * FROM User WHERE isRunning=1 and userID <> {$seedPlayer['userID']} ORDER BY ABS(mu-{$seedPlayer['mu']}) LIMIT $muRankLimit) muRankTable ORDER BY rand() LIMIT ".($numPlayers-1));
-            array_push($players, $seedPlayer);
+            array_unshift($players, $seedPlayer);
 
             // Pick map size
             $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
