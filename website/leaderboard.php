@@ -19,7 +19,7 @@
                     <div class="row" style="margin-top: 21px; margin-bottom: 10px;">
                         <div class="col-sm-9">
                             <h1 id="leaderHeading" style="margin-top: 0px;">Leaderboard</h1>
-                            <p>There are <span id="numUsers"></span> users on the Halite leaderboard with <span id="numSubmissions"></span> bot submissions.</p>
+                            <p>There are <span id="numUsers"></span> users on the Halite leaderboard. Want to join them? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group">
