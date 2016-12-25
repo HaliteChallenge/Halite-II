@@ -1,5 +1,4 @@
 $(function() {
-    $("#numUsers").html(getNumActiveUsers());
     var userSearch = {
         $usernameField: $("#usernameField"),
         $submitButton: $("#usernameSubmitButton"),
