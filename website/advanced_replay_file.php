@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Replay File Reference</title>
+    <title>Replay Files</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">

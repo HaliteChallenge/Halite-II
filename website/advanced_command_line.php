@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Environment Command Reference</title>
+    <title>Halite Environment CLI</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">

@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Game Server Reference</title>
+    <title>Game Servers</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
