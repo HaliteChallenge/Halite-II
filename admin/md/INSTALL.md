@@ -23,7 +23,6 @@ Finish Apache setup:
  * [Allow the following of symlinks by apache](http://superuser.com/questions/244245/how-do-i-get-apache-to-follow-symlinks)
  * [Allow .htaccess override](http://stackoverflow.com/a/22526144)
  * [Redirect root directory to website directory](http://serverfault.com/questions/9992/how-to-get-apache2-to-redirect-to-a-subdirectory)
- * Tell apache to forbid access to the storage/errors and storage/bots folders and to the halite.ini file
  * [Increase your max file upload size (worker's posting large replays, users posting big bot archives)](http://stackoverflow.com/questions/2184513/php-change-the-maximum-upload-file-size)
 
 To setup automatic backups on the website server, copy the `backupWebsite` file in the `Halite/website/cron` folder into the server's `/etc/cron.hourly` folder, change the IP address in the file to that of the backup server, and make sure that the ssh key of the website server is in the `~/.ssh/authorized_keys` file on the backup server. Once copied, mark the `backupWebsite` file as executable and give cron permission to execute it like so:
