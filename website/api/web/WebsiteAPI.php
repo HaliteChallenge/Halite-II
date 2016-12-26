@@ -69,6 +69,7 @@ class WebsiteAPI extends API{
 
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
+        $numUsers = $this->numRows("SELECT * FROM User WHERE isRunning=1");
         foreach($users as &$user) {
             if($privateInfo == false) {
                 unset($user['email']);
@@ -77,7 +78,7 @@ class WebsiteAPI extends API{
             }
             
             if(intval($user['isRunning']) == 1) {
-                $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
+                $percentile = intval($user['rank']) / $numUsers;
                 if($percentile < 1/64) $user['tier'] = "Diamond";
                 else if($percentile < 1/16) $user['tier'] = "Gold";
                 else if($percentile < 1/4) $user['tier'] = "Silver";
