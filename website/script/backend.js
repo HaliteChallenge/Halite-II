@@ -242,6 +242,40 @@ function getNotifications() {
     }).responseJSON;
 }
 
+function getValidHighSchools() {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}
+
+function getValidHighSchoolByName(name) {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET",
+        data: {name: name}
+    }).responseJSON;
+}
+
+function getValidScrimmages() {
+    return $.ajax({
+        url: url+"scrimmage",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}
+
+function getValidScrimmagesByState(state) {
+    return $.ajax({
+        url: url+"scrimmage",
+        async: false,
+        method: "GET",
+        data: {state: state}
+    }).responseJSON;
+}
+
 function validateEmail() {
     return $.ajax({
         url: url+"email",
@@ -252,10 +286,29 @@ function validateEmail() {
 }
 
 function newEmail(email) {
+    // NOTE: These should be PUTs not GETs (since they aren't indempondent). TODO: change
     return $.ajax({
         url: url+"email",
         async: false,
         method: "GET",
         data: {newEmail: email}
+    }).responseJSON;
+}
+
+function newEmailForProfessional(email, level) {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        data: {newEmail: email, newLevel: level}
+    }).responseJSON;
+}
+
+function newEmailForHighSchool(email, level, institution, scrimmage) {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        data: {newEmail: email, newLevel: level, newInstitution: institution, newScrimmage: scrimmage}
     }).responseJSON;
 }

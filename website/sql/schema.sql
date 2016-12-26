@@ -72,7 +72,9 @@ CREATE TABLE `User` (
   `isEmailGood` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `level` enum('High-School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organization` varchar(64) NOT NULL,
+  `scrimmage` varchar(64),
   `language` varchar(16) DEFAULT NULL,
   `mu` float NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
@@ -148,6 +150,35 @@ CREATE TABLE `UserNotification` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `HighSchool`
+--
+
+DROP TABLE IF EXISTS `HighSchool`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HighSchool` (
+  `name` varchar(64) NOT NULL,
+  `state` varchar(2) NOT NULL,
+  PRIMARY KEY(`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `Scrimmage`
+--
+
+DROP TABLE IF EXISTS `Scrimmage`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Scrimmage` (
+  `name` varchar(64) NOT NULL,
+  `state` varchar(2) NOT NULL,
+  `endDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(`name`, `state`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 --
 -- Table structure for table `Worker`
 --
