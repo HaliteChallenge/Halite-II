@@ -20,8 +20,8 @@
 
                 <h3>Tutorials</h3>
                 <ul>
-                   <li><a href="http://forums.halite.io/t/ml-starter-bot-tutorial/616/38">Machine Learning Starter Bot by brianvanleeuwen</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
-                   <li><a href="http://forums.halite.io/t/running-your-halite-bot-from-an-ide/70/10">Running Your Halite Bot from an IDE by the Halite team</a></li> 
+                   <li><a href="http://forums.halite.io/t/ml-starter-bot-tutorial/616">Machine Learning Starter Bot by brianvanleeuwen</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
+                   <li><a href="http://forums.halite.io/t/running-your-halite-bot-from-an-ide/70">Running Your Halite Bot from an IDE by the Halite team</a></li> 
                    <li><a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">So you've Improved the Random Bot. Now what? by nmalaguti</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li>
                 </ul>
 
@@ -50,8 +50,15 @@
                 <h3>Alternate Starter Packages</h3>
                 <ul>
                    <li><a href="http://forums.halite.io/t/slightly-more-powerful-c-starter-package/767">C#: more powerful starter package</a></li> 
-                   <li><a href="http://forums.halite.io/t/python3-much-alternative-starter-kit-asyncio-based-timeout-management-etc/611">Python: asyncio timeout-based package</a></li> 
+                   <li><a href="http://forums.halite.io/t/python3-much-alternative-starter-kit-asyncio-based-timeout-management-etc/611">Python: asyncio timeout-based starter package</a></li> 
+                   <li><a href="http://forums.halite.io/t/distributed-evolutionary-algorithm-deap-starter/624">Python: Distributed Evolutionary Algorithm (DEAP) starter package</a></li> 
                    <li><a href="http://forums.halite.io/t/python3-numpy-focused-all-i-want-is-matrices-starter-kit/766">Python: numpy matrix oriented starter package</a></li> 
+                </ul>
+
+                <h3>Replay File Dumps</h3>
+                <ul>
+                   <li><a href="http://forums.halite.io/t/diamond-replay-dump/749">December 22, 1583 replays of diamond tier bots</a></li> 
+                   <li><a href="http://forums.halite.io/t/2gb-hlt-files-to-train-on/569">December 1, 2GB of @erdman, @djma, and @daniel-shields</a></li> 
                 </ul>
             </div>
         </div>
