@@ -88,7 +88,7 @@ class ManagerAPI extends API{
             $seedPlayer = null;
             $randValue = mt_rand() / mt_getrandmax();
             if($randValue > 0.5) {
-                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 order by rand()*-pow(sigma, 2) LIMIT 1");
+                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and numGames < 400 order by rand()*-pow(sigma, 2) LIMIT 1");
             }
             if ($randValue > 0.25 && $randValue <= 0.5) {
                 $seedPlayer = $this->select("SELECT * FROM (SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 400 and isRunning = 1 order by maxTime ASC limit 15) orderedTable order by rand() limit 1;");
@@ -99,7 +99,7 @@ class ManagerAPI extends API{
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));
             $players = $this->selectMultiple("SELECT * FROM (SELECT * FROM User WHERE isRunning=1 and userID <> {$seedPlayer['userID']} ORDER BY ABS(mu-{$seedPlayer['mu']}) LIMIT $muRankLimit) muRankTable ORDER BY rand() LIMIT ".($numPlayers-1));
-            array_push($players, $seedPlayer);
+            array_unshift($players, $seedPlayer);
 
             // Pick map size
             $sizes = array(20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50);
@@ -154,16 +154,16 @@ class ManagerAPI extends API{
 
             $mapWidth = $_POST['mapWidth'];
             $mapHeight = $_POST['mapHeight'];
-            $users = json_decode($_POST['users']);
-            $storedUsers = array();
+            $users = json_decode($_POST['users'], true);
 
             // Throw out the game if it is using an old version of a person's bot
-            foreach($users as $user) {
-                $storedUser = $this->select("SELECT * FROM User WHERE userID=".$this->mysqli->real_escape_string($user->userID));
-                array_push($storedUsers, $storedUser);
-                if(intval($storedUser['numSubmissions']) != intval($user->numSubmissions)) {
+            foreach($users as $key => $user) {
+                // Will need email credentials for email sending, numSubmissions for version checking, and mu + sigma so we can update trueskill
+                $storedUser = $this->select("SELECT userID, onEmailList, email, numSubmissions, mu, sigma FROM User WHERE userID=".$this->mysqli->real_escape_string($user['userID']));
+                if(intval($storedUser['numSubmissions']) != intval($user['numSubmissions'])) {
                     return null;
                 }
+                $users[$key] = array_merge($user, $storedUser); // Second param overwrites first param
             }
 
             // Store replay file and error logs
@@ -188,9 +188,8 @@ class ManagerAPI extends API{
                 $s3Client->putObject($args);
             }
 
-
             // Check that we arent stoing too many games in db
-            $numAllowed = 100000;
+            $numAllowed = 500000;
             $res = mysqli_query($this->mysqli, "SELECT * FROM Game");
             $numRows = $res->num_rows;
             $numToDelete = $numRows - $numAllowed;
@@ -204,52 +203,50 @@ class ManagerAPI extends API{
 
             // Store game information in db
             $this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('".$this->mysqli->real_escape_string($replayName)."', ".$this->mysqli->real_escape_string($mapWidth).", ".$this->mysqli->real_escape_string($mapHeight).", NOW())");
-            $gameIDArray = $this->select("SELECT gameID FROM Game WHERE replayName = '".$this->mysqli->real_escape_string($replayName)."' LIMIT 1");
-            $gameID = $gameIDArray['gameID'];
+            $gameID = $this->mysqli->insert_id;
 
             // Update each participant's stats
             for($a = 0; $a < count($users); $a++) {
-                $timeoutInt = $users[$a]->didTimeout ? 1 : 0;
-                $errorLogName = $users[$a]->errorLogName == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]->errorLogName)."'";
-                $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout, versionNumber) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]->userID).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]->rank).", ".$this->mysqli->real_escape_string($users[$a]->playerTag).", {$timeoutInt}, {$storedUsers[$a]['numSubmissions']})");
+                $timeoutInt = $users[$a]['didTimeout'] ? 1 : 0;
+                $errorLogName = $users[$a]['errorLogName'] == NULL ? "NULL" : "'".$this->mysqli->real_escape_string($users[$a]['errorLogName'])."'";
+                $this->insert("INSERT INTO GameUser (gameID, userID, errorLogName, rank, playerIndex, didTimeout, versionNumber) VALUES ($gameID, ".$this->mysqli->real_escape_string($users[$a]['userID']).", $errorLogName, ".$this->mysqli->real_escape_string($users[$a]['rank']).", ".$this->mysqli->real_escape_string($users[$a]['playerTag']).", {$timeoutInt}, {$users[$a]['numSubmissions']})");
 
                 // Increment number of games
-                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]->userID); 
+                $this->insert("UPDATE User SET numGames=numGames+1 WHERE userID=".$users[$a]['userID']); 
             }
             
 
             // Send first game email and first timeout email
             foreach($users as $user) {
-                $storedUser = $this->select("SELECT * FROM User WHERE userID=".$user->userID);
-                if($user->didTimeout && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$storedUser['numSubmissions']} and userID={$user->userID}")->num_rows == 1) {
+                if($user['didTimeout'] && mysqli_query($this->mysqli, "SELECT * from GameUser WHERE didTimeout = 1 and versionNumber = {$user['numSubmissions']} and userID={$user['userID']}")->num_rows == 1) {
                     $errorLogContents = NULL;
                     foreach($_FILES as $file) {
-                        if($file['name'] == $user->errorLogName) {
+                        if($file['name'] == $user['errorLogName']) {
                             $errorLogContents = file_get_contents($file['tmp_name']);
                             break;
                         }
                     }
                     if($errorLogContents == NULL) continue;
 
-                    $message = "<p>Your bot timed out in a game for the first time. This happens when your bot doesn't respond in 15 seconds of a game's start or 1 second of a turn's start. A timeout may be the result of a runtime error in your bot. When your bot times out, its pieces become part of the map and it is ejected from the game.</p> <p><a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game in which your bot timed out.</p> <p><a href='".WEB_DOMAIN."api/web/errorLog?errorLogName={$user->errorLogName}'>Here</a> is your bot's error log. An error log contains your bot's output (from stdout and stderr) and the time it took per turn. For more on error logs, see <a href='https://halite.io/guides_development.php'>the dev guide</a>.</p>";
-                    $this->sendNotification($storedUser, "First Bot Timeout/Error", $message, -1);
+                    $message = "<p>Your bot timed out in a game for the first time. This happens when your bot doesn't respond in 15 seconds of a game's start or 1 second of a turn's start. A timeout may be the result of a runtime error in your bot. When your bot times out, its pieces become part of the map and it is ejected from the game.</p> <p><a href='".WEB_DOMAIN."game.php?replay={$replayName}'>Here</a> is a visualization of the game in which your bot timed out.</p> <p><a href='".WEB_DOMAIN."api/web/errorLog?errorLogName={$user['errorLogName']}'>Here</a> is your bot's error log. An error log contains your bot's output (from stdout and stderr) and the time it took per turn.</p>";
+                    $this->sendNotification($user, "First Bot Timeout/Error", $message, -1);
                 }
             }
 
             // Update mu and sigma for the players
             usort($users, function($a, $b) {
-                return $a->rank > $b->rank;
+                return $a['rank'] > $b['rank'];
             });
             $rankings = array();
             foreach($users as $user) {
-                array_push($rankings, $user->mu);
-                array_push($rankings, $user->sigma);
+                array_push($rankings, $user['mu']);
+                array_push($rankings, $user['sigma']);
             }
             exec("python3 updateTrueskill.py ".implode(' ', $rankings), $lines);
             var_dump($lines);
             for($a = 0; $a < count($users); $a++) {
                 $components = explode(' ', $lines[$a]);
-                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]->userID));
+                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]['userID']));
             }
 
             // Update overall rank of everyone
@@ -257,10 +254,13 @@ class ManagerAPI extends API{
             usort($allUsers, function($a, $b) {
                 return $a['mu']-3*$a['sigma'] < $b['mu']-3*$b['sigma'];
             });
+            $query = "UPDATE User set rank = CASE";
             for($userIndex = 0; $userIndex < count($allUsers); $userIndex++) {
                 $rank = $userIndex+1;
-                $this->insert("UPDATE User SET rank={$rank} WHERE userID={$allUsers[$userIndex]['userID']}");
+                $query .= " WHEN userID = {$allUsers[$userIndex]['userID']} THEN {$rank}";
             }
+            $query .= " ELSE rank END;";
+            $this->insert($query);
         }
     }
 

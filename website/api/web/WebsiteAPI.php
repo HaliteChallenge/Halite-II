@@ -69,6 +69,7 @@ class WebsiteAPI extends API{
 
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
+        $numUsers = $this->numRows("SELECT * FROM User WHERE isRunning=1");
         foreach($users as &$user) {
             if($privateInfo == false) {
                 unset($user['email']);
@@ -77,7 +78,7 @@ class WebsiteAPI extends API{
             }
             
             if(intval($user['isRunning']) == 1) {
-                $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
+                $percentile = intval($user['rank']) / $numUsers;
                 if($percentile < 1/64) $user['tier'] = "Diamond";
                 else if($percentile < 1/16) $user['tier'] = "Gold";
                 else if($percentile < 1/4) $user['tier'] = "Silver";
@@ -341,16 +342,20 @@ class WebsiteAPI extends API{
             $versionNumber = isset($_GET['versionNumber']) ? intval($_GET['versionNumber']) : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
             $gameArrays = $this->selectMultiple("SELECT g.* FROM GameUser gu INNER JOIN Game g ON g.gameID = gu.gameID WHERE gu.userID = $userID and gu.versionNumber = $versionNumber and gu.gameID < $startingID ORDER BY gu.gameID DESC LIMIT $limit");
+        } else {
+            $previousID = isset($_GET['previousID']) ? intval($_GET['previousID']) : 0;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 20;
+            $gameArrays = $this->selectMultiple("SELECT * FROM Game WHERE gameID > $previousID ORDER BY gameID DESC LIMIT $limit"); 
+        }
 
-            // Get each game's info
-            foreach ($gameArrays as &$gameArray) {
-                $gameID = $gameArray['gameID'];
+        // Get each game's info
+        foreach ($gameArrays as &$gameArray) {
+            $gameID = $gameArray['gameID'];
 
-                // Get information about users
-                $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
-            }
-            return $gameArrays;
-        } 
+            // Get information about users
+            $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID, u.mu, u.sigma, u.rank AS userRank FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
+        }
+        return $gameArrays;
     }
     
     /* Bot File Endpoint

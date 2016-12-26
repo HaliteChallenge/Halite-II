@@ -295,6 +295,7 @@ function newEmail(email) {
     }).responseJSON;
 }
 
+
 function newEmailForProfessional(email, level) {
     return $.ajax({
         url: url+"email",
@@ -310,5 +311,12 @@ function newEmailForHighSchool(email, level, institution, scrimmage) {
         async: false,
         method: "GET",
         data: {newEmail: email, newLevel: level, newInstitution: institution, newScrimmage: scrimmage}
+
+function getGames(previousID) {
+    return $.ajax({
+        url: "api/web/game",
+        async: false,
+        method: "GET",
+        data: {previousID: previousID}
     }).responseJSON;
 }

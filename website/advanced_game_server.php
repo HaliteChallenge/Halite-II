@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Game Server Reference</title>
+    <title>Game Servers</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -15,7 +15,7 @@
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
 
-                <h1>Game Server Reference</h1>
+                <h1>Game Servers</h1>
 
                 <h3>Hardware</h3>
                 <p>All compilation and game execution is done on AWS EC2 m3.medium servers running Ubuntu 16.04. They have the following specs:
@@ -31,7 +31,7 @@
 
                     <h3>Compilation</h3>
                     <p>Bot compilation is done using <a href="https://github.com/HaliteChallenge/Halite/blob/master/worker/compiler.py">this autocompile script</a>.</p>
-                    <p>To facilitate the installation of custom software, we allow users to include an install script. If a file named <code>install.sh</code> exists in your submission, it is run as a bash script under the root user in a sandbox with internet access and 10 minutes of runtime. Bots may only read and write to their current directory, so all files that you want to be available at runtime must be installed locally. For more on using 3rd party libraries, click <a href="guides_libraries.php">here</a>.</p>
+                    <p>To facilitate the installation of custom software, we allow users to include an install script. If a file named <code>install.sh</code> exists in your submission, it is run as a bash script under the root user in a sandbox with internet access and 10 minutes of runtime. Bots may only read and write to their current directory, so all files that you want to be available at runtime must be installed locally. For more on using 3rd party libraries, click <a href="advanced_libraries.php">here</a>.</p>
                     <p>
                         Your main file must be called <code>MyBot</code>. Your language is recognized using the file extension of your <code>MyBot</code> file. The appropriate file extensions for each language are:
                         <ul>

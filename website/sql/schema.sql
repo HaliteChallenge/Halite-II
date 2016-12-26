@@ -49,7 +49,8 @@ CREATE TABLE `GameUser` (
   `errorLogName` varchar(64) DEFAULT NULL,
   `rank` smallint(5) unsigned NOT NULL,
   `playerIndex` smallint(5) unsigned NOT NULL,
-  `didTimeout` tinyint(1) unsigned NOT NULL
+  `didTimeout` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`gameID`,`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
