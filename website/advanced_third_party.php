@@ -28,7 +28,7 @@
                 <h3>Strategy Writeups</h3>
                 <ul>
                    <li><a href="http://forums.halite.io/t/early-mid-and-late-game/703">Early, Mid, and Late Game Strategy by nmalaguti</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
-                   <li><a href="http://forums.halite.io/t/how-your-starting-position-impacts-your-bots-performance/769">How your starting position impacts your bots performance by nmalaguti</a></li> 
+                   <li><a href="http://forums.halite.io/t/how-your-starting-position-impacts-your-bots-performance/769">How Your Starting Position Impacts Your Bot's Performance by nmalaguti</a></li> 
                    <li><a href="http://forums.halite.io/t/perimeter-optimization-during-expansion/723">Perimeter Optimization by Sydriax</a></li> 
                 </ul>
 
