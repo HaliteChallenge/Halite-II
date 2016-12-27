@@ -23,6 +23,7 @@
                    <li><a href="http://forums.halite.io/t/ml-starter-bot-tutorial/616">Machine Learning Starter Bot by brianvanleeuwen</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
                    <li><a href="http://forums.halite.io/t/running-your-halite-bot-from-an-ide/70">Running Your Halite Bot from an IDE by the Halite team</a></li> 
                    <li><a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">So you've Improved the Random Bot. Now what? by nmalaguti</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li>
+                   <li><a href="http://forums.halite.io/t/building-a-good-ml-bot/776">Building a Good Machine Learning Bot by KalraA</a></li>
                 </ul>
 
                 <h3>Strategy Writeups</h3>
