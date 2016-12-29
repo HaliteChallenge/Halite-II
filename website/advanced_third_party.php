@@ -60,7 +60,7 @@
                 <h3>Replay File Dumps</h3>
                 <ul>
                    <li><a href="http://forums.halite.io/t/diamond-replay-dump/749">December 22, 1583 replays of diamond tier bots</a></li> 
-                   <li><a href="http://forums.halite.io/t/2gb-hlt-files-to-train-on/569">December 1, 2GB of @erdman, @djma, and @daniel-shields</a></li> 
+                   <li><a href="http://forums.halite.io/t/2gb-hlt-files-to-train-on/569">December 1, 5GB of @erdman, @djma, and @daniel-shields</a></li> 
                 </ul>
             </div>
         </div>
