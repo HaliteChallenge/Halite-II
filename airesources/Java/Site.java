@@ -1,3 +1,9 @@
 public class Site {
-    public int owner, strength, production;
+
+    private final int production;
+    public int owner, strength;
+
+    public Site(int production) {
+        this.production = production;
+    }
 }
