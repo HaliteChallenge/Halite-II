@@ -229,7 +229,7 @@ function getFilteredUsers(filters, orderBy, limit, page) {
         method: "GET",
         data: {fields: fields, values: values, orderBy: orderBy, limit: limit, page: page}
     });
-	console.log(result)
+    console.log(result)
 
     return result.responseJSON;
 }
@@ -311,6 +311,8 @@ function newEmailForHighSchool(email, level, institution, scrimmage) {
         async: false,
         method: "GET",
         data: {newEmail: email, newLevel: level, newInstitution: institution, newScrimmage: scrimmage}
+    }).responseJSON;
+}
 
 function getGames(previousID) {
     return $.ajax({
