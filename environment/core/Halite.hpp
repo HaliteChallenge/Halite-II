@@ -85,7 +85,7 @@ private:
 public:
     Halite(unsigned short width_, unsigned short height_, unsigned int seed_, unsigned short n_players_for_map_creation, Networking networking_, bool shouldIgnoreTimeout);
 
-    GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id);
+  GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id, bool enabledReplay, std::string replayDirectory);
     std::string getName(unsigned char playerTag);
 
     ~Halite();
