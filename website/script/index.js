@@ -1,4 +1,5 @@
 $(function() {
+    $("#numUsers").html(getNumActiveUsers());
     var data = textFromURL("ar1478846062-2923329127.hlt", $("#gameReplay"), function(data) {
         console.log(data)
         if(data != null) {

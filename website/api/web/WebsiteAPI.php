@@ -69,7 +69,7 @@ class WebsiteAPI extends API{
 
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
-        $numUsers = $this->numRows("SELECT * FROM User WHERE isRunning=1");
+        $numUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1");
         foreach($users as &$user) {
             if($privateInfo == false) {
                 unset($user['email']);
@@ -192,11 +192,11 @@ class WebsiteAPI extends API{
             $githubUser = json_decode($gitHub->request('user'), true);
             $email = json_decode($gitHub->request('user/emails'), true)[0];
 
-            if($this->numRows("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
+            if($this->numRows("SELECT COUNT(*) FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
-                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
+                $numActiveUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1"); 
                 $this->insert("INSERT INTO User (username, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
             }
@@ -387,8 +387,8 @@ class WebsiteAPI extends API{
             if(intval($this->config['test']['isTest']) == 0) $this->sendNotification($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
 
             // AWS auto scaling
-            $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-            $numWorkers = $this->numRows("SELECT workerID FROM Worker");
+            $numActiveUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1"); 
+            $numWorkers = $this->numRows("SELECT COUNT(*) FROM Worker");
             if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
                 echo shell_exec("python3 openNewWorker.py > /dev/null 2>/dev/null &");
             }

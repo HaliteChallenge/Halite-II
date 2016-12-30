@@ -23,6 +23,7 @@
                    <li><a href="http://forums.halite.io/t/ml-starter-bot-tutorial/616">Machine Learning Starter Bot by brianvanleeuwen</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
                    <li><a href="http://forums.halite.io/t/running-your-halite-bot-from-an-ide/70">Running Your Halite Bot from an IDE by the Halite team</a></li> 
                    <li><a href="http://forums.halite.io/t/so-youve-improved-the-random-bot-now-what/482">So you've Improved the Random Bot. Now what? by nmalaguti</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li>
+                   <li><a href="http://forums.halite.io/t/building-a-good-ml-bot/776">Building a Good Machine Learning Bot by KalraA</a></li>
                 </ul>
 
                 <h3>Strategy Writeups</h3>
@@ -38,8 +39,9 @@
                    <li><a href="http://forums.halite.io/t/halite-swig-wrapper-for-the-game-engine/550">Environment: halite environment SWIG wrapper</a></li> 
                    <li><a href="http://forums.halite.io/t/unofficial-halite-engine-clone-reloader/582">Environment: multi-featured game environment clone</a></li> 
                    <li><a href="http://forums.halite.io/t/unofficial-match-manager-for-local-testing/505">Local tournament manager</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
-                   <li><a href="http://forums.halite.io/t/a-stand-alone-game-viewer/615">Visualizer: 3D visualizer</a></li> 
-                   <li><a href="http://forums.halite.io/t/auto-visualization-of-test-runs/422">Visualizer: Auto-reloading game visualizer</a></li> 
+                   <li><a href="http://forums.halite.io/t/visualizer-with-more-graphs-aka-experimental-visualizer/771">Visualizer: web visualizer with aws s3 hosting, extra stats, and easy linking</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
+                   <li><a href="http://forums.halite.io/t/a-stand-alone-game-viewer/615">Visualizer: local 3D visualizer</a></li> 
+                   <li><a href="http://forums.halite.io/t/auto-visualization-of-test-runs/422">Visualizer: local auto-reloading visualizer</a></li> 
                 </ul>
 
                 <h3>Mini Competitions</h3>
@@ -58,7 +60,7 @@
                 <h3>Replay File Dumps</h3>
                 <ul>
                    <li><a href="http://forums.halite.io/t/diamond-replay-dump/749">December 22, 1583 replays of diamond tier bots</a></li> 
-                   <li><a href="http://forums.halite.io/t/2gb-hlt-files-to-train-on/569">December 1, 2GB of @erdman, @djma, and @daniel-shields</a></li> 
+                   <li><a href="http://forums.halite.io/t/2gb-hlt-files-to-train-on/569">December 1, 5GB of @erdman, @djma, and @daniel-shields</a></li> 
                 </ul>
             </div>
         </div>
