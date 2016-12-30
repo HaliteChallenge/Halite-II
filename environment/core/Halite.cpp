@@ -306,7 +306,7 @@ void Halite::output(std::string filename) {
     gameFile.close();
 }
 
-GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id, bool outputReplay, std::string replayDirectory) {
+GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id, bool enabledReplay, std::string replayDirectory) {
     //For rankings
     std::vector<bool> result(number_of_players, true);
     std::vector<unsigned char> rankings;
