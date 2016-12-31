@@ -47,7 +47,7 @@ int main(int argc, char ** argv) {
     TCLAP::ValueArg<unsigned int> nPlayersArg("n", "nplayers", "Create a map that will accommodate n players [SINGLE PLAYER MODE ONLY].", false, 1, "{1,2,3,4,5,6}", cmd);
     TCLAP::ValueArg< std::pair<signed int, signed int> > dimensionArgs("d", "dimensions", "The dimensions of the map.", false, { 0, 0 }, "a string containing two space-seprated positive integers", cmd);
     TCLAP::ValueArg<unsigned int> seedArg("s", "seed", "The seed for the map generator.", false, 0, "positive integer", cmd);
-    TCLAP::ValueArg<std::string> replayDirectoryArg("i", "replaydirectory", "The path to directory for replay output (needs to end with a /).", false, "./", "path to directory", cmd);
+    TCLAP::ValueArg<std::string> replayDirectoryArg("i", "replaydirectory", "The path to directory for replay output.", false, ".", "path to directory", cmd);
 
     //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
     TCLAP::UnlabeledMultiArg<std::string> otherArgs("NonspecifiedArgs", "Start commands for bots.", false, "Array of strings", cmd);
@@ -138,7 +138,13 @@ int main(int argc, char ** argv) {
     //Create game. Null parameters will be ignored.
     my_game = new Halite(mapWidth, mapHeight, seed, n_players_for_map_creation, networking, ignore_timeout);
 
-    GameStatistics stats = my_game->runGame(names, seed, id, !noReplaySwitch.getValue(), replayDirectoryArg.getValue());
+    std::string outputFilename = replayDirectoryArg.getValue();
+#ifdef _WIN32
+    if(outputFilename.back() != '\\') outputFilename.push_back('\\');
+#else
+    if(outputFilename.back() != '/') outputFilename.push_back('/');
+#endif
+    GameStatistics stats = my_game->runGame(names, seed, id, !noReplaySwitch.getValue(), outputFilename);
     if(names != NULL) delete names;
 
     std::string victoryOut;
