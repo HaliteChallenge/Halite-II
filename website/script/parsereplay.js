@@ -11,18 +11,18 @@ textToGame = function(text, seed) {
 
 	//Hardcoding colors:
 	var colors = [
-	              '#00718A',
-	              '#9010B9',
-	              '#005DD0',
-	              '#0A9BF3',
-	              '#F577F2',
-	              '#23D1DE',
-	              '#B11243',
-	              '#FF704B',
-	              '#00B553',
-	              '#F8EC31',
-	              '#8FFE7B',
-	              '#FBE4B3'
+	              '0x00718A',
+	              '0x9010B9',
+	              '0x005DD0',
+	              '0x0A9BF3',
+	              '0xF577F2',
+	              '0x23D1DE',
+	              '0xB11243',
+	              '0xFF704B',
+	              '0x00B553',
+	              '0xF8EC31',
+	              '0x8FFE7B',
+	              '0xFBE4B3'
 	             ];
 
 	var x, i;
