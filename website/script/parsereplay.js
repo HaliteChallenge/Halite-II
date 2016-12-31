@@ -11,14 +11,18 @@ textToGame = function(text, seed) {
 
 	//Hardcoding colors:
 	var colors = [
-	              '0x24ff24', // 14 Green
-	              '0xB6DBFF', // 10 Cyan
-	              '0xDB6D00', // 13 Orange
-	              '0xB66DFF', // 8 Lavender
-	              '0xffff6d', // 15 Yellow
-	              '0xFF6DB6', // 4 Pink
-	              '0x924900', // 12 Brown
-	              '0x006DDB', // 7 Blue
+	              '#00718A',
+	              '#9010B9',
+	              '#005DD0',
+	              '#0A9BF3',
+	              '#F577F2',
+	              '#23D1DE',
+	              '#B11243',
+	              '#FF704B',
+	              '#00B553',
+	              '#F8EC31',
+	              '#8FFE7B',
+	              '#FBE4B3'
 	             ];
 
 	var x, i;
