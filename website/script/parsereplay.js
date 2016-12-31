@@ -11,10 +11,8 @@ textToGame = function(text, seed) {
 
 	//Hardcoding colors:
 	var colors = [
-	              '0x00718A',
 	              '0x9010B9',
 	              '0x005DD0',
-	              '0x0A9BF3',
 	              '0xF577F2',
 	              '0x23D1DE',
 	              '0xB11243',
