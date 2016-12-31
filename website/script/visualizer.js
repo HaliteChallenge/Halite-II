@@ -86,7 +86,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             strText.anchor = new PIXI.Point(0, 1);
             strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
             stage.addChild(strText);
-            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
+            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 40).toString() + 'px Arial', fill: 0xffffff });
             infoText.anchor = new PIXI.Point(0, 1);
             infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
             stage.addChild(infoText);
@@ -303,11 +303,14 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                 for(var b = 0; b < game.width; b++) {
                     var site = game.frames[frame][Math.floor(loc / game.width)][loc % game.width];
                     if(site.strength == 255) mapGraphics.lineStyle(1, '0xfffff0');
-                    mapGraphics.beginFill(game.players[site.owner].color);
-                    var pw = rw * Math.sqrt(site.strength / 255) / 2, ph = rh * Math.sqrt(site.strength / 255) / 2;
-                    var move = t > 0 ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
+                    if(site.strength != 0) mapGraphics.beginFill(game.players[site.owner].color);
+                    var pw = rw * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2
+                    var ph = rh * Math.sqrt(site.strength > 0 ? site.strength / 255 : 0.1) / 2;
+                    var direction = frame < game.moves.length ? game.moves[frame][Math.floor(loc / game.width)][loc % game.width] : 0;
+                    var move = t > 0 ? direction : 0;
                     var sY2 = move == 1 ? sY - 1 : move == 3 ? sY + 1 : sY;
                     var sX2 = move == 2 ? sX + 1 : move == 4 ? sX - 1 : sX;
+                    if(site.strength == 0 && direction != 0) mapGraphics.lineStyle(1, '0x888888')
                     var center = new PIXI.Point(rw * ((t * sX2 + (1 - t) * sX) + 0.5), rh * ((t * sY2 + (1 - t) * sY) + 0.5));
                     var pts = new Array();
                     const squarescale = 0.75;
@@ -316,8 +319,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     pts.push(new PIXI.Point(center.x - squarescale * pw, center.y - squarescale * ph));
                     pts.push(new PIXI.Point(center.x - squarescale * pw, center.y + squarescale * ph));
                     mapGraphics.drawPolygon(pts);
-                    mapGraphics.endFill();
-                    if(site.strength == 255) mapGraphics.lineStyle(0, '0xffffff');
+                    if(site.strength != 0) mapGraphics.endFill();
+                    mapGraphics.lineStyle(0, '0xffffff');
                     loc++;
                     sX++;
                     if(sX == game.width) sX = 0;
@@ -358,8 +361,17 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         if(!isminimal) {
             //Update info text:
             var mousepos = manager.mouse.global;
-            if(!mousePressed || mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
+            if(mousepos.x < 0 || mousepos.x > sw || mousepos.y < 0 || mousepos.y > sh) { //Mouse is not over renderer.
                 infoText.text = 'Frame #' + frame.toString();
+            }
+            else if(!mousePressed) {
+                infoText.text = 'Frame #' + frame.toString();
+                if(mousepos.x < mw && mousepos.y < mh) { //Over map
+                    var x = (Math.floor(mousepos.x / rw) - xOffset) % game.width, y = (Math.floor(mousepos.y / rh) - yOffset) % game.height;
+                    if(x < 0) x += game.width;
+                    if(y < 0) y += game.height;
+                    infoText.text += ' | Loc: ' + x.toString() + ',' + y.toString();
+                }
             }
             else { //Mouse is clicked and over renderer.
                 if(mousepos.x < mw && mousepos.y < mh) { //Over map:
@@ -369,6 +381,13 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                     str = game.frames[frame][y][x].strength;
                     prod = game.productions[y][x];
                     infoText.text = 'Str: ' + str.toString() + ' | Prod: ' + prod.toString();
+                    if(frame < game.moves.length && game.frames[frame][y][x].owner != 0) {
+                        move = game.moves[frame][y][x];
+                        if(move >= 0 && move < 5) {
+                            move = "0NESW"[move];
+                        }
+                        infoText.text += ' | Mv: ' + move.toString();
+                    }
                 }
                 else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
                     frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
