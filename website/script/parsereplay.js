@@ -18,8 +18,7 @@ textToGame = function(text, seed) {
 	              '0xB11243',
 	              '0xFF704B',
 	              '0x00B553',
-	              '0xF8EC31',
-	              '0x8FFE7B'
+	              '0xF8EC31'
 	             ];
 
 	var x, i;
