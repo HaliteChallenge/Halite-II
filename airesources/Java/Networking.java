@@ -4,57 +4,57 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
 
 public class Networking {
+    public static final int SIZE_OF_INTEGER_PREFIX = 4;
+    public static final int CHAR_SIZE = 1;
+    private static int _width, _height;
+    private static ArrayList< ArrayList<Integer> > _productions;
 
-    static int[][] deserializeProductions(String inputString, int width, int height) {
+    static void deserializeGameMapSize(String inputString) {
+        String[] inputStringComponents = inputString.split(" ");
+
+        _width = Integer.parseInt(inputStringComponents[0]);
+        _height = Integer.parseInt(inputStringComponents[1]);
+    }
+
+
+    static void deserializeProductions(String inputString) {
         String[] inputStringComponents = inputString.split(" ");
 
         int index = 0;
-        int[][] productions = new int[width][height];
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                productions[x][y] = Integer.parseInt(inputStringComponents[index]);
+        _productions = new ArrayList< ArrayList<Integer> >();
+        for(int a = 0; a < _height; a++) {
+            ArrayList<Integer> row = new ArrayList<Integer>();
+            for(int b = 0; b < _width; b++) {
+                row.add(Integer.parseInt(inputStringComponents[index]));
                 index++;
             }
+            _productions.add(row);
         }
-
-        return productions;
     }
 
-    static String serializeMoveList(List<Move> moves) {
+    static String serializeMoveList(ArrayList<Move> moves) {
         StringBuilder builder = new StringBuilder();
-        for (Move move : moves) {
-            builder.append(move.loc.x)
-                .append(" ")
-                .append(move.loc.y)
-                .append(" ")
-                .append(move.dir.ordinal())
-                .append(" ");
-        }
+        for(Move move : moves) builder.append(move.loc.x + " " + move.loc.y + " " + move.dir.ordinal() + " ");
         return builder.toString();
     }
 
-    static GameMap deserializeGameMap(String inputString, GameMap map) {
+    static GameMap deserializeGameMap(String inputString) {
         String[] inputStringComponents = inputString.split(" ");
+
+        GameMap map = new GameMap(_width, _height);
 
         // Run-length encode of owners
         int y = 0, x = 0;
         int counter = 0, owner = 0;
         int currentIndex = 0;
-
-
-        while (y != map.height) {
-
+        while(y != map.height) {
             counter = Integer.parseInt(inputStringComponents[currentIndex]);
             owner = Integer.parseInt(inputStringComponents[currentIndex + 1]);
-
             currentIndex += 2;
-            for (int a = 0; a < counter; a++) {
-
-                map.getLocation(x,y).getSite().owner = owner;
+            for(int a = 0; a < counter; ++a) {
+                map.contents.get(y).get(x).owner = owner;
                 ++x;
                 if(x == map.width) {
                     x = 0;
@@ -63,11 +63,12 @@ public class Networking {
             }
         }
 
-        for (int b = 0; b < map.height; b++) {
-            for (int a = 0; a < map.width; a++) {
+        for (int a = 0; a < map.contents.size(); ++a) {
+            for (int b = 0; b < map.contents.get(a).size(); ++b) {
                 int strengthInt = Integer.parseInt(inputStringComponents[currentIndex]);
                 currentIndex++;
-                map.getLocation(a,b).getSite().strength = strengthInt;
+                map.contents.get(a).get(b).strength = strengthInt;
+                map.contents.get(a).get(b).production = _productions.get(a).get(b);
             }
         }
 
@@ -99,22 +100,11 @@ public class Networking {
     }
 
     static InitPackage getInit() {
-
         InitPackage initPackage = new InitPackage();
         initPackage.myID = (int)Integer.parseInt(getString());
-
-        // Deserialize width and height:
-        final String[] inputStringComponents = getString().split(" ");
-
-        int width = Integer.parseInt(inputStringComponents[0]);
-        int height = Integer.parseInt(inputStringComponents[1]);
-
-        int[][] productions = deserializeProductions(getString(), width, height);
-
-        GameMap map = new GameMap(width, height, productions);
-        deserializeGameMap(getString(), map);
-
-        initPackage.map = map;
+        deserializeGameMapSize(getString());
+        deserializeProductions(getString());
+        initPackage.map = deserializeGameMap(getString());
 
         return initPackage;
     }
@@ -123,12 +113,11 @@ public class Networking {
         sendString(name);
     }
 
-    static void updateFrame(GameMap map) {
-        map.reset();
-        deserializeGameMap(getString(), map);
+    static GameMap getFrame() {
+        return deserializeGameMap(getString());
     }
 
-    static void sendFrame(List<Move> moves) {
+    static void sendFrame(ArrayList<Move> moves) {
         sendString(serializeMoveList(moves));
     }
 
