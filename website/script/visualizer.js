@@ -31,12 +31,13 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                 return "<span style='color: #"+p.color.slice(2, p.color.length)+";'>"+filterXSS(p.name)+"</span>"
             }
         }).join(" vs ")+"</h3>")));
-        $row.append($("<div class='col-md-1' style='text-align: left;'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback, as do the digits keys 1-5.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>W, A, S, and D pan the view around the map. O recenters the the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
+        $row.append($("<div class='col-md-1' style='text-align: left;'><button type='button' class='btn btn-sm btn-default pull-right' data-toggle='modal' data-target='#myModal'><span class='glyphicon glyphicon-info-sign'></span></button> <div id='myModal' class='modal fade' role='dialog'> <div class='modal-dialog'> <div class='modal-content'> <div class='modal-header'> <button type='button' class='close' data-dismiss='modal'>&times;</button> <h4 class='modal-title'>Using the Visualizer</h4> </div><div class='modal-body'> <p><ul><li>Space pauses and plays.</li><li>Left and Right arrows navigate through the game.</li><li>Up and Down arrows change the speed of playback, as do the digits keys 1-5.</li><li>Plus (+) and Minus (-) zoom in and out on the graphs.</li><li>Z and X jump to the beginning and end of the game.</li><li>P shows the production heatmap onscreen.</li><li>E toggles the display of extra information.</li><li>W, A, S, and D pan the view around the map. O recenters the origin.</li><li>Comma and Period (< and >) navigate through the game by a single frame.</li><li>One can also click on the graphs to navigate through the game.</li></ul></p></div></div></div></div></div>"));
         $container.append($row);
     }
     $container.append(renderer.view);
     $container.append($("<br>"));
 
+    var showExtended = false;
     var frame = 0;
     var transit = 0;
     var framespersec = seconds == null ? 3 : game.num_frames / seconds;
@@ -62,31 +63,76 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
         }
         else {
-            if(allowedWidth < allowedHeight*4/3) {
-                sw = allowedWidth, sh = allowedWidth*3/4;
+            var splits = showExtended ? 5 : 4;
+            if(allowedWidth < allowedHeight*splits/3) {
+                sw = allowedWidth, sh = allowedWidth*3/splits;
             } else {
-                sw = allowedHeight*4/3, sh = allowedHeight;
+                sw = allowedHeight*splits/3, sh = allowedHeight;
             }
             mw = sh, mh = sh;
             renderer.resize(sw, sh);
             rw = mw / game.width, rh = mh / game.height; //Sizes of rectangles for rendering tiles.
-            GRAPH_LEFT = mw * 1.025, GRAPH_RIGHT = sw - 1;
-            TER_TOP = sh * 0.095, TER_BTM = sh * 0.36, PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675, STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
+            if(showExtended) {
+                LEFT_GRAPH_LEFT = mw * 1.025, LEFT_GRAPH_RIGHT = LEFT_GRAPH_LEFT + sw * 0.17;
+            } else {
+                LEFT_GRAPH_LEFT = mw * 1.025, LEFT_GRAPH_RIGHT = sw - 1;
+            }
+            RIGHT_GRAPH_LEFT = mw * 1.35, RIGHT_GRAPH_RIGHT = RIGHT_GRAPH_LEFT + sw * 0.17;
+
+            if(showExtended) {
+                TER_TOP = sh * 0.09, TER_BTM = sh * 0.29;
+                PROD_TOP = sh * 0.33, PROD_BTM = sh * 0.53;
+                STR_TOP = sh * 0.57, STR_BTM = sh * 0.77;
+            } else {
+                TER_TOP = sh * 0.09, TER_BTM = sh * 0.36;
+                PROD_TOP = sh * 0.41, PROD_BTM = sh * 0.675;
+                STR_TOP = sh * 0.725, STR_BTM = sh * 0.99;
+            }
+
+            ENV_DMG_TOP = sh * 0.09, ENV_DMG_BTM = sh * 0.29;
+            ACT_PROD_TOP = sh * 0.33, ACT_PROD_BTM = sh * 0.53;
+            CAP_LOSS_TOP = sh * 0.57, CAP_LOSS_BTM = sh * 0.77;
+
+            PLR_DMG_TOP = sh * 0.81, PLR_DMG_BTM = sh * 0.99;
+            DMG_TKN_TOP = sh * 0.81, DMG_TKN_BTM = sh * 0.99;
+
             //Create the text for rendering the terrritory, strength, and prod graphs.
             stage.removeChildren();
-            terText = new PIXI.Text('Territory', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
+            terText = new PIXI.Text('Territory', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
             terText.anchor = new PIXI.Point(0, 1);
             terText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.005);
             stage.addChild(terText);
-            prodText = new PIXI.Text('Production', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
+            prodText = new PIXI.Text('Production', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
             prodText.anchor = new PIXI.Point(0, 1);
             prodText.position = new PIXI.Point(mw + sh / 32, PROD_TOP - sh * 0.005);
             stage.addChild(prodText);
-            strText = new PIXI.Text('Strength', { font: (sh / 32).toString() + 'px Arial', fill: 0xffffff });
+            strText = new PIXI.Text('Strength', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
             strText.anchor = new PIXI.Point(0, 1);
             strText.position = new PIXI.Point(mw + sh / 32, STR_TOP - sh * 0.005);
             stage.addChild(strText);
-            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 40).toString() + 'px Arial', fill: 0xffffff });
+            if(showExtended) {
+                envDmgText = new PIXI.Text('Environment Damage', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+                envDmgText.anchor = new PIXI.Point(0, 1);
+                envDmgText.position = new PIXI.Point(mw + sh / 2.75, ENV_DMG_TOP - sh * 0.005);
+                stage.addChild(envDmgText);
+                actProdText = new PIXI.Text('Realized Production', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+                actProdText.anchor = new PIXI.Point(0, 1);
+                actProdText.position = new PIXI.Point(mw + sh / 2.75, ACT_PROD_TOP - sh * 0.005);
+                stage.addChild(actProdText);
+                capLossText = new PIXI.Text('Strength Loss to Cap', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+                capLossText.anchor = new PIXI.Point(0, 1);
+                capLossText.position = new PIXI.Point(mw + sh / 2.75, CAP_LOSS_TOP - sh * 0.005);
+                stage.addChild(capLossText);
+                plrDmgDltText = new PIXI.Text('Overkill Damage', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+                plrDmgDltText.anchor = new PIXI.Point(0, 1);
+                plrDmgDltText.position = new PIXI.Point(mw + sh / 32, PLR_DMG_TOP - sh * 0.005);
+                stage.addChild(plrDmgDltText);
+                dmgTknText = new PIXI.Text('Damage Taken', { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
+                dmgTknText.anchor = new PIXI.Point(0, 1);
+                dmgTknText.position = new PIXI.Point(mw + sh / 2.75, DMG_TKN_TOP - sh * 0.005);
+                stage.addChild(dmgTknText);
+            }
+            infoText = new PIXI.Text('Frame #' + frame.toString(), { font: (sh / 38).toString() + 'px Arial', fill: 0xffffff });
             infoText.anchor = new PIXI.Point(0, 1);
             infoText.position = new PIXI.Point(mw + sh / 32, TER_TOP - sh * 0.05);
             stage.addChild(infoText);
@@ -112,8 +158,12 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
     document.onkeydown=function(e){
         e = e || window.event;
         pressed[e.keyCode] = true;
-            if(e.keyCode == 32) { //Space
+        if(e.keyCode == 32) { //Space
             shouldplay = !shouldplay;
+        }
+        else if(e.keyCode == 69) { //e
+            showExtended = !showExtended;
+            window.onresize();
         }
         else if(e.keyCode == 90) { //z
             frame = 0;
@@ -196,63 +246,96 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             if(firstFrame < 0) firstFrame = 0;
             if(lastFrame >= game.num_frames) lastFrame = game.num_frames - 1;
             nf = lastFrame - firstFrame;
-            var dw = (GRAPH_RIGHT - GRAPH_LEFT) / (nf);
+            var dw = (LEFT_GRAPH_RIGHT - LEFT_GRAPH_LEFT) / (nf);
             //Normalize values with respect to the range of frames seen by the graph.
-            var maxTer = 0, maxProd = 0, maxStr = 0;
+            var maxTer = 0, maxProd = 0, maxStr = 0, maxActProd = 0;
+            var maxPlrDmgDlt = 0, maxEnvDmgDlt = 0, maxDmgTkn = 0, maxCapLoss = 0;
             for(var a = 1; a <= game.num_players; a++) {
                 for(var b = firstFrame; b <= lastFrame; b++) {
                     if(game.players[a].territories[b] > maxTer) maxTer = game.players[a].territories[b] * 1.01;
                     if(game.players[a].productions[b] > maxProd) maxProd = game.players[a].productions[b] * 1.01;
                     if(game.players[a].strengths[b] > maxStr) maxStr = game.players[a].strengths[b] * 1.01;
+                    if(game.players[a].actualProduction[b] > maxActProd) maxActProd = game.players[a].actualProduction[b] * 1.01;
+                    if(game.players[a].playerDamageDealt[b] > maxPlrDmgDlt) maxPlrDmgDlt = game.players[a].playerDamageDealt[b] * 1.01;
+                    if(game.players[a].environmentDamageDealt[b] > maxEnvDmgDlt) maxEnvDmgDlt = game.players[a].environmentDamageDealt[b] * 1.01;
+                    if(game.players[a].damageTaken[b] > maxDmgTkn) maxDmgTkn = game.players[a].damageTaken[b] * 1.01;
+                    if(game.players[a].capLosses[b] > maxCapLoss) maxCapLoss = game.players[a].capLosses[b] * 1.01;
+                }
+            }
+            function drawGraph(left, top, bottom, data, maxData) {
+                graphGraphics.moveTo(left, (top - bottom) * data[firstFrame] / maxData + bottom);
+                for(var b = firstFrame + 1; b <= lastFrame; b++) {
+                    graphGraphics.lineTo(left + dw * (b - firstFrame), (top - bottom) * data[b] / maxData + bottom);
                 }
             }
             for(var a = 1; a <= game.num_players; a++) {
+                /*
+                TER_TOP = sh * 0.09, TER_BTM = sh * 0.29;
+                ENV_DMG_TOP = sh * 0.09, ENV_DMG_BTM = sh * 0.29;
+
+                PROD_TOP = sh * 0.33, PROD_BTM = sh * 0.53;
+                ACT_PROD_TOP = sh * 0.33, ACT_PROD_BTM = sh * 0.53;
+
+                STR_TOP = sh * 0.57, STR_BTM = sh * 0.77;
+                CAP_LOSS_TOP = sh * 0.57, CAP_LOSS_BTM = sh * 0.77;
+
+                PLR_DMG_TOP = sh * 0.81, PLR_DMG_BTM = sh * 1.00;
+                DMG_TKN_TOP = sh * 0.81, DMG_TKN_BTM = sh * 1.00;
+                */
+
                 graphGraphics.lineStyle(1, game.players[a].color);
                 //Draw ter graph.
-                graphGraphics.moveTo(GRAPH_LEFT, (TER_TOP - TER_BTM) * game.players[a].territories[firstFrame] / maxTer + TER_BTM);
-                for(var b = firstFrame + 1; b <= lastFrame; b++) {
-                    graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (TER_TOP - TER_BTM) * game.players[a].territories[b] / maxTer + TER_BTM);
-                }
+                drawGraph(LEFT_GRAPH_LEFT, TER_TOP, TER_BTM, game.players[a].territories, maxTer);
                 //Draw prod graph.
-                graphGraphics.moveTo(GRAPH_LEFT, (PROD_TOP - PROD_BTM) * game.players[a].productions[firstFrame] / maxProd + PROD_BTM);
-                for(var b = firstFrame + 1; b <= lastFrame; b++) {
-                    graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (PROD_TOP - PROD_BTM) * game.players[a].productions[b] / maxProd + PROD_BTM);
-                }
+                drawGraph(LEFT_GRAPH_LEFT, PROD_TOP, PROD_BTM, game.players[a].productions, maxProd);
                 //Draw str graph.
-                graphGraphics.moveTo(GRAPH_LEFT, (STR_TOP - STR_BTM) * game.players[a].strengths[firstFrame] / maxStr + STR_BTM);
-                for(var b = firstFrame + 1; b <= lastFrame; b++) {
-                    graphGraphics.lineTo(GRAPH_LEFT + dw * (b - firstFrame), (STR_TOP - STR_BTM) * game.players[a].strengths[b] / maxStr + STR_BTM);
+                drawGraph(LEFT_GRAPH_LEFT, STR_TOP, STR_BTM, game.players[a].strengths, maxStr);
+                if(showExtended) {
+                    //Draw env dmg graph.
+                    drawGraph(RIGHT_GRAPH_LEFT, ENV_DMG_TOP, ENV_DMG_BTM, game.players[a].environmentDamageDealt, maxEnvDmgDlt);
+                    //Draw act prod graph.
+                    drawGraph(RIGHT_GRAPH_LEFT, ACT_PROD_TOP, ACT_PROD_BTM, game.players[a].actualProduction, maxActProd);
+                    //Draw str loss graph.
+                    drawGraph(RIGHT_GRAPH_LEFT, CAP_LOSS_TOP, CAP_LOSS_BTM, game.players[a].capLosses, maxCapLoss);
+                    //Draw plr dmg dealt.
+                    drawGraph(LEFT_GRAPH_LEFT, PLR_DMG_TOP, PLR_DMG_BTM, game.players[a].playerDamageDealt, maxPlrDmgDlt);
+                    //Draw damage taken.
+                    drawGraph(RIGHT_GRAPH_LEFT, DMG_TKN_TOP, DMG_TKN_BTM, game.players[a].damageTaken, maxDmgTkn);
                 }
             }
             //Draw borders.
             graphGraphics.lineStyle(1, '0xffffff');
+            function drawGraphBorder(left, right, top, bottom) {
+                graphGraphics.moveTo(left + dw * (frame - firstFrame), top);
+                graphGraphics.lineTo(left + dw * (frame - firstFrame), bottom);
+                if((frame - firstFrame) > 0) graphGraphics.lineTo(left, bottom); //Deals with odd disappearing line.;
+                graphGraphics.lineTo(left, top);
+                graphGraphics.lineTo(right, top);
+                graphGraphics.lineTo(right, bottom);
+                graphGraphics.lineTo(left + dw * (frame - firstFrame), bottom);
+            }
+
             //Draw ter border.
-            graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_TOP);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
-            if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, TER_BTM); //Deals with odd disappearing line.;
-            graphGraphics.lineTo(GRAPH_LEFT, TER_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, TER_BTM);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), TER_BTM);
+            drawGraphBorder(LEFT_GRAPH_LEFT, LEFT_GRAPH_RIGHT, TER_TOP, TER_BTM);
             //Draw prod border.
-            graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_TOP);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
-            if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, PROD_BTM); //Deals with odd disappearing line.;
-            graphGraphics.lineTo(GRAPH_LEFT, PROD_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, PROD_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, PROD_BTM);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), PROD_BTM);
+            drawGraphBorder(LEFT_GRAPH_LEFT, LEFT_GRAPH_RIGHT, PROD_TOP, PROD_BTM);
             //Draw str border.
-            graphGraphics.moveTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_TOP);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
-            if((frame - firstFrame) > 0) graphGraphics.lineTo(GRAPH_LEFT, STR_BTM); //Deals with odd disappearing line.;
-            graphGraphics.lineTo(GRAPH_LEFT, STR_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, STR_TOP);
-            graphGraphics.lineTo(GRAPH_RIGHT, STR_BTM);
-            graphGraphics.lineTo(GRAPH_LEFT + dw * (frame - firstFrame), STR_BTM);
+            drawGraphBorder(LEFT_GRAPH_LEFT, LEFT_GRAPH_RIGHT, STR_TOP, STR_BTM);
+            if(showExtended) {
+                //Draw env dmg border.
+                drawGraphBorder(RIGHT_GRAPH_LEFT, RIGHT_GRAPH_RIGHT, ENV_DMG_TOP, ENV_DMG_BTM);
+                //Draw act prod border.
+                drawGraphBorder(RIGHT_GRAPH_LEFT, RIGHT_GRAPH_RIGHT, ACT_PROD_TOP, ACT_PROD_BTM);
+                //Draw str loss border.
+                drawGraphBorder(RIGHT_GRAPH_LEFT, RIGHT_GRAPH_RIGHT, CAP_LOSS_TOP, CAP_LOSS_BTM);
+                //Draw plr damage dealt.
+                drawGraphBorder(LEFT_GRAPH_LEFT, LEFT_GRAPH_RIGHT, PLR_DMG_TOP, PLR_DMG_BTM);
+                //Draw plr damage taken.
+                drawGraphBorder(RIGHT_GRAPH_LEFT, RIGHT_GRAPH_RIGHT, DMG_TKN_TOP, DMG_TKN_BTM);
+            }
             //Draw frame/ter text seperator.
-            graphGraphics.moveTo(GRAPH_LEFT, TER_TOP - sh * 0.045);
-            graphGraphics.lineTo(GRAPH_RIGHT, TER_TOP - sh * 0.045);
+            graphGraphics.moveTo(LEFT_GRAPH_LEFT, TER_TOP - sh * 0.045);
+            graphGraphics.lineTo(RIGHT_GRAPH_RIGHT, TER_TOP - sh * 0.045);
         }
 
         //Clear mapGraphics so that we can redraw freely.
@@ -389,8 +472,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                         infoText.text += ' | Mv: ' + move.toString();
                     }
                 }
-                else if(mousepos.x < GRAPH_RIGHT && mousepos.x > GRAPH_LEFT) {
-                    frame = firstFrame + Math.round((mousepos.x - GRAPH_LEFT) / dw);
+                else if(mousepos.x < RIGHT_GRAPH_RIGHT && mousepos.x > LEFT_GRAPH_LEFT) {
+                    frame = firstFrame + Math.round((mousepos.x - LEFT_GRAPH_LEFT) / dw);
                     if(frame < 0) frame = 0;
                     if(frame >= game.num_frames) frame = game.num_frames - 1;
                     transit = 0;
