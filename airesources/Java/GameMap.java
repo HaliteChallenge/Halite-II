@@ -1,23 +1,24 @@
 import java.util.ArrayList;
 public class GameMap{
+    public ArrayList< ArrayList<Site> > contents;
+    public int width, height;
 
-    private final Site[][] contents;
-    private final Location[][] locations;
-    public final int width, height;
+    public GameMap() {
+        width = 0;
+        height = 0;
+        contents = new ArrayList< ArrayList<Site> >(0);
+    }
 
-    public GameMap(int width, int height, int[][] productions) {
-
-        this.width = width;
-        this.height = height;
-        this.contents = new Site[width][height];
-        this.locations = new Location[width][height];
-
-        for (int y = 0; y < height; y++) {
+    public GameMap(int width_, int height_) {
+        width = width_;
+        height = height_;
+        contents = new ArrayList< ArrayList<Site> >(0);
+        for(int y = 0; y < height; y++) {
+            ArrayList<Site> row = new ArrayList<Site>();
             for(int x = 0; x < width; x++) {
-                final Site site = new Site(productions[x][y]);
-                contents[x][y] = site;
-                locations[x][y] = new Location(x, y, site);
+                row.add(new Site());
             }
+            contents.add(row);
         }
     }
 
@@ -51,42 +52,35 @@ public class GameMap{
         return Math.atan2(dy, dx);
     }
 
-    public Location getLocation(Location location, Direction direction) {
-        switch (direction) {
-            case STILL:
-                return location;
-            case NORTH:
-                return locations[location.getX()][(location.getY() == 0 ? height : location.getY()) -1];
-            case EAST:
-                return locations[location.getX() == width - 1 ? 0 : location.getX() + 1][location.getY()];
-            case SOUTH:
-                return locations[location.getX()][location.getY() == height - 1 ? 0 : location.getY() + 1];
-            case WEST:
-                return locations[(location.getX() == 0 ? width : location.getX()) - 1][location.getY()];
-            default:
-                throw new IllegalArgumentException(String.format("Unknown direction %s encountered", direction));
+    public Location getLocation(Location loc, Direction dir) {
+        Location l = new Location(loc);
+        if(dir != Direction.STILL) {
+            if(dir == Direction.NORTH) {
+                if(l.y == 0) l.y = height - 1;
+                else l.y--;
+            }
+            else if(dir == Direction.EAST) {
+                if(l.x == width - 1) l.x = 0;
+                else l.x++;
+            }
+            else if(dir == Direction.SOUTH) {
+                if(l.y == height - 1) l.y = 0;
+                else l.y++;
+            }
+            else if(dir == Direction.WEST) {
+                if(l.x == 0) l.x = width - 1;
+                else l.x--;
+            }
         }
+        return l;
     }
 
     public Site getSite(Location loc, Direction dir) {
-        return getLocation(loc, dir).getSite();
+        Location l = getLocation(loc, dir);
+        return contents.get(l.y).get(l.x);
     }
 
     public Site getSite(Location loc) {
-        return loc.getSite();
-    }
-
-    public Location getLocation(int x, int y) {
-        return locations[x][y];
-    }
-
-    void reset() {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                final Site site = contents[x][y];
-                site.owner = 0;
-                site.strength = 0;
-            }
-        }
+        return contents.get(loc.y).get(loc.x);
     }
 }
