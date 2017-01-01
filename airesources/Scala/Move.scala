@@ -1,1 +1,1 @@
-case class Move(x: Int, y: Int, direction: Direction)
+case class Move(location: Location, direction: Direction)

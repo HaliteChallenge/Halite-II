@@ -1,17 +1,15 @@
-import scala.Console._
-
 object Env {
   def readId(): Int = {
-    in.readLine().toInt
+    read().toInt
   }
 
   def readInit(): Grid = {
-    val dims = in.readLine().split(" ")
+    val dims = read().split(" ")
     val width = dims(0).toInt
     val height = dims(1).toInt
 
-    val locations = Array.ofDim[Location](width, height)
-    val productions = in.readLine().split(" ")
+    val locations = Array.ofDim[Location](height, width)
+    val productions = read().split(" ")
 
     for (y <- 0 until height) {
       for (x <- 0 until width) {
@@ -24,13 +22,13 @@ object Env {
   }
 
   def readFrame(width: Int, height: Int): Array[Array[Occupant]] = {
-    val ownersStrengths = in.readLine().split(" ")
+    val ownersStrengths = read().split(" ")
     val strengthsIndex = ownersStrengths.length - width * height
 
     var y, x, count = 0
     var owner, cur, i = 0
 
-    val occupants = Array.ofDim[Occupant](width, height)
+    val occupants = Array.ofDim[Occupant](height, width)
     while (y < height) {
       if (cur < count) {
         occupants(y)(x) = Occupant(owner, ownersStrengths(strengthsIndex + y * width + x).toInt)
@@ -52,12 +50,12 @@ object Env {
     occupants
   }
 
-  def writeFrame(moves: IndexedSeq[Move]): Unit = {
+  def writeFrame(moves: Iterable[Move]): Unit = {
     val builder = new StringBuilder()
     moves foreach { m =>
-      builder.append(m.x)
+      builder.append(m.location.x)
       builder.append(" ")
-      builder.append(m.y)
+      builder.append(m.location.y)
       builder.append(" ")
       builder.append(m.direction.getValue)
       builder.append(" ")
@@ -70,7 +68,17 @@ object Env {
   }
 
   private def writeString(s: String): Unit = {
-    print(s + '\n')
-    flush()
+    System.out.print(s + '\n')
+    System.out.flush()
+  }
+
+  private def read(): String = {
+    val buffer = new StringBuilder()
+    var next = System.in.read()
+    while (next != '\n' && next != 0) {
+      buffer.append(next.asInstanceOf[Char])
+      next = System.in.read()
+    }
+    buffer.toString
   }
 }
