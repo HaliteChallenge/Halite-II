@@ -181,6 +181,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         }
         else if(e.keyCode == 69) { //e
             showExtended = !showExtended;
+            mapGraphics.clear();
+            graphGraphics.clear();
             window.onresize();
         }
         else if(e.keyCode == 90) { //z
