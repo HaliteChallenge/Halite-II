@@ -46,6 +46,24 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
     var zoom = 8;
     if(game.num_frames / zoom < 3) zoom = game.num_frames / 3;
     if(zoom < 1) zoom = 1;
+    function centerStartPositions() {
+        var minX = game.width, maxX = 0, minY = game.height, maxY = 0;
+        // find the initial bounding box of all players
+        for(var x=0; x < game.width; x++) {
+            for(var y=0; y < game.height; y++) {
+                if(game.frames[0][y][x].owner != 0) {
+                    if(x < minX) { minX = x; }
+                    if(x > maxX) { maxX = x; }
+                    if(y < minY) { minY = y; }
+                    if(y > maxY) { maxY = y; }
+                }
+            }
+        }
+        // offset by half the difference from the edges rounded toward zero
+        xOffset = ((game.width - 1 - maxX - minX) / 2) | 0;
+        yOffset = ((game.height - 1 - maxY - minY) / 2) | 0;
+    }
+    centerStartPositions();
 
     window.onresize = function() {
         var allowedWidth = (maxWidth == null ? $container.width() : maxWidth), allowedHeight = (maxHeight == null ? window.innerHeight - (25 + $("canvas").offset().top) : maxHeight);
