@@ -1,5 +1,9 @@
 function processFrame(game, frameNum) {
-    var gameMap = _.cloneDeep(game.frames[frameNum]);
+    var checkSim = false;
+    var gameMap = game.frames[frameNum];
+    if(checkSim) {
+        gameMap = _.cloneDeep(game.frames[frameNum]);
+    }
     var moves = game.moves[frameNum];
     var productions = game.productions;
     var width = game.width;
@@ -18,34 +22,29 @@ function processFrame(game, frameNum) {
     var p, q, y, x;
 
     function getLocation(loc, direction) {
-        var x = loc.x;
-        var y = loc.y;
-
         if (direction === STILL) {
             // nothing
         } else if (direction === NORTH) {
-            y -= 1;
+            loc.y -= 1;
         } else if (direction === EAST) {
-            x += 1;
+            loc.x += 1;
         } else if (direction === SOUTH) {
-            y += 1;
+            loc.y += 1;
         } else if (direction === WEST) {
-            x -= 1;
+            loc.x -= 1;
         }
 
-        if (x < 0) {
-            x = width - 1;
+        if (loc.x < 0) {
+            loc.x = width - 1;
         } else {
-            x %= width;
+            loc.x %= width;
         }
 
-        if (y < 0) {
-            y = height - 1;
+        if (loc.y < 0) {
+            loc.y = height - 1;
         } else {
-            y %= height;
+            loc.y %= height;
         }
-
-        return { x: x, y: y };
     }
 
     for (p = 0; p < numPlayers; p++) {
@@ -83,7 +82,8 @@ function processFrame(game, frameNum) {
                 }
             }
 
-            var newLoc = getLocation({ x: x, y: y }, direction);
+            var newLoc = { x: x, y: y };
+            getLocation(newLoc, direction);
             if (!_.isUndefined(pieces[player][newLoc.y][newLoc.x])) {
                 if (pieces[player][newLoc.y][newLoc.x] + cell.strength <= 255) {
                     pieces[player][newLoc.y][newLoc.x] += cell.strength;
@@ -101,7 +101,10 @@ function processFrame(game, frameNum) {
             }
 
             // erase from the game map so that the player can't make another move with the same piece
-            gameMap[y][x] = { owner: 0, strength: 0 };
+            // On second thought, trust that the original game took care of that.
+            if(checkSim) {
+                gameMap[y][x] = { owner: 0, strength: 0 };
+            }
         }
     }
 
@@ -134,7 +137,8 @@ function processFrame(game, frameNum) {
                         if (p !== q) {
                             for (var dir = STILL; dir <= WEST; dir++) {
                                 // check STILL square
-                                var loc = getLocation({ x: x, y: y}, dir);
+                                var loc = { x: x, y: y };
+                                getLocation(loc, dir);
 
                                 // if the other player has a piece here
                                 if (!_.isUndefined(pieces[q][loc.y][loc.x])) {
@@ -154,7 +158,7 @@ function processFrame(game, frameNum) {
                     }
 
                     // if the environment can do damage back
-                    if (gameMap[y][x].strength > 0) {
+                    if (gameMap[y][x].owner == 0 && gameMap[y][x].strength > 0) {
                         if (!_.isUndefined(toInjure[p][y][x])) {
                             toInjure[p][y][x] += gameMap[y][x].strength;
                         } else {
@@ -191,40 +195,44 @@ function processFrame(game, frameNum) {
         }
     }
 
-    // apply damage to map pieces
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {
-            if (gameMap[y][x].strength < injureMap[y][x]) {
-                gameMap[y][x].strength = 0;
-            } else {
-                gameMap[y][x].strength -= injureMap[y][x]
-            }
-            gameMap[y][x].owner = 0;
-        }
-    }
-
-    // add pieces back into the map
-    for (p = 0; p < numPlayers; p++) {
+    if(checkSim) {
+        // apply damage to map pieces
         for (y = 0; y < height; y++) {
             for (x = 0; x < width; x++) {
-                if (!_.isUndefined(pieces[p][y][x])) {
-                    gameMap[y][x].owner = p + 1;
-                    gameMap[y][x].strength = pieces[p][y][x];
+                if (gameMap[y][x].strength < injureMap[y][x]) {
+                    gameMap[y][x].strength = 0;
+                } else {
+                    gameMap[y][x].strength -= injureMap[y][x]
+                }
+                gameMap[y][x].owner = 0;
+            }
+        }
+
+        // add pieces back into the map
+        for (p = 0; p < numPlayers; p++) {
+            for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
+                    if (!_.isUndefined(pieces[p][y][x])) {
+                        gameMap[y][x].owner = p + 1;
+                        gameMap[y][x].strength = pieces[p][y][x];
+                    }
                 }
             }
         }
-    }
 
-    if (frameNum + 1 < gameMap.num_frames - 1) {
-        if (!_.isEqual(gameMap, game.frames[frameNum + 1])) {
-            throw new Error("Evaluated frame did not match actual game map for frame number " + frameNum);
+        if (frameNum + 1 < gameMap.num_frames - 1) {
+            if (!_.isEqual(gameMap, game.frames[frameNum + 1])) {
+                throw new Error("Evaluated frame did not match actual game map for frame number " + frameNum);
+            }
         }
     }
 
     return stats;
 }
 
-textToGame = function(text, seed) {
+function textToGame(text, seed) {
+    var startParse = new Date();
+    console.log("Starting parse at", startParse);
 	var game = JSON.parse(text)
 
 	if (game.version != 11) {
@@ -378,5 +386,8 @@ textToGame = function(text, seed) {
 		}
 	}
 
+	var endParse = new Date();
+	console.log("Finished parse at", endParse);
+	console.log("Parse took", (endParse - startParse) / 1000);
 	return game
 }
