@@ -1,3 +1,7 @@
+object Grid {
+  val NEUTRAL = 0
+}
+
 class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occupants: Array[Array[Occupant]]) {
   def update(occupants: Array[Array[Occupant]]) = this.occupants = occupants
 
@@ -8,14 +12,22 @@ class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occup
   def getLocation(x: Int, y: Int): Location = locations(y)(x)
   def getSite(x: Int, y: Int): Site = Site(getLocation(x, y), getOccupant(x, y))
 
-  def getSites: IndexedSeq[Site] = {
+  def getSites: Seq[Site] = {
     for {
       x <- 0 until width
       y <- 0 until height
     } yield getSite(x, y)
   }
 
-  def distance(first: Location, second: Location): Int = {
+  def getMine(id: Int): Seq[Site] = {
+    for {
+      x <- 0 until width
+      y <- 0 until height
+      if getOccupant(x, y).id == id
+    } yield getSite(x, y)
+  }
+
+  def getDistance(first: Location, second: Location): Int = {
     var dx = Math.abs(first.x - second.x)
     var dy = Math.abs(first.y - second.y)
 
@@ -30,7 +42,7 @@ class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occup
     dx + dy
   }
 
-  def angle(first: Location, second: Location): Double = {
+  def getAngle(first: Location, second: Location): Double = {
     var dx = first.x - second.x
 
     // Flip order because 0,0 is top left
@@ -54,19 +66,28 @@ class Grid(width: Int, height: Int, locations: Array[Array[Location]], var occup
     Math.atan2(dy, dx)
   }
 
-  def neighbor(location: Location, direction: Direction): Location = {
+  def getNeighbor(location: Location, direction: Direction): Neighbor = {
     val x = location.x
     val y = location.y
     direction match {
-      case North => locations(x)(if (y == 0) height - 1 else y - 1)
-      case East => locations(if (x == width - 1) 0 else x + 1)(y)
-      case South => locations(x)(if (y == height - 1) 0 else y + 1)
-      case West => locations(if (x == 0) width - 1 else x - 1)(y)
-      case Still => location
+      case North => Neighbor(getSite(x, if (y == 0) height - 1 else y - 1), North)
+      case East => Neighbor(getSite(if (x == width - 1) 0 else x + 1, y), East)
+      case South => Neighbor(getSite(x, if (y == height - 1) 0 else y + 1), South)
+      case West => Neighbor(getSite(if (x == 0) width - 1 else x - 1, y), West)
+      case Still => Neighbor(getSite(x, y), Still)
     }
+  }
+
+  def getNeighbors(location: Location): Seq[Neighbor] = {
+    Direction.CARDINALS map (d => getNeighbor(location, d))
+  }
+
+  def getMyNeighbors(id: Int, location: Location): Seq[Neighbor] = {
+    getNeighbors(location).filter(_.site.occupant.id == id)
   }
 }
 
 case class Location(x: Int, y: Int, production: Int)
 case class Occupant(id: Int, strength: Int)
 case class Site(location: Location, occupant: Occupant)
+case class Neighbor(site: Site, direction: Direction)

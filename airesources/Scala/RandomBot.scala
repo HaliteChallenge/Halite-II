@@ -1,5 +1,3 @@
-import scala.util.Random
-
 object RandomBot extends BotFactory {
   def main(args: Array[String]): Unit = {
     Runner.run("scalaRandom", this)
@@ -8,13 +6,10 @@ object RandomBot extends BotFactory {
   override def make(id: Int): Bot = new RandomBot(id)
 }
 
-class RandomBot(id: Int) extends Bot {
-  val random = new Random()
-
-  override def getMoves(grid: Grid): IndexedSeq[Move] = {
+class RandomBot(myId: Int) extends Bot {
+  override def getMoves(grid: Grid): Iterable[Move] = {
     for {
-      space <- grid.getSites
-      if space.occupant.id == id
-    } yield Move(space.location.x, space.location.y, Direction.getRandomDir)
+      site <- grid.getMine(myId)
+    } yield Move(site.location, Direction.getRandomDir)
   }
 }
