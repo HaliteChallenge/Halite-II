@@ -1,6 +1,6 @@
 public class Site {
 
-    private final int production;
+    public final int production;
     public int owner, strength;
 
     public Site(int production) {
