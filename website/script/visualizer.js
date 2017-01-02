@@ -183,6 +183,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
             showExtended = !showExtended;
             mapGraphics.clear();
             graphGraphics.clear();
+            renderer.render(stage);
             window.onresize();
         }
         else if(e.keyCode == 90) { //z
@@ -289,20 +290,6 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
                 }
             }
             for(var a = 1; a <= game.num_players; a++) {
-                /*
-                TER_TOP = sh * 0.09, TER_BTM = sh * 0.29;
-                ENV_DMG_TOP = sh * 0.09, ENV_DMG_BTM = sh * 0.29;
-
-                PROD_TOP = sh * 0.33, PROD_BTM = sh * 0.53;
-                ACT_PROD_TOP = sh * 0.33, ACT_PROD_BTM = sh * 0.53;
-
-                STR_TOP = sh * 0.57, STR_BTM = sh * 0.77;
-                CAP_LOSS_TOP = sh * 0.57, CAP_LOSS_BTM = sh * 0.77;
-
-                PLR_DMG_TOP = sh * 0.81, PLR_DMG_BTM = sh * 1.00;
-                DMG_TKN_TOP = sh * 0.81, DMG_TKN_BTM = sh * 1.00;
-                */
-
                 graphGraphics.lineStyle(1, game.players[a].color);
                 //Draw ter graph.
                 drawGraph(LEFT_GRAPH_LEFT, TER_TOP, TER_BTM, game.players[a].territories, maxTer);
