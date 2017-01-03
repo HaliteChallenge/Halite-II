@@ -72,6 +72,7 @@ function processFrame(game, frameNum) {
             if (gameMap[y][x].owner == 0) continue
 
             if (direction === STILL) {
+                cell = { owner: gameMap[y][x].owner, strength: gameMap[y][x].strength };
                 if (cell.strength + production <= 255) {
                     stats[player].actualProduction += production;
                     cell.strength += production;
