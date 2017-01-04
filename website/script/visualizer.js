@@ -170,6 +170,7 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
         mousePressed = false;
     };
 
+    renderer.animateFunction = animate;
     requestAnimationFrame(animate);
 
     var pressed={};
@@ -253,6 +254,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
     }
 
     function animate() {
+
+        if(renderer.animateFunction !== animate) { return; }
 
         if(!isminimal) {
             //Clear graphGraphics so that we can redraw freely.
