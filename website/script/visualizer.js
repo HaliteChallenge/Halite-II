@@ -66,7 +66,8 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
     centerStartPositions();
 
     window.onresize = function() {
-        var allowedWidth = (maxWidth == null ? $container.width() : maxWidth), allowedHeight = (maxHeight == null ? window.innerHeight - (25 + $("canvas").offset().top) : maxHeight);
+        var allowedWidth = (maxWidth == null ? $container.width() : maxWidth);
+        var allowedHeight = (maxHeight == null ? window.innerHeight - (25 + $("canvas").offset().top) : maxHeight - ($("canvas").offset().top - $container.offset().top));
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);
