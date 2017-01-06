@@ -67,7 +67,17 @@ function showGame(game, $container, maxWidth, maxHeight, showmovement, isminimal
 
     window.onresize = function() {
         var allowedWidth = (maxWidth == null ? $container.width() : maxWidth);
-        var allowedHeight = (maxHeight == null ? window.innerHeight - (25 + $("canvas").offset().top) : maxHeight - ($("canvas").offset().top - $container.offset().top));
+        var allowedHeight = window.innerHeight - (25 + $("canvas").offset().top);
+        if(maxHeight != null) {
+            if(maxHeight > 0) {
+                allowedHeight = maxHeight - ($("canvas").offset().top - $container.offset().top);
+            } else {
+                // A negative maxHeight signifies extra space to leave for
+                // other page elements following the visualizer
+                allowedHeight += maxHeight;
+            }
+        }
+
         console.log(window.innerHeight)
         console.log(allowedHeight)
         var definingDimension = Math.min(allowedWidth, allowedHeight);

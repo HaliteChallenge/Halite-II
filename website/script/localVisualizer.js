@@ -11,7 +11,8 @@ $(function () {
             return function(e2) {
                 $("#displayArea").empty();
                 $("label[for=filePicker]").text("Select another file");
-                showGame(textToGame(e2.target.result, filename), $("#displayArea"), null, null, true, false, true);
+                var fsHeight = $("#fileSelect").outerHeight();
+                showGame(textToGame(e2.target.result, filename), $("#displayArea"), null, -fsHeight, true, false, true);
             };
         })(file.name);
         reader.readAsText(file); // start reading the file data.
