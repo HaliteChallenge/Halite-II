@@ -12,7 +12,7 @@ if(isset($_SESSION['userID'])) {
         exit();
     }
     if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isEmailGood=0"))) > 0) {
-        header("Location: email.php");
+        header("Location: associate.php");
     }
 }
 ?>
