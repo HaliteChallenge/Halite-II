@@ -20,7 +20,7 @@ $(function() {
                 this.displayMessage("Empty Fields", "Please fill your email twice in the boxes below.", false);
             } else {
                 this.displayMessage("Success", "We've sent a verification email to "+this.$firstField.val()+". Redirecting to the front page.", true);
-                this.submitCallback(this.$firstField.val(), getSelectedText("selectionLevel"), getSelectedText("selectionHighSchool"), getSelectedText("selectionScrimmage"));
+                this.submitCallback(this.$firstField.val(), getSelectedText("selectionLevel"), getSelectedText("selectionHighSchool"));
                 setTimeout( function(){ window.location.href = "index.php" }, 2000 );
                
             }
@@ -57,16 +57,8 @@ $(function() {
         $("#forms").css("display", "block");
     }
 
-    function updateScrimmageDropDown() {
-        var school = getSelectedText("selectionHighSchool")
-        var state = getValidHighSchoolByName(school)[0]['state'];
-        var scrimmages = getValidScrimmagesByState(state).map(function(x){ return x['name'] });
-        populateSelection("selectionScrimmage", scrimmages);
-    }
-
     var schools = getValidHighSchools().map(function(x){ return x['name'] });
     populateSelection("selectionHighSchool", schools);
-    updateScrimmageDropDown();
     render();
 
     document.getElementById("selectionLevel").onchange = function(){
@@ -77,15 +69,12 @@ $(function() {
         }
     }
 
-    document.getElementById("selectionHighSchool").onchange = function(){
-        updateScrimmageDropDown();
-    }
 
-    customEmailForm.init(function(email, level, institution, scrimmage) {
+    customEmailForm.init(function(email, level, institution) {
         if(level != "High-School") {
             newEmailForProfessional(email, level);
         } else {
-            newEmailForHighSchool(email, level, institution, scrimmage);
+            newEmailForHighSchool(email, level, institution);
         }
     });
 });

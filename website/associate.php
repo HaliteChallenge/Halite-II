@@ -39,9 +39,6 @@
                         <label for="selectionHighSchool">Select your High School:</label>
                         <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionHighSchool">
                         </select>
-                        <label for="selectionScrimmage">Select your Scrimmage:</label>
-                        <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionScrimmage">
-                        </select>
                     </div>
 
                     <div id="forms">
