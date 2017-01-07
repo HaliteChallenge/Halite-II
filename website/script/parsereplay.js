@@ -327,26 +327,25 @@ function textToGame(text, seed) {
             game.players[a].territories.push(ter);
             game.players[a].productions.push(prod);
             game.players[a].strengths.push(str);
-            if (b < game.num_frames - 1) {
-                if (b > 0) {
-                    game.players[a].actualProduction.push(game.players[a].actualProduction[b - 1] + stats[b][a - 1].actualProduction);
-                    game.players[a].environmentDamageDealt.push(game.players[a].environmentDamageDealt[b - 1] + stats[b][a - 1].environmentDamageDealt);
-                    game.players[a].damageTaken.push(game.players[a].damageTaken[b - 1] + stats[b][a - 1].damageTaken - stats[b][a - 1].environmentDamageDealt);
-                    game.players[a].playerDamageDealt.push(game.players[a].playerDamageDealt[b - 1] + stats[b][a - 1].overkillDamage);
-                    game.players[a].capLosses.push(game.players[a].capLosses[b - 1] + stats[b][a - 1].capLosses);
-                } else {
-                    game.players[a].actualProduction.push(stats[b][a - 1].actualProduction);
-                    game.players[a].environmentDamageDealt.push(stats[b][a - 1].environmentDamageDealt);
-                    game.players[a].damageTaken.push(stats[b][a - 1].damageTaken - stats[b][a - 1].environmentDamageDealt);
-                    game.players[a].playerDamageDealt.push(stats[b][a - 1].overkillDamage);
-                    game.players[a].capLosses.push(stats[b][a - 1].capLosses);
-                }
+            if (b == 0) {
+                game.players[a].actualProduction.push(stats[b][a - 1].actualProduction);
+                game.players[a].environmentDamageDealt.push(stats[b][a - 1].environmentDamageDealt);
+                game.players[a].damageTaken.push(stats[b][a - 1].damageTaken - stats[b][a - 1].environmentDamageDealt);
+                game.players[a].playerDamageDealt.push(stats[b][a - 1].overkillDamage);
+                game.players[a].capLosses.push(stats[b][a - 1].capLosses);
+            }
+            else if (b < game.num_frames - 1) {
+                game.players[a].actualProduction.push(game.players[a].actualProduction[b - 1] + stats[b][a - 1].actualProduction);
+                game.players[a].environmentDamageDealt.push(game.players[a].environmentDamageDealt[b - 1] + stats[b][a - 1].environmentDamageDealt);
+                game.players[a].damageTaken.push(game.players[a].damageTaken[b - 1] + stats[b][a - 1].damageTaken - stats[b][a - 1].environmentDamageDealt);
+                game.players[a].playerDamageDealt.push(game.players[a].playerDamageDealt[b - 1] + stats[b][a - 1].overkillDamage);
+                game.players[a].capLosses.push(game.players[a].capLosses[b - 1] + stats[b][a - 1].capLosses);
             } else {
-                game.players[a].actualProduction.push(0);
-                game.players[a].playerDamageDealt.push(0);
-                game.players[a].environmentDamageDealt.push(0);
-                game.players[a].damageTaken.push(0);
-                game.players[a].capLosses.push(0);
+                game.players[a].actualProduction.push(game.players[a].actualProduction[b - 1]);
+                game.players[a].playerDamageDealt.push(game.players[a].playerDamageDealt[b - 1]);
+                game.players[a].environmentDamageDealt.push(game.players[a].environmentDamageDealt[b - 1]);
+                game.players[a].damageTaken.push(game.players[a].damageTaken[b - 1]);
+                game.players[a].capLosses.push(game.players[a].capLosses[b - 1]);
             }
         }
     }
