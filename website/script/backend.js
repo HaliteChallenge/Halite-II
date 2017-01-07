@@ -305,12 +305,12 @@ function newEmailForProfessional(email, level) {
     }).responseJSON;
 }
 
-function newEmailForHighSchool(email, level, institution, scrimmage) {
+function newEmailForHighSchool(email, level, institution) {
     return $.ajax({
         url: url+"email",
         async: false,
         method: "GET",
-        data: {newEmail: email, newLevel: level, newInstitution: institution, newScrimmage: scrimmage}
+        data: {newEmail: email, newLevel: level, newInstitution: institution}
     }).responseJSON;
 }
 

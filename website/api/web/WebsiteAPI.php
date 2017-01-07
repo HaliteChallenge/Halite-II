@@ -219,31 +219,13 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
         } else if($user != null && isset($_GET['newEmail'])) {
             $verificationCode = rand(0, 9999999999);
-            if(isset($_GET['newLevel']) && $_GET['newLevel'] == 'High-School') {
-                if(empty($this->getHS($_GET['newInstitution'], null)) ||
-                    empty($this->getScrimmage($_GET['newScrimmage'], null)) ||
-                    empty($this->getScrimmage($_GET['newScrimmage'], $this->getHS($_GET['newInstitution'], null)['state']))) {
-                    # The only way this error should occur is if users manually try to game it (i.e.: REST calls)
-                    # As such we can just print their input is incorrect rather than getting a better landing page.
-                    echo "INVALID INPUT: EITHER INSTITUTION OR SCRIMMAGE ARE NOT FROM AVAILABLE OPTIONS.";
-                    die();
-                }
-                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
-                "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
-                "', organization='".$this->mysqli->real_escape_string($_GET['newInstitution']).
-                "', scrimmage='".$this->mysqli->real_escape_string($_GET['newScrimmage']).
-                "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
-            } else if(isset($_GET['newLevel'])) {
-                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
+            $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
                 "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
                 "', organization='".$this->getOrganizationForEmail($this->mysqli->real_escape_string($_GET['newEmail'])).
                 "', scrimmage=null",
                 "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
-            } else {
-                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
-            }
-            $user["email"] = $_GET["newEmail"];
 
+            $user["email"] = $_GET["newEmail"];
             $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false, true);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
