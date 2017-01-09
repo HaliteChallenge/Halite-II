@@ -75,7 +75,6 @@ CREATE TABLE `User` (
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `level` enum('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organization` varchar(64) NOT NULL,
-  `scrimmage` varchar(64),
   `language` varchar(16) DEFAULT NULL,
   `mu` float NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
