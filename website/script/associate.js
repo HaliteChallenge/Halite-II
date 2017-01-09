@@ -20,7 +20,7 @@ $(function() {
                 this.displayMessage("Empty Fields", "Please fill your email twice in the boxes below.", false);
             } else {
                 this.displayMessage("Success", "We've sent a verification email to "+this.$firstField.val()+". Redirecting to the front page.", true);
-                this.submitCallback(this.$firstField.val(), getSelectedText("selectionLevel"), getSelectedText("selectionHighSchool"));
+                this.submitCallback(this.$firstField.val(), getSelectedText("selectionLevel"));
                 setTimeout( function(){ window.location.href = "index.php" }, 2000 );
                
             }
@@ -74,7 +74,7 @@ $(function() {
         if(level != "High School") {
             newEmailForProfessional(email, level);
         } else {
-            newEmailForHighSchool(email, level, institution);
+            newEmailForHighSchool(email, level);
         }
     });
 });

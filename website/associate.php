@@ -4,7 +4,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Email Selection</title>
+    <title>Association</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -34,12 +34,6 @@
                         <option>Graduate</option>
                         <option selected="selected">Professional</option>
                     </select>       
-
-                    <div id="highSchoolItems">
-                        <label for="selectionHighSchool">Select your High School:</label>
-                        <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionHighSchool">
-                        </select>
-                    </div>
 
                     <div id="forms">
                         <label for="firstField" style="margin-top: 0px">Please enter your e-mail:</label>

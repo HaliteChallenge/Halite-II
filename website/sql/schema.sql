@@ -152,35 +152,6 @@ CREATE TABLE `UserNotification` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `HighSchool`
---
-
-DROP TABLE IF EXISTS `HighSchool`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `HighSchool` (
-  `name` varchar(64) NOT NULL,
-  `state` varchar(2) NOT NULL,
-  PRIMARY KEY(`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-
---
--- Table structure for table `Scrimmage`
---
-
-DROP TABLE IF EXISTS `Scrimmage`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Scrimmage` (
-  `name` varchar(64) NOT NULL,
-  `state` varchar(2) NOT NULL,
-  `endDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY(`name`, `state`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
---
 -- Table structure for table `Worker`
 --
 
