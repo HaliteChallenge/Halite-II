@@ -1,5 +1,5 @@
 trait Bot {
-  def getMoves(grid: Grid): IndexedSeq[Move]
+  def getMoves(grid: Grid): Iterable[Move]
 }
 
 trait BotFactory {

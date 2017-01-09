@@ -16,7 +16,7 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    We radically changed the Python starter package on December 11.
+                    On December 31st, we patched the version of the Java starter package that we had released on December 30th.
                 </p>
                 <h3>Official Packages</h3>
                 <ul>

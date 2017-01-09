@@ -71,8 +71,8 @@ if(isset($_SESSION['userID'])) {
                     <p>Halite is grateful for the support of many strong tech partners!</p>
                     
                     <div class="text-center">
-                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 70px; margin-right: 40px; margin-top: 10px; margin-bottom: 20.5px;"></a>
-                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 70px; margin-top: 10px; margin-bottom: 20.5px;"></a>
+                        <a href="https://www.vettery.com/"><img src="assets/vettery.png" style="max-width: 100%; max-height: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 20.5px;"></a>
+                        <a href="https://www.aminoapps.com/"><img src="assets/amino.png" style="max-width: 100%; max-height: 40px; margin-top: 10px; margin-bottom: 20.5px;"></a>
                     </div>
                 </div>
             </div>
@@ -81,6 +81,7 @@ if(isset($_SESSION['userID'])) {
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
     <script src="script/backend.js"></script>

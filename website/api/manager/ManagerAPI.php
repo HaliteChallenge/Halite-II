@@ -245,7 +245,7 @@ class ManagerAPI extends API{
             var_dump($lines);
             for($a = 0; $a < count($users); $a++) {
                 $components = explode(' ', $lines[$a]);
-                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]['userID']));
+                $this->insert("UPDATE User SET mu=".$this->mysqli->real_escape_string($components[0]).", sigma=".$this->mysqli->real_escape_string($components[1])." WHERE userID=".$this->mysqli->real_escape_string($users[$a]['userID'])." AND numSubmissions=".$this->mysqli->real_escape_string($users[$a]['numSubmissions']));
             }
 
             // Update overall rank of everyone
