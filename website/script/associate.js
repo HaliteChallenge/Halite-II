@@ -40,13 +40,13 @@ $(function() {
     function populateSelection(selectionId, selectionList) {
         var selection = document.getElementById(selectionId);
         for (i = selection.options.length - 1; i >= 0; i--) {
-            selection.remove(i);
+            selection.removeChild(i);
         }
         for( var item in selectionList ){
             var option = document.createElement('option');
             option.innerHTML = selectionList[item];
             option.value = selectionList[item];
-            selection.append(option);
+            selection.appendChild(option);
         }
 
     }
