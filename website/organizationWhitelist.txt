@@ -104,3 +104,4 @@ Teleopti - teleopti.com
 UC San Diego - ucsd.edu
 University of Edinburgh - ed.ac.uk
 University of Bordeaux - u-bordeaux.fr
+University of Bordeaux - etu.u-bordeaux.fr
