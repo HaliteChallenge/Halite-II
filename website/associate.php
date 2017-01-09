@@ -29,7 +29,7 @@
 
                     <label for="selectionLevel">Select your level:</label>
                     <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionLevel">
-                        <option>High-School</option>
+                        <option>High School</option>
                         <option>Undergraduate</option>
                         <option>Graduate</option>
                         <option selected="selected">Professional</option>

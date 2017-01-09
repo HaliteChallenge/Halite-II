@@ -37,6 +37,7 @@ console.log(this.submissions[a]["language"])
             $tableRow.append("<td>"+user.tier+"</td>");
             $tableRow.append("<td><a href='leaderboard.php?field=language&value="+encodeURIComponent(user.language)+"&heading="+encodeURIComponent(user.language)+"'>"+user.language+"</a></td>");
             $tableRow.append("<td><a href='leaderboard.php?field=organization&value="+encodeURIComponent(user.organization)+"&heading="+encodeURIComponent(user.organization)+"'>"+user.organization+"</a></td>");
+            $tableRow.append("<td><a href='leaderboard.php?field=level&value="+encodeURIComponent(user.level)+"&heading="+encodeURIComponent(user.level)+"'>"+user.level+"</a></td>");
             $tableRow.append("<td title='mu: "+ mu +" sigma: "+ sigma +"'>"+score+"</td>");
 
             this.$tableBody.append($tableRow);

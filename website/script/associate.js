@@ -62,7 +62,7 @@ $(function() {
     render();
 
     document.getElementById("selectionLevel").onchange = function(){
-        if(getSelectedText("selectionLevel") == "High-School") {
+        if(getSelectedText("selectionLevel") == "High School") {
             $("#highSchoolItems").css("display", "block");
         } else {
             $("#highSchoolItems").css("display", "none");
@@ -71,7 +71,7 @@ $(function() {
 
 
     customEmailForm.init(function(email, level, institution) {
-        if(level != "High-School") {
+        if(level != "High School") {
             newEmailForProfessional(email, level);
         } else {
             newEmailForHighSchool(email, level, institution);
