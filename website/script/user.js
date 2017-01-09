@@ -24,10 +24,8 @@ $(function() {
 
             this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+encodeURIComponent(this.user['language'])+"&value="+encodeURIComponent(this.user['language'])+"'>"+this.user['language']+ "</a></span>"));
             this.$secondaryInfo.append($("<br>"));
-            if(this.user['level'] != 'Other') {
-                this.$secondaryInfo.append($("<span>At <a href='leaderboard.php?field=level&heading="+encodeURIComponent(this.user['level'])+"&value="+encodeURIComponent(this.user['level'])+"'>"+this.user['level']+ "</a> level</span>"));
-                this.$secondaryInfo.append($("<br>"));
-            } 
+            this.$secondaryInfo.append($("<span>At <a href='leaderboard.php?field=level&heading="+encodeURIComponent(this.user['level'])+"&value="+encodeURIComponent(this.user['level'])+"'>"+this.user['level']+ "</a> level</span>"));
+            this.$secondaryInfo.append($("<br>"));
             if(this.user['organization'] != 'Other') {
                 this.$secondaryInfo.append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+encodeURIComponent(this.user['organization'])+"&value="+encodeURIComponent(this.user['organization'])+"'>"+this.user['organization']+ "</a></span>"));
                 this.$secondaryInfo.append($("<br>"));
