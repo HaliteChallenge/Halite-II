@@ -12,7 +12,7 @@ if(isset($_SESSION['userID'])) {
         exit();
     }
     if(count(mysqli_fetch_array(mysqli_query($mysqli, "SELECT * FROM User WHERE userID={$_SESSION['userID']} and isEmailGood=0"))) > 0) {
-        header("Location: email.php");
+        header("Location: associate.php");
     }
 }
 ?>
@@ -41,6 +41,7 @@ if(isset($_SESSION['userID'])) {
                     <?php include 'includes/dropdowns.php'; ?>
                     <li><a href="#" id="submitButton">Submit</a><input type="file" id="myFile" name="botFile"></li>
                     <li><a href="#" id="logoutButton">Logout</a></li>
+                    <li><a href="associate.php">Associate</a></li>
                 </ul>
             </form>
         </div>

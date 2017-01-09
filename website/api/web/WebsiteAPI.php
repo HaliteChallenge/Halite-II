@@ -95,6 +95,20 @@ class WebsiteAPI extends API{
         if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
     }
 
+    /**
+     * Helper to interface with the database and get high schools based on the filters.
+     */
+    private function getHS($name=null, $state=null) {
+        $query_string = "SELECT * FROM HighSchool ";
+        if(!empty($name) && isset($name)) {
+            $query_string = $query_string."WHERE name='".$this->mysqli->real_escape_string($name)."' ";
+        } 
+        if(!empty($state) && isset($state)) {
+            $query_string = $query_string.(!empty($name) && isset($name)?"AND":"WHERE")." state='".$this->mysqli->real_escape_string($state)."' ";
+        }
+        return $this->selectMultiple($query_string."ORDER BY name ASC");
+    }
+
     private function getOrganizationForEmail($email) {
         $emailDomain = explode('@', $email)[1];
         $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
@@ -191,9 +205,27 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
         } else if($user != null && isset($_GET['newEmail'])) {
             $verificationCode = rand(0, 9999999999);
-            $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
-            $user["email"] = $_GET["newEmail"];
+            if(isset($_GET['newLevel']) && $_GET['newLevel'] == 'High School') {
+                if(empty($this->getHS($_GET['newInstitution'], null))) { 
+                    # The only way this error should occur is if users manually try to game it (i.e.: REST calls)
+                    # As such we can just print their input is incorrect rather than getting a better landing page.
+                    echo "INVALID INPUT: EITHER INSTITUTION OR SCRIMMAGE ARE NOT FROM AVAILABLE OPTIONS.";
+                    die();
+                }
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
+                "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
+                "', organization='".$this->mysqli->real_escape_string($_GET['newInstitution']).
+                "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            } else if(isset($_GET['newLevel'])) {
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
+                "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
+                "', organization='".$this->getOrganizationForEmail($this->mysqli->real_escape_string($_GET['newEmail'])).
+                "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            } else {
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            }
 
+            $user["email"] = $_GET["newEmail"];
             $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false, true);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
@@ -248,6 +280,14 @@ class WebsiteAPI extends API{
         if(isset($_GET["userID"])) {
             return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID=".intval($_GET["userID"])." ORDER BY versionNumber DESC");
         }
+    }
+
+    /* High School Endpoint
+     *
+     * Simple retrieval from the high school store. All participating high schools should be here.
+     */
+    protected function highSchool() {
+        return $this->getHS(isset($_GET["name"])?$_GET["name"]:null, isset($_GET["state"])?$_GET["state"]:null);
     }
 
     /* User Notification Endpoint
