@@ -27,13 +27,16 @@
                         <h4>We’ll use the domain of your email address to identify your university or company so you can easily see how you rank against others in your organization. We’ll also email you about bot submission events like compilation errors. You can opt out of these at any time.</h4>
                     </div>
 
-                    <label for="selectionLevel">Select your level:</label>
-                    <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionLevel">
-                        <option>High School</option>
-                        <option>Undergraduate</option>
-                        <option>Graduate</option>
-                        <option selected="selected">Professional</option>
-                    </select>       
+
+                    <div id="levelItems">
+                        <label for="selectionLevel">Select your level:</label>
+                        <select class="form-control" type="level" style="margin-top: 0px;max-width: 400px;margin-bottom: 20px;" id="selectionLevel">
+                            <option>High School</option>
+                            <option>Undergraduate</option>
+                            <option>Graduate</option>
+                            <option selected="selected">Professional</option>
+                        </select>       
+                    </div>
 
                     <div id="highSchoolItems">
                         <label for="selectionHighSchool">Select your High School:</label>

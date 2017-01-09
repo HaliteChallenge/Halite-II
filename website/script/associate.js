@@ -53,12 +53,13 @@ $(function() {
 
     function render() {
         var session = getSession();
-        var user = (session != null && session.hasProperty("userID")) ? getUser(session["userID"]) : null;
+        var user = (session != null && session.hasOwnProperty("userID")) ? getUser(session["userID"]) : null;
         if(user != null && parseInt(user.isEmailGood) == 0 && user.email != null && user.email != undefined) {
             $("#waitMessage").css("display", "block");
+            $("#levelItems").css("display", "none");
             $("#highSchoolItems").css("display", "none");
             $("#associateMessage").css("display", "none");
-            $("#forms").css("display", "nonw");
+            $("#forms").css("display", "none");
         } else {
             $("#waitMessage").css("display", "none");
             $("#highSchoolItems").css("display", "none");
