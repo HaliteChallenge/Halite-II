@@ -242,6 +242,40 @@ function getNotifications() {
     }).responseJSON;
 }
 
+function getValidHighSchools() {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}
+
+function getValidHighSchoolByName(name) {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET",
+        data: {name: name}
+    }).responseJSON;
+}
+
+function getValidScrimmages() {
+    return $.ajax({
+        url: url+"scrimmage",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}
+
+function getValidScrimmagesByState(state) {
+    return $.ajax({
+        url: url+"scrimmage",
+        async: false,
+        method: "GET",
+        data: {state: state}
+    }).responseJSON;
+}
+
 function validateEmail() {
     return $.ajax({
         url: url+"email",

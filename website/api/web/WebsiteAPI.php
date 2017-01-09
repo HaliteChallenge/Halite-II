@@ -95,6 +95,34 @@ class WebsiteAPI extends API{
         if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
     }
 
+    /**
+     * Helper to interface with the database and get high schools based on the filters.
+     */
+    private function getHS($name=null, $state=null) {
+        $query_string = "SELECT * FROM HighSchool ";
+        if(!empty($name) && isset($name)) {
+            $query_string = $query_string."WHERE name='".$this->mysqli->real_escape_string($name)."' ";
+        } 
+        if(!empty($state) && isset($state)) {
+            $query_string = $query_string.(!empty($name) && isset($name)?"AND":"WHERE")." state='".$this->mysqli->real_escape_string($state)."' ";
+        }
+        return $this->selectMultiple($query_string."ORDER BY name ASC");
+    }
+
+    /**
+     * Helper to interface with the database and get scrimmages based on the filters.
+     */
+    private function getScrimmage($name=null, $state=null) {
+        $query_string = "SELECT * FROM Scrimmage where endDate >= CURRENT_DATE() ";
+        if(!empty($name) && isset($name)) {
+            $query_string = $query_string."AND name='".$this->mysqli->real_escape_string($name)."' ";
+        } 
+        if(!empty($state) && isset($state)) {
+            $query_string = $query_string."AND state='".$this->mysqli->real_escape_string($state)."' ";
+        }
+        return $this->selectMultiple($query_string."ORDER BY name ASC");
+    }
+
     private function getOrganizationForEmail($email) {
         $emailDomain = explode('@', $email)[1];
         $rows = explode("\n", rtrim(file_get_contents(ORGANIZATION_WHITELIST_PATH)));
@@ -194,6 +222,7 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
                 "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
                 "', organization='".$this->getOrganizationForEmail($this->mysqli->real_escape_string($_GET['newEmail'])).
+                "', scrimmage=null",
                 "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
 
             $user["email"] = $_GET["newEmail"];
@@ -251,6 +280,23 @@ class WebsiteAPI extends API{
         if(isset($_GET["userID"])) {
             return $this->selectMultiple("SELECT * FROM UserHistory WHERE userID=".intval($_GET["userID"])." ORDER BY versionNumber DESC");
         }
+    }
+
+    /* High School Endpoint
+     *
+     * Simple retrieval from the high school store. All participating high schools should be here.
+     */
+    protected function highSchool() {
+        return $this->getHS(isset($_GET["name"])?$_GET["name"]:null, isset($_GET["state"])?$_GET["state"]:null);
+    }
+
+    /* Scrimmage Endpoint
+     *
+     * Simple retrieval from the scrimmage store. Scrimmage is mapped with high school via a state designation, and exist within a specific time.
+     * For that purpose we only retrieve current scrimmages.
+     */
+    protected function scrimmage() {
+        return $this->getScrimmage(isset($_GET["name"])?$_GET["name"]:null, isset($_GET["state"])?$_GET["state"]:null);
     }
 
     /* User Notification Endpoint
