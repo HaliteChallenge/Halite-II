@@ -74,11 +74,3 @@
 .has-hover-text {
     cursor: pointer;
 }
-
-.button-link {
-    padding: 10px 15px;
-    background: #002225;
-    border: solid;
-    color: #FFF;
-}
-
