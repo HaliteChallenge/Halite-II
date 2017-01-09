@@ -4,7 +4,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Email Selection</title>
+    <title>Association</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
