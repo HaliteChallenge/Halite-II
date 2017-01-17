@@ -22,9 +22,9 @@
                 <div class="col-sm-12">
                     <div id="messageBox"></div>
                     <div id="associateMessage">
-                        <h1>Associate With a Valid Institution</h1>
-                        <h4>Please enter your Association Information.</h4>
-                        <h4>We’ll use the domain of your email address to identify your university or company so you can easily see how you rank against others in your organization. We’ll also email you about bot submission events like compilation errors. You can opt out of these at any time.</h4>
+                        <h1>Share Your Affiliation</h1>
+                        <h4>Curious to see how your organization stacks up against the others? Want to see who else from your company or school is playing Halite?</h4>
+                        <h4>Enter your work/school information below and we'll match you with your organization. This way you can see your ranking on your team's leaderboard as well as your ranking overall. May the best bot win!</h4>
                     </div>
 
 
@@ -56,6 +56,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <br/><br/>
+        <div id="missingAssociation">
+            <p><center><small>Is your organization missing from our selection? Click <a href="mailto:halite@halite.io?Subject=New%20Organization%20Request" target="_top">here</a> to e-mail us with the name and we will add it promptly.</small></center></p>
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
