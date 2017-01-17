@@ -16,7 +16,7 @@
 
                 <h2>Starter Packages</h2>
                 <p>
-                    This set of starter packages was uploaded on November 13th. We uploaded a Go starter package.
+                    On December 31st, we patched the version of the Java starter package that we had released on December 30th.
                 </p>
                 <h3>Official Packages</h3>
                 <ul>
@@ -35,12 +35,13 @@
                     <li><a href="downloads/starterpackages/Halite-JavaScript-Starter-Package.zip">Node.js (JavaScript) 7.1.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-OCaml-Starter-Package.zip">OCaml 4.01.0</a></li>
                     <li><a href="downloads/starterpackages/Halite-Clojure-Starter-Package.zip">Clojure 1.8.0</a></li>
+                    <li><a href="downloads/starterpackages/Halite-C-Starter-Package.zip">C</a></li>
                     <li><a href="downloads/starterpackages/Halite-Julia-Starter-Package.zip">Julia 0.5.0</a></li>
                 </ul>
                 </p>
 
                 <h2>Game Environment</h2>
-                <p>The environment is on version <b>1.0</b>. This version of the environment was posted on November 2nd.</p>
+                <p>The environment is on version <b>1.1</b>. This version of the environment was posted on December 9th.</p>
 
                 <h3>Linux/macOS</h3>
                 <p>Execute:</p>

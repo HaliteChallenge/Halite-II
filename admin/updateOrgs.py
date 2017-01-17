@@ -20,12 +20,15 @@ for user in users:
         continue
 
     realUserOrg = "Other"
-    emailDomain = user["email"].split("@")[1]
+    try:
+        emailDomain = user["email"].split("@")[1]
+    except:
+        pass
     for org in orgs:
         if emailDomain == org[1]:
             realUserOrg = org[0]
             break
-    if realUserOrg != "Other" and realUserOrg != user["organization"]:
-        print(user["organization"] + " " + realUserOrg)
+    if (realUserOrg != "Other" or user["organization"] == "") and realUserOrg != user["organization"]:
+        print("%s, %s, %s" % (realUserOrg, user["organization"], user["email"]))
         cursor.execute("update User set organization = '"+realUserOrg+"' where userID="+str(user["userID"]))
         db.commit()

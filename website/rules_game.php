@@ -29,9 +29,17 @@
 
                 <p>When pieces from the same player try to occupy the same site, the resultant piece has the sum of their strengths. Strengths are capped at 255, so if two pieces with a strength of 150 were to both attempt to occupy the same square, the resultant piece would still have a strength of 255.</p>
 
+                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/combination.png" style="max-width: 500px;"></div>
+
                 <p>When pieces from opposing players try to occupy either the same or cardinally adjacent sites (diagonals are not included), the battle will be resolved according to the relative strengths of the pieces, as each piece decreases the strength of every adjacent or coinciding opposing piece by its own strength. Pieces with a strength of 0 or less are removed from the game, excepting pieces with a strength of 0 which have not engaged in combat during that turn.</p>
 
-                <p>Because a piece damages all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage.</p>
+                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/overkill-2.png" style="max-width: 500px;"></div>
+
+                <p>Notice how in the above example, the pieces combined prior to fighting.</p>
+
+                <p>Because a piece damages all adjacent enemy pieces, if a piece is killed while attacking multiple pieces, it will output (often significantly) more damage than it had strength. This is referred to as "overkill" and means that bots can use their pieces tactically to their own advantage. This is shown in the below examples:</p>
+
+                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/overkill-1.png" style="max-width: 500px;"></div>
 
                 <p>The map is initialized by the environment to have productions and strengths. Combat with map squares works identically to combat with other players except only applies on that square; empty map squares neither apply damage to nor take damage from adjacent squares.</p>
 

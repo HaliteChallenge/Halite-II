@@ -1,21 +1,22 @@
 $(function () {
-    var $dropZone = $("#dropZone");
+    var $dropZone = $("html");
     var $filePicker = $("#filePicker");
     function handleFiles(files) {
-        for(var i=0, file; file=files[i]; i++) {
-            console.log(file)
-            var reader = new FileReader();
+        // only use the first file.
+        file = files[0];
+        console.log(file)
+        var reader = new FileReader();
 
-            reader.onload = (function(filename) { // finished reading file data.
-                return function(e2) {
-                    $dropZone.remove();
-                    showGame(textToGame(e2.target.result, filename), $("#pageContent"), null, null, true, false, true);
-                };
-            })(file.name);
-            reader.readAsText(file); // start reading the file data.
-        }
+        reader.onload = (function(filename) { // finished reading file data.
+            return function(e2) {
+                $("#displayArea").empty();
+                $("label[for=filePicker]").text("Select another file");
+                var fsHeight = $("#fileSelect").outerHeight();
+                showGame(textToGame(e2.target.result, filename), $("#displayArea"), null, -fsHeight, true, false, true);
+            };
+        })(file.name);
+        reader.readAsText(file); // start reading the file data.
     }
-    $("#pageContent").append($dropZone);
 
     $dropZone.on('dragover', function(e) {
         e.stopPropagation();

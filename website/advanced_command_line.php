@@ -2,7 +2,7 @@
 <head>
     <?php include 'includes/header.php'; ?>
 
-    <title>Environment Command Reference</title>
+    <title>Halite Environment CLI</title>
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
@@ -14,7 +14,7 @@
         <div class="row">
             <?php include 'includes/learn_sidebar.php'; ?>
             <div class="col-sm-9">
-                <h1>Environment Command Reference</h1>
+                <h1>Halite Environment CLI</h1>
 
                 <p>The Halite environment is responsible for running games between bots and outputting appropriate data and files upon the end of a game. The downloadable version is the same version used on the servers.</p>
 
@@ -25,9 +25,12 @@
                         <li><code>-t</code>: disables timeouts for the duration of the game.</li>
                         <li><code>-q</code>: turns on quiet output. Output will take the form of:
                             <ul>
+                                <li>Unless the <code>-o</code> option is also specified, lines with the command used to run each bot (one bot per line).</li>
+                                <li>A line showing the actual map size used.</li>
                                 <li>A line containing the replay file name, a space, and the map seed.</li>
-                                <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>rank playerID</code></li>
+                                <li>For <code>n</code> players in the game, <code>n</code> lines like so: <code>playerID rank lastFrameAlive</code></li>
                                 <li>A line of space separated playerIDs of the players that timed out.</li>
+                                <li>A line of space separated timeout log filenames.</li>
                             </ul>
                         </li>
                         <li><code>-s</code>: provides the seed to the map generator. If this is not provided, it will use a time-based seed.</li>

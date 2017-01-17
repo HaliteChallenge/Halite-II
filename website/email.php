@@ -38,13 +38,12 @@
                         <button id="customSubmitButton" class="btn btn-primary">Submit</button>
                     </div>
                     <div id="waitMessage" style="display: none;">
-                        <h2>We've sent you a verification email and are waiting for you to click the link in it.</h2>
+                        <h2>We've sent you a verification email and are waiting for you to click the link in it. This email may land in your spam folder.</h2>
                         <h4>If you've already verified your email, head to our <a href="index.php">homepage</a>. If you're having problems with registration, please email us at halite@halite.io.</h4>
                     </div>
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

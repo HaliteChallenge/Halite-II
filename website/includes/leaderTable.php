@@ -5,6 +5,7 @@
             <th>User</th>
             <th>Tier</th>
             <th>Language</th>
+            <th>Level</th>
             <th>Organization</th>
             <th>Points</th>
         </tr>

@@ -1,4 +1,5 @@
 Two Sigma - twosigma.com
+Auburn - auburn.edu
 Cornell - cornell.edu
 NYU - nyu.edu
 Stanford - stanford.edu
@@ -17,6 +18,7 @@ CMU - andrew.cmu.edu
 CMU - cmu.edu
 RIT - rit.edu
 NJU - lamda.nju.edu.cn
+Chalmers - chalmers.se
 Chalmers - student.chalmers.se
 McGill - mail.mcgill.ca
 Purdue - purdue.edu
@@ -74,7 +76,7 @@ Amazon - amazon.de
 Amazon - amazon.com
 Academy for Science and Design - asdnh.org
 KTH - kth.se
-Horace Mann - horacemann.org
+Horace Mann School - horacemann.org
 Shaw - shaw.ca
 Futurice - futurice.com
 Seznam - seznam.cz
@@ -91,3 +93,17 @@ Carleton University - carleton.ca
 DoubleDutch - doubledutch.me
 RWTH Aachen - rwth-aachen.de
 University of Aveiro - ua.pt
+Allstate - allstate.com
+Dreamix - dreamix.eu
+KU Leuven - student.kuleuven.be
+Green Brick Labs - greenbricklabs.com
+Verst - verst.co
+Queens University - queensu.ca
+Qure.ai - qure.ai
+Teleopti - teleopti.com
+UC San Diego - ucsd.edu
+University of Edinburgh - ed.ac.uk
+University of Edinburgh - sms.ed.ac.uk
+University of Bordeaux - u-bordeaux.fr
+University of Bordeaux - etu.u-bordeaux.fr
+Wargaming.net - wargaming.net

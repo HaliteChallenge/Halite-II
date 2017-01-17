@@ -1,8 +1,9 @@
 $(function() {
-    var data = textFromURL("ar1478846062-2923329127.hlt", $("#gameReplay"), function(data) {
+    $("#numUsers").html(getNumActiveUsers());
+    var data = textFromURL("ar1482947270-2437412300.hlt", $("#gameReplay"), function(data) {
         console.log(data)
         if(data != null) {
-            showGame(data, $("#gameReplay"), null, 500, true, true);
+            showGame(data, $("#gameReplay"), null, 500, true, true, true, 30);
         }
     });
 })

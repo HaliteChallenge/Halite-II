@@ -22,6 +22,7 @@ except ImportError:
     MEMORY_LIMIT = 1500
 
 BOT = "MyBot"
+LANGUAGE_FILE = "LANGUAGE"
 SAFEPATH = re.compile('[a-zA-Z0-9_.$-]+$')
 
 class CD(object):
@@ -92,7 +93,7 @@ def check_path(path, errors):
     else:
         return True
 
-class Compiler:
+class Compiler(object):
     def compile(self, globs, errors):
         raise NotImplementedError
 
@@ -127,6 +128,9 @@ class ExternalCompiler(Compiler):
         with CD(bot_dir):
             print("GLOBS: " + ", ".join(globs))
             files = safeglob_multi(globs)
+            if (len("".join(globs)) != 0 and len(files) == 0):
+                # no files to compile
+                return True
 
         try:
             if self.separate:
@@ -168,7 +172,7 @@ class ExternalCompiler(Compiler):
         return True
 
     def cmd_error_filter(self, cmd_out, cmd_errors):
-        cmd_errors = [line for line in cmd_errors if line is None or not self.stderr_re.search(line)]
+        cmd_errors = [line for line in cmd_errors if line is None or self.stderr_re.search(line) is None]
         return cmd_errors
 
 
@@ -190,7 +194,7 @@ class ErrorFilterCompiler(ExternalCompiler):
         return "ErrorFilterCompiler: %s" % (' '.join(self.args),)
 
     def cmd_error_filter(self, cmd_out, cmd_errors):
-        cmd_errors = ExternalCompiler.cmd_error_filter(cmd_out, cmd_errors)
+        cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors)
 
         if self.skip_stdout > 0:
             del cmd_out[:self.skip_stdout]
@@ -200,9 +204,10 @@ class ErrorFilterCompiler(ExternalCompiler):
                        line is None or not self.stdout_re.search(line)]
         if self.stderr_re is not None:
             cmd_errors = [line for line in cmd_errors if
-                          line is None or not self.stderr_re.search(line)]
+                          line is None or self.stderr_re.search(line) is None]
         if self.stdout_is_error:
             return [line for line in cmd_out if line is not None] + cmd_errors
+
         return cmd_errors
 
 class TargetCompiler(Compiler):
@@ -245,7 +250,7 @@ comp_args = {
                              ["gnatlink", "-o", BOT]],
     "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
                              ["gcc", "-O2", "-lm", "-o", BOT]],
-    "C#"            : [["mcs", "-warn:0", "-optimize+", "-out:%s.exe" % BOT]],
+    "C#"            : [["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT]],
     "Clojure"     : [["lein", "uberjar"]],
     "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
@@ -482,6 +487,20 @@ def detect_language(bot_dir):
         else:
             return detected_langs[0], None
 
+def detect_language_file(bot_dir):
+    with CD(bot_dir):
+        try:
+            with open(LANGUAGE_FILE, 'r') as lang_file:
+                print("detected %s file" % LANGUAGE_FILE)
+                language_name = lang_file.readline().strip()
+
+                if not language_name:
+                    return None
+                else:
+                    return language_name
+        except IOError:
+            return None
+
 def get_run_cmd(submission_dir):
     with CD(submission_dir):
         if os.path.exists('run.sh'):
@@ -523,6 +542,11 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
             except Exception as e:
                 print("error")
                 print(e.strerror)
+
+            # allow LANGUAGE file to override language name
+            override_name = detect_language_file(bot_dir)
+            if override_name:
+                name = override_name
             return name, None
         else:
             # limit length of reported errors

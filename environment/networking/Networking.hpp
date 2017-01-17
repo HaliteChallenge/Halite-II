@@ -16,6 +16,9 @@
     #include <sys/stat.h>
     #include <fcntl.h>
     #include <sys/select.h>
+#ifdef __linux__
+    #include <sys/prctl.h>
+#endif
     #include <unistd.h>
 #endif
 

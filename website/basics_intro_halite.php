@@ -31,10 +31,10 @@
 
                 <h3>Testing your bot</h3>
                 <p>To play games of Halite locally, you will need the game environment. As of this writing we support Windows, Linux and OSX platforms. You can download the game environment <a href="downloads.php">here</a>. Place the downloaded binary (halite or halite.exe) in your starter kit folder.</p>
-                <p>To simulate a game, simply runGame.sh (Linux and macOS) or runGame.bat (Windows). This command will run a game between my MyBot and RandomBot (both are just copies of each other at this point) on a grid of size 30x30.</p>
+                <p>To simulate a game, simply issue the command ./runGame.sh (Linux and macOS) or runGame.bat (Windows). This command will run a game between my MyBot and RandomBot (both are just copies of each other at this point) on a grid of size 30x30.</p>
                 <p>The output should look like this and the details of the game will be stored in a file with the "hlt" extension (35538-124984302.hlt in the example below).</p>
 
-                <pre><code>$ . runGame.sh 
+                <pre><code>$ ./runGame.sh 
 python3 MyBot.py
 python3 RandomBot.py
 Init Message sent to player 2.
@@ -55,8 +55,10 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
 
                 <h3>Visualizing a game</h3>
-                <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a> to get a visualization like this one:</p>
-                <div class="text-center" style="margin-bottom: 18px;"><img src="assets/example_vis.png" style="max-width: 500px;"></div>
+                <p>The console output from the game environment gives just the outcome of the game. To replay the game, drag and drop the file to <a href="local_visualizer.php">the visualizer</a>. Since the starter pack is very bad at playing Halite, your visualization will be quite dull.</p>
+                <p>Here's a taste of what some very good Halite bots look like:</p>
+                <div id="gameReplay" class="text-center"></div>
+                <div id="gameReplayTwo" class="text-center"></div>
 
                 <h3>Halite game rules</h3>
                 <p>What do all of these pretty squares mean?</p>
@@ -65,6 +67,7 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
                 <p>When two or more pieces from the same player try to occupy the same site, the resultant piece gets the sum of their strengths (this strength is capped at 255).</p>
                 <p>When pieces with different owners move onto the same site or cardinally adjacent sites, the pieces are forced to fight, and each piece loses strength equal to the strength of its opponent. When a player's piece moves onto an unowned site, that piece and the unowned piece fight, and each piece loses strength equal to the strength of its opponent. </p>
                 <p>When a piece loses all of its strength, it dies and is removed from the grid.</p>
+                <p>For the full rules, see <a href="rules_game.php">here</a>.</p>
                 
                 <h3>How do we program a bot?</h3>
                 <p>Move on to <a href="basics_improve_random.php">Improving the Random Bot</a>.</p>
@@ -75,8 +78,14 @@ Player #2, RandomPythonBot, came in rank #2!</code></pre>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
+    <script src="lib/pixi.min.js"></script>
+    <script src="script/parsereplay.js"></script>
+    <script src="script/visualizer.js"></script>
+    <script src="script/basics_intro_halite.js"></script>
 </body>
 </html>

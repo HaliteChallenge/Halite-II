@@ -31,12 +31,6 @@ void promptDimensions(unsigned short & w, unsigned short & h);
 int main(int argc, char ** argv) {
     srand(time(NULL)); //For all non-seeded randomness.
 
-    if(argc == 1) {
-        std::cout << "You've provided the environment with no arguments.\n"
-        << "If this was intentional, please ignore this message.\n"
-        << "Else, please use the --help flag for usage details.\n";
-    }
-    
     Networking networking;
     std::vector<std::string> * names = NULL;
     unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
@@ -47,10 +41,13 @@ int main(int argc, char ** argv) {
     TCLAP::SwitchArg quietSwitch("q", "quiet", "Runs game in quiet mode, producing machine-parsable output.", cmd, false);
     TCLAP::SwitchArg overrideSwitch("o", "override", "Overrides player-sent names using cmd args [SERVER ONLY].", cmd, false);
     TCLAP::SwitchArg timeoutSwitch("t", "timeout", "Causes game environment to ignore timeouts (give all bots infinite time).", cmd, false);
+    TCLAP::SwitchArg noReplaySwitch("r", "noreplay", "Turns off the replay generation.", cmd, false);
 
     //Value Args
+    TCLAP::ValueArg<unsigned int> nPlayersArg("n", "nplayers", "Create a map that will accommodate n players [SINGLE PLAYER MODE ONLY].", false, 1, "{1,2,3,4,5,6}", cmd);
     TCLAP::ValueArg< std::pair<signed int, signed int> > dimensionArgs("d", "dimensions", "The dimensions of the map.", false, { 0, 0 }, "a string containing two space-seprated positive integers", cmd);
     TCLAP::ValueArg<unsigned int> seedArg("s", "seed", "The seed for the map generator.", false, 0, "positive integer", cmd);
+    TCLAP::ValueArg<std::string> replayDirectoryArg("i", "replaydirectory", "The path to directory for replay output.", false, ".", "path to directory", cmd);
 
     //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
     TCLAP::UnlabeledMultiArg<std::string> otherArgs("NonspecifiedArgs", "Start commands for bots.", false, "Array of strings", cmd);
@@ -64,6 +61,8 @@ int main(int argc, char ** argv) {
     if(seedArg.getValue() != 0) seed = seedArg.getValue();
     else seed = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 4294967295);
 
+    unsigned short n_players_for_map_creation = nPlayersArg.getValue();
+
     quiet_output = quietSwitch.getValue();
     bool override_names = overrideSwitch.getValue();
     bool ignore_timeout = timeoutSwitch.getValue();
@@ -75,13 +74,15 @@ int main(int argc, char ** argv) {
     }
 
     if(mapWidth == 0 && mapHeight == 0) {
-        promptDimensions(mapWidth, mapHeight);
+        std::vector<unsigned short> mapSizeChoices = {20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45, 50};
+        mapWidth = mapSizeChoices[rand() % mapSizeChoices.size()];
+        mapHeight = mapWidth;
     }
 
     if(override_names) {
         if(unlabeledArgs.size() < 4 || unlabeledArgs.size() % 2 != 0) {
-            std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
-            networking = promptNetworking();
+            std::cout << "Invalid number of player parameters with override switch enabled.  Override intended for server use only." << std::endl;
+            exit(1);
         }
         else {
             try {
@@ -94,17 +95,18 @@ int main(int argc, char ** argv) {
                 }
             }
             catch(...) {
-                std::cout << "Invalid player parameters from argv. Prompting instead (override disabled):" << std::endl;
-                networking = promptNetworking();
+                std::cout << "Invalid player parameters with override switch enabled.  Override intended for server use only." << std::endl;
                 delete names;
                 names = NULL;
+                exit(1);
             }
         }
     }
     else {
-        if(unlabeledArgs.size() < 2) {
-            std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
-            networking = promptNetworking();
+        if(unlabeledArgs.size() < 1) {
+            std::cout << "Please provide the launch command string for at least one bot." << std::endl
+            << "Use the --help flag for usage details.\n";
+            exit(1);
         }
         try {
             while(!unlabeledArgs.empty()) {
@@ -114,15 +116,35 @@ int main(int argc, char ** argv) {
             }
         }
         catch(...) {
-            std::cout << "Invalid player parameters from argv. Prompting instead:" << std::endl;
-            networking = promptNetworking();
+            std::cout << "One or more of your bot launch command strings failed.  Please check for correctness and try again." << std::endl;
+            exit(1);
         }
     }
 
-    //Create game. Null parameters will be ignored.
-    my_game = new Halite(mapWidth, mapHeight, seed, networking, ignore_timeout);
+    if(networking.numberOfPlayers() > 1 && n_players_for_map_creation != 1) {
+        std::cout << std::endl << "Only single-player mode enables specified n-player maps.  When entering multiple bots, please do not try to specify n." << std::endl << std::endl;
+        exit(1);
+    }
 
-    GameStatistics stats = my_game->runGame(names, seed, id);
+    if(networking.numberOfPlayers() > 1) n_players_for_map_creation = networking.numberOfPlayers();
+
+    if(n_players_for_map_creation > 6 || n_players_for_map_creation < 1) {
+        std::cout << std::endl << "A map can only accommodate between 1 and 6 players." << std::endl << std::endl;
+        exit(1);
+    }
+
+
+
+    //Create game. Null parameters will be ignored.
+    my_game = new Halite(mapWidth, mapHeight, seed, n_players_for_map_creation, networking, ignore_timeout);
+
+    std::string outputFilename = replayDirectoryArg.getValue();
+#ifdef _WIN32
+    if(outputFilename.back() != '\\') outputFilename.push_back('\\');
+#else
+    if(outputFilename.back() != '/') outputFilename.push_back('/');
+#endif
+    GameStatistics stats = my_game->runGame(names, seed, id, !noReplaySwitch.getValue(), outputFilename);
     if(names != NULL) delete names;
 
     std::string victoryOut;
@@ -130,74 +152,10 @@ int main(int argc, char ** argv) {
         std::cout << stats;
     }
     else {
-        for(unsigned int a = 0; a < stats.player_statistics.size(); a++) std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << "!\n";
+        for(unsigned int a = 0; a < stats.player_statistics.size(); a++) std::cout << "Player #" << stats.player_statistics[a].tag << ", " << my_game->getName(stats.player_statistics[a].tag) << ", came in rank #" << stats.player_statistics[a].rank << " and was last alive on frame #" << stats.player_statistics[a].last_frame_alive << "!\n";
     }
 
     delete my_game;
 
     return 0;
-}
-
-Networking promptNetworking() {
-    Networking n;
-    std::string in;
-    bool done = false;
-    for(int np = 0; !done; np++) {
-        //If less than 2, bypass this step: Ask if the user like to add another AI
-        if (np >= 2) {
-            std::cout << "Would you like to add another player? Please enter Yes or No: ";
-            while (true) {
-                std::getline(std::cin, in);
-                std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-                if (in == "n" || in == "no" || in == "nope" || in == "y" || in == "yes" || in == "yep") break;
-                std::cout << "That isn't a valid input. Please enter Yes or No: ";
-            }
-            if (in == "n" || in == "no" || in == "nope") break;
-        }
-
-        while (true) {
-            std::string startCommand;
-            std::cout << "What is the start command for this bot: ";
-            std::getline(std::cin, startCommand);
-
-            try{
-                n.startAndConnectBot(startCommand);
-                break;
-            }
-            catch (int e) {
-                std::cout << "There was a problem with that start command. Please enter another one.\n";
-            }
-        }
-
-        std::cout << "Connected to player #" << int(np + 1) << std::endl;
-    }
-    return n;
-}
-
-void promptDimensions(unsigned short & w, unsigned short & h) {
-    std::string in;
-    std::cout << "Please enter the width of the map: ";
-    std::getline(std::cin, in);
-    while(true) {
-        try{
-            w = std::stoi(in);
-            break;
-        }
-        catch(std::exception e) {
-            std::cout << "That isn't a valid input. Please enter a positive integer width of the map: ";
-            std::getline(std::cin, in);
-        }
-    }
-    std::cout << "Please enter the height of the map: ";
-    std::getline(std::cin, in);
-    while(true) {
-        try{
-            h = std::stoi(in);
-            break;
-        }
-        catch(std::exception e) {
-            std::cout << "That isn't a valid input. Please enter a positive integer height of the map: ";
-            std::getline(std::cin, in);
-        }
-    }
 }

@@ -39,7 +39,7 @@ else:
 
 # Ensures that the environment can run a basic game where a bot wins. Confirm that the bot expected to win does indeed win.
 genlines = subprocess.Popen('../../environment/halite -d "10 10" -q "python3 ModBot.py" "python3 ModBot.py" -s 1001', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
-if genlines[3].split()[1] != "1" or genlines[4].split()[1] != "2" or genlines[5] != " " or genlines[6] != " ":
+if genlines[-4].split()[1] != "1" or genlines[-3].split()[1] != "2" or genlines[-2] != " " or genlines[-1] != " ":
     print('General environment test failed. Environment output:\n#######################################################')
     print('\n'.join(genlines) + '\n#######################################################')
     isGood = False
@@ -47,17 +47,20 @@ else:
     print('General environment test succeeded.')
 
 # Ensures that the environment can run a basic game where a bot wins. Confirm that the bot expected to win does indeed win.
-splines = subprocess.Popen('../../environment/halite -d "10 10" -q "../../airesources/C++/MyBot" "cd ../../airesources/Java; java MyBot" "python3 ../../airesources/Python/MyBot.py" "../../airesources/Rust/target/release/MyBot" -s 1000', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
-if splines[9] != " " or splines[10] != " ":
+splines = subprocess.Popen('../../environment/halite -d "10 10" -q "../../airesources/C++/MyBot" "java -cp ../../airesources/Java MyBot" "python3 ../../airesources/Python/MyBot.py" "../../airesources/Rust/target/release/MyBot" -s 1000', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
+if splines[-2] != " " or splines[-1] != " ":
     print('Starter package test failed. Environment output:\n#######################################################')
     print('\n'.join(splines) + '\n#######################################################')
     isGood = False
 else:
     print('Starter package test succeeded.')
 
+splines = subprocess.Popen('cat *.log', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
+print('\n'.join(splines))
+
 # Ensures that tie evaluation is correct. Confirm that the bot expected to win does indeed win.
 tielines = subprocess.Popen('../../environment/halite -d "10 10" -q "python3 ModBot.py" "python3 ModBot.py" -s 998', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
-if tielines[3].split()[1] != "2" or tielines[4].split()[1] != "1" or tielines[5] != " " or tielines[6] != " ":
+if tielines[-4].split()[1] != "2" or tielines[-3].split()[1] != "1" or tielines[-2] != " " or tielines[-1] != " ":
     print('Tie evaluation test failed. Environment output:\n#######################################################')
     print('\n'.join(tielines) + '\n#######################################################')
     isGood = False
@@ -66,7 +69,7 @@ else:
 
 # Ensures that all timeouts work well.
 timelines = subprocess.Popen('../../environment/halite -d "20 20" -q "python3 FailInitBot.py" "python3 TimeoutInitBot.py" "python3 Fail10Bot.py" "python3 Timeout10Bot.py" "python3 ModBot.py" -s 998', stdout=subprocess.PIPE, shell = True).stdout.read().decode('utf-8').split('\n')
-if timelines[6].split()[1] != "5" or timelines[7].split()[1] != "4" or timelines[8].split()[1] != "3" or timelines[9].split()[1] != "2" or timelines[10].split()[1] != "1" or timelines[11] != "1 2 3 4 ":
+if timelines[-7].split()[1] != "5" or timelines[-6].split()[1] != "4" or timelines[-5].split()[1] != "3" or timelines[-4].split()[1] != "2" or timelines[-3].split()[1] != "1" or timelines[-2] != "1 2 3 4 ":
     print('Timeout evaluation test failed. Environment output:\n#######################################################')
     print('\n'.join(timelines) + '\n#######################################################')
     isGood = False

@@ -42,7 +42,7 @@ abstract class API{
     protected $file = Null;
 
     protected function numRows($sql) {
-        return mysqli_query($this->mysqli, $sql)->num_rows;
+        return mysqli_fetch_assoc(mysqli_query($this->mysqli, $sql))["COUNT(*)"];
     }
 
     protected function select($sql) {

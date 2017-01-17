@@ -18,7 +18,7 @@ date_default_timezone_set('America/New_York');
 include dirname(__FILE__).'/../API.class.php';
 
 define("ORGANIZATION_WHITELIST_PATH", dirname(__FILE__)."/../../organizationWhitelist.txt");
-define("USER_TO_SERVER_RATIO", 30);
+define("USER_TO_SERVER_RATIO", 100);
 define("WORKER_LIMIT", 50);
 
 class WebsiteAPI extends API{
@@ -69,6 +69,7 @@ class WebsiteAPI extends API{
 
     private function getUsers($query, $privateInfo=false) {
         $users = $this->selectMultiple($query);
+        $numUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1");
         foreach($users as &$user) {
             if($privateInfo == false) {
                 unset($user['email']);
@@ -77,8 +78,8 @@ class WebsiteAPI extends API{
             }
             
             if(intval($user['isRunning']) == 1) {
-                $percentile = intval($user['rank']) / $this->numRows("SELECT * FROM User WHERE isRunning=1");
-                if($percentile < 1/32) $user['tier'] = "Diamond";
+                $percentile = intval($user['rank']) / $numUsers;
+                if($percentile < 1/64) $user['tier'] = "Diamond";
                 else if($percentile < 1/16) $user['tier'] = "Gold";
                 else if($percentile < 1/4) $user['tier'] = "Silver";
                 else $user['tier'] = "Bronze";
@@ -92,6 +93,20 @@ class WebsiteAPI extends API{
 
     private function getLoggedInUser() {
         if(isset($_SESSION['userID'])) return $this->getUsers("SELECT * FROM User WHERE userID={$_SESSION['userID']}", true)[0];
+    }
+
+    /**
+     * Helper to interface with the database and get high schools based on the filters.
+     */
+    private function getHS($name=null, $state=null) {
+        $query_string = "SELECT * FROM HighSchool ";
+        if(!empty($name) && isset($name)) {
+            $query_string = $query_string."WHERE name='".$this->mysqli->real_escape_string($name)."' ";
+        } 
+        if(!empty($state) && isset($state)) {
+            $query_string = $query_string.(!empty($name) && isset($name)?"AND":"WHERE")." state='".$this->mysqli->real_escape_string($state)."' ";
+        }
+        return $this->selectMultiple($query_string."ORDER BY name ASC");
     }
 
     private function getOrganizationForEmail($email) {
@@ -163,11 +178,11 @@ class WebsiteAPI extends API{
             $githubUser = json_decode($gitHub->request('user'), true);
             $email = json_decode($gitHub->request('user/emails'), true)[0];
 
-            if($this->numRows("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
+            if($this->numRows("SELECT COUNT(*) FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}") > 0) { // Already signed up
                 
                 $_SESSION['userID'] = $this->select("SELECT userID FROM User WHERE oauthProvider=1 and oauthID={$githubUser['id']}")['userID'];
             } else { // New User
-                $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
+                $numActiveUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1"); 
                 $this->insert("INSERT INTO User (username, githubEmail, oauthID, oauthProvider, rank) VALUES ('{$githubUser['login']}', '{$email}', {$githubUser['id']}, 1, {$numActiveUsers})");
                 $_SESSION['userID'] = $this->mysqli->insert_id;
             }
@@ -190,9 +205,27 @@ class WebsiteAPI extends API{
             $this->insert("UPDATE User SET email=githubEmail, organization='$organization', isEmailGood=1 WHERE userID = {$user['userID']}");
         } else if($user != null && isset($_GET['newEmail'])) {
             $verificationCode = rand(0, 9999999999);
-            $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
-            $user["email"] = $_GET["newEmail"];
+            if(isset($_GET['newLevel']) && $_GET['newLevel'] == 'High School') {
+                if(empty($this->getHS($_GET['newInstitution'], null))) { 
+                    # The only way this error should occur is if users manually try to game it (i.e.: REST calls)
+                    # As such we can just print their input is incorrect rather than getting a better landing page.
+                    echo "INVALID INPUT: EITHER INSTITUTION OR SCRIMMAGE ARE NOT FROM AVAILABLE OPTIONS.";
+                    die();
+                }
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
+                "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
+                "', organization='".$this->mysqli->real_escape_string($_GET['newInstitution']).
+                "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            } else if(isset($_GET['newLevel'])) {
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail']).
+                "', level='".$this->mysqli->real_escape_string($_GET['newLevel']).
+                "', organization='".$this->getOrganizationForEmail($this->mysqli->real_escape_string($_GET['newEmail'])).
+                "', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            } else {
+                $this->insert("UPDATE User SET email='".$this->mysqli->real_escape_string($_GET['newEmail'])."', verificationCode = '{$verificationCode}' WHERE userID = {$user['userID']}");
+            }
 
+            $user["email"] = $_GET["newEmail"];
             $this->sendNotification($user, "Email Verification", "<p>Click <a href='".WEB_DOMAIN."api/web/email?verificationCode=$verificationCode'>here</a> to verify your email address.</p>", 0, false, true);
         } else if(isset($_GET['verificationCode'])) {
             if($user == null) {
@@ -249,6 +282,14 @@ class WebsiteAPI extends API{
         }
     }
 
+    /* High School Endpoint
+     *
+     * Simple retrieval from the high school store. All participating high schools should be here.
+     */
+    protected function highSchool() {
+        return $this->getHS(isset($_GET["name"])?$_GET["name"]:null, isset($_GET["state"])?$_GET["state"]:null);
+    }
+
     /* User Notification Endpoint
      *
      * Allows the downloading of all of the notifications a user has recieved over email.
@@ -274,16 +315,20 @@ class WebsiteAPI extends API{
             $versionNumber = isset($_GET['versionNumber']) ? intval($_GET['versionNumber']) : $this->select("SELECT numSubmissions FROM User WHERE userID=$userID")['numSubmissions']; 
 
             $gameArrays = $this->selectMultiple("SELECT g.* FROM GameUser gu INNER JOIN Game g ON g.gameID = gu.gameID WHERE gu.userID = $userID and gu.versionNumber = $versionNumber and gu.gameID < $startingID ORDER BY gu.gameID DESC LIMIT $limit");
+        } else {
+            $previousID = isset($_GET['previousID']) ? intval($_GET['previousID']) : 0;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 20;
+            $gameArrays = $this->selectMultiple("SELECT * FROM Game WHERE gameID > $previousID ORDER BY gameID DESC LIMIT $limit"); 
+        }
 
-            // Get each game's info
-            foreach ($gameArrays as &$gameArray) {
-                $gameID = $gameArray['gameID'];
+        // Get each game's info
+        foreach ($gameArrays as &$gameArray) {
+            $gameID = $gameArray['gameID'];
 
-                // Get information about users
-                $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
-            }
-            return $gameArrays;
-        } 
+            // Get information about users
+            $gameArray['users'] = $this->selectMultiple("SELECT gu.userID, gu.errorLogName, gu.rank, u.username, u.oauthID, u.mu, u.sigma, u.rank AS userRank FROM GameUser gu INNER JOIN User u ON u.userID=gu.userID WHERE gu.gameID = $gameID");
+        }
+        return $gameArrays;
     }
     
     /* Bot File Endpoint
@@ -315,8 +360,8 @@ class WebsiteAPI extends API{
             if(intval($this->config['test']['isTest']) == 0) $this->sendNotification($user, "Bot Received", "<p>We have received and processed the zip file of your bot's source code. In a few minutes, our servers will compile your bot, and you will receive another email notification, even if your bot has compilation errors.</p>", 0);
 
             // AWS auto scaling
-            $numActiveUsers = $this->numRows("SELECT userID FROM User WHERE isRunning=1"); 
-            $numWorkers = $this->numRows("SELECT workerID FROM Worker");
+            $numActiveUsers = $this->numRows("SELECT COUNT(*) FROM User WHERE isRunning=1"); 
+            $numWorkers = $this->numRows("SELECT COUNT(*) FROM Worker");
             if($numWorkers > 0 && $numWorkers < WORKER_LIMIT && $numActiveUsers / $numWorkers > USER_TO_SERVER_RATIO) {
                 echo shell_exec("python3 openNewWorker.py > /dev/null 2>/dev/null &");
             }

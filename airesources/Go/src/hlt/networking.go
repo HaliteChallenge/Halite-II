@@ -20,12 +20,11 @@ const (
 	WEST
 )
 
-var Directions = []Direction{STILL, NORTH,EAST, SOUTH, WEST}
-var CARDINALS = []Direction{NORTH,EAST, SOUTH, WEST}
-
+var Directions = []Direction{STILL, NORTH, EAST, SOUTH, WEST}
+var CARDINALS = []Direction{NORTH, EAST, SOUTH, WEST}
 
 type Site struct {
-	Owner	   int
+	Owner      int
 	Strength   int
 	Production int
 }
@@ -58,10 +57,10 @@ func (ms MoveSet) serialize() string {
 
 type Connection struct {
 	width, height int
-	PlayerTag	  int
+	PlayerTag     int
 	productions   [][]int
-	reader		  *bufio.Reader
-	writer		  io.Writer
+	reader        *bufio.Reader
+	writer        io.Writer
 }
 
 func (c *Connection) deserializeMap() GameMap {
@@ -130,7 +129,7 @@ func (c *Connection) deserializeProductions() {
 	}
 }
 
-func NewConnection(name string) (Connection, GameMap) {
+func NewConnection() (Connection, GameMap) {
 	conn := Connection{
 		reader: bufio.NewReader(os.Stdin),
 		writer: os.Stdout,
@@ -138,9 +137,11 @@ func NewConnection(name string) (Connection, GameMap) {
 	conn.PlayerTag = conn.getInt()
 	conn.deserializeMapSize()
 	conn.deserializeProductions()
-	conn.sendString(name)
-
 	return conn, conn.deserializeMap()
+}
+
+func (c *Connection) SendName(name string) {
+	c.sendString(name)
 }
 
 func (c *Connection) GetFrame() GameMap {

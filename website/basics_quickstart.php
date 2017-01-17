@@ -38,8 +38,9 @@
                 <p>Congratulations. You are now an official contestant!</p>
                 <p>It may be up to <b>10 minutes</b> before your bot has played a few games. In the meantime, move onto <a href="basics_intro_halite.php">Introducing Halite</a>.</p>
 
-                <h3>Need Help? Have Feedback?</h3>
-                <p>Please post on <a href="http://forums.halite.io">the forums</a>.</p>
+                <h3>Join the Community</h3>
+                <p>If you need help or have feedback, please visit the <a href="http://forums.halite.io/">forums</a>! If you’d like to hang out and chat with other players, come join the <a href="https://discordapp.com/invite/rbVDB4n">official discord</a>.</p>
+
             </div>
         </div>
         <?php include 'includes/footer.php'; ?>

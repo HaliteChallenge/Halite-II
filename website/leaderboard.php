@@ -19,7 +19,7 @@
                     <div class="row" style="margin-top: 21px; margin-bottom: 10px;">
                         <div class="col-sm-9">
                             <h1 id="leaderHeading" style="margin-top: 0px;">Leaderboard</h1>
-                            <p>These rankings are continuously updated. Want to get on the leaderboard? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
+                            <p>There are <span id="numUsers">1366</span> users on the Halite leaderboard. Want to join them? Visit our <a href="basics_quickstart.php">getting started guide</a>.</p>
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group">
@@ -45,6 +45,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="lib/xss.js"></script>
     <script src="script/backend.js"></script>
     <script src="script/general.js"></script>
     <script src="script/leaderTable.js"></script>

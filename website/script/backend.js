@@ -229,7 +229,7 @@ function getFilteredUsers(filters, orderBy, limit, page) {
         method: "GET",
         data: {fields: fields, values: values, orderBy: orderBy, limit: limit, page: page}
     });
-	console.log(result)
+    console.log(result)
 
     return result.responseJSON;
 }
@@ -239,6 +239,23 @@ function getNotifications() {
         url: url+"notification",
         async: false,
         method: "GET"
+    }).responseJSON;
+}
+
+function getValidHighSchools() {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET"
+    }).responseJSON;
+}
+
+function getValidHighSchoolByName(name) {
+    return $.ajax({
+        url: url+"highSchool",
+        async: false,
+        method: "GET",
+        data: {name: name}
     }).responseJSON;
 }
 
@@ -252,10 +269,39 @@ function validateEmail() {
 }
 
 function newEmail(email) {
+    // NOTE: These should be PUTs not GETs (since they aren't indempondent). TODO: change
     return $.ajax({
         url: url+"email",
         async: false,
         method: "GET",
         data: {newEmail: email}
+    }).responseJSON;
+}
+
+
+function newEmailForProfessional(email, level) {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        data: {newEmail: email, newLevel: level}
+    }).responseJSON;
+}
+
+function newEmailForHighSchool(email, level, institution) {
+    return $.ajax({
+        url: url+"email",
+        async: false,
+        method: "GET",
+        data: {newEmail: email, newLevel: level, newInstitution: institution}
+    }).responseJSON;
+}
+
+function getGames(previousID) {
+    return $.ajax({
+        url: "api/web/game",
+        async: false,
+        method: "GET",
+        data: {previousID: previousID}
     }).responseJSON;
 }

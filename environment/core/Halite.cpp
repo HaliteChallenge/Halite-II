@@ -204,12 +204,18 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 }
 
 //Public Functions -------------------
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, Networking networking_, bool shouldIgnoreTimeout) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, unsigned short n_players_for_map_creation, Networking networking_, bool shouldIgnoreTimeout) {
     networking = networking_;
+    // number_of_players is the number of active bots to start the match; it is constant throughout game
     number_of_players = networking.numberOfPlayers();
 
     //Initialize map
-    game_map = hlt::Map(width_, height_, number_of_players, seed_);
+    game_map = hlt::Map(width_, height_, n_players_for_map_creation, seed_);
+
+    //If this is single-player mode, remove all the extra players (they were automatically inserted in map, just 0 them out)
+    if (number_of_players == 1){
+        for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner > 1) game_map.contents[b][c].owner = 0;
+    }
 
     //Default initialize
     player_moves = std::vector< std::map<hlt::Location, unsigned char> >();
@@ -226,6 +232,7 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
     ignore_timeout = shouldIgnoreTimeout;
 
     //Init statistics
+    productive_squares_remaining = 1;   // just more than zero to get through the game_loop the first time
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
     last_territory_count = std::vector<unsigned int>(number_of_players, 1);
     full_territory_count = std::vector<unsigned int>(number_of_players, 1);
@@ -299,7 +306,7 @@ void Halite::output(std::string filename) {
     gameFile.close();
 }
 
-GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id) {
+GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id, bool enabledReplay, std::string replayDirectory) {
     //For rankings
     std::vector<bool> result(number_of_players, true);
     std::vector<unsigned char> rankings;
@@ -325,7 +332,7 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
     }
     const int maxTurnNumber = sqrt(game_map.map_width * game_map.map_height) * 10;
-    while(std::count(result.begin(), result.end(), true) > 1 && turn_number < maxTurnNumber) {
+    while(turn_number < maxTurnNumber && (std::count(result.begin(), result.end(), true) > 1 || (number_of_players == 1 && productive_squares_remaining > 0))) {
         //Increment turn number:
         turn_number++;
         if(!quiet_output) std::cout << "Turn " << turn_number << "\n";
@@ -342,6 +349,10 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
             return last_territory_count[u1] < last_territory_count[u2];
         });
         for(auto a = newRankings.begin(); a != newRankings.end(); a++) rankings.push_back(*a);
+
+        //Count productive squares remaining for Halite single-player game
+        productive_squares_remaining = 0;
+        for(unsigned short b = 0; b < game_map.map_height; b++) for(unsigned short c = 0; c < game_map.map_width; c++) if(game_map.contents[b][c].owner == 0 && game_map.contents[b][c].production > 0) productive_squares_remaining++;
         result = newResult;
     }
     std::vector<unsigned int> newRankings;
@@ -359,6 +370,10 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         PlayerStatistics p;
         p.tag = a + 1;
         p.rank = std::distance(rankings.begin(), std::find(rankings.begin(), rankings.end(), a)) + 1;
+        // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
+        // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
+        // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but finishers who are alive in last frame of game who only need -1
+        p.last_frame_alive = alive_frame_count[a] - 2 + result[a];
         p.average_territory_count = full_territory_count[a] / double(chunkSize * alive_frame_count[a]);
         p.average_strength_count = full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
         p.average_production_count = alive_frame_count[a] > 1 ? full_production_count[a] / double(chunkSize * (alive_frame_count[a] - 1)) : 0; //For this, we want turns rather than frames.
@@ -370,16 +385,18 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
     stats.timeout_tags = timeout_tags;
     stats.timeout_log_filenames = std::vector<std::string>(timeout_tags.size());
     //Output gamefile. First try the replays folder; if that fails, just use the straight filename.
-    stats.output_filename = "Replays/" + std::to_string(id) + '-' + std::to_string(seed) + ".hlt";
-    try {
-        output(stats.output_filename);
+    if (enabledReplay) {
+      stats.output_filename = replayDirectory + "Replays/" + std::to_string(id) + '-' + std::to_string(seed) + ".hlt";
+      try {
+	output(stats.output_filename);
+      }
+      catch(std::runtime_error & e) {
+	stats.output_filename = replayDirectory + std::to_string(id) + '-' + std::to_string(seed) + ".hlt";
+	output(stats.output_filename);
+      }
+      if(!quiet_output) std::cout << "Map seed was " << seed << std::endl << "Opening a file at " << stats.output_filename << std::endl;
+      else std::cout << stats.output_filename << ' ' << seed << std::endl;
     }
-    catch(std::runtime_error & e) {
-        stats.output_filename = stats.output_filename.substr(8);
-        output(stats.output_filename);
-    }
-    if(!quiet_output) std::cout << "Map seed was " << seed << std::endl << "Opening a file at " << stats.output_filename << std::endl;
-    else std::cout << stats.output_filename << ' ' << seed << std::endl;
     //Output logs for players that timed out or errored.
     int timeoutIndex = 0;
     for(auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {

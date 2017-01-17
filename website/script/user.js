@@ -8,17 +8,23 @@ $(function() {
             this.render();
         },
         render: function() {
+            var mu = Math.round(this.user.mu*100)/100;
+            var sigma = Math.round(this.user.sigma*100)/100;
+            var score = Math.round((this.user.mu-(3*this.user.sigma))*100)/100;
+
             var vr = "<span style='color: #0092a1;'>|</span>";
             this.$profileImage.attr("src", "https://avatars.githubusercontent.com/u/"+this.user["oauthID"]);
-            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + filterXSS(this.user['username']) + "</a>");
+            this.$name.html("<a href='https://github.com/" + this.user['username'] + "'>" + this.user['username'] + "</a>");
 
             this.$primaryInfo.append("<a href='leaderboard.php?userID="+this.user["userID"]+"'>Rank " + this.user['rank']+"</a>");
             this.$primaryInfo.append("<br>");
             this.$primaryInfo.append("<span>" + this.user['tier'] + " Tier</span>");
             this.$primaryInfo.append("<br>");
-            this.$primaryInfo.append("<span>"+(Math.round((this.user['mu']-this.user['sigma']*3)*100)/100)+" points</span>");
+            this.$primaryInfo.append("<span title='mu: "+ mu +" sigma: "+ sigma +"'>"+ score +" points</span>");
 
             this.$secondaryInfo.append($("<span>Made in <a href='leaderboard.php?field=language&heading="+encodeURIComponent(this.user['language'])+"&value="+encodeURIComponent(this.user['language'])+"'>"+this.user['language']+ "</a></span>"));
+            this.$secondaryInfo.append($("<br>"));
+            this.$secondaryInfo.append($("<span>At <a href='leaderboard.php?field=level&heading="+encodeURIComponent(this.user['level'])+"&value="+encodeURIComponent(this.user['level'])+"'>"+this.user['level']+ "</a> level</span>"));
             this.$secondaryInfo.append($("<br>"));
             if(this.user['organization'] != 'Other') {
                 this.$secondaryInfo.append($("<span>Member of <a href='leaderboard.php?field=organization&heading="+encodeURIComponent(this.user['organization'])+"&value="+encodeURIComponent(this.user['organization'])+"'>"+this.user['organization']+ "</a></span>"));
@@ -183,7 +189,7 @@ $(function() {
             playersList = game.users.filter(function(player) {
                 return player.userID != userID;
             }).map(function(player) {
-                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;'></a>";
+                return "<a href='user.php?userID="+player.userID+"'><img src='https://avatars1.githubusercontent.com/u/"+player.oauthID+"?s=20' style='border-radius: 2px; width: 20px; height: 20px;' title='("+player.userRank+") "+player.username+"'></a>";
             }).join(" ");
 
             var thisUser = game.users.find(function(p){return parseInt(p.userID)==userID;});
@@ -216,11 +222,14 @@ $(function() {
     if(userIDGET != null || (session = getSession())) {
         var isMe = (userIDGET == null || userIDGET == undefined);
         var user = isMe ? getUser(session['userID']) : getUser(userIDGET);
+        user["username"] = escapeHtml(filterXSS(user["username"]));
+        user["language"] = escapeHtml(filterXSS(user["language"]));
+
         if(user['isRunning'] == 0) {
             $("#normalBody").css("display", "none");
             $("#noBotMessage").css("display", "block");
         } else {
-            $(document).prop('title', filterXSS(user.username));
+            $(document).prop('title', user["username"]);
 
             profileCard.init(user);
             gameTable.init(parseInt(user["userID"]), isMe, function(userID, startingID) {

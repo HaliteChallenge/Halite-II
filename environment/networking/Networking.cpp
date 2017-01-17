@@ -109,9 +109,12 @@ void Networking::sendString(unsigned char playerTag, std::string &sendString) {
 #endif
 }
 
-std::string Networking::getString(unsigned char playerTag, unsigned int timeoutMillis) {
+std::string Networking::getString(unsigned char playerTag, const unsigned int timeoutMillis) {
 
     std::string newString;
+    int timeoutMillisRemaining = timeoutMillis;
+    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
+    
 #ifdef _WIN32
     WinConnection connection = connections[playerTag - 1];
 
@@ -120,7 +123,9 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     char buffer;
 
     //Keep reading char by char until a newline
-    while (true) {
+    while(true) {
+        timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
+        if(timeoutMillisRemaining < 0) throw newString;
         //Check to see that there are bytes in the pipe before reading
         //Throw error if no bytes in alloted time
         //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
@@ -129,7 +134,7 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
         if(bytesAvailable < 1) {
             std::chrono::high_resolution_clock::time_point initialTime = std::chrono::high_resolution_clock::now();
             while (bytesAvailable < 1) {
-                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > timeoutMillis) throw newString;
+                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > timeoutMillisRemaining) throw newString;
                 PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
             }
         }
@@ -152,20 +157,17 @@ std::string Networking::getString(unsigned char playerTag, unsigned int timeoutM
     fd_set set;
     FD_ZERO(&set); /* clear the set */
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
-
-
-    std::chrono::high_resolution_clock::time_point tp = std::chrono::high_resolution_clock::now();
     char buffer;
 
     //Keep reading char by char until a newline
     while(true) {
 
         //Check if there are bytes in the pipe
-        timeoutMillis -= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
-        tp = std::chrono::high_resolution_clock::now();
+        timeoutMillisRemaining = timeoutMillis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
+        if(timeoutMillisRemaining < 0) throw newString;
         struct timeval timeout;
-        timeout.tv_sec = timeoutMillis / 1000.0;
-        timeout.tv_usec = (timeoutMillis % 1000)*1000;
+        timeout.tv_sec = timeoutMillisRemaining / 1000.0;
+        timeout.tv_usec = (timeoutMillisRemaining % 1000)*1000;
         int selectionResult = select(connection.read+1, &set, NULL, NULL, &timeout);
 
         if(selectionResult > 0) {
@@ -258,7 +260,7 @@ void Networking::startAndConnectBot(std::string command) {
 
     if(!quiet_output) std::cout << command << "\n";
 
-    pid_t pid = (pid_t)NULL;
+    pid_t pid;
     int writePipe[2];
     int readPipe[2];
 
@@ -271,10 +273,25 @@ void Networking::startAndConnectBot(std::string command) {
         throw 1;
     }
 
+    pid_t ppid_before_fork = getpid();
+
     //Fork a child process
     pid = fork();
     if(pid == 0) { //This is the child
         setpgid(getpid(), getpid());
+
+#ifdef __linux__
+        // install a parent death signal
+        // http://stackoverflow.com/a/36945270
+        int r = prctl(PR_SET_PDEATHSIG, SIGTERM);
+        if (r == -1)
+        {
+            if(!quiet_output) std::cout << "Error installing parent death signal\n";
+            throw 1;
+        }
+        if (getppid() != ppid_before_fork)
+            exit(1);
+#endif
 
         dup2(writePipe[0], STDIN_FILENO);
 
@@ -304,9 +321,9 @@ void Networking::startAndConnectBot(std::string command) {
 }
 
 int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, bool ignoreTimeout, std::string * playerName) {
-    
+
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 15000;
-    
+
     std::string response;
     try {
         std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
@@ -349,7 +366,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
 int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves) {
 
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
-    
+
     std::string response;
     try {
         if(isProcessDead(playerTag)) return -1;

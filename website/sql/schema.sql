@@ -49,7 +49,8 @@ CREATE TABLE `GameUser` (
   `errorLogName` varchar(64) DEFAULT NULL,
   `rank` smallint(5) unsigned NOT NULL,
   `playerIndex` smallint(5) unsigned NOT NULL,
-  `didTimeout` tinyint(1) unsigned NOT NULL
+  `didTimeout` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`gameID`,`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -72,9 +73,10 @@ CREATE TABLE `User` (
   `isEmailGood` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `level` enum('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organization` varchar(64) NOT NULL,
   `language` varchar(16) DEFAULT NULL,
-  `mu` float unsigned NOT NULL DEFAULT 25.000,
+  `mu` float NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,
   `rank` smallint(5) DEFAULT NULL,
   `numSubmissions` smallint(5) NOT NULL DEFAULT 0,
@@ -145,6 +147,19 @@ CREATE TABLE `UserNotification` (
   `mood` tinyint(1) NOT NULL,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`userNotificationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `HighSchool`
+--
+
+DROP TABLE IF EXISTS `HighSchool`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HighSchool` (
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY(`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

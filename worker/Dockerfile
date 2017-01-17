@@ -38,6 +38,10 @@ RUN sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/lein
 RUN chmod a+x /usr/bin/lein
 RUN lein
 
-RUN pip3 install virtualenv
+RUN apt-get install -y git
+
+RUN pip3 install numpy scipy scikit-learn pillow h5py
+RUN pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.0rc0-cp35-cp35m-linux_x86_64.whl 
+RUN pip3 install keras
 
 RUN apt-get install -y julia
