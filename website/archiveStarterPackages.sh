@@ -16,7 +16,7 @@ mkdir Halite-Python-Starter-Package \
       Halite-JavaScript-Starter-Package \
       Halite-OCaml-Starter-Package \
       Halite-Clojure-Starter-Package \
-      Halite-C-Starter-Package
+      Halite-C-Starter-Package \
       Halite-Julia-Starter-Package
 
 cp -r Python/* Halite-Python-Starter-Package/
