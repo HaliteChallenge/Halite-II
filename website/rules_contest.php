@@ -17,7 +17,7 @@
                 <h1>Contest Rules</h1>
 
                 <h3>Schedule</h3>
-                <p>The Halite contest officially began on November 10 and will end on February 2. Submit early and often!</p>
+                <p>The Halite contest officially began on November 10 and will end on February 12. Submit early and often!</p>
 
                 <h3>Account Ownership</h3>
                 <p>Though collaboration is highly encouraged, teams are not technically allowed.</p>
