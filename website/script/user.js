@@ -175,8 +175,9 @@ $(function() {
                 this.$alternateMessage.css("display", "block");
                 this.$panel.css("display", "none");
             } else {
-                this.$tableHeader.html("<th>Time</th><th>Opponents</th><th>Result</th><th>Dimensions</th><th>View</th>");
-                if(this.isMe) this.$tableHeader.append("<th>Error Log</th>");
+                var errorHeader = "<th>Error</th>";
+                if(this.isMe) { errorHeader = "<th>Error Log</th>"; }
+                this.$tableHeader.html("<th>Time</th><th>Opponents</th><th>Result</th>"+ errorHeader +"<th>Dimensions</th><th>View</th>");
                 this.$tableBody.empty();
                 for(var a = 0; a < this.games.length; a++) {
                     this.$tableBody.append(this.getTableRow(this.games[a]));
@@ -198,18 +199,22 @@ $(function() {
             var dateComponents = game.timestamp.split(/[- :]/);
             var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
 
-            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
-            if(this.isMe) {
-                var me = null;
-                for(var a = 0; a < game.users.length; a++) {
-                    if(game.users[a].userID == this.userID) {
-                        me = game.users[a];
-                        break;
-                    }
+            var me = null;
+            for(var a = 0; a < game.users.length; a++) {
+                if(game.users[a].userID == this.userID) {
+                    me = game.users[a];
+                    break;
                 }
-                if(me.errorLogName != undefined && me.errorLogName != null) $row.append("<td><a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a></td>");
-                else $row.append("<td>NA</td>");
             }
+            var errorMsg = "";
+            if(me.errorLogName != undefined && me.errorLogName != null) {
+                if(this.isMe) {
+                    errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a>";
+                } else {
+                    errorMsg = "<span class='glyphicon glyphicon-exclamation-sign'></span>";
+                }
+            }
+            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+"</td><td>"+errorMsg+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             return $row;
         },
         loadMore: function() {
