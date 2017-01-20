@@ -206,7 +206,7 @@ $(function() {
                     break;
                 }
             }
-            var errorMsg = "";
+            var errorMsg = "&mdash;";
             if(me.errorLogName != undefined && me.errorLogName != null) {
                 if(this.isMe) {
                     errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a>";
