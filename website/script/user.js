@@ -175,9 +175,7 @@ $(function() {
                 this.$alternateMessage.css("display", "block");
                 this.$panel.css("display", "none");
             } else {
-                var errorHeader = "<th>Error</th>";
-                if(this.isMe) { errorHeader = "<th>Error Log</th>"; }
-                this.$tableHeader.html("<th>Time</th><th>Opponents</th><th>Result</th>"+ errorHeader +"<th>Dimensions</th><th>View</th>");
+                this.$tableHeader.html("<th>Time</th><th>Opponents</th><th>Result</th><th>Dimensions</th><th>View</th>");
                 this.$tableBody.empty();
                 for(var a = 0; a < this.games.length; a++) {
                     this.$tableBody.append(this.getTableRow(this.games[a]));
@@ -206,15 +204,15 @@ $(function() {
                     break;
                 }
             }
-            var errorMsg = "&mdash;";
+            var errorMsg = "";
             if(me.errorLogName != undefined && me.errorLogName != null) {
                 if(this.isMe) {
-                    errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file'></span></a>";
+                    errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file' title='Click to view error log'></span></a>";
                 } else {
-                    errorMsg = "<span class='glyphicon glyphicon-exclamation-sign'></span>";
+                    errorMsg = "<span class='glyphicon glyphicon-exclamation-sign' title='Ended game with an error'></span>";
                 }
             }
-            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+"</td><td>"+errorMsg+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
+            var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+" "+errorMsg+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             return $row;
         },
         loadMore: function() {
