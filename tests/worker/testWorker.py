@@ -86,7 +86,7 @@ class GameTests(unittest.TestCase):
         ERROR_LOGS = [str(user['errorLogName']) for user in USERS if user["didTimeout"] == True]
 
         lines = ["%d %d" % MAP_SIZE]
-        lines += ["%s %d" % (REPLAY_FILE, SEED)]
+        lines += ["./%s %d" % (REPLAY_FILE, SEED)]
         for user in USERS:
             lines += ["%d %d %f %f %f %f %f" % (user['playerTag'], user['rank'], user['territoryAverage'], user['strengthAverage'], user['productionAverage'], user['stillPercentage'], user['turnTimeAverage'])]
         lines += [str(user['playerTag']) for user in USERS if user["didTimeout"] == True]
