@@ -210,10 +210,16 @@ $(function() {
             }
             var errorMsg = "";
             if(me.errorLogName != undefined && me.errorLogName != null) {
+                var tooltip = "Ended game with an error";
+                if(numErrors > 1) {
+                    tooltip = "This bot and "+(numErrors - 1)+" other";
+                    if(numErrors > 2) { tooltip += "s"; }
+                    tooltip += " errored out";
+                }
                 if(this.isMe) {
-                    errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file' title='Click to view error log'></span></a>";
+                    errorMsg = "<a target='_blank' href='"+url+"errorLog?errorLogName="+me.errorLogName+"'><span class='glyphicon glyphicon-save-file' title='"+tooltip+"'></span></a>";
                 } else {
-                    errorMsg = "<span class='glyphicon glyphicon-exclamation-sign' title='Ended game with an error'></span>";
+                    errorMsg = "<span class='glyphicon glyphicon-exclamation-sign' title='"+tooltip+"'></span>";
                 }
             } else if(numErrors == 1) {
                 errorMsg = "<span class='glyphicon glyphicon-asterisk' title='One opponent errored out.'></span>";
