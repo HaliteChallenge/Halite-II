@@ -198,10 +198,14 @@ $(function() {
             var gameDate = new Date(Date.UTC(dateComponents[0], dateComponents[1]-1, dateComponents[2], dateComponents[3], dateComponents[4], dateComponents[5]));
 
             var me = null;
+            var numErrors = 0;
             for(var a = 0; a < game.users.length; a++) {
-                if(game.users[a].userID == this.userID) {
-                    me = game.users[a];
-                    break;
+                var u = game.users[a];
+                if(u.userID == this.userID) {
+                    me = u;
+                }
+                if(u.errorLogName != undefined && u.errorLogName != null){
+                    numErrors += 1;
                 }
             }
             var errorMsg = "";
@@ -211,6 +215,10 @@ $(function() {
                 } else {
                     errorMsg = "<span class='glyphicon glyphicon-exclamation-sign' title='Ended game with an error'></span>";
                 }
+            } else if(numErrors == 1) {
+                errorMsg = "<span class='glyphicon glyphicon-asterisk' title='One opponent errored out.'></span>";
+            } else if(numErrors > 1) {
+                errorMsg = "<span class='glyphicon glyphicon-asterisk' title='"+numErrors+" opponents errored out.'></span>";
             }
             var $row = $("<tr><td>"+gameDate.toLocaleTimeString()+"</td><td>"+playersList+"</td><td>"+result+" "+errorMsg+"</td><td>"+game.mapWidth+"x"+game.mapHeight+"</td><td><a href='game.php?replay="+game.replayName+"'><span class='glyphicon glyphicon-film'></span></a></td></tr>");
             return $row;
