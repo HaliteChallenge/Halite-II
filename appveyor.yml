@@ -12,8 +12,8 @@ branches:
   only:
     - master
 
-before_build:
-  - dir \s
+#before_build:
+#  - dir \s
 
 # scripts that run after cloning repository
 build_script:
