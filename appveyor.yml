@@ -12,5 +12,4 @@ branches:
 # scripts that run after cloning repository
 build_script:
  - cd C:\Halite\environment
- - dir
- - environment\make.bat
+ - .\make.bat
