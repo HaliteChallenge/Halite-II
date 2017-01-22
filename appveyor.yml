@@ -19,3 +19,7 @@ branches:
 build_script:
   - cd C:\Halite\environment
   - .\make.bat
+
+artifacts:
+  - path: C:\Halite\environment\halite.exe
+    name: halite.exe
