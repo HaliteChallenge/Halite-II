@@ -1,0 +1,19 @@
+# Specify version format
+version: "{build}"
+
+# build configuration, i.e. Debug, Release, etc.
+configuration:
+  - Release
+
+# clone directory
+clone_folder: C:\Halite
+
+# branches to build
+branches:
+ only:
+  - master
+
+# scripts that run after cloning repository
+build:
+  - cmd: cd C:\Halite\environment
+  - cmd: environment\make.bat
