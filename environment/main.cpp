@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
     std::vector<std::string> * names = NULL;
     unsigned int id = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
-    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.0.1");
+    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.2");
 
     //Switch Args.
     TCLAP::SwitchArg quietSwitch("q", "quiet", "Runs game in quiet mode, producing machine-parsable output.", cmd, false);
