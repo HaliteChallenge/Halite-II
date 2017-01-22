@@ -10,6 +10,6 @@ branches:
   - master
 
 # scripts that run after cloning repository
-build:
- - cmd: cd C:\Halite\environment
- - cmd: environment\make.bat
+build_script:
+ - cd C:\Halite\environment
+ - environment\make.bat
