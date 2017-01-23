@@ -1,0 +1,28 @@
+# Specify version format
+version: "{build}"
+
+only_commits:
+  message: /build/
+
+# Build worker image (VM template)
+image: Windows Server 2012 R2
+
+# clone directory
+clone_folder: C:\Halite
+
+# branches to build
+branches:
+  only:
+    - master
+
+#before_build:
+#  - dir \s
+
+# scripts that run after cloning repository
+build_script:
+  - cd C:\Halite\environment
+  - .\make.bat
+
+artifacts:
+  - path: environment\halite.exe
+    name: halite.exe

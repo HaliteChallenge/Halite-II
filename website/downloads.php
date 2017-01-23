@@ -49,7 +49,7 @@
                 <p>You should see a file titled "halite" in your current directory. This is the game environment. Put it in the root directory of your starter package.</p>
 
                 <h3>Windows</h3>
-                <p>Download <a href="downloads/environment/halite.exe">halite.exe</a>. Put it in the root directory of your starter package.</p>
+                <p>Download the halite.exe executable from <a href="https://ci.appveyor.com/project/Sydriax/halite/build/artifacts">here</a>. Put it in the root directory of your starter package.</p>
 
                 <h3>Building from Source</h3>
                 <p>Extract <a href="downloads/environment/HaliteEnvironment-Source.zip">this archive</a>.</p>
