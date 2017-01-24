@@ -107,3 +107,5 @@ University of Edinburgh - sms.ed.ac.uk
 University of Bordeaux - u-bordeaux.fr
 University of Bordeaux - etu.u-bordeaux.fr
 Wargaming.net - wargaming.net
+Grand Valley State University - mail.gvsu.edu
+Grand Valley State University - gvsu.edu
