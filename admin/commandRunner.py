@@ -7,7 +7,7 @@ import os.path
 
 def runOnWorker(worker, keyPath, command):
     print("########"+worker['ipAddress']+"########")
-    os.system("ssh -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
+    os.system("ssh -oStrictHostKeyChecking=no -i \""+keyPath+"\" ubuntu@"+worker['ipAddress']+" '"+command+"'")
     print("########"+worker['ipAddress']+"########")
 
 parser = configparser.ConfigParser()
