@@ -305,3 +305,12 @@ function getGames(previousID) {
         data: {previousID: previousID}
     }).responseJSON;
 }
+
+function getScoreMedians() {
+    return $.ajax({
+        url: url+"stats",
+        async: false,
+        method: "GET",
+        data: {scoreMedians: 1}
+    }).responseJSON;
+}

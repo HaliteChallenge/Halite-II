@@ -43,10 +43,14 @@ $(function() {
     var throughput = getThroughput();
     var users = getNumActiveUsers();
     var averageUsersPerGame = 4;
+    var medians = getScoreMedians();
+    medians["mu"] = Math.round(100*medians["mu"])/100;
+    medians["sigma"] = Math.round(100*medians["sigma"])/100;
     statTable.init([
         {name: "Throughput", value: throughput},
         {name: "Estimated time/game/user (Avg users/game = 4)", value: ((24*60*users)/(throughput*averageUsersPerGame)).toFixed(2) + " min"},
         {name: "Active Users", value: getNumActiveUsers()},
-        {name: "Total Submissions", value: getNumSubmissions()}
+        {name: "Total Submissions", value: getNumSubmissions()},
+        {name: "Median mu (sigma)", value: medians["mu"]+" ("+medians["sigma"]+")"}
     ]);
 })
