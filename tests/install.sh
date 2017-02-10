@@ -24,9 +24,9 @@ apt-get update -y
 apt-get install -y sbt
 
 # Php unit
-wget https://phar.phpunit.de/phpunit.phar
-chmod +x phpunit.phar
-mv phpunit.phar /usr/local/bin/phpunit
+wget https://phar.phpunit.de/phpunit-5.7.phar
+chmod +x phpunit-5.7.phar
+mv phpunit-5.7.phar /usr/local/bin/phpunit
 
 
 php -v
