@@ -4,6 +4,7 @@ Cornell - cornell.edu
 NYU - nyu.edu
 Stanford - stanford.edu
 Harvard - harvard.edu
+Harvard - college.harvard.edu
 Harvard - g.harvard.edu
 Harvard - fas.harvard.edu
 Princeton - princeton.edu
