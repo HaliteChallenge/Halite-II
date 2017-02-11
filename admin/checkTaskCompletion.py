@@ -52,7 +52,11 @@ def main():
             else:
                 print()
         time.sleep(5)
-    print("All tasks completed.")
+    db.begin()
+    with db.cursor() as cursor:
+        cursor.execute("SELECT MAX(gameID) FROM Game")
+        max_game = cursor.fetchone()["MAX(gameID)"]
+    print("All tasks completed, last gameID %d." % (max_game,))
 
 if __name__ == "__main__":
     main()
