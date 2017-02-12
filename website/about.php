@@ -28,7 +28,7 @@
 
                 <p>To help productize and orchestrate the public launch, Two Sigma reached out to <a href="http://tech.cornell.edu/">Cornell Tech</a>, a leader in graduate tech education. With a shared interest in encouraging programming, entrepreneurship, and growth of the thriving New York tech scene, the two partners initiated the public Halite competition in November 2016. Cornell Tech is providing ongoing game support and community management, and by working closely with the online gaming community, it will empower players to collaborate, learn and have fun.</p>
 
-                <p>Many have contributed to Halite beyond Ben’s and Michael’s invention and engineering; they include Eric Abrego, Matt Adereth, Trammel Hudson, Emily Malloy, Arnaud Sahuguet, and Scott Spinner. And, no doubt, much credit should also be provided to users who are sending questions and comments to the <a href="http://forums.halite.io">forums</a>.</p>
+                <p>Many have contributed to Halite beyond Ben’s and Michael’s invention and engineering; they include Jaques Clapauch, Eric Abrego, Matt Adereth, Trammel Hudson, Emily Malloy, Arnaud Sahuguet, and Scott Spinner. And, no doubt, much credit should also be provided to users who are sending questions and comments to the <a href="http://forums.halite.io">forums</a>.</p>
 
                 <p>May the best bot win!</p>
 
