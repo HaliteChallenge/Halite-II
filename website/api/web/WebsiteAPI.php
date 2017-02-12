@@ -340,7 +340,7 @@ class WebsiteAPI extends API{
         if($this->isLoggedIn() && isset($_FILES['botFile']['name'])) {
             $user = $this->getLoggedInUser();
 
-            if(isset($this->config["compStatus"]["closeSubmissions"]) && $this->config["compStatus"]["closeSubmissions"]) {
+            if(isset($this->config["compState"]["closeSubmissions"]) && $this->config["compState"]["closeSubmissions"]) {
                 return "Sorry, bot submissions are closed.";
             }
             
