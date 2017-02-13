@@ -448,6 +448,23 @@ class WebsiteAPI extends API{
         else if(isset($_GET['numActive'])) {
             return mysqli_query($this->mysqli, "SELECT userID FROM User WHERE isRunning=1")->num_rows;
         } 
+
+        // Get the median mu and sigma of active users
+        else if(isset($_GET['scoreMedians'])) {
+            $medians = array();
+            $medians["mu"] = $this->select("SELECT AVG(tbl.mu) as medianMu FROM (
+                SELECT @rownum:=@rownum+1 as row, mu FROM User, (SELECT @rownum:=0) rn
+                    WHERE isRunning=1 ORDER BY mu
+                ) as tbl
+                WHERE tbl.row in (floor((@rownum+1)/2), floor((@rownum+2)/2))")["medianMu"];
+
+            $medians["sigma"] = $this->select("SELECT AVG(tbl.sigma) as medianSigma FROM (
+                SELECT @rownum:=@rownum+1 as row, sigma FROM User, (SELECT @rownum:=0) rn
+                    WHERE isRunning=1 ORDER BY sigma
+                ) as tbl
+                WHERE tbl.row in (floor((@rownum+1)/2), floor((@rownum+2)/2))")["medianSigma"];
+            return $medians;
+        }
     }
 
     /* Announcement Endpoint
