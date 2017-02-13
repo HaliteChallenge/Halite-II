@@ -1,7 +1,7 @@
 <?php
 session_start();
+$config = parse_ini_file("../halite.ini", true);
 if(isset($_SESSION['userID'])) {
-    $config = parse_ini_file("../halite.ini", true);
     $mysqli = new mysqli($config['database']['hostname'],
         $config['database']['username'],
         $config['database']['password'],
@@ -39,7 +39,9 @@ if(isset($_SESSION['userID'])) {
             <form id="submitForm">
                 <ul class="nav navbar-nav navbar-right loggedIn" id="logoutNav">
                     <?php include 'includes/dropdowns.php'; ?>
+                    <?php if(!isset($config["compState"]["closeSubmissions"]) || !$config["compState"]["closeSubmissions"]): ?>
                     <li><a href="#" id="submitButton">Submit</a><input type="file" id="myFile" name="botFile"></li>
+                    <?php endif; ?>
                     <li><a href="#" id="logoutButton">Logout</a></li>
                     <li><a href="associate.php">Associate</a></li>
                 </ul>

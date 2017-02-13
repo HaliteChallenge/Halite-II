@@ -65,6 +65,13 @@ class ManagerAPI extends API{
         return floatval($lines[0]);
     }
 
+    private function checkConfig($section, $key) {
+        if(!isset($this->config[$section]) || !isset($this->config[$section][$key])) {
+            return false;
+        }
+        return $this->config[$section][$key];
+    }
+
 
     /////////////////////////API ENDPOINTS\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
@@ -81,20 +88,29 @@ class ManagerAPI extends API{
                 );
             }
 
+            // don't give out any task if games have been stopped.
+            if($this->checkConfig("compState", "noGameTasks")) {
+                return array("type" => "notask");
+            }
+
             // Assign a run game tasks
             $possibleNumPlayers = array(2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6);
             $numPlayers = $possibleNumPlayers[array_rand($possibleNumPlayers)];
 
             $seedPlayer = null;
-            $randValue = mt_rand() / mt_getrandmax();
-            if($randValue > 0.5) {
-                $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and numGames < 400 order by rand()*-pow(sigma, 2) LIMIT 1");
-            }
-            if ($randValue > 0.25 && $randValue <= 0.5) {
-                $seedPlayer = $this->select("SELECT * FROM (SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 400 and isRunning = 1 order by maxTime ASC limit 15) orderedTable order by rand() limit 1;");
-            } 
-            if($randValue <= 0.25 || count($seedPlayer) < 1) {
-                $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where isRunning = 1 order by maxTime ASC limit 1");
+            if(!$this->checkConfig("compState", "finalsPairing")) {
+                $randValue = mt_rand() / mt_getrandmax();
+                if($randValue > 0.5) {
+                    $seedPlayer = $this->select("SELECT * FROM User WHERE isRunning = 1 and numGames < 400 order by rand()*-pow(sigma, 2) LIMIT 1");
+                }
+                if ($randValue > 0.25 && $randValue <= 0.5) {
+                    $seedPlayer = $this->select("SELECT * FROM (SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where numGames < 400 and isRunning = 1 order by maxTime ASC limit 15) orderedTable order by rand() limit 1;");
+                }
+                if($randValue <= 0.25 || count($seedPlayer) < 1) {
+                    $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where isRunning = 1 order by maxTime ASC limit 1");
+                }
+            } else {
+                $seedPlayer = $this->select("SELECT * FROM (SELECT * FROM User WHERE isRunning = 1 ORDER BY numGames ASC limit 15) orderedTable ORDER BY rand() LIMIT 1");
             }
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));

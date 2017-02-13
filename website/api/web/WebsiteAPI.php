@@ -339,6 +339,10 @@ class WebsiteAPI extends API{
         // Mark a new botfile for compilation if valid. Return error otherwise 
         if($this->isLoggedIn() && isset($_FILES['botFile']['name'])) {
             $user = $this->getLoggedInUser();
+
+            if(isset($this->config["compState"]["closeSubmissions"]) && $this->config["compState"]["closeSubmissions"]) {
+                return "Sorry, bot submissions are closed.";
+            }
             
             if($user['compileStatus'] != 0) {
                 return "Compiling";
