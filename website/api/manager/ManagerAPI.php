@@ -189,7 +189,7 @@ class ManagerAPI extends API{
             }
 
             // Check that we arent stoing too many games in db
-            $numAllowed = 500000;
+            $numAllowed = 600000;
             $numRows = $this->numRows("SELECT COUNT(*) FROM Game");
             $numToDelete = $numRows - $numAllowed;
             if($numToDelete > 0) {
