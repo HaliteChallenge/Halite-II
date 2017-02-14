@@ -322,7 +322,7 @@ void Networking::startAndConnectBot(std::string command) {
 
 int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m, bool ignoreTimeout, std::string * playerName) {
 
-    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 30000;
+    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 40000;
 
     std::string response;
     try {
@@ -365,7 +365,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
 
 int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves) {
 
-    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
+    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 2500;
 
     std::string response;
     try {
