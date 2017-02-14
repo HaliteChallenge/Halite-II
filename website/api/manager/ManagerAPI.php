@@ -110,7 +110,7 @@ class ManagerAPI extends API{
                     $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where isRunning = 1 order by maxTime ASC limit 1");
                 }
             } else {
-                $seedPlayer = $this->select("SELECT * FROM (SELECT * FROM User WHERE isRunning = 1 ORDER BY numGames ASC limit 15) orderedTable ORDER BY rand() LIMIT 1");
+                $seedPlayer = $this->select("SELECT * FROM (SELECT * FROM User WHERE rank < 1000 and isRunning = 1 ORDER BY numGames ASC limit 15) orderedTable ORDER BY rand() LIMIT 1");
             }
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));
@@ -167,6 +167,7 @@ class ManagerAPI extends API{
         // Each user in users must have a rank, playerIndex, mu, sigma, and userID
         if(isset($_POST['users']) && count($_FILES) > 0) {
             $this->insert("UPDATE Worker SET numGames=numGames+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
+            $workerID = $this->select("SELECT workerID FROM Worker WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey))["workerID"];
 
             $mapWidth = $_POST['mapWidth'];
             $mapHeight = $_POST['mapHeight'];
@@ -217,7 +218,7 @@ class ManagerAPI extends API{
             }
 
             // Store game information in db
-            $this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp) VALUES ('".$this->mysqli->real_escape_string($replayName)."', ".$this->mysqli->real_escape_string($mapWidth).", ".$this->mysqli->real_escape_string($mapHeight).", NOW())");
+            $this->insert("INSERT INTO Game (replayName, mapWidth, mapHeight, timestamp, workerID) VALUES ('".$this->mysqli->real_escape_string($replayName)."', ".$this->mysqli->real_escape_string($mapWidth).", ".$this->mysqli->real_escape_string($mapHeight).", NOW(), $workerID)");
             $gameID = $this->mysqli->insert_id;
 
             // Update each participant's stats
