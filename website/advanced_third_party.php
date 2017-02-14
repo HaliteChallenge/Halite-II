@@ -42,6 +42,7 @@
                    <li><a href="http://forums.halite.io/t/visualizer-with-more-graphs-aka-experimental-visualizer/771">Visualizer: web visualizer with aws s3 hosting, extra stats, and easy linking</a> <span class="glyphicon glyphicon-star" aria-hidden="true"></span></li> 
                    <li><a href="http://forums.halite.io/t/a-stand-alone-game-viewer/615">Visualizer: local 3D visualizer</a></li> 
                    <li><a href="http://forums.halite.io/t/auto-visualization-of-test-runs/422">Visualizer: local auto-reloading visualizer</a></li> 
+                   <li><a href="https://github.com/erdman/halint">Halint: load in replays and analyse gameplay for obvious mistakes</a></li> 
                 </ul>
 
                 <h3>Mini Competitions</h3>
