@@ -110,7 +110,7 @@ class ManagerAPI extends API{
                     $seedPlayer = $this->select("SELECT u.* FROM (SELECT MAX(g.timestamp) as maxTime, gu.userID as userID FROM GameUser gu INNER JOIN Game g ON g.gameID=gu.gameID GROUP BY gu.userID) temptable INNER JOIN User u on u.userID = temptable.userID where isRunning = 1 order by maxTime ASC limit 1");
                 }
             } else {
-                $seedPlayer = $this->select("SELECT * FROM (SELECT * FROM User WHERE rank < 500 and isRunning = 1 ORDER BY numGames ASC limit 15) orderedTable ORDER BY rand() LIMIT 1");
+                $seedPlayer = $this->select("SELECT * FROM (SELECT * FROM User WHERE rank < 398 and isRunning = 1 ORDER BY numGames ASC limit 15) orderedTable ORDER BY rand() LIMIT 1");
             }
 
             $muRankLimit = intval(5.0 / pow((float)mt_rand(1, mt_getrandmax())/(float)mt_getrandmax(), 0.65));
