@@ -46,12 +46,12 @@ if(isset($_SESSION['userID'])) {
                 <div class="col-sm-12">
                     <img src="assets/hero.png" style="margin-bottom: 21px; width: 100%">
                     <div id="intro_blurb">
+                        <h1>The official Halite Competition is over!</h1>
+                        <p>Halite's final rankings closed on February 16, 2017. Thank you to our 1500+ competitors!</p>
+                        <p>Congratulations to mzotkiew, Halite's winner. Congrats also to the rest of the top 10: shummie, erdman, timfoden, curbin, PeppiKokki, DexGroves, nmalaguti, moonbirth, and ewirkerman. You can see some of their post-mortems and bot source code <a href="http://forums.halite.io/t/published-bot-source-code/987/11">here</a>.</p>
+                        <p>Two Sigma plans to release another programming competition in the future. Stay tuned!</p>
                         <h1>Halite is an artificial intelligence programming challenge.</h1>
-                        <p><i>New submissions closed at 11:59PM EST, Sunday, 12-Feb-17</i></p>
-                        <p><i>Final rankings tentatively available before 9:00PM EST, Thursday, 16-Feb-17</i></p>
-                        <p><i>Stay tuned for more on the future of Halite!</i></p>
                         <p>Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot's combat ability, and braving a branching factor billions of times higher than that of Go.</p>
-                        <p><span id="numUsers"></span> coders are already playing! The simplest Halite bot is just 10 lines of code, and it takes less than a minute to get on the leaderboard. <a href="basics_quickstart.php">Interested?</a></p>
                         <div id="gameReplay" class="text-center"></div>
                     </div>
 
