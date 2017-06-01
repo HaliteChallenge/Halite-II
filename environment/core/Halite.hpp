@@ -56,12 +56,10 @@ private:
     //Game state
     unsigned short turn_number;
     unsigned short number_of_players;
-    unsigned short productive_squares_remaining;
-    unsigned short n_players_for_map_creation;
     bool ignore_timeout;
     hlt::Map game_map;
     std::vector<std::string> player_names;
-    std::vector< std::map<hlt::Location, unsigned char> > player_moves;
+    std::vector<std::vector<hlt::Move>> player_moves;
 
     //Statistics
     std::vector<unsigned short> alive_frame_count;
@@ -77,11 +75,11 @@ private:
 
     //Full game
     std::vector<hlt::Map> full_frames; //All the maps!
-    std::vector< std::vector< std::vector<int> > > full_player_moves; //Each inner 2d array represents the moves across the map for the corresponding frame
-                                                                      //and is guaranteed to have an outer size of map_height and an inner size of map_width
+    std::vector< std::vector<std::vector<hlt::Move>> > full_player_moves;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
     void output(std::string filename);
+    void killPlayer(hlt::PlayerId player);
 public:
     Halite(unsigned short width_, unsigned short height_, unsigned int seed_, unsigned short n_players_for_map_creation, Networking networking_, bool shouldIgnoreTimeout);
 

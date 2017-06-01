@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <core/hlt.hpp>
 
 std::mutex coutMutex;
 
@@ -18,45 +19,24 @@ std::string serializeMapSize(const hlt::Map & map) {
     return returnString;
 }
 
-std::string serializeProductions(const hlt::Map & map) {
-    std::string returnString = "";
-    std::ostringstream oss;
-    for(auto a = map.contents.begin(); a != map.contents.end(); a++) {
-        for(auto b = a->begin(); b != a->end(); b++) {
-            oss << (unsigned short)(b->production) << ' ';
-        }
-    }
-    returnString = oss.str();
-    return returnString;
-}
-
 std::string Networking::serializeMap(const hlt::Map & map) {
     std::string returnString = "";
     std::ostringstream oss;
 
-    //Run-length encode of owners
-    unsigned short currentOwner = map.contents[0][0].owner;
-    unsigned short counter = 0;
-    for(int a = 0; a < map.contents.size(); ++a) {
-        for(int b = 0; b < map.contents[a].size(); ++b) {
-            if(map.contents[a][b].owner == currentOwner) {
-                counter++;
-            }
-            else {
-                oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
-                counter = 1;
-                currentOwner = map.contents[a][b].owner;
-            }
+    // Encode individual ships
+    oss << "ships;";  // Later we will have other entity types
+    for (hlt::PlayerId playerId = 0; playerId < numberOfPlayers(); playerId++) {
+        oss << playerId << ';';
+        for (const auto& ship : map.ships.at(playerId)) {
+            oss << ship.location.x;
+            oss << ' ' << ship.location.y;
+            oss << ' ' << ship.health;
+            oss << ' ' << ship.speed;
+            oss << ' ' << ship.thrusters.middle;
+            oss << ' ' << ship.thrusters.sides;
+            oss << ':';
         }
-    }
-    //Place the last run into the string
-    oss << (unsigned short)counter << ' ' << (unsigned short)currentOwner << ' ';
-
-    //Encoding of ages
-    for(int a = 0; a < map.contents.size(); ++a) {
-        for(int b = 0; b < map.contents[a].size(); ++b) {
-            oss << (unsigned short)map.contents[a][b].strength << ' ';
-        }
+        oss << ';';
     }
 
     returnString = oss.str();
@@ -64,10 +44,10 @@ std::string Networking::serializeMap(const hlt::Map & map) {
     return returnString;
 }
 
-std::map<hlt::Location, unsigned char> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
-    std::map<hlt::Location, unsigned char> moves = std::map<hlt::Location, unsigned char>();
+std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
+    std::vector<hlt::Move> moves = std::vector<hlt::Move>();
 
-    if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return (c < '0' || c > '9') && c != ' '; }) != inputString.end()) {
+    if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return (c < '0' || c > '9') && (c < 'a' || c > 'z') && c != ' ' && c != '-'; }) != inputString.end()) {
         if(!quiet_output) {
             std::string errorMessage = "Bot sent an invalid character - ejecting from game.\n";
 
@@ -78,9 +58,28 @@ std::map<hlt::Location, unsigned char> Networking::deserializeMoveSet(std::strin
     }
 
     std::stringstream iss(inputString);
-    hlt::Location l;
-    int d;
-    while (iss >> l.x >> l.y >> d && m.inBounds(l)) moves[l] = d;
+
+    hlt::Move move;
+
+    char command;
+    while (iss >> command) {
+        switch (command) {
+            case 'r':
+                move.type = hlt::MoveType::Rotate;
+                iss >> move.shipId;
+                iss >> move.move.rotate.thrust;
+                break;
+            case 't':
+                move.type = hlt::MoveType::Thrust;
+                iss >> move.shipId;
+                iss >> move.move.thrust.thrust;
+                break;
+            default:
+                continue;
+        }
+        moves.push_back(move);
+        move = { };
+    }
 
     return moves;
 }
@@ -326,10 +325,9 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
 
     std::string response;
     try {
-        std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m), prodString = serializeProductions(m);
+        std::string playerTagString = std::to_string(playerTag), mapSizeString = serializeMapSize(m), mapString = serializeMap(m);
         sendString(playerTag, playerTagString);
         sendString(playerTag, mapSizeString);
-        sendString(playerTag, prodString);
         sendString(playerTag, mapString);
         std::string outMessage = "Init Message sent to player " + std::to_string(int(playerTag)) + ".\n";
         if(!quiet_output) std::cout << outMessage;
@@ -363,7 +361,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
     return -1;
 }
 
-int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves) {
+int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::vector<hlt::Move> * moves) {
 
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
 
@@ -392,12 +390,12 @@ int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned sh
     catch(std::string s) {
         if(s.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
         else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + s;
-        *moves = std::map<hlt::Location, unsigned char>();
+        *moves = std::vector<hlt::Move>();
     }
     catch(...) {
         if(response.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
         else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + response;
-        *moves = std::map<hlt::Location, unsigned char>();
+        *moves = std::vector<hlt::Move>();
     }
     return -1;
 }

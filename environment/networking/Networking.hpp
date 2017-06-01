@@ -30,7 +30,7 @@ class Networking {
 public:
     void startAndConnectBot(std::string command);
     int handleInitNetworking(unsigned char playerTag, const hlt::Map & m, bool ignoreTimeout, std::string * playerName);
-    int handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::map<hlt::Location, unsigned char> * moves);
+    int handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::vector<hlt::Move> * moves);
     void killPlayer(unsigned char playerTag);
     bool isProcessDead(unsigned char playerTag);
     int numberOfPlayers();
@@ -53,7 +53,7 @@ private:
 #endif
 
     std::string serializeMap(const hlt::Map & map);
-    std::map<hlt::Location, unsigned char> deserializeMoveSet(std::string & inputString, const hlt::Map & m);
+    std::vector<hlt::Move> deserializeMoveSet(std::string & inputString, const hlt::Map & m);
 
     void sendString(unsigned char playerTag, std::string &sendString);
     std::string getString(unsigned char playerTag, unsigned int timoutMillis);
