@@ -127,19 +127,16 @@ namespace hlt {
             return atan2(dy, dx);
         }
 
-        void damageShips(Ship &ship1, Ship &ship2) {
+        //! Damage the given ship, killing it and returning true if the ship health falls below 0
+        auto damageShip(Ship &ship, unsigned short damage) -> bool {
             // TODO: actual damage calculations
-            if (ship1.health < 50) {
-                killShip(ship1);
+            if (ship.health <= damage) {
+                killShip(ship);
+                return true;
             }
             else {
-                ship1.health -= 50;
-            }
-            if (ship2.health < 50) {
-                killShip(ship2);
-            }
-            else {
-                ship2.health -= 50;
+                ship.health -= damage;
+                return false;
             }
         }
     };

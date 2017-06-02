@@ -94,6 +94,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                 auto move = player_moves[player_id][move_no][ship_id];
 
+                assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
+                collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
+
                 switch (move.type) {
                     case hlt::MoveType::Rotate: {
                         // Update orientation based on thrust
@@ -112,8 +115,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                         movement_deltas.at(player_id).at(ship_id) = {dx, dy};
                         intermediate_positions.at(player_id).at(ship_id) = {ship.location.x, ship.location.y};
-                        assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
-                        collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
 
                         break;
                     }
@@ -137,7 +138,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     if (!ship.is_alive()) continue;
 
                     auto &pos = intermediate_positions.at(player_id).at(ship_id);
-                    const auto &delta = movement_deltas.at(player_id).at(ship_id);
+                    auto &delta = movement_deltas.at(player_id).at(ship_id);
 
                     if (delta.first == 0 && delta.second == 0) continue;
 
@@ -157,14 +158,45 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     auto yp = static_cast<unsigned short>(pos.second);
 
                     // Check collisions
-                    const auto &other = collision_map.at(xp).at(yp);
-                    if (other.first > -1 && other.second > -1) {
-                        game_map.damageShips(ship, game_map.ships.at(other.first).at(other.second));
+                    const auto& occupancy = collision_map.at(xp).at(yp);
+                    if (occupancy.first > -1 && occupancy.second > -1) {
+                        auto& other = game_map.ships.at(occupancy.first).at(occupancy.second);
+
+                        // The collision is head-on for us if the direction of
+                        // movement is parallel to the ship orientation
+                        // (10 degree fudge factor)
+                        auto self_head_on = fabsf(atan2f(delta.second, delta.first) - ship.orientation) < 10;
+
+                        // The collision is head-on for the other if the two
+                        // ship directions are antiparallel
+                        auto other_head_on = std::abs(std::abs(ship.orientation - other.orientation) - 180) < 10;
+
+                        if (self_head_on) {
+                            delta.first = delta.second = 0;
+                            game_map.damageShip(ship, 100);
+                        }
+                        else {
+                            game_map.damageShip(ship, 200);
+                        }
+
+                        if (other_head_on) {
+                            auto& other_delta = movement_deltas.at(occupancy.first).at(occupancy.second);
+                            other_delta.first = other_delta.second = 0;
+                            game_map.damageShip(other, 100);
+                        }
+                        else {
+                            game_map.damageShip(other, 200);
+                        }
+                    }
+                    else {
+                        // Move the ship
+                        ship.location.x = xp;
+                        ship.location.y = yp;
                     }
 
-                    // Move the ship
-                    ship.location.x = xp;
-                    ship.location.y = yp;
+                    if (!ship.is_alive()) continue;
+
+                    assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
                     collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
                 }
             }
