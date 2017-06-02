@@ -89,7 +89,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             if (!alive[player_id]) continue;
 
             for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
-                auto ship = game_map.getShip(player_id, ship_id);
+                auto& ship = game_map.getShip(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
                 auto move = player_moves[player_id][move_no][ship_id];
@@ -97,11 +97,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 switch (move.type) {
                     case hlt::MoveType::Rotate: {
                         // Update orientation based on thrust
-                        // Negative thrust = turn counterclockwise (positive orientation)
-                        const auto degrees = move.move.rotateBy;
-                        ship.orientation -= degrees;
-                        ship.orientation %= 360;
-                        while (ship.orientation < 0) ship.orientation += 360;
+                        const short degrees = -move.move.rotateBy;
+                        auto new_orientation = static_cast<short>((degrees + ship.orientation) % 360);
+                        while (new_orientation < 0) new_orientation += 360;
+                        ship.orientation = static_cast<unsigned short>(new_orientation);
 
                         break;
                     }
