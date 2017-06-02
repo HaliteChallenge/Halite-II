@@ -13,14 +13,6 @@ void Halite::killPlayer(hlt::PlayerId player) {
     }
 }
 
-bool would_overflow(unsigned short a, short delta, unsigned short limit) {
-    if (delta < 0) return abs(delta) > a;
-    else if (delta > 0) {
-        return delta >= limit || limit - delta >= a;
-    }
-    return false;
-}
-
 std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     //Update alive frame counts
     for(hlt::PlayerId a = 0; a < number_of_players; a++) if(alive[a]) alive_frame_count[a]++;
@@ -41,7 +33,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         }
     }
 
-    full_player_moves.push_back(std::vector<std::vector<hlt::Move>>());
+    full_player_moves.push_back(std::vector<std::vector<hlt::Move>>(number_of_players, std::vector<hlt::Move>()));
 
     //Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
     threadLocation = 0; //Represents place in frameThreads.
@@ -83,9 +75,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         }
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-            // TODO: record moves
-            full_player_moves.back().push_back(std::vector<hlt::Move>());
-
             if (!alive[player_id]) continue;
 
             for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
@@ -123,8 +112,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         break;
                 }
 
-                // TODO: record moves
-                // full_player_moves.back().back().push_back(move);
+                full_player_moves.back().at(player_id).push_back(move);
             }
         }
 
