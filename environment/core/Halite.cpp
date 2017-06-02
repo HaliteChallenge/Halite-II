@@ -149,32 +149,48 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     const auto& occupancy = collision_map.at(xp).at(yp);
                     if (occupancy.first > -1 && occupancy.second > -1) {
                         auto& other = game_map.ships.at(occupancy.first).at(occupancy.second);
+                        auto& other_delta = movement_deltas.at(occupancy.first).at(occupancy.second);
 
                         // The collision is head-on for us if the direction of
                         // movement is parallel to the ship orientation
                         // (10 degree fudge factor)
                         auto self_head_on = fabsf(atan2f(delta.second, delta.first) - ship.orientation) < 10;
+                        auto self_vel_factor =
+                            static_cast<unsigned short>(sqrtf(delta.first * delta.first + delta.second * delta.second) / 25);
+                        self_vel_factor = std::max(self_vel_factor, static_cast<unsigned short>(1));
 
                         // The collision is head-on for the other if the two
                         // ship directions are antiparallel
                         auto other_head_on = std::abs(std::abs(ship.orientation - other.orientation) - 180) < 10;
+                        auto other_vel_factor =
+                            static_cast<unsigned short>(sqrtf(other_delta.first * other_delta.first + other_delta.second * other_delta.second) / 25);
+                        other_vel_factor = std::max(other_vel_factor, static_cast<unsigned short>(1));
+
+                        unsigned short self_damage = 0;
+                        unsigned short other_damage = 0;
 
                         if (self_head_on) {
                             delta.first = delta.second = 0;
-                            game_map.damageShip(ship, 100);
+                            self_damage += 25 * self_vel_factor;
+                            other_damage += 50 * self_vel_factor;
                         }
                         else {
-                            game_map.damageShip(ship, 200);
+                            self_damage += 50 * self_vel_factor;
+                            other_damage += 25 * self_vel_factor;
                         }
 
                         if (other_head_on) {
-                            auto& other_delta = movement_deltas.at(occupancy.first).at(occupancy.second);
                             other_delta.first = other_delta.second = 0;
-                            game_map.damageShip(other, 100);
+                            self_damage += 50 * other_vel_factor;
+                            other_damage += 25 * other_vel_factor;
                         }
                         else {
-                            game_map.damageShip(other, 200);
+                            self_damage += 25 * other_vel_factor;
+                            other_damage += 50 * other_vel_factor;
                         }
+
+                        game_map.damageShip(ship, self_damage);
+                        game_map.damageShip(other, other_damage);
                     }
                     else {
                         // Move the ship
