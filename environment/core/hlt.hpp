@@ -70,37 +70,33 @@ namespace hlt {
     class Map {
     public:
         std::array<std::array<Ship, MAX_PLAYER_SHIPS>, MAX_PLAYERS> ships;
-        std::vector<std::vector<bool>> collision;
         unsigned short map_width, map_height; //Number of rows and columns, NOT maximum index.
 
         Map() {
             map_width = 0;
             map_height = 0;
             ships = { {} };
-            collision = { { } };
         }
 
         Map(const Map &otherMap) {
             map_width = otherMap.map_width;
             map_height = otherMap.map_height;
             ships = otherMap.ships;
-            collision = otherMap.collision;
         }
 
         Map(unsigned short width, unsigned short height, unsigned char numberOfPlayers, unsigned int seed) : Map() {
             map_width = width;
             map_height = height;
 
-            collision = std::vector<std::vector<bool>>(width, std::vector<bool>(height, false));
-
             //Pseudorandom number generator.
             std::mt19937 prg(seed);
             std::uniform_real_distribution<double> urd(0.0, 1.0);
 
             for (PlayerId playerId = 0; playerId < numberOfPlayers; playerId++) {
-                ships[playerId][0].health = 200;
-                ships[playerId][0].location.x = (unsigned short) playerId;
-                collision[playerId][0] = true;
+                for (int i = 0; i < 3; i++) {
+                    ships[playerId][i].health = 200;
+                    ships[playerId][i].location.x = (unsigned short) playerId;
+                }
             }
 
             std::cout << map_width << " " << map_height << std::endl;
@@ -112,7 +108,6 @@ namespace hlt {
 
         void killShip(Ship& ship) {
             ship.kill();
-            collision[ship.location.x][ship.location.y] = false;
         }
 
         float getDistance(Location l1, Location l2) const {
