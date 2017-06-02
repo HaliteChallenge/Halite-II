@@ -48,6 +48,9 @@ static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
     return o;
 }
 
+constexpr auto SUBSTEPS = 8;
+constexpr auto SUBSTEP_DT = 1.0 / SUBSTEPS;
+
 class Halite {
 private:
     //Networking
@@ -59,7 +62,7 @@ private:
     bool ignore_timeout;
     hlt::Map game_map;
     std::vector<std::string> player_names;
-    std::vector<std::vector<hlt::Move>> player_moves;
+    hlt::MoveQueue player_moves;
 
     //Statistics
     std::vector<unsigned short> alive_frame_count;

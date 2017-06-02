@@ -11,12 +11,13 @@
 
 #define MAX_PLAYERS 4
 #define MAX_PLAYER_SHIPS 40
+#define MAX_QUEUED_MOVES 3
 
 extern bool quiet_output;
 
 namespace hlt {
     typedef unsigned char PlayerId;
-    typedef unsigned int  EntityId;
+    typedef unsigned int  EntityIndex;
 
     struct Location {
         unsigned short x, y;
@@ -54,14 +55,17 @@ namespace hlt {
 
     struct Move {
         MoveType type;
-        EntityId shipId;
+        EntityIndex shipId;
 
         union {
             short rotateBy;
             short thrustBy;
-            EntityId dockTo;
+            EntityIndex dockTo;
         } move;
     };
+
+    typedef std::array<std::array<hlt::Move, MAX_PLAYER_SHIPS>, MAX_QUEUED_MOVES> PlayerMoveQueue;
+    typedef std::array<PlayerMoveQueue, MAX_PLAYERS> MoveQueue;
 
     class Map {
     public:
@@ -102,13 +106,13 @@ namespace hlt {
             std::cout << map_width << " " << map_height << std::endl;
         }
 
-        Ship& getShip(PlayerId player, EntityId entity) {
+        Ship& getShip(PlayerId player, EntityIndex entity) {
             return ships.at(player).at(entity);
         }
 
-        void killShip(Ship* ship) {
-            ship->kill();
-            collision[ship->location.x][ship->location.y] = false;
+        void killShip(Ship& ship) {
+            ship.kill();
+            collision[ship.location.x][ship.location.y] = false;
         }
 
         float getDistance(Location l1, Location l2) const {
@@ -121,6 +125,22 @@ namespace hlt {
             short dx = l2.x - l1.x;
             short dy = l2.y - l1.y;
             return atan2(dy, dx);
+        }
+
+        void damageShips(Ship &ship1, Ship &ship2) {
+            // TODO: actual damage calculations
+            if (ship1.health < 50) {
+                killShip(ship1);
+            }
+            else {
+                ship1.health -= 50;
+            }
+            if (ship2.health < 50) {
+                killShip(ship2);
+            }
+            else {
+                ship2.health -= 50;
+            }
         }
     };
 }

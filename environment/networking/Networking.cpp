@@ -45,9 +45,7 @@ auto is_valid_move_character(const char& c) -> bool {
     return (c >= '0' && c <= '9') || c == ' ' || c == '-' || c == 'r' || c == 't';
 }
 
-std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
-    std::vector<hlt::Move> moves = std::vector<hlt::Move>();
-
+void Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m, hlt::PlayerMoveQueue& moves) {
     if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return !is_valid_move_character(c); }) != inputString.end()) {
         if(!quiet_output) {
             std::string errorMessage = "Bot sent an invalid character - ejecting from game.\n";
@@ -61,6 +59,8 @@ std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString,
     std::stringstream iss(inputString);
 
     hlt::Move move;
+    // Keep track of how many queued commands each ship has
+    std::array<int, MAX_PLAYER_SHIPS> queue_depth = { 0 };
 
     char command;
     while (iss >> command) {
@@ -98,11 +98,23 @@ std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString,
             default:
                 continue;
         }
-        moves.push_back(move);
+
+        auto queue_index = queue_depth.at(move.shipId);
+        if (queue_index < MAX_QUEUED_MOVES) {
+            moves.at(queue_index).at(move.shipId) = move;
+            queue_depth.at(move.shipId)++;
+        }
+        else {
+            // TODO: refactor this into its own helper
+            std::string errorMessage = "Bot tried to queue too many moves for a particular ship - ejecting from game.\n";
+            if (!quiet_output) {
+                std::lock_guard<std::mutex> guard(coutMutex);
+                std::cout << errorMessage;
+            }
+            throw errorMessage;
+        }
         move = { };
     }
-
-    return moves;
 }
 
 void Networking::sendString(unsigned char playerTag, std::string &sendString) {
@@ -176,6 +188,8 @@ std::string Networking::getString(unsigned char playerTag, const unsigned int ti
 
     fd_set set;
     FD_ZERO(&set); /* clear the set */
+    // TODO: remove this
+    if (connection.read > FD_SETSIZE) assert(false);
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
     char buffer;
 
@@ -382,7 +396,7 @@ int Networking::handleInitNetworking(unsigned char playerTag, const hlt::Map & m
     return -1;
 }
 
-int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, std::vector<hlt::Move> * moves) {
+int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned short & turnNumber, const hlt::Map & m, bool ignoreTimeout, hlt::PlayerMoveQueue& moves) {
 
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
 
@@ -394,7 +408,7 @@ int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned sh
         std::string mapString = serializeMap(m);
         sendString(playerTag, mapString);
 
-        moves->clear();
+        // TODO: clear out array
 
         player_logs[playerTag - 1] += "\n-----------------------------------------------------------------------------\n --- Frame #" + std::to_string(turnNumber) + " ---\n";
 
@@ -404,19 +418,17 @@ int Networking::handleFrameNetworking(unsigned char playerTag, const unsigned sh
 
         player_logs[playerTag - 1] += response + "\n --- Bot used " + std::to_string(millisTaken) + " milliseconds ---";
 
-        *moves = deserializeMoveSet(response, m);
+        deserializeMoveSet(response, m, moves);
 
         return millisTaken;
     }
     catch(std::string s) {
         if(s.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
         else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + s;
-        *moves = std::vector<hlt::Move>();
     }
     catch(...) {
         if(response.empty()) player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
         else player_logs[playerTag - 1] += "\nERRORED!\nResponse received (if any):\n" + response;
-        *moves = std::vector<hlt::Move>();
     }
     return -1;
 }
@@ -506,7 +518,7 @@ bool Networking::isProcessDead(unsigned char playerTag) {
 #ifdef _WIN32
     return processes[playerTag - 1] == NULL;
 #else
-    return processes[playerTag - 1] == -1;
+    return processes.at(playerTag - 1) == -1;
 #endif
 }
 

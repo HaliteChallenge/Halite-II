@@ -1,4 +1,5 @@
 #include "Halite.hpp"
+#include "hlt.hpp"
 
 //Private Functions ------------------
 
@@ -8,7 +9,7 @@ void Halite::killPlayer(hlt::PlayerId player) {
 
     // Kill those ships
     for (auto& ship : game_map.ships.at(player)) {
-        game_map.killShip(&ship);
+        game_map.killShip(ship);
     }
 }
 
@@ -31,7 +32,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     //Get the messages sent by bots this frame
     for(hlt::PlayerId a = 0; a < number_of_players; a++) {
         if(alive[a]) {
-            frameThreads[threadLocation] = std::async(&Networking::handleFrameNetworking, &networking, a + 1, turn_number, game_map, ignore_timeout, &player_moves[a]);
+            hlt::PlayerMoveQueue& moves = player_moves.at(a);
+            frameThreads[threadLocation] = std::async(
+                [&, a]() -> int {
+                    return networking.handleFrameNetworking(a+1, turn_number, game_map, ignore_timeout, moves);
+                });
             threadLocation++;
         }
     }
@@ -51,23 +56,65 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         }
     }
 
-    // Process moves
-    for (hlt::PlayerId a = 0; a < number_of_players; a++) {
-        full_player_moves.back().push_back(std::vector<hlt::Move>());
-        if (alive[a]) {
-            // TODO: disallow multiple moves to the same ship? or provide a move queue?
-            for (const auto& move : player_moves[a]) {
-                auto ship = game_map.getShip(a, move.shipId);
+    auto collision_map =
+        std::vector<std::vector<std::pair<int, int>>>(
+            game_map.map_width,
+            std::vector<std::pair<int, int>>(game_map.map_height, { -1, -1 }));
+    auto movement_deltas =
+        std::vector<std::vector<std::pair<short, short>>>(
+            number_of_players,
+            std::vector<std::pair<short, short>>(MAX_PLAYER_SHIPS, {0, 0}));
+    auto intermediate_positions =
+        std::vector<std::vector<std::pair<float, float>>>(
+            number_of_players,
+            std::vector<std::pair<float, float>>(MAX_PLAYER_SHIPS, {0.0, 0.0}));
+
+    // Process queue of moves
+    for (unsigned int move_no = 0; move_no < MAX_QUEUED_MOVES; move_no++) {
+        // Reset auxiliary data structures
+        for (auto& row : collision_map) {
+            std::fill(row.begin(), row.end(), std::make_pair(-1, -1));
+        }
+        for (auto& row : movement_deltas) {
+            std::fill(row.begin(), row.end(), std::make_pair(0, 0));
+        }
+        for (auto& row : intermediate_positions) {
+            std::fill(row.begin(), row.end(), std::make_pair(0, 0));
+        }
+
+        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+            // TODO: record moves
+            full_player_moves.back().push_back(std::vector<hlt::Move>());
+
+            if (!alive[player_id]) continue;
+
+            for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
+                auto ship = game_map.getShip(player_id, ship_id);
                 if (!ship.is_alive()) continue;
+
+                auto move = player_moves[player_id][move_no][ship_id];
 
                 switch (move.type) {
                     case hlt::MoveType::Rotate: {
-                        const auto thrust = move.move.rotateBy;
+                        // Update orientation based on thrust
+                        // Negative thrust = turn counterclockwise (positive orientation)
+                        const auto degrees = move.move.rotateBy;
+                        ship.orientation -= degrees;
+                        ship.orientation %= 360;
+                        while (ship.orientation < 0) ship.orientation += 360;
 
                         break;
                     }
                     case hlt::MoveType::Thrust: {
-                        const auto thrust = move.move.thrustBy;
+                        // Update speed based on thrust
+                        const auto distance = move.move.thrustBy;
+                        short dx = (short) (distance * std::cos(ship.orientation * M_2_PI / 360));
+                        short dy = (short) (distance * std::sin(ship.orientation * M_2_PI / 360));
+
+                        movement_deltas.at(player_id).at(ship_id) = {dx, dy};
+                        intermediate_positions.at(player_id).at(ship_id) = {ship.location.x, ship.location.y};
+                        assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
+                        collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
 
                         break;
                     }
@@ -76,20 +123,57 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         break;
                 }
 
-                full_player_moves.back().back().push_back(move);
+                // TODO: record moves
+                // full_player_moves.back().back().push_back(move);
+            }
+        }
+
+        // Resolve collisions - update in small increments; collisions
+        // happen if two entities are within the same grid square at any instant
+        for (int i = 1; i <= SUBSTEPS; i++) {
+            for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+                auto& player_ships = game_map.ships.at(player_id);
+                for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
+                    auto& ship = player_ships.at(ship_id);
+                    if (!ship.is_alive()) continue;
+
+                    auto &pos = intermediate_positions.at(player_id).at(ship_id);
+                    const auto &delta = movement_deltas.at(player_id).at(ship_id);
+
+                    if (delta.first == 0 && delta.second == 0) continue;
+
+                    collision_map.at(ship.location.x).at(ship.location.y) = {-1, -1};
+                    pos.first += SUBSTEP_DT * delta.first;
+                    pos.second += SUBSTEP_DT * delta.second;
+
+                    // Check boundaries
+                    // TODO: be consistent and explicit about rounding vs truncation
+                    if (pos.first < 0 || pos.first >= game_map.map_width ||
+                        pos.second < 0 || pos.second >= game_map.map_height) {
+                        game_map.killShip(ship);
+                        continue;
+                    }
+
+                    auto xp = static_cast<unsigned short>(pos.first);
+                    auto yp = static_cast<unsigned short>(pos.second);
+
+                    // Check collisions
+                    const auto &other = collision_map.at(xp).at(yp);
+                    if (other.first > -1 && other.second > -1) {
+                        game_map.damageShips(ship, game_map.ships.at(other.first).at(other.second));
+                    }
+
+                    // Move the ship
+                    ship.location.x = xp;
+                    ship.location.y = yp;
+                    collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
+                }
             }
         }
     }
 
-    // Save old map for the replay
+    // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));
-
-    // Process movement and resolve collisions
-    for (auto& player_ships : game_map.ships) {
-        for (auto& ship : player_ships) {
-            // TODO Update position based on velocity
-        }
-    }
 
     // Check if the game is over
     std::vector<bool> stillAlive(number_of_players, false);
@@ -122,15 +206,12 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
     }
 
     //Default initialize
-    player_moves = std::vector< std::vector<hlt::Move> >();
+    player_moves = {{{{}}}};
     turn_number = 0;
     player_names = std::vector< std::string >(number_of_players);
 
     //Add to full game:
     full_frames.push_back(hlt::Map(game_map));
-
-    //Initialize player moves vector
-    player_moves.resize(number_of_players);
 
     //Check if timeout should be ignored.
     ignore_timeout = shouldIgnoreTimeout;
