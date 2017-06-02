@@ -48,7 +48,7 @@ static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
     return o;
 }
 
-constexpr auto SUBSTEPS = 8;
+constexpr auto SUBSTEPS = 128;
 constexpr auto SUBSTEP_DT = 1.0 / SUBSTEPS;
 
 class Halite {
