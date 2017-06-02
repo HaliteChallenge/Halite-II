@@ -44,10 +44,14 @@ std::string Networking::serializeMap(const hlt::Map & map) {
     return returnString;
 }
 
+auto is_valid_move_character(const char& c) -> bool {
+    return (c >= '0' && c <= '9') || c == ' ' || c == '-' || c == 'r' || c == 't';
+}
+
 std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m) {
     std::vector<hlt::Move> moves = std::vector<hlt::Move>();
 
-    if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return (c < '0' || c > '9') && (c < 'a' || c > 'z') && c != ' ' && c != '-'; }) != inputString.end()) {
+    if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return !is_valid_move_character(c); }) != inputString.end()) {
         if(!quiet_output) {
             std::string errorMessage = "Bot sent an invalid character - ejecting from game.\n";
 

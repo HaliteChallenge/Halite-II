@@ -3,8 +3,6 @@
 #include "limits.h"
 #include "hlt.hpp"
 
-#define F_NEWLINE '\n'
-
 //Private Functions ------------------
 
 void Halite::killPlayer(hlt::PlayerId player) {
@@ -60,6 +58,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     for (hlt::PlayerId a = 0; a < number_of_players; a++) {
         full_player_moves.back().push_back(std::vector<hlt::Move>());
         if (alive[a]) {
+            // TODO: disallow multiple moves to the same ship? or provide a move queue?
             for (const auto& move : player_moves[a]) {
                 auto ship = game_map.getShip(a, move.shipId);
                 if (!ship->is_alive()) continue;
@@ -89,7 +88,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         }
     }
 
-    // Process movement
+    // Save old map for the replay
+    full_frames.push_back(hlt::Map(game_map));
+
+    // Process movement and resolve collisions
     for (auto& player_ships : game_map.ships) {
         for (auto& ship : player_ships) {
             // Update orientation based on thrust
@@ -104,6 +106,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             // Update position based on velocity
             short dx = (short) (ship.speed * std::cos(ship.orientation * M_2_PI / 360));
             // If the ship hits a map boundary, destroy it
+            // TODO: scan through intermediate positions to determine collisions
             if (would_overflow(ship.location.x, dx, game_map.map_width)) {
                 game_map.killShip(&ship);
             }
@@ -122,11 +125,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             ship.location.y += dy;
         }
     }
-
-    // Resolve collisions
-
-    // Save current map for the replay
-    full_frames.push_back(hlt::Map(game_map));
 
     // Check if the game is over
     std::vector<bool> stillAlive(number_of_players, false);
