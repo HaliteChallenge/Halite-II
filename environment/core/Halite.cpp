@@ -1,8 +1,5 @@
 #include "Halite.hpp"
 
-#include "limits.h"
-#include "hlt.hpp"
-
 //Private Functions ------------------
 
 void Halite::killPlayer(hlt::PlayerId player) {
@@ -61,20 +58,16 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             // TODO: disallow multiple moves to the same ship? or provide a move queue?
             for (const auto& move : player_moves[a]) {
                 auto ship = game_map.getShip(a, move.shipId);
-                if (!ship->is_alive()) continue;
+                if (!ship.is_alive()) continue;
 
                 switch (move.type) {
                     case hlt::MoveType::Rotate: {
-                        const auto thrust = move.move.rotate.thrust;
-                        // TODO: validate thrust is -100 to 100
-                        ship->thrusters.sides = thrust;
+                        const auto thrust = move.move.rotateBy;
 
                         break;
                     }
                     case hlt::MoveType::Thrust: {
-                        const auto thrust = move.move.thrust.thrust;
-                        // TODO: validate thrust is -100 to 100
-                        ship->thrusters.middle = thrust;
+                        const auto thrust = move.move.thrustBy;
 
                         break;
                     }
@@ -94,35 +87,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     // Process movement and resolve collisions
     for (auto& player_ships : game_map.ships) {
         for (auto& ship : player_ships) {
-            // Update orientation based on thrust
-            // Negative thrust = turn counterclockwise (positive orientation)
-            ship.orientation -= ship.thrusters.sides;
-            ship.orientation %= 360;
-            while (ship.orientation < 0) ship.orientation += 360;
-
-            // Update speed based on thrust
-            ship.speed += ship.thrusters.middle / 10;
-
-            // Update position based on velocity
-            short dx = (short) (ship.speed * std::cos(ship.orientation * M_2_PI / 360));
-            // If the ship hits a map boundary, destroy it
-            // TODO: scan through intermediate positions to determine collisions
-            if (would_overflow(ship.location.x, dx, game_map.map_width)) {
-                game_map.killShip(&ship);
-            }
-            else {
-                ship.location.x += dx;
-            }
-
-            short dy = (short) (ship.speed * std::sin(ship.orientation * M_2_PI / 360));
-            if (would_overflow(ship.location.y, dy, game_map.map_height)) {
-                game_map.killShip(&ship);
-            }
-            else {
-                ship.location.y += dy;
-            }
-
-            ship.location.y += dy;
+            // TODO Update position based on velocity
         }
     }
 
@@ -224,11 +189,7 @@ void Halite::output(std::string filename) {
                 record["y"] = ship.location.y;
                 record["health"] = ship.health;
                 record["orientation"] = ship.orientation;
-                record["speed"] = ship.speed;
-                record["thrusters"] = nlohmann::json {
-                    { "sides", ship.thrusters.sides },
-                    { "middle", ship.thrusters.middle },
-                };
+
                 ships.push_back(record);
             }
         }
@@ -250,11 +211,11 @@ void Halite::output(std::string filename) {
                 switch (move.type) {
                     case hlt::MoveType::Rotate:
                         record["type"] = "rotate";
-                        record["thrust"] = move.move.rotate.thrust;
+                        record["thrust"] = move.move.rotateBy;
                         break;
                     case hlt::MoveType::Thrust:
                         record["type"] = "thrust";
-                        record["thrust"] = move.move.rotate.thrust;
+                        record["thrust"] = move.move.thrustBy;
                         break;
                     default:
                         // TODO:

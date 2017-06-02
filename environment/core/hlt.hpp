@@ -44,17 +44,11 @@ namespace hlt {
     struct Ship : Entity {
         //! Rotation of the ship, degrees (0-359) from due east
         unsigned short orientation;
-        short speed;
-        struct {
-            short sides;
-            short middle;
-        } thrusters;
     };
 
     enum MoveType {
         Rotate,
         Thrust,
-        MoveTo,
         Dock,
     };
 
@@ -63,10 +57,9 @@ namespace hlt {
         EntityId shipId;
 
         union {
-            struct { short thrust; } rotate;
-            struct { short thrust; } thrust;
-            struct { unsigned long x, y; short thrust; } move;
-            struct { int planetId; } dock;
+            short rotateBy;
+            short thrustBy;
+            EntityId dockTo;
         } move;
     };
 
@@ -109,8 +102,8 @@ namespace hlt {
             std::cout << map_width << " " << map_height << std::endl;
         }
 
-        Ship* getShip(PlayerId player, EntityId entity) {
-            return &ships.at(player).at(entity);
+        Ship& getShip(PlayerId player, EntityId entity) {
+            return ships.at(player).at(entity);
         }
 
         void killShip(Ship* ship) {

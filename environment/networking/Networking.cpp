@@ -31,9 +31,6 @@ std::string Networking::serializeMap(const hlt::Map & map) {
             oss << ship.location.x;
             oss << ' ' << ship.location.y;
             oss << ' ' << ship.health;
-            oss << ' ' << ship.speed;
-            oss << ' ' << ship.thrusters.middle;
-            oss << ' ' << ship.thrusters.sides;
             oss << ':';
         }
         oss << ';';
@@ -68,16 +65,36 @@ std::vector<hlt::Move> Networking::deserializeMoveSet(std::string & inputString,
     char command;
     while (iss >> command) {
         switch (command) {
-            case 'r':
+            case 'r': {
                 move.type = hlt::MoveType::Rotate;
                 iss >> move.shipId;
-                iss >> move.move.rotate.thrust;
+                iss >> move.move.rotateBy;
+                const auto thrust = move.move.rotateBy;
+                if (thrust < -100 || thrust > 100) {
+                    std::string errorMessage = "Bot sent an invalid rotation thrust - ejecting from game.\n";
+                    if (!quiet_output) {
+                        std::lock_guard<std::mutex> guard(coutMutex);
+                        std::cout << errorMessage;
+                    }
+                    throw errorMessage;
+                }
                 break;
-            case 't':
+            }
+            case 't': {
                 move.type = hlt::MoveType::Thrust;
                 iss >> move.shipId;
-                iss >> move.move.thrust.thrust;
+                iss >> move.move.thrustBy;
+                const auto thrust = move.move.thrustBy;
+                if (thrust < -100 || thrust > 100) {
+                    std::string errorMessage = "Bot sent an invalid rotation thrust - ejecting from game.\n";
+                    if (!quiet_output) {
+                        std::lock_guard<std::mutex> guard(coutMutex);
+                        std::cout << errorMessage;
+                    }
+                    throw errorMessage;
+                }
                 break;
+            }
             default:
                 continue;
         }
