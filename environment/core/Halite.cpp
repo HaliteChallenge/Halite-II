@@ -9,7 +9,7 @@ void Halite::killPlayer(hlt::PlayerId player) {
 
     // Kill those ships
     for (auto& ship : game_map.ships.at(player)) {
-        game_map.killShip(ship);
+        ship.kill();
     }
 }
 
@@ -72,6 +72,12 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         }
         for (auto& row : intermediate_positions) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
+        }
+
+        for (hlt::EntityIndex entity_index = 0; entity_index < game_map.planets.size(); entity_index++) {
+            const auto& planet = game_map.planets[entity_index];
+            if (!planet.is_alive()) continue;
+            collision_map[planet.location.x][planet.location.y] = hlt::EntityId::for_planet(entity_index);
         }
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
@@ -138,7 +144,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // TODO: be consistent and explicit about rounding vs truncation
                     if (pos.first < 0 || pos.first >= game_map.map_width ||
                         pos.second < 0 || pos.second >= game_map.map_height) {
-                        game_map.killShip(ship);
+                        ship.kill();
                         continue;
                     }
 
@@ -148,51 +154,59 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // Check collisions
                     const auto& occupancy = collision_map.at(xp).at(yp);
                     if (occupancy.is_valid()) {
-                        if (occupancy.is_planet()) continue;
-
-                        auto& other = game_map.getShip(occupancy);
-                        auto& other_delta = movement_deltas.at(occupancy.player_id()).at(occupancy.entity_index());
+                        unsigned short self_damage = 0;
+                        unsigned short other_damage = 0;
 
                         // The collision is head-on for us if the direction of
                         // movement is parallel to the ship orientation
                         // (10 degree fudge factor)
                         auto self_head_on = fabsf(atan2f(delta.second, delta.first) - ship.orientation) < 10;
                         auto self_vel_factor =
-                            static_cast<unsigned short>(sqrtf(delta.first * delta.first + delta.second * delta.second) / 25);
+                            static_cast<unsigned short>(
+                                sqrtf(delta.first * delta.first + delta.second * delta.second) / 25);
                         self_vel_factor = std::max(self_vel_factor, static_cast<unsigned short>(1));
-
-                        // The collision is head-on for the other if the two
-                        // ship directions are antiparallel
-                        auto other_head_on = std::abs(std::abs(ship.orientation - other.orientation) - 180) < 10;
-                        auto other_vel_factor =
-                            static_cast<unsigned short>(sqrtf(other_delta.first * other_delta.first + other_delta.second * other_delta.second) / 25);
-                        other_vel_factor = std::max(other_vel_factor, static_cast<unsigned short>(1));
-
-                        unsigned short self_damage = 0;
-                        unsigned short other_damage = 0;
 
                         if (self_head_on) {
                             delta.first = delta.second = 0;
                             self_damage += 25 * self_vel_factor;
                             other_damage += 50 * self_vel_factor;
-                        }
-                        else {
+                        } else {
                             self_damage += 50 * self_vel_factor;
                             other_damage += 25 * self_vel_factor;
                         }
 
-                        if (other_head_on) {
-                            other_delta.first = other_delta.second = 0;
-                            self_damage += 50 * other_vel_factor;
-                            other_damage += 25 * other_vel_factor;
+                        if (occupancy.is_planet()) {
+                            self_damage += 200;
+                            other_damage += 100;
+
+                            game_map.damageEntity(game_map.getPlanet(occupancy), other_damage);
                         }
                         else {
-                            self_damage += 25 * other_vel_factor;
-                            other_damage += 50 * other_vel_factor;
+                            auto& other = game_map.getShip(occupancy);
+                            auto& other_delta = movement_deltas.at(occupancy.player_id()).at(occupancy.entity_index());
+
+                            // The collision is head-on for the other if the two
+                            // ship directions are antiparallel
+                            auto other_head_on = std::abs(std::abs(ship.orientation - other.orientation) - 180) < 10;
+                            auto other_vel_factor =
+                                static_cast<unsigned short>(sqrtf(
+                                    other_delta.first * other_delta.first + other_delta.second * other_delta.second)
+                                    / 25);
+                            other_vel_factor = std::max(other_vel_factor, static_cast<unsigned short>(1));
+
+                            if (other_head_on) {
+                                other_delta.first = other_delta.second = 0;
+                                self_damage += 50 * other_vel_factor;
+                                other_damage += 25 * other_vel_factor;
+                            } else {
+                                self_damage += 25 * other_vel_factor;
+                                other_damage += 50 * other_vel_factor;
+                            }
+
+                            game_map.damageEntity(other, other_damage);
                         }
 
-                        game_map.damageShip(ship, self_damage);
-                        game_map.damageShip(other, other_damage);
+                        game_map.damageEntity(ship, self_damage);
                     }
                     else {
                         // Move the ship

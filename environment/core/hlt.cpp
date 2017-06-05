@@ -41,6 +41,12 @@ namespace hlt {
     EntityIndex EntityId::entity_index() const {
         return static_cast<EntityIndex>(_entity_index);
     }
+
+    EntityId EntityId::for_planet(EntityIndex index) {
+        auto result = EntityId();
+        result._entity_index = index;
+        return result;
+    }
 }
 
 #endif

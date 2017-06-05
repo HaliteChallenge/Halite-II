@@ -94,6 +94,7 @@ namespace hlt {
         EntityIndex entity_index() const;
 
         static EntityId invalid();
+        static EntityId for_planet(EntityIndex index);
     };
 
     enum MoveType {
@@ -205,8 +206,12 @@ namespace hlt {
 
                 for (int i = 0; i < 3; i++) {
                     ships[playerId][i].health = Ship::BASE_HEALTH;
-                    ships[playerId][i].location.x = region.x + (region.width / 2);
-                    ships[playerId][i].location.y = region.y + (region.height / 2) - 1 + i;
+                    const auto x = static_cast<unsigned short>(region.x + (region.width / 2));
+                    const auto y = static_cast<unsigned short>(region.y + (region.height / 2) - 1 + i);
+
+                    ships[playerId][i].location.x = x;
+                    ships[playerId][i].location.y = y;
+                    planets.push_back(Planet(x + 1, y, 1));
                 }
             }
 
@@ -221,6 +226,7 @@ namespace hlt {
                     const auto r = rand_radius();
 
                     for (Region region : regions) {
+                        // TODO: make sure planets don't overlap!
                         if (getDistance({ region.x, region.y }, { x, y }) < r + MIN_DISTANCE) {
                             goto TRY_AGAIN;
                         }
@@ -247,8 +253,9 @@ namespace hlt {
             return getShip(entity_id.player_id(), entity_id.entity_index());
         }
 
-        void killShip(Ship& ship) {
-            ship.kill();
+        Planet& getPlanet(EntityId entity_id) {
+            assert(entity_id.is_planet());
+            return planets.at(entity_id.entity_index());
         }
 
         float getDistance(Location l1, Location l2) const {
@@ -264,13 +271,13 @@ namespace hlt {
         }
 
         //! Damage the given ship, killing it and returning true if the ship health falls below 0
-        auto damageShip(Ship &ship, unsigned short damage) -> bool {
-            if (ship.health <= damage) {
-                killShip(ship);
+        auto damageEntity(Entity& entity, unsigned short damage) -> bool {
+            if (entity.health <= damage) {
+                entity.kill();
                 return true;
             }
             else {
-                ship.health -= damage;
+                entity.health -= damage;
                 return false;
             }
         }
