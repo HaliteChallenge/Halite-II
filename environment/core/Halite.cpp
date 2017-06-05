@@ -12,49 +12,54 @@ void Halite::killPlayer(hlt::PlayerId player) {
     }
 }
 
-std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
-    //Update alive frame counts
-    for (hlt::PlayerId a = 0; a < number_of_players; a++)
-        if (alive[a]) alive_frame_count[a]++;
-
-    //Create threads to send/receive data to/from players. The threads should return a float of how much time passed between the end of their message being sent and the end of the AI's message being received.
-    std::vector<std::future<int> >
-        frameThreads(std::count(alive.begin(), alive.end(), true));
-    unsigned char threadLocation = 0; //Represents place in frameThreads.
+auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
+    //Create threads to send/receive data to/from players. The threads should
+    // return a float of how much time passed between the end of their message
+    // being sent and the end of the AI's message being received.
+    std::vector<std::future<int>>
+        frame_threads(std::count(alive.begin(), alive.end(), true));
 
     //Get the messages sent by bots this frame
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (alive[player_id]) {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
-            frameThreads[threadLocation] = std::async(
+            frame_threads[player_id] = std::async(
                 [&, player_id]() -> int {
-                    return networking.handleFrameNetworking(player_id + 1,
-                                                            turn_number,
-                                                            game_map,
-                                                            ignore_timeout,
-                                                            moves);
+                    // TODO: consistently make first player have ID 0
+                    return networking.handleFrameNetworking(
+                        player_id + 1,
+                        turn_number,
+                        game_map,
+                        ignore_timeout,
+                        moves);
                 });
-            threadLocation++;
         }
     }
 
-    full_player_moves.push_back(std::vector<std::vector<hlt::Move>>(
-        number_of_players,
-        std::vector<hlt::Move>()));
-
-    //Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
-    threadLocation = 0; //Represents place in frameThreads.
+    //Join threads. Figure out if the player responded in an allowable amount
+    // of time or if the player has timed out.
     for (hlt::PlayerId player_id = 0;
          player_id < number_of_players;
          player_id++) {
         if (alive[player_id]) {
-            int time = frameThreads[threadLocation].get();
+            int time = frame_threads[player_id].get();
             if (time == -1) {
                 killPlayer(player_id);
             } else total_frame_response_times[player_id] += time;
-            threadLocation++;
         }
     }
+}
+
+std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
+    //Update alive frame counts
+    for (hlt::PlayerId a = 0; a < number_of_players; a++)
+        if (alive[a]) alive_frame_count[a]++;
+
+    retrieve_moves(alive);
+
+    full_player_moves.push_back(std::vector<std::vector<hlt::Move>>(
+        number_of_players,
+        std::vector<hlt::Move>()));
 
     auto collision_map =
         std::vector<std::vector<hlt::EntityId>>(

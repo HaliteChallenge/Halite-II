@@ -88,6 +88,9 @@ private:
     std::vector<hlt::Map> full_frames; //All the maps!
     std::vector<std::vector<std::vector<hlt::Move>>> full_player_moves;
 
+    //! Grab the next set of moves from the bots
+    auto retrieve_moves(std::vector<bool> alive) -> void;
+
     std::vector<bool> processNextFrame(std::vector<bool> alive);
     void output(std::string filename);
     void killPlayer(hlt::PlayerId player);
