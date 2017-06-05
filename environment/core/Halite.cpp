@@ -102,6 +102,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 assert(!collision_map.at(ship.location.x).at(ship.location.y).is_valid());
                 collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
 
+                // TODO: ignore commands if ship is docked (eject player
+                // from game?)
+
                 switch (move.type) {
                     case hlt::MoveType::Rotate: {
                         // Update orientation based on thrust
@@ -123,12 +126,62 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                         break;
                     }
+                    case hlt::MoveType::Dock: {
+                        const auto planet_id = move.move.dockTo;
+                        if (planet_id >= game_map.planets.size()) {
+                            // Planet is invalid, do nothing
+                            ship.reset_docking_status();
+                            break;
+                        }
+
+                        auto& planet = game_map.planets[planet_id];
+                        if (!planet.is_alive()) {
+                            ship.reset_docking_status();
+                            break;
+                        }
+
+                        if (!planet.owned) {
+                            planet.owned = true;
+                            planet.owner = player_id;
+                        }
+
+                        // Don't initialize docking status again if already
+                        // docking to same planet
+                        if ((ship.docked_planet != planet_id ||
+                            ship.docking_status !=
+                                hlt::DockingStatus::Docking) &&
+                            planet.owner == player_id &&
+                            planet.docked_ships.size() < planet.docking_spots) {
+                            ship.docked_planet = planet_id;
+                            ship.docking_status = hlt::DockingStatus::Docking;
+                            ship.docking_progress = hlt::Planet::DOCK_TURNS;
+                            planet.docked_ships.push_back(ship_id);
+                        }
+
+                        break;
+                    }
                     default:
                         assert(false);
                         break;
                 }
 
                 full_player_moves.back().at(player_id).push_back(move);
+            }
+        }
+
+        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+            auto& player_ships = game_map.ships.at(player_id);
+            for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+                auto& ship = player_ships.at(ship_id);
+                if (ship.docking_status == hlt::DockingStatus::Docking) {
+                    ship.docking_progress--;
+                    if (ship.docking_progress == 0) {
+                        ship.docking_status = hlt::DockingStatus::Docked;
+                        // Invariant: planet should be alive (destroying a
+                        // planet should have destroyed any ships in the
+                        // middle of docking)
+                    }
+                }
             }
         }
 
@@ -188,8 +241,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         if (occupancy.is_planet()) {
                             self_damage += 200;
                             other_damage += 100;
-
-                            game_map.damageEntity(game_map.getPlanet(occupancy), other_damage);
                         }
                         else {
                             auto& other = game_map.getShip(occupancy);
@@ -213,10 +264,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                                 other_damage += 50 * other_vel_factor;
                             }
 
-                            game_map.damageEntity(other, other_damage);
                         }
 
-                        game_map.damageEntity(ship, self_damage);
+                        game_map.damageEntity(occupancy, other_damage);
+                        game_map.damageEntity(
+                            hlt::EntityId(player_id, ship_id), self_damage);
                     }
                     else {
                         // Move the ship
@@ -333,17 +385,47 @@ void Halite::output(std::string filename) {
                 record["health"] = ship.health;
                 record["orientation"] = ship.orientation;
 
+                nlohmann::json docking;
+                switch (ship.docking_status) {
+                    case hlt::DockingStatus::Undocked:
+                        docking["status"] = "undocked";
+                        break;
+                    case hlt::DockingStatus::Docking:
+                        docking["status"] = "docking";
+                        docking["planet_id"] = ship.docked_planet;
+                        docking["turns_left"] = ship.docking_progress;
+                        break;
+                    case hlt::DockingStatus::Docked:
+                        docking["status"] = "docked";
+                        docking["planet_id"] = ship.docked_planet;
+                        break;
+                    default:
+                        assert(false);
+                }
+
+                record["docking"] = docking;
+
                 ships.push_back(record);
             }
         }
 
         for (hlt::EntityIndex i = 0; i < current_map.planets.size(); i++) {
             const auto& planet = current_map.planets[i];
-            planets.push_back({
-                                  { "id", i },
-                                  { "x", planet.location.x },
-                                  { "y", planet.location.y },
-                              });
+            planets.push_back(nlohmann::json{
+                { "id", i },
+                { "health", planet.health },
+                { "x", planet.location.x },
+                { "y", planet.location.y },
+                { "r", planet.radius },
+                { "docking_spots", planet.docking_spots },
+                { "docked_ships", planet.docked_ships },
+            });
+            if (planet.owned) {
+                planets.back()["owner"] = planet.owner;
+            }
+            else {
+                planets.back()["owner"] = nullptr;
+            }
         }
 
         frame["ships"] = ships;
@@ -370,8 +452,12 @@ void Halite::output(std::string filename) {
                         record["type"] = "thrust";
                         record["thrust"] = move.move.thrustBy;
                         break;
+                    case hlt::MoveType::Dock:
+                        record["type"] = "dock";
+                        record["planet_id"] = move.move.dockTo;
+                        break;
                     default:
-                        // TODO:
+                        assert(false);
                         break;
                 }
                 frame.push_back(record);

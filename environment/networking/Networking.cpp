@@ -58,18 +58,26 @@ std::string Networking::serializeMap(const hlt::Map & map) {
 }
 
 auto is_valid_move_character(const char& c) -> bool {
-    return (c >= '0' && c <= '9') || c == ' ' || c == '-' || c == 'r' || c == 't';
+    return (c >= '0' && c <= '9')
+        || c == ' '
+        || c == '-'
+        || c == 'r'
+        || c == 't'
+        || c == 'd';
+}
+
+auto eject_bot(std::string message) -> std::string {
+    if (!quiet_output) {
+        std::lock_guard<std::mutex> guard(coutMutex);
+        std::cout << message;
+    }
+    return message;
 }
 
 void Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & m, hlt::PlayerMoveQueue& moves) {
     if(std::find_if(inputString.begin(), inputString.end(), [](const char & c) -> bool { return !is_valid_move_character(c); }) != inputString.end()) {
-        if(!quiet_output) {
-            std::string errorMessage = "Bot sent an invalid character - ejecting from game.\n";
-
-            std::lock_guard<std::mutex> guard(coutMutex);
-            std::cout << errorMessage;
-        }
-        throw inputString;
+        throw eject_bot(
+            "Bot sent an invalid character - ejecting from game.\n");
     }
 
     std::stringstream iss(inputString);
@@ -111,8 +119,23 @@ void Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & 
                 }
                 break;
             }
+            case 'd': {
+                // TODO: validate ship ID everywhere? or treat as noop?
+                // TODO: don't validate this here since planet can die
+                // between commands anyways
+                move.type = hlt::MoveType::Dock;
+                iss >> move.shipId;
+                iss >> move.move.dockTo;
+                if (move.move.dockTo >= m.planets.size()
+                    || !m.planets[move.move.dockTo].is_alive()) {
+                    throw eject_bot(
+                        "Bot docked to invalid planet - ejecting from game.\n");
+                }
+                break;
+            }
             default:
-                continue;
+                throw eject_bot(
+                    "Bot sent an invalid command - ejecting from game.\n");
         }
 
         auto queue_index = queue_depth.at(move.shipId);

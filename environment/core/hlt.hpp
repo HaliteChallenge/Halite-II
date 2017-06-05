@@ -55,6 +55,12 @@ namespace hlt {
         DockingStatus docking_status;
         unsigned short docking_progress;
         EntityIndex docked_planet;
+
+        auto reset_docking_status() -> void {
+            docking_status = DockingStatus::Undocked;
+            docking_progress = 0;
+            docked_planet = 0;
+        }
     };
 
     struct Planet : Entity {
@@ -74,6 +80,7 @@ namespace hlt {
             location.y = y;
             this->radius = radius;
             health = (short) (500 + 100 * sqrt(radius));
+            docking_spots = radius;
 
             owned = false;
         }
@@ -262,7 +269,17 @@ namespace hlt {
 
         Planet& getPlanet(EntityId entity_id) {
             assert(entity_id.is_planet());
-            return planets.at(entity_id.entity_index());
+            assert(entity_id.entity_index() < planets.size());
+            return planets[entity_id.entity_index()];
+        }
+
+        auto getEntity(EntityId entity_id) -> Entity& {
+            if (entity_id.is_planet()) {
+                return getPlanet(entity_id);
+            }
+            else {
+                return getShip(entity_id);
+            }
         }
 
         float getDistance(Location l1, Location l2) const {
@@ -277,10 +294,33 @@ namespace hlt {
             return atan2f(dy, dx);
         }
 
+        void killEntity(EntityId& id) {
+            Entity& entity = getEntity(id);
+            entity.kill();
+
+            if (id.is_ship()) {
+                Ship& ship = getShip(id);
+
+                if (ship.docking_status != DockingStatus::Undocked) {
+                    auto& planet = planets.at(ship.docked_planet);
+                    auto pos = std::find(
+                        planet.docked_ships.begin(),
+                        planet.docked_ships.end(),
+                        id.entity_index()
+                    );
+                    if (pos != planet.docked_ships.end()) {
+                        planet.docked_ships.erase(pos);
+                    }
+                }
+            }
+        }
+
         //! Damage the given ship, killing it and returning true if the ship health falls below 0
-        auto damageEntity(Entity& entity, unsigned short damage) -> bool {
+        auto damageEntity(EntityId id, unsigned short damage) -> bool {
+            Entity& entity = getEntity(id);
+
             if (entity.health <= damage) {
-                entity.kill();
+                killEntity(id);
                 return true;
             }
             else {
