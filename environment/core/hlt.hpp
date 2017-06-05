@@ -87,29 +87,35 @@ namespace hlt {
         }
     };
 
+    enum EntityType {
+        InvalidEntity,
+        ShipEntity,
+        PlanetEntity,
+    };
+
     struct EntityId {
     private:
         int _player_id;
         int _entity_index;
     public:
+        EntityType type;
+
         EntityId();
         EntityId(PlayerId player, EntityIndex index);
 
-        bool is_valid() const;
-        bool is_planet() const;
-        bool is_ship() const;
+        auto is_valid() const -> bool;
 
-        PlayerId player_id() const;
-        EntityIndex entity_index() const;
+        auto player_id() const -> PlayerId;
+        auto entity_index() const -> EntityIndex;
 
-        static EntityId invalid();
-        static EntityId for_planet(EntityIndex index);
+        static auto invalid() -> EntityId;
+        static auto for_planet(EntityIndex index) -> EntityId;
     };
 
     enum MoveType {
         //! Noop is not user-specifiable - instead it's the default command,
         //! used to mean that no command was issued
-            Noop = 0,
+        Noop = 0,
         Rotate,
         Thrust,
         Dock,

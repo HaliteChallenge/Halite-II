@@ -6,42 +6,38 @@
 
 namespace hlt {
     EntityId::EntityId() {
+        type = EntityType::InvalidEntity;
         _player_id = -1;
         _entity_index = -1;
     }
 
     EntityId::EntityId(PlayerId player, EntityIndex index) {
+        type = EntityType::ShipEntity;
         _player_id = player;
-        _entity_index = index;
+        _entity_index = static_cast<int>(index);
     }
 
-    bool EntityId::is_valid() const {
-        return _player_id >= -1 && _entity_index >= 0;
+    auto EntityId::is_valid() const -> bool {
+        return type != EntityType::InvalidEntity &&
+            _player_id >= -1 && _entity_index >= 0;
     }
 
-    bool EntityId::is_planet() const {
-        return is_valid() && _player_id == -1;
-    }
-
-    bool EntityId::is_ship() const {
-        return is_valid() && _player_id >= 0;
-    }
-
-    EntityId EntityId::invalid() {
+    auto EntityId::invalid() -> EntityId {
         return EntityId();
     }
 
-    PlayerId EntityId::player_id() const {
+    auto EntityId::player_id() const -> PlayerId {
         return static_cast<PlayerId>(_player_id);
     }
 
-    EntityIndex EntityId::entity_index() const {
+    auto EntityId::entity_index() const -> EntityIndex {
         return static_cast<EntityIndex>(_entity_index);
     }
 
-    EntityId EntityId::for_planet(EntityIndex index) {
+    auto EntityId::for_planet(EntityIndex index) -> EntityId {
         auto result = EntityId();
-        result._entity_index = index;
+        result.type = EntityType::PlanetEntity;
+        result._entity_index = static_cast<int>(index);
         return result;
     }
 
@@ -195,21 +191,26 @@ namespace hlt {
     }
 
     auto Map::get_ship(EntityId entity_id) -> Ship& {
-        assert(entity_id.is_ship());
+        assert(entity_id.is_valid());
+        assert(entity_id.type == EntityType::ShipEntity);
         return get_ship(entity_id.player_id(), entity_id.entity_index());
     }
 
     auto Map::get_planet(EntityId entity_id) -> Planet& {
-        assert(entity_id.is_planet());
+        assert(entity_id.is_valid());
+        assert(entity_id.type == EntityType::PlanetEntity);
         assert(entity_id.entity_index() < planets.size());
         return planets[entity_id.entity_index()];
     }
 
     auto Map::get_entity(EntityId entity_id) -> Entity& {
-        if (entity_id.is_planet()) {
-            return get_planet(entity_id);
-        } else {
-            return get_ship(entity_id);
+        switch (entity_id.type) {
+            case EntityType::InvalidEntity:
+                throw std::string("Can't get entity from invalid ID");
+            case EntityType::PlanetEntity:
+                return get_planet(entity_id);
+            case EntityType::ShipEntity:
+                return get_ship(entity_id);
         }
     }
 
@@ -229,7 +230,7 @@ namespace hlt {
         Entity& entity = get_entity(id);
         entity.kill();
 
-        if (id.is_ship()) {
+        if (id.type == EntityType::ShipEntity) {
             Ship& ship = get_ship(id);
 
             if (ship.docking_status != DockingStatus::Undocked) {
