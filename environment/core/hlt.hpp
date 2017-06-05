@@ -21,11 +21,11 @@ namespace hlt {
     typedef size_t EntityIndex;
 
     struct Location {
-        unsigned short x, y;
+        unsigned short pos_x, pos_y;
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
-        return l1.x == l2.x && l1.y == l2.y;
+        return l1.pos_x == l2.pos_x && l1.pos_y == l2.pos_y;
     }
 
     struct Entity {
@@ -77,8 +77,8 @@ namespace hlt {
         std::vector<EntityIndex> docked_ships;
 
         Planet(unsigned short x, unsigned short y, unsigned short radius) {
-            location.x = x;
-            location.y = y;
+            location.pos_x = x;
+            location.pos_y = y;
             this->radius = radius;
             health = (short) (500 + 100 * sqrt(radius));
             docking_spots = radius;

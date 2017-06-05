@@ -139,8 +139,8 @@ namespace hlt {
                 const auto y = static_cast<unsigned short>(region.y
                     + (region.height / 2) - 1 + i);
 
-                ships[playerId][i].location.x = x;
-                ships[playerId][i].location.y = y;
+                ships[playerId][i].location.pos_x = x;
+                ships[playerId][i].location.pos_y = y;
             }
 
             planets.push_back(Planet(region.x + (region.width / 2) + 2,
@@ -215,14 +215,14 @@ namespace hlt {
     }
 
     auto Map::get_distance(Location l1, Location l2) const -> float {
-        short dx = l1.x - l2.x;
-        short dy = l1.y - l2.y;
+        short dx = l1.pos_x - l2.pos_x;
+        short dy = l1.pos_y - l2.pos_y;
         return sqrtf((dx * dx) + (dy * dy));
     }
 
     auto Map::get_angle(Location l1, Location l2) const -> float {
-        short dx = l2.x - l1.x;
-        short dy = l2.y - l1.y;
+        short dx = l2.pos_x - l1.pos_x;
+        short dy = l2.pos_y - l1.pos_y;
         return atan2f(dy, dx);
     }
 

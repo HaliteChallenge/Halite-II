@@ -93,8 +93,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             if (!planet.is_alive()) continue;
             for (int dx = -planet.radius; dx <= planet.radius; dx++) {
                 for (int dy = -planet.radius; dy <= planet.radius; dy++) {
-                    const auto x = planet.location.x + dx;
-                    const auto y = planet.location.y + dy;
+                    const auto x = planet.location.pos_x + dx;
+                    const auto y = planet.location.pos_y + dy;
 
                     if (x >= 0 && y >= 0 && x < game_map.map_width
                         && y < game_map.map_height &&
@@ -117,8 +117,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                 auto move = player_moves[player_id][move_no][ship_id];
 
-                assert(!collision_map.at(ship.location.x).at(ship.location.y).is_valid());
-                collision_map.at(ship.location.x).at(ship.location.y) =
+                assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
+                collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
                     { player_id, ship_id };
 
                 // TODO: ignore commands if ship is docked (eject player
@@ -160,7 +160,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         movement_deltas.at(player_id).at(ship_id) =
                             { dx, dy };
                         intermediate_positions.at(player_id).at(ship_id) =
-                            { ship.location.x, ship.location.y };
+                            { ship.location.pos_x, ship.location.pos_y };
 
                         break;
                     }
@@ -250,7 +250,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                     if (delta.first == 0 && delta.second == 0) continue;
 
-                    collision_map.at(ship.location.x).at(ship.location.y) =
+                    collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
                         hlt::EntityId::invalid();
                     pos.first += SUBSTEP_DT * delta.first;
                     pos.second += SUBSTEP_DT * delta.second;
@@ -341,14 +341,14 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                             hlt::EntityId(player_id, ship_id), self_damage);
                     } else {
                         // Move the ship
-                        ship.location.x = xp;
-                        ship.location.y = yp;
+                        ship.location.pos_x = xp;
+                        ship.location.pos_y = yp;
                     }
 
                     if (!ship.is_alive()) continue;
 
-                    assert(!collision_map.at(ship.location.x).at(ship.location.y).is_valid());
-                    collision_map.at(ship.location.x).at(ship.location.y) =
+                    assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
+                    collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
                         { player_id, ship_id };
                 }
             }
@@ -459,8 +459,8 @@ void Halite::output(std::string filename) {
                 nlohmann::json record;
                 record["id"] = ship_id;
                 record["owner"] = (int) playerId;
-                record["x"] = ship.location.x;
-                record["y"] = ship.location.y;
+                record["x"] = ship.location.pos_x;
+                record["y"] = ship.location.pos_y;
                 record["health"] = ship.health;
                 record["orientation"] = ship.orientation;
 
@@ -494,8 +494,8 @@ void Halite::output(std::string filename) {
             planets.push_back(nlohmann::json{
                 { "id", planet_index },
                 { "health", planet.health },
-                { "x", planet.location.x },
-                { "y", planet.location.y },
+                { "x", planet.location.pos_x },
+                { "y", planet.location.pos_y },
                 { "r", planet.radius },
                 { "docking_spots", planet.docking_spots },
                 { "docked_ships", planet.docked_ships },

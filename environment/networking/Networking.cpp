@@ -29,8 +29,8 @@ std::string Networking::serializeMap(const hlt::Map& map) {
             if (!ship.is_alive()) continue;
 
             oss << ' ' << ship_id;
-            oss << ' ' << ship.location.x;
-            oss << ' ' << ship.location.y;
+            oss << ' ' << ship.location.pos_x;
+            oss << ' ' << ship.location.pos_y;
             oss << ' ' << ship.health;
             oss << ' ' << ship.orientation;
             // TODO: send other ship information
@@ -44,8 +44,8 @@ std::string Networking::serializeMap(const hlt::Map& map) {
         if (!planet.is_alive()) continue;
 
         oss << ' ' << planet_id;
-        oss << ' ' << planet.location.x;
-        oss << ' ' << planet.location.y;
+        oss << ' ' << planet.location.pos_x;
+        oss << ' ' << planet.location.pos_y;
         oss << ' ' << planet.health;
     }
 
