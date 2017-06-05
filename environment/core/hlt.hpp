@@ -57,7 +57,6 @@ namespace hlt {
     };
 
     struct Planet : Entity {
-        constexpr static auto MINIMUM_RADIUS = 3;
         constexpr static auto DOCK_TURNS = 5;
 
         PlayerId owner;
@@ -68,6 +67,15 @@ namespace hlt {
         unsigned short docking_spots;
 
         std::vector<EntityIndex> docked_ships;
+
+        Planet(unsigned short x, unsigned short y, unsigned short radius) {
+            location.x = x;
+            location.y = y;
+            this->radius = radius;
+            health = (short) (500 + 100 * sqrt(radius));
+
+            owned = false;
+        }
     };
 
     enum MoveType {
@@ -111,9 +119,16 @@ namespace hlt {
         }
 
         Map(unsigned short width, unsigned short height, unsigned char numberOfPlayers, unsigned int seed) : Map() {
+            // TODO: enforce a minimum map size to make sure we always have room for planets
+
             //Pseudorandom number generator.
             std::mt19937 prg(seed);
-            std::uniform_real_distribution<double> urd(0.0, 1.0);
+            std::uniform_int_distribution<unsigned short> uidw(0, width - 1);
+            std::uniform_int_distribution<unsigned short> uidh(0, height - 1);
+            std::uniform_int_distribution<unsigned short> uidr(1, std::min(width, height) / 25);
+            const auto rand_width = [&]() -> unsigned short { return uidw(prg); };
+            const auto rand_height = [&]() -> unsigned short { return uidh(prg); };
+            const auto rand_radius = [&]() -> unsigned short { return uidr(prg); };
 
             //Decides whether to put more players along the horizontal or the vertical.
             bool preferHorizontal = prg() % 2 == 0;
@@ -144,12 +159,12 @@ namespace hlt {
 
             class Region {
             public:
-                int width;
-                int height;
-                int x;
-                int y;
+                unsigned short width;
+                unsigned short height;
+                unsigned short x;
+                unsigned short y;
 
-                Region(int _x, int _y, int _width, int _height) {
+                Region(unsigned short _x, unsigned short _y, unsigned short _width, unsigned short _height) {
                     this->x = _x;
                     this->y = _y;
                     this->width = _width;
@@ -177,7 +192,30 @@ namespace hlt {
                 }
             }
 
-            // TODO: Scatter planets throughout all of space, avoiding the starting ships
+            // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
+            const auto MAX_PLANETS  = numberOfPlayers * 2;
+            const auto MAX_TRIES    = 100;
+            const auto MIN_DISTANCE = 5;
+            for (int i = 0; i < MAX_PLANETS; i++) {
+                for (int j = 0; j < MAX_TRIES; j++) {
+                    const auto x = rand_width();
+                    const auto y = rand_height();
+                    const auto r = rand_radius();
+
+                    for (Region region : regions) {
+                        if (getDistance({ region.x, region.y }, { x, y }) < r + MIN_DISTANCE) {
+                            goto TRY_AGAIN;
+                        }
+                    }
+
+                    planets.push_back(Planet(x, y, r));
+                    goto NEXT_PLANET;
+
+                    TRY_AGAIN: ;
+                }
+
+                NEXT_PLANET: ;
+            }
 
             std::cout << map_width << " " << map_height << std::endl;
         }
