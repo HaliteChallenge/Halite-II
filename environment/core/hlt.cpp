@@ -227,38 +227,4 @@ namespace hlt {
         short dy = l2.pos_y - l1.pos_y;
         return atan2f(dy, dx);
     }
-
-    auto Map::kill_entity(EntityId& id) -> void {
-        Entity& entity = get_entity(id);
-        entity.kill();
-
-        if (id.type == EntityType::ShipEntity) {
-            Ship& ship = get_ship(id);
-
-            if (ship.docking_status != DockingStatus::Undocked) {
-                auto& planet = planets.at(ship.docked_planet);
-                auto pos = std::find(
-                    planet.docked_ships.begin(),
-                    planet.docked_ships.end(),
-                    id.entity_index()
-                );
-                if (pos != planet.docked_ships.end()) {
-                    planet.docked_ships.erase(pos);
-                }
-            }
-        }
-    }
-
-    //! Damage the given ship, killing it and returning true if the ship health falls below 0
-    auto Map::damage_entity(EntityId id, unsigned short damage) -> bool {
-        Entity& entity = get_entity(id);
-
-        if (entity.health <= damage) {
-            kill_entity(id);
-            return true;
-        } else {
-            entity.health -= damage;
-            return false;
-        }
-    }
 }

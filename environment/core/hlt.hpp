@@ -162,9 +162,6 @@ namespace hlt {
         auto get_entity(EntityId entity_id) -> Entity&;
         auto get_distance(Location l1, Location l2) const -> float;
         auto get_angle(Location l1, Location l2) const -> float;
-        auto kill_entity(EntityId& id) -> void;
-        //! Damage the given ship, killing it and returning true if the ship health falls below 0
-        auto damage_entity(EntityId id, unsigned short damage) -> bool;
     };
 }
 

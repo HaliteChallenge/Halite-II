@@ -96,6 +96,9 @@ private:
         hlt::EntityId self_id, hlt::EntityId other_id,
         std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
         -> std::pair<unsigned short, unsigned short>;
+
+    auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
+    auto kill_entity(hlt::EntityId id) -> void;
 public:
     Halite(unsigned short width_,
            unsigned short height_,

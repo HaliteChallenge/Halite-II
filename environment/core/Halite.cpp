@@ -280,7 +280,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // TODO: be consistent and explicit about rounding vs truncation
                     if (pos.first < 0 || pos.first >= game_map.map_width ||
                         pos.second < 0 || pos.second >= game_map.map_height) {
-                        game_map.kill_entity(id);
+                        kill_entity(id);
                         continue;
                     }
 
@@ -294,9 +294,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         auto self_damage = damage.first;
                         auto other_damage = damage.second;
 
-                        game_map.damage_entity(occupancy, other_damage);
-                        game_map.damage_entity(
-                            hlt::EntityId::for_ship(player_id, ship_id), self_damage);
+                        damage_entity(occupancy, other_damage);
+                        damage_entity(hlt::EntityId::for_ship(player_id, ship_id), self_damage);
                     } else {
                         // Move the ship
                         ship.location.pos_x = xp;
@@ -568,7 +567,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     }
 
     // const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
-    const int maxTurnNumber = 10;
+    const int maxTurnNumber = 15;
 
     while (turn_number < maxTurnNumber
         && (std::count(result.begin(), result.end(), true) > 1
@@ -778,4 +777,52 @@ auto Halite::compute_damage(
     }
 
     return std::make_pair(self_damage, other_damage);
+}
+
+auto Halite::kill_entity(hlt::EntityId id) -> void {
+    hlt::Entity& entity = game_map.get_entity(id);
+    entity.kill();
+
+    switch (id.type) {
+        case hlt::EntityType::ShipEntity: {
+            hlt::Ship& ship = game_map.get_ship(id);
+
+            if (ship.docking_status != hlt::DockingStatus::Undocked) {
+                auto& planet = game_map.planets.at(ship.docked_planet);
+                auto pos = std::find(
+                    planet.docked_ships.begin(),
+                    planet.docked_ships.end(),
+                    id.entity_index()
+                );
+                if (pos != planet.docked_ships.end()) {
+                    planet.docked_ships.erase(pos);
+                }
+            }
+            break;
+        }
+        case hlt::EntityType::PlanetEntity: {
+            // TODO: Destroy/damage any and all ships attached to the planet
+            hlt::Planet& planet = game_map.get_planet(id);
+
+            for (const auto entity_index : planet.docked_ships) {
+                // TODO: calculate planet explosion damage
+                damage_entity(hlt::EntityId::for_ship(planet.owner, entity_index), 100);
+            }
+
+            break;
+        }
+        case hlt::EntityType::InvalidEntity: {
+            assert(false);
+        }
+    }
+}
+
+auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
+    hlt::Entity& entity = game_map.get_entity(id);
+
+    if (entity.health <= damage) {
+        kill_entity(id);
+    } else {
+        entity.health -= damage;
+    }
 }
