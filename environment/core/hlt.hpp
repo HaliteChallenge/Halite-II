@@ -211,7 +211,6 @@ namespace hlt {
 
                     ships[playerId][i].location.x = x;
                     ships[playerId][i].location.y = y;
-                    planets.push_back(Planet(x + 1, y, 1));
                 }
             }
 

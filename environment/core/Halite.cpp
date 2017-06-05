@@ -77,7 +77,17 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         for (hlt::EntityIndex entity_index = 0; entity_index < game_map.planets.size(); entity_index++) {
             const auto& planet = game_map.planets[entity_index];
             if (!planet.is_alive()) continue;
-            collision_map[planet.location.x][planet.location.y] = hlt::EntityId::for_planet(entity_index);
+            for (int dx = -planet.radius; dx <= planet.radius; dx++) {
+                for (int dy = -planet.radius; dy <= planet.radius; dy++) {
+                    const auto x = planet.location.x + dx;
+                    const auto y = planet.location.y + dy;
+
+                    if (x >= 0 && y >= 0 && x < game_map.map_width && y < game_map.map_height &&
+                        dx*dx + dy*dy <= planet.radius) {
+                        collision_map[x][y] = hlt::EntityId::for_planet(entity_index);
+                    }
+                }
+            }
         }
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
