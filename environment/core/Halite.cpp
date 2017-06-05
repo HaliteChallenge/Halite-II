@@ -23,12 +23,12 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     unsigned char threadLocation = 0; //Represents place in frameThreads.
 
     //Get the messages sent by bots this frame
-    for (hlt::PlayerId a = 0; a < number_of_players; a++) {
-        if (alive[a]) {
-            hlt::PlayerMoveQueue& moves = player_moves.at(a);
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        if (alive[player_id]) {
+            hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
             frameThreads[threadLocation] = std::async(
-                [&, a]() -> int {
-                    return networking.handleFrameNetworking(a + 1,
+                [&, player_id]() -> int {
+                    return networking.handleFrameNetworking(player_id + 1,
                                                             turn_number,
                                                             game_map,
                                                             ignore_timeout,
@@ -44,12 +44,14 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
     //Join threads. Figure out if the player responded in an allowable amount of time or if the player has timed out.
     threadLocation = 0; //Represents place in frameThreads.
-    for (unsigned char a = 0; a < number_of_players; a++) {
-        if (alive[a]) {
+    for (hlt::PlayerId player_id = 0;
+         player_id < number_of_players;
+         player_id++) {
+        if (alive[player_id]) {
             int time = frameThreads[threadLocation].get();
             if (time == -1) {
-                killPlayer(a);
-            } else total_frame_response_times[a] += time;
+                killPlayer(player_id);
+            } else total_frame_response_times[player_id] += time;
             threadLocation++;
         }
     }
@@ -71,7 +73,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                                                  { 0.0, 0.0 }));
 
     // Process queue of moves
-    for (unsigned int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES;
+    for (unsigned int move_no = 0;
+         move_no < hlt::MAX_QUEUED_MOVES;
          move_no++) {
         // Reset auxiliary data structures
         for (auto& row : collision_map) {
@@ -230,7 +233,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
         // Resolve collisions - update in small increments; collisions
         // happen if two entities are within the same grid square at any instant
-        for (int i = 1; i <= SUBSTEPS; i++) {
+        for (int substep = 1; substep <= SUBSTEPS; substep++) {
             for (hlt::PlayerId player_id = 0; player_id < number_of_players;
                  player_id++) {
                 auto& player_ships = game_map.ships.at(player_id);
@@ -433,19 +436,21 @@ void Halite::output(std::string filename) {
     std::vector<std::vector<nlohmann::json> > moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
-    for (int a = 0; a < full_frames.size(); a++) {
+    for (int frame_idx = 0; frame_idx < full_frames.size(); frame_idx++) {
         nlohmann::json frame;
         std::vector<nlohmann::json> ships;
         std::vector<nlohmann::json> planets;
 
-        auto current_map = full_frames[a];
+        auto current_map = full_frames[frame_idx];
         for (hlt::PlayerId playerId = 0; playerId < number_of_players;
              playerId++) {
-            for (int i = 0; i < hlt::MAX_PLAYER_SHIPS; i++) {
-                auto ship = current_map.ships.at(playerId).at(i);
+            for (hlt::EntityIndex ship_id = 0;
+                 ship_id < hlt::MAX_PLAYER_SHIPS;
+                 ship_id++) {
+                auto ship = current_map.ships.at(playerId).at(ship_id);
                 if (!ship.is_alive()) continue;
                 nlohmann::json record;
-                record["id"] = i;
+                record["id"] = ship_id;
                 record["owner"] = (int) playerId;
                 record["x"] = ship.location.x;
                 record["y"] = ship.location.y;
@@ -475,10 +480,12 @@ void Halite::output(std::string filename) {
             }
         }
 
-        for (hlt::EntityIndex i = 0; i < current_map.planets.size(); i++) {
-            const auto& planet = current_map.planets[i];
+        for (hlt::EntityIndex planet_index = 0;
+             planet_index < current_map.planets.size();
+             planet_index++) {
+            const auto& planet = current_map.planets[planet_index];
             planets.push_back(nlohmann::json{
-                { "id", i },
+                { "id", planet_index },
                 { "health", planet.health },
                 { "x", planet.location.x },
                 { "y", planet.location.y },
@@ -546,7 +553,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
                                std::string replayDirectory) {
     //For rankings
     std::vector<bool> result(number_of_players, true);
-    std::vector<unsigned char> rankings;
+    std::vector<hlt::PlayerId> rankings;
 
     //Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
@@ -558,13 +565,15 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
                                     ignore_timeout,
                                     &player_names[a]);
     }
-    for (unsigned char a = 0; a < number_of_players; a++) {
-        int time = initThreads[a].get();
+    for (hlt::PlayerId player_id = 0;
+         player_id < number_of_players;
+         player_id++) {
+        int time = initThreads[player_id].get();
         if (time == -1) {
-            killPlayer(a);
-            result[a] = false;
-            rankings.push_back(a);
-        } else init_response_times[a] = time;
+            killPlayer(player_id);
+            result[player_id] = false;
+            rankings.push_back(player_id);
+        } else init_response_times[player_id] = time;
     }
 
     //Override player names with the provided ones if appropriate.
@@ -633,31 +642,31 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     GameStatistics stats;
     int chunkSize =
         game_map.map_width * game_map.map_height / number_of_players;
-    for (unsigned char a = 0; a < number_of_players; a++) {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         PlayerStatistics p;
-        p.tag = a + 1;
+        p.tag = player_id + 1;
         p.rank = std::distance(rankings.begin(),
-                               std::find(rankings.begin(), rankings.end(), a))
+                               std::find(rankings.begin(), rankings.end(), player_id))
             + 1;
         // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
         // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
         // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but finishers who are alive in last frame of game who only need -1
-        p.last_frame_alive = alive_frame_count[a] - 2 + result[a];
-        p.average_territory_count = full_territory_count[a]
-            / double(chunkSize * alive_frame_count[a]);
+        p.last_frame_alive = alive_frame_count[player_id] - 2 + result[player_id];
+        p.average_territory_count = full_territory_count[player_id]
+            / double(chunkSize * alive_frame_count[player_id]);
         p.average_strength_count =
-            full_strength_count[a] / double(chunkSize * alive_frame_count[a]);
+            full_strength_count[player_id] / double(chunkSize * alive_frame_count[player_id]);
         p.average_production_count =
-            alive_frame_count[a] > 1 ? full_production_count[a]
-                / double(chunkSize * (alive_frame_count[a] - 1))
+            alive_frame_count[player_id] > 1 ? full_production_count[player_id]
+                / double(chunkSize * (alive_frame_count[player_id] - 1))
                                      : 0; //For this, we want turns rather than frames.
         p.still_percentage =
-            full_cardinal_count[a] + full_still_count[a] > 0 ?
-            full_still_count[a]
-                / double(full_cardinal_count[a] + full_still_count[a]) : 0;
-        p.init_response_time = init_response_times[a];
-        p.average_frame_response_time = total_frame_response_times[a]
-            / double(alive_frame_count[a]); //In milliseconds.
+            full_cardinal_count[player_id] + full_still_count[player_id] > 0 ?
+            full_still_count[player_id]
+                / double(full_cardinal_count[player_id] + full_still_count[player_id]) : 0;
+        p.init_response_time = init_response_times[player_id];
+        p.average_frame_response_time = total_frame_response_times[player_id]
+            / double(alive_frame_count[player_id]); //In milliseconds.
         stats.player_statistics.push_back(p);
     }
     stats.timeout_tags = timeout_tags;
@@ -697,7 +706,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     return stats;
 }
 
-std::string Halite::getName(unsigned char playerTag) {
+std::string Halite::getName(hlt::PlayerId playerTag) {
     return player_names[playerTag - 1];
 }
 
