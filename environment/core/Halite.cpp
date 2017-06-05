@@ -378,7 +378,9 @@ GameStatistics Halite::runGame(std::vector<std::string> * names_, unsigned int s
         player_names.clear();
         for(auto a = names_->begin(); a != names_->end(); a++) player_names.push_back(a->substr(0, 30));
     }
-    const int maxTurnNumber = (int) sqrt(game_map.map_width * game_map.map_height) * 10;
+
+    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
+
     while(turn_number < maxTurnNumber && (std::count(result.begin(), result.end(), true) > 1 || number_of_players == 1)) {
         //Increment turn number:
         turn_number++;
