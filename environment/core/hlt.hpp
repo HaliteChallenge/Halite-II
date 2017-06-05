@@ -45,6 +45,7 @@ namespace hlt {
         Undocked,
         Docking,
         Docked,
+        Undocking,
     };
 
     struct Ship : Entity {
@@ -74,6 +75,7 @@ namespace hlt {
         unsigned short remaining_production;
         unsigned short docking_spots;
 
+        //! Contains IDs of all ships in the process of docking or undocking, as well as docked ships.
         std::vector<EntityIndex> docked_ships;
 
         Planet(unsigned short x, unsigned short y, unsigned short radius) {

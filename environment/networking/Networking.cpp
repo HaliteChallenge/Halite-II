@@ -60,6 +60,7 @@ auto is_valid_move_character(const char& c) -> bool {
         || c == '-'
         || c == 'r'
         || c == 't'
+        || c == 'u'
         || c == 'd';
 }
 
@@ -125,7 +126,6 @@ void Networking::deserializeMoveSet(std::string& inputString,
                 break;
             }
             case 'd': {
-                // TODO: validate ship ID everywhere? or treat as noop?
                 // TODO: don't validate this here since planet can die
                 // between commands anyways
                 move.type = hlt::MoveType::Dock;
@@ -136,6 +136,11 @@ void Networking::deserializeMoveSet(std::string& inputString,
                     throw eject_bot(
                         "Bot docked to invalid planet - ejecting from game.\n");
                 }
+                break;
+            }
+            case 'u': {
+                move.type = hlt::MoveType::Undock;
+                iss >> move.shipId;
                 break;
             }
             default:

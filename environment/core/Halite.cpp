@@ -72,6 +72,40 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
             std::vector<std::pair<float, float>>(hlt::MAX_PLAYER_SHIPS,
                                                  { 0.0, 0.0 }));
 
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        auto& player_ships = game_map.ships.at(player_id);
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = player_ships.at(ship_id);
+            if (ship.docking_status == hlt::DockingStatus::Docking) {
+                ship.docking_progress--;
+                if (ship.docking_progress == 0) {
+                    ship.docking_status = hlt::DockingStatus::Docked;
+                    // Invariant: planet should be alive (destroying a
+                    // planet should have destroyed any ships in the
+                    // middle of docking)
+                }
+            }
+            else if (ship.docking_status == hlt::DockingStatus::Undocking) {
+                ship.docking_progress--;
+                if (ship.docking_progress == 0) {
+                    ship.docking_status = hlt::DockingStatus::Undocked;
+                    auto& planet = game_map.planets.at(ship.docked_planet);
+                    auto pos = std::find(
+                        planet.docked_ships.begin(),
+                        planet.docked_ships.end(),
+                        ship_id
+                    );
+                    if (pos != planet.docked_ships.end()) {
+                        planet.docked_ships.erase(pos);
+                    }
+                }
+            }
+        }
+    }
+
     // Process queue of moves
     for (unsigned int move_no = 0;
          move_no < hlt::MAX_QUEUED_MOVES;
@@ -209,28 +243,15 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     }
 
                     case hlt::MoveType::Undock:
+                        if (ship.docking_status != hlt::DockingStatus::Docked) break;
+
+                        ship.docking_status = hlt::DockingStatus::Undocking;
+                        ship.docking_progress = hlt::Planet::DOCK_TURNS;
+
                         break;
                 }
 
                 full_player_moves.back().at(player_id).push_back(move);
-            }
-        }
-
-        for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-             player_id++) {
-            auto& player_ships = game_map.ships.at(player_id);
-            for (hlt::EntityIndex ship_id = 0;
-                 ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                auto& ship = player_ships.at(ship_id);
-                if (ship.docking_status == hlt::DockingStatus::Docking) {
-                    ship.docking_progress--;
-                    if (ship.docking_progress == 0) {
-                        ship.docking_status = hlt::DockingStatus::Docked;
-                        // Invariant: planet should be alive (destroying a
-                        // planet should have destroyed any ships in the
-                        // middle of docking)
-                    }
-                }
             }
         }
 
@@ -413,6 +434,11 @@ void Halite::output(std::string filename) {
                         break;
                     case hlt::DockingStatus::Docking:
                         docking["status"] = "docking";
+                        docking["planet_id"] = ship.docked_planet;
+                        docking["turns_left"] = ship.docking_progress;
+                        break;
+                    case hlt::DockingStatus::Undocking:
+                        docking["status"] = "undocking";
                         docking["planet_id"] = ship.docked_planet;
                         docking["turns_left"] = ship.docking_progress;
                         break;
