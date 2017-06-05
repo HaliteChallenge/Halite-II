@@ -20,10 +20,6 @@ struct PlayerStatistics {
     int tag;
     int rank;
     int last_frame_alive;
-    double average_territory_count;
-    double average_strength_count;
-    double average_production_count;
-    double still_percentage;
     int init_response_time;
     double average_frame_response_time;
 };
@@ -74,13 +70,9 @@ private:
 
     //Statistics
     std::vector<unsigned short> alive_frame_count;
-    std::vector<unsigned int> last_territory_count;
-    std::vector<unsigned int> full_territory_count;
-    std::vector<unsigned int> full_strength_count;
-    std::vector<unsigned int> full_production_count;
-    std::vector<unsigned int> full_still_count;
-    std::vector<unsigned int> full_cardinal_count;
     std::vector<unsigned int> init_response_times;
+    std::vector<unsigned int> last_ship_count;
+    std::vector<unsigned int> last_ship_health_total;
     std::vector<unsigned int> total_frame_response_times;
     std::set<unsigned short> timeout_tags;
 
@@ -104,6 +96,9 @@ private:
 
     auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
     auto kill_entity(hlt::EntityId id) -> void;
+
+    auto compare_rankings(const hlt::PlayerId& player1,
+                          const hlt::PlayerId& player2) const -> bool;
 public:
     Halite(unsigned short width_,
            unsigned short height_,

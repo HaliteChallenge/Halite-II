@@ -1,6 +1,17 @@
 #include "Halite.hpp"
+#include <functional>
 
 //Private Functions ------------------
+
+auto Halite::compare_rankings(const hlt::PlayerId& player1,
+                              const hlt::PlayerId& player2) const -> bool{
+    if (last_ship_count[player1]
+        == last_ship_count[player2])
+        return last_ship_health_total[player1]
+            < last_ship_health_total[player2];
+    return last_ship_count[player1]
+        < last_ship_count[player2];
+}
 
 auto Halite::compute_damage(
     hlt::EntityId self_id, hlt::EntityId other_id,
@@ -479,11 +490,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     // Check if the game is over
     std::vector<bool> stillAlive(number_of_players, false);
 
+    std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
     for (hlt::PlayerId player = 0; player < number_of_players; player++) {
-        for (auto& ship : game_map.ships.at(player)) {
+        for (const auto& ship : game_map.ships[player]) {
             if (ship.is_alive()) {
                 stillAlive[player] = true;
-                break;
+                last_ship_count[player]++;
+                last_ship_health_total[player] += ship.health;
             }
         }
     }
@@ -529,13 +542,9 @@ Halite::Halite(unsigned short width_,
 
     //Init statistics
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
-    last_territory_count = std::vector<unsigned int>(number_of_players, 1);
-    full_territory_count = std::vector<unsigned int>(number_of_players, 1);
-    full_strength_count = std::vector<unsigned int>(number_of_players, 255);
-    full_production_count = std::vector<unsigned int>(number_of_players);
-    full_still_count = std::vector<unsigned int>(number_of_players);
-    full_cardinal_count = std::vector<unsigned int>(number_of_players);
     init_response_times = std::vector<unsigned int>(number_of_players);
+    last_ship_count = std::vector<unsigned int>(number_of_players);
+    last_ship_health_total = std::vector<unsigned int>(number_of_players);
     total_frame_response_times = std::vector<unsigned int>(number_of_players);
     timeout_tags = std::set<unsigned short>();
 }
@@ -694,7 +703,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
                                bool enabledReplay,
                                std::string replayDirectory) {
     //For rankings
-    std::vector<bool> result(number_of_players, true);
+    std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
 
     //Send initial package
@@ -712,14 +721,14 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
          player_id++) {
         int time = initThreads[player_id].get();
         if (time == -1) {
-            killPlayer(player_id);
-            result[player_id] = false;
+            kill_player(player_id);
+            living_players[player_id] = false;
             rankings.push_back(player_id);
         } else init_response_times[player_id] = time;
     }
 
-    //Override player names with the provided ones if appropriate.
-    if (names_ != NULL) {
+    // Override player names with the provided ones
+    if (names_ != nullptr) {
         player_names.clear();
         for (auto a = names_->begin(); a != names_->end(); a++)
             player_names.push_back(a->substr(0, 30));
@@ -729,64 +738,55 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     const int maxTurnNumber = 15;
 
     while (turn_number < maxTurnNumber
-        && (std::count(result.begin(), result.end(), true) > 1
+        && (std::count(living_players.begin(), living_players.end(), true) > 1
             || number_of_players == 1)) {
-        //Increment turn number:
         turn_number++;
+
         if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
+
         //Frame logic.
-        std::vector<bool> newResult = processNextFrame(result);
+        std::vector<bool> new_living_players = processNextFrame(living_players);
+
         //Add to vector of players that should be dead.
         std::vector<hlt::PlayerId> newRankings;
         for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
-            if (result[player_id] && !newResult[player_id]) {
+            if (living_players[player_id] && !new_living_players[player_id]) {
                 newRankings.push_back(player_id);
             }
-        //Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
-        std::stable_sort(newRankings.begin(),
-                         newRankings.end(),
-                         [&](const unsigned int& u1,
-                             const unsigned int& u2) -> bool {
-                             if (last_territory_count[u1]
-                                 == last_territory_count[u2])
-                                 return full_territory_count[u1]
-                                     < full_territory_count[u2];
-                             return last_territory_count[u1]
-                                 < last_territory_count[u2];
-                         });
-        for (auto a = newRankings.begin(); a != newRankings.end();
-             a++)
-            rankings.push_back(*a);
+
+        // Sort ranking by number of ships, using total ship health to break ties.
+        std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
+            std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
+        std::stable_sort(
+            newRankings.begin(),
+            newRankings.end(),
+            comparator);
+        rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
 
         // Count productive squares remaining for Halite single-player game
         // TODO: come up with similar metric for 2.0
-        result = newResult;
+
+        living_players = new_living_players;
     }
     std::vector<hlt::PlayerId> newRankings;
     for (hlt::PlayerId player_id = 0;
          player_id < number_of_players; player_id++) {
-        if (result[player_id]) newRankings.push_back(player_id);
+        if (living_players[player_id]) newRankings.push_back(player_id);
     }
     //Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
-    std::stable_sort(newRankings.begin(),
-                     newRankings.end(),
-                     [&](const unsigned int& u1,
-                         const unsigned int& u2) -> bool {
-                         if (last_territory_count[u1]
-                             == last_territory_count[u2])
-                             return full_territory_count[u1]
-                                 < full_territory_count[u2];
-                         return last_territory_count[u1]
-                             < last_territory_count[u2];
-                     });
 
+    std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
+        std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
+    std::stable_sort(
+            newRankings.begin(),
+            newRankings.end(),
+            comparator);
     rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
 
     std::reverse(rankings.begin(),
                  rankings.end()); //Best player first rather than last.
     GameStatistics stats;
-    int chunkSize =
-        game_map.map_width * game_map.map_height / number_of_players;
+
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         PlayerStatistics p;
         p.tag = player_id + 1;
@@ -796,19 +796,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
         // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
         // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
         // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but finishers who are alive in last frame of game who only need -1
-        p.last_frame_alive = alive_frame_count[player_id] - 2 + result[player_id];
-        p.average_territory_count = full_territory_count[player_id]
-            / double(chunkSize * alive_frame_count[player_id]);
-        p.average_strength_count =
-            full_strength_count[player_id] / double(chunkSize * alive_frame_count[player_id]);
-        p.average_production_count =
-            alive_frame_count[player_id] > 1 ? full_production_count[player_id]
-                / double(chunkSize * (alive_frame_count[player_id] - 1))
-                                     : 0; //For this, we want turns rather than frames.
-        p.still_percentage =
-            full_cardinal_count[player_id] + full_still_count[player_id] > 0 ?
-            full_still_count[player_id]
-                / double(full_cardinal_count[player_id] + full_still_count[player_id]) : 0;
+        p.last_frame_alive = alive_frame_count[player_id] - 2 + living_players[player_id];
         p.init_response_time = init_response_times[player_id];
         p.average_frame_response_time = total_frame_response_times[player_id]
             / double(alive_frame_count[player_id]); //In milliseconds.
