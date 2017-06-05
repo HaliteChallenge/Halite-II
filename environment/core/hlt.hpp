@@ -224,9 +224,16 @@ namespace hlt {
                     const auto y = rand_height();
                     const auto r = rand_radius();
 
+                    // Make sure planets are far enough away from the center
+                    // of each region, where initial ships spawn
                     for (Region region : regions) {
-                        // TODO: make sure planets don't overlap!
                         if (getDistance({ region.x, region.y }, { x, y }) < r + MIN_DISTANCE) {
+                            goto TRY_AGAIN;
+                        }
+                    }
+
+                    for (Planet planet : planets) {
+                        if (getDistance(planet.location, { x, y }) < r + planet.radius + 1) {
                             goto TRY_AGAIN;
                         }
                     }
