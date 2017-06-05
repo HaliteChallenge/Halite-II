@@ -17,7 +17,7 @@ namespace hlt {
     constexpr auto MAX_QUEUED_MOVES = 3;
 
     typedef unsigned char PlayerId;
-    typedef unsigned int  EntityIndex;
+    typedef size_t        EntityIndex;
 
     struct Location {
         unsigned short x, y;
@@ -39,20 +39,35 @@ namespace hlt {
         }
     };
 
+    enum DockingStatus {
+        Undocked,
+        Docking,
+        Docked,
+    };
+
     struct Ship : Entity {
         constexpr static auto BASE_HEALTH = 200;
 
         //! Rotation of the ship, degrees (0-359) from due east
         unsigned short orientation;
+
+        DockingStatus docking_status;
+        unsigned short docking_progress;
+        EntityIndex docked_planet;
     };
 
     struct Planet : Entity {
         constexpr static auto MINIMUM_RADIUS = 3;
         constexpr static auto DOCK_TURNS = 5;
 
+        PlayerId owner;
+        bool owned;
+
         unsigned short radius;
         unsigned short remaining_production;
         unsigned short docking_spots;
+
+        std::vector<EntityIndex> docked_ships;
     };
 
     enum MoveType {
