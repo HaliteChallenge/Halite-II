@@ -40,8 +40,19 @@ namespace hlt {
     };
 
     struct Ship : Entity {
+        constexpr static auto BASE_HEALTH = 200;
+
         //! Rotation of the ship, degrees (0-359) from due east
         unsigned short orientation;
+    };
+
+    struct Planet : Entity {
+        constexpr static auto MINIMUM_RADIUS = 3;
+        constexpr static auto DOCK_TURNS = 5;
+
+        unsigned short radius;
+        unsigned short remaining_production;
+        unsigned short docking_spots;
     };
 
     enum MoveType {
@@ -67,18 +78,21 @@ namespace hlt {
     class Map {
     public:
         std::array<std::array<Ship, MAX_PLAYER_SHIPS>, MAX_PLAYERS> ships;
+        std::vector<Planet> planets;
         unsigned short map_width, map_height; //Number of rows and columns, NOT maximum index.
 
         Map() {
             map_width = 0;
             map_height = 0;
             ships = { {} };
+            planets = std::vector<Planet>();
         }
 
         Map(const Map &otherMap) {
             map_width = otherMap.map_width;
             map_height = otherMap.map_height;
             ships = otherMap.ships;
+            planets = otherMap.planets;
         }
 
         Map(unsigned short width, unsigned short height, unsigned char numberOfPlayers, unsigned int seed) : Map() {
@@ -91,7 +105,7 @@ namespace hlt {
 
             for (PlayerId playerId = 0; playerId < numberOfPlayers; playerId++) {
                 for (int i = 0; i < 3; i++) {
-                    ships[playerId][i].health = 200;
+                    ships[playerId][i].health = Ship::BASE_HEALTH;
                     ships[playerId][i].location.x = (unsigned short) playerId;
                     ships[playerId][i].location.y = i;
                 }
