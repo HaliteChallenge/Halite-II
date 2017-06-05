@@ -27,8 +27,10 @@ struct PlayerStatistics {
     int init_response_time;
     double average_frame_response_time;
 };
-static std::ostream & operator<<(std::ostream & o, const PlayerStatistics & p) {
-    o << p.tag << ' ' << p.rank << ' ' << p.last_frame_alive;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
+
+static std::ostream& operator<<(std::ostream& o, const PlayerStatistics& p) {
+    o << p.tag << ' ' << p.rank << ' '
+      << p.last_frame_alive;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
     return o;
 }
 
@@ -38,13 +40,19 @@ struct GameStatistics {
     std::set<unsigned short> timeout_tags;
     std::vector<std::string> timeout_log_filenames;
 };
-static std::ostream & operator<<(std::ostream & o, const GameStatistics & g) {
-    for(auto a = g.player_statistics.begin(); a != g.player_statistics.end(); a++) o << (*a) << std::endl;
-    for(auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++) o << (*a) << ' ';
-    if(g.timeout_tags.empty()) o << ' ';
+
+static std::ostream& operator<<(std::ostream& o, const GameStatistics& g) {
+    for (auto a = g.player_statistics.begin(); a != g.player_statistics.end();
+         a++)
+        o << (*a) << std::endl;
+    for (auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++)
+        o << (*a) << ' ';
+    if (g.timeout_tags.empty()) o << ' ';
     std::cout << std::endl;
-    for(auto a = g.timeout_log_filenames.begin(); a != g.timeout_log_filenames.end(); a++) o << (*a) << ' ';
-    if(g.timeout_log_filenames.empty()) o << ' ';
+    for (auto a = g.timeout_log_filenames.begin();
+         a != g.timeout_log_filenames.end(); a++)
+        o << (*a) << ' ';
+    if (g.timeout_log_filenames.empty()) o << ' ';
     return o;
 }
 
@@ -78,15 +86,24 @@ private:
 
     //Full game
     std::vector<hlt::Map> full_frames; //All the maps!
-    std::vector< std::vector<std::vector<hlt::Move>> > full_player_moves;
+    std::vector<std::vector<std::vector<hlt::Move>>> full_player_moves;
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
     void output(std::string filename);
     void killPlayer(hlt::PlayerId player);
 public:
-    Halite(unsigned short width_, unsigned short height_, unsigned int seed_, unsigned short n_players_for_map_creation, Networking networking_, bool shouldIgnoreTimeout);
+    Halite(unsigned short width_,
+           unsigned short height_,
+           unsigned int seed_,
+           unsigned short n_players_for_map_creation,
+           Networking networking_,
+           bool shouldIgnoreTimeout);
 
-  GameStatistics runGame(std::vector<std::string> * names_, unsigned int seed, unsigned int id, bool enabledReplay, std::string replayDirectory);
+    GameStatistics runGame(std::vector<std::string>* names_,
+                           unsigned int seed,
+                           unsigned int id,
+                           bool enabledReplay,
+                           std::string replayDirectory);
     std::string getName(unsigned char playerTag);
 
     ~Halite();

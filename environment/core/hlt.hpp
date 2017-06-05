@@ -18,18 +18,19 @@ namespace hlt {
     constexpr auto MAX_QUEUED_MOVES = 3;
 
     typedef unsigned char PlayerId;
-    typedef size_t        EntityIndex;
+    typedef size_t EntityIndex;
 
     struct Location {
         unsigned short x, y;
     };
-    static bool operator==(const Location & l1, const Location & l2) {
+
+    static bool operator==(const Location& l1, const Location& l2) {
         return l1.x == l2.x && l1.y == l2.y;
     }
 
     struct Entity {
         Location location;
-        short    health;
+        short health;
 
         void kill() {
             health = 0;
@@ -108,7 +109,7 @@ namespace hlt {
     enum MoveType {
         //! Noop is not user-specifiable - instead it's the default command,
         //! used to mean that no command was issued
-        Noop = 0,
+            Noop = 0,
         Rotate,
         Thrust,
         Dock,
@@ -125,14 +126,16 @@ namespace hlt {
         } move;
     };
 
-    typedef std::array<std::array<hlt::Move, MAX_PLAYER_SHIPS>, MAX_QUEUED_MOVES> PlayerMoveQueue;
+    typedef std::array<std::array<hlt::Move, MAX_PLAYER_SHIPS>,
+                       MAX_QUEUED_MOVES> PlayerMoveQueue;
     typedef std::array<PlayerMoveQueue, MAX_PLAYERS> MoveQueue;
 
     class Map {
     public:
         std::array<std::array<Ship, MAX_PLAYER_SHIPS>, MAX_PLAYERS> ships;
         std::vector<Planet> planets;
-        unsigned short map_width, map_height; //Number of rows and columns, NOT maximum index.
+        unsigned short map_width,
+            map_height; //Number of rows and columns, NOT maximum index.
 
         Map() {
             map_width = 0;
@@ -141,38 +144,44 @@ namespace hlt {
             planets = std::vector<Planet>();
         }
 
-        Map(const Map &otherMap) {
+        Map(const Map& otherMap) {
             map_width = otherMap.map_width;
             map_height = otherMap.map_height;
             ships = otherMap.ships;
             planets = otherMap.planets;
         }
 
-        Map(unsigned short width, unsigned short height, unsigned char numberOfPlayers, unsigned int seed) : Map() {
+        Map(unsigned short width,
+            unsigned short height,
+            unsigned char numberOfPlayers,
+            unsigned int seed) : Map() {
             // TODO: enforce a minimum map size to make sure we always have room for planets
 
             //Pseudorandom number generator.
             std::mt19937 prg(seed);
             std::uniform_int_distribution<unsigned short> uidw(0, width - 1);
             std::uniform_int_distribution<unsigned short> uidh(0, height - 1);
-            std::uniform_int_distribution<unsigned short> uidr(1, std::min(width, height) / 25);
-            const auto rand_width = [&]() -> unsigned short { return uidw(prg); };
-            const auto rand_height = [&]() -> unsigned short { return uidh(prg); };
-            const auto rand_radius = [&]() -> unsigned short { return uidr(prg); };
+            std::uniform_int_distribution<unsigned short>
+                uidr(1, std::min(width, height) / 25);
+            const auto
+                rand_width = [&]() -> unsigned short { return uidw(prg); };
+            const auto
+                rand_height = [&]() -> unsigned short { return uidh(prg); };
+            const auto
+                rand_radius = [&]() -> unsigned short { return uidr(prg); };
 
             //Decides whether to put more players along the horizontal or the vertical.
             bool preferHorizontal = prg() % 2 == 0;
 
             int dw, dh;
             //Find number closest to square that makes the match symmetric.
-            if(preferHorizontal) {
+            if (preferHorizontal) {
                 dh = (int) sqrt(numberOfPlayers);
-                while(numberOfPlayers % dh != 0) dh--;
+                while (numberOfPlayers % dh != 0) dh--;
                 dw = numberOfPlayers / dh;
-            }
-            else {
+            } else {
                 dw = (int) sqrt(numberOfPlayers);
-                while(numberOfPlayers % dw != 0) dw--;
+                while (numberOfPlayers % dw != 0) dw--;
                 dh = numberOfPlayers / dw;
             }
 
@@ -194,7 +203,10 @@ namespace hlt {
                 unsigned short x;
                 unsigned short y;
 
-                Region(unsigned short _x, unsigned short _y, unsigned short _width, unsigned short _height) {
+                Region(unsigned short _x,
+                       unsigned short _y,
+                       unsigned short _width,
+                       unsigned short _height) {
                     this->x = _x;
                     this->y = _y;
                     this->width = _width;
@@ -212,22 +224,29 @@ namespace hlt {
             }
 
             // Center the player's starting ships in each region
-            for (PlayerId playerId = 0; playerId < numberOfPlayers; playerId++) {
+            for (PlayerId playerId = 0; playerId < numberOfPlayers;
+                 playerId++) {
                 const auto& region = regions.at(playerId);
 
                 for (int i = 0; i < 3; i++) {
                     ships[playerId][i].health = Ship::BASE_HEALTH;
-                    const auto x = static_cast<unsigned short>(region.x + (region.width / 2));
-                    const auto y = static_cast<unsigned short>(region.y + (region.height / 2) - 1 + i);
+                    const auto x = static_cast<unsigned short>(region.x
+                        + (region.width / 2));
+                    const auto y = static_cast<unsigned short>(region.y
+                        + (region.height / 2) - 1 + i);
 
                     ships[playerId][i].location.x = x;
                     ships[playerId][i].location.y = y;
                 }
+
+                planets.push_back(Planet(region.x + (region.width / 2) + 2,
+                                         region.y + (region.height / 2),
+                                         1));
             }
 
             // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
-            const auto MAX_PLANETS  = numberOfPlayers * 2;
-            const auto MAX_TRIES    = 100;
+            const auto MAX_PLANETS = numberOfPlayers * 2;
+            const auto MAX_TRIES = 100;
             const auto MIN_DISTANCE = 5;
             for (int i = 0; i < MAX_PLANETS; i++) {
                 for (int j = 0; j < MAX_TRIES; j++) {
@@ -238,13 +257,15 @@ namespace hlt {
                     // Make sure planets are far enough away from the center
                     // of each region, where initial ships spawn
                     for (Region region : regions) {
-                        if (getDistance({ region.x, region.y }, { x, y }) < r + MIN_DISTANCE) {
+                        if (getDistance({ region.x, region.y }, { x, y })
+                            < r + MIN_DISTANCE) {
                             goto TRY_AGAIN;
                         }
                     }
 
                     for (Planet planet : planets) {
-                        if (getDistance(planet.location, { x, y }) < r + planet.radius + 1) {
+                        if (getDistance(planet.location, { x, y })
+                            < r + planet.radius + 1) {
                             goto TRY_AGAIN;
                         }
                     }
@@ -252,10 +273,10 @@ namespace hlt {
                     planets.push_back(Planet(x, y, r));
                     goto NEXT_PLANET;
 
-                    TRY_AGAIN: ;
+                    TRY_AGAIN:;
                 }
 
-                NEXT_PLANET: ;
+                NEXT_PLANET:;
             }
 
             std::cout << map_width << " " << map_height << std::endl;
@@ -279,8 +300,7 @@ namespace hlt {
         auto getEntity(EntityId entity_id) -> Entity& {
             if (entity_id.is_planet()) {
                 return getPlanet(entity_id);
-            }
-            else {
+            } else {
                 return getShip(entity_id);
             }
         }
@@ -288,7 +308,7 @@ namespace hlt {
         float getDistance(Location l1, Location l2) const {
             short dx = l1.x - l2.x;
             short dy = l1.y - l2.y;
-            return sqrtf((dx*dx) + (dy*dy));
+            return sqrtf((dx * dx) + (dy * dy));
         }
 
         float getAngle(Location l1, Location l2) const {
@@ -325,8 +345,7 @@ namespace hlt {
             if (entity.health <= damage) {
                 killEntity(id);
                 return true;
-            }
-            else {
+            } else {
                 entity.health -= damage;
                 return false;
             }
