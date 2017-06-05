@@ -34,7 +34,7 @@ namespace hlt {
             health = 0;
         }
 
-        bool is_alive() {
+        bool is_alive() const {
             return health > 0;
         }
     };

@@ -292,6 +292,7 @@ void Halite::output(std::string filename) {
     for(int a = 0; a < full_frames.size(); a++) {
         nlohmann::json frame;
         std::vector<nlohmann::json> ships;
+        std::vector<nlohmann::json> planets;
 
         auto current_map = full_frames[a];
         for (hlt::PlayerId playerId = 0; playerId < number_of_players; playerId++) {
@@ -310,7 +311,17 @@ void Halite::output(std::string filename) {
             }
         }
 
+        for (hlt::EntityIndex i = 0; i < current_map.planets.size(); i++) {
+            const auto& planet = current_map.planets[i];
+            planets.push_back({
+                                  { "id", i },
+                                  { "x", planet.location.x },
+                                  { "y", planet.location.y },
+                              });
+        }
+
         frame["ships"] = ships;
+        frame["planets"] = planets;
         frames.push_back(frame);
     }
 

@@ -24,16 +24,32 @@ std::string Networking::serializeMap(const hlt::Map & map) {
     std::ostringstream oss;
 
     // Encode individual ships
-    oss << "ships;";  // Later we will have other entity types
+    oss << "ships";
     for (hlt::PlayerId playerId = 0; playerId < numberOfPlayers(); playerId++) {
-        oss << playerId << ';';
-        for (const auto& ship : map.ships.at(playerId)) {
-            oss << ship.location.x;
+        oss << " player " << (int) playerId;
+
+        for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            const auto& ship = map.ships[playerId][ship_id];
+            if (!ship.is_alive()) continue;
+
+            oss << ' ' << ship_id;
+            oss << ' ' << ship.location.x;
             oss << ' ' << ship.location.y;
             oss << ' ' << ship.health;
-            oss << ':';
+            oss << ' ' << ship.orientation;
+            // TODO: send other ship information
         }
-        oss << ';';
+    }
+
+    oss << " planets";
+    for (hlt::EntityIndex planet_id = 0; planet_id < map.planets.size(); planet_id++) {
+        const auto& planet = map.planets[planet_id];
+        if (!planet.is_alive()) continue;
+
+        oss << ' ' << planet_id;
+        oss << ' ' << planet.location.x;
+        oss << ' ' << planet.location.y;
+        oss << ' ' << planet.health;
     }
 
     returnString = oss.str();
