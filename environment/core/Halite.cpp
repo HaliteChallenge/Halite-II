@@ -801,12 +801,16 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
             break;
         }
         case hlt::EntityType::PlanetEntity: {
-            // TODO: Destroy/damage any and all ships attached to the planet
             hlt::Planet& planet = game_map.get_planet(id);
 
+            // Damage any and all ships attached to the planet
             for (const auto entity_index : planet.docked_ships) {
-                // TODO: calculate planet explosion damage
-                damage_entity(hlt::EntityId::for_ship(planet.owner, entity_index), 100);
+                const auto ship_id =
+                    hlt::EntityId::for_ship(planet.owner, entity_index);
+                const auto& ship = game_map.get_ship(ship_id);
+                const auto explosion_damage =
+                    compute_planet_explosion_damage(planet, ship.location);
+                damage_entity(ship_id, explosion_damage);
             }
 
             break;
@@ -824,5 +828,26 @@ auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
         kill_entity(id);
     } else {
         entity.health -= damage;
+    }
+}
+
+auto Halite::compute_planet_explosion_damage(
+    hlt::Planet& planet, hlt::Location location) -> unsigned short {
+    const auto dx = static_cast<short>(planet.location.pos_x) - location.pos_x;
+    const auto dy = static_cast<short>(planet.location.pos_y) - location.pos_y;
+    const auto distance_squared = dx*dx + dy*dy;
+
+    if (distance_squared == 0) {
+        return std::numeric_limits<unsigned short>::max();
+    }
+    else if (distance_squared <= 25) {
+        // Ensure a ship next to a planet receives 200 damage 
+        // (killing it instantly)
+        const auto distance_factor = 25 - (distance_squared - 1);
+        return static_cast<unsigned short>(
+            (hlt::Ship::BASE_HEALTH / 5) * distance_factor / 5);
+    }
+    else {
+        return 0;
     }
 }
