@@ -60,7 +60,7 @@ void Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & 
 
     hlt::Move move;
     // Keep track of how many queued commands each ship has
-    std::array<int, MAX_PLAYER_SHIPS> queue_depth = { 0 };
+    std::array<int, hlt::MAX_PLAYER_SHIPS> queue_depth = { { 0 } };
 
     char command;
     while (iss >> command) {
@@ -100,7 +100,7 @@ void Networking::deserializeMoveSet(std::string & inputString, const hlt::Map & 
         }
 
         auto queue_index = queue_depth.at(move.shipId);
-        if (queue_index < MAX_QUEUED_MOVES) {
+        if (queue_index < hlt::MAX_QUEUED_MOVES) {
             moves.at(queue_index).at(move.shipId) = move;
             queue_depth.at(move.shipId)++;
         }

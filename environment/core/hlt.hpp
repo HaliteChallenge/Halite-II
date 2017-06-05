@@ -9,22 +9,19 @@
 #include <assert.h>
 #include <array>
 
-#define MAX_PLAYERS 4
-#define MAX_PLAYER_SHIPS 40
-#define MAX_QUEUED_MOVES 3
-
 extern bool quiet_output;
 
 namespace hlt {
+    constexpr auto MAX_PLAYERS = 4;
+    constexpr auto MAX_PLAYER_SHIPS = 40;
+    constexpr auto MAX_QUEUED_MOVES = 3;
+
     typedef unsigned char PlayerId;
     typedef unsigned int  EntityIndex;
 
     struct Location {
         unsigned short x, y;
     };
-    static bool operator<(const Location & l1, const Location & l2) {
-        return ((l1.x + l1.y)*((unsigned int)l1.x + l1.y + 1) / 2) + l1.y < ((l2.x + l2.y)*((unsigned int)l2.x + l2.y + 1) / 2) + l2.y;
-    }
     static bool operator==(const Location & l1, const Location & l2) {
         return l1.x == l2.x && l1.y == l2.y;
     }

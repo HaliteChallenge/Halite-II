@@ -55,14 +55,14 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     auto movement_deltas =
         std::vector<std::vector<std::pair<short, short>>>(
             number_of_players,
-            std::vector<std::pair<short, short>>(MAX_PLAYER_SHIPS, {0, 0}));
+            std::vector<std::pair<short, short>>(hlt::MAX_PLAYER_SHIPS, {0, 0}));
     auto intermediate_positions =
         std::vector<std::vector<std::pair<float, float>>>(
             number_of_players,
-            std::vector<std::pair<float, float>>(MAX_PLAYER_SHIPS, {0.0, 0.0}));
+            std::vector<std::pair<float, float>>(hlt::MAX_PLAYER_SHIPS, {0.0, 0.0}));
 
     // Process queue of moves
-    for (unsigned int move_no = 0; move_no < MAX_QUEUED_MOVES; move_no++) {
+    for (unsigned int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
         // Reset auxiliary data structures
         for (auto& row : collision_map) {
             std::fill(row.begin(), row.end(), std::make_pair(-1, -1));
@@ -77,7 +77,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
             if (!alive[player_id]) continue;
 
-            for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
+            for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
                 auto& ship = game_map.getShip(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
@@ -121,7 +121,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
         for (int i = 1; i <= SUBSTEPS; i++) {
             for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
                 auto& player_ships = game_map.ships.at(player_id);
-                for (hlt::EntityIndex ship_id = 0; ship_id < MAX_PLAYER_SHIPS; ship_id++) {
+                for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
                     auto& ship = player_ships.at(ship_id);
                     if (!ship.is_alive()) continue;
 
@@ -295,7 +295,7 @@ void Halite::output(std::string filename) {
 
         auto current_map = full_frames[a];
         for (hlt::PlayerId playerId = 0; playerId < number_of_players; playerId++) {
-            for (int i = 0; i < MAX_PLAYER_SHIPS; i++) {
+            for (int i = 0; i < hlt::MAX_PLAYER_SHIPS; i++) {
                 auto ship = current_map.ships.at(playerId).at(i);
                 if (!ship.is_alive()) continue;
                 nlohmann::json record;
