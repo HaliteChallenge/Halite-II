@@ -165,7 +165,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         break;
                     }
                     case hlt::MoveType::Dock: {
-                        // TODO: separate undock command or repurpose this?
                         if (ship.docking_status
                             != hlt::DockingStatus::Undocked) {
                             break;
@@ -205,7 +204,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                         break;
                     }
-                    default:assert(false);
+
+                    case hlt::MoveType::Undock:
                         break;
                 }
 
@@ -417,7 +417,6 @@ void Halite::output(std::string filename) {
                         docking["status"] = "docked";
                         docking["planet_id"] = ship.docked_planet;
                         break;
-                    default:assert(false);
                 }
 
                 record["docking"] = docking;
@@ -463,17 +462,22 @@ void Halite::output(std::string filename) {
                     { "shipId", move.shipId },
                 };
                 switch (move.type) {
-                    case hlt::MoveType::Noop:continue;
-                    case hlt::MoveType::Rotate:record["type"] = "rotate";
+                    case hlt::MoveType::Noop:
+                        continue;
+                    case hlt::MoveType::Rotate:
+                        record["type"] = "rotate";
                         record["thrust"] = move.move.rotateBy;
                         break;
-                    case hlt::MoveType::Thrust:record["type"] = "thrust";
+                    case hlt::MoveType::Thrust:
+                        record["type"] = "thrust";
                         record["thrust"] = move.move.thrustBy;
                         break;
-                    case hlt::MoveType::Dock:record["type"] = "dock";
+                    case hlt::MoveType::Dock:
+                        record["type"] = "dock";
                         record["planet_id"] = move.move.dockTo;
                         break;
-                    default:assert(false);
+                    case hlt::MoveType::Undock:
+                        record["type"] = "undock";
                         break;
                 }
                 frame.push_back(record);
@@ -735,8 +739,6 @@ auto Halite::compute_damage(
             }
             break;
         }
-        default:
-            throw std::string("Collided with invalid entity");
     }
 
     return std::make_pair(self_damage, other_damage);

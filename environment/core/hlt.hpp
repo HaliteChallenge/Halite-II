@@ -41,7 +41,7 @@ namespace hlt {
         }
     };
 
-    enum DockingStatus {
+    enum class DockingStatus {
         Undocked,
         Docking,
         Docked,
@@ -87,7 +87,7 @@ namespace hlt {
         }
     };
 
-    enum EntityType {
+    enum class EntityType {
         InvalidEntity,
         ShipEntity,
         PlanetEntity,
@@ -112,13 +112,14 @@ namespace hlt {
         static auto for_ship(PlayerId player_id, EntityIndex index) -> EntityId;
     };
 
-    enum MoveType {
+    enum class MoveType {
         //! Noop is not user-specifiable - instead it's the default command,
         //! used to mean that no command was issued
         Noop = 0,
         Rotate,
         Thrust,
         Dock,
+        Undock,
     };
 
     struct Move {
