@@ -2,7 +2,161 @@
 
 //Private Functions ------------------
 
-void Halite::killPlayer(hlt::PlayerId player) {
+auto Halite::compute_damage(
+    hlt::EntityId self_id, hlt::EntityId other_id,
+    std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
+-> std::pair<unsigned short, unsigned short> {
+
+    unsigned short self_damage = 0;
+    unsigned short other_damage = 0;
+
+    assert(self_id.type == hlt::EntityType::ShipEntity);
+    const auto& ship = game_map.get_ship(self_id);
+
+    auto& delta = movement_deltas.at(self_id.player_id())
+        .at(self_id.entity_index());
+
+    // The collision is head-on for us if the direction of
+    // movement is parallel to the ship orientation
+    // (10 degree fudge factor)
+    auto self_head_on = fabsf(
+        atan2f(delta.second, delta.first)
+            - ship.orientation) < 10;
+    auto self_vel_factor =
+        static_cast<unsigned short>(
+            sqrtf(delta.first * delta.first
+                      + delta.second * delta.second)
+                / 25);
+    self_vel_factor = std::max(self_vel_factor,
+                               static_cast<unsigned short>(1));
+
+    if (self_head_on) {
+        delta.first = delta.second = 0;
+        self_damage += 25 * self_vel_factor;
+        other_damage += 50 * self_vel_factor;
+    } else {
+        self_damage += 50 * self_vel_factor;
+        other_damage += 25 * self_vel_factor;
+    }
+
+    switch (other_id.type) {
+        case hlt::EntityType::PlanetEntity:
+            self_damage += 200;
+            other_damage += 100;
+            break;
+        case hlt::EntityType::ShipEntity: {
+            auto& other = game_map.get_ship(other_id);
+            auto& other_delta =
+                movement_deltas.at(other_id.player_id()).at(
+                    other_id.entity_index());
+
+            // The collision is head-on for the other if the two
+            // ship directions are antiparallel
+            auto other_head_on = std::abs(
+                std::abs(
+                    ship.orientation - other.orientation)
+                    - 180) < 10;
+            auto other_vel_factor =
+                static_cast<unsigned short>(sqrtf(
+                    other_delta.first * other_delta.first
+                        + other_delta.second
+                            * other_delta.second)
+                    / 25);
+            other_vel_factor = std::max(other_vel_factor,
+                                        static_cast<unsigned short>(1));
+
+            if (other_head_on) {
+                other_delta.first = other_delta.second =
+                    0;
+                self_damage += 50 * other_vel_factor;
+                other_damage += 25 * other_vel_factor;
+            } else {
+                self_damage += 25 * other_vel_factor;
+                other_damage += 50 * other_vel_factor;
+            }
+            break;
+        }
+        case hlt::EntityType::InvalidEntity:
+            throw std::string("Cannot compute damage against an invalid entity");
+    }
+
+    return std::make_pair(self_damage, other_damage);
+}
+
+auto Halite::compute_planet_explosion_damage(
+    hlt::Planet& planet, hlt::Location location) -> unsigned short {
+    const auto dx = static_cast<short>(planet.location.pos_x) - location.pos_x;
+    const auto dy = static_cast<short>(planet.location.pos_y) - location.pos_y;
+    const auto distance_squared = dx*dx + dy*dy;
+
+    if (distance_squared == 0) {
+        return std::numeric_limits<unsigned short>::max();
+    }
+    else if (distance_squared <= 25) {
+        // Ensure a ship next to a planet receives 200 damage
+        // (killing it instantly)
+        const auto distance_factor = 25 - (distance_squared - 1);
+        return static_cast<unsigned short>(
+            (hlt::Ship::BASE_HEALTH / 5) * distance_factor / 5);
+    }
+    else {
+        return 0;
+    }
+}
+
+auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
+    hlt::Entity& entity = game_map.get_entity(id);
+
+    if (entity.health <= damage) {
+        kill_entity(id);
+    } else {
+        entity.health -= damage;
+    }
+}
+
+auto Halite::kill_entity(hlt::EntityId id) -> void {
+    hlt::Entity& entity = game_map.get_entity(id);
+    entity.kill();
+
+    switch (id.type) {
+        case hlt::EntityType::ShipEntity: {
+            hlt::Ship& ship = game_map.get_ship(id);
+
+            if (ship.docking_status != hlt::DockingStatus::Undocked) {
+                auto& planet = game_map.planets.at(ship.docked_planet);
+                auto pos = std::find(
+                    planet.docked_ships.begin(),
+                    planet.docked_ships.end(),
+                    id.entity_index()
+                );
+                if (pos != planet.docked_ships.end()) {
+                    planet.docked_ships.erase(pos);
+                }
+            }
+            break;
+        }
+        case hlt::EntityType::PlanetEntity: {
+            hlt::Planet& planet = game_map.get_planet(id);
+
+            // Damage any and all ships attached to the planet
+            for (const auto entity_index : planet.docked_ships) {
+                const auto ship_id =
+                    hlt::EntityId::for_ship(planet.owner, entity_index);
+                const auto& ship = game_map.get_ship(ship_id);
+                const auto explosion_damage =
+                    compute_planet_explosion_damage(planet, ship.location);
+                damage_entity(ship_id, explosion_damage);
+            }
+
+            break;
+        }
+        case hlt::EntityType::InvalidEntity: {
+            assert(false);
+        }
+    }
+}
+
+void Halite::kill_player(hlt::PlayerId player) {
     networking.killPlayer(player + 1);
     timeout_tags.insert(player + 1);
 
@@ -44,7 +198,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
         if (alive[player_id]) {
             int time = frame_threads[player_id].get();
             if (time == -1) {
-                killPlayer(player_id);
+                kill_player(player_id);
             } else total_frame_response_times[player_id] += time;
         }
     }
@@ -704,158 +858,4 @@ std::string Halite::getName(hlt::PlayerId playerTag) {
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
     for (int a = 0; a < number_of_players; a++) networking.killPlayer(a + 1);
-}
-
-auto Halite::compute_damage(
-    hlt::EntityId self_id, hlt::EntityId other_id,
-    std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
-    -> std::pair<unsigned short, unsigned short> {
-
-    unsigned short self_damage = 0;
-    unsigned short other_damage = 0;
-
-    assert(self_id.type == hlt::EntityType::ShipEntity);
-    const auto& ship = game_map.get_ship(self_id);
-
-    auto& delta = movement_deltas.at(self_id.player_id())
-        .at(self_id.entity_index());
-
-    // The collision is head-on for us if the direction of
-    // movement is parallel to the ship orientation
-    // (10 degree fudge factor)
-    auto self_head_on = fabsf(
-        atan2f(delta.second, delta.first)
-            - ship.orientation) < 10;
-    auto self_vel_factor =
-        static_cast<unsigned short>(
-            sqrtf(delta.first * delta.first
-                      + delta.second * delta.second)
-                / 25);
-    self_vel_factor = std::max(self_vel_factor,
-                               static_cast<unsigned short>(1));
-
-    if (self_head_on) {
-        delta.first = delta.second = 0;
-        self_damage += 25 * self_vel_factor;
-        other_damage += 50 * self_vel_factor;
-    } else {
-        self_damage += 50 * self_vel_factor;
-        other_damage += 25 * self_vel_factor;
-    }
-
-    switch (other_id.type) {
-        case hlt::EntityType::PlanetEntity:
-            self_damage += 200;
-            other_damage += 100;
-            break;
-        case hlt::EntityType::ShipEntity: {
-            auto& other = game_map.get_ship(other_id);
-            auto& other_delta =
-                movement_deltas.at(other_id.player_id()).at(
-                    other_id.entity_index());
-
-            // The collision is head-on for the other if the two
-            // ship directions are antiparallel
-            auto other_head_on = std::abs(
-                std::abs(
-                    ship.orientation - other.orientation)
-                    - 180) < 10;
-            auto other_vel_factor =
-                static_cast<unsigned short>(sqrtf(
-                    other_delta.first * other_delta.first
-                        + other_delta.second
-                            * other_delta.second)
-                    / 25);
-            other_vel_factor = std::max(other_vel_factor,
-                                        static_cast<unsigned short>(1));
-
-            if (other_head_on) {
-                other_delta.first = other_delta.second =
-                    0;
-                self_damage += 50 * other_vel_factor;
-                other_damage += 25 * other_vel_factor;
-            } else {
-                self_damage += 25 * other_vel_factor;
-                other_damage += 50 * other_vel_factor;
-            }
-            break;
-        }
-        case hlt::EntityType::InvalidEntity:
-            throw std::string("Cannot compute damage against an invalid entity");
-    }
-
-    return std::make_pair(self_damage, other_damage);
-}
-
-auto Halite::kill_entity(hlt::EntityId id) -> void {
-    hlt::Entity& entity = game_map.get_entity(id);
-    entity.kill();
-
-    switch (id.type) {
-        case hlt::EntityType::ShipEntity: {
-            hlt::Ship& ship = game_map.get_ship(id);
-
-            if (ship.docking_status != hlt::DockingStatus::Undocked) {
-                auto& planet = game_map.planets.at(ship.docked_planet);
-                auto pos = std::find(
-                    planet.docked_ships.begin(),
-                    planet.docked_ships.end(),
-                    id.entity_index()
-                );
-                if (pos != planet.docked_ships.end()) {
-                    planet.docked_ships.erase(pos);
-                }
-            }
-            break;
-        }
-        case hlt::EntityType::PlanetEntity: {
-            hlt::Planet& planet = game_map.get_planet(id);
-
-            // Damage any and all ships attached to the planet
-            for (const auto entity_index : planet.docked_ships) {
-                const auto ship_id =
-                    hlt::EntityId::for_ship(planet.owner, entity_index);
-                const auto& ship = game_map.get_ship(ship_id);
-                const auto explosion_damage =
-                    compute_planet_explosion_damage(planet, ship.location);
-                damage_entity(ship_id, explosion_damage);
-            }
-
-            break;
-        }
-        case hlt::EntityType::InvalidEntity: {
-            assert(false);
-        }
-    }
-}
-
-auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
-    hlt::Entity& entity = game_map.get_entity(id);
-
-    if (entity.health <= damage) {
-        kill_entity(id);
-    } else {
-        entity.health -= damage;
-    }
-}
-
-auto Halite::compute_planet_explosion_damage(
-    hlt::Planet& planet, hlt::Location location) -> unsigned short {
-    const auto dx = static_cast<short>(planet.location.pos_x) - location.pos_x;
-    const auto dy = static_cast<short>(planet.location.pos_y) - location.pos_y;
-    const auto distance_squared = dx*dx + dy*dy;
-
-    if (distance_squared == 0) {
-        return std::numeric_limits<unsigned short>::max();
-    }
-    else if (distance_squared <= 25) {
-        // Ensure a ship next to a planet receives 200 damage 
-        // (killing it instantly)
-        const auto distance_factor = 25 - (distance_squared - 1);
-        return static_cast<unsigned short>(
-            (hlt::Ship::BASE_HEALTH / 5) * distance_factor / 5);
-    }
-    else {
-        return 0;
-    }
 }

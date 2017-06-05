@@ -93,7 +93,7 @@ private:
 
     std::vector<bool> processNextFrame(std::vector<bool> alive);
     void output(std::string filename);
-    void killPlayer(hlt::PlayerId player);
+    void kill_player(hlt::PlayerId player);
 
     auto compute_damage(
         hlt::EntityId self_id, hlt::EntityId other_id,

@@ -75,15 +75,17 @@ namespace hlt {
         unsigned short remaining_production;
         unsigned short docking_spots;
 
-        //! Contains IDs of all ships in the process of docking or undocking, as well as docked ships.
+        //! Contains IDs of all ships in the process of docking or undocking,
+        //! as well as docked ships.
         std::vector<EntityIndex> docked_ships;
 
         Planet(unsigned short x, unsigned short y, unsigned short radius) {
             location.pos_x = x;
             location.pos_y = y;
             this->radius = radius;
-            health = (short) (500 + 100 * sqrt(radius));
+            health = static_cast<unsigned short>(500 + 100 * sqrt(radius));
             docking_spots = radius;
+            remaining_production = static_cast<unsigned short>(radius * 100);
 
             owned = false;
         }
