@@ -155,9 +155,6 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
                     hlt::EntityId::for_ship(player_id, ship_id);
 
-                // TODO: ignore commands if ship is docked (eject player
-                // from game?)
-
                 switch (move.type) {
                     case hlt::MoveType::Noop: {
                         break;
@@ -324,13 +321,18 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     // Check if the game is over
     std::vector<bool> stillAlive(number_of_players, false);
 
-    // TODO also check planets
     for (hlt::PlayerId player = 0; player < number_of_players; player++) {
         for (auto& ship : game_map.ships.at(player)) {
             if (ship.is_alive()) {
                 stillAlive[player] = true;
                 break;
             }
+        }
+    }
+
+    for (const auto& planet : game_map.planets) {
+        if (planet.is_alive() && planet.owned) {
+            stillAlive[planet.owner] = true;
         }
     }
 
