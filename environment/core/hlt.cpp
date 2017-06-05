@@ -2,9 +2,6 @@
 // Created by David Li on 6/5/17.
 //
 
-#ifndef HLT_H
-#define HLT_H
-
 #include "hlt.hpp"
 
 namespace hlt {
@@ -48,5 +45,3 @@ namespace hlt {
         return result;
     }
 }
-
-#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HLT_H
+#define HLT_H
 
 #include <list>
 #include <vector>
@@ -289,3 +290,5 @@ namespace hlt {
         }
     };
 }
+
+#endif
