@@ -106,7 +106,13 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 // from game?)
 
                 switch (move.type) {
+                    case hlt::MoveType::Noop: {
+                        break;
+                    }
                     case hlt::MoveType::Rotate: {
+                        if (ship.docking_status != hlt::DockingStatus::Undocked) {
+                            break;
+                        }
                         // Update orientation based on thrust
                         const short degrees = -move.move.rotateBy;
                         auto new_orientation = static_cast<short>((degrees + ship.orientation) % 360);
@@ -116,6 +122,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         break;
                     }
                     case hlt::MoveType::Thrust: {
+                        if (ship.docking_status != hlt::DockingStatus::Undocked) {
+                            break;
+                        }
+
                         // Update speed based on thrust
                         const auto distance = move.move.thrustBy;
                         short dx = (short) (distance * std::cos(ship.orientation * M_2_PI / 360));
@@ -127,6 +137,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         break;
                     }
                     case hlt::MoveType::Dock: {
+                        // TODO: separate undock command or repurpose this?
+                        if (ship.docking_status != hlt::DockingStatus::Undocked) {
+                            break;
+                        }
+
                         const auto planet_id = move.move.dockTo;
                         if (planet_id >= game_map.planets.size()) {
                             // Planet is invalid, do nothing
@@ -192,6 +207,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 auto& player_ships = game_map.ships.at(player_id);
                 for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
                     auto& ship = player_ships.at(ship_id);
+                    auto id = hlt::EntityId(player_id, ship_id);
+
                     if (!ship.is_alive()) continue;
 
                     auto &pos = intermediate_positions.at(player_id).at(ship_id);
@@ -207,7 +224,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // TODO: be consistent and explicit about rounding vs truncation
                     if (pos.first < 0 || pos.first >= game_map.map_width ||
                         pos.second < 0 || pos.second >= game_map.map_height) {
-                        ship.kill();
+                        game_map.killEntity(id);
                         continue;
                     }
 
@@ -444,6 +461,8 @@ void Halite::output(std::string filename) {
                     { "shipId", move.shipId },
                 };
                 switch (move.type) {
+                    case hlt::MoveType::Noop:
+                        continue;
                     case hlt::MoveType::Rotate:
                         record["type"] = "rotate";
                         record["thrust"] = move.move.rotateBy;

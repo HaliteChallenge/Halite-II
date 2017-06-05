@@ -106,6 +106,9 @@ namespace hlt {
     };
 
     enum MoveType {
+        //! Noop is not user-specifiable - instead it's the default command,
+        //! used to mean that no command was issued
+        Noop = 0,
         Rotate,
         Thrust,
         Dock,
