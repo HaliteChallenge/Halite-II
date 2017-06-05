@@ -144,15 +144,15 @@ namespace hlt {
             unsigned char numberOfPlayers,
             unsigned int seed);
 
-        auto getShip(PlayerId player, EntityIndex entity) -> Ship&;
-        auto getShip(EntityId entity_id) -> Ship&;
-        auto getPlanet(EntityId entity_id) -> Planet&;
-        auto getEntity(EntityId entity_id) -> Entity&;
-        auto getDistance(Location l1, Location l2) const -> float;
-        auto getAngle(Location l1, Location l2) const -> float;
-        auto killEntity(EntityId& id) -> void;
+        auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
+        auto get_ship(EntityId entity_id) -> Ship&;
+        auto get_planet(EntityId entity_id) -> Planet&;
+        auto get_entity(EntityId entity_id) -> Entity&;
+        auto get_distance(Location l1, Location l2) const -> float;
+        auto get_angle(Location l1, Location l2) const -> float;
+        auto kill_entity(EntityId& id) -> void;
         //! Damage the given ship, killing it and returning true if the ship health falls below 0
-        auto damageEntity(EntityId id, unsigned short damage) -> bool;
+        auto damage_entity(EntityId id, unsigned short damage) -> bool;
     };
 }
 

@@ -165,14 +165,14 @@ namespace hlt {
                 // Make sure planets are far enough away from the center
                 // of each region, where initial ships spawn
                 for (Region region : regions) {
-                    if (getDistance({ region.x, region.y }, { x, y })
+                    if (get_distance({ region.x, region.y }, { x, y })
                         < r + MIN_DISTANCE) {
                         goto TRY_AGAIN;
                     }
                 }
 
                 for (Planet planet : planets) {
-                    if (getDistance(planet.location, { x, y })
+                    if (get_distance(planet.location, { x, y })
                         < r + planet.radius + 1) {
                         goto TRY_AGAIN;
                     }
@@ -190,47 +190,47 @@ namespace hlt {
         std::cout << map_width << " " << map_height << std::endl;
     }
 
-    auto Map::getShip(PlayerId player, EntityIndex entity) -> Ship& {
+    auto Map::get_ship(PlayerId player, EntityIndex entity) -> Ship& {
         return ships.at(player).at(entity);
     }
 
-    auto Map::getShip(EntityId entity_id) -> Ship& {
+    auto Map::get_ship(EntityId entity_id) -> Ship& {
         assert(entity_id.is_ship());
-        return getShip(entity_id.player_id(), entity_id.entity_index());
+        return get_ship(entity_id.player_id(), entity_id.entity_index());
     }
 
-    auto Map::getPlanet(EntityId entity_id) -> Planet& {
+    auto Map::get_planet(EntityId entity_id) -> Planet& {
         assert(entity_id.is_planet());
         assert(entity_id.entity_index() < planets.size());
         return planets[entity_id.entity_index()];
     }
 
-    auto Map::getEntity(EntityId entity_id) -> Entity& {
+    auto Map::get_entity(EntityId entity_id) -> Entity& {
         if (entity_id.is_planet()) {
-            return getPlanet(entity_id);
+            return get_planet(entity_id);
         } else {
-            return getShip(entity_id);
+            return get_ship(entity_id);
         }
     }
 
-    auto Map::getDistance(Location l1, Location l2) const -> float {
+    auto Map::get_distance(Location l1, Location l2) const -> float {
         short dx = l1.x - l2.x;
         short dy = l1.y - l2.y;
         return sqrtf((dx * dx) + (dy * dy));
     }
 
-    auto Map::getAngle(Location l1, Location l2) const -> float {
+    auto Map::get_angle(Location l1, Location l2) const -> float {
         short dx = l2.x - l1.x;
         short dy = l2.y - l1.y;
         return atan2f(dy, dx);
     }
 
-    auto Map::killEntity(EntityId& id) -> void {
-        Entity& entity = getEntity(id);
+    auto Map::kill_entity(EntityId& id) -> void {
+        Entity& entity = get_entity(id);
         entity.kill();
 
         if (id.is_ship()) {
-            Ship& ship = getShip(id);
+            Ship& ship = get_ship(id);
 
             if (ship.docking_status != DockingStatus::Undocked) {
                 auto& planet = planets.at(ship.docked_planet);
@@ -247,11 +247,11 @@ namespace hlt {
     }
 
     //! Damage the given ship, killing it and returning true if the ship health falls below 0
-    auto Map::damageEntity(EntityId id, unsigned short damage) -> bool {
-        Entity& entity = getEntity(id);
+    auto Map::damage_entity(EntityId id, unsigned short damage) -> bool {
+        Entity& entity = get_entity(id);
 
         if (entity.health <= damage) {
-            killEntity(id);
+            kill_entity(id);
             return true;
         } else {
             entity.health -= damage;

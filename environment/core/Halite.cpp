@@ -112,7 +112,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
             for (hlt::EntityIndex ship_id = 0;
                  ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                auto& ship = game_map.getShip(player_id, ship_id);
+                auto& ship = game_map.get_ship(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
                 auto move = player_moves[player_id][move_no][ship_id];
@@ -259,7 +259,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // TODO: be consistent and explicit about rounding vs truncation
                     if (pos.first < 0 || pos.first >= game_map.map_width ||
                         pos.second < 0 || pos.second >= game_map.map_height) {
-                        game_map.killEntity(id);
+                        game_map.kill_entity(id);
                         continue;
                     }
 
@@ -299,7 +299,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                             self_damage += 200;
                             other_damage += 100;
                         } else {
-                            auto& other = game_map.getShip(occupancy);
+                            auto& other = game_map.get_ship(occupancy);
                             auto& other_delta =
                                 movement_deltas.at(occupancy.player_id()).at(
                                     occupancy.entity_index());
@@ -329,8 +329,8 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                         }
 
-                        game_map.damageEntity(occupancy, other_damage);
-                        game_map.damageEntity(
+                        game_map.damage_entity(occupancy, other_damage);
+                        game_map.damage_entity(
                             hlt::EntityId(player_id, ship_id), self_damage);
                     } else {
                         // Move the ship
