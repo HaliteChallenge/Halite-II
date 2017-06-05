@@ -49,9 +49,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     }
 
     auto collision_map =
-        std::vector<std::vector<std::pair<int, int>>>(
+        std::vector<std::vector<hlt::EntityId>>(
             game_map.map_width,
-            std::vector<std::pair<int, int>>(game_map.map_height, { -1, -1 }));
+            std::vector<hlt::EntityId>(game_map.map_height, hlt::EntityId::invalid()));
     auto movement_deltas =
         std::vector<std::vector<std::pair<short, short>>>(
             number_of_players,
@@ -65,7 +65,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
     for (unsigned int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
         // Reset auxiliary data structures
         for (auto& row : collision_map) {
-            std::fill(row.begin(), row.end(), std::make_pair(-1, -1));
+            std::fill(row.begin(), row.end(), hlt::EntityId::invalid());
         }
         for (auto& row : movement_deltas) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
@@ -83,7 +83,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                 auto move = player_moves[player_id][move_no][ship_id];
 
-                assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
+                assert(!collision_map.at(ship.location.x).at(ship.location.y).is_valid());
                 collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
 
                 switch (move.type) {
@@ -130,7 +130,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                     if (delta.first == 0 && delta.second == 0) continue;
 
-                    collision_map.at(ship.location.x).at(ship.location.y) = {-1, -1};
+                    collision_map.at(ship.location.x).at(ship.location.y) = hlt::EntityId::invalid();
                     pos.first += SUBSTEP_DT * delta.first;
                     pos.second += SUBSTEP_DT * delta.second;
 
@@ -147,9 +147,11 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                     // Check collisions
                     const auto& occupancy = collision_map.at(xp).at(yp);
-                    if (occupancy.first > -1 && occupancy.second > -1) {
-                        auto& other = game_map.ships.at(occupancy.first).at(occupancy.second);
-                        auto& other_delta = movement_deltas.at(occupancy.first).at(occupancy.second);
+                    if (occupancy.is_valid()) {
+                        if (occupancy.is_planet()) continue;
+
+                        auto& other = game_map.getShip(occupancy);
+                        auto& other_delta = movement_deltas.at(occupancy.player_id()).at(occupancy.entity_index());
 
                         // The collision is head-on for us if the direction of
                         // movement is parallel to the ship orientation
@@ -200,7 +202,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                     if (!ship.is_alive()) continue;
 
-                    assert(collision_map.at(ship.location.x).at(ship.location.y) == std::make_pair(-1, -1));
+                    assert(!collision_map.at(ship.location.x).at(ship.location.y).is_valid());
                     collision_map.at(ship.location.x).at(ship.location.y) = {player_id, ship_id};
                 }
             }

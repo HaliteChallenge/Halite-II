@@ -78,6 +78,24 @@ namespace hlt {
         }
     };
 
+    struct EntityId {
+    private:
+        int _player_id;
+        int _entity_index;
+    public:
+        EntityId();
+        EntityId(PlayerId player, EntityIndex index);
+
+        bool is_valid() const;
+        bool is_planet() const;
+        bool is_ship() const;
+
+        PlayerId player_id() const;
+        EntityIndex entity_index() const;
+
+        static EntityId invalid();
+    };
+
     enum MoveType {
         Rotate,
         Thrust,
@@ -222,6 +240,11 @@ namespace hlt {
 
         Ship& getShip(PlayerId player, EntityIndex entity) {
             return ships.at(player).at(entity);
+        }
+
+        Ship& getShip(EntityId entity_id) {
+            assert(entity_id.is_ship());
+            return getShip(entity_id.player_id(), entity_id.entity_index());
         }
 
         void killShip(Ship& ship) {
