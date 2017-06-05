@@ -134,7 +134,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                             break;
                         }
                         // Update orientation based on thrust
-                        const short degrees = -move.move.rotateBy;
+                        const short degrees = -move.move.rotate_by;
                         auto new_orientation =
                             static_cast<short>((degrees + ship.orientation)
                                 % 360);
@@ -151,7 +151,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                         }
 
                         // Update speed based on thrust
-                        const auto distance = move.move.thrustBy;
+                        const auto distance = move.move.thrust_by;
                         short dx = (short) (distance
                             * std::cos(ship.orientation * M_2_PI / 360));
                         short dy = (short) (distance
@@ -170,7 +170,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                             break;
                         }
 
-                        const auto planet_id = move.move.dockTo;
+                        const auto planet_id = move.move.dock_to;
                         if (planet_id >= game_map.planets.size()) {
                             // Planet is invalid, do nothing
                             ship.reset_docking_status();
@@ -466,15 +466,15 @@ void Halite::output(std::string filename) {
                         continue;
                     case hlt::MoveType::Rotate:
                         record["type"] = "rotate";
-                        record["thrust"] = move.move.rotateBy;
+                        record["thrust"] = move.move.rotate_by;
                         break;
                     case hlt::MoveType::Thrust:
                         record["type"] = "thrust";
-                        record["thrust"] = move.move.thrustBy;
+                        record["thrust"] = move.move.thrust_by;
                         break;
                     case hlt::MoveType::Dock:
                         record["type"] = "dock";
-                        record["planet_id"] = move.move.dockTo;
+                        record["planet_id"] = move.move.dock_to;
                         break;
                     case hlt::MoveType::Undock:
                         record["type"] = "undock";

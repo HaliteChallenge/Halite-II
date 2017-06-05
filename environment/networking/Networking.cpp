@@ -95,8 +95,8 @@ void Networking::deserializeMoveSet(std::string& inputString,
             case 'r': {
                 move.type = hlt::MoveType::Rotate;
                 iss >> move.shipId;
-                iss >> move.move.rotateBy;
-                const auto thrust = move.move.rotateBy;
+                iss >> move.move.rotate_by;
+                const auto thrust = move.move.rotate_by;
                 if (thrust < -100 || thrust > 100) {
                     std::string errorMessage =
                         "Bot sent an invalid rotation thrust - ejecting from game.\n";
@@ -111,8 +111,8 @@ void Networking::deserializeMoveSet(std::string& inputString,
             case 't': {
                 move.type = hlt::MoveType::Thrust;
                 iss >> move.shipId;
-                iss >> move.move.thrustBy;
-                const auto thrust = move.move.thrustBy;
+                iss >> move.move.thrust_by;
+                const auto thrust = move.move.thrust_by;
                 if (thrust < -100 || thrust > 100) {
                     std::string errorMessage =
                         "Bot sent an invalid rotation thrust - ejecting from game.\n";
@@ -130,9 +130,9 @@ void Networking::deserializeMoveSet(std::string& inputString,
                 // between commands anyways
                 move.type = hlt::MoveType::Dock;
                 iss >> move.shipId;
-                iss >> move.move.dockTo;
-                if (move.move.dockTo >= m.planets.size()
-                    || !m.planets[move.move.dockTo].is_alive()) {
+                iss >> move.move.dock_to;
+                if (move.move.dock_to >= m.planets.size()
+                    || !m.planets[move.move.dock_to].is_alive()) {
                     throw eject_bot(
                         "Bot docked to invalid planet - ejecting from game.\n");
                 }

@@ -127,9 +127,9 @@ namespace hlt {
         EntityIndex shipId;
 
         union {
-            short rotateBy;
-            short thrustBy;
-            EntityIndex dockTo;
+            short rotate_by;
+            short thrust_by;
+            EntityIndex dock_to;
         } move;
     };
 
