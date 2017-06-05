@@ -111,18 +111,17 @@ namespace hlt {
         float getDistance(Location l1, Location l2) const {
             short dx = l1.x - l2.x;
             short dy = l1.y - l2.y;
-            return sqrt((dx*dx) + (dy*dy));
+            return sqrtf((dx*dx) + (dy*dy));
         }
 
         float getAngle(Location l1, Location l2) const {
             short dx = l2.x - l1.x;
             short dy = l2.y - l1.y;
-            return atan2(dy, dx);
+            return atan2f(dy, dx);
         }
 
         //! Damage the given ship, killing it and returning true if the ship health falls below 0
         auto damageShip(Ship &ship, unsigned short damage) -> bool {
-            // TODO: actual damage calculations
             if (ship.health <= damage) {
                 killShip(ship);
                 return true;
