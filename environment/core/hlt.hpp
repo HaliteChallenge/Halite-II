@@ -93,6 +93,7 @@ namespace hlt {
                 for (int i = 0; i < 3; i++) {
                     ships[playerId][i].health = 200;
                     ships[playerId][i].location.x = (unsigned short) playerId;
+                    ships[playerId][i].location.y = i;
                 }
             }
 
