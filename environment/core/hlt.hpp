@@ -111,20 +111,73 @@ namespace hlt {
         }
 
         Map(unsigned short width, unsigned short height, unsigned char numberOfPlayers, unsigned int seed) : Map() {
-            map_width = width;
-            map_height = height;
-
             //Pseudorandom number generator.
             std::mt19937 prg(seed);
             std::uniform_real_distribution<double> urd(0.0, 1.0);
 
-            for (PlayerId playerId = 0; playerId < numberOfPlayers; playerId++) {
-                for (int i = 0; i < 3; i++) {
-                    ships[playerId][i].health = Ship::BASE_HEALTH;
-                    ships[playerId][i].location.x = (unsigned short) playerId;
-                    ships[playerId][i].location.y = i;
+            //Decides whether to put more players along the horizontal or the vertical.
+            bool preferHorizontal = prg() % 2 == 0;
+
+            int dw, dh;
+            //Find number closest to square that makes the match symmetric.
+            if(preferHorizontal) {
+                dh = (int) sqrt(numberOfPlayers);
+                while(numberOfPlayers % dh != 0) dh--;
+                dw = numberOfPlayers / dh;
+            }
+            else {
+                dw = (int) sqrt(numberOfPlayers);
+                while(numberOfPlayers % dw != 0) dw--;
+                dh = numberOfPlayers / dw;
+            }
+
+            //Figure out chunk width and height accordingly.
+            //Matches width and height as closely as it can, but is not guaranteed to match exactly.
+            //It is guaranteed to be smaller if not the same size, however.
+            int cw = 5 * width / dw;
+            int ch = 5 * height / dh;
+
+            map_width = (unsigned short) (cw * dw);
+            map_height = (unsigned short) (ch * dh);
+
+            // Divide the map into regions for each player
+
+            class Region {
+            public:
+                int width;
+                int height;
+                int x;
+                int y;
+
+                Region(int _x, int _y, int _width, int _height) {
+                    this->x = _x;
+                    this->y = _y;
+                    this->width = _width;
+                    this->height = _height;
+                }
+            };
+
+            std::vector<Region> regions = std::vector<Region>();
+            regions.reserve(numberOfPlayers);
+
+            for (int row = 0; row < dh; row++) {
+                for (int col = 0; col < dw; col++) {
+                    regions.push_back(Region(col * cw, row * ch, cw, ch));
                 }
             }
+
+            // Center the player's starting ships in each region
+            for (PlayerId playerId = 0; playerId < numberOfPlayers; playerId++) {
+                const auto& region = regions.at(playerId);
+
+                for (int i = 0; i < 3; i++) {
+                    ships[playerId][i].health = Ship::BASE_HEALTH;
+                    ships[playerId][i].location.x = region.x + (region.width / 2);
+                    ships[playerId][i].location.y = region.y + (region.height / 2) - 1 + i;
+                }
+            }
+
+            // TODO: Scatter planets throughout all of space, avoiding the starting ships
 
             std::cout << map_width << " " << map_height << std::endl;
         }
