@@ -578,10 +578,10 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
         //Frame logic.
         std::vector<bool> newResult = processNextFrame(result);
         //Add to vector of players that should be dead.
-        std::vector<unsigned int> newRankings;
-        for (unsigned char a = 0; a < number_of_players; a++)
-            if (result[a] && !newResult[a]) {
-                newRankings.push_back(a);
+        std::vector<hlt::PlayerId> newRankings;
+        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
+            if (result[player_id] && !newResult[player_id]) {
+                newRankings.push_back(player_id);
             }
         //Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
         std::stable_sort(newRankings.begin(),
@@ -603,9 +603,11 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
         // TODO: come up with similar metric for 2.0
         result = newResult;
     }
-    std::vector<unsigned int> newRankings;
-    for (int a = 0; a < number_of_players; a++)
-        if (result[a]) newRankings.push_back(a);
+    std::vector<hlt::PlayerId> newRankings;
+    for (hlt::PlayerId player_id = 0;
+         player_id < number_of_players; player_id++) {
+        if (result[player_id]) newRankings.push_back(player_id);
+    }
     //Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
     std::stable_sort(newRankings.begin(),
                      newRankings.end(),
@@ -618,8 +620,9 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
                          return last_territory_count[u1]
                              < last_territory_count[u2];
                      });
-    for (auto a = newRankings.begin(); a != newRankings.end(); a++)
-        rankings.push_back(*a);
+
+    rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
+
     std::reverse(rankings.begin(),
                  rankings.end()); //Best player first rather than last.
     GameStatistics stats;
