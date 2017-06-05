@@ -119,7 +119,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                 assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
                 collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
-                    { player_id, ship_id };
+                    hlt::EntityId::for_ship(player_id, ship_id);
 
                 // TODO: ignore commands if ship is docked (eject player
                 // from game?)
@@ -240,7 +240,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                 for (hlt::EntityIndex ship_id = 0;
                      ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
                     auto& ship = player_ships.at(ship_id);
-                    auto id = hlt::EntityId(player_id, ship_id);
+                    auto id = hlt::EntityId::for_ship(player_id, ship_id);
 
                     if (!ship.is_alive()) continue;
 
@@ -338,7 +338,7 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
 
                         game_map.damage_entity(occupancy, other_damage);
                         game_map.damage_entity(
-                            hlt::EntityId(player_id, ship_id), self_damage);
+                            hlt::EntityId::for_ship(player_id, ship_id), self_damage);
                     } else {
                         // Move the ship
                         ship.location.pos_x = xp;
@@ -348,8 +348,10 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     if (!ship.is_alive()) continue;
 
                     assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
-                    collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
-                        { player_id, ship_id };
+                    collision_map
+                        .at(ship.location.pos_x)
+                        .at(ship.location.pos_y) =
+                        hlt::EntityId::for_ship(player_id, ship_id);
                 }
             }
         }

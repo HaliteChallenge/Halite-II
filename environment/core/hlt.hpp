@@ -97,11 +97,10 @@ namespace hlt {
     private:
         int _player_id;
         int _entity_index;
+        EntityId();
+
     public:
         EntityType type;
-
-        EntityId();
-        EntityId(PlayerId player, EntityIndex index);
 
         auto is_valid() const -> bool;
 
@@ -110,6 +109,7 @@ namespace hlt {
 
         static auto invalid() -> EntityId;
         static auto for_planet(EntityIndex index) -> EntityId;
+        static auto for_ship(PlayerId player_id, EntityIndex index) -> EntityId;
     };
 
     enum MoveType {

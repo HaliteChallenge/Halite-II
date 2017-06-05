@@ -11,12 +11,6 @@ namespace hlt {
         _entity_index = -1;
     }
 
-    EntityId::EntityId(PlayerId player, EntityIndex index) {
-        type = EntityType::ShipEntity;
-        _player_id = player;
-        _entity_index = static_cast<int>(index);
-    }
-
     auto EntityId::is_valid() const -> bool {
         return type != EntityType::InvalidEntity &&
             _player_id >= -1 && _entity_index >= 0;
@@ -37,6 +31,14 @@ namespace hlt {
     auto EntityId::for_planet(EntityIndex index) -> EntityId {
         auto result = EntityId();
         result.type = EntityType::PlanetEntity;
+        result._entity_index = static_cast<int>(index);
+        return result;
+    }
+
+    auto EntityId::for_ship(PlayerId player_id, EntityIndex index) -> EntityId {
+        auto result = EntityId();
+        result.type = EntityType::ShipEntity;
+        result._player_id = player_id;
         result._entity_index = static_cast<int>(index);
         return result;
     }
