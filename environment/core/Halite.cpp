@@ -128,6 +128,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     case hlt::MoveType::Noop: {
                         break;
                     }
+                    case hlt::MoveType::Error: {
+                        break;
+                    }
                     case hlt::MoveType::Rotate: {
                         if (ship.docking_status
                             != hlt::DockingStatus::Undocked) {
@@ -479,6 +482,9 @@ void Halite::output(std::string filename) {
                     case hlt::MoveType::Undock:
                         record["type"] = "undock";
                         break;
+                    case hlt::MoveType::Error:
+                        // TODO: wrap the move that could not be executed
+                        assert(false);
                 }
                 frame.push_back(record);
             }
@@ -739,6 +745,8 @@ auto Halite::compute_damage(
             }
             break;
         }
+        case hlt::EntityType::InvalidEntity:
+            throw std::string("Cannot compute damage against an invalid entity");
     }
 
     return std::make_pair(self_damage, other_damage);

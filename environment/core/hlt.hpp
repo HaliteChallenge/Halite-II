@@ -120,6 +120,9 @@ namespace hlt {
         Thrust,
         Dock,
         Undock,
+        //! Error wraps a move that was syntactically valid, but could not be
+        //! executed in the current game state.
+        Error,
     };
 
     struct Move {
