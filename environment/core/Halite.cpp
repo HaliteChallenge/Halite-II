@@ -269,72 +269,9 @@ std::vector<bool> Halite::processNextFrame(std::vector<bool> alive) {
                     // Check collisions
                     const auto& occupancy = collision_map.at(xp).at(yp);
                     if (occupancy.is_valid()) {
-                        unsigned short self_damage = 0;
-                        unsigned short other_damage = 0;
-
-                        // The collision is head-on for us if the direction of
-                        // movement is parallel to the ship orientation
-                        // (10 degree fudge factor)
-                        auto self_head_on = fabsf(
-                            atan2f(delta.second, delta.first)
-                                - ship.orientation) < 10;
-                        auto self_vel_factor =
-                            static_cast<unsigned short>(
-                                sqrtf(delta.first * delta.first
-                                          + delta.second * delta.second)
-                                    / 25);
-                        self_vel_factor = std::max(self_vel_factor,
-                                                   static_cast<unsigned short>(1));
-
-                        if (self_head_on) {
-                            delta.first = delta.second = 0;
-                            self_damage += 25 * self_vel_factor;
-                            other_damage += 50 * self_vel_factor;
-                        } else {
-                            self_damage += 50 * self_vel_factor;
-                            other_damage += 25 * self_vel_factor;
-                        }
-
-                        switch (occupancy.type) {
-                            case hlt::EntityType::PlanetEntity:
-                                self_damage += 200;
-                                other_damage += 100;
-                                break;
-                            case hlt::EntityType::ShipEntity: {
-                                auto& other = game_map.get_ship(occupancy);
-                                auto& other_delta =
-                                    movement_deltas.at(occupancy.player_id()).at(
-                                        occupancy.entity_index());
-
-                                // The collision is head-on for the other if the two
-                                // ship directions are antiparallel
-                                auto other_head_on = std::abs(
-                                    std::abs(
-                                        ship.orientation - other.orientation)
-                                        - 180) < 10;
-                                auto other_vel_factor =
-                                    static_cast<unsigned short>(sqrtf(
-                                        other_delta.first * other_delta.first
-                                            + other_delta.second
-                                                * other_delta.second)
-                                        / 25);
-                                other_vel_factor = std::max(other_vel_factor,
-                                                            static_cast<unsigned short>(1));
-
-                                if (other_head_on) {
-                                    other_delta.first = other_delta.second =
-                                        0;
-                                    self_damage += 50 * other_vel_factor;
-                                    other_damage += 25 * other_vel_factor;
-                                } else {
-                                    self_damage += 25 * other_vel_factor;
-                                    other_damage += 50 * other_vel_factor;
-                                }
-                                break;
-                            }
-                            default:
-                                throw std::string("Collided with invalid entity");
-                        }
+                        auto damage = compute_damage(id, occupancy, movement_deltas);
+                        auto self_damage = damage.first;
+                        auto other_damage = damage.second;
 
                         game_map.damage_entity(occupancy, other_damage);
                         game_map.damage_entity(
@@ -722,4 +659,85 @@ std::string Halite::getName(hlt::PlayerId playerTag) {
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
     for (int a = 0; a < number_of_players; a++) networking.killPlayer(a + 1);
+}
+
+auto Halite::compute_damage(
+    hlt::EntityId self_id, hlt::EntityId other_id,
+    std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
+    -> std::pair<unsigned short, unsigned short> {
+
+    unsigned short self_damage = 0;
+    unsigned short other_damage = 0;
+
+    assert(self_id.type == hlt::EntityType::ShipEntity);
+    const auto& ship = game_map.get_ship(self_id);
+
+    auto& delta = movement_deltas.at(self_id.player_id())
+        .at(self_id.entity_index());
+
+    // The collision is head-on for us if the direction of
+    // movement is parallel to the ship orientation
+    // (10 degree fudge factor)
+    auto self_head_on = fabsf(
+        atan2f(delta.second, delta.first)
+            - ship.orientation) < 10;
+    auto self_vel_factor =
+        static_cast<unsigned short>(
+            sqrtf(delta.first * delta.first
+                      + delta.second * delta.second)
+                / 25);
+    self_vel_factor = std::max(self_vel_factor,
+                               static_cast<unsigned short>(1));
+
+    if (self_head_on) {
+        delta.first = delta.second = 0;
+        self_damage += 25 * self_vel_factor;
+        other_damage += 50 * self_vel_factor;
+    } else {
+        self_damage += 50 * self_vel_factor;
+        other_damage += 25 * self_vel_factor;
+    }
+
+    switch (other_id.type) {
+        case hlt::EntityType::PlanetEntity:
+            self_damage += 200;
+            other_damage += 100;
+            break;
+        case hlt::EntityType::ShipEntity: {
+            auto& other = game_map.get_ship(other_id);
+            auto& other_delta =
+                movement_deltas.at(other_id.player_id()).at(
+                    other_id.entity_index());
+
+            // The collision is head-on for the other if the two
+            // ship directions are antiparallel
+            auto other_head_on = std::abs(
+                std::abs(
+                    ship.orientation - other.orientation)
+                    - 180) < 10;
+            auto other_vel_factor =
+                static_cast<unsigned short>(sqrtf(
+                    other_delta.first * other_delta.first
+                        + other_delta.second
+                            * other_delta.second)
+                    / 25);
+            other_vel_factor = std::max(other_vel_factor,
+                                        static_cast<unsigned short>(1));
+
+            if (other_head_on) {
+                other_delta.first = other_delta.second =
+                    0;
+                self_damage += 50 * other_vel_factor;
+                other_damage += 25 * other_vel_factor;
+            } else {
+                self_damage += 25 * other_vel_factor;
+                other_damage += 50 * other_vel_factor;
+            }
+            break;
+        }
+        default:
+            throw std::string("Collided with invalid entity");
+    }
+
+    return std::make_pair(self_damage, other_damage);
 }

@@ -91,6 +91,11 @@ private:
     std::vector<bool> processNextFrame(std::vector<bool> alive);
     void output(std::string filename);
     void killPlayer(hlt::PlayerId player);
+
+    auto compute_damage(
+        hlt::EntityId self_id, hlt::EntityId other_id,
+        std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
+        -> std::pair<unsigned short, unsigned short>;
 public:
     Halite(unsigned short width_,
            unsigned short height_,
