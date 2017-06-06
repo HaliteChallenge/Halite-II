@@ -33,6 +33,8 @@ std::string Networking::serializeMap(const hlt::Map& map) {
             oss << ' ' << ship.location.pos_y;
             oss << ' ' << ship.health;
             oss << ' ' << ship.orientation;
+            oss << ' ' << static_cast<int>(ship.docking_status);
+            oss << ' ' << static_cast<int>(ship.docked_planet);
             // TODO: send other ship information
         }
     }

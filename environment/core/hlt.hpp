@@ -47,10 +47,10 @@ namespace hlt {
     };
 
     enum class DockingStatus {
-        Undocked,
-        Docking,
-        Docked,
-        Undocking,
+        Undocked = 0,
+        Docking = 1,
+        Docked = 2,
+        Undocking = 3,
     };
 
     struct Ship : Entity {
