@@ -123,7 +123,7 @@ void Networking::deserializeMoveSet(std::string& inputString,
                 const auto thrust = move.move.thrust_by;
                 if (thrust < -100 || thrust > 100) {
                     std::string errorMessage =
-                        "Bot sent an invalid rotation thrust - ejecting from game.\n";
+                        "Bot sent an invalid movement thrust - ejecting from game.\n";
                     if (!quiet_output) {
                         std::lock_guard<std::mutex> guard(coutMutex);
                         std::cout << errorMessage;
