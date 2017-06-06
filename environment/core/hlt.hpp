@@ -30,7 +30,12 @@ namespace hlt {
 
     struct Entity {
         Location location;
-        short health;
+        unsigned short health;
+        //! The radius of the entity, in terms of grid cells from the center.
+        //! Ships have a radius of 0 (they occupy only the center). A planet
+        //! with radius=1 will occupy 5 grid cells (the center and the four
+        //! adjacent cells in the cardinal directions)
+        unsigned short radius;
 
         void kill() {
             health = 0;
@@ -72,7 +77,6 @@ namespace hlt {
         PlayerId owner;
         bool owned;
 
-        unsigned short radius;
         unsigned short remaining_production;
         unsigned short current_production;
         unsigned short docking_spots;
@@ -99,8 +103,10 @@ namespace hlt {
         PlanetEntity,
     };
 
+    //! A way to uniquely identify an Entity, regardless of its type.
     struct EntityId {
     private:
+        //! Planets are unowned, and have player ID == -1.
         int _player_id;
         int _entity_index;
         EntityId();
@@ -113,8 +119,11 @@ namespace hlt {
         auto player_id() const -> PlayerId;
         auto entity_index() const -> EntityIndex;
 
+        //! Construct an entity ID representing an invalid entity.
         static auto invalid() -> EntityId;
+        //! Construct an entity ID for the given planet.
         static auto for_planet(EntityIndex index) -> EntityId;
+        //! Construct an entity ID for the given ship.
         static auto for_ship(PlayerId player_id, EntityIndex index) -> EntityId;
     };
 

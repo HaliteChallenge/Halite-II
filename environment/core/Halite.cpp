@@ -115,7 +115,7 @@ auto Halite::compute_planet_explosion_damage(
     }
 }
 
-auto Halite::update_collision_map(
+auto Halite::reset_collision_map(
     std::vector<std::vector<hlt::EntityId>>& collision_map) -> void {
     for (auto& row : collision_map) {
         fill(row.begin(), row.end(), hlt::EntityId::invalid());
@@ -314,7 +314,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
         }
 
-        update_collision_map(collision_map);
+        reset_collision_map(collision_map);
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players;
              player_id++) {

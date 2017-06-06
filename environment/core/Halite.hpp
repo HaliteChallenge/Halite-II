@@ -87,18 +87,26 @@ private:
     void output(std::string filename);
     void kill_player(hlt::PlayerId player);
 
+    //! Compute the damage between two colliding ships
     auto compute_damage(
         hlt::EntityId self_id, hlt::EntityId other_id,
         std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
         -> std::pair<unsigned short, unsigned short>;
+    //! Compute the damage dealt to an entity at the given location
+    //! by a planet explosion
     auto compute_planet_explosion_damage(
         hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
+    //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
+    //! Helper to kill an entity and clean up any dependents (planet
+    //! explosions, docked ships, etc.)
     auto kill_entity(hlt::EntityId id) -> void;
 
-    auto update_collision_map(std::vector<std::vector<hlt::EntityId>>& collision_map) -> void;
+    //! Resets the collision map, adding the locations of planets (but not ships)
+    auto reset_collision_map(std::vector<std::vector<hlt::EntityId>>& collision_map) -> void;
 
+    //! Comparison function to rank two players, based on the number of ships and their total health.
     auto compare_rankings(const hlt::PlayerId& player1,
                           const hlt::PlayerId& player2) const -> bool;
 public:
