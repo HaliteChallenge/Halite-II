@@ -47,6 +47,13 @@ std::string Networking::serializeMap(const hlt::Map& map) {
         oss << ' ' << planet.location.pos_x;
         oss << ' ' << planet.location.pos_y;
         oss << ' ' << planet.health;
+        oss << ' ' << planet.radius;
+        if (planet.owned) {
+            oss << ' ' << 1 << ' ' << (int) planet.owner;
+        }
+        else {
+            oss << ' ' << 0 << ' ' << 0;
+        }
     }
 
     returnString = oss.str();
