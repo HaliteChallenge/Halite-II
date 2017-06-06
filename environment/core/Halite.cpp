@@ -131,7 +131,7 @@ auto Halite::reset_collision_map(
 
                 if (x >= 0 && y >= 0 && x < game_map.map_width
                     && y < game_map.map_height &&
-                    dx * dx + dy * dy <= planet.radius) {
+                    dx * dx + dy * dy <= planet.radius * planet.radius) {
                     collision_map[x][y] =
                         hlt::EntityId::for_planet(entity_index);
                 }
