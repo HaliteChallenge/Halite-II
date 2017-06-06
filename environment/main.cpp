@@ -126,9 +126,11 @@ int main(int argc, char** argv) {
 
     if (mapWidth == 0 && mapHeight == 0) {
         std::vector<unsigned short> mapSizeChoices =
-            { 20, 25, 25, 30, 30, 30, 35, 35, 35, 35, 40, 40, 40, 45, 45,
-              50 };
-        mapWidth = mapSizeChoices[rand() % mapSizeChoices.size()];
+            { 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300 };
+        std::mt19937 prg(seed);
+        std::uniform_int_distribution<unsigned short> size_dist(0, mapSizeChoices.size());
+        auto random_choice = size_dist(prg);
+        mapWidth = mapSizeChoices[random_choice];
         mapHeight = mapWidth;
     }
 
