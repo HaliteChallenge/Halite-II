@@ -84,8 +84,8 @@ namespace hlt {
         //Figure out chunk width and height accordingly.
         //Matches width and height as closely as it can, but is not guaranteed to match exactly.
         //It is guaranteed to be smaller if not the same size, however.
-        int cw = 5 * width / dw;
-        int ch = 5 * height / dh;
+        int cw = width / dw;
+        int ch = height / dh;
 
         map_width = (unsigned short) (cw * dw);
         map_height = (unsigned short) (ch * dh);
@@ -100,7 +100,6 @@ namespace hlt {
             rand_height = [&]() -> unsigned short { return uidh(prg); };
         const auto
             rand_radius = [&]() -> unsigned short { return uidr(prg); };
-
 
         // Divide the map into regions for each player
 
