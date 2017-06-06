@@ -363,9 +363,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         // Update speed based on thrust
                         const auto distance = move.move.thrust_by;
                         short dx = (short) (distance
-                            * std::cos(ship.orientation * M_2_PI / 360));
+                            * std::cos(ship.orientation * M_PI / 180));
                         short dy = (short) (distance
-                            * std::sin(ship.orientation * M_2_PI / 360));
+                            * std::sin(ship.orientation * M_PI / 180));
 
                         movement_deltas.at(player_id).at(ship_id) =
                             { dx, dy };
