@@ -568,7 +568,22 @@ void Halite::output(std::string filename) {
     //Encode player names.
     j["player_names"] = nlohmann::json(player_names);
 
-    // TODO Encode the planet map.
+    // Encode the planet map. This information doesn't change between frames,
+    // so there's no need to re-encode it every time.
+    auto planets = std::vector<nlohmann::json>();
+    for (hlt::EntityIndex planet_index = 0;
+         planet_index < game_map.planets.size();
+         planet_index++) {
+        const auto& planet = game_map.planets[planet_index];
+        planets.push_back(nlohmann::json{
+            { "id", planet_index },
+            { "x", planet.location.pos_x },
+            { "y", planet.location.pos_y },
+            { "r", planet.radius },
+            { "docking_spots", planet.docking_spots },
+        });
+    }
+    j["planets"] = planets;
 
     // Encode the frames. Note that there is no moves field for the last frame.
     std::vector<nlohmann::json> frames;
@@ -630,10 +645,6 @@ void Halite::output(std::string filename) {
             planets.push_back(nlohmann::json{
                 { "id", planet_index },
                 { "health", planet.health },
-                { "x", planet.location.pos_x },
-                { "y", planet.location.pos_y },
-                { "r", planet.radius },
-                { "docking_spots", planet.docking_spots },
                 { "docked_ships", planet.docked_ships },
             });
             if (planet.owned) {
@@ -737,6 +748,9 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     // const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
     const int maxTurnNumber = 15;
 
+    // Sort ranking by number of ships, using total ship health to break ties.
+    std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
+        std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
     while (turn_number < maxTurnNumber
         && (std::count(living_players.begin(), living_players.end(), true) > 1
             || number_of_players == 1)) {
@@ -754,9 +768,6 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
                 newRankings.push_back(player_id);
             }
 
-        // Sort ranking by number of ships, using total ship health to break ties.
-        std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
-            std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
         std::stable_sort(
             newRankings.begin(),
             newRankings.end(),
@@ -773,10 +784,8 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
          player_id < number_of_players; player_id++) {
         if (living_players[player_id]) newRankings.push_back(player_id);
     }
-    //Sort newRankings by last territory count. If it's the same, use the territory integral instead to break that tie.
 
-    std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
-        std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
+    // Re-sort rankings
     std::stable_sort(
             newRankings.begin(),
             newRankings.end(),
