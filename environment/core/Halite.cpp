@@ -209,6 +209,13 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     std::vector<std::future<int>>
         frame_threads(std::count(alive.begin(), alive.end(), true));
 
+    // TODO: is there a more idiomatic way to clear out the move array?
+    for (auto& row : player_moves) {
+        for (auto& subrow : row) {
+            std::fill(subrow.begin(), subrow.end(), hlt::Move{});
+        }
+    }
+
     //Get the messages sent by bots this frame
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (alive[player_id]) {
