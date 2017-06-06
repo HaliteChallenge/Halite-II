@@ -65,16 +65,6 @@ namespace hlt {
 
         //Pseudorandom number generator.
         std::mt19937 prg(seed);
-        std::uniform_int_distribution<unsigned short> uidw(0, width - 1);
-        std::uniform_int_distribution<unsigned short> uidh(0, height - 1);
-        std::uniform_int_distribution<unsigned short>
-            uidr(1, std::min(width, height) / 25);
-        const auto
-            rand_width = [&]() -> unsigned short { return uidw(prg); };
-        const auto
-            rand_height = [&]() -> unsigned short { return uidh(prg); };
-        const auto
-            rand_radius = [&]() -> unsigned short { return uidr(prg); };
 
         //Decides whether to put more players along the horizontal or the vertical.
         bool preferHorizontal = prg() % 2 == 0;
@@ -100,6 +90,18 @@ namespace hlt {
         map_width = (unsigned short) (cw * dw);
         map_height = (unsigned short) (ch * dh);
 
+        std::uniform_int_distribution<unsigned short> uidw(0, map_width - 1);
+        std::uniform_int_distribution<unsigned short> uidh(0, map_height - 1);
+        std::uniform_int_distribution<unsigned short>
+            uidr(1, std::min(map_width, map_height) / 25);
+        const auto
+            rand_width = [&]() -> unsigned short { return uidw(prg); };
+        const auto
+            rand_height = [&]() -> unsigned short { return uidh(prg); };
+        const auto
+            rand_radius = [&]() -> unsigned short { return uidr(prg); };
+
+
         // Divide the map into regions for each player
 
         class Region {
@@ -117,6 +119,14 @@ namespace hlt {
                 this->y = _y;
                 this->width = _width;
                 this->height = _height;
+            }
+
+            auto center_x() const -> unsigned short {
+                return static_cast<unsigned short>(x + (width / 2));
+            }
+
+            auto center_y() const -> unsigned short {
+                return static_cast<unsigned short>(y + (height / 2));
             }
         };
 
@@ -136,18 +146,9 @@ namespace hlt {
 
             for (int i = 0; i < 3; i++) {
                 ships[playerId][i].health = Ship::BASE_HEALTH;
-                const auto x = static_cast<unsigned short>(region.x
-                    + (region.width / 2));
-                const auto y = static_cast<unsigned short>(region.y
-                    + (region.height / 2) - 1 + i);
-
-                ships[playerId][i].location.pos_x = x;
-                ships[playerId][i].location.pos_y = y;
+                ships[playerId][i].location.pos_x = region.center_x();
+                ships[playerId][i].location.pos_y = region.center_y() - 1 + i;
             }
-
-            planets.push_back(Planet(region.x + (region.width / 2) + 2,
-                                     region.y + (region.height / 2),
-                                     1));
         }
 
         // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
@@ -163,7 +164,7 @@ namespace hlt {
                 // Make sure planets are far enough away from the center
                 // of each region, where initial ships spawn
                 for (Region region : regions) {
-                    if (get_distance({ region.x, region.y }, { x, y })
+                    if (get_distance({ region.center_x(), region.center_y() }, { x, y })
                         < r + MIN_DISTANCE) {
                         goto TRY_AGAIN;
                     }
