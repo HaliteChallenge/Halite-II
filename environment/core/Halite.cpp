@@ -393,6 +393,12 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             break;
                         }
 
+                        // TODO: factor max distance into a constant
+                        if (game_map.get_distance(planet.location, ship.location) > planet.radius + ship.radius + 2) {
+                            ship.reset_docking_status();
+                            break;
+                        }
+
                         if (!planet.owned) {
                             planet.owned = true;
                             planet.owner = player_id;
