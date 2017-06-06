@@ -819,8 +819,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
             player_names.push_back(a->substr(0, 30));
     }
 
-    // const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
-    const int maxTurnNumber = 15;
+    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
 
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
