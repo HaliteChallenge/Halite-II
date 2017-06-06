@@ -344,7 +344,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             break;
                         }
                         // Update orientation based on thrust
-                        const short degrees = -move.move.rotate_by;
+                        const short degrees = move.move.rotate_by;
                         auto new_orientation =
                             static_cast<short>((degrees + ship.orientation)
                                 % 360);
