@@ -83,7 +83,7 @@ private:
     //! Grab the next set of moves from the bots
     auto retrieve_moves(std::vector<bool> alive) -> void;
 
-    std::vector<bool> processNextFrame(std::vector<bool> alive);
+    std::vector<bool> process_next_frame(std::vector<bool> alive);
     void output(std::string filename);
     void kill_player(hlt::PlayerId player);
 
@@ -96,6 +96,8 @@ private:
 
     auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
     auto kill_entity(hlt::EntityId id) -> void;
+
+    auto update_collision_map(std::vector<std::vector<hlt::EntityId>>& collision_map) -> void;
 
     auto compare_rankings(const hlt::PlayerId& player1,
                           const hlt::PlayerId& player2) const -> bool;

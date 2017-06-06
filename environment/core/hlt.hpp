@@ -67,12 +67,14 @@ namespace hlt {
 
     struct Planet : Entity {
         constexpr static auto DOCK_TURNS = 5;
+        constexpr static auto PRODUCTION_PER_SHIP = 100;
 
         PlayerId owner;
         bool owned;
 
         unsigned short radius;
         unsigned short remaining_production;
+        unsigned short current_production;
         unsigned short docking_spots;
 
         //! Contains IDs of all ships in the process of docking or undocking,
