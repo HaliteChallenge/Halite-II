@@ -610,7 +610,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     }
 
     for (const auto& planet : game_map.planets) {
-        if (planet.is_alive() && planet.owned) {
+        if (planet.is_alive() && planet.owned && planet.docked_ships.size() > 0) {
             stillAlive[planet.owner] = true;
         }
     }
