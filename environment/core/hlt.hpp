@@ -17,7 +17,7 @@ namespace hlt {
     constexpr auto MAX_PLAYER_SHIPS = 40;
     constexpr auto MAX_QUEUED_MOVES = 3;
 
-    typedef unsigned char PlayerId;
+    typedef uint8_t PlayerId;
     typedef size_t EntityIndex;
 
     struct Location {
@@ -166,7 +166,7 @@ namespace hlt {
         Map(const Map& otherMap);
         Map(unsigned short width,
             unsigned short height,
-            unsigned char numberOfPlayers,
+            uint8_t numberOfPlayers,
             unsigned int seed);
 
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;

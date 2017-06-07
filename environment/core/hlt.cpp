@@ -59,7 +59,7 @@ namespace hlt {
 
     Map::Map(unsigned short width,
              unsigned short height,
-             unsigned char numberOfPlayers,
+             uint8_t numberOfPlayers,
              unsigned int seed) : Map() {
         // TODO: enforce a minimum map size to make sure we always have room for planets
 
