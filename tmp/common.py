@@ -34,11 +34,12 @@ def get_string():
 
 
 class Planet:
-    def __init__(self, id, x, y, hp, r, owned, owner, docked_ships):
+    def __init__(self, id, x, y, hp, r, remaining, owned, owner, docked_ships):
         self.id = id
         self.x = x
         self.y = y
         self.r = r
+        self.remaining = remaining
         self.hp = hp
         self.owned = owned
         self.owner = owner
@@ -59,7 +60,7 @@ class Ship:
 class Map:
     def __init__(self):
         self.ships = []
-        self.planets = []
+        self.planets = {}
 
     def generate_collision(self):
         self.collision_map = []
@@ -69,7 +70,7 @@ class Map:
                 col.append(None)
             self.collision_map.append(col)
 
-        for planet in self.planets:
+        for planet in self.planets.values():
             for dx in range(-planet.r, planet.r + 1):
                 for dy in range(-planet.r, planet.r + 1):
                     x = planet.x + dx
@@ -84,11 +85,12 @@ def parse(map):
     planets = planets.split()
 
     m = Map()
-    for (plid, x, y, hp, r, owned, owner, docked_ships) in _grouper(planets, 8):
-        planet = Planet(int(plid), int(x), int(y), int(hp), int(r), bool(int(owned)), int(owner), [])
+    for pl in _grouper(planets, 9):
+        (plid, x, y, hp, r, remaining, owned, owner, docked_ships) = pl
+        planet = Planet(int(plid), int(x), int(y), int(hp), int(r), int(remaining), bool(int(owned)), int(owner), [])
         docked_ships = [int(x) for x in docked_ships.strip(",").strip().split(",") if x]
         planet.docked_ships = docked_ships
-        m.planets.append(planet)
+        m.planets[planet.id] = planet
 
     while ships:
         ships = ships[2:]
@@ -113,7 +115,7 @@ def parse(map):
     return m
 
 
-def assign(ship, angle, distance, avoidance=10):
+def move_to(ship, angle, distance, avoidance=10):
 
     net_angle = (ship.orientation + angle) % 360
     net_angle = net_angle * (math.pi / 180)

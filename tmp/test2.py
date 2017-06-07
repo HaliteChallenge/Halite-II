@@ -4,8 +4,6 @@ import common
 
 tag, *_ = common.initialize("SettlingBot")
 
-docking = []
-
 while True:
     i = common.get_string()
     if not i:
@@ -14,15 +12,15 @@ while True:
     m = common.parse(i)
 
     for ship in m.ships[tag]:
-        if ship.docked != "undocked":
-            continue
+        if ship.docked == "docked":
+            planet = m.planets[ship.planet]
 
-        if ship.id in docking:
+        if ship.docked != "undocked":
             continue
 
         assigned = False
 
-        for planet in sorted(m.planets, key=common.distance(ship)):
+        for planet in sorted(m.planets.values(), key=common.distance(ship)):
             if planet.owned and planet.owner == tag and not planet.docked_ships:
                 pass
 
@@ -32,10 +30,9 @@ while True:
                 angle, d = common.orient_towards(ship, planet)
                 if d < planet.r + 2:
                     common.send_string("d {ship} {planet}".format(ship=ship.id, planet=planet.id))
-                    docking.append(ship.id)
                     assigned = True
                     break
-                common.assign(ship, angle, 2)
+                common.move_to(ship, angle, 2)
                 assigned = True
                 break
 
@@ -48,7 +45,7 @@ while True:
 
             for enemy in sorted(ships, key=lambda s: -1 if s.docked != "undocked" else common.distance(ship)(s)):
                 angle, d = common.orient_towards(ship, enemy)
-                common.assign(ship, angle, max(min(d, 10), 2))
+                common.move_to(ship, angle, max(min(d, 10), 2))
                 assigned = True
                 break
 
