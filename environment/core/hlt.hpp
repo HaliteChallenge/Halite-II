@@ -163,10 +163,10 @@ namespace hlt {
             map_height; //Number of rows and columns, NOT maximum index.
 
         Map();
-        Map(const Map& otherMap);
+        Map(const Map& other_map);
         Map(unsigned short width,
             unsigned short height,
-            uint8_t numberOfPlayers,
+            uint8_t player_count,
             unsigned int seed);
 
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;

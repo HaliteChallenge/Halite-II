@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
             try {
                 names = new std::vector<std::string>();
                 while (!unlabeledArgs.empty()) {
-                    networking.startAndConnectBot(unlabeledArgs.front());
+                    networking.launch_bot(unlabeledArgs.front());
                     unlabeledArgs.pop_front();
                     names->push_back(unlabeledArgs.front());
                     unlabeledArgs.pop_front();
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
         try {
             while (!unlabeledArgs.empty()) {
                 std::cout << unlabeledArgs.front() << std::endl;
-                networking.startAndConnectBot(unlabeledArgs.front());
+                networking.launch_bot(unlabeledArgs.front());
                 unlabeledArgs.pop_front();
             }
         }
@@ -182,15 +182,15 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (networking.numberOfPlayers() > 1 && n_players_for_map_creation != 1) {
+    if (networking.player_count() > 1 && n_players_for_map_creation != 1) {
         std::cout << std::endl
                   << "Only single-player mode enables specified n-player maps.  When entering multiple bots, please do not try to specify n."
                   << std::endl << std::endl;
         exit(1);
     }
 
-    if (networking.numberOfPlayers() > 1)
-        n_players_for_map_creation = networking.numberOfPlayers();
+    if (networking.player_count() > 1)
+        n_players_for_map_creation = networking.player_count();
 
     if (n_players_for_map_creation > 6 || n_players_for_map_creation < 1) {
         std::cout << std::endl
@@ -215,11 +215,11 @@ int main(int argc, char** argv) {
 #else
     if (outputFilename.back() != '/') outputFilename.push_back('/');
 #endif
-    GameStatistics stats = my_game->runGame(names,
-                                            seed,
-                                            id,
-                                            !noReplaySwitch.getValue(),
-                                            outputFilename);
+    GameStatistics stats = my_game->run_game(names,
+                                             seed,
+                                             id,
+                                             !noReplaySwitch.getValue(),
+                                             outputFilename);
     if (names != NULL) delete names;
 
     std::string victoryOut;
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
     } else {
         for (unsigned int a = 0; a < stats.player_statistics.size(); a++)
             std::cout << "Player #" << stats.player_statistics[a].tag << ", "
-                      << my_game->getName(stats.player_statistics[a].tag)
+                      << my_game->get_name(stats.player_statistics[a].tag)
                       << ", came in rank #" << stats.player_statistics[a].rank
                       << " and was last alive on frame #"
                       << stats.player_statistics[a].last_frame_alive << "!\n";

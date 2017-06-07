@@ -30,19 +30,19 @@ extern bool quiet_output;
 
 class Networking {
 public:
-    void startAndConnectBot(std::string command);
-    int handleInitNetworking(hlt::PlayerId playerTag,
-                             const hlt::Map& m,
-                             bool ignoreTimeout,
-                             std::string* playerName);
-    int handleFrameNetworking(hlt::PlayerId playerTag,
-                              const unsigned short& turnNumber,
-                              const hlt::Map& m,
-                              bool ignoreTimeout,
-                              hlt::PlayerMoveQueue& moves);
-    void killPlayer(hlt::PlayerId playerTag);
-    bool isProcessDead(hlt::PlayerId playerTag);
-    int numberOfPlayers();
+    void launch_bot(std::string command);
+    int handle_init_networking(hlt::PlayerId player_tag,
+                               const hlt::Map& m,
+                               bool ignoreTimeout,
+                               std::string* playerName);
+    int handle_frame_networking(hlt::PlayerId player_tag,
+                                const unsigned short& turnNumber,
+                                const hlt::Map& m,
+                                bool ignoreTimeout,
+                                hlt::PlayerMoveQueue& moves);
+    void kill_player(hlt::PlayerId player_tag);
+    bool is_process_dead(hlt::PlayerId player_tag);
+    int player_count();
 
     std::vector<std::string> player_logs;
 
@@ -61,13 +61,14 @@ private:
     std::vector<int> processes;
 #endif
 
-    std::string serializeMap(const hlt::Map& map);
-    void deserializeMoveSet(std::string& inputString,
-                            const hlt::Map& m,
-                            hlt::PlayerMoveQueue& moves);
+    std::string serialize_map(const hlt::Map& map);
+    void deserialize_move_set(std::string& inputString,
+                              const hlt::Map& m,
+                              hlt::PlayerMoveQueue& moves);
 
-    void sendString(hlt::PlayerId playerTag, std::string& sendString);
-    std::string getString(hlt::PlayerId playerTag, unsigned int timoutMillis);
+    void send_string(hlt::PlayerId player_tag, std::string& sendString);
+    std::string get_string(hlt::PlayerId player_tag,
+                           unsigned int timeout_millis);
 };
 
 #endif

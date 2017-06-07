@@ -193,7 +193,7 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
 }
 
 void Halite::kill_player(hlt::PlayerId player) {
-    networking.killPlayer(player);
+    networking.kill_player(player);
     timeout_tags.insert(player);
 
     // Kill those ships
@@ -222,7 +222,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
             frame_threads[player_id] = std::async(
                 [&, player_id]() -> int {
-                    return networking.handleFrameNetworking(
+                    return networking.handle_frame_networking(
                         player_id,
                         turn_number,
                         game_map,
@@ -604,10 +604,10 @@ Halite::Halite(unsigned short width_,
                unsigned int seed_,
                unsigned short n_players_for_map_creation,
                Networking networking_,
-               bool shouldIgnoreTimeout) {
+               bool should_ignore_timeout) {
     networking = networking_;
     // number_of_players is the number of active bots to start the match; it is constant throughout game
-    number_of_players = networking.numberOfPlayers();
+    number_of_players = networking.player_count();
 
     //Initialize map
     game_map = hlt::Map(width_, height_, n_players_for_map_creation, seed_);
@@ -626,7 +626,7 @@ Halite::Halite(unsigned short width_,
     full_frames.push_back(hlt::Map(game_map));
 
     //Check if timeout should be ignored.
-    ignore_timeout = shouldIgnoreTimeout;
+    ignore_timeout = should_ignore_timeout;
 
     //Init statistics
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
@@ -796,11 +796,11 @@ void Halite::output(std::string filename) {
     gameFile.close();
 }
 
-GameStatistics Halite::runGame(std::vector<std::string>* names_,
-                               unsigned int seed,
-                               unsigned int id,
-                               bool enabledReplay,
-                               std::string replayDirectory) {
+GameStatistics Halite::run_game(std::vector<std::string>* names_,
+                                unsigned int seed,
+                                unsigned int id,
+                                bool enable_replay,
+                                std::string replay_directory) {
     //For rankings
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
@@ -808,7 +808,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     //Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-        initThreads[player_id] = std::async(&Networking::handleInitNetworking,
+        initThreads[player_id] = std::async(&Networking::handle_init_networking,
                                     &networking,
                                     player_id,
                                     game_map,
@@ -903,15 +903,15 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     stats.timeout_log_filenames =
         std::vector<std::string>(timeout_tags.size());
     //Output gamefile. First try the replays folder; if that fails, just use the straight filename.
-    if (enabledReplay) {
+    if (enable_replay) {
         stats.output_filename =
-            replayDirectory + "Replays/" + std::to_string(id) + '-'
+            replay_directory + "Replays/" + std::to_string(id) + '-'
                 + std::to_string(seed) + ".hlt";
         try {
             output(stats.output_filename);
         }
         catch (std::runtime_error& e) {
-            stats.output_filename = replayDirectory + std::to_string(id) + '-'
+            stats.output_filename = replay_directory + std::to_string(id) + '-'
                 + std::to_string(seed) + ".hlt";
             output(stats.output_filename);
         }
@@ -936,11 +936,11 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
     return stats;
 }
 
-std::string Halite::getName(hlt::PlayerId playerTag) {
-    return player_names[playerTag];
+std::string Halite::get_name(hlt::PlayerId player_tag) {
+    return player_names[player_tag];
 }
 
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
-    for (int a = 0; a < number_of_players; a++) networking.killPlayer(a);
+    for (int a = 0; a < number_of_players; a++) networking.kill_player(a);
 }

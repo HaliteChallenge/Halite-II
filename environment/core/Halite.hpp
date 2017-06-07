@@ -115,14 +115,14 @@ public:
            unsigned int seed_,
            unsigned short n_players_for_map_creation,
            Networking networking_,
-           bool shouldIgnoreTimeout);
+           bool should_ignore_timeout);
 
-    GameStatistics runGame(std::vector<std::string>* names_,
-                           unsigned int seed,
-                           unsigned int id,
-                           bool enabledReplay,
-                           std::string replayDirectory);
-    std::string getName(hlt::PlayerId playerTag);
+    GameStatistics run_game(std::vector<std::string>* names_,
+                            unsigned int seed,
+                            unsigned int id,
+                            bool enable_replay,
+                            std::string replay_directory);
+    std::string get_name(hlt::PlayerId player_tag);
 
     ~Halite();
 };

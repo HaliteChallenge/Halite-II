@@ -50,16 +50,16 @@ namespace hlt {
         planets = std::vector<Planet>();
     }
 
-    Map::Map(const Map& otherMap) {
-        map_width = otherMap.map_width;
-        map_height = otherMap.map_height;
-        ships = otherMap.ships;
-        planets = otherMap.planets;
+    Map::Map(const Map& other_map) {
+        map_width = other_map.map_width;
+        map_height = other_map.map_height;
+        ships = other_map.ships;
+        planets = other_map.planets;
     }
 
     Map::Map(unsigned short width,
              unsigned short height,
-             uint8_t numberOfPlayers,
+             uint8_t player_count,
              unsigned int seed) : Map() {
         // TODO: enforce a minimum map size to make sure we always have room for planets
 
@@ -72,13 +72,13 @@ namespace hlt {
         int dw, dh;
         //Find number closest to square that makes the match symmetric.
         if (preferHorizontal) {
-            dh = (int) sqrt(numberOfPlayers);
-            while (numberOfPlayers % dh != 0) dh--;
-            dw = numberOfPlayers / dh;
+            dh = (int) sqrt(player_count);
+            while (player_count % dh != 0) dh--;
+            dw = player_count / dh;
         } else {
-            dw = (int) sqrt(numberOfPlayers);
-            while (numberOfPlayers % dw != 0) dw--;
-            dh = numberOfPlayers / dw;
+            dw = (int) sqrt(player_count);
+            while (player_count % dw != 0) dw--;
+            dh = player_count / dw;
         }
 
         //Figure out chunk width and height accordingly.
@@ -130,7 +130,7 @@ namespace hlt {
         };
 
         std::vector<Region> regions = std::vector<Region>();
-        regions.reserve(numberOfPlayers);
+        regions.reserve(player_count);
 
         for (int row = 0; row < dh; row++) {
             for (int col = 0; col < dw; col++) {
@@ -139,7 +139,7 @@ namespace hlt {
         }
 
         // Center the player's starting ships in each region
-        for (PlayerId playerId = 0; playerId < numberOfPlayers;
+        for (PlayerId playerId = 0; playerId < player_count;
              playerId++) {
             const auto& region = regions.at(playerId);
 
@@ -151,7 +151,7 @@ namespace hlt {
         }
 
         // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
-        const auto MAX_PLANETS = numberOfPlayers * 2;
+        const auto MAX_PLANETS = player_count * 2;
         const auto MAX_TRIES = 100;
         const auto MIN_DISTANCE = 5;
         for (int i = 0; i < MAX_PLANETS; i++) {
