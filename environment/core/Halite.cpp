@@ -659,15 +659,17 @@ void Halite::output(std::string filename) {
     // Encode the planet map. This information doesn't change between frames,
     // so there's no need to re-encode it every time.
     auto planets = std::vector<nlohmann::json>();
+    const auto& initial_map = full_frames[0];
     for (hlt::EntityIndex planet_index = 0;
-         planet_index < game_map.planets.size();
+         planet_index < initial_map.planets.size();
          planet_index++) {
-        const auto& planet = game_map.planets[planet_index];
+        const auto& planet = initial_map.planets[planet_index];
         planets.push_back(nlohmann::json{
             { "id", planet_index },
             { "x", planet.location.pos_x },
             { "y", planet.location.pos_y },
             { "r", planet.radius },
+            { "health", planet.health },
             { "docking_spots", planet.docking_spots },
         });
     }
