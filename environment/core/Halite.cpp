@@ -99,14 +99,19 @@ auto Halite::compute_planet_explosion_damage(
     const auto dx = static_cast<short>(planet.location.pos_x) - location.pos_x;
     const auto dy = static_cast<short>(planet.location.pos_y) - location.pos_y;
     const auto distance_squared = dx*dx + dy*dy;
+    const auto radius_squared = planet.radius * planet.radius;
 
-    if (distance_squared == 0) {
+    if (distance_squared <= radius_squared) {
         return std::numeric_limits<unsigned short>::max();
     }
-    else if (distance_squared <= 25) {
+
+    // Distance is at least 1
+    const auto distance_from_crust = distance_squared - radius_squared;
+
+    if (distance_from_crust <= 25) {
         // Ensure a ship next to a planet receives 200 damage
         // (killing it instantly)
-        const auto distance_factor = 25 - (distance_squared - 1);
+        const auto distance_factor = 25 - (distance_from_crust - 1);
         return static_cast<unsigned short>(
             (hlt::Ship::BASE_HEALTH / 5) * distance_factor / 5);
     }
