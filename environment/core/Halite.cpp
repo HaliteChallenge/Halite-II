@@ -201,9 +201,17 @@ void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
     timeout_tags.insert(player);
 
-    // Kill those ships
+    // Kill player's ships
     for (auto& ship : game_map.ships.at(player)) {
         ship.kill();
+    }
+
+    // Make their planets unowned
+    for (auto& planet : game_map.planets) {
+        if (planet.owned && planet.owner == player) {
+            planet.owned = false;
+            planet.docked_ships.clear();
+        }
     }
 }
 
