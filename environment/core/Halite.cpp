@@ -160,7 +160,8 @@ auto Halite::damage_entity(hlt::EntityId id,
 auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     entity.kill();
-    // TODO: remove from collision map
+    collision_map[entity.location.pos_x][entity.location.pos_y] =
+        hlt::EntityId::invalid();
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
