@@ -63,7 +63,7 @@ class Map:
         for _ in range(map_size[0]):
             col = []
             for _ in range(map_size[1]):
-                col.append(False)
+                col.append(None)
             self.collision_map.append(col)
 
         for planet in self.planets:

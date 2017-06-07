@@ -4,7 +4,7 @@
 
 const WIDTH = 1000;
 const HEIGHT = 800;
-let CELL_SIZE = 4;
+let CELL_SIZE = 2;
 
 const PLANET_COLOR = 0xe8b23e;
 const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFF00FF];
@@ -15,10 +15,19 @@ let entities = new PIXI.Graphics();
 let camera = new PIXI.Container();
 camera.addChild(entities);
 
+let playPause;
 let slider;
+let moves;
 
 let currentFrame = 0;
 
+let timer = null;
+
+function resetAutoPlay() {
+    window.clearInterval(timer);
+    timer = null;
+    playPause.innerText = "Play";
+}
 function setup() {
     document.body.addEventListener("dragenter", (e) => {
         e.stopPropagation();
@@ -44,15 +53,42 @@ function setup() {
         reader.readAsText(files[0]);
     });
 
+    let container = document.createElement("div");
+
     slider = document.createElement("input");
     slider.setAttribute("type", "range");
     slider.setAttribute("min", 0);
     slider.setAttribute("value", 0);
     document.body.appendChild(slider);
     slider.addEventListener("input", () => {
-        currentFrame = slider.value;
+        currentFrame = parseInt(slider.value, 10);
         render();
     });
+
+    playPause = document.createElement("button");
+    playPause.innerText = "Play";
+    playPause.addEventListener("click", () => {
+       if (timer === null) {
+           timer = window.setInterval(() => {
+               stepForward();
+               // Stop at the end
+               if (currentFrame === 0) {
+                   currentFrame = replay.num_frames - 1;
+                   resetAutoPlay();
+                   updateFrameSlider();
+                   render();
+               }
+           }, 1000 / 15);
+           playPause.innerText = "Pause";
+       }
+       else {
+           resetAutoPlay();
+       }
+    });
+    document.body.appendChild(playPause);
+
+    moves = document.createElement("textarea");
+    container.appendChild(moves);
 
     document.body.addEventListener("keypress", (e) => {
         if (e.key === "w") {
@@ -78,32 +114,29 @@ function setup() {
             render();
         }
         else if (e.key === "-" || e.key === "_") {
-            if (CELL_SIZE > 4) {
+            if (CELL_SIZE > 2) {
                 CELL_SIZE /= 2;
             }
             updateGrid();
             render();
         }
         else if (e.key === " ") {
-            if (currentFrame < replay.num_frames - 1) {
-                currentFrame++;
-            }
-            else {
-                currentFrame = 0;
-            }
-            updateFrameSlider();
-            render();
+            stepForward();
         }
     });
 
     let app = new PIXI.Application(WIDTH, HEIGHT, { backgroundColor: 0x000 });
 
     app.stage.addChild(grid, camera);
-    document.body.appendChild(app.view);
+    container.appendChild(app.view);
+
+    document.body.appendChild(container);
 }
 
 function init() {
     if (!replay) return;
+
+    resetAutoPlay();
 
     slider.setAttribute("max", replay.num_frames - 1);
     slider.focus();
@@ -152,7 +185,7 @@ function render() {
             ship.x * CELL_SIZE,
             ship.y * CELL_SIZE,
             CELL_SIZE,
-            CELL_SIZE * (ship.health / 200),
+            CELL_SIZE * Math.max(0.2, ship.health / 200),
         );
         entities.endFill();
         if (ship.docking.status === "docking") {
@@ -174,6 +207,27 @@ function render() {
             entities.endFill();
         }
     }
+
+    moves.value = `Frame ${currentFrame} Turn ${currentFrame == 0 ? "(pre-game)" : currentFrame} \n`
+    if (currentFrame > 0) {
+        for (let move of replay.moves[currentFrame - 1]) {
+            moves.value += `Player ${move.owner} Ship ${move.shipId} `;
+            switch (move.type) {
+                case "rotate":
+                    moves.value += `rotate by ${move.thrust}\n`;
+                    break;
+                case "thrust":
+                    moves.value += `move by ${move.thrust}\n`;
+                    break;
+                case "dock":
+                    moves.value += `dock to ${move.planet_id}\n`;
+                    break;
+                case "undock":
+                    moves.value += `undock\n`;
+                    break;
+            }
+        }
+    }
 }
 
 function updateGrid() {
@@ -182,20 +236,36 @@ function updateGrid() {
 
     grid.clear();
 
+    if (CELL_SIZE <= 4) return;
+
+    const effectiveSize = CELL_SIZE <= 4 ? CELL_SIZE * 2 : CELL_SIZE;
+    const delta = CELL_SIZE <= 4 ? 2 : 1;
+
     grid.lineStyle(1, 0xFFFFFF);
 
-    for (let i = 0; i < gridWidth + 1; i++) {
-        grid.moveTo(CELL_SIZE * i, 0);
-        grid.lineTo(CELL_SIZE * i, HEIGHT);
+    for (let i = 0; i < gridWidth + 1; i+=delta) {
+        grid.moveTo(effectiveSize * i, 0);
+        grid.lineTo(effectiveSize * i, HEIGHT);
     }
-    for (let i = 0; i < gridHeight + 1; i++) {
-        grid.moveTo(0, CELL_SIZE * i);
-        grid.lineTo(WIDTH, CELL_SIZE * i);
+    for (let i = 0; i < gridHeight + 1; i+=delta) {
+        grid.moveTo(0, effectiveSize * i);
+        grid.lineTo(WIDTH, effectiveSize * i);
     }
 }
 
 function updateFrameSlider() {
     slider.value = currentFrame;
+}
+
+function stepForward() {
+    if (currentFrame < replay.num_frames - 1) {
+        currentFrame++;
+    }
+    else {
+        currentFrame = 0;
+    }
+    updateFrameSlider();
+    render();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
