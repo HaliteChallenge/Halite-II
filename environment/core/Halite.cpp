@@ -152,6 +152,9 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
                     planet.docked_ships.erase(pos);
                 }
 
+                ship.docking_status = hlt::DockingStatus::Undocked;
+                ship.docked_planet = 0;
+
                 if (planet.docked_ships.size() == 0) {
                     planet.owned = false;
                 }
