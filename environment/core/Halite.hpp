@@ -55,7 +55,18 @@ static std::ostream& operator<<(std::ostream& o, const GameStatistics& g) {
 constexpr auto SUBSTEPS = 128;
 constexpr auto SUBSTEP_DT = 1.0 / SUBSTEPS;
 
-typedef std::vector<std::vector<hlt::EntityId>>& CollisionMap;
+struct CollisionMap {
+private:
+    std::vector<std::vector<hlt::EntityId>> map;
+public:
+    CollisionMap(hlt::Map& game_map);
+
+    auto at(const hlt::Location& location) -> const hlt::EntityId&;
+    auto at(unsigned short pos_x, unsigned short pos_y) -> const hlt::EntityId&;
+    auto fill(const hlt::Location& location, hlt::EntityId id) -> void;
+    auto reset(const hlt::Map& game_map) -> void;
+    auto clear(const hlt::Location& location) -> void;
+};
 
 class Halite {
 private:
@@ -106,9 +117,6 @@ private:
     //! Helper to kill an entity and clean up any dependents (planet
     //! explosions, docked ships, etc.)
     auto kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void;
-
-    //! Resets the collision map, adding the locations of planets (but not ships)
-    auto reset_collision_map(CollisionMap collision_map) -> void;
 
     //! Comparison function to rank two players, based on the number of ships and their total health.
     auto compare_rankings(const hlt::PlayerId& player1,

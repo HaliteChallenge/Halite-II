@@ -120,31 +120,6 @@ auto Halite::compute_planet_explosion_damage(
     }
 }
 
-auto Halite::reset_collision_map(
-    CollisionMap collision_map) -> void {
-    for (auto& row : collision_map) {
-        fill(row.begin(), row.end(), hlt::EntityId::invalid());
-    }
-    for (hlt::EntityIndex entity_index = 0;
-         entity_index < game_map.planets.size(); entity_index++) {
-        const auto& planet = game_map.planets[entity_index];
-        if (!planet.is_alive()) continue;
-        for (int dx = -planet.radius; dx <= planet.radius; dx++) {
-            for (int dy = -planet.radius; dy <= planet.radius; dy++) {
-                const auto x = planet.location.pos_x + dx;
-                const auto y = planet.location.pos_y + dy;
-
-                if (x >= 0 && y >= 0 && x < game_map.map_width
-                    && y < game_map.map_height &&
-                    dx * dx + dy * dy <= planet.radius * planet.radius) {
-                    collision_map[x][y] =
-                        hlt::EntityId::for_planet(entity_index);
-                }
-            }
-        }
-    }
-}
-
 auto Halite::damage_entity(hlt::EntityId id,
                            unsigned short damage,
                            CollisionMap collision_map) -> void {
@@ -160,8 +135,7 @@ auto Halite::damage_entity(hlt::EntityId id,
 auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     entity.kill();
-    collision_map[entity.location.pos_x][entity.location.pos_y] =
-        hlt::EntityId::invalid();
+    collision_map.clear(entity.location);
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
@@ -197,7 +171,7 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
                 for (int dy = -max_delta; dy <= max_delta; dy++) {
                     const auto loc = game_map.location_with_delta(planet.location, dx, dy);
 
-                    const auto target_id = collision_map[loc.pos_x][loc.pos_y];
+                    const auto target_id = collision_map.at(loc);
 
                     if (target_id.is_valid() && target_id != id) {
                         const auto& target = game_map.get_entity(target_id);
@@ -282,11 +256,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         number_of_players,
         std::vector<hlt::Move>()));
 
-    auto collision_map =
-        std::vector<std::vector<hlt::EntityId>>(
-            game_map.map_width,
-            std::vector<hlt::EntityId>(game_map.map_height,
-                                       hlt::EntityId::invalid()));
+    auto collision_map = CollisionMap(game_map);
+
     auto movement_deltas =
         std::vector<std::vector<std::pair<short, short>>>(
             number_of_players,
@@ -345,7 +316,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
         }
 
-        reset_collision_map(collision_map);
+        collision_map.reset(game_map);
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players;
              player_id++) {
@@ -358,9 +329,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                 auto move = player_moves[player_id][move_no][ship_id];
 
-                assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
-                collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
-                    hlt::EntityId::for_ship(player_id, ship_id);
+                assert(!collision_map.at(ship.location).is_valid());
+                collision_map.fill(ship.location,
+                    hlt::EntityId::for_ship(player_id, ship_id));
 
                 switch (move.type) {
                     case hlt::MoveType::Noop: {
@@ -484,8 +455,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                     if (delta.first == 0 && delta.second == 0) continue;
 
-                    collision_map.at(ship.location.pos_x).at(ship.location.pos_y) =
-                        hlt::EntityId::invalid();
+                    collision_map.clear(ship.location);
                     pos.first += SUBSTEP_DT * delta.first;
                     pos.second += SUBSTEP_DT * delta.second;
 
@@ -501,7 +471,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     auto yp = static_cast<unsigned short>(pos.second);
 
                     // Check collisions
-                    const auto& occupancy = collision_map.at(xp).at(yp);
+                    const auto& occupancy = collision_map.at(xp, yp);
                     if (occupancy.is_valid()) {
                         auto damage = compute_damage(id, occupancy, movement_deltas);
                         auto self_damage = damage.first;
@@ -522,11 +492,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                     if (!ship.is_alive()) continue;
 
-                    assert(!collision_map.at(ship.location.pos_x).at(ship.location.pos_y).is_valid());
-                    collision_map
-                        .at(ship.location.pos_x)
-                        .at(ship.location.pos_y) =
-                        hlt::EntityId::for_ship(player_id, ship_id);
+                    collision_map.fill(ship.location,
+                        hlt::EntityId::for_ship(player_id, ship_id));
                 }
             }
         }
@@ -570,15 +537,15 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
                 for (int dy = -planet.radius - 2; dy <= planet.radius + 2; dy++) {
                     const auto loc = game_map.location_with_delta(planet.location, dx, dy);
-                    if (!collision_map[loc.pos_x][loc.pos_y].is_valid()) {
+                    if (!collision_map.at(loc).is_valid()) {
                         for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
                             auto& ship = ships[ship_id];
 
                             if (!ship.is_alive()) {
                                 ship.health = hlt::Ship::BASE_HEALTH;
                                 ship.location = loc;
-                                collision_map[loc.pos_x][loc.pos_y] =
-                                    hlt::EntityId::for_ship(planet.owner, ship_id);
+                                collision_map.fill(loc,
+                                    hlt::EntityId::for_ship(planet.owner, ship_id));
                                 goto SUCCESS;
                             }
                         }
@@ -971,4 +938,52 @@ std::string Halite::get_name(hlt::PlayerId player_tag) {
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
     for (int a = 0; a < number_of_players; a++) networking.kill_player(a);
+}
+
+CollisionMap::CollisionMap(hlt::Map& game_map) {
+    map = std::vector<std::vector<hlt::EntityId>>(
+        game_map.map_width,
+        std::vector<hlt::EntityId>(game_map.map_height, hlt::EntityId::invalid())
+    );
+}
+
+auto CollisionMap::at(const hlt::Location& location) -> const hlt::EntityId& {
+    return at(location.pos_x, location.pos_y);
+}
+
+auto CollisionMap::at(unsigned short pos_x, unsigned short pos_y) -> const hlt::EntityId& {
+    return map.at(pos_x).at(pos_y);
+}
+
+auto CollisionMap::reset(const hlt::Map& game_map) -> void {
+    for (auto& row : map) {
+        std::fill(row.begin(), row.end(), hlt::EntityId::invalid());
+    }
+    for (hlt::EntityIndex entity_index = 0;
+         entity_index < game_map.planets.size(); entity_index++) {
+        const auto& planet = game_map.planets[entity_index];
+        if (!planet.is_alive()) continue;
+        for (int dx = -planet.radius; dx <= planet.radius; dx++) {
+            for (int dy = -planet.radius; dy <= planet.radius; dy++) {
+                const auto x = planet.location.pos_x + dx;
+                const auto y = planet.location.pos_y + dy;
+
+                if (x >= 0 && y >= 0 && x < game_map.map_width
+                    && y < game_map.map_height &&
+                    dx * dx + dy * dy <= planet.radius * planet.radius) {
+                    map[x][y] = hlt::EntityId::for_planet(entity_index);
+                }
+            }
+        }
+    }
+}
+
+auto CollisionMap::fill(const hlt::Location& location, hlt::EntityId id) -> void {
+    assert(!at(location).is_valid());
+    assert(id.is_valid());
+    map.at(location.pos_x).at(location.pos_y) = id;
+}
+
+auto CollisionMap::clear(const hlt::Location& location) -> void {
+    map.at(location.pos_x).at(location.pos_y) = hlt::EntityId::invalid();
 }
