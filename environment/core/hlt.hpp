@@ -93,10 +93,13 @@ namespace hlt {
             this->radius = radius;
             health = static_cast<unsigned short>(500 + 100 * sqrt(radius));
             docking_spots = radius;
-            remaining_production = static_cast<unsigned short>(radius * 100);
+            remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
 
             owned = false;
         }
+
+        auto add_ship(EntityIndex ship) -> void;
+        auto remove_ship(EntityIndex ship) -> void;
     };
 
     enum class EntityType {

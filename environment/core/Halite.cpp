@@ -143,14 +143,9 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
 
             if (ship.docking_status != hlt::DockingStatus::Undocked) {
                 auto& planet = game_map.planets.at(ship.docked_planet);
-                auto pos = std::find(
-                    planet.docked_ships.begin(),
-                    planet.docked_ships.end(),
-                    id.entity_index()
-                );
-                if (pos != planet.docked_ships.end()) {
-                    planet.docked_ships.erase(pos);
-                }
+                planet.remove_ship(id.entity_index());
+                ship.docking_status = hlt::DockingStatus::Undocked;
+                ship.docked_planet = 0;
             }
             break;
         }
@@ -194,9 +189,17 @@ void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
     timeout_tags.insert(player);
 
-    // Kill those ships
+    // Kill player's ships
     for (auto& ship : game_map.ships.at(player)) {
         ship.kill();
+    }
+
+    // Make their planets unowned
+    for (auto& planet : game_map.planets) {
+        if (planet.owned && planet.owner == player) {
+            planet.owned = false;
+            planet.docked_ships.clear();
+        }
     }
 }
 
@@ -290,14 +293,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 if (ship.docking_progress == 0) {
                     ship.docking_status = hlt::DockingStatus::Undocked;
                     auto& planet = game_map.planets.at(ship.docked_planet);
-                    auto pos = std::find(
-                        planet.docked_ships.begin(),
-                        planet.docked_ships.end(),
-                        ship_id
-                    );
-                    if (pos != planet.docked_ships.end()) {
-                        planet.docked_ships.erase(pos);
-                    }
+                    planet.remove_ship(ship_id);
                 }
             }
         }
@@ -417,7 +413,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             ship.docked_planet = planet_id;
                             ship.docking_status = hlt::DockingStatus::Docking;
                             ship.docking_progress = hlt::Planet::DOCK_TURNS;
-                            planet.docked_ships.push_back(ship_id);
+
+                            planet.add_ship(ship_id);
                         }
 
                         break;
@@ -729,6 +726,8 @@ void Halite::output(std::string filename) {
                 { "id", planet_index },
                 { "health", planet.health },
                 { "docked_ships", planet.docked_ships },
+                { "remaining_production", planet.remaining_production },
+                { "current_production", planet.current_production },
             });
             if (planet.owned) {
                 planets.back()["owner"] = planet.owner;

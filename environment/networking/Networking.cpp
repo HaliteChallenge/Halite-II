@@ -50,6 +50,7 @@ std::string Networking::serialize_map(const hlt::Map& map) {
         oss << ' ' << planet.location.pos_y;
         oss << ' ' << planet.health;
         oss << ' ' << planet.radius;
+        oss << ' ' << planet.remaining_production;
         if (planet.owned) {
             oss << ' ' << 1 << ' ' << (int) planet.owner;
         }

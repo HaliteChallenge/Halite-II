@@ -272,4 +272,25 @@ namespace hlt {
         ostream << '(' << location.pos_x << ", " << location.pos_y << ')';
         return ostream;
     }
+
+    auto Planet::add_ship(EntityIndex ship) -> void {
+        assert(docked_ships.size() < docking_spots);
+        docked_ships.push_back(ship);
+    }
+
+    auto Planet::remove_ship(EntityIndex ship_id) -> void {
+        auto pos = std::find(
+            docked_ships.begin(),
+            docked_ships.end(),
+            ship_id
+        );
+        if (pos != docked_ships.end()) {
+            docked_ships.erase(pos);
+        }
+
+        if (docked_ships.size() == 0) {
+            owned = false;
+            owner = 0;
+        }
+    }
 }
