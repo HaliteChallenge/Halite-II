@@ -199,9 +199,9 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
                     const auto target_id = collision_map[loc.pos_x][loc.pos_y];
 
                     if (target_id.is_valid() && target_id != id) {
+                        const auto& target = game_map.get_entity(target_id);
                         const auto explosion_damage =
-                            compute_planet_explosion_damage(planet, entity.location);
-                        std::cout << "Damage is " << explosion_damage << '\n';
+                            compute_planet_explosion_damage(planet, target.location);
                         damage_entity(target_id, explosion_damage, collision_map);
                     }
                 }
