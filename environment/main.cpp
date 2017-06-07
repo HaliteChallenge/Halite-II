@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
         std::vector<unsigned short> mapSizeChoices =
             { 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300 };
         std::mt19937 prg(seed);
-        std::uniform_int_distribution<unsigned short> size_dist(0, mapSizeChoices.size());
+        std::uniform_int_distribution<unsigned short> size_dist(0, mapSizeChoices.size() - 1);
         auto random_choice = size_dist(prg);
         mapWidth = mapSizeChoices[random_choice];
         mapHeight = mapWidth;
