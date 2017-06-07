@@ -566,14 +566,19 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         while (planet.current_production >= hlt::Planet::PRODUCTION_PER_SHIP) {
             // Try to spawn the ship
 
+            auto& ships = game_map.ships[planet.owner];
             for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
                 for (int dy = -planet.radius - 2; dy <= planet.radius + 2; dy++) {
                     const auto loc = game_map.location_with_delta(planet.location, dx, dy);
                     if (!collision_map[loc.pos_x][loc.pos_y].is_valid()) {
-                        for (auto& ship : game_map.ships[planet.owner]) {
+                        for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+                            auto& ship = ships[ship_id];
+
                             if (!ship.is_alive()) {
                                 ship.health = hlt::Ship::BASE_HEALTH;
                                 ship.location = loc;
+                                collision_map[loc.pos_x][loc.pos_y] =
+                                    hlt::EntityId::for_ship(planet.owner, ship_id);
                                 goto SUCCESS;
                             }
                         }
