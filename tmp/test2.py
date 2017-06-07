@@ -35,7 +35,7 @@ while True:
                     docking.append(ship.id)
                     assigned = True
                     break
-                common.assign(ship.id, angle, 2)
+                common.assign(ship, angle, 2)
                 assigned = True
                 break
 
@@ -48,7 +48,7 @@ while True:
 
             for enemy in sorted(ships, key=lambda s: -1 if s.docked != "undocked" else common.distance(ship)(s)):
                 angle, d = common.orient_towards(ship, enemy)
-                common.assign(ship.id, angle, max(min(d, 10), 2))
+                common.assign(ship, angle, max(min(d, 10), 2))
                 assigned = True
                 break
 

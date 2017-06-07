@@ -6,7 +6,9 @@ import sys
 import itertools
 
 
+my_tag = None
 map_size = None
+last_map = None
 
 
 def _grouper(iterable, n, fillvalue=None):
@@ -44,13 +46,14 @@ class Planet:
 
 
 class Ship:
-    def __init__(self, id, x, y, hp, orientation, docked):
+    def __init__(self, id, x, y, hp, orientation, docked, planet):
         self.id = id
         self.x = x
         self.y = y
         self.hp = hp
         self.orientation = orientation
         self.docked = docked
+        self.planet = planet
 
 
 class Map:
@@ -98,27 +101,60 @@ def parse(map):
                 docked = "undocked"
             elif docked == 2:
                 docked = "docked"
-            s.append(Ship(int(sid), int(x), int(y), int(hp), int(orientation), docked))
+            s.append(Ship(int(sid), int(x), int(y), int(hp), int(orientation), docked, int(docked_planet)))
 
         m.ships.append(s)
+
+    m.generate_collision()
+
+    global last_map
+    last_map = m
 
     return m
 
 
-def assign(ship, angle, distance):
+def assign(ship, angle, distance, avoidance=10):
+
+    net_angle = (ship.orientation + angle) % 360
+    net_angle = net_angle * (math.pi / 180)
+
+    pos_x = ship.x
+    pos_y = ship.y
+
+    STEPS = 100
+    dx = distance * math.cos(net_angle) / STEPS
+    dy = distance * math.sin(net_angle) / STEPS
+
+    for i in range(1, STEPS + 1):
+        pos_x += dx
+        pos_y += dy
+
+        effective_x = int(pos_x)
+        effective_y = int(pos_y)
+
+        # Collision avoidance
+        if not ((0 <= effective_x < map_size[0] and
+                 0 <= effective_y < map_size[1]) or
+                last_map.collision_map[effective_x][effective_y] == my_tag
+                ):
+            if avoidance > 0:
+                assign(ship, (angle + 20) % 360, distance, avoidance-1)
+                return
+
     if angle <= 100:
-        send_string("r {ship} {angle} ".format(ship=ship, angle=angle))
+        send_string("r {ship} {angle} ".format(ship=ship.id, angle=angle))
     elif angle <= 180:
         send_string("r {ship} {angle} r {ship} {angle2} ".format(
-            ship=ship, angle=100, angle2=angle-100))
+            ship=ship.id, angle=100, angle2=angle-100))
     elif angle < 260:
         send_string("r {ship} {angle} r {ship} {angle2} ".format(
-            ship=ship, angle=-100, angle2=angle-260))
+            ship=ship.id, angle=-100, angle2=angle-260))
     else:
         send_string("r {ship} {angle} ".format(
-            ship=ship, angle=angle-360))
+            ship=ship.id, angle=angle-360))
 
-    send_string("t {ship} {distance}".format(ship=ship, distance=min(distance, 100)))
+    send_string(
+        "t {ship} {distance}".format(ship=ship.id, distance=min(distance, 100)))
 
 
 def distance(a):
@@ -149,7 +185,9 @@ def orient_towards(ship, target):
 
 def initialize(name):
     global map_size
+    global my_tag
     tag = int(get_string())
+    my_tag = tag
     map_size = [int(x) for x in get_string().strip().split()]
     initial_map = get_string()
     send_string("My Bot Name")
