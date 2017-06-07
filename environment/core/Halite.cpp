@@ -143,21 +143,9 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
 
             if (ship.docking_status != hlt::DockingStatus::Undocked) {
                 auto& planet = game_map.planets.at(ship.docked_planet);
-                auto pos = std::find(
-                    planet.docked_ships.begin(),
-                    planet.docked_ships.end(),
-                    id.entity_index()
-                );
-                if (pos != planet.docked_ships.end()) {
-                    planet.docked_ships.erase(pos);
-                }
-
+                planet.remove_ship(id.entity_index());
                 ship.docking_status = hlt::DockingStatus::Undocked;
                 ship.docked_planet = 0;
-
-                if (planet.docked_ships.size() == 0) {
-                    planet.owned = false;
-                }
             }
             break;
         }
@@ -305,14 +293,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 if (ship.docking_progress == 0) {
                     ship.docking_status = hlt::DockingStatus::Undocked;
                     auto& planet = game_map.planets.at(ship.docked_planet);
-                    auto pos = std::find(
-                        planet.docked_ships.begin(),
-                        planet.docked_ships.end(),
-                        ship_id
-                    );
-                    if (pos != planet.docked_ships.end()) {
-                        planet.docked_ships.erase(pos);
-                    }
+                    planet.remove_ship(ship_id);
                 }
             }
         }
@@ -432,7 +413,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             ship.docked_planet = planet_id;
                             ship.docking_status = hlt::DockingStatus::Docking;
                             ship.docking_progress = hlt::Planet::DOCK_TURNS;
-                            planet.docked_ships.push_back(ship_id);
+
+                            planet.add_ship(ship_id);
                         }
 
                         break;
