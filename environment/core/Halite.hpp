@@ -122,7 +122,7 @@ public:
                            unsigned int id,
                            bool enabledReplay,
                            std::string replayDirectory);
-    std::string getName(unsigned char playerTag);
+    std::string getName(hlt::PlayerId playerTag);
 
     ~Halite();
 };

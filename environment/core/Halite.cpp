@@ -193,8 +193,8 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
 }
 
 void Halite::kill_player(hlt::PlayerId player) {
-    networking.killPlayer(player + 1);
-    timeout_tags.insert(player + 1);
+    networking.killPlayer(player);
+    timeout_tags.insert(player);
 
     // Kill those ships
     for (auto& ship : game_map.ships.at(player)) {
@@ -222,9 +222,8 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
             frame_threads[player_id] = std::async(
                 [&, player_id]() -> int {
-                    // TODO: consistently make first player have ID 0
                     return networking.handleFrameNetworking(
-                        player_id + 1,
+                        player_id,
                         turn_number,
                         game_map,
                         ignore_timeout,
@@ -249,8 +248,10 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
 
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
-    for (hlt::PlayerId a = 0; a < number_of_players; a++)
-        if (alive[a]) alive_frame_count[a]++;
+    for (hlt::PlayerId player_id = 0;
+         player_id < number_of_players;
+         player_id++)
+        if (alive[player_id]) alive_frame_count[player_id]++;
 
     retrieve_moves(alive);
 
@@ -806,13 +807,13 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
 
     //Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
-    for (unsigned char a = 0; a < number_of_players; a++) {
-        initThreads[a] = std::async(&Networking::handleInitNetworking,
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        initThreads[player_id] = std::async(&Networking::handleInitNetworking,
                                     &networking,
-                                    static_cast<unsigned char>(a + 1),
+                                    player_id,
                                     game_map,
                                     ignore_timeout,
-                                    &player_names[a]);
+                                    &player_names[player_id]);
     }
     for (hlt::PlayerId player_id = 0;
          player_id < number_of_players;
@@ -885,7 +886,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         PlayerStatistics p;
-        p.tag = player_id + 1;
+        p.tag = player_id;
         p.rank = std::distance(rankings.begin(),
                                std::find(rankings.begin(), rankings.end(), player_id))
             + 1;
@@ -927,7 +928,7 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
             std::to_string(*a) + '-' + std::to_string(id) + ".log";
         std::ofstream file(stats.timeout_log_filenames[timeoutIndex],
                            std::ios_base::binary);
-        file << networking.player_logs[*a - 1];
+        file << networking.player_logs[*a];
         file.flush();
         file.close();
         timeoutIndex++;
@@ -936,10 +937,10 @@ GameStatistics Halite::runGame(std::vector<std::string>* names_,
 }
 
 std::string Halite::getName(hlt::PlayerId playerTag) {
-    return player_names[playerTag - 1];
+    return player_names[playerTag];
 }
 
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
-    for (int a = 0; a < number_of_players; a++) networking.killPlayer(a + 1);
+    for (int a = 0; a < number_of_players; a++) networking.killPlayer(a);
 }

@@ -175,13 +175,13 @@ void Networking::deserializeMoveSet(std::string& inputString,
     }
 }
 
-void Networking::sendString(unsigned char playerTag,
+void Networking::sendString(hlt::PlayerId playerTag,
                             std::string& sendString) {
     //End message with newline character
     sendString += '\n';
 
 #ifdef _WIN32
-    WinConnection connection = connections[playerTag - 1];
+    WinConnection connection = connections[playerTag];
 
     DWORD charsWritten;
     bool success;
@@ -191,7 +191,7 @@ void Networking::sendString(unsigned char playerTag,
         throw 1;
     }
 #else
-    UniConnection connection = connections[playerTag - 1];
+    UniConnection connection = connections[playerTag];
     ssize_t charsWritten =
         write(connection.write, sendString.c_str(), sendString.length());
     if (charsWritten < sendString.length()) {
@@ -201,7 +201,7 @@ void Networking::sendString(unsigned char playerTag,
 #endif
 }
 
-std::string Networking::getString(unsigned char playerTag,
+std::string Networking::getString(hlt::PlayerId playerTag,
                                   const unsigned int timeoutMillis) {
 
     std::string newString;
@@ -210,7 +210,7 @@ std::string Networking::getString(unsigned char playerTag,
         tp = std::chrono::high_resolution_clock::now();
 
 #ifdef _WIN32
-    WinConnection connection = connections[playerTag - 1];
+    WinConnection connection = connections[playerTag];
 
     DWORD charsRead;
     bool success;
@@ -246,7 +246,7 @@ std::string Networking::getString(unsigned char playerTag,
         else newString += buffer;
     }
 #else
-    UniConnection connection = connections[playerTag - 1];
+    UniConnection connection = connections[playerTag];
 
     fd_set set;
     FD_ZERO(&set); /* clear the set */
@@ -421,7 +421,7 @@ void Networking::startAndConnectBot(std::string command) {
     player_logs.push_back(std::string());
 }
 
-int Networking::handleInitNetworking(unsigned char playerTag,
+int Networking::handleInitNetworking(hlt::PlayerId playerTag,
                                      const hlt::Map& m,
                                      bool ignoreTimeout,
                                      std::string* playerName) {
@@ -440,7 +440,7 @@ int Networking::handleInitNetworking(unsigned char playerTag,
                 + ".\n";
         if (!quiet_output) std::cout << outMessage;
 
-        player_logs[playerTag - 1] += " --- Init ---\n";
+        player_logs[playerTag] += " --- Init ---\n";
 
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
@@ -450,7 +450,7 @@ int Networking::handleInitNetworking(unsigned char playerTag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[playerTag - 1] +=
+        player_logs[playerTag] +=
             response + "\n --- Bot used " + std::to_string(millisTaken)
                 + " milliseconds ---";
 
@@ -465,18 +465,18 @@ int Networking::handleInitNetworking(unsigned char playerTag,
     }
     catch (std::string s) {
         if (s.empty())
-            player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+            player_logs[playerTag] += "\nERRORED!\nNo response received.";
         else
-            player_logs[playerTag - 1] +=
+            player_logs[playerTag] +=
                 "\nERRORED!\nResponse received (if any):\n" + s;
         *playerName =
             "Bot #" + std::to_string(playerTag) + "; timed out during Init";
     }
     catch (...) {
         if (response.empty())
-            player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+            player_logs[playerTag] += "\nERRORED!\nNo response received.";
         else
-            player_logs[playerTag - 1] +=
+            player_logs[playerTag] +=
                 "\nERRORED!\nResponse received (if any):\n" + response;
         *playerName =
             "Bot #" + std::to_string(playerTag) + "; timed out during Init";
@@ -484,7 +484,7 @@ int Networking::handleInitNetworking(unsigned char playerTag,
     return -1;
 }
 
-int Networking::handleFrameNetworking(unsigned char playerTag,
+int Networking::handleFrameNetworking(hlt::PlayerId playerTag,
                                       const unsigned short& turnNumber,
                                       const hlt::Map& m,
                                       bool ignoreTimeout,
@@ -502,7 +502,7 @@ int Networking::handleFrameNetworking(unsigned char playerTag,
 
         // TODO: clear out array
 
-        player_logs[playerTag - 1] +=
+        player_logs[playerTag] +=
             "\n-----------------------------------------------------------------------------\n --- Frame #"
                 + std::to_string(turnNumber) + " ---\n";
 
@@ -514,7 +514,7 @@ int Networking::handleFrameNetworking(unsigned char playerTag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[playerTag - 1] +=
+        player_logs[playerTag] +=
             response + "\n --- Bot used " + std::to_string(millisTaken)
                 + " milliseconds ---";
 
@@ -524,22 +524,22 @@ int Networking::handleFrameNetworking(unsigned char playerTag,
     }
     catch (std::string s) {
         if (s.empty())
-            player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+            player_logs[playerTag] += "\nERRORED!\nNo response received.";
         else
-            player_logs[playerTag - 1] +=
+            player_logs[playerTag] +=
                 "\nERRORED!\nResponse received (if any):\n" + s;
     }
     catch (...) {
         if (response.empty())
-            player_logs[playerTag - 1] += "\nERRORED!\nNo response received.";
+            player_logs[playerTag] += "\nERRORED!\nNo response received.";
         else
-            player_logs[playerTag - 1] +=
+            player_logs[playerTag] +=
                 "\nERRORED!\nResponse received (if any):\n" + response;
     }
     return -1;
 }
 
-void Networking::killPlayer(unsigned char playerTag) {
+void Networking::killPlayer(hlt::PlayerId playerTag) {
     if (isProcessDead(playerTag)) return;
 
     std::string newString;
@@ -549,7 +549,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 #ifdef _WIN32
 
     //Try to read entire contents of pipe.
-    WinConnection connection = connections[playerTag - 1];
+    WinConnection connection = connections[playerTag];
     DWORD charsRead;
     bool success;
     char buffer;
@@ -578,13 +578,13 @@ void Networking::killPlayer(unsigned char playerTag) {
         newString += buffer;
     }
 
-    HANDLE process = processes[playerTag - 1];
+    HANDLE process = processes[playerTag];
 
     TerminateProcess(process, 0);
 
-    processes[playerTag - 1] = NULL;
-    connections[playerTag - 1].read = NULL;
-    connections[playerTag - 1].write = NULL;
+    processes[playerTag] = NULL;
+    connections[playerTag].read = NULL;
+    connections[playerTag].write = NULL;
 
     std::string deadMessage = "Player " + std::to_string(playerTag) + " is dead\n";
     if(!quiet_output) std::cout << deadMessage;
@@ -592,7 +592,7 @@ void Networking::killPlayer(unsigned char playerTag) {
 #else
 
     //Try to read entire contents of pipe.
-    UniConnection connection = connections[playerTag - 1];
+    UniConnection connection = connections[playerTag];
     fd_set set;
     FD_ZERO(&set); /* clear the set */
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
@@ -613,24 +613,24 @@ void Networking::killPlayer(unsigned char playerTag) {
         } else break;
     }
 
-    kill(-processes[playerTag - 1], SIGKILL);
+    kill(-processes[playerTag], SIGKILL);
 
-    processes[playerTag - 1] = -1;
-    connections[playerTag - 1].read = -1;
-    connections[playerTag - 1].write = -1;
+    processes[playerTag] = -1;
+    connections[playerTag].read = -1;
+    connections[playerTag].write = -1;
 #endif
 
     if (!newString.empty())
-        player_logs[playerTag - 1] +=
+        player_logs[playerTag] +=
             "\n --- Bot was killed. Below is the rest of its output (if any): ---\n"
                 + newString + "\n --- End bot output ---";
 }
 
-bool Networking::isProcessDead(unsigned char playerTag) {
+bool Networking::isProcessDead(hlt::PlayerId playerTag) {
 #ifdef _WIN32
-    return processes[playerTag - 1] == NULL;
+    return processes[playerTag] == NULL;
 #else
-    return processes.at(playerTag - 1) == -1;
+    return processes.at(playerTag) == -1;
 #endif
 }
 
