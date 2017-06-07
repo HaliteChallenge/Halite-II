@@ -12,26 +12,34 @@ while True:
     m = common.parse(i)
 
     for ship in m.ships[tag]:
+        assigned = False
+
         if ship.docked == "docked":
             planet = m.planets[ship.planet]
+            # Undock ships from unproductive planets
+            if planet.remaining == 0:
+                common.send_string("u {ship}".format(ship=ship.id))
+                assigned = True
 
         if ship.docked != "undocked":
             continue
 
-        assigned = False
-
         for planet in sorted(m.planets.values(), key=common.distance(ship)):
-            if planet.owned and planet.owner == tag and not planet.docked_ships:
-                pass
+            angle, d = common.orient_towards(ship, planet)
 
-            if not planet.owned:
-                planet.owned = True
+            if d < planet.r + 2:
+                if (not planet.owned or
+                        (planet.owned and planet.owner == tag and not planet.docked_ships)):
+                    # Prevent later ships from going towards this one
+                    planet.owned = True
+                    planet.docked_ships.append(ship.id)
 
-                angle, d = common.orient_towards(ship, planet)
-                if d < planet.r + 2:
                     common.send_string("d {ship} {planet}".format(ship=ship.id, planet=planet.id))
                     assigned = True
                     break
+
+            if not planet.owned:
+                planet.owned = True
                 common.move_to(ship, angle, 2)
                 assigned = True
                 break
