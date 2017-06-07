@@ -744,6 +744,8 @@ void Halite::output(std::string filename) {
                 { "id", planet_index },
                 { "health", planet.health },
                 { "docked_ships", planet.docked_ships },
+                { "remaining_production", planet.remaining_production },
+                { "current_production", planet.current_production },
             });
             if (planet.owned) {
                 planets.back()["owner"] = planet.owner;
