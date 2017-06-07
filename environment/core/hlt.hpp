@@ -22,6 +22,8 @@ namespace hlt {
 
     struct Location {
         unsigned short pos_x, pos_y;
+
+        friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
@@ -125,6 +127,10 @@ namespace hlt {
         static auto for_planet(EntityIndex index) -> EntityId;
         //! Construct an entity ID for the given ship.
         static auto for_ship(PlayerId player_id, EntityIndex index) -> EntityId;
+
+        friend auto operator<< (std::ostream& ostream, const EntityId& id) -> std::ostream&;
+        friend auto operator== (const EntityId& id1, const EntityId& id2) -> bool;
+        friend auto operator!= (const EntityId& id1, const EntityId& id2) -> bool;
     };
 
     enum class MoveType {
@@ -175,6 +181,8 @@ namespace hlt {
         auto get_entity(EntityId entity_id) -> Entity&;
         auto get_distance(Location l1, Location l2) const -> float;
         auto get_angle(Location l1, Location l2) const -> float;
+
+        auto location_with_delta(Location location, int dx, int dy) -> Location;
     };
 }
 

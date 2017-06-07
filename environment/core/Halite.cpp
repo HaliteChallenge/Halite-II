@@ -121,7 +121,7 @@ auto Halite::compute_planet_explosion_damage(
 }
 
 auto Halite::reset_collision_map(
-    std::vector<std::vector<hlt::EntityId>>& collision_map) -> void {
+    CollisionMap collision_map) -> void {
     for (auto& row : collision_map) {
         fill(row.begin(), row.end(), hlt::EntityId::invalid());
     }
@@ -145,19 +145,22 @@ auto Halite::reset_collision_map(
     }
 }
 
-auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
+auto Halite::damage_entity(hlt::EntityId id,
+                           unsigned short damage,
+                           CollisionMap collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
 
     if (entity.health <= damage) {
-        kill_entity(id);
+        kill_entity(id, collision_map);
     } else {
         entity.health -= damage;
     }
 }
 
-auto Halite::kill_entity(hlt::EntityId id) -> void {
+auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     entity.kill();
+    // TODO: remove from collision map
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
@@ -179,14 +182,29 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
         case hlt::EntityType::PlanetEntity: {
             hlt::Planet& planet = game_map.get_planet(id);
 
-            // Damage any and all ships attached to the planet
+            // Undock any ships
             for (const auto entity_index : planet.docked_ships) {
                 const auto ship_id =
                     hlt::EntityId::for_ship(planet.owner, entity_index);
-                const auto& ship = game_map.get_ship(ship_id);
-                const auto explosion_damage =
-                    compute_planet_explosion_damage(planet, ship.location);
-                damage_entity(ship_id, explosion_damage);
+                auto& ship = game_map.get_ship(ship_id);
+
+                ship.reset_docking_status();
+            }
+
+            const auto max_delta = planet.radius * 2;
+            for (int dx = -max_delta; dx <= max_delta; dx++) {
+                for (int dy = -max_delta; dy <= max_delta; dy++) {
+                    const auto loc = game_map.location_with_delta(planet.location, dx, dy);
+
+                    const auto target_id = collision_map[loc.pos_x][loc.pos_y];
+
+                    if (target_id.is_valid() && target_id != id) {
+                        const auto explosion_damage =
+                            compute_planet_explosion_damage(planet, entity.location);
+                        std::cout << "Damage is " << explosion_damage << '\n';
+                        damage_entity(target_id, explosion_damage, collision_map);
+                    }
+                }
             }
 
             break;
@@ -475,7 +493,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     // TODO: be consistent and explicit about rounding vs truncation
                     if (pos.first < 0 || pos.first >= game_map.map_width ||
                         pos.second < 0 || pos.second >= game_map.map_height) {
-                        kill_entity(id);
+                        kill_entity(id, collision_map);
                         continue;
                     }
 
@@ -489,8 +507,13 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         auto self_damage = damage.first;
                         auto other_damage = damage.second;
 
-                        damage_entity(occupancy, other_damage);
-                        damage_entity(hlt::EntityId::for_ship(player_id, ship_id), self_damage);
+                        damage_entity(occupancy,
+                                      other_damage,
+                                      collision_map);
+                        damage_entity(hlt::EntityId::for_ship(player_id,
+                                                              ship_id),
+                                      self_damage,
+                                      collision_map);
                     } else {
                         // Move the ship
                         ship.location.pos_x = xp;
@@ -545,20 +568,12 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
             for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
                 for (int dy = -planet.radius - 2; dy <= planet.radius + 2; dy++) {
-                    const auto pos_x = static_cast<unsigned short>(
-                        std::min(
-                            std::max(0, planet.location.pos_x + dx),
-                            game_map.map_width - 1));
-                    const auto pos_y = static_cast<unsigned short>(
-                        std::min(
-                            std::max(0, planet.location.pos_y + dy),
-                            game_map.map_height - 1));
-                    if (!collision_map[pos_x][pos_y].is_valid()) {
+                    const auto loc = game_map.location_with_delta(planet.location, dx, dy);
+                    if (!collision_map[loc.pos_x][loc.pos_y].is_valid()) {
                         for (auto& ship : game_map.ships[planet.owner]) {
                             if (!ship.is_alive()) {
                                 ship.health = hlt::Ship::BASE_HEALTH;
-                                ship.location.pos_x = pos_x;
-                                ship.location.pos_y = pos_y;
+                                ship.location = loc;
                                 goto SUCCESS;
                             }
                         }
@@ -737,6 +752,7 @@ void Halite::output(std::string filename) {
              planet_index < current_map.planets.size();
              planet_index++) {
             const auto& planet = current_map.planets[planet_index];
+            if (!planet.is_alive()) continue;
             planets.push_back(nlohmann::json{
                 { "id", planet_index },
                 { "health", planet.health },

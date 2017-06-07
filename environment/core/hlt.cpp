@@ -43,6 +43,31 @@ namespace hlt {
         return result;
     }
 
+    auto operator<<(std::ostream& ostream, const EntityId& id) -> std::ostream& {
+        switch (id.type) {
+            case EntityType::InvalidEntity:
+                ostream << "[Invalid ID]";
+                break;
+            case EntityType::PlanetEntity:
+                ostream << "[Planet " << id.entity_index() << "]";
+                break;
+            case EntityType::ShipEntity:
+                ostream << "[Ship " << static_cast<int>(id.player_id());
+                ostream << ' ' << id.entity_index() << "]";
+                break;
+        }
+
+        return ostream;
+    }
+
+    auto operator==(const EntityId& id1, const EntityId& id2) -> bool {
+        return id1._player_id == id2._player_id && id1._entity_index == id2._entity_index;
+    }
+
+    auto operator!=(const EntityId& id1, const EntityId& id2) -> bool {
+        return !(id1 == id2);
+    }
+
     Map::Map() {
         map_width = 0;
         map_height = 0;
@@ -226,5 +251,25 @@ namespace hlt {
         short dx = l2.pos_x - l1.pos_x;
         short dy = l2.pos_y - l1.pos_y;
         return atan2f(dy, dx);
+    }
+
+    auto Map::location_with_delta(Location location,
+                                  int dx,
+                                  int dy) -> Location {
+        const auto pos_x = static_cast<unsigned short>(
+            std::min(
+                std::max(0, location.pos_x + dx),
+                map_width - 1));
+        const auto pos_y = static_cast<unsigned short>(
+            std::min(
+                std::max(0, location.pos_y + dy),
+                map_height - 1));
+        return Location{pos_x, pos_y};
+    }
+
+    auto operator<<(std::ostream& ostream,
+                         const Location& location) -> std::ostream& {
+        ostream << '(' << location.pos_x << ", " << location.pos_y << ')';
+        return ostream;
     }
 }
