@@ -226,11 +226,10 @@ void Halite::kill_player(hlt::PlayerId player) {
 }
 
 auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
-    //Create threads to send/receive data to/from players. The threads should
+    // Create threads to send/receive data to/from players. The threads should
     // return a float of how much time passed between the end of their message
     // being sent and the end of the AI's message being received.
-    std::vector<std::future<int>>
-        frame_threads(std::count(alive.begin(), alive.end(), true));
+    std::vector<std::future<int>> frame_threads(alive.size());
 
     // TODO: is there a more idiomatic way to clear out the move array?
     for (auto& row : player_moves) {
