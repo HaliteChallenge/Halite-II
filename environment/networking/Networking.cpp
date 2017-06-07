@@ -56,6 +56,10 @@ std::string Networking::serialize_map(const hlt::Map& map) {
         else {
             oss << ' ' << 0 << ' ' << 0;
         }
+        oss << " ,";
+        for (const auto docked : planet.docked_ships) {
+            oss << docked << ',';
+        }
     }
 
     returnString = oss.str();
