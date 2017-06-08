@@ -345,7 +345,10 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         break;
                 }
 
-                full_player_moves.back()[player_id][ship_id][move_no] = move;
+                auto& move_set = full_player_moves.back();
+                auto& player_moves = move_set[player_id];
+                auto& ship_moves = player_moves[move_no];
+                ship_moves[ship_id] = move;
             }
         }
 
