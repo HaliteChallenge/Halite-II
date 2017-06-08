@@ -476,6 +476,18 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         }
     }
 
+    // Update inertia/implement drag
+    for (auto& player_ships : game_map.ships) {
+        for (auto& ship : player_ships) {
+            const auto magnitude = ship.velocity.magnitude();
+            if (magnitude <= 5) {
+                ship.velocity.vel_x = ship.velocity.vel_y = 0;
+            }
+            else {
+                ship.velocity.accelerate_by(static_cast<unsigned short>(magnitude), ship.velocity.angle() + M_PI);
+            }
+        }
+    }
 
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));

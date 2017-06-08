@@ -30,6 +30,8 @@ namespace hlt {
         short vel_x, vel_y;
 
         auto accelerate_by(unsigned short magnitude, double angle) -> void;
+        auto magnitude() -> double;
+        auto angle() -> double;
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
