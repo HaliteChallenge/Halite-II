@@ -255,10 +255,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     retrieve_moves(alive);
 
-    full_player_moves.push_back(std::vector<std::vector<hlt::Move>>(
-        number_of_players,
-        std::vector<hlt::Move>()));
-
     auto collision_map = CollisionMap(game_map);
 
     auto movement_deltas =
@@ -298,6 +294,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             }
         }
     }
+
+    full_player_moves.push_back({ { { } } });
 
     // Process queue of moves
     for (unsigned int move_no = 0;
@@ -429,7 +427,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         break;
                 }
 
-                full_player_moves.back().at(player_id).push_back(move);
+                full_player_moves.back()[player_id][ship_id][move_no] = move;
             }
         }
 
@@ -747,34 +745,37 @@ void Halite::output(std::string filename) {
         for (hlt::PlayerId player_id = 0; player_id < current_moves.size();
              player_id++) {
             const auto& player_moves = current_moves.at(player_id);
-            for (const auto& move : player_moves) {
-                auto record = nlohmann::json{
-                    { "owner", player_id },
-                    { "shipId", move.shipId },
-                };
-                switch (move.type) {
-                    case hlt::MoveType::Noop:
-                        continue;
-                    case hlt::MoveType::Rotate:
-                        record["type"] = "rotate";
-                        record["thrust"] = move.move.rotate_by;
-                        break;
-                    case hlt::MoveType::Thrust:
-                        record["type"] = "thrust";
-                        record["thrust"] = move.move.thrust_by;
-                        break;
-                    case hlt::MoveType::Dock:
-                        record["type"] = "dock";
-                        record["planet_id"] = move.move.dock_to;
-                        break;
-                    case hlt::MoveType::Undock:
-                        record["type"] = "undock";
-                        break;
-                    case hlt::MoveType::Error:
-                        // TODO: wrap the move that could not be executed
-                        assert(false);
+            for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
+                for (const auto& move : current_moves[player_id][move_no]) {
+                    auto record = nlohmann::json{
+                        { "owner", player_id },
+                        { "queue_number", move_no },
+                        { "shipId", move.shipId },
+                    };
+                    switch (move.type) {
+                        case hlt::MoveType::Noop:
+                            continue;
+                        case hlt::MoveType::Rotate:
+                            record["type"] = "rotate";
+                            record["thrust"] = move.move.rotate_by;
+                            break;
+                        case hlt::MoveType::Thrust:
+                            record["type"] = "thrust";
+                            record["thrust"] = move.move.thrust_by;
+                            break;
+                        case hlt::MoveType::Dock:
+                            record["type"] = "dock";
+                            record["planet_id"] = move.move.dock_to;
+                            break;
+                        case hlt::MoveType::Undock:
+                            record["type"] = "undock";
+                            break;
+                        case hlt::MoveType::Error:
+                            // TODO: wrap the move that could not be executed
+                            assert(false);
+                    }
+                    frame.push_back(record);
                 }
-                frame.push_back(record);
             }
         }
 

@@ -91,7 +91,7 @@ private:
 
     //Full game
     std::vector<hlt::Map> full_frames; //All the maps!
-    std::vector<std::vector<std::vector<hlt::Move>>> full_player_moves;
+    std::vector<hlt::MoveQueue> full_player_moves;
 
     //! Grab the next set of moves from the bots
     auto retrieve_moves(std::vector<bool> alive) -> void;
