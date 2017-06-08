@@ -61,13 +61,13 @@ class Map:
     def __init__(self):
         self.ships = []
         self.planets = {}
+        self.collision_map = []
 
     def generate_collision(self):
-        self.collision_map = []
         for _ in range(map_size[0]):
             col = []
             for _ in range(map_size[1]):
-                col.append(None)
+                col.append((None, None))
             self.collision_map.append(col)
 
         for planet in self.planets.values():
@@ -75,8 +75,16 @@ class Map:
                 for dy in range(-planet.r, planet.r + 1):
                     x = planet.x + dx
                     y = planet.y + dy
+                    if dx*dx + dy*dy > planet.r:
+                        continue
+
                     if 0 <= x < map_size[0] and 0 <= y < map_size[1]:
-                        self.collision_map[x][y] = True
+                        self.collision_map[x][y] = \
+                            (planet.owner if planet.owned else -1, "planet")
+
+        for player_tag, player_ships in enumerate(self.ships):
+            for ship in player_ships:
+                self.collision_map[ship.x][ship.y] = (player_tag, "ship")
 
 
 def parse(map):
@@ -135,12 +143,16 @@ def move_to(ship, angle, distance, avoidance=10):
         effective_y = int(pos_y)
 
         # Collision avoidance
-        if not ((0 <= effective_x < map_size[0] and
-                 0 <= effective_y < map_size[1]) or
-                last_map.collision_map[effective_x][effective_y] == my_tag
-                ):
+        if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
+            last_map.collision_map[effective_x][effective_y][1] == "planet" or
+            last_map.collision_map[effective_x][effective_y][0] == my_tag):
             if avoidance > 0:
-                assign(ship, (angle + 20) % 360, distance, avoidance-1)
+                if ship.id % 2 == 0:
+                    new_angle = (angle + 20) % 360
+                else:
+                    new_angle = (angle - 20) % 360
+                    if new_angle < 0: new_angle += 360
+                move_to(ship, new_angle, max(2, distance // 4), avoidance-1)
                 return
 
     if angle <= 100:
@@ -192,6 +204,6 @@ def initialize(name):
     my_tag = tag
     map_size = [int(x) for x in get_string().strip().split()]
     initial_map = get_string()
-    send_string("My Bot Name")
+    send_string(name)
     done_sending()
     return tag, map_size, initial_map
