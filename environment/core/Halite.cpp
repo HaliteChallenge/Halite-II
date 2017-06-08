@@ -280,9 +280,11 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             break;
                         }
 
+                        auto angle = move.move.thrust.angle * M_PI / 180;
+
                         ship.velocity.accelerate_by(
                             move.move.thrust.thrust,
-                            move.move.thrust.angle);
+                            angle);
 
                         break;
                     }

@@ -295,7 +295,7 @@ namespace hlt {
     }
 
     auto Velocity::accelerate_by(unsigned short magnitude,
-                                 unsigned short angle) -> void {
+                                 double angle) -> void {
         auto new_vel_x = vel_x + static_cast<int>(magnitude * cos(angle));
         auto new_vel_y = vel_y + static_cast<int>(magnitude * sin(angle));
 
