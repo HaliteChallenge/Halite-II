@@ -101,9 +101,7 @@ private:
     void kill_player(hlt::PlayerId player);
 
     //! Compute the damage between two colliding ships
-    auto compute_damage(
-        hlt::EntityId self_id, hlt::EntityId other_id,
-        std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
+    auto compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
         -> std::pair<unsigned short, unsigned short>;
     //! Compute the damage dealt to an entity at the given location
     //! by a planet explosion

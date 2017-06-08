@@ -293,4 +293,16 @@ namespace hlt {
             owner = 0;
         }
     }
+
+    auto Velocity::accelerate_by(unsigned short magnitude,
+                                 unsigned short angle) -> void {
+        auto new_vel_x = vel_x + static_cast<int>(magnitude * cos(angle));
+        auto new_vel_y = vel_y + static_cast<int>(magnitude * sin(angle));
+
+        new_vel_x = std::max(-100, std::min(100, new_vel_x));
+        new_vel_y = std::max(-100, std::min(100, new_vel_y));
+
+        vel_x = static_cast<short>(new_vel_x);
+        vel_y = static_cast<short>(new_vel_y);
+    }
 }

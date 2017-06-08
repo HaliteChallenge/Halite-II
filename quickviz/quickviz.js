@@ -213,11 +213,8 @@ function render() {
         for (let move of replay.moves[currentFrame - 1]) {
             moves.value += `Player ${move.owner} Ship ${move.shipId} `;
             switch (move.type) {
-                case "rotate":
-                    moves.value += `rotate by ${move.thrust}\n`;
-                    break;
                 case "thrust":
-                    moves.value += `move by ${move.thrust}\n`;
+                    moves.value += `accelerate by ${move.magnitude} ${move.angle}\n`;
                     break;
                 case "dock":
                     moves.value += `dock to ${move.planet_id}\n`;

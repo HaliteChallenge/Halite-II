@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <thread>
+#include <core/hlt.hpp>
 
 std::mutex coutMutex;
 
@@ -32,7 +33,8 @@ std::string Networking::serialize_map(const hlt::Map& map) {
             oss << ' ' << ship.location.pos_x;
             oss << ' ' << ship.location.pos_y;
             oss << ' ' << ship.health;
-            oss << ' ' << ship.orientation;
+            oss << ' ' << ship.velocity.vel_x;
+            oss << ' ' << ship.velocity.vel_y;
             oss << ' ' << static_cast<int>(ship.docking_status);
             oss << ' ' << static_cast<int>(ship.docked_planet);
             // TODO: send other ship information
@@ -72,7 +74,6 @@ auto is_valid_move_character(const char& c) -> bool {
     return (c >= '0' && c <= '9')
         || c == ' '
         || c == '-'
-        || c == 'r'
         || c == 't'
         || c == 'u'
         || c == 'd';
@@ -107,28 +108,13 @@ void Networking::deserialize_move_set(std::string& inputString,
     char command;
     while (iss >> command) {
         switch (command) {
-            case 'r': {
-                move.type = hlt::MoveType::Rotate;
-                iss >> move.shipId;
-                iss >> move.move.rotate_by;
-                const auto thrust = move.move.rotate_by;
-                if (thrust < -100 || thrust > 100) {
-                    std::string errorMessage =
-                        "Bot sent an invalid rotation thrust - ejecting from game.\n";
-                    if (!quiet_output) {
-                        std::lock_guard<std::mutex> guard(coutMutex);
-                        std::cout << errorMessage;
-                    }
-                    throw errorMessage;
-                }
-                break;
-            }
             case 't': {
                 move.type = hlt::MoveType::Thrust;
                 iss >> move.shipId;
-                iss >> move.move.thrust_by;
-                const auto thrust = move.move.thrust_by;
-                if (thrust < -100 || thrust > 100) {
+                iss >> move.move.thrust.thrust;
+                iss >> move.move.thrust.angle;
+                const auto thrust = move.move.thrust.thrust;
+                if (thrust > 100) {
                     std::string errorMessage =
                         "Bot sent an invalid movement thrust - ejecting from game.\n";
                     if (!quiet_output) {
@@ -140,16 +126,9 @@ void Networking::deserialize_move_set(std::string& inputString,
                 break;
             }
             case 'd': {
-                // TODO: don't validate this here since planet can die
-                // between commands anyways
                 move.type = hlt::MoveType::Dock;
                 iss >> move.shipId;
                 iss >> move.move.dock_to;
-                if (move.move.dock_to >= m.planets.size()
-                    || !m.planets[move.move.dock_to].is_alive()) {
-                    throw eject_bot(
-                        "Bot docked to invalid planet - ejecting from game.\n");
-                }
                 break;
             }
             case 'u': {

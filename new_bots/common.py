@@ -47,12 +47,13 @@ class Planet:
 
 
 class Ship:
-    def __init__(self, id, x, y, hp, orientation, docked, planet):
+    def __init__(self, id, x, y, hp, vel_x, vel_y, docked, planet):
         self.id = id
         self.x = x
         self.y = y
+        self.vel_x = vel_x
+        self.vel_y = vel_y
         self.hp = hp
-        self.orientation = orientation
         self.docked = docked
         self.planet = planet
 
@@ -105,13 +106,17 @@ def parse(map):
         s = []
 
         while ships and ships[0] != "player":
-            sid, x, y, hp, orientation, docked, docked_planet, *ships = ships
+            sid, x, y, hp, vel_x, vel_y, docked, docked_planet, *ships = ships
             docked = int(docked)
             if docked == 0:
                 docked = "undocked"
             elif docked == 2:
                 docked = "docked"
-            s.append(Ship(int(sid), int(x), int(y), int(hp), int(orientation), docked, int(docked_planet)))
+            s.append(Ship(int(sid),
+                          int(x), int(y),
+                          int(hp),
+                          int(vel_x), int(vel_y),
+                          docked, int(docked_planet)))
 
         m.ships.append(s)
 
@@ -124,51 +129,38 @@ def parse(map):
 
 
 def move_to(ship, angle, distance, avoidance=10):
-
-    net_angle = (ship.orientation + angle) % 360
-    net_angle = net_angle * (math.pi / 180)
-
-    pos_x = ship.x
-    pos_y = ship.y
-
-    STEPS = 100
-    dx = distance * math.cos(net_angle) / STEPS
-    dy = distance * math.sin(net_angle) / STEPS
-
-    for i in range(1, STEPS + 1):
-        pos_x += dx
-        pos_y += dy
-
-        effective_x = int(pos_x)
-        effective_y = int(pos_y)
-
-        # Collision avoidance
-        if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
-            last_map.collision_map[effective_x][effective_y][1] == "planet" or
-            last_map.collision_map[effective_x][effective_y][0] == my_tag):
-            if avoidance > 0:
-                if ship.id % 2 == 0:
-                    new_angle = (angle + 20) % 360
-                else:
-                    new_angle = (angle - 20) % 360
-                    if new_angle < 0: new_angle += 360
-                move_to(ship, new_angle, max(2, distance // 4), avoidance-1)
-                return
-
-    if angle <= 100:
-        send_string("r {ship} {angle} ".format(ship=ship.id, angle=angle))
-    elif angle <= 180:
-        send_string("r {ship} {angle} r {ship} {angle2} ".format(
-            ship=ship.id, angle=100, angle2=angle-100))
-    elif angle < 260:
-        send_string("r {ship} {angle} r {ship} {angle2} ".format(
-            ship=ship.id, angle=-100, angle2=angle-260))
-    else:
-        send_string("r {ship} {angle} ".format(
-            ship=ship.id, angle=angle-360))
+    # net_angle = (ship.orientation + angle) % 360
+    # net_angle = net_angle * (math.pi / 180)
+    #
+    # pos_x = ship.x
+    # pos_y = ship.y
+    #
+    # STEPS = 100
+    # dx = distance * math.cos(net_angle) / STEPS
+    # dy = distance * math.sin(net_angle) / STEPS
+    #
+    # for i in range(1, STEPS + 1):
+    #     pos_x += dx
+    #     pos_y += dy
+    #
+    #     effective_x = int(pos_x)
+    #     effective_y = int(pos_y)
+    #
+    #     # Collision avoidance
+    #     if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
+    #         last_map.collision_map[effective_x][effective_y][1] == "planet" or
+    #         last_map.collision_map[effective_x][effective_y][0] == my_tag):
+    #         if avoidance > 0:
+    #             if ship.id % 2 == 0:
+    #                 new_angle = (angle + 20) % 360
+    #             else:
+    #                 new_angle = (angle - 20) % 360
+    #                 if new_angle < 0: new_angle += 360
+    #             move_to(ship, new_angle, max(2, distance // 4), avoidance-1)
+    #             return
 
     send_string(
-        "t {ship} {distance}".format(ship=ship.id, distance=min(distance, 100)))
+        "t {ship} {distance} {angle}".format(ship=ship.id, distance=min(distance, 2), angle=angle))
 
 
 def distance(a):
@@ -189,7 +181,6 @@ def orient_towards(ship, target):
     if angle < 0:
         angle += math.tau
     angle = int(180 * angle / math.pi)
-    angle = angle - ship.orientation
     angle %= 360
     while angle < 0:
         angle += 360

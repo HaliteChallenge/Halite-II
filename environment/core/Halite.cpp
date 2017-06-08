@@ -1,4 +1,5 @@
 #include "Halite.hpp"
+#include "hlt.hpp"
 #include <functional>
 
 //Private Functions ------------------
@@ -13,78 +14,20 @@ auto Halite::compare_rankings(const hlt::PlayerId& player1,
         < last_ship_count[player2];
 }
 
-auto Halite::compute_damage(
-    hlt::EntityId self_id, hlt::EntityId other_id,
-    std::vector<std::vector<std::pair<short, short>>>& movement_deltas)
--> std::pair<unsigned short, unsigned short> {
+auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
+    -> std::pair<unsigned short, unsigned short> {
 
-    unsigned short self_damage = 0;
+    unsigned short self_damage = 200;
     unsigned short other_damage = 0;
 
     assert(self_id.type == hlt::EntityType::ShipEntity);
-    const auto& ship = game_map.get_ship(self_id);
-
-    auto& delta = movement_deltas.at(self_id.player_id())
-        .at(self_id.entity_index());
-
-    // The collision is head-on for us if the direction of
-    // movement is parallel to the ship orientation
-    // (10 degree fudge factor)
-    auto self_head_on = fabsf(
-        atan2f(delta.second, delta.first)
-            - ship.orientation) < 10;
-    auto self_vel_factor =
-        static_cast<unsigned short>(
-            sqrtf(delta.first * delta.first
-                      + delta.second * delta.second)
-                / 25);
-    self_vel_factor = std::max(self_vel_factor,
-                               static_cast<unsigned short>(1));
-
-    if (self_head_on) {
-        delta.first = delta.second = 0;
-        self_damage += 25 * self_vel_factor;
-        other_damage += 50 * self_vel_factor;
-    } else {
-        self_damage += 50 * self_vel_factor;
-        other_damage += 25 * self_vel_factor;
-    }
 
     switch (other_id.type) {
         case hlt::EntityType::PlanetEntity:
-            self_damage += 200;
-            other_damage += 100;
+            other_damage = 100;
             break;
         case hlt::EntityType::ShipEntity: {
-            auto& other = game_map.get_ship(other_id);
-            auto& other_delta =
-                movement_deltas.at(other_id.player_id()).at(
-                    other_id.entity_index());
-
-            // The collision is head-on for the other if the two
-            // ship directions are antiparallel
-            auto other_head_on = std::abs(
-                std::abs(
-                    ship.orientation - other.orientation)
-                    - 180) < 10;
-            auto other_vel_factor =
-                static_cast<unsigned short>(sqrtf(
-                    other_delta.first * other_delta.first
-                        + other_delta.second
-                            * other_delta.second)
-                    / 25);
-            other_vel_factor = std::max(other_vel_factor,
-                                        static_cast<unsigned short>(1));
-
-            if (other_head_on) {
-                other_delta.first = other_delta.second =
-                    0;
-                self_damage += 50 * other_vel_factor;
-                other_damage += 25 * other_vel_factor;
-            } else {
-                self_damage += 25 * other_vel_factor;
-                other_damage += 50 * other_vel_factor;
-            }
+            other_damage = 200;
             break;
         }
         case hlt::EntityType::InvalidEntity:
@@ -257,11 +200,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     auto collision_map = CollisionMap(game_map);
 
-    auto movement_deltas =
-        std::vector<std::vector<std::pair<short, short>>>(
-            number_of_players,
-            std::vector<std::pair<short, short>>(hlt::MAX_PLAYER_SHIPS,
-                                                 { 0, 0 }));
     auto intermediate_positions =
         std::vector<std::vector<std::pair<float, float>>>(
             number_of_players,
@@ -303,9 +241,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
          move_no++) {
         // Reset auxiliary data structures
 
-        for (auto& row : movement_deltas) {
-            std::fill(row.begin(), row.end(), std::make_pair(0, 0));
-        }
         for (auto& row : intermediate_positions) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
         }
@@ -327,27 +262,16 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 collision_map.fill(ship.location,
                     hlt::EntityId::for_ship(player_id, ship_id));
 
+                intermediate_positions[player_id][ship_id] = {
+                    ship.location.pos_x,
+                    ship.location.pos_y,
+                };
+
                 switch (move.type) {
                     case hlt::MoveType::Noop: {
                         break;
                     }
                     case hlt::MoveType::Error: {
-                        break;
-                    }
-                    case hlt::MoveType::Rotate: {
-                        if (ship.docking_status
-                            != hlt::DockingStatus::Undocked) {
-                            break;
-                        }
-                        // Update orientation based on thrust
-                        const short degrees = move.move.rotate_by;
-                        auto new_orientation =
-                            static_cast<short>((degrees + ship.orientation)
-                                % 360);
-                        while (new_orientation < 0) new_orientation += 360;
-                        ship.orientation =
-                            static_cast<unsigned short>(new_orientation);
-
                         break;
                     }
                     case hlt::MoveType::Thrust: {
@@ -356,17 +280,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             break;
                         }
 
-                        // Update speed based on thrust
-                        const auto distance = move.move.thrust_by;
-                        short dx = (short) (distance
-                            * std::cos(ship.orientation * M_PI / 180));
-                        short dy = (short) (distance
-                            * std::sin(ship.orientation * M_PI / 180));
-
-                        movement_deltas.at(player_id).at(ship_id) =
-                            { dx, dy };
-                        intermediate_positions.at(player_id).at(ship_id) =
-                            { ship.location.pos_x, ship.location.pos_y };
+                        ship.velocity.accelerate_by(
+                            move.move.thrust.thrust,
+                            move.move.thrust.angle);
 
                         break;
                     }
@@ -446,13 +362,13 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                     auto& pos =
                         intermediate_positions.at(player_id).at(ship_id);
-                    auto& delta = movement_deltas.at(player_id).at(ship_id);
+                    auto& velocity = ship.velocity;
 
-                    if (delta.first == 0 && delta.second == 0) continue;
+                    if (velocity.vel_x == 0 && velocity.vel_y == 0) continue;
 
                     collision_map.clear(ship.location);
-                    pos.first += SUBSTEP_DT * delta.first;
-                    pos.second += SUBSTEP_DT * delta.second;
+                    pos.first += SUBSTEP_DT * velocity.vel_x;
+                    pos.second += SUBSTEP_DT * velocity.vel_y;
 
                     // Check boundaries
                     // TODO: be consistent and explicit about rounding vs truncation
@@ -468,7 +384,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     // Check collisions
                     const auto& occupancy = collision_map.at(xp, yp);
                     if (occupancy.is_valid()) {
-                        auto damage = compute_damage(id, occupancy, movement_deltas);
+                        auto damage = compute_damage(id, occupancy);
                         auto self_damage = damage.first;
                         auto other_damage = damage.second;
 
@@ -685,8 +601,9 @@ void Halite::output(std::string filename) {
                 record["owner"] = (int) playerId;
                 record["x"] = ship.location.pos_x;
                 record["y"] = ship.location.pos_y;
+                record["vel_x"] = ship.velocity.vel_x;
+                record["vel_y"] = ship.velocity.vel_y;
                 record["health"] = ship.health;
-                record["orientation"] = ship.orientation;
 
                 nlohmann::json docking;
                 switch (ship.docking_status) {
@@ -744,7 +661,6 @@ void Halite::output(std::string filename) {
         std::vector<nlohmann::json> frame;
         for (hlt::PlayerId player_id = 0; player_id < current_moves.size();
              player_id++) {
-            const auto& player_moves = current_moves.at(player_id);
             for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
                 for (const auto& move : current_moves[player_id][move_no]) {
                     auto record = nlohmann::json{
@@ -755,13 +671,10 @@ void Halite::output(std::string filename) {
                     switch (move.type) {
                         case hlt::MoveType::Noop:
                             continue;
-                        case hlt::MoveType::Rotate:
-                            record["type"] = "rotate";
-                            record["thrust"] = move.move.rotate_by;
-                            break;
                         case hlt::MoveType::Thrust:
                             record["type"] = "thrust";
-                            record["thrust"] = move.move.thrust_by;
+                            record["magnitude"] = move.move.thrust.thrust;
+                            record["angle"] = move.move.thrust.angle;
                             break;
                         case hlt::MoveType::Dock:
                             record["type"] = "dock";

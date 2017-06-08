@@ -15,7 +15,7 @@ extern bool quiet_output;
 namespace hlt {
     constexpr auto MAX_PLAYERS = 4;
     constexpr auto MAX_PLAYER_SHIPS = 40;
-    constexpr auto MAX_QUEUED_MOVES = 3;
+    constexpr auto MAX_QUEUED_MOVES = 1;
 
     typedef uint8_t PlayerId;
     typedef size_t EntityIndex;
@@ -24,6 +24,12 @@ namespace hlt {
         unsigned short pos_x, pos_y;
 
         friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
+    };
+
+    struct Velocity {
+        short vel_x, vel_y;
+
+        auto accelerate_by(unsigned short magnitude, unsigned short angle) -> void;
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
@@ -58,8 +64,7 @@ namespace hlt {
     struct Ship : Entity {
         constexpr static auto BASE_HEALTH = 200;
 
-        //! Rotation of the ship, degrees (0-359) from due east
-        unsigned short orientation;
+        Velocity velocity;
 
         DockingStatus docking_status;
         unsigned short docking_progress;
@@ -140,7 +145,6 @@ namespace hlt {
         //! Noop is not user-specifiable - instead it's the default command,
         //! used to mean that no command was issued
         Noop = 0,
-        Rotate,
         Thrust,
         Dock,
         Undock,
@@ -154,8 +158,7 @@ namespace hlt {
         EntityIndex shipId;
 
         union {
-            short rotate_by;
-            short thrust_by;
+            struct { unsigned short thrust; unsigned short angle; } thrust;
             EntityIndex dock_to;
         } move;
     };
