@@ -196,8 +196,10 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     }
 }
 
-auto Halite::process_attacks(hlt::EntityId entity_id,
-                             CollisionMap& collision_map) {
+auto Halite::process_attacks(
+    hlt::EntityId entity_id,
+    CollisionMap& collision_map,
+    std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void {
     // Compute hits
     auto targets = std::vector<hlt::EntityId>();
 
@@ -511,6 +513,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             }
         }
 
+        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>
+            ship_damage = { {} };
+
         // Resolve collisions - update in small increments; collisions
         // happen if two entities are within the same grid square at any instant
         for (int substep = 1; substep <= SUBSTEPS; substep++) {
@@ -564,6 +569,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         ship.location.pos_x = xp;
                         ship.location.pos_y = yp;
                     }
+
+                    process_attacks(id, collision_map, ship_damage);
 
                     if (!ship.is_alive()) continue;
 

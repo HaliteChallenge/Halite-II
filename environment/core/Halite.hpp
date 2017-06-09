@@ -109,7 +109,10 @@ private:
         hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
     // Subparts of game loop
-    auto process_attacks(hlt::EntityId entity_id, CollisionMap& collision_map) -> void;
+    auto process_attacks(
+        hlt::EntityId entity_id,
+        CollisionMap& collision_map,
+        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void;
     auto process_docking() -> void;
     auto process_production(CollisionMap& collision_map) -> void;
     auto process_drag() -> void;
