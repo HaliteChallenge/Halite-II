@@ -4,6 +4,7 @@ import math
 import sys
 
 import itertools
+import logging
 
 
 my_tag = None
@@ -128,6 +129,10 @@ def parse(map):
     return m
 
 
+def warp(ship, angle, distance, avoidance=10):
+    pass
+
+
 def move_to(ship, angle, distance, avoidance=10):
     # net_angle = (ship.orientation + angle) % 360
     # net_angle = net_angle * (math.pi / 180)
@@ -159,8 +164,7 @@ def move_to(ship, angle, distance, avoidance=10):
     #             move_to(ship, new_angle, max(2, distance // 4), avoidance-1)
     #             return
 
-    send_string(
-        "t {ship} {distance} {angle}".format(ship=ship.id, distance=min(distance, 2), angle=angle))
+    return "t {ship} {distance} {angle}".format(ship=ship.id, distance=min(distance, 2), angle=angle)
 
 
 def distance(a):
@@ -197,4 +201,41 @@ def initialize(name):
     initial_map = get_string()
     send_string(name)
     done_sending()
+
+    log_file = "{}_{}.log".format(my_tag, name)
+    # Truncate the log
+    with open(log_file, 'w'):
+        pass
+
+    logging.basicConfig(filename=log_file, level=logging.INFO)
+    logging.info("Initialized bot")
     return tag, map_size, initial_map
+
+
+def run_bot(main_loop):
+    generator = main_loop()
+
+    name = next(generator)
+    tag, map_size, initial_map = initialize(name)
+
+    logging.info("Send info")
+    generator.send((tag, map_size, initial_map, logging.info))
+
+    while True:
+        i = get_string()
+        if not i:
+            break
+
+        m = parse(i)
+
+        logging.info("Send map")
+        command_set = generator.send(m)
+        logging.info("Got commands: {}".format(command_set))
+        # logging.info("Ask for commands")
+        # command_set = next(generator)
+
+        for command in command_set:
+            send_string(command)
+
+        done_sending()
+        next(generator)
