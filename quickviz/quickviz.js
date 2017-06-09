@@ -185,7 +185,7 @@ function render() {
             ship.x * CELL_SIZE,
             ship.y * CELL_SIZE,
             CELL_SIZE,
-            CELL_SIZE * Math.max(0.2, ship.health / 200),
+            CELL_SIZE * Math.max(0.2, ship.health / 150),
         );
         entities.endFill();
         if (ship.docking.status === "docking") {
