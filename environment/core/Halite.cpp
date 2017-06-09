@@ -27,7 +27,8 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
     switch (other_id.type) {
         case hlt::EntityType::PlanetEntity:
             other_damage =
-                static_cast<unsigned short>(20 * self.velocity.magnitude());
+                static_cast<unsigned short>(
+                    (self.health / 40) * self.velocity.magnitude());
             break;
         case hlt::EntityType::ShipEntity: {
             const auto& other = game_map.get_ship(other_id);
