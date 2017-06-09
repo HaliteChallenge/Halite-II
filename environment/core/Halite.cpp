@@ -487,11 +487,13 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     for (auto& player_ships : game_map.ships) {
         for (auto& ship : player_ships) {
             const auto magnitude = ship.velocity.magnitude();
-            if (magnitude <= 5) {
+            if (magnitude <= hlt::Velocity::DRAG) {
                 ship.velocity.vel_x = ship.velocity.vel_y = 0;
             }
             else {
-                ship.velocity.accelerate_by(static_cast<unsigned short>(magnitude), ship.velocity.angle() + M_PI);
+                ship.velocity.accelerate_by(
+                    hlt::Velocity::DRAG,
+                    ship.velocity.angle() + M_PI);
             }
         }
     }

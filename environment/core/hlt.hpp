@@ -27,6 +27,8 @@ namespace hlt {
     };
 
     struct Velocity {
+        constexpr static auto DRAG = 5;
+
         short vel_x, vel_y;
 
         auto accelerate_by(unsigned short magnitude, double angle) -> void;
