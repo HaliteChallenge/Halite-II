@@ -15,7 +15,7 @@ auto Halite::compare_rankings(const hlt::PlayerId& player1,
 }
 
 auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
-    -> std::pair<unsigned short, unsigned short> {
+-> std::pair<unsigned short, unsigned short> {
 
     assert(self_id.type == hlt::EntityType::ShipEntity);
     const auto& self = game_map.get_ship(self_id);
@@ -70,7 +70,7 @@ auto Halite::compute_planet_explosion_damage(
 
 auto Halite::damage_entity(hlt::EntityId id,
                            unsigned short damage,
-                           CollisionMap collision_map) -> void {
+                           CollisionMap& collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
 
     if (entity.health <= damage) {
@@ -80,7 +80,7 @@ auto Halite::damage_entity(hlt::EntityId id,
     }
 }
 
-auto Halite::kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void {
+auto Halite::kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     entity.kill();
     collision_map.clear(entity.location);

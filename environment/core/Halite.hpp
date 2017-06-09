@@ -111,10 +111,10 @@ private:
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,
                        unsigned short damage,
-                       CollisionMap collision_map) -> void;
+                       CollisionMap& collision_map) -> void;
     //! Helper to kill an entity and clean up any dependents (planet
     //! explosions, docked ships, etc.)
-    auto kill_entity(hlt::EntityId id, CollisionMap collision_map) -> void;
+    auto kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void;
 
     //! Comparison function to rank two players, based on the number of ships and their total health.
     auto compare_rankings(const hlt::PlayerId& player1,
