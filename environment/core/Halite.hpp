@@ -68,6 +68,8 @@ public:
     auto clear(const hlt::Location& location) -> void;
 };
 
+typedef std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS> DamageMap;
+
 class Halite {
 private:
     //Networking
@@ -111,8 +113,9 @@ private:
     // Subparts of game loop
     auto process_attacks(
         hlt::EntityId entity_id,
-        CollisionMap& collision_map,
-        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void;
+        CollisionMap& collision_map, DamageMap& ship_damage) -> void;
+    auto process_damage(
+        CollisionMap& collision_map, DamageMap& ship_damage) -> void;
     auto process_docking() -> void;
     auto process_production(CollisionMap& collision_map) -> void;
     auto process_drag() -> void;

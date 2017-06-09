@@ -242,7 +242,9 @@ auto Halite::process_attacks(
             targets.clear();
         }
     }
+}
 
+auto Halite::process_damage(CollisionMap& collision_map, DamageMap& ship_damage) -> void {
     // Resolve damage
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
@@ -580,6 +582,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         ship.location.pos_y = yp;
                     }
 
+                    // TODO: cooldowns should be processed at end-of-turn
                     process_attacks(id, collision_map, ship_damage);
 
                     if (!ship.is_alive()) continue;
@@ -589,6 +592,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                                                                ship_id));
                 }
             }
+
+            process_damage(collision_map, ship_damage);
         }
     }
 
