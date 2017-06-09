@@ -306,11 +306,11 @@ namespace hlt {
         vel_y = static_cast<short>(new_vel_y);
     }
 
-    auto Velocity::magnitude() -> double {
+    auto Velocity::magnitude() const -> double {
         return sqrt(vel_x*vel_x + vel_y*vel_y);
     }
 
-    auto Velocity::angle() -> double {
+    auto Velocity::angle() const -> double {
         return atan2(vel_y, vel_x);
     }
 }
