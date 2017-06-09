@@ -212,6 +212,11 @@ auto Halite::process_attacks(
 
             if (!ship.is_alive()) continue;
 
+            if (ship.weapon_cooldown > 0) {
+                ship.weapon_cooldown--;
+                continue;
+            }
+
             for (int dx = -hlt::Ship::WEAPON_RADIUS;
                  dx <= hlt::Ship::WEAPON_RADIUS; dx++) {
                 for (int dy = -hlt::Ship::WEAPON_RADIUS;
@@ -227,6 +232,8 @@ auto Halite::process_attacks(
                     }
                 }
             }
+
+            ship.weapon_cooldown = hlt::Ship::WEAPON_COOLDOWN;
 
             for (const auto target: targets) {
                 ship_damage[target.player_id()][target.entity_index()] +=
@@ -330,8 +337,11 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
                             auto& ship = ships[ship_id];
 
                             if (!ship.is_alive()) {
+                                // TODO: refactor into a "reset ship"
                                 ship.health = hlt::Ship::BASE_HEALTH;
                                 ship.location = loc.first;
+                                ship.weapon_cooldown = 0;
+
                                 collision_map.fill(loc.first,
                                                    hlt::EntityId::for_ship(
                                                        planet.owner,
