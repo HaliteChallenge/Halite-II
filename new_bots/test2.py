@@ -3,8 +3,6 @@
 import common
 import math
 
-# tag, *_ = common.initialize("SettlingBot")
-
 
 def enemy_priority(me):
     dist_func = common.distance(me)

@@ -20,6 +20,10 @@ namespace hlt {
     typedef uint8_t PlayerId;
     typedef size_t EntityIndex;
 
+    //! A poor man's std::optional.
+    template<typename T>
+    using possibly = std::pair<T, bool>;
+
     struct Location {
         unsigned short pos_x, pos_y;
 
@@ -66,9 +70,14 @@ namespace hlt {
     };
 
     struct Ship : Entity {
-        constexpr static auto BASE_HEALTH = 200;
+        constexpr static auto BASE_HEALTH = 150;
+        constexpr static auto WEAPON_COOLDOWN = 1;
+        constexpr static auto WEAPON_RADIUS = 5;
+        constexpr static auto WEAPON_DAMAGE = 50;
 
         Velocity velocity;
+
+        uint8_t weapon_cooldown;
 
         DockingStatus docking_status;
         unsigned short docking_progress;
@@ -192,7 +201,7 @@ namespace hlt {
         auto get_distance(Location l1, Location l2) const -> float;
         auto get_angle(Location l1, Location l2) const -> float;
 
-        auto location_with_delta(Location location, int dx, int dy) -> Location;
+        auto location_with_delta(Location location, int dx, int dy) -> possibly<Location>;
     };
 }
 

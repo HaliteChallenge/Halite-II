@@ -108,6 +108,12 @@ private:
     auto compute_planet_explosion_damage(
         hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
+    // Subparts of game loop
+    auto process_attacks(hlt::EntityId entity_id, CollisionMap& collision_map) -> void;
+    auto process_docking() -> void;
+    auto process_production(CollisionMap& collision_map) -> void;
+    auto process_drag() -> void;
+
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,
                        unsigned short damage,

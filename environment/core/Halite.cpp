@@ -114,7 +114,9 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void 
                 for (int dy = -max_delta; dy <= max_delta; dy++) {
                     const auto loc = game_map.location_with_delta(planet.location, dx, dy);
 
-                    const auto target_id = collision_map.at(loc);
+                    if (!loc.second) continue;
+
+                    const auto target_id = collision_map.at(loc.first);
 
                     if (target_id.is_valid() && target_id != id) {
                         const auto& target = game_map.get_entity(target_id);
@@ -194,6 +196,179 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     }
 }
 
+auto Halite::process_attacks(hlt::EntityId entity_id,
+                             CollisionMap& collision_map) {
+    // Compute hits
+    auto targets = std::vector<hlt::EntityId>();
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        auto& player_ships = game_map.ships.at(player_id);
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = player_ships.at(ship_id);
+
+            if (!ship.is_alive()) continue;
+
+            for (int dx = -hlt::Ship::WEAPON_RADIUS;
+                 dx <= hlt::Ship::WEAPON_RADIUS; dx++) {
+                for (int dy = -hlt::Ship::WEAPON_RADIUS;
+                     dy <= hlt::Ship::WEAPON_RADIUS; dy++) {
+                    const auto pos = game_map.location_with_delta(ship.location, dx, dy);
+                    if (!pos.second) continue;
+
+                    const auto target_id = collision_map.at(pos.first);
+                    if (!target_id.is_valid()) continue;
+
+                    if (target_id.type == hlt::EntityType::ShipEntity) {
+                        targets.push_back(target_id);
+                    }
+                }
+            }
+
+            for (const auto target: targets) {
+                ship_damage[target.player_id()][target.entity_index()] +=
+                    hlt::Ship::WEAPON_DAMAGE / (float) targets.size();
+            }
+            targets.clear();
+        }
+    }
+
+    // Resolve damage
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        auto& player_ships = game_map.ships.at(player_id);
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = player_ships.at(ship_id);
+            auto damage = ship_damage[player_id][ship_id];
+            damage_entity(
+                hlt::EntityId::for_ship(player_id, ship_id),
+                static_cast<unsigned short>(damage),
+                collision_map
+            );
+        }
+    }
+}
+
+auto Halite::process_docking() -> void {
+    // Update docking/undocking status
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        auto& player_ships = game_map.ships.at(player_id);
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = player_ships.at(ship_id);
+            if (ship.docking_status == hlt::DockingStatus::Docking) {
+                ship.docking_progress--;
+                if (ship.docking_progress == 0) {
+                    ship.docking_status = hlt::DockingStatus::Docked;
+                    // Invariant: planet should be alive (destroying a
+                    // planet should have destroyed any ships in the
+                    // middle of docking)
+                }
+            } else if (ship.docking_status == hlt::DockingStatus::Undocking) {
+                ship.docking_progress--;
+                if (ship.docking_progress == 0) {
+                    ship.docking_status = hlt::DockingStatus::Undocked;
+                    auto& planet = game_map.planets.at(ship.docked_planet);
+                    planet.remove_ship(ship_id);
+                }
+            }
+        }
+    }
+}
+
+auto Halite::process_production(CollisionMap& collision_map) -> void {
+    // Update productions
+    // Collision map should be up-to-date
+    // We do this after processing moves so that a bot can't try to guess the
+    // resulting ship ID and issue commands to it immediately
+    for (hlt::EntityIndex entity_index = 0;
+         entity_index < game_map.planets.size();
+         entity_index++) {
+        auto& planet = game_map.planets[entity_index];
+        if (!planet.is_alive()) continue;
+
+        if (!planet.owned) continue;
+        const auto num_docked_ships = count_if(
+            planet.docked_ships.begin(),
+            planet.docked_ships.end(),
+            [&](hlt::EntityIndex ship_idx) -> bool {
+                const auto& ship =
+                    game_map.get_ship(planet.owner, ship_idx);
+                return ship.docking_status == hlt::DockingStatus::Docked;
+            }
+        );
+
+        if (num_docked_ships == 0) continue;
+
+        const auto production = std::__1::min(
+            planet.remaining_production,
+            static_cast<unsigned short>(25 + (num_docked_ships - 1) * 15)
+        );
+
+        planet.remaining_production -= production;
+        planet.current_production += production;
+
+        while (planet.current_production >= hlt::Planet::PRODUCTION_PER_SHIP) {
+            // Try to spawn the ship
+
+            auto& ships = game_map.ships[planet.owner];
+            for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
+                for (int dy = -planet.radius - 2; dy <= planet.radius + 2;
+                     dy++) {
+                    const auto loc =
+                        game_map.location_with_delta(planet.location, dx, dy);
+                    if (!loc.second) continue;
+
+                    if (!collision_map.at(loc.first).is_valid()) {
+                        for (hlt::EntityIndex ship_id = 0;
+                             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+                            auto& ship = ships[ship_id];
+
+                            if (!ship.is_alive()) {
+                                ship.health = hlt::Ship::BASE_HEALTH;
+                                ship.location = loc.first;
+                                collision_map.fill(loc.first,
+                                                   hlt::EntityId::for_ship(
+                                                       planet.owner,
+                                                       ship_id));
+                                goto SUCCESS;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Can't find a place to spawn the ship, or the player has the
+        // maximum number of ships - leave the production there and try
+        // to spawn next turn
+        break;
+
+        SUCCESS:
+        planet.current_production -= hlt::Planet::PRODUCTION_PER_SHIP;
+    }
+}
+
+auto Halite::process_drag() -> void {
+    // Update inertia/implement drag
+    for (auto& player_ships : game_map.ships) {
+        for (auto& ship : player_ships) {
+            const auto magnitude = ship.velocity.magnitude();
+            if (magnitude <= hlt::Velocity::DRAG) {
+                ship.velocity.vel_x = ship.velocity.vel_y = 0;
+            }
+            else {
+                ship.velocity.accelerate_by(
+                    hlt::Velocity::DRAG,
+                    ship.velocity.angle() + M_PI);
+            }
+        }
+    }
+}
+
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
     for (hlt::PlayerId player_id = 0;
@@ -211,45 +386,19 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             std::vector<std::pair<float, float>>(hlt::MAX_PLAYER_SHIPS,
                                                  { 0.0, 0.0 }));
 
-    // Update docking/undocking status
-    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-         player_id++) {
-        auto& player_ships = game_map.ships.at(player_id);
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = player_ships.at(ship_id);
-            if (ship.docking_status == hlt::DockingStatus::Docking) {
-                ship.docking_progress--;
-                if (ship.docking_progress == 0) {
-                    ship.docking_status = hlt::DockingStatus::Docked;
-                    // Invariant: planet should be alive (destroying a
-                    // planet should have destroyed any ships in the
-                    // middle of docking)
-                }
-            }
-            else if (ship.docking_status == hlt::DockingStatus::Undocking) {
-                ship.docking_progress--;
-                if (ship.docking_progress == 0) {
-                    ship.docking_status = hlt::DockingStatus::Undocked;
-                    auto& planet = game_map.planets.at(ship.docked_planet);
-                    planet.remove_ship(ship_id);
-                }
-            }
-        }
-    }
-
     full_player_moves.push_back({ { { } } });
+
+    process_docking();
 
     // Process queue of moves
     for (unsigned int move_no = 0;
          move_no < hlt::MAX_QUEUED_MOVES;
          move_no++) {
-        // Reset auxiliary data structures
 
+        // Reset auxiliary data structures
         for (auto& row : intermediate_positions) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
         }
-
         collision_map.reset(game_map);
 
         for (hlt::PlayerId player_id = 0; player_id < number_of_players;
@@ -265,7 +414,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                 assert(!collision_map.at(ship.location).is_valid());
                 collision_map.fill(ship.location,
-                    hlt::EntityId::for_ship(player_id, ship_id));
+                                   hlt::EntityId::for_ship(player_id,
+                                                           ship_id));
 
                 intermediate_positions[player_id][ship_id] = {
                     ship.location.pos_x,
@@ -313,7 +463,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         }
 
                         // TODO: factor max distance into a constant
-                        if (game_map.get_distance(planet.location, ship.location) > planet.radius + ship.radius + 2) {
+                        if (game_map.get_distance(planet.location,
+                                                  ship.location)
+                            > planet.radius + ship.radius + 2) {
                             ship.reset_docking_status();
                             break;
                         }
@@ -342,7 +494,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     }
 
                     case hlt::MoveType::Undock:
-                        if (ship.docking_status != hlt::DockingStatus::Docked) break;
+                        if (ship.docking_status
+                            != hlt::DockingStatus::Docked)
+                            break;
 
                         ship.docking_status = hlt::DockingStatus::Undocking;
                         ship.docking_progress = hlt::Planet::DOCK_TURNS;
@@ -414,90 +568,15 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     if (!ship.is_alive()) continue;
 
                     collision_map.fill(ship.location,
-                        hlt::EntityId::for_ship(player_id, ship_id));
+                                       hlt::EntityId::for_ship(player_id,
+                                                               ship_id));
                 }
             }
         }
     }
 
-    // Update productions
-    // Collision map should be up-to-date
-    // We do this after processing moves so that a bot can't try to guess the
-    // resulting ship ID and issue commands to it immediately
-    for (hlt::EntityIndex entity_index = 0;
-         entity_index < game_map.planets.size();
-         entity_index++) {
-        auto& planet = game_map.planets[entity_index];
-        if (!planet.is_alive()) continue;
-
-        if (!planet.owned) continue;
-        const auto num_docked_ships = std::count_if(
-            planet.docked_ships.begin(),
-            planet.docked_ships.end(),
-            [&](hlt::EntityIndex ship_idx) -> bool {
-                const auto& ship =
-                    game_map.get_ship(planet.owner, ship_idx);
-                return ship.docking_status == hlt::DockingStatus::Docked;
-            }
-        );
-
-        if (num_docked_ships == 0) continue;
-
-        const auto production = std::min(
-            planet.remaining_production,
-            static_cast<unsigned short>(25 + (num_docked_ships - 1) * 15)
-        );
-
-        planet.remaining_production -= production;
-        planet.current_production += production;
-
-        while (planet.current_production >= hlt::Planet::PRODUCTION_PER_SHIP) {
-            // Try to spawn the ship
-
-            auto& ships = game_map.ships[planet.owner];
-            for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
-                for (int dy = -planet.radius - 2; dy <= planet.radius + 2; dy++) {
-                    const auto loc = game_map.location_with_delta(planet.location, dx, dy);
-                    if (!collision_map.at(loc).is_valid()) {
-                        for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                            auto& ship = ships[ship_id];
-
-                            if (!ship.is_alive()) {
-                                ship.health = hlt::Ship::BASE_HEALTH;
-                                ship.location = loc;
-                                collision_map.fill(loc,
-                                    hlt::EntityId::for_ship(planet.owner, ship_id));
-                                goto SUCCESS;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Can't find a place to spawn the ship, or the player has the
-            // maximum number of ships - leave the production there and try
-            // to spawn next turn
-            break;
-
-            SUCCESS:
-            planet.current_production -= hlt::Planet::PRODUCTION_PER_SHIP;
-        }
-    }
-
-    // Update inertia/implement drag
-    for (auto& player_ships : game_map.ships) {
-        for (auto& ship : player_ships) {
-            const auto magnitude = ship.velocity.magnitude();
-            if (magnitude <= hlt::Velocity::DRAG) {
-                ship.velocity.vel_x = ship.velocity.vel_y = 0;
-            }
-            else {
-                ship.velocity.accelerate_by(
-                    hlt::Velocity::DRAG,
-                    ship.velocity.angle() + M_PI);
-            }
-        }
-    }
+    process_production(collision_map);
+    process_drag();
 
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));
@@ -741,11 +820,11 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         initThreads[player_id] = std::async(&Networking::handle_init_networking,
-                                    &networking,
-                                    player_id,
-                                    game_map,
-                                    ignore_timeout,
-                                    &player_names[player_id]);
+                                            &networking,
+                                            player_id,
+                                            game_map,
+                                            ignore_timeout,
+                                            &player_names[player_id]);
     }
     for (hlt::PlayerId player_id = 0;
          player_id < number_of_players;
@@ -807,9 +886,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
 
     // Re-sort rankings
     std::stable_sort(
-            newRankings.begin(),
-            newRankings.end(),
-            comparator);
+        newRankings.begin(),
+        newRankings.end(),
+        comparator);
     rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
 
     std::reverse(rankings.begin(),

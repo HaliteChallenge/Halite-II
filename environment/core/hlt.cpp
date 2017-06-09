@@ -255,16 +255,24 @@ namespace hlt {
 
     auto Map::location_with_delta(Location location,
                                   int dx,
-                                  int dy) -> Location {
-        const auto pos_x = static_cast<unsigned short>(
-            std::min(
-                std::max(0, location.pos_x + dx),
-                map_width - 1));
-        const auto pos_y = static_cast<unsigned short>(
-            std::min(
-                std::max(0, location.pos_y + dy),
-                map_height - 1));
-        return Location{pos_x, pos_y};
+                                  int dy) -> possibly<Location> {
+        const auto pos_x = location.pos_x + dx;
+        if (pos_x < 0 || pos_x >= map_width) {
+            return { Location{}, false };
+        }
+
+        const auto pos_y = location.pos_y + dy;
+        if (pos_y < 0 || pos_y >= map_height) {
+            return { Location{}, false };
+        }
+
+        return {
+            Location{
+                static_cast<unsigned short>(pos_x),
+                static_cast<unsigned short>(pos_y),
+            },
+            true
+        };
     }
 
     auto operator<<(std::ostream& ostream,
