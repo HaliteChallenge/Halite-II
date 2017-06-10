@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <fstream>

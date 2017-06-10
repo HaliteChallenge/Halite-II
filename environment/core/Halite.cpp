@@ -314,7 +314,7 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
 
         if (num_docked_ships == 0) continue;
 
-        const auto production = std::__1::min(
+        const auto production = std::min(
             planet.remaining_production,
             static_cast<unsigned short>(25 + (num_docked_ships - 1) * 15)
         );
