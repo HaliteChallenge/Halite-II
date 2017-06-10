@@ -545,51 +545,49 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         intermediate_positions.at(player_id).at(ship_id);
                     auto& velocity = ship.velocity;
 
-                    if (velocity.vel_x == 0 && velocity.vel_y == 0) continue;
+                    if (velocity.vel_x != 0 || velocity.vel_y != 0) {
+                        collision_map.clear(ship.location);
+                        pos.first += SUBSTEP_DT * velocity.vel_x;
+                        pos.second += SUBSTEP_DT * velocity.vel_y;
 
-                    collision_map.clear(ship.location);
-                    pos.first += SUBSTEP_DT * velocity.vel_x;
-                    pos.second += SUBSTEP_DT * velocity.vel_y;
+                        // Check boundaries
+                        // TODO: be consistent and explicit about rounding vs truncation
+                        if (pos.first < 0 || pos.first >= game_map.map_width ||
+                            pos.second < 0 || pos.second >= game_map.map_height) {
+                            kill_entity(id, collision_map);
+                            continue;
+                        }
 
-                    // Check boundaries
-                    // TODO: be consistent and explicit about rounding vs truncation
-                    if (pos.first < 0 || pos.first >= game_map.map_width ||
-                        pos.second < 0 || pos.second >= game_map.map_height) {
-                        kill_entity(id, collision_map);
-                        continue;
-                    }
+                        auto xp = static_cast<unsigned short>(pos.first);
+                        auto yp = static_cast<unsigned short>(pos.second);
 
-                    auto xp = static_cast<unsigned short>(pos.first);
-                    auto yp = static_cast<unsigned short>(pos.second);
+                        // Check collisions
+                        const auto& occupancy = collision_map.at(xp, yp);
+                        if (occupancy.is_valid()) {
+                            auto damage = compute_damage(id, occupancy);
+                            auto self_damage = damage.first;
+                            auto other_damage = damage.second;
 
-                    // Check collisions
-                    const auto& occupancy = collision_map.at(xp, yp);
-                    if (occupancy.is_valid()) {
-                        auto damage = compute_damage(id, occupancy);
-                        auto self_damage = damage.first;
-                        auto other_damage = damage.second;
+                            damage_entity(occupancy,
+                                          other_damage,
+                                          collision_map);
+                            damage_entity(hlt::EntityId::for_ship(player_id,
+                                                                  ship_id),
+                                          self_damage,
+                                          collision_map);
+                        } else {
+                            // Move the ship
+                            ship.location.pos_x = xp;
+                            ship.location.pos_y = yp;
+                        }
 
-                        damage_entity(occupancy,
-                                      other_damage,
-                                      collision_map);
-                        damage_entity(hlt::EntityId::for_ship(player_id,
-                                                              ship_id),
-                                      self_damage,
-                                      collision_map);
-                    } else {
-                        // Move the ship
-                        ship.location.pos_x = xp;
-                        ship.location.pos_y = yp;
+                        if (ship.is_alive()) {
+                            collision_map.fill(ship.location, id);
+                        }
                     }
 
                     // TODO: cooldowns should be processed at end-of-turn
                     process_attacks(id, collision_map, ship_damage);
-
-                    if (!ship.is_alive()) continue;
-
-                    collision_map.fill(ship.location,
-                                       hlt::EntityId::for_ship(player_id,
-                                                               ship_id));
                 }
             }
 
