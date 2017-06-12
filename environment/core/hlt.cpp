@@ -123,15 +123,16 @@ namespace hlt {
             unsigned short height;
             unsigned short x;
             unsigned short y;
+            int col;
+            int row;
 
-            Region(unsigned short _x,
-                   unsigned short _y,
-                   unsigned short _width,
-                   unsigned short _height) {
-                this->x = _x;
-                this->y = _y;
-                this->width = _width;
-                this->height = _height;
+            Region(int _col, int _row, int _cw, int _ch) {
+                this->x = _col * _cw;
+                this->y = _row * _ch;
+                this->width = _cw;
+                this->height = _ch;
+                this->col = _col;
+                this->row = _row;
             }
 
             auto center_x() const -> unsigned short {
@@ -148,7 +149,7 @@ namespace hlt {
 
         for (int row = 0; row < dh; row++) {
             for (int col = 0; col < dw; col++) {
-                regions.push_back(Region(col * cw, row * ch, cw, ch));
+                regions.push_back(Region(col, row, cw, ch));
             }
         }
 
@@ -166,49 +167,167 @@ namespace hlt {
 
         // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
 
-        std::uniform_int_distribution<unsigned short> uidw(0, map_width - 1);
-        std::uniform_int_distribution<unsigned short> uidh(0, map_height - 1);
+        const auto MAX_RADIUS = std::min(cw, ch) / 12;
+        std::uniform_int_distribution<unsigned short> uidrw(MAX_RADIUS, cw - MAX_RADIUS);
+        std::uniform_int_distribution<unsigned short> uidrh(MAX_RADIUS, ch - MAX_RADIUS);
         std::uniform_int_distribution<unsigned short>
-            uidr(1, std::min(map_width, map_height) / 50);
-        const auto
-            rand_width = [&]() -> unsigned short { return uidw(prg); };
-        const auto
-            rand_height = [&]() -> unsigned short { return uidh(prg); };
+            uidr(3, MAX_RADIUS);
+        // TODO: use std::bind here to clean things up
         const auto
             rand_radius = [&]() -> unsigned short { return uidr(prg); };
+        const auto rand_region_width = [&]() -> unsigned short { return uidrw(prg); };
+        const auto rand_region_height = [&]() -> unsigned short { return uidrh(prg); };
 
         const auto MAX_PLANETS = player_count * PLANETS_PER_PLAYER;
-        constexpr auto MAX_TRIES = 500;
+        constexpr auto MAX_TRIES = 2500;
         constexpr auto MIN_DISTANCE = 5;
-        for (int i = 0; i < MAX_PLANETS; i++) {
+
+        const auto is_valid_planet_position =
+            [&](unsigned short x, unsigned short y, unsigned short r) -> bool {
+                if (get_distance(
+                    { regions[0].center_x(), regions[0].center_y() },
+                    { x, y }) < r + MIN_DISTANCE) {
+                    return false;
+                }
+
+                for (const auto& planet : planets) {
+                    if (get_distance(
+                        { planet.location.pos_x, planet.location.pos_y },
+                        { x, y }) < r + planet.radius + MIN_DISTANCE) {
+                        return false;
+                    }
+                }
+
+                return true;
+
+            };
+
+        // Generate 4 planets in a region, then mirror that across all regions
+        for (int i = 0; i < 4; i++) {
             for (int j = 0; j < MAX_TRIES; j++) {
-                const auto x = rand_width();
-                const auto y = rand_height();
+                const auto x = rand_region_width();
+                const auto y = rand_region_height();
                 const auto r = rand_radius();
 
-                // Make sure planets are far enough away from the center
-                // of each region, where initial ships spawn
-                for (Region region : regions) {
-                    if (get_distance({ region.center_x(), region.center_y() }, { x, y })
-                        < r + MIN_DISTANCE) {
-                        goto TRY_AGAIN;
-                    }
+                if (!is_valid_planet_position(x, y, r)) {
+                    continue;
                 }
 
-                for (Planet planet : planets) {
-                    if (get_distance(planet.location, { x, y })
-                        < r + planet.radius + 1) {
-                        goto TRY_AGAIN;
-                    }
+                for (const auto& region : regions) {
+                    planets.push_back(Planet(region.x + x, region.y + y, r));
                 }
 
-                planets.push_back(Planet(x, y, r));
-                goto NEXT_PLANET;
+                break;
+            }
+        }
 
-                TRY_AGAIN:;
+        // Try to generate planets on the border of regions, mirroring those
+        // across regions as well
+        std::vector<Region> adjacent_regions;
+        for (const auto r : regions) {
+            if (std::abs(r.col - regions[0].col) == 1 || std::abs(r.row - regions[0].row) == 1) {
+                adjacent_regions.push_back(r);
+            }
+        }
+        std::uniform_int_distribution<int> rand_region(0, adjacent_regions.size() - 1);
+        std::uniform_int_distribution<int> rand_sign_dist(0, 1);
+        auto rand_sign = [&]() -> bool {
+            return rand_sign_dist(prg) == 1;
+        };
+
+        for (int j = 0; j < MAX_TRIES && planets.size() < MAX_PLANETS; j++) {
+            const auto base = regions[0];
+            const auto region = adjacent_regions[rand_region(prg)];
+            const auto midpoint_x = (base.center_x() + region.center_x()) / 2;
+            const auto midpoint_y = (base.center_y() + region.center_y()) / 2;
+
+            // Generate two planets around the midpoint
+            // (This might generate an extra planet if the # of planets
+            // remaining is odd, but oh well)
+            const auto r = rand_radius();
+
+            int x1, y1, x2, y2;
+
+            if (region.col != base.col && region.row != base.row) {
+                const auto offset = std::min(rand_region_width(), rand_region_height()) / 4;
+                // Diagonal relative to each other
+                if (rand_sign()) {
+                    x1 = midpoint_x - offset;
+                    y1 = midpoint_y - offset;
+                    x2 = midpoint_x + offset;
+                    x2 = midpoint_y + offset;
+                }
+                else {
+                    x1 = midpoint_x - offset;
+                    y1 = midpoint_y + offset;
+                    x2 = midpoint_x + offset;
+                    y2 = midpoint_y - offset;
+                }
+            }
+            else if (region.col != base.col) {
+                const auto offset = rand_region_height() / 2;
+                // Side-by-side
+                x1 = midpoint_x;
+                y1 = midpoint_y - offset;
+                x2 = midpoint_x;
+                y2 = midpoint_y + offset;
+            }
+            else {
+                const auto offset = rand_region_width() / 2;
+                // One above the other
+                x1 = midpoint_x - offset;
+                y1 = midpoint_y;
+                x2 = midpoint_x + offset;
+                y2 = midpoint_y;
             }
 
-            NEXT_PLANET:;
+            if (!is_valid_planet_position(x1, y1, r) ||
+                !is_valid_planet_position(x2, y2, r)) {
+                continue;
+            }
+
+            if (std::abs(x1 - x2) < 2 * r + 1 && std::abs(y1 - y2) < 2 * r + 1) {
+                continue;
+            }
+
+            std::vector<Region> target_regions;
+            if (region.col != base.col && region.row != base.row) {
+                // Diagonal relative to each other
+                for (const auto& r1 : regions) {
+                    for (const auto& r2 : regions) {
+                        if (r2.col == r1.col + 1 && r2.row == r1.row + 1) {
+                            target_regions.push_back(r1);
+                        }
+                    }
+                }
+            }
+            else if (region.col != base.col) {
+                // Side-by-side
+                for (const auto& r1 : regions) {
+                    for (const auto& r2 : regions) {
+                        if (r2.col == r1.col + 1 && r2.row == r1.row) {
+                            target_regions.push_back(r1);
+                        }
+                    }
+                }
+            }
+            else {
+                // One above the other
+                for (const auto& r1 : regions) {
+                    for (const auto& r2 : regions) {
+                        if (r2.col == r1.col && r2.row == r1.row + 1) {
+                            target_regions.push_back(r1);
+                        }
+                    }
+                }
+            }
+
+            for (const auto& target_region : target_regions) {
+                planets.push_back(Planet(target_region.x + x1,
+                                         target_region.y + y1, r));
+                planets.push_back(Planet(target_region.x + x2,
+                                         target_region.y + y2, r));
+            }
         }
 
         std::cout << map_width << " " << map_height << std::endl;
