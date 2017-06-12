@@ -38,7 +38,7 @@ def assign_ship_planet(m, ship):
 
         if d < planet.r + 2:
             if (not planet.owned or
-                        (planet.owned and planet.owner == tag and len(planet.docked_ships)) < 2):
+                        (planet.owned and planet.owner == common.my_tag and len(planet.docked_ships)) < 2):
                 # Prevent later ships from going towards this one
                 planet.owned = True
                 planet.docked_ships.append(ship.id)
@@ -101,6 +101,5 @@ def settling_bot():
 
         log("Send commands")
         yield queue
-
 
 common.run_bot(settling_bot)

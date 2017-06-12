@@ -227,7 +227,9 @@ auto Halite::process_attacks(
                     if (!target_id.is_valid()) continue;
 
                     if (target_id.type == hlt::EntityType::ShipEntity) {
-                        targets.push_back(target_id);
+                        if (target_id.player_id() != player_id) {
+                            targets.push_back(target_id);
+                        }
                     }
                 }
             }
