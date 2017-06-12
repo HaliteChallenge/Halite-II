@@ -1,17 +1,15 @@
 #include "Halite.hpp"
 #include "hlt.hpp"
 #include <functional>
+#include "spdlog/spdlog.h"
 
 //Private Functions ------------------
 
 auto Halite::compare_rankings(const hlt::PlayerId& player1,
                               const hlt::PlayerId& player2) const -> bool{
-    if (last_ship_count[player1]
-        == last_ship_count[player2])
-        return last_ship_health_total[player1]
-            < last_ship_health_total[player2];
-    return last_ship_count[player1]
-        < last_ship_count[player2];
+    if (total_ship_count[player1] == total_ship_count[player2])
+        return damage_dealt[player1] < damage_dealt[player2];
+    return total_ship_count[player1] < total_ship_count[player2];
 }
 
 auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
@@ -237,8 +235,13 @@ auto Halite::process_attacks(
             ship.weapon_cooldown = hlt::Ship::WEAPON_COOLDOWN;
 
             for (const auto target: targets) {
-                ship_damage[target.player_id()][target.entity_index()] +=
+                const auto damage =
                     hlt::Ship::WEAPON_DAMAGE / (float) targets.size();
+                ship_damage[target.player_id()][target.entity_index()] +=
+                    damage;
+
+                // TODO: how to round attributed damage?
+                damage_dealt[player_id] += static_cast<unsigned int>(damage);
             }
             targets.clear();
         }
@@ -345,6 +348,8 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
                                 ship.location = loc.first;
                                 ship.weapon_cooldown = 0;
 
+                                total_ship_count[planet.owner]++;
+
                                 collision_map.fill(loc.first,
                                                    hlt::EntityId::for_ship(
                                                        planet.owner,
@@ -438,8 +443,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 auto& ship = game_map.get_ship(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
-                auto move = player_moves[player_id][move_no][ship_id];
-
                 assert(!collision_map.at(ship.location).is_valid());
                 collision_map.fill(ship.location,
                                    hlt::EntityId::for_ship(player_id,
@@ -450,6 +453,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     ship.location.pos_y,
                 };
 
+                auto move = player_moves[player_id][move_no][ship_id];
                 switch (move.type) {
                     case hlt::MoveType::Noop: {
                         break;
@@ -559,8 +563,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         intermediate_positions.at(player_id).at(ship_id);
                     auto& velocity = ship.velocity;
 
+                    const auto old_location = ship.location;
                     if (velocity.vel_x != 0 || velocity.vel_y != 0) {
-                        collision_map.clear(ship.location);
                         pos.first += SUBSTEP_DT * velocity.vel_x;
                         pos.second += SUBSTEP_DT * velocity.vel_y;
 
@@ -577,7 +581,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
                         // Check collisions
                         const auto& occupancy = collision_map.at(xp, yp);
-                        if (occupancy.is_valid()) {
+                        if (occupancy != id && occupancy.is_valid()) {
                             auto damage = compute_damage(id, occupancy);
                             auto self_damage = damage.first;
                             auto other_damage = damage.second;
@@ -596,6 +600,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         }
 
                         if (ship.is_alive()) {
+                            collision_map.clear(old_location);
                             collision_map.fill(ship.location, id);
                         }
                     }
@@ -637,45 +642,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     }
 
     return stillAlive;
-}
-
-//Public Functions -------------------
-Halite::Halite(unsigned short width_,
-               unsigned short height_,
-               unsigned int seed_,
-               unsigned short n_players_for_map_creation,
-               Networking networking_,
-               bool should_ignore_timeout) {
-    networking = networking_;
-    // number_of_players is the number of active bots to start the match; it is constant throughout game
-    number_of_players = networking.player_count();
-
-    //Initialize map
-    game_map = hlt::Map(width_, height_, n_players_for_map_creation, seed_);
-
-    //If this is single-player mode, remove all the extra players (they were automatically inserted in map, just 0 them out)
-    if (number_of_players == 1) {
-        // TODO
-    }
-
-    //Default initialize
-    player_moves = { { { {} } } };
-    turn_number = 0;
-    player_names = std::vector<std::string>(number_of_players);
-
-    //Add to full game:
-    full_frames.push_back(hlt::Map(game_map));
-
-    //Check if timeout should be ignored.
-    ignore_timeout = should_ignore_timeout;
-
-    //Init statistics
-    alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
-    init_response_times = std::vector<unsigned int>(number_of_players);
-    last_ship_count = std::vector<unsigned int>(number_of_players);
-    last_ship_health_total = std::vector<unsigned int>(number_of_players);
-    total_frame_response_times = std::vector<unsigned int>(number_of_players);
-    timeout_tags = std::set<unsigned short>();
 }
 
 void Halite::output(std::string filename) {
@@ -851,7 +817,10 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
 
-    //Send initial package
+    // Debug logging
+    auto log = spdlog::basic_logger_mt("halite", "log-" + std::to_string(id) + '-' + std::to_string(seed) + ".hlt");
+
+    // Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         initThreads[player_id] = std::async(&Networking::handle_init_networking,
@@ -879,55 +848,48 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             player_names.push_back(a->substr(0, 30));
     }
 
-    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) / 2.0);
+    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) * 2.0);
 
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
-    while (turn_number < maxTurnNumber
-        && (std::count(living_players.begin(), living_players.end(), true) > 1
-            || number_of_players == 1)) {
+    while (turn_number < maxTurnNumber &&
+        (std::count(living_players.begin(), living_players.end(), true) > 1 ||
+            number_of_players == 1)) {
         turn_number++;
 
         if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
 
-        //Frame logic.
+        // Frame logic.
         std::vector<bool> new_living_players =
             process_next_frame(living_players);
 
-        //Add to vector of players that should be dead.
-        std::vector<hlt::PlayerId> newRankings;
-        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
+        // Add to vector of players that should be dead.
+        std::vector<hlt::PlayerId> new_rankings;
+        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
             if (living_players[player_id] && !new_living_players[player_id]) {
-                newRankings.push_back(player_id);
+                new_rankings.push_back(player_id);
             }
+        }
 
-        std::stable_sort(
-            newRankings.begin(),
-            newRankings.end(),
-            comparator);
-        rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
-
-        // Count productive squares remaining for Halite single-player game
-        // TODO: come up with similar metric for 2.0
+        std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
+        rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
         living_players = new_living_players;
     }
-    std::vector<hlt::PlayerId> newRankings;
+
+    // Add remaining players to the ranking. Break ties using the same
+    // comparison function.
+    std::vector<hlt::PlayerId> new_rankings;
     for (hlt::PlayerId player_id = 0;
          player_id < number_of_players; player_id++) {
-        if (living_players[player_id]) newRankings.push_back(player_id);
+        if (living_players[player_id]) new_rankings.push_back(player_id);
     }
+    std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
+    rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
-    // Re-sort rankings
-    std::stable_sort(
-        newRankings.begin(),
-        newRankings.end(),
-        comparator);
-    rankings.insert(rankings.end(), newRankings.begin(), newRankings.end());
-
-    std::reverse(rankings.begin(),
-                 rankings.end()); //Best player first rather than last.
+    // Best player first rather than last.
+    std::reverse(rankings.begin(), rankings.end());
     GameStatistics stats;
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
@@ -984,6 +946,48 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
 
 std::string Halite::get_name(hlt::PlayerId player_tag) {
     return player_names[player_tag];
+}
+
+//Public Functions -------------------
+Halite::Halite(unsigned short width_,
+               unsigned short height_,
+               unsigned int seed_,
+               unsigned short n_players_for_map_creation,
+               Networking networking_,
+               bool should_ignore_timeout) {
+    networking = networking_;
+    // number_of_players is the number of active bots to start the match; it is constant throughout game
+    number_of_players = networking.player_count();
+
+    //Initialize map
+    game_map = hlt::Map(width_, height_, n_players_for_map_creation, seed_);
+
+    //If this is single-player mode, remove all the extra players (they were automatically inserted in map, just 0 them out)
+    if (number_of_players == 1) {
+        // TODO
+    }
+
+    //Default initialize
+    player_moves = { { { {} } } };
+    turn_number = 0;
+    player_names = std::vector<std::string>(number_of_players);
+
+    //Add to full game:
+    full_frames.push_back(hlt::Map(game_map));
+
+    //Check if timeout should be ignored.
+    ignore_timeout = should_ignore_timeout;
+
+    //Init statistics
+    alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
+    init_response_times = std::vector<unsigned int>(number_of_players);
+    last_ship_count = std::vector<unsigned int>(number_of_players);
+    last_ship_health_total = std::vector<unsigned int>(number_of_players);
+    total_ship_count = std::vector<unsigned int>(number_of_players);
+    kill_count = std::vector<unsigned int>(number_of_players);
+    damage_dealt = std::vector<unsigned int>(number_of_players);
+    total_frame_response_times = std::vector<unsigned int>(number_of_players);
+    timeout_tags = std::set<unsigned short>();
 }
 
 Halite::~Halite() {
