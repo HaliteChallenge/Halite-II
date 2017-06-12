@@ -427,9 +427,14 @@ namespace hlt {
         auto new_vel_x = vel_x + static_cast<int>(magnitude * cos(angle));
         auto new_vel_y = vel_y + static_cast<int>(magnitude * sin(angle));
 
-        new_vel_x = std::max(-100, std::min(100, new_vel_x));
-        new_vel_y = std::max(-100, std::min(100, new_vel_y));
+        vel_x = static_cast<short>(new_vel_x);
+        vel_y = static_cast<short>(new_vel_y);
 
+        if (this->magnitude() > MAX_MAGNITUDE) {
+            auto scale = MAX_MAGNITUDE / this->magnitude();
+            new_vel_x *= scale;
+            new_vel_y *= scale;
+        }
         vel_x = static_cast<short>(new_vel_x);
         vel_y = static_cast<short>(new_vel_y);
     }

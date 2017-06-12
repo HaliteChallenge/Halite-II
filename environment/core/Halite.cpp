@@ -589,8 +589,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     const auto& occupancy = collision_map.at(ship.location);
                     // Collision occurred, process damage
                     if (occupancy != id && occupancy.is_valid()) {
-                        std::cout << "Collision " << id << occupancy << ship.location << '\n';
-
                         auto damage = compute_damage(id, occupancy);
                         auto self_damage = damage.first;
                         auto other_damage = damage.second;

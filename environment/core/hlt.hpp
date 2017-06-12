@@ -34,6 +34,7 @@ namespace hlt {
 
     struct Velocity {
         constexpr static auto DRAG = 5;
+        constexpr static auto MAX_MAGNITUDE = 20;
 
         short vel_x, vel_y;
 
