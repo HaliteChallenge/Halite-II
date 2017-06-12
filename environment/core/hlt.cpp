@@ -115,17 +115,6 @@ namespace hlt {
         map_width = (unsigned short) (cw * dw);
         map_height = (unsigned short) (ch * dh);
 
-        std::uniform_int_distribution<unsigned short> uidw(0, map_width - 1);
-        std::uniform_int_distribution<unsigned short> uidh(0, map_height - 1);
-        std::uniform_int_distribution<unsigned short>
-            uidr(1, std::min(map_width, map_height) / 25);
-        const auto
-            rand_width = [&]() -> unsigned short { return uidw(prg); };
-        const auto
-            rand_height = [&]() -> unsigned short { return uidh(prg); };
-        const auto
-            rand_radius = [&]() -> unsigned short { return uidr(prg); };
-
         // Divide the map into regions for each player
 
         class Region {
@@ -166,19 +155,33 @@ namespace hlt {
         // Center the player's starting ships in each region
         for (PlayerId playerId = 0; playerId < player_count;
              playerId++) {
-            const auto& region = regions.at(playerId);
+//            const auto& region = regions[playerId];
+
+            const auto& region = regions[0];
 
             for (int i = 0; i < 3; i++) {
                 ships[playerId][i].health = Ship::BASE_HEALTH;
-                ships[playerId][i].location.pos_x = region.center_x();
+                ships[playerId][i].location.pos_x = region.center_x() + playerId;
                 ships[playerId][i].location.pos_y = region.center_y() - 1 + i;
             }
         }
 
         // Scatter planets throughout all of space, avoiding the starting ships (centers of regions)
-        const auto MAX_PLANETS = player_count * 2;
-        const auto MAX_TRIES = 100;
-        const auto MIN_DISTANCE = 5;
+
+        std::uniform_int_distribution<unsigned short> uidw(0, map_width - 1);
+        std::uniform_int_distribution<unsigned short> uidh(0, map_height - 1);
+        std::uniform_int_distribution<unsigned short>
+            uidr(1, std::min(map_width, map_height) / 50);
+        const auto
+            rand_width = [&]() -> unsigned short { return uidw(prg); };
+        const auto
+            rand_height = [&]() -> unsigned short { return uidh(prg); };
+        const auto
+            rand_radius = [&]() -> unsigned short { return uidr(prg); };
+
+        const auto MAX_PLANETS = player_count * 6;
+        constexpr auto MAX_TRIES = 500;
+        constexpr auto MIN_DISTANCE = 5;
         for (int i = 0; i < MAX_PLANETS; i++) {
             for (int j = 0; j < MAX_TRIES; j++) {
                 const auto x = rand_width();
