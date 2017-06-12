@@ -213,7 +213,6 @@ auto Halite::process_attacks(
             if (!ship.is_alive()) continue;
 
             if (ship.weapon_cooldown > 0) {
-                ship.weapon_cooldown--;
                 continue;
             }
 
@@ -370,6 +369,7 @@ auto Halite::process_drag() -> void {
     // Update inertia/implement drag
     for (auto& player_ships : game_map.ships) {
         for (auto& ship : player_ships) {
+            if (!ship.is_alive()) continue;
             const auto magnitude = ship.velocity.magnitude();
             if (magnitude <= hlt::Velocity::DRAG) {
                 ship.velocity.vel_x = ship.velocity.vel_y = 0;
@@ -378,6 +378,18 @@ auto Halite::process_drag() -> void {
                 ship.velocity.accelerate_by(
                     hlt::Velocity::DRAG,
                     ship.velocity.angle() + M_PI);
+            }
+        }
+    }
+}
+
+auto Halite::process_cooldowns() -> void {
+    for (auto& player_ships : game_map.ships) {
+        for (auto& ship : player_ships) {
+            if (!ship.is_alive()) continue;
+
+            if (ship.weapon_cooldown > 0) {
+                ship.weapon_cooldown--;
             }
         }
     }
@@ -597,6 +609,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     process_production(collision_map);
     process_drag();
+    process_cooldowns();
 
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));

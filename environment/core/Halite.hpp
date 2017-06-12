@@ -119,6 +119,7 @@ private:
     auto process_docking() -> void;
     auto process_production(CollisionMap& collision_map) -> void;
     auto process_drag() -> void;
+    auto process_cooldowns() -> void;
 
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,
