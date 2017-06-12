@@ -95,7 +95,8 @@ private:
     std::set<unsigned short> timeout_tags;
 
     //Full game
-    std::vector<hlt::Map> full_frames; //All the maps!
+    //! A record of the game state at every substep, used for replays.
+    std::vector<std::vector<hlt::Map>> full_frames;
     std::vector<hlt::MoveQueue> full_player_moves;
 
     //! Grab the next set of moves from the bots

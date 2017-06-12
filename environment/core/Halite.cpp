@@ -252,10 +252,8 @@ auto Halite::process_damage(CollisionMap& collision_map, DamageMap& ship_damage)
     // Resolve damage
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
-        auto& player_ships = game_map.ships.at(player_id);
         for (hlt::EntityIndex ship_id = 0;
              ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = player_ships.at(ship_id);
             auto damage = ship_damage[player_id][ship_id];
             damage_entity(
                 hlt::EntityId::for_ship(player_id, ship_id),
@@ -419,6 +417,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             std::vector<std::pair<float, float>>(hlt::MAX_PLAYER_SHIPS,
                                                  { 0.0, 0.0 }));
 
+    full_frames.push_back({});
     full_player_moves.push_back({ { { } } });
 
     process_docking();
@@ -547,6 +546,10 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             // Reset collision map so we can process all movements simultaneously
             collision_map.reset(game_map);
 
+            if (substep > 1) {
+                full_frames.back().push_back(hlt::Map(game_map));
+            }
+
             for (hlt::PlayerId player_id = 0; player_id < number_of_players;
                  player_id++) {
                 auto& player_ships = game_map.ships.at(player_id);
@@ -614,7 +617,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     process_cooldowns();
 
     // Save map for the replay
-    full_frames.push_back(hlt::Map(game_map));
+    full_frames.back().push_back(hlt::Map(game_map));
 
     // Check if the game is over
     std::vector<bool> stillAlive(number_of_players, false);
@@ -661,7 +664,7 @@ void Halite::output(std::string filename) {
     // Encode the planet map. This information doesn't change between frames,
     // so there's no need to re-encode it every time.
     auto planets = std::vector<nlohmann::json>();
-    const auto& initial_map = full_frames[0];
+    const auto& initial_map = full_frames[0][0];
     for (hlt::EntityIndex planet_index = 0;
          planet_index < initial_map.planets.size();
          planet_index++) {
@@ -679,79 +682,84 @@ void Halite::output(std::string filename) {
 
     // Encode the frames. Note that there is no moves field for the last frame.
     std::vector<nlohmann::json> frames;
-    std::vector<std::vector<nlohmann::json> > moves;
+    std::vector<std::vector<nlohmann::json>> moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
-    for (int frame_idx = 0; frame_idx < full_frames.size(); frame_idx++) {
-        nlohmann::json frame;
-        std::vector<nlohmann::json> ships;
-        std::vector<nlohmann::json> planets;
+    for (const auto& frame_maps : full_frames) {
+        std::vector<nlohmann::json> frame;
 
-        auto current_map = full_frames[frame_idx];
-        for (hlt::PlayerId playerId = 0; playerId < number_of_players;
-             playerId++) {
-            for (hlt::EntityIndex ship_id = 0;
-                 ship_id < hlt::MAX_PLAYER_SHIPS;
-                 ship_id++) {
-                auto ship = current_map.ships.at(playerId).at(ship_id);
-                if (!ship.is_alive()) continue;
-                nlohmann::json record;
-                record["id"] = ship_id;
-                record["owner"] = (int) playerId;
-                record["x"] = ship.location.pos_x;
-                record["y"] = ship.location.pos_y;
-                record["vel_x"] = ship.velocity.vel_x;
-                record["vel_y"] = ship.velocity.vel_y;
-                record["health"] = ship.health;
+        for (const auto& current_map : frame_maps) {
+            std::vector<nlohmann::json> ships;
+            std::vector<nlohmann::json> planets;
 
-                nlohmann::json docking;
-                switch (ship.docking_status) {
-                    case hlt::DockingStatus::Undocked:
-                        docking["status"] = "undocked";
-                        break;
-                    case hlt::DockingStatus::Docking:
-                        docking["status"] = "docking";
-                        docking["planet_id"] = ship.docked_planet;
-                        docking["turns_left"] = ship.docking_progress;
-                        break;
-                    case hlt::DockingStatus::Undocking:
-                        docking["status"] = "undocking";
-                        docking["planet_id"] = ship.docked_planet;
-                        docking["turns_left"] = ship.docking_progress;
-                        break;
-                    case hlt::DockingStatus::Docked:
-                        docking["status"] = "docked";
-                        docking["planet_id"] = ship.docked_planet;
-                        break;
+            for (hlt::PlayerId playerId = 0; playerId < number_of_players;
+                 playerId++) {
+                for (hlt::EntityIndex ship_id = 0;
+                     ship_id < hlt::MAX_PLAYER_SHIPS;
+                     ship_id++) {
+                    auto ship = current_map.ships.at(playerId).at(ship_id);
+                    if (!ship.is_alive()) continue;
+                    nlohmann::json record;
+                    record["id"] = ship_id;
+                    record["owner"] = (int) playerId;
+                    record["x"] = ship.location.pos_x;
+                    record["y"] = ship.location.pos_y;
+                    record["vel_x"] = ship.velocity.vel_x;
+                    record["vel_y"] = ship.velocity.vel_y;
+                    record["health"] = ship.health;
+
+                    nlohmann::json docking;
+                    switch (ship.docking_status) {
+                        case hlt::DockingStatus::Undocked:
+                            docking["status"] = "undocked";
+                            break;
+                        case hlt::DockingStatus::Docking:
+                            docking["status"] = "docking";
+                            docking["planet_id"] = ship.docked_planet;
+                            docking["turns_left"] = ship.docking_progress;
+                            break;
+                        case hlt::DockingStatus::Undocking:
+                            docking["status"] = "undocking";
+                            docking["planet_id"] = ship.docked_planet;
+                            docking["turns_left"] = ship.docking_progress;
+                            break;
+                        case hlt::DockingStatus::Docked:
+                            docking["status"] = "docked";
+                            docking["planet_id"] = ship.docked_planet;
+                            break;
+                    }
+
+                    record["docking"] = docking;
+
+                    ships.push_back(record);
                 }
-
-                record["docking"] = docking;
-
-                ships.push_back(record);
             }
-        }
 
-        for (hlt::EntityIndex planet_index = 0;
-             planet_index < current_map.planets.size();
-             planet_index++) {
-            const auto& planet = current_map.planets[planet_index];
-            if (!planet.is_alive()) continue;
-            planets.push_back(nlohmann::json{
-                { "id", planet_index },
-                { "health", planet.health },
-                { "docked_ships", planet.docked_ships },
-                { "remaining_production", planet.remaining_production },
-                { "current_production", planet.current_production },
+            for (hlt::EntityIndex planet_index = 0;
+                 planet_index < current_map.planets.size();
+                 planet_index++) {
+                const auto& planet = current_map.planets[planet_index];
+                if (!planet.is_alive()) continue;
+                planets.push_back(nlohmann::json{
+                    { "id", planet_index },
+                    { "health", planet.health },
+                    { "docked_ships", planet.docked_ships },
+                    { "remaining_production", planet.remaining_production },
+                    { "current_production", planet.current_production },
+                });
+                if (planet.owned) {
+                    planets.back()["owner"] = planet.owner;
+                } else {
+                    planets.back()["owner"] = nullptr;
+                }
+            }
+
+            frame.push_back(nlohmann::json{
+                { "ships", ships },
+                { "planets", planets },
             });
-            if (planet.owned) {
-                planets.back()["owner"] = planet.owner;
-            } else {
-                planets.back()["owner"] = nullptr;
-            }
         }
 
-        frame["ships"] = ships;
-        frame["planets"] = planets;
         frames.push_back(frame);
     }
 
@@ -968,7 +976,7 @@ Halite::Halite(unsigned short width_,
     player_names = std::vector<std::string>(number_of_players);
 
     //Add to full game:
-    full_frames.push_back(hlt::Map(game_map));
+    full_frames.push_back({ hlt::Map(game_map) });
 
     //Check if timeout should be ignored.
     ignore_timeout = should_ignore_timeout;
