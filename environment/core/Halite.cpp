@@ -443,11 +443,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 auto& ship = game_map.get_ship(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
-                assert(!collision_map.at(ship.location).is_valid());
-                collision_map.fill(ship.location,
-                                   hlt::EntityId::for_ship(player_id,
-                                                           ship_id));
-
                 intermediate_positions[player_id][ship_id] = {
                     ship.location.pos_x,
                     ship.location.pos_y,
@@ -549,6 +544,9 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         // Resolve collisions - update in small increments; collisions
         // happen if two entities are within the same grid square at any instant
         for (int substep = 1; substep <= SUBSTEPS; substep++) {
+            // Reset collision map so we can process all movements simultaneously
+            collision_map.reset(game_map);
+
             for (hlt::PlayerId player_id = 0; player_id < number_of_players;
                  player_id++) {
                 auto& player_ships = game_map.ships.at(player_id);
@@ -563,7 +561,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         intermediate_positions.at(player_id).at(ship_id);
                     auto& velocity = ship.velocity;
 
-                    const auto old_location = ship.location;
                     if (velocity.vel_x != 0 || velocity.vel_y != 0) {
                         pos.first += SUBSTEP_DT * velocity.vel_x;
                         pos.second += SUBSTEP_DT * velocity.vel_y;
@@ -579,33 +576,33 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         auto xp = static_cast<unsigned short>(pos.first);
                         auto yp = static_cast<unsigned short>(pos.second);
 
-                        // Check collisions
-                        const auto& occupancy = collision_map.at(xp, yp);
-                        if (occupancy != id && occupancy.is_valid()) {
-                            auto damage = compute_damage(id, occupancy);
-                            auto self_damage = damage.first;
-                            auto other_damage = damage.second;
-
-                            damage_entity(occupancy,
-                                          other_damage,
-                                          collision_map);
-                            damage_entity(hlt::EntityId::for_ship(player_id,
-                                                                  ship_id),
-                                          self_damage,
-                                          collision_map);
-                        } else {
-                            // Move the ship
-                            ship.location.pos_x = xp;
-                            ship.location.pos_y = yp;
-                        }
-
-                        if (ship.is_alive()) {
-                            collision_map.clear(old_location);
-                            collision_map.fill(ship.location, id);
-                        }
+                        // Move the ship (this is temporary, see below)
+                        ship.location.pos_x = xp;
+                        ship.location.pos_y = yp;
                     }
 
-                    // TODO: cooldowns should be processed at end-of-turn
+                    // We don't insert ships into the collision map until
+                    // after they've moved so that a ship that has had its
+                    // movement processed doesn't collide with one that hasn't
+                    // yet moved. As a side effect, killing a ship means you
+                    // can fly through that space.
+                    const auto& occupancy = collision_map.at(ship.location);
+                    // Collision occurred, process damage
+                    if (occupancy != id && occupancy.is_valid()) {
+                        std::cout << "Collision " << id << occupancy << ship.location << '\n';
+
+                        auto damage = compute_damage(id, occupancy);
+                        auto self_damage = damage.first;
+                        auto other_damage = damage.second;
+
+                        damage_entity(occupancy, other_damage, collision_map);
+                        damage_entity(id, self_damage, collision_map);
+                    }
+
+                    if (ship.is_alive()) {
+                        collision_map.fill(ship.location, id);
+                    }
+
                     process_attacks(id, collision_map, ship_damage);
                 }
             }
