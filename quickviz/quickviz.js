@@ -7,7 +7,7 @@ const HEIGHT = 800;
 let CELL_SIZE = 2;
 
 const PLANET_COLOR = 0xe8b23e;
-const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFF00FF];
+const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFF00FF, 0xFFFF00, 0x00FFFF];
 
 let grid = new PIXI.Graphics();
 let entities = new PIXI.Graphics();

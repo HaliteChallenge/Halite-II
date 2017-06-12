@@ -155,13 +155,11 @@ namespace hlt {
         // Center the player's starting ships in each region
         for (PlayerId playerId = 0; playerId < player_count;
              playerId++) {
-//            const auto& region = regions[playerId];
-
-            const auto& region = regions[0];
+            const auto& region = regions[playerId];
 
             for (int i = 0; i < 3; i++) {
                 ships[playerId][i].health = Ship::BASE_HEALTH;
-                ships[playerId][i].location.pos_x = region.center_x() + playerId;
+                ships[playerId][i].location.pos_x = region.center_x();
                 ships[playerId][i].location.pos_y = region.center_y() - 1 + i;
             }
         }
@@ -179,7 +177,7 @@ namespace hlt {
         const auto
             rand_radius = [&]() -> unsigned short { return uidr(prg); };
 
-        const auto MAX_PLANETS = player_count * 6;
+        const auto MAX_PLANETS = player_count * PLANETS_PER_PLAYER;
         constexpr auto MAX_TRIES = 500;
         constexpr auto MIN_DISTANCE = 5;
         for (int i = 0; i < MAX_PLANETS; i++) {
