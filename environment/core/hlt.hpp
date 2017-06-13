@@ -14,8 +14,8 @@
 extern bool quiet_output;
 
 namespace hlt {
-    constexpr auto MAX_PLAYERS = 6;
-    constexpr auto MAX_PLAYER_SHIPS = 40;
+    constexpr auto MAX_PLAYERS = 4;
+    constexpr auto MAX_PLAYER_SHIPS = 200;
     constexpr auto MAX_QUEUED_MOVES = 1;
     constexpr auto PLANETS_PER_PLAYER = 6;
 
