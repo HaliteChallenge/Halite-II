@@ -834,7 +834,8 @@ void Halite::output(std::string filename) {
     j["frames"] = nlohmann::json(frames);
     j["moves"] = nlohmann::json(moves);
 
-    gameFile << j;
+    std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
+    gameFile.write((char*)&bin_data[0], bin_data.size() * sizeof(uint8_t));
 
     gameFile.flush();
     gameFile.close();
