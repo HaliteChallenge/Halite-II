@@ -83,34 +83,44 @@ class HaliteVisualizer {
 
         const side = CELL_SIZE * this.scale;
 
+        this.planetContainer.lineStyle(0);
         for (let dx = -planetBase.r; dx <= planetBase.r; dx++) {
             for (let dy = -planetBase.r; dy <= planetBase.r; dy++) {
                 if (dx*dx + dy*dy <= planetBase.r*planetBase.r) {
                     const x = side * (dx + planetBase.x);
                     const y = side * (dy + planetBase.y);
-
-                    this.planetContainer.beginFill(0xFFFFFF);
+                    if (planet.owner !== null) {
+                        this.planetContainer.beginFill(PLAYER_COLORS[planet.owner]);
+                    }
+                    else {
+                        this.planetContainer.beginFill(0xA56729);
+                    }
                     this.planetContainer.drawRect(x, y, side, side);
+                    this.planetContainer.endFill();
                 }
             }
         }
 
-        if (planet.owner !== null) {
-            this.planetContainer.beginFill(PLAYER_COLORS[planet.owner]);
-            this.planetContainer.drawCircle(side * (planetBase.x + 0.5), side * (planetBase.y + 0.5), side * planetBase.r / 2);
-        }
+        const center_x = side * planetBase.x;
+        const center_y = side * (planetBase.y + 0.5);
+
+        const health_factor = planet.health / planetBase.health;
+        const health_bar = health_factor * side * (planetBase.r - 1);
+        this.planetContainer.beginFill(0xFF0000);
+        this.planetContainer.lineStyle(2, 0x000000);
+        this.planetContainer.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
+        this.planetContainer.endFill();
     }
 
     drawShip(ship) {
-        const width = CELL_SIZE * this.scale;
-        const height = CELL_SIZE * this.scale;
+        const side = CELL_SIZE * this.scale;
 
-        const x = width * ship.x;
-        const y = width * ship.y;
+        const x = side * ship.x;
+        const y = side * ship.y;
 
-        this.shipContainer.lineStyle(0);
+        this.shipContainer.lineStyle(1, 0x000000);
         this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
-        this.shipContainer.drawRect(x, y, width, height);
+        this.shipContainer.drawRect(x, y, side, side);
         this.shipContainer.endFill();
 
         if (ship.docking.status !== "undocked") {
@@ -119,21 +129,25 @@ class HaliteVisualizer {
             const planetId = ship.docking.planet_id;
             const planetBase = this.replay.planets[planetId];
 
-            const planetX = width * planetBase.x;
-            const planetY = width * planetBase.y;
+            const planetX = side * (planetBase.x + 0.5);
+            const planetY = side * (planetBase.y + 0.5);
 
-            const dx = planetX - x;
-            const dy = planetY - y;
+            const cx = x + 0.5*side;
+            const cy = y + 0.5*side;
+
+            const dx = planetX - cx;
+            const dy = planetY - cy;
+
 
             this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
-            this.shipContainer.lineStyle(2, PLAYER_COLORS[ship.owner], 0.5);
+            this.shipContainer.lineStyle(2, 0xFFFFFF, 1);
             if (ship.docking.status === "undocking") {
                 // TODO:
             }
             else {
                 progress /= DOCK_TURNS;
-                this.shipContainer.moveTo(x, y);
-                this.shipContainer.lineTo(x + progress*dx, y + progress*dy);
+                this.shipContainer.moveTo(cx, cy);
+                this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
             }
             this.shipContainer.endFill();
         }
