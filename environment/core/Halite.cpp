@@ -215,6 +215,7 @@ auto Halite::process_attacks(
             auto& ship = player_ships.at(ship_id);
 
             if (!ship.is_alive()) continue;
+            if (ship.docking_status != hlt::DockingStatus::Undocked) continue;
 
             if (ship.weapon_cooldown > 0) {
                 continue;
