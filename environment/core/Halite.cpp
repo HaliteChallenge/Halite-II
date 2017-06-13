@@ -201,11 +201,11 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
 }
 
 auto Halite::process_attacks(
-    hlt::EntityId entity_id,
     CollisionMap& collision_map,
     std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void {
     // Compute hits
-    auto targets = std::vector<hlt::EntityId>();
+    std::vector<hlt::EntityId> targets;
+    std::vector<hlt::Location> target_locations;
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
@@ -233,6 +233,7 @@ auto Halite::process_attacks(
                     if (target_id.type == hlt::EntityType::ShipEntity) {
                         if (target_id.player_id() != player_id) {
                             targets.push_back(target_id);
+                            target_locations.emplace_back(pos.first);
                         }
                     }
                 }
@@ -240,7 +241,7 @@ auto Halite::process_attacks(
 
             ship.weapon_cooldown = hlt::Ship::WEAPON_COOLDOWN;
 
-            for (const auto target: targets) {
+            for (const auto target : targets) {
                 const auto damage =
                     hlt::Ship::WEAPON_DAMAGE / (float) targets.size();
                 ship_damage[target.player_id()][target.entity_index()] +=
@@ -249,6 +250,15 @@ auto Halite::process_attacks(
                 // TODO: how to round attributed damage?
                 damage_dealt[player_id] += static_cast<unsigned int>(damage);
             }
+
+            if (targets.size() > 0) {
+                auto id = hlt::EntityId::for_ship(player_id, ship_id);
+                full_frame_events.back().back().push_back(
+                    std::unique_ptr<Event>(
+                        new AttackEvent(id, ship.location, target_locations)
+                    ));
+            }
+
             targets.clear();
         }
     }
@@ -553,13 +563,31 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         // Resolve collisions - update in small increments; collisions
         // happen if two entities are within the same grid square at any instant
         for (int substep = 1; substep <= SUBSTEPS; substep++) {
-            // Reset collision map so we can process all movements simultaneously
-            collision_map.reset(game_map);
             full_frame_events.back().emplace_back();
-
             if (substep > 1) {
                 full_frames.back().push_back(hlt::Map(game_map));
             }
+
+            auto attack_map = CollisionMap(game_map);
+            attack_map.reset(game_map);
+
+            for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+                 player_id++) {
+                auto& player_ships = game_map.ships.at(player_id);
+                for (hlt::EntityIndex ship_id = 0;
+                     ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+                    auto& ship = player_ships.at(ship_id);
+                    auto id = hlt::EntityId::for_ship(player_id, ship_id);
+
+                    if (!ship.is_alive()) continue;
+                    attack_map.fill(ship.location, id);
+                }
+            }
+
+            process_attacks(attack_map, ship_damage);
+
+            // Reset collision map so we can process all movements simultaneously
+            collision_map.reset(game_map);
 
             for (hlt::PlayerId player_id = 0; player_id < number_of_players;
                  player_id++) {
@@ -614,12 +642,13 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                     if (ship.is_alive()) {
                         collision_map.fill(ship.location, id);
                     }
-
-                    process_attacks(id, collision_map, ship_damage);
                 }
             }
 
             process_damage(collision_map, ship_damage);
+            for (auto& row : ship_damage) {
+                std::fill(row.begin(), row.end(), 0);
+            }
         }
     }
 
@@ -1076,3 +1105,23 @@ auto CollisionMap::clear(const hlt::Location& location) -> void {
     map.at(location.pos_x).at(location.pos_y) = hlt::EntityId::invalid();
 }
 
+auto to_json(const hlt::Location& location) -> nlohmann::json {
+    return {
+        { "x", location.pos_x },
+        { "y", location.pos_y },
+    };
+}
+
+auto to_json(const hlt::EntityId& id) -> nlohmann::json {
+    switch (id.type) {
+        case hlt::EntityType::ShipEntity:
+            return {
+                { "type", "ship" },
+                { "owner", id.player_id() },
+                { "id", id.entity_index() },
+            };
+            // TODO:
+        case hlt::EntityType::InvalidEntity:break;
+        case hlt::EntityType::PlanetEntity:break;
+    }
+}

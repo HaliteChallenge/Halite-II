@@ -80,30 +80,56 @@ struct Event {
     Event() {};
 };
 
+// JSON serialization
+// Have to place these here because json.hpp isn't safe to include more than
+// once; otherwise we could define these in the hlt namespace, and have the
+// library automatically call them
+
+auto to_json(const hlt::EntityId& id) -> nlohmann::json;
+auto to_json(const hlt::Location& location) -> nlohmann::json;
+
 struct DestroyedEvent : Event {
     hlt::EntityId id;
     hlt::Location location;
     unsigned short radius;
 
-    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, unsigned short radius_) : id(id_), location(location_), radius(radius_) {};
+    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, unsigned short radius_)
+        : id(id_), location(location_), radius(radius_) {};
+
     auto serialize() -> nlohmann::json {
-        nlohmann::json entity;
-        switch (id.type) {
-            case hlt::EntityType::ShipEntity:
-                entity["type"] = "ship";
-                entity["owner"] = id.player_id();
-                entity["id"] = id.entity_index();
-                break;
-                // TODO:
-            case hlt::EntityType::InvalidEntity:break;
-            case hlt::EntityType::PlanetEntity:break;
-        }
         return nlohmann::json{
             { "event", "destroyed" },
-            { "entity", entity },
+            { "entity", to_json(id) },
             { "x", location.pos_x },
             { "y", location.pos_y },
             { "radius", radius },
+        };
+    }
+};
+
+struct AttackEvent : Event {
+    hlt::EntityId id;
+    hlt::Location location;
+
+    std::vector<hlt::Location> targets;
+
+    AttackEvent(hlt::EntityId id_, hlt::Location location_, std::vector<hlt::Location> targets_)
+        : id(id_), location(location_) {
+        targets = targets_;
+    };
+
+    auto serialize() -> nlohmann::json {
+        std::vector<nlohmann::json> target_locations;
+        target_locations.reserve(targets.size());
+        for (auto& location : targets) {
+            target_locations.push_back(to_json(location));
+        }
+        return nlohmann::json{
+            { "event", "attack" },
+            { "entity", to_json(id) },
+            { "x", location.pos_x },
+            { "y", location.pos_y },
+            { "targets", target_locations },
         };
     }
 };
@@ -157,7 +183,6 @@ private:
 
     // Subparts of game loop
     auto process_attacks(
-        hlt::EntityId entity_id,
         CollisionMap& collision_map, DamageMap& ship_damage) -> void;
     auto process_damage(
         CollisionMap& collision_map, DamageMap& ship_damage) -> void;
