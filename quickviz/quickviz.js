@@ -22,14 +22,20 @@ class HaliteVisualizer {
         this.frame = 0;
         this.substep = 0;
         // TODO: match aspect ratio of map
-        this.application = new PIXI.Application(800, 800);
+        this.application = new PIXI.Application(800, 900);
 
         this.scale = 800 / Math.max(replay.width, replay.height);
 
         this.planetContainer = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
-        this.application.stage.addChild(this.planetContainer);
-        this.application.stage.addChild(this.shipContainer);
+        this.container = new PIXI.Container();
+        this.container.position.set(0, 100);
+        this.container.addChild(this.planetContainer, this.shipContainer);
+
+        this.statsDisplay = new PIXI.Graphics();
+
+        this.application.stage.addChild(this.container);
+        this.application.stage.addChild(this.statsDisplay);
 
         this.timer = null;
 
@@ -38,6 +44,39 @@ class HaliteVisualizer {
 
     get currentSubstep() {
         return this.replay.frames[this.frame][this.substep];
+    }
+
+    get currentStatistics() {
+        let substep = this.currentSubstep;
+        let planets = { "unowned": 0 };
+        let ships = {};
+        let total_ships = 0;
+
+        for (let planet of substep.planets) {
+            if (planet.owner !== null) {
+                if (typeof planets[planet.owner] === "undefined") {
+                    planets[planet.owner] = 0;
+                }
+                planets[planet.owner]++;
+            }
+            else {
+                planets["unowned"]++;
+            }
+        }
+
+        for (let ship of substep.ships) {
+            if (typeof ships[ship.owner] === "undefined") {
+                ships[ship.owner] = 0;
+            }
+            ships[ship.owner]++;
+            total_ships++;
+        }
+
+        return {
+            "planets": planets,
+            "ships": ships,
+            "total_ships": total_ships,
+        }
     }
 
     attach(containerEl) {
@@ -229,6 +268,33 @@ class HaliteVisualizer {
         for (let ship of this.currentSubstep.ships) {
             this.drawShip(ship);
         }
+
+        let stats = this.currentStatistics;
+
+        let x = 0;
+        for (let player = 0; player < this.replay.num_players; player++) {
+            const width = 800 * (stats.ships[player] || 0) / stats.total_ships;
+            this.statsDisplay.beginFill(PLAYER_COLORS[player]);
+            this.statsDisplay.drawRect(x, 0, width, 40);
+            this.statsDisplay.endFill();
+            x += width;
+        }
+        this.statsDisplay.beginFill(0x000000);
+        this.statsDisplay.drawRect(0, 40, 800, 10);
+        this.statsDisplay.endFill();
+        x = 0;
+        for (let player = 0; player < this.replay.num_players; player++) {
+            const width = 800 * (stats.planets[player] || 0) / this.replay.planets.length;
+            this.statsDisplay.beginFill(PLAYER_COLORS[player]);
+            this.statsDisplay.drawRect(x, 50, width, 40);
+            this.statsDisplay.endFill();
+            x += width;
+        }
+        const width = 800 * (stats.planets["unowned"] || 0) / this.replay.planets.length;
+        this.statsDisplay.beginFill(0xA56729);
+        this.statsDisplay.drawRect(x, 50, width, 40);
+        this.statsDisplay.endFill();
+        this.statsDisplay.drawRect(0, 90, 800, 10);
 
         this.animationQueue = this.animationQueue.filter((anim) => {
             anim.draw(anim.frames);
