@@ -6,6 +6,7 @@ const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
 
 const DOCK_TURNS = 5;
+const ATTACK_RADIUS = 5;
 
 class FrameAnimation {
     constructor(frames, update, draw) {
@@ -49,20 +50,23 @@ class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            this.substep++;
-            if (this.substep >= this.replay.frames[this.frame].length) {
-                this.substep = 0;
-                this.frame++;
-            }
+            for (let i = 0; i < 6; i++) {
+                this.substep++;
+                if (this.substep >= this.replay.frames[this.frame].length) {
+                    this.substep = 0;
+                    this.frame++;
+                }
 
-            if (this.frame >= this.replay.frames.length) {
-                this.pause();
-                this.frame = this.replay.frames.length - 1;
-                this.substep = this.replay.frames[this.frame].length - 1;
-            }
+                if (this.frame >= this.replay.frames.length) {
+                    this.pause();
+                    this.frame = this.replay.frames.length - 1;
+                    this.substep = this.replay.frames[this.frame].length - 1;
+                    break;
+                }
 
-            this.update();
-        }, 1000/120);
+                this.update();
+            }
+        }, 1000/40);
 
         this.application.ticker.add(this.draw.bind(this));
     }
@@ -152,9 +156,31 @@ class HaliteVisualizer {
                             const y = width * event.y;
 
                             this.shipContainer.beginFill(0xFFA500, frame / 24);
+                            this.shipContainer.lineStyle(0);
                             this.shipContainer.drawRect(x, y, width, height);
+                            this.shipContainer.endFill();
                         },
                     ));
+                }
+                else if (event.event === "attack") {
+                    this.animationQueue.push(new FrameAnimation(
+                        24,
+                        () => {
+                        },
+                        (frame) => {
+                            const side = CELL_SIZE * this.scale;
+
+                            const x = side * (event.x + 0.5);
+                            const y = side * (event.y + 0.5);
+
+                            this.shipContainer.lineStyle(2, 0xFFFFFF, 0.5 * frame / 24);
+                            this.shipContainer.drawCircle(x, y, side * ATTACK_RADIUS);
+                            this.shipContainer.endFill();
+                        },
+                    ));
+                }
+                else {
+                    console.log(event);
                 }
             }
         }
