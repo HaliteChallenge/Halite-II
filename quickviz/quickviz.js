@@ -5,6 +5,8 @@
 const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
 
+const DOCK_TURNS = 5;
+
 class FrameAnimation {
     constructor(frames, update, draw) {
         this.frames = frames;
@@ -74,19 +76,24 @@ class HaliteVisualizer {
 
     drawPlanet(planet) {
         let planetBase = this.replay.planets[planet.id];
+
+        const side = CELL_SIZE * this.scale;
+
         for (let dx = -planetBase.r; dx <= planetBase.r; dx++) {
             for (let dy = -planetBase.r; dy <= planetBase.r; dy++) {
                 if (dx*dx + dy*dy <= planetBase.r*planetBase.r) {
-                    const width = CELL_SIZE * this.scale;
-                    const height = CELL_SIZE * this.scale;
-
-                    const x = width * (dx + planetBase.x);
-                    const y = width * (dy + planetBase.y);
+                    const x = side * (dx + planetBase.x);
+                    const y = side * (dy + planetBase.y);
 
                     this.planetContainer.beginFill(0xFFFFFF);
-                    this.planetContainer.drawRect(x, y, width, height);
+                    this.planetContainer.drawRect(x, y, side, side);
                 }
             }
+        }
+
+        if (planet.owner !== null) {
+            this.planetContainer.beginFill(PLAYER_COLORS[planet.owner]);
+            this.planetContainer.drawCircle(side * (planetBase.x + 0.5), side * (planetBase.y + 0.5), side * planetBase.r / 2);
         }
     }
 
@@ -97,8 +104,35 @@ class HaliteVisualizer {
         const x = width * ship.x;
         const y = width * ship.y;
 
+        this.shipContainer.lineStyle(0);
         this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
         this.shipContainer.drawRect(x, y, width, height);
+        this.shipContainer.endFill();
+
+        if (ship.docking.status !== "undocked") {
+            let progress = ship.docking.status === "docked" ? DOCK_TURNS : DOCK_TURNS - ship.docking.turns_left;
+
+            const planetId = ship.docking.planet_id;
+            const planetBase = this.replay.planets[planetId];
+
+            const planetX = width * planetBase.x;
+            const planetY = width * planetBase.y;
+
+            const dx = planetX - x;
+            const dy = planetY - y;
+
+            this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
+            this.shipContainer.lineStyle(2, PLAYER_COLORS[ship.owner], 0.5);
+            if (ship.docking.status === "undocking") {
+                // TODO:
+            }
+            else {
+                progress /= DOCK_TURNS;
+                this.shipContainer.moveTo(x, y);
+                this.shipContainer.lineTo(x + progress*dx, y + progress*dy);
+            }
+            this.shipContainer.endFill();
+        }
     }
 
     update() {
