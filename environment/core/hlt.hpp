@@ -73,10 +73,10 @@ namespace hlt {
     };
 
     struct Ship : Entity {
-        constexpr static auto BASE_HEALTH = 150;
+        constexpr static auto BASE_HEALTH = 255;
         constexpr static auto WEAPON_COOLDOWN = 1;
         constexpr static auto WEAPON_RADIUS = 5;
-        constexpr static auto WEAPON_DAMAGE = 50;
+        constexpr static auto WEAPON_DAMAGE = 64;
 
         Velocity velocity;
 
