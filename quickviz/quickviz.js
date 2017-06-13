@@ -157,23 +157,41 @@ class HaliteVisualizer {
         if (this.currentSubstep.events) {
             for (let event of this.currentSubstep.events) {
                 if (event.event === "destroyed") {
+                    let draw = (frame) => {
+                        const width = CELL_SIZE * this.scale;
+                        const height = CELL_SIZE * this.scale;
+
+                        const x = width * event.x;
+                        const y = width * event.y;
+
+                        this.shipContainer.beginFill(0xFFA500, frame / 24);
+                        this.shipContainer.lineStyle(0);
+                        this.shipContainer.drawRect(x, y, width, height);
+                        this.shipContainer.endFill();
+                    };
+                    if (event.radius > 0) {
+                        let r = event.radius;
+                        draw = (frame) => {
+                            const side = CELL_SIZE * this.scale;
+                            this.planetContainer.lineStyle(0);
+                            for (let dx = -r; dx <= r; dx++) {
+                                for (let dy = -r; dy <= r; dy++) {
+                                    if (dx*dx + dy*dy <= r*r) {
+                                        const distance = (48 - frame) / 24;
+                                        const x = side * (distance * dx + event.x);
+                                        const y = side * (distance * dy + event.y);
+
+                                        this.planetContainer.beginFill(0xFFA500, (frame / 48) * (1 / (1 + dx*dx + dy*dy)));
+                                        this.planetContainer.drawRect(x, y, side, side);
+                                        this.planetContainer.endFill();
+                                    }
+                                }
+                            }
+                        };
+                    }
+
                     this.animationQueue.push(new FrameAnimation(
-                        48,
-                        () => {
-
-                        },
-                        (frame) => {
-                            const width = CELL_SIZE * this.scale;
-                            const height = CELL_SIZE * this.scale;
-
-                            const x = width * event.x;
-                            const y = width * event.y;
-
-                            this.shipContainer.beginFill(0xFFA500, frame / 24);
-                            this.shipContainer.lineStyle(0);
-                            this.shipContainer.drawRect(x, y, width, height);
-                            this.shipContainer.endFill();
-                        },
+                        48, () => {}, draw,
                     ));
                 }
                 else if (event.event === "attack") {
