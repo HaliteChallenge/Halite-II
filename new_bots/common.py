@@ -133,38 +133,36 @@ def warp(ship, angle, distance, avoidance=10):
     pass
 
 
-def move_to(ship, angle, distance, avoidance=10):
-    # net_angle = (ship.orientation + angle) % 360
-    # net_angle = net_angle * (math.pi / 180)
-    #
-    # pos_x = ship.x
-    # pos_y = ship.y
-    #
-    # STEPS = 100
-    # dx = distance * math.cos(net_angle) / STEPS
-    # dy = distance * math.sin(net_angle) / STEPS
-    #
-    # for i in range(1, STEPS + 1):
-    #     pos_x += dx
-    #     pos_y += dy
-    #
-    #     effective_x = int(pos_x)
-    #     effective_y = int(pos_y)
-    #
-    #     # Collision avoidance
-    #     if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
-    #         last_map.collision_map[effective_x][effective_y][1] == "planet" or
-    #         last_map.collision_map[effective_x][effective_y][0] == my_tag):
-    #         if avoidance > 0:
-    #             if ship.id % 2 == 0:
-    #                 new_angle = (angle + 20) % 360
-    #             else:
-    #                 new_angle = (angle - 20) % 360
-    #                 if new_angle < 0: new_angle += 360
-    #             move_to(ship, new_angle, max(2, distance // 4), avoidance-1)
-    #             return
+def move_to(ship, angle, distance, avoidance=20):
+    pos_x = ship.x
+    pos_y = ship.y
 
-    return "t {ship} {distance} {angle}".format(ship=ship.id, distance=min(distance, 2), angle=angle)
+    if ship.vel_x != 0 or ship.vel_y != 0:
+        logging.warn("INERTIAL INTERFERENCE")
+
+    STEPS = 64
+    dx = distance * math.cos(angle) / STEPS
+    dy = distance * math.sin(angle) / STEPS
+
+    for i in range(1, STEPS + 1):
+        pos_x += dx
+        pos_y += dy
+
+        effective_x = int(pos_x)
+        effective_y = int(pos_y)
+
+        # Collision avoidance
+        if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
+            last_map.collision_map[effective_x][effective_y][1] == "planet" or
+            last_map.collision_map[effective_x][effective_y][0] == my_tag):
+            if avoidance > 0:
+                new_angle = (angle + 10) % 360
+                if new_angle < 0: new_angle += 360
+                return move_to(ship, new_angle, 3, avoidance-1)
+            else:
+                logging.warn("Failed")
+
+    return "t {ship} {distance} {angle}".format(ship=ship.id, distance=distance, angle=angle)
 
 
 def distance(a):

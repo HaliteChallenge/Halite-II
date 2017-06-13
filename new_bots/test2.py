@@ -47,7 +47,7 @@ def assign_ship_planet(m, ship):
 
         if not planet.owned:
             planet.owned = True
-            return d - 10, common.move_to(ship, angle, max(min(d - planet.r - 2, 25), 2))
+            return d - 10, common.move_to(ship, angle, 5)
 
     return 10000000, None
 
@@ -59,7 +59,7 @@ def assign_ship_attack(m, ship):
 
         for enemy in sorted(ships, key=enemy_priority(ship)):
             angle, d = common.orient_towards(ship, enemy)
-            return d + 10, common.move_to(ship, angle, max(min(d, 25), 2))
+            return d + 10, common.move_to(ship, angle, 5)
 
     return 10000000, None
 
