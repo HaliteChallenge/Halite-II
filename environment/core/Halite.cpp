@@ -1,6 +1,7 @@
 #include "Halite.hpp"
 #include "hlt.hpp"
 #include <functional>
+#include <memory>
 #include "spdlog/spdlog.h"
 
 //Private Functions ------------------
@@ -80,6 +81,10 @@ auto Halite::damage_entity(hlt::EntityId id,
 
 auto Halite::kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
+    if (!entity.is_alive()) return;
+    full_frame_events.back().back().push_back(
+        std::unique_ptr<Event>(
+            new DestroyedEvent(id, entity.location, entity.radius)));
     entity.kill();
     collision_map.clear(entity.location);
 
@@ -139,6 +144,7 @@ void Halite::kill_player(hlt::PlayerId player) {
 
     // Kill player's ships
     for (auto& ship : game_map.ships.at(player)) {
+        // TODO: use kill_entity
         ship.kill();
     }
 
@@ -254,9 +260,12 @@ auto Halite::process_damage(CollisionMap& collision_map, DamageMap& ship_damage)
          player_id++) {
         for (hlt::EntityIndex ship_id = 0;
              ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto id = hlt::EntityId::for_ship(player_id, ship_id);
+            auto& entity = game_map.get_entity(id);
+            if (!entity.is_alive()) continue;
             auto damage = ship_damage[player_id][ship_id];
             damage_entity(
-                hlt::EntityId::for_ship(player_id, ship_id),
+                id,
                 static_cast<unsigned short>(damage),
                 collision_map
             );
@@ -418,6 +427,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                                                  { 0.0, 0.0 }));
 
     full_frames.push_back({});
+    full_frame_events.emplace_back();
     full_player_moves.push_back({ { { } } });
 
     process_docking();
@@ -545,6 +555,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         for (int substep = 1; substep <= SUBSTEPS; substep++) {
             // Reset collision map so we can process all movements simultaneously
             collision_map.reset(game_map);
+            full_frame_events.back().emplace_back();
 
             if (substep > 1) {
                 full_frames.back().push_back(hlt::Map(game_map));
@@ -681,7 +692,7 @@ void Halite::output(std::string filename) {
     j["planets"] = planets;
 
     // Encode the frames. Note that there is no moves field for the last frame.
-    std::vector<nlohmann::json> frames;
+    std::vector<std::vector<nlohmann::json>> frames;
     std::vector<std::vector<nlohmann::json>> moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
@@ -761,6 +772,24 @@ void Halite::output(std::string filename) {
         }
 
         frames.push_back(frame);
+    }
+
+    for (auto frame_idx = 0; frame_idx < full_frame_events.size(); frame_idx++) {
+        auto& frame_events = full_frame_events[frame_idx];
+        auto& frame_data = frames.at(frame_idx + 1);
+
+        for (auto substep_idx = 0; substep_idx < frame_events.size(); substep_idx++) {
+            auto& substep_events = frame_events[substep_idx];
+            auto& substep_data = frame_data.at(substep_idx);
+
+            std::vector<nlohmann::json> substep_event_record;
+
+            for (auto& event : substep_events) {
+                substep_event_record.push_back(event->serialize());
+            }
+
+            substep_data["events"] = nlohmann::json(substep_event_record);
+        }
     }
 
     // Serialize moves
@@ -1045,3 +1074,4 @@ auto CollisionMap::fill(const hlt::Location& location, hlt::EntityId id) -> void
 auto CollisionMap::clear(const hlt::Location& location) -> void {
     map.at(location.pos_x).at(location.pos_y) = hlt::EntityId::invalid();
 }
+

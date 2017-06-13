@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <memory>
 #include <set>
 #include <algorithm>
 #include <iostream>
@@ -68,6 +69,45 @@ public:
     auto clear(const hlt::Location& location) -> void;
 };
 
+
+/**
+ * An event that happens during game simulation. Recorded for the replay, so
+ * that visualizers have more information to use.
+ */
+struct Event {
+    virtual auto serialize() -> nlohmann::json = 0;
+
+    Event() {};
+};
+
+struct DestroyedEvent : Event {
+    hlt::EntityId id;
+    hlt::Location location;
+    unsigned short radius;
+
+    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, unsigned short radius_) : id(id_), location(location_), radius(radius_) {};
+    auto serialize() -> nlohmann::json {
+        nlohmann::json entity;
+        switch (id.type) {
+            case hlt::EntityType::ShipEntity:
+                entity["type"] = "ship";
+                entity["owner"] = id.player_id();
+                entity["id"] = id.entity_index();
+                break;
+                // TODO:
+            case hlt::EntityType::InvalidEntity:break;
+            case hlt::EntityType::PlanetEntity:break;
+        }
+        return nlohmann::json{
+            { "event", "destroyed" },
+            { "entity", entity },
+            { "x", location.pos_x },
+            { "y", location.pos_y },
+            { "radius", radius },
+        };
+    }
+};
+
 typedef std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS> DamageMap;
 
 class Halite {
@@ -97,6 +137,7 @@ private:
     //Full game
     //! A record of the game state at every substep, used for replays.
     std::vector<std::vector<hlt::Map>> full_frames;
+    std::vector<std::vector<std::vector<std::unique_ptr<Event>>>> full_frame_events;
     std::vector<hlt::MoveQueue> full_player_moves;
 
     //! Grab the next set of moves from the bots
