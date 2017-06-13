@@ -5,6 +5,14 @@
 const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
 
+class FrameAnimation {
+    constructor(frames, update, draw) {
+        this.frames = frames;
+        this.update = update;
+        this.draw = draw;
+    }
+}
+
 class HaliteVisualizer {
     constructor(replay) {
         this.replay = replay;
@@ -21,6 +29,8 @@ class HaliteVisualizer {
         this.application.stage.addChild(this.shipContainer);
 
         this.timer = null;
+
+        this.animationQueue = [];
     }
 
     get currentSubstep() {
@@ -48,7 +58,9 @@ class HaliteVisualizer {
                 this.frame = this.replay.frames.length - 1;
                 this.substep = this.replay.frames[this.frame].length - 1;
             }
-        }, 1000/250);
+
+            this.update();
+        }, 1000/120);
 
         this.application.ticker.add(this.draw.bind(this));
     }
@@ -89,6 +101,31 @@ class HaliteVisualizer {
         this.shipContainer.drawRect(x, y, width, height);
     }
 
+    update() {
+        if (this.currentSubstep.events) {
+            for (let event of this.currentSubstep.events) {
+                if (event.event === "destroyed") {
+                    this.animationQueue.push(new FrameAnimation(
+                        48,
+                        () => {
+
+                        },
+                        (frame) => {
+                            const width = CELL_SIZE * this.scale;
+                            const height = CELL_SIZE * this.scale;
+
+                            const x = width * event.x;
+                            const y = width * event.y;
+
+                            this.shipContainer.beginFill(0xFFA500, frame / 24);
+                            this.shipContainer.drawRect(x, y, width, height);
+                        },
+                    ));
+                }
+            }
+        }
+    }
+
     draw() {
         this.planetContainer.clear();
         this.shipContainer.clear();
@@ -100,6 +137,12 @@ class HaliteVisualizer {
         for (let ship of this.currentSubstep.ships) {
             this.drawShip(ship);
         }
+
+        this.animationQueue = this.animationQueue.filter((anim) => {
+            anim.draw(anim.frames);
+            anim.frames--;
+            return anim.frames > 0;
+        });
     }
 }
 
