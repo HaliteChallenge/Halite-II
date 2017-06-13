@@ -226,14 +226,14 @@ function setupUpload() {
 
         let reader = new FileReader();
         reader.onload = function(e) {
-            const replay = JSON.parse(e.target.result);
+            const replay = msgpack.decode(new Uint8Array(e.target.result));
 
             console.log(replay);
 
             let visualizer = new HaliteVisualizerControls(replay);
             visualizer.attach(visualizerEl);
         };
-        reader.readAsText(files[0]);
+        reader.readAsArrayBuffer(files[0]);
     });
 }
 
