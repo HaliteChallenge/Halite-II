@@ -112,9 +112,9 @@ namespace hlt {
             location.pos_x = x;
             location.pos_y = y;
             this->radius = radius;
-            health = static_cast<unsigned short>(500 + 100 * sqrt(radius));
             docking_spots = radius;
             remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
+            health = static_cast<unsigned short>(remaining_production * Ship::BASE_HEALTH);
 
             owned = false;
         }
