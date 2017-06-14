@@ -462,9 +462,10 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 auto& ship = game_map.get_ship(player_id, ship_id);
                 if (!ship.is_alive()) continue;
 
+                // Position ships in the center of their cell
                 intermediate_positions[player_id][ship_id] = {
-                    ship.location.pos_x,
-                    ship.location.pos_y,
+                    ship.location.pos_x + 0.5,
+                    ship.location.pos_y + 0.5,
                 };
 
                 auto move = player_moves[player_id][move_no][ship_id];
