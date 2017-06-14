@@ -136,8 +136,8 @@ def warp(ship, angle, distance, avoidance=10):
 
 
 def move_to(ship, angle, speed, avoidance=20):
-    pos_x = ship.x
-    pos_y = ship.y
+    pos_x = ship.x + 0.5
+    pos_y = ship.y + 0.5
 
     if ship.vel_x != 0 or ship.vel_y != 0:
         logging.warn("INERTIAL INTERFERENCE")
@@ -152,6 +152,9 @@ def move_to(ship, angle, speed, avoidance=20):
 
         effective_x = int(pos_x)
         effective_y = int(pos_y)
+
+        if effective_x == ship.x and effective_y == ship.y:
+            continue
 
         # Collision avoidance
         if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
