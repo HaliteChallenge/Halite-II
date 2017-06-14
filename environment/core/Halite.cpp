@@ -322,6 +322,7 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
         if (!planet.is_alive()) continue;
 
         if (!planet.owned) continue;
+
         const auto num_docked_ships = count_if(
             planet.docked_ships.begin(),
             planet.docked_ships.end(),
@@ -381,7 +382,7 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
         // Can't find a place to spawn the ship, or the player has the
         // maximum number of ships - leave the production there and try
         // to spawn next turn
-        break;
+        continue;
 
         SUCCESS:
         planet.current_production -= hlt::Planet::PRODUCTION_PER_SHIP;
