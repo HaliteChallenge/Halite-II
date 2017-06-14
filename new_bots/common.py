@@ -181,6 +181,10 @@ def dock(ship, planet):
     return "d {ship} {planet}".format(ship=ship.id, planet=planet.id)
 
 
+def undock(ship):
+    return "u {ship}".format(ship=ship.id)
+
+
 def can_dock(ship, planet):
     return distance(ship, planet) < planet.r + 2
 
