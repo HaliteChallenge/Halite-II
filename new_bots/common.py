@@ -149,8 +149,8 @@ def move_to(ship, angle, speed, avoidance=10):
         logging.warn("INERTIAL INTERFERENCE")
 
     STEPS = 64
-    dx = round(speed * math.cos(angle)) / STEPS
-    dy = round(speed * math.sin(angle)) / STEPS
+    dx = round(speed * math.cos(angle * math.pi / 180)) / STEPS
+    dy = round(speed * math.sin(angle * math.pi / 180)) / STEPS
 
     for i in range(1, STEPS + 1):
         pos_x += dx
