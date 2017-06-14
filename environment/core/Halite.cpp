@@ -385,19 +385,24 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
                                            hlt::EntityId::for_ship(
                                                planet.owner,
                                                ship_id));
-                        goto SUCCESS;
+
+                        full_frame_events.back().back().emplace_back(
+                            new SpawnEvent(hlt::EntityId::for_ship(planet.owner, ship_id), best_location.first, planet.location)
+                        );
+
+                        planet.current_production -= production_per_ship;
+                        break;
                     }
                 }
             }
+            else {
+                // Can't find a place to spawn the ship, or the player has the
+                // maximum number of ships - leave the production there and try
+                // to spawn next turn
+
+                break;
+            }
         }
-
-        // Can't find a place to spawn the ship, or the player has the
-        // maximum number of ships - leave the production there and try
-        // to spawn next turn
-        continue;
-
-        SUCCESS:
-        planet.current_production -= production_per_ship;
     }
 }
 

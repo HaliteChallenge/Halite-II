@@ -136,6 +136,27 @@ struct AttackEvent : Event {
     }
 };
 
+struct SpawnEvent : Event {
+    hlt::EntityId id;
+    hlt::Location location;
+    hlt::Location planet_location;
+
+    SpawnEvent(hlt::EntityId id_, hlt::Location location_,
+               hlt::Location planet_location_)
+        : id(id_), location(location_), planet_location(planet_location_) {}
+
+    auto serialize() -> nlohmann::json {
+        return nlohmann::json{
+            { "event", "spawned" },
+            { "entity", to_json(id) },
+            { "x", location.pos_x },
+            { "y", location.pos_y },
+            { "planet_x", planet_location.pos_x },
+            { "planet_y", planet_location.pos_y },
+        };
+    }
+};
+
 typedef std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS> DamageMap;
 
 class Halite {

@@ -277,6 +277,24 @@ class HaliteVisualizer {
                         },
                     ));
                 }
+                else if (event.event === "spawned") {
+                     this.animationQueue.push(new FrameAnimation(
+                        24,
+                        () => {
+                        },
+                        (frame) => {
+                            const side = CELL_SIZE * this.scale;
+                            const planetX = side * (event.planet_x + 0.5);
+                            const planetY = side * (event.planet_y + 0.5);
+                            const ship_x = side * (event.x + 0.5);
+                            const ship_y = side * (event.y + 0.5);
+                            this.shipContainer.lineStyle(3, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
+                            this.shipContainer.moveTo(planetX, planetY);
+                            this.shipContainer.lineTo(ship_x, ship_y);
+                            this.shipContainer.endFill();
+                        },
+                    ));
+                }
                 else {
                     console.log(event);
                 }
