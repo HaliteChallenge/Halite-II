@@ -112,7 +112,9 @@ class HaliteVisualizer {
             }
         }, 1000/40);
 
-        this.application.ticker.add(this.draw.bind(this));
+        this.application.ticker.add((dt) => {
+            this.draw(dt);
+        });
     }
 
     pause() {
@@ -302,7 +304,7 @@ class HaliteVisualizer {
         }
     }
 
-    draw() {
+    draw(dt=0) {
         this.planetContainer.clear();
         this.shipContainer.clear();
 
@@ -343,9 +345,10 @@ class HaliteVisualizer {
 
         this.currentTurnDisplay.text = `Frame ${this.frame}.${this.substep}`;
 
+        // dt comes from Pixi ticker, and the unit is essentially frames
         this.animationQueue = this.animationQueue.filter((anim) => {
             anim.draw(anim.frames);
-            anim.frames--;
+            anim.frames -= dt;
             return anim.frames > 0;
         });
     }
