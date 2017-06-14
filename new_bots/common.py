@@ -77,7 +77,7 @@ class Map:
                 for dy in range(-planet.r, planet.r + 1):
                     x = planet.x + dx
                     y = planet.y + dy
-                    if dx*dx + dy*dy > planet.r:
+                    if dx*dx + dy*dy > planet.r*planet.r:
                         continue
 
                     if 0 <= x < map_size[0] and 0 <= y < map_size[1]:
@@ -87,6 +87,10 @@ class Map:
         for player_tag, player_ships in self.ships.items():
             for ship in player_ships:
                 self.collision_map[ship.x][ship.y] = (player_tag, "ship")
+
+    def print_collision(self):
+        for row in range(map_size[1]):
+            logging.info(''.join('.' if self.collision_map[col][row] == (None, None) else 'X' for col in range(map_size[0])))
 
 
 def parse(map):
@@ -163,6 +167,7 @@ def move_to(ship, angle, speed, avoidance=20):
             if avoidance > 0:
                 new_angle = (angle + 10) % 360
                 if new_angle < 0: new_angle += 360
+                logging.warn("Averting collision for ship {} pos {} angle {} speed {} because of {} (try {})".format(ship.id, (ship.x, ship.y), angle, speed, (effective_x, effective_y), 20-avoidance))
                 return move_to(ship, new_angle, 1, avoidance-1)
             else:
                 logging.warn("Failed")
