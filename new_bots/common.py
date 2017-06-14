@@ -87,7 +87,7 @@ class Map:
                             (planet.owner if planet.owned else -1, "planet")
 
         for player_tag, player_ships in self.ships.items():
-            for ship in player_ships:
+            for ship in player_ships.values():
                 self.collision_map[ship.x][ship.y] = (player_tag, "ship")
 
     def print_collision(self):
@@ -111,7 +111,7 @@ def parse(map):
     player = 0
     while ships:
         ships = ships[2:]
-        s = []
+        s = {}
 
         while ships and ships[0] != "player":
             sid, x, y, hp, vel_x, vel_y, docked, docked_planet, *ships = ships
@@ -120,11 +120,11 @@ def parse(map):
                 docked = "undocked"
             elif docked == 2:
                 docked = "docked"
-            s.append(Ship(int(sid),
-                          int(x), int(y),
-                          int(hp),
-                          int(vel_x), int(vel_y),
-                          docked, int(docked_planet)))
+            s[int(sid)] = Ship(int(sid),
+                               int(x), int(y),
+                               int(hp),
+                               int(vel_x), int(vel_y),
+                               docked, int(docked_planet))
 
         m.ships[player] = s
         player += 1

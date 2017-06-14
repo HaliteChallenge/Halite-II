@@ -8,7 +8,7 @@ def settler():
         game_map = yield
         command_queue = []
 
-        for ship in game_map.ships[my_tag]:
+        for ship in game_map.ships[my_tag].values():
             if ship.docked != "undocked":
                 continue
 
