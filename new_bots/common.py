@@ -139,7 +139,7 @@ def warp(ship, angle, distance, avoidance=10):
     pass
 
 
-def move_to(ship, angle, speed, avoidance=20):
+def move_to(ship, angle, speed, avoidance=10):
     pos_x = ship.x + 0.5
     pos_y = ship.y + 0.5
 
@@ -165,7 +165,7 @@ def move_to(ship, angle, speed, avoidance=20):
             last_map.collision_map[effective_x][effective_y][1] == "planet" or
             last_map.collision_map[effective_x][effective_y][0] == my_tag):
             if avoidance > 0:
-                new_angle = (angle + 10) % 360
+                new_angle = (angle + 30) % 360
                 if new_angle < 0: new_angle += 360
                 logging.warn("Averting collision for ship {} pos {} angle {} speed {} because of {} (try {})".format(ship.id, (ship.x, ship.y), angle, speed, (effective_x, effective_y), 20-avoidance))
                 return move_to(ship, new_angle, 1, avoidance-1)
