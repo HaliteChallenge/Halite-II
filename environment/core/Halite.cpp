@@ -348,6 +348,13 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
             // Try to spawn the ship
 
             auto& ships = game_map.ships[planet.owner];
+            auto best_location = game_map.location_with_delta(planet.location, 0, 0);
+            auto best_distance = game_map.map_width + game_map.map_height;
+            const auto& center = hlt::Location{
+                static_cast<unsigned short>(game_map.map_width / 2),
+                static_cast<unsigned short>(game_map.map_height / 2),
+            };
+
             for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
                 for (int dy = -planet.radius - 2; dy <= planet.radius + 2;
                      dy++) {
@@ -356,21 +363,29 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
                     if (!loc.second) continue;
 
                     if (!collision_map.at(loc.first).is_valid()) {
-                        for (hlt::EntityIndex ship_id = 0;
-                             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                            auto& ship = ships[ship_id];
-
-                            if (!ship.is_alive()) {
-                                ship.revive(loc.first);
-                                total_ship_count[planet.owner]++;
-
-                                collision_map.fill(loc.first,
-                                                   hlt::EntityId::for_ship(
-                                                       planet.owner,
-                                                       ship_id));
-                                goto SUCCESS;
-                            }
+                        const auto distance = game_map.get_distance(loc.first, center);
+                        if (!best_location.second || distance < best_distance) {
+                            best_location = loc;
+                            best_distance = distance;
                         }
+                    }
+                }
+            }
+
+            if (best_location.second) {
+                for (hlt::EntityIndex ship_id = 0;
+                     ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+                    auto& ship = ships[ship_id];
+
+                    if (!ship.is_alive()) {
+                        ship.revive(best_location.first);
+                        total_ship_count[planet.owner]++;
+
+                        collision_map.fill(best_location.first,
+                                           hlt::EntityId::for_ship(
+                                               planet.owner,
+                                               ship_id));
+                        goto SUCCESS;
                     }
                 }
             }
