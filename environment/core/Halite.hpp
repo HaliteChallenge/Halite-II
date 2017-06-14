@@ -72,6 +72,14 @@ public:
 };
 
 
+// JSON serialization
+// Have to place these here because json.hpp isn't safe to include more than
+// once; otherwise we could define these in the hlt namespace, and have the
+// library automatically call them
+
+auto to_json(const hlt::EntityId& id) -> nlohmann::json;
+auto to_json(const hlt::Location& location) -> nlohmann::json;
+
 /**
  * An event that happens during game simulation. Recorded for the replay, so
  * that visualizers have more information to use.
@@ -81,14 +89,6 @@ struct Event {
 
     Event() {};
 };
-
-// JSON serialization
-// Have to place these here because json.hpp isn't safe to include more than
-// once; otherwise we could define these in the hlt namespace, and have the
-// library automatically call them
-
-auto to_json(const hlt::EntityId& id) -> nlohmann::json;
-auto to_json(const hlt::Location& location) -> nlohmann::json;
 
 struct DestroyedEvent : Event {
     hlt::EntityId id;

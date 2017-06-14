@@ -35,12 +35,14 @@ def get_string():
 
 
 class Planet:
-    def __init__(self, id, x, y, hp, r, remaining, owned, owner, docked_ships):
+    def __init__(self, id, x, y, hp, r, docking_spots, current, remaining, owned, owner, docked_ships):
         self.id = id
         self.x = x
         self.y = y
         self.r = r
-        self.remaining = remaining
+        self.num_docking_spots = docking_spots
+        self.current_production = current
+        self.remaining_production = remaining
         self.hp = hp
         self.owned = owned
         self.owner = owner
@@ -99,9 +101,9 @@ def parse(map):
     planets = planets.split()
 
     m = Map()
-    for pl in _grouper(planets, 9):
-        (plid, x, y, hp, r, remaining, owned, owner, docked_ships) = pl
-        planet = Planet(int(plid), int(x), int(y), int(hp), int(r), int(remaining), bool(int(owned)), int(owner), [])
+    for pl in _grouper(planets, 11):
+        (plid, x, y, hp, r, docking, current, remaining, owned, owner, docked_ships) = pl
+        planet = Planet(int(plid), int(x), int(y), int(hp), int(r), int(docking), int(current), int(remaining), bool(int(owned)), int(owner), [])
         docked_ships = [int(x) for x in docked_ships.strip(",").strip().split(",") if x]
         planet.docked_ships = docked_ships
         m.planets[planet.id] = planet
