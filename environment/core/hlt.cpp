@@ -2,6 +2,7 @@
 // Created by David Li on 6/5/17.
 //
 
+#include <cmath>
 #include "hlt.hpp"
 
 namespace hlt {
@@ -424,14 +425,14 @@ namespace hlt {
 
     auto Velocity::accelerate_by(unsigned short magnitude,
                                  double angle) -> void {
-        auto new_vel_x = vel_x + static_cast<int>(magnitude * cos(angle));
-        auto new_vel_y = vel_y + static_cast<int>(magnitude * sin(angle));
+        double new_vel_x = vel_x + std::round(magnitude * std::cos(angle));
+        double new_vel_y = vel_y + std::round(magnitude * std::sin(angle));
 
         vel_x = static_cast<short>(new_vel_x);
         vel_y = static_cast<short>(new_vel_y);
 
         if (this->magnitude() > MAX_MAGNITUDE) {
-            auto scale = MAX_MAGNITUDE / this->magnitude();
+            double scale = MAX_MAGNITUDE / this->magnitude();
             new_vel_x *= scale;
             new_vel_y *= scale;
         }
