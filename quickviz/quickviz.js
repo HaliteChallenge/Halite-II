@@ -7,6 +7,7 @@ const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFF
 
 const DOCK_TURNS = 5;
 const ATTACK_RADIUS = 5;
+const BASE_SHIP_HEALTH = 255;
 
 class FrameAnimation {
     constructor(frames, update, draw) {
@@ -157,9 +158,17 @@ class HaliteVisualizer {
         const x = side * ship.x;
         const y = side * ship.y;
 
-        this.shipContainer.lineStyle(1, 0x000000);
-        this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
+        this.shipContainer.lineStyle(0);
+        this.shipContainer.beginFill(PLAYER_COLORS[ship.owner], 0.5);
         this.shipContainer.drawRect(x, y, side, side);
+        this.shipContainer.endFill();
+        const health_factor = 0.1 + 0.3 * (BASE_SHIP_HEALTH - ship.health) / BASE_SHIP_HEALTH;
+        this.shipContainer.beginFill(PLAYER_COLORS[ship.owner], 1);
+        this.shipContainer.drawRect(
+            x + health_factor * side,
+            y + health_factor * side,
+            (1 - 2*health_factor) * side,
+            (1 - 2*health_factor) * side);
         this.shipContainer.endFill();
 
         if (ship.docking.status !== "undocked") {
