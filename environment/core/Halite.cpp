@@ -2,12 +2,13 @@
 #include "hlt.hpp"
 #include <functional>
 #include <memory>
+#include <chrono>
 #include "spdlog/spdlog.h"
 
 //Private Functions ------------------
 
 auto Halite::compare_rankings(const hlt::PlayerId& player1,
-                              const hlt::PlayerId& player2) const -> bool{
+                              const hlt::PlayerId& player2) const -> bool {
     if (total_ship_count[player1] == total_ship_count[player2])
         return damage_dealt[player1] < damage_dealt[player2];
     return total_ship_count[player1] < total_ship_count[player2];
@@ -984,6 +985,8 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         p.init_response_time = init_response_times[player_id];
         p.average_frame_response_time = total_frame_response_times[player_id]
             / double(alive_frame_count[player_id]); //In milliseconds.
+        p.total_ship_count = total_ship_count[player_id];
+        p.damage_dealt = damage_dealt[player_id];
         stats.player_statistics.push_back(p);
     }
     stats.timeout_tags = timeout_tags;

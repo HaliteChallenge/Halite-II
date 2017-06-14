@@ -226,12 +226,19 @@ int main(int argc, char** argv) {
     if (quiet_output) {
         std::cout << stats;
     } else {
-        for (unsigned int a = 0; a < stats.player_statistics.size(); a++)
-            std::cout << "Player #" << stats.player_statistics[a].tag << ", "
-                      << my_game->get_name(stats.player_statistics[a].tag)
-                      << ", came in rank #" << stats.player_statistics[a].rank
-                      << " and was last alive on frame #"
-                      << stats.player_statistics[a].last_frame_alive << "!\n";
+        for (unsigned int player_id = 0;
+             player_id < stats.player_statistics.size(); player_id++) {
+            auto& player_stats = stats.player_statistics[player_id];
+            std::cout
+                << "Player #" << player_stats.tag << ", "
+                << my_game->get_name(player_stats.tag)
+                << ", came in rank #" << player_stats.rank
+                << " and was last alive on frame #"
+                << player_stats.last_frame_alive
+                << ", producing " << player_stats.total_ship_count << " ships"
+                << " and dealing " << player_stats.damage_dealt << " damage"
+                << "!\n";
+        }
     }
 
     delete my_game;
