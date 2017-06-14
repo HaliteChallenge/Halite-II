@@ -707,6 +707,94 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     return still_alive;
 }
 
+auto output_ship(const hlt::Ship& ship, const hlt::PlayerId player_id,
+                 const hlt::EntityIndex ship_id) -> nlohmann::json {
+    nlohmann::json docking;
+
+    switch (ship.docking_status) {
+        case hlt::DockingStatus::Undocked:
+            docking["status"] = "undocked";
+            break;
+        case hlt::DockingStatus::Docking:
+            docking["status"] = "docking";
+            docking["planet_id"] = ship.docked_planet;
+            docking["turns_left"] = ship.docking_progress;
+            break;
+        case hlt::DockingStatus::Undocking:
+            docking["status"] = "undocking";
+            docking["planet_id"] = ship.docked_planet;
+            docking["turns_left"] = ship.docking_progress;
+            break;
+        case hlt::DockingStatus::Docked:
+            docking["status"] = "docked";
+            docking["planet_id"] = ship.docked_planet;
+            break;
+    }
+
+    auto record = nlohmann::json{
+        { "id", ship_id },
+        { "owner", (int) player_id },
+        { "x", ship.location.pos_x },
+        { "y", ship.location.pos_y },
+        { "vel_x", ship.velocity.vel_x },
+        { "vel_y", ship.velocity.vel_y },
+        { "health", ship.health },
+        { "docking", docking },
+    };
+
+    return record;
+}
+
+auto output_planet(const hlt::Planet& planet,
+                   const hlt::EntityIndex planet_id) -> nlohmann::json {
+    auto record = nlohmann::json{
+        { "id", planet_id },
+        { "health", planet.health },
+        { "docked_ships", planet.docked_ships },
+        { "remaining_production", planet.remaining_production },
+        { "current_production", planet.current_production },
+    };
+
+    if (planet.owned) {
+        record["owner"] = planet.owner;
+    } else {
+        record["owner"] = nullptr;
+    }
+
+    return record;
+}
+
+auto output_move(const hlt::Move& move, hlt::PlayerId player_id,
+                 int move_no) -> nlohmann::json {
+    auto record = nlohmann::json{
+        { "owner", player_id },
+        { "queue_number", move_no },
+        { "shipId", move.shipId },
+    };
+
+    switch (move.type) {
+        case hlt::MoveType::Noop:
+            assert(false);
+        case hlt::MoveType::Thrust:
+            record["type"] = "thrust";
+            record["magnitude"] = move.move.thrust.thrust;
+            record["angle"] = move.move.thrust.angle;
+            break;
+        case hlt::MoveType::Dock:
+            record["type"] = "dock";
+            record["planet_id"] = move.move.dock_to;
+            break;
+        case hlt::MoveType::Undock:
+            record["type"] = "undock";
+            break;
+        case hlt::MoveType::Error:
+            // TODO: wrap the move that could not be executed
+            assert(false);
+    }
+
+    return record;
+}
+
 void Halite::output(std::string filename) {
     std::ofstream gameFile;
     gameFile.open(filename, std::ios_base::binary);
@@ -746,58 +834,34 @@ void Halite::output(std::string filename) {
     }
     j["planets"] = planets;
 
+    auto after_header = std::chrono::high_resolution_clock::now();
+
     // Encode the frames. Note that there is no moves field for the last frame.
     std::vector<std::vector<nlohmann::json>> frames;
     std::vector<std::vector<nlohmann::json>> moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
+    std::vector<nlohmann::json> frame;
+    std::vector<nlohmann::json> subframe_ships;
+    std::vector<nlohmann::json> subframe_planets;
+    frame.reserve(SUBSTEPS);
+
     for (const auto& frame_maps : full_frames) {
-        std::vector<nlohmann::json> frame;
+        frame.clear();
 
         for (const auto& current_map : frame_maps) {
-            std::vector<nlohmann::json> ships;
-            std::vector<nlohmann::json> planets;
+            subframe_ships.clear();
+            subframe_planets.clear();
 
             for (hlt::PlayerId playerId = 0; playerId < number_of_players;
                  playerId++) {
                 for (hlt::EntityIndex ship_id = 0;
                      ship_id < hlt::MAX_PLAYER_SHIPS;
                      ship_id++) {
-                    auto ship = current_map.ships.at(playerId).at(ship_id);
+                    const auto& ship = current_map.ships[playerId][ship_id];
                     if (!ship.is_alive()) continue;
-                    nlohmann::json record;
-                    record["id"] = ship_id;
-                    record["owner"] = (int) playerId;
-                    record["x"] = ship.location.pos_x;
-                    record["y"] = ship.location.pos_y;
-                    record["vel_x"] = ship.velocity.vel_x;
-                    record["vel_y"] = ship.velocity.vel_y;
-                    record["health"] = ship.health;
 
-                    nlohmann::json docking;
-                    switch (ship.docking_status) {
-                        case hlt::DockingStatus::Undocked:
-                            docking["status"] = "undocked";
-                            break;
-                        case hlt::DockingStatus::Docking:
-                            docking["status"] = "docking";
-                            docking["planet_id"] = ship.docked_planet;
-                            docking["turns_left"] = ship.docking_progress;
-                            break;
-                        case hlt::DockingStatus::Undocking:
-                            docking["status"] = "undocking";
-                            docking["planet_id"] = ship.docked_planet;
-                            docking["turns_left"] = ship.docking_progress;
-                            break;
-                        case hlt::DockingStatus::Docked:
-                            docking["status"] = "docked";
-                            docking["planet_id"] = ship.docked_planet;
-                            break;
-                    }
-
-                    record["docking"] = docking;
-
-                    ships.push_back(record);
+                    subframe_ships.push_back(output_ship(ship, playerId, ship_id));
                 }
             }
 
@@ -806,23 +870,13 @@ void Halite::output(std::string filename) {
                  planet_index++) {
                 const auto& planet = current_map.planets[planet_index];
                 if (!planet.is_alive()) continue;
-                planets.push_back(nlohmann::json{
-                    { "id", planet_index },
-                    { "health", planet.health },
-                    { "docked_ships", planet.docked_ships },
-                    { "remaining_production", planet.remaining_production },
-                    { "current_production", planet.current_production },
-                });
-                if (planet.owned) {
-                    planets.back()["owner"] = planet.owner;
-                } else {
-                    planets.back()["owner"] = nullptr;
-                }
+
+                subframe_planets.push_back(output_planet(planet, planet_index));
             }
 
             frame.push_back(nlohmann::json{
-                { "ships", ships },
-                { "planets", planets },
+                { "ships", subframe_ships },
+                { "planets", subframe_planets },
             });
         }
 
@@ -848,42 +902,21 @@ void Halite::output(std::string filename) {
     }
 
     // Serialize moves
+    std::vector<nlohmann::json> frame_moves;
     for (const auto& current_moves : full_player_moves) {
-        std::vector<nlohmann::json> frame;
+        frame_moves.clear();
         for (hlt::PlayerId player_id = 0; player_id < current_moves.size();
              player_id++) {
             for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
                 for (const auto& move : current_moves[player_id][move_no]) {
-                    auto record = nlohmann::json{
-                        { "owner", player_id },
-                        { "queue_number", move_no },
-                        { "shipId", move.shipId },
-                    };
-                    switch (move.type) {
-                        case hlt::MoveType::Noop:
-                            continue;
-                        case hlt::MoveType::Thrust:
-                            record["type"] = "thrust";
-                            record["magnitude"] = move.move.thrust.thrust;
-                            record["angle"] = move.move.thrust.angle;
-                            break;
-                        case hlt::MoveType::Dock:
-                            record["type"] = "dock";
-                            record["planet_id"] = move.move.dock_to;
-                            break;
-                        case hlt::MoveType::Undock:
-                            record["type"] = "undock";
-                            break;
-                        case hlt::MoveType::Error:
-                            // TODO: wrap the move that could not be executed
-                            assert(false);
-                    }
-                    frame.push_back(record);
+                    if (move.type == hlt::MoveType::Noop) continue;
+
+                    frame_moves.push_back(output_move(move, player_id, move_no));
                 }
             }
         }
 
-        moves.push_back(frame);
+        moves.push_back(frame_moves);
     }
 
     j["frames"] = nlohmann::json(frames);
