@@ -20,8 +20,9 @@ namespace hlt {
 
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
-        int DRAG = 5;
-        int MAX_SPEED = 20;
+        int DRAG = 3;
+        int MAX_SPEED = 30;
+        int MAX_ACCELERATION = 10;
         unsigned short BASE_SHIP_HEALTH = 255;
         unsigned int WEAPON_COOLDOWN = 1;
         int WEAPON_RADIUS = 5;

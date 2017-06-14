@@ -52,7 +52,7 @@ def dogfighter():
                     angle, distance = common.orient_towards(ship, enemy)
                     # Only move closer to get into attack range
                     if distance > 10:
-                        command_queue.append(common.move_to(ship, angle, 4))
+                        command_queue.append(common.move_to(ship, angle, 3))
                     elif distance > 5:
                         command_queue.append(common.move_to(ship, angle, 2))
                     elif distance > 3:
