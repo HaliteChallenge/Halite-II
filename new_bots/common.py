@@ -61,7 +61,7 @@ class Ship:
 
 class Map:
     def __init__(self):
-        self.ships = []
+        self.ships = {}
         self.planets = {}
         self.collision_map = []
 
@@ -84,7 +84,7 @@ class Map:
                         self.collision_map[x][y] = \
                             (planet.owner if planet.owned else -1, "planet")
 
-        for player_tag, player_ships in enumerate(self.ships):
+        for player_tag, player_ships in self.ships.items():
             for ship in player_ships:
                 self.collision_map[ship.x][ship.y] = (player_tag, "ship")
 
@@ -102,6 +102,7 @@ def parse(map):
         planet.docked_ships = docked_ships
         m.planets[planet.id] = planet
 
+    player = 0
     while ships:
         ships = ships[2:]
         s = []
@@ -119,7 +120,8 @@ def parse(map):
                           int(vel_x), int(vel_y),
                           docked, int(docked_planet)))
 
-        m.ships.append(s)
+        m.ships[player] = s
+        player += 1
 
     m.generate_collision()
 
@@ -133,7 +135,7 @@ def warp(ship, angle, distance, avoidance=10):
     pass
 
 
-def move_to(ship, angle, distance, avoidance=20):
+def move_to(ship, angle, speed, avoidance=20):
     pos_x = ship.x
     pos_y = ship.y
 
@@ -141,8 +143,8 @@ def move_to(ship, angle, distance, avoidance=20):
         logging.warn("INERTIAL INTERFERENCE")
 
     STEPS = 64
-    dx = distance * math.cos(angle) / STEPS
-    dy = distance * math.sin(angle) / STEPS
+    dx = round(speed * math.cos(angle)) / STEPS
+    dy = round(speed * math.sin(angle)) / STEPS
 
     for i in range(1, STEPS + 1):
         pos_x += dx
@@ -158,20 +160,26 @@ def move_to(ship, angle, distance, avoidance=20):
             if avoidance > 0:
                 new_angle = (angle + 10) % 360
                 if new_angle < 0: new_angle += 360
-                return move_to(ship, new_angle, 3, avoidance-1)
+                return move_to(ship, new_angle, 1, avoidance-1)
             else:
                 logging.warn("Failed")
 
-    return "t {ship} {distance} {angle}".format(ship=ship.id, distance=distance, angle=angle)
+    return "t {ship} {speed} {angle}".format(ship=ship.id, speed=speed, angle=angle)
 
 
-def distance(a):
-    def _d(b):
-        dx = a.x - b.x
-        dy = a.y - b.y
-        d = int(math.sqrt(dx*dx + dy*dy))
-        return d
-    return _d
+def dock(ship, planet):
+    return "d {ship} {planet}".format(ship=ship.id, planet=planet.id)
+
+
+def can_dock(ship, planet):
+    return distance(ship, planet) < planet.r + 2
+
+
+def distance(a, b):
+    dx = a.x - b.x
+    dy = a.y - b.y
+    d = int(math.sqrt(dx*dx + dy*dy))
+    return d
 
 
 def orient_towards(ship, target):
