@@ -15,14 +15,13 @@ def settler():
             planets = game_map.planets.values()
             sort_key = lambda planet: common.distance(ship, planet)
             for planet in sorted(planets, key=sort_key):
-                angle, distance = common.orient_towards(ship, planet)
-
                 if planet.owned:
                     continue
 
                 # Prevent multiple ships from converging on the same planet
                 planet.owned = True
 
+                angle, distance = common.orient_towards(ship, planet)
                 if common.can_dock(ship, planet):
                     command_queue.append(common.dock(ship, planet))
                 else:
