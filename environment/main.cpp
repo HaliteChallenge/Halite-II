@@ -91,6 +91,15 @@ int main(int argc, char** argv) {
                                                     ".",
                                                     "path to directory",
                                                     cmd);
+    TCLAP::ValueArg<int> dragArg(
+        "",
+        "drag",
+        "Drag applied to all ship velocities",
+        false,
+        hlt::GameConstants::get().DRAG,
+        "integer",
+        cmd
+    );
 
     //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
     TCLAP::UnlabeledMultiArg<std::string> otherArgs("NonspecifiedArgs",
@@ -116,6 +125,19 @@ int main(int argc, char** argv) {
     quiet_output = quietSwitch.getValue();
     bool override_names = overrideSwitch.getValue();
     bool ignore_timeout = timeoutSwitch.getValue();
+
+    // Update the game constants.
+    auto& constants = hlt::GameConstants::get_mut();
+    if (dragArg.isSet()) {
+        constants.DRAG = dragArg.getValue();
+    }
+
+    if (!quiet_output) {
+        std::cout
+            << "Game constants: \n"
+            << "\tDrag: " << constants.DRAG
+            << (dragArg.isSet() ? " (user-set)" : " (default)") << '\n';
+    }
 
     std::vector<std::string> unlabeledArgsVector = otherArgs.getValue();
     std::list<std::string> unlabeledArgs;
