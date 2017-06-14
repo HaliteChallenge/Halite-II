@@ -110,7 +110,7 @@ class HaliteVisualizer {
 
                 this.update();
             }
-        }, 1000/40);
+        }, 1000/30);
 
         this.application.ticker.add((dt) => {
             this.draw(dt);
@@ -316,6 +316,17 @@ class HaliteVisualizer {
             this.drawShip(ship);
         }
 
+        this.drawStats();
+
+        // dt comes from Pixi ticker, and the unit is essentially frames
+        this.animationQueue = this.animationQueue.filter((anim) => {
+            anim.draw(anim.frames);
+            anim.frames -= dt;
+            return anim.frames > 0;
+        });
+    }
+
+    drawStats() {
         let stats = this.currentStatistics;
 
         let x = 0;
@@ -344,13 +355,6 @@ class HaliteVisualizer {
         this.statsDisplay.drawRect(0, 90, 800, 10);
 
         this.currentTurnDisplay.text = `Frame ${this.frame}.${this.substep}`;
-
-        // dt comes from Pixi ticker, and the unit is essentially frames
-        this.animationQueue = this.animationQueue.filter((anim) => {
-            anim.draw(anim.frames);
-            anim.frames -= dt;
-            return anim.frames > 0;
-        });
     }
 }
 

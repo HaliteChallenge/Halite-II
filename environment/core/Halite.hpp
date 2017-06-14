@@ -193,7 +193,8 @@ private:
     auto retrieve_moves(std::vector<bool> alive) -> void;
 
     std::vector<bool> process_next_frame(std::vector<bool> alive);
-    void output(std::string filename);
+    auto output_header(nlohmann::json& replay) -> void;
+    auto output(std::string filename) -> void;
     void kill_player(hlt::PlayerId player);
 
     //! Compute the damage between two colliding ships
@@ -213,6 +214,7 @@ private:
     auto process_production(CollisionMap& collision_map) -> void;
     auto process_drag() -> void;
     auto process_cooldowns() -> void;
+    auto process_moves(std::vector<bool>& alive, int move_no, std::vector<std::vector<std::pair<float, float>>>& intermediate_positions) -> void;
 
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,

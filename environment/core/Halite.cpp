@@ -435,6 +435,115 @@ auto Halite::process_cooldowns() -> void {
     }
 }
 
+auto Halite::process_moves(
+    std::vector<bool>& alive, int move_no,
+    std::vector<std::vector<std::pair<float, float>>>& intermediate_positions) -> void {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        if (!alive[player_id]) continue;
+
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = game_map.get_ship(player_id, ship_id);
+            if (!ship.is_alive()) continue;
+
+            // Position ships in the center of their cell
+            intermediate_positions[player_id][ship_id] = {
+                ship.location.pos_x + 0.5,
+                ship.location.pos_y + 0.5,
+            };
+
+            auto move = player_moves[player_id][move_no][ship_id];
+            switch (move.type) {
+                case hlt::MoveType::Noop: {
+                    break;
+                }
+                case hlt::MoveType::Error: {
+                    break;
+                }
+                case hlt::MoveType::Thrust: {
+                    if (ship.docking_status
+                        != hlt::DockingStatus::Undocked) {
+                        break;
+                    }
+
+                    auto angle = move.move.thrust.angle * M_PI / 180;
+
+                    ship.velocity.accelerate_by(
+                        move.move.thrust.thrust,
+                        angle);
+
+                    break;
+                }
+                case hlt::MoveType::Dock: {
+                    if (ship.docking_status
+                        != hlt::DockingStatus::Undocked) {
+                        break;
+                    }
+
+                    const auto planet_id = move.move.dock_to;
+                    if (planet_id >= game_map.planets.size()) {
+                        // Planet is invalid, do nothing
+                        ship.reset_docking_status();
+                        break;
+                    }
+
+                    auto& planet = game_map.planets[planet_id];
+                    if (!planet.is_alive()) {
+                        ship.reset_docking_status();
+                        break;
+                    }
+
+                    // TODO: factor max distance into a constant
+                    if (game_map.get_distance(planet.location,
+                                              ship.location)
+                        > planet.radius + ship.radius + 2) {
+                        ship.reset_docking_status();
+                        break;
+                    }
+
+                    if (!planet.owned) {
+                        planet.owned = true;
+                        planet.owner = player_id;
+                    }
+
+                    // Don't initialize docking status again if already
+                    // docking to same planet
+                    if ((ship.docked_planet != planet_id ||
+                        ship.docking_status !=
+                            hlt::DockingStatus::Docking) &&
+                        planet.owner == player_id &&
+                        planet.docked_ships.size()
+                            < planet.docking_spots) {
+                        ship.docked_planet = planet_id;
+                        ship.docking_status = hlt::DockingStatus::Docking;
+                        ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
+
+                        planet.add_ship(ship_id);
+                    }
+
+                    break;
+                }
+
+                case hlt::MoveType::Undock:
+                    if (ship.docking_status
+                        != hlt::DockingStatus::Docked)
+                        break;
+
+                    ship.docking_status = hlt::DockingStatus::Undocking;
+                    ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
+
+                    break;
+            }
+
+            auto& move_set = full_player_moves.back();
+            auto& player_moves = move_set[player_id];
+            auto& ship_moves = player_moves[move_no];
+            ship_moves[ship_id] = move;
+        }
+    }
+}
+
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
     for (hlt::PlayerId player_id = 0;
@@ -459,120 +568,14 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     process_docking();
 
     // Process queue of moves
-    for (unsigned int move_no = 0;
-         move_no < hlt::MAX_QUEUED_MOVES;
-         move_no++) {
-
+    for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
         // Reset auxiliary data structures
         for (auto& row : intermediate_positions) {
             std::fill(row.begin(), row.end(), std::make_pair(0, 0));
         }
         collision_map.reset(game_map);
 
-        for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-             player_id++) {
-            if (!alive[player_id]) continue;
-
-            for (hlt::EntityIndex ship_id = 0;
-                 ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                auto& ship = game_map.get_ship(player_id, ship_id);
-                if (!ship.is_alive()) continue;
-
-                // Position ships in the center of their cell
-                intermediate_positions[player_id][ship_id] = {
-                    ship.location.pos_x + 0.5,
-                    ship.location.pos_y + 0.5,
-                };
-
-                auto move = player_moves[player_id][move_no][ship_id];
-                switch (move.type) {
-                    case hlt::MoveType::Noop: {
-                        break;
-                    }
-                    case hlt::MoveType::Error: {
-                        break;
-                    }
-                    case hlt::MoveType::Thrust: {
-                        if (ship.docking_status
-                            != hlt::DockingStatus::Undocked) {
-                            break;
-                        }
-
-                        auto angle = move.move.thrust.angle * M_PI / 180;
-
-                        ship.velocity.accelerate_by(
-                            move.move.thrust.thrust,
-                            angle);
-
-                        break;
-                    }
-                    case hlt::MoveType::Dock: {
-                        if (ship.docking_status
-                            != hlt::DockingStatus::Undocked) {
-                            break;
-                        }
-
-                        const auto planet_id = move.move.dock_to;
-                        if (planet_id >= game_map.planets.size()) {
-                            // Planet is invalid, do nothing
-                            ship.reset_docking_status();
-                            break;
-                        }
-
-                        auto& planet = game_map.planets[planet_id];
-                        if (!planet.is_alive()) {
-                            ship.reset_docking_status();
-                            break;
-                        }
-
-                        // TODO: factor max distance into a constant
-                        if (game_map.get_distance(planet.location,
-                                                  ship.location)
-                            > planet.radius + ship.radius + 2) {
-                            ship.reset_docking_status();
-                            break;
-                        }
-
-                        if (!planet.owned) {
-                            planet.owned = true;
-                            planet.owner = player_id;
-                        }
-
-                        // Don't initialize docking status again if already
-                        // docking to same planet
-                        if ((ship.docked_planet != planet_id ||
-                            ship.docking_status !=
-                                hlt::DockingStatus::Docking) &&
-                            planet.owner == player_id &&
-                            planet.docked_ships.size()
-                                < planet.docking_spots) {
-                            ship.docked_planet = planet_id;
-                            ship.docking_status = hlt::DockingStatus::Docking;
-                            ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
-
-                            planet.add_ship(ship_id);
-                        }
-
-                        break;
-                    }
-
-                    case hlt::MoveType::Undock:
-                        if (ship.docking_status
-                            != hlt::DockingStatus::Docked)
-                            break;
-
-                        ship.docking_status = hlt::DockingStatus::Undocking;
-                        ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
-
-                        break;
-                }
-
-                auto& move_set = full_player_moves.back();
-                auto& player_moves = move_set[player_id];
-                auto& ship_moves = player_moves[move_no];
-                ship_moves[ship_id] = move;
-            }
-        }
+        process_moves(alive, move_no, intermediate_positions);
 
         std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>
             ship_damage = { {} };
@@ -815,24 +818,22 @@ auto output_move(const hlt::Move& move, hlt::PlayerId player_id,
     return record;
 }
 
-void Halite::output(std::string filename) {
-    std::ofstream gameFile;
-    gameFile.open(filename, std::ios_base::binary);
-    if (!gameFile.is_open())
-        throw std::runtime_error("Could not open file for replay");
-
-    nlohmann::json j;
-
-    j["version"] = 20;
+/**
+ * Build up the in-memory representation of the header of the replay.
+ *
+ * @param replay
+ */
+auto Halite::output_header(nlohmann::json& replay) -> void {
+    replay["version"] = 20;
 
     //Encode some details about the game that will make it convenient to parse.
-    j["width"] = game_map.map_width;
-    j["height"] = game_map.map_height;
-    j["num_players"] = player_names.size();
-    j["num_frames"] = full_frames.size();
+    replay["width"] = game_map.map_width;
+    replay["height"] = game_map.map_height;
+    replay["num_players"] = player_names.size();
+    replay["num_frames"] = full_frames.size();
 
     //Encode player names.
-    j["player_names"] = nlohmann::json(player_names);
+    replay["player_names"] = nlohmann::json(player_names);
 
     // Encode the planet map. This information doesn't change between frames,
     // so there's no need to re-encode it every time.
@@ -852,11 +853,27 @@ void Halite::output(std::string filename) {
             { "production", planet.remaining_production },
         });
     }
-    j["planets"] = planets;
+    replay["planets"] = planets;
+}
+
+auto Halite::output(std::string filename) -> void {
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    std::ofstream gameFile;
+    gameFile.open(filename, std::ios_base::binary);
+    if (!gameFile.is_open())
+        throw std::runtime_error("Could not open file for replay");
+
+    nlohmann::json j;
+
+    output_header(j);
 
     auto after_header = std::chrono::high_resolution_clock::now();
 
     // Encode the frames. Note that there is no moves field for the last frame.
+
+    // Try to avoid re-allocating as much here
     std::vector<std::vector<nlohmann::json>> frames;
     std::vector<std::vector<nlohmann::json>> moves;
     frames.reserve(full_frames.size());
@@ -903,6 +920,10 @@ void Halite::output(std::string filename) {
         frames.push_back(frame);
     }
 
+    auto after_frames = std::chrono::high_resolution_clock::now();
+
+    // Save the frame events. This is added to the frame data, alongside
+    // ships and planets.
     for (auto frame_idx = 0; frame_idx < full_frame_events.size(); frame_idx++) {
         auto& frame_events = full_frame_events[frame_idx];
         auto& frame_data = frames.at(frame_idx + 1);
@@ -942,11 +963,20 @@ void Halite::output(std::string filename) {
     j["frames"] = nlohmann::json(frames);
     j["moves"] = nlohmann::json(moves);
 
+    auto after_building = std::chrono::high_resolution_clock::now();
+
+    // Use msgpack to cut down on the size of the replay file
     std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
     gameFile.write((char*)&bin_data[0], bin_data.size() * sizeof(uint8_t));
 
     gameFile.flush();
     gameFile.close();
+
+    auto after_writing = std::chrono::high_resolution_clock::now();
+
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_building - start_time).count() << '\n';
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_writing - after_building).count() << '\n';
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_frames - after_header).count() << '\n';
 }
 
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
