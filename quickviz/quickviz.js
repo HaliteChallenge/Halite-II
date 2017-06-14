@@ -3,7 +3,8 @@
  */
 
 const CELL_SIZE = 1;
-const PLAYER_COLORS = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
+const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
+const PLANET_COLOR = 0x888888;
 
 const DOCK_TURNS = 5;
 const ATTACK_RADIUS = 5;
@@ -133,7 +134,7 @@ class HaliteVisualizer {
                         this.planetContainer.beginFill(PLAYER_COLORS[planet.owner]);
                     }
                     else {
-                        this.planetContainer.beginFill(0xA56729);
+                        this.planetContainer.beginFill(PLANET_COLOR);
                     }
                     this.planetContainer.drawRect(x, y, side, side);
                     this.planetContainer.endFill();
@@ -253,7 +254,7 @@ class HaliteVisualizer {
                             const x = side * (event.x + 0.5);
                             const y = side * (event.y + 0.5);
 
-                            this.shipContainer.lineStyle(2, 0xFFFFFF, 0.5 * frame / 24);
+                            this.shipContainer.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
                             this.shipContainer.drawCircle(x, y, side * ATTACK_RADIUS);
                             this.shipContainer.endFill();
                         },
@@ -300,7 +301,7 @@ class HaliteVisualizer {
             x += width;
         }
         const width = 800 * (stats.planets["unowned"] || 0) / this.replay.planets.length;
-        this.statsDisplay.beginFill(0xA56729);
+        this.statsDisplay.beginFill(PLANET_COLOR);
         this.statsDisplay.drawRect(x, 50, width, 40);
         this.statsDisplay.endFill();
         this.statsDisplay.drawRect(0, 90, 800, 10);
