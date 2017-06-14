@@ -164,7 +164,7 @@ namespace hlt {
             const auto& region = regions[playerId];
 
             for (int i = 0; i < 3; i++) {
-                ships[playerId][i].health = Ship::BASE_HEALTH;
+                ships[playerId][i].health = GameConstants::get().BASE_SHIP_HEALTH;
                 // Spread out ships to make it less likely they'll collide
                 // in the start
                 ships[playerId][i].location.pos_x = region.center_x();
@@ -185,7 +185,7 @@ namespace hlt {
         const auto rand_region_width = [&]() -> unsigned short { return uidrw(prg); };
         const auto rand_region_height = [&]() -> unsigned short { return uidrh(prg); };
 
-        const auto MAX_PLANETS = player_count * PLANETS_PER_PLAYER;
+        const auto MAX_PLANETS = player_count * GameConstants::get().PLANETS_PER_PLAYER;
         constexpr auto MAX_TRIES = 2500;
         constexpr auto MIN_DISTANCE = 5;
 
@@ -437,8 +437,9 @@ namespace hlt {
         vel_x = static_cast<short>(new_vel_x);
         vel_y = static_cast<short>(new_vel_y);
 
-        if (this->magnitude() > MAX_MAGNITUDE) {
-            double scale = MAX_MAGNITUDE / this->magnitude();
+        const auto max_speed = GameConstants::get().MAX_SPEED;
+        if (this->magnitude() > max_speed) {
+            double scale = max_speed / this->magnitude();
             new_vel_x *= scale;
             new_vel_y *= scale;
         }

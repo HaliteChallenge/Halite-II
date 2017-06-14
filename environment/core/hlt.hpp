@@ -17,7 +17,28 @@ namespace hlt {
     constexpr auto MAX_PLAYERS = 4;
     constexpr auto MAX_PLAYER_SHIPS = 200;
     constexpr auto MAX_QUEUED_MOVES = 1;
-    constexpr auto PLANETS_PER_PLAYER = 6;
+
+    struct GameConstants {
+        int PLANETS_PER_PLAYER = 6;
+        int DRAG = 5;
+        int MAX_SPEED = 20;
+        unsigned short BASE_SHIP_HEALTH = 255;
+        unsigned int WEAPON_COOLDOWN = 1;
+        int WEAPON_RADIUS = 5;
+        int WEAPON_DAMAGE = 64;
+        unsigned int DOCK_TURNS = 5;
+        int PRODUCTION_PER_SHIP = 100;
+
+        static auto get_mut() -> GameConstants& {
+            // Guaranteed initialized only once by C++11
+            static GameConstants instance;
+            return instance;
+        }
+
+        static auto get() -> const GameConstants& {
+            return get_mut();
+        }
+    };
 
     typedef uint8_t PlayerId;
     typedef size_t EntityIndex;
@@ -33,9 +54,6 @@ namespace hlt {
     };
 
     struct Velocity {
-        constexpr static auto DRAG = 5;
-        constexpr static auto MAX_MAGNITUDE = 20;
-
         short vel_x, vel_y;
 
         auto accelerate_by(unsigned short magnitude, double angle) -> void;
@@ -73,17 +91,12 @@ namespace hlt {
     };
 
     struct Ship : Entity {
-        constexpr static auto BASE_HEALTH = 255;
-        constexpr static auto WEAPON_COOLDOWN = 1;
-        constexpr static auto WEAPON_RADIUS = 5;
-        constexpr static auto WEAPON_DAMAGE = 64;
-
         Velocity velocity;
 
-        uint8_t weapon_cooldown;
+        unsigned int weapon_cooldown;
 
         DockingStatus docking_status;
-        unsigned short docking_progress;
+        unsigned int docking_progress;
         EntityIndex docked_planet;
 
         auto reset_docking_status() -> void {
@@ -91,12 +104,15 @@ namespace hlt {
             docking_progress = 0;
             docked_planet = 0;
         }
+
+        auto revive(const Location& loc) -> void {
+            health = GameConstants::get().BASE_SHIP_HEALTH;
+            location = loc;
+            weapon_cooldown = 0;
+        }
     };
 
     struct Planet : Entity {
-        constexpr static auto DOCK_TURNS = 5;
-        constexpr static auto PRODUCTION_PER_SHIP = 100;
-
         PlayerId owner;
         bool owned;
 
@@ -114,7 +130,7 @@ namespace hlt {
             this->radius = radius;
             docking_spots = radius;
             remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
-            health = static_cast<unsigned short>(remaining_production * Ship::BASE_HEALTH);
+            health = static_cast<unsigned short>(remaining_production * GameConstants::get().BASE_SHIP_HEALTH);
 
             owned = false;
         }

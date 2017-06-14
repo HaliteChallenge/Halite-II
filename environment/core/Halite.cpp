@@ -59,7 +59,7 @@ auto Halite::compute_planet_explosion_damage(
         // (killing it instantly)
         const auto distance_factor = 25 - (distance_from_crust - 1);
         return static_cast<unsigned short>(
-            (hlt::Ship::BASE_HEALTH / 5) * distance_factor / 5);
+            (hlt::GameConstants::get().BASE_SHIP_HEALTH / 5) * distance_factor / 5);
     }
     else {
         return 0;
@@ -220,10 +220,9 @@ auto Halite::process_attacks(
                 continue;
             }
 
-            for (int dx = -hlt::Ship::WEAPON_RADIUS;
-                 dx <= hlt::Ship::WEAPON_RADIUS; dx++) {
-                for (int dy = -hlt::Ship::WEAPON_RADIUS;
-                     dy <= hlt::Ship::WEAPON_RADIUS; dy++) {
+            const auto radius = hlt::GameConstants::get().WEAPON_RADIUS;
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dy = -radius; dy <= radius; dy++) {
                     const auto pos = game_map.location_with_delta(ship.location, dx, dy);
                     if (!pos.second) continue;
 
@@ -239,11 +238,11 @@ auto Halite::process_attacks(
                 }
             }
 
-            ship.weapon_cooldown = hlt::Ship::WEAPON_COOLDOWN;
+            ship.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
 
             for (const auto target : targets) {
                 const auto damage =
-                    hlt::Ship::WEAPON_DAMAGE / (float) targets.size();
+                    hlt::GameConstants::get().WEAPON_DAMAGE / (float) targets.size();
                 ship_damage[target.player_id()][target.entity_index()] +=
                     damage;
 
@@ -344,7 +343,8 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
         planet.remaining_production -= production;
         planet.current_production += production;
 
-        while (planet.current_production >= hlt::Planet::PRODUCTION_PER_SHIP) {
+        const auto production_per_ship = hlt::GameConstants::get().PRODUCTION_PER_SHIP;
+        while (planet.current_production >= production_per_ship) {
             // Try to spawn the ship
 
             auto& ships = game_map.ships[planet.owner];
@@ -361,11 +361,7 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
                             auto& ship = ships[ship_id];
 
                             if (!ship.is_alive()) {
-                                // TODO: refactor into a "reset ship"
-                                ship.health = hlt::Ship::BASE_HEALTH;
-                                ship.location = loc.first;
-                                ship.weapon_cooldown = 0;
-
+                                ship.revive(loc.first);
                                 total_ship_count[planet.owner]++;
 
                                 collision_map.fill(loc.first,
@@ -386,23 +382,22 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
         continue;
 
         SUCCESS:
-        planet.current_production -= hlt::Planet::PRODUCTION_PER_SHIP;
+        planet.current_production -= production_per_ship;
     }
 }
 
 auto Halite::process_drag() -> void {
     // Update inertia/implement drag
+    const auto drag = hlt::GameConstants::get().DRAG;
     for (auto& player_ships : game_map.ships) {
         for (auto& ship : player_ships) {
             if (!ship.is_alive()) continue;
             const auto magnitude = ship.velocity.magnitude();
-            if (magnitude <= hlt::Velocity::DRAG) {
+            if (magnitude <= drag) {
                 ship.velocity.vel_x = ship.velocity.vel_y = 0;
             }
             else {
-                ship.velocity.accelerate_by(
-                    hlt::Velocity::DRAG,
-                    ship.velocity.angle() + M_PI);
+                ship.velocity.accelerate_by(drag, ship.velocity.angle() + M_PI);
             }
         }
     }
@@ -533,7 +528,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                                 < planet.docking_spots) {
                             ship.docked_planet = planet_id;
                             ship.docking_status = hlt::DockingStatus::Docking;
-                            ship.docking_progress = hlt::Planet::DOCK_TURNS;
+                            ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
 
                             planet.add_ship(ship_id);
                         }
@@ -547,7 +542,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                             break;
 
                         ship.docking_status = hlt::DockingStatus::Undocking;
-                        ship.docking_progress = hlt::Planet::DOCK_TURNS;
+                        ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
 
                         break;
                 }
