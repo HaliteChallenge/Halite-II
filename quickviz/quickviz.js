@@ -119,6 +119,31 @@ class HaliteVisualizer {
         this.timer = null;
     }
 
+    /**
+     *
+     * @param container
+     * @param x
+     * @param y
+     * @param color
+     * @param health_factor
+     */
+    drawCell(container, x, y, color, health_factor) {
+        const side = CELL_SIZE * this.scale;
+        x = x * side;
+        y = y * side;
+        container.lineStyle(0);
+        container.beginFill(color, 0.5);
+        container.drawRect(x, y, side, side);
+        container.endFill();
+        container.beginFill(color, 1);
+        container.drawRect(
+            x + health_factor * side,
+            y + health_factor * side,
+            (1 - 2*health_factor) * side,
+            (1 - 2*health_factor) * side);
+        container.endFill();
+    }
+
     drawPlanet(planet) {
         let planetBase = this.replay.planets[planet.id];
 
@@ -128,16 +153,15 @@ class HaliteVisualizer {
         for (let dx = -planetBase.r; dx <= planetBase.r; dx++) {
             for (let dy = -planetBase.r; dy <= planetBase.r; dy++) {
                 if (dx*dx + dy*dy <= planetBase.r*planetBase.r) {
-                    const x = side * (dx + planetBase.x);
-                    const y = side * (dy + planetBase.y);
-                    if (planet.owner !== null) {
-                        this.planetContainer.beginFill(PLAYER_COLORS[planet.owner]);
-                    }
-                    else {
-                        this.planetContainer.beginFill(PLANET_COLOR);
-                    }
-                    this.planetContainer.drawRect(x, y, side, side);
-                    this.planetContainer.endFill();
+                    const health_factor = 0.5 *
+                        (planetBase.production - planet.remaining_production) / planetBase.production;
+                    this.drawCell(
+                        this.planetContainer,
+                        dx + planetBase.x,
+                        dy + planetBase.y,
+                        planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner],
+                        health_factor,
+                    );
                 }
             }
         }
@@ -155,22 +179,12 @@ class HaliteVisualizer {
 
     drawShip(ship) {
         const side = CELL_SIZE * this.scale;
+        const health_factor = 0.1 + 0.3 * (BASE_SHIP_HEALTH - ship.health) / BASE_SHIP_HEALTH;
 
         const x = side * ship.x;
         const y = side * ship.y;
 
-        this.shipContainer.lineStyle(0);
-        this.shipContainer.beginFill(PLAYER_COLORS[ship.owner], 0.5);
-        this.shipContainer.drawRect(x, y, side, side);
-        this.shipContainer.endFill();
-        const health_factor = 0.1 + 0.3 * (BASE_SHIP_HEALTH - ship.health) / BASE_SHIP_HEALTH;
-        this.shipContainer.beginFill(PLAYER_COLORS[ship.owner], 1);
-        this.shipContainer.drawRect(
-            x + health_factor * side,
-            y + health_factor * side,
-            (1 - 2*health_factor) * side,
-            (1 - 2*health_factor) * side);
-        this.shipContainer.endFill();
+        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor);
 
         if (ship.docking.status !== "undocked") {
             let progress = ship.docking.status === "docked" ? DOCK_TURNS : DOCK_TURNS - ship.docking.turns_left;

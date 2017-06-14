@@ -730,6 +730,7 @@ void Halite::output(std::string filename) {
             { "r", planet.radius },
             { "health", planet.health },
             { "docking_spots", planet.docking_spots },
+            { "production", planet.remaining_production },
         });
     }
     j["planets"] = planets;
