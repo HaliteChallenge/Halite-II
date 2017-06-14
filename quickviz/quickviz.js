@@ -36,8 +36,11 @@ class HaliteVisualizer {
 
         this.statsDisplay = new PIXI.Graphics();
 
+        this.currentTurnDisplay = new PIXI.Text("Frame");
+
         this.application.stage.addChild(this.container);
         this.application.stage.addChild(this.statsDisplay);
+        this.application.stage.addChild(this.currentTurnDisplay);
 
         this.timer = null;
 
@@ -319,6 +322,8 @@ class HaliteVisualizer {
         this.statsDisplay.drawRect(x, 50, width, 40);
         this.statsDisplay.endFill();
         this.statsDisplay.drawRect(0, 90, 800, 10);
+
+        this.currentTurnDisplay.text = `Frame ${this.frame}.${this.substep}`;
 
         this.animationQueue = this.animationQueue.filter((anim) => {
             anim.draw(anim.frames);
