@@ -659,26 +659,41 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     full_frames.back().push_back(hlt::Map(game_map));
 
     // Check if the game is over
-    std::vector<bool> stillAlive(number_of_players, false);
+    std::vector<bool> still_alive(number_of_players, false);
 
     std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
     for (hlt::PlayerId player = 0; player < number_of_players; player++) {
         for (const auto& ship : game_map.ships[player]) {
             if (ship.is_alive()) {
-                stillAlive[player] = true;
+                still_alive[player] = true;
                 last_ship_count[player]++;
                 last_ship_health_total[player] += ship.health;
             }
         }
     }
 
+    std::vector<int> owned_planets(number_of_players, 0);
+    auto total_planets = 0;
     for (const auto& planet : game_map.planets) {
-        if (planet.is_alive() && planet.owned && planet.docked_ships.size() > 0) {
-            stillAlive[planet.owner] = true;
+        if (!planet.is_alive()) continue;
+        total_planets++;
+        if (planet.owned && planet.docked_ships.size() > 0) {
+            still_alive[planet.owner] = true;
+            owned_planets[planet.owner]++;
         }
     }
 
-    return stillAlive;
+    // If one player owns all living planets, that player wins
+    for (int player_id = 0; player_id < owned_planets.size(); player_id++) {
+        auto num_owned_planets = owned_planets[player_id];
+        if (num_owned_planets == total_planets) {
+            // End the game by "killing off" the other players
+            std::fill(still_alive.begin(), still_alive.end(), false);
+            still_alive[player_id] = true;
+        }
+    }
+
+    return still_alive;
 }
 
 void Halite::output(std::string filename) {
