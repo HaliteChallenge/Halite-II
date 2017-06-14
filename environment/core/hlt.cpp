@@ -85,8 +85,12 @@ namespace hlt {
 
     Map::Map(unsigned short width,
              unsigned short height,
-             uint8_t player_count,
+             unsigned int player_count,
              unsigned int seed) : Map() {
+        // TODO: make map generation configurable
+        // TODO: revamp algorithm to not need this
+        if (player_count < 2) player_count = 2;
+
         // TODO: enforce a minimum map size to make sure we always have room for planets
 
         //Pseudorandom number generator.
