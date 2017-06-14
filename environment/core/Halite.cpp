@@ -682,7 +682,20 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         total_planets++;
         if (planet.owned && planet.docked_ships.size() > 0) {
             still_alive[planet.owner] = true;
-            owned_planets[planet.owner]++;
+
+            // Only count a planet as owned if a ship has completed docking
+            const auto num_docked_ships = count_if(
+                planet.docked_ships.begin(),
+                planet.docked_ships.end(),
+                [&](hlt::EntityIndex ship_idx) -> bool {
+                    const auto& ship =
+                        game_map.get_ship(planet.owner, ship_idx);
+                    return ship.docking_status == hlt::DockingStatus::Docked;
+                }
+            );
+            if (num_docked_ships > 0) {
+                owned_planets[planet.owner]++;
+            }
         }
     }
 
