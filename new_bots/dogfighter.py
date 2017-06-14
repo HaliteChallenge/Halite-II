@@ -43,7 +43,7 @@ def dogfighter():
                 found_enemy = False
 
                 for enemy in sorted(
-                        ships,
+                        ships.values(),
                         key=lambda enemy: common.distance(ship, enemy)):
                     angle, distance = common.orient_towards(ship, enemy)
                     # Only move closer to get into attack range
