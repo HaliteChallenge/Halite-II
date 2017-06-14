@@ -161,8 +161,10 @@ namespace hlt {
 
             for (int i = 0; i < 3; i++) {
                 ships[playerId][i].health = Ship::BASE_HEALTH;
+                // Spread out ships to make it less likely they'll collide
+                // in the start
                 ships[playerId][i].location.pos_x = region.center_x();
-                ships[playerId][i].location.pos_y = region.center_y() - 1 + i;
+                ships[playerId][i].location.pos_y = region.center_y() - 2 * (i - 1);
             }
         }
 
