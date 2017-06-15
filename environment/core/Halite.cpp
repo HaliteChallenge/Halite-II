@@ -3,7 +3,8 @@
 #include <functional>
 #include <memory>
 #include <chrono>
-#include "spdlog/spdlog.h"
+
+#include "mapgen/SolarSystem.h"
 
 //Private Functions ------------------
 
@@ -996,9 +997,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
 
-    // Debug logging
-    auto log = spdlog::basic_logger_mt("halite", "log-" + std::to_string(id) + '-' + std::to_string(seed) + ".hlt");
-
     // Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
@@ -1027,7 +1025,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             player_names.push_back(a->substr(0, 30));
     }
 
-    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height) * 2.0);
+    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height));
 
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
@@ -1141,7 +1139,9 @@ Halite::Halite(unsigned short width_,
     number_of_players = networking.player_count();
 
     //Initialize map
-    game_map = hlt::Map(width_, height_, n_players_for_map_creation, seed_);
+    auto generator = mapgen::SolarSystem(seed_);
+    game_map = hlt::Map(width_, height_);
+    generator.generate(game_map, number_of_players, n_players_for_map_creation);
 
     //If this is single-player mode, remove all the extra players (they were automatically inserted in map, just 0 them out)
     if (number_of_players == 1) {

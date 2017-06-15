@@ -83,6 +83,11 @@ namespace hlt {
         planets = other_map.planets;
     }
 
+    Map::Map(unsigned short width, unsigned short height) {
+        map_width = width;
+        map_height = height;
+    }
+
     Map::Map(unsigned short width,
              unsigned short height,
              unsigned int player_count,
@@ -381,7 +386,7 @@ namespace hlt {
         return atan2f(dy, dx);
     }
 
-    auto Map::location_with_delta(Location location,
+    auto Map::location_with_delta(Location& location,
                                   int dx,
                                   int dy) -> possibly<Location> {
         const auto pos_x = location.pos_x + dx;
