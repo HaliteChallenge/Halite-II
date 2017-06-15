@@ -192,6 +192,12 @@ class HaliteVisualizer {
 
         if (ship.docking.status !== "undocked") {
             let progress = ship.docking.status === "docked" ? dock_turns : dock_turns - ship.docking.turns_left;
+            if (ship.docking.status === "undocking") {
+                progress = ship.docking.turns_left / dock_turns;
+            }
+            else {
+                progress /= dock_turns;
+            }
 
             const planetId = ship.docking.planet_id;
             const planetBase = this.replay.planets[planetId];
@@ -208,14 +214,8 @@ class HaliteVisualizer {
 
             this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
             this.shipContainer.lineStyle(2, 0xFFFFFF, 1);
-            if (ship.docking.status === "undocking") {
-                // TODO:
-            }
-            else {
-                progress /= dock_turns;
-                this.shipContainer.moveTo(cx, cy);
-                this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
-            }
+            this.shipContainer.moveTo(cx, cy);
+            this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
             this.shipContainer.endFill();
         }
     }
