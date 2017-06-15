@@ -142,9 +142,8 @@ void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
     timeout_tags.insert(player);
 
-    // Kill player's ships
+    // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
-        // TODO: use kill_entity
         ship.kill();
     }
 
@@ -500,10 +499,12 @@ auto Halite::process_moves(
                         break;
                     }
 
-                    // TODO: factor max distance into a constant
-                    if (game_map.get_distance(planet.location,
-                                              ship.location)
-                        > planet.radius + ship.radius + 2) {
+                    const auto max_distance =
+                        planet.radius + ship.radius +
+                            hlt::GameConstants::get().MAX_DOCKING_DISTANCE;
+                    const auto ship_distance =
+                        game_map.get_distance(planet.location, ship.location);
+                    if (ship_distance > max_distance) {
                         ship.reset_docking_status();
                         break;
                     }
@@ -634,7 +635,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                         pos.second += SUBSTEP_DT * velocity.vel_y;
 
                         // Check boundaries
-                        // TODO: be consistent and explicit about rounding vs truncation
                         if (pos.first < 0 || pos.first >= game_map.map_width ||
                             pos.second < 0 || pos.second >= game_map.map_height) {
                             kill_entity(id, collision_map);
@@ -1135,7 +1135,8 @@ Halite::Halite(unsigned short width_,
                Networking networking_,
                bool should_ignore_timeout) {
     networking = networking_;
-    // number_of_players is the number of active bots to start the match; it is constant throughout game
+    // number_of_players is the number of active bots to start the match; it
+    // is constant throughout game
     number_of_players = networking.player_count();
 
     //Initialize map
@@ -1148,12 +1149,7 @@ Halite::Halite(unsigned short width_,
     game_map = hlt::Map(width_, height_);
     generator.generate(game_map, number_of_players, n_players_for_map_creation);
 
-    //If this is single-player mode, remove all the extra players (they were automatically inserted in map, just 0 them out)
-    if (number_of_players == 1) {
-        // TODO
-    }
-
-    //Default initialize
+    // Default initialize
     player_moves = { { { {} } } };
     turn_number = 0;
     player_names = std::vector<std::string>(number_of_players);
@@ -1244,7 +1240,6 @@ auto to_json(const hlt::EntityId& id) -> nlohmann::json {
                 { "owner", id.player_id() },
                 { "id", id.entity_index() },
             };
-            // TODO:
         case hlt::EntityType::InvalidEntity:
             return {
                 { "type", "invalid" },

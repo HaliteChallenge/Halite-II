@@ -22,19 +22,23 @@ namespace hlt {
 
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
+        unsigned int EXTRA_PLANETS = 4;
+
         int DRAG = 3;
         int MAX_SPEED = 30;
         int MAX_ACCELERATION = 10;
+
         unsigned short MAX_SHIP_HEALTH = 255;
         unsigned short BASE_SHIP_HEALTH = 127;
         unsigned short DOCKED_SHIP_REGENERATION = 32;
+
         unsigned int WEAPON_COOLDOWN = 1;
         int WEAPON_RADIUS = 5;
         int WEAPON_DAMAGE = 64;
+
+        unsigned int MAX_DOCKING_DISTANCE = 4;
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
-
-        unsigned int EXTRA_PLANETS = 4;
 
         static auto get_mut() -> GameConstants& {
             // Guaranteed initialized only once by C++11

@@ -152,18 +152,23 @@ int main(int argc, char** argv) {
             std::cout
                 << "Game constants: \n"
                 << "\tPLANETS_PER_PLAYER: " << constants.PLANETS_PER_PLAYER << '\n'
+                << "\tEXTRA_PLANETS: " << constants.EXTRA_PLANETS << '\n'
+
                 << "\tDRAG: " << constants.DRAG << '\n'
                 << "\tMAX_SPEED: " << constants.MAX_SPEED << '\n'
                 << "\tMAX_ACCELERATION: " << constants.MAX_ACCELERATION << '\n'
+
                 << "\tMAX_SHIP_HEALTH: " << constants.MAX_SHIP_HEALTH << '\n'
                 << "\tBASE_SHIP_HEALTH: " << constants.BASE_SHIP_HEALTH << '\n'
                 << "\tDOCKED_SHIP_REGENERATION: " << constants.DOCKED_SHIP_REGENERATION << '\n'
+
                 << "\tWEAPON_COOLDOWN: " << constants.WEAPON_COOLDOWN << '\n'
                 << "\tWEAPON_RADIUS: " << constants.WEAPON_RADIUS << '\n'
                 << "\tWEAPON_DAMAGE: " << constants.WEAPON_DAMAGE << '\n'
+
                 << "\tDOCK_TURNS: " << constants.DOCK_TURNS << '\n'
                 << "\tPRODUCTION_PER_SHIP: " << constants.PRODUCTION_PER_SHIP << '\n'
-                << "\tEXTRA_PLANETS: " << constants.EXTRA_PLANETS << '\n';
+                << "\tMAX_DOCKING_DISTANCE: " << constants.MAX_DOCKING_DISTANCE << '\n';
         }
     }
     else {

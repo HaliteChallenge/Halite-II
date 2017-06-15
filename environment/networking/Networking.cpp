@@ -117,13 +117,7 @@ void Networking::deserialize_move_set(std::string& inputString,
                 iss >> move.move.thrust.angle;
                 const auto thrust = move.move.thrust.thrust;
                 if (thrust > hlt::GameConstants::get().MAX_ACCELERATION) {
-                    std::string errorMessage =
-                        "Bot sent an invalid movement thrust - ejecting from game.\n";
-                    if (!quiet_output) {
-                        std::lock_guard<std::mutex> guard(coutMutex);
-                        std::cout << errorMessage;
-                    }
-                    throw errorMessage;
+                    throw eject_bot("Bot sent an invalid movement thrust - ejecting from game.\n")
                 }
                 break;
             }
@@ -148,14 +142,8 @@ void Networking::deserialize_move_set(std::string& inputString,
             moves.at(queue_index).at(move.shipId) = move;
             queue_depth.at(move.shipId)++;
         } else {
-            // TODO: refactor this into its own helper
-            std::string errorMessage =
-                "Bot tried to queue too many moves for a particular ship - ejecting from game.\n";
-            if (!quiet_output) {
-                std::lock_guard<std::mutex> guard(coutMutex);
-                std::cout << errorMessage;
-            }
-            throw errorMessage;
+            throw eject_bot(
+                "Bot tried to queue too many moves for a particular ship - ejecting from game.\n");
         }
         move = {};
     }
@@ -485,8 +473,6 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         //Send this bot the game map and the messages addressed to this bot
         std::string mapString = serialize_map(m);
         send_string(player_tag, mapString);
-
-        // TODO: clear out array
 
         player_logs[player_tag] +=
             "\n-----------------------------------------------------------------------------\n --- Frame #"
