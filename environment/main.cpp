@@ -162,7 +162,8 @@ int main(int argc, char** argv) {
                 << "\tWEAPON_RADIUS: " << constants.WEAPON_RADIUS << '\n'
                 << "\tWEAPON_DAMAGE: " << constants.WEAPON_DAMAGE << '\n'
                 << "\tDOCK_TURNS: " << constants.DOCK_TURNS << '\n'
-                << "\tPRODUCTION_PER_SHIP: " << constants.PRODUCTION_PER_SHIP << '\n';
+                << "\tPRODUCTION_PER_SHIP: " << constants.PRODUCTION_PER_SHIP << '\n'
+                << "\tEXTRA_PLANETS: " << constants.EXTRA_PLANETS << '\n';
         }
     }
     else {

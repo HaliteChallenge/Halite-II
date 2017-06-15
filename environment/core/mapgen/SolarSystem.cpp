@@ -91,12 +91,45 @@ namespace mapgen {
         const auto center_x = map.map_width / 2;
         const auto center_y = map.map_height / 2;
 
-        const auto planets_per_player =
+        auto planets_per_player =
             hlt::GameConstants::get().PLANETS_PER_PLAYER;
         const auto total_planets = effective_players * planets_per_player;
+        const auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
 
         // Temporary storage for the planets created in a particular orbit
         auto planets = std::vector<Zone>();
+
+        auto is_ok_location = [&](const hlt::Location& location, int radius) -> bool {
+            // I promise this pun was an accident
+            for (const auto& zone : spawn_zones) {
+                const auto min_distance = zone.radius + radius + 15;
+                if (map.get_distance(zone.location, location)
+                    <= min_distance) {
+                    return false;
+                }
+            }
+
+            for (const auto& zone : planets) {
+                const auto min_distance = zone.radius + radius + 3;
+                if (map.get_distance(zone.location, location)
+                    <= min_distance) {
+                    return false;
+                }
+            }
+
+            for (const auto& planet : map.planets) {
+                const auto min_distance = planet.radius + radius + 15;
+                if (map.get_distance(planet.location, location)
+                    <= min_distance) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        // Generate more frequent, sparser rings
+        if (planets_per_player % 2 == 0) planets_per_player /= 2;
+        else planets_per_player--;
 
         while (map.planets.size() < total_planets) {
             // Planets to generate per player this iteration
@@ -128,29 +161,8 @@ namespace mapgen {
                         center_y + ellipse_y_axis * std::sin(angle));
                     const auto location = hlt::Location{ x, y };
 
-                    // I promise this pun was an accident
-                    for (const auto& zone : spawn_zones) {
-                        const auto min_distance = zone.radius + radius + 5;
-                        if (map.get_distance(zone.location, location)
-                            <= min_distance) {
-                            goto TRY_AGAIN;
-                        }
-                    }
-
-                    for (const auto& zone : planets) {
-                        const auto min_distance = zone.radius + radius + 5;
-                        if (map.get_distance(zone.location, location)
-                            <= min_distance) {
-                            goto TRY_AGAIN;
-                        }
-                    }
-
-                    for (const auto& planet : map.planets) {
-                        const auto min_distance = planet.radius + radius + 5;
-                        if (map.get_distance(planet.location, location)
-                            <= min_distance) {
-                            goto TRY_AGAIN;
-                        }
+                    if (!is_ok_location(location, radius)) {
+                        goto TRY_AGAIN;
                     }
 
                     planets.emplace_back(location, radius);
@@ -164,6 +176,42 @@ namespace mapgen {
                 break;
 
                 TRY_AGAIN:;
+            }
+        }
+
+        if (extra_planets > 0) {
+            const auto choice = std::uniform_int_distribution<>(0, 0)(rng);
+            if (choice == 0) {
+                // Planet in center
+                const auto big_radius = static_cast<int>(
+                    std::sqrt(std::min(map.map_width, map.map_height)));
+                const auto small_radius = static_cast<int>(
+                    std::sqrt(std::min(map.map_width, map.map_height)) / 1.5);
+
+                for (auto attempt = 0; attempt < 500; attempt++) {
+                    const auto location = hlt::Location{
+                        static_cast<unsigned short>(center_x),
+                        static_cast<unsigned short>(center_y),
+                    };
+                    const auto radius =
+                        std::uniform_int_distribution<>(small_radius, big_radius)(rng);
+                    if (is_ok_location(location, radius)) {
+                        map.planets.emplace_back(
+                            location.pos_x,
+                            location.pos_y,
+                            radius
+                        );
+                        break;
+                    }
+                }
+            }
+            else if (choice == 1) {
+                // Line of planets down vertical axis
+
+            }
+            else if (choice == 2) {
+                // Line of planets down horizontal axis
+
             }
         }
 

@@ -34,6 +34,8 @@ namespace hlt {
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
 
+        unsigned int EXTRA_PLANETS = 4;
+
         static auto get_mut() -> GameConstants& {
             // Guaranteed initialized only once by C++11
             static GameConstants instance;

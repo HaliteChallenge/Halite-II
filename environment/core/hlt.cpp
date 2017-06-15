@@ -217,6 +217,7 @@ namespace hlt {
             { "WEAPON_DAMAGE", WEAPON_DAMAGE },
             { "DOCK_TURNS", DOCK_TURNS },
             { "PRODUCTION_PER_SHIP", PRODUCTION_PER_SHIP },
+            { "EXTRA_PLANETS", EXTRA_PLANETS },
         };
     }
 
@@ -233,5 +234,6 @@ namespace hlt {
         WEAPON_DAMAGE = json.value("WEAPON_DAMAGE", WEAPON_DAMAGE);
         DOCK_TURNS = json.value("DOCK_TURNS", DOCK_TURNS);
         PRODUCTION_PER_SHIP = json.value("PRODUCTION_PER_SHIP", PRODUCTION_PER_SHIP);
+        EXTRA_PLANETS = json.value("EXTRA_PLANETS", EXTRA_PLANETS);
     }
 }
