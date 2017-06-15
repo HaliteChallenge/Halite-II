@@ -137,8 +137,45 @@ def parse(map):
     return m
 
 
-def warp(ship, angle, distance, avoidance=10):
-    pass
+class Location:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+def warp(ship, x, y):
+    max_acceleration = 8
+    angle, distance = orient_towards(ship, Location(x, y))
+    while distance > 10:
+        thrust = int(min(max_acceleration, distance / 30 * max_acceleration))
+        logging.warn("Warping acceleration {} {} {}".format(ship.id, thrust, angle))
+        yield "t {} {} {}".format(ship.id, thrust, angle)
+        ship = last_map.ships[my_tag].get(ship.id, None)
+        if not ship:
+            return
+        angle, distance = orient_towards(ship, Location(x, y))
+
+    speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
+    angle = math.atan2(ship.vel_y, ship.vel_x)
+    while speed > 0:
+        thrust = int(min(speed, max_acceleration))
+        angle = int(180 + 180 * angle / math.pi) % 360
+        if angle < 0: angle += 360
+        logging.warn("Warping deceleration {} {} {}".format(ship.id, thrust, angle))
+        yield "t {} {} {}".format(ship.id, thrust, angle)
+        ship = last_map.ships[my_tag].get(ship.id, None)
+        if not ship:
+            return
+        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
+        angle = math.atan2(ship.vel_y, ship.vel_x)
+
+    while ship.x != x and ship.y != y:
+        angle, distance = orient_towards(ship, Location(x, y))
+        logging.warn("Warping move to")
+        yield move_to(ship, angle, 1)
+        ship = last_map.ships[my_tag].get(ship.id, None)
+        if not ship:
+            return
 
 
 def move_to(ship, angle, speed, avoidance=10):
