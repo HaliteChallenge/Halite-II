@@ -19,8 +19,8 @@ class HaliteVisualizer {
         this.replay = replay;
         this.frame = 0;
         this.substep = 0;
-        // TODO: match aspect ratio of map
-        this.application = new PIXI.Application(800, 900);
+        this.application = new PIXI.Application(
+            800, 100 + 800 * (this.replay.height / this.replay.width));
 
         this.scale = 800 / Math.max(replay.width, replay.height);
 
