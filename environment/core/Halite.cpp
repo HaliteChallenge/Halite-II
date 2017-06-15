@@ -839,6 +839,9 @@ auto Halite::output_header(nlohmann::json& replay) -> void {
     //Encode player names.
     replay["player_names"] = nlohmann::json(player_names);
 
+    // Encode the constants used to run this particular game iteration.
+    replay["constants"] = hlt::GameConstants::get().to_json();
+
     // Encode the planet map. This information doesn't change between frames,
     // so there's no need to re-encode it every time.
     auto planets = std::vector<nlohmann::json>();

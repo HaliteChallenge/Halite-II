@@ -6,10 +6,6 @@ const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 const PLANET_COLOR = 0x888888;
 
-const DOCK_TURNS = 5;
-const ATTACK_RADIUS = 5;
-const BASE_SHIP_HEALTH = 255;
-
 class FrameAnimation {
     constructor(frames, update, draw) {
         this.frames = frames;
@@ -184,15 +180,18 @@ class HaliteVisualizer {
 
     drawShip(ship) {
         const side = CELL_SIZE * this.scale;
-        const health_factor = 0.1 + 0.3 * (BASE_SHIP_HEALTH - ship.health) / BASE_SHIP_HEALTH;
+        const max_ship_health = this.replay.constants.MAX_SHIP_HEALTH;
+        const health_factor = 0.1 + 0.3 * (max_ship_health - ship.health) / max_ship_health;
 
         const x = side * ship.x;
         const y = side * ship.y;
 
         this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor);
 
+        const dock_turns = this.replay.constants.DOCK_TURNS;
+
         if (ship.docking.status !== "undocked") {
-            let progress = ship.docking.status === "docked" ? DOCK_TURNS : DOCK_TURNS - ship.docking.turns_left;
+            let progress = ship.docking.status === "docked" ? dock_turns : dock_turns - ship.docking.turns_left;
 
             const planetId = ship.docking.planet_id;
             const planetBase = this.replay.planets[planetId];
@@ -213,7 +212,7 @@ class HaliteVisualizer {
                 // TODO:
             }
             else {
-                progress /= DOCK_TURNS;
+                progress /= dock_turns;
                 this.shipContainer.moveTo(cx, cy);
                 this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
             }
@@ -274,7 +273,7 @@ class HaliteVisualizer {
                             const y = side * (event.y + 0.5);
 
                             this.shipContainer.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
-                            this.shipContainer.drawCircle(x, y, side * ATTACK_RADIUS);
+                            this.shipContainer.drawCircle(x, y, side * this.replay.constants.WEAPON_RADIUS);
                             this.shipContainer.endFill();
                         },
                     ));
