@@ -232,6 +232,18 @@ def initialize(name):
     return tag, map_size, initial_map
 
 
+def send_command_queue(command_queue):
+    for command in command_queue:
+        send_string(command)
+
+    done_sending()
+
+
+def get_map():
+    i = get_string()
+    return parse(i)
+
+
 def run_bot(main_loop):
     generator = main_loop()
 
@@ -251,11 +263,6 @@ def run_bot(main_loop):
         logging.info("Send map")
         command_set = generator.send(m)
         logging.info("Got commands: {}".format(command_set))
-        # logging.info("Ask for commands")
-        # command_set = next(generator)
 
-        for command in command_set:
-            send_string(command)
-
-        done_sending()
+        send_command_queue(command_set)
         next(generator)
