@@ -353,6 +353,7 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
 
             auto& ships = game_map.ships[planet.owner];
             auto best_location = game_map.location_with_delta(planet.location, 0, 0);
+            best_location.second = false;
             auto best_distance = game_map.map_width + game_map.map_height;
             const auto& center = hlt::Location{
                 static_cast<unsigned short>(game_map.map_width / 2),
