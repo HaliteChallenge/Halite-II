@@ -78,22 +78,22 @@ namespace mapgen {
         const auto max_radius = static_cast<int>(
             std::sqrt(std::min(map.map_width, map.map_height)) / 2);
         auto rand_x_axis = std::bind(
-            std::uniform_int_distribution<int>(1, map.map_width / 2 - 1), rng);
+            std::uniform_int_distribution<int>(1, map.map_width / 2 - 1), std::ref(rng));
         auto rand_y_axis = std::bind(
-            std::uniform_int_distribution<int>(1, map.map_height / 2 - 1), rng);
+            std::uniform_int_distribution<int>(1, map.map_height / 2 - 1), std::ref(rng));
         auto rand_angle = std::bind(
-            std::uniform_real_distribution<double>(0, 2 * M_PI), rng);
+            std::uniform_real_distribution<double>(0, 2 * M_PI), std::ref(rng));
         auto rand_radius =
-            std::bind(std::uniform_int_distribution<int>(2, max_radius), rng);
+            std::bind(std::uniform_int_distribution<int>(2, max_radius), std::ref(rng));
         auto rand_planets_generated =
-            std::bind(std::discrete_distribution<int>({ 0, 70, 30 }), rng);
+            std::bind(std::discrete_distribution<int>({ 0, 0, 1, 70, 2, 30 }), std::ref(rng));
 
         const auto center_x = map.map_width / 2;
         const auto center_y = map.map_height / 2;
 
         const auto planets_per_player =
             hlt::GameConstants::get().PLANETS_PER_PLAYER;
-        const auto total_planets = num_players * planets_per_player;
+        const auto total_planets = effective_players * planets_per_player;
 
         // Temporary storage for the planets created in a particular orbit
         auto planets = std::vector<Zone>();
