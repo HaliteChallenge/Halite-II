@@ -143,7 +143,9 @@ namespace hlt {
             this->radius = radius;
             docking_spots = radius;
             remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
+            current_production = 0;
             health = static_cast<unsigned short>(remaining_production * GameConstants::get().MAX_SHIP_HEALTH / 100);
+            docked_ships = std::vector<EntityIndex>();
 
             owned = false;
         }
