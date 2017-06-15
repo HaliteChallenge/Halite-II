@@ -224,10 +224,6 @@ namespace hlt {
         Map();
         Map(const Map& other_map);
         Map(unsigned short width, unsigned short height);
-        Map(unsigned short width,
-            unsigned short height,
-            unsigned int player_count,
-            unsigned int seed);
 
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
         auto get_ship(EntityId entity_id) -> Ship&;
