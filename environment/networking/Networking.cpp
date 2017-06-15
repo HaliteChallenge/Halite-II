@@ -117,7 +117,7 @@ void Networking::deserialize_move_set(std::string& inputString,
                 iss >> move.move.thrust.angle;
                 const auto thrust = move.move.thrust.thrust;
                 if (thrust > hlt::GameConstants::get().MAX_ACCELERATION) {
-                    throw eject_bot("Bot sent an invalid movement thrust - ejecting from game.\n")
+                    throw eject_bot("Bot sent an invalid movement thrust - ejecting from game.\n");
                 }
                 break;
             }
