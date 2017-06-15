@@ -131,7 +131,8 @@ namespace mapgen {
         if (planets_per_player % 2 == 0) planets_per_player /= 2;
         else planets_per_player--;
 
-        while (map.planets.size() < total_planets) {
+        auto total_attempts = 0;
+        while (map.planets.size() < total_planets && total_attempts < 10000) {
             // Planets to generate per player this iteration
             // We want a chance to double up on planets in an orbit to keep it
             // interesting, but we should be careful not to make too many planets
@@ -142,8 +143,9 @@ namespace mapgen {
                 planets_to_generate = 1 * planets_per_player;
             }
 
-            for (auto attempt = 0; attempt < 500; attempt++) {
+            for (auto attempt = 0; attempt < 100; attempt++) {
                 planets.clear();
+                total_attempts++;
 
                 const auto ellipse_x_axis = rand_x_axis();
                 const auto ellipse_y_axis = rand_y_axis();
@@ -188,7 +190,7 @@ namespace mapgen {
                 const auto small_radius = static_cast<int>(
                     std::sqrt(std::min(map.map_width, map.map_height)) / 1.5);
 
-                for (auto attempt = 0; attempt < 500; attempt++) {
+                for (auto attempt = 0; attempt < 100; attempt++) {
                     const auto location = hlt::Location{
                         static_cast<unsigned short>(center_x),
                         static_cast<unsigned short>(center_y),

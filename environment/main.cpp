@@ -224,7 +224,6 @@ int main(int argc, char** argv) {
         }
         try {
             while (!unlabeledArgs.empty()) {
-                std::cout << unlabeledArgs.front() << std::endl;
                 networking.launch_bot(unlabeledArgs.front());
                 unlabeledArgs.pop_front();
             }

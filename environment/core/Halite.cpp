@@ -1139,6 +1139,11 @@ Halite::Halite(unsigned short width_,
     number_of_players = networking.player_count();
 
     //Initialize map
+    if (!quiet_output) {
+        std::cout
+            << "Seed: " << seed_
+            << " Dimensions: " << width_ << 'x' << height_ << '\n';
+    }
     auto generator = mapgen::SolarSystem(seed_);
     game_map = hlt::Map(width_, height_);
     generator.generate(game_map, number_of_players, n_players_for_map_creation);
