@@ -59,7 +59,7 @@ auto Halite::compute_planet_explosion_damage(
         // (killing it instantly)
         const auto distance_factor = 25 - (distance_from_crust - 1);
         return static_cast<unsigned short>(
-            (hlt::GameConstants::get().BASE_SHIP_HEALTH / 5) * distance_factor / 5);
+            (hlt::GameConstants::get().MAX_SHIP_HEALTH / 5) * distance_factor / 5);
     }
     else {
         return 0;
@@ -298,13 +298,17 @@ auto Halite::process_docking() -> void {
                     // planet should have destroyed any ships in the
                     // middle of docking)
                 }
-            } else if (ship.docking_status == hlt::DockingStatus::Undocking) {
+            }
+            else if (ship.docking_status == hlt::DockingStatus::Undocking) {
                 ship.docking_progress--;
                 if (ship.docking_progress == 0) {
                     ship.docking_status = hlt::DockingStatus::Undocked;
                     auto& planet = game_map.planets.at(ship.docked_planet);
                     planet.remove_ship(ship_id);
                 }
+            }
+            else if (ship.docking_status == hlt::DockingStatus::Docked) {
+                ship.heal(hlt::GameConstants::get().DOCKED_SHIP_REGENERATION);
             }
         }
     }

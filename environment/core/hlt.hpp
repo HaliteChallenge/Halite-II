@@ -23,7 +23,9 @@ namespace hlt {
         int DRAG = 3;
         int MAX_SPEED = 30;
         int MAX_ACCELERATION = 10;
-        unsigned short BASE_SHIP_HEALTH = 255;
+        unsigned short MAX_SHIP_HEALTH = 255;
+        unsigned short BASE_SHIP_HEALTH = 127;
+        unsigned short DOCKED_SHIP_REGENERATION = 32;
         unsigned int WEAPON_COOLDOWN = 1;
         int WEAPON_RADIUS = 5;
         int WEAPON_DAMAGE = 64;
@@ -82,6 +84,11 @@ namespace hlt {
         bool is_alive() const {
             return health > 0;
         }
+
+        auto heal(unsigned short points) -> void {
+            health = std::min(GameConstants::get().MAX_SHIP_HEALTH,
+                              static_cast<unsigned short>(health + points));
+        }
     };
 
     enum class DockingStatus {
@@ -131,7 +138,7 @@ namespace hlt {
             this->radius = radius;
             docking_spots = radius;
             remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
-            health = static_cast<unsigned short>(remaining_production * GameConstants::get().BASE_SHIP_HEALTH);
+            health = static_cast<unsigned short>(remaining_production * GameConstants::get().MAX_SHIP_HEALTH / 100);
 
             owned = false;
         }

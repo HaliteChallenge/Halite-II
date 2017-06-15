@@ -94,7 +94,7 @@ class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 3; i++) {
                 this.substep++;
                 if (this.substep >= this.replay.frames[this.frame].length) {
                     this.substep = 0;

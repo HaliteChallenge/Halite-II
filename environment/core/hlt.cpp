@@ -164,11 +164,12 @@ namespace hlt {
             const auto& region = regions[playerId];
 
             for (int i = 0; i < 3; i++) {
-                ships[playerId][i].health = GameConstants::get().BASE_SHIP_HEALTH;
                 // Spread out ships to make it less likely they'll collide
                 // in the start
-                ships[playerId][i].location.pos_x = region.center_x();
-                ships[playerId][i].location.pos_y = region.center_y() - 2 * (i - 1);
+                ships[playerId][i].revive(Location{
+                    static_cast<unsigned short>(region.center_x()),
+                    static_cast<unsigned short>(region.center_y() - 2 * (i - 1)),
+                });
             }
         }
 
