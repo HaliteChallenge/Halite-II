@@ -455,4 +455,36 @@ namespace hlt {
     auto Velocity::angle() const -> double {
         return atan2(vel_y, vel_x);
     }
+
+    auto GameConstants::to_json() const -> nlohmann::json {
+        return {
+            { "PLANETS_PER_PLAYER", PLANETS_PER_PLAYER },
+            { "DRAG", DRAG },
+            { "MAX_SPEED", MAX_SPEED },
+            { "MAX_ACCELERATION", MAX_ACCELERATION },
+            { "MAX_SHIP_HEALTH", MAX_SHIP_HEALTH },
+            { "BASE_SHIP_HEALTH", BASE_SHIP_HEALTH },
+            { "DOCKED_SHIP_REGENERATION", DOCKED_SHIP_REGENERATION },
+            { "WEAPON_COOLDOWN", WEAPON_COOLDOWN },
+            { "WEAPON_RADIUS", WEAPON_RADIUS },
+            { "WEAPON_DAMAGE", WEAPON_DAMAGE },
+            { "DOCK_TURNS", DOCK_TURNS },
+            { "PRODUCTION_PER_SHIP", PRODUCTION_PER_SHIP },
+        };
+    }
+
+    auto GameConstants::from_json(const nlohmann::json& json) -> void {
+        PLANETS_PER_PLAYER = json.value("PLANETS_PER_PLAYER", PLANETS_PER_PLAYER);
+        DRAG = json.value("DRAG", DRAG);
+        MAX_SPEED = json.value("MAX_SPEED", MAX_SPEED);
+        MAX_ACCELERATION = json.value("MAX_ACCELERATION", MAX_ACCELERATION);
+        MAX_SHIP_HEALTH = json.value("MAX_SHIP_HEALTH", MAX_SHIP_HEALTH);
+        BASE_SHIP_HEALTH = json.value("BASE_SHIP_HEALTH", BASE_SHIP_HEALTH);
+        DOCKED_SHIP_REGENERATION = json.value("DOCKED_SHIP_REGENERATION", DOCKED_SHIP_REGENERATION);
+        WEAPON_COOLDOWN = json.value("WEAPON_COOLDOWN", WEAPON_COOLDOWN);
+        WEAPON_RADIUS = json.value("WEAPON_RADIUS", WEAPON_RADIUS);
+        WEAPON_DAMAGE = json.value("WEAPON_DAMAGE", WEAPON_DAMAGE);
+        DOCK_TURNS = json.value("DOCK_TURNS", DOCK_TURNS);
+        PRODUCTION_PER_SHIP = json.value("PRODUCTION_PER_SHIP", PRODUCTION_PER_SHIP);
+    }
 }

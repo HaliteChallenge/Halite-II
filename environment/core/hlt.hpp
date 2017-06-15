@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <array>
 
+#include "json.hpp"
+
 extern bool quiet_output;
 
 namespace hlt {
@@ -41,6 +43,9 @@ namespace hlt {
         static auto get() -> const GameConstants& {
             return get_mut();
         }
+
+        auto to_json() const -> nlohmann::json;
+        auto from_json(const nlohmann::json& json) -> void;
     };
 
     typedef uint8_t PlayerId;

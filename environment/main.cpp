@@ -91,14 +91,22 @@ int main(int argc, char** argv) {
                                                     ".",
                                                     "path to directory",
                                                     cmd);
-    TCLAP::ValueArg<int> dragArg(
+    TCLAP::ValueArg<std::string> constantsArg(
         "",
-        "drag",
-        "Drag applied to all ship velocities",
+        "constantsfile",
+        "JSON file containing runtime constants to use.",
         false,
-        hlt::GameConstants::get().DRAG,
-        "integer",
+        "",
+        "path to file",
         cmd
+    );
+
+    TCLAP::SwitchArg printConstantsSwitch(
+        "",
+        "print-constants",
+        "Print out the default constants and exit.",
+        cmd,
+        false
     );
 
     //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
@@ -126,17 +134,41 @@ int main(int argc, char** argv) {
     bool override_names = overrideSwitch.getValue();
     bool ignore_timeout = timeoutSwitch.getValue();
 
-    // Update the game constants.
-    auto& constants = hlt::GameConstants::get_mut();
-    if (dragArg.isSet()) {
-        constants.DRAG = dragArg.getValue();
+    if (printConstantsSwitch.getValue()) {
+        std::cout << hlt::GameConstants::get().to_json().dump(4) << '\n';
+        return 0;
     }
 
-    if (!quiet_output) {
-        std::cout
-            << "Game constants: \n"
-            << "\tDrag: " << constants.DRAG
-            << (dragArg.isSet() ? " (user-set)" : " (default)") << '\n';
+    // Update the game constants.
+    if (constantsArg.isSet()) {
+        std::ifstream constants_file(constantsArg.getValue());
+        nlohmann::json constants_json;
+        constants_file >> constants_json;
+        auto& constants = hlt::GameConstants::get_mut();
+        constants.from_json(constants_json);
+
+        if (!quiet_output) {
+            const auto& constants = hlt::GameConstants::get();
+            std::cout
+                << "Game constants: \n"
+                << "\tPLANETS_PER_PLAYER: " << constants.PLANETS_PER_PLAYER << '\n'
+                << "\tDRAG: " << constants.DRAG << '\n'
+                << "\tMAX_SPEED: " << constants.MAX_SPEED << '\n'
+                << "\tMAX_ACCELERATION: " << constants.MAX_ACCELERATION << '\n'
+                << "\tMAX_SHIP_HEALTH: " << constants.MAX_SHIP_HEALTH << '\n'
+                << "\tBASE_SHIP_HEALTH: " << constants.BASE_SHIP_HEALTH << '\n'
+                << "\tDOCKED_SHIP_REGENERATION: " << constants.DOCKED_SHIP_REGENERATION << '\n'
+                << "\tWEAPON_COOLDOWN: " << constants.WEAPON_COOLDOWN << '\n'
+                << "\tWEAPON_RADIUS: " << constants.WEAPON_RADIUS << '\n'
+                << "\tWEAPON_DAMAGE: " << constants.WEAPON_DAMAGE << '\n'
+                << "\tDOCK_TURNS: " << constants.DOCK_TURNS << '\n'
+                << "\tPRODUCTION_PER_SHIP: " << constants.PRODUCTION_PER_SHIP << '\n';
+        }
+    }
+    else {
+        if (!quiet_output) {
+            std::cout << "Game constants: all default\n";
+        }
     }
 
     std::vector<std::string> unlabeledArgsVector = otherArgs.getValue();

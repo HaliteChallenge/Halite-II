@@ -1236,7 +1236,15 @@ auto to_json(const hlt::EntityId& id) -> nlohmann::json {
                 { "id", id.entity_index() },
             };
             // TODO:
-        case hlt::EntityType::InvalidEntity:break;
-        case hlt::EntityType::PlanetEntity:break;
+        case hlt::EntityType::InvalidEntity:
+            return {
+                { "type", "invalid" },
+            };
+        case hlt::EntityType::PlanetEntity: {
+            return {
+                { "type", "planet" },
+                { "id", id.entity_index() },
+            };
+        }
     }
 }
