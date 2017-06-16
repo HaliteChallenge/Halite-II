@@ -501,6 +501,10 @@ auto Halite::process_moves(
                         break;
                     }
 
+                    if (ship.velocity.vel_x != 0 || ship.velocity.vel_y != 0) {
+                        break;
+                    }
+
                     const auto planet_id = move.move.dock_to;
                     if (planet_id >= game_map.planets.size()) {
                         // Planet is invalid, do nothing
