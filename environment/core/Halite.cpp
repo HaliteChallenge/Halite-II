@@ -614,7 +614,10 @@ auto Halite::find_living_players() -> std::vector<bool> {
         if (num_owned_planets == total_planets) {
             // End the game by "killing off" the other players
             std::fill(still_alive.begin(), still_alive.end(), false);
-            still_alive[player_id] = true;
+            // If there's only one player, let the game end
+            if (number_of_players > 1) {
+                still_alive[player_id] = true;
+            }
         }
     }
     return still_alive;
@@ -1040,14 +1043,19 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             player_names.push_back(a->substr(0, 30));
     }
 
-    const int maxTurnNumber = 100 + (int) (sqrt(game_map.map_width * game_map.map_height));
+    const int max_turn_number = 100 + (int) (sqrt(game_map.map_width * game_map.map_height));
+
+    auto game_complete = [&]() -> bool {
+        const auto num_living_players = std::count(living_players.begin(), living_players.end(), true);
+        return turn_number >= max_turn_number ||
+            (num_living_players <= 1 && number_of_players > 1) ||
+            (num_living_players == 0 && number_of_players == 1);
+    };
 
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
-    while (turn_number < maxTurnNumber &&
-        (std::count(living_players.begin(), living_players.end(), true) > 1 ||
-            number_of_players == 1)) {
+    while (!game_complete()) {
         turn_number++;
 
         if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
