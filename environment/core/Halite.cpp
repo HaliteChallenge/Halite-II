@@ -956,18 +956,25 @@ auto Halite::output(std::string filename) -> void {
     }
 
     // Serialize moves
-    std::vector<nlohmann::json> frame_moves;
     for (const auto& current_moves : full_player_moves) {
-        frame_moves.clear();
+        // Each move array is an array of player moves
+        auto frame_moves = nlohmann::json::array();
+
         for (hlt::PlayerId player_id = 0; player_id < current_moves.size();
              player_id++) {
+            // Each player move set is represented as an array of queued moves
+            std::vector<nlohmann::json> all_player_moves;
             for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
+                // Each set of queued moves is an object mapping ship ID to move
+                auto player_moves = nlohmann::json::object();
                 for (const auto& move : current_moves[player_id][move_no]) {
                     if (move.type == hlt::MoveType::Noop) continue;
 
-                    frame_moves.push_back(output_move(move, player_id, move_no));
+                    player_moves[std::to_string(move.shipId)] = output_move(move, player_id, move_no);
                 }
+                all_player_moves.push_back(std::move(player_moves));
             }
+            frame_moves.push_back(all_player_moves);
         }
 
         moves.push_back(frame_moves);
