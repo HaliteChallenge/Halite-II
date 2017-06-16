@@ -90,7 +90,7 @@ class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 6; i++) {
                 this.substep++;
                 if (this.substep >= this.replay.frames[this.frame].length) {
                     this.substep = 0;
@@ -248,7 +248,7 @@ class HaliteVisualizer {
                                         const x = side * (distance * dx + event.x);
                                         const y = side * (distance * dy + event.y);
 
-                                        this.planetContainer.beginFill(0xFFA500, (frame / 48) * (1 / (1 + dx*dx + dy*dy)));
+                                        this.planetContainer.beginFill(0xFFA500, (frame / 48) * (1 / (1 + distance + 1 / (1 + dx*dx + dy*dy))));
                                         this.planetContainer.drawRect(x, y, side, side);
                                         this.planetContainer.endFill();
                                     }

@@ -200,11 +200,26 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
 }
 
 auto Halite::process_attacks(
-    CollisionMap& collision_map,
     std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void {
     // Compute hits
     std::vector<hlt::EntityId> targets;
     std::vector<hlt::Location> target_locations;
+
+    auto collision_map = CollisionMap(game_map);
+    collision_map.reset(game_map);
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        auto& player_ships = game_map.ships.at(player_id);
+        for (hlt::EntityIndex ship_id = 0;
+             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
+            auto& ship = player_ships.at(ship_id);
+            auto id = hlt::EntityId::for_ship(player_id, ship_id);
+
+            if (!ship.is_alive()) continue;
+            collision_map.fill(ship.location, id);
+        }
+    }
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
@@ -551,6 +566,56 @@ auto Halite::process_moves(
     }
 }
 
+auto Halite::find_living_players() -> std::vector<bool> {
+    std::vector<bool> still_alive(number_of_players, false);
+
+    std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
+    for (hlt::PlayerId player = 0; player < number_of_players; player++) {
+        for (const auto& ship : game_map.ships[player]) {
+            if (ship.is_alive()) {
+                still_alive[player] = true;
+                last_ship_count[player]++;
+                last_ship_health_total[player] += ship.health;
+            }
+        }
+    }
+
+    std::vector<int> owned_planets(number_of_players, 0);
+    auto total_planets = 0;
+    for (const auto& planet : game_map.planets) {
+        if (!planet.is_alive()) continue;
+        total_planets++;
+        if (planet.owned && planet.docked_ships.size() > 0) {
+            still_alive[planet.owner] = true;
+
+            // Only count a planet as owned if a ship has completed docking
+            const auto num_docked_ships = count_if(
+                planet.docked_ships.begin(),
+                planet.docked_ships.end(),
+                [&](hlt::EntityIndex ship_idx) -> bool {
+                    const auto& ship =
+                        game_map.get_ship(planet.owner, ship_idx);
+                    return ship.docking_status == hlt::DockingStatus::Docked;
+                }
+            );
+            if (num_docked_ships > 0) {
+                owned_planets[planet.owner]++;
+            }
+        }
+    }
+
+    // If one player owns all living planets, that player wins
+    for (int player_id = 0; player_id < owned_planets.size(); player_id++) {
+        auto num_owned_planets = owned_planets[player_id];
+        if (num_owned_planets == total_planets) {
+            // End the game by "killing off" the other players
+            std::fill(still_alive.begin(), still_alive.end(), false);
+            still_alive[player_id] = true;
+        }
+    }
+    return still_alive;
+}
+
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
     for (hlt::PlayerId player_id = 0;
@@ -595,23 +660,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 full_frames.back().push_back(hlt::Map(game_map));
             }
 
-            auto attack_map = CollisionMap(game_map);
-            attack_map.reset(game_map);
-
-            for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-                 player_id++) {
-                auto& player_ships = game_map.ships.at(player_id);
-                for (hlt::EntityIndex ship_id = 0;
-                     ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                    auto& ship = player_ships.at(ship_id);
-                    auto id = hlt::EntityId::for_ship(player_id, ship_id);
-
-                    if (!ship.is_alive()) continue;
-                    attack_map.fill(ship.location, id);
-                }
-            }
-
-            process_attacks(attack_map, ship_damage);
+            process_attacks(ship_damage);
 
             // Reset collision map so we can process all movements simultaneously
             collision_map.reset(game_map);
@@ -686,53 +735,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     full_frames.back().push_back(hlt::Map(game_map));
 
     // Check if the game is over
-    std::vector<bool> still_alive(number_of_players, false);
-
-    std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
-    for (hlt::PlayerId player = 0; player < number_of_players; player++) {
-        for (const auto& ship : game_map.ships[player]) {
-            if (ship.is_alive()) {
-                still_alive[player] = true;
-                last_ship_count[player]++;
-                last_ship_health_total[player] += ship.health;
-            }
-        }
-    }
-
-    std::vector<int> owned_planets(number_of_players, 0);
-    auto total_planets = 0;
-    for (const auto& planet : game_map.planets) {
-        if (!planet.is_alive()) continue;
-        total_planets++;
-        if (planet.owned && planet.docked_ships.size() > 0) {
-            still_alive[planet.owner] = true;
-
-            // Only count a planet as owned if a ship has completed docking
-            const auto num_docked_ships = count_if(
-                planet.docked_ships.begin(),
-                planet.docked_ships.end(),
-                [&](hlt::EntityIndex ship_idx) -> bool {
-                    const auto& ship =
-                        game_map.get_ship(planet.owner, ship_idx);
-                    return ship.docking_status == hlt::DockingStatus::Docked;
-                }
-            );
-            if (num_docked_ships > 0) {
-                owned_planets[planet.owner]++;
-            }
-        }
-    }
-
-    // If one player owns all living planets, that player wins
-    for (int player_id = 0; player_id < owned_planets.size(); player_id++) {
-        auto num_owned_planets = owned_planets[player_id];
-        if (num_owned_planets == total_planets) {
-            // End the game by "killing off" the other players
-            std::fill(still_alive.begin(), still_alive.end(), false);
-            still_alive[player_id] = true;
-        }
-    }
-
+    auto still_alive = find_living_players();
     return still_alive;
 }
 

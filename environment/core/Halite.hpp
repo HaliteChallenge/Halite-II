@@ -207,7 +207,7 @@ private:
 
     // Subparts of game loop
     auto process_attacks(
-        CollisionMap& collision_map, DamageMap& ship_damage) -> void;
+        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void;
     auto process_damage(
         CollisionMap& collision_map, DamageMap& ship_damage) -> void;
     auto process_docking() -> void;
@@ -215,6 +215,7 @@ private:
     auto process_drag() -> void;
     auto process_cooldowns() -> void;
     auto process_moves(std::vector<bool>& alive, int move_no, std::vector<std::vector<std::pair<float, float>>>& intermediate_positions) -> void;
+    auto find_living_players() -> std::vector<bool>;
 
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,
