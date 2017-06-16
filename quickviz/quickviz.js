@@ -247,6 +247,22 @@ class HaliteVisualizer {
 
         this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, true);
 
+        if (this.frame > 0) {
+            let move = this.replay.moves[this.frame-1][ship.owner][0][ship.id];
+            if (move && move.type === "thrust" && move.magnitude > this.replay.constants.DRAG) {
+                // Draw thrust trail
+                const magnitude = move.magnitude / this.replay.constants.MAX_ACCELERATION;
+                this.shipContainer.beginFill(0xFF0000, 0.5 + 0.3 * magnitude);
+                const cx = x + 0.5 * side;
+                const cy = y + 0.5 * side;
+                const angle = (move.angle + 180) * Math.PI / 180;
+                const deltaAngle = Math.PI / 10 + Math.PI / 10 * magnitude;
+                this.shipContainer.moveTo(cx, cy);
+                this.shipContainer.arc(cx, cy, (2 + 2 * magnitude) * side, angle - deltaAngle, angle + deltaAngle);
+                this.shipContainer.endFill();
+            }
+        }
+
         const dock_turns = this.replay.constants.DOCK_TURNS;
 
         if (ship.docking.status !== "undocked") {
