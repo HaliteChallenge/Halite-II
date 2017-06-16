@@ -4,7 +4,7 @@
 
 const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
-const PLANET_COLOR = 0x888888;
+const PLANET_COLOR = 0x3F3C15;
 
 class FrameAnimation {
     constructor(frames, update, draw) {
@@ -20,16 +20,21 @@ class HaliteVisualizer {
         this.frame = 0;
         this.substep = 0;
         this.application = new PIXI.Application(
-            800, 100 + 800 * (this.replay.height / this.replay.width));
+            800, 100 + 800 * (this.replay.height / this.replay.width),
+            {
+                backgroundColor: 0x15223F,
+            }
+        );
 
         this.scale = 800 / Math.max(replay.width, replay.height);
+        this.starfield = new PIXI.Graphics();
 
         this.backgroundContainer = new PIXI.Graphics();
         this.planetContainer = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
         this.container = new PIXI.Container();
         this.container.position.set(0, 100);
-        this.container.addChild(this.backgroundContainer, this.planetContainer, this.shipContainer);
+        this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer);
 
         this.statsDisplay = new PIXI.Graphics();
 
@@ -152,6 +157,15 @@ class HaliteVisualizer {
     }
 
     drawPOI() {
+        let next_rand = new alea('halite');
+        for (let i = 0; i < 400; i++) {
+            this.starfield.beginFill(0xFFFFFF, next_rand());
+            const x = Math.floor(next_rand() * this.application.stage.width);
+            const y = Math.floor(next_rand() * this.application.stage.height);
+            this.starfield.drawRect(x, y, 1, 1);
+            this.starfield.endFill();
+        }
+
         const side = CELL_SIZE * this.scale;
         for (let poi of this.replay.poi) {
             if (poi.type === "orbit") {
@@ -329,6 +343,7 @@ class HaliteVisualizer {
     }
 
     draw(dt=0) {
+        this.starfield.clear();
         this.backgroundContainer.clear();
         this.planetContainer.clear();
         this.shipContainer.clear();
