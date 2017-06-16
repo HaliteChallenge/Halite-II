@@ -18,9 +18,10 @@ namespace mapgen {
             : location(_location), radius(_radius) {}
     };
 
-    auto SolarSystem::generate(hlt::Map& map,
-                               unsigned int num_players,
-                               unsigned int effective_players) -> void {
+    auto SolarSystem::generate(
+        hlt::Map& map,
+        unsigned int num_players,
+        unsigned int effective_players) -> std::vector<PointOfInterest> {
         assert(effective_players == 2 || effective_players == 4);
         assert(num_players <= effective_players);
 
@@ -126,6 +127,10 @@ namespace mapgen {
             return true;
         };
 
+        // Store the orbits of the planets we generate, so the visualizer
+        // can use them
+        auto orbits = std::vector<PointOfInterest>();
+
         auto total_attempts = 0;
         while (map.planets.size() < total_planets && total_attempts < 10000) {
             // Planets to generate per player this iteration
@@ -168,6 +173,12 @@ namespace mapgen {
                                              zone.location.pos_y,
                                              zone.radius);
                 }
+
+                orbits.push_back({ hlt::Location{
+                    static_cast<unsigned short>(center_x),
+                    static_cast<unsigned short>(center_y),
+                }, ellipse_x_axis, ellipse_y_axis });
+
                 break;
 
                 TRY_AGAIN:;
@@ -226,5 +237,7 @@ namespace mapgen {
                 });
             }
         }
+
+        return orbits;
     }
 }

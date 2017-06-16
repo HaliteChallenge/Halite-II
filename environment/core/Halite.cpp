@@ -866,6 +866,7 @@ auto Halite::output_header(nlohmann::json& replay) -> void {
         });
     }
     replay["planets"] = planets;
+    replay["poi"] = points_of_interest;
 }
 
 auto Halite::output(std::string filename) -> void {
@@ -1150,7 +1151,7 @@ Halite::Halite(unsigned short width_,
     }
     auto generator = mapgen::SolarSystem(seed_);
     game_map = hlt::Map(width_, height_);
-    generator.generate(game_map, number_of_players, n_players_for_map_creation);
+    points_of_interest = generator.generate(game_map, number_of_players, n_players_for_map_creation);
 
     // Default initialize
     player_moves = { { { {} } } };

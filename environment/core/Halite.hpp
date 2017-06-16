@@ -10,6 +10,7 @@
 #include <iostream>
 #include <thread>
 #include <future>
+#include <core/mapgen/Generator.h>
 
 #include "hlt.hpp"
 #include "json.hpp"
@@ -188,6 +189,7 @@ private:
     std::vector<std::vector<hlt::Map>> full_frames;
     std::vector<std::vector<std::vector<std::unique_ptr<Event>>>> full_frame_events;
     std::vector<hlt::MoveQueue> full_player_moves;
+    std::vector<mapgen::PointOfInterest> points_of_interest;
 
     //! Grab the next set of moves from the bots
     auto retrieve_moves(std::vector<bool> alive) -> void;

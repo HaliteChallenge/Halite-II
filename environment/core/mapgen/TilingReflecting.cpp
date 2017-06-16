@@ -10,7 +10,7 @@ namespace mapgen {
 
     auto TilingReflecting::generate(hlt::Map& map,
                                     unsigned int num_players,
-                                    unsigned int effective_players) -> void {
+                                    unsigned int effective_players) -> std::vector<PointOfInterest> {
         // TODO: revamp algorithm to not need this
         if (effective_players < 2) effective_players = 2;
 
@@ -259,5 +259,7 @@ namespace mapgen {
         }
 
         std::cout << map.map_width << " " << map.map_height << std::endl;
+
+        return {};
     }
 }

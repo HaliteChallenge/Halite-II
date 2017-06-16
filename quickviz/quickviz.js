@@ -24,11 +24,12 @@ class HaliteVisualizer {
 
         this.scale = 800 / Math.max(replay.width, replay.height);
 
+        this.backgroundContainer = new PIXI.Graphics();
         this.planetContainer = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
         this.container = new PIXI.Container();
         this.container.position.set(0, 100);
-        this.container.addChild(this.planetContainer, this.shipContainer);
+        this.container.addChild(this.backgroundContainer, this.planetContainer, this.shipContainer);
 
         this.statsDisplay = new PIXI.Graphics();
 
@@ -133,6 +134,11 @@ class HaliteVisualizer {
         x = x * side;
         y = y * side;
         container.lineStyle(0);
+        // Hide the background
+        container.beginFill(0x000000);
+        container.drawRect(x, y, side, side);
+        container.endFill();
+        // Draw the actual cell
         container.beginFill(color, 0.5);
         container.drawRect(x, y, side, side);
         container.endFill();
@@ -143,6 +149,25 @@ class HaliteVisualizer {
             (1 - 2*health_factor) * side,
             (1 - 2*health_factor) * side);
         container.endFill();
+    }
+
+    drawPOI() {
+        const side = CELL_SIZE * this.scale;
+        for (let poi of this.replay.poi) {
+            if (poi.type === "orbit") {
+                this.backgroundContainer.beginFill(0, 0);
+                this.backgroundContainer.lineStyle(1, 0xFFFFFF, 0.3);
+                const x = side * poi.x;
+                const y = side * poi.y;
+                const a = side * poi.x_axis;
+                const b = side * poi.y_axis;
+                this.backgroundContainer.drawEllipse(x, y, a, b);
+                this.backgroundContainer.endFill();
+            }
+            else {
+                console.log(poi);
+            }
+        }
     }
 
     drawPlanet(planet) {
@@ -304,8 +329,11 @@ class HaliteVisualizer {
     }
 
     draw(dt=0) {
+        this.backgroundContainer.clear();
         this.planetContainer.clear();
         this.shipContainer.clear();
+
+        this.drawPOI();
 
         for (let planet of this.currentSubstep.planets) {
             this.drawPlanet(planet);

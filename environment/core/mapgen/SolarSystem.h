@@ -18,9 +18,10 @@ namespace mapgen {
     public:
         SolarSystem(unsigned int _seed);
 
-        auto generate(hlt::Map& map,
-                      unsigned int num_players,
-                      unsigned int effective_players) -> void;
+        auto generate(
+            hlt::Map& map,
+            unsigned int num_players,
+            unsigned int effective_players) -> std::vector<PointOfInterest>;
     };
 
 }
