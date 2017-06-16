@@ -154,12 +154,12 @@ def warp(ship, x, y):
 
 
 def _warp(ship, x, y):
+    last_id = ship.id
     max_acceleration = 8
 
     while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
-            # TODO: remove myself from warp queue
             return
 
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
@@ -186,7 +186,6 @@ def _warp(ship, x, y):
     while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
-            # TODO: remove myself from warp queue
             return
 
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
@@ -214,7 +213,6 @@ def _warp(ship, x, y):
             .format(ship.id, ship.x, ship.y, x, y))
         angle, distance = orient_towards(ship, Location(x, y))
         yield move_to(ship, angle, 1)
-
 
 
 def update_warps():
@@ -281,7 +279,7 @@ def undock(ship):
 
 
 def can_dock(ship, planet):
-    return distance(ship, planet) < planet.r + 2
+    return distance(ship, planet) < planet.r + 4
 
 
 def distance(a, b):

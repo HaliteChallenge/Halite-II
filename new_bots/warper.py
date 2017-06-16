@@ -3,7 +3,6 @@ import logging
 
 
 my_tag, map_size, initial_map = common.initialize("Warper")
-executing_commands = {}
 
 while True:
     game_map = common.get_map()
