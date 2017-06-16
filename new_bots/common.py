@@ -143,39 +143,85 @@ class Location:
         self.y = y
 
 
+warp_queue = {}
+
+
 def warp(ship, x, y):
+    # TODO: make sure no warp is already executing
+    # TODO: provide way to cancel warp
+    warp_state = _warp(ship, x, y)
+    warp_queue[ship.id] = warp_state
+
+
+def _warp(ship, x, y):
     max_acceleration = 8
-    angle, distance = orient_towards(ship, Location(x, y))
-    while distance > 10:
-        thrust = int(min(max_acceleration, distance / 30 * max_acceleration))
-        logging.warn("Warping acceleration {} {} {}".format(ship.id, thrust, angle))
-        yield "t {} {} {}".format(ship.id, thrust, angle)
+
+    while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
+            # TODO: remove myself from warp queue
             return
-        angle, distance = orient_towards(ship, Location(x, y))
 
-    speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
-    angle = math.atan2(ship.vel_y, ship.vel_x)
-    while speed > 0:
+        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
+        angle, distance = orient_towards(ship, Location(x, y))
+        # Guard against divide-by-zero
+        turns_left = distance // speed if speed else 100000
+        turns_to_decelerate = speed // (max_acceleration + 3)
+
+        if turns_left <= turns_to_decelerate + 1 or distance <= 5:
+            break
+
+        thrust = int(max(1, min(max_acceleration, distance / 30 * max_acceleration)))
+        logging.warn("Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}".format(ship.id, thrust, angle, distance, speed, turns_left, ship.x, ship.y, x, y))
+        yield "t {} {} {}".format(ship.id, thrust, angle)
+
+    while True:
+        ship = last_map.ships[my_tag].get(ship.id, None)
+        if not ship:
+            # TODO: remove myself from warp queue
+            return
+
+        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
+        angle = math.atan2(ship.vel_y, ship.vel_x)
+        _, distance = orient_towards(ship, Location(x, y))
+
+        if speed == 0 or distance <= 5:
+            break
+
         thrust = int(min(speed, max_acceleration))
         angle = int(180 + 180 * angle / math.pi) % 360
         if angle < 0: angle += 360
-        logging.warn("Warping deceleration {} {} {}".format(ship.id, thrust, angle))
+        logging.warn("Warp {}: deceleration {} {}, s {} pos {} {} target {} {}".format(ship.id, thrust, angle, speed, ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
-        ship = last_map.ships[my_tag].get(ship.id, None)
-        if not ship:
-            return
-        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
-        angle = math.atan2(ship.vel_y, ship.vel_x)
 
     while ship.x != x and ship.y != y:
-        angle, distance = orient_towards(ship, Location(x, y))
-        logging.warn("Warping move to")
-        yield move_to(ship, angle, 1)
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
             return
+
+        logging.warn("Warp {}: move from {} {} to {} {}".format(ship.id, ship.x, ship.y, x, y))
+        angle, distance = orient_towards(ship, Location(x, y))
+        yield move_to(ship, angle, 1)
+
+
+
+def update_warps():
+    finished_executing = set()
+    command_queue = []
+    for ship_id, generator in warp_queue.items():
+        try:
+            command_queue.append(next(generator))
+        except StopIteration:
+            finished_executing.add(ship_id)
+
+    for ship_id in finished_executing:
+        del warp_queue[ship_id]
+
+    return command_queue
+
+
+def is_warping(ship):
+    return ship.id in warp_queue
 
 
 def move_to(ship, angle, speed, avoidance=10):
