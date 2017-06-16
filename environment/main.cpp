@@ -194,6 +194,19 @@ int main(int argc, char** argv) {
         mapHeight = mapWidth;
     }
 
+    if (unlabeledArgs.size() != 1 && unlabeledArgs.size() != 2 &&
+        unlabeledArgs.size() != 4) {
+        std::cout << "Must have either 2 or 4 players, or a solo player.\n";
+        return 1;
+    }
+
+    if (unlabeledArgs.size() == 1 && n_players_for_map_creation != 2 &&
+        n_players_for_map_creation != 4) {
+        // Limiation of solar system map generator used
+        std::cout << "Must have either 2 or 4 players for map creation.\n";
+        return 1;
+    }
+
     if (override_names) {
         if (unlabeledArgs.size() < 4 || unlabeledArgs.size() % 2 != 0) {
             std::cout
