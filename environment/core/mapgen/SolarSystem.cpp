@@ -79,7 +79,7 @@ namespace mapgen {
         const auto planets_per_player =
             hlt::GameConstants::get().PLANETS_PER_PLAYER;
         const auto total_planets = effective_players * planets_per_player;
-        const auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
+        auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
         const auto center_x = map.map_width / 2;
         const auto center_y = map.map_height / 2;
 
@@ -94,7 +94,7 @@ namespace mapgen {
         auto rand_radius =
             std::bind(std::uniform_int_distribution<int>(3, max_radius), std::ref(rng));
         auto rand_planets_generated =
-            std::bind(std::uniform_int_distribution<>(3, planets_per_player), std::ref(rng));
+            std::bind(std::uniform_int_distribution<>(1, std::max(2, planets_per_player / 2)), std::ref(rng));
 
         // Temporary storage for the planets created in a particular orbit
         auto planets = std::vector<Zone>();
@@ -127,6 +127,33 @@ namespace mapgen {
             return true;
         };
 
+        // Planet in center
+        if (extra_planets > 0) {
+            extra_planets--;
+            const auto big_radius = static_cast<int>(
+                std::sqrt(std::min(map.map_width, map.map_height)));
+            const auto small_radius = static_cast<int>(
+                std::sqrt(std::min(map.map_width, map.map_height) / 1.5));
+
+            for (auto attempt = 0; attempt < 100; attempt++) {
+                const auto location = hlt::Location{
+                    static_cast<unsigned short>(center_x),
+                    static_cast<unsigned short>(center_y),
+                };
+                const auto radius =
+                    std::uniform_int_distribution<>(small_radius, big_radius)(
+                        rng);
+                if (is_ok_location(location, radius)) {
+                    map.planets.emplace_back(
+                        location.pos_x,
+                        location.pos_y,
+                        radius
+                    );
+                    break;
+                }
+            }
+        }
+
         // Store the orbits of the planets we generate, so the visualizer
         // can use them
         auto orbits = std::vector<PointOfInterest>();
@@ -134,11 +161,9 @@ namespace mapgen {
         auto total_attempts = 0;
         while (map.planets.size() < total_planets && total_attempts < 10000) {
             // Planets to generate per player this iteration
-            // We want a chance to double up on planets in an orbit to keep it
-            // interesting, but we should be careful not to make too many planets
-            auto planets_to_generate = rand_planets_generated();
+            auto planets_to_generate = rand_planets_generated() * 2;
             if (map.planets.size() + planets_to_generate > total_planets) {
-                planets_to_generate = 3;
+                planets_to_generate = 2;
             }
 
             for (auto attempt = 0; attempt < 100; attempt++) {
@@ -189,28 +214,6 @@ namespace mapgen {
             // TODO: can we make this composable?
             const auto choice = std::uniform_int_distribution<>(0, 0)(rng);
             if (choice == 0) {
-                // Planet in center
-                const auto big_radius = static_cast<int>(
-                    std::sqrt(std::min(map.map_width, map.map_height)));
-                const auto small_radius = static_cast<int>(
-                    std::sqrt(std::min(map.map_width, map.map_height) / 2));
-
-                for (auto attempt = 0; attempt < 100; attempt++) {
-                    const auto location = hlt::Location{
-                        static_cast<unsigned short>(center_x),
-                        static_cast<unsigned short>(center_y),
-                    };
-                    const auto radius =
-                        std::uniform_int_distribution<>(small_radius, big_radius)(rng);
-                    if (is_ok_location(location, radius)) {
-                        map.planets.emplace_back(
-                            location.pos_x,
-                            location.pos_y,
-                            radius
-                        );
-                        break;
-                    }
-                }
             }
             else if (choice == 1) {
                 // Line of planets down vertical axis
