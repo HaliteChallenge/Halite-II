@@ -168,11 +168,19 @@ def _warp(ship, x, y):
         turns_left = distance // speed if speed else 100000
         turns_to_decelerate = speed // (max_acceleration + 3)
 
-        if turns_left <= turns_to_decelerate + 1 or distance <= 5:
+        if turns_left <= turns_to_decelerate:
+            logging.warn("Warp {}: close enough, decelerating".format(ship.id))
+            break
+        if distance <= 5:
+            logging.warn("Warp {}: too close, decelerating".format(ship.id))
             break
 
-        thrust = int(max(1, min(max_acceleration, distance / 30 * max_acceleration)))
-        logging.warn("Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}".format(ship.id, thrust, angle, distance, speed, turns_left, ship.x, ship.y, x, y))
+        thrust = int(
+            max(1, min(max_acceleration, distance / 30 * max_acceleration)))
+        logging.warn(
+            "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
+            .format(ship.id, thrust, angle, distance, speed, turns_left,
+                    ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
 
     while True:
@@ -185,13 +193,15 @@ def _warp(ship, x, y):
         angle = math.atan2(ship.vel_y, ship.vel_x)
         _, distance = orient_towards(ship, Location(x, y))
 
-        if speed == 0 or distance <= 5:
+        if speed == 0:
             break
 
         thrust = int(min(speed, max_acceleration))
         angle = int(180 + 180 * angle / math.pi) % 360
         if angle < 0: angle += 360
-        logging.warn("Warp {}: deceleration {} {}, s {} pos {} {} target {} {}".format(ship.id, thrust, angle, speed, ship.x, ship.y, x, y))
+        logging.warn(
+            "Warp {}: deceleration {} {}, s {} pos {} {} target {} {}"
+            .format(ship.id, thrust, angle, speed, ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
 
     while ship.x != x and ship.y != y:
@@ -199,7 +209,9 @@ def _warp(ship, x, y):
         if not ship:
             return
 
-        logging.warn("Warp {}: move from {} {} to {} {}".format(ship.id, ship.x, ship.y, x, y))
+        logging.warn(
+            "Warp {}: move from {} {} to {} {}"
+            .format(ship.id, ship.x, ship.y, x, y))
         angle, distance = orient_towards(ship, Location(x, y))
         yield move_to(ship, angle, 1)
 

@@ -30,8 +30,8 @@ while True:
             elif distance > 10:
                 # Find closest point on planet to us
                 import math
-                x = planet.x + int((planet.r + 2) * math.cos((angle * math.pi / 180) + math.pi))
-                y = planet.y + int((planet.r + 2) * math.sin((angle * math.pi / 180) + math.pi))
+                x = planet.x + int((planet.r + 1) * math.cos((angle * math.pi / 180) + math.pi))
+                y = planet.y + int((planet.r + 1) * math.sin((angle * math.pi / 180) + math.pi))
                 logging.warn("Ship {} headed for planet {} {} {} point {} {}".format(ship.id, planet.x, planet.y, planet.r, x, y))
                 common.warp(ship, x, y)
             else:
