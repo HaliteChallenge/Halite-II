@@ -75,6 +75,13 @@ namespace mapgen {
                 1);
         }
 
+        const auto planets_per_player =
+            hlt::GameConstants::get().PLANETS_PER_PLAYER;
+        const auto total_planets = effective_players * planets_per_player;
+        const auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
+        const auto center_x = map.map_width / 2;
+        const auto center_y = map.map_height / 2;
+
         const auto max_radius = static_cast<int>(
             std::sqrt(std::min(map.map_width, map.map_height)) / 2);
         auto rand_x_axis = std::bind(
@@ -84,17 +91,9 @@ namespace mapgen {
         auto rand_angle = std::bind(
             std::uniform_real_distribution<double>(0, 2 * M_PI), std::ref(rng));
         auto rand_radius =
-            std::bind(std::uniform_int_distribution<int>(2, max_radius), std::ref(rng));
+            std::bind(std::uniform_int_distribution<int>(3, max_radius), std::ref(rng));
         auto rand_planets_generated =
-            std::bind(std::discrete_distribution<int>({ 0, 0, 1, 70, 2, 30 }), std::ref(rng));
-
-        const auto center_x = map.map_width / 2;
-        const auto center_y = map.map_height / 2;
-
-        auto planets_per_player =
-            hlt::GameConstants::get().PLANETS_PER_PLAYER;
-        const auto total_planets = effective_players * planets_per_player;
-        const auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
+            std::bind(std::uniform_int_distribution<>(3, planets_per_player), std::ref(rng));
 
         // Temporary storage for the planets created in a particular orbit
         auto planets = std::vector<Zone>();
@@ -127,20 +126,14 @@ namespace mapgen {
             return true;
         };
 
-        // Generate more frequent, sparser rings
-        if (planets_per_player % 2 == 0) planets_per_player /= 2;
-        else planets_per_player--;
-
         auto total_attempts = 0;
         while (map.planets.size() < total_planets && total_attempts < 10000) {
             // Planets to generate per player this iteration
             // We want a chance to double up on planets in an orbit to keep it
             // interesting, but we should be careful not to make too many planets
-            auto planets_to_generate =
-                rand_planets_generated() * planets_per_player;
-
-            if (planets_to_generate + map.planets.size() > total_planets) {
-                planets_to_generate = 1 * planets_per_player;
+            auto planets_to_generate = rand_planets_generated();
+            if (map.planets.size() + planets_to_generate > total_planets) {
+                planets_to_generate = 3;
             }
 
             for (auto attempt = 0; attempt < 100; attempt++) {
@@ -182,13 +175,14 @@ namespace mapgen {
         }
 
         if (extra_planets > 0) {
+            // TODO: can we make this composable?
             const auto choice = std::uniform_int_distribution<>(0, 0)(rng);
             if (choice == 0) {
                 // Planet in center
                 const auto big_radius = static_cast<int>(
                     std::sqrt(std::min(map.map_width, map.map_height)));
                 const auto small_radius = static_cast<int>(
-                    std::sqrt(std::min(map.map_width, map.map_height)) / 1.5);
+                    std::sqrt(std::min(map.map_width, map.map_height) / 2));
 
                 for (auto attempt = 0; attempt < 100; attempt++) {
                     const auto location = hlt::Location{
@@ -214,6 +208,9 @@ namespace mapgen {
             else if (choice == 2) {
                 // Line of planets down horizontal axis
 
+            }
+            else if (choice == 4) {
+                // Planets in corners
             }
         }
 
