@@ -159,7 +159,7 @@ namespace mapgen {
         auto orbits = std::vector<PointOfInterest>();
 
         auto total_attempts = 0;
-        while (map.planets.size() < total_planets && total_attempts < 10000) {
+        while (map.planets.size() < total_planets && total_attempts < MAX_TOTAL_ATTEMPTS) {
             // Planets to generate per player this iteration
             auto planets_to_generate = rand_planets_generated() * 2;
             if (map.planets.size() + planets_to_generate > total_planets) {
@@ -210,20 +210,56 @@ namespace mapgen {
             }
         }
 
-        if (extra_planets > 0) {
+        while (extra_planets > 0 && total_attempts < MAX_TOTAL_ATTEMPTS) {
             // TODO: can we make this composable?
-            const auto choice = std::uniform_int_distribution<>(0, 0)(rng);
-            if (choice == 0) {
-            }
-            else if (choice == 1) {
-                // Line of planets down vertical axis
+            total_attempts++;
 
+            const auto choice = std::uniform_int_distribution<>(1, 2)(rng);
+            if (choice == 1) {
+                // Line of planets down vertical axis
+                auto offset = std::uniform_int_distribution<>(max_radius, map.map_height / 2 - max_radius)(rng);
+                auto radius = rand_radius();
+                auto location1 = hlt::Location{
+                    static_cast<unsigned short>(center_x),
+                    static_cast<unsigned short>(center_y + offset),
+                };
+                auto location2 = hlt::Location{
+                    static_cast<unsigned short>(center_x),
+                    static_cast<unsigned short>(center_y - offset),
+                };
+                if (is_ok_location(location1, radius) &&
+                    is_ok_location(location2, radius)) {
+                    // Avoid underflow
+                    if (extra_planets <= 2) extra_planets = 0;
+                    else extra_planets -= 2;
+
+                    planets.emplace_back(location1, radius);
+                    planets.emplace_back(location2, radius);
+                }
             }
             else if (choice == 2) {
                 // Line of planets down horizontal axis
+                auto offset = std::uniform_int_distribution<>(max_radius, map.map_width / 2 - max_radius)(rng);
+                auto radius = rand_radius();
+                auto location1 = hlt::Location{
+                    static_cast<unsigned short>(center_x + offset),
+                    static_cast<unsigned short>(center_y),
+                };
+                auto location2 = hlt::Location{
+                    static_cast<unsigned short>(center_x - offset),
+                    static_cast<unsigned short>(center_y),
+                };
+                if (is_ok_location(location1, radius) &&
+                    is_ok_location(location2, radius)) {
+                    // Avoid underflow
+                    if (extra_planets <= 2) extra_planets = 0;
+                    else extra_planets -= 2;
 
+                    planets.emplace_back(location1, radius);
+                    planets.emplace_back(location2, radius);
+                }
             }
-            else if (choice == 4) {
+            else if (choice == 3) {
                 // Planets in corners
             }
         }
