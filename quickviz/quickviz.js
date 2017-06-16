@@ -96,7 +96,7 @@ class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 4; i++) {
                 this.substep++;
                 if (this.substep >= this.replay.frames[this.frame].length) {
                     this.substep = 0;
@@ -134,7 +134,7 @@ class HaliteVisualizer {
      * @param color
      * @param health_factor
      */
-    drawCell(container, x, y, color, health_factor) {
+    drawCell(container, x, y, color, health_factor, glow=false) {
         const side = CELL_SIZE * this.scale;
         x = x * side;
         y = y * side;
@@ -154,6 +154,12 @@ class HaliteVisualizer {
             (1 - 2*health_factor) * side,
             (1 - 2*health_factor) * side);
         container.endFill();
+
+        if (glow) {
+            container.beginFill(color, 0.1);
+            container.drawCircle(x + 0.5 * side, y + 0.5 * side, 2 * side);
+            container.endFill();
+        }
     }
 
     drawPOI() {
@@ -162,7 +168,8 @@ class HaliteVisualizer {
             this.starfield.beginFill(0xFFFFFF, next_rand());
             const x = Math.floor(next_rand() * this.application.stage.width);
             const y = Math.floor(next_rand() * this.application.stage.height);
-            this.starfield.drawRect(x, y, 1, 1);
+            const size = 0.5 + next_rand();
+            this.starfield.drawRect(x, y, size, size);
             this.starfield.endFill();
         }
 
@@ -170,7 +177,7 @@ class HaliteVisualizer {
         for (let poi of this.replay.poi) {
             if (poi.type === "orbit") {
                 this.backgroundContainer.beginFill(0, 0);
-                this.backgroundContainer.lineStyle(1, 0xFFFFFF, 0.3);
+                this.backgroundContainer.lineStyle(1, 0xFFFFFF, 0.2);
                 const x = side * poi.x;
                 const y = side * poi.y;
                 const a = side * poi.x_axis;
@@ -188,18 +195,31 @@ class HaliteVisualizer {
         let planetBase = this.replay.planets[planet.id];
 
         const side = CELL_SIZE * this.scale;
+        const color = planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner];
+
+        if (planet.owner !== null) {
+            const r = this.replay.constants.MAX_DOCKING_DISTANCE + planetBase.r;
+            const percent_production =
+                planet.remaining_production / planetBase.production;
+            this.planetContainer.beginFill(color, 0.2 * percent_production);
+            this.planetContainer.lineStyle(1, 0xFFFFFF, 0.3);
+            this.planetContainer.drawCircle(
+                (planetBase.x + 0.5) * side, (planetBase.y + 0.5) * side,
+                side * r);
+            this.planetContainer.endFill();
+        }
 
         this.planetContainer.lineStyle(0);
         for (let dx = -planetBase.r; dx <= planetBase.r; dx++) {
             for (let dy = -planetBase.r; dy <= planetBase.r; dy++) {
                 if (dx*dx + dy*dy <= planetBase.r*planetBase.r) {
-                    const health_factor = 0.5 *
+                    const health_factor = 0.2 + 0.3 *
                         (planetBase.production - planet.remaining_production) / planetBase.production;
                     this.drawCell(
                         this.planetContainer,
                         dx + planetBase.x,
                         dy + planetBase.y,
-                        planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner],
+                        color,
                         health_factor,
                     );
                 }
@@ -225,7 +245,7 @@ class HaliteVisualizer {
         const x = side * ship.x;
         const y = side * ship.y;
 
-        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor);
+        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, true);
 
         const dock_turns = this.replay.constants.DOCK_TURNS;
 
@@ -249,7 +269,6 @@ class HaliteVisualizer {
 
             const dx = planetX - cx;
             const dy = planetY - cy;
-
 
             this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
             this.shipContainer.lineStyle(2, 0xFFFFFF, 1);
@@ -284,8 +303,8 @@ class HaliteVisualizer {
                                 for (let dy = -r; dy <= r; dy++) {
                                     if (dx*dx + dy*dy <= r*r) {
                                         const distance = (48 - frame) / 24;
-                                        const x = side * (distance * dx + event.x);
-                                        const y = side * (distance * dy + event.y);
+                                        const x = Math.floor(side * (distance * dx + event.x));
+                                        const y = Math.floor(side * (distance * dy + event.y));
 
                                         this.planetContainer.beginFill(0xFFA500, (frame / 48) * (1 / (1 + distance + 1 / (1 + dx*dx + dy*dy))));
                                         this.planetContainer.drawRect(x, y, side, side);
