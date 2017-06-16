@@ -83,7 +83,7 @@ namespace hlt {
         planets = other_map.planets;
     }
 
-    Map::Map(unsigned short width, unsigned short height) {
+    Map::Map(unsigned short width, unsigned short height) : Map() {
         map_width = width;
         map_height = height;
     }
