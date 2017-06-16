@@ -1,4 +1,4 @@
-CXXFLAGS += -std=c++11 -pthread -I ./
+CXXFLAGS += -std=c++11 -pthread -I ./ -O2
 INSTALL_PATH?=/usr/local
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
