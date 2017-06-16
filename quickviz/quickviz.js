@@ -437,12 +437,27 @@ class HaliteVisualizer {
 
 class HaliteVisualizerControls {
     constructor(replay) {
+        this.replay = replay;
         this.visualizer = new HaliteVisualizer(replay);
     }
 
     attach(el) {
         $(el).empty();
 
+        let header = $("<h1>");
+        for (let i = 0; i < this.replay.num_players; i++) {
+            let color = PLAYER_COLORS[i].toString(16);
+            while (color.length < 6) {
+                color = "0" + color;
+            }
+            $("<span></span>")
+                .text(this.replay.player_names[i])
+                .css("color", `#${color}`)
+                .appendTo(header);
+            $("<span>  </span>").appendTo(header);
+        }
+
+        header.appendTo($(el));
         this.visualizer.attach(el);
 
         this.visualizer.play();
