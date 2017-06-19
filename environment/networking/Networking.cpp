@@ -51,7 +51,6 @@ std::string Networking::serialize_map(const hlt::Map& map) {
         }
     }
 
-    oss << " planets";
     for (hlt::EntityIndex planet_id = 0; planet_id < map.planets.size();
          planet_id++) {
         const auto& planet = map.planets[planet_id];

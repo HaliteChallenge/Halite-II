@@ -120,26 +120,9 @@ class Map:
 
 def parse(map):
     """Parse the map description from the game."""
-    ships, planets = map.split("planets")
-    ships = ships.split()
-    planets = planets.split()
-
     m = Map()
-    while planets:
-        (plid, x, y, hp, r, docking, current, remaining,
-         owned, owner, num_docked_ships, *planets) = planets
 
-        docked_ships = []
-        for _ in range(int(num_docked_ships)):
-            ship_id, *planets = planets
-            docked_ships.append(int(ship_id))
-
-        planet = Planet(
-            int(plid), int(x), int(y), int(hp), int(r), int(docking),
-            int(current), int(remaining), bool(int(owned)), int(owner), docked_ships)
-        m.planets[planet.id] = planet
-
-    num_players, *ships = ships
+    num_players, *ships = map.split()
     num_players = int(num_players)
 
     for _ in range(num_players):
@@ -163,6 +146,21 @@ def parse(map):
                                int(progress), int(cooldown))
 
         m.ships[player] = s
+
+    planets = ships
+    while planets:
+        (plid, x, y, hp, r, docking, current, remaining,
+         owned, owner, num_docked_ships, *planets) = planets
+
+        docked_ships = []
+        for _ in range(int(num_docked_ships)):
+            ship_id, *planets = planets
+            docked_ships.append(int(ship_id))
+
+        planet = Planet(
+            int(plid), int(x), int(y), int(hp), int(r), int(docking),
+            int(current), int(remaining), bool(int(owned)), int(owner), docked_ships)
+        m.planets[planet.id] = planet
 
     m.generate_collision()
 
