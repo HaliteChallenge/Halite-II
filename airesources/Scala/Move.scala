@@ -1,1 +1,0 @@
-case class Move(location: Location, direction: Direction)

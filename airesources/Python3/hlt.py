@@ -528,7 +528,7 @@ def get_map():
 def run_bot(main_loop):
     """
     DEPRECATED method to run a bot structured as a generator.
-    
+
     :param main_loop:
     :return:
     """
