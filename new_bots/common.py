@@ -146,15 +146,48 @@ class Location:
 warp_queue = {}
 
 
-def warp(ship, x, y):
+def warp(ship, x, y, *, extra_data=None):
     # TODO: make sure no warp is already executing
-    # TODO: provide way to cancel warp
+    if ship.id in warp_queue:
+        cancel_warp(ship)
+        return
     warp_state = _warp(ship, x, y)
-    warp_queue[ship.id] = warp_state
+    warp_queue[ship.id] = [warp_state, extra_data]
+
+
+def brake(ship, *, max_acceleration=8):
+    while True:
+        ship = last_map.ships[my_tag].get(ship.id, None)
+        if not ship:
+            return
+
+        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
+        angle = math.atan2(ship.vel_y, ship.vel_x)
+
+        if speed == 0:
+            break
+
+        thrust = int(min(speed, max_acceleration))
+        angle = int(180 + 180 * angle / math.pi) % 360
+        if angle < 0: angle += 360
+        logging.warn(
+            "Warp {}: deceleration {} {}, s {} pos {} {}"
+            .format(ship.id, thrust, angle, speed, ship.x, ship.y))
+        yield "t {} {} {}".format(ship.id, thrust, angle)
+
+
+def cancel_warp(ship):
+    extra_data = warp_queue.get(ship.id, (None, None))[1]
+    warp_queue[ship.id] = [brake(ship), extra_data]
+
+
+def get_warp_extra_data(ship):
+    if ship.id in warp_queue:
+        return warp_queue[ship.id][1]
+    return None
 
 
 def _warp(ship, x, y):
-    last_id = ship.id
     max_acceleration = 8
 
     while True:
@@ -183,30 +216,15 @@ def _warp(ship, x, y):
                     ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
 
+    yield from brake(ship, max_acceleration=max_acceleration)
+
     while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
             return
 
-        speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
-        angle = math.atan2(ship.vel_y, ship.vel_x)
-        _, distance = orient_towards(ship, Location(x, y))
-
-        if speed == 0:
+        if ship.x == x and ship.y == y:
             break
-
-        thrust = int(min(speed, max_acceleration))
-        angle = int(180 + 180 * angle / math.pi) % 360
-        if angle < 0: angle += 360
-        logging.warn(
-            "Warp {}: deceleration {} {}, s {} pos {} {} target {} {}"
-            .format(ship.id, thrust, angle, speed, ship.x, ship.y, x, y))
-        yield "t {} {} {}".format(ship.id, thrust, angle)
-
-    while ship.x != x and ship.y != y:
-        ship = last_map.ships[my_tag].get(ship.id, None)
-        if not ship:
-            return
 
         logging.warn(
             "Warp {}: move from {} {} to {} {}"
@@ -218,7 +236,7 @@ def _warp(ship, x, y):
 def update_warps():
     finished_executing = set()
     command_queue = []
-    for ship_id, generator in warp_queue.items():
+    for ship_id, (generator, _) in warp_queue.items():
         try:
             command_queue.append(next(generator))
         except StopIteration:
@@ -234,7 +252,7 @@ def is_warping(ship):
     return ship.id in warp_queue
 
 
-def move_to(ship, angle, speed, avoidance=20):
+def move_to(ship, angle, speed, avoidance=25):
     pos_x = ship.x + 0.5
     pos_y = ship.y + 0.5
 
@@ -256,13 +274,18 @@ def move_to(ship, angle, speed, avoidance=20):
             continue
 
         # Collision avoidance
-        if (not (0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]) or
+        within_bounds = 0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]
+        if (not within_bounds or
             last_map.collision_map[effective_x][effective_y][1] == "planet" or
             last_map.collision_map[effective_x][effective_y][0] == my_tag):
             if avoidance > 0:
                 new_angle = (angle + 15) % 360
                 if new_angle < 0: new_angle += 360
                 logging.warn("Averting collision for ship {} pos {} angle {} speed {} because of {} (try {})".format(ship.id, (ship.x, ship.y), angle, speed, (effective_x, effective_y), 20-avoidance))
+                if within_bounds:
+                    logging.warn("We would collide with {} at {} {}".format(last_map.collision_map[effective_x][effective_y], effective_x, effective_y))
+                else:
+                    logging.warn("We would be out of bounds at {} {}".format(effective_x, effective_y))
                 return move_to(ship, new_angle, 1, avoidance-1)
             else:
                 logging.warn("Failed")
