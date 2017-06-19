@@ -51,6 +51,16 @@ std::string Networking::serialize_map(const hlt::Map& map) {
         }
     }
 
+    auto num_planets = std::count_if(
+        map.planets.begin(),
+        map.planets.end(),
+        [](const hlt::Planet& planet) -> bool {
+            return planet.is_alive();
+        }
+    );
+
+    oss << ' ' << num_planets;
+
     for (hlt::EntityIndex planet_id = 0; planet_id < map.planets.size();
          planet_id++) {
         const auto& planet = map.planets[planet_id];

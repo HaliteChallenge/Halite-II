@@ -148,7 +148,9 @@ def parse(map):
         m.ships[player] = s
 
     planets = ships
-    while planets:
+    num_planets, *planets = planets
+    num_planets = int(num_planets)
+    for _ in range(num_planets):
         (plid, x, y, hp, r, docking, current, remaining,
          owned, owner, num_docked_ships, *planets) = planets
 
