@@ -8,7 +8,7 @@ int main() {
 
     auto moves = std::vector<hlt::Move>();
     while (true) {
-        hlt::Map game_map = hlt::get_map();
+        auto game_map = hlt::get_map();
         moves.clear();
 
         for (const auto& ship_pair : game_map.ships[my_tag]) {
