@@ -185,6 +185,14 @@ def warp(ship, x, y, *, extra_data=None):
     :func:`move_to`. May get "stuck" in such cases (see the documentation
     for :func:`move_to`).
 
+    Do not issue commands to this ship while it is still warping. You can
+    check this with :func:`is_warping`. A warp can be canceled with
+    :func:`cancel_warp`, but you will not have immediate control over the
+    ship, as it will brake first.
+
+    Make sure to call :func:`update_warps` each turn to get the commands
+    for warping, and add them to the move queue.
+
     :param Ship ship:
     :param int x:
     :param int y:
@@ -201,6 +209,13 @@ def warp(ship, x, y, *, extra_data=None):
 
 
 def brake(ship, *, max_acceleration=8):
+    """
+    Stop the given ship. Uses the same infrastructure as warping, so do not
+    issue commands to the ship until this is done.
+    :param ship:
+    :param max_acceleration:
+    :return:
+    """
     while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
@@ -222,6 +237,11 @@ def brake(ship, *, max_acceleration=8):
 
 
 def cancel_warp(ship):
+    """
+    Cancel a warp, braking the ship before returning control.
+    :param ship:
+    :return:
+    """
     extra_data = warp_queue.get(ship.id, (None, None))[1]
     warp_queue[ship.id] = [brake(ship), extra_data]
 
@@ -233,6 +253,13 @@ def get_warp_extra_data(ship):
 
 
 def _warp(ship, x, y):
+    """
+    The actual warp implementation. You should not use this directly.
+    :param ship:
+    :param x:
+    :param y:
+    :return:
+    """
     max_acceleration = 8
 
     while True:
@@ -279,6 +306,11 @@ def _warp(ship, x, y):
 
 
 def update_warps():
+    """
+    Update all warp and brake commands in progress.
+
+    :return: A list of commands to issue.
+    """
     finished_executing = set()
     command_queue = []
     for ship_id, (generator, _) in warp_queue.items():
@@ -294,10 +326,29 @@ def update_warps():
 
 
 def is_warping(ship):
+    """
+    Check if a ship is currently warping.
+    :param ship:
+    :return:
+    """
     return ship.id in warp_queue
 
 
 def move_to(ship, angle, speed, avoidance=25):
+    """
+    Move the ship in the given direction for one turn.
+
+    Performs basic collision avoidance along the projected trajectory, but
+    does not account for other ships' movements or inertia. Does not perform
+    long-term pathfinding or planning - using this function exclusively can
+    get a ship stuck!
+
+    :param ship:
+    :param angle:
+    :param speed:
+    :param avoidance: How many tries to avoid collisions.
+    :return:
+    """
     pos_x = ship.x + 0.5
     pos_y = ship.y + 0.5
 
@@ -340,18 +391,22 @@ def move_to(ship, angle, speed, avoidance=25):
 
 
 def dock(ship, planet):
+    """Begin docking the ship to the planet, if in range."""
     return "d {ship} {planet}".format(ship=ship.id, planet=planet.id)
 
 
 def undock(ship):
+    """Undock the ship."""
     return "u {ship}".format(ship=ship.id)
 
 
 def can_dock(ship, planet):
+    """Check whether the ship is within docking range."""
     return distance(ship, planet) < planet.r + 4
 
 
 def distance(a, b):
+    """Compute the distance between two entities (ships or planets)."""
     dx = a.x - b.x
     dy = a.y - b.y
     d = int(math.sqrt(dx*dx + dy*dy))
@@ -359,6 +414,7 @@ def distance(a, b):
 
 
 def orient_towards(ship, target):
+    """Find the angle and distance between a ship and the given target."""
     dx = target.x - ship.x
     dy = target.y - ship.y
     d = int(math.sqrt(dx*dx + dy*dy))
@@ -375,6 +431,7 @@ def orient_towards(ship, target):
 
 
 def occupiable(x, y):
+    """Check whether the given coordinate can be occupied."""
     if x < 0 or x >= map_size[0] or y < 0 or y >= map_size[1]:
         return False
 
@@ -385,6 +442,10 @@ def occupiable(x, y):
 
 
 def pathable(ship, target_x, target_y):
+    """
+    Check whether there is a straight-line path to the given point,
+    without planetary obstacles in between. Does not account for ships.
+    """
     dx = target_x - ship.x
     dy = target_y - ship.y
 
@@ -402,6 +463,14 @@ def pathable(ship, target_x, target_y):
 
 
 def closest_point_to(ship, target, *, r=3):
+    """
+    Find the closest point to the given ship near the given target, within
+    the given radius.
+    :param ship:
+    :param target:
+    :param r:
+    :return:
+    """
     angle, _ = orient_towards(ship, target)
     r = getattr(target, 'r', 0) + r
     x = target.x + int(r * math.cos((angle * math.pi / 180) + math.pi))
@@ -411,6 +480,11 @@ def closest_point_to(ship, target, *, r=3):
 
 
 def initialize(name):
+    """
+    Initialize the bot with the given name.
+    :param name:
+    :return:
+    """
     global map_size
     global my_tag
     tag = int(get_string())
@@ -431,6 +505,11 @@ def initialize(name):
 
 
 def send_command_queue(command_queue):
+    """
+    Issue the given list of commands.
+    :param command_queue:
+    :return:
+    """
     for command in command_queue:
         send_string(command)
 
@@ -438,11 +517,21 @@ def send_command_queue(command_queue):
 
 
 def get_map():
+    """
+    Parse the map given by the engine. Probably shouldn't be directly used.
+    :return:
+    """
     i = get_string()
     return parse(i)
 
 
 def run_bot(main_loop):
+    """
+    DEPRECATED method to run a bot structured as a generator.
+    
+    :param main_loop:
+    :return:
+    """
     generator = main_loop()
 
     name = next(generator)
