@@ -157,7 +157,7 @@ class HaliteVisualizer {
 
         if (glow) {
             container.beginFill(color, 0.1);
-            container.drawCircle(x + 0.5 * side, y + 0.5 * side, 2 * side);
+            container.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
             container.endFill();
         }
     }
@@ -245,7 +245,7 @@ class HaliteVisualizer {
         const x = side * ship.x;
         const y = side * ship.y;
 
-        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, true);
+        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown == 0);
 
         if (this.frame > 0) {
             let move = this.replay.moves[this.frame-1][ship.owner][0][ship.id];

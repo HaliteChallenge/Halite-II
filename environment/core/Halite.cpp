@@ -778,6 +778,7 @@ auto output_ship(const hlt::Ship& ship, const hlt::PlayerId player_id,
         { "vel_y", ship.velocity.vel_y },
         { "health", ship.health },
         { "docking", docking },
+        { "cooldown", ship.weapon_cooldown },
     };
 
     return record;
