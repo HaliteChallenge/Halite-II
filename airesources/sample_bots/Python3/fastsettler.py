@@ -1,6 +1,6 @@
 import math
 
-import common
+import hlt
 import logging
 
 
@@ -17,15 +17,15 @@ def fast_settler():
             if ship.docked != "undocked":
                 continue
 
-            if common.is_warping(ship):
-                data = common.get_warp_extra_data(ship)
+            if hlt.is_warping(ship):
+                data = hlt.get_warp_extra_data(ship)
                 planet = game_map.planets.get(data)
                 if planet and planet.owned:
-                    common.cancel_warp(ship)
+                    hlt.cancel_warp(ship)
                 continue
 
             planets = game_map.planets.values()
-            sort_key = lambda planet: common.distance(ship, planet)
+            sort_key = lambda planet: hlt.distance(ship, planet)
             for planet in sorted(planets, key=sort_key):
                 if planet.owned:
                     if planet.owner != my_tag:
@@ -42,22 +42,22 @@ def fast_settler():
                 planet.owned = True
                 planet.docked_ships.append(ship.id)
 
-                angle, distance = common.orient_towards(ship, planet)
+                angle, distance = hlt.orient_towards(ship, planet)
                 x = planet.x + int((planet.r + 1) * math.cos((angle * math.pi / 180) + math.pi))
                 y = planet.y + int((planet.r + 1) * math.sin((angle * math.pi / 180) + math.pi))
-                if common.can_dock(ship, planet):
+                if hlt.can_dock(ship, planet):
                     logging.warn("{:03} {:02}: docking".format(turn, ship.id))
-                    command_queue.append(common.dock(ship, planet))
-                elif distance > 10 and common.pathable(ship, x, y):
+                    command_queue.append(hlt.dock(ship, planet))
+                elif distance > 10 and hlt.pathable(ship, x, y):
                     logging.warn("{:03} {:02}: warping to {} {}".format(turn, ship.id, x, y))
-                    common.warp(ship, x, y, extra_data=planet.id)
+                    hlt.warp(ship, x, y, extra_data=planet.id)
                 else:
                     logging.warn("{:03} {:02}: moving to {} {}".format(turn, ship.id, planet.x, planet.y))
-                    command_queue.append(common.move_to(ship, angle, 1))
+                    command_queue.append(hlt.move_to(ship, angle, 1))
 
                 break
 
-        command_queue.extend(common.update_warps())
+        command_queue.extend(hlt.update_warps())
         yield command_queue
 
-common.run_bot(fast_settler)
+hlt.run_bot(fast_settler)

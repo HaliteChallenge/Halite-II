@@ -1,10 +1,10 @@
-import common
+import hlt
 import logging
 
 
 def analyze_planets(ship):
     choices = []
-    for planet in common.last_map.planets.values():
+    for planet in hlt.last_map.planets.values():
         if planet.owned:
             continue
 
@@ -15,22 +15,22 @@ def analyze_planets(ship):
         if num_docked >= planet.num_docking_spots:
             continue
 
-        angle, distance = common.orient_towards(ship, planet)
-        dock_x, dock_y = common.closest_point_to(ship, planet)
-        pathable = common.pathable(ship, dock_x, dock_y)
+        angle, distance = hlt.orient_towards(ship, planet)
+        dock_x, dock_y = hlt.closest_point_to(ship, planet)
+        pathable = hlt.pathable(ship, dock_x, dock_y)
         score = distance
         score -= 5 * (planet.remaining_production / 100)
 
-        if common.can_dock(ship, planet):
-            choices.append((-1000, planet, lambda planet=planet: common.dock(ship, planet)))
+        if hlt.can_dock(ship, planet):
+            choices.append((-1000, planet, lambda planet=planet: hlt.dock(ship, planet)))
         elif pathable:
             def warp_action(dock_x=dock_x, dock_y=dock_y):
-                common.warp(ship, dock_x, dock_y, extra_data=planet.id)
+                hlt.warp(ship, dock_x, dock_y, extra_data=planet.id)
             score *= 0.8
             choices.append((score, planet, warp_action))
         else:
             def move_action(angle=angle):
-                return common.move_to(ship, angle, 2)
+                return hlt.move_to(ship, angle, 2)
             choices.append((score, planet, move_action))
 
     choices.sort(key=lambda x: x[0])
@@ -39,44 +39,44 @@ def analyze_planets(ship):
 
 def analyze_enemies(ship):
     choices = []
-    for player_tag, player_ships in common.last_map.ships.items():
-        if player_tag == common.my_tag:
+    for player_tag, player_ships in hlt.last_map.ships.items():
+        if player_tag == hlt.my_tag:
             continue
 
         for enemy in player_ships.values():
-            angle, distance = common.orient_towards(ship, enemy)
+            angle, distance = hlt.orient_towards(ship, enemy)
             score = distance
             if enemy.docked != "undocked":
                 score *= 0.9
 
             if distance > 10:
                 choices.append((score + 10,
-                                lambda: common.move_to(ship, angle, 3)))
+                                lambda: hlt.move_to(ship, angle, 3)))
             elif distance > 5:
                 choices.append((score,
-                                lambda: common.move_to(ship, angle, 2)))
+                                lambda: hlt.move_to(ship, angle, 2)))
             elif distance > 3:
                 choices.append((score - 5,
-                                lambda: common.move_to(ship, angle, 1)))
+                                lambda: hlt.move_to(ship, angle, 1)))
 
     choices.sort(key=lambda x: x[0])
     return choices
 
 
-my_tag, map_size, initial_map = common.initialize("Tradeoffs MkIII")
+my_tag, map_size, initial_map = hlt.initialize("Tradeoffs MkIII")
 
 while True:
-    game_map = common.get_map()
+    game_map = hlt.get_map()
     command_queue = []
 
     assigned_planets = set()
     for ship in game_map.ships[my_tag].values():
-        if common.is_warping(ship):
+        if hlt.is_warping(ship):
             continue
         if ship.docked == "docked":
             planet = game_map.planets[ship.planet]
             if planet.remaining_production == 0:
-                command_queue.append(common.undock(ship))
+                command_queue.append(hlt.undock(ship))
                 continue
         if ship.docked != "undocked":
             continue
@@ -126,5 +126,5 @@ while True:
             if command:
                 command_queue.append(command)
 
-    command_queue.extend(common.update_warps())
-    common.send_command_queue(command_queue)
+    command_queue.extend(hlt.update_warps())
+    hlt.send_command_queue(command_queue)

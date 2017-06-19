@@ -1,4 +1,4 @@
-import common
+import hlt
 
 
 def settler():
@@ -10,8 +10,8 @@ def settler():
 
         for ship in game_map.ships[my_tag].values():
             if ship.y < map_size[1] - 1:
-                command_queue.append(common.move_to(ship, 90, 1))
+                command_queue.append(hlt.move_to(ship, 90, 1))
 
         yield command_queue
 
-common.run_bot(settler)
+hlt.run_bot(settler)

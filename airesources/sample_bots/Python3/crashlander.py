@@ -1,4 +1,4 @@
-import common
+import hlt
 
 
 def crashlander():
@@ -13,7 +13,7 @@ def crashlander():
                 continue
 
             planets = game_map.planets.values()
-            sort_key = lambda planet: common.distance(ship, planet)
+            sort_key = lambda planet: hlt.distance(ship, planet)
             found_planet = False
             for planet in sorted(planets, key=sort_key):
                 if planet.owned:
@@ -22,11 +22,11 @@ def crashlander():
                 # Prevent multiple ships from converging on the same planet
                 planet.owned = True
 
-                angle, distance = common.orient_towards(ship, planet)
-                if common.can_dock(ship, planet):
-                    command_queue.append(common.dock(ship, planet))
+                angle, distance = hlt.orient_towards(ship, planet)
+                if hlt.can_dock(ship, planet):
+                    command_queue.append(hlt.dock(ship, planet))
                 else:
-                    command_queue.append(common.move_to(ship, angle, 1))
+                    command_queue.append(hlt.move_to(ship, angle, 1))
 
                 found_planet = True
 
@@ -40,11 +40,11 @@ def crashlander():
                 if planet.owned and planet.owner == my_tag:
                     continue
 
-                angle, distance = common.orient_towards(ship, planet)
-                command_queue.append(common.move_to(ship, angle, 5))
+                angle, distance = hlt.orient_towards(ship, planet)
+                command_queue.append(hlt.move_to(ship, angle, 5))
 
                 break
 
         yield command_queue
 
-common.run_bot(crashlander)
+hlt.run_bot(crashlander)

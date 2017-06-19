@@ -1,6 +1,6 @@
 import math
 
-import common
+import hlt
 
 
 def pathable(ship, target_x, target_y):
@@ -10,10 +10,10 @@ def pathable(ship, target_x, target_y):
         x = int(ship.x + i * dx / 120)
         y = int(ship.y + i * dy / 120)
 
-        if x < 0 or x >= common.map_size[0] or y < 0 or y >= common.map_size[1]:
+        if x < 0 or x >= hlt.map_size[0] or y < 0 or y >= hlt.map_size[1]:
             return False
 
-        if common.last_map.collision_map[int(x)][int(y)][1] == "planet":
+        if hlt.last_map.collision_map[int(x)][int(y)][1] == "planet":
             return False
 
     return True
@@ -28,17 +28,17 @@ def fast_settler():
 
         for ship in game_map.ships[my_tag].values():
             if ship.docked == "docked" and game_map.planets[ship.planet].remaining_production == 0:
-                command_queue.append(common.undock(ship))
+                command_queue.append(hlt.undock(ship))
                 continue
 
             if ship.docked != "undocked":
                 continue
 
-            if common.is_warping(ship):
+            if hlt.is_warping(ship):
                 continue
 
             planets = game_map.planets.values()
-            sort_key = lambda planet: common.distance(ship, planet)
+            sort_key = lambda planet: hlt.distance(ship, planet)
             found_planet = False
             for planet in sorted(planets, key=sort_key):
                 if planet.remaining_production == 0:
@@ -59,15 +59,15 @@ def fast_settler():
                 planet.owned = True
                 planet.docked_ships.append(ship.id)
 
-                angle, distance = common.orient_towards(ship, planet)
+                angle, distance = hlt.orient_towards(ship, planet)
                 x = planet.x + int((planet.r + 1) * math.cos((angle * math.pi / 180) + math.pi))
                 y = planet.y + int((planet.r + 1) * math.sin((angle * math.pi / 180) + math.pi))
-                if common.can_dock(ship, planet):
-                    command_queue.append(common.dock(ship, planet))
+                if hlt.can_dock(ship, planet):
+                    command_queue.append(hlt.dock(ship, planet))
                 elif distance > 10 and pathable(ship, x, y):
-                    common.warp(ship, x, y)
+                    hlt.warp(ship, x, y)
                 else:
-                    command_queue.append(common.move_to(ship, angle, 1))
+                    command_queue.append(hlt.move_to(ship, angle, 1))
 
                 found_planet = True
 
@@ -85,15 +85,15 @@ def fast_settler():
 
                 for enemy in sorted(
                         ships.values(),
-                        key=lambda enemy: common.distance(ship, enemy)):
-                    angle, distance = common.orient_towards(ship, enemy)
+                        key=lambda enemy: hlt.distance(ship, enemy)):
+                    angle, distance = hlt.orient_towards(ship, enemy)
                     # Only move closer to get into attack range
                     if distance > 10:
-                        command_queue.append(common.move_to(ship, angle, 3))
+                        command_queue.append(hlt.move_to(ship, angle, 3))
                     elif distance > 5:
-                        command_queue.append(common.move_to(ship, angle, 2))
+                        command_queue.append(hlt.move_to(ship, angle, 2))
                     elif distance > 3:
-                        command_queue.append(common.move_to(ship, angle, 1))
+                        command_queue.append(hlt.move_to(ship, angle, 1))
 
                     found_enemy = True
                     break
@@ -101,7 +101,7 @@ def fast_settler():
                 if found_enemy:
                     break
 
-        command_queue.extend(common.update_warps())
+        command_queue.extend(hlt.update_warps())
         yield command_queue
 
-common.run_bot(fast_settler)
+hlt.run_bot(fast_settler)

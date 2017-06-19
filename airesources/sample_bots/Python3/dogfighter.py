@@ -1,4 +1,4 @@
-import common
+import hlt
 
 
 def dogfighter():
@@ -13,7 +13,7 @@ def dogfighter():
                 continue
 
             planets = game_map.planets.values()
-            sort_key = lambda planet: common.distance(ship, planet)
+            sort_key = lambda planet: hlt.distance(ship, planet)
             found_planet = False
             for planet in sorted(planets, key=sort_key):
                 if planet.owned:
@@ -22,11 +22,11 @@ def dogfighter():
                 # Prevent multiple ships from converging on the same planet
                 planet.owned = True
 
-                angle, distance = common.orient_towards(ship, planet)
-                if common.can_dock(ship, planet):
-                    command_queue.append(common.dock(ship, planet))
+                angle, distance = hlt.orient_towards(ship, planet)
+                if hlt.can_dock(ship, planet):
+                    command_queue.append(hlt.dock(ship, planet))
                 else:
-                    command_queue.append(common.move_to(ship, angle, 1))
+                    command_queue.append(hlt.move_to(ship, angle, 1))
 
                 found_planet = True
 
@@ -44,13 +44,13 @@ def dogfighter():
 
                 for enemy in sorted(
                         ships.values(),
-                        key=lambda enemy: common.distance(ship, enemy)):
-                    angle, distance = common.orient_towards(ship, enemy)
+                        key=lambda enemy: hlt.distance(ship, enemy)):
+                    angle, distance = hlt.orient_towards(ship, enemy)
                     # Only move closer to get into attack range
                     if distance > 5:
-                        command_queue.append(common.move_to(ship, angle, 2))
+                        command_queue.append(hlt.move_to(ship, angle, 2))
                     elif distance > 3:
-                        command_queue.append(common.move_to(ship, angle, 1))
+                        command_queue.append(hlt.move_to(ship, angle, 1))
 
                     found_enemy = True
                     break
@@ -60,4 +60,4 @@ def dogfighter():
 
         yield command_queue
 
-common.run_bot(dogfighter)
+hlt.run_bot(dogfighter)
