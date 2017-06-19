@@ -58,7 +58,8 @@ class Planet:
 
 
 class Ship:
-    def __init__(self, id, x, y, hp, vel_x, vel_y, docked, planet):
+    def __init__(self, id, x, y, hp, vel_x, vel_y,
+                 docked, planet, progress, cooldown):
         self.id = id
         self.x = x
         self.y = y
@@ -67,6 +68,8 @@ class Ship:
         self.hp = hp
         self.docked = docked
         self.planet = planet
+        self.docking_progress = progress
+        self.weapon_cooldown = cooldown
 
 
 class Map:
@@ -139,7 +142,8 @@ def parse(map):
         s = {}
 
         while ships and ships[0] != "player":
-            sid, x, y, hp, vel_x, vel_y, docked, docked_planet, *ships = ships
+            sid, x, y, hp, vel_x, vel_y, \
+                docked, docked_planet, progress, cooldown, *ships = ships
             docked = int(docked)
             if docked == 0:
                 docked = "undocked"
@@ -149,7 +153,8 @@ def parse(map):
                                int(x), int(y),
                                int(hp),
                                int(vel_x), int(vel_y),
-                               docked, int(docked_planet))
+                               docked, int(docked_planet),
+                               int(progress), int(cooldown))
 
         m.ships[player] = s
         player += 1
