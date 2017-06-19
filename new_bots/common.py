@@ -7,8 +7,13 @@ import itertools
 import logging
 
 
+"""This player's unique identifier, used to issue commands."""
 my_tag = None
+
+"""A tuple (width, height) of the map size."""
 map_size = None
+
+"""The most recent map received from the server. See :class:`Map`."""
 last_map = None
 
 
@@ -20,16 +25,19 @@ def _grouper(iterable, n, fillvalue=None):
 
 
 def send_string(s):
+    """Send data to the game. Call :function:`done_sending` once finished."""
     sys.stdout.write(s)
     sys.stdout.flush()
 
 
 def done_sending():
+    """Finish sending commands to the game."""
     sys.stdout.write('\n')
     sys.stdout.flush()
 
 
 def get_string():
+    """Read input from the game."""
     result = sys.stdin.readline().rstrip('\n')
     return result
 
@@ -68,6 +76,16 @@ class Map:
         self.collision_map = []
 
     def generate_collision(self):
+        """
+        Generate the collision map.
+
+        The map is indexed by the x and y coordinates. Each cell is a 2-tuple
+        of (owner, entity_type). If the cell is empty, the cell will contain
+        (None, None). If the entity is a planet, the owner will be either -1
+        (if unowned) or the owner's tag, and the entity type will be "planet".
+        If the entity is a ship, the 2-tuple will contain the owner's tag and
+        the string "ship".
+        """
         for _ in range(map_size[0]):
             col = []
             for _ in range(map_size[1]):
@@ -92,19 +110,26 @@ class Map:
 
     def print_collision(self):
         for row in range(map_size[1]):
-            logging.info(''.join('.' if self.collision_map[col][row] == (None, None) else 'X' for col in range(map_size[0])))
+            logging.info(''.join(
+                '.' if self.collision_map[col][row] == (None, None) else 'X'
+                for col in range(map_size[0])))
 
 
 def parse(map):
+    """Parse the map description from the game."""
     ships, planets = map.split("planets")
     ships = ships.split()[1:]
     planets = planets.split()
 
     m = Map()
     for pl in _grouper(planets, 11):
-        (plid, x, y, hp, r, docking, current, remaining, owned, owner, docked_ships) = pl
-        planet = Planet(int(plid), int(x), int(y), int(hp), int(r), int(docking), int(current), int(remaining), bool(int(owned)), int(owner), [])
-        docked_ships = [int(x) for x in docked_ships.strip(",").strip().split(",") if x]
+        (plid, x, y, hp, r, docking, current, remaining,
+         owned, owner, docked_ships) = pl
+        planet = Planet(
+            int(plid), int(x), int(y), int(hp), int(r), int(docking),
+            int(current), int(remaining), bool(int(owned)), int(owner), [])
+        docked_ships = \
+            [int(x) for x in docked_ships.strip(",").strip().split(",") if x]
         planet.docked_ships = docked_ships
         m.planets[planet.id] = planet
 
@@ -143,10 +168,25 @@ class Location:
         self.y = y
 
 
+"""Auxiliary data structure holding the state of currently warping ships."""
 warp_queue = {}
 
 
 def warp(ship, x, y, *, extra_data=None):
+    """
+    Move the given ship to the target location, taking advantage of inertia.
+
+    Does not avoid obstacles, except at the end, where it falls back to
+    :func:`move_to`. May get "stuck" in such cases (see the documentation
+    for :func:`move_to`).
+
+    :param Ship ship:
+    :param int x:
+    :param int y:
+    :param extra_data: Extra data to be stored for the given ship, that can
+    be retrieved with :func:`get_warp_extra_data`.
+    :return:
+    """
     # TODO: make sure no warp is already executing
     if ship.id in warp_queue:
         cancel_warp(ship)
@@ -259,11 +299,11 @@ def move_to(ship, angle, speed, avoidance=25):
     if ship.vel_x != 0 or ship.vel_y != 0:
         logging.warn("INERTIAL INTERFERENCE")
 
-    STEPS = 64
-    dx = round(speed * math.cos(angle * math.pi / 180)) / STEPS
-    dy = round(speed * math.sin(angle * math.pi / 180)) / STEPS
+    steps = 64
+    dx = round(speed * math.cos(angle * math.pi / 180)) / steps
+    dy = round(speed * math.sin(angle * math.pi / 180)) / steps
 
-    for i in range(1, STEPS + 1):
+    for i in range(1, steps + 1):
         pos_x += dx
         pos_y += dy
 
@@ -274,10 +314,11 @@ def move_to(ship, angle, speed, avoidance=25):
             continue
 
         # Collision avoidance
-        within_bounds = 0 <= effective_x < map_size[0] and 0 <= effective_y < map_size[1]
+        within_bounds = 0 <= effective_x < map_size[0] and \
+            0 <= effective_y < map_size[1]
         if (not within_bounds or
             last_map.collision_map[effective_x][effective_y][1] == "planet" or
-            last_map.collision_map[effective_x][effective_y][0] == my_tag):
+                last_map.collision_map[effective_x][effective_y][0] == my_tag):
             if avoidance > 0:
                 new_angle = (angle + 15) % 360
                 if new_angle < 0: new_angle += 360
@@ -326,6 +367,42 @@ def orient_towards(ship, target):
         angle += 360
 
     return angle, d
+
+
+def occupiable(x, y):
+    if x < 0 or x >= map_size[0] or y < 0 or y >= map_size[1]:
+        return False
+
+    if last_map.collision_map[int(x)][int(y)][1] == "planet":
+        return False
+
+    return True
+
+
+def pathable(ship, target_x, target_y):
+    dx = target_x - ship.x
+    dy = target_y - ship.y
+
+    if not occupiable(target_x, target_y):
+        return False
+
+    for i in range(121):
+        x = int(ship.x + i * dx / 120)
+        y = int(ship.y + i * dy / 120)
+
+        if not occupiable(x, y):
+            return False
+
+    return True
+
+
+def closest_point_to(ship, target, *, r=3):
+    angle, _ = orient_towards(ship, target)
+    r = getattr(target, 'r', 0) + r
+    x = target.x + int(r * math.cos((angle * math.pi / 180) + math.pi))
+    y = target.y + int(r * math.sin((angle * math.pi / 180) + math.pi))
+
+    return x, y
 
 
 def initialize(name):

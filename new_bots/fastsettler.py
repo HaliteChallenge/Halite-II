@@ -4,33 +4,6 @@ import common
 import logging
 
 
-def occupiable(x, y):
-    if x < 0 or x >= common.map_size[0] or y < 0 or y >= common.map_size[1]:
-        return False
-
-    if common.last_map.collision_map[int(x)][int(y)][1] == "planet":
-        return False
-
-    return True
-
-
-def pathable(ship, target_x, target_y):
-    dx = target_x - ship.x
-    dy = target_y - ship.y
-
-    if not occupiable(target_x, target_y):
-        return False
-
-    for i in range(121):
-        x = int(ship.x + i * dx / 120)
-        y = int(ship.y + i * dy / 120)
-
-        if not occupiable(x, y):
-            return False
-
-    return True
-
-
 def fast_settler():
     my_tag, map_size, initial_map, log = yield "Fast Settler"
     turn = 0
@@ -75,7 +48,7 @@ def fast_settler():
                 if common.can_dock(ship, planet):
                     logging.warn("{:03} {:02}: docking".format(turn, ship.id))
                     command_queue.append(common.dock(ship, planet))
-                elif distance > 10 and pathable(ship, x, y):
+                elif distance > 10 and common.pathable(ship, x, y):
                     logging.warn("{:03} {:02}: warping to {} {}".format(turn, ship.id, x, y))
                     common.warp(ship, x, y, extra_data=planet.id)
                 else:
