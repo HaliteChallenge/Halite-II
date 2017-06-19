@@ -20,10 +20,19 @@ int main() {
             }
 
             for (const auto& planet_pair : game_map.planets) {
+                const auto planet_id = planet_pair.first;
                 const auto& planet = planet_pair.second;
 
                 if (planet.owned) {
                     continue;
+                }
+
+                if (hlt::can_dock(ship, planet)) {
+                    moves.push_back(hlt::Move::dock(ship_id, planet_id));
+                }
+                else {
+                    const auto angle = hlt::orient_towards(ship, planet);
+                    moves.push_back(hlt::Move::thrust(ship_id, angle, 2));
                 }
 
                 break;

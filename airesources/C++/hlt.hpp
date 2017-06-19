@@ -125,6 +125,27 @@ namespace hlt {
             struct { unsigned short thrust; unsigned short angle; } thrust;
             EntityIndex dock_to;
         } move;
+
+        static auto dock(EntityIndex ship_id, EntityIndex dock_to) -> Move {
+            Move move;
+            move.type = MoveType::Dock;
+            move.ship_id = ship_id;
+            move.move.dock_to = dock_to;
+
+            return move;
+        }
+
+        static auto thrust(EntityIndex ship_id, double angle,
+                           unsigned short thrust) -> Move {
+            Move move;
+            move.type = MoveType::Thrust;
+            move.ship_id = ship_id;
+            move.move.thrust.thrust = thrust;
+            move.move.thrust.angle =
+                static_cast<unsigned short>(angle * 180 / M_PI);
+
+            return move;
+        }
     };
 
     class Map {
@@ -147,18 +168,6 @@ namespace hlt {
 
         auto get_planet(EntityIndex index) -> Planet& {
             return planets.at(index);
-        }
-
-        auto get_distance(Location l1, Location l2) const -> double {
-            const auto dx = l1.pos_x - l2.pos_x;
-            const auto dy = l1.pos_y - l2.pos_y;
-            return std::sqrt(dx * dx + dy * dy);
-        }
-
-        auto get_angle(Location l1, Location l2) const -> double {
-            const auto dx = l2.pos_x - l1.pos_x;
-            const auto dy = l2.pos_y - l1.pos_y;
-            return std::atan2(dy, dx);
         }
 
         auto location_with_delta(Location& location, int dx, int dy) -> std::pair<Location, bool> {
@@ -278,40 +287,11 @@ namespace hlt {
             }
         }
 
-        while (iss) {
-            Planet planet = {};
-            EntityIndex planet_id;
-
-            iss >> planet_id;
-            iss >> planet.location.pos_x;
-            iss >> planet.location.pos_y;
-            iss >> planet.health;
-            iss >> planet.radius;
-            iss >> planet.docking_spots;
-            iss >> planet.current_production;
-            iss >> planet.remaining_production;
-            int owned;
-            iss >> owned;
-            if (owned == 1) {
-                planet.owned = true;
-                int owner;
-                iss >> owner;
-                planet.owner = static_cast<PlayerId>(owner);
-            }
-            else {
-                planet.owned = false;
-            }
-
-            int num_docked_ships;
-            iss >> num_docked_ships;
-            planet.docked_ships.reserve(num_docked_ships);
-            for (auto j = 0; j < num_docked_ships; j++) {
-                EntityIndex ship_id;
-                iss >> ship_id;
-                planet.docked_ships.push_back(ship_id);
-            }
-
-            map.planets[planet_id] = planet;
+        int num_planets;
+        iss >> num_planets;
+        for (auto i = 0; i < num_planets; i++) {
+            const auto& planet_pair = parse_planet(iss);
+            map.planets[planet_pair.first] = planet_pair.second;
         }
 
         return map;
@@ -357,6 +337,35 @@ namespace hlt {
         send_string(bot_name);
 
         return std::make_pair(my_tag, initial_map);
+    }
+
+    static auto get_distance(Location l1, Location l2) -> double {
+        const auto dx = l1.pos_x - l2.pos_x;
+        const auto dy = l1.pos_y - l2.pos_y;
+        return std::sqrt(dx * dx + dy * dy);
+    }
+
+    static auto get_angle(Location l1, Location l2) -> double {
+        const auto dx = l2.pos_x - l1.pos_x;
+        const auto dy = l2.pos_y - l1.pos_y;
+        return std::atan2(dy, dx);
+    }
+
+    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
+        auto dx = target.location.pos_x - ship.location.pos_x;
+        auto dy = target.location.pos_y - ship.location.pos_y;
+
+        auto angle_rad = std::atan2(dy, dx);
+        if (angle_rad < 0) {
+            angle_rad += 2 * M_PI;
+        }
+
+        return angle_rad;
+    }
+
+    static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
+        return get_distance(ship.location, planet.location) <=
+            GameConstants::get().MAX_DOCKING_DISTANCE;
     }
 }
 
