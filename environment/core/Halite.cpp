@@ -253,8 +253,6 @@ auto Halite::process_attacks(
                 }
             }
 
-            ship.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
-
             for (const auto target : targets) {
                 const auto damage =
                     hlt::GameConstants::get().WEAPON_DAMAGE / (float) targets.size();
@@ -266,6 +264,7 @@ auto Halite::process_attacks(
             }
 
             if (targets.size() > 0) {
+                ship.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
                 auto id = hlt::EntityId::for_ship(player_id, ship_id);
                 full_frame_events.back().back().push_back(
                     std::unique_ptr<Event>(
