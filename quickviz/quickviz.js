@@ -89,6 +89,45 @@ class HaliteVisualizer {
     attach(containerEl) {
         $(containerEl).append(this.application.view);
 
+        document.body.addEventListener("keypress", (e) => {
+            if (e.keyCode === 97) {
+                this.pause();
+                this.substep--;
+                if (this.substep < 0) {
+                    this.frame--;
+                    if (this.frame < 0) {
+                        this.frame = 0;
+                    }
+                    this.substep = this.replay.frames[this.frame].length - 1;
+                }
+            }
+            else if (e.keyCode === 100) {
+                this.pause();
+                this.substep++;
+                if (this.substep >= this.replay.frames[this.frame].length) {
+                    this.substep = 0;
+                    this.frame++;
+                }
+
+                if (this.frame >= this.replay.frames.length) {
+                    this.frame = this.replay.frames.length - 1;
+                    this.substep = this.replay.frames[this.frame].length - 1;
+                }
+            }
+            else if (e.keyCode === 32) {
+                if (this.timer) this.pause();
+                else this.play();
+            }
+            else {
+                console.log(e);
+                return;
+            }
+            this.update();
+        });
+
+        this.application.ticker.add((dt) => {
+            this.draw(dt);
+        });
         this.draw();
     }
 
@@ -113,10 +152,6 @@ class HaliteVisualizer {
                 this.update();
             }
         }, 1000/30);
-
-        this.application.ticker.add((dt) => {
-            this.draw(dt);
-        });
     }
 
     pause() {
