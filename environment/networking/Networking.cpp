@@ -19,10 +19,19 @@ std::string Networking::serialize_map(const hlt::Map& map) {
     std::ostringstream oss;
 
     // Encode individual ships
-    oss << "ships";
+    oss << ' ' << player_count();
     for (hlt::PlayerId playerId = 0; playerId < player_count();
          playerId++) {
-        oss << " player " << (int) playerId;
+        oss << ' ' << (int) playerId;
+
+        auto num_ships = std::count_if(
+            map.ships[playerId].begin(),
+            map.ships[playerId].end(),
+        [](const hlt::Ship& ship) -> bool {
+            return ship.is_alive();
+        });
+
+        oss << ' ' << num_ships;
 
         for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS;
              ship_id++) {
@@ -62,9 +71,9 @@ std::string Networking::serialize_map(const hlt::Map& map) {
         else {
             oss << ' ' << 0 << ' ' << 0;
         }
-        oss << " ,";
+        oss << ' ' << planet.docked_ships.size();
         for (const auto docked : planet.docked_ships) {
-            oss << docked << ',';
+            oss << ' ' << docked;
         }
     }
 

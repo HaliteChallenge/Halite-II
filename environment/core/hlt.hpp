@@ -54,8 +54,8 @@ namespace hlt {
         auto from_json(const nlohmann::json& json) -> void;
     };
 
-    typedef uint8_t PlayerId;
-    typedef size_t EntityIndex;
+    typedef unsigned char PlayerId;
+    typedef unsigned long EntityIndex;
 
     //! A poor man's std::optional.
     template<typename T>

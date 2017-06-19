@@ -121,27 +121,33 @@ class Map:
 def parse(map):
     """Parse the map description from the game."""
     ships, planets = map.split("planets")
-    ships = ships.split()[1:]
+    ships = ships.split()
     planets = planets.split()
 
     m = Map()
-    for pl in _grouper(planets, 11):
+    while planets:
         (plid, x, y, hp, r, docking, current, remaining,
-         owned, owner, docked_ships) = pl
+         owned, owner, num_docked_ships, *planets) = planets
+
+        docked_ships = []
+        for _ in range(int(num_docked_ships)):
+            ship_id, *planets = planets
+            docked_ships.append(int(ship_id))
+
         planet = Planet(
             int(plid), int(x), int(y), int(hp), int(r), int(docking),
-            int(current), int(remaining), bool(int(owned)), int(owner), [])
-        docked_ships = \
-            [int(x) for x in docked_ships.strip(",").strip().split(",") if x]
-        planet.docked_ships = docked_ships
+            int(current), int(remaining), bool(int(owned)), int(owner), docked_ships)
         m.planets[planet.id] = planet
 
-    player = 0
-    while ships:
-        ships = ships[2:]
-        s = {}
+    num_players, *ships = ships
+    num_players = int(num_players)
 
-        while ships and ships[0] != "player":
+    for _ in range(num_players):
+        player, num_ships, *ships = ships
+        player = int(player)
+        num_ships = int(num_ships)
+        s = {}
+        for _ in range(num_ships):
             sid, x, y, hp, vel_x, vel_y, \
                 docked, docked_planet, progress, cooldown, *ships = ships
             docked = int(docked)
@@ -157,7 +163,6 @@ def parse(map):
                                int(progress), int(cooldown))
 
         m.ships[player] = s
-        player += 1
 
     m.generate_collision()
 
