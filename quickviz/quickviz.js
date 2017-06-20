@@ -531,7 +531,17 @@ function setupUpload() {
 
         let reader = new FileReader();
         reader.onload = function(e) {
-            const replay = msgpack.decode(new Uint8Array(e.target.result));
+            const result = new Uint8Array(e.target.result);
+            let replay;
+            try {
+                const inflated = pako.inflate(result);
+                console.log("Compressed replay");
+                replay = msgpack.decode(inflated);
+            }
+            catch (e) {
+                console.log("Uncompressed replay");
+                replay = msgpack.decode(result);
+            }
 
             console.log(replay);
 
