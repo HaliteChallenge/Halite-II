@@ -1,6 +1,8 @@
 #ifndef HALITE_HLT_H
 #define HALITE_HLT_H
 
+#include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -39,6 +41,11 @@ namespace hlt {
 
     typedef unsigned char PlayerId;
     typedef unsigned long EntityIndex;
+
+    /** Global state */
+    static PlayerId my_tag = 0;
+    static unsigned short map_width;
+    static unsigned short map_height;
 
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
@@ -83,8 +90,13 @@ namespace hlt {
     struct Velocity {
         short vel_x, vel_y;
 
-        auto magnitude() const -> double;
-        auto angle() const -> double;
+        auto magnitude() const -> double {
+            return sqrt(vel_x*vel_x + vel_y*vel_y);
+        }
+
+        auto angle() const -> double {
+            return atan2(vel_y, vel_x);
+        }
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
@@ -351,6 +363,41 @@ namespace hlt {
 
         constexpr static auto FORECAST_STEPS = 64;
         constexpr static auto FORECAST_DELTA = 1.0 / FORECAST_STEPS;
+
+        auto occupiable(int x, int y) const -> bool {
+            if (x < 0 || x >= map_width || y < 0 || y >= map_height) {
+                return false;
+            }
+
+            auto occupancy = occupancy_map[x][y];
+            if (occupancy.is_valid() &&
+                occupancy.type == EntityType::PlanetEntity) {
+                return false;
+            }
+
+            return true;
+        }
+
+        auto pathable(const Location& start, const Location& target) const -> bool {
+            if (!occupiable(target.pos_x, target.pos_y)) {
+                return false;
+            }
+
+            auto dx = (target.pos_x - start.pos_x) * FORECAST_DELTA;
+            auto dy = (target.pos_y - start.pos_y) * FORECAST_DELTA;
+
+            for (auto step = 0; step < FORECAST_STEPS; step++) {
+                auto x = start.pos_x + step * dx;
+                auto y = start.pos_y + step * dy;
+
+                if (!occupiable(static_cast<int>(x), static_cast<int>(y))) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         auto forecast_collision(const Location& start, double angle,
                                 unsigned short thrust) -> bool {
             double current_x = start.pos_x + 0.5;
@@ -406,6 +453,175 @@ namespace hlt {
         }
     };
 
+    static auto get_distance(Location l1, Location l2) -> double {
+        const auto dx = l1.pos_x - l2.pos_x;
+        const auto dy = l1.pos_y - l2.pos_y;
+        return std::sqrt(dx * dx + dy * dy);
+    }
+
+    static auto orient_towards(const Location& start, const Location& target) -> double {
+        auto dx = target.pos_x - start.pos_x;
+        auto dy = target.pos_y - start.pos_y;
+
+        auto angle_rad = std::atan2(dy, dx);
+        if (angle_rad < 0) {
+            angle_rad += 2 * M_PI;
+        }
+
+        return angle_rad;
+    }
+
+    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
+        return orient_towards(ship.location, target.location);
+    }
+
+    static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
+        return get_distance(ship.location, planet.location) <=
+            GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
+    }
+
+    // TODO: This API could be made more convenient/as a member function
+    auto closest_point(Map& game_map, const Location& start,
+                       const Location& target, unsigned short radius)
+        -> std::pair<Location, bool> {
+        auto angle = orient_towards(start, target) + M_PI;
+        auto dx = static_cast<int>(radius * std::cos(angle));
+        auto dy = static_cast<int>(radius * std::sin(angle));
+
+        return game_map.location_with_delta(target, dx, dy);
+    }
+
+    enum class BehaviorType {
+        Brake,
+        Warp,
+    };
+
+    struct Behavior {
+        BehaviorType type;
+        EntityIndex ship_id;
+
+        union {
+            struct { Location target; bool braked; bool braking; } warp;
+        } data;
+
+        auto is_finished(Map& game_map) const -> bool {
+            if (game_map.ships[my_tag].count(ship_id) == 0) {
+                return true;
+            }
+
+            const auto& ship = game_map.get_ship(my_tag, ship_id);
+            switch (type) {
+                case BehaviorType::Brake:
+                    return ship.velocity.vel_x == 0 &&
+                        ship.velocity.vel_y == 0;
+                case BehaviorType::Warp:
+                    return ship.location == data.warp.target;
+            }
+        }
+
+        auto brake(double speed, double angle, int max_accel) -> Move {
+            auto thrust = std::min(
+                static_cast<unsigned short>(max_accel),
+                static_cast<unsigned short>(speed));
+            return Move::thrust(ship_id, angle + M_PI, thrust);
+        }
+
+        auto next(Map& game_map) -> Move {
+            if (game_map.ships[my_tag].count(ship_id) == 0) {
+                assert(false);
+            }
+
+            const auto& ship = game_map.get_ship(my_tag, ship_id);
+            const auto max_accel = GameConstants::get().MAX_ACCELERATION;
+            auto speed = ship.velocity.magnitude();
+            auto angle = ship.velocity.angle();
+            switch (type) {
+                case BehaviorType::Brake: {
+                    return brake(speed, angle, max_accel);
+                }
+                case BehaviorType::Warp: {
+                    auto distance = get_distance(ship.location, data.warp.target);
+                    auto turns_left = 10000;
+                    if (speed > 0) {
+                        turns_left = static_cast<int>(distance / speed);
+                    }
+                    auto turns_to_decelerate =
+                        speed /
+                            (GameConstants::get().MAX_ACCELERATION
+                                + GameConstants::get().DRAG);
+
+                    if (data.warp.braked || (data.warp.braking && speed == 0)) {
+                        data.warp.braked = true;
+                        // Move at low speed to target
+                        const auto angle = orient_towards(ship.location, data.warp.target);
+                        return hlt::Move::thrust(
+                            ship_id,
+                            game_map.adjust_for_collision(ship.location, angle, 2));
+                    }
+                    else if (turns_left <= turns_to_decelerate || data.warp.braking) {
+                        // Start braking
+                        data.warp.braking = true;
+                        return brake(speed, angle, max_accel);
+                    }
+                    else {
+                        // Accelerate
+                        auto angle = orient_towards(ship.location, data.warp.target);
+                        auto thrust = static_cast<unsigned short>(
+                            std::max(1, std::min(
+                                max_accel,
+                                static_cast<int>(distance / 30 * max_accel))));
+                        return Move::thrust(ship_id, angle, thrust);
+                    }
+                }
+            }
+        }
+
+        auto cancel() -> void {
+            type = BehaviorType::Brake;
+        }
+    };
+
+    struct BehaviorManager {
+        std::unordered_map<EntityIndex, Behavior> behaviors;
+
+        BehaviorManager() {
+            behaviors = {};
+        }
+
+        auto update(Map& game_map, std::vector<Move>& moves) -> void {
+            for (auto& behavior_pair : behaviors) {
+                auto& behavior = behavior_pair.second;
+                if (!behavior.is_finished(game_map)) {
+                    moves.push_back(behavior.next(game_map));
+                }
+            }
+
+            for (auto it = std::begin(behaviors); it != std::end(behaviors);) {
+                if (it->second.is_finished(game_map)) {
+                    it = behaviors.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+        }
+
+        auto is_behaving(EntityIndex ship_id) -> bool {
+            return behaviors.count(ship_id) > 0;
+        }
+
+        auto warp_to(EntityIndex ship_id, Location& target) -> void {
+            Behavior warp;
+            warp.ship_id = ship_id;
+            warp.type = BehaviorType::Warp;
+            warp.data.warp.target = target;
+            warp.data.warp.braked = false;
+            warp.data.warp.braking = false;
+
+            behaviors[ship_id] = warp;
+        }
+    };
+
     static auto get_string() -> std::string {
         std::string result;
         std::getline(std::cin, result);
@@ -416,10 +632,6 @@ namespace hlt {
         // std::endl used to flush
         std::cout << text << std::endl;
     }
-
-    static PlayerId my_tag = 0;
-    static unsigned short map_width;
-    static unsigned short map_height;
 
     static auto parse_ship(std::istream& iss)
     -> std::pair<EntityIndex, Ship> {
@@ -558,39 +770,6 @@ namespace hlt {
         send_string(bot_name);
 
         return std::make_pair(my_tag, initial_map);
-    }
-
-    static auto get_distance(Location l1, Location l2) -> double {
-        const auto dx = l1.pos_x - l2.pos_x;
-        const auto dy = l1.pos_y - l2.pos_y;
-        return std::sqrt(dx * dx + dy * dy);
-    }
-
-    static auto get_angle(Location l1, Location l2) -> double {
-        const auto dx = l2.pos_x - l1.pos_x;
-        const auto dy = l2.pos_y - l1.pos_y;
-        return std::atan2(dy, dx);
-    }
-
-    static auto orient_towards(const Ship& ship, const Location& target) -> double {
-        auto dx = target.pos_x - ship.location.pos_x;
-        auto dy = target.pos_y - ship.location.pos_y;
-
-        auto angle_rad = std::atan2(dy, dx);
-        if (angle_rad < 0) {
-            angle_rad += 2 * M_PI;
-        }
-
-        return angle_rad;
-    }
-
-    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
-        return orient_towards(ship, target.location);
-    }
-
-    static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
-        return get_distance(ship.location, planet.location) <=
-            GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
     }
 }
 

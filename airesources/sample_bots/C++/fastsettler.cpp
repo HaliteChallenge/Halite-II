@@ -6,8 +6,10 @@ typedef std::pair<hlt::EntityIndex, hlt::Planet> PlanetPair;
 int main() {
     hlt::PlayerId my_tag;
 
-    auto setup = hlt::initialize("Dogfighter++");
+    auto setup = hlt::initialize("FastSettler++");
     my_tag = setup.first;
+
+    auto behaviors = hlt::BehaviorManager();
 
     auto moves = std::vector<hlt::Move>();
     while (true) {
@@ -15,25 +17,18 @@ int main() {
         // Generate the map of which spaces are occupied, used for basic
         // collision avoidance
         game_map.generate_occupancy_map();
-        game_map.log_occupancy_map();
 
         moves.clear();
 
         auto planets = std::vector<PlanetPair>(
             game_map.planets.begin(), game_map.planets.end());
-        auto enemies = std::vector<hlt::Location>();
-
-        for (const auto& player_ships_pair : game_map.ships) {
-            if (player_ships_pair.first == my_tag) continue;
-
-            for (const auto& ship : player_ships_pair.second) {
-                enemies.push_back(ship.second.location);
-            }
-        }
-
         for (const auto& ship_pair : game_map.ships[my_tag]) {
             const auto ship_id = ship_pair.first;
             const auto& ship = ship_pair.second;
+
+            if (behaviors.is_behaving(ship_id)) {
+                continue;
+            }
 
             if (ship.docking_status != hlt::DockingStatus::Undocked) {
                 continue;
@@ -60,8 +55,17 @@ int main() {
                 // the same frame
                 planet.owned = true;
 
+                auto closest_point = hlt::closest_point(
+                    game_map, ship.location, planet.location,
+                    planet.radius + hlt::GameConstants::get().MAX_DOCKING_DISTANCE);
+
                 if (hlt::can_dock(ship, planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
+                }
+                else if (closest_point.second &&
+                    game_map.pathable(ship.location, closest_point.first) &&
+                    hlt::get_distance(ship.location, planet.location) > 10) {
+                    behaviors.warp_to(ship_id, closest_point.first);
                 }
                 else {
                     const auto angle = hlt::orient_towards(ship, planet);
@@ -70,37 +74,11 @@ int main() {
                         game_map.adjust_for_collision(ship.location, angle, 2)));
                 }
 
-                goto MOVE_ASSIGNED;
+                break;
             }
-
-            // Sort enemies by distance from current ship
-            std::sort(
-                enemies.begin(), enemies.end(),
-                [&](const hlt::Location& enemy1, const hlt::Location& enemy2) -> bool {
-                    const auto distance1 = hlt::get_distance(ship.location, enemy1);
-                    const auto distance2 = hlt::get_distance(ship.location, enemy2);
-                    return distance1 < distance2;
-                }
-            );
-
-            for (const auto& enemy : enemies) {
-                if (hlt::get_distance(ship.location, enemy) > hlt::GameConstants::get().WEAPON_RADIUS) {
-                    // Stay near the ship
-                    const auto angle = hlt::orient_towards(ship.location, enemy);
-                    moves.push_back(hlt::Move::thrust(
-                        ship_id,
-                        game_map.adjust_for_collision(ship.location, angle, 2)));
-                }
-                goto MOVE_ASSIGNED;
-            }
-
-            MOVE_ASSIGNED: ;
         }
 
+        behaviors.update(game_map, moves);
         hlt::send_moves(moves);
     }
 }
-//
-// Created by David Li on 6/20/17.
-//
-
