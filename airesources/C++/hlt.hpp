@@ -11,6 +11,10 @@
 #include <vector>
 
 namespace hlt {
+    /**
+     * Quick-and-simple logging facility. Recommended to be replaced with
+     * your own.
+     */
     struct Log {
     private:
         std::ofstream file;
@@ -47,6 +51,10 @@ namespace hlt {
     static unsigned short map_width;
     static unsigned short map_height;
 
+    /**
+     * Gameplay constants that may be tweaked (though they should be at their
+     * default values in a tournament setting).
+     */
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
         unsigned int EXTRA_PLANETS = 4;
@@ -78,6 +86,9 @@ namespace hlt {
         }
     };
 
+    /**
+     * A location on the discretized Halite grid.
+     */
     struct Location {
         unsigned short pos_x, pos_y;
 
@@ -87,6 +98,9 @@ namespace hlt {
         }
     };
 
+    /**
+     * The discretized velocity of a ship.
+     */
     struct Velocity {
         short vel_x, vel_y;
 
@@ -103,6 +117,9 @@ namespace hlt {
         return l1.pos_x == l2.pos_x && l1.pos_y == l2.pos_y;
     }
 
+    /**
+     * Superclass of a ship and a planet.
+     */
     struct Entity {
         Location location;
         unsigned short health;
@@ -117,6 +134,9 @@ namespace hlt {
         }
     };
 
+    /**
+     * The statuses a ship can be in regarding docking.
+     */
     enum class DockingStatus {
         Undocked = 0,
         Docking = 1,
@@ -127,10 +147,14 @@ namespace hlt {
     struct Ship : Entity {
         Velocity velocity;
 
+        //! The turns left before the ship can fire again.
         unsigned int weapon_cooldown;
 
         DockingStatus docking_status;
+        //! The number of turns left to complete (un)docking.
         unsigned int docking_progress;
+        //! The index of the planet this ship is docked to. Only valid if
+        //! Ship::docking_status is -not- DockingStatus::Undocked.
         EntityIndex docked_planet;
     };
 
@@ -138,8 +162,12 @@ namespace hlt {
         PlayerId owner;
         bool owned;
 
+        //! The remaining production capacity.
         unsigned short remaining_production;
+        //! The current production capacity. A new ship will spawn once this
+        //! is at least GameStatistics::PRODUCTION_PER_SHIP.
         unsigned short current_production;
+        //! The maximum number of ships that may be docked.
         unsigned short docking_spots;
 
         //! Contains IDs of all ships in the process of docking or undocking,
@@ -162,6 +190,9 @@ namespace hlt {
         Undock,
     };
 
+    /**
+     * Represents a command that may be issued to a ship.
+     */
     struct Move {
         MoveType type;
         EntityIndex ship_id;
@@ -302,6 +333,15 @@ namespace hlt {
             return planets.at(index);
         }
 
+        /**
+         * Create a location with an offset applied, checking if the location
+         * is within bounds. If not, the second member of the pair will be
+         * false.
+         * @param location
+         * @param dx
+         * @param dy
+         * @return
+         */
         auto location_with_delta(const Location& location, int dx, int dy) -> std::pair<Location, bool> {
             const auto x = location.pos_x + dx;
             const auto y = location.pos_y + dy;
@@ -316,6 +356,9 @@ namespace hlt {
             }, true);
         }
 
+        /**
+         * Fills in #occupancy_map.
+         */
         auto generate_occupancy_map() -> void {
             occupancy_map = std::vector<std::vector<EntityId>>(
                 map_width,
@@ -350,6 +393,10 @@ namespace hlt {
             }
         }
 
+        /**
+         * Prints #occupancy_map to the built-in logging mechanism. Useful
+         * for debugging what your bot "sees".
+         */
         auto log_occupancy_map() -> void {
             std::stringstream log_msg;
             for (int y = 0; y < map_height; y++) {
@@ -370,6 +417,13 @@ namespace hlt {
         constexpr static auto FORECAST_STEPS = 64;
         constexpr static auto FORECAST_DELTA = 1.0 / FORECAST_STEPS;
 
+        /**
+         * Checks if a given spot is a valid location that can be occupied by
+         * a ship (i.e. is not within a planet).
+         * @param x
+         * @param y
+         * @return
+         */
         auto occupiable(int x, int y) const -> bool {
             if (x < 0 || x >= map_width || y < 0 || y >= map_height) {
                 return false;
@@ -384,6 +438,14 @@ namespace hlt {
             return true;
         }
 
+        /**
+         * Checks if there is a valid straight-line path between the two
+         * locations. Does not account for collisions with ships, but does
+         * account for planets.
+         * @param start
+         * @param target
+         * @return
+         */
         auto pathable(const Location& start, const Location& target) const -> bool {
             if (!occupiable(target.pos_x, target.pos_y)) {
                 return false;
@@ -404,6 +466,18 @@ namespace hlt {
             return true;
         }
 
+        /**
+         * Check if a collision might occur if a ship at the given location
+         * were to accelerate in the given direction.
+         *
+         * Does not account for the ship's current velocity, so it is only
+         * useful for sub-inertial speeds. Does not account for the movements
+         * of other ships.
+         * @param start
+         * @param angle
+         * @param thrust
+         * @return
+         */
         auto forecast_collision(const Location& start, double angle,
                                 unsigned short thrust) -> bool {
             double current_x = start.pos_x + 0.5;
@@ -435,6 +509,20 @@ namespace hlt {
             return false;
         }
 
+        /**
+         * Try to avoid forecasted collisions (as predicted by
+         * forecast_collision()) by adjusting the direction of travel.
+         *
+         * All caveats of forecast_collision() apply. Additionally, it does
+         * not try and predict the movements of other ships, and it may not
+         * be able to avert a collision. In such cases, it will still try and
+         * move, though it may move in a particularly suboptimal direction.
+         * @param start
+         * @param angle
+         * @param thrust
+         * @param tries
+         * @return
+         */
         auto adjust_for_collision(
             const Location& start, double angle, unsigned short thrust,
             int tries=25) -> std::pair<double, unsigned short> {
@@ -465,6 +553,13 @@ namespace hlt {
         return std::sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * Find the angle from something positioned at the start location to
+     * something positioned at the target location.
+     * @param start
+     * @param target
+     * @return
+     */
     static auto orient_towards(const Location& start, const Location& target) -> double {
         auto dx = target.pos_x - start.pos_x;
         auto dy = target.pos_y - start.pos_y;
@@ -481,11 +576,26 @@ namespace hlt {
         return orient_towards(ship.location, target.location);
     }
 
+    /**
+     * Check if the given ship is close enough to dock to the given planet.
+     * @param ship
+     * @param planet
+     * @return
+     */
     static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
         return get_distance(ship.location, planet.location) <=
             GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
     }
 
+    /**
+     * Find the closest point at the minimum given distance (radius) to the
+     * given target point from the given start point.
+     * @param game_map
+     * @param start
+     * @param target
+     * @param radius
+     * @return
+     */
     // TODO: This API could be made more convenient/as a member function
     auto closest_point(Map& game_map, const Location& start,
                        const Location& target, unsigned short radius)
@@ -498,10 +608,15 @@ namespace hlt {
     }
 
     enum class BehaviorType {
+        //! Stop the ship across multiple turns, as quickly as possible.
         Brake,
+        //! Accelerate towards a target point, braking as the ship draws near.
         Warp,
     };
 
+    /**
+     * A multi-turn command for a ship.
+     */
     struct Behavior {
         BehaviorType type;
         EntityIndex ship_id;
@@ -510,6 +625,11 @@ namespace hlt {
             struct { Location target; bool braked; bool braking; } warp;
         } data;
 
+        /**
+         * Check if the behavior is finished executing.
+         * @param game_map
+         * @return
+         */
         auto is_finished(Map& game_map) const -> bool {
             if (game_map.ships[my_tag].count(ship_id) == 0) {
                 return true;
@@ -532,6 +652,13 @@ namespace hlt {
             return Move::thrust(ship_id, angle + M_PI, thrust);
         }
 
+        /**
+         * Get the next command to issue for this behavior. Make sure to
+         * check is_finished() first.
+         *
+         * @param game_map
+         * @return
+         */
         auto next(Map& game_map) -> Move {
             if (game_map.ships[my_tag].count(ship_id) == 0) {
                 assert(false);
@@ -582,11 +709,20 @@ namespace hlt {
             }
         }
 
+        /**
+         * Cancel the behavior. Note that this may not return control of
+         * the ship immediately - for instance, a warping ship will try to
+         * brake.
+         */
         auto cancel() -> void {
             type = BehaviorType::Brake;
         }
     };
 
+    /**
+     * Manage ship behaviors across multiple turns. Issues commands and checks
+     * whether control has returned for you.
+     */
     struct BehaviorManager {
         std::unordered_map<EntityIndex, Behavior> behaviors;
 
@@ -594,6 +730,12 @@ namespace hlt {
             behaviors = {};
         }
 
+        /**
+         * Issue all pending commands, and return control of ships that have
+         * finished.
+         * @param game_map
+         * @param moves
+         */
         auto update(Map& game_map, std::vector<Move>& moves) -> void {
             for (auto& behavior_pair : behaviors) {
                 auto& behavior = behavior_pair.second;
@@ -612,10 +754,22 @@ namespace hlt {
             }
         }
 
+        /**
+         * Check if a ship is currently executing a behavior.
+         * @param ship_id
+         * @return
+         */
         auto is_behaving(EntityIndex ship_id) -> bool {
             return behaviors.count(ship_id) > 0;
         }
 
+        /**
+         * Command the ship to warp towards a given point. Unlike standard
+         * movement, warping will take advantage of acceleration to reach
+         * the given point faster, so long as there is a clear path.
+         * @param ship_id
+         * @param target
+         */
         auto warp_to(EntityIndex ship_id, Location& target) -> void {
             Behavior warp;
             warp.ship_id = ship_id;
@@ -738,6 +892,10 @@ namespace hlt {
         return parse_map(input);
     }
 
+    /**
+     * Send all queued moves to the game engine.
+     * @param moves
+     */
     static auto send_moves(std::vector<Move>& moves) -> void {
         std::ostringstream oss;
         for (const auto& move : moves) {
@@ -762,6 +920,12 @@ namespace hlt {
         send_string(oss.str());
     }
 
+    /**
+     * Initialize our bot with the given name, getting back our player tag and
+     * the initial map.
+     * @param bot_name
+     * @return
+     */
     static auto initialize(std::string bot_name) -> std::pair<PlayerId, Map> {
         std::cout.sync_with_stdio(false);
         my_tag = static_cast<PlayerId>(std::stoi(get_string()));
