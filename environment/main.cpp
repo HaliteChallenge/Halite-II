@@ -37,8 +37,8 @@ int main(int argc, char** argv) {
 
     Networking networking;
     std::vector<std::string>* names = NULL;
-    unsigned int id =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock().now().time_since_epoch()).count();
+    auto id = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
     TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.2");
 

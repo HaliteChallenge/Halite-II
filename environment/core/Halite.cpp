@@ -1131,17 +1131,23 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     stats.timeout_tags = timeout_tags;
     stats.timeout_log_filenames =
         std::vector<std::string>(timeout_tags.size());
-    //Output gamefile. First try the replays folder; if that fails, just use the straight filename.
+    // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
+
+    std::stringstream filename_buf;
+    auto time = std::time(nullptr);
+    auto localtime = *std::localtime(&time);
+    filename_buf << "replay-" << std::put_time(&localtime, "%Y%m%d-%H%M%S%z-");
+    filename_buf << id << ".hlt";
+    auto filename = filename_buf.str();
+
     if (enable_replay) {
         stats.output_filename =
-            replay_directory + "Replays/" + std::to_string(id) + '-'
-                + std::to_string(seed) + ".hlt";
+            replay_directory + "Replays/" + filename;
         try {
             output(stats.output_filename);
         }
         catch (std::runtime_error& e) {
-            stats.output_filename = replay_directory + std::to_string(id) + '-'
-                + std::to_string(seed) + ".hlt";
+            stats.output_filename = replay_directory + filename;
             output(stats.output_filename);
         }
         if (!quiet_output)
