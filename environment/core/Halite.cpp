@@ -6,6 +6,8 @@
 
 #include "mapgen/SolarSystem.h"
 
+#include "miniz/miniz.h"
+
 //Private Functions ------------------
 
 auto Halite::compare_rankings(const hlt::PlayerId& player1,
@@ -994,7 +996,23 @@ auto Halite::output(std::string filename) -> void {
 
     // Use msgpack to cut down on the size of the replay file
     std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
-    gameFile.write((char*)&bin_data[0], bin_data.size() * sizeof(uint8_t));
+
+    // Use miniz to further compress replay file
+    auto compressed_length = compressBound(bin_data.size());
+    auto compressed_data = reinterpret_cast<mz_uint8*>(std::malloc(compressed_length));
+    auto result = mz_compress(compressed_data, &compressed_length, bin_data.data(), bin_data.size());
+    if (result != MZ_OK) {
+        if (!quiet_output) {
+            std::cout << "Error: could not compress replay file!\n";
+        }
+        gameFile.write(reinterpret_cast<const char*>(bin_data.data()),
+                       bin_data.size() * sizeof(uint8_t));
+    }
+    else {
+        gameFile.write(reinterpret_cast<const char*>(compressed_data), compressed_length);
+    }
+
+    std::free(compressed_data);
 
     gameFile.flush();
     gameFile.close();
