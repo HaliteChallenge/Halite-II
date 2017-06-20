@@ -41,6 +41,12 @@ namespace mapgen {
         Generator(unsigned int _seed);
 
         /**
+         * Get the name of this map generator.
+         * @return
+         */
+        virtual auto name() -> std::string = 0;
+
+        /**
          * Given a map, fill it with planets and initial ships.
          *
          * @param map The map to use.

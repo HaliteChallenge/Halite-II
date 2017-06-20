@@ -843,6 +843,8 @@ auto output_move(const hlt::Move& move, hlt::PlayerId player_id,
  */
 auto Halite::output_header(nlohmann::json& replay) -> void {
     replay["version"] = 20;
+    replay["seed"] = seed;
+    replay["map_generator"] = map_generator;
 
     //Encode some details about the game that will make it convenient to parse.
     replay["width"] = game_map.map_width;
@@ -1025,7 +1027,6 @@ auto Halite::output(std::string filename) -> void {
 }
 
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
-                                unsigned int seed,
                                 unsigned int id,
                                 bool enable_replay,
                                 std::string replay_directory) {
@@ -1186,7 +1187,10 @@ Halite::Halite(unsigned short width_,
             << "Seed: " << seed_
             << " Dimensions: " << width_ << 'x' << height_ << '\n';
     }
+
     auto generator = mapgen::SolarSystem(seed_);
+    seed = seed_;
+    map_generator = generator.name();
     game_map = hlt::Map(width_, height_);
     points_of_interest = generator.generate(game_map, number_of_players, n_players_for_map_creation);
 

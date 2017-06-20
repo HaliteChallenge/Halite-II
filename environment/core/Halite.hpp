@@ -173,6 +173,9 @@ private:
     std::vector<std::string> player_names;
     hlt::MoveQueue player_moves;
 
+    unsigned int seed;
+    std::string map_generator;
+
     //Statistics
     std::vector<unsigned short> alive_frame_count;
     std::vector<unsigned int> init_response_times;
@@ -239,7 +242,6 @@ public:
            bool should_ignore_timeout);
 
     GameStatistics run_game(std::vector<std::string>* names_,
-                            unsigned int seed,
                             unsigned int id,
                             bool enable_replay,
                             std::string replay_directory);

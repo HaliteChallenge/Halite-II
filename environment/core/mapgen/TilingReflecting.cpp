@@ -262,4 +262,8 @@ namespace mapgen {
 
         return {};
     }
+
+    auto TilingReflecting::name() -> std::string {
+        return "TilingReflecting";
+    }
 }

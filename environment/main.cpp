@@ -288,7 +288,6 @@ int main(int argc, char** argv) {
     if (outputFilename.back() != '/') outputFilename.push_back('/');
 #endif
     GameStatistics stats = my_game->run_game(names,
-                                             seed,
                                              id,
                                              !noReplaySwitch.getValue(),
                                              outputFilename);
