@@ -180,6 +180,12 @@ namespace hlt {
             return move;
         }
 
+        static auto undock(EntityIndex ship_id) -> Move {
+            Move move;
+            move.type = MoveType::Undock;
+            return move;
+        }
+
         static auto thrust(EntityIndex ship_id, double angle,
                            unsigned short thrust) -> Move {
             Move move;
