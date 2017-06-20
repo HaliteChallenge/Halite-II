@@ -9,6 +9,34 @@
 #include <vector>
 
 namespace hlt {
+    struct Log {
+    private:
+        std::ofstream file;
+
+        auto initialize(std::string filename) -> void {
+            if (!ENABLED) return;
+            file.open(filename, std::ios::trunc | std::ios::out);
+        }
+
+    public:
+        constexpr static auto ENABLED = true;
+
+        static auto open(std::string filename) -> void {
+            if (!ENABLED) return;
+            get().initialize(filename);
+        }
+
+        static auto get() -> Log& {
+            static Log instance{};
+            return instance;
+        }
+
+        static auto log(std::string message) -> void {
+            if (!ENABLED) return;
+            get().file << message << '\n';
+        }
+    };
+
     typedef unsigned char PlayerId;
     typedef unsigned long EntityIndex;
 
@@ -45,6 +73,11 @@ namespace hlt {
 
     struct Location {
         unsigned short pos_x, pos_y;
+
+        friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream& {
+            ostream << '(' << location.pos_x << ", " << location.pos_y << ')';
+            return ostream;
+        }
     };
 
     struct Velocity {
@@ -141,10 +174,89 @@ namespace hlt {
             move.type = MoveType::Thrust;
             move.ship_id = ship_id;
             move.move.thrust.thrust = thrust;
+            auto angle_deg = static_cast<int>(angle * 180 / M_PI) % 360;
+            if (angle_deg < 0) angle_deg += 360;
             move.move.thrust.angle =
-                static_cast<unsigned short>(angle * 180 / M_PI);
+                static_cast<unsigned short>(angle_deg);
 
             return move;
+        }
+
+        static auto thrust(EntityIndex ship_id,
+                           std::pair<double, unsigned short> direction) -> Move {
+            return thrust(ship_id, direction.first, direction.second);
+        }
+    };
+
+    //! A way to uniquely identify an Entity, regardless of its type.
+    struct EntityId {
+    private:
+        //! Planets are unowned, and have player ID == -1.
+        int _player_id;
+        int _entity_index;
+
+        EntityId() {
+            type = EntityType::InvalidEntity;
+            _player_id = -1;
+            _entity_index = -1;
+        }
+
+    public:
+        EntityType type;
+
+        auto is_valid() const -> bool {
+            return type != EntityType::InvalidEntity &&
+                _player_id >= -1 && _entity_index >= 0;
+        }
+
+        auto player_id() const -> PlayerId {
+            return static_cast<PlayerId>(_player_id);
+        }
+        auto entity_index() const -> EntityIndex {
+            return static_cast<EntityIndex>(_entity_index);
+        }
+
+        //! Construct an entity ID representing an invalid entity.
+        static auto invalid() -> EntityId {
+            return EntityId();
+        }
+        //! Construct an entity ID for the given planet.
+        static auto for_planet(EntityIndex index) -> EntityId {
+            auto result = EntityId();
+            result.type = EntityType::PlanetEntity;
+            result._entity_index = static_cast<int>(index);
+            return result;
+        }
+        //! Construct an entity ID for the given ship.
+        static auto for_ship(PlayerId player_id, EntityIndex index) -> EntityId {
+            auto result = EntityId();
+            result.type = EntityType::ShipEntity;
+            result._player_id = player_id;
+            result._entity_index = static_cast<int>(index);
+            return result;
+        }
+
+        friend auto operator<< (std::ostream& ostream, const EntityId& id) -> std::ostream& {
+            switch (id.type) {
+                case EntityType::InvalidEntity:
+                    ostream << "[Invalid ID]";
+                    break;
+                case EntityType::PlanetEntity:
+                    ostream << "[Planet " << id.entity_index() << "]";
+                    break;
+                case EntityType::ShipEntity:
+                    ostream << "[Ship " << static_cast<int>(id.player_id());
+                    ostream << ' ' << id.entity_index() << "]";
+                    break;
+            }
+
+            return ostream;
+        }
+        friend auto operator== (const EntityId& id1, const EntityId& id2) -> bool {
+            return id1._player_id == id2._player_id && id1._entity_index == id2._entity_index;
+        }
+        friend auto operator!= (const EntityId& id1, const EntityId& id2) -> bool{
+            return !(id1 == id2);
         }
     };
 
@@ -154,6 +266,8 @@ namespace hlt {
         std::unordered_map<EntityIndex, Planet> planets;
         // Number of rows and columns, NOT maximum index.
         unsigned short map_width, map_height;
+
+        std::vector<std::vector<EntityId>> occupancy_map;
 
         Map(unsigned short width, unsigned short height) {
             map_width = width;
@@ -170,7 +284,7 @@ namespace hlt {
             return planets.at(index);
         }
 
-        auto location_with_delta(Location& location, int dx, int dy) -> std::pair<Location, bool> {
+        auto location_with_delta(const Location& location, int dx, int dy) -> std::pair<Location, bool> {
             const auto x = location.pos_x + dx;
             const auto y = location.pos_y + dy;
 
@@ -183,22 +297,126 @@ namespace hlt {
                 static_cast<unsigned short>(y),
             }, true);
         }
+
+        auto generate_occupancy_map() -> void {
+            occupancy_map = std::vector<std::vector<EntityId>>(
+                map_width,
+                std::vector<EntityId>(map_height, EntityId::invalid()));
+
+            for (const auto& planet_pair : planets) {
+                const auto planet_index = planet_pair.first;
+                const auto& planet = planet_pair.second;
+                for (int dx = -planet.radius; dx <= planet.radius; dx++) {
+                    for (int dy = -planet.radius; dy <= planet.radius; dy++) {
+                        const auto location_pair = location_with_delta(planet.location, dx, dy);
+                        const auto valid_location = location_pair.second;
+                        const auto location = location_pair.first;
+                        if (valid_location &&
+                            dx*dx + dy*dy <= planet.radius*planet.radius) {
+                            occupancy_map[location.pos_x][location.pos_y] =
+                                EntityId::for_planet(planet_index);
+                        }
+                    }
+                }
+            }
+
+            for (const auto& player_ship_pair : ships) {
+                const auto& player_ships = player_ship_pair.second;
+                const auto player_id = player_ship_pair.first;
+                for (const auto& ship_pair : player_ships) {
+                    const auto& location = ship_pair.second.location;
+                    const auto ship_id = ship_pair.first;
+                    occupancy_map[location.pos_x][location.pos_y] =
+                        EntityId::for_ship(player_id, ship_id);
+                }
+            }
+        }
+
+        auto log_occupancy_map() -> void {
+            std::stringstream log_msg;
+            for (int y = 0; y < map_height; y++) {
+                for (int x = 0; x < map_width; x++) {
+                    if (occupancy_map[x][y].is_valid()) {
+                        log_msg << 'X';
+                    }
+                    else {
+                        log_msg << '.';
+                    }
+                }
+                log_msg << '\n';
+            }
+
+            Log::log(log_msg.str());
+        }
+
+        constexpr static auto FORECAST_STEPS = 64;
+        constexpr static auto FORECAST_DELTA = 1.0 / FORECAST_STEPS;
+        auto forecast_collision(const Location& start, double angle,
+                                unsigned short thrust) -> bool {
+            double current_x = start.pos_x + 0.5;
+            double current_y = start.pos_y + 0.5;
+            auto dx = std::round(thrust * std::cos(angle)) * FORECAST_DELTA;
+            auto dy = std::round(thrust * std::sin(angle)) * FORECAST_DELTA;
+
+            for (int time = 1; time <= FORECAST_STEPS; time++) {
+                current_x += dx;
+                current_y += dy;
+
+                auto xp = static_cast<int>(current_x);
+                auto yp = static_cast<int>(current_y);
+
+                if (xp < 0 || xp >= map_width || yp < 0 || yp >= map_height) {
+                    return true;
+                }
+
+                if (xp == start.pos_x && yp == start.pos_y) {
+                    continue;
+                }
+
+                auto occupancy = occupancy_map[xp][yp];
+                if (occupancy.is_valid()) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        auto adjust_for_collision(
+            const Location& start, double angle, unsigned short thrust,
+            int tries=25) -> std::pair<double, unsigned short> {
+            while (tries > 0) {
+                if (forecast_collision(start, angle, thrust)) {
+                    std::stringstream log_msg;
+                    log_msg << "Forecasted collision for " << start << " at angle " << angle << " at thrust " << thrust;
+                    Log::log(log_msg.str());
+                    angle += M_PI / 12;
+                }
+                else {
+                    std::stringstream log_msg;
+                    log_msg << "No forecasted collision for " << start << " at angle " << angle << " at thrust " << thrust;
+                    Log::log(log_msg.str());
+                    break;
+                }
+
+                tries--;
+            }
+
+            return std::make_pair(angle, thrust);
+        }
     };
 
-    namespace {
-        auto get_string() -> std::string {
-            std::string result;
-            std::getline(std::cin, result);
-            return result;
-        }
-
-        auto send_string(std::string text) -> void {
-            // std::endl used to flush
-            std::cout << text << std::endl;
-        }
+    static auto get_string() -> std::string {
+        std::string result;
+        std::getline(std::cin, result);
+        return result;
     }
 
-    static Map* last_map = nullptr;
+    static auto send_string(std::string text) -> void {
+        // std::endl used to flush
+        std::cout << text << std::endl;
+    }
+
     static PlayerId my_tag = 0;
     static unsigned short map_width;
     static unsigned short map_height;
@@ -322,12 +540,15 @@ namespace hlt {
                     break;
             }
         }
+        Log::log(oss.str());
         send_string(oss.str());
     }
 
     static auto initialize(std::string bot_name) -> std::pair<PlayerId, Map> {
         std::cout.sync_with_stdio(false);
         my_tag = static_cast<PlayerId>(std::stoi(get_string()));
+
+        Log::open(std::to_string(static_cast<int>(my_tag)) + bot_name + ".log");
 
         std::stringstream iss(get_string());
         iss >> map_width >> map_height;
@@ -351,9 +572,9 @@ namespace hlt {
         return std::atan2(dy, dx);
     }
 
-    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
-        auto dx = target.location.pos_x - ship.location.pos_x;
-        auto dy = target.location.pos_y - ship.location.pos_y;
+    static auto orient_towards(const Ship& ship, const Location& target) -> double {
+        auto dx = target.pos_x - ship.location.pos_x;
+        auto dy = target.pos_y - ship.location.pos_y;
 
         auto angle_rad = std::atan2(dy, dx);
         if (angle_rad < 0) {
@@ -363,9 +584,13 @@ namespace hlt {
         return angle_rad;
     }
 
+    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
+        return orient_towards(ship, target.location);
+    }
+
     static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
         return get_distance(ship.location, planet.location) <=
-            GameConstants::get().MAX_DOCKING_DISTANCE;
+            GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
     }
 }
 
