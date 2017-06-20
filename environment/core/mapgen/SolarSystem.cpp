@@ -85,6 +85,8 @@ namespace mapgen {
 
         const auto max_radius = static_cast<int>(
             std::sqrt(std::min(map.map_width, map.map_height)) / 2);
+        const auto min_separation = static_cast<int>(
+            std::sqrt(std::min(map.map_width, map.map_height)));
         auto rand_x_axis = std::bind(
             std::uniform_int_distribution<int>(1, map.map_width / 2 - 1), std::ref(rng));
         auto rand_y_axis = std::bind(
@@ -102,7 +104,7 @@ namespace mapgen {
         auto is_ok_location = [&](const hlt::Location& location, int radius) -> bool {
             // I promise this pun was an accident
             for (const auto& zone : spawn_zones) {
-                const auto min_distance = zone.radius + radius + 15;
+                const auto min_distance = zone.radius + radius + min_separation;
                 if (map.get_distance(zone.location, location)
                     <= min_distance) {
                     return false;
@@ -110,7 +112,7 @@ namespace mapgen {
             }
 
             for (const auto& zone : planets) {
-                const auto min_distance = zone.radius + radius + 3;
+                const auto min_distance = zone.radius + radius + 5;
                 if (map.get_distance(zone.location, location)
                     <= min_distance) {
                     return false;
@@ -118,7 +120,7 @@ namespace mapgen {
             }
 
             for (const auto& planet : map.planets) {
-                const auto min_distance = planet.radius + radius + 15;
+                const auto min_distance = planet.radius + radius + min_separation;
                 if (map.get_distance(planet.location, location)
                     <= min_distance) {
                     return false;
