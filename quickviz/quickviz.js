@@ -32,9 +32,11 @@ class HaliteVisualizer {
         this.backgroundContainer = new PIXI.Graphics();
         this.planetContainer = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
+        this.lights = new PIXI.Graphics();
+        this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
         this.container = new PIXI.Container();
         this.container.position.set(0, 100);
-        this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer);
+        this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer, this.lights);
 
         this.statsDisplay = new PIXI.Graphics();
 
@@ -47,6 +49,10 @@ class HaliteVisualizer {
         this.timer = null;
 
         this.animationQueue = [];
+
+        this.onUpdate = function() {};
+        this.onPlay = function() {};
+        this.onPause = function() {};
     }
 
     get currentSubstep() {
@@ -151,7 +157,11 @@ class HaliteVisualizer {
 
                 this.update();
             }
+
+            this.onUpdate();
         }, 1000/30);
+
+        this.onPlay();
     }
 
     pause() {
@@ -159,6 +169,7 @@ class HaliteVisualizer {
 
         window.clearInterval(this.timer);
         this.timer = null;
+        this.onPause();
     }
 
     /**
@@ -191,9 +202,9 @@ class HaliteVisualizer {
         container.endFill();
 
         if (glow) {
-            container.beginFill(color, 0.1);
-            container.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
-            container.endFill();
+            this.lights.beginFill(color, 0.1);
+            this.lights.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
+            this.lights.endFill();
         }
     }
 
@@ -417,6 +428,7 @@ class HaliteVisualizer {
         this.backgroundContainer.clear();
         this.planetContainer.clear();
         this.shipContainer.clear();
+        this.lights.clear();
 
         this.drawPOI();
 
@@ -468,6 +480,10 @@ class HaliteVisualizer {
 
         this.currentTurnDisplay.text = `Frame ${this.frame}.${this.substep}`;
     }
+
+    isPlaying() {
+        return this.timer !== null;
+    }
 }
 
 class HaliteVisualizerControls {
@@ -477,7 +493,10 @@ class HaliteVisualizerControls {
     }
 
     attach(el) {
-        $(el).empty();
+        el = $(el);
+        el.empty();
+
+        el.addClass("halite-visualizer");
 
         let header = $("<h1>");
         for (let i = 0; i < this.replay.num_players; i++) {
@@ -492,8 +511,46 @@ class HaliteVisualizerControls {
             $("<span>  </span>").appendTo(header);
         }
 
-        header.appendTo($(el));
+        header.appendTo(el);
+
+        let playPause = $("<button>Pause</button>");
+        playPause.on("click", () => {
+           if (this.visualizer.isPlaying()) {
+               this.visualizer.pause();
+           }
+           else {
+               this.visualizer.play();
+           }
+        });
+
+        let scrubber = $("<input>");
+        scrubber.addClass("halite-frame-scrubber");
+        scrubber.prop("type", "range");
+        scrubber.prop("min", 0);
+        scrubber.prop("max", this.replay.frames.length - 1);
+        scrubber.prop("value", 0);
+        scrubber.on("input", () => {
+            this.visualizer.pause();
+            this.visualizer.substep = 0;
+            this.visualizer.frame = scrubber.val();
+        });
+
+        let controls = $("<div>");
+        playPause.appendTo(controls);
+        scrubber.appendTo(controls);
+        controls.appendTo(el);
+
         this.visualizer.attach(el);
+
+        this.visualizer.onUpdate = () => {
+            scrubber.val(this.visualizer.frame);
+        };
+        this.visualizer.onPause = () => {
+            playPause.text("Play");
+        };
+        this.visualizer.onPlay = () => {
+            playPause.text("Pause");
+        };
 
         this.visualizer.play();
     }

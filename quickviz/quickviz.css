@@ -14,3 +14,7 @@
 .halite-dnd-popup.hidden {
     display: none;
 }
+
+.halite-frame-scrubber {
+    width: 50%;
+}
