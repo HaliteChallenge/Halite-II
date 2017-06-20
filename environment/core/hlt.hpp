@@ -243,7 +243,7 @@ namespace hlt {
         auto get_distance(Location l1, Location l2) const -> float;
         auto get_angle(Location l1, Location l2) const -> float;
 
-        auto location_with_delta(Location& location, int dx, int dy) -> possibly<Location>;
+        auto location_with_delta(const Location& location, int dx, int dy) -> possibly<Location>;
     };
 }
 

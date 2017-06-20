@@ -89,7 +89,7 @@ namespace hlt {
     }
 
     auto Map::get_ship(PlayerId player, EntityIndex entity) -> Ship& {
-        return ships.at(player).at(entity);
+        return ships[player][entity];
     }
 
     auto Map::get_ship(EntityId entity_id) -> Ship& {
@@ -128,7 +128,7 @@ namespace hlt {
         return atan2f(dy, dx);
     }
 
-    auto Map::location_with_delta(Location& location,
+    auto Map::location_with_delta(const Location& location,
                                   int dx,
                                   int dy) -> possibly<Location> {
         const auto pos_x = location.pos_x + dx;
