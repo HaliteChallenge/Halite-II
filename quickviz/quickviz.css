@@ -15,6 +15,23 @@
     display: none;
 }
 
+.halite-play-pause {
+    width: 20%;
+    border: 0;
+    font-size: 1rem;
+    padding: 1rem;
+    margin: 0;
+    color: #FFF;
+}
+
+.halite-play-pause-pause {
+    background: #F00;
+}
+
+.halite-play-pause-play {
+    background: #0F0;
+}
+
 .halite-frame-scrubber {
     width: 50%;
 }

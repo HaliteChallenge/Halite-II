@@ -514,6 +514,8 @@ class HaliteVisualizerControls {
         header.appendTo(el);
 
         let playPause = $("<button>Pause</button>");
+        playPause.addClass("halite-play-pause");
+        playPause.addClass("halite-play-pause-pause");
         playPause.on("click", () => {
            if (this.visualizer.isPlaying()) {
                this.visualizer.pause();
@@ -546,13 +548,19 @@ class HaliteVisualizerControls {
             scrubber.val(this.visualizer.frame);
         };
         this.visualizer.onPause = () => {
+            playPause.removeClass("halite-play-pause-pause");
+            playPause.addClass("halite-play-pause-play");
             playPause.text("Play");
         };
         this.visualizer.onPlay = () => {
+            playPause.removeClass("halite-play-pause-play");
+            playPause.addClass("halite-play-pause-pause");
             playPause.text("Pause");
         };
 
         this.visualizer.play();
+
+        el.css("width", $(this.visualizer.application.view).width() + "px");
     }
 }
 
