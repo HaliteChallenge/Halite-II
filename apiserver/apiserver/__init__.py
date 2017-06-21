@@ -19,10 +19,13 @@ def response_failure(reason):
     })
 
 
-def response_success():
-    return flask.jsonify({
+def response_success(more=None):
+    response = {
         "status": "success",
-    })
+    }
+    if more is not None:
+        response.update(more)
+    return flask.jsonify(response)
 
 
 def requires_login(view):

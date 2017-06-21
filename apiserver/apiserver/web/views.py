@@ -2,7 +2,6 @@ import os.path
 
 import flask
 import google.cloud.storage as gcloud_storage
-import sqlalchemy
 
 from .. import config, model
 from .. import requires_login_api, response_failure, response_success

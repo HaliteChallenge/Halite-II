@@ -1,3 +1,5 @@
+# TODO: make this read from a JSON file instead
+
 COMPETITION_OPEN = True
 
 # Google Cloud
