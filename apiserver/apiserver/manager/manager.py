@@ -89,6 +89,7 @@ def update_compilation_status():
                 isRunning=1,
                 language=language,
             )
+        return response_success()
     else:
         # TODO: email the user
 
@@ -111,6 +112,7 @@ def upload_bot():
     blob = gcloud_storage.Blob(str(user_id), model.get_bot_bucket(),
                                chunk_size=262144)
     blob.upload_from_file(uploaded_file)
+    return response_success()
 
 
 @manager_api.route("/botFile", methods=["GET"])
