@@ -1,0 +1,1 @@
+COMPETITION_OPEN = True
