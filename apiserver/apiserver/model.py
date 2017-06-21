@@ -19,3 +19,8 @@ def get_storage_client():
 def get_compilation_bucket():
     """Get the object storage bucket for bots to be compiled."""
     return get_storage_client().get_bucket(config.GCLOUD_COMPILATION_BUCKET)
+
+
+def get_bot_bucket():
+    """Get the object storage bucket for compiled bots."""
+    return get_storage_client().get_bucket(config.GCLOUD_BOT_BUCKET)

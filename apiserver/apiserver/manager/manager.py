@@ -122,6 +122,22 @@ def download_bot():
 @manager_api.route("/botHash")
 def hash_bot():
     """Get the MD5 hash of a compiled bot."""
+    user_id = flask.request.args.get("userID", None)
+    compile = flask.request.args.get("compile", False)
+
+    if not user_id:
+        return response_failure("Please provide the user ID.")
+
+    if compile:
+        bucket = model.get_compilation_bucket()
+    else:
+        bucket = model.get_bot_bucket()
+
+    blob = bucket.get_blob(str(user_id))
+    if blob is None:
+        return response_failure("Bot does not exist.")
+
+    return blob.md5_hash
 
 
 @manager_api.route("/games", methods=["POST"])
