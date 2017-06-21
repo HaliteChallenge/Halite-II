@@ -1,9 +1,8 @@
 import os.path
 
 import flask
+import google.cloud.storage as gcloud_storage
 import sqlalchemy
-
-from werkzeug.utils import secure_filename
 
 from .. import config, model
 from .. import requires_login_api, response_failure, response_success
@@ -20,7 +19,8 @@ def upload_bot(*, user_id):
         return response_failure("Sorry, but bot submissions are closed.")
 
     conn = model.engine.connect()
-    user = conn.execute(model.users.select(model.users.c.userID == user_id)).first()
+    user = conn.execute(model.users.select(model.users.c.userID == user_id))\
+        .first()
 
     # Check if the user already has a bot compiling
     if user["compileStatus"] != 0:
@@ -36,8 +36,10 @@ def upload_bot(*, user_id):
         return response_failure("Please provide the bot file with a valid "
                                 "name. The file must be a .zip file.")
 
-    filename = secure_filename(uploaded_file.filename)
     # Save to GCloud
+    blob = gcloud_storage.Blob(str(user_id), model.get_compilation_bucket(),
+                               chunk_size=262144)
+    blob.upload_from_file(uploaded_file)
 
     # Flag the user as compiling
     update = model.users.update()\
@@ -45,9 +47,9 @@ def upload_bot(*, user_id):
         .values(compileStatus=1)
     conn.execute(update)
 
-    # Email the user
+    # TODO: Email the user
 
-    # Spin up more workers?
+    # TODO: Spin up more workers?
 
     return flask.jsonify({
         "status": "success",
