@@ -14,7 +14,7 @@ def task():
     """Serve compilation and game tasks to worker instances."""
     conn = model.engine.connect()
     find_compilation_task = model.users\
-        .select([model.users.c.userID])\
+        .select(model.users.c.userID)\
         .where(model.users.c.compileStatus == 1)\
         .order_by(sqlalchemy.asc(model.users.c.userID))\
         .limit(1)

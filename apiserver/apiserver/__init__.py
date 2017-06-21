@@ -33,7 +33,8 @@ def requires_login(view):
     def decorated_view(*args, **kwargs):
         if "user_id" not in flask.session:
             return flask.redirect("/login")
-        return view(*args, **kwargs, user_id=flask.session["user_id"])
+        kwargs["user_id"] = flask.session["user_id"]
+        return view(*args, **kwargs)
 
     return decorated_view
 
@@ -43,7 +44,8 @@ def requires_login_api(view):
     def decorated_view(*args, **kwargs):
         if "user_id" not in flask.session:
             return flask.abort(401)
-        return view(*args, **kwargs, user_id=flask.session["user_id"])
+        kwargs["user_id"] = flask.session["user_id"]
+        return view(*args, **kwargs)
 
     return decorated_view
 
@@ -60,7 +62,6 @@ def user(*, user_id):
     return str(user_id)
 
 
-from . import views
 from . import manager
 from . import web
 
