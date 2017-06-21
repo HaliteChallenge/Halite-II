@@ -1,3 +1,8 @@
+.halite-visualizer {
+    font-size: 1rem;
+    font-family: sans-serif;
+}
+
 .halite-dnd-popup {
     position: fixed;
 
@@ -18,7 +23,8 @@
 .halite-play-pause {
     width: 20%;
     border: 0;
-    font-size: 1rem;
+    font-size: inherit;
+    font-family: inherit;
     padding: 1rem;
     margin: 0;
     color: #FFF;
@@ -32,6 +38,23 @@
     background: #0F0;
 }
 
+.halite-frame-display-container {
+    display: inline-block;
+    width: 30%;
+}
+
+.halite-frame-display {
+    border: 0;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
+    -webkit-appearance: inherit;
+    display: inline;
+}
+
 .halite-frame-scrubber {
+    margin: 0;
+    padding: 0;
     width: 50%;
 }

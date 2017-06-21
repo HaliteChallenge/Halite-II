@@ -40,11 +40,14 @@ class HaliteVisualizer {
 
         this.statsDisplay = new PIXI.Graphics();
 
-        this.currentTurnDisplay = new PIXI.Text("Frame");
+        this.shipStrengthLabel = new PIXI.Text("Relative Fleet Strength");
+        this.planetStrengthLabel = new PIXI.Text("Relative Territory");
+        this.planetStrengthLabel.position.y = 50;
 
         this.application.stage.addChild(this.container);
         this.application.stage.addChild(this.statsDisplay);
-        this.application.stage.addChild(this.currentTurnDisplay);
+        this.application.stage.addChild(this.shipStrengthLabel);
+        this.application.stage.addChild(this.planetStrengthLabel);
 
         this.timer = null;
 
@@ -477,8 +480,6 @@ class HaliteVisualizer {
         this.statsDisplay.drawRect(x, 50, width, 40);
         this.statsDisplay.endFill();
         this.statsDisplay.drawRect(0, 90, 800, 10);
-
-        this.currentTurnDisplay.text = `Frame ${this.frame}.${this.substep}`;
     }
 
     isPlaying() {
@@ -525,6 +526,13 @@ class HaliteVisualizerControls {
            }
         });
 
+        let frameDisplay = $(`<input type="text">`);
+        frameDisplay.addClass("halite-frame-display");
+        let frameDisplayContainer = $("<span>")
+            .addClass("halite-frame-display-container")
+            .text("Frame: ")
+            .append(frameDisplay);
+
         let scrubber = $("<input>");
         scrubber.addClass("halite-frame-scrubber");
         scrubber.prop("type", "range");
@@ -535,17 +543,20 @@ class HaliteVisualizerControls {
             this.visualizer.pause();
             this.visualizer.substep = 0;
             this.visualizer.frame = scrubber.val();
+            this.visualizer.onUpdate();  // TODO: better way to sync all UI?
         });
 
-        let controls = $("<div>");
-        playPause.appendTo(controls);
-        scrubber.appendTo(controls);
+        let controls = $("<div>")
+            .append(playPause)
+            .append(frameDisplayContainer)
+            .append(scrubber);
         controls.appendTo(el);
 
         this.visualizer.attach(el);
 
         this.visualizer.onUpdate = () => {
             scrubber.val(this.visualizer.frame);
+            frameDisplay.val(this.visualizer.frame.toString() + "." + this.visualizer.substep.toString());
         };
         this.visualizer.onPause = () => {
             playPause.removeClass("halite-play-pause-pause");
