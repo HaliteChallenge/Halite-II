@@ -30,7 +30,7 @@ def requires_valid_worker(view):
 
         conn = model.engine.connect()
         find_worker = model.workers\
-            .select(model.workers.c.ipAddress)\
+            .select(model.workers.c.apiKey)\
             .where(model.workers.c.apiKey == api_key)
         if len(conn.execute(find_worker).fetchall()) != 1:
             return flask.abort(401)
@@ -42,7 +42,8 @@ def requires_valid_worker(view):
 
 
 @manager_api.route("/task")
-def task():
+@requires_valid_worker
+def task(*, api_key):
     """Serve compilation and game tasks to worker instances."""
     conn = model.engine.connect()
     find_compilation_task = model.users\
@@ -72,7 +73,8 @@ def task():
 
 # TODO: these aren't RESTful URLs, but it's what the worker expects
 @manager_api.route("/compile", methods=["POST"])
-def update_compilation_status():
+@requires_valid_worker
+def update_compilation_status(*, api_key):
     """Update the compilation status of a bot."""
     user_id = flask.request.form.get("userID", None)
     did_compile = flask.request.form.get("didCompile", False)
@@ -142,7 +144,8 @@ def update_compilation_status():
 
 
 @manager_api.route("/botFile", methods=["POST"])
-def upload_bot():
+@requires_valid_worker
+def upload_bot(*, api_key):
     user_id = flask.request.form.get("userID", None)
 
     if "bot.zip" not in flask.request.files:
@@ -157,7 +160,8 @@ def upload_bot():
 
 
 @manager_api.route("/botFile", methods=["GET"])
-def download_bot():
+@requires_valid_worker
+def download_bot(*, api_key):
     user_id = flask.request.values.get("userID", None)
     compile = flask.request.values.get("compile", False)
 
@@ -177,7 +181,8 @@ def download_bot():
 
 
 @manager_api.route("/botHash")
-def hash_bot():
+@requires_valid_worker
+def hash_bot(*, api_key):
     """Get the MD5 hash of a compiled bot."""
     user_id = flask.request.args.get("userID", None)
     compile = flask.request.args.get("compile", False)
@@ -200,5 +205,6 @@ def hash_bot():
 
 
 @manager_api.route("/games", methods=["POST"])
-def upload_game():
+@requires_valid_worker
+def upload_game(*, api_key):
     pass
