@@ -76,7 +76,8 @@ def task(*, api_key):
             table.c.numSubmissions,
             table.c.mu,
         ]
-    player_count = random.randint(2, 4)
+    # Only allow 2 or 4 player games
+    player_count = 2 if random.random() > 0.5 else 4
     seed_player = None
     with model.engine.connect() as conn:
         seed_player = find_seed_player(conn, desired_columns_of)
