@@ -29,12 +29,12 @@ def requires_valid_worker(view):
         if api_key is None:
             return flask.abort(401)
 
-        conn = model.engine.connect()
-        find_worker = model.workers\
-            .select(model.workers.c.apiKey)\
-            .where(model.workers.c.apiKey == api_key)
-        if len(conn.execute(find_worker).fetchall()) != 1:
-            return flask.abort(401)
+        with model.engine.connect() as conn:
+            find_worker = model.workers\
+                .select(model.workers.c.apiKey)\
+                .where(model.workers.c.apiKey == api_key)
+            if len(conn.execute(find_worker).fetchall()) != 1:
+                return flask.abort(401)
 
         kwargs["api_key"] = api_key
         return view(*args, **kwargs)
@@ -46,26 +46,25 @@ def requires_valid_worker(view):
 @requires_valid_worker
 def task(*, api_key):
     """Serve compilation and game tasks to worker instances."""
-    conn = model.engine.connect()
-
-    # Try to assign a compilation task.
-    find_compilation_task = model.users\
-        .select(model.users.c.userID)\
-        .where(model.users.c.compileStatus == 1)\
-        .order_by(sqlalchemy.asc(model.users.c.userID))\
-        .limit(1)
-    users = conn.execute(find_compilation_task).fetchall()
-    if users:
-        user_id = users[0]["userID"]
-        # TODO: some way to clear compileStatus if it gets stuck
-        update = model.users.update() \
-            .where(model.users.c.userID == user_id) \
-            .values(compileStatus=2)
-        conn.execute(update)
-        return response_success({
-            "type": "compile",
-            "user": user_id,
-        })
+    with model.engine.connect() as conn:
+        # Try to assign a compilation task.
+        find_compilation_task = model.users\
+            .select(model.users.c.userID)\
+            .where(model.users.c.compileStatus == 1)\
+            .order_by(sqlalchemy.asc(model.users.c.userID))\
+            .limit(1)
+        users = conn.execute(find_compilation_task).fetchall()
+        if users:
+            user_id = users[0]["userID"]
+            # TODO: some way to clear compileStatus if it gets stuck
+            update = model.users.update() \
+                .where(model.users.c.userID == user_id) \
+                .values(compileStatus=2)
+            conn.execute(update)
+            return response_success({
+                "type": "compile",
+                "user": user_id,
+            })
 
     # Try to play a game.
     # Need user: ID, username, and # of submissions.
@@ -78,45 +77,47 @@ def task(*, api_key):
             table.c.mu,
         ]
     player_count = random.randint(2, 4)
-    seed_player = find_seed_player(conn, desired_columns_of)
+    seed_player = None
+    with model.engine.connect() as conn:
+        seed_player = find_seed_player(conn, desired_columns_of)
 
-    if seed_player:
-        # Select the rest of the players
-        mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
+        if seed_player:
+            # Select the rest of the players
+            mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
 
-        # Find closely matched players
-        sqlfunc = sqlalchemy.sql.func
-        close_players = sqlalchemy.sql.select(
-            desired_columns_of(model.users)
-        ).where(
-            (model.users.c.isRunning == 1) &
-            (model.users.c.userID != seed_player["userID"])
-        ).order_by(
-            sqlalchemy.func.abs(model.users.c.mu - seed_player["mu"])
-        ).limit(mu_rank_limit).alias("muranktable")
-        query = close_players.select().order_by(sqlfunc.rand())\
-            .limit(player_count - 1)
-        players = conn.execute(query).fetchall()
-        players.insert(0, seed_player)
+            # Find closely matched players
+            sqlfunc = sqlalchemy.sql.func
+            close_players = sqlalchemy.sql.select(
+                desired_columns_of(model.users)
+            ).where(
+                (model.users.c.isRunning == 1) &
+                (model.users.c.userID != seed_player["userID"])
+            ).order_by(
+                sqlalchemy.func.abs(model.users.c.mu - seed_player["mu"])
+            ).limit(mu_rank_limit).alias("muranktable")
+            query = close_players.select().order_by(sqlfunc.rand())\
+                .limit(player_count - 1)
 
-        # Pick map size
-        map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160, 192, 192, 192, 256]
-        map_size = random.choice(map_sizes)
+            players = conn.execute(query).fetchall()
+            players.insert(0, seed_player)
 
-        players = [{
-            "userID": player["userID"],
-            "username": player["username"],
-            "numSubmissions": player["numSubmissions"],
-        } for player in players]
+            # Pick map size
+            map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160, 192, 192, 192, 256]
+            map_size = random.choice(map_sizes)
 
-        if len(players) == player_count:
-            return response_success({
+            players = [{
+                "userID": player["userID"],
+                "username": player["username"],
+                "numSubmissions": player["numSubmissions"],
+            } for player in players]
+
+            if len(players) == player_count:
+                return response_success({
                 "type": "game",
                 "width": map_size,
                 "height": map_size,
                 "users": players,
             })
-    # $players = $this->selectMultiple("SELECT * FROM (SELECT * FROM User WHERE isRunning=1 and userID <> {$seedPlayer['userID']} ORDER BY ABS(mu-{$seedPlayer['mu']}) LIMIT $muRankLimit) muRankTable ORDER BY rand() LIMIT ".($numPlayers-1));
 
     return response_success({
         "type": "notask",
@@ -134,67 +135,65 @@ def update_compilation_status(*, api_key):
     if user_id is None:
         return response_failure("Must provide user ID.")
 
-    conn = model.engine.connect()
-
     language = flask.request.form.get("language", "Other")
 
     # Increment the number of compilation tasks this worker has completed
     # TODO: this field is never actually used
-    update_worker = model.workers.update()\
-        .where(model.workers.c.apiKey == api_key)\
-        .values(numCompiles=model.workers.c.numCompiles + 1)
-    conn.execute(update_worker)
-
-    update = model.users.update()\
-        .where(model.users.c.userID == user_id)\
-        .values(compileStatus=0)
-    conn.execute(update)
-
-    if did_compile:
-        # TODO: email the user
-
-        user = model.users.select().where(model.users.c.userID == user_id)
-        user = conn.execute(user).first()
-
-        # This is backwards of the order in the original PHP, but the original
-        # PHP updated the table using the -old- values of the User row. This
-        # ordering makes it clearer that this is intentional.
-        if user["numSubmissions"] != 0:
-            # TODO: make this more efficient
-            num_active_users = len(conn.execute(
-                model.users
-                    .select(model.users.c.userID)
-                    .where(model.users.c.isRunning == 1)
-            ).fetchall())
-
-            conn.execute(
-                model.user_history.insert().values(
-                    userID=user_id,
-                    versionNumber=user["numSubmissions"],
-                    # TODO: figure out why this isn't defined
-                    lastRank=user["rank"] or 0,
-                    lastNumPlayers=num_active_users,
-                    lastNumGames=user["numGames"],
-                )
-            )
+    with model.engine.connect() as conn:
+        update_worker = model.workers.update()\
+            .where(model.workers.c.apiKey == api_key)\
+            .values(numCompiles=model.workers.c.numCompiles + 1)
+        conn.execute(update_worker)
 
         update = model.users.update()\
             .where(model.users.c.userID == user_id)\
-            .values(
-                numSubmissions=model.users.c.numSubmissions + 1,
-                numGames=0,
-                mu=25.000,
-                sigma=8.333,
-                compileStatus=0,
-                isRunning=1,
-                language=language,
-            )
+            .values(compileStatus=0)
         conn.execute(update)
-        return response_success()
-    else:
-        # TODO: email the user
 
-        return response_success()
+        if did_compile:
+            # TODO: email the user
+
+            user = model.users.select().where(model.users.c.userID == user_id)
+            user = conn.execute(user).first()
+
+            # This is backwards of the order in the original PHP, but the original
+            # PHP updated the table using the -old- values of the User row. This
+            # ordering makes it clearer that this is intentional.
+            if user["numSubmissions"] != 0:
+                # TODO: make this more efficient
+                num_active_users = len(conn.execute(
+                    model.users
+                        .select(model.users.c.userID)
+                        .where(model.users.c.isRunning == 1)
+                ).fetchall())
+
+                conn.execute(
+                    model.user_history.insert().values(
+                        userID=user_id,
+                        versionNumber=user["numSubmissions"],
+                        # TODO: figure out why this isn't defined
+                        lastRank=user["rank"] or 0,
+                        lastNumPlayers=num_active_users,
+                        lastNumGames=user["numGames"],
+                    )
+                )
+
+            update = model.users.update()\
+                .where(model.users.c.userID == user_id)\
+                .values(
+                    numSubmissions=model.users.c.numSubmissions + 1,
+                    numGames=0,
+                    mu=25.000,
+                    sigma=8.333,
+                    compileStatus=0,
+                    isRunning=1,
+                    language=language,
+            )
+            conn.execute(update)
+            return response_success()
+        else:
+            # TODO: email the user
+            return response_success()
 
 
 @manager_api.route("/botFile", methods=["POST"])

@@ -1,6 +1,8 @@
 # TODO: make this read from a JSON file instead
 
 COMPETITION_OPEN = True
+# Original PHP: "compState", "finalsPairing"
+COMPETITION_FINALS_PAIRING = False
 
 # Google Cloud
 GCLOUD_PROJECT = 'TODO'
