@@ -9,13 +9,13 @@ from oauth2client.client import GoogleCredentials
 from .. import config, model
 
 
-WORKER_STARTUP_SCRIPT_PATH =os.path.join(os.path.dirname(__file__),
-                                         "worker_startup.sh")
+WORKER_STARTUP_SCRIPT_PATH = os.path.join(os.path.dirname(__file__),
+                                          "worker_startup.sh")
 with open(WORKER_STARTUP_SCRIPT_PATH) as worker_startup_script_file:
     WORKER_STARTUP_SCRIPT = worker_startup_script_file.read()
 
 
-def create_worker(name, *, verbose=False):
+def create_worker(name, manager, *, verbose=False):
     compute = googleapiclient.discovery.build('compute', 'v1')
     credentials = GoogleCredentials.get_application_default()
 
@@ -95,6 +95,9 @@ def create_worker(name, *, verbose=False):
             }, {
                 'key': 'halite-api-key',
                 'value': api_key,
+            }, {
+                'key': 'halite-manager-url',
+                'value': manager,
             }]
         }
     }
@@ -109,6 +112,7 @@ def create_worker(name, *, verbose=False):
 
 def main():
     create_worker("halite-worker-" + str(random.randrange(0, 1000000000)),
+                  config.HALITE_MANAGER_URL,
                   verbose=True)
 
 

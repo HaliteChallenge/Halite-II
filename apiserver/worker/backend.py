@@ -1,6 +1,5 @@
 import urllib.request
 import requests
-import json
 from hashlib import md5
 import json
 import os
