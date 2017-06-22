@@ -1,3 +1,5 @@
+import base64
+import binascii
 import functools
 import io
 
@@ -192,7 +194,9 @@ def hash_bot():
     if blob is None:
         return response_failure("Bot does not exist.")
 
-    return blob.md5_hash
+    return response_success({
+        "hash": binascii.hexlify(base64.b64decode(blob.md5_hash)).decode('utf-8'),
+    })
 
 
 @manager_api.route("/games", methods=["POST"])
