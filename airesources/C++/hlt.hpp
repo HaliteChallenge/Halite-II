@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -105,11 +106,11 @@ namespace hlt {
         short vel_x, vel_y;
 
         auto magnitude() const -> double {
-            return sqrt(vel_x*vel_x + vel_y*vel_y);
+            return std::sqrt(vel_x*vel_x + vel_y*vel_y);
         }
 
         auto angle() const -> double {
-            return atan2(vel_y, vel_x);
+            return std::atan2(vel_y, vel_x);
         }
     };
 
