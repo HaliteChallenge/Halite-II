@@ -86,6 +86,11 @@ def update_compilation_status():
     # TODO: we need the API key
     # $this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
 
+    update = model.users.update()\
+        .where(model.users.c.userID == user_id)\
+        .values(compileStatus=0)
+    conn.execute(update)
+
     if did_compile:
         # TODO: email the user
 
@@ -97,8 +102,8 @@ def update_compilation_status():
         # ordering makes it clearer that this is intentional.
         if user["numSubmissions"] != 0:
             num_active_users = conn.execute(
-                model.users\
-                    .select([sqlalchemy.func.count(model.users.c.userID)])\
+                model.users
+                    .select([sqlalchemy.func.count(model.users.c.userID)])
                     .where(model.users.c.isRunning == 1)
             ).first()[0]
 
@@ -123,14 +128,11 @@ def update_compilation_status():
                 isRunning=1,
                 language=language,
             )
+        conn.execute(update)
         return response_success()
     else:
         # TODO: email the user
 
-        update = model.users.update()\
-            .where(model.users.c.userID == user_id)\
-            .values(compileStatus=0)
-        conn.execute(update)
         return response_success()
 
 
