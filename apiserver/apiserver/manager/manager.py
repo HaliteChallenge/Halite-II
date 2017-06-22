@@ -1,4 +1,5 @@
 import functools
+import io
 
 import flask
 import sqlalchemy
@@ -101,17 +102,19 @@ def update_compilation_status():
         # PHP updated the table using the -old- values of the User row. This
         # ordering makes it clearer that this is intentional.
         if user["numSubmissions"] != 0:
-            num_active_users = conn.execute(
+            # TODO: make this more efficient
+            num_active_users = len(conn.execute(
                 model.users
-                    .select([sqlalchemy.func.count(model.users.c.userID)])
+                    .select(model.users.c.userID)
                     .where(model.users.c.isRunning == 1)
-            ).first()[0]
+            ).fetchall())
 
             conn.execute(
                 model.user_history.insert().values(
                     userID=user_id,
                     versionNumber=user["numSubmissions"],
-                    lastRank=user["rank"],
+                    # TODO: figure out why this isn't defined
+                    lastRank=user["rank"] or 0,
                     lastNumPlayers=num_active_users,
                     lastNumGames=user["numGames"],
                 )
@@ -153,8 +156,22 @@ def upload_bot():
 
 @manager_api.route("/botFile", methods=["GET"])
 def download_bot():
-    # TODO: implement bot downloading
-    pass
+    user_id = flask.request.values.get("userID", None)
+    compile = flask.request.values.get("compile", False)
+
+    if compile:
+        bucket = model.get_compilation_bucket()
+    else:
+        bucket = model.get_bot_bucket()
+
+    # Retrieve from GCloud
+    blob = gcloud_storage.Blob(str(user_id), bucket, chunk_size=262144)
+    buffer = io.BytesIO()
+    blob.download_to_file(buffer)
+    buffer.seek(0)
+    return flask.send_file(buffer, mimetype="application/zip",
+                           as_attachment=True,
+                           attachment_filename=str(user_id)+".zip")
 
 
 @manager_api.route("/botHash")
