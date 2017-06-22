@@ -15,7 +15,7 @@ with open(WORKER_STARTUP_SCRIPT_PATH) as worker_startup_script_file:
     WORKER_STARTUP_SCRIPT = worker_startup_script_file.read()
 
 
-def create_worker(name, manager, *, verbose=False):
+def create_worker(name, manager, secret_folder, *, verbose=False):
     compute = googleapiclient.discovery.build('compute', 'v1')
     credentials = GoogleCredentials.get_application_default()
 
@@ -98,6 +98,9 @@ def create_worker(name, manager, *, verbose=False):
             }, {
                 'key': 'halite-manager-url',
                 'value': manager,
+            }, {
+                'key': 'halite-secret-folder',
+                'value': secret_folder,
             }]
         }
     }
@@ -113,6 +116,7 @@ def create_worker(name, manager, *, verbose=False):
 def main():
     create_worker("halite-worker-" + str(random.randrange(0, 1000000000)),
                   config.HALITE_MANAGER_URL,
+                  config.HALITE_CE_SECRET_FOLDER,
                   verbose=True)
 
 

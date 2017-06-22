@@ -13,6 +13,9 @@ GCLOUD_BOT_BUCKET = 'TODO'
 # Manager
 HALITE_MANAGER_URL = ''
 
+# Competition Environment (HCE)
+HALITE_CE_SECRET_FOLDER = 'sosecret'
+
 # Workers
 GCLOUD_WORKER_IMAGE_FAMILY = 'TODO'
 GCLOUD_WORKER_MACHINE_TYPE = 'g1-small'

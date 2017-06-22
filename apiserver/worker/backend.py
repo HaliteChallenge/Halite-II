@@ -10,6 +10,7 @@ with open("config.json") as configfile:
     config = json.load(configfile)
     API_KEY = config["API_KEY"]
     MANAGER_URL = config["MANAGER_URL"]
+    SECRET_FOLDER = config["SECRET_FOLDER"]
 
 
 def getTask():

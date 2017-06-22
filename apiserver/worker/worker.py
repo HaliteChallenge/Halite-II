@@ -1,34 +1,20 @@
-import archive
-import backend
-
-import random
-
+import copy
 import os
 import os.path
-import stat
 import glob
-
-import platform
-import tempfile
+import gzip
+import shutil
+import subprocess
+import traceback
 
 from time import sleep, gmtime, strftime
 
-from compiler import *
+import archive
+import backend
+import compiler
 
-import configparser
-
-import copy
-
-import traceback
-
-import shutil
-import gzip
-
-parser = configparser.ConfigParser()
-parser.read("../halite.ini")
 
 RUN_GAME_FILE_NAME = "runGame.sh"
-SECRET_FOLDER = parser["hce"]["secretFolder"]
 
 def makePath(path):
     """Deletes anything residing at path, creates path, and chmods the directory"""
@@ -50,7 +36,7 @@ def executeCompileTask(user, backend):
 
         while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
             singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
-            bufferFolder = os.path.join(workingPath, SECRET_FOLDER)
+            bufferFolder = os.path.join(workingPath, backend.SECRET_FOLDER)
             os.mkdir(bufferFolder)
 
             for filename in os.listdir(singleFolder):
@@ -64,7 +50,7 @@ def executeCompileTask(user, backend):
         # Rm symlinks
         os.system("find "+workingPath+" -type l -delete")
 
-        language, errors = compile_anything(workingPath)
+        language, errors = compiler.compile_anything(workingPath)
         didCompile = True if errors == None else False
     except Exception as e:
         language = "Other"
@@ -96,7 +82,7 @@ def runGame(width, height, users):
 
     print("Run game command %s\n" % runGameCommand)
     print("Waiting for game output...\n")
-    lines =  subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+    lines = subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
     print("\n-----Here is game output: -----")
     print("\n".join(lines))
     print("--------------------------------\n")
