@@ -2,13 +2,14 @@ import base64
 import binascii
 import functools
 import io
+import random
 
 import flask
 import sqlalchemy
 
 import google.cloud.storage as gcloud_storage
 
-from .. import model, response_success, response_failure
+from .. import config, model, response_success, response_failure
 
 
 manager_api = flask.Blueprint("manager_api", __name__)
@@ -46,6 +47,8 @@ def requires_valid_worker(view):
 def task(*, api_key):
     """Serve compilation and game tasks to worker instances."""
     conn = model.engine.connect()
+
+    # Try to assign a compilation task.
     find_compilation_task = model.users\
         .select(model.users.c.userID)\
         .where(model.users.c.compileStatus == 1)\
@@ -64,7 +67,56 @@ def task(*, api_key):
             "user": user_id,
         })
 
-    # TODO: implement task to run a game
+    # Try to play a game.
+    # Need user: ID, username, and # of submissions.
+    # TODO: make sure these end up in JSON as keys
+    def desired_columns_of(table):
+        return [
+            table.c.userID,
+            table.c.username,
+            table.c.numSubmissions,
+            table.c.mu,
+        ]
+    player_count = random.randint(2, 4)
+    seed_player = find_seed_player(conn, desired_columns_of)
+
+    if seed_player:
+        # Select the rest of the players
+        mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
+
+        # Find closely matched players
+        sqlfunc = sqlalchemy.sql.func
+        close_players = sqlalchemy.sql.select(
+            desired_columns_of(model.users)
+        ).where(
+            (model.users.c.isRunning == 1) &
+            (model.users.c.userID != seed_player["userID"])
+        ).order_by(
+            sqlalchemy.func.abs(model.users.c.mu - seed_player["mu"])
+        ).limit(mu_rank_limit).alias("muranktable")
+        query = close_players.select().order_by(sqlfunc.rand())\
+            .limit(player_count - 1)
+        players = conn.execute(query).fetchall()
+        players.insert(0, seed_player)
+
+        # Pick map size
+        map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160, 192, 192, 192, 256]
+        map_size = random.choice(map_sizes)
+
+        players = [{
+            "userID": player["userID"],
+            "username": player["username"],
+            "numSubmissions": player["numSubmissions"],
+        } for player in players]
+
+        if len(players) == player_count:
+            return response_success({
+                "type": "game",
+                "width": map_size,
+                "height": map_size,
+                "users": players,
+            })
+    # $players = $this->selectMultiple("SELECT * FROM (SELECT * FROM User WHERE isRunning=1 and userID <> {$seedPlayer['userID']} ORDER BY ABS(mu-{$seedPlayer['mu']}) LIMIT $muRankLimit) muRankTable ORDER BY rand() LIMIT ".($numPlayers-1));
 
     return response_success({
         "type": "notask",
@@ -88,8 +140,10 @@ def update_compilation_status(*, api_key):
 
     # Increment the number of compilation tasks this worker has completed
     # TODO: this field is never actually used
-    # TODO: we need the API key
-    # $this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
+    update_worker = model.workers.update()\
+        .where(model.workers.c.apiKey == api_key)\
+        .values(numCompiles=model.workers.c.numCompiles + 1)
+    conn.execute(update_worker)
 
     update = model.users.update()\
         .where(model.users.c.userID == user_id)\
@@ -208,3 +262,100 @@ def hash_bot(*, api_key):
 @requires_valid_worker
 def upload_game(*, api_key):
     pass
+
+
+def find_seed_player(conn, desired_columns_of):
+    """
+    Find a seed player for a game.
+    :param conn: A database connection.
+    :param desired_columns_of: Function that returns a list of columns desired
+    from a given table of user data.
+    :return: A seed player, or None.
+    """
+    sqlfunc = sqlalchemy.sql.func
+    seed_player = None
+    if not config.COMPETITION_FINALS_PAIRING:
+        rand_value = random.random()
+
+        if rand_value > 0.5:
+            ordering = sqlfunc.rand() * -sqlfunc.pow(model.users.c.sigma, 2)
+            query = sqlalchemy.sql.select(desired_columns_of(model.users))\
+                .where(model.users.c.isRunning == 1 and
+                       model.users.c.numGames < 400)\
+                .order_by(ordering)\
+                .limit(1)
+            result = conn.execute(query).fetchall()
+            if result:
+                seed_player = result[0]
+        elif 0.25 < rand_value <= 0.5:
+            # Find the users in the most recent games, and pick a seed player
+            # from those
+            games = model.games
+            gameusers = model.gameusers
+
+            max_time = sqlfunc.max(games.c.timestamp).label("maxTime")
+            user_id = gameusers.c.userID.label("userID")
+            recent_gamers = sqlalchemy.sql.select([
+                max_time,
+                user_id
+            ]).select_from(
+                gameusers.join(games, games.c.gameID == gameusers.c.gameID)
+            ).group_by(user_id).alias("temptable")
+
+            # Of those users, select ones with under 400 games, preferring
+            # ones in older games, and get their data
+            outer_users = model.users.alias("u")
+            potential_players = sqlalchemy.sql.select(
+                desired_columns_of(outer_users)
+            ).select_from(
+                recent_gamers.join(
+                    outer_users,
+                    outer_users.c.userID == recent_gamers.c.userID)) \
+                .where((outer_users.c.numGames < 400) &
+                       (outer_users.c.isRunning == 1)) \
+                .order_by(recent_gamers.c.maxTime.asc()) \
+                .limit(15).alias("orderedtable")
+
+            # Then sort them randomly and take one
+            query = sqlalchemy.sql.select(
+                desired_columns_of(potential_players)
+            ).order_by(sqlfunc.rand()).limit(1)
+            result = conn.execute(query).fetchall()
+            if result:
+                seed_player = result[0]
+
+        if rand_value <= 0.25 or not seed_player:
+            # Same as the previous case, but we do not restrict how many
+            # games the user can have played, and we do not sort randomly.
+            games = model.games
+            gameusers = model.gameusers
+
+            max_time = sqlfunc.max(games.c.timestamp).label("maxTime")
+            user_id = gameusers.c.userID.label("userID")
+            recent_gamers = sqlalchemy.sql.select([
+                max_time,
+                user_id
+            ]).select_from(
+                gameusers.join(games, games.c.gameID == gameusers.c.gameID)
+            ).group_by(user_id).alias("temptable")
+
+            # Of those users, select ones with under 400 games, preferring
+            # ones in older games, and get their data
+            outer_users = model.users.alias("u")
+            potential_players = sqlalchemy.sql.select(
+                desired_columns_of(outer_users)
+            ).select_from(
+                recent_gamers.join(
+                    outer_users,
+                    outer_users.c.userID == recent_gamers.c.userID)) \
+                .where(outer_users.c.isRunning == 1) \
+                .order_by(recent_gamers.c.maxTime.asc()) \
+                .limit(1)
+
+            result = conn.execute(potential_players).fetchall()
+            if result:
+                seed_player = result[0]
+    else:
+        pass
+
+    return seed_player

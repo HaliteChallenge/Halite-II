@@ -12,6 +12,8 @@ metadata = sqlalchemy.MetaData(bind=engine)
 users = sqlalchemy.Table("User", metadata, autoload=True)
 user_history = sqlalchemy.Table("UserHistory", metadata, autoload=True)
 workers = sqlalchemy.Table("Worker", metadata, autoload=True)
+games = sqlalchemy.Table("Game", metadata, autoload=True)
+gameusers = sqlalchemy.Table("GameUser", metadata, autoload=True)
 
 
 def get_storage_client():
