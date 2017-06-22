@@ -59,7 +59,9 @@ def storeBotLocally(userID, storageDir, isCompile=False):
         localZip.write(remoteZipContents)
         localZip.close()
 
-        if md5(remoteZipContents).hexdigest() != getBotHash(userID, isCompile):
+        content_hash = md5(remoteZipContents).hexdigest()
+        remote_hash = getBotHash(userID, isCompile)
+        if content_hash != remote_hash:
             iterations += 1
             continue
 

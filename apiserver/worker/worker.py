@@ -23,15 +23,15 @@ def makePath(path):
     os.makedirs(path)
     os.chmod(path, 0o777)
 
-def executeCompileTask(user, backend):
+def executeCompileTask(user_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
-    print("Compiling a bot with userID %s\n" % str(user["userID"]))
+    print("Compiling a bot with userID %s\n" % str(user_id))
 
     try:
         workingPath = "workingPath"
         makePath(workingPath)
 
-        botPath = backend.storeBotLocally(int(user["userID"]), workingPath, isCompile=True)
+        botPath = backend.storeBotLocally(user_id, workingPath, isCompile=True)
         archive.unpack(botPath)
 
         while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
@@ -59,13 +59,13 @@ def executeCompileTask(user, backend):
 
     if didCompile:
         print("Bot did compile\n")
-        archive.zipFolder(workingPath, os.path.join(workingPath, user["userID"]+".zip"))
-        backend.storeBotRemotely(int(user["userID"]), os.path.join(workingPath, user["userID"]+".zip"))
+        archive.zipFolder(workingPath, os.path.join(workingPath, str(user_id)+".zip"))
+        backend.storeBotRemotely(user_id, os.path.join(workingPath, str(user_id)+".zip"))
     else:
         print("Bot did not compile\n")
         print("Bot errors %s\n" % str(errors))
 
-    backend.compileResult(int(user["userID"]), didCompile, language, errors=(None if didCompile else "\n".join(errors)))
+    backend.compileResult(user_id, didCompile, language, errors=(None if didCompile else "\n".join(errors)))
     if os.path.isdir(workingPath):
         shutil.rmtree(workingPath)
 
@@ -166,6 +166,7 @@ if __name__ == "__main__":
                 sleep(2)
         except Exception as e:
             print("Error on get task %s\n" % str(e))
+            traceback.print_exc()
             print("Sleeping...\n")
             sleep(2)
 
