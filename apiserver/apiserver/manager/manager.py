@@ -15,8 +15,7 @@ def requires_valid_worker(view):
     """
     Decorator that checks that the remote client is a valid worker.
 
-    A valid worker must provide an API key, and their IP address must match
-    the stored IP address for that API key.
+    A valid worker must provide an API key.
 
     API keys are generated and stored when the worker is initially started.
     """
@@ -29,10 +28,7 @@ def requires_valid_worker(view):
         conn = model.engine.connect()
         find_worker = model.workers\
             .select(model.workers.c.ipAddress)\
-            .where(
-                model.workers.c.apiKey == api_key and
-                model.workers.c.ipAddress == flask.request.remote_addr
-            )
+            .where(model.workers.c.apiKey == api_key)
         if len(conn.execute(find_worker).fetchall()) != 1:
             return flask.abort(401)
 
