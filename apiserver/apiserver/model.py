@@ -8,8 +8,10 @@ from . import config
 # TODO: make this configurable
 engine = sqlalchemy.create_engine("mysql+pymysql://halite2:password@localhost/halite2")
 metadata = sqlalchemy.MetaData(bind=engine)
+
 users = sqlalchemy.Table("User", metadata, autoload=True)
 user_history = sqlalchemy.Table("UserHistory", metadata, autoload=True)
+workers = sqlalchemy.Table("Worker", metadata, autoload=True)
 
 
 def get_storage_client():

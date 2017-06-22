@@ -1,3 +1,5 @@
+import functools
+
 import flask
 import sqlalchemy
 
@@ -7,6 +9,37 @@ from .. import model, response_success, response_failure
 
 
 manager_api = flask.Blueprint("manager_api", __name__)
+
+
+def requires_valid_worker(view):
+    """
+    Decorator that checks that the remote client is a valid worker.
+
+    A valid worker must provide an API key, and their IP address must match
+    the stored IP address for that API key.
+
+    API keys are generated and stored when the worker is initially started.
+    """
+    @functools.wraps(view)
+    def _requires_valid_worker(*args, **kwargs):
+        api_key = flask.request.values.get("apiKey", None)
+        if api_key is None:
+            return flask.abort(401)
+
+        conn = model.engine.connect()
+        find_worker = model.workers\
+            .select(model.workers.c.ipAddress)\
+            .where(
+                model.workers.c.apiKey == api_key and
+                model.workers.c.ipAddress == flask.request.remote_addr
+            )
+        if len(conn.execute(find_worker).fetchall()) != 1:
+            return flask.abort(401)
+
+        kwargs["api_key"] = api_key
+        return view(*args, **kwargs)
+
+    return _requires_valid_worker
 
 
 @manager_api.route("/task")
@@ -51,6 +84,11 @@ def update_compilation_status():
     conn = model.engine.connect()
 
     language = flask.request.form.get("language", "Other")
+
+    # Increment the number of compilation tasks this worker has completed
+    # TODO: this field is never actually used
+    # TODO: we need the API key
+    # $this->insert("UPDATE Worker SET numCompiles=numCompiles+1 WHERE apiKey=".$this->mysqli->real_escape_string($this->apiKey));
 
     if did_compile:
         # TODO: email the user
