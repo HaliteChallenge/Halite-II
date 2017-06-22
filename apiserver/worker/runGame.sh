@@ -37,8 +37,12 @@ do
     
     BOTNAMEINDEX=$(($i+$NUMBOTS));
     BOTNAME=${!BOTNAMEINDEX};
+    CGROUP=halitebot_$i
 
-    BOTSTARTCOMMANDS+="\"/usr/bin/docker run --net=none --memory='350m' --cpu-shares=1024 --storage-opt size=10G -i -v $PWD/$BOT:$PWD/$BOT mntruell/halite_sandbox:latest sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
+    sudo cgcreate -g cpu,memory:/${CGROUP}
+    sudo cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
+
+    BOTSTARTCOMMANDS+="\"sudo cgexec -g cpu,memory:$CGROUP sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
     BOTSTARTCOMMANDS+="\"$BOTNAME\" ";
 done
 
@@ -47,11 +51,6 @@ eval "chmod +x $ENVIRONMENT"
 RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d \"$WIDTH $HEIGHT\" $BOTSTARTCOMMANDS"
 echo $RUN_GAME_COMMAND;
 eval $RUN_GAME_COMMAND;
-
-docker kill  $(docker ps -aq) >/dev/null
-docker rm -v $(docker ps -aq) >/dev/null
-
-rm /run/network/ifstate.veth*
 
 mv *.hlt ../
 mv *.log ../

@@ -2,14 +2,16 @@ import urllib.request
 import requests
 import json
 from hashlib import md5
-import configparser
+import json
 import os
 from time import gmtime, strftime
 
-config = configparser.ConfigParser()
-config.read("../halite.ini")
-API_KEY = config.get("hce", "apiKey")
-MANAGER_URL = config.get("hce", "managerURL")
+
+with open("config.json") as configfile:
+    config = json.load(configfile)
+    API_KEY = config["API_KEY"]
+    MANAGER_URL = config["MANAGER_URL"]
+
 
 def getTask():
     """Gets either a run or a compile task from the API"""
@@ -21,6 +23,7 @@ def getTask():
     else:
         return json.loads(content)
 
+
 def getBotHash(userID, isCompile=False):
     """Gets the checksum of a user's bot's zipped source code"""
     params = {"apiKey": API_KEY, "userID": userID}
@@ -31,6 +34,7 @@ def getBotHash(userID, isCompile=False):
 
     print("Getting bot hash %s\n" % result.text)
     return json.loads(result.text).get("hash")
+
 
 def storeBotLocally(userID, storageDir, isCompile=False):
     """Downloads and store's a bot's zip file locally
@@ -63,6 +67,7 @@ def storeBotLocally(userID, storageDir, isCompile=False):
 
     raise ValueError
 
+
 def storeBotRemotely(userID, zipFilePath):
     """Posts a bot file to the manager"""
     zipContents = open(zipFilePath, "rb").read()
@@ -81,10 +86,12 @@ def storeBotRemotely(userID, zipFilePath):
         return
     raise ValueError
 
+
 def compileResult(userID, didCompile, language, errors=None):
     """Posts the result of a compilation task"""
     r = requests.post(MANAGER_URL+"compile", data={"apiKey": API_KEY, "userID": userID, "didCompile": int(didCompile), "language": language, "errors": errors})
     print("Posting compile result %s\n" % r.text)
+
 
 def gameResult(width, height, users, replayPath, errorPaths):
     """Posts the result of a game task"""

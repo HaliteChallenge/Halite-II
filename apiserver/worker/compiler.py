@@ -65,7 +65,7 @@ def nukeglob(pattern):
 
 def _run_cmd(cmd, working_dir, timelimit):
     absoluteWorkingDir = os.path.abspath(working_dir)
-    cmd = "docker run -i -v "+absoluteWorkingDir+":"+absoluteWorkingDir+" mntruell/halite_sandbox:latest sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
+    cmd = "sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
@@ -76,12 +76,11 @@ def _run_cmd(cmd, working_dir, timelimit):
 
         errorsString = rawErrors.decode("utf-8").strip()
         errors = errorsString.split("\n") if errorsString.isspace() == False and errorsString != "" else None
-    except TimeoutExpired as e:
+    except subprocess.TimeoutExpired:
         out = []
         errors = ["Compilation timed out with command %s" % (cmd,)]
 
-    os.system("docker kill $(docker ps -aq)")
-    os.system("docker rm $(docker ps -aq)")
+    # TODO: kill the process? (before it removed the docker container)
     return out, errors
 
 
