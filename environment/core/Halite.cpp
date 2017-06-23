@@ -881,9 +881,6 @@ auto Halite::output_header(nlohmann::json& replay) -> void {
 }
 
 auto Halite::output(std::string filename) -> void {
-
-    auto start_time = std::chrono::high_resolution_clock::now();
-
     std::ofstream gameFile;
     gameFile.open(filename, std::ios_base::binary);
     if (!gameFile.is_open())
@@ -892,8 +889,6 @@ auto Halite::output(std::string filename) -> void {
     nlohmann::json j;
 
     output_header(j);
-
-    auto after_header = std::chrono::high_resolution_clock::now();
 
     // Encode the frames. Note that there is no moves field for the last frame.
 
@@ -944,8 +939,6 @@ auto Halite::output(std::string filename) -> void {
         frames.push_back(frame);
     }
 
-    auto after_frames = std::chrono::high_resolution_clock::now();
-
     // Save the frame events. This is added to the frame data, alongside
     // ships and planets.
     for (auto frame_idx = 0; frame_idx < full_frame_events.size(); frame_idx++) {
@@ -994,8 +987,6 @@ auto Halite::output(std::string filename) -> void {
     j["frames"] = nlohmann::json(frames);
     j["moves"] = nlohmann::json(moves);
 
-    auto after_building = std::chrono::high_resolution_clock::now();
-
     // Use msgpack to cut down on the size of the replay file
     std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
 
@@ -1018,12 +1009,6 @@ auto Halite::output(std::string filename) -> void {
 
     gameFile.flush();
     gameFile.close();
-
-    auto after_writing = std::chrono::high_resolution_clock::now();
-
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_building - start_time).count() << '\n';
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_writing - after_building).count() << '\n';
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(after_frames - after_header).count() << '\n';
 }
 
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
