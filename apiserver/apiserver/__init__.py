@@ -32,17 +32,6 @@ def requires_login(view):
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
         if "user_id" not in flask.session:
-            return flask.redirect("/login")
-        kwargs["user_id"] = flask.session["user_id"]
-        return view(*args, **kwargs)
-
-    return decorated_view
-
-
-def requires_login_api(view):
-    @functools.wraps(view)
-    def decorated_view(*args, **kwargs):
-        if "user_id" not in flask.session:
             return flask.abort(401)
         kwargs["user_id"] = flask.session["user_id"]
         return view(*args, **kwargs)
@@ -54,12 +43,6 @@ def requires_login_api(view):
 def login():
     flask.session["user_id"] = 2609
     return flask.redirect("/")
-
-
-@app.route('/user')
-@requires_login
-def user(*, user_id):
-    return str(user_id)
 
 
 from . import manager

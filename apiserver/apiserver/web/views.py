@@ -4,21 +4,65 @@ import flask
 import google.cloud.storage as gcloud_storage
 
 from .. import config, model
-from .. import requires_login_api, response_failure, response_success
+from .. import requires_login, response_failure, response_success
 
 
 web_api = flask.Blueprint("web_api", __name__)
 
+######################
+# USER API ENDPOINTS #
+######################
+@web_api.route("/user")
+def list_users():
+    pass
 
-@web_api.route("/botFile", methods=["POST"])
-@requires_login_api
-def upload_bot(*, user_id):
+
+@web_api.route("/user/<username>", methods=["GET"])
+def get_user(username):
+    pass
+
+
+@web_api.route("/user/<username>", methods=["POST"])
+def create_user(username):
+    # TODO: investigate how this works with OAuth/Github (this endpoint redirects to Github?)
+    pass
+
+
+@web_api.route("/user/<username>", methods=["PUT"])
+@requires_login
+def get_user(username):
+    pass
+
+
+@web_api.route("/user/<username>", methods=["DELETE"])
+@requires_login
+def delete_user(username):
+    pass
+
+
+# ---------------------- #
+# USER BOT API ENDPOINTS #
+# ---------------------- #
+@web_api.route("/user/<username>/bot", methods=["GET"])
+def list_user_bots(username):
+    pass
+
+
+@web_api.route("/user/<username>/bot/<bot_id>", methods=["GET"])
+def get_user_bot(username, bot_id):
+    pass
+
+
+@web_api.route("/user/<username>/bot/<bot_id>", methods=["PUT"])
+@web_api.route("/user/<username>/bot/<bot_id>", methods=["POST"])
+@requires_login
+def store_user_bot(user_id, username, bot_id):
     """Store an uploaded bot in object storage."""
     if not config.COMPETITION_OPEN:
         return response_failure("Sorry, but bot submissions are closed.")
 
     conn = model.engine.connect()
-    user = conn.execute(model.users.select(model.users.c.userID == user_id))\
+    user = conn.execute(model.users.select(model.users.c.userID == user_id)) \
         .first()
 
     # Check if the user already has a bot compiling
@@ -41,8 +85,8 @@ def upload_bot(*, user_id):
     blob.upload_from_file(uploaded_file)
 
     # Flag the user as compiling
-    update = model.users.update()\
-        .where(model.users.c.userID == user_id)\
+    update = model.users.update() \
+        .where(model.users.c.userID == user_id) \
         .values(compileStatus=1)
     conn.execute(update)
 
@@ -58,3 +102,58 @@ def upload_bot(*, user_id):
 def allowed_file(filename):
     _, extension = os.path.splitext(filename)
     return extension == ".zip"
+
+
+@web_api.route("/user/<username>/bot/<bot_id>", methods=["DELETE"])
+@requires_login
+def delete_user_bot(username, bot_id):
+    pass
+
+
+# ------------------------ #
+# USER MATCH API ENDPOINTS #
+# ------------------------ #
+@web_api.route("/user/<username>/match", methods=["GET"])
+def list_user_matches(username):
+    pass
+
+
+@web_api.route("/user/<username>/match/<match_id>", methods=["GET"])
+def get_user_match(username, match_id):
+    pass
+
+
+##############################
+# ORGANIZATION API ENDPOINTS #
+##############################
+@web_api.route("/organization")
+def list_organizations():
+    pass
+
+
+@web_api.route("/organization/<name>", methods=["GET"])
+def get_organization(name):
+    pass
+
+
+@web_api.route("/organization/<name>", methods=["POST"])
+def create_organization(name):
+    pass
+
+
+@web_api.route("/organization/<name>", methods=["PUT"])
+def update_organization(name):
+    pass
+
+
+@web_api.route("/organization/<name>", methods=["DELETE"])
+def delete_organization(name):
+    pass
+
+
+#############################
+# LEADERBOARD API ENDPOINTS #
+#############################
+@web_api.route("/leaderboard")
+def leaderboard():
+    pass
