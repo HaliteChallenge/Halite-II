@@ -96,7 +96,7 @@ namespace mapgen {
         auto rand_radius =
             std::bind(std::uniform_int_distribution<int>(3, max_radius), std::ref(rng));
         auto rand_planets_generated =
-            std::bind(std::uniform_int_distribution<>(4, std::max(2, planets_per_player / 2)), std::ref(rng));
+            std::bind(std::uniform_int_distribution<>(2, std::max(2, planets_per_player / 2)), std::ref(rng));
 
         // Temporary storage for the planets created in a particular orbit
         auto planets = std::vector<Zone>();
