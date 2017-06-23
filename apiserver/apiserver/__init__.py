@@ -42,6 +42,18 @@ def requires_login(view):
     return decorated_view
 
 
+def optional_login(view):
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        if "user_id" in flask.session:
+            kwargs["user_id"] = None
+        else:
+            kwargs["user_id"] = flask.session["user_id"]
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
 @app.route('/login')
 def login():
     flask.session["user_id"] = 2609
