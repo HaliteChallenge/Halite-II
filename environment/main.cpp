@@ -294,9 +294,7 @@ int main(int argc, char** argv) {
     if (names != NULL) delete names;
 
     std::string victoryOut;
-    if (quiet_output) {
-        std::cout << stats;
-    } else {
+    if (!quiet_output) {
         for (unsigned int player_id = 0;
              player_id < stats.player_statistics.size(); player_id++) {
             auto& player_stats = stats.player_statistics[player_id];

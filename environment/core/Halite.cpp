@@ -8,6 +8,16 @@
 
 #include "miniz/miniz.h"
 
+auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void {
+    for (hlt::PlayerId player_id = 0;
+         player_id < stats.player_statistics.size(); player_id++) {
+        auto& player_stats = stats.player_statistics[player_id];
+        json[std::to_string(static_cast<int>(player_id))] = nlohmann::json{
+            { "rank", player_stats.rank },
+        };
+    }
+}
+
 //Private Functions ------------------
 
 auto Halite::compare_rankings(const hlt::PlayerId& player1,
@@ -1135,17 +1145,21 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             stats.output_filename = replay_directory + filename;
             output(stats.output_filename);
         }
-        if (!quiet_output)
+        if (!quiet_output) {
             std::cout << "Map seed was " << seed << std::endl
                       << "Opening a file at " << stats.output_filename
                       << std::endl;
-        else std::cout << stats.output_filename << ' ' << seed << std::endl;
+        }
     }
-    //Output logs for players that timed out or errored.
+
+    // Output logs for players that timed out or errored.
     int timeoutIndex = 0;
+    auto error_logs = nlohmann::json::object();
     for (auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
-        stats.timeout_log_filenames[timeoutIndex] =
+        auto timeout_log_filename =
             std::to_string(*a) + '-' + std::to_string(id) + ".log";
+        stats.timeout_log_filenames[timeoutIndex] = timeout_log_filename;
+        error_logs[std::to_string((int) *a)] = timeout_log_filename;
         std::ofstream file(stats.timeout_log_filenames[timeoutIndex],
                            std::ios_base::binary);
         file << networking.player_logs[*a];
@@ -1153,6 +1167,22 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         file.close();
         timeoutIndex++;
     }
+
+    if (quiet_output) {
+        // Write out machine-readable log of what happened
+        nlohmann::json results;
+        results["replay"] = stats.output_filename;
+        results["map_seed"] = seed;
+        results["map_generator"] = map_generator;
+        results["map_width"] = game_map.map_width;
+        results["map_height"] = game_map.map_height;
+        results["gameplay_parameters"] = hlt::GameConstants::get().to_json();
+        results["error_logs"] = error_logs;
+        results["stats"] = stats;
+
+        std::cout << results.dump(4) << std::endl;
+    }
+
     return stats;
 }
 

@@ -30,7 +30,7 @@ struct PlayerStatistics {
 
 static std::ostream& operator<<(std::ostream& o, const PlayerStatistics& p) {
     o << p.tag << ' ' << p.rank << ' '
-      << p.last_frame_alive;// << ' ' << p.average_territory_count << ' ' << p.average_strength_count << ' ' << p.average_production_count << ' ' << p.still_percentage << ' ' << p.average_response_time;
+      << p.last_frame_alive;
     return o;
 }
 
@@ -55,6 +55,8 @@ static std::ostream& operator<<(std::ostream& o, const GameStatistics& g) {
     if (g.timeout_log_filenames.empty()) o << ' ';
     return o;
 }
+
+auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
 
 constexpr auto SUBSTEPS = 24;
 constexpr auto SUBSTEP_DT = 1.0 / SUBSTEPS;
