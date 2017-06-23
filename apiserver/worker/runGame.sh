@@ -6,11 +6,11 @@ WORKINGPATH="workingPath"
 
 if [ ! -f $ENVIRONMENT ]; then
     echo "NO ENVIRONMENT!!"
-    cd ../environment
+    cd ../../environment
     make clean
     make 
-    mv halite ../worker
-    cd ../worker
+    mv halite ../apiserver/worker
+    cd ../apiserver/worker
 fi
 
 WIDTH=$1
@@ -49,7 +49,7 @@ done
 eval "chmod +x $ENVIRONMENT"
 
 RUN_GAME_COMMAND="./$ENVIRONMENT -q -o -d \"$WIDTH $HEIGHT\" $BOTSTARTCOMMANDS"
-echo $RUN_GAME_COMMAND;
+>&2 echo $RUN_GAME_COMMAND;
 eval $RUN_GAME_COMMAND;
 
 mv *.hlt ../

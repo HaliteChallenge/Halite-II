@@ -95,13 +95,30 @@ def compileResult(userID, didCompile, language, errors=None):
     print("Posting compile result %s\n" % r.text)
 
 
-def gameResult(width, height, users, replayPath, errorPaths):
-    """Posts the result of a game task"""
+def gameResult(users, game_output):
+    """
+    POST the results of a game to the game coordinator.
+    :param users:
+    :param game_output: The parsed JSON result the game gives in quiet mode.
+    :return:
+    """
+
+    replay_path = game_output["replay"]
     print("Posting game result %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
-    files = {os.path.basename(replayPath): open(replayPath, "rb").read()}
-    for path in errorPaths:
+    files = {os.path.basename(replay_path): open(replay_path, "rb").read()}
+    for path in game_output["error_logs"].values():
         files[os.path.basename(path)] = open(path, "rb").read()
-    r = requests.post(MANAGER_URL+"game", data={"apiKey": API_KEY, "mapWidth": str(width), "mapHeight": str(height), "users": json.dumps(users)}, files=files)
+
+    data = {
+        "apiKey": API_KEY,
+        "users": json.dumps(users),
+        "game_output": json.dumps(game_output),
+    }
+    print("Uploading game result")
+    print(json.dumps(users, indent=4))
+    print(json.dumps(game_output, indent=4))
+    r = requests.post(MANAGER_URL+"game", data=data, files=files)
+
     print("Got game result %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
     print("\n-------Game result:-----")
     print(r.text)

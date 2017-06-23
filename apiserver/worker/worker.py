@@ -3,6 +3,7 @@ import os
 import os.path
 import glob
 import gzip
+import json
 import shutil
 import subprocess
 import traceback
@@ -78,7 +79,12 @@ def downloadUsers(users):
         archive.unpack(backend.storeBotLocally(user["userID"], userDir))
 
 def runGame(width, height, users):
-    runGameCommand = " ".join([RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))]+[a["userID"] for a in users]+["\""+a["username"]+" v"+a["numSubmissions"]+"\"" for a in users])
+    runGameCommand = " ".join(
+        [RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))] +
+        [str(a["userID"]) for a in users] +
+        ["\""+a["username"]+" v"+str(a["numSubmissions"]) +
+        "\"" for a in users]
+    )
 
     print("Run game command %s\n" % runGameCommand)
     print("Waiting for game output...\n")
@@ -91,37 +97,22 @@ def runGame(width, height, users):
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
 
-    width, height = [int(sz) for sz in output[len(output) - (len(users)+4)].split(" ")]
-    replayPath = output[len(output) - (len(users)+3)].split(" ")[0][2:]
+    print(output)
+    result = json.loads(output)
 
-    # Get player ranks and scores by parsing shellOutput
-    for lineIndex in range(len(output)-(len(users)+2), len(output)-2):
-        components = output[lineIndex].split(" ")
-        for cIndex in range(len(components)):
-            if components[cIndex] == "nan" or components[cIndex] == "-nan":
-                components[cIndex] = 0
-        playerTag = int(components[0])
-        users[playerTag-1]["playerTag"] = playerTag
-        users[playerTag-1]["rank"] = int(components[1])
+    for player_tag, stats in result["stats"].items():
+        player_tag = int(player_tag)
+        users[player_tag]["playerTag"] = player_tag
+        users[player_tag]["rank"] = stats["rank"]
+        users[player_tag]["didTimeout"] = False
+        users[player_tag]["errorLogName"] = None
 
-    for user in users:
-        user["didTimeout"] = False
-        user["errorLogName"] = None
+    for player_tag, error_log in result["error_logs"].items():
+        player_tag = int(player_tag)
+        users[player_tag]["didTimeout"] = True
+        users[player_tag]["errorLogName"] = os.path.basename(error_log)
 
-    errorLine = output[len(output)-1]
-    errorPaths = []
-    if errorLine.isspace() == False:
-        errorPaths = errorLine.strip().split(" ")
-
-    timeoutLine = output[len(output)-2]
-    if timeoutLine.isspace() == False:
-        timeoutTags = [int(a) for a in timeoutLine.strip().split(" ")]
-        for index in range(len(timeoutTags)):
-            playerTag = timeoutTags[index]
-            users[playerTag-1]["didTimeout"] = True
-            users[playerTag-1]["errorLogName"] = os.path.basename(errorPaths[index])
-
-    return width, height, users, replayPath, errorPaths
+    return users, result
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
@@ -129,22 +120,16 @@ def executeGameTask(width, height, users, backend):
     print("Users objects %s\n" % (str(users)))
 
     downloadUsers(users)
-    width, height, users, replayPath, errorPaths = parseGameOutput(runGame(width, height, users), users)
+    raw_output = '\n'.join(runGame(width, height, users))
+    users, parsed_output = parseGameOutput(raw_output, users)
 
-    replayArchivePath = "ar"+replayPath
-    fIn = open(replayPath, 'rb')
-    fOut = gzip.open(replayArchivePath, 'wb')
-    shutil.copyfileobj(fIn, fOut)
-    fIn.close()
-    fOut.close()
+    backend.gameResult(users, parsed_output)
 
-    backend.gameResult(width, height, users, replayArchivePath, errorPaths)
+    # Clean up game logs and replays
     filelist = glob.glob("*.log")
     for f in filelist:
         os.remove(f)
-
-    os.remove(replayPath)
-    os.remove(replayArchivePath)
+    os.remove(parsed_output["replay"])
 
 if __name__ == "__main__":
     print("\n\n\n\nStarting up worker...\n\n\n")
