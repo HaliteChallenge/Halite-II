@@ -28,3 +28,13 @@ def get_compilation_bucket():
 def get_bot_bucket():
     """Get the object storage bucket for compiled bots."""
     return get_storage_client().get_bucket(config.GCLOUD_BOT_BUCKET)
+
+
+def get_replay_bucket():
+    """Get the object storage bucket for game replays."""
+    return get_storage_client().get_bucket(config.GCLOUD_REPLAY_BUCKET)
+
+
+def get_error_log_bucket():
+    """Get the object storage bucket for game error log files."""
+    return get_storage_client().get_bucket(config.GCLOUD_ERROR_LOG_BUCKET)

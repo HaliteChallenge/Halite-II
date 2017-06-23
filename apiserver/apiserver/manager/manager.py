@@ -2,10 +2,13 @@ import base64
 import binascii
 import functools
 import io
+import json
+import os
 import random
 
 import flask
 import sqlalchemy
+import trueskill
 
 import google.cloud.storage as gcloud_storage
 
@@ -258,10 +261,142 @@ def hash_bot(*, api_key):
     })
 
 
-@manager_api.route("/games", methods=["POST"])
+@manager_api.route("/game", methods=["POST"])
 @requires_valid_worker
 def upload_game(*, api_key):
-    pass
+    if "game_output" not in flask.request.values \
+            or "users" not in flask.request.values:
+        return response_failure(
+            "Please provide both the game output and users.")
+
+    game_output = json.loads(flask.request.values["game_output"])
+    users = json.loads(flask.request.values["users"])
+
+    # Increment the number of games this worker has handled
+    # TODO: why do we even track this?
+    with model.engine.connect() as conn:
+        conn.execute(model.workers.update().where(
+            model.workers.c.apiKey == api_key
+        ).values(
+            numGames=model.workers.c.numGames + 1,
+        ))
+
+        worker_id = conn.execute(sqlalchemy.sql.select([
+            model.workers.c.workerID
+        ]).where(model.workers.c.apiKey == api_key)).first()["workerID"]
+
+    # If the user has submitted a new bot in the meanwhile, ignore the game
+    with model.engine.connect() as conn:
+        for user in users:
+            stored_user = conn.execute(
+                sqlalchemy.sql.select([
+                    model.users.c.userID,
+                    model.users.c.onEmailList,
+                    model.users.c.email,
+                    model.users.c.numSubmissions,
+                    model.users.c.mu,
+                    model.users.c.sigma,
+                ]).where(model.users.c.userID == user["userID"])
+            ).first()
+
+            if stored_user["numSubmissions"] != user["numSubmissions"]:
+                return response_success({
+                    "message":
+                        "User {} has uploaded a new bot, discarding match."\
+                            .format(user["userID"])
+                })
+
+            user.update(dict(stored_user))
+
+    # Store the replay and any error logs
+    replay_name = os.path.basename(game_output["replay"])
+    replay_key, _ = os.path.splitext(replay_name)
+    if replay_name not in flask.request.files:
+        return response_failure("Replay file not found in uploaded files.")
+    blob = gcloud_storage.Blob(replay_key, model.get_replay_bucket(),
+                               chunk_size=262144)
+    blob.upload_from_file(flask.request.files[replay_name])
+
+    error_logs = {}
+    for user in users:
+        if user["didTimeout"]:
+            error_log_name = user["errorLogName"]
+            if error_log_name not in flask.request.files:
+                return response_failure(
+                    "Error log {} not found in uploaded files."\
+                        .format(error_log_name))
+
+            blob = gcloud_storage.Blob(os.path.basename(error_log_name),
+                                       model.get_error_log_bucket(),
+                                       chunk_size=262144)
+            blob.upload_from_file(flask.request.files[error_log_name])
+
+    # TODO: the original code deletes games if there are over 600k in the
+    # database. Is that really a concern for us?
+
+    # Store game results in database
+    with model.engine.connect() as conn:
+        game_id = conn.execute(model.games.insert().values(
+            replayName=replay_key,
+            mapWidth=game_output["map_width"],
+            mapHeight=game_output["map_height"],
+            # TODO: store map seed and algorithm
+            timestamp=sqlalchemy.sql.func.NOW(),
+            workerID=worker_id,
+        )).inserted_primary_key
+
+    # Update the participants' stats
+    with model.engine.connect() as conn:
+        for user in users:
+            timeout = 1 if user["didTimeout"] else 0
+            conn.execute(model.gameusers.insert().values(
+                gameID=game_id,
+                userID=user["userID"],
+                errorLogName=user["errorLogName"],
+                rank=user["rank"],
+                playerIndex=user["playerTag"],
+                didTimeout=timeout,
+                versionNumber=user["numSubmissions"]
+            ))
+
+            # Increment number of games played
+            conn.execute(model.users.update().where(
+                model.users.c.userID == user["userID"]
+            ).values(
+                numGames=model.users.c.numGames + 1,
+            ))
+
+    # TODO: send first game email, first timeout email
+
+    # Update rankings
+    users.sort(key=lambda user: user["rank"], reverse=True)
+    teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
+             for user in users]
+    new_ratings = trueskill.rate(teams)
+    with model.engine.connect() as conn:
+        for user, rating in zip(users, new_ratings):
+            conn.execute(model.users.update().where(
+                (model.users.c.userID == user["userID"]) &
+                # TODO: why filter on numSubmissions? (Should we be using a DB transaction?)
+                (model.users.c.numSubmissions == user["numSubmissions"])
+            ).values(
+                mu=rating[0].mu,
+                sigma=rating[0].sigma,
+            ))
+
+    # Update everyone's overall rank
+    # TODO: is there a more efficient way to have the DB implement this?
+
+    # TODO:
+    # with model.engine.connect() as conn:
+    #     all_users = conn.execute(sqlalchemy.sql.select([
+    #         model.users.c.mu,
+    #         model.users.c.sigma,
+    #     ]).where(model.users.c.isRunning == 1)).fetchall()
+    #
+    #     all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"])
+
+    return response_success()
 
 
 def find_seed_player(conn, desired_columns_of):
