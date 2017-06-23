@@ -3,11 +3,14 @@ import functools
 import flask
 from flask import Flask
 
+from . import util
+
 
 app = Flask(__name__)
 # TODO: make this configurable
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 app.secret_key = "development"
+app.errorhandler(util.APIError)(util.handle_api_error)
 
 # Helpers
 
