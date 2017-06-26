@@ -47,11 +47,15 @@ def get_sort_filter(fields):
                 400, message="Cannot filter on field {}".format(field))
 
         column = fields[field]
-        conversion = lambda x: x
+        conversion = None
         if isinstance(column.type, sqlalchemy.types.Integer):
             conversion = int
         elif isinstance(column.type, sqlalchemy.types.DateTime):
             conversion = lambda x: arrow.get(x).datetime
+        elif isinstance(column.type, sqlalchemy.types.Float):
+            conversion = float
+        elif isinstance(column.type, sqlalchemy.types.String):
+            conversion = lambda x: x
         else:
             raise RuntimeError("Filtering on column is not supported yet: " + repr(column))
 
@@ -109,9 +113,22 @@ def get_sort_filter(fields):
 def list_users():
     result = []
     offset, limit = get_offset_limit()
+    where_clause, order_clause = get_sort_filter({
+        "user_id": model.users.c.userID,
+        "username": model.users.c.username,
+        "level": model.users.c.level,
+        "rank": model.users.c.rank,
+        "num_submissions": model.users.c.numSubmissions,
+        "num_games": model.users.c.numGames,
+        "organization": model.users.c.organization,
+    })
 
     with model.engine.connect() as conn:
-        query = conn.execute(model.users.select().offset(offset).limit(limit))
+        query = conn.execute(
+            model.users.select()
+                .where(where_clause).order_by(*order_clause)
+                .offset(offset).limit(limit)
+        )
 
         for row in query.fetchall():
             result.append({
@@ -121,6 +138,7 @@ def list_users():
                 "rank": row["rank"],
                 "num_submissions": row["numSubmissions"],
                 "num_games": row["numGames"],
+                "organization": row["organization"],
             })
 
     return flask.jsonify(result)
@@ -149,6 +167,7 @@ def get_user(user_id):
             "user_id": row["userID"],
             "username": row["username"],
             "level": row["level"],
+            "organization": row["organization"],
             # In the future, these would be the stats of their best bot
             # Right now, though, each user has at most 1 bot
             "rank": row["rank"],
@@ -488,12 +507,22 @@ def delete_organization(name):
 #############################
 @web_api.route("/leaderboard")
 def leaderboard():
-    # TODO: filtering and ordering options, asc/desc
     offset, limit = get_offset_limit()
+    where_clause, order_clause = get_sort_filter({
+        "user_id": model.users.c.userID,
+        "username": model.users.c.username,
+        "level": model.users.c.level,
+        "organization": model.users.c.organization,
+        "language": model.users.c.language,
+        "points": model.users.c.mu,
+        "rank": model.users.c.rank,
+    })
+    if not order_clause:
+        order_clause = [model.users.c.rank.asc()]
     result = []
 
     with model.engine.connect() as conn:
-        players = conn.execute(sqlalchemy.sql.select([
+        query = sqlalchemy.sql.select([
             model.users.c.userID,
             model.users.c.username,
             model.users.c.level,
@@ -501,7 +530,8 @@ def leaderboard():
             model.users.c.language,
             model.users.c.mu,
             model.users.c.rank,
-        ]).order_by(model.users.c.rank.asc()).offset(offset).limit(limit))
+        ]).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
+        players = conn.execute(query)
 
         for player in players.fetchall():
             result.append({
