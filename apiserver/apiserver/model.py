@@ -9,6 +9,7 @@ from . import config
 engine = sqlalchemy.create_engine("mysql+pymysql://halite2:password@localhost/halite2")
 metadata = sqlalchemy.MetaData(bind=engine)
 
+organizations = sqlalchemy.Table("Organization", metadata, autoload=True)
 users = sqlalchemy.Table("User", metadata, autoload=True)
 user_history = sqlalchemy.Table("UserHistory", metadata, autoload=True)
 workers = sqlalchemy.Table("Worker", metadata, autoload=True)

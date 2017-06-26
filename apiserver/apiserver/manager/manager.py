@@ -54,7 +54,7 @@ def task(*, api_key):
         find_compilation_task = model.users\
             .select(model.users.c.userID)\
             .where(model.users.c.compileStatus == 1)\
-            .order_by(sqlalchemy.asc(model.users.c.userID))\
+            .order_by(model.users.c.userID.asc())\
             .limit(1)
         users = conn.execute(find_compilation_task).fetchall()
         if users:
@@ -117,11 +117,11 @@ def task(*, api_key):
 
             if len(players) == player_count:
                 return response_success({
-                "type": "game",
-                "width": map_size,
-                "height": map_size,
-                "users": players,
-            })
+                    "type": "game",
+                    "width": map_size,
+                    "height": map_size,
+                    "users": players,
+                })
 
     return response_success({
         "type": "notask",
@@ -141,9 +141,8 @@ def update_compilation_status(*, api_key):
 
     language = flask.request.form.get("language", "Other")
 
-    # Increment the number of compilation tasks this worker has completed
-    # TODO: this field is never actually used
     with model.engine.connect() as conn:
+        # Increment the number of compilation tasks this worker has completed
         update_worker = model.workers.update()\
             .where(model.workers.c.apiKey == api_key)\
             .values(numCompiles=model.workers.c.numCompiles + 1)
@@ -160,9 +159,10 @@ def update_compilation_status(*, api_key):
             user = model.users.select().where(model.users.c.userID == user_id)
             user = conn.execute(user).first()
 
-            # This is backwards of the order in the original PHP, but the original
-            # PHP updated the table using the -old- values of the User row. This
-            # ordering makes it clearer that this is intentional.
+            # This is backwards of the order in the original PHP, but the
+            # original PHP updated the table using the -old- values of the
+            # User row. This ordering makes it clearer that this is
+            # intentional.
             if user["numSubmissions"] != 0:
                 # TODO: make this more efficient
                 num_active_users = len(conn.execute(

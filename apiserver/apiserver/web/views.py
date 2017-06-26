@@ -4,6 +4,7 @@ import operator
 import arrow
 import flask
 import sqlalchemy
+import sqlalchemy.orm.exc as sqlalchemy_exc
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
@@ -120,7 +121,7 @@ def list_users():
         "rank": model.users.c.rank,
         "num_submissions": model.users.c.numSubmissions,
         "num_games": model.users.c.numGames,
-        "organization": model.users.c.organization,
+        "organization_id": model.users.c.organizationID,
     })
 
     with model.engine.connect() as conn:
@@ -138,7 +139,7 @@ def list_users():
                 "rank": row["rank"],
                 "num_submissions": row["numSubmissions"],
                 "num_games": row["numGames"],
-                "organization": row["organization"],
+                "organization_id": row["organization_id"],
             })
 
     return flask.jsonify(result)
@@ -153,25 +154,39 @@ def create_user():
 @web_api.route("/user/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     with model.engine.connect() as conn:
-        query = conn.execute(model.users.select().where(
+        query = sqlalchemy.sql.select([
+            model.users.c.userID,
+            model.users.c.username,
+            model.users.c.level,
+            model.users.c.organizationID,
+            model.users.c.rank,
+            model.users.c.mu,
+            model.users.c.sigma,
+            model.users.c.numSubmissions,
+            model.users.c.numGames,
+            model.organizations.c.organizationName,
+        ]).where(
             model.users.c.userID == user_id
-        )).fetchall()
+        ).select_from(
+            model.users.join(
+                model.organizations,
+                model.users.c.organizationID == model.organizations.c.organizationID)
+        )
 
-        if len(query) != 1:
-            raise util.APIError(
-                404, message="Could not find user."
-            )
+        row = conn.execute(query).first()
+        if not row:
+            raise util.APIError(404, message="No user found.")
 
-        row = query[0]
         return flask.jsonify({
             "user_id": row["userID"],
             "username": row["username"],
             "level": row["level"],
-            "organization": row["organization"],
+            "organization_id": row["organizationID"],
+            "organization": row["organizationName"],
             # In the future, these would be the stats of their best bot
             # Right now, though, each user has at most 1 bot
             "rank": row["rank"],
-            "points": row["mu"],
+            "points": row["mu"] - 3 * row["sigma"],
             "num_submissions": row["numSubmissions"],
             "num_games": row["numGames"],
         })
@@ -179,14 +194,19 @@ def get_user(user_id):
 
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
 @requires_login
-def update_user(user_id, intended_user_id):
+def update_user(intended_user_id, *, user_id):
     pass
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
 @requires_login
-def delete_user(user_id, intended_user_id):
-    pass
+def delete_user(intended_user_id, *, user_id):
+    if user_id != intended_user_id:
+        raise user_mismatch_error()
+
+    with model.engine.connect() as conn:
+        conn.execute(model.users.delete().where(
+            model.users.c.userID == user_id))
 
 
 # ---------------------- #
@@ -512,7 +532,7 @@ def leaderboard():
         "user_id": model.users.c.userID,
         "username": model.users.c.username,
         "level": model.users.c.level,
-        "organization": model.users.c.organization,
+        "organization_id": model.users.c.organizationID,
         "language": model.users.c.language,
         "points": model.users.c.mu,
         "rank": model.users.c.rank,
@@ -526,11 +546,16 @@ def leaderboard():
             model.users.c.userID,
             model.users.c.username,
             model.users.c.level,
-            model.users.c.organization,
+            model.users.c.organizationID,
+            model.organizations.c.organizationName,
             model.users.c.language,
             model.users.c.mu,
             model.users.c.rank,
-        ]).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
+        ]).select_from(
+            model.users.join(
+                model.organizations,
+                model.users.c.organizationID == model.organizations.c.organizationID)
+        ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
         players = conn.execute(query)
 
         for player in players.fetchall():
@@ -538,7 +563,8 @@ def leaderboard():
                 "user_id": player["userID"],
                 "username": player["username"],
                 "level": player["level"],
-                "organization": player["organization"],
+                "organization_id": player["organizationID"],
+                "organization": player["organizationName"],
                 "language": player["language"],
                 "points": player["mu"],
                 "rank": player["rank"],
