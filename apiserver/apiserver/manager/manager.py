@@ -401,7 +401,8 @@ def upload_game(*, api_key):
                 model.users.c.sigma,
             ]).where(model.users.c.isRunning == 1)).fetchall()
 
-            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"])
+            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"],
+                           reverse=True)
 
             cases = {user["userID"]: rank + 1
                      for rank, user in enumerate(all_users)}
