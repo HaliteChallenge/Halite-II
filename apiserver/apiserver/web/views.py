@@ -15,9 +15,9 @@ def user_mismatch_error(message="Cannot perform action for other user."):
 
 
 def get_offset_limit(*, default_limit=10, max_limit=100):
-    offset = flask.request.values.get("offset", 0)
+    offset = int(flask.request.values.get("offset", 0))
     offset = max(offset, 0)
-    limit = flask.request.values.get("limit", default_limit)
+    limit = int(flask.request.values.get("limit", default_limit))
     limit = min(max(limit, 0), max_limit)
 
     return offset, limit
@@ -65,16 +65,17 @@ def get_user(user_id):
             return response_failure("Could not find user.")
 
         row = query[0]
-        return {
+        return flask.jsonify({
             "user_id": row["userID"],
             "username": row["username"],
             "level": row["level"],
             # In the future, these would be the stats of their best bot
             # Right now, though, each user has at most 1 bot
             "rank": row["rank"],
+            "points": row["mu"],
             "num_submissions": row["numSubmissions"],
             "num_games": row["numGames"],
-        }
+        })
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
@@ -213,43 +214,78 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
 # USER MATCH API ENDPOINTS #
 # ------------------------ #
 @web_api.route("/user/<int:intended_user>/match", methods=["GET"])
-@optional_login
-def list_user_matches(intended_user, *, user_id):
+def list_user_matches(intended_user):
     offset, limit = get_offset_limit()
     result = []
 
     with model.engine.connect() as conn:
         query = conn.execute(sqlalchemy.sql.select([
-            model.gameusers.c.gameID,
+            model.games.c.gameID,
+            model.games.c.replayName,
+            model.games.c.mapWidth,
+            model.games.c.mapHeight,
+            model.games.c.timestamp,
+        ]).select_from(model.games.join(
+            model.gameusers,
+            (model.games.c.gameID == model.gameusers.c.gameID) &
+            (model.gameusers.c.userID == intended_user),
+        )).offset(offset).limit(limit))
+
+        for match in query.fetchall():
+            result.append({
+                "game_id": match["gameID"],
+                "map_width": match["mapWidth"],
+                "map_height": match["mapHeight"],
+                "replay": match["replayName"],
+                "timestamp": match["timestamp"],
+            })
+
+    return flask.jsonify(result)
+
+
+@web_api.route("/user/<int:intended_user>/match/<int:match_id>", methods=["GET"])
+@optional_login
+def get_user_match(intended_user, match_id, *, user_id):
+    with model.engine.connect() as conn:
+        query = conn.execute(sqlalchemy.sql.select([
+            model.gameusers.c.userID,
             model.gameusers.c.rank,
             model.gameusers.c.playerIndex,
             model.gameusers.c.didTimeout,
             model.gameusers.c.errorLogName,
         ]).where(
-            model.gameusers.c.userID == user_id
-        ).offset(offset).limit(limit))
+            model.gameusers.c.gameID == match_id
+        ))
 
+        match = conn.execute(sqlalchemy.sql.select([
+            model.games.c.replayName,
+            model.games.c.mapWidth,
+            model.games.c.mapHeight,
+            model.games.c.timestamp,
+        ]).where(
+            model.games.c.gameID == match_id
+        )).first()
+
+        result = {
+            "map_width": match["mapWidth"],
+            "map_height": match["mapHeight"],
+            "replay": match["replayName"],
+            "timestamp": match["timestamp"],
+            "players": {}
+        }
         for row in query.fetchall():
-            result.append({
-                "game_id": row["gameID"],
+            result["game_id"] = match_id
+            result["players"][row["userID"]] = {
                 "rank": row["rank"],
                 "player_index": row["playerIndex"],
                 "timed_out": bool(row["didTimeout"]),
-            })
+            }
 
-            # Some info is only shown to that user
-            if user_id is not None and intended_user == user_id:
-                result[-1].update({
-                    # TODO: the error log name needs to be unique and not guessable
-                    "error_log": model.gameusers.c.errorLogName,
-                })
+            if (user_id is not None and intended_user == user_id and
+                    row["userID"] == user_id):
+                result["players"][row["userID"]]["error_log"] = row["errorLogName"]
 
     return flask.jsonify(result)
-
-
-@web_api.route("/user/<username>/match/<match_id>", methods=["GET"])
-def get_user_match(username, match_id):
-    pass
 
 
 ##############################
@@ -285,4 +321,30 @@ def delete_organization(name):
 #############################
 @web_api.route("/leaderboard")
 def leaderboard():
-    pass
+    # TODO: filtering and ordering options, asc/desc
+    offset, limit = get_offset_limit()
+    result = []
+
+    with model.engine.connect() as conn:
+        players = conn.execute(sqlalchemy.sql.select([
+            model.users.c.userID,
+            model.users.c.username,
+            model.users.c.level,
+            model.users.c.organization,
+            model.users.c.language,
+            model.users.c.mu,
+            model.users.c.rank,
+        ]).order_by(model.users.c.rank.asc()).offset(offset).limit(limit))
+
+        for player in players.fetchall():
+            result.append({
+                "user_id": player["userID"],
+                "username": player["username"],
+                "level": player["level"],
+                "organization": player["organization"],
+                "language": player["language"],
+                "points": player["mu"],
+                "rank": player["rank"],
+            })
+
+    return flask.jsonify(result)

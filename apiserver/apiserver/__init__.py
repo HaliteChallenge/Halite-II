@@ -46,9 +46,9 @@ def optional_login(view):
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
         if "user_id" in flask.session:
-            kwargs["user_id"] = None
-        else:
             kwargs["user_id"] = flask.session["user_id"]
+        else:
+            kwargs["user_id"] = None
         return view(*args, **kwargs)
 
     return decorated_view
