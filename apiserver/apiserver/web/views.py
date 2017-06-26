@@ -9,7 +9,7 @@ import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
 from .. import config, model, util
-from .. import optional_login, requires_login, response_success
+from .. import optional_login, requires_login, response_success, requires_admin
 
 
 web_api = flask.Blueprint("web_api", __name__)
@@ -517,27 +517,101 @@ def get_match_error_log(intended_user, match_id, *, user_id):
 ##############################
 @web_api.route("/organization")
 def list_organizations():
-    pass
+    result = []
+    offset, limit = get_offset_limit()
+    where_clause, order_clause = get_sort_filter({
+        "organization_id": model.organizations.c.organizationID,
+        "organization_name": model.organizations.c.organizationName,
+    })
+
+    with model.engine.connect() as conn:
+        query = model.organizations.select()\
+            .where(where_clause).order_by(*order_clause)\
+            .offset(offset).limit(limit)
+        orgs = conn.execute(query)
+
+        for org in orgs.fetchall():
+            result.append({
+                "organization_id": org["organizationID"],
+                "organization_name": org["organizationName"],
+            })
+
+    return flask.jsonify(result)
 
 
-@web_api.route("/organization/<name>", methods=["GET"])
-def get_organization(name):
-    pass
+@web_api.route("/organization/<int:org_id>", methods=["GET"])
+def get_organization(org_id):
+    with model.engine.connect() as conn:
+        org = conn.execute(model.organizations.select().where(
+            model.organizations.c.organizationID == org_id
+        )).first()
+
+        if not org:
+            raise util.APIError(404, message="Organization not found.")
+
+        return flask.jsonify({
+            "organization_id": org["organizationID"],
+            "organization_name": org["organizationName"],
+        })
 
 
-@web_api.route("/organization/<name>", methods=["POST"])
-def create_organization(name):
-    pass
+@web_api.route("/organization", methods=["POST"])
+@requires_admin
+def create_organization():
+    org_body = flask.request.get_json()
+    if "name" not in org_body:
+        raise util.APIError(400, message="Organization must be named.")
+
+    with model.engine.connect() as conn:
+        org_id = conn.execute(model.organizations.insert().values(
+            organizationName=org_body["name"]
+        )).inserted_primary_key
+
+    return response_success({
+        "organization_id": org_id[0],
+    })
 
 
-@web_api.route("/organization/<name>", methods=["PUT"])
-def update_organization(name):
-    pass
+@web_api.route("/organization/<int:org_id>", methods=["PUT"])
+@requires_admin
+def update_organization(org_id):
+    fields = flask.request.get_json()
+    columns = {
+        "name": model.organizations.c.organizationName,
+    }
+
+    for key in fields:
+        if key not in columns:
+            raise util.APIError(400, message="Cannot update '{}'".format(key))
+
+    with model.engine.connect() as conn:
+        conn.execute(model.organizations.update().where(
+            model.organizations.c.organizationID == org_id
+        ).values(**fields))
+
+    return response_success()
 
 
-@web_api.route("/organization/<name>", methods=["DELETE"])
-def delete_organization(name):
-    pass
+@web_api.route("/organization/<int:org_id>", methods=["DELETE"])
+@requires_admin
+def delete_organization(org_id):
+    with model.engine.connect() as conn:
+        with conn.begin() as transaction:
+            count = conn.execute(sqlalchemy.sql.select([
+                sqlalchemy.sql.func.count()
+            ]).select_from(model.users).where(
+                model.users.c.organizationID == org_id
+            )).first()[0]
+
+            if count > 0:
+                raise util.APIError(
+                    400, message="Cannot delete organization with members.")
+
+            conn.execute(model.organizations.delete().where(
+                model.organizations.c.organizationID == org_id
+            ))
+
+    return response_success()
 
 
 #############################

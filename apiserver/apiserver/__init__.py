@@ -47,6 +47,15 @@ def optional_login(view):
     return decorated_view
 
 
+def requires_admin(view):
+    # TODO: NOT IMPLEMENTED!
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
 @app.route('/login')
 def login():
     flask.session["user_id"] = 2609
