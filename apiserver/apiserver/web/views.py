@@ -24,6 +24,45 @@ def get_offset_limit(*, default_limit=10, max_limit=100):
 
     return offset, limit
 
+
+def get_sort_filter(fields):
+    """
+    Parse flask.request to create clauses for SQLAlchemy's order_by and where.
+
+    :param fields: A dictionary of field names to SQLAlchemy table columns
+    listing what fields can be sorted/ordered on.
+    :return: A 2-tuple of (where_clause, order_clause). order_clause is an
+    ordered list of columns.
+    """
+    where_clause = None
+    order_clause = []
+
+    # TODO: implement where
+
+    for order_param in flask.request.args.getlist("order_by"):
+        direction = "asc"
+        if "," in order_param:
+            direction, field = order_param.split(",")
+        else:
+            field = order_param
+
+        if field not in fields:
+            raise util.APIError(
+                400, message="Cannot order on field {}".format(field))
+
+        column = fields[field]
+        if direction == "asc":
+            column = column.asc()
+        elif direction == "desc":
+            column = column.desc()
+        else:
+            raise util.APIError(
+                400, message="Cannot order column by '{}'".format(direction))
+
+        order_clause.append(column)
+
+    return where_clause, order_clause
+
 ######################
 # USER API ENDPOINTS #
 ######################
@@ -157,7 +196,7 @@ def get_user_bot(user_id, bot_id):
             }
         ])
 
-
+# TODO: POST to just /bot to create a new bot
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["POST"])
 @requires_login
@@ -218,6 +257,9 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
 @web_api.route("/user/<int:intended_user>/match", methods=["GET"])
 def list_user_matches(intended_user):
     offset, limit = get_offset_limit()
+    where_clause, order_clause = get_sort_filter({
+        "timestamp": model.games.c.timestamp,
+    })
     result = []
 
     with model.engine.connect() as conn:
@@ -231,7 +273,7 @@ def list_user_matches(intended_user):
             model.gameusers,
             (model.games.c.gameID == model.gameusers.c.gameID) &
             (model.gameusers.c.userID == intended_user),
-        )).offset(offset).limit(limit))
+        )).order_by(*order_clause).offset(offset).limit(limit))
 
         for match in query.fetchall():
             result.append({
