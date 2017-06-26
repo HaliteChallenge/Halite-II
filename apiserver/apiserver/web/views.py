@@ -1,5 +1,7 @@
 import io
+import operator
 
+import arrow
 import flask
 import sqlalchemy
 import google.cloud.storage as gcloud_storage
@@ -34,10 +36,45 @@ def get_sort_filter(fields):
     :return: A 2-tuple of (where_clause, order_clause). order_clause is an
     ordered list of columns.
     """
-    where_clause = None
+    where_clause = True
     order_clause = []
 
-    # TODO: implement where
+    for filter_param in flask.request.args.getlist("filter"):
+        field, cmp, value = filter_param.split(",")
+
+        if field not in fields:
+            raise util.APIError(
+                400, message="Cannot filter on field {}".format(field))
+
+        column = fields[field]
+        conversion = lambda x: x
+        if isinstance(column.type, sqlalchemy.types.Integer):
+            conversion = int
+        elif isinstance(column.type, sqlalchemy.types.DateTime):
+            conversion = lambda x: arrow.get(x).datetime
+        else:
+            raise RuntimeError("Filtering on column is not supported yet: " + repr(column))
+
+        value = conversion(value)
+        operation = {
+            "=": operator.eq,
+            "<": operator.lt,
+            "<=": operator.le,
+            ">": operator.gt,
+            ">=": operator.ge,
+            "!=": operator.ne,
+        }.get(cmp, None)
+
+        if operation is None:
+            raise util.APIError(
+                400, message="Cannot compare column by '{}'".format(cmp))
+
+        clause = operation(column, value)
+        if where_clause is True:
+            where_clause = clause
+        else:
+            where_clause &= clause
+
 
     for order_param in flask.request.args.getlist("order_by"):
         direction = "asc"
@@ -276,12 +313,13 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
 def list_user_matches(intended_user):
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
+        "game_id": model.games.c.gameID,
         "timestamp": model.games.c.timestamp,
     })
     result = []
 
     with model.engine.connect() as conn:
-        query = conn.execute(sqlalchemy.sql.select([
+        query = sqlalchemy.sql.select([
             model.games.c.gameID,
             model.games.c.replayName,
             model.games.c.mapWidth,
@@ -291,9 +329,10 @@ def list_user_matches(intended_user):
             model.gameusers,
             (model.games.c.gameID == model.gameusers.c.gameID) &
             (model.gameusers.c.userID == intended_user),
-        )).order_by(*order_clause).offset(offset).limit(limit))
+        )).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
+        matches = conn.execute(query)
 
-        for match in query.fetchall():
+        for match in matches.fetchall():
             result.append({
                 "game_id": match["gameID"],
                 "map_width": match["mapWidth"],
