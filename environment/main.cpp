@@ -194,8 +194,10 @@ int main(int argc, char** argv) {
         mapHeight = mapWidth;
     }
 
-    if (unlabeledArgs.size() != 1 && unlabeledArgs.size() != 2 &&
-        unlabeledArgs.size() != 4) {
+    const auto override_factor = overrideSwitch.getValue() ? 2 : 1;
+    if (unlabeledArgs.size() != 1 &&
+        unlabeledArgs.size() != 2 * override_factor &&
+        unlabeledArgs.size() != 4 * override_factor) {
         std::cout << "Must have either 2 or 4 players, or a solo player.\n";
         return 1;
     }
