@@ -1,3 +1,5 @@
+import io
+
 import flask
 import sqlalchemy
 import google.cloud.storage as gcloud_storage
@@ -286,6 +288,27 @@ def get_user_match(intended_user, match_id, *, user_id):
                 result["players"][row["userID"]]["error_log"] = row["errorLogName"]
 
     return flask.jsonify(result)
+
+
+@web_api.route("/user/<int:intended_user>/match/<int:match_id>/replay",
+               methods=["GET"])
+def get_match_replay(intended_user, match_id):
+    with model.engine.connect() as conn:
+        match = conn.execute(sqlalchemy.sql.select([
+            model.games.c.replayName,
+        ]).where(
+            model.games.c.gameID == match_id
+        )).first()
+
+        blob = gcloud_storage.Blob(match["replayName"],
+                                   model.get_replay_bucket(),
+                                   chunk_size=262144)
+        buffer = io.BytesIO()
+        blob.download_to_file(buffer)
+        buffer.seek(0)
+        return flask.send_file(buffer, mimetype="application/x-halite-2-replay",
+                               as_attachment=True,
+                               attachment_filename=str(match_id)+".hlt")
 
 
 ##############################
