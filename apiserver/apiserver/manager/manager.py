@@ -376,7 +376,7 @@ def upload_game(*, api_key):
     # TODO: send first game email, first timeout email
 
     # Update rankings
-    users.sort(key=lambda user: user["rank"], reverse=True)
+    users.sort(key=lambda user: user["rank"])
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
              for user in users]
     new_ratings = trueskill.rate(teams)
