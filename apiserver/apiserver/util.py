@@ -14,6 +14,7 @@ class APIError(Exception):
 
     def to_dict(self):
         result = dict(self.body or ())
+        result["status"] = "failure"
         if self.message is not None:
             result["message"] = self.message
 
@@ -27,6 +28,6 @@ def handle_api_error(error):
     :param error:
     :return:
     """
-    response = flask.jsonify(error.to_dict)
+    response = flask.jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
