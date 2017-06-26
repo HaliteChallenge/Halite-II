@@ -426,7 +426,7 @@ def orient_towards(ship, target):
 
     angle = math.atan2(dy, dx)
     if angle < 0:
-        angle += math.tau
+        angle += 2 * math.pi
     angle = int(180 * angle / math.pi)
     angle %= 360
     while angle < 0:
