@@ -353,6 +353,51 @@ def get_match_replay(intended_user, match_id):
                                attachment_filename=str(match_id)+".hlt")
 
 
+@web_api.route("/user/<int:intended_user>/match/<int:match_id>/error_log",
+               methods=["GET"])
+@requires_login
+def get_match_error_log(intended_user, match_id, *, user_id):
+    """
+    Serve the error log for a user's bot in a particular match.
+
+    Only allows a logged-in user to download their own error log.
+    """
+
+    if intended_user != user_id:
+        raise util.APIError(
+            404, message="Cannot find error log. You must be signed in, "
+                         "and you can only request your error log. "
+        )
+
+    with model.engine.connect() as conn:
+        match = conn.execute(sqlalchemy.sql.select([
+            model.gameusers.c.errorLogName,
+        ]).where(
+            (model.gameusers.c.gameID == match_id) &
+            (model.gameusers.c.userID == user_id)
+        )).first()
+
+        if match is None:
+            raise util.APIError(
+                404, message="Game does not exist."
+            )
+
+        if match["errorLogName"] is None:
+            raise util.APIError(
+                404, message="No error log for this player in this game."
+            )
+
+        blob = gcloud_storage.Blob(match["errorLogName"],
+                                   model.get_error_log_bucket(),
+                                   chunk_size=262144)
+        buffer = io.BytesIO()
+        blob.download_to_file(buffer)
+        buffer.seek(0)
+        return flask.send_file(
+            buffer, mimetype="text/plain", as_attachment=True,
+            attachment_filename="match_{}_user_{}_errors.log".format(match_id, user_id))
+
+
 ##############################
 # ORGANIZATION API ENDPOINTS #
 ##############################
