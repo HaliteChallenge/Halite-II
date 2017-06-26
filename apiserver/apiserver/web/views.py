@@ -195,12 +195,30 @@ def get_user(user_id):
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
 @requires_login
 def update_user(intended_user_id, *, user_id):
-    pass
+    if user_id != intended_user_id:
+        raise user_mismatch_error()
+
+    fields = flask.request.get_json()
+    columns = {
+        "level": model.users.c.level,
+    }
+
+    for key in fields:
+        if key not in columns:
+            raise util.APIError(400, message="Cannot update '{}'".format(key))
+
+    with model.engine.connect() as conn:
+        conn.execute(model.users.update().where(
+            model.users.c.userID == user_id
+        ).values(**fields))
+
+    return response_success()
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
 @requires_login
 def delete_user(intended_user_id, *, user_id):
+    # TODO: what happens to their games?
     if user_id != intended_user_id:
         raise user_mismatch_error()
 
