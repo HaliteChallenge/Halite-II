@@ -5,8 +5,7 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 
 from .. import config, model, util
-# TODO: get rid of response_failure
-from .. import optional_login, requires_login, response_failure, response_success
+from .. import optional_login, requires_login, response_success
 
 
 web_api = flask.Blueprint("web_api", __name__)
@@ -103,7 +102,9 @@ def get_user(user_id):
         )).fetchall()
 
         if len(query) != 1:
-            return response_failure("Could not find user.")
+            raise util.APIError(
+                404, message="Could not find user."
+            )
 
         row = query[0]
         return flask.jsonify({
@@ -203,7 +204,9 @@ def get_user_bot(user_id, bot_id):
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
     if not config.COMPETITION_OPEN:
-        return response_failure("Sorry, but bot submissions are closed.")
+        raise util.APIError(
+            400, message="Sorry, but bot submissions are closed."
+        )
 
     if user_id != intended_user:
         raise user_mismatch_error(

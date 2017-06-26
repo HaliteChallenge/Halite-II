@@ -12,7 +12,7 @@ import trueskill
 
 import google.cloud.storage as gcloud_storage
 
-from .. import config, model, response_success, response_failure
+from .. import config, model, response_success, util
 
 
 manager_api = flask.Blueprint("manager_api", __name__)
@@ -137,7 +137,7 @@ def update_compilation_status(*, api_key):
     did_compile = flask.request.form.get("didCompile", False)
 
     if user_id is None:
-        return response_failure("Must provide user ID.")
+        raise util.APIError(400, message="Must provide user ID.")
 
     language = flask.request.form.get("language", "Other")
 
@@ -206,7 +206,7 @@ def upload_bot(*, api_key):
     user_id = flask.request.form.get("userID", None)
 
     if "bot.zip" not in flask.request.files:
-        return response_failure("Please provide the bot file.")
+        raise util.APIError(400, message="Please provide the bot file.")
 
     uploaded_file = flask.request.files["bot.zip"]
     # Save to GCloud
@@ -245,7 +245,7 @@ def hash_bot(*, api_key):
     compile = flask.request.args.get("compile", False)
 
     if not user_id:
-        return response_failure("Please provide the user ID.")
+        raise util.APIError(400, message="Please provide the user ID.")
 
     if compile:
         bucket = model.get_compilation_bucket()
@@ -254,7 +254,7 @@ def hash_bot(*, api_key):
 
     blob = bucket.get_blob(str(user_id))
     if blob is None:
-        return response_failure("Bot does not exist.")
+        raise util.APIError(400, message="Bot does not exist.")
 
     return response_success({
         "hash": binascii.hexlify(base64.b64decode(blob.md5_hash)).decode('utf-8'),
@@ -266,8 +266,8 @@ def hash_bot(*, api_key):
 def upload_game(*, api_key):
     if "game_output" not in flask.request.values \
             or "users" not in flask.request.values:
-        return response_failure(
-            "Please provide both the game output and users.")
+        raise util.APIError(
+            400, message="Please provide both the game output and users.")
 
     game_output = json.loads(flask.request.values["game_output"])
     users = json.loads(flask.request.values["users"])
@@ -312,7 +312,8 @@ def upload_game(*, api_key):
     replay_name = os.path.basename(game_output["replay"])
     replay_key, _ = os.path.splitext(replay_name)
     if replay_name not in flask.request.files:
-        return response_failure("Replay file not found in uploaded files.")
+        raise util.APIError(
+            400, message="Replay file not found in uploaded files.")
     blob = gcloud_storage.Blob(replay_key, model.get_replay_bucket(),
                                chunk_size=262144)
     blob.upload_from_file(flask.request.files[replay_name])
@@ -322,9 +323,9 @@ def upload_game(*, api_key):
         if user["didTimeout"]:
             error_log_name = user["errorLogName"]
             if error_log_name not in flask.request.files:
-                return response_failure(
-                    "Error log {} not found in uploaded files."\
-                        .format(error_log_name))
+                raise util.APIError(400,
+                    message="Error log {} not found in uploaded files."
+                                    .format(error_log_name))
 
             error_log_key = user["errorLogName"] = \
                 replay_key + "_error_log_" + str(user["userID"])

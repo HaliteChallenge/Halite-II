@@ -15,13 +15,6 @@ app.errorhandler(util.APIError)(util.handle_api_error)
 # Helpers
 
 
-def response_failure(reason):
-    return flask.jsonify({
-        "status": "failure",
-        "reason": reason,
-    })
-
-
 def response_success(more=None):
     response = {
         "status": "success",
