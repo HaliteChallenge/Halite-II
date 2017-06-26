@@ -389,15 +389,23 @@ def upload_game(*, api_key):
 
     # Update everyone's overall rank
     # TODO: is there a more efficient way to have the DB implement this?
+    with model.engine.connect() as conn:
+        with conn.begin() as transaction:
+            all_users = conn.execute(sqlalchemy.sql.select([
+                model.users.c.userID,
+                model.users.c.mu,
+                model.users.c.sigma,
+            ]).where(model.users.c.isRunning == 1)).fetchall()
 
-    # TODO:
-    # with model.engine.connect() as conn:
-    #     all_users = conn.execute(sqlalchemy.sql.select([
-    #         model.users.c.mu,
-    #         model.users.c.sigma,
-    #     ]).where(model.users.c.isRunning == 1)).fetchall()
-    #
-    #     all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"])
+            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"],
+                           reverse=True)
+
+            cases = {user["userID"]: rank + 1
+                     for rank, user in enumerate(all_users)}
+            ranks = sqlalchemy.sql.expression.case(
+                cases, value=model.users.c.userID)
+            query = model.users.update().values(rank=ranks)
+            conn.execute(query)
 
     return response_success()
 
