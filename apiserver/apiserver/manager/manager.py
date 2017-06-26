@@ -11,6 +11,7 @@ import sqlalchemy
 import trueskill
 
 import google.cloud.storage as gcloud_storage
+import google.cloud.exceptions as gcloud_exceptions
 
 from .. import config, model, response_success, util
 
@@ -228,13 +229,16 @@ def download_bot(*, api_key):
         bucket = model.get_bot_bucket()
 
     # Retrieve from GCloud
-    blob = gcloud_storage.Blob(str(user_id), bucket, chunk_size=262144)
-    buffer = io.BytesIO()
-    blob.download_to_file(buffer)
-    buffer.seek(0)
-    return flask.send_file(buffer, mimetype="application/zip",
-                           as_attachment=True,
-                           attachment_filename=str(user_id)+".zip")
+    try:
+        blob = gcloud_storage.Blob(str(user_id), bucket, chunk_size=262144)
+        buffer = io.BytesIO()
+        blob.download_to_file(buffer)
+        buffer.seek(0)
+        return flask.send_file(buffer, mimetype="application/zip",
+                               as_attachment=True,
+                               attachment_filename=str(user_id)+".zip")
+    except gcloud_exceptions.NotFound:
+        raise util.APIError(404, message="Bot not found.")
 
 
 @manager_api.route("/botHash")
@@ -397,8 +401,7 @@ def upload_game(*, api_key):
                 model.users.c.sigma,
             ]).where(model.users.c.isRunning == 1)).fetchall()
 
-            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"],
-                           reverse=True)
+            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"])
 
             cases = {user["userID"]: rank + 1
                      for rank, user in enumerate(all_users)}
