@@ -326,7 +326,9 @@ def upload_game(*, api_key):
                     "Error log {} not found in uploaded files."\
                         .format(error_log_name))
 
-            blob = gcloud_storage.Blob(os.path.basename(error_log_name),
+            error_log_key = user["errorLogName"] = \
+                replay_key + "_error_log_" + str(user["userID"])
+            blob = gcloud_storage.Blob(error_log_key,
                                        model.get_error_log_bucket(),
                                        chunk_size=262144)
             blob.upload_from_file(flask.request.files[error_log_name])
