@@ -66,7 +66,8 @@ CREATE TABLE `UserHistory` (
   `lastRank` smallint(5) NOT NULL,
   `lastNumPlayers` smallint(5) NOT NULL,
   `lastNumGames` smallint(5) DEFAULT NULL,
-  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`userID`) REFERENCES User(`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `Announcement`;
@@ -80,7 +81,9 @@ CREATE TABLE `Announcement` (
 DROP TABLE IF EXISTS `DoneWithAnnouncement`;
 CREATE TABLE `DoneWithAnnouncement` (
   `announcementID` mediumint(8) unsigned NOT NULL,
-  `userID` mediumint(8) unsigned NOT NULL
+  `userID` mediumint(8) unsigned NOT NULL,
+  FOREIGN KEY (`userID`) REFERENCES User(`userID`),
+  FOREIGN KEY (`announcementID`) REFERENCES Announcement(`announcementID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `UserNotification`;
@@ -91,13 +94,8 @@ CREATE TABLE `UserNotification` (
   `body` varchar(2048) NOT NULL,
   `mood` tinyint(1) NOT NULL,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`userID`) REFERENCES User(`userID`),
   PRIMARY KEY (`userNotificationID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `HighSchool`;
-CREATE TABLE `HighSchool` (
-  `name` varchar(64) NOT NULL,
-  PRIMARY KEY(`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `Worker`;

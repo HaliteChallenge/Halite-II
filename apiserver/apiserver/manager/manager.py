@@ -176,7 +176,7 @@ def update_compilation_status(*, api_key):
                     model.user_history.insert().values(
                         userID=user_id,
                         versionNumber=user["numSubmissions"],
-                        # TODO: figure out why this isn't defined
+                        # User is unranked if this is their first bot
                         lastRank=user["rank"] or 0,
                         lastNumPlayers=num_active_users,
                         lastNumGames=user["numGames"],
