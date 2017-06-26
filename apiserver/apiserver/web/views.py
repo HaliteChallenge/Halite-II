@@ -3,6 +3,7 @@ import io
 import flask
 import sqlalchemy
 import google.cloud.storage as gcloud_storage
+import google.cloud.exceptions as gcloud_exceptions
 
 from .. import config, model, util
 from .. import optional_login, requires_login, response_success
@@ -251,7 +252,21 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
         raise user_mismatch_error(
             message="Cannot delete bot for another user.")
 
-    # TODO: implement
+    with model.engine.connect() as conn:
+        conn.execute(model.users.update().where(
+            model.users.c.userID == user_id
+        ).values(
+            isRunning=0,
+        ))
+
+        for bucket in [model.get_bot_bucket(), model.get_compilation_bucket()]:
+            try:
+                blob = gcloud_storage.Blob(str(user_id), bucket)
+                blob.delete()
+            except gcloud_exceptions.NotFound:
+                pass
+
+        return response_success()
 
 
 # ------------------------ #
