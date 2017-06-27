@@ -4,8 +4,10 @@
 
 # Fetch the worker script
 # TODO: This is in GCloud right now, but we should use Git when we go public
+gsutil cp gs://dml339-test-worker-storage/worker.tgz .
 
-cd worker/
+tar xvzf worker.tgz
+cd Halite/apiserver/worker
 
 # Grab configuration values
 python3 grab_config.py
