@@ -26,4 +26,4 @@ screen -S api -d -m /bin/bash -c \
     "PYTHONPATH=$(pwd) FLASK_APP=apiserver.server FLASK_DEBUG=true flask run -h 0.0.0.0 -p 5000"
 
 screen -S coordinator_internal -d -m /bin/bash -c \
-    "PYTHONPATH=$(pwd) FLASK_APP=apiserver.server FLASK_DEBUG=true flask run -h 0.0.0.0 -p 5001"
+    "PYTHONPATH=$(pwd) FLASK_APP=apiserver.coordinator_server FLASK_DEBUG=true flask run -h 0.0.0.0 -p 5001"
