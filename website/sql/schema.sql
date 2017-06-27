@@ -29,6 +29,7 @@ CREATE TABLE `User` (
   `isEmailGood` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `isRunning` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `compileStatus` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `compileStart` datetime,
   `level` enum('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organizationID` INT,
   `language` varchar(16) DEFAULT NULL,

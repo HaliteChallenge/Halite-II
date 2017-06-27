@@ -1,5 +1,6 @@
 import base64
 import binascii
+import datetime
 import functools
 import io
 import json
@@ -51,24 +52,38 @@ def requires_valid_worker(view):
 def task(*, api_key):
     """Serve compilation and game tasks to worker instances."""
     with model.engine.connect() as conn:
-        # Try to assign a compilation task.
-        find_compilation_task = model.users\
-            .select(model.users.c.userID)\
-            .where(model.users.c.compileStatus == 1)\
-            .order_by(model.users.c.userID.asc())\
-            .limit(1)
-        users = conn.execute(find_compilation_task).fetchall()
-        if users:
-            user_id = users[0]["userID"]
-            # TODO: some way to clear compileStatus if it gets stuck
-            update = model.users.update() \
-                .where(model.users.c.userID == user_id) \
-                .values(compileStatus=2)
-            conn.execute(update)
-            return response_success({
-                "type": "compile",
-                "user": user_id,
-            })
+        # Check ongoing compilation tasks, and reset ones that are "stuck".
+        reset_stuck_tasks = model.users.update().where(
+            (model.users.c.compileStatus == 2) &
+            (model.users.c.compileStart <
+             datetime.datetime.now() - datetime.timedelta(minutes=30))
+        ).values(
+            compileStatus=1,
+            compileStart=None,
+        )
+        conn.execute(reset_stuck_tasks)
+
+        with conn.begin() as transaction:
+            # Try to assign a compilation task.
+            find_compilation_task = model.users\
+                .select(model.users.c.userID)\
+                .where(model.users.c.compileStatus == 1)\
+                .order_by(model.users.c.userID.asc())\
+                .limit(1)
+            user = conn.execute(find_compilation_task).first()
+            if user:
+                user_id = user["userID"]
+                # Keep track of when compilation started, so that we can
+                # restart it if it gets stuck
+                update = model.users.update() \
+                    .where(model.users.c.userID == user_id) \
+                    .values(compileStatus=2,
+                            compileStart=sqlalchemy.sql.func.now())
+                conn.execute(update)
+                return response_success({
+                    "type": "compile",
+                    "user": user_id,
+                })
 
     # Try to play a game.
     # Need user: ID, username, and # of submissions.
