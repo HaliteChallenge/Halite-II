@@ -57,14 +57,17 @@ def requires_admin(view):
 
 
 @app.route('/login')
-def login():
-    flask.session["user_id"] = 2609
+def dev_login():
+    # TODO: THIS IS FOR DEVELOPMENT ONLY
+    flask.session["user_id"] = int(flask.request.values["user_id"])
     return flask.redirect("/")
 
 
+from . import login
 from . import manager
 from . import web
 
 
+app.register_blueprint(login.oauth_login, url_prefix="/login")
 app.register_blueprint(manager.manager_api, url_prefix="/manager")
 app.register_blueprint(web.web_api, url_prefix="/api/web")
