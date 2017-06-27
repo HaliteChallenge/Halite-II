@@ -22,6 +22,11 @@ gcloud beta compute --project "${GCLOUD_PROJECT}" \
     firewall-rules create "allow-coordinator-internal-traffic" \
     --allow tcp:5001 --direction "INGRESS" --priority "1000" \
     --network "default" --source-tags "worker" --target-tags "coordinator"
+gcloud beta compute --project "${GCLOUD_PROJECT}" \
+    firewall-rules create "disallow-coordinator-internal-traffic" \
+    --deny tcp:5001 --direction "INGRESS" --priority "2000" \
+    --network "default" --source-ranges "0.0.0.0/0" --target-tags "coordinator"
+
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "coordinator-instance-template" \
