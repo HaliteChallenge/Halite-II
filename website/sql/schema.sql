@@ -8,6 +8,14 @@ CREATE TABLE `Organization` (
   `organizationName` VARCHAR(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `OrganizationEmailDomain`;
+CREATE TABLE `OrganizationEmailDomain` (
+    `organizationID` INT NOT NULL,
+    `domain` VARCHAR(64) NOT NULL,
+    PRIMARY KEY (`organizationID`, `domain`),
+    FOREIGN KEY (`organizationID`) REFERENCES Organization(`organizationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
   `userID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,

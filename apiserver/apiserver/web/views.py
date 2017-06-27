@@ -204,9 +204,25 @@ def create_user(*, user_id):
             if org is None:
                 raise util.APIError(400, message="Organization does not exist.")
 
+            # Verify the email against the org
+            email_to_verify = email or user_data["githubEmail"]
+            if "@" not in email_to_verify:
+                raise util.APIError(
+                    400, message="Email should at least have an at sign...")
+            domain = email.split("@")[1].strip().lower()
+            count = conn.execute(sqlalchemy.sql.select([
+                sqlalchemy.sql.func.count()
+            ]).select_from(model.organization_email_domains).where(
+                (model.organization_email_domains.c.organizationID == org_id) &
+                (model.organization_email_domains.c.domain == domain)
+            )).first()[0]
+
+            if count == 0:
+                raise util.APIError(
+                    400, message="Invalid email for organization.")
+
         # Set the verification code (if necessary), and update the user's
         # level to match the organization's level.
-        # TODO: verify the user's affiliation somehow
         if email:
             query = model.users.update()\
                 .where(model.users.c.userID == user_id) \

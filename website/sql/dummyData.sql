@@ -6,6 +6,12 @@ VALUES (1000, 'Cornell University'),
        (1001, 'Basha High School'),
        (1002, 'Two Sigma');
 
+INSERT INTO OrganizationEmailDomain (organizationID, domain)
+VALUES (1000, 'cornell.edu'),
+       (1001, 'cusd80.com'),
+       (1001, 'chandlerschools.com'),
+       (1002, 'twosigma.com');
+
 INSERT INTO User (userID, oauthID, oauthProvider, username, email, compileStatus, isRunning, language, organizationID)
 VALUES (2609, 0, 0, 'erdman',         'abc@gmail.com', 0, 0, 'Python', 1000),
        (1017, 1, 0, 'djma',           'abc@gmail.com', 0, 0, 'Java',   1001),
