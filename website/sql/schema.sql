@@ -4,6 +4,7 @@ use halite2;
 DROP TABLE IF EXISTS `Organization`;
 CREATE TABLE `Organization` (
   `organizationID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `level` enum('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organizationName` VARCHAR(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

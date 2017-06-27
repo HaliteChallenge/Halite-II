@@ -1,5 +1,6 @@
 import io
 import operator
+import random
 
 import arrow
 import flask
@@ -146,9 +147,91 @@ def list_users():
 
 
 @web_api.route("/user", methods=["POST"])
-def create_user():
-    # TODO: investigate how this works with OAuth/Github (this endpoint redirects to Github?)
-    pass
+@requires_login
+def create_user(*, user_id):
+    """
+    Set up a user created from an OAuth authorization flow.
+
+    This endpoint, given an organization ID, generates a validation email
+    and sets up the user's actual email.
+    """
+    body = flask.request.get_json()
+    if not body:
+        raise util.APIError(400, message="Please provide user data.")
+
+    # Check if the user has already validated
+    with model.engine.connect() as conn:
+        user_data = conn.execute(model.users.select().where(
+            model.users.c.userID == user_id
+        )).first()
+
+        if user_data["verificationCode"]:
+            raise util.APIError(400, message="User needs to verify email.")
+
+        if user_data["isEmailGood"] == 1:
+            raise util.APIError(400, message="User already validated.")
+
+    org_id = body.get("organization_id")
+    email = body.get("email")
+    verification_code = str(random.randint(0, 2**63))
+
+    if org_id is None and email is None:
+        # Just use their Github email. Don't bother guessing an affiliation
+        # (we can do that client-side)
+        query = model.users.update().where(model.users.c.userID == user_id) \
+            .values(email=model.users.c.githubEmail,
+                    isEmailGood=1,
+                    organizationID=None,
+                    # TODO: validate the level
+                    level=body.get("level", model.users.c.level))
+        message = "User all set."
+    elif org_id is None:
+        query = model.users.update().where(model.users.c.userID == user_id) \
+            .values(email=email,
+                    verificationCode=verification_code,
+                    isEmailGood=0,
+                    organizationID=None,
+                    # TODO: validate the level
+                    level=body.get("level", model.users.c.level))
+        message = "User needs to validate email."
+    else:
+        # Check the org
+        with model.engine.connect() as conn:
+            org = conn.execute(model.organizations.select().where(
+                model.organizations.c.organizationID == org_id
+            )).first()
+
+            if org is None:
+                raise util.APIError(400, message="Organization does not exist.")
+
+        # Set the verification code (if necessary), and update the user's
+        # level to match the organization's level.
+        # TODO: verify the user's affiliation somehow
+        if email:
+            query = model.users.update()\
+                .where(model.users.c.userID == user_id) \
+                .values(email=email,
+                        verificationCode=verification_code,
+                        isEmailGood=0,
+                        organizationID=org_id,
+                        level=org["level"])
+            # TODO: send the verification email
+            message = "User added to organization, but needs to validate email."
+        else:
+            query = model.users.update()\
+                .where(model.users.c.userID == user_id) \
+                .values(email=model.users.c.githubEmail,
+                        isEmailGood=1,
+                        organizationID=org_id,
+                        level=org["level"])
+            message = "User added to organization."
+
+    with model.engine.connect() as conn:
+        conn.execute(query)
+
+    return response_success({
+        "message": message,
+    })
 
 
 @web_api.route("/user/<int:user_id>", methods=["GET"])
@@ -190,6 +273,37 @@ def get_user(user_id):
             "num_submissions": row["numSubmissions"],
             "num_games": row["numGames"],
         })
+
+
+@web_api.route("/user/<int:user_id>/verify", methods=["GET"])
+def verify_user_email(user_id):
+    verification_code = flask.request.args.get("verification_code")
+    if not verification_code:
+        raise util.APIError(400, message="Please provide verification code.")
+
+    with model.engine.connect() as conn:
+        query = sqlalchemy.sql.select([
+            model.users.c.verificationCode,
+        ]).where(
+            model.users.c.userID == user_id
+        )
+
+        row = conn.execute(query).first()
+        if not row:
+            raise util.APIError(404, message="No user found.")
+
+        if row["verificationCode"] == verification_code:
+            conn.execute(model.users.update().where(
+                model.users.c.userID == user_id
+            ).values(
+                isEmailGood=1,
+                verificationCode="",
+            ))
+            return response_success({
+                "message": "Email verified."
+            })
+
+        raise util.APIError(400, message="Invalid verification code.")
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
@@ -522,6 +636,7 @@ def list_organizations():
     where_clause, order_clause = get_sort_filter({
         "organization_id": model.organizations.c.organizationID,
         "organization_name": model.organizations.c.organizationName,
+        "level": model.organizations.c.level,
     })
 
     with model.engine.connect() as conn:
@@ -533,7 +648,8 @@ def list_organizations():
         for org in orgs.fetchall():
             result.append({
                 "organization_id": org["organizationID"],
-                "organization_name": org["organizationName"],
+                "name": org["organizationName"],
+                "level": org["level"],
             })
 
     return flask.jsonify(result)
@@ -551,7 +667,8 @@ def get_organization(org_id):
 
         return flask.jsonify({
             "organization_id": org["organizationID"],
-            "organization_name": org["organizationName"],
+            "name": org["organizationName"],
+            "level": org["level"],
         })
 
 
@@ -564,7 +681,8 @@ def create_organization():
 
     with model.engine.connect() as conn:
         org_id = conn.execute(model.organizations.insert().values(
-            organizationName=org_body["name"]
+            organizationName=org_body["name"],
+            level=org_body.get("level", "Professional"),
         )).inserted_primary_key
 
     return response_success({
