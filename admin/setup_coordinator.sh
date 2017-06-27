@@ -10,8 +10,18 @@ SERVICE_ACCOUNT="apiserver"
 MACHINE_TYPE="f1-micro"
 IMAGE="worker3"
 
-# TODO: create our own service account?
 # TODO: document what the service account needs
+# TODO: document load balancer setup
+# TODO: document firewall setup
+
+gcloud beta compute --project "${GCLOUD_PROJECT}" \
+    firewall-rules create "allow-coordinator-external-traffic" \
+    --allow tcp:5000 --direction "INGRESS" --priority "1000" \
+    --network "default" --source-ranges "0.0.0.0/0" --target-tags "coordinator"
+gcloud beta compute --project "${GCLOUD_PROJECT}" \
+    firewall-rules create "allow-coordinator-internal-traffic" \
+    --allow tcp:5001 --direction "INGRESS" --priority "1000" \
+    --network "default" --source-tags "worker" --target-tags "coordinator"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "coordinator-instance-template" \
@@ -22,6 +32,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --service-account "${SERVICE_ACCOUNT}@${GCLOUD_PROJECT}.iam.gserviceaccount.com" \
     --image "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
     --boot-disk-size "10" --boot-disk-type "pd-standard" \
+    --tags "coordinator" \
     --scopes "https://www.googleapis.com/auth/sqlservice.admin","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring.write","https://www.googleapis.com/auth/trace.append","https://www.googleapis.com/auth/devstorage.read_write"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
