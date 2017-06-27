@@ -5,8 +5,7 @@ from . import config
 
 
 # Database setup
-# TODO: make this configurable
-engine = sqlalchemy.create_engine("mysql+pymysql://halite2:password@localhost/halite2")
+engine = sqlalchemy.create_engine(config.DATABASE_URL)
 metadata = sqlalchemy.MetaData(bind=engine)
 
 organizations = sqlalchemy.Table("Organization", metadata, autoload=True)
