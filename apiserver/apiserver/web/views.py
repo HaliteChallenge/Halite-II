@@ -139,7 +139,7 @@ def list_users():
                 "rank": row["rank"],
                 "num_submissions": row["numSubmissions"],
                 "num_games": row["numGames"],
-                "organization_id": row["organization_id"],
+                "organization_id": row["organizationID"],
             })
 
     return flask.jsonify(result)
