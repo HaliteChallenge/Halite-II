@@ -13,7 +13,6 @@ organization_email_domains = \
     sqlalchemy.Table("OrganizationEmailDomain", metadata, autoload=True)
 users = sqlalchemy.Table("User", metadata, autoload=True)
 user_history = sqlalchemy.Table("UserHistory", metadata, autoload=True)
-workers = sqlalchemy.Table("Worker", metadata, autoload=True)
 games = sqlalchemy.Table("Game", metadata, autoload=True)
 gameusers = sqlalchemy.Table("GameUser", metadata, autoload=True)
 

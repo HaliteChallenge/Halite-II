@@ -1,7 +1,6 @@
 import base64
 import binascii
 import datetime
-import functools
 import io
 import json
 import os
@@ -20,36 +19,8 @@ from .. import config, model, response_success, util
 manager_api = flask.Blueprint("manager_api", __name__)
 
 
-def requires_valid_worker(view):
-    """
-    Decorator that checks that the remote client is a valid worker.
-
-    A valid worker must provide an API key.
-
-    API keys are generated and stored when the worker is initially started.
-    """
-    @functools.wraps(view)
-    def _requires_valid_worker(*args, **kwargs):
-        api_key = flask.request.values.get("apiKey", None)
-        if api_key is None:
-            return flask.abort(401)
-
-        with model.engine.connect() as conn:
-            find_worker = model.workers\
-                .select(model.workers.c.apiKey)\
-                .where(model.workers.c.apiKey == api_key)
-            if len(conn.execute(find_worker).fetchall()) != 1:
-                return flask.abort(401)
-
-        kwargs["api_key"] = api_key
-        return view(*args, **kwargs)
-
-    return _requires_valid_worker
-
-
 @manager_api.route("/task")
-@requires_valid_worker
-def task(*, api_key):
+def task():
     """Serve compilation and game tasks to worker instances."""
     with model.engine.connect() as conn:
         # Check ongoing compilation tasks, and reset ones that are "stuck".
@@ -146,8 +117,7 @@ def task(*, api_key):
 
 # TODO: these aren't RESTful URLs, but it's what the worker expects
 @manager_api.route("/compile", methods=["POST"])
-@requires_valid_worker
-def update_compilation_status(*, api_key):
+def update_compilation_status():
     """Update the compilation status of a bot."""
     user_id = flask.request.form.get("userID", None)
     did_compile = flask.request.form.get("didCompile", False)
@@ -158,12 +128,6 @@ def update_compilation_status(*, api_key):
     language = flask.request.form.get("language", "Other")
 
     with model.engine.connect() as conn:
-        # Increment the number of compilation tasks this worker has completed
-        update_worker = model.workers.update()\
-            .where(model.workers.c.apiKey == api_key)\
-            .values(numCompiles=model.workers.c.numCompiles + 1)
-        conn.execute(update_worker)
-
         update = model.users.update()\
             .where(model.users.c.userID == user_id)\
             .values(compileStatus=0)
@@ -217,8 +181,7 @@ def update_compilation_status(*, api_key):
 
 
 @manager_api.route("/botFile", methods=["POST"])
-@requires_valid_worker
-def upload_bot(*, api_key):
+def upload_bot():
     user_id = flask.request.form.get("userID", None)
 
     if "bot.zip" not in flask.request.files:
@@ -233,8 +196,7 @@ def upload_bot(*, api_key):
 
 
 @manager_api.route("/botFile", methods=["GET"])
-@requires_valid_worker
-def download_bot(*, api_key):
+def download_bot():
     user_id = flask.request.values.get("userID", None)
     compile = flask.request.values.get("compile", False)
 
@@ -257,8 +219,7 @@ def download_bot(*, api_key):
 
 
 @manager_api.route("/botHash")
-@requires_valid_worker
-def hash_bot(*, api_key):
+def hash_bot():
     """Get the MD5 hash of a compiled bot."""
     user_id = flask.request.args.get("userID", None)
     compile = flask.request.args.get("compile", False)
@@ -281,8 +242,7 @@ def hash_bot(*, api_key):
 
 
 @manager_api.route("/game", methods=["POST"])
-@requires_valid_worker
-def upload_game(*, api_key):
+def upload_game():
     if "game_output" not in flask.request.values \
             or "users" not in flask.request.values:
         raise util.APIError(
@@ -290,19 +250,6 @@ def upload_game(*, api_key):
 
     game_output = json.loads(flask.request.values["game_output"])
     users = json.loads(flask.request.values["users"])
-
-    # Increment the number of games this worker has handled
-    # TODO: why do we even track this?
-    with model.engine.connect() as conn:
-        conn.execute(model.workers.update().where(
-            model.workers.c.apiKey == api_key
-        ).values(
-            numGames=model.workers.c.numGames + 1,
-        ))
-
-        worker_id = conn.execute(sqlalchemy.sql.select([
-            model.workers.c.workerID
-        ]).where(model.workers.c.apiKey == api_key)).first()["workerID"]
 
     # If the user has submitted a new bot in the meanwhile, ignore the game
     with model.engine.connect() as conn:
@@ -364,7 +311,6 @@ def upload_game(*, api_key):
             mapHeight=game_output["map_height"],
             # TODO: store map seed and algorithm
             timestamp=sqlalchemy.sql.func.NOW(),
-            workerID=worker_id,
         )).inserted_primary_key
 
     # Update the participants' stats
