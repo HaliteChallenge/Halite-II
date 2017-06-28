@@ -1,0 +1,24 @@
+{
+  "name": "libhaliteviz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/browserify -r ./src/main.js:libhaliteviz -o index.js"
+  },
+  "author": "David Li <David.M.Li@TwoSigma.com>",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "msgpack-lite": "^0.1.26",
+    "pako": "^1.0.5",
+    "pixi-extra-filters": "^1.1.4",
+    "pixi.js": "^4.5.3",
+    "seedrandom": "^2.4.3"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "browserify-versionify": "^1.0.6"
+  }
+}
