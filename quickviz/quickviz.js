@@ -34,6 +34,7 @@ class HaliteVisualizer {
         this.shipContainer = new PIXI.Graphics();
         this.lights = new PIXI.Graphics();
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
+        this.lights.filters = [new PIXI.filters.GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
         this.container = new PIXI.Container();
         this.container.position.set(0, 100);
         this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer, this.lights);
@@ -56,6 +57,7 @@ class HaliteVisualizer {
         this.onUpdate = function() {};
         this.onPlay = function() {};
         this.onPause = function() {};
+        this.onEnd = function() {};
     }
 
     get currentSubstep() {
@@ -155,6 +157,8 @@ class HaliteVisualizer {
                     this.pause();
                     this.frame = this.replay.frames.length - 1;
                     this.substep = this.replay.frames[this.frame].length - 1;
+                    console.log("Ending");
+                    this.onEnd();
                     break;
                 }
 
@@ -205,9 +209,9 @@ class HaliteVisualizer {
         container.endFill();
 
         if (glow) {
-            this.lights.beginFill(color, 0.1);
-            this.lights.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
-            this.lights.endFill();
+            container.beginFill(color, 0.1);
+            container.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
+            container.endFill();
         }
     }
 
@@ -354,10 +358,10 @@ class HaliteVisualizer {
                         const x = width * event.x;
                         const y = width * event.y;
 
-                        this.shipContainer.beginFill(0xFFA500, frame / 24);
-                        this.shipContainer.lineStyle(0);
-                        this.shipContainer.drawRect(x, y, width, height);
-                        this.shipContainer.endFill();
+                        this.lights.beginFill(0xFFA500, frame / 24);
+                        this.lights.lineStyle(0);
+                        this.lights.drawRect(x, y, width, height);
+                        this.lights.endFill();
                     };
                     if (event.radius > 0) {
                         let r = event.radius;
@@ -371,9 +375,9 @@ class HaliteVisualizer {
                                         const x = Math.floor(side * (distance * dx + event.x));
                                         const y = Math.floor(side * (distance * dy + event.y));
 
-                                        this.planetContainer.beginFill(0xFFA500, (frame / 48) * (1 / (1 + distance + 1 / (1 + dx*dx + dy*dy))));
-                                        this.planetContainer.drawRect(x, y, side, side);
-                                        this.planetContainer.endFill();
+                                        this.lights.beginFill(0xFFA500, (frame / 48) * (1 / (1 + distance + 1 / (1 + dx*dx + dy*dy))));
+                                        this.lights.drawRect(x, y, side, side);
+                                        this.lights.endFill();
                                     }
                                 }
                             }
@@ -395,9 +399,9 @@ class HaliteVisualizer {
                             const x = side * (event.x + 0.5);
                             const y = side * (event.y + 0.5);
 
-                            this.shipContainer.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
-                            this.shipContainer.drawCircle(x, y, side * this.replay.constants.WEAPON_RADIUS);
-                            this.shipContainer.endFill();
+                            this.lights.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
+                            this.lights.drawCircle(x, y, side * this.replay.constants.WEAPON_RADIUS);
+                            this.lights.endFill();
                         },
                     ));
                 }
@@ -576,56 +580,99 @@ class HaliteVisualizerControls {
 }
 
 function setupUpload() {
-    const dragPopup = $(`<div class="halite-dnd-popup">`).appendTo(document.body);
-    dragPopup.append($("<h1>Drop to visualize</h1>"));
-
+    // const dragPopup = $(`<div class="halite-dnd-popup">`).appendTo(document.body);
+    // dragPopup.append($("<h1>Drop to visualize</h1>"));
+    //
+    const match = $(`<h1>`).appendTo(document.body);
     const visualizerEl = $("<section>").appendTo(document.body);
+    //
+    // document.body.addEventListener("dragenter", (e) => {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //
+    //     dragPopup.removeClass("hidden");
+    // });
+    // document.body.addEventListener("dragover", (e) => {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    // });
+    // document.body.addEventListener("dragexit", (e) => {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     dragPopup.addClass("hidden");
+    // });
+    //
+    // document.body.addEventListener("drop", (e) => {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     dragPopup.addClass("hidden");
+    //
+    //     let dt = e.dataTransfer;
+    //     let files = dt.files;
+    //
+    //     let reader = new FileReader();
+    //     reader.onload = function(e) {
+    //         const result = new Uint8Array(e.target.result);
+    //         let replay;
+    //         try {
+    //             const inflated = pako.inflate(result);
+    //             console.log("Compressed replay");
+    //             replay = msgpack.decode(inflated);
+    //         }
+    //         catch (e) {
+    //             console.log("Uncompressed replay");
+    //             replay = msgpack.decode(result);
+    //         }
+    //
+    //         console.log(replay);
+    //
+    //         let visualizer = new HaliteVisualizerControls(replay);
+    //         visualizer.attach(visualizerEl);
+    //     };
+    //     reader.readAsArrayBuffer(files[0]);
+    // });
 
-    document.body.addEventListener("dragenter", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+    const COORDINATOR_URL = "http://35.184.15.108:5000/api/web/";
+    let visualizer;
+    const getGame = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const header = xhr.getResponseHeader("Content-Disposition");
+                const replayName = /\d+/.exec(header)[0];
+                $.get(COORDINATOR_URL + "match/" + replayName).then((match) => {
+                    console.log(match);
+                });
+                match.text(replayName);
+                var res = this.response;
+                var reader = new window.FileReader();
+                reader.readAsArrayBuffer(res);
+                reader.onload = function(e) {
+                    const result = new Uint8Array(e.target.result);
+                    let replay;
+                    try {
+                        const inflated = pako.inflate(result);
+                        console.log("Compressed replay");
+                        replay = msgpack.decode(inflated);
+                    }
+                    catch (e) {
+                        console.log("Uncompressed replay");
+                        replay = msgpack.decode(result);
+                    }
 
-        dragPopup.removeClass("hidden");
-    });
-    document.body.addEventListener("dragover", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-    });
-    document.body.addEventListener("dragexit", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        dragPopup.addClass("hidden");
-    });
+                    console.log(replay);
 
-    document.body.addEventListener("drop", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        dragPopup.addClass("hidden");
-
-        let dt = e.dataTransfer;
-        let files = dt.files;
-
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            const result = new Uint8Array(e.target.result);
-            let replay;
-            try {
-                const inflated = pako.inflate(result);
-                console.log("Compressed replay");
-                replay = msgpack.decode(inflated);
+                    visualizer = new HaliteVisualizerControls(replay);
+                    visualizer.attach(visualizerEl);
+                };
             }
-            catch (e) {
-                console.log("Uncompressed replay");
-                replay = msgpack.decode(result);
-            }
-
-            console.log(replay);
-
-            let visualizer = new HaliteVisualizerControls(replay);
-            visualizer.attach(visualizerEl);
         };
-        reader.readAsArrayBuffer(files[0]);
-    });
+        xhr.open("GET", COORDINATOR_URL + "latestMatch");
+        xhr.responseType = 'blob';
+        xhr.send();
+    };
+
+    getGame();
 }
 
 function setup() {
