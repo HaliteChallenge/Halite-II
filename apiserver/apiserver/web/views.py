@@ -1,6 +1,8 @@
+import functools
 import io
 import operator
 import random
+import string
 
 import arrow
 import flask
@@ -10,10 +12,72 @@ import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
 from .. import config, model, util
-from .. import optional_login, requires_login, response_success, requires_admin
+from .. import response_success
 
 
 web_api = flask.Blueprint("web_api", __name__)
+
+
+def requires_login(view):
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        if "api_key" in flask.request.args:
+            api_key = flask.request.args["api_key"]
+            if ":" not in api_key:
+                raise util.APIError(401, message="Invalid API key.")
+
+            user_id, api_key = api_key.split(":", 1)
+            user_id = int(user_id)
+            with model.engine.connect() as conn:
+                user = conn.execute(sqlalchemy.sql.select([
+                    model.users.c.apiKeyHash,
+                ]).where(model.users.c.userID == user_id)).first()
+
+                if not user:
+                    raise util.APIError(401, message="User not logged in.")
+
+                if config.api_key_context.verify(api_key, user["apiKeyHash"]):
+                    kwargs["user_id"] = user_id
+                    return view(*args, **kwargs)
+                else:
+                    raise util.APIError(401, message="User not logged in.")
+        else:
+            return requires_oauth_login(view)(*args, **kwargs)
+
+    return decorated_view
+
+
+def requires_oauth_login(view):
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        if "user_id" not in flask.session:
+            raise util.APIError(401, message="User not logged in.")
+
+        kwargs["user_id"] = flask.session["user_id"]
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
+def optional_login(view):
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        if "user_id" in flask.session:
+            kwargs["user_id"] = flask.session["user_id"]
+        else:
+            kwargs["user_id"] = None
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
+def requires_admin(view):
+    # TODO: NOT IMPLEMENTED!
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        return view(*args, **kwargs)
+
+    return decorated_view
 
 
 def user_mismatch_error(message="Cannot perform action for other user."):
@@ -491,6 +555,28 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
                 pass
 
         return response_success()
+
+
+@web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
+@requires_oauth_login
+def reset_api_key(intended_user, *, user_id):
+    if user_id != intended_user:
+        raise user_mismatch_error(
+            message="Cannot reset another user's API key.")
+
+    chars = string.ascii_letters + string.digits
+    with model.engine.connect() as conn:
+        api_key = "".join(random.choice(chars) for _ in range(32))
+
+        conn.execute(model.users.update().where(
+            model.users.c.userID == user_id
+        ).values(
+            apiKeyHash=config.api_key_context.hash(api_key),
+        ))
+
+        return response_success({
+            "api_key": "{}:{}".format(user_id, api_key),
+        })
 
 
 # ------------------------ #

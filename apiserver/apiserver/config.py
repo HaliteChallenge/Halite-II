@@ -1,3 +1,5 @@
+from passlib.context import CryptContext
+
 COMPETITION_OPEN = True
 # Original PHP: "compState", "finalsPairing"
 COMPETITION_FINALS_PAIRING = False
@@ -20,3 +22,9 @@ GCLOUD_COMPILATION_BUCKET = 'TODO'
 GCLOUD_BOT_BUCKET = 'TODO'
 GCLOUD_REPLAY_BUCKET = 'TODO'
 GCLOUD_ERROR_LOG_BUCKET = 'TODO'
+
+# API Key authentication
+api_key_context = CryptContext(
+    schemes=["argon2"],
+    deprecated="auto",
+)

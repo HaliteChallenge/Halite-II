@@ -9,8 +9,6 @@ MACHINE_TYPE="custom-1-2560"
 IMAGE="worker3"
 COORDINATOR_URL="http://10.128.0.5:5001/coordinator/v1/"
 
-WORKER_API_KEY=$1
-
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
     --machine-type "${MACHINE_TYPE}" \
