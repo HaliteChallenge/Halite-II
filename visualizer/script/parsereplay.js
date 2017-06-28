@@ -1,1 +1,0 @@
-../../website/script/parsereplay.js

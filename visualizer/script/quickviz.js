@@ -273,7 +273,7 @@ class HaliteVisualizer {
                         dx + planetBase.x,
                         dy + planetBase.y,
                         color,
-                        health_factor,
+                        health_factor
                     );
                 }
             }
@@ -385,7 +385,7 @@ class HaliteVisualizer {
                     }
 
                     this.animationQueue.push(new FrameAnimation(
-                        48, () => {}, draw,
+                        48, () => {}, draw
                     ));
                 }
                 else if (event.event === "attack") {
@@ -402,7 +402,7 @@ class HaliteVisualizer {
                             this.lights.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
                             this.lights.drawCircle(x, y, side * this.replay.constants.WEAPON_RADIUS);
                             this.lights.endFill();
-                        },
+                        }
                     ));
                 }
                 else if (event.event === "spawned") {
@@ -420,7 +420,7 @@ class HaliteVisualizer {
                             this.shipContainer.moveTo(planetX, planetY);
                             this.shipContainer.lineTo(ship_x, ship_y);
                             this.shipContainer.endFill();
-                        },
+                        }
                     ));
                 }
                 else {
@@ -580,57 +580,9 @@ class HaliteVisualizerControls {
 }
 
 function setupUpload() {
-    // const dragPopup = $(`<div class="halite-dnd-popup">`).appendTo(document.body);
-    // dragPopup.append($("<h1>Drop to visualize</h1>"));
-    //
     const match = $(`<h1>`).appendTo(document.body);
     const visualizerEl = $("<section>").appendTo(document.body);
-    //
-    // document.body.addEventListener("dragenter", (e) => {
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    //
-    //     dragPopup.removeClass("hidden");
-    // });
-    // document.body.addEventListener("dragover", (e) => {
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    // });
-    // document.body.addEventListener("dragexit", (e) => {
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    //     dragPopup.addClass("hidden");
-    // });
-    //
-    // document.body.addEventListener("drop", (e) => {
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    //     dragPopup.addClass("hidden");
-    //
-    //     let dt = e.dataTransfer;
-    //     let files = dt.files;
-    //
-    //     let reader = new FileReader();
-    //     reader.onload = function(e) {
-    //         const result = new Uint8Array(e.target.result);
-    //         let replay;
-    //         try {
-    //             const inflated = pako.inflate(result);
-    //             console.log("Compressed replay");
-    //             replay = msgpack.decode(inflated);
-    //         }
-    //         catch (e) {
-    //             console.log("Uncompressed replay");
-    //             replay = msgpack.decode(result);
-    //         }
-    //
-    //         console.log(replay);
-    //
-    //         let visualizer = new HaliteVisualizerControls(replay);
-    //         visualizer.attach(visualizerEl);
-    //     };
-    //     reader.readAsArrayBuffer(files[0]);
-    // });
+
 
     const COORDINATOR_URL = "http://35.184.15.108:5000/api/web/";
     let visualizer;
@@ -673,8 +625,4 @@ function setupUpload() {
     };
 
     getGame();
-}
-
-function setup() {
-    setupUpload();
 }

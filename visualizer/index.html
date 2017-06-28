@@ -5,6 +5,7 @@
 
     <link href="lib/bootstrap.min.css" rel="stylesheet">
     <link href="style/general.css" rel="stylesheet">
+    <link href="style/quickviz.css" rel="stylesheet">
 </head>
 <body>
     <div id="container" class="container">
@@ -22,12 +23,14 @@
     </div>
     <script>window.$ = window.jQuery = require('./lib/jquery.min.js');</script>
     <script>window._ = require('./lib/lodash.min.js');</script>
+    <script>window.alea = require('./lib/alea.js');</script>
     <script src="lib/bootstrap.min.js"></script>
-    <script src="lib/seedrandom.min.js"></script>
     <script src="lib/pixi.min.js"></script>
     <script src="lib/xss.js"></script>
-    <script src="script/parsereplay.js"></script>
-    <script src="script/visualizer.js"></script>
+    <script src="lib/msgpack.min.js"></script>
+    <script src="lib/pako_inflate.min.js"></script>
+    <script src="lib/pixi-extra-filters.js"></script>
+    <script src="script/quickviz.js"></script>
     <script src="index.js"></script>
 </body>
 </html>
