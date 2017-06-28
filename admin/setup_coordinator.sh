@@ -50,5 +50,5 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-groups managed set-autoscaling "coordinator-instances" \
     --zone "${GCLOUD_ZONE}" \
     --cool-down-period "60" \
-    --max-num-replicas "1" --min-num-replicas "1" \
+    --max-num-replicas "3" --min-num-replicas "1" \
     --target-cpu-utilization "0.8"

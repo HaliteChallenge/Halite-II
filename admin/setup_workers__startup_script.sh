@@ -13,4 +13,4 @@ cd Halite/apiserver/worker
 python3 grab_config.py
 
 # Start the worker
-./startWorkerScreen.sh
+screen -S worker -d -m /bin/bash -c "python3 worker.py"

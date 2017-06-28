@@ -6,8 +6,8 @@ GCLOUD_PROJECT="nth-observer-171418"
 GCLOUD_ZONE="us-central1-c"
 
 MACHINE_TYPE="custom-1-2560"
-IMAGE="worker2"
-COORDINATOR_URL="http://halite-coordinator:5000/manager/"
+IMAGE="worker3"
+COORDINATOR_URL="http://10.128.0.5:5001/coordinator/v1/"
 
 WORKER_API_KEY=$1
 
@@ -15,10 +15,11 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
     --machine-type "${MACHINE_TYPE}" \
     --network "default" \
-    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=secret_folder#&&#halite-api-key=${WORKER_API_KEY}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
+    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=secret_folder#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
     --no-restart-on-failure \
     --maintenance-policy "TERMINATE" \
     --preemptible \
+    --tags "worker" \
     --image "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
     --boot-disk-size "10" --boot-disk-type "pd-standard"
 
