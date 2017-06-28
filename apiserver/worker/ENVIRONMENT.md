@@ -51,5 +51,6 @@ Additionally, for running the game environment, the following packages were
 installed:
 
 - cgroup-tools 0.41-8ubuntu1
+- virtualenv
     
 [nodesource]: https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
