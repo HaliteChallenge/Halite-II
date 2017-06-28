@@ -8,14 +8,13 @@ from time import gmtime, strftime
 
 with open("config.json") as configfile:
     config = json.load(configfile)
-    API_KEY = config["API_KEY"]
     MANAGER_URL = config["MANAGER_URL"]
     SECRET_FOLDER = config["SECRET_FOLDER"]
 
 
 def getTask():
     """Gets either a run or a compile task from the API"""
-    content = requests.get(MANAGER_URL+"task", params={"apiKey": API_KEY}).text
+    content = requests.get(MANAGER_URL+"task").text
 
     print("Task call %s\n" % content)
     if content == "null":
@@ -26,7 +25,7 @@ def getTask():
 
 def getBotHash(userID, isCompile=False):
     """Gets the checksum of a user's bot's zipped source code"""
-    params = {"apiKey": API_KEY, "userID": userID}
+    params = {"userID": userID}
     if isCompile:
             params["compile"] = 1
 
@@ -42,7 +41,7 @@ def storeBotLocally(userID, storageDir, isCompile=False):
     """
     iterations = 0
     while iterations < 100:
-        url = MANAGER_URL+"botFile?apiKey="+str(API_KEY)+"&userID="+str(userID)
+        url = MANAGER_URL+"botFile?userID="+str(userID)
         if isCompile: url += "&compile=1"
         print("Bot file url %s\n" % url)
 
@@ -76,7 +75,7 @@ def storeBotRemotely(userID, zipFilePath):
     iterations = 0
 
     while iterations < 100:
-        r = requests.post(MANAGER_URL+"botFile", data={"apiKey": API_KEY, "userID": str(userID)}, files={"bot.zip": zipContents})
+        r = requests.post(MANAGER_URL+"botFile", data={"userID": str(userID)}, files={"bot.zip": zipContents})
         print("Posting compiled bot archive %s\n" % r.text)
 
         # Try again if local and remote hashes differ
@@ -91,7 +90,7 @@ def storeBotRemotely(userID, zipFilePath):
 
 def compileResult(userID, didCompile, language, errors=None):
     """Posts the result of a compilation task"""
-    r = requests.post(MANAGER_URL+"compile", data={"apiKey": API_KEY, "userID": userID, "didCompile": int(didCompile), "language": language, "errors": errors})
+    r = requests.post(MANAGER_URL+"compile", data={"userID": userID, "didCompile": int(didCompile), "language": language, "errors": errors})
     print("Posting compile result %s\n" % r.text)
 
 
@@ -110,7 +109,6 @@ def gameResult(users, game_output):
         files[os.path.basename(path)] = open(path, "rb").read()
 
     data = {
-        "apiKey": API_KEY,
         "users": json.dumps(users),
         "game_output": json.dumps(game_output),
     }
