@@ -40,6 +40,7 @@ CREATE TABLE `User` (
   `numGames` smallint(5) NOT NULL DEFAULT 0,
   `creationTime` datetime DEFAULT CURRENT_TIMESTAMP,
   `updateTime` datetime ON UPDATE CURRENT_TIMESTAMP,
+  `apiKeyHash` VARCHAR(255),
   FOREIGN KEY (`organizationID`) REFERENCES Organization(`organizationID`),
   PRIMARY KEY (`userID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;

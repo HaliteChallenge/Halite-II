@@ -2,7 +2,6 @@ import copy
 import os
 import os.path
 import glob
-import gzip
 import json
 import shutil
 import subprocess
@@ -130,6 +129,9 @@ def executeGameTask(width, height, users, backend):
     for f in filelist:
         os.remove(f)
     os.remove(parsed_output["replay"])
+
+    # Make sure game processes exit
+    subprocess.run(["pkill", "--signal", "9", "-f", "cgexec"])
 
 if __name__ == "__main__":
     print("\n\n\n\nStarting up worker...\n\n\n")
