@@ -1,6 +1,0 @@
-User-agent: *
-Disallow: /cron
-Disallow: /sql
-Disallow: /vendor
-Allow: /
-Sitemap: https://halite.io/sitemap.xml
