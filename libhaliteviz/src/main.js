@@ -14,6 +14,12 @@ const PLANET_COLOR = 0x3F3C15;
 
 
 const BACKGROUND_IMAGE = require("../assets/backgrounds/spr_stars02.png");
+const PLANET_IMAGES = [
+    "dist/" + require("../assets/planets/p1.png"),
+    "dist/" + require("../assets/planets/p2.png"),
+    "dist/" + require("../assets/planets/p3.png"),
+    "dist/" + require("../assets/planets/p4.png"),
+];
 
 
 class FrameAnimation {
@@ -47,6 +53,22 @@ export class HaliteVisualizer {
         this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
         this.container = new PIXI.Container();
         this.container.position.set(0, 100);
+
+        this.planets = [];
+        for (let i = 0; i < this.replay.planets.length; i++) {
+            const planetBase = this.replay.planets[i];
+            const planetSprite =
+                PIXI.Sprite.fromImage(PLANET_IMAGES[i % PLANET_IMAGES.length]);
+            const r = planetBase.r * CELL_SIZE * this.scale;
+            planetSprite.width = planetSprite.height = 2 * r;
+            planetSprite.anchor.x = 0.5;
+            planetSprite.anchor.y = 0.5;
+            planetSprite.position.x = this.scale * CELL_SIZE * planetBase.x;
+            planetSprite.position.y = this.scale * CELL_SIZE * planetBase.y;
+            this.planets.push(planetSprite);
+            this.container.addChild(planetSprite);
+        }
+
         this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer, this.lights);
 
         this.statsDisplay = new PIXI.Graphics();
@@ -248,36 +270,17 @@ export class HaliteVisualizer {
         let planetBase = this.replay.planets[planet.id];
 
         const side = CELL_SIZE * this.scale;
-        const color = planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner];
+        const color = planet.owner === null ? 0xFFFFFF : PLAYER_COLORS[planet.owner];
 
-        if (planet.owner !== null) {
-            const r = this.replay.constants.MAX_DOCKING_DISTANCE + planetBase.r;
-            const percent_production =
-                planet.remaining_production / planetBase.production;
-            this.planetContainer.beginFill(color, 0.2 * percent_production);
-            this.planetContainer.lineStyle(1, 0xFFFFFF, 0.3);
-            this.planetContainer.drawCircle(
-                (planetBase.x + 0.5) * side, (planetBase.y + 0.5) * side,
-                side * r);
-            this.planetContainer.endFill();
-        }
-
-        this.planetContainer.lineStyle(0);
-        for (let dx = -planetBase.r; dx <= planetBase.r; dx++) {
-            for (let dy = -planetBase.r; dy <= planetBase.r; dy++) {
-                if (dx*dx + dy*dy <= planetBase.r*planetBase.r) {
-                    const health_factor = 0.2 + 0.3 *
-                        (planetBase.production - planet.remaining_production) / planetBase.production;
-                    this.drawCell(
-                        this.planetContainer,
-                        dx + planetBase.x,
-                        dy + planetBase.y,
-                        color,
-                        health_factor
-                    );
-                }
-            }
-        }
+        const r = planetBase.r;
+        const percent_production =
+            planet.remaining_production / planetBase.production;
+        this.planetContainer.beginFill(color, 0.2 * percent_production);
+        this.planetContainer.lineStyle(1, 0xFFFFFF, 0.3);
+        this.planetContainer.drawCircle(
+            (planetBase.x + 0.5) * side, (planetBase.y + 0.5) * side,
+            side * r);
+        this.planetContainer.endFill();
 
         const center_x = side * planetBase.x;
         const center_y = side * (planetBase.y + 0.5);

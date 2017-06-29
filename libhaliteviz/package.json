@@ -18,6 +18,7 @@
     "seedrandom": "^2.4.3"
   },
   "devDependencies": {
+    "browserify-versionify": "^1.0.6",
     "file-loader": "^0.11.2",
     "ify-loader": "^1.0.4",
     "webpack": "^3.0.0"
