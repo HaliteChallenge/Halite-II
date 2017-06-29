@@ -39,31 +39,13 @@ We need four buckets: one for compiled bot storage, one for uploaded bots, one f
 
 We need a service account so the coordinators can access everything they need.
 
-These are the permissions I currently have, but these are probably more than necessary:
-
 - Cloud SQL Client
 - Cloud SQL Editor
 - Cloud SQL Viewer
-- Storage Object Creator
-- Storage Object Viewer
-
-- Cloud SQL Admin
-- Cloud SQL Client
-- Cloud SQL Editor
-- Cloud SQL Viewer
-- Compute Image User
-- Compute Instance Admin (v1)
-- Compute Network Admin
-- Compute Network User
-- Compute Network Viewer
-- Compute Security Admin
-- Compute Security Admin
-- Compute Storage Admin
-- Service Account Actor
 - Storage Admin
 - Storage Object Admin
-
-(I think most of these are needed for the CLI in order to run the scripts below. The server itself shouldn't need more than access to Cloud SQL and Storage.)
+- Storage Object Creator
+- Storage Object Viewer
 
 ### Create the Instance Group
 
@@ -96,10 +78,6 @@ This load balancer is for the internal game/compilation workers.
 1. Set the frontend to use port 5001.
 
 Create the load balancer and note the IP address of the balancer.
-
-1. Create a firewall rule to allow access to the game coordinator from the load balancer.
-    1. Target tag: `coordinator`
-    1. Source filters: the subnet of the load balancer
 
 ## Creating the Worker Instances
 

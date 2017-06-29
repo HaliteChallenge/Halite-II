@@ -8,11 +8,7 @@ GCLOUD_ZONE="us-central1-c"
 SERVICE_ACCOUNT="apiserver"
 
 MACHINE_TYPE="f1-micro"
-IMAGE="worker3"
-
-# TODO: document what the service account needs
-# TODO: document load balancer setup
-# TODO: document firewall setup
+IMAGE="worker"
 
 gcloud beta compute --project "${GCLOUD_PROJECT}" \
     firewall-rules create "allow-coordinator-external-traffic" \
