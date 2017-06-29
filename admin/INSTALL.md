@@ -31,6 +31,7 @@ We need four buckets: one for compiled bot storage, one for uploaded bots, one f
 1. Use `schema.sql` to create the initial database. (You can copy-paste it into console.)
     1. Optionally, use `dummyData.sql` to set up some test data.
 1. Create an account and put its credentials into `apiserver/apiserver/config.py`. Also add the project ID of the project, the database was created in, and the database instance name.
+1. Enable the Cloud SQL Administration API: https://console.developers.google.com/apis/api/sqladmin.googleapis.com/overview
 
 ## Creating the Coordinator Instances
 
@@ -106,4 +107,4 @@ Create the load balancer and note the IP address of the balancer.
 1. Set the coordinator URL to the URL of the externally facing HTTP load balancer created earlier.
 1. Run the script.
 
-At this point, everything should be set. You can `ssh` into individual instances to check on them. `sudo su` to switch to root, and use `screen -list` to see what sessions are running. Coordinator servers should have 3 screen sessions, one for the SQL proxy, one for the API server, and one for the coordinator. Workers should have 1 session, for the worker itself.
+At this point, everything should be set. You can `ssh` into individual instances to check on them. `sudo su` to switch to `worker`, and use `screen -list` to see what sessions are running. Coordinator servers should have 3 screen sessions, one for the SQL proxy, one for the API server, and one for the coordinator. Workers should have 1 session, for the worker itself.
