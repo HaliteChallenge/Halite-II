@@ -14,18 +14,22 @@ We need a service account to use locally.
 
 ### Create the Worker Image
 
-We need to create a machine image with all necessary compilers and other things
-set up already.
+We need to create a machine image with all necessary compilers and other things set up already. Create an f1-micro instance based on Ubuntu 17.04. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Once the instance is started, run `setup_worker_image.sh`, then delete the instance and create an image from it.
+
+At the end, the script also prints out all installed packages with their versions, which is useful for documentation.
 
 ### Create GCS Buckets
 
-### Upload Coordinator and Worker to GCS
+We need four buckets: one for compiled bot storage, one for uploaded bots, one for replays, and one for error logs. (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
+
+### Upload Coordinator and Worker to GCS (Non-Github Deploy Only)
 
 ## MySQL Server
 
 1. Create a Google Cloud SQL MySQL (second generation) instance.
     1. Use MySQL 5.7.
 1. Use `schema.sql` to create the initial database. (You can copy-paste it into console.)
+    1. Optionally, use `dummyData.sql` to set up some test data.
 1. Create an account and put its credentials into `apiserver/apiserver/config.py`. Also add the project ID of the project, the database was created in, and the database instance name.
 
 ## Creating the Coordinator Instances
@@ -35,6 +39,12 @@ set up already.
 We need a service account so the coordinators can access everything they need.
 
 These are the permissions I currently have, but these are probably more than necessary:
+
+- Cloud SQL Client
+- Cloud SQL Editor
+- Cloud SQL Viewer
+- Storage Object Creator
+- Storage Object Viewer
 
 - Cloud SQL Admin
 - Cloud SQL Client
