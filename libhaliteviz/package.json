@@ -2,10 +2,10 @@
   "name": "libhaliteviz",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/browserify -r ./src/main.js:libhaliteviz -o index.js"
+    "build": "./node_modules/.bin/browserify --debug -r ./src/main.js:libhaliteviz -o index.js"
   },
   "author": "David Li <David.M.Li@TwoSigma.com>",
   "license": "MIT",
@@ -18,7 +18,8 @@
     "seedrandom": "^2.4.3"
   },
   "devDependencies": {
-    "browserify": "^14.4.0",
-    "browserify-versionify": "^1.0.6"
+    "file-loader": "^0.11.2",
+    "ify-loader": "^1.0.4",
+    "webpack": "^3.0.0"
   }
 }

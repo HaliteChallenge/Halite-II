@@ -12,6 +12,10 @@ const CELL_SIZE = 1;
 const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 const PLANET_COLOR = 0x3F3C15;
 
+
+const BACKGROUND_IMAGE = require("../assets/backgrounds/spr_stars02.png");
+
+
 class FrameAnimation {
     constructor(frames, update, draw) {
         this.frames = frames;
@@ -20,7 +24,7 @@ class FrameAnimation {
     }
 }
 
-class HaliteVisualizer {
+export class HaliteVisualizer {
     constructor(replay) {
         this.replay = replay;
         this.frame = 0;
@@ -33,7 +37,7 @@ class HaliteVisualizer {
         );
 
         this.scale = 800 / Math.max(replay.width, replay.height);
-        this.starfield = new PIXI.Graphics();
+        this.starfield = PIXI.Sprite.fromImage("dist/"+BACKGROUND_IMAGE);
 
         this.backgroundContainer = new PIXI.Graphics();
         this.planetContainer = new PIXI.Graphics();
@@ -222,16 +226,6 @@ class HaliteVisualizer {
     }
 
     drawPOI() {
-        let next_rand = new alea('halite');
-        for (let i = 0; i < 400; i++) {
-            this.starfield.beginFill(0xFFFFFF, next_rand());
-            const x = Math.floor(next_rand() * this.application.stage.width);
-            const y = Math.floor(next_rand() * this.application.stage.height);
-            const size = 0.5 + next_rand();
-            this.starfield.drawRect(x, y, size, size);
-            this.starfield.endFill();
-        }
-
         const side = CELL_SIZE * this.scale;
         for (let poi of this.replay.poi) {
             if (poi.type === "orbit") {
@@ -437,7 +431,6 @@ class HaliteVisualizer {
     }
 
     draw(dt=0) {
-        this.starfield.clear();
         this.backgroundContainer.clear();
         this.planetContainer.clear();
         this.shipContainer.clear();
@@ -497,7 +490,7 @@ class HaliteVisualizer {
     }
 }
 
-class HaliteVisualizerControls {
+export class HaliteVisualizerControls {
     constructor(replay) {
         this.replay = replay;
         this.visualizer = new HaliteVisualizer(replay);
@@ -585,7 +578,7 @@ class HaliteVisualizerControls {
     }
 }
 
-function parseReplay(buffer) {
+export function parseReplay(buffer) {
     try {
         const inflated = pako.inflate(buffer);
         return msgpack.decode(inflated);
@@ -594,9 +587,3 @@ function parseReplay(buffer) {
         return msgpack.decode(buffer);
     }
 }
-
-module.exports = {
-    parseReplay: parseReplay,
-    HaliteVisualizerControls: HaliteVisualizerControls,
-    HaliteVisualizer: HaliteVisualizer,
-};
