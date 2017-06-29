@@ -176,6 +176,9 @@ def update_compilation_status():
             conn.execute(update)
             return response_success()
         else:
+            conn.execute(model.users.update()
+                .where(model.users.c.userID == user_id)
+                .values(isRunning=0))
             # TODO: email the user
             return response_success()
 
