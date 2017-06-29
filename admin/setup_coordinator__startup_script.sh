@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# We are already running as root
+# We are running as root, switch to a less privileged account
+sudo -iu worker bash <<"EOF"
+cd
 
 # Fetch the coordinator
 # TODO: This is in GCloud right now, but we should use Git when we go public
@@ -27,3 +29,5 @@ screen -S api -d -m /bin/bash -c \
 
 screen -S coordinator_internal -d -m /bin/bash -c \
     "PYTHONPATH=$(pwd) FLASK_APP=apiserver.coordinator_server FLASK_DEBUG=true flask run -h 0.0.0.0 -p 5001"
+
+EOF
