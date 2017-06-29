@@ -7,6 +7,9 @@
 *.userosscache
 *.sln.docstates
 
+# IntelliJ/CLion
+.idea/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -452,3 +455,5 @@ screenlog.*
 
 node_modules
 /dist
+
+*.dSYM/
