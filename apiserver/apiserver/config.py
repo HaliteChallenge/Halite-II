@@ -28,3 +28,7 @@ api_key_context = CryptContext(
     schemes=["argon2"],
     deprecated="auto",
 )
+
+# Discourse SSO
+DISCOURSE_SSO_SECRET = b""
+DISCOURSE_URL = "https://forums.halite.io/sso"
