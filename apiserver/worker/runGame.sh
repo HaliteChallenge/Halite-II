@@ -39,10 +39,11 @@ do
     BOTNAME=${!BOTNAMEINDEX};
     CGROUP=halitebot_$i
 
-    sudo cgcreate -g cpu,memory:/${CGROUP}
-    sudo cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
+    # Grant control over the group to our user
+    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker
+    cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
 
-    BOTSTARTCOMMANDS+="\"sudo cgexec -g cpu,memory:$CGROUP sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
+    BOTSTARTCOMMANDS+="\"cgexec -g cpu,memory:$CGROUP sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
     BOTSTARTCOMMANDS+="\"$BOTNAME\" ";
 done
 
