@@ -14,6 +14,7 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 import pycountry
+from flask_cors import cross_origin
 
 from .. import config, model, util
 from .. import response_success
@@ -200,6 +201,7 @@ def get_sort_filter(fields):
 
 
 @web_api.route("/user")
+@cross_origin(methods=["GET"])
 def list_users():
     result = []
     offset, limit = get_offset_limit()
@@ -374,6 +376,8 @@ def create_user(*, user_id):
 
 
 @web_api.route("/user/<int:intended_user>", methods=["GET"])
+# TODO: need CSRF protection
+@cross_origin(methods=["GET"])
 @optional_login
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
@@ -917,6 +921,7 @@ def delete_organization(org_id):
 # LEADERBOARD API ENDPOINTS #
 #############################
 @web_api.route("/leaderboard")
+@cross_origin(methods=["GET"])
 def leaderboard():
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
