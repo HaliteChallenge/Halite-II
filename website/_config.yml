@@ -38,3 +38,5 @@ exclude:
   - Gemfile.lock
   - vendor/
   - vendor_assets/
+  - javascript/
+  - node_modules/
