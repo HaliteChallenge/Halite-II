@@ -32,6 +32,11 @@ CREATE TABLE `User` (
   `compileStart` datetime,
   `level` enum('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
   `organizationID` INT,
+  # ISO-3166 3-letter country code
+  `countryCode` VARCHAR(3),
+  # ISO-3166-2 variable length country code
+  `countrySubdivisionCode` VARCHAR(10),
+  `countryVisible` BOOL DEFAULT FALSE,
   `language` varchar(16) DEFAULT NULL,
   `mu` float NOT NULL DEFAULT 25.000,
   `sigma` float unsigned NOT NULL DEFAULT 8.333,

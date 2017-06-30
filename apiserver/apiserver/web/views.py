@@ -11,15 +11,35 @@ import urllib.parse
 import arrow
 import flask
 import sqlalchemy
-import sqlalchemy.orm.exc as sqlalchemy_exc
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
+import pycountry
 
 from .. import config, model, util
 from .. import response_success
 
 
 web_api = flask.Blueprint("web_api", __name__)
+
+
+def validate_country(country_code, subdivision_code):
+    try:
+        country = pycountry.countries.get(alpha_3=country_code)
+    except KeyError:
+        return False
+
+    if subdivision_code:
+        subdivisions = pycountry.subdivisions.get(country_code=country.alpha_2)
+        for subdivision in subdivisions:
+            if subdivision.code == subdivision_code:
+                return True
+        return False
+    else:
+        return True
+
+
+def validate_user_level(level):
+    return level in ('High School','Undergraduate','Graduate','Professional')
 
 
 def requires_login(view):
@@ -201,7 +221,7 @@ def list_users():
         )
 
         for row in query.fetchall():
-            result.append({
+            user = {
                 "user_id": row["userID"],
                 "username": row["username"],
                 "level": row["level"],
@@ -209,7 +229,12 @@ def list_users():
                 "num_submissions": row["numSubmissions"],
                 "num_games": row["numGames"],
                 "organization_id": row["organizationID"],
-            })
+            }
+            if row["countryVisible"] == 1:
+                user["country_code"] = row["countryCode"]
+                user["country_subdivision_code"] = row["countrySubdivisionCode"]
+
+            result.append(user)
 
     return flask.jsonify(result)
 
@@ -241,26 +266,54 @@ def create_user(*, user_id):
 
     org_id = body.get("organization_id")
     email = body.get("email")
+    level = body.get("level", model.users.c.level)
     verification_code = str(random.randint(0, 2**63))
 
+    # Values to insert into the database
+    values = {}
+
+    # Perform validation on given values
+    if "level" in body and not validate_user_level(body["level"]):
+        raise util.APIError(400, message="Invalid user level.")
+
+    if "country_code" in body or "country_subdivision_code" in body:
+        country_code = body.get("country_code")
+        subdivision_code = body.get("country_subdivision_code")
+
+        if subdivision_code and not country_code:
+            raise util.APIError(400, message="Must provide country code if country subdivision code is given.")
+
+        if not validate_country(country_code, subdivision_code):
+            raise util.APIError(400, message="Invalid country/country subdivision code.")
+
+        values["countryCode"] = country_code
+        values["countrySubdivisionCode"] = subdivision_code
+
+    if "country_visible" in body:
+        if body["country_visible"] not in ("0", "1"):
+            raise util.APIError(400, message="Invalid country_visible (must be 0 or 1).")
+        else:
+            values["countryVisible"] = int(body["country_visible"])
+
+    # Figure out the situation with their email/organization
     if org_id is None and email is None:
         # Just use their Github email. Don't bother guessing an affiliation
         # (we can do that client-side)
-        query = model.users.update().where(model.users.c.userID == user_id) \
-            .values(email=model.users.c.githubEmail,
-                    isEmailGood=1,
-                    organizationID=None,
-                    # TODO: validate the level
-                    level=body.get("level", model.users.c.level))
+        values.update({
+            "email": model.users.c.githubEmail,
+            "isEmailGood": 1,
+            "organizationID": None,
+            "level": level,
+        })
         message = "User all set."
     elif org_id is None:
-        query = model.users.update().where(model.users.c.userID == user_id) \
-            .values(email=email,
-                    verificationCode=verification_code,
-                    isEmailGood=0,
-                    organizationID=None,
-                    # TODO: validate the level
-                    level=body.get("level", model.users.c.level))
+        values.update({
+            "email": email,
+            "isEmailGood": 0,
+            "verificationCode": verification_code,
+            "organizationID": None,
+            "level": level,
+        })
         message = "User needs to validate email."
     else:
         # Check the org
@@ -292,48 +345,40 @@ def create_user(*, user_id):
         # Set the verification code (if necessary), and update the user's
         # level to match the organization's level.
         if email:
-            query = model.users.update()\
-                .where(model.users.c.userID == user_id) \
-                .values(email=email,
-                        verificationCode=verification_code,
-                        isEmailGood=0,
-                        organizationID=org_id,
-                        level=org["level"])
+            values.update({
+                "email": email,
+                "isEmailGood": 0,
+                "verificationCode": verification_code,
+                "organizationID": org_id,
+                "level": org["level"],
+            })
             # TODO: send the verification email
             message = "User added to organization, but needs to validate email."
         else:
-            query = model.users.update()\
-                .where(model.users.c.userID == user_id) \
-                .values(email=model.users.c.githubEmail,
-                        isEmailGood=1,
-                        organizationID=org_id,
-                        level=org["level"])
+            values.update({
+                "email": model.users.c.githubEmail,
+                "isEmailGood": 1,
+                "organizationID": org_id,
+                "level": org["level"],
+            })
             message = "User added to organization."
 
     with model.engine.connect() as conn:
-        conn.execute(query)
+        conn.execute(model.users.update().where(
+            model.users.c.userID == user_id
+        ).values(**values))
 
     return response_success({
         "message": message,
     })
 
 
-@web_api.route("/user/<int:user_id>", methods=["GET"])
-def get_user(user_id):
+@web_api.route("/user/<int:intended_user>", methods=["GET"])
+@optional_login
+def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
-        query = sqlalchemy.sql.select([
-            model.users.c.userID,
-            model.users.c.username,
-            model.users.c.level,
-            model.users.c.organizationID,
-            model.users.c.rank,
-            model.users.c.mu,
-            model.users.c.sigma,
-            model.users.c.numSubmissions,
-            model.users.c.numGames,
-            model.organizations.c.organizationName,
-        ]).where(
-            model.users.c.userID == user_id
+        query = model.users.select(
+            model.users.c.userID == intended_user
         ).select_from(
             model.users.join(
                 model.organizations,
@@ -344,7 +389,7 @@ def get_user(user_id):
         if not row:
             raise util.APIError(404, message="No user found.")
 
-        return flask.jsonify({
+        user = {
             "user_id": row["userID"],
             "username": row["username"],
             "level": row["level"],
@@ -356,7 +401,12 @@ def get_user(user_id):
             "points": row["mu"] - 3 * row["sigma"],
             "num_submissions": row["numSubmissions"],
             "num_games": row["numGames"],
-        })
+        }
+        if row["countryVisible"] == 1 or intended_user == user_id:
+            user["country_code"] = row["countryCode"]
+            user["country_subdivision_code"] = row["countrySubdivisionCode"]
+
+        return flask.jsonify(user)
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["GET"])
@@ -398,17 +448,42 @@ def update_user(intended_user_id, *, user_id):
 
     fields = flask.request.get_json()
     columns = {
-        "level": model.users.c.level,
+        "level": "level",
+        "country_code": "countryCode",
+        "country_subdivision_code": "countrySubdivisionCode",
+        "country_visible": "countryVisible",
     }
+
+    update = {}
 
     for key in fields:
         if key not in columns:
             raise util.APIError(400, message="Cannot update '{}'".format(key))
 
+        update[columns[key]] = fields[key]
+
+    if "level" in update and not validate_user_level(update["level"]):
+        raise util.APIError(400, message="Invalid user level.")
+
+    if "countryCode" in update or "countrySubdivisionCode" in update:
+        with model.engine.connect() as conn:
+            user = conn.execute(model.users.select(model.users.c.userID == user_id)).first()
+        country_code = update.get("countryCode", user["countryCode"])
+        subdivision_code = update.get("countrySubdivisionCode", user["countrySubdivisionCode"])
+
+        if not validate_country(country_code, subdivision_code):
+            raise util.APIError(400, message="Invalid country/country subdivision code.")
+
+    if "countryVisible" in update:
+        if update["countryVisible"] not in ("0", "1"):
+            raise util.APIError(400, message="Invalid country_visible (must be 0 or 1).")
+        else:
+            update["countryVisible"] = int(update["countryVisible"])
+
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
             model.users.c.userID == user_id
-        ).values(**fields))
+        ).values(**update))
 
     return response_success()
 
