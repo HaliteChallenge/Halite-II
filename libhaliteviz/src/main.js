@@ -69,6 +69,8 @@ export class HaliteVisualizer {
             this.container.addChild(planetSprite);
         }
 
+        this.drawPOI();
+
         this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer, this.lights);
 
         this.statsDisplay = new PIXI.Graphics();
@@ -434,12 +436,9 @@ export class HaliteVisualizer {
     }
 
     draw(dt=0) {
-        this.backgroundContainer.clear();
         this.planetContainer.clear();
         this.shipContainer.clear();
         this.lights.clear();
-
-        this.drawPOI();
 
         for (let planet of this.currentSubstep.planets) {
             this.drawPlanet(planet);
