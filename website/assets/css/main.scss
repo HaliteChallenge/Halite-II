@@ -1,0 +1,41 @@
+---
+---
+
+@import "bootstrap-sass-3.3.7/assets/stylesheets/bootstrap";
+
+body {
+    padding-top: 50px;
+}
+
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+
+    img {
+        height: $navbar-height;
+    }
+}
+
+.navbar-bottom {
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+footer {
+    margin-top: $line-height-computed;
+}
+
+/* Homepage */
+#hero {
+    width: 100%;
+    height: auto;
+}
+
+.home-about-halite {
+    margin: $line-height-computed 0;
+}
+
+/* General Styles */
+.img-full {
+    width: 100%;
+}
