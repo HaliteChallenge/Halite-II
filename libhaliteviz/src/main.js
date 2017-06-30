@@ -63,8 +63,8 @@ export class HaliteVisualizer {
             planetSprite.width = planetSprite.height = 2 * r;
             planetSprite.anchor.x = 0.5;
             planetSprite.anchor.y = 0.5;
-            planetSprite.position.x = this.scale * CELL_SIZE * planetBase.x;
-            planetSprite.position.y = this.scale * CELL_SIZE * planetBase.y;
+            planetSprite.position.x = this.scale * CELL_SIZE * (planetBase.x + 0.5);
+            planetSprite.position.y = this.scale * CELL_SIZE * (planetBase.y + 0.5);
             this.planets.push(planetSprite);
             this.container.addChild(planetSprite);
         }
