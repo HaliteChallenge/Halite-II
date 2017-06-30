@@ -13,7 +13,13 @@ const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 const PLANET_COLOR = 0x3F3C15;
 
 
-const BACKGROUND_IMAGE = require("../assets/backgrounds/spr_stars02.png");
+const BACKGROUND_IMAGES = [
+    "dist/" + require("../assets/backgrounds/Space001.png"),
+    "dist/" + require("../assets/backgrounds/Space002.png"),
+    "dist/" + require("../assets/backgrounds/Space003.png"),
+    "dist/" + require("../assets/backgrounds/Space004.png"),
+    "dist/" + require("../assets/backgrounds/Space005.png"),
+];
 const PLANET_IMAGES = [
     "dist/" + require("../assets/planets/p1.png"),
     "dist/" + require("../assets/planets/p2.png"),
@@ -43,10 +49,11 @@ export class HaliteVisualizer {
         );
 
         this.scale = 800 / Math.max(replay.width, replay.height);
-        this.starfield = PIXI.Sprite.fromImage("dist/"+BACKGROUND_IMAGE);
+        this.starfield = PIXI.Sprite.fromImage(BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)]);
 
         this.backgroundContainer = new PIXI.Graphics();
-        this.planetContainer = new PIXI.Graphics();
+        this.planetContainer = new PIXI.Container();
+        this.planetOverlay = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
         this.lights = new PIXI.Graphics();
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
@@ -66,8 +73,9 @@ export class HaliteVisualizer {
             planetSprite.position.x = this.scale * CELL_SIZE * (planetBase.x + 0.5);
             planetSprite.position.y = this.scale * CELL_SIZE * (planetBase.y + 0.5);
             this.planets.push(planetSprite);
-            this.container.addChild(planetSprite);
+            this.planetContainer.addChild(planetSprite);
         }
+        this.planetContainer.addChild(this.planetOverlay);
 
         this.drawPOI();
 
@@ -277,22 +285,22 @@ export class HaliteVisualizer {
         const r = planetBase.r;
         const percent_production =
             planet.remaining_production / planetBase.production;
-        this.planetContainer.beginFill(color, 0.2 * percent_production);
-        this.planetContainer.lineStyle(1, 0xFFFFFF, 0.3);
-        this.planetContainer.drawCircle(
+        this.planetOverlay.beginFill(color, 0.2 * percent_production);
+        this.planetOverlay.lineStyle(1, 0xFFFFFF, 0.3);
+        this.planetOverlay.drawCircle(
             (planetBase.x + 0.5) * side, (planetBase.y + 0.5) * side,
             side * r);
-        this.planetContainer.endFill();
+        this.planetOverlay.endFill();
 
         const center_x = side * planetBase.x;
         const center_y = side * (planetBase.y + 0.5);
 
         const health_factor = planet.health / planetBase.health;
         const health_bar = health_factor * side * (planetBase.r - 1);
-        this.planetContainer.beginFill(0xFF0000);
-        this.planetContainer.lineStyle(2, 0x000000);
-        this.planetContainer.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
-        this.planetContainer.endFill();
+        this.planetOverlay.beginFill(0xFF0000);
+        this.planetOverlay.lineStyle(2, 0x000000);
+        this.planetOverlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
+        this.planetOverlay.endFill();
     }
 
     drawShip(ship) {
@@ -372,7 +380,7 @@ export class HaliteVisualizer {
                         let r = event.radius;
                         draw = (frame) => {
                             const side = CELL_SIZE * this.scale;
-                            this.planetContainer.lineStyle(0);
+                            this.planetOverlay.lineStyle(0);
                             for (let dx = -r; dx <= r; dx++) {
                                 for (let dy = -r; dy <= r; dy++) {
                                     if (dx*dx + dy*dy <= r*r) {
@@ -436,7 +444,7 @@ export class HaliteVisualizer {
     }
 
     draw(dt=0) {
-        this.planetContainer.clear();
+        this.planetOverlay.clear();
         this.shipContainer.clear();
         this.lights.clear();
 
