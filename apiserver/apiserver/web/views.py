@@ -757,7 +757,7 @@ def get_user_match(intended_user, match_id, *, user_id):
             model.games.c.map_height,
             model.games.c.time_played,
         ]).where(
-            model.games.c.gameID == match_id
+            model.games.c.id == match_id
         )).first()
 
         result = {
@@ -878,7 +878,7 @@ def list_organizations():
 def get_organization(org_id):
     with model.engine.connect() as conn:
         org = conn.execute(model.organizations.select().where(
-            model.organizations.c.organizationID == org_id
+            model.organizations.c.id == org_id
         )).first()
 
         if not org:
@@ -956,8 +956,8 @@ def delete_organization(org_id):
 def list_matches():
     with model.engine.connect() as conn:
         match = conn.execute(sqlalchemy.sql.select([
-            model.games.c.gameID,
-            model.games.c.replayName,
+            model.games.c.id,
+            model.games.c.replay_name,
         ]).order_by(model.games.c.timestamp.desc())).first()
 
         blob = gcloud_storage.Blob(match["replayName"],
@@ -968,7 +968,7 @@ def list_matches():
         buffer.seek(0)
         return flask.send_file(buffer, mimetype="application/x-halite-2-replay",
                                as_attachment=True,
-                               attachment_filename=str(match["gameID"])+".hlt")
+                               attachment_filename=str(match["id"])+".hlt")
 
 
 @web_api.route("/match/<int:match_id>")
@@ -1016,7 +1016,7 @@ def leaderboard():
         ]).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organizationID == model.organizations.c.id)
+                model.users.c.organization_id == model.organizations.c.id)
         ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
         players = conn.execute(query)
 
@@ -1024,7 +1024,7 @@ def leaderboard():
             result.append({
                 "user_id": player["id"],
                 "username": player["username"],
-                "level": player["level"],
+                "level": player["player_level"],
                 "organization_id": player["organization_id"],
                 "organization": player["organization_name"],
                 # "language": player["language"],
