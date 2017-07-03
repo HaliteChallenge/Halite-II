@@ -67,5 +67,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="{{ site.baseurl }}/bootstrap.min.js"></script>
 <script src="{{ site.baseurl }}/assets/js/bundle.js"></script>
+{% if page.mount_view %}
+<script>
+    window.views["{{ page.mount_view }}"]();
+</script>
+{% endif %}
 </body>
 </html>

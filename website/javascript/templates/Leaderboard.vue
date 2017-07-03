@@ -12,7 +12,7 @@
         <tbody>
         <tr v-for="player in leaderboard">
             <td>{{ player.rank }}</td>
-            <td>{{ player.username }}</td>
+            <td><a :href="'user?user_id=' + player.user_id">{{ player.username }}</a></td>
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
             <td>{{ player.points }}</td>
