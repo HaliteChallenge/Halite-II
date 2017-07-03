@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS halite2;
-USE halite2;
+USE halite2test;
 
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -13,7 +12,7 @@ CREATE TABLE organization_email_domain (
   FOREIGN KEY (organization_id) REFERENCES organization(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE player (
+CREATE TABLE `user` (
   id MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
   oauth_id INT(12) UNSIGNED NOT NULL,
   oauth_provider TINYINT(1) UNSIGNED NOT NULL,
@@ -40,9 +39,8 @@ CREATE TABLE player (
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 
 CREATE TABLE bot (
-  player_id MEDIUMINT(8) UNSIGNED NOT NULL,
+  user_id MEDIUMINT(8) UNSIGNED NOT NULL,
   id MEDIUMINT(8) UNSIGNED NOT NULL,
-  is_running BOOL NOT NULL DEFAULT 0,
   compile_status ENUM('Uploaded', 'InProgress', 'Successful', 'Failed') NOT NULL,
   compile_start DATETIME,
   language VARCHAR(16) DEFAULT NULL,
@@ -52,8 +50,8 @@ CREATE TABLE bot (
   mu FLOAT NOT NULL DEFAULT 25.000,
   sigma FLOAT UNSIGNED NOT NULL DEFAULT 8.333,
   score FLOAT NOT NULL DEFAULT 0,
-  FOREIGN KEY (player_id) REFERENCES player(id),
-  PRIMARY KEY (player_id, id)
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  PRIMARY KEY (user_id, id)
 );
 
 CREATE TABLE game (
@@ -67,7 +65,7 @@ CREATE TABLE game (
 
 CREATE TABLE game_participant (
   game_id MEDIUMINT(8) UNSIGNED NOT NULL,
-  player_id MEDIUMINT(8) UNSIGNED NOT NULL,
+  user_id MEDIUMINT(8) UNSIGNED NOT NULL,
   bot_id MEDIUMINT(8) UNSIGNED NOT NULL,
   version_number MEDIUMINT(8) UNSIGNED NOT NULL,
   log_name VARCHAR(64) DEFAULT NULL,
@@ -75,16 +73,16 @@ CREATE TABLE game_participant (
   player_index SMALLINT(5) UNSIGNED NOT NULL,
   timed_out BOOL NOT NULL,
   FOREIGN KEY (game_id) REFERENCES game(id),
-  FOREIGN KEY (player_id) REFERENCES player(id),
-  FOREIGN KEY (player_id, bot_id) REFERENCES bot(player_id, id),
-  PRIMARY KEY (game_id, player_id, bot_id)
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  PRIMARY KEY (game_id, user_id, bot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- A history of submitted bots, recorded whenever a new one is submitted.
 -- This intends to prevent players from keeping their bots in "stealth", where
 -- they submit bots, wait for the rank to stabilize, then take them down.
 CREATE TABLE bot_history (
-  player_id MEDIUMINT(8) UNSIGNED NOT NULL,
+  user_id MEDIUMINT(8) UNSIGNED NOT NULL,
   bot_id MEDIUMINT(8) UNSIGNED NOT NULL,
   version_number SMALLINT(5) NOT NULL,
   last_rank SMALLINT(5) NOT NULL,
@@ -94,18 +92,18 @@ CREATE TABLE bot_history (
   -- The number of games this bot has played.
   last_num_games SMALLINT(5) DEFAULT NULL,
   when_retired DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (player_id) REFERENCES player(id),
-  FOREIGN KEY (player_id, bot_id) REFERENCES bot(player_id, id),
-  PRIMARY KEY (player_id, bot_id)
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  PRIMARY KEY (user_id, bot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE player_notification (
+CREATE TABLE user_notification (
   id MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-  player_id mediumint(8) unsigned NOT NULL,
+  user_id mediumint(8) unsigned NOT NULL,
   title varchar(64) NOT NULL,
   body varchar(2048) NOT NULL,
   mood ENUM("error", "neutral", "success") NOT NULL DEFAULT "neutral",
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (player_id) REFERENCES player(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

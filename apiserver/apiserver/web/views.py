@@ -40,7 +40,8 @@ def validate_country(country_code, subdivision_code):
 
 
 def validate_user_level(level):
-    return level in ('High School','Undergraduate','Graduate','Professional')
+    return level in ('High School', 'Undergraduate', 'Graduate',
+                     'Professional')
 
 
 def requires_login(view):
@@ -55,13 +56,13 @@ def requires_login(view):
             user_id = int(user_id)
             with model.engine.connect() as conn:
                 user = conn.execute(sqlalchemy.sql.select([
-                    model.users.c.apiKeyHash,
-                ]).where(model.users.c.userID == user_id)).first()
+                    model.users.c.api_key_hash,
+                ]).where(model.users.c.id == user_id)).first()
 
                 if not user:
                     raise util.APIError(401, message="User not logged in.")
 
-                if config.api_key_context.verify(api_key, user["apiKeyHash"]):
+                if config.api_key_context.verify(api_key, user["api_key_hash"]):
                     kwargs["user_id"] = user_id
                     return view(*args, **kwargs)
                 else:
@@ -170,7 +171,6 @@ def get_sort_filter(fields):
         else:
             where_clause &= clause
 
-
     for order_param in flask.request.args.getlist("order_by"):
         direction = "asc"
         if "," in order_param:
@@ -206,35 +206,34 @@ def list_users():
     result = []
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
-        "user_id": model.users.c.userID,
+        "user_id": model.users.c.id,
         "username": model.users.c.username,
-        "level": model.users.c.level,
-        "rank": model.users.c.rank,
-        "num_submissions": model.users.c.numSubmissions,
-        "num_games": model.users.c.numGames,
-        "organization_id": model.users.c.organizationID,
+        "level": model.users.c.player_level,
+        # "rank": model.users.c.rank,
+        # TODO: figure out how to filter/sort rank, # of submissions, # of games played
+        "organization_id": model.users.c.organization_id,
     })
 
     with model.engine.connect() as conn:
         query = conn.execute(
             model.users.select()
+                .select_from(model.users.join(
+                    model.organizations,
+                    model.users.c.organization_id == model.organizations.c.id))
                 .where(where_clause).order_by(*order_clause)
-                .offset(offset).limit(limit)
+                .offset(offset).limit(limit).reduce_columns()
         )
 
         for row in query.fetchall():
             user = {
-                "user_id": row["userID"],
+                "user_id": row["user_id"],
                 "username": row["username"],
-                "level": row["level"],
-                "rank": row["rank"],
-                "num_submissions": row["numSubmissions"],
-                "num_games": row["numGames"],
-                "organization_id": row["organizationID"],
+                "level": row["player_level"],
+                "organization_id": row["organization_id"],
+                "organization": row["organization"],
+                "country_code": row["country_code"],
+                "country_subdivision_code": row["country_subdivision_code"],
             }
-            if row["countryVisible"] == 1:
-                user["country_code"] = row["countryCode"]
-                user["country_subdivision_code"] = row["countrySubdivisionCode"]
 
             result.append(user)
 
@@ -257,18 +256,18 @@ def create_user(*, user_id):
     # Check if the user has already validated
     with model.engine.connect() as conn:
         user_data = conn.execute(model.users.select().where(
-            model.users.c.userID == user_id
+            model.users.c.id == user_id
         )).first()
 
-        if user_data["verificationCode"]:
+        if user_data["verification_code"]:
             raise util.APIError(400, message="User needs to verify email.")
 
-        if user_data["isEmailGood"] == 1:
+        if user_data["is_email_good"] == 1:
             raise util.APIError(400, message="User already validated.")
 
     org_id = body.get("organization_id")
     email = body.get("email")
-    level = body.get("level", model.users.c.level)
+    level = body.get("level", model.users.c.player_level)
     verification_code = str(random.randint(0, 2**63))
 
     # Values to insert into the database
@@ -288,55 +287,49 @@ def create_user(*, user_id):
         if not validate_country(country_code, subdivision_code):
             raise util.APIError(400, message="Invalid country/country subdivision code.")
 
-        values["countryCode"] = country_code
-        values["countrySubdivisionCode"] = subdivision_code
-
-    if "country_visible" in body:
-        if body["country_visible"] not in ("0", "1"):
-            raise util.APIError(400, message="Invalid country_visible (must be 0 or 1).")
-        else:
-            values["countryVisible"] = int(body["country_visible"])
+        values["country_code"] = country_code
+        values["country_subdivision_code"] = subdivision_code
 
     # Figure out the situation with their email/organization
     if org_id is None and email is None:
         # Just use their Github email. Don't bother guessing an affiliation
         # (we can do that client-side)
         values.update({
-            "email": model.users.c.githubEmail,
-            "isEmailGood": 1,
-            "organizationID": None,
-            "level": level,
+            "email": model.users.c.github_email,
+            "is_email_good": 1,
+            "organization_id": None,
+            "player_level": level,
         })
         message = "User all set."
     elif org_id is None:
         values.update({
             "email": email,
-            "isEmailGood": 0,
-            "verificationCode": verification_code,
-            "organizationID": None,
-            "level": level,
+            "is_email_good": 0,
+            "verification_code": verification_code,
+            "organization_id": None,
+            "player_level": level,
         })
         message = "User needs to validate email."
     else:
         # Check the org
         with model.engine.connect() as conn:
             org = conn.execute(model.organizations.select().where(
-                model.organizations.c.organizationID == org_id
+                model.organizations.c.id == org_id
             )).first()
 
             if org is None:
                 raise util.APIError(400, message="Organization does not exist.")
 
             # Verify the email against the org
-            email_to_verify = email or user_data["githubEmail"]
+            email_to_verify = email or user_data["github_email"]
             if "@" not in email_to_verify:
                 raise util.APIError(
-                    400, message="Email should at least have an at sign...")
+                    400, message="Email should at least have an at sign…")
             domain = email.split("@")[1].strip().lower()
             count = conn.execute(sqlalchemy.sql.select([
                 sqlalchemy.sql.func.count()
             ]).select_from(model.organization_email_domains).where(
-                (model.organization_email_domains.c.organizationID == org_id) &
+                (model.organization_email_domains.c.organization_id == org_id) &
                 (model.organization_email_domains.c.domain == domain)
             )).first()[0]
 
@@ -349,25 +342,23 @@ def create_user(*, user_id):
         if email:
             values.update({
                 "email": email,
-                "isEmailGood": 0,
-                "verificationCode": verification_code,
-                "organizationID": org_id,
-                "level": org["level"],
+                "is_email_good": 0,
+                "verification_code": verification_code,
+                "organization_id": org_id,
             })
             # TODO: send the verification email
             message = "User added to organization, but needs to validate email."
         else:
             values.update({
-                "email": model.users.c.githubEmail,
-                "isEmailGood": 1,
-                "organizationID": org_id,
-                "level": org["level"],
+                "email": model.users.c.github_email,
+                "is_email_good": 1,
+                "organization_id": org_id,
             })
             message = "User added to organization."
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
-            model.users.c.userID == user_id
+            model.users.c.id == user_id
         ).values(**values))
 
     return response_success({
@@ -382,33 +373,33 @@ def create_user(*, user_id):
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
         query = model.users.select(
-            model.users.c.userID == intended_user
+            model.users.c.id == intended_user
         ).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organizationID == model.organizations.c.organizationID)
-        )
+                model.users.c.organization_id == model.organizations.c.id)
+        ).reduce_columns()
 
         row = conn.execute(query).first()
         if not row:
             raise util.APIError(404, message="No user found.")
 
         user = {
-            "user_id": row["userID"],
+            "user_id": row["id"],
             "username": row["username"],
             "level": row["level"],
-            "organization_id": row["organizationID"],
-            "organization": row["organizationName"],
+            "organization_id": row["organization_id"],
+            "organization": row["organization_name"],
             # In the future, these would be the stats of their best bot
             # Right now, though, each user has at most 1 bot
-            "rank": row["rank"],
-            "points": row["mu"] - 3 * row["sigma"],
-            "num_submissions": row["numSubmissions"],
-            "num_games": row["numGames"],
+            # TODO:
+            # "rank": row["rank"],
+            # "points": row["mu"] - 3 * row["sigma"],
+            # "num_submissions": row["numSubmissions"],
+            # "num_games": row["numGames"],
+            "country_code": row["country_code"],
+            "country_subdivision_code": row["country_subdivision_code"],
         }
-        if row["countryVisible"] == 1 or intended_user == user_id:
-            user["country_code"] = row["countryCode"]
-            user["country_subdivision_code"] = row["countrySubdivisionCode"]
 
         return flask.jsonify(user)
 
@@ -421,21 +412,21 @@ def verify_user_email(user_id):
 
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
-            model.users.c.verificationCode,
+            model.users.c.verification_code,
         ]).where(
-            model.users.c.userID == user_id
+            model.users.c.id == user_id
         )
 
         row = conn.execute(query).first()
         if not row:
             raise util.APIError(404, message="No user found.")
 
-        if row["verificationCode"] == verification_code:
+        if row["verification_code"] == verification_code:
             conn.execute(model.users.update().where(
-                model.users.c.userID == user_id
+                model.users.c.id == user_id
             ).values(
-                isEmailGood=1,
-                verificationCode="",
+                is_email_good=1,
+                verification_code="",
             ))
             return response_success({
                 "message": "Email verified."
@@ -452,10 +443,9 @@ def update_user(intended_user_id, *, user_id):
 
     fields = flask.request.get_json()
     columns = {
-        "level": "level",
-        "country_code": "countryCode",
-        "country_subdivision_code": "countrySubdivisionCode",
-        "country_visible": "countryVisible",
+        "level": "player_level",
+        "country_code": "country_code",
+        "country_subdivision_code": "country_subdivision_code",
     }
 
     update = {}
@@ -466,27 +456,21 @@ def update_user(intended_user_id, *, user_id):
 
         update[columns[key]] = fields[key]
 
-    if "level" in update and not validate_user_level(update["level"]):
-        raise util.APIError(400, message="Invalid user level.")
+    if "player_level" in update and not validate_user_level(update["player_level"]):
+        raise util.APIError(400, message="Invalid player level.")
 
-    if "countryCode" in update or "countrySubdivisionCode" in update:
+    if "country_code" in update or "country_subdivision_code" in update:
         with model.engine.connect() as conn:
-            user = conn.execute(model.users.select(model.users.c.userID == user_id)).first()
-        country_code = update.get("countryCode", user["countryCode"])
-        subdivision_code = update.get("countrySubdivisionCode", user["countrySubdivisionCode"])
+            user = conn.execute(model.users.select(model.users.c.id == user_id)).first()
+        country_code = update.get("country_code", user["country_code"])
+        subdivision_code = update.get("country_subdivision_code", user["country_subdivision_code"])
 
         if not validate_country(country_code, subdivision_code):
             raise util.APIError(400, message="Invalid country/country subdivision code.")
 
-    if "countryVisible" in update:
-        if update["countryVisible"] not in ("0", "1"):
-            raise util.APIError(400, message="Invalid country_visible (must be 0 or 1).")
-        else:
-            update["countryVisible"] = int(update["countryVisible"])
-
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
-            model.users.c.userID == user_id
+            model.users.c.id == user_id
         ).values(**update))
 
     return response_success()
@@ -501,7 +485,7 @@ def delete_user(intended_user_id, *, user_id):
 
     with model.engine.connect() as conn:
         conn.execute(model.users.delete().where(
-            model.users.c.userID == user_id))
+            model.users.c.id == user_id))
 
 
 # ---------------------- #
@@ -517,57 +501,49 @@ def delete_user(intended_user_id, *, user_id):
 def list_user_bots(user_id):
     # TODO: parameter to get only IDs
 
+    result = []
     with model.engine.connect() as conn:
-        query = conn.execute(model.users.select().where(
-            model.users.c.userID == user_id
-        )).fetchall()
+        bots = conn.execute(model.bots.select().where(
+            model.bots.c.user_id == user_id
+        ).order_by(model.bots.c.id)).fetchall()
 
-        if len(query) != 1:
-            raise util.APIError(404, message="User not found.")
+        for bot in bots:
+            result.append({
+                "bot_id": bot["id"],
+                # TODO:
+                # "rank": row["rank"],
+                "version_number": bot["version_number"],
+                "games_played": bot["games_played"],
+                "language": bot["language"],
+                "score": bot["score"],
+                "compilation_status": bot["compile_status"],
+            })
 
-        row = query[0]
-
-        if row["numSubmissions"] == 0:
-            return flask.jsonify([])
-
-        return flask.jsonify([
-            {
-                "bot_id": 0,
-                "rank": row["rank"],
-                "num_submissions": row["numSubmissions"],
-                "num_games": row["numGames"],
-                "language": row["language"],
-            }
-        ])
+    return flask.jsonify(result)
 
 
 @web_api.route("/user/<int:user_id>/bot/<int:bot_id>", methods=["GET"])
 def get_user_bot(user_id, bot_id):
     with model.engine.connect() as conn:
-        query = conn.execute(model.users.select().where(
-            model.users.c.userID == user_id
-        )).fetchall()
+        bot = conn.execute(model.bots.select().where(
+            (model.bots.c.id == bot_id) &
+            (model.users.c.user_id == user_id)
+        )).first()
 
-        if len(query) != 1:
-            raise util.APIError(404, message="User not found.")
-
-        if bot_id != 0:
+        if not bot:
             raise util.APIError(404, message="Bot not found.")
 
-        row = query[0]
+        return flask.jsonify({
+            "bot_id": bot_id,
+            # TODO:
+            # "rank": row["rank"],
+            "version_number": bot["version_number"],
+            "games_played": bot["games_played"],
+            "language": bot["language"],
+            "score": bot["score"],
+            "compilation_status": bot["compile_status"],
+        })
 
-        if row["numSubmissions"] == 0:
-            return flask.jsonify([])
-
-        return flask.jsonify([
-            {
-                "bot_id": 0,
-                "rank": row["rank"],
-                "num_submissions": row["numSubmissions"],
-                "num_games": row["numGames"],
-                "language": row["language"],
-            }
-        ])
 
 # TODO: POST to just /bot to create a new bot
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
@@ -584,12 +560,20 @@ def store_user_bot(user_id, intended_user, bot_id):
         raise user_mismatch_error(
             message="Cannot upload bot for another user.")
 
+    if bot_id != 0:
+        raise util.APIError(
+            400, message="Sorry, only one bot allowed per user.")
+
     conn = model.engine.connect()
-    user = conn.execute(model.users.select(model.users.c.userID == user_id)) \
-        .first()
+    bot = conn.execute(model.bots.select(
+        (model.bots.c.user_id == user_id) & (model.bots.c.id == bot_id)
+    )).first()
+
+    if not bot:
+        raise util.APIError(404, message="Bot not found.")
 
     # Check if the user already has a bot compiling
-    if user["compileStatus"] != 0:
+    if bot["compile_status"] not in ("Sucessful", "Failed"):
         raise util.APIError(400, message="Cannot upload new bot until "
                                          "previous one is compiled.")
 
@@ -606,12 +590,10 @@ def store_user_bot(user_id, intended_user, bot_id):
     # Flag the user as compiling
     update = model.users.update() \
         .where(model.users.c.userID == user_id) \
-        .values(compileStatus=1)
+        .values(compile_status="Uploaded")
     conn.execute(update)
 
     # TODO: Email the user
-
-    # TODO: Spin up more workers?
 
     return response_success()
 
@@ -624,10 +606,10 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
             message="Cannot delete bot for another user.")
 
     with model.engine.connect() as conn:
-        conn.execute(model.users.update().where(
-            model.users.c.userID == user_id
-        ).values(
-            isRunning=0,
+        # TODO: move bot to BotHistory
+        conn.execute(model.bots.delete().where(
+            (model.bots.c.user_id == user_id) &
+            (model.bots.c.id == bot_id)
         ))
 
         for bucket in [model.get_bot_bucket(), model.get_compilation_bucket()]:
@@ -652,9 +634,9 @@ def reset_api_key(intended_user, *, user_id):
         api_key = "".join(random.choice(chars) for _ in range(32))
 
         conn.execute(model.users.update().where(
-            model.users.c.userID == user_id
+            model.users.c.id == user_id
         ).values(
-            apiKeyHash=config.api_key_context.hash(api_key),
+            api_key_hash=config.api_key_context.hash(api_key),
         ))
 
         return response_success({
@@ -666,96 +648,100 @@ def reset_api_key(intended_user, *, user_id):
 # USER MATCH API ENDPOINTS #
 # ------------------------ #
 @web_api.route("/user/<int:intended_user>/match", methods=["GET"])
+@cross_origin(methods=["GET"])
 def list_user_matches(intended_user):
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
-        "game_id": model.games.c.gameID,
-        "timestamp": model.games.c.timestamp,
+        "game_id": model.games.c.id,
+        "time_played": model.games.c.time_played,
+        # TODO: filter by participants
     })
     result = []
 
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
-            model.games.c.gameID,
-            model.games.c.replayName,
-            model.games.c.mapWidth,
-            model.games.c.mapHeight,
-            model.games.c.timestamp,
+            model.games.c.id,
+            model.games.c.replay_name,
+            model.games.c.map_width,
+            model.games.c.map_height,
+            model.games.c.time_played,
         ]).select_from(model.games.join(
-            model.gameusers,
-            (model.games.c.gameID == model.gameusers.c.gameID) &
-            (model.gameusers.c.userID == intended_user),
-        )).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
+            model.game_participants,
+            (model.games.c.id == model.game_participants.c.game_id) &
+            (model.game_participants.c.user_id == intended_user),
+        )).where(where_clause).order_by(*order_clause).offset(offset).limit(limit).reduce_columns()
         matches = conn.execute(query)
 
+        # TODO: include participants, winner
         for match in matches.fetchall():
             result.append({
-                "game_id": match["gameID"],
-                "map_width": match["mapWidth"],
-                "map_height": match["mapHeight"],
-                "replay": match["replayName"],
-                "timestamp": match["timestamp"],
+                "game_id": match["id"],
+                "map_width": match["map_width"],
+                "map_height": match["map_height"],
+                "replay": match["replay_name"],
+                "time_played": match["time_played"],
             })
 
     return flask.jsonify(result)
 
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>", methods=["GET"])
+@cross_origin(methods=["GET"])
 @optional_login
 def get_user_match(intended_user, match_id, *, user_id):
     with model.engine.connect() as conn:
         query = conn.execute(sqlalchemy.sql.select([
-            model.gameusers.c.userID,
-            model.gameusers.c.rank,
-            model.gameusers.c.playerIndex,
-            model.gameusers.c.didTimeout,
-            model.gameusers.c.errorLogName,
+            model.game_participants.c.user_id,
+            model.game_participants.c.bot_id,
+            model.game_participants.c.rank,
+            model.game_participants.c.version_number,
+            model.game_participants.c.player_index,
+            model.game_participants.c.timed_out,
         ]).where(
-            model.gameusers.c.gameID == match_id
+            model.game_participants.c.game_id == match_id
         ))
 
         match = conn.execute(sqlalchemy.sql.select([
-            model.games.c.replayName,
-            model.games.c.mapWidth,
-            model.games.c.mapHeight,
-            model.games.c.timestamp,
+            model.games.c.replay_name,
+            model.games.c.map_width,
+            model.games.c.map_height,
+            model.games.c.time_played,
         ]).where(
             model.games.c.gameID == match_id
         )).first()
 
         result = {
-            "map_width": match["mapWidth"],
-            "map_height": match["mapHeight"],
-            "replay": match["replayName"],
-            "timestamp": match["timestamp"],
+            "map_width": match["map_width"],
+            "map_height": match["map_height"],
+            "replay": match["replay_name"],
+            "time_played": match["time_played"],
             "players": {}
         }
         for row in query.fetchall():
             result["game_id"] = match_id
-            result["players"][row["userID"]] = {
+            result["players"][row["user_id"]] = {
+                "bot_id": row["bot_id"],
+                "version_number": row["version_number"],
+                "player_index": row["player_index"],
                 "rank": row["rank"],
-                "player_index": row["playerIndex"],
-                "timed_out": bool(row["didTimeout"]),
+                "timed_out": bool(row["timed_out"]),
             }
-
-            if (user_id is not None and intended_user == user_id and
-                    row["userID"] == user_id):
-                result["players"][row["userID"]]["error_log"] = row["errorLogName"]
 
     return flask.jsonify(result)
 
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>/replay",
                methods=["GET"])
+@cross_origin(methods=["GET"])
 def get_match_replay(intended_user, match_id):
     with model.engine.connect() as conn:
         match = conn.execute(sqlalchemy.sql.select([
-            model.games.c.replayName,
+            model.games.c.replay_name,
         ]).where(
-            model.games.c.gameID == match_id
+            model.games.c.id == match_id
         )).first()
 
-        blob = gcloud_storage.Blob(match["replayName"],
+        blob = gcloud_storage.Blob(match["replay_name"],
                                    model.get_replay_bucket(),
                                    chunk_size=262144)
         buffer = io.BytesIO()
@@ -784,10 +770,10 @@ def get_match_error_log(intended_user, match_id, *, user_id):
 
     with model.engine.connect() as conn:
         match = conn.execute(sqlalchemy.sql.select([
-            model.gameusers.c.errorLogName,
+            model.game_participants.c.log_name,
         ]).where(
-            (model.gameusers.c.gameID == match_id) &
-            (model.gameusers.c.userID == user_id)
+            (model.game_participants.c.id == match_id) &
+            (model.game_participants.c.user_id == user_id)
         )).first()
 
         if match is None:
@@ -795,12 +781,12 @@ def get_match_error_log(intended_user, match_id, *, user_id):
                 404, message="Game does not exist."
             )
 
-        if match["errorLogName"] is None:
+        if match["log_name"] is None:
             raise util.APIError(
                 404, message="No error log for this player in this game."
             )
 
-        blob = gcloud_storage.Blob(match["errorLogName"],
+        blob = gcloud_storage.Blob(match["log_name"],
                                    model.get_error_log_bucket(),
                                    chunk_size=262144)
         buffer = io.BytesIO()
@@ -819,9 +805,8 @@ def list_organizations():
     result = []
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
-        "organization_id": model.organizations.c.organizationID,
-        "organization_name": model.organizations.c.organizationName,
-        "level": model.organizations.c.level,
+        "organization_id": model.organizations.c.id,
+        "organization_name": model.organizations.c.organization_name,
     })
 
     with model.engine.connect() as conn:
@@ -832,9 +817,8 @@ def list_organizations():
 
         for org in orgs.fetchall():
             result.append({
-                "organization_id": org["organizationID"],
-                "name": org["organizationName"],
-                "level": org["level"],
+                "organization_id": org["id"],
+                "name": org["organization_name"],
             })
 
     return flask.jsonify(result)
@@ -851,9 +835,8 @@ def get_organization(org_id):
             raise util.APIError(404, message="Organization not found.")
 
         return flask.jsonify({
-            "organization_id": org["organizationID"],
-            "name": org["organizationName"],
-            "level": org["level"],
+            "organization_id": org["id"],
+            "name": org["organization_name"],
         })
 
 
@@ -866,8 +849,7 @@ def create_organization():
 
     with model.engine.connect() as conn:
         org_id = conn.execute(model.organizations.insert().values(
-            organizationName=org_body["name"],
-            level=org_body.get("level", "Professional"),
+            organization_name=org_body["name"],
         )).inserted_primary_key
 
     return response_success({
@@ -880,7 +862,7 @@ def create_organization():
 def update_organization(org_id):
     fields = flask.request.get_json()
     columns = {
-        "name": model.organizations.c.organizationName,
+        "name": model.organizations.c.organization_name,
     }
 
     for key in fields:
@@ -889,7 +871,7 @@ def update_organization(org_id):
 
     with model.engine.connect() as conn:
         conn.execute(model.organizations.update().where(
-            model.organizations.c.organizationID == org_id
+            model.organizations.c.id == org_id
         ).values(**fields))
 
     return response_success()
@@ -903,7 +885,7 @@ def delete_organization(org_id):
             count = conn.execute(sqlalchemy.sql.select([
                 sqlalchemy.sql.func.count()
             ]).select_from(model.users).where(
-                model.users.c.organizationID == org_id
+                model.users.c.id == org_id
             )).first()[0]
 
             if count > 0:
@@ -911,10 +893,40 @@ def delete_organization(org_id):
                     400, message="Cannot delete organization with members.")
 
             conn.execute(model.organizations.delete().where(
-                model.organizations.c.organizationID == org_id
+                model.organizations.c.id == org_id
             ))
 
     return response_success()
+
+############################
+# MATCH DATA API ENDPOINTS #
+############################
+
+@web_api.route("/latestMatch")
+def list_matches():
+    with model.engine.connect() as conn:
+        match = conn.execute(sqlalchemy.sql.select([
+            model.games.c.gameID,
+            model.games.c.replayName,
+        ]).order_by(model.games.c.timestamp.desc())).first()
+
+        blob = gcloud_storage.Blob(match["replayName"],
+                                   model.get_replay_bucket(),
+                                   chunk_size=262144)
+        buffer = io.BytesIO()
+        blob.download_to_file(buffer)
+        buffer.seek(0)
+        return flask.send_file(buffer, mimetype="application/x-halite-2-replay",
+                               as_attachment=True,
+                               attachment_filename=str(match["gameID"])+".hlt")
+
+
+@web_api.route("/match/<int:match_id>")
+@optional_login
+def get_match(match_id, *, user_id):
+    if user_id is None:
+        user_id = -1
+    return get_user_match(user_id, match_id, user_id=user_id)
 
 
 #############################
@@ -925,45 +937,49 @@ def delete_organization(org_id):
 def leaderboard():
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
-        "user_id": model.users.c.userID,
+        "user_id": model.users.c.id,
         "username": model.users.c.username,
-        "level": model.users.c.level,
-        "organization_id": model.users.c.organizationID,
-        "language": model.users.c.language,
-        "points": model.users.c.mu,
-        "rank": model.users.c.rank,
+        "level": model.users.c.player_level,
+        "organization_id": model.users.c.organization_id,
+        # TODO:
+        # "language": model.users.c.language,
+        # "points": model.users.c.mu,
+        # "rank": model.users.c.rank,
     })
     if not order_clause:
-        order_clause = [model.users.c.rank.asc()]
+        order_clause = []
+        # TODO:
+        # order_clause = [model.users.c.rank.asc()]
     result = []
 
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
-            model.users.c.userID,
+            model.users.c.id,
             model.users.c.username,
-            model.users.c.level,
-            model.users.c.organizationID,
-            model.organizations.c.organizationName,
-            model.users.c.language,
-            model.users.c.mu,
-            model.users.c.rank,
+            model.users.c.player_level,
+            model.users.c.organization_id,
+            model.organizations.c.organization_name,
+            # TODO:
+            # model.users.c.language,
+            # model.users.c.mu,
+            # model.users.c.rank,
         ]).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organizationID == model.organizations.c.organizationID)
+                model.users.c.organizationID == model.organizations.c.id)
         ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
         players = conn.execute(query)
 
         for player in players.fetchall():
             result.append({
-                "user_id": player["userID"],
+                "user_id": player["id"],
                 "username": player["username"],
                 "level": player["level"],
-                "organization_id": player["organizationID"],
-                "organization": player["organizationName"],
-                "language": player["language"],
-                "points": player["mu"],
-                "rank": player["rank"],
+                "organization_id": player["organization_id"],
+                "organization": player["organization_name"],
+                # "language": player["language"],
+                # "points": player["mu"],
+                # "rank": player["rank"],
             })
 
     return flask.jsonify(result)
@@ -991,7 +1007,7 @@ def discourse_sso(*, user_id):
 
     with model.engine.connect() as conn:
         user = conn.execute(model.users.select().where(
-            model.users.c.userID == user_id,
+            model.users.c.id == user_id,
         )).first()
 
         if not user:
@@ -1010,7 +1026,7 @@ def discourse_sso(*, user_id):
         "external_id": str(user_id),
         "username": user["username"],
     }
-    if user["isEmailGood"] != 1:
+    if user["is_email_good"] != 1:
         raw_payload["require_activation"] = "true"
 
     encoded_payload = base64.b64encode(
