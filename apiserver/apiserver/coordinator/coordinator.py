@@ -120,8 +120,9 @@ def task():
 @coordinator_api.route("/compile", methods=["POST"])
 def update_compilation_status():
     """Update the compilation status of a bot."""
-    user_id = flask.request.form.get("userID", None)
-    did_compile = flask.request.form.get("didCompile", False)
+    user_id = flask.request.form.get("user_id", None)
+    bot_id = flask.request.form.get("bot_id", None)
+    did_compile = flask.request.form.get("did_compile", False)
 
     if user_id is None:
         raise util.APIError(400, message="Must provide user ID.")
@@ -129,9 +130,10 @@ def update_compilation_status():
     language = flask.request.form.get("language", "Other")
 
     with model.engine.connect() as conn:
-        update = model.users.update()\
-            .where(model.users.c.userID == user_id)\
-            .values(compileStatus=0)
+        update = model.bots.update()\
+            .where((model.bots.c.user_id == user_id) &
+                   (model.bots.c.id == bot_id))\
+            .values(compile_status="Successful" if did_compile else "Failed")
         conn.execute(update)
 
         if did_compile:
