@@ -16,48 +16,49 @@ import google.cloud.exceptions as gcloud_exceptions
 from .. import config, model, response_success, util
 
 
-manager_api = flask.Blueprint("manager_api", __name__)
+coordinator_api = flask.Blueprint("coordinator_api", __name__)
 
 
-@manager_api.route("/task")
+@coordinator_api.route("/task")
 def task():
     """Serve compilation and game tasks to worker instances."""
     with model.engine.connect() as conn:
         # Check ongoing compilation tasks, and reset ones that are "stuck".
-        reset_stuck_tasks = model.users.update().where(
-            (model.users.c.compileStatus == 2) &
-            (model.users.c.compileStart <
+        reset_stuck_tasks = model.bots.update().where(
+            (model.bots.c.compile_status == "InProgress") &
+            (model.bots.c.compile_start <
              datetime.datetime.now() - datetime.timedelta(minutes=30))
         ).values(
-            compileStatus=1,
-            compileStart=None,
+            compile_status="Uploaded",
+            compile_start=None,
         )
         conn.execute(reset_stuck_tasks)
 
         with conn.begin() as transaction:
             # Try to assign a compilation task.
-            find_compilation_task = model.users\
-                .select(model.users.c.userID)\
-                .where(model.users.c.compileStatus == 1)\
-                .order_by(model.users.c.userID.asc())\
+            find_compilation_task = model.bots.select()\
+                .where(model.bots.c.compile_status == "Uploaded")\
+                .order_by(model.bots.c.user_id.asc())\
                 .limit(1)
-            user = conn.execute(find_compilation_task).first()
-            if user:
-                user_id = user["userID"]
+            bot = conn.execute(find_compilation_task).first()
+            if bot:
+                user_id = bot["user_id"]
+                bot_id = bot["id"]
                 # Keep track of when compilation started, so that we can
                 # restart it if it gets stuck
-                update = model.users.update() \
-                    .where(model.users.c.userID == user_id) \
-                    .values(compileStatus=2,
-                            compileStart=sqlalchemy.sql.func.now())
+                update = model.bots.update() \
+                    .where((model.bots.c.user_id == user_id) &
+                           (model.bots.c.id == bot_id)) \
+                    .values(compile_status="InProgress",
+                            compile_start=sqlalchemy.sql.func.now())
                 conn.execute(update)
                 return response_success({
                     "type": "compile",
                     "user": user_id,
+                    "bot": bot_id,
                 })
 
     # Try to play a game.
-    # Need user: ID, username, and # of submissions.
     # TODO: make sure these end up in JSON as keys
     def desired_columns_of(table):
         return [
@@ -116,7 +117,7 @@ def task():
 
 
 # TODO: these aren't RESTful URLs, but it's what the worker expects
-@manager_api.route("/compile", methods=["POST"])
+@coordinator_api.route("/compile", methods=["POST"])
 def update_compilation_status():
     """Update the compilation status of a bot."""
     user_id = flask.request.form.get("userID", None)
@@ -183,7 +184,7 @@ def update_compilation_status():
             return response_success()
 
 
-@manager_api.route("/botFile", methods=["POST"])
+@coordinator_api.route("/botFile", methods=["POST"])
 def upload_bot():
     user_id = flask.request.form.get("userID", None)
 
@@ -198,7 +199,7 @@ def upload_bot():
     return response_success()
 
 
-@manager_api.route("/botFile", methods=["GET"])
+@coordinator_api.route("/botFile", methods=["GET"])
 def download_bot():
     user_id = flask.request.values.get("userID", None)
     compile = flask.request.values.get("compile", False)
@@ -221,7 +222,7 @@ def download_bot():
         raise util.APIError(404, message="Bot not found.")
 
 
-@manager_api.route("/botHash")
+@coordinator_api.route("/botHash")
 def hash_bot():
     """Get the MD5 hash of a compiled bot."""
     user_id = flask.request.args.get("userID", None)
@@ -244,7 +245,7 @@ def hash_bot():
     })
 
 
-@manager_api.route("/game", methods=["POST"])
+@coordinator_api.route("/game", methods=["POST"])
 def upload_game():
     if "game_output" not in flask.request.values \
             or "users" not in flask.request.values:
