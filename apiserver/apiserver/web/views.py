@@ -633,7 +633,8 @@ def store_user_bot(user_id, intended_user, bot_id):
 
         # Save to GCloud
         uploaded_file = flask.request.files["botFile"]
-        blob = gcloud_storage.Blob(str(user_id), model.get_compilation_bucket(),
+        blob = gcloud_storage.Blob("{}_{}".format(user_id, bot_id),
+                                   model.get_compilation_bucket(),
                                    chunk_size=262144)
         blob.upload_from_file(uploaded_file)
 
