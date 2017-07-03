@@ -216,21 +216,28 @@ def list_users():
 
     with model.engine.connect() as conn:
         query = conn.execute(
-            model.users.select()
-                .select_from(model.users.join(
-                    model.organizations,
-                    model.users.c.organization_id == model.organizations.c.id))
-                .where(where_clause).order_by(*order_clause)
-                .offset(offset).limit(limit).reduce_columns()
+            sqlalchemy.sql.select([
+                model.users.c.id,
+                model.users.c.username,
+                model.users.c.player_level,
+                model.users.c.organization_id,
+                model.organizations.c.organization_name,
+                model.users.c.country_code,
+                model.users.c.country_subdivision_code,
+            ]).select_from(model.users.join(
+                model.organizations,
+                model.users.c.organization_id == model.organizations.c.id)
+            ).where(where_clause).order_by(*order_clause)
+             .offset(offset).limit(limit).reduce_columns()
         )
 
         for row in query.fetchall():
             user = {
-                "user_id": row["user_id"],
+                "user_id": row["id"],
                 "username": row["username"],
                 "level": row["player_level"],
                 "organization_id": row["organization_id"],
-                "organization": row["organization"],
+                "organization": row["organization_name"],
                 "country_code": row["country_code"],
                 "country_subdivision_code": row["country_subdivision_code"],
             }
@@ -372,9 +379,15 @@ def create_user(*, user_id):
 @optional_login
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
-        query = model.users.select(
-            model.users.c.id == intended_user
-        ).select_from(
+        query = sqlalchemy.sql.select([
+            model.users.c.id,
+            model.users.c.username,
+            model.users.c.player_level,
+            model.users.c.organization_id,
+            model.organizations.c.organization_name,
+            model.users.c.country_code,
+            model.users.c.country_subdivision_code,
+        ]).where(model.users.c.id == intended_user).select_from(
             model.users.join(
                 model.organizations,
                 model.users.c.organization_id == model.organizations.c.id)
@@ -384,19 +397,29 @@ def get_user(intended_user, *, user_id):
         if not row:
             raise util.APIError(404, message="No user found.")
 
+        func = sqlalchemy.sql.func
+        bot_stats = conn.execute(sqlalchemy.sql.select([
+            func.count(),
+            func.coalesce(func.sum(model.bots.c.games_played), 0),
+            func.coalesce(func.sum(model.bots.c.version_number), 0),
+        ]).select_from(model.bots).where(
+            model.bots.c.id == intended_user
+        )).first()
+
         user = {
             "user_id": row["id"],
             "username": row["username"],
-            "level": row["level"],
+            "level": row["player_level"],
             "organization_id": row["organization_id"],
             "organization": row["organization_name"],
+            "num_bots": bot_stats[0],
+            "total_games_played": int(bot_stats[1]),
+            "total_submissions": int(bot_stats[2]),
             # In the future, these would be the stats of their best bot
             # Right now, though, each user has at most 1 bot
             # TODO:
             # "rank": row["rank"],
             # "points": row["mu"] - 3 * row["sigma"],
-            # "num_submissions": row["numSubmissions"],
-            # "num_games": row["numGames"],
             "country_code": row["country_code"],
             "country_subdivision_code": row["country_subdivision_code"],
         }
@@ -527,7 +550,7 @@ def get_user_bot(user_id, bot_id):
     with model.engine.connect() as conn:
         bot = conn.execute(model.bots.select().where(
             (model.bots.c.id == bot_id) &
-            (model.users.c.user_id == user_id)
+            (model.bots.c.user_id == user_id)
         )).first()
 
         if not bot:
@@ -545,9 +568,36 @@ def get_user_bot(user_id, bot_id):
         })
 
 
-# TODO: POST to just /bot to create a new bot
+@web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
+@requires_login
+def create_user_bot(intended_user, *, user_id):
+    if not config.COMPETITION_OPEN:
+        raise util.APIError(
+            400, message="Sorry, but bot submissions are closed."
+        )
+
+    if user_id != intended_user:
+        raise user_mismatch_error(
+            message="Cannot upload bot for another user.")
+
+    with model.engine.connect() as conn:
+        if conn.execute(model.bots.select(model.bots.c.user_id == user_id)).first():
+            raise util.APIError(
+                400, message="Only one bot allowed per user.")
+
+        conn.execute(model.bots.insert().values(
+            user_id=user_id,
+            id=0,
+            compile_status="Failed",
+        ))
+
+    store_user_bot(intended_user=intended_user, user_id=user_id, bot_id=0)
+    return response_success({
+        "bot_id": 0,
+    })
+
+
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
-@web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["POST"])
 @requires_login
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
@@ -564,34 +614,34 @@ def store_user_bot(user_id, intended_user, bot_id):
         raise util.APIError(
             400, message="Sorry, only one bot allowed per user.")
 
-    conn = model.engine.connect()
-    bot = conn.execute(model.bots.select(
-        (model.bots.c.user_id == user_id) & (model.bots.c.id == bot_id)
-    )).first()
+    bot_where_clause = (model.bots.c.user_id == user_id) & \
+                       (model.bots.c.id == bot_id)
+    with model.engine.connect() as conn:
+        bot = conn.execute(model.bots.select(bot_where_clause)).first()
 
-    if not bot:
-        raise util.APIError(404, message="Bot not found.")
+        if not bot:
+            raise util.APIError(404, message="Bot not found.")
 
-    # Check if the user already has a bot compiling
-    if bot["compile_status"] not in ("Sucessful", "Failed"):
-        raise util.APIError(400, message="Cannot upload new bot until "
-                                         "previous one is compiled.")
+        # Check if the user already has a bot compiling
+        if bot["compile_status"] not in ("Sucessful", "Failed"):
+            raise util.APIError(400, message="Cannot upload new bot until "
+                                             "previous one is compiled.")
 
-    if "botFile" not in flask.request.files:
-        raise util.APIError(400, message="Bot file not provided (must "
-                                         "provide as botFile).")
+        if "botFile" not in flask.request.files:
+            raise util.APIError(400, message="Bot file not provided (must "
+                                             "provide as botFile).")
 
-    # Save to GCloud
-    uploaded_file = flask.request.files["botFile"]
-    blob = gcloud_storage.Blob(str(user_id), model.get_compilation_bucket(),
-                               chunk_size=262144)
-    blob.upload_from_file(uploaded_file)
+        # Save to GCloud
+        uploaded_file = flask.request.files["botFile"]
+        blob = gcloud_storage.Blob(str(user_id), model.get_compilation_bucket(),
+                                   chunk_size=262144)
+        blob.upload_from_file(uploaded_file)
 
-    # Flag the user as compiling
-    update = model.users.update() \
-        .where(model.users.c.userID == user_id) \
-        .values(compile_status="Uploaded")
-    conn.execute(update)
+        # Flag the user as compiling
+        update = model.bots.update() \
+            .where(bot_where_clause) \
+            .values(compile_status="Uploaded")
+        conn.execute(update)
 
     # TODO: Email the user
 
