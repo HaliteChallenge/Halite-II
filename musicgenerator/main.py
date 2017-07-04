@@ -6,8 +6,9 @@ from google.cloud import storage
 
 PROJECT = 'halite-2'
 
-
 # move to key management soon, create a new key and disable the current one
+AMPER_KEY = 'wLntjWsRjS3PpZZsIKvbLvIbWTEdLwVkQ7kznKi3DrU5Y4Ut7mKmxQnMjTpYomLm'
+
 MUSIC_BUCKET = 'ampermusichalite2'
 
 AMPER_BASE_API_URL = 'https://jimmy.ampermusic.com/v1/'
@@ -18,7 +19,7 @@ def ampergenerate():
         url = AMPER_BASE_API_URL
         payload = "{\n    \"timeline\":\n    {\n\t    \"events\": [\n\t        {\n\t            \"event\": \"region\",\n\t            \"id\": 1,\n\t            \"time\": 0,\n\t            \"descriptor\": \"epic_percussive_high\"\n\t        },\n\t        {\n\t            \"event\": \"silence\",\n\t            \"time\": 30.07\n\t        }\n\t    ]\n    }\n}"
         headers = {
-            'authorization': "Bearer wLntjWsRjS3PpZZsIKvbLvIbWTEdLwVkQ7kznKi3DrU5Y4Ut7mKmxQnMjTpYomLm",
+            'authorization': "Bearer " + AMPER_KEY,
             'content-type': "application/json",
             'cache-control': "no-cache",
         }
