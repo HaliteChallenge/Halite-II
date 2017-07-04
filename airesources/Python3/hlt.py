@@ -3,7 +3,6 @@
 import math
 import sys
 
-import itertools
 import logging
 
 
@@ -15,13 +14,6 @@ map_size = None
 
 """The most recent map received from the server. See :class:`Map`."""
 last_map = None
-
-
-def _grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-    args = [iter(iterable)] * n
-    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 def send_string(s):
@@ -56,6 +48,50 @@ class Planet:
         self.owner = owner
         self.docked_ships = docked_ships
 
+    @staticmethod
+    def parse_single(tokens):
+        """
+        Parse a single planet given tokenized input from the game environment.
+
+        :return: The planet ID, planet object, and unused tokens.
+        """
+        (plid, x, y, hp, r, docking, current, remaining,
+         owned, owner, num_docked_ships, *remainder) = tokens
+
+        plid = int(plid)
+        docked_ships = []
+
+        for _ in range(int(num_docked_ships)):
+            ship_id, *remainder = remainder
+            docked_ships.append(int(ship_id))
+
+        planet = Planet(int(plid),
+                        int(x), int(y),
+                        int(hp), int(r), int(docking),
+                        int(current), int(remaining),
+                        bool(int(owned)), int(owner),
+                        docked_ships)
+
+        return plid, planet, remainder
+
+    @staticmethod
+    def parse_all(game_map, tokens):
+        """
+        Parse planet data given a partial map and tokenized input.
+
+        :param Map game_map:
+        :param List[str] tokens:
+        :return: The unused tokens. The map will be mutated.
+        """
+        num_planets, *remainder = tokens
+        num_planets = int(num_planets)
+
+        for _ in range(num_planets):
+            plid, planet, remainder = Planet.parse_single(remainder)
+            game_map.planets[plid] = planet
+
+        return remainder
+
 
 class Ship:
     def __init__(self, id, x, y, hp, vel_x, vel_y,
@@ -71,6 +107,57 @@ class Ship:
         self.docking_progress = progress
         self.weapon_cooldown = cooldown
 
+    @staticmethod
+    def parse_single(tokens):
+        """
+        Parse a single ship given tokenized input from the game environment.
+
+        :return: The ship ID, ship object, and unused tokens.
+        """
+        sid, x, y, hp, vel_x, vel_y, \
+            docked, docked_planet, progress, cooldown, *remainder = tokens
+
+        sid = int(sid)
+        docked = int(docked)
+        if docked == 0:
+            docked = "undocked"
+        elif docked == 2:
+            docked = "docked"
+
+        ship = Ship(sid,
+                    int(x), int(y),
+                    int(hp),
+                    int(vel_x), int(vel_y),
+                    docked, int(docked_planet),
+                    int(progress), int(cooldown))
+
+        return sid, ship, remainder
+
+    @staticmethod
+    def parse_all(game_map, tokens):
+        """
+        Parse ship data given a partial map and tokenized input.
+
+        :param Map game_map:
+        :param List[str] tokens:
+        :return: The unused tokens.
+        """
+        num_players, *remainder = tokens
+        num_players = int(num_players)
+
+        for _ in range(num_players):
+            player, num_ships, *remainder = remainder
+            player = int(player)
+            num_ships = int(num_ships)
+            player_ships = {}
+            for _ in range(num_ships):
+                sid, ship, remainder = Ship.parse_single(remainder)
+                player_ships[sid] = ship
+
+            game_map.ships[player] = player_ships
+
+        return remainder
+
 
 class Map:
     def __init__(self):
@@ -78,7 +165,7 @@ class Map:
         self.planets = {}
         self.collision_map = []
 
-    def generate_collision(self):
+    def generate_collision_map(self):
         """
         Generate the collision map.
 
@@ -120,56 +207,20 @@ class Map:
 
 def parse(map):
     """Parse the map description from the game."""
-    m = Map()
+    game_map = Map()
+    tokens = map.split()
 
-    num_players, *ships = map.split()
-    num_players = int(num_players)
+    tokens = Ship.parse_all(game_map, tokens)
+    tokens = Planet.parse_all(game_map, tokens)
+    # There should be no remaining tokens
+    assert(len(tokens) == 0)
 
-    for _ in range(num_players):
-        player, num_ships, *ships = ships
-        player = int(player)
-        num_ships = int(num_ships)
-        s = {}
-        for _ in range(num_ships):
-            sid, x, y, hp, vel_x, vel_y, \
-                docked, docked_planet, progress, cooldown, *ships = ships
-            docked = int(docked)
-            if docked == 0:
-                docked = "undocked"
-            elif docked == 2:
-                docked = "docked"
-            s[int(sid)] = Ship(int(sid),
-                               int(x), int(y),
-                               int(hp),
-                               int(vel_x), int(vel_y),
-                               docked, int(docked_planet),
-                               int(progress), int(cooldown))
-
-        m.ships[player] = s
-
-    planets = ships
-    num_planets, *planets = planets
-    num_planets = int(num_planets)
-    for _ in range(num_planets):
-        (plid, x, y, hp, r, docking, current, remaining,
-         owned, owner, num_docked_ships, *planets) = planets
-
-        docked_ships = []
-        for _ in range(int(num_docked_ships)):
-            ship_id, *planets = planets
-            docked_ships.append(int(ship_id))
-
-        planet = Planet(
-            int(plid), int(x), int(y), int(hp), int(r), int(docking),
-            int(current), int(remaining), bool(int(owned)), int(owner), docked_ships)
-        m.planets[planet.id] = planet
-
-    m.generate_collision()
+    game_map.generate_collision_map()
 
     global last_map
-    last_map = m
+    last_map = game_map
 
-    return m
+    return game_map
 
 
 class Location:
