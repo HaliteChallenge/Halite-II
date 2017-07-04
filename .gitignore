@@ -457,3 +457,6 @@ node_modules
 /dist
 
 *.dSYM/
+
+musicgenerator/haliteamp/*
+/musicgenerator/*.wav
