@@ -26,6 +26,16 @@ def github_login_init():
         callback=flask.url_for(".github_login_callback", _external=True))
 
 
+@oauth_login.route("/me")
+def me():
+    if "user_id" in flask.session:
+        return flask.jsonify({
+            "user_id": flask.session["user_id"],
+        })
+    else:
+        return flask.jsonify(None)
+
+
 @oauth_login.route("/response/github")
 def github_login_callback():
     response = github.authorized_response()
@@ -54,30 +64,26 @@ def github_login_callback():
 
     with model.engine.connect() as conn:
         user = conn.execute(sqlalchemy.sql.select([
-            model.users.c.userID,
+            model.users.c.id,
         ]).select_from(model.users).where(
-            (model.users.c.oauthProvider == 1) &
-            (model.users.c.oauthID == github_user_id)
+            (model.users.c.oauth_provider == 1) &
+            (model.users.c.oauth_id == github_user_id)
         )).first()
 
         if not user:
             # New user
-            rank = conn.execute(sqlalchemy.sql.select([
-                sqlalchemy.sql.func.count()
-            ]).select_from(model.users)).first()[0]
             new_user_id = conn.execute(model.users.insert().values(
                 username=username,
-                githubEmail=email,
-                oauthID=github_user_id,
-                oauthProvider=1,
-                rank=rank,
+                github_email=email,
+                oauth_id=github_user_id,
+                oauth_provider=1,
             )).inserted_primary_key
             flask.session["user_id"] = new_user_id
         else:
-            flask.session["user_id"] = user["userID"]
+            flask.session["user_id"] = user["id"]
 
-    if flask.request.params.get("redirectURL"):
-        return flask.redirect(flask.request.params["redirectURL"])
+    if "redirectURL" in flask.request.args:
+        return flask.redirect(flask.request.args["redirectURL"])
     return flask.redirect("/")
 
 
