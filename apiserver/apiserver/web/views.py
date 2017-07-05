@@ -228,8 +228,6 @@ def list_users():
         "user_id": model.users.c.id,
         "username": model.users.c.username,
         "level": model.users.c.player_level,
-        # "rank": model.users.c.rank,
-        # TODO: figure out how to filter/sort rank
         "organization_id": model.users.c.organization_id,
         "num_bots": num_bots,
         "num_submissions": num_submissions,
@@ -445,8 +443,6 @@ def get_user(intended_user, *, user_id):
             "num_bots": bot_stats[0],
             "total_games_played": int(bot_stats[1]),
             "total_submissions": int(bot_stats[2]),
-            # TODO:
-            # "rank": row["rank"],
             "score": float(bot_stats[3]) if bot_stats[3] is not None else None,
             "country_code": row["country_code"],
             "country_subdivision_code": row["country_subdivision_code"],
@@ -554,15 +550,29 @@ def list_user_bots(user_id):
 
     result = []
     with model.engine.connect() as conn:
-        bots = conn.execute(model.bots.select().where(
+        bots = conn.execute(sqlalchemy.sql.select([
+            model.bots.c.id,
+            model.bots.c.version_number,
+            model.bots.c.games_played,
+            model.bots.c.language,
+            model.bots.c.score,
+            model.bots.c.compile_status,
+            sqlalchemy.sql.text("ranked_bots.bot_rank"),
+        ]).select_from(
+            model.bots.join(
+                model.ranked_bots,
+                (model.bots.c.id == model.ranked_bots.c.bot_id) &
+                (model.bots.c.user_id == model.ranked_bots.c.user_id)
+            )
+        ).where(
             model.bots.c.user_id == user_id
         ).order_by(model.bots.c.id)).fetchall()
 
         for bot in bots:
+            print(bot)
             result.append({
                 "bot_id": bot["id"],
-                # TODO:
-                # "rank": row["rank"],
+                "rank": int(bot["bot_rank"]) if bot["bot_rank"] else None,
                 "version_number": bot["version_number"],
                 "games_played": bot["games_played"],
                 "language": bot["language"],
@@ -576,18 +586,31 @@ def list_user_bots(user_id):
 @web_api.route("/user/<int:user_id>/bot/<int:bot_id>", methods=["GET"])
 def get_user_bot(user_id, bot_id):
     with model.engine.connect() as conn:
-        bot = conn.execute(model.bots.select().where(
-            (model.bots.c.id == bot_id) &
-            (model.bots.c.user_id == user_id)
-        )).first()
+        bot = conn.execute(sqlalchemy.sql.select([
+            model.bots.c.id,
+            model.bots.c.version_number,
+            model.bots.c.games_played,
+            model.bots.c.language,
+            model.bots.c.score,
+            model.bots.c.compile_status,
+            sqlalchemy.sql.text("ranked_bots.bot_rank"),
+        ]).select_from(
+            model.bots.join(
+                model.ranked_bots,
+                (model.bots.c.id == model.ranked_bots.c.bot_id) &
+                (model.bots.c.user_id == model.ranked_bots.c.user_id)
+            )
+        ).where(
+            (model.bots.c.user_id == user_id) &
+            (model.bots.c.id == bot_id)
+        ).order_by(model.bots.c.id)).first()
 
         if not bot:
             raise util.APIError(404, message="Bot not found.")
 
         return flask.jsonify({
             "bot_id": bot_id,
-            # TODO:
-            # "rank": row["rank"],
+            "rank": int(bot["bot_rank"]) if bot["bot_rank"] else None,
             "version_number": bot["version_number"],
             "games_played": bot["games_played"],
             "language": bot["language"],
@@ -1013,22 +1036,6 @@ def get_match(match_id, *, user_id):
 #############################
 
 
-def monkeypatch_text(text):
-    text.asc = lambda: sqlalchemy.sql.text(text.text + " ASC")
-    text.desc = lambda: sqlalchemy.sql.text(text.text + " DESC")
-    return text
-
-
-ranked_bots = sqlalchemy.sql.select([
-    sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
-    model.bots.c.user_id,
-    model.bots.c.id.label("bot_id"),
-    model.bots.c.score,
-]).select_from(model.bots).select_from(sqlalchemy.sql.select([
-    sqlalchemy.sql.text("@rank:=0")
-]).alias("rn")).order_by(model.bots.c.score.desc()).alias("ranked_bots")
-
-
 @web_api.route("/leaderboard")
 @cross_origin(methods=["GET"])
 def leaderboard():
@@ -1040,7 +1047,7 @@ def leaderboard():
         "organization_id": model.users.c.organization_id,
         "language": model.bots.c.language,
         "score": model.bots.c.score,
-        "rank": monkeypatch_text(sqlalchemy.sql.text("ranked_bots.bot_rank")),
+        "rank": model.monkeypatch_text(sqlalchemy.sql.text("ranked_bots.bot_rank")),
     })
     if not order_clause:
         order_clause = [sqlalchemy.sql.text("ranked_bots.bot_rank ASC")]
@@ -1057,19 +1064,19 @@ def leaderboard():
             model.bots.c.language,
             model.bots.c.games_played,
             model.bots.c.version_number,
-            ranked_bots.c.score,
-            ranked_bots.c.bot_id,
+            model.ranked_bots.c.score,
+            model.ranked_bots.c.bot_id,
         ]).select_from(
             model.users.join(
                 model.organizations,
                 model.users.c.organization_id == model.organizations.c.id
             ).join(
-                ranked_bots,
-                ranked_bots.c.user_id == model.users.c.id
+                model.ranked_bots,
+                model.ranked_bots.c.user_id == model.users.c.id
             ).join(
                 model.bots,
                 (model.bots.c.user_id == model.users.c.id) &
-                (model.bots.c.id == ranked_bots.c.bot_id)
+                (model.bots.c.id == model.ranked_bots.c.bot_id)
             )
         ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
         players = conn.execute(query)

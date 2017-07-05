@@ -141,6 +141,11 @@ def update_compilation_status():
             (model.bots.c.id == bot_id)
         )).first()
 
+        bot_rank = conn.execute(model.ranked_bots.select(
+            (model.ranked_bots.c.user_id == user_id) &
+            (model.ranked_bots.c.bot_id == bot_id)
+        )).first()
+
         if not user:
             raise util.APIError(400, message="User not found.")
         if not bot:
@@ -179,8 +184,7 @@ def update_compilation_status():
                         bot_id=bot_id,
                         version_number=bot["version_number"],
                         # User is unranked if this is their first bot
-                        # TODO:
-                        # lastRank=user["rank"] or 0,
+                        lastRank=bot_rank["bot_rank"] if bot_rank else None,
                         last_rank=0,
                         last_score=bot["score"],
                         last_num_players=num_active_users,

@@ -19,6 +19,22 @@ games = sqlalchemy.Table("game", metadata, autoload=True)
 game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True)
 
 
+def monkeypatch_text(text):
+    text.asc = lambda: sqlalchemy.sql.text(text.text + " ASC")
+    text.desc = lambda: sqlalchemy.sql.text(text.text + " DESC")
+    return text
+
+
+ranked_bots = sqlalchemy.sql.select([
+    sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
+    bots.c.user_id,
+    bots.c.id.label("bot_id"),
+    bots.c.score,
+]).select_from(bots).select_from(sqlalchemy.sql.select([
+    sqlalchemy.sql.text("@rank:=0")
+]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
+
+
 def get_storage_client():
     return gcloud_storage.Client(project=config.GCLOUD_PROJECT)
 
