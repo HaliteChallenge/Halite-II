@@ -774,15 +774,30 @@ def list_user_matches(intended_user):
         )).where(where_clause).order_by(*order_clause).offset(offset).limit(limit).reduce_columns()
         matches = conn.execute(query)
 
-        # TODO: include participants, winner
         for match in matches.fetchall():
-            result.append({
+            participants = conn.execute(model.game_participants.select(
+                model.game_participants.c.game_id == match["id"]
+            ))
+
+            match = {
                 "game_id": match["id"],
                 "map_width": match["map_width"],
                 "map_height": match["map_height"],
                 "replay": match["replay_name"],
                 "time_played": match["time_played"],
-            })
+                "players": {},
+            }
+
+            for participant in participants:
+                match["players"][participant["user_id"]] = {
+                    "bot_id": participant["bot_id"],
+                    "version_number": participant["version_number"],
+                    "player_index": participant["player_index"],
+                    "rank": participant["rank"],
+                    "timed_out": bool(participant["timed_out"]),
+                }
+
+            result.append(match)
 
     return flask.jsonify(result)
 

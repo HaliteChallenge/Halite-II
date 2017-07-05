@@ -1,4 +1,4 @@
-USE halite2test;
+USE halite2;
 
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
