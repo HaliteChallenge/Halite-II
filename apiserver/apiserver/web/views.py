@@ -205,13 +205,35 @@ def get_sort_filter(fields):
 def list_users():
     result = []
     offset, limit = get_offset_limit()
+
+    sqlfunc = sqlalchemy.sql.func
+
+    # TODO: more efficent way to do this?
+    bot_count = sqlalchemy.sql.select([
+        sqlfunc.count(),
+    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
+    num_bots = bot_count.label("num_bots")
+
+    submission_count = sqlalchemy.sql.select([
+        sqlfunc.coalesce(sqlfunc.sum(model.bots.c.version_number), 0),
+    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
+    num_submissions = submission_count.label("num_submissions")
+
+    game_count = sqlalchemy.sql.select([
+        sqlfunc.coalesce(sqlfunc.sum(model.bots.c.games_played), 0),
+    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
+    num_games = game_count.label("num_games")
+
     where_clause, order_clause = get_sort_filter({
         "user_id": model.users.c.id,
         "username": model.users.c.username,
         "level": model.users.c.player_level,
         # "rank": model.users.c.rank,
-        # TODO: figure out how to filter/sort rank, # of submissions, # of games played
+        # TODO: figure out how to filter/sort rank
         "organization_id": model.users.c.organization_id,
+        "num_bots": num_bots,
+        "num_submissions": num_submissions,
+        "num_games": num_games,
     })
 
     with model.engine.connect() as conn:
@@ -224,10 +246,13 @@ def list_users():
                 model.organizations.c.organization_name,
                 model.users.c.country_code,
                 model.users.c.country_subdivision_code,
+                num_bots,
+                num_submissions,
+                num_games,
             ]).select_from(model.users.join(
                 model.organizations,
-                model.users.c.organization_id == model.organizations.c.id)
-            ).where(where_clause).order_by(*order_clause)
+                model.users.c.organization_id == model.organizations.c.id
+            )).where(where_clause).order_by(*order_clause)
              .offset(offset).limit(limit).reduce_columns()
         )
 
@@ -240,6 +265,9 @@ def list_users():
                 "organization": row["organization_name"],
                 "country_code": row["country_code"],
                 "country_subdivision_code": row["country_subdivision_code"],
+                "num_bots": row["num_bots"],
+                "num_submissions": int(row["num_submissions"]),
+                "num_games": int(row["num_games"]),
             }
 
             result.append(user)
