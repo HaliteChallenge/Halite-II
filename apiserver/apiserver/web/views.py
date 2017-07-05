@@ -418,7 +418,8 @@ def get_user(intended_user, *, user_id):
         ]).where(model.users.c.id == intended_user).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organization_id == model.organizations.c.id)
+                model.users.c.organization_id == model.organizations.c.id
+            )
         ).reduce_columns()
 
         row = conn.execute(query).first()
@@ -430,8 +431,9 @@ def get_user(intended_user, *, user_id):
             func.count(),
             func.coalesce(func.sum(model.bots.c.games_played), 0),
             func.coalesce(func.sum(model.bots.c.version_number), 0),
+            func.max(model.bots.c.score),
         ]).select_from(model.bots).where(
-            model.bots.c.id == intended_user
+            model.bots.c.user_id == intended_user
         )).first()
 
         user = {
@@ -443,11 +445,9 @@ def get_user(intended_user, *, user_id):
             "num_bots": bot_stats[0],
             "total_games_played": int(bot_stats[1]),
             "total_submissions": int(bot_stats[2]),
-            # In the future, these would be the stats of their best bot
-            # Right now, though, each user has at most 1 bot
             # TODO:
             # "rank": row["rank"],
-            # "points": row["mu"] - 3 * row["sigma"],
+            "score": float(bot_stats[3]) if bot_stats[3] is not None else None,
             "country_code": row["country_code"],
             "country_subdivision_code": row["country_subdivision_code"],
         }
@@ -1011,6 +1011,24 @@ def get_match(match_id, *, user_id):
 #############################
 # LEADERBOARD API ENDPOINTS #
 #############################
+
+
+def monkeypatch_text(text):
+    text.asc = lambda: sqlalchemy.sql.text(text.text + " ASC")
+    text.desc = lambda: sqlalchemy.sql.text(text.text + " DESC")
+    return text
+
+
+ranked_bots = sqlalchemy.sql.select([
+    sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
+    model.bots.c.user_id,
+    model.bots.c.id.label("bot_id"),
+    model.bots.c.score,
+]).select_from(model.bots).select_from(sqlalchemy.sql.select([
+    sqlalchemy.sql.text("@rank:=0")
+]).alias("rn")).order_by(model.bots.c.score.desc()).alias("ranked_bots")
+
+
 @web_api.route("/leaderboard")
 @cross_origin(methods=["GET"])
 def leaderboard():
@@ -1020,15 +1038,12 @@ def leaderboard():
         "username": model.users.c.username,
         "level": model.users.c.player_level,
         "organization_id": model.users.c.organization_id,
-        # TODO:
-        # "language": model.users.c.language,
-        # "points": model.users.c.mu,
-        # "rank": model.users.c.rank,
+        "language": model.bots.c.language,
+        "score": model.bots.c.score,
+        "rank": monkeypatch_text(sqlalchemy.sql.text("ranked_bots.bot_rank")),
     })
     if not order_clause:
-        order_clause = []
-        # TODO:
-        # order_clause = [model.users.c.rank.asc()]
+        order_clause = [sqlalchemy.sql.text("ranked_bots.bot_rank ASC")]
     result = []
 
     with model.engine.connect() as conn:
@@ -1038,27 +1053,41 @@ def leaderboard():
             model.users.c.player_level,
             model.users.c.organization_id,
             model.organizations.c.organization_name,
-            # TODO:
-            # model.users.c.language,
-            # model.users.c.mu,
-            # model.users.c.rank,
+            sqlalchemy.sql.text("ranked_bots.bot_rank"),
+            model.bots.c.language,
+            model.bots.c.games_played,
+            model.bots.c.version_number,
+            ranked_bots.c.score,
+            ranked_bots.c.bot_id,
         ]).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organization_id == model.organizations.c.id)
+                model.users.c.organization_id == model.organizations.c.id
+            ).join(
+                ranked_bots,
+                ranked_bots.c.user_id == model.users.c.id
+            ).join(
+                model.bots,
+                (model.bots.c.user_id == model.users.c.id) &
+                (model.bots.c.id == ranked_bots.c.bot_id)
+            )
         ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
         players = conn.execute(query)
 
         for player in players.fetchall():
+            print(player)
             result.append({
                 "user_id": player["id"],
                 "username": player["username"],
                 "level": player["player_level"],
                 "organization_id": player["organization_id"],
                 "organization": player["organization_name"],
-                # "language": player["language"],
-                # "points": player["mu"],
-                # "rank": player["rank"],
+                "language": player["language"],
+                "games_played": player["games_played"],
+                "version_number": player["version_number"],
+                "rank": int(player["bot_rank"]),
+                "score": player["score"],
+                "bot_id": player["bot_id"],
             })
 
     return flask.jsonify(result)
