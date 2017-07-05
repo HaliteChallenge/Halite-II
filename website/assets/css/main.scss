@@ -21,6 +21,14 @@ body {
     margin-bottom: 0;
 }
 
+.side-nav {
+    margin-top: 20px;
+
+    .active > a {
+        font-style: italic;
+    }
+}
+
 footer {
     margin-top: $line-height-computed;
 }

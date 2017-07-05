@@ -1,0 +1,28 @@
+---
+layout: default
+---
+
+<div class="row">
+    {% if page.full_width %}
+    <div class="col-md-12">
+        <div class="page-header">
+            <h1>{{ page.title }}</h1>
+        </div>
+        {{ content }}
+    </div>
+    {% else %}
+    <div class="col-md-8">
+        <div class="page-header">
+            <h1>{{ page.title }}</h1>
+        </div>
+        {% if page.toc %}
+        {{ content | toc_only }}
+        {% endif %}
+
+        {{ content | inject_anchors }}
+    </div>
+    <div class="col-md-4">
+        {% include navigation.html %}
+    </div>
+    {% endif %}
+</div>
