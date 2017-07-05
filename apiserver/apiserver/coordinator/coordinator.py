@@ -141,7 +141,9 @@ def update_compilation_status():
             (model.bots.c.id == bot_id)
         )).first()
 
-        bot_rank = conn.execute(model.ranked_bots.select(
+        bot_rank = conn.execute(sqlalchemy.sql.select([
+            sqlalchemy.sql.text("ranked_bots.bot_rank")
+        ]).where(
             (model.ranked_bots.c.user_id == user_id) &
             (model.ranked_bots.c.bot_id == bot_id)
         )).first()
@@ -184,8 +186,7 @@ def update_compilation_status():
                         bot_id=bot_id,
                         version_number=bot["version_number"],
                         # User is unranked if this is their first bot
-                        lastRank=bot_rank["bot_rank"] if bot_rank else None,
-                        last_rank=0,
+                        last_rank=bot_rank[0] if bot_rank else None,
                         last_score=bot["score"],
                         last_num_players=num_active_users,
                         last_games_played=bot["games_played"],
