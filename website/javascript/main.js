@@ -2,6 +2,8 @@ import Vue from "vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import UserProfile from "./templates/UserProfile.vue";
 
+import * as api from "./api";
+
 window.views = {
     Leaderboard: function () {
         new Vue({
@@ -16,3 +18,10 @@ window.views = {
         });
     },
 };
+
+api.me().then((me) => {
+   if (me) {
+       $(".logged-in").show();
+       $(".not-logged-in").hide();
+   }
+});

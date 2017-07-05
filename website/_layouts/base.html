@@ -37,10 +37,14 @@
                 <li><a href="{{ site.baseurl }}/leaderboard">Leaderboard</a></li>
                 <li><a href="{{ site.baseurl }}/tv">Halite TV</a></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Sign Up</a></li>
-                <li><a href="#">Login with Github</a></li>
+            <ul class="nav navbar-nav navbar-right not-logged-in">
+                <li><a href="{{ site.login_server_url }}/github">Sign Up</a></li>
+                <li><a href="{{ site.login_server_url }}/github">Login with Github</a></li>
             </ul>
+            <form class="nav navbar-form navbar-right logged-in">
+                <button type="submit" class="btn btn-default">Submit a Bot</button>
+                <a href="{{ site.baseurl }}/user?me" title="Your User Profile"><img src="http://via.placeholder.com/150x150" class="img-circle" alt="Your user profile image" /></a>
+            </form>
         </div><!--/.nav-collapse -->
     </div>
 </nav>

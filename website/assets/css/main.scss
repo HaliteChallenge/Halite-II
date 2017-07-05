@@ -21,6 +21,17 @@ body {
     margin-bottom: 0;
 }
 
+.logged-in {
+    display: none;
+
+    margin-top: 5px;
+    margin-bottom: 0;
+
+    img {
+        height: 40px;
+    }
+}
+
 .side-nav {
     margin-top: 20px;
 
