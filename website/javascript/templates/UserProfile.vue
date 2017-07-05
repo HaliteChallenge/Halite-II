@@ -11,8 +11,9 @@
             <section>
                 <h2>Stats Summary</h2>
 
-                <p>{{ user.points }} points</p>
-                <p>{{ user.num_games }} games played</p>
+                <p>{{ user.score }} points</p>
+                <p>{{ user.total_games_played }} games played</p>
+                <p>{{ user.total_submissions }} submissions</p>
             </section>
             <section>
                 <h2>Recent Games</h2>
@@ -44,11 +45,12 @@
             $.get("http://35.190.3.178/api/v1/user/" + user_id.toString())
                 .then((data) => {
                     this.user = data;
+                    console.log(data);
                 });
             $.get("http://35.190.3.178/api/v1/user/" + user_id.toString() + "/match")
                 .then((data) => {
                     this.games = data;
-                    console.log(this);
+                    console.log(data);
                 });
         },
     }
