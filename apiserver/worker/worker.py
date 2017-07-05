@@ -23,15 +23,17 @@ def makePath(path):
     os.makedirs(path)
     os.chmod(path, 0o777)
 
-def executeCompileTask(user_id, backend):
+def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     print("Compiling a bot with userID %s\n" % str(user_id))
 
     try:
-        workingPath = "workingPath"
+        # TODO: use tempdir
+        workingPath = "compilation_path"
         makePath(workingPath)
 
-        botPath = backend.storeBotLocally(user_id, workingPath, isCompile=True)
+        botPath = backend.storeBotLocally(user_id, bot_id, workingPath,
+                                          is_compile=True)
         archive.unpack(botPath)
 
         while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
@@ -60,34 +62,45 @@ def executeCompileTask(user_id, backend):
     if didCompile:
         print("Bot did compile\n")
         archive.zipFolder(workingPath, os.path.join(workingPath, str(user_id)+".zip"))
-        backend.storeBotRemotely(user_id, os.path.join(workingPath, str(user_id)+".zip"))
+        backend.storeBotRemotely(user_id, bot_id, os.path.join(workingPath, str(user_id)+".zip"))
     else:
         print("Bot did not compile\n")
         print("Bot errors %s\n" % str(errors))
 
-    backend.compileResult(user_id, didCompile, language, errors=(None if didCompile else "\n".join(errors)))
+    backend.compileResult(user_id, bot_id, didCompile, language, errors=(None if didCompile else "\n".join(errors)))
     if os.path.isdir(workingPath):
         shutil.rmtree(workingPath)
 
+
 def downloadUsers(users):
     for user in users:
-        userDir = str(user["userID"])
-        if os.path.isdir(userDir):
-            shutil.rmtree(userDir)
-        os.mkdir(userDir)
-        archive.unpack(backend.storeBotLocally(user["userID"], userDir))
+        user_dir = "{}_{}".format(user["user_id"], user["bot_id"])
+        if os.path.isdir(user_dir):
+            shutil.rmtree(user_dir)
+        os.mkdir(user_dir)
+        archive.unpack(backend.storeBotLocally(
+            user["user_id"], user["bot_id"], user_dir))
+
 
 def runGame(width, height, users):
-    runGameCommand = " ".join(
-        [RUN_GAME_FILE_NAME, str(width), str(height), str(len(users))] +
-        [str(a["userID"]) for a in users] +
-        ["\""+a["username"]+" v"+str(a["numSubmissions"]) +
-        "\"" for a in users]
-    )
+    runGameCommand = [
+        "bash",
+        RUN_GAME_FILE_NAME,
+        str(width), str(height),
+        str(len(users)),
+    ]
+    runGameCommand.extend(
+        "{}_{}".format(a["user_id"], a["bot_id"])
+        for a in users)
+    runGameCommand.extend(
+        '{} v{}'.format(a["username"], a["version_number"])
+        for a in users)
 
     print("Run game command %s\n" % runGameCommand)
     print("Waiting for game output...\n")
-    lines = subprocess.Popen("bash "+runGameCommand, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+    lines = subprocess.Popen(
+        runGameCommand,
+        stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
     print("\n-----Here is game output: -----")
     print("\n".join(lines))
     print("--------------------------------\n")
@@ -144,16 +157,16 @@ if __name__ == "__main__":
                 print("Task object %s\n" % str(task))
                 if task["type"] == "compile":
                     print("Running a compilation task...\n")
-                    executeCompileTask(task["user"], backend)
+                    executeCompileTask(task["user"], task["bot"], backend)
                 else:
                     print("Running a game task...\n")
                     executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
             else:
                 print("No task available at time %s (GMT). Sleeping...\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
-                sleep(2)
         except Exception as e:
             print("Error on get task %s\n" % str(e))
             traceback.print_exc()
             print("Sleeping...\n")
-            sleep(2)
+
+        sleep(5)
 

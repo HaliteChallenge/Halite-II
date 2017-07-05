@@ -59,19 +59,13 @@ def task():
                 })
 
     # Try to play a game.
-    # TODO: make sure these end up in JSON as keys
-    def desired_columns_of(table):
-        return [
-            table.c.userID,
-            table.c.username,
-            table.c.numSubmissions,
-            table.c.mu,
-        ]
+
     # Only allow 2 or 4 player games
     player_count = 2 if random.random() > 0.5 else 4
+
     seed_player = None
     with model.engine.connect() as conn:
-        seed_player = find_seed_player(conn, desired_columns_of)
+        seed_player = find_seed_player(conn)
 
         if seed_player:
             # Select the rest of the players
@@ -79,13 +73,23 @@ def task():
 
             # Find closely matched players
             sqlfunc = sqlalchemy.sql.func
-            close_players = sqlalchemy.sql.select(
-                desired_columns_of(model.users)
+            close_players = sqlalchemy.sql.select([
+                model.bots.c.id.label("bot_id"),
+                model.bots.c.user_id,
+                model.bots.c.version_number,
+                model.bots.c.mu,
+                model.users.c.username,
+            ]).select_from(
+                model.bots.join(
+                    model.users,
+                    model.bots.c.user_id == model.users.c.id,
+                )
             ).where(
-                (model.users.c.isRunning == 1) &
-                (model.users.c.userID != seed_player["userID"])
+                (model.bots.c.compile_status == "Successful") &
+                (~((model.bots.c.user_id == seed_player["user_id"]) &
+                   (model.bots.c.id == seed_player["bot_id"])))
             ).order_by(
-                sqlalchemy.func.abs(model.users.c.mu - seed_player["mu"])
+                sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
             ).limit(mu_rank_limit).alias("muranktable")
             query = close_players.select().order_by(sqlfunc.rand())\
                 .limit(player_count - 1)
@@ -98,9 +102,10 @@ def task():
             map_size = random.choice(map_sizes)
 
             players = [{
-                "userID": player["userID"],
+                "user_id": player["user_id"],
+                "bot_id": player["bot_id"],
                 "username": player["username"],
-                "numSubmissions": player["numSubmissions"],
+                "version_number": player["version_number"],
             } for player in players]
 
             if len(players) == player_count:
@@ -164,9 +169,9 @@ def update_compilation_status():
             # history table.
             if bot["version_number"] != 0:
                 num_active_users = conn.execute(
-                    sqlalchemy.sql.select(
+                    sqlalchemy.sql.select([
                         sqlalchemy.sql.func.count()
-                    ).select_from(model.users)
+                    ]).select_from(model.users)
                 ).first()[0]
 
                 conn.execute(
@@ -285,31 +290,36 @@ def upload_game():
         for user in users:
             stored_user = conn.execute(
                 sqlalchemy.sql.select([
-                    model.users.c.id,
+                    model.users.c.id.label("user_id"),
                     model.users.c.on_email_list,
                     model.users.c.email,
-                ]).where(model.users.c.id == user["id"])
+                ]).where(model.users.c.id == user["user_id"])
             ).first()
 
             stored_bot = conn.execute(
                 sqlalchemy.sql.select([
-
+                    model.bots.c.version_number,
+                    model.bots.c.mu,
+                    model.bots.c.sigma,
                 ]).where(
-                    (model.users.c.id == user["bot"]["id"]) &
-                    (model.users.c.user_id == user["id"])
+                    (model.bots.c.id == user["bot_id"]) &
+                    (model.bots.c.user_id == user["user_id"])
                 )
-            )
+            ).first()
+
+            if not stored_user or not stored_bot:
+                raise util.APIError(400, message="User or bot doesn't exist")
 
             # If the user has submitted a new bot in the meanwhile,
             # ignore the game
-            if stored_bot["version_number"] != user["bot"]["version_number"]:
+            if stored_bot["version_number"] != user["version_number"]:
                 return response_success({
                     "message": "User {} has uploaded a new bot, discarding "
-                               "match.".format(user["id"])
+                               "match.".format(user["user_id"])
                 })
 
             user.update(dict(stored_user))
-            user["bot"].update(dict(stored_bot))
+            user.update(dict(stored_bot))
 
     # Store the replay and any error logs
     replay_name = os.path.basename(game_output["replay"])
@@ -331,7 +341,7 @@ def upload_game():
                             .format(error_log_name))
 
             error_log_key = user["log_name"] = \
-                replay_key + "_error_log_" + str(user["id"])
+                replay_key + "_error_log_" + str(user["user_id"])
             blob = gcloud_storage.Blob(error_log_key,
                                        model.get_error_log_bucket(),
                                        chunk_size=262144)
@@ -348,7 +358,7 @@ def upload_game():
             map_height=game_output["map_height"],
             map_seed=game_output["map_seed"],
             map_generator=game_output["map_generator"],
-            timestamp=sqlalchemy.sql.func.NOW(),
+            time_played=sqlalchemy.sql.func.NOW(),
         )).inserted_primary_key
 
     # Update the participants' stats
@@ -356,23 +366,21 @@ def upload_game():
         for user in users:
             conn.execute(model.game_participants.insert().values(
                 game_id=game_id,
-                user_id=user["id"],
-                bot_id=user["bot"]["id"],
-                version_number=user["bot"]["version_number"],
+                user_id=user["user_id"],
+                bot_id=user["bot_id"],
+                version_number=user["version_number"],
                 log_name=user["log_name"],
-                # TODO:
-                # rank=user["rank"],
-                rank=0,
+                rank=user["rank"],
                 player_index=user["player_tag"],
                 timed_out=user["timed_out"],
             ))
 
             # Increment number of games played
             conn.execute(model.bots.update().where(
-                (model.bots.c.user_id == user["id"]) &
-                (model.bots.c.id == user["bot"]["id"])
+                (model.bots.c.user_id == user["user_id"]) &
+                (model.bots.c.id == user["bot_id"])
             ).values(
-                games_played=model.users.c.games_played + 1,
+                games_played=model.bots.c.games_played + 1,
             ))
 
     # TODO: send first game email, first timeout email
@@ -385,24 +393,23 @@ def upload_game():
     with model.engine.connect() as conn:
         for user, rating in zip(users, new_ratings):
             conn.execute(model.bots.update().where(
-                (model.users.c.user_id == user["id"]) &
-                (model.bots.c.id == user["bot"]["id"]) &
+                (model.bots.c.user_id == user["user_id"]) &
+                (model.bots.c.id == user["bot_id"]) &
                 # TODO: why filter version? (Use a DB transaction?)
-                (model.bots.c.version_number == user["bot"]["version_number"])
+                (model.bots.c.version_number == user["version_number"])
             ).values(
                 mu=rating[0].mu,
                 sigma=rating[0].sigma,
+                score=rating[0].mu - 3*rating[0].sigma,
             ))
 
     return response_success()
 
 
-def find_seed_player(conn, desired_columns_of):
+def find_seed_player(conn):
     """
     Find a seed player for a game.
     :param conn: A database connection.
-    :param desired_columns_of: Function that returns a list of columns desired
-    from a given table of user data.
     :return: A seed player, or None.
     """
     sqlfunc = sqlalchemy.sql.func
@@ -411,84 +418,125 @@ def find_seed_player(conn, desired_columns_of):
         rand_value = random.random()
 
         if rand_value > 0.5:
-            ordering = sqlfunc.rand() * -sqlfunc.pow(model.users.c.sigma, 2)
-            query = sqlalchemy.sql.select(desired_columns_of(model.users))\
-                .where(model.users.c.isRunning == 1 and
-                       model.users.c.numGames < 400)\
-                .order_by(ordering)\
-                .limit(1)
-            result = conn.execute(query).fetchall()
+            ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
+            result = conn.execute(sqlalchemy.sql.select([
+                model.users.c.id.label("user_id"),
+                model.bots.c.id.label("bot_id"),
+                model.users.c.username,
+                model.bots.c.version_number,
+                model.bots.c.mu,
+            ]).select_from(
+                model.users.join(
+                    model.bots,
+                    model.users.c.id == model.bots.c.user_id
+                )
+            ).where(
+                (model.bots.c.compile_status == "Successful") &
+                (model.bots.c.games_played < 400)
+            ).order_by(ordering).limit(1).reduce_columns()).first()
             if result:
-                seed_player = result[0]
+                seed_player = result
         elif 0.25 < rand_value <= 0.5:
             # Find the users in the most recent games, and pick a seed player
             # from those
-            games = model.games
-            gameusers = model.gameusers
+            max_time = sqlfunc.max(model.games.c.time_played).label("max_time")
+            user_id = model.game_participants.c.user_id
+            bot_id = model.game_participants.c.bot_id
 
-            max_time = sqlfunc.max(games.c.timestamp).label("maxTime")
-            user_id = gameusers.c.userID.label("userID")
             recent_gamers = sqlalchemy.sql.select([
                 max_time,
-                user_id
+                user_id,
+                bot_id,
+                model.users.c.username,
+                model.bots.c.version_number,
+                model.bots.c.mu,
             ]).select_from(
-                gameusers.join(games, games.c.gameID == gameusers.c.gameID)
-            ).group_by(user_id).alias("temptable")
+                model.game_participants.join(
+                    model.games,
+                    model.games.c.id == model.game_participants.c.game_id,
+                ).join(
+                    model.users,
+                    model.users.c.id == model.game_participants.c.user_id,
+                ).join(
+                    model.bots,
+                    (model.bots.c.id == model.game_participants.c.bot_id) &
+                    (model.bots.c.user_id == model.game_participants.c.user_id)
+                )
+            ).group_by(user_id, bot_id).reduce_columns().alias("temptable")
 
             # Of those users, select ones with under 400 games, preferring
             # ones in older games, and get their data
-            outer_users = model.users.alias("u")
-            potential_players = sqlalchemy.sql.select(
-                desired_columns_of(outer_users)
-            ).select_from(
+            outer_bots = model.bots.alias("u")
+            potential_players = sqlalchemy.sql.select([
+                recent_gamers.c.user_id,
+                recent_gamers.c.bot_id,
+                recent_gamers.c.username,
+                recent_gamers.c.version_number,
+                recent_gamers.c.mu,
+            ]).select_from(
                 recent_gamers.join(
-                    outer_users,
-                    outer_users.c.userID == recent_gamers.c.userID)) \
-                .where((outer_users.c.numGames < 400) &
-                       (outer_users.c.isRunning == 1)) \
-                .order_by(recent_gamers.c.maxTime.asc()) \
+                    outer_bots,
+                    outer_bots.c.id == recent_gamers.c.user_id)) \
+                .where((outer_bots.c.games_played < 400) &
+                       (outer_bots.c.compile_status == "Successful")) \
+                .order_by(recent_gamers.c.max_time.asc()) \
                 .limit(15).alias("orderedtable")
 
             # Then sort them randomly and take one
-            query = sqlalchemy.sql.select(
-                desired_columns_of(potential_players)
-            ).order_by(sqlfunc.rand()).limit(1)
-            result = conn.execute(query).fetchall()
+            query = potential_players.select().order_by(sqlfunc.rand()).limit(1)
+            result = conn.execute(query).first()
             if result:
-                seed_player = result[0]
+                seed_player = result
 
         if rand_value <= 0.25 or not seed_player:
             # Same as the previous case, but we do not restrict how many
             # games the user can have played, and we do not sort randomly.
-            games = model.games
-            gameusers = model.gameusers
+            max_time = sqlfunc.max(model.games.c.time_played).label("max_time")
+            user_id = model.game_participants.c.user_id
+            bot_id = model.game_participants.c.bot_id
 
-            max_time = sqlfunc.max(games.c.timestamp).label("maxTime")
-            user_id = gameusers.c.userID.label("userID")
             recent_gamers = sqlalchemy.sql.select([
                 max_time,
-                user_id
+                user_id,
+                bot_id,
+                model.users.c.username,
+                model.bots.c.version_number,
+                model.bots.c.mu,
             ]).select_from(
-                gameusers.join(games, games.c.gameID == gameusers.c.gameID)
-            ).group_by(user_id).alias("temptable")
+                model.game_participants.join(
+                    model.games,
+                    model.games.c.id == model.game_participants.c.game_id,
+                ).join(
+                    model.users,
+                    model.users.c.id == model.game_participants.c.user_id,
+                ).join(
+                    model.bots,
+                    (model.bots.c.id == model.game_participants.c.bot_id) &
+                    (model.bots.c.user_id == model.game_participants.c.user_id)
+                )
+            ).group_by(user_id, bot_id).reduce_columns().alias("temptable")
 
-            # Of those users, select ones with under 400 games, preferring
-            # ones in older games, and get their data
-            outer_users = model.users.alias("u")
-            potential_players = sqlalchemy.sql.select(
-                desired_columns_of(outer_users)
-            ).select_from(
+            outer_bots = model.bots.alias("u")
+            potential_players = sqlalchemy.sql.select([
+                recent_gamers.c.user_id,
+                recent_gamers.c.bot_id,
+                recent_gamers.c.username,
+                recent_gamers.c.version_number,
+                recent_gamers.c.mu,
+            ]).select_from(
                 recent_gamers.join(
-                    outer_users,
-                    outer_users.c.userID == recent_gamers.c.userID)) \
-                .where(outer_users.c.isRunning == 1) \
-                .order_by(recent_gamers.c.maxTime.asc()) \
-                .limit(1)
+                    outer_bots,
+                    outer_bots.c.id == recent_gamers.c.user_id)) \
+                .where(outer_bots.c.compile_status == "Successful") \
+                .order_by(recent_gamers.c.max_time.asc()) \
+                .limit(15).alias("orderedtable")
 
-            result = conn.execute(potential_players).fetchall()
+            query = potential_players.select().limit(1)
+            result = conn.execute(query).first()
             if result:
-                seed_player = result[0]
+                seed_player = result
     else:
+        # TODO: wtf??
         pass
 
     return seed_player

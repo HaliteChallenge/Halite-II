@@ -108,7 +108,7 @@ def compileResult(user_id, bot_id, did_compile, language, errors=None):
     r = requests.post(MANAGER_URL+"compile", data={
         "user_id": user_id,
         "bot_id": bot_id,
-        "didCompile": int(did_compile),
+        "did_compile": int(did_compile),
         "language": language,
         "errors": errors,
     })

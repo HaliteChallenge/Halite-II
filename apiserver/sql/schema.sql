@@ -59,7 +59,7 @@ CREATE TABLE game (
   replay_name VARCHAR(128) NOT NULL,
   map_width SMALLINT(5) NOT NULL,
   map_height SMALLINT(5) NOT NULL,
-  map_seed NOT NULL,
+  map_seed INT UNSIGNED NOT NULL,
   map_generator VARCHAR(128) NOT NULL,
   time_played DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
