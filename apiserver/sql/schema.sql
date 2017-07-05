@@ -56,9 +56,11 @@ CREATE TABLE bot (
 
 CREATE TABLE game (
   id MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-  replay_name VARCHAR(64) NOT NULL,
+  replay_name VARCHAR(128) NOT NULL,
   map_width SMALLINT(5) NOT NULL,
   map_height SMALLINT(5) NOT NULL,
+  map_seed NOT NULL,
+  map_generator VARCHAR(128) NOT NULL,
   time_played DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -90,7 +92,8 @@ CREATE TABLE bot_history (
   -- The count of active players when this bot was retired.
   last_num_players SMALLINT(5) NOT NULL,
   -- The number of games this bot has played.
-  last_num_games SMALLINT(5) DEFAULT NULL,
+  last_games_played SMALLINT(5) DEFAULT NULL,
+  language VARCHAR(16) NOT NULL,
   when_retired DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),

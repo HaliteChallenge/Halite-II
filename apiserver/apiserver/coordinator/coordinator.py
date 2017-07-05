@@ -123,79 +123,99 @@ def update_compilation_status():
     user_id = flask.request.form.get("user_id", None)
     bot_id = flask.request.form.get("bot_id", None)
     did_compile = flask.request.form.get("did_compile", False)
+    language = flask.request.form.get("language", "Other")
 
     if user_id is None:
         raise util.APIError(400, message="Must provide user ID.")
 
-    language = flask.request.form.get("language", "Other")
-
     with model.engine.connect() as conn:
-        update = model.bots.update()\
+        user = conn.execute(model.users.select(
+            model.users.c.id == user_id
+        )).first()
+        bot = conn.execute(model.bots.select(
+            (model.bots.c.user_id == user_id) &
+            (model.bots.c.id == bot_id)
+        )).first()
+
+        if not user:
+            raise util.APIError(400, message="User not found.")
+        if not bot:
+            raise util.APIError(400, message="Bot not found.")
+
+        update = model.bots.update() \
             .where((model.bots.c.user_id == user_id) &
-                   (model.bots.c.id == bot_id))\
-            .values(compile_status="Successful" if did_compile else "Failed")
+                   (model.bots.c.id == bot_id)) \
+            .values(
+            compile_status="Successful" if did_compile else "Failed",
+            compile_start=None,
+        )
         conn.execute(update)
 
         if did_compile:
             # TODO: email the user
 
-            user = model.users.select().where(model.users.c.userID == user_id)
-            user = conn.execute(user).first()
-
             # This is backwards of the order in the original PHP, but the
             # original PHP updated the table using the -old- values of the
             # User row. This ordering makes it clearer that this is
             # intentional.
-            if user["numSubmissions"] != 0:
-                # TODO: make this more efficient
-                num_active_users = len(conn.execute(
-                    model.users
-                        .select(model.users.c.userID)
-                        .where(model.users.c.isRunning == 1)
-                ).fetchall())
+
+            # If version number is 0, then this is the first time the bot
+            # has ever been submitted, so there's nothing to put in the
+            # history table.
+            if bot["version_number"] != 0:
+                num_active_users = conn.execute(
+                    sqlalchemy.sql.select(
+                        sqlalchemy.sql.func.count()
+                    ).select_from(model.users)
+                ).first()[0]
 
                 conn.execute(
-                    model.user_history.insert().values(
-                        userID=user_id,
-                        versionNumber=user["numSubmissions"],
+                    model.bot_history.insert().values(
+                        user_id=user_id,
+                        bot_id=bot_id,
+                        version_number=bot["version_number"],
                         # User is unranked if this is their first bot
-                        lastRank=user["rank"] or 0,
-                        lastNumPlayers=num_active_users,
-                        lastNumGames=user["numGames"],
+                        # TODO:
+                        # lastRank=user["rank"] or 0,
+                        last_rank=0,
+                        last_score=bot["score"],
+                        last_num_players=num_active_users,
+                        last_games_played=bot["games_played"],
+                        language=bot["language"],
                     )
                 )
 
-            update = model.users.update()\
-                .where(model.users.c.userID == user_id)\
-                .values(
-                    numSubmissions=model.users.c.numSubmissions + 1,
-                    numGames=0,
+            conn.execute(
+                model.bots.update().where(
+                    (model.bots.c.user_id == user_id) &
+                    (model.bots.c.id == bot_id)
+                ).values(
+                    language=language,
+                    version_number=model.bots.c.version_number + 1,
+                    games_played=0,
                     mu=25.000,
                     sigma=8.333,
-                    compileStatus=0,
-                    isRunning=1,
-                    language=language,
+                    score=0,
+                )
             )
-            conn.execute(update)
             return response_success()
         else:
-            conn.execute(model.users.update()
-                .where(model.users.c.userID == user_id)
-                .values(isRunning=0))
             # TODO: email the user
             return response_success()
 
 
 @coordinator_api.route("/botFile", methods=["POST"])
 def upload_bot():
-    user_id = flask.request.form.get("userID", None)
+    user_id = flask.request.form.get("user_id", None)
+    bot_id = flask.request.form.get("bot_id", None)
 
     if "bot.zip" not in flask.request.files:
         raise util.APIError(400, message="Please provide the bot file.")
 
     uploaded_file = flask.request.files["bot.zip"]
     # Save to GCloud
-    blob = gcloud_storage.Blob(str(user_id), model.get_bot_bucket(),
+    blob = gcloud_storage.Blob("{}_{}".format(user_id, bot_id),
+                               model.get_bot_bucket(),
                                chunk_size=262144)
     blob.upload_from_file(uploaded_file)
     return response_success()
@@ -203,7 +223,8 @@ def upload_bot():
 
 @coordinator_api.route("/botFile", methods=["GET"])
 def download_bot():
-    user_id = flask.request.values.get("userID", None)
+    user_id = flask.request.values.get("user_id", None)
+    bot_id = flask.request.values.get("bot_id", None)
     compile = flask.request.values.get("compile", False)
 
     if compile:
@@ -213,13 +234,15 @@ def download_bot():
 
     # Retrieve from GCloud
     try:
-        blob = gcloud_storage.Blob(str(user_id), bucket, chunk_size=262144)
+        botname = "{}_{}".format(user_id, bot_id)
+        blob = gcloud_storage.Blob(botname,
+                                   bucket, chunk_size=262144)
         buffer = io.BytesIO()
         blob.download_to_file(buffer)
         buffer.seek(0)
         return flask.send_file(buffer, mimetype="application/zip",
                                as_attachment=True,
-                               attachment_filename=str(user_id)+".zip")
+                               attachment_filename=botname + ".zip")
     except gcloud_exceptions.NotFound:
         raise util.APIError(404, message="Bot not found.")
 
@@ -227,18 +250,19 @@ def download_bot():
 @coordinator_api.route("/botHash")
 def hash_bot():
     """Get the MD5 hash of a compiled bot."""
-    user_id = flask.request.args.get("userID", None)
+    user_id = flask.request.args.get("user_id", None)
+    bot_id = flask.request.args.get("bot_id", None)
     compile = flask.request.args.get("compile", False)
 
-    if not user_id:
-        raise util.APIError(400, message="Please provide the user ID.")
+    if not user_id or not bot_id:
+        raise util.APIError(400, message="Please provide user and bot ID.")
 
     if compile:
         bucket = model.get_compilation_bucket()
     else:
         bucket = model.get_bot_bucket()
 
-    blob = bucket.get_blob(str(user_id))
+    blob = bucket.get_blob("{}_{}".format(user_id, bot_id))
     if blob is None:
         raise util.APIError(400, message="Bot does not exist.")
 
@@ -249,36 +273,43 @@ def hash_bot():
 
 @coordinator_api.route("/game", methods=["POST"])
 def upload_game():
-    if "game_output" not in flask.request.values \
-            or "users" not in flask.request.values:
+    if ("game_output" not in flask.request.values or
+            "users" not in flask.request.values):
         raise util.APIError(
             400, message="Please provide both the game output and users.")
 
     game_output = json.loads(flask.request.values["game_output"])
     users = json.loads(flask.request.values["users"])
 
-    # If the user has submitted a new bot in the meanwhile, ignore the game
     with model.engine.connect() as conn:
         for user in users:
             stored_user = conn.execute(
                 sqlalchemy.sql.select([
-                    model.users.c.userID,
-                    model.users.c.onEmailList,
+                    model.users.c.id,
+                    model.users.c.on_email_list,
                     model.users.c.email,
-                    model.users.c.numSubmissions,
-                    model.users.c.mu,
-                    model.users.c.sigma,
-                ]).where(model.users.c.userID == user["userID"])
+                ]).where(model.users.c.id == user["id"])
             ).first()
 
-            if stored_user["numSubmissions"] != user["numSubmissions"]:
+            stored_bot = conn.execute(
+                sqlalchemy.sql.select([
+
+                ]).where(
+                    (model.users.c.id == user["bot"]["id"]) &
+                    (model.users.c.user_id == user["id"])
+                )
+            )
+
+            # If the user has submitted a new bot in the meanwhile,
+            # ignore the game
+            if stored_bot["version_number"] != user["bot"]["version_number"]:
                 return response_success({
-                    "message":
-                        "User {} has uploaded a new bot, discarding match."\
-                            .format(user["userID"])
+                    "message": "User {} has uploaded a new bot, discarding "
+                               "match.".format(user["id"])
                 })
 
             user.update(dict(stored_user))
+            user["bot"].update(dict(stored_bot))
 
     # Store the replay and any error logs
     replay_name = os.path.basename(game_output["replay"])
@@ -290,17 +321,17 @@ def upload_game():
                                chunk_size=262144)
     blob.upload_from_file(flask.request.files[replay_name])
 
-    error_logs = {}
     for user in users:
-        if user["didTimeout"]:
-            error_log_name = user["errorLogName"]
+        if user["timed_out"]:
+            error_log_name = user["log_name"]
             if error_log_name not in flask.request.files:
-                raise util.APIError(400,
+                raise util.APIError(
+                    400,
                     message="Error log {} not found in uploaded files."
-                                    .format(error_log_name))
+                            .format(error_log_name))
 
-            error_log_key = user["errorLogName"] = \
-                replay_key + "_error_log_" + str(user["userID"])
+            error_log_key = user["log_name"] = \
+                replay_key + "_error_log_" + str(user["id"])
             blob = gcloud_storage.Blob(error_log_key,
                                        model.get_error_log_bucket(),
                                        chunk_size=262144)
@@ -312,32 +343,36 @@ def upload_game():
     # Store game results in database
     with model.engine.connect() as conn:
         game_id = conn.execute(model.games.insert().values(
-            replayName=replay_key,
-            mapWidth=game_output["map_width"],
-            mapHeight=game_output["map_height"],
-            # TODO: store map seed and algorithm
+            replay_name=replay_key,
+            map_width=game_output["map_width"],
+            map_height=game_output["map_height"],
+            map_seed=game_output["map_seed"],
+            map_generator=game_output["map_generator"],
             timestamp=sqlalchemy.sql.func.NOW(),
         )).inserted_primary_key
 
     # Update the participants' stats
     with model.engine.connect() as conn:
         for user in users:
-            timeout = 1 if user["didTimeout"] else 0
-            conn.execute(model.gameusers.insert().values(
-                gameID=game_id,
-                userID=user["userID"],
-                errorLogName=user["errorLogName"],
-                rank=user["rank"],
-                playerIndex=user["playerTag"],
-                didTimeout=timeout,
-                versionNumber=user["numSubmissions"]
+            conn.execute(model.game_participants.insert().values(
+                game_id=game_id,
+                user_id=user["id"],
+                bot_id=user["bot"]["id"],
+                version_number=user["bot"]["version_number"],
+                log_name=user["log_name"],
+                # TODO:
+                # rank=user["rank"],
+                rank=0,
+                player_index=user["player_tag"],
+                timed_out=user["timed_out"],
             ))
 
             # Increment number of games played
-            conn.execute(model.users.update().where(
-                model.users.c.userID == user["userID"]
+            conn.execute(model.bots.update().where(
+                (model.bots.c.user_id == user["id"]) &
+                (model.bots.c.id == user["bot"]["id"])
             ).values(
-                numGames=model.users.c.numGames + 1,
+                games_played=model.users.c.games_played + 1,
             ))
 
     # TODO: send first game email, first timeout email
@@ -349,34 +384,15 @@ def upload_game():
     new_ratings = trueskill.rate(teams)
     with model.engine.connect() as conn:
         for user, rating in zip(users, new_ratings):
-            conn.execute(model.users.update().where(
-                (model.users.c.userID == user["userID"]) &
-                # TODO: why filter on numSubmissions? (Should we be using a DB transaction?)
-                (model.users.c.numSubmissions == user["numSubmissions"])
+            conn.execute(model.bots.update().where(
+                (model.users.c.user_id == user["id"]) &
+                (model.bots.c.id == user["bot"]["id"]) &
+                # TODO: why filter version? (Use a DB transaction?)
+                (model.bots.c.version_number == user["bot"]["version_number"])
             ).values(
                 mu=rating[0].mu,
                 sigma=rating[0].sigma,
             ))
-
-    # Update everyone's overall rank
-    # TODO: is there a more efficient way to have the DB implement this?
-    with model.engine.connect() as conn:
-        with conn.begin() as transaction:
-            all_users = conn.execute(sqlalchemy.sql.select([
-                model.users.c.userID,
-                model.users.c.mu,
-                model.users.c.sigma,
-            ]).where(model.users.c.isRunning == 1)).fetchall()
-
-            all_users.sort(key=lambda user: user["mu"] - 3 * user["sigma"],
-                           reverse=True)
-
-            cases = {user["userID"]: rank + 1
-                     for rank, user in enumerate(all_users)}
-            ranks = sqlalchemy.sql.expression.case(
-                cases, value=model.users.c.userID)
-            query = model.users.update().values(rank=ranks)
-            conn.execute(query)
 
     return response_success()
 

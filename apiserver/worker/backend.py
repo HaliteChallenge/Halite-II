@@ -23,10 +23,13 @@ def getTask():
         return json.loads(content)
 
 
-def getBotHash(userID, isCompile=False):
+def getBotHash(user_id, bot_id, is_compile=False):
     """Gets the checksum of a user's bot's zipped source code"""
-    params = {"userID": userID}
-    if isCompile:
+    params = {
+        "user_id": user_id,
+        "bot_id": bot_id
+    }
+    if is_compile:
             params["compile"] = 1
 
     result = requests.get(MANAGER_URL+"botHash", params=params)
@@ -35,63 +38,81 @@ def getBotHash(userID, isCompile=False):
     return json.loads(result.text).get("hash")
 
 
-def storeBotLocally(userID, storageDir, isCompile=False):
-    """Downloads and store's a bot's zip file locally
+def storeBotLocally(user_id, bot_id, storage_dir, is_compile=False):
+    """
+    Download and store a bot's zip file locally
+
     Checks the file's checksum to make sure the file was downloaded properly
     """
+
     iterations = 0
     while iterations < 100:
-        url = MANAGER_URL+"botFile?userID="+str(userID)
-        if isCompile: url += "&compile=1"
+        url = MANAGER_URL + "botFile?user_id={}&bot_id={}".format(user_id, bot_id)
+        if is_compile:
+            url += "&compile=1"
+
         print("Bot file url %s\n" % url)
 
-        remoteZip = urllib.request.urlopen(url)
-        zipFilename = remoteZip.headers.get('Content-disposition').split("filename")[1]
-        zipPath = os.path.join(storageDir, zipFilename)
-        if os.path.exists(zipPath):
-            os.remove(zipPath)
+        remote_zip = urllib.request.urlopen(url)
+        zip_filename = remote_zip.headers.get('Content-disposition').split("filename")[1]
+        zip_path = os.path.join(storage_dir, zip_filename)
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
 
-        remoteZipContents = remoteZip.read()
-        remoteZip.close()
+        remote_zip_contents = remote_zip.read()
+        remote_zip.close()
 
-        localZip = open(zipPath, "wb")
-        localZip.write(remoteZipContents)
-        localZip.close()
+        local_zip = open(zip_path, "wb")
+        local_zip.write(remote_zip_contents)
+        local_zip.close()
 
-        content_hash = md5(remoteZipContents).hexdigest()
-        remote_hash = getBotHash(userID, isCompile)
+        content_hash = md5(remote_zip_contents).hexdigest()
+        remote_hash = getBotHash(user_id, bot_id, is_compile)
         if content_hash != remote_hash:
             iterations += 1
             continue
 
-        return zipPath
+        return zip_path
 
-    raise ValueError
+    raise RuntimeError("Could not download bot with valid hash, aborting")
 
 
-def storeBotRemotely(userID, zipFilePath):
+def storeBotRemotely(user_id, bot_id, zip_file_path):
     """Posts a bot file to the manager"""
-    zipContents = open(zipFilePath, "rb").read()
+    zip_contents = open(zip_file_path, "rb").read()
     iterations = 0
+    local_hash = md5(zip_contents).hexdigest()
 
     while iterations < 100:
-        r = requests.post(MANAGER_URL+"botFile", data={"userID": str(userID)}, files={"bot.zip": zipContents})
+        r = requests.post(MANAGER_URL+"botFile",
+                          data={
+                              "user_id": str(user_id),
+                              "bot_id": str(bot_id),
+                          },
+                          files={"bot.zip": zip_contents})
         print("Posting compiled bot archive %s\n" % r.text)
 
         # Try again if local and remote hashes differ
-        if md5(zipContents).hexdigest() != getBotHash(userID):
+        if local_hash != getBotHash(user_id, bot_id):
             print("Hashes do not match! Redoing file upload...\n")
             iterations += 1
             continue
 
         return
-    raise ValueError
+
+    raise RuntimeError("Could not upload bot with valid hash, aborting")
 
 
-def compileResult(userID, didCompile, language, errors=None):
+def compileResult(user_id, bot_id, did_compile, language, errors=None):
     """Posts the result of a compilation task"""
-    r = requests.post(MANAGER_URL+"compile", data={"userID": userID, "didCompile": int(didCompile), "language": language, "errors": errors})
-    print("Posting compile result %s\n" % r.text)
+    r = requests.post(MANAGER_URL+"compile", data={
+        "user_id": user_id,
+        "bot_id": bot_id,
+        "didCompile": int(did_compile),
+        "language": language,
+        "errors": errors,
+    })
+    print("Posted compile result %s\n" % r.text)
 
 
 def gameResult(users, game_output):

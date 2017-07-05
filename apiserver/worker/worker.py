@@ -101,15 +101,15 @@ def parseGameOutput(output, users):
 
     for player_tag, stats in result["stats"].items():
         player_tag = int(player_tag)
-        users[player_tag]["playerTag"] = player_tag
+        users[player_tag]["player_tag"] = player_tag
         users[player_tag]["rank"] = stats["rank"]
-        users[player_tag]["didTimeout"] = False
-        users[player_tag]["errorLogName"] = None
+        users[player_tag]["timed_out"] = False
+        users[player_tag]["log_name"] = None
 
     for player_tag, error_log in result["error_logs"].items():
         player_tag = int(player_tag)
-        users[player_tag]["didTimeout"] = True
-        users[player_tag]["errorLogName"] = os.path.basename(error_log)
+        users[player_tag]["timed_out"] = True
+        users[player_tag]["log_name"] = os.path.basename(error_log)
 
     return users, result
 
