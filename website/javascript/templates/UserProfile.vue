@@ -19,6 +19,26 @@
                 <h2>Recent Games</h2>
 
                 <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time Played</th>
+                            <th>Opponents</th>
+                            <th>Map Specification</th>
+                            <th>Watch</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="game in games">
+                            <td>{{ game.time_played }}</td>
+                            <td>
+                                <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player">
+                                    <img :alt="player" :src="player" />
+                                </a>
+                            </td>
+                            <td>{{ game.map_width }} by {{ game.map_height }}</td>
+                            <td>{{ game.game_id }}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </section>
         </div>
