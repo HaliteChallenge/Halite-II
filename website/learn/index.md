@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Documentation
+title: Learn
 toc: true
 ---
 
