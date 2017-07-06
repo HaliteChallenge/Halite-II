@@ -12,6 +12,7 @@
 </template>
 
 <script>
+    import * as api from "../api";
     import * as libhaliteviz from "../../../libhaliteviz";
     libhaliteviz.setAssetRoot("assets/js/");
 
@@ -34,8 +35,12 @@
         },
         mounted: function() {
             const params = new URLSearchParams(window.location.search);
-            if (params.has("match_id")) {
-
+            if (params.has("game_id")) {
+                const game_id = params.get("game_id");
+                api.get_replay(game_id).then((replay) => {
+                    console.log(replay);
+                    showGame(replay, document.getElementById("visualizer"));
+                });
             }
         },
         methods: {

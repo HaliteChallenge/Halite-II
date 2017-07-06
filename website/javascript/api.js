@@ -41,3 +41,24 @@ export function register_me(data) {
         },
     });
 }
+
+export function get_replay(game_id) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open("GET", `${API_SERVER_URL}/user/0/match/${game_id}/replay`, true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function(e) {
+            if (this.status == 200) {
+                const blob = this.response;
+                resolve(blob);
+            }
+            else {
+                reject();
+            }
+        };
+
+        xhr.send();
+    });
+}
