@@ -2,7 +2,7 @@
     <div class="row">
         <!-- TODO: indieweb markup -->
         <div class="col-md-4">
-            <img class="img-responsive" src="" :alt="user.username">
+            <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username">
             <h1>{{ user.username }}</h1>
 
             <p>{{ user.level }} at {{ user.organization }}</p>
@@ -30,8 +30,8 @@
                         <tr v-for="game in games">
                             <td>{{ game.time_played | moment("calendar") }}</td>
                             <td>
-                                <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player">
-                                    <img :alt="player" :src="player" />
+                                <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player" class="game-participant" >
+                                    <img :alt="player" :src="profile_images[player]" />
                                 </a>
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
@@ -63,6 +63,7 @@
                     "num_games": "",
                 },
                 games: [],
+                profile_images: {},
             };
         },
         mounted: function() {
@@ -83,6 +84,18 @@
                     .then((data) => {
                         this.games = data;
                         console.log(data);
+                        for (let game of data) {
+                            console.log(game);
+                            for (let participant of Object.keys(game.players)) {
+                                if (this.profile_images[participant]) continue;
+                                this.profile_images[participant] = "loading";
+
+                                api.get_user(participant).then((user) => {
+                                    this.profile_images[participant] = `https://github.com/${user.username}.png`;
+                                    this.$forceUpdate();
+                                });
+                            }
+                        }
                     });
             });
         },
@@ -90,5 +103,9 @@
 </script>
 
 <style lang="scss" scoped>
-
+    .game-participant {
+        img {
+            height: 20px;
+        }
+    }
 </style>
