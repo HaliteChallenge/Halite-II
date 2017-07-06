@@ -3,10 +3,10 @@ SET sql_mode = 'ANSI_QUOTES';
 DELETE FROM "user";
 DELETE FROM organization;
 
-INSERT INTO organization (id, organization_name)
-VALUES (1000, 'Cornell University'),
-       (1001, 'Basha High School'),
-       (1002, 'Two Sigma');
+INSERT INTO organization (id, organization_name, kind)
+VALUES (1000, 'Cornell University', 'University'),
+       (1001, 'Basha High School', 'High School'),
+       (1002, 'Two Sigma', 'Company');
 
 INSERT INTO organization_email_domain (organization_id, domain)
 VALUES (1000, 'cornell.edu'),

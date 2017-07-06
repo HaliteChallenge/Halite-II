@@ -936,30 +936,35 @@ def get_match_error_log(intended_user, match_id, *, user_id):
 # ORGANIZATION API ENDPOINTS #
 ##############################
 @web_api.route("/organization")
+@cross_origin(methods=["GET"])
 def list_organizations():
     result = []
     offset, limit = get_offset_limit()
     where_clause, order_clause = get_sort_filter({
         "organization_id": model.organizations.c.id,
-        "organization_name": model.organizations.c.organization_name,
+        "name": model.organizations.c.organization_name,
+        "type": model.organizations.c.kind,
     })
 
     with model.engine.connect() as conn:
+        # Don't limit this query
         query = model.organizations.select()\
             .where(where_clause).order_by(*order_clause)\
-            .offset(offset).limit(limit)
+            .offset(offset)
         orgs = conn.execute(query)
 
         for org in orgs.fetchall():
             result.append({
                 "organization_id": org["id"],
                 "name": org["organization_name"],
+                "type": org["kind"],
             })
 
     return flask.jsonify(result)
 
 
 @web_api.route("/organization/<int:org_id>", methods=["GET"])
+@cross_origin(methods=["GET"])
 def get_organization(org_id):
     with model.engine.connect() as conn:
         org = conn.execute(model.organizations.select().where(
@@ -972,6 +977,7 @@ def get_organization(org_id):
         return flask.jsonify({
             "organization_id": org["id"],
             "name": org["organization_name"],
+            "type": org["kind"],
         })
 
 
@@ -982,9 +988,13 @@ def create_organization():
     if "name" not in org_body:
         raise util.APIError(400, message="Organization must be named.")
 
+    if "type" not in org_body:
+        raise util.APIError(400, message="Organization must have a type.")
+
     with model.engine.connect() as conn:
         org_id = conn.execute(model.organizations.insert().values(
             organization_name=org_body["name"],
+            organization_kind=org_body["type"],
         )).inserted_primary_key
 
     return response_success({
@@ -998,6 +1008,7 @@ def update_organization(org_id):
     fields = flask.request.get_json()
     columns = {
         "name": model.organizations.c.organization_name,
+        "type": model.organizations.c.kind,
     }
 
     for key in fields:
