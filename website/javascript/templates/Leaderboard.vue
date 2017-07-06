@@ -5,6 +5,7 @@
                 <th>#</th>
                 <th>Username</th>
                 <th>Organization</th>
+                <th>Level</th>
                 <th>Language</th>
                 <th>Points</th>
             </tr>
@@ -14,8 +15,9 @@
             <td>{{ player.rank }}</td>
             <td><a :href="'user?user_id=' + player.user_id">{{ player.username }}</a></td>
             <td>{{ player.organization }}</td>
+            <td>{{ player.level }}</td>
             <td>{{ player.language }}</td>
-            <td>{{ player.points }}</td>
+            <td>{{ player.score }}</td>
         </tr>
         </tbody>
     </table>
