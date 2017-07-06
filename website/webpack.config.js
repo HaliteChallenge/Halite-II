@@ -20,6 +20,16 @@ module.exports = {
                     }
                 }
             },
+            // Work around pixi-extra-filter's use of glslify (which is
+            // browserify-dependent) to load shaders
+            {
+                test: path.resolve(__dirname, "node_modules", "pixi-extra-filters"),
+                loader: "ify-loader",
+            },
+            {
+                test: /\.png$/,
+                loader: "file-loader",
+            },
         ],
     },
     resolve: {

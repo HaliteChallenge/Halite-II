@@ -35,7 +35,11 @@
                                 </a>
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
-                            <td>{{ game.game_id }}</td>
+                            <td>
+                                <a :href="'tv?game_id=' + game.game_id">
+                                    {{ game.game_id }}
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

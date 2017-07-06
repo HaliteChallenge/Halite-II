@@ -2,6 +2,7 @@ import Vue from "vue";
 import Associate from "./templates/Associate.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import UserProfile from "./templates/UserProfile.vue";
+import Visualizer from "./templates/Visualizer.vue";
 
 import * as api from "./api";
 
@@ -24,6 +25,12 @@ window.views = {
         new Vue({
             el: "#user-profile-container",
             render: (h) => h(UserProfile),
+        });
+    },
+    Visualizer: function () {
+        new Vue({
+            el: "#visualizer-container",
+            render: (h) => h(Visualizer),
         });
     },
 };

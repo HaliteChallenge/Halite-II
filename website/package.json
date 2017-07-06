@@ -11,10 +11,19 @@
   "author": "David Li <David.M.Li@TwoSigma.com>",
   "license": "MIT",
   "dependencies": {
+    "libhaliteviz": "file:../libhaliteviz",
+    "msgpack-lite": "^0.1.26",
+    "pako": "^1.0.5",
+    "pixi-extra-filters": "^1.1.4",
+    "pixi.js": "^4.5.3",
+    "seedrandom": "^2.4.3",
     "vue": "^2.3.4"
   },
   "devDependencies": {
+    "browserify-versionify": "^1.0.6",
     "css-loader": "^0.28.4",
+    "file-loader": "^0.11.2",
+    "ify-loader": "^1.0.4",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
     "vue-loader": "^13.0.0",
