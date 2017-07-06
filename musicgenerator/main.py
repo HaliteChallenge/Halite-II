@@ -48,7 +48,7 @@ def ampergenerate():
                     file = postcreatedata['files'][1]
 
                     # dict keys are mangled, this is flaky, need to fix before release
-                    rid = file.values()[8]
+                    rid = file['id']
                     response = requests.request("GET", url + 'render_files/' + str(rid), data=payload, headers=headers)
                     content = response.content
                     fileid = str(rid) + '.mp3'
