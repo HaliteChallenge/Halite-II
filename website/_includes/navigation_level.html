@@ -2,8 +2,7 @@
         <a href="{{ include.level.index.url }}">
             {{ include.level.name }}
         </a>
-
-        <ul>
+        <ul class="list-group">
             {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">
                 <a href="{{ subpage.url }}">{{ subpage.title }}</a>

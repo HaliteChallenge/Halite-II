@@ -3,13 +3,26 @@
 
 @import "bootstrap-sass-3.3.7/assets/stylesheets/bootstrap";
 
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
 body {
     padding-top: 50px;
+    margin-bottom: 60px;
 }
 
 .doctocleft
 {
-    margin-top: 75px;
+    margin-top: 78px;
 }
 
 .doctocright
@@ -48,10 +61,6 @@ body {
     .active > a {
         font-style: italic;
     }
-}
-
-footer {
-    margin-top: $line-height-computed;
 }
 
 /* Homepage */
