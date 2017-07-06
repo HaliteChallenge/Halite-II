@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Tutorial
+title: The Story
 toc: true
 ---
 
