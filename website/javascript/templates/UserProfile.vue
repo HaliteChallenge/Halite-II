@@ -34,7 +34,7 @@
                                     <img :alt="player" :src="player" />
                                 </a>
                             </td>
-                            <td>{{ game.map_width }} by {{ game.map_height }}</td>
+                            <td>{{ game.map_width }}x{{ game.map_height }}</td>
                             <td>{{ game.game_id }}</td>
                         </tr>
                     </tbody>
