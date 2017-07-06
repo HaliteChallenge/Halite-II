@@ -10,10 +10,9 @@
         <div class="col-md-8">
             <section>
                 <h2>Stats Summary</h2>
-
-                <p>{{ user.score }} points</p>
-                <p>{{ user.total_games_played }} games played</p>
-                <p>{{ user.total_submissions }} submissions</p>
+                <p><b>Points:</b> {{ Math.round(user.score * 100) / 100 }}</p>
+                <p><b>Games Played:</b>  {{ user.total_games_played }}</p>
+                <p><b>Submissions:</b>  {{ user.total_submissions }}</p>
             </section>
             <section>
                 <h2>Recent Games</h2>
@@ -21,9 +20,9 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Time Played</th>
+                            <th>Played On</th>
                             <th>Opponents</th>
-                            <th>Map Specification</th>
+                            <th>Map Size</th>
                             <th>Watch</th>
                         </tr>
                     </thead>
