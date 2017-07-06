@@ -32,7 +32,7 @@ module Jekyll
         level["name"] = root[0].data["title"]
         level["index"] = root[0]
       else
-        level["name"] = dir
+        level["name"] = full_dir
         level["index"] = nil
       end
 
