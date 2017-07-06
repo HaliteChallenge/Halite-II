@@ -1,4 +1,3 @@
-<ul>
     <li class="{% if include.level.index.url == page.url %}active{% endif %}">
         <a href="{{ include.level.index.url }}">
             {{ include.level.name }}
@@ -10,9 +9,8 @@
                 <a href="{{ subpage.url }}">{{ subpage.title }}</a>
             </li>
             {% endfor %}
-        </ul>
         {% for level in include.level.sublevels %}
         {% include navigation_level.html level=level %}
         {% endfor %}
+        </ul>
     </li>
-</ul>
