@@ -15,7 +15,7 @@
                 <p><b>Submissions:</b>  {{ user.total_submissions }}</p>
             </section>
             <section>
-                <h2>Recent Games</h2>
+                <h2>Game Feed</h2>
 
                 <table class="table">
                     <thead>
@@ -28,7 +28,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="game in games">
-                            <td>{{ game.time_played | moment("MMMM Do YYYY") }}</td>
+                            <td>{{ game.time_played | moment("calendar") }}</td>
                             <td>
                                 <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player">
                                     <img :alt="player" :src="player" />
