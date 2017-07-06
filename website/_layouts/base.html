@@ -42,7 +42,7 @@
                 <li><a href="{{ site.login_server_url }}/github">Login with Github</a></li>
             </ul>
             <form class="nav navbar-form navbar-right logged-in">
-                <button type="submit" class="btn btn-default">Submit a Bot</button>
+                <a href="{{ site.baseurl }}/play" class="btn btn-default">Submit a Bot</a>
                 <a href="{{ site.baseurl }}/user?me" title="Your User Profile"><img src="http://via.placeholder.com/150x150" class="img-circle" alt="Your user profile image" /></a>
             </form>
         </div><!--/.nav-collapse -->
@@ -80,6 +80,13 @@
 {% if page.mount_view %}
 <script>
     window.views["{{ page.mount_view }}"]();
+</script>
+{% endif %}
+{% if page.mount_views %}
+<script>
+{% for mount_view in page.mount_views %}
+    window.views["{{ mount_view }}"]();
+{% endfor %}
 </script>
 {% endif %}
 </body>

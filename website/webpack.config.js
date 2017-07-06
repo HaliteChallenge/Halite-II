@@ -27,6 +27,10 @@ module.exports = {
                 loader: "ify-loader",
             },
             {
+                test: /pixi-extra-filters/,
+                loader: "ify-loader",
+            },
+            {
                 test: /\.png$/,
                 loader: "file-loader",
             },

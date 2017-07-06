@@ -1,11 +1,19 @@
 <template>
-    <table class="table table-striped table-hover">
-    </table>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h2>Drop or upload REPLAY files here</h2>
+                <form>
+                    <input class="form-control" type="file" v-on:change="play_replay" />
+                </form>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
-    import * as libhaliteviz from "libhaliteviz";
-    console.log(libhaliteviz);
+    import * as libhaliteviz from "../../../libhaliteviz";
+    libhaliteviz.setAssetRoot("assets/js/");
 
     function showGame(buffer, displayArea) {
         let replay = libhaliteviz.parseReplay(buffer);
@@ -17,43 +25,6 @@
         return visualizer;
     }
 
-    const $dropZone = $("html");
-    const $filePicker = $("#filePicker");
-    const displayArea = $("#container");
-
-    function handleFiles(files) {
-        // only use the first file.
-        const file = files[0];
-        console.log(file);
-        const reader = new FileReader();
-
-        reader.onload = (function(filename) { // finished reading file data.
-            return function(e2) {
-                displayArea.empty();
-                $("label[for=filePicker]").text("Select another file");
-                let fsHeight = $("#fileSelect").outerHeight();
-
-                visualizer = showGame(e2.target.result, displayArea);
-            };
-        })(file.name);
-        reader.readAsArrayBuffer(file); // start reading the file data.
-    }
-
-    $dropZone.on('dragover', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-    });
-    $dropZone.on('drop', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        const files = e.originalEvent.dataTransfer.files; // Array of all files
-        handleFiles(files);
-    });
-    $filePicker.on('change', function(e) {
-        const files = e.target.files;
-        handleFiles(files);
-    });
-
     export default {
         name: "visualizer",
         data: function() {
@@ -62,6 +33,21 @@
             };
         },
         mounted: function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("match_id")) {
+
+            }
+        },
+        methods: {
+            play_replay: function(event) {
+                  if (event.target.files.length > 0) {
+                      const reader = new FileReader();
+                      reader.onload = function(e) {
+                          showGame(e.target.result, document.getElementById("visualizer"));
+                      };
+                      reader.readAsArrayBuffer(event.target.files[0]);
+                  }
+            },
         },
     }
 </script>

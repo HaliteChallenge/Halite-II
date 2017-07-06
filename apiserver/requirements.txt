@@ -30,9 +30,11 @@ pycountry==17.5.14
 pycparser==2.17
 PyMySQL==0.7.11
 python-dateutil==2.6.0
+python-http-client==2.4.0
 requests==2.18.1
 requests-oauthlib==0.8.0
 rsa==3.4.2
+sendgrid==4.2.0
 six==1.10.0
 SQLAlchemy==1.1.11
 trueskill==0.4.4

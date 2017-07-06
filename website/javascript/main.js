@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Associate from "./templates/Associate.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
+import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
 import Visualizer from "./templates/Visualizer.vue";
 
@@ -19,6 +20,12 @@ window.views = {
         new Vue({
             el: "#leaderboard-container",
             render: (h) => h(Leaderboard),
+        });
+    },
+    Upload: function () {
+        new Vue({
+            el: "#upload-container",
+            render: (h) => h(Upload),
         });
     },
     UserProfile: function () {

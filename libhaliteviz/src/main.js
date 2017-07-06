@@ -13,19 +13,31 @@ const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 const PLANET_COLOR = 0x3F3C15;
 
 
-const BACKGROUND_IMAGES = [
-    "dist/" + require("../assets/backgrounds/Space001.png"),
-    "dist/" + require("../assets/backgrounds/Space002.png"),
-    "dist/" + require("../assets/backgrounds/Space003.png"),
-    "dist/" + require("../assets/backgrounds/Space004.png"),
-    "dist/" + require("../assets/backgrounds/Space005.png"),
-];
-const PLANET_IMAGES = [
-    "dist/" + require("../assets/planets/p1.png"),
-    "dist/" + require("../assets/planets/p2.png"),
-    "dist/" + require("../assets/planets/p3.png"),
-    "dist/" + require("../assets/planets/p4.png"),
-];
+let ASSET_ROOT = "dist/";
+
+
+export function setAssetRoot(path) {
+    ASSET_ROOT = path;
+    BACKGROUND_IMAGES = [
+    ASSET_ROOT + require("../assets/backgrounds/Space001.png"),
+    ASSET_ROOT + require("../assets/backgrounds/Space002.png"),
+    ASSET_ROOT + require("../assets/backgrounds/Space003.png"),
+    ASSET_ROOT + require("../assets/backgrounds/Space004.png"),
+    ASSET_ROOT + require("../assets/backgrounds/Space005.png"),
+    ];
+    PLANET_IMAGES = [
+        ASSET_ROOT + require("../assets/planets/p1.png"),
+        ASSET_ROOT + require("../assets/planets/p2.png"),
+        ASSET_ROOT + require("../assets/planets/p3.png"),
+        ASSET_ROOT + require("../assets/planets/p4.png"),
+    ];
+}
+
+
+let BACKGROUND_IMAGES = [];
+let PLANET_IMAGES = [];
+
+setAssetRoot("dist/");
 
 
 class FrameAnimation {

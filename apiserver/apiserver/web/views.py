@@ -16,7 +16,7 @@ import google.cloud.exceptions as gcloud_exceptions
 import pycountry
 from flask_cors import cross_origin as flask_cross_origin
 
-from .. import config, model, util
+from .. import config, model, notify, util
 from .. import response_success
 
 
@@ -391,7 +391,14 @@ def create_user(*, user_id):
                 "verification_code": verification_code,
                 "organization_id": org_id,
             })
-            # TODO: send the verification email
+
+            notify.send_notification(
+                email,
+                user_data["username"],
+                "Email verification",
+                notify.VERIFY_EMAIL.format(verification_code=verification_code),
+            )
+
             message = "User added to organization, but needs to validate email."
         else:
             values.update({

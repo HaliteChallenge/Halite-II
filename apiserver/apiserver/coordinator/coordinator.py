@@ -13,7 +13,7 @@ import trueskill
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
-from .. import config, model, response_success, util
+from .. import config, model, notify, response_success, util
 
 
 coordinator_api = flask.Blueprint("coordinator_api", __name__)
@@ -128,6 +128,7 @@ def update_compilation_status():
     bot_id = flask.request.form.get("bot_id", None)
     did_compile = flask.request.form.get("did_compile", False)
     language = flask.request.form.get("language", "Other")
+    errors = flask.request.form.get("errors", "")
 
     if user_id is None:
         raise util.APIError(400, message="Must provide user ID.")
@@ -163,8 +164,6 @@ def update_compilation_status():
         conn.execute(update)
 
         if did_compile:
-            # TODO: email the user
-
             # This is backwards of the order in the original PHP, but the
             # original PHP updated the table using the -old- values of the
             # User row. This ordering makes it clearer that this is
@@ -207,9 +206,21 @@ def update_compilation_status():
                     score=0,
                 )
             )
+
+            notify.send_notification(
+                user["email"],
+                user["username"],
+                "Bot successfully compiled",
+                notify.COMPILATION_SUCCESS)
+
             return response_success()
         else:
-            # TODO: email the user
+            notify.send_notification(
+                user["email"],
+                user["username"],
+                "Bot failed to compile",
+                notify.COMPILATION_FAILURE.format(language=language,
+                                                  errors=errors))
             return response_success()
 
 
