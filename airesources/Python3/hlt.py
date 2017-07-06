@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Halite II Python 3 starter kit
+"""
 
 import math
 import sys
@@ -14,6 +17,17 @@ map_size = None
 
 """The most recent map received from the server. See :class:`Map`."""
 last_map = None
+
+"""The number of steps to use when checking pathability."""
+PATHING_STEPS = 64
+
+"""Constants used in parsing ship docking status."""
+DOCKING_STATUS = {
+    0: "undocked",
+    1: "docking",
+    2: "docked",
+    3: "undocking",
+}
 
 
 def send_string(s):
@@ -35,6 +49,24 @@ def get_string():
 
 
 class Planet:
+    """
+    A planet on the game map.
+
+    :ivar id: The planet ID.
+    :ivar x:
+    :ivar y:
+    :ivar r: The planet radius.
+    :ivar num_docking_spots: The max number of ships that can be docked.
+    :ivar current_production: How much production the planet has generated
+        at the moment. Once it reaches the threshold, a ship will spawn and
+        this will be reset.
+    :ivar remaining_production: The remaining production capacity of the planet.
+    :ivar hp: The planet's health.
+    :ivar owned: Whether the planet is owned.
+    :ivar owner: The player ID of the owner, if any. Only valid if `owned` is `True`.
+    :ivar docked_ships: A list of ship IDs of ships docked to the current
+        planet, all owned by the owner.
+    """
     def __init__(self, id, x, y, hp, r, docking_spots, current, remaining, owned, owner, docked_ships):
         self.id = id
         self.x = x
@@ -94,6 +126,20 @@ class Planet:
 
 
 class Ship:
+    """
+    A ship in the game.
+
+    :ivar id: The ship ID.
+    :ivar x: The ship x-coordinate.
+    :ivar y: The ship y-coordinate.
+    :ivar vel_x: The x-velocity.
+    :ivar vel_y: The y-velocity.
+    :ivar hp: The ship's remaining health.
+    :ivar docked: The docking status ("undocked", "docked", "docking", "undocking")
+    :ivar planet: The ID of the planet the ship is docked to, if applicable.
+    :ivar docking_progress: The turns left to dock/undock from a planet, if applicable.
+    :ivar weapon_cooldown: The turns left before the ship can attack again.
+    """
     def __init__(self, id, x, y, hp, vel_x, vel_y,
                  docked, planet, progress, cooldown):
         self.id = id
@@ -107,6 +153,18 @@ class Ship:
         self.docking_progress = progress
         self.weapon_cooldown = cooldown
 
+    def thrust(self, magnitude, angle):
+        """Generate a command to accelerate this ship."""
+        return "t {} {} {}".format(self.id, magnitude, angle)
+
+    def dock(self, planet):
+        """Generate a command to dock to a planet."""
+        return "d {} {}".format(self.id, planet.id)
+
+    def undock(self):
+        """Generate a command to undock from the current planet."""
+        return "u {}".format(self.id)
+
     @staticmethod
     def parse_single(tokens):
         """
@@ -118,11 +176,7 @@ class Ship:
             docked, docked_planet, progress, cooldown, *remainder = tokens
 
         sid = int(sid)
-        docked = int(docked)
-        if docked == 0:
-            docked = "undocked"
-        elif docked == 2:
-            docked = "docked"
+        docked = DOCKING_STATUS.get(int(docked), "undocked")
 
         ship = Ship(sid,
                     int(x), int(y),
@@ -176,12 +230,14 @@ class Map:
         If the entity is a ship, the 2-tuple will contain the owner's tag and
         the string "ship".
         """
+        # Initialize the map
         for _ in range(map_size[0]):
             col = []
             for _ in range(map_size[1]):
                 col.append((None, None))
             self.collision_map.append(col)
 
+        # Fill in spots occupied by planets
         for planet in self.planets.values():
             for dx in range(-planet.r, planet.r + 1):
                 for dy in range(-planet.r, planet.r + 1):
@@ -194,11 +250,13 @@ class Map:
                         self.collision_map[x][y] = \
                             (planet.owner if planet.owned else -1, "planet")
 
+        # Fill in spots occupied by ships
         for player_tag, player_ships in self.ships.items():
             for ship in player_ships.values():
                 self.collision_map[ship.x][ship.y] = (player_tag, "ship")
 
     def print_collision(self):
+        """Debug method that prints the collision map to the log."""
         for row in range(map_size[1]):
             logging.info(''.join(
                 '.' if self.collision_map[col][row] == (None, None) else 'X'
@@ -224,6 +282,11 @@ def parse(map):
 
 
 class Location:
+    """
+    A simple wrapper for a coordinate.
+
+    Intended to be passed to some functions in place of a ship or planet.
+    """
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -256,10 +319,11 @@ def warp(ship, x, y, *, extra_data=None):
     be retrieved with :func:`get_warp_extra_data`.
     :return:
     """
-    # TODO: make sure no warp is already executing
+    # Make sure no warp is already executing
     if ship.id in warp_queue:
         cancel_warp(ship)
         return
+
     warp_state = _warp(ship, x, y)
     warp_queue[ship.id] = [warp_state, extra_data]
 
@@ -268,12 +332,14 @@ def brake(ship, *, max_acceleration=8):
     """
     Stop the given ship. Uses the same infrastructure as warping, so do not
     issue commands to the ship until this is done.
-    :param ship:
-    :param max_acceleration:
+    :param Ship ship:
+    :param int max_acceleration:
     :return:
     """
     while True:
+        # Get the most up-to-date ship
         ship = last_map.ships[my_tag].get(ship.id, None)
+        # Whoops, we died
         if not ship:
             return
 
@@ -285,11 +351,13 @@ def brake(ship, *, max_acceleration=8):
 
         thrust = int(min(speed, max_acceleration))
         angle = int(180 + 180 * angle / math.pi) % 360
-        if angle < 0: angle += 360
-        logging.warn(
+        if angle < 0:
+            angle += 360
+
+        logging.debug(
             "Warp {}: deceleration {} {}, s {} pos {} {}"
             .format(ship.id, thrust, angle, speed, ship.x, ship.y))
-        yield "t {} {} {}".format(ship.id, thrust, angle)
+        yield ship.thrust(thrust, angle)
 
 
 def cancel_warp(ship):
@@ -303,12 +371,13 @@ def cancel_warp(ship):
 
 
 def get_warp_extra_data(ship):
+    """Retrieve the user-supplied extra data associated with a warp."""
     if ship.id in warp_queue:
         return warp_queue[ship.id][1]
     return None
 
 
-def _warp(ship, x, y):
+def _warp(ship, x, y, *, max_acceleration=8):
     """
     The actual warp implementation. You should not use this directly.
     :param ship:
@@ -316,9 +385,10 @@ def _warp(ship, x, y):
     :param y:
     :return:
     """
-    max_acceleration = 8
 
+    # Acceleration stage
     while True:
+        # Get the most up-to-date ship
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
             return
@@ -330,22 +400,24 @@ def _warp(ship, x, y):
         turns_to_decelerate = speed // (max_acceleration + 3)
 
         if turns_left <= turns_to_decelerate:
-            logging.warn("Warp {}: close enough, decelerating".format(ship.id))
+            logging.debug("Warp {}: close enough, decelerating".format(ship.id))
             break
         if distance <= 5:
-            logging.warn("Warp {}: too close, decelerating".format(ship.id))
+            logging.debug("Warp {}: too close, decelerating".format(ship.id))
             break
 
         thrust = int(
             max(1, min(max_acceleration, distance / 30 * max_acceleration)))
-        logging.warn(
+        logging.debug(
             "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
             .format(ship.id, thrust, angle, distance, speed, turns_left,
                     ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
 
+    # Braking stage
     yield from brake(ship, max_acceleration=max_acceleration)
 
+    # Low-velocity maneuvering stage - fall back on move_to
     while True:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
@@ -354,7 +426,7 @@ def _warp(ship, x, y):
         if ship.x == x and ship.y == y:
             break
 
-        logging.warn(
+        logging.debug(
             "Warp {}: move from {} {} to {} {}"
             .format(ship.id, ship.x, ship.y, x, y))
         angle, distance = orient_towards(ship, Location(x, y))
@@ -405,17 +477,20 @@ def move_to(ship, angle, speed, avoidance=25):
     :param avoidance: How many tries to avoid collisions.
     :return:
     """
+    # Ships are centered on the center of a grid square
     pos_x = ship.x + 0.5
     pos_y = ship.y + 0.5
 
     if ship.vel_x != 0 or ship.vel_y != 0:
-        logging.warn("INERTIAL INTERFERENCE")
+        logging.warning(
+            "Ship {}: inertial interference in moving {}@{}deg".format(
+                ship.id, speed, angle
+            ))
 
-    steps = 64
-    dx = round(speed * math.cos(angle * math.pi / 180)) / steps
-    dy = round(speed * math.sin(angle * math.pi / 180)) / steps
+    dx = round(speed * math.cos(angle * math.pi / 180)) / PATHING_STEPS
+    dy = round(speed * math.sin(angle * math.pi / 180)) / PATHING_STEPS
 
-    for i in range(1, steps + 1):
+    for i in range(1, PATHING_STEPS + 1):
         pos_x += dx
         pos_y += dy
 
@@ -425,35 +500,53 @@ def move_to(ship, angle, speed, avoidance=25):
         if effective_x == ship.x and effective_y == ship.y:
             continue
 
-        # Collision avoidance
+        # Collision avoidance - check if the ship is about to move off the
+        # map boundary, into a planet, or into one of our own ships
+        # (we don't care about enemy ones)
         within_bounds = 0 <= effective_x < map_size[0] and \
             0 <= effective_y < map_size[1]
         if (not within_bounds or
             last_map.collision_map[effective_x][effective_y][1] == "planet" or
                 last_map.collision_map[effective_x][effective_y][0] == my_tag):
+            # We only try to avoid collisions a certain number of times to
+            # avoid getting stuck and timing out
             if avoidance > 0:
                 new_angle = (angle + 15) % 360
-                if new_angle < 0: new_angle += 360
-                logging.warn("Averting collision for ship {} pos {} angle {} speed {} because of {} (try {})".format(ship.id, (ship.x, ship.y), angle, speed, (effective_x, effective_y), 20-avoidance))
+                if new_angle < 0:
+                    new_angle += 360
+
+                logging.warning(
+                    "Averting collision for ship {} pos {} "
+                    "angle {} speed {} "
+                    "because of {} ({} tries left)".format(
+                        ship.id, (ship.x, ship.y), angle, speed,
+                        (effective_x, effective_y), avoidance))
                 if within_bounds:
-                    logging.warn("We would collide with {} at {} {}".format(last_map.collision_map[effective_x][effective_y], effective_x, effective_y))
+                    logging.warning("We would collide with {} at {} {}".format(
+                        last_map.collision_map[effective_x][effective_y],
+                        effective_x, effective_y))
                 else:
-                    logging.warn("We would be out of bounds at {} {}".format(effective_x, effective_y))
+                    logging.warning(
+                        "We would be out of bounds at {} {}".format(
+                            effective_x, effective_y))
+
                 return move_to(ship, new_angle, 1, avoidance-1)
             else:
-                logging.warn("Failed")
+                logging.warning(
+                    "Ship {}: could not avert collision, continuing...".format(
+                        ship.id))
 
-    return "t {ship} {speed} {angle}".format(ship=ship.id, speed=speed, angle=angle)
+    return ship.thrust(speed, angle)
 
 
 def dock(ship, planet):
     """Begin docking the ship to the planet, if in range."""
-    return "d {ship} {planet}".format(ship=ship.id, planet=planet.id)
+    return ship.dock(planet)
 
 
 def undock(ship):
     """Undock the ship."""
-    return "u {ship}".format(ship=ship.id)
+    return ship.undock()
 
 
 def can_dock(ship, planet):
@@ -476,6 +569,7 @@ def orient_towards(ship, target):
     d = int(math.sqrt(dx*dx + dy*dy))
 
     angle = math.atan2(dy, dx)
+    # Normalize the angle and convert to degrees
     if angle < 0:
         angle += 2 * math.pi
     angle = int(180 * angle / math.pi)
@@ -487,7 +581,14 @@ def orient_towards(ship, target):
 
 
 def occupiable(x, y):
-    """Check whether the given coordinate can be occupied."""
+    """
+    Check whether the given coordinate can be occupied.
+
+    That is, check whether it is theoretically possible for a ship to be at
+    the given coordinate, regardless of whether it could actually reach that
+    coordinate. Essentially, this checks if there is a planet at the given
+    location.
+    """
     if x < 0 or x >= map_size[0] or y < 0 or y >= map_size[1]:
         return False
 
@@ -508,9 +609,9 @@ def pathable(ship, target_x, target_y):
     if not occupiable(target_x, target_y):
         return False
 
-    for i in range(121):
-        x = int(ship.x + i * dx / 120)
-        y = int(ship.y + i * dy / 120)
+    for i in range(PATHING_STEPS + 1):
+        x = int(ship.x + i * dx / PATHING_STEPS)
+        y = int(ship.y + i * dy / PATHING_STEPS)
 
         if not occupiable(x, y):
             return False
@@ -538,11 +639,12 @@ def closest_point_to(ship, target, *, r=3):
 def initialize(name):
     """
     Initialize the bot with the given name.
-    :param name:
-    :return:
+    :param name: The name of the bot.
+    :return: The player tag, map dimensions, and initial map.
     """
     global map_size
     global my_tag
+
     tag = int(get_string())
     my_tag = tag
     map_size = [int(x) for x in get_string().strip().split()]
@@ -550,13 +652,13 @@ def initialize(name):
     send_string(name)
     done_sending()
 
+    # Set up and truncate the log
     log_file = "{}_{}.log".format(my_tag, name)
-    # Truncate the log
     with open(log_file, 'w'):
         pass
+    logging.basicConfig(filename=log_file, level=logging.DEBUG)
+    logging.info("Initialized bot {}".format(name))
 
-    logging.basicConfig(filename=log_file, level=logging.INFO)
-    logging.info("Initialized bot")
     return tag, map_size, initial_map
 
 
@@ -577,8 +679,7 @@ def get_map():
     Parse the map given by the engine. Probably shouldn't be directly used.
     :return:
     """
-    i = get_string()
-    return parse(i)
+    return parse(get_string())
 
 
 def run_bot(main_loop):
