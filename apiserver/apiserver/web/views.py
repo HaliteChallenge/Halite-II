@@ -14,13 +14,20 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 import pycountry
-from flask_cors import cross_origin
+from flask_cors import cross_origin as flask_cross_origin
 
 from .. import config, model, util
 from .. import response_success
 
 
 web_api = flask.Blueprint("web_api", __name__)
+
+
+def cross_origin(*args, **kwargs):
+    kwargs["origins"] = config.CORS_ORIGINS
+    kwargs["supports_credentials"] = True
+    kwargs["allow_headers"] = ["Origin", "Accept", "Content-Type"]
+    return flask_cross_origin(*args, **kwargs)
 
 
 def validate_country(country_code, subdivision_code):
@@ -201,7 +208,7 @@ def get_sort_filter(fields):
 
 
 @web_api.route("/user")
-@cross_origin(methods=["GET"])
+@cross_origin(methods=["GET", "POST"])
 def list_users():
     result = []
     offset, limit = get_offset_limit()
@@ -249,9 +256,10 @@ def list_users():
                 num_games,
             ]).select_from(model.users.join(
                 model.organizations,
-                model.users.c.organization_id == model.organizations.c.id
+                model.users.c.organization_id == model.organizations.c.id,
+                isouter=True,
             )).where(where_clause).order_by(*order_clause)
-             .offset(offset).limit(limit).reduce_columns()
+              .offset(offset).limit(limit).reduce_columns()
         )
 
         for row in query.fetchall():
@@ -274,6 +282,7 @@ def list_users():
 
 
 @web_api.route("/user", methods=["POST"])
+@cross_origin(methods=["GET", "POST"])
 @requires_login
 def create_user(*, user_id):
     """
@@ -309,6 +318,9 @@ def create_user(*, user_id):
     # Perform validation on given values
     if "level" in body and not validate_user_level(body["level"]):
         raise util.APIError(400, message="Invalid user level.")
+
+    if email is not None and "@" not in email:
+        raise util.APIError(400, message="Invalid user email.")
 
     if "country_code" in body or "country_subdivision_code" in body:
         country_code = body.get("country_code")
@@ -407,6 +419,7 @@ def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
             model.users.c.id,
+            model.users.c.email,
             model.users.c.username,
             model.users.c.player_level,
             model.users.c.organization_id,
@@ -416,7 +429,8 @@ def get_user(intended_user, *, user_id):
         ]).where(model.users.c.id == intended_user).select_from(
             model.users.join(
                 model.organizations,
-                model.users.c.organization_id == model.organizations.c.id
+                model.users.c.organization_id == model.organizations.c.id,
+                isouter=True,
             )
         ).reduce_columns()
 
@@ -447,6 +461,10 @@ def get_user(intended_user, *, user_id):
             "country_code": row["country_code"],
             "country_subdivision_code": row["country_subdivision_code"],
         }
+
+        if row["email"] is None and intended_user == user_id:
+            # User is new user, indicate this when they are logged in
+            user["is_new_user"] = True
 
         return flask.jsonify(user)
 

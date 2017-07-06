@@ -1,6 +1,7 @@
 import flask
 import sqlalchemy
 from flask_oauthlib.client import OAuth
+from flask_cors import cross_origin
 
 from .. import app, config, model, util
 
@@ -27,6 +28,7 @@ def github_login_init():
 
 
 @oauth_login.route("/me")
+@cross_origin(methods=["GET"], origins=config.CORS_ORIGINS, supports_credentials=True)
 def me():
     if "user_id" in flask.session:
         return flask.jsonify({

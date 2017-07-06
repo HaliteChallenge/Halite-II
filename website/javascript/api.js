@@ -24,3 +24,20 @@ export function get_user(user_id) {
         },
     });
 }
+
+export function list_organizations() {
+    return $.get({
+        url: `${API_SERVER_URL}/organization`,
+    });
+}
+
+export function register_me(data) {
+    return $.post({
+        url: `${API_SERVER_URL}/user`,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
+}

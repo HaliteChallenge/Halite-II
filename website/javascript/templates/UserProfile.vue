@@ -49,6 +49,8 @@
 </template>
 
 <script>
+    import * as api from "../api";
+
     export default {
         name: "UserProfile",
         data: function() {
@@ -64,17 +66,25 @@
             };
         },
         mounted: function() {
-            const user_id = (new URLSearchParams(window.location.search)).get("user_id");
-            $.get("http://35.190.3.178/api/v1/user/" + user_id.toString())
-                .then((data) => {
-                    this.user = data;
-                    console.log(data);
-                });
-            $.get("http://35.190.3.178/api/v1/user/" + user_id.toString() + "/match")
-                .then((data) => {
-                    this.games = data;
-                    console.log(data);
-                });
+            const params = new URLSearchParams(window.location.search);
+            let source;
+
+            if (params.has("me")) {
+                source = api.me();
+            }
+            else {
+                const user_id = params.get("user_id");
+                source = api.get_user(user_id);
+            }
+
+            source.then((user) => {
+                this.user = user;
+                $.get("http://35.190.3.178/api/v1/user/" + user.user_id.toString() + "/match")
+                    .then((data) => {
+                        this.games = data;
+                        console.log(data);
+                    });
+            });
         },
     }
 </script>
