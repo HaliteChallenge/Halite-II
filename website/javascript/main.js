@@ -4,6 +4,8 @@ import UserProfile from "./templates/UserProfile.vue";
 
 import * as api from "./api";
 
+Vue.use(require('vue-moment'))
+
 window.views = {
     Leaderboard: function () {
         new Vue({

@@ -29,7 +29,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="game in games">
-                            <td>{{ game.time_played }}</td>
+                            <td>{{ game.time_played | moment("MMMM Do YYYY") }}</td>
                             <td>
                                 <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player">
                                     <img :alt="player" :src="player" />
