@@ -7,6 +7,7 @@ import operator
 import random
 import string
 import urllib.parse
+import zipfile
 
 import arrow
 import flask
@@ -712,6 +713,13 @@ def store_user_bot(user_id, intended_user, bot_id):
 
         # Save to GCloud
         uploaded_file = flask.request.files["botFile"]
+        if not zipfile.is_zipfile(uploaded_file):
+            raise util.APIError(
+                400,
+                message="Bot file does not appear to be a zip file. Please "
+                        "upload a zip file containing your bot, where the "
+                        "main file is named MyBot with an appropriate "
+                        "extension.")
         blob = gcloud_storage.Blob("{}_{}".format(user_id, bot_id),
                                    model.get_compilation_bucket(),
                                    chunk_size=262144)
