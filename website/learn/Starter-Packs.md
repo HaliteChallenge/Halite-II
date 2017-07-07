@@ -4,12 +4,8 @@ title: Starter Packs
 toc: true
 ---
 
-This is the tutorial!
-
-## Basic Bot
-
-## Improving
-
-## Further Ideas
-
-### Docs
+{% for file in site.static_files %}
+    {% if file.path contains 'assets/starter_kits' %}
+- [{{ file.name }}]({{ site.baseurl }}{{ file.path }})
+    {% endif %}
+{% endfor %}
