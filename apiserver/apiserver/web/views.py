@@ -478,6 +478,7 @@ def get_user(intended_user, *, user_id):
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["GET"])
+@cross_origin(methods=["GET"])
 def verify_user_email(user_id):
     verification_code = flask.request.args.get("verification_code")
     if not verification_code:

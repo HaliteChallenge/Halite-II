@@ -3,6 +3,7 @@ import Associate from "./templates/Associate.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
+import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
 
 import * as api from "./api";
@@ -32,6 +33,12 @@ window.views = {
         new Vue({
             el: "#user-profile-container",
             render: (h) => h(UserProfile),
+        });
+    },
+    VerifyEmail: function () {
+        new Vue({
+            el: "#verify-email-container",
+            render: (h) => h(VerifyEmail),
         });
     },
     Visualizer: function () {
