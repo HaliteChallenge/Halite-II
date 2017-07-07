@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Rules
-permalink: /rules/
-toc: true
+title: Contact Us
+permalink: /contact/
+toc: false
 ---
 
 Test game rules
