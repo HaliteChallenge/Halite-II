@@ -13,6 +13,10 @@
                 <p><b>Points:</b> {{ Math.round(user.score * 100) / 100 }}</p>
                 <p><b>Games Played:</b>  {{ user.total_games_played }}</p>
                 <p><b>Submissions:</b>  {{ user.total_submissions }}</p>
+                <p v-for="bot in bots">
+                    Bot version {{ bot.version_number }} rank {{ bot.rank }} written in {{ bot.language }} with {{ bot.games_played }} games played
+                    <span v-if="bot.compilation_status">(latest version compilation status: {{ bot.compilation_status }})</span>
+                </p>
             </section>
             <section>
                 <h2>Game Feed</h2>
@@ -74,6 +78,7 @@
                     "num_games": "",
                 },
                 games: [],
+                bots: [],
                 profile_images: {},
                 page: 0,
                 offset: 0,
@@ -93,6 +98,9 @@
 
             source.then((user) => {
                 this.user = user;
+                api.list_bots(user.user_id).then((bots) => {
+                    this.bots = bots;
+                });
                 this.fetch();
             });
         },
