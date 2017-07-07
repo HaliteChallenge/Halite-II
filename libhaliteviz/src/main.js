@@ -200,7 +200,7 @@ export class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 8; i++) {
                 this.substep++;
                 if (this.substep >= this.replay.frames[this.frame].length) {
                     this.substep = 0;
@@ -220,7 +220,7 @@ export class HaliteVisualizer {
             }
 
             this.onUpdate();
-        }, 1000/30);
+        }, 1000/20);
 
         this.onPlay();
     }
