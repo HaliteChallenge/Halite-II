@@ -5,7 +5,7 @@ from . import config
 
 
 # Database setup
-engine = sqlalchemy.create_engine(config.DATABASE_URL, echo=True)
+engine = sqlalchemy.create_engine(config.DATABASE_URL)
 metadata = sqlalchemy.MetaData(bind=engine)
 
 organizations = sqlalchemy.Table("organization", metadata, autoload=True)

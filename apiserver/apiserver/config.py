@@ -33,3 +33,7 @@ api_key_context = CryptContext(
 # Discourse SSO
 DISCOURSE_SSO_SECRET = b""
 DISCOURSE_URL = "https://forums.halite.io/sso"
+
+# SendGrid
+SENDGRID_API_KEY = ""
+SENDGRID_SANDBOX_MODE = True
