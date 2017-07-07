@@ -126,7 +126,7 @@ def update_compilation_status():
     """Update the compilation status of a bot."""
     user_id = flask.request.form.get("user_id", None)
     bot_id = flask.request.form.get("bot_id", None)
-    did_compile = flask.request.form.get("did_compile", False)
+    did_compile = bool(int(flask.request.form.get("did_compile", '0')))
     language = flask.request.form.get("language", "Other")
     errors = flask.request.form.get("errors", "")
 
