@@ -43,6 +43,17 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="btn-group" role="group" aria-label="Game Navigation">
+                    <button
+                        type="button"
+                        class="btn btn-default"
+                        :disabled="page === 0"
+                        v-on:click="prev_page">Prev</button>
+                    <button
+                        type="button"
+                        class="btn btn-default"
+                        v-on:click="next_page">Next</button>
+                </div>
             </section>
         </div>
     </div>
@@ -64,6 +75,8 @@
                 },
                 games: [],
                 profile_images: {},
+                page: 0,
+                offset: 0,
             };
         },
         mounted: function() {
@@ -80,24 +93,41 @@
 
             source.then((user) => {
                 this.user = user;
-                $.get(`http://35.190.3.178/api/v1/user/${user.user_id}/match?order_by=desc,time_played`)
-                    .then((data) => {
-                        this.games = data;
-                        console.log(data);
-                        for (let game of data) {
-                            console.log(game);
-                            for (let participant of Object.keys(game.players)) {
-                                if (this.profile_images[participant]) continue;
-                                this.profile_images[participant] = "loading";
-
-                                api.get_user(participant).then((user) => {
-                                    this.profile_images[participant] = `https://github.com/${user.username}.png`;
-                                    this.$forceUpdate();
-                                });
-                            }
-                        }
-                    });
+                this.fetch();
             });
+        },
+        methods: {
+            fetch: function() {
+                return $.get(`http://35.190.3.178/api/v1/user/${this.user.user_id}/match?order_by=desc,time_played&offset=${this.offset}`)
+                 .then((data) => {
+                     this.games = data;
+                     for (let game of data) {
+                         for (let participant of Object.keys(game.players)) {
+                             if (this.profile_images[participant]) continue;
+                             this.profile_images[participant] = "loading";
+
+                             api.get_user(participant).then((user) => {
+                                 this.profile_images[participant] = `https://github.com/${user.username}.png`;
+                                 this.$forceUpdate();
+                             });
+                         }
+                     }
+                 });
+            },
+
+            next_page: function() {
+                this.offset += 10;
+                this.fetch().then(() => {
+                    this.page += 1;
+                });
+            },
+
+            prev_page: function() {
+                this.offset -= 10;
+                this.fetch().then(() => {
+                    this.page -= 1;
+                });
+            },
         },
     }
 </script>
