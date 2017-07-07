@@ -1,10 +1,13 @@
 <template>
     <div class="col-md-6">
-        <halite-upload-zone
+        <halite-upload-zone v-if="logged_in"
                 title="Drop BOT here or click to select"
                 :message="error"
                 v-on:change="upload_bot">
         </halite-upload-zone>
+        <div v-else>
+            <h2>Log In to upload bot</h2>
+        </div>
     </div>
 </template>
 
@@ -20,7 +23,15 @@
         data: function() {
             return {
                 error: null,
+                logged_in: false,
             };
+        },
+        mounted: function() {
+            api.me().then((me) => {
+                if (me != null) {
+                    this.logged_in = true;
+                }
+            });
         },
         methods: {
             upload_bot: function(files) {
