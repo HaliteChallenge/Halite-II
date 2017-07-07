@@ -5,13 +5,12 @@ DELETE FROM organization;
 
 INSERT INTO organization (id, organization_name, kind)
 VALUES (1000, 'Cornell University', 'University'),
-       (1001, 'Basha High School', 'High School'),
+       (1001, 'Massachusetts Institute of Technology', 'University'),
        (1002, 'Two Sigma', 'Company');
 
 INSERT INTO organization_email_domain (organization_id, domain)
 VALUES (1000, 'cornell.edu'),
-       (1001, 'cusd80.com'),
-       (1001, 'chandlerschools.com'),
+       (1001, 'mit.edu'),
        (1002, 'twosigma.com');
 
 INSERT INTO "user" (id, oauth_id, oauth_provider, username, email, player_level, is_active, organization_id)

@@ -46,7 +46,7 @@
         methods: {
             submit: function() {
                 if (this.verification_code && this.user_id) {
-                    $.get({
+                    $.post({
                         url: `${api.API_SERVER_URL}/user/${this.user_id}/verify`,
                         data: {
                             verification_code: this.verification_code,

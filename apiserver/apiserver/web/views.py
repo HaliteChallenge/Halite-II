@@ -478,16 +478,17 @@ def get_user(intended_user, *, user_id):
         return flask.jsonify(user)
 
 
-@web_api.route("/user/<int:user_id>/verify", methods=["GET"])
-@cross_origin(methods=["GET"])
+@web_api.route("/user/<int:user_id>/verify", methods=["POST"])
+@cross_origin(methods=["POST"])
 def verify_user_email(user_id):
-    verification_code = flask.request.args.get("verification_code")
+    verification_code = flask.request.form.get("verification_code")
     if not verification_code:
         raise util.APIError(400, message="Please provide verification code.")
 
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
             model.users.c.verification_code,
+            model.users.c.is_email_good,
         ]).where(
             model.users.c.id == user_id
         )
@@ -505,6 +506,10 @@ def verify_user_email(user_id):
             ))
             return response_success({
                 "message": "Email verified."
+            })
+        elif row["is_email_good"]:
+            return response_success({
+                "message": "Email already verified.",
             })
 
         raise util.APIError(400, message="Invalid verification code.")
