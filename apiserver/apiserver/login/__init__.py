@@ -80,7 +80,7 @@ def github_login_callback():
                 oauth_id=github_user_id,
                 oauth_provider=1,
             )).inserted_primary_key
-            flask.session["user_id"] = new_user_id
+            flask.session["user_id"] = new_user_id[0]
         else:
             flask.session["user_id"] = user["id"]
 
