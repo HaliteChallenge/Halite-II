@@ -32,6 +32,8 @@
 </template>
 
 <script>
+    import * as api from "../api";
+
     export default {
         name: "leaderboard",
         data: function() {
@@ -45,13 +47,13 @@
         },
         methods: {
             update_filter: function() {
-                let url = "http://35.190.3.178/api/v1/leaderboard";
+                let filters;
                 if (this.username_filter.length > 0) {
-                    url += "?filter=username,=," + this.username_filter;
+                    filters = "username,=," + this.username_filter;
                 }
-                $.get(url).then((data) => {
-                    this.leaderboard = data;
-                    console.log(data);
+
+                api.leaderboard(filters).then((leaderboard) => {
+                    this.leaderboard = leaderboard;
                 });
             }
         },

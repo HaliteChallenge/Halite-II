@@ -1,5 +1,5 @@
-const API_SERVER_URL = "http://35.185.123.54:5000/api/v1";
-const LOGIN_SERVER_URL = "http://35.185.123.54:5000/login";
+const API_SERVER_URL = "http://35.190.3.178/api/v1";
+const LOGIN_SERVER_URL = "http://35.190.3.178/login";
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
@@ -112,5 +112,14 @@ export function get_replay(game_id) {
         };
 
         xhr.send();
+    });
+}
+
+export function leaderboard(filters) {
+    return $.get({
+        url: `${API_SERVER_URL}/leaderboard`,
+        data: {
+            filters: filters,
+        }
     });
 }

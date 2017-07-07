@@ -18,14 +18,14 @@ email: halite@halite.io
 description: > # this means to ignore newlines until "baseurl:"
   Halite is an artificial intelligence programming challenge.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://35.185.45.87/" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: haliteAI
 github_username:  jekyll
 
 permalink: /blog/:year/:month/:day/:title.html
 
-api_server_url: "http://35.185.123.54:5000/api/v1"
-login_server_url: "http://35.185.123.54:5000/login"
+api_server_url: "http://35.190.3.178/api/v1"
+login_server_url: "http://35.190.3.178/login"
 
 # Build settings
 markdown: kramdown
