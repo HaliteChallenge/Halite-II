@@ -49,9 +49,15 @@ Error logs:
 
 
 VERIFY_EMAIL = """
-Please verify your email!
+<p>Please verify your email!</p>
 
-{verification_code}
+<p>Visit or copy to your browser: 
+<a href="http://35.185.45.87/verify_email?user_id={user_id}&verification_code={verification_code}">
+http://35.185.45.87/verify_email?user_id={user_id}&verification_code={verification_code}
+</a>
+</p>
 
+<p>
 - Halite II Alpha
+</p>
 """

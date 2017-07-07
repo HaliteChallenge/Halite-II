@@ -383,8 +383,7 @@ def create_user(*, user_id):
                 raise util.APIError(
                     400, message="Invalid email for organization.")
 
-        # Set the verification code (if necessary), and update the user's
-        # level to match the organization's level.
+        # Set the verification code (if necessary).
         if email:
             values.update({
                 "email": email,
@@ -397,17 +396,19 @@ def create_user(*, user_id):
                 email,
                 user_data["username"],
                 "Email verification",
-                notify.VERIFY_EMAIL.format(verification_code=verification_code),
+                notify.VERIFY_EMAIL.format(
+                    user_id=user_id,
+                    verification_code=verification_code),
             )
 
-            message = "User added to organization, but needs to validate email."
+            message = "Please check your email for a verification code."
         else:
             values.update({
                 "email": model.users.c.github_email,
                 "is_email_good": 1,
                 "organization_id": org_id,
             })
-            message = "User added to organization."
+            message = "You've been added to the organization automatically!"
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
