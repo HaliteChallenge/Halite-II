@@ -720,6 +720,7 @@ def store_user_bot(user_id, intended_user, bot_id):
                         "upload a zip file containing your bot, where the "
                         "main file is named MyBot with an appropriate "
                         "extension.")
+        uploaded_file.seek(0)
         blob = gcloud_storage.Blob("{}_{}".format(user_id, bot_id),
                                    model.get_compilation_bucket(),
                                    chunk_size=262144)
