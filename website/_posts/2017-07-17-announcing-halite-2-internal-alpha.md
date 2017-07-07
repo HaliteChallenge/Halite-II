@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Announcing Halite 2"
-date:   2017-06-30 12:05:54 -0400
+title:  "Announcing Halite 2 Internal Alpha"
+date:   2017-07-06 08:00:00 -0400
 categories: announcement
 ---
 
