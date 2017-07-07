@@ -7,7 +7,7 @@ import Visualizer from "./templates/Visualizer.vue";
 
 import * as api from "./api";
 
-Vue.use(require('vue-moment'))
+Vue.use(require('vue-moment'));
 
 window.views = {
     Associate: function () {

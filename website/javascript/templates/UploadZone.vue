@@ -5,6 +5,7 @@
          v-bind:class="{ dragging: drag_over }">
         <div class="panel-body">
             <h2>{{ title }}</h2>
+            <p v-if="message">{{ message }}</p>
             <input class="form-control" type="file" v-on:change="on_changed" />
         </div>
     </div>
@@ -13,7 +14,7 @@
 <script>
     export default {
         name: "halite-upload-zone",
-        props: ["title"],
+        props: ["title", "message"],
         data: function() {
             return {
                 drag_over: false,

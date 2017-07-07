@@ -570,6 +570,7 @@ def delete_user(intended_user_id, *, user_id):
 
 
 @web_api.route("/user/<int:user_id>/bot", methods=["GET"])
+@cross_origin(methods=["GET"])
 def list_user_bots(user_id):
     # TODO: parameter to get only IDs
 
@@ -594,7 +595,6 @@ def list_user_bots(user_id):
         ).order_by(model.bots.c.id)).fetchall()
 
         for bot in bots:
-            print(bot)
             result.append({
                 "bot_id": bot["id"],
                 "rank": int(bot["bot_rank"]) if bot["bot_rank"] else None,
@@ -609,6 +609,7 @@ def list_user_bots(user_id):
 
 
 @web_api.route("/user/<int:user_id>/bot/<int:bot_id>", methods=["GET"])
+@cross_origin(methods=["GET", "PUT"])
 def get_user_bot(user_id, bot_id):
     with model.engine.connect() as conn:
         bot = conn.execute(sqlalchemy.sql.select([
@@ -645,6 +646,7 @@ def get_user_bot(user_id, bot_id):
 
 
 @web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
+@cross_origin(methods=["POST"])
 @requires_login
 def create_user_bot(intended_user, *, user_id):
     if not config.COMPETITION_OPEN:
@@ -674,6 +676,7 @@ def create_user_bot(intended_user, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
+@cross_origin(methods=["GET", "PUT"])
 @requires_login
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
@@ -1133,7 +1136,6 @@ def leaderboard():
         players = conn.execute(query)
 
         for player in players.fetchall():
-            print(player)
             result.append({
                 "user_id": player["id"],
                 "username": player["username"],
