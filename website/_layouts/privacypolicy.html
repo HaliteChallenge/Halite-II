@@ -1,0 +1,27 @@
+---
+layout: default
+---
+
+<article class="row h-entry">
+    <div class="col-md-8">
+        <div class="page-header">
+            <h1 class="p-name"><a href="{{ page.url }}" class="u-url">{{ page.title }}</a></h1>
+        </div>
+        <p class="post-meta">
+            <time datetime="{{ page.date | date_to_xmlschema }}" class="dt-published" >{{ page.date | date: "%b %-d, %Y" }}</time>
+            {% if post.author %}
+            •
+            <span rel="author">{{ post.author }}</span>
+            {% endif %}
+        </p>
+
+        <div class="e-content">
+            {{ content | inject_anchors }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        {% if page.toc %}
+        {{ content | toc_only }}
+        {% endif %}
+    </div>
+</article>
