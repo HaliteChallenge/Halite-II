@@ -86,7 +86,7 @@ def github_login_callback():
 
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
-    return flask.redirect("/")
+    return flask.redirect(config.SITE_URL)
 
 
 @github.tokengetter
