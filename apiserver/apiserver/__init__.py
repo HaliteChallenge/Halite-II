@@ -1,4 +1,5 @@
-import functools
+import logging
+import logging.handlers
 
 import flask
 from flask import Flask
@@ -32,3 +33,13 @@ def health_check():
         conn.execute(sqlalchemy.sql.text("select 1"))
         return ""
 
+
+def log_exception(sender, exception, **extra):
+    pass
+
+
+def setup_logging(log_name):
+    handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=1024*1024*10, backupCount=10)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
+    logging.basicConfig(handlers=[handler])

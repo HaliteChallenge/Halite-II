@@ -3,6 +3,7 @@ import functools
 import hashlib
 import hmac
 import io
+import logging
 import operator
 import random
 import string
@@ -383,32 +384,32 @@ def create_user(*, user_id):
                 raise util.APIError(
                     400, message="Invalid email for organization.")
 
-        # Set the verification code (if necessary).
-        if email:
-            values.update({
-                "email": email,
-                "is_email_good": 0,
-                "verification_code": verification_code,
-                "organization_id": org_id,
-            })
+    # Set the verification code (if necessary).
+    if email:
+        values.update({
+            "email": email,
+            "is_email_good": 0,
+            "verification_code": verification_code,
+            "organization_id": org_id,
+        })
 
-            notify.send_notification(
-                email,
-                user_data["username"],
-                "Email verification",
-                notify.VERIFY_EMAIL.format(
-                    user_id=user_id,
-                    verification_code=verification_code),
-            )
+        notify.send_notification(
+            email,
+            user_data["username"],
+            "Email verification",
+            notify.VERIFY_EMAIL.format(
+                user_id=user_id,
+                verification_code=verification_code),
+        )
 
-            message = "Please check your email for a verification code."
-        else:
-            values.update({
-                "email": model.users.c.github_email,
-                "is_email_good": 1,
-                "organization_id": org_id,
-            })
-            message = "You've been added to the organization automatically!"
+        message = "Please check your email for a verification code."
+    else:
+        values.update({
+            "email": model.users.c.github_email,
+            "is_email_good": 1,
+            "organization_id": org_id,
+        })
+        message = "You've been added to the organization automatically!"
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
