@@ -24,9 +24,11 @@ def response_success(more=None):
     return flask.jsonify(response)
 
 
-@app.route('/login')
-def dev_login():
-    # TODO: THIS IS FOR DEVELOPMENT ONLY
-    flask.session["user_id"] = int(flask.request.values["user_id"])
-    return flask.redirect("/")
+@app.route('/health_check')
+def health_check():
+    from . import model
+    import sqlalchemy
+    with model.engine.connect() as conn:
+        conn.execute(sqlalchemy.sql.text("select 1"))
+        return ""
 

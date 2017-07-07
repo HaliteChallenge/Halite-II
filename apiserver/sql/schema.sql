@@ -98,7 +98,7 @@ CREATE TABLE bot_history (
   when_retired DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
-  PRIMARY KEY (user_id, bot_id)
+  PRIMARY KEY (user_id, bot_id, version_number)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE user_notification (
