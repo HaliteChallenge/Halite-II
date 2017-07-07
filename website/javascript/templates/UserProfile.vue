@@ -80,7 +80,7 @@
 
             source.then((user) => {
                 this.user = user;
-                $.get("http://35.190.3.178/api/v1/user/" + user.user_id.toString() + "/match")
+                $.get(`http://35.190.3.178/api/v1/user/${user.user_id}/match?order_by=desc,time_played`)
                     .then((data) => {
                         this.games = data;
                         console.log(data);
