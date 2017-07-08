@@ -19,6 +19,37 @@
 
         <div class="halite-visualizer-canvas" ref="visualizer_container">
         </div>
+
+        <div class="halite-visualizer-info">
+            <div v-for="(player_name, index) in replay.player_names">
+                <h3 :style="'color: ' + colors[index]">{{ player_name }}</h3>
+                <dl>
+                    <dt>Ship Count</dt>
+                    <dd>{{ statistics[index].ships }}</dd>
+
+                    <dt>Planet Count</dt>
+                    <dd>{{ statistics[index].planets }}</dd>
+                </dl>
+            </div>
+            <div v-if="selected.kind === 'planet'">
+                <h3>Selected Planet</h3>
+                <dl>
+                    <dt>ID</dt>
+                    <dd>{{ selected.id }}</dd>
+
+                    <dt>Health</dt>
+                    <dd>{{ selected_planet.state.health }}/{{ selected_planet.base.health }}</dd>
+
+                    <dt>Remaining Production</dt>
+                    <dd>{{ selected_planet.state.remaining_production }}/{{ selected_planet.base.production }}</dd>
+
+                    <dt>Owner</dt>
+                    <dd v-if="selected_planet.state.owner !== null">{{ replay.player_names[selected_planet.state.owner] }}</dd>
+                    <dd v-else>(indepdendent)</dd>
+
+                </dl>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -38,10 +69,18 @@
                     return '#' + color;
                 }),
                 visualizer: new HaliteVisualizer(this.replay),
+                selected: {
+                    kind: null,
+                },
             };
         },
         mounted: function() {
             this.visualizer.attach(this.$refs.visualizer_container);
+            this.visualizer.onSelect = (kind, args) => {
+                this.selected.kind = "planet";
+                this.selected.id = args.id;
+                this.$forceUpdate();
+            };
             this.visualizer.play();
         },
         methods: {
@@ -61,6 +100,38 @@
             playing: function() {
                 return this.visualizer.isPlaying();
             },
+            statistics: function() {
+                let count = {};
+                for (let i = 0; i < this.replay.num_players; i++) {
+                    count[i] = {
+                        ships: 0,
+                        planets: 0,
+                    };
+                }
+
+                let substep = this.replay.frames[this.visualizer.frame][this.visualizer.substep];
+                for (let ship of substep.ships) {
+                    count[ship.owner].ships++;
+                }
+
+                for (let planet of substep.planets) {
+                    if (planet.owner !== null) {
+                        count[planet.owner].planets++;
+                    }
+                }
+
+                return count;
+            },
+            selected_planet: function() {
+                if (this.selected.kind === "planet") {
+                    let substep = this.replay.frames[this.visualizer.frame][this.visualizer.substep];
+                    return {
+                        base: this.replay.planets[this.selected.id],
+                        state: substep.planets[this.selected.id],
+                    };
+                }
+                return null;
+            }
         },
     };
 </script>
@@ -68,11 +139,24 @@
 <style lang="scss" scoped>
  .halite-visualizer {
      margin: 0 auto;
+     width: 940px;
  }
 
  .halite-visualizer-controls {
      input {
          color: #000;
      }
+ }
+
+ .halite-visualizer-canvas {
+     width: 640px;
+ }
+
+ .halite-visualizer-canvas, .halite-visualizer-info {
+     float: left;
+ }
+
+ .halite-visualizer-info {
+     width: 300px;
  }
 </style>

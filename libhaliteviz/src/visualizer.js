@@ -90,7 +90,9 @@ export class HaliteVisualizer {
             planetSprite.interactive = true;
             planetSprite.buttonMode = true;
             planetSprite.on("pointerdown", () => {
-                this.onSelect("planet", planetBase);
+                this.onSelect("planet", {
+                    id: i,
+                });
             });
 
             this.planets.push(planetSprite);
