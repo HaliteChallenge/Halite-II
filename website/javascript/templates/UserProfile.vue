@@ -35,7 +35,7 @@
                             <td>{{ game.time_played | moment("calendar") }}</td>
                             <td>
                                 <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player" class="game-participant" >
-                                    <img :alt="player" :src="profile_images[player]" />
+                                    <img :alt="player" :src="profile_images[player]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
                                 </a>
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
