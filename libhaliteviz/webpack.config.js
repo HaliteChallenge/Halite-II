@@ -10,6 +10,16 @@ module.exports = {
     devtool: "source-map",
     module: {
         loaders: [
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+                options: {
+                    loaders: {
+                        'scss': 'vue-style-loader!css-loader!sass-loader',
+                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+                    }
+                }
+            },
             // Work around pixi-extra-filter's use of glslify (which is
             // browserify-dependent) to load shaders
             {
@@ -21,5 +31,10 @@ module.exports = {
                 loader: "file-loader",
             },
         ],
+    },
+    resolve: {
+        alias: {
+            'vue$': 'vue/dist/vue.esm.js'
+        }
     },
 };
