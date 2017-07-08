@@ -2,7 +2,7 @@
     <div class="row">
         <!-- TODO: indieweb markup -->
         <div class="col-md-4">
-            <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username">
+            <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
             <h1>{{ user.username }}</h1>
 
             <p>{{ user.level }} at {{ user.organization }}</p>
