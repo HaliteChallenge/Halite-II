@@ -3,6 +3,7 @@ import binascii
 import datetime
 import io
 import json
+import logging
 import os
 import random
 
@@ -69,6 +70,11 @@ def task():
         if seed_player:
             # Select the rest of the players
             mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
+
+            logging.warning(
+                "Matchmaking: seed player: ID {}, mu {}, "
+                "maximum rank distance {}".format(
+                    seed_player.user_id, seed_player.mu, mu_rank_limit))
 
             # Find closely matched players
             sqlfunc = sqlalchemy.sql.func
@@ -433,8 +439,10 @@ def find_seed_player(conn):
         rand_value = random.random()
 
         if rand_value > 0.5:
+            logging.warning("Matchmaking: seed player: looking for random bot"
+                            " with under 400 games played")
             ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
-            result = conn.execute(sqlalchemy.sql.select([
+            query = sqlalchemy.sql.select([
                 model.users.c.id.label("user_id"),
                 model.bots.c.id.label("bot_id"),
                 model.users.c.username,
@@ -448,10 +456,16 @@ def find_seed_player(conn):
             ).where(
                 (model.bots.c.compile_status == "Successful") &
                 (model.bots.c.games_played < 400)
-            ).order_by(ordering).limit(1).reduce_columns()).first()
+            ).order_by(ordering).limit(1).reduce_columns()
+
+            logging.info("{}".format(str(query)))
+
+            result = conn.execute(query).first()
             if result:
                 seed_player = result
         elif 0.25 < rand_value <= 0.5:
+            logging.warning("Matchmaking: seed player: looking for random bot"
+                            " from recent game with under 400 games played")
             # Find the users in the most recent games, and pick a seed player
             # from those
             max_time = sqlfunc.max(model.games.c.time_played).label("max_time")
@@ -481,7 +495,7 @@ def find_seed_player(conn):
 
             # Of those users, select ones with under 400 games, preferring
             # ones in older games, and get their data
-            outer_bots = model.bots.alias("u")
+            outer_bots = model.bots.alias("bot")
             potential_players = sqlalchemy.sql.select([
                 recent_gamers.c.user_id,
                 recent_gamers.c.bot_id,
@@ -491,7 +505,8 @@ def find_seed_player(conn):
             ]).select_from(
                 recent_gamers.join(
                     outer_bots,
-                    outer_bots.c.id == recent_gamers.c.user_id)) \
+                    (outer_bots.c.user_id == recent_gamers.c.user_id) &
+                    (outer_bots.c.id == recent_gamers.c.bot_id))) \
                 .where((outer_bots.c.games_played < 400) &
                        (outer_bots.c.compile_status == "Successful")) \
                 .order_by(recent_gamers.c.max_time.asc()) \
@@ -499,6 +514,8 @@ def find_seed_player(conn):
 
             # Then sort them randomly and take one
             query = potential_players.select().order_by(sqlfunc.rand()).limit(1)
+            logging.info("{}".format(str(query)))
+
             result = conn.execute(query).first()
             if result:
                 seed_player = result
@@ -506,6 +523,8 @@ def find_seed_player(conn):
         if rand_value <= 0.25 or not seed_player:
             # Same as the previous case, but we do not restrict how many
             # games the user can have played, and we do not sort randomly.
+            logging.warning("Matchmaking: seed player: looking for random bot"
+                            " from recent game")
             max_time = sqlfunc.max(model.games.c.time_played).label("max_time")
             user_id = model.game_participants.c.user_id
             bot_id = model.game_participants.c.bot_id
@@ -531,7 +550,7 @@ def find_seed_player(conn):
                 )
             ).group_by(user_id, bot_id).reduce_columns().alias("temptable")
 
-            outer_bots = model.bots.alias("u")
+            outer_bots = model.bots.alias("bot")
             potential_players = sqlalchemy.sql.select([
                 recent_gamers.c.user_id,
                 recent_gamers.c.bot_id,
@@ -541,12 +560,15 @@ def find_seed_player(conn):
             ]).select_from(
                 recent_gamers.join(
                     outer_bots,
-                    outer_bots.c.id == recent_gamers.c.user_id)) \
+                    (outer_bots.c.user_id == recent_gamers.c.user_id) &
+                    (outer_bots.c.id == recent_gamers.c.bot_id))) \
                 .where(outer_bots.c.compile_status == "Successful") \
                 .order_by(recent_gamers.c.max_time.asc()) \
                 .limit(15).alias("orderedtable")
 
             query = potential_players.select().limit(1)
+            logging.info("{}".format(str(query)))
+
             result = conn.execute(query).first()
             if result:
                 seed_player = result

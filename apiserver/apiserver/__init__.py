@@ -42,4 +42,4 @@ def setup_logging(log_name):
     handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=1024*1024*10, backupCount=10)
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
-    logging.basicConfig(handlers=[handler])
+    logging.basicConfig(handlers=[handler], level=logging.INFO)
