@@ -3,7 +3,7 @@
         <div class="input-group">
             <input type="text" class="form-control" placeholder="Find username" v-model="username_filter" />
             <span class="input-group-btn">
-                <button class="btn btn-default" type="button" v-on:click="update_filter" ><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                <button class="btn btn-default" type="button" v-on:click="update_filter" ><i class="fa fa-search" aria-hidden="true"></i></button>
             </span>
         </div><!-- /input-group -->
         <table class="table">
