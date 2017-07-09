@@ -654,18 +654,40 @@ def get_user_bot(user_id, bot_id):
         })
 
 
-@web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
-@cross_origin(methods=["POST"])
-@requires_login
-def create_user_bot(intended_user, *, user_id):
+def validate_bot_submission():
+    """Validate the uploaded bot, returning the bot file if so."""
     if not config.COMPETITION_OPEN:
         raise util.APIError(
             400, message="Sorry, but bot submissions are closed."
         )
 
+    if "botFile" not in flask.request.files:
+        raise util.APIError(400, message="Bot file not provided (must "
+                            "provide as botFile).")
+
+    # Save to GCloud
+    uploaded_file = flask.request.files["botFile"]
+    if not zipfile.is_zipfile(uploaded_file):
+        raise util.APIError(
+            400,
+            message="Bot file does not appear to be a zip file. Please "
+                    "upload a zip file containing your bot, where the "
+                    "main file is named MyBot with an appropriate "
+                    "extension.")
+
+    uploaded_file.seek(0)
+    return uploaded_file
+
+
+@web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
+@cross_origin(methods=["POST"])
+@requires_login
+def create_user_bot(intended_user, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
-            message="Cannot upload bot for another user.")
+            message="Cannot create bot for another user.")
+
+    _ = validate_bot_submission(intended_user, user_id)
 
     with model.engine.connect() as conn:
         if conn.execute(model.bots.select(model.bots.c.user_id == user_id)).first():
@@ -689,11 +711,6 @@ def create_user_bot(intended_user, *, user_id):
 @requires_login
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
-    if not config.COMPETITION_OPEN:
-        raise util.APIError(
-            400, message="Sorry, but bot submissions are closed."
-        )
-
     if user_id != intended_user:
         raise user_mismatch_error(
             message="Cannot upload bot for another user.")
@@ -702,11 +719,12 @@ def store_user_bot(user_id, intended_user, bot_id):
         raise util.APIError(
             400, message="Sorry, only one bot allowed per user.")
 
+    uploaded_file = validate_bot_submission()
+
     bot_where_clause = (model.bots.c.user_id == user_id) & \
                        (model.bots.c.id == bot_id)
     with model.engine.connect() as conn:
         bot = conn.execute(model.bots.select(bot_where_clause)).first()
-
         if not bot:
             raise util.APIError(404, message="Bot not found.")
 
@@ -715,20 +733,6 @@ def store_user_bot(user_id, intended_user, bot_id):
             raise util.APIError(400, message="Cannot upload new bot until "
                                              "previous one is compiled.")
 
-        if "botFile" not in flask.request.files:
-            raise util.APIError(400, message="Bot file not provided (must "
-                                             "provide as botFile).")
-
-        # Save to GCloud
-        uploaded_file = flask.request.files["botFile"]
-        if not zipfile.is_zipfile(uploaded_file):
-            raise util.APIError(
-                400,
-                message="Bot file does not appear to be a zip file. Please "
-                        "upload a zip file containing your bot, where the "
-                        "main file is named MyBot with an appropriate "
-                        "extension.")
-        uploaded_file.seek(0)
         blob = gcloud_storage.Blob("{}_{}".format(user_id, bot_id),
                                    model.get_compilation_bucket(),
                                    chunk_size=262144)
