@@ -1,3 +1,5 @@
+import urllib.parse
+
 import flask
 import sqlalchemy
 from flask_oauthlib.client import OAuth
@@ -86,7 +88,7 @@ def github_login_callback():
 
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
-    return flask.redirect(config.SITE_URL)
+    return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/associate"))
 
 
 @github.tokengetter
