@@ -14,6 +14,13 @@
     export default {
         name: "user-profile-bar",
         data: function() {
+            const me = api.me_cached();
+            if (me) {
+                return {
+                    username: me.username,
+                    profile_image: api.make_profile_image_url(me.username),
+                };
+            }
             return {
                 username: "",
                 profile_image: null,

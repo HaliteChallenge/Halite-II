@@ -5,6 +5,18 @@ export const LOGIN_SERVER_URL = "http://35.190.3.178/login";
 let cached_me = null;
 let logged_in = null;
 
+export function me_cached() {
+    if (window.localStorage["cache"]) {
+        return {
+            user_id: window.localStorage["user_id"],
+            username: window.localStorage["username"],
+        };
+    }
+    else {
+        return null;
+    }
+}
+
 export function me() {
     if (cached_me !== null) return Promise.resolve(cached_me);
     else if (logged_in === false) return Promise.resolve(null);
@@ -22,6 +34,10 @@ export function me() {
         logged_in = true;
         return get_user(me.user_id).then((user) => {
             cached_me = user;
+            // TODO: invalidate this cache every so often
+            window.localStorage["cache"] = Date.now();
+            window.localStorage["user_id"] = user.user_id;
+            window.localStorage["username"] = user.username;
             return user;
         });
     });
