@@ -29,16 +29,19 @@ namespace hlt {
         int MAX_ACCELERATION = 10;
 
         unsigned short MAX_SHIP_HEALTH = 255;
-        unsigned short BASE_SHIP_HEALTH = 127;
-        unsigned short DOCKED_SHIP_REGENERATION = 32;
+        unsigned short BASE_SHIP_HEALTH = 255;
+        unsigned short DOCKED_SHIP_REGENERATION = 0;
 
         unsigned int WEAPON_COOLDOWN = 1;
         int WEAPON_RADIUS = 5;
-        int WEAPON_DAMAGE = 64;
+        int WEAPON_DAMAGE = 128;
+        unsigned int EXPLOSION_RADIUS = 5;
 
         unsigned int MAX_DOCKING_DISTANCE = 4;
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
+        unsigned int BASE_PRODUCTIVITY = 25;
+        unsigned int ADDITIONAL_PRODUCTIVITY = 15;
 
         static auto get_mut() -> GameConstants& {
             // Guaranteed initialized only once by C++11
@@ -153,7 +156,7 @@ namespace hlt {
             location.pos_y = y;
             this->radius = radius;
             docking_spots = radius;
-            remaining_production = static_cast<unsigned short>(sqrt(10 * radius) * 100);
+            remaining_production = static_cast<unsigned short>(std::sqrt(10 * radius)) * 100;
             current_production = 0;
             health = static_cast<unsigned short>(remaining_production * GameConstants::get().MAX_SHIP_HEALTH / 100);
             docked_ships = std::vector<EntityIndex>();

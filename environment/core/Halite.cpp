@@ -65,14 +65,18 @@ auto Halite::compute_planet_explosion_damage(
     }
 
     // Distance is at least 1
-    const auto distance_from_crust = distance_squared - radius_squared;
+    const auto distance_from_crust = static_cast<int>(
+        std::sqrt(distance_squared) - std::sqrt(radius_squared));
 
-    if (distance_from_crust <= 25) {
-        // Ensure a ship next to a planet receives 200 damage
-        // (killing it instantly)
-        const auto distance_factor = 25 - (distance_from_crust - 1);
+    const auto explosion_radius = hlt::GameConstants::get().EXPLOSION_RADIUS;
+    if (distance_from_crust <= explosion_radius) {
+        // Ensure a ship next to a planet receives enough damage
+        // to kill it instantly
+        const auto distance_factor =
+            explosion_radius - (distance_from_crust - 1);
         return static_cast<unsigned short>(
-            (hlt::GameConstants::get().MAX_SHIP_HEALTH / 5) * distance_factor / 5);
+            (hlt::GameConstants::get().MAX_SHIP_HEALTH / explosion_radius) *
+                distance_factor / explosion_radius);
     }
     else {
         return 0;
@@ -365,10 +369,13 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
 
         if (num_docked_ships == 0) continue;
 
+        const auto& constants = hlt::GameConstants::get();
+        const auto base_productivity = constants.BASE_PRODUCTIVITY;
+        const auto additional_productivity = constants.ADDITIONAL_PRODUCTIVITY;
         const auto production = std::min(
             planet.remaining_production,
-            static_cast<unsigned short>(25 + (num_docked_ships - 1) * 15)
-        );
+            static_cast<unsigned short>(base_productivity +
+                (num_docked_ships - 1) * additional_productivity));
 
         planet.remaining_production -= production;
         planet.current_production += production;
