@@ -3,4 +3,4 @@ from . import coordinator
 
 
 setup_logging("coordinator_server.log")
-app.register_blueprint(coordinator.coordinator_api, url_prefix="/coordinator/v1")
+app.register_blueprint(coordinator.coordinator_api, url_prefix="/v1/coordinator")
