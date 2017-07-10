@@ -9,7 +9,11 @@ cd
 gsutil cp gs://dml339-test-worker-storage/worker.tgz .
 
 tar xvzf worker.tgz
-cd Halite/apiserver/worker
+
+cd Halite/environment
+make -j2
+
+cd ../apiserver/worker
 
 # Grab configuration values
 python3 grab_config.py
