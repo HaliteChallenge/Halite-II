@@ -8,6 +8,7 @@ import operator
 import random
 import string
 import urllib.parse
+import uuid
 import zipfile
 
 import arrow
@@ -312,7 +313,7 @@ def create_user(*, user_id):
     org_id = body.get("organization_id")
     email = body.get("email")
     level = body.get("level", model.users.c.player_level)
-    verification_code = str(random.randint(0, 2**63))
+    verification_code = uuid.uuid4().hex
 
     # Values to insert into the database
     values = {}
