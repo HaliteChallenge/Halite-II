@@ -67,22 +67,25 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="{{ site.baseurl }}/bootstrap.min.js"></script>
-    {% if page.additional_js %} {% for dep in page.additional_js %}
+    {% if page.additional_js %}
+    {% for dep in page.additional_js %}
     <script src="{{ site.baseurl }}/assets/js/{{ dep }}.js"></script>
-    {% endfor %} {% endif %}
+    {% endfor %}
+    {% endif %}
+
     <script src="{{ site.baseurl }}/assets/js/bundle.js"></script>
+
     {% if page.mount_view %}
     <script>
         window.views["{{ page.mount_view }}"]();
     </script>
-    {% endif %} {% if page.mount_views %}
+    {% endif %}
+
+    {% if page.mount_views %}
     <script>
-        { %
-            for mount_view in page.mount_views %
-        }
-        window.views["{{ mount_view }}"](); { % endfor %
-        }
+        {% for mount_view in page.mount_views %}
+        window.views["{{ mount_view }}"]();
+        {% endfor %}
     </script>
     {% endif %}
 </body>
