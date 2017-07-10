@@ -1,5 +1,5 @@
 export const API_SERVER_URL = "http://35.190.3.178/api/v1";
-const LOGIN_SERVER_URL = "http://35.190.3.178/login";
+export const LOGIN_SERVER_URL = "http://35.190.3.178/login";
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;

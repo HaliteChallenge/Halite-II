@@ -97,6 +97,10 @@
             }
 
             source.then((user) => {
+                if (user === null) {
+                    window.location.replace(`${api.LOGIN_SERVER_URL}/github`);
+                    return;
+                }
                 this.user = user;
                 api.list_bots(user.user_id).then((bots) => {
                     this.bots = bots;
