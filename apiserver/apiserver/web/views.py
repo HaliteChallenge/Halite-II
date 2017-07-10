@@ -116,6 +116,22 @@ def requires_admin(view):
     return decorated_view
 
 
+def requires_association(view):
+    """Indicates that an endpoint requires the user to confirm their email."""
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        user_id = kwargs.get("user_id")
+        with model.engine.connect() as conn:
+            user = conn.execute(
+                model.users.select(model.users.c.id == user_id)).first()
+            if not user or not user["is_email_good"] or not user["is_active"]:
+                raise util.APIError(
+                    400, message="Please verify your email first.")
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
 def user_mismatch_error(message="Cannot perform action for other user."):
     raise util.APIError(400, message=message)
 
@@ -682,6 +698,7 @@ def validate_bot_submission():
 
 @web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
 @cross_origin(methods=["POST"])
+@requires_association
 @requires_login
 def create_user_bot(intended_user, *, user_id):
     if user_id != intended_user:
@@ -709,6 +726,7 @@ def create_user_bot(intended_user, *, user_id):
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
 @cross_origin(methods=["GET", "PUT"])
+@requires_association
 @requires_login
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
@@ -751,6 +769,7 @@ def store_user_bot(user_id, intended_user, bot_id):
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["DELETE"])
+@requires_association
 @requires_login
 def delete_user_bot(intended_user, bot_id, *, user_id):
     if user_id != intended_user:
@@ -775,6 +794,7 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
+@requires_association
 @requires_oauth_login
 def reset_api_key(intended_user, *, user_id):
     if user_id != intended_user:

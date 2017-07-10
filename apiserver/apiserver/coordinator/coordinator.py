@@ -102,7 +102,8 @@ def task():
             players = conn.execute(query).fetchall()
             players.insert(0, seed_player)
 
-            # Pick map size
+            # Pick map size. Maps are square (currently), and duplicate entries
+            # are used to weight the probability of a particular size
             map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160, 192, 192, 192, 256]
             map_size = random.choice(map_sizes)
 
