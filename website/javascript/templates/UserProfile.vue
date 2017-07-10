@@ -125,7 +125,7 @@
                              this.profile_images[participant] = "loading";
 
                              api.get_user(participant).then((user) => {
-                                 this.profile_images[participant] = `https://github.com/${user.username}.png`;
+                                 this.profile_images[participant] = api.make_profile_image_url(user.username);
                                  this.$forceUpdate();
                              });
                          }

@@ -3,6 +3,7 @@ import Associate from "./templates/Associate.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
+import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
 
@@ -54,8 +55,12 @@ window.views = {
 
 api.me().then((me) => {
    if (me) {
-       $(".logged-in").show();
        $(".not-logged-in").hide();
+
+       new Vue({
+           el: "#user-profile-bar-container",
+           render: (h) => h(UserProfileBar),
+       });
 
        if (me.is_new_user && window.location.pathname !== "/associate") {
            window.location.replace("/associate");

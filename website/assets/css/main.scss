@@ -52,13 +52,15 @@ body {
 }
 
 .logged-in {
-    display: none;
-
     margin-top: 5px;
     margin-bottom: 0;
 
     img {
         height: 40px;
+    }
+
+    a.profile-link {
+        display: inline-block;
     }
 }
 
