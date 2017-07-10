@@ -17,15 +17,21 @@ export const PLANET_COLOR = 0x3F3C15;
 
 let ASSET_ROOT = "dist/";
 
+let BACKGROUND_IMAGES = [];
+let PLANET_IMAGES = [];
+let HALO_IMAGE = "";
+let ATTACK_IMAGE = "";
+
 
 export function setAssetRoot(path) {
     ASSET_ROOT = path;
+
     BACKGROUND_IMAGES = [
-    ASSET_ROOT + require("../assets/backgrounds/Space001.png"),
-    ASSET_ROOT + require("../assets/backgrounds/Space002.png"),
-    ASSET_ROOT + require("../assets/backgrounds/Space003.png"),
-    ASSET_ROOT + require("../assets/backgrounds/Space004.png"),
-    ASSET_ROOT + require("../assets/backgrounds/Space005.png"),
+        ASSET_ROOT + require("../assets/backgrounds/Space001.png"),
+        ASSET_ROOT + require("../assets/backgrounds/Space002.png"),
+        ASSET_ROOT + require("../assets/backgrounds/Space003.png"),
+        ASSET_ROOT + require("../assets/backgrounds/Space004.png"),
+        ASSET_ROOT + require("../assets/backgrounds/Space005.png"),
     ];
     PLANET_IMAGES = [
         ASSET_ROOT + require("../assets/planets/p1.png"),
@@ -33,20 +39,20 @@ export function setAssetRoot(path) {
         ASSET_ROOT + require("../assets/planets/p3.png"),
         ASSET_ROOT + require("../assets/planets/p4.png"),
     ];
+    HALO_IMAGE = ASSET_ROOT + require("../assets/halo.png");
+    ATTACK_IMAGE = ASSET_ROOT + require("../assets/attack.png");
 }
 
-
-let BACKGROUND_IMAGES = [];
-let PLANET_IMAGES = [];
 
 setAssetRoot("dist/");
 
 
 class FrameAnimation {
-    constructor(frames, update, draw) {
+    constructor(frames, update, draw, finish) {
         this.frames = frames;
         this.update = update;
         this.draw = draw;
+        this.finish = finish;
     }
 }
 
@@ -423,28 +429,42 @@ export class HaliteVisualizer {
                     }
 
                     this.animationQueue.push(new FrameAnimation(
-                        48, () => {}, draw
+                        48, () => {}, draw, () => {}
                     ));
                 }
                 else if (event.event === "attack") {
+                    const side = CELL_SIZE * this.scale;
+
+                    const x = side * (event.x + 0.5);
+                    const y = side * (event.y + 0.5);
+
+                    let attackSprite = PIXI.Sprite.fromImage(ATTACK_IMAGE);
+                    attackSprite.anchor.x = 0.5;
+                    attackSprite.anchor.y = 0.5;
+                    attackSprite.position.x = x;
+                    attackSprite.position.y = y;
+                    attackSprite.width = 2 * side * this.replay.constants.WEAPON_RADIUS;
+                    attackSprite.height = 2 * side * this.replay.constants.WEAPON_RADIUS;
+                    attackSprite.tint = PLAYER_COLORS[event.entity.owner];
+                    this.container.addChild(attackSprite);
+
+                    console.log(attackSprite);
+                    console.log(ATTACK_IMAGE);
+
                     this.animationQueue.push(new FrameAnimation(
                         24,
                         () => {
                         },
                         (frame) => {
-                            const side = CELL_SIZE * this.scale;
-
-                            const x = side * (event.x + 0.5);
-                            const y = side * (event.y + 0.5);
-
-                            this.lights.lineStyle(2, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
-                            this.lights.drawCircle(x, y, side * this.replay.constants.WEAPON_RADIUS);
-                            this.lights.endFill();
+                            attackSprite.alpha = 0.5 * frame / 24;
+                        },
+                        () => {
+                            this.container.removeChild(attackSprite);
                         }
                     ));
                 }
                 else if (event.event === "spawned") {
-                     this.animationQueue.push(new FrameAnimation(
+                    this.animationQueue.push(new FrameAnimation(
                         24,
                         () => {
                         },
@@ -458,7 +478,10 @@ export class HaliteVisualizer {
                             this.shipContainer.moveTo(planetX, planetY);
                             this.shipContainer.lineTo(ship_x, ship_y);
                             this.shipContainer.endFill();
-                        }
+                        },
+                        () => {
+
+                        },
                     ));
                 }
                 else {
@@ -484,11 +507,18 @@ export class HaliteVisualizer {
         this.drawStats();
 
         // dt comes from Pixi ticker, and the unit is essentially frames
-        this.animationQueue = this.animationQueue.filter((anim) => {
-            anim.draw(anim.frames);
-            anim.frames -= dt;
-            return anim.frames > 0;
-        });
+        let queue = this.animationQueue;
+        this.animationQueue = [];
+        for (let anim of queue) {
+            if (anim.frames > 0) {
+                anim.draw(anim.frames);
+                anim.frames -= dt;
+                this.animationQueue.push(anim);
+            }
+            else {
+                anim.finish();
+            }
+        }
     }
 
     drawStats() {
