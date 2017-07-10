@@ -46,7 +46,6 @@
                     <dt>Owner</dt>
                     <dd v-if="selected_planet.state.owner !== null">{{ replay.player_names[selected_planet.state.owner] }}</dd>
                     <dd v-else>(indepdendent)</dd>
-
                 </dl>
             </div>
         </div>
@@ -114,7 +113,7 @@
                     count[ship.owner].ships++;
                 }
 
-                for (let planet of substep.planets) {
+                for (let planet of Object.values(substep.planets)) {
                     if (planet.owner !== null) {
                         count[planet.owner].planets++;
                     }
@@ -126,13 +125,12 @@
                 if (this.selected.kind === "planet") {
                     let frame = this.replay.frames[this.visualizer.frame];
                     let substep = frame[this.visualizer.substep];
-                    for (let planet of substep.planets) {
-                        if (planet.id === this.selected.id) {
-                            return {
-                                base: this.replay.planets[this.selected.id],
-                                state: substep.planets[this.selected.id],
-                            };
-                        }
+                    let state = substep.planets[this.selected.id];
+                    if (state !== null) {
+                        return {
+                            base: this.replay.planets[this.selected.id],
+                            state: state,
+                        };
                     }
                 }
                 return null;

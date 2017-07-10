@@ -909,15 +909,14 @@ auto Halite::output(std::string filename) -> void {
     moves.reserve(full_frames.size() - 1);
     std::vector<nlohmann::json> frame;
     std::vector<nlohmann::json> subframe_ships;
-    std::vector<nlohmann::json> subframe_planets;
     frame.reserve(SUBSTEPS);
 
     for (const auto& frame_maps : full_frames) {
         frame.clear();
 
         for (const auto& current_map : frame_maps) {
+            nlohmann::json subframe_planets;
             subframe_ships.clear();
-            subframe_planets.clear();
 
             for (hlt::PlayerId playerId = 0; playerId < number_of_players;
                  playerId++) {
@@ -937,7 +936,8 @@ auto Halite::output(std::string filename) -> void {
                 const auto& planet = current_map.planets[planet_index];
                 if (!planet.is_alive()) continue;
 
-                subframe_planets.push_back(output_planet(planet, planet_index));
+                subframe_planets[std::to_string(planet_index)] =
+                    output_planet(planet, planet_index);
             }
 
             frame.push_back(nlohmann::json{

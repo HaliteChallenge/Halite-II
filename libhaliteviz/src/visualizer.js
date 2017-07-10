@@ -147,7 +147,7 @@ export class HaliteVisualizer {
         let ships = {};
         let total_ships = 0;
 
-        for (let planet of substep.planets) {
+        for (let planet of Object.values(substep.planets)) {
             if (planet.owner !== null) {
                 if (typeof planets[planet.owner] === "undefined") {
                     planets[planet.owner] = 0;
@@ -500,7 +500,7 @@ export class HaliteVisualizer {
         this.shipContainer.clear();
         this.lights.clear();
 
-        for (let planet of this.currentSubstep.planets) {
+        for (let planet of Object.values(this.currentSubstep.planets)) {
             this.drawPlanet(planet);
         }
 
