@@ -311,23 +311,23 @@ export class HaliteVisualizer {
         let planetBase = this.replay.planets[planet.id];
 
         const side = CELL_SIZE * this.scale;
-        const color = planet.owner === null ? 0xFFFFFF : PLAYER_COLORS[planet.owner];
-
-        const r = planetBase.r;
-        const percent_production =
-            planet.remaining_production / planetBase.production;
-        this.planetOverlay.beginFill(color, 0.2 * percent_production);
-        this.planetOverlay.lineStyle(1, 0xFFFFFF, 0.3);
-        this.planetOverlay.drawCircle(
-            (planetBase.x + 0.5) * side, (planetBase.y + 0.5) * side,
-            side * r);
-        this.planetOverlay.endFill();
+        const color = planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner];
 
         const center_x = side * planetBase.x;
         const center_y = side * (planetBase.y + 0.5);
 
         const health_factor = planet.health / planetBase.health;
         const health_bar = health_factor * side * (planetBase.r - 1);
+
+
+        this.planets[planet.id].tint = color;
+        if (health_factor < 0.25) {
+            this.planets[planet.id].alpha = 0.5;
+        }
+        else if (health_factor == 0) {
+            this.planets[planet.id].alpha = 0;
+        }
+
         this.planetOverlay.beginFill(0xFF0000);
         this.planetOverlay.lineStyle(2, 0x000000);
         this.planetOverlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
