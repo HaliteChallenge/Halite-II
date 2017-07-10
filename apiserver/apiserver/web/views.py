@@ -364,7 +364,6 @@ def create_user(*, user_id):
             "organization_id": None,
             "player_level": level,
         })
-        message = "User all set."
     elif org_id is None:
         values.update({
             "email": email,
@@ -373,7 +372,6 @@ def create_user(*, user_id):
             "organization_id": None,
             "player_level": level,
         })
-        message = "User needs to validate email."
     else:
         # Check the org
         with model.engine.connect() as conn:
@@ -386,9 +384,9 @@ def create_user(*, user_id):
 
             # Verify the email against the org
             email_to_verify = email or user_data["github_email"]
-            if "@" not in email_to_verify:
+            if not email or "@" not in email_to_verify:
                 raise util.APIError(
-                    400, message="Email should at least have an at sign…")
+                    400, message="Email invalid.")
             domain = email.split("@")[1].strip().lower()
             count = conn.execute(sqlalchemy.sql.select([
                 sqlalchemy.sql.func.count()
@@ -427,6 +425,11 @@ def create_user(*, user_id):
             "organization_id": org_id,
         })
         message = "You've been added to the organization automatically!"
+
+    if org_id is None:
+        raise util.APIError(
+            401,
+            message="For the alpha, you must be associated with an organization.")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
