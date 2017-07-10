@@ -116,7 +116,7 @@
         },
         methods: {
             fetch: function() {
-                return $.get(`http://35.190.3.178/api/v1/user/${this.user.user_id}/match?order_by=desc,time_played&offset=${this.offset}`)
+                return $.get(`${api.API_SERVER_URL}/user/${this.user.user_id}/match?order_by=desc,time_played&offset=${this.offset}`)
                  .then((data) => {
                      this.games = data;
                      for (let game of data) {
