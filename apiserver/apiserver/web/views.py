@@ -913,9 +913,16 @@ def get_match_replay(intended_user, match_id):
         buffer = io.BytesIO()
         blob.download_to_file(buffer)
         buffer.seek(0)
-        return flask.send_file(buffer, mimetype="application/x-halite-2-replay",
-                               as_attachment=True,
-                               attachment_filename=str(match_id)+".hlt")
+        response = flask.make_response(flask.send_file(
+            buffer,
+            mimetype="application/x-halite-2-replay",
+            as_attachment=True,
+            attachment_filename=str(match_id)+".hlt"))
+
+        response.headers["Content-Length"] = str(buffer.getbuffer().nbytes)
+
+        return response
+
 
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>/error_log",
