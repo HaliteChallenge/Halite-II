@@ -94,15 +94,21 @@ export function register_me(data) {
     });
 }
 
-export function get_replay(game_id) {
+export function get_replay(game_id, progress_callback) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("GET", `${API_SERVER_URL}/user/0/match/${game_id}/replay`, true);
         xhr.responseType = "arraybuffer";
 
+        if (progress_callback) {
+            xhr.onprogress = function(e) {
+                progress_callback(e.loaded, e.total);
+            };
+        }
+
         xhr.onload = function(e) {
-            if (this.status == 200) {
+            if (this.status === 200) {
                 const blob = this.response;
                 resolve(blob);
             }

@@ -2,7 +2,10 @@
     <div class="col-md-6">
         <halite-upload-zone
                 title="Drop REPLAY here or click to select"
-                v-on:change="play_replay">
+                v-on:change="play_replay"
+                :progressBar="is_downloading"
+                :progress="progress"
+                :message="message">
         </halite-upload-zone>
     </div>
 </template>
@@ -42,15 +45,30 @@
             "halite-upload-zone": UploadZone,
         },
         data: function() {
-            return {};
+            return {
+                is_downloading: false,
+                progress: 0,
+                message: null,
+            };
         },
         mounted: function() {
             const params = new URLSearchParams(window.location.search);
             if (params.has("game_id")) {
                 const game_id = params.get("game_id");
-                api.get_replay(game_id).then((replay) => {
-                    console.log(replay);
+                this.message = `Downloading game ${game_id}.`;
+                api.get_replay(game_id, (loaded, total) => {
+                    if (total !== 0) {
+                        const progress = loaded / total;
+                        this.is_downloading = true;
+                        this.progress = Math.floor(100 * progress);
+                    }
+                }).then((replay) => {
+                    this.message = null;
+                    this.is_downloading = false;
                     showGame(replay, document.getElementById("visualizer"));
+                }, () => {
+                    this.message = `Could not download replay.`;
+                    this.is_downloading = false;
                 });
             }
         },
