@@ -102,6 +102,12 @@
                     return;
                 }
                 this.user = user;
+
+                if (params.has("me")) {
+                    window.history.replaceState(
+                        {}, "",
+                        `${window.location.origin}${window.location.pathname}?user_id=${user.user_id}`);
+                }
                 api.list_bots(user.user_id).then((bots) => {
                     this.bots = bots;
                 });
