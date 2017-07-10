@@ -69,9 +69,9 @@ export class HaliteVisualizer {
         );
 
         this.scale = VISUALIZER_SIZE / Math.max(replay.width, replay.height);
-        this.starfield = PIXI.Sprite.fromImage(BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)]);
+        this.starfield = PIXI.Sprite.fromImage(
+            BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)]);
 
-        this.backgroundContainer = new PIXI.Graphics();
         this.planetContainer = new PIXI.Container();
         this.planetOverlay = new PIXI.Graphics();
         this.shipContainer = new PIXI.Graphics();
@@ -106,9 +106,13 @@ export class HaliteVisualizer {
         }
         this.planetContainer.addChild(this.planetOverlay);
 
-        this.drawPOI();
+        let poi = new PIXI.Graphics();
+        this.drawPOI(poi);
+        let renderer = new PIXI.CanvasRenderer(VISUALIZER_SIZE, VISUALIZER_SIZE);
+        let texture = renderer.generateTexture(poi);
+        this.poi = PIXI.Sprite.from(texture);
 
-        this.container.addChild(this.starfield, this.backgroundContainer, this.planetContainer, this.shipContainer, this.lights);
+        this.container.addChild(this.starfield, poi, this.planetContainer, this.shipContainer, this.lights);
 
         this.statsDisplay = new PIXI.Graphics();
 
@@ -288,18 +292,18 @@ export class HaliteVisualizer {
         }
     }
 
-    drawPOI() {
+    drawPOI(graphics) {
         const side = CELL_SIZE * this.scale;
         for (let poi of this.replay.poi) {
             if (poi.type === "orbit") {
-                this.backgroundContainer.beginFill(0, 0);
-                this.backgroundContainer.lineStyle(1, 0xFFFFFF, 0.2);
+                graphics.beginFill(0, 0);
+                graphics.lineStyle(1, 0xFFFFFF, 0.2);
                 const x = side * poi.x;
                 const y = side * poi.y;
                 const a = side * poi.x_axis;
                 const b = side * poi.y_axis;
-                this.backgroundContainer.drawEllipse(x, y, a, b);
-                this.backgroundContainer.endFill();
+                graphics.drawEllipse(x, y, a, b);
+                graphics.endFill();
             }
             else {
                 console.log(poi);
@@ -324,7 +328,7 @@ export class HaliteVisualizer {
         if (health_factor < 0.25) {
             this.planets[planet.id].alpha = 0.5;
         }
-        else if (health_factor == 0) {
+        else if (health_factor === 0) {
             this.planets[planet.id].alpha = 0;
         }
 
@@ -342,7 +346,7 @@ export class HaliteVisualizer {
         const x = side * ship.x;
         const y = side * ship.y;
 
-        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown == 0);
+        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown === 0);
 
         if (this.frame > 0) {
             let move = this.replay.moves[this.frame-1][ship.owner][0][ship.id];
