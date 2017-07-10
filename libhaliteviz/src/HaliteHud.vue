@@ -31,7 +31,7 @@
                     <dd>{{ statistics[index].planets }}</dd>
                 </dl>
             </div>
-            <div v-if="selected.kind === 'planet'">
+            <div v-if="selected.kind === 'planet' && selected_planet !== null">
                 <h3>Selected Planet</h3>
                 <dl>
                     <dt>ID</dt>
@@ -124,11 +124,16 @@
             },
             selected_planet: function() {
                 if (this.selected.kind === "planet") {
-                    let substep = this.replay.frames[this.visualizer.frame][this.visualizer.substep];
-                    return {
-                        base: this.replay.planets[this.selected.id],
-                        state: substep.planets[this.selected.id],
-                    };
+                    let frame = this.replay.frames[this.visualizer.frame];
+                    let substep = frame[this.visualizer.substep];
+                    for (let planet of substep.planets) {
+                        if (planet.id === this.selected.id) {
+                            return {
+                                base: this.replay.planets[this.selected.id],
+                                state: substep.planets[this.selected.id],
+                            };
+                        }
+                    }
                 }
                 return null;
             }
