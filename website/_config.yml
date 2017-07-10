@@ -24,8 +24,8 @@ github_username:  jekyll
 
 permalink: /blog/:year/:month/:day/:title.html
 
-api_server_url: "http://35.190.3.178/api/v1"
-login_server_url: "http://35.190.3.178/login"
+api_server_url: "http://35.190.3.178/v1/api"
+login_server_url: "http://35.190.3.178/v1/login"
 
 # Build settings
 markdown: kramdown
