@@ -7,6 +7,13 @@
             <h2>{{ title }}</h2>
             <p v-if="message">{{ message }}</p>
             <input class="form-control" type="file" v-on:change="on_changed" />
+            <div class="progress" v-if="progressBar">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"
+                     :style="'width: ' + progress.toString() + '%;'">
+                    {{ progress }}%
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -14,7 +21,7 @@
 <script>
     export default {
         name: "halite-upload-zone",
-        props: ["title", "message"],
+        props: ["title", "message", "progress", "progressBar"],
         data: function() {
             return {
                 drag_over: false,

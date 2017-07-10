@@ -1,8 +1,10 @@
 <template>
     <div class="col-md-6">
         <halite-upload-zone v-if="logged_in"
-                title="Drop BOT here or click to select"
-                :message="error"
+                            title="Drop BOT here or click to select"
+                            :message="error"
+                            :progressBar="is_uploading"
+                            :progress="progress"
                 v-on:change="upload_bot">
         </halite-upload-zone>
         <div v-else>
@@ -24,11 +26,14 @@
             return {
                 error: null,
                 logged_in: false,
+                is_uploading: false,
+                progress: 0,
             };
         },
         mounted: function() {
+            this.logged_in = true;
             api.me().then((me) => {
-                if (me != null) {
+                if (me !== null) {
                     this.logged_in = true;
                 }
             });
@@ -37,6 +42,8 @@
             upload_bot: function(files) {
                 if (files.length > 0) {
                     let user_id;
+                    this.error = null;
+
                     const has_bot_promise = api.me().then((user) => {
                         user_id = user.user_id;
                         return api.list_bots(user.user_id);
@@ -50,13 +57,16 @@
                     has_bot_promise
                         .then((bot_id) => {
                             return api.update_bot(user_id, bot_id, files[0], (progress) => {
-                                this.error = `Uploading (${Math.floor(progress * 100)}%)`;
+                                this.is_uploading = true;
+                                this.progress = Math.floor(progress * 100);
                             });
                         })
                         .then(() => {
                             this.error = "Successfully uploaded!";
+                            this.is_uploading = false;
                         }, (error) => {
                             this.error = error.message;
+                            this.is_uploading = false;
                         });
                 }
             }
