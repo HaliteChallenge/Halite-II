@@ -6,6 +6,9 @@ import UserProfile from "./templates/UserProfile.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
 
+// Include bootstrap.js - do not remove
+import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
+
 import * as api from "./api";
 
 Vue.use(require('vue-moment'));
