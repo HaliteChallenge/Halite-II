@@ -126,7 +126,7 @@
                     let frame = this.replay.frames[this.visualizer.frame];
                     let substep = frame[this.visualizer.substep];
                     let state = substep.planets[this.selected.id];
-                    if (state !== null) {
+                    if (state) {
                         return {
                             base: this.replay.planets[this.selected.id],
                             state: state,
