@@ -20,5 +20,8 @@ To deploy, you will need the [Google Cloud SDK][gcloud-sdk] installed and config
     $ npm run build
     $ bundle exec jekyll build
     $ gcloud compute scp --recurse _site/* ubuntu@GOOGLE_CLOUD_INSTANCE_NAME:/var/www/html
+
+    E.g gcloud compute scp --recurse _site/* ubuntu@halite-web-server:/var/www/html
+
     
 [gcloud-sdk]: https://cloud.google.com/sdk/gcloud/
