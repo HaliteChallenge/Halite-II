@@ -6,7 +6,7 @@ cd
 
 # Fetch the coordinator
 # TODO: This is in GCloud right now, but we should use Git when we go public
-gsutil cp gs://dml339-test-worker-storage/coordinator.tgz .
+gsutil cp gs://halite-2-deployed-artifacts/coordinator.tgz .
 
 tar xvzf coordinator.tgz
 cd apiserver/

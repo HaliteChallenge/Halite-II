@@ -676,7 +676,7 @@ def send_command_queue(command_queue):
 
 def get_map():
     """
-    Parse the map given by the engine. Probably shouldn't be directly used.
+    Parse the map given by the engine.
     :return:
     """
     return parse(get_string())
