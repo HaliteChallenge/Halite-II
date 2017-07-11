@@ -274,21 +274,21 @@ def list_users():
     offset, limit = get_offset_limit()
 
     where_clause, order_clause = get_sort_filter({
-        "user_id": model.ranked_users.c.user_id,
-        "username": model.ranked_users.c.username,
-        "level": model.ranked_users.c.player_level,
-        "organization_id": model.ranked_users.c.organization_id,
-        "num_bots": model.ranked_users.c.num_bots,
-        "num_submissions": model.ranked_users.c.num_submissions,
-        "num_games": model.ranked_users.c.num_games,
-        "rank": model.ranked_users.c.rank,
+        "user_id": model.all_users.c.user_id,
+        "username": model.all_users.c.username,
+        "level": model.all_users.c.player_level,
+        "organization_id": model.all_users.c.organization_id,
+        "num_bots": model.all_users.c.num_bots,
+        "num_submissions": model.all_users.c.num_submissions,
+        "num_games": model.all_users.c.num_games,
+        "rank": model.all_users.c.rank,
     })
 
     with model.engine.connect() as conn:
         total_users = conn.execute(model.total_ranked_users).first()[0]
 
         query = conn.execute(
-            model.ranked_users.select()
+            model.all_users.select()
                     .where(where_clause).order_by(*order_clause)
                     .offset(offset).limit(limit).reduce_columns())
 
@@ -446,8 +446,8 @@ def create_user(*, user_id):
 @optional_login
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
-        query = model.ranked_users.select(
-            model.ranked_users.c.user_id == intended_user)
+        query = model.all_users.select(
+            model.all_users.c.user_id == intended_user)
 
         row = conn.execute(query).first()
         if not row:
@@ -1102,62 +1102,34 @@ def get_match(match_id, *, user_id):
 @web_api.route("/leaderboard")
 @cross_origin(methods=["GET"])
 def leaderboard():
-    offset, limit = get_offset_limit()
-    where_clause, order_clause = get_sort_filter({
-        "user_id": model.users.c.id,
-        "username": model.users.c.username,
-        "level": model.users.c.player_level,
-        "organization_id": model.users.c.organization_id,
-        "language": model.bots.c.language,
-        "score": model.bots.c.score,
-        "rank": model.monkeypatch_text(sqlalchemy.sql.text("ranked_bots.bot_rank")),
-    })
-    if not order_clause:
-        order_clause = [sqlalchemy.sql.text("ranked_bots.bot_rank ASC")]
     result = []
+    offset, limit = get_offset_limit()
+
+    where_clause, order_clause = get_sort_filter({
+        "user_id": model.ranked_users.c.user_id,
+        "username": model.ranked_users.c.username,
+        "level": model.ranked_users.c.player_level,
+        "organization_id": model.ranked_users.c.organization_id,
+        "num_bots": model.ranked_users.c.num_bots,
+        "num_submissions": model.ranked_users.c.num_submissions,
+        "num_games": model.ranked_users.c.num_games,
+        "rank": model.ranked_users.c.rank,
+    })
+
+    if not order_clause:
+        order_clause = [model.ranked_users.c.rank]
 
     with model.engine.connect() as conn:
-        query = sqlalchemy.sql.select([
-            model.users.c.id,
-            model.users.c.username,
-            model.users.c.player_level,
-            model.users.c.organization_id,
-            model.organizations.c.organization_name,
-            sqlalchemy.sql.text("ranked_bots.bot_rank"),
-            model.bots.c.language,
-            model.bots.c.games_played,
-            model.bots.c.version_number,
-            model.ranked_bots.c.score,
-            model.ranked_bots.c.bot_id,
-        ]).select_from(
-            model.users.join(
-                model.organizations,
-                model.users.c.organization_id == model.organizations.c.id
-            ).join(
-                model.ranked_bots,
-                model.ranked_bots.c.user_id == model.users.c.id
-            ).join(
-                model.bots,
-                (model.bots.c.user_id == model.users.c.id) &
-                (model.bots.c.id == model.ranked_bots.c.bot_id)
-            )
-        ).where(where_clause).order_by(*order_clause).offset(offset).limit(limit)
-        players = conn.execute(query)
+        total_users = conn.execute(model.total_ranked_users).first()[0]
 
-        for player in players.fetchall():
-            result.append({
-                "user_id": player["id"],
-                "username": player["username"],
-                "level": player["player_level"],
-                "organization_id": player["organization_id"],
-                "organization": player["organization_name"],
-                "language": player["language"],
-                "games_played": player["games_played"],
-                "version_number": player["version_number"],
-                "rank": int(player["bot_rank"]),
-                "score": player["score"],
-                "bot_id": player["bot_id"],
-            })
+        query = conn.execute(
+            model.ranked_users.select()
+                    .where(where_clause).order_by(*order_clause)
+                    .offset(offset).limit(limit).reduce_columns())
+
+        for row in query.fetchall():
+            result.append(make_user_record(row, logged_in=False,
+                                           total_users=total_users))
 
     return flask.jsonify(result)
 

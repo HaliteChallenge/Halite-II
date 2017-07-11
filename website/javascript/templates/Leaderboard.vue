@@ -15,6 +15,7 @@
                     <th>Level</th>
                     <th>Language</th>
                     <th>Points</th>
+                    <th>Tier</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +26,7 @@
                     <td>{{ player.level }}</td>
                     <td>{{ player.language }}</td>
                     <td>{{ player.score }}</td>
+                    <td>{{ player.tier }}</td>
                 </tr>
             </tbody>
         </table>

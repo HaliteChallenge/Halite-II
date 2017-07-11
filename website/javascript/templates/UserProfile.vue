@@ -9,6 +9,7 @@
         <div class="col-md-8">
             <section>
                 <h2>Stats Summary</h2>
+                <p v-if="user.tier"><b>{{ user.tier }}</b> player</p>
                 <p><b>Points:</b> {{ Math.round(user.score * 100) / 100 }}</p>
                 <p v-if="user.rank"><b>Rank:</b> {{ user.rank }}</p>
                 <p><b>Games Played:</b>  {{ user.num_games }}</p>

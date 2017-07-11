@@ -37,29 +37,36 @@ ranked_bots = sqlalchemy.sql.select([
 ]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
 
 _func = sqlalchemy.sql.func
-ranked_users = sqlalchemy.sql.select([
-    users.c.id.label("user_id"),
-    users.c.username,
-    users.c.player_level,
-    users.c.organization_id,
-    organizations.c.organization_name,
-    users.c.country_code,
-    users.c.country_subdivision_code,
-    users.c.email,
-    _func.coalesce(_func.count(), 0).label("num_bots"),
-    _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
-    _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
-    _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
-    _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
-]).select_from(users.join(
-    ranked_bots,
-    ranked_bots.c.user_id == users.c.id,
-    isouter=True,
-).join(
-    organizations,
-    organizations.c.id == users.c.organization_id,
-    isouter=True
-)).group_by(users.c.id).alias("ranked_users")
+
+
+def _make_derived_user_table(name, *, only_ranked):
+    return sqlalchemy.sql.select([
+        users.c.id.label("user_id"),
+        users.c.username,
+        users.c.player_level,
+        users.c.organization_id,
+        organizations.c.organization_name,
+        users.c.country_code,
+        users.c.country_subdivision_code,
+        users.c.email,
+        _func.coalesce(_func.count(), 0).label("num_bots"),
+        _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
+        _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
+        _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
+        _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+    ]).select_from(users.join(
+        ranked_bots,
+        ranked_bots.c.user_id == users.c.id,
+        isouter=not only_ranked,
+        ).join(
+        organizations,
+        organizations.c.id == users.c.organization_id,
+        isouter=True
+    )).group_by(users.c.id).alias(name)
+
+
+ranked_users = _make_derived_user_table("ranked_users", only_ranked=True)
+all_users = _make_derived_user_table("ranked_users", only_ranked=False)
 
 total_ranked_users = sqlalchemy.sql.select([
     _func.count()
