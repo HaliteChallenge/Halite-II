@@ -1,6 +1,10 @@
 #ifndef HALITE_HLT_H
 #define HALITE_HLT_H
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
