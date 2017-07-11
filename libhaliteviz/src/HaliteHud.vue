@@ -18,39 +18,42 @@
             Frame: <input class="frameinput" type="text" :value="visualizer.frame + '.' + visualizer.substep" />
         </div>
 
-        <div class="halite-visualizer-canvas" ref="visualizer_container">
+        <div class="row">
+            <div class="halite-visualizer-canvas col-md-8" ref="visualizer_container"></div>
+            <div class="halite-visualizer-info col-md-4">
+                <div v-for="(player_name, index) in replay.player_names">
+                    <h3 :style="'color: ' + colors[index]">{{ player_name }}</h3>
+                    <dl>
+                        <dt>Ship Count</dt>
+                        <dd>{{ statistics[index].ships }}</dd>
+
+                        <dt>Planet Count</dt>
+                        <dd>{{ statistics[index].planets }}</dd>
+                    </dl>
+                </div>
+                <div v-if="selected.kind === 'planet' && selected_planet !== null">
+                    <h3>Selected Planet</h3>
+                    <dl>
+                        <dt>ID</dt>
+                        <dd>{{ selected.id }}</dd>
+
+                        <dt>Health</dt>
+                        <dd>{{ selected_planet.state.health }}/{{ selected_planet.base.health }}</dd>
+
+                        <dt>Remaining Production</dt>
+                        <dd>{{ selected_planet.state.remaining_production }}/{{ selected_planet.base.production }}</dd>
+
+                        <dt>Owner</dt>
+                        <dd v-if="selected_planet.state.owner !== null">{{ replay.player_names[selected_planet.state.owner] }}</dd>
+                        <dd v-else>(indepdendent)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
         </div>
 
-        <div class="halite-visualizer-info">
-            <div v-for="(player_name, index) in replay.player_names">
-                <h3 :style="'color: ' + colors[index]">{{ player_name }}</h3>
-                <dl>
-                    <dt>Ship Count</dt>
-                    <dd>{{ statistics[index].ships }}</dd>
+       
 
-                    <dt>Planet Count</dt>
-                    <dd>{{ statistics[index].planets }}</dd>
-                </dl>
-            </div>
-            <div v-if="selected.kind === 'planet' && selected_planet !== null">
-                <h3>Selected Planet</h3>
-                <dl>
-                    <dt>ID</dt>
-                    <dd>{{ selected.id }}</dd>
-
-                    <dt>Health</dt>
-                    <dd>{{ selected_planet.state.health }}/{{ selected_planet.base.health }}</dd>
-
-                    <dt>Remaining Production</dt>
-                    <dd>{{ selected_planet.state.remaining_production }}/{{ selected_planet.base.production }}</dd>
-
-                    <dt>Owner</dt>
-                    <dd v-if="selected_planet.state.owner !== null">{{ replay.player_names[selected_planet.state.owner] }}</dd>
-                    <dd v-else>(indepdendent)</dd>
-                </dl>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -156,9 +159,9 @@
      width: 640px;
  }
 
- .halite-visualizer-canvas, .halite-visualizer-info {
-     float: left;
- }
+.halite-visualizer-info {
+      float: right;
+}
 
  .halite-visualizer-info {
      width: 300px;
@@ -168,9 +171,13 @@
      margin-bottom: 5px;
  }
 
-  .frameinput{
+.frameinput{
      vertical-align:  top;
      line-height: 2em;
+ }
+
+.infosummary{
+     float: right
  }
 
 </style>
