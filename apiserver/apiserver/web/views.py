@@ -284,7 +284,7 @@ def list_users():
     })
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_users).first()[0]
+        total_users = conn.execute(model.total_ranked_bots).first()[0]
 
         query = conn.execute(
             model.all_users.select()
@@ -452,7 +452,7 @@ def get_user(intended_user, *, user_id):
         if not row:
             raise util.APIError(404, message="No user found.")
 
-        total_users = conn.execute(model.total_ranked_users).first()[0]
+        total_users = conn.execute(model.total_ranked_bots).first()[0]
 
         logged_in = user_id is not None and intended_user == user_id
         return flask.jsonify(make_user_record(row, logged_in=logged_in,
@@ -1105,30 +1105,47 @@ def leaderboard():
     offset, limit = get_offset_limit()
 
     where_clause, order_clause = get_sort_filter({
-        "user_id": model.ranked_users.c.user_id,
-        "username": model.ranked_users.c.username,
-        "level": model.ranked_users.c.player_level,
-        "organization_id": model.ranked_users.c.organization_id,
-        "num_bots": model.ranked_users.c.num_bots,
-        "num_submissions": model.ranked_users.c.num_submissions,
-        "num_games": model.ranked_users.c.num_games,
-        "rank": model.ranked_users.c.rank,
+        "user_id": model.ranked_bots_users.c.user_id,
+        "username": model.ranked_bots_users.c.username,
+        "level": model.ranked_bots_users.c.player_level,
+        "organization_id": model.ranked_bots_users.c.organization_id,
+        "version_number": model.ranked_bots_users.c.num_submissions,
+        "num_games": model.ranked_bots_users.c.num_games,
+        "rank": model.ranked_bots_users.c.rank,
+        "language": model.ranked_bots_users.c.language,
     })
 
     if not order_clause:
-        order_clause = [model.ranked_users.c.rank]
+        order_clause = [model.ranked_bots_users.c.rank]
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_users).first()[0]
+        total_users = conn.execute(model.total_ranked_bots).first()[0]
 
         query = conn.execute(
-            model.ranked_users.select()
+            model.ranked_bots_users.select()
                     .where(where_clause).order_by(*order_clause)
                     .offset(offset).limit(limit).reduce_columns())
 
         for row in query.fetchall():
-            result.append(make_user_record(row, logged_in=False,
-                                           total_users=total_users))
+            user = {
+                "user_id": row["user_id"],
+                "username": row["username"],
+                "level": row["player_level"],
+                "organization_id": row["organization_id"],
+                "organization": row["organization_name"],
+                "version_number": int(row["num_submissions"]),
+                "num_games": int(row["num_games"]),
+                "score": float(row["score"]),
+                "language": row["language"],
+                "rank": int(row["rank"]) if row["rank"] is not None else None,
+            }
+
+            if total_users and row["rank"] is not None:
+                user["tier"] = util.tier(row["rank"], total_users)
+            else:
+                user["tier"] = None
+
+            result.append(user)
 
     return flask.jsonify(result)
 

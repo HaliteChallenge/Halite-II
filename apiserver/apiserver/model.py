@@ -32,6 +32,7 @@ ranked_bots = sqlalchemy.sql.select([
     bots.c.score,
     bots.c.games_played,
     bots.c.version_number,
+    bots.c.language,
 ]).select_from(bots).select_from(sqlalchemy.sql.select([
     sqlalchemy.sql.text("@rank:=0")
 ]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
@@ -39,38 +40,59 @@ ranked_bots = sqlalchemy.sql.select([
 _func = sqlalchemy.sql.func
 
 
-def _make_derived_user_table(name, *, only_ranked):
-    return sqlalchemy.sql.select([
-        users.c.id.label("user_id"),
-        users.c.username,
-        users.c.player_level,
-        users.c.organization_id,
-        organizations.c.organization_name,
-        users.c.country_code,
-        users.c.country_subdivision_code,
-        users.c.email,
-        _func.coalesce(_func.count(), 0).label("num_bots"),
-        _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
-        _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
-        _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
-        _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
-    ]).select_from(users.join(
-        ranked_bots,
-        ranked_bots.c.user_id == users.c.id,
-        isouter=not only_ranked,
-        ).join(
-        organizations,
-        organizations.c.id == users.c.organization_id,
-        isouter=True
-    )).group_by(users.c.id).alias(name)
+all_users = sqlalchemy.sql.select([
+    users.c.id.label("user_id"),
+    users.c.username,
+    users.c.player_level,
+    users.c.organization_id,
+    organizations.c.organization_name,
+    users.c.country_code,
+    users.c.country_subdivision_code,
+    users.c.email,
+    _func.coalesce(_func.count(), 0).label("num_bots"),
+    _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
+    _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
+    _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
+    _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+]).select_from(users.join(
+    ranked_bots,
+    ranked_bots.c.user_id == users.c.id,
+    isouter=True,
+    ).join(
+    organizations,
+    organizations.c.id == users.c.organization_id,
+    isouter=True
+)).group_by(users.c.id).alias("all_users")
 
 
-ranked_users = _make_derived_user_table("ranked_users", only_ranked=True)
-all_users = _make_derived_user_table("ranked_users", only_ranked=False)
+ranked_bots_users = sqlalchemy.sql.select([
+    users.c.id.label("user_id"),
+    users.c.username,
+    users.c.player_level,
+    users.c.organization_id,
+    organizations.c.organization_name,
+    users.c.country_code,
+    users.c.country_subdivision_code,
+    users.c.email,
+    ranked_bots.c.games_played.label("num_games"),
+    ranked_bots.c.version_number.label("num_submissions"),
+    ranked_bots.c.score,
+    ranked_bots.c.language,
+    # Perform a no-op operation so we can label the column easily
+    _func.abs(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+]).select_from(ranked_bots.join(
+    users,
+    ranked_bots.c.user_id == users.c.id,
+    ).join(
+    organizations,
+    organizations.c.id == users.c.organization_id,
+    isouter=True
+)).alias("ranked_bots_users")
 
-total_ranked_users = sqlalchemy.sql.select([
+
+total_ranked_bots = sqlalchemy.sql.select([
     _func.count()
-]).select_from(users.join(bots, users.c.id == bots.c.user_id))
+]).select_from(bots).where(bots.c.games_played > 0)
 
 
 def get_storage_client():
