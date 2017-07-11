@@ -4,12 +4,11 @@ import logging.handlers
 import flask
 from flask import Flask
 
-from . import util
+from . import config, util
 
 
 app = Flask(__name__)
-# TODO: make this configurable
-app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"] = config.MAX_BOT_UPLOAD_SIZE
 app.secret_key = "development"
 app.errorhandler(util.APIError)(util.handle_api_error)
 

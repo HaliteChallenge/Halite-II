@@ -108,9 +108,17 @@ def optional_login(view):
 
 
 def requires_admin(view):
-    # TODO: NOT IMPLEMENTED!
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
+        if "user_id" not in flask.session:
+            raise util.APIError(401, message="User not logged in.")
+        with model.engine.connect() as conn:
+            user_id = flask.session["user_id"]
+            user = conn.execute(
+                model.users.select(model.users.c.id == user_id)).first()
+            if not user or not user["is_admin"]:
+                raise util.APIError(
+                    401, message="User cannot take this action.")
         return view(*args, **kwargs)
 
     return decorated_view
@@ -145,12 +153,15 @@ def get_offset_limit(*, default_limit=10, max_limit=100):
     return offset, limit
 
 
-def get_sort_filter(fields):
+def get_sort_filter(fields, false_fields=()):
     """
     Parse flask.request to create clauses for SQLAlchemy's order_by and where.
 
     :param fields: A dictionary of field names to SQLAlchemy table columns
     listing what fields can be sorted/ordered on.
+    :param false_fields: A list of fields that can be sorted/ordered on, but
+    that the caller will manually handle. (Non-recognized fields generate
+    an API error.)
     :return: A 2-tuple of (where_clause, order_clause). order_clause is an
     ordered list of columns.
     """
@@ -160,7 +171,7 @@ def get_sort_filter(fields):
     for filter_param in flask.request.args.getlist("filter"):
         field, cmp, value = filter_param.split(",")
 
-        if field not in fields:
+        if field not in fields and field not in false_fields:
             raise util.APIError(
                 400, message="Cannot filter on field {}".format(field))
 
@@ -578,7 +589,7 @@ def update_user(intended_user_id, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
-@requires_login
+@requires_admin
 def delete_user(intended_user_id, *, user_id):
     # TODO: what happens to their games?
     if user_id != intended_user_id:
@@ -601,8 +612,6 @@ def delete_user(intended_user_id, *, user_id):
 @web_api.route("/user/<int:user_id>/bot", methods=["GET"])
 @cross_origin(methods=["GET"])
 def list_user_bots(user_id):
-    # TODO: parameter to get only IDs
-
     result = []
     with model.engine.connect() as conn:
         bots = conn.execute(sqlalchemy.sql.select([

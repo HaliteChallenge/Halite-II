@@ -22,7 +22,6 @@ CREATE TABLE `user` (
   github_email VARCHAR(64),
   verification_code VARCHAR(64),
   is_active BOOL NOT NULL DEFAULT TRUE,
-  -- TODO: port this over
   on_email_list BOOL NOT NULL DEFAULT 1,
   is_email_good BOOL NOT NULL DEFAULT 0,
   player_level ENUM('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
@@ -35,6 +34,7 @@ CREATE TABLE `user` (
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME ON UPDATE CURRENT_TIMESTAMP,
   api_key_hash VARCHAR(255),
+  is_admin BOOL DEFAULT FALSE,
   FOREIGN KEY (organization_id) REFERENCES organization(id),
   PRIMARY KEY (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
