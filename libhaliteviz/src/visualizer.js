@@ -488,7 +488,7 @@ export class HaliteVisualizer {
                         },
                         () => {
 
-                        },
+                        }
                     ));
                 }
                 else {

@@ -1,0 +1,28 @@
+{
+  "name": "halite_standalone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack -w",
+    "build": "webpack",
+    "start": "electron ."
+  },
+  "author": "David Li <David.M.Li@TwoSigma.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.6.11",
+    "file-loader": "^0.11.2",
+    "ify-loader": "^1.0.4",
+    "node-sass": "^4.5.3",
+    "scss-loader": "0.0.1",
+    "vue-loader": "^13.0.1",
+    "vue-template-compiler": "^2.3.4",
+    "webpack": "^3.1.0"
+  },
+  "dependencies": {
+    "libhaliteviz": "file:../libhaliteviz",
+    "vue": "^2.3.4"
+  }
+}

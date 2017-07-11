@@ -163,40 +163,40 @@
 </script>
 
 <style lang="scss" scoped>
- .halite-visualizer {
-     margin: 0 auto;
-     width: 940px;
- }
+    .halite-visualizer {
+        margin: 0 auto;
+        width: 940px;
+    }
 
- .halite-visualizer-controls {
-     input {
-         color: #000;
-     }
- }
+    .halite-visualizer-controls {
+        input {
+            color: #000;
+        }
+    }
 
- .halite-visualizer-canvas {
-     width: 640px;
- }
+    .halite-visualizer-canvas {
+        width: 640px;
+        float: left;
+    }
 
-.halite-visualizer-info {
-      float: right;
-}
+    .halite-visualizer-info {
+        float: left;
+    }
 
- .halite-visualizer-info {
-     width: 300px;
- }
+    .halite-visualizer-info {
+        width: 300px;
+    }
 
- .playbutton{
-     margin-bottom: 5px;
- }
+    .playbutton {
+        margin-bottom: 5px;
+    }
 
-.frameinput{
-     vertical-align:  top;
-     line-height: 2em;
- }
+    .frameinput {
+        vertical-align: top;
+        line-height: 2em;
+    }
 
-.infosummary{
-     float: right
- }
-
+    .infosummary {
+        float: right
+    }
 </style>
