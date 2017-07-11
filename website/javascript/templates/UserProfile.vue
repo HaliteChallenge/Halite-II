@@ -1,6 +1,5 @@
 <template>
     <div class="row">
-        <!-- TODO: indieweb markup -->
         <div class="col-md-4">
             <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
             <h1>{{ user.username }}</h1>
@@ -32,10 +31,16 @@
                     </thead>
                     <tbody>
                         <tr v-for="game in games">
-                            <td>{{ game.time_played | moment("calendar") }}</td>
+                            <td>
+                                <time :datetime="game.time_played"
+                                      :title="game.time_played">
+                                    {{ game.time_played | moment("calendar") }}
+                                </time>
+                            </td>
                             <td>
                                 <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player" class="game-participant" >
                                     <img :alt="player" :src="profile_images[player]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                    <span class="rank">{{ game.players[player].rank }}</span>
                                 </a>
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
