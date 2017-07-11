@@ -658,14 +658,14 @@ def validate_bot_submission():
 
 @web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
 @cross_origin(methods=["POST"])
-@requires_association
 @requires_login
+@requires_association
 def create_user_bot(intended_user, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
             message="Cannot create bot for another user.")
 
-    _ = validate_bot_submission(intended_user, user_id)
+    _ = validate_bot_submission()
 
     with model.engine.connect() as conn:
         if conn.execute(model.bots.select(model.bots.c.user_id == user_id)).first():
@@ -686,8 +686,8 @@ def create_user_bot(intended_user, *, user_id):
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
 @cross_origin(methods=["GET", "PUT"])
-@requires_association
 @requires_login
+@requires_association
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
     if user_id != intended_user:
@@ -729,8 +729,8 @@ def store_user_bot(user_id, intended_user, bot_id):
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["DELETE"])
-@requires_association
 @requires_login
+@requires_association
 def delete_user_bot(intended_user, bot_id, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
@@ -754,8 +754,8 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
-@requires_association
 @requires_oauth_login
+@requires_association
 def reset_api_key(intended_user, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
