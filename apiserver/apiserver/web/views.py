@@ -243,58 +243,25 @@ def list_users():
     result = []
     offset, limit = get_offset_limit()
 
-    sqlfunc = sqlalchemy.sql.func
-
-    # TODO: more efficent way to do this?
-    bot_count = sqlalchemy.sql.select([
-        sqlfunc.count(),
-    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
-    num_bots = bot_count.label("num_bots")
-
-    submission_count = sqlalchemy.sql.select([
-        sqlfunc.coalesce(sqlfunc.sum(model.bots.c.version_number), 0),
-    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
-    num_submissions = submission_count.label("num_submissions")
-
-    game_count = sqlalchemy.sql.select([
-        sqlfunc.coalesce(sqlfunc.sum(model.bots.c.games_played), 0),
-    ]).select_from(model.bots).where(model.bots.c.user_id == model.users.c.id)
-    num_games = game_count.label("num_games")
-
     where_clause, order_clause = get_sort_filter({
-        "user_id": model.users.c.id,
-        "username": model.users.c.username,
-        "level": model.users.c.player_level,
-        "organization_id": model.users.c.organization_id,
-        "num_bots": num_bots,
-        "num_submissions": num_submissions,
-        "num_games": num_games,
+        "user_id": model.ranked_users.c.user_id,
+        "username": model.ranked_users.c.username,
+        "level": model.ranked_users.c.player_level,
+        "organization_id": model.ranked_users.c.organization_id,
+        "num_bots": model.ranked_users.c.num_bots,
+        "num_submissions": model.ranked_users.c.num_submissions,
+        "num_games": model.ranked_users.c.num_games,
     })
 
     with model.engine.connect() as conn:
         query = conn.execute(
-            sqlalchemy.sql.select([
-                model.users.c.id,
-                model.users.c.username,
-                model.users.c.player_level,
-                model.users.c.organization_id,
-                model.organizations.c.organization_name,
-                model.users.c.country_code,
-                model.users.c.country_subdivision_code,
-                num_bots,
-                num_submissions,
-                num_games,
-            ]).select_from(model.users.join(
-                model.organizations,
-                model.users.c.organization_id == model.organizations.c.id,
-                isouter=True,
-            )).where(where_clause).order_by(*order_clause)
-              .offset(offset).limit(limit).reduce_columns()
-        )
+            model.ranked_users.select()
+                    .where(where_clause).order_by(*order_clause)
+                    .offset(offset).limit(limit).reduce_columns())
 
         for row in query.fetchall():
             user = {
-                "user_id": row["id"],
+                "user_id": row["user_id"],
                 "username": row["username"],
                 "level": row["player_level"],
                 "organization_id": row["organization_id"],

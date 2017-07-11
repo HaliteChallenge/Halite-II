@@ -34,6 +34,29 @@ ranked_bots = sqlalchemy.sql.select([
     sqlalchemy.sql.text("@rank:=0")
 ]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
 
+_func = sqlalchemy.sql.func
+ranked_users = sqlalchemy.sql.select([
+    users.c.id.label("user_id"),
+    users.c.username,
+    users.c.player_level,
+    users.c.organization_id,
+    organizations.c.organization_name,
+    users.c.country_code,
+    users.c.country_subdivision_code,
+    _func.coalesce(_func.count(), 0).label("num_bots"),
+    _func.coalesce(_func.sum(bots.c.games_played), 0).label("num_games"),
+    _func.coalesce(_func.sum(bots.c.version_number), 0).label("num_submissions"),
+    _func.coalesce(_func.max(bots.c.score), 0).label("score"),
+]).select_from(users.join(
+    bots,
+    bots.c.user_id == users.c.id,
+    isouter=True,
+).join(
+    organizations,
+    organizations.c.id == users.c.organization_id,
+    isouter=True
+)).group_by(users.c.id).alias("ranked_users")
+
 
 def get_storage_client():
     return gcloud_storage.Client(project=config.GCLOUD_PROJECT)
