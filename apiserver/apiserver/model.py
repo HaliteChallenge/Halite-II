@@ -61,6 +61,10 @@ ranked_users = sqlalchemy.sql.select([
     isouter=True
 )).group_by(users.c.id).alias("ranked_users")
 
+total_ranked_users = sqlalchemy.sql.select([
+    _func.count()
+]).select_from(users.join(bots, users.c.id == bots.c.user_id))
+
 
 def get_storage_client():
     return gcloud_storage.Client(project=config.GCLOUD_PROJECT)

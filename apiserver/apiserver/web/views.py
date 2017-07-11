@@ -237,7 +237,7 @@ def get_sort_filter(fields, false_fields=()):
 ######################
 
 
-def make_user_record(row, *, logged_in):
+def make_user_record(row, *, logged_in, total_users=None):
     """Given a database result row, create the JSON user object."""
     user = {
         "user_id": row["user_id"],
@@ -253,6 +253,12 @@ def make_user_record(row, *, logged_in):
         "score": float(row["score"]),
         "rank": int(row["rank"]) if row["rank"] is not None else None,
     }
+
+    if total_users and row["rank"] is not None:
+        percentile = row["rank"] / total_users
+        user["tier"] = util.tier(percentile)
+    else:
+        user["tier"] = None
 
     if row["email"] is None and logged_in:
         # User is new user, indicate this when they are logged in
@@ -279,13 +285,16 @@ def list_users():
     })
 
     with model.engine.connect() as conn:
+        total_users = conn.execute(model.total_ranked_users).first()[0]
+
         query = conn.execute(
             model.ranked_users.select()
                     .where(where_clause).order_by(*order_clause)
                     .offset(offset).limit(limit).reduce_columns())
 
         for row in query.fetchall():
-            result.append(make_user_record(row, logged_in=False))
+            result.append(make_user_record(row, logged_in=False,
+                                           total_users=total_users))
 
     return flask.jsonify(result)
 
@@ -444,8 +453,11 @@ def get_user(intended_user, *, user_id):
         if not row:
             raise util.APIError(404, message="No user found.")
 
+        total_users = conn.execute(model.total_ranked_users).first()[0]
+
         logged_in = user_id is not None and intended_user == user_id
-        return flask.jsonify(make_user_record(row, logged_in=logged_in))
+        return flask.jsonify(make_user_record(row, logged_in=logged_in,
+                                              total_users=total_users))
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
@@ -459,9 +471,7 @@ def verify_user_email(user_id):
         query = sqlalchemy.sql.select([
             model.users.c.verification_code,
             model.users.c.is_email_good,
-        ]).where(
-            model.users.c.id == user_id
-        )
+        ]).where(model.users.c.id == user_id)
 
         row = conn.execute(query).first()
         if not row:

@@ -2,6 +2,8 @@ import flask
 
 from flask_cors import cross_origin
 
+from . import config
+
 
 class APIError(Exception):
     """
@@ -35,3 +37,16 @@ def handle_api_error(error):
     response = flask.jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+
+def tier(percentile):
+    if percentile <= config.PLATINUM:
+        return "Platinum"
+    elif percentile <= config.DIAMOND:
+        return "Diamond"
+    elif percentile <= config.GOLD:
+        return "Gold"
+    elif percentile <= config.SILVER:
+        return "Silver"
+    else:
+        return "Bronze"
