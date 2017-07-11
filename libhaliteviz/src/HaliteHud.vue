@@ -75,6 +75,7 @@
                 playing: false,
                 selected: {
                     kind: null,
+                    id: null,
                 },
             };
         },
