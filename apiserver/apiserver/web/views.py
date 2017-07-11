@@ -237,6 +237,30 @@ def get_sort_filter(fields, false_fields=()):
 ######################
 
 
+def make_user_record(row, *, logged_in):
+    """Given a database result row, create the JSON user object."""
+    user = {
+        "user_id": row["user_id"],
+        "username": row["username"],
+        "level": row["player_level"],
+        "organization_id": row["organization_id"],
+        "organization": row["organization_name"],
+        "country_code": row["country_code"],
+        "country_subdivision_code": row["country_subdivision_code"],
+        "num_bots": row["num_bots"],
+        "num_submissions": int(row["num_submissions"]),
+        "num_games": int(row["num_games"]),
+        "score": float(row["score"]),
+        "rank": int(row["rank"]) if row["rank"] is not None else None,
+    }
+
+    if row["email"] is None and logged_in:
+        # User is new user, indicate this when they are logged in
+        user["is_new_user"] = True
+
+    return user
+
+
 @web_api.route("/user")
 @cross_origin(methods=["GET", "POST"])
 def list_users():
@@ -251,6 +275,7 @@ def list_users():
         "num_bots": model.ranked_users.c.num_bots,
         "num_submissions": model.ranked_users.c.num_submissions,
         "num_games": model.ranked_users.c.num_games,
+        "rank": model.ranked_users.c.rank,
     })
 
     with model.engine.connect() as conn:
@@ -260,20 +285,7 @@ def list_users():
                     .offset(offset).limit(limit).reduce_columns())
 
         for row in query.fetchall():
-            user = {
-                "user_id": row["user_id"],
-                "username": row["username"],
-                "level": row["player_level"],
-                "organization_id": row["organization_id"],
-                "organization": row["organization_name"],
-                "country_code": row["country_code"],
-                "country_subdivision_code": row["country_subdivision_code"],
-                "num_bots": row["num_bots"],
-                "num_submissions": int(row["num_submissions"]),
-                "num_games": int(row["num_games"]),
-            }
-
-            result.append(user)
+            result.append(make_user_record(row, logged_in=False))
 
     return flask.jsonify(result)
 
@@ -425,56 +437,15 @@ def create_user(*, user_id):
 @optional_login
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
-        query = sqlalchemy.sql.select([
-            model.users.c.id,
-            model.users.c.email,
-            model.users.c.username,
-            model.users.c.player_level,
-            model.users.c.organization_id,
-            model.organizations.c.organization_name,
-            model.users.c.country_code,
-            model.users.c.country_subdivision_code,
-        ]).where(model.users.c.id == intended_user).select_from(
-            model.users.join(
-                model.organizations,
-                model.users.c.organization_id == model.organizations.c.id,
-                isouter=True,
-            )
-        ).reduce_columns()
+        query = model.ranked_users.select(
+            model.ranked_users.c.user_id == intended_user)
 
         row = conn.execute(query).first()
         if not row:
             raise util.APIError(404, message="No user found.")
 
-        func = sqlalchemy.sql.func
-        bot_stats = conn.execute(sqlalchemy.sql.select([
-            func.count(),
-            func.coalesce(func.sum(model.bots.c.games_played), 0),
-            func.coalesce(func.sum(model.bots.c.version_number), 0),
-            func.max(model.bots.c.score),
-        ]).select_from(model.bots).where(
-            model.bots.c.user_id == intended_user
-        )).first()
-
-        user = {
-            "user_id": row["id"],
-            "username": row["username"],
-            "level": row["player_level"],
-            "organization_id": row["organization_id"],
-            "organization": row["organization_name"],
-            "num_bots": bot_stats[0],
-            "total_games_played": int(bot_stats[1]),
-            "total_submissions": int(bot_stats[2]),
-            "score": float(bot_stats[3]) if bot_stats[3] is not None else None,
-            "country_code": row["country_code"],
-            "country_subdivision_code": row["country_subdivision_code"],
-        }
-
-        if row["email"] is None and intended_user == user_id:
-            # User is new user, indicate this when they are logged in
-            user["is_new_user"] = True
-
-        return flask.jsonify(user)
+        logged_in = user_id is not None and intended_user == user_id
+        return flask.jsonify(make_user_record(row, logged_in=logged_in))
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])

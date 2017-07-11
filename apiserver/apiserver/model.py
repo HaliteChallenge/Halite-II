@@ -30,6 +30,8 @@ ranked_bots = sqlalchemy.sql.select([
     bots.c.user_id,
     bots.c.id.label("bot_id"),
     bots.c.score,
+    bots.c.games_played,
+    bots.c.version_number,
 ]).select_from(bots).select_from(sqlalchemy.sql.select([
     sqlalchemy.sql.text("@rank:=0")
 ]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
@@ -43,13 +45,15 @@ ranked_users = sqlalchemy.sql.select([
     organizations.c.organization_name,
     users.c.country_code,
     users.c.country_subdivision_code,
+    users.c.email,
     _func.coalesce(_func.count(), 0).label("num_bots"),
-    _func.coalesce(_func.sum(bots.c.games_played), 0).label("num_games"),
-    _func.coalesce(_func.sum(bots.c.version_number), 0).label("num_submissions"),
-    _func.coalesce(_func.max(bots.c.score), 0).label("score"),
+    _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
+    _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
+    _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
+    _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
 ]).select_from(users.join(
-    bots,
-    bots.c.user_id == users.c.id,
+    ranked_bots,
+    ranked_bots.c.user_id == users.c.id,
     isouter=True,
 ).join(
     organizations,
