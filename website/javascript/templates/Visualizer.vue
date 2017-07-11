@@ -17,7 +17,7 @@
     import UploadZone from "./UploadZone.vue";
     libhaliteviz.setAssetRoot("assets/js/");
 
-    function showGame(buffer, displayArea) {
+    function showGame(buffer) {
         let replay = libhaliteviz.parseReplay(buffer);
 
         console.log(replay);
@@ -33,7 +33,7 @@
             el: container,
             render: (h) => h(libhaliteviz.HaliteHud, {
                 props: {
-                    replay: replay,
+                    replay: Object.freeze(replay),
                 },
             }),
         });
@@ -65,7 +65,7 @@
                 }).then((replay) => {
                     this.message = null;
                     this.is_downloading = false;
-                    showGame(replay, document.getElementById("visualizer"));
+                    showGame(replay);
                 }, () => {
                     this.message = `Could not download replay.`;
                     this.is_downloading = false;
@@ -77,7 +77,7 @@
                 if (files.length > 0) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        showGame(e.target.result, document.getElementById("visualizer"));
+                        showGame(e.target.result);
                     };
                     reader.readAsArrayBuffer(files[0]);
                 }

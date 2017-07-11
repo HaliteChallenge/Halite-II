@@ -6,17 +6,16 @@
             </span>
         </h1>
 
+        <div class="halite-visualizer-controls">
+            <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
+            <button class="btn btn-default playbutton" v-else v-on:click="play" title="Play"><i class="fa fa-play" aria-hidden="true"></i> </button>
+
+            Frame: <input type="text" :value="frame + '.' + substep" />
+        </div>
 
         <input type="range" min="0" :max="replay.frames.length - 1"
-               :value="visualizer.frame"
+               :value="frame"
                v-on:input="scrub" />
-
-        <div class="halite-visualizer-controls">
-            <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause"><i class="fa fa-play" aria-hidden="true"></i></button>
-            <button class="btn btn-default playbutton" v-else v-on:click="play"><i class="fa fa-pause" aria-hidden="true"></i></button>
-
-            Frame: <input class="frameinput" type="text" :value="visualizer.frame + '.' + visualizer.substep" />
-        </div>
 
         <div class="row">
             <div class="halite-visualizer-canvas col-md-8" ref="visualizer_container"></div>
@@ -71,38 +70,58 @@
                     }
                     return '#' + color;
                 }),
-                visualizer: new HaliteVisualizer(this.replay),
+                frame: 0,
+                substep: 0,
+                playing: false,
                 selected: {
                     kind: null,
                 },
             };
         },
         mounted: function() {
-            this.visualizer.attach(this.$refs.visualizer_container);
-            this.visualizer.onSelect = (kind, args) => {
+            console.log(this.replay);
+            const visualizer = new HaliteVisualizer(this.replay);
+            visualizer.attach(this.$refs.visualizer_container);
+            visualizer.onUpdate = () => {
+                this.frame = visualizer.frame;
+                this.substep = visualizer.substep;
+            };
+            visualizer.onSelect = (kind, args) => {
                 this.selected.kind = "planet";
                 this.selected.id = args.id;
+                visualizer.onUpdate();
                 this.$forceUpdate();
             };
-            this.visualizer.play();
+            visualizer.onPlay = () => {
+                this.playing = true;
+            };
+            visualizer.onPause = () => {
+                this.playing = false;
+            };
+            visualizer.play();
+            this.play = () => {
+                visualizer.play();
+            };
+            this.pause = () => {
+                visualizer.pause();
+            };
+            this.scrub = (e) => {
+                visualizer.pause();
+                visualizer.substep = 0;
+                visualizer.frame = e.target.value;
+                visualizer.onUpdate();
+            };
         },
         methods: {
+            // Stubs - see mounted()
             play: function() {
-                this.visualizer.play();
             },
             pause: function() {
-                this.visualizer.pause();
             },
             scrub: function(e) {
-                this.visualizer.pause();
-                this.visualizer.substep = 0;
-                this.visualizer.frame = e.target.value;
             }
         },
         computed: {
-            playing: function() {
-                return this.visualizer.isPlaying();
-            },
             statistics: function() {
                 let count = {};
                 for (let i = 0; i < this.replay.num_players; i++) {
@@ -112,7 +131,7 @@
                     };
                 }
 
-                let substep = this.replay.frames[this.visualizer.frame][this.visualizer.substep];
+                let substep = this.replay.frames[this.frame][this.substep];
                 for (let ship of substep.ships) {
                     count[ship.owner].ships++;
                 }
@@ -127,8 +146,8 @@
             },
             selected_planet: function() {
                 if (this.selected.kind === "planet") {
-                    let frame = this.replay.frames[this.visualizer.frame];
-                    let substep = frame[this.visualizer.substep];
+                    let frame = this.replay.frames[this.frame];
+                    let substep = frame[this.substep];
                     let state = substep.planets[this.selected.id];
                     if (state) {
                         return {
