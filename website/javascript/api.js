@@ -145,7 +145,7 @@ export function leaderboard(filters) {
     return $.get({
         url: `${API_SERVER_URL}/leaderboard`,
         data: {
-            filters: filters,
+            filter: filters,
         }
     });
 }
