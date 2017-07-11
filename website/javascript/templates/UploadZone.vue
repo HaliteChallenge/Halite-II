@@ -30,7 +30,9 @@
         methods: {
             on_changed: function(event) {
                 this.drag_over = false;
-                this.$emit("change", event.target.files);
+                this.$emit("change",
+                    Array.prototype.slice.call(event.target.files));
+                event.target.value = null;
             },
         },
     }
