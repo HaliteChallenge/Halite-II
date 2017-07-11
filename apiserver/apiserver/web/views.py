@@ -255,8 +255,7 @@ def make_user_record(row, *, logged_in, total_users=None):
     }
 
     if total_users and row["rank"] is not None:
-        percentile = row["rank"] / total_users
-        user["tier"] = util.tier(percentile)
+        user["tier"] = util.tier(row["rank"], total_users)
     else:
         user["tier"] = None
 

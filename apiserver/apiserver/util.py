@@ -1,4 +1,5 @@
 import flask
+import math
 
 from flask_cors import cross_origin
 
@@ -39,14 +40,15 @@ def handle_api_error(error):
     return response
 
 
-def tier(percentile):
-    if percentile <= config.PLATINUM:
-        return "Platinum"
-    elif percentile <= config.DIAMOND:
-        return "Diamond"
-    elif percentile <= config.GOLD:
-        return "Gold"
-    elif percentile <= config.SILVER:
-        return "Silver"
-    else:
-        return "Bronze"
+def tier(rank, total_users):
+    for tier, percentage in (("Platinum", config.PLATINUM),
+                             ("Diamond", config.DIAMOND),
+                             ("Gold", config.GOLD),
+                             ("Silver", config.SILVER)):
+        num_players = math.ceil(percentage * total_users)
+        if rank <= num_players:
+            return tier
+        else:
+            rank -= num_players
+
+    return "Bronze"
