@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm ./assets/starter_kits/*.zip
+
 for directory in ../airesources/*; do
     language=$(basename ${directory})
     if [[ "${language}" = "sample_bots" ]]; then
