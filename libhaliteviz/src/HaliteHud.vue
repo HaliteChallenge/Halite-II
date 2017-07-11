@@ -6,16 +6,17 @@
             </span>
         </h1>
 
-        <div class="halite-visualizer-controls">
-            <button class="btn btn-default" v-if="playing" v-on:click="pause">Pause</button>
-            <button class="btn btn-default" v-else v-on:click="play">Play</button>
-
-            Frame: <input type="text" :value="visualizer.frame + '.' + visualizer.substep" />
-        </div>
 
         <input type="range" min="0" :max="replay.frames.length - 1"
                :value="visualizer.frame"
                v-on:input="scrub" />
+
+        <div class="halite-visualizer-controls">
+            <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause"><i class="fa fa-play" aria-hidden="true"></i></button>
+            <button class="btn btn-default playbutton" v-else v-on:click="play"><i class="fa fa-pause" aria-hidden="true"></i></button>
+
+            Frame: <input class="frameinput" type="text" :value="visualizer.frame + '.' + visualizer.substep" />
+        </div>
 
         <div class="halite-visualizer-canvas" ref="visualizer_container">
         </div>
@@ -162,4 +163,14 @@
  .halite-visualizer-info {
      width: 300px;
  }
+
+ .playbutton{
+     margin-bottom: 5px;
+ }
+
+  .frameinput{
+     vertical-align:  top;
+     line-height: 2em;
+ }
+
 </style>
