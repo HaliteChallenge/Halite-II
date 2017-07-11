@@ -12,7 +12,7 @@ const CONTAINER_SIZE = 960;
 const VISUALIZER_SIZE = 640;
 const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
-export const PLANET_COLOR = 0x3F3C15;
+export const PLANET_COLOR = 0x665646;
 
 
 let ASSET_ROOT = "dist/";
@@ -234,7 +234,6 @@ export class HaliteVisualizer {
                     this.pause();
                     this.frame = this.replay.frames.length - 1;
                     this.substep = this.replay.frames[this.frame].length - 1;
-                    console.log("Ending");
                     this.onEnd();
                     break;
                 }
@@ -323,13 +322,20 @@ export class HaliteVisualizer {
         const health_factor = planet.health / planetBase.health;
         const health_bar = health_factor * side * (planetBase.r - 1);
 
-
         this.planets[planet.id].tint = color;
-        if (health_factor < 0.25) {
-            this.planets[planet.id].alpha = 0.5;
-        }
-        else if (health_factor === 0) {
+        this.planets[planet.id].alpha = 1.0;
+        this.planets[planet.id].visible = true;
+        this.planets[planet.id].interactive = true;
+        this.planets[planet.id].buttonMode = true;
+
+        if (planet.health === 0) {
             this.planets[planet.id].alpha = 0;
+        }
+        else if (health_factor < 0.25) {
+            this.planets[planet.id].alpha = 0.5;
+            this.planets[planet.id].visible = false;
+            this.planets[planet.id].interactive = false;
+            this.planets[planet.id].buttonMode = false;
         }
 
         this.planetOverlay.beginFill(0xFF0000);
@@ -452,9 +458,6 @@ export class HaliteVisualizer {
                     attackSprite.tint = PLAYER_COLORS[event.entity.owner];
                     this.container.addChild(attackSprite);
 
-                    console.log(attackSprite);
-                    console.log(ATTACK_IMAGE);
-
                     this.animationQueue.push(new FrameAnimation(
                         24,
                         () => {
@@ -502,6 +505,13 @@ export class HaliteVisualizer {
 
         for (let planet of Object.values(this.currentSubstep.planets)) {
             this.drawPlanet(planet);
+        }
+
+        // Handle dead planets
+        for (let planet of this.replay.planets) {
+            if (typeof this.currentSubstep.planets[planet.id] === "undefined") {
+                this.drawPlanet({ id: planet.id, owner: null, health: 0 });
+            }
         }
 
         for (let ship of this.currentSubstep.ships) {
@@ -642,7 +652,6 @@ export class HaliteVisualizerControls {
                 }
                 count[owner]++;
             }
-            console.log(count);
         };
         this.visualizer.onPause = () => {
             playPause.removeClass("halite-play-pause-pause");
