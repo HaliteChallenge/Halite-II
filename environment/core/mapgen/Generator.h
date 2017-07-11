@@ -5,6 +5,11 @@
 #ifndef HALITE_GENERATOR_H
 #define HALITE_GENERATOR_H
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#include <cmath>
+#endif
+
 #include <random>
 #include "../hlt.hpp"
 #include "../json.hpp"
