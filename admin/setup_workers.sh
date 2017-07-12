@@ -6,8 +6,8 @@ GCLOUD_PROJECT="nth-observer-171418"
 GCLOUD_ZONE="us-central1-c"
 
 MACHINE_TYPE="custom-1-2560"
-IMAGE="worker3"
-COORDINATOR_URL="http://10.128.0.5:5001/coordinator/v1/"
+IMAGE="worker"
+COORDINATOR_URL="http://10.142.0.5:5001/v1/coordinator/"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
