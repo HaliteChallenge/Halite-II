@@ -153,6 +153,29 @@ def get_offset_limit(*, default_limit=50, max_limit=250):
     return offset, limit
 
 
+def parse_filter(filter_string):
+    """
+    Parse a filter string into a field name, comparator, and value.
+    :param filter_string: Of the format field,operator,value.
+    :return: (field_name, operator_func, value)
+    """
+    field, cmp, value = filter_string.split(",")
+
+    operation = {
+            "=": operator.eq,
+            "<": operator.lt,
+            "<=": operator.le,
+            ">": operator.gt,
+            ">=": operator.ge,
+            "!=": operator.ne,
+    }.get(cmp, None)
+    if operation is None:
+        raise util.APIError(
+            400, message="Cannot compare '{}' by '{}'".format(field, cmp))
+
+    return field, operation, value
+
+
 def get_sort_filter(fields, false_fields=()):
     """
     Parse flask.request to create clauses for SQLAlchemy's order_by and where.
@@ -165,18 +188,22 @@ def get_sort_filter(fields, false_fields=()):
     :return: A 2-tuple of (where_clause, order_clause). order_clause is an
     ordered list of columns.
     """
-    where_clause = True
+    where_clause = sqlalchemy.true()
     order_clause = []
+    manual_fields = []
 
     for filter_param in flask.request.args.getlist("filter"):
-        field, cmp, value = filter_param.split(",")
+        field, operation, value = parse_filter(filter_param)
 
         if field not in fields and field not in false_fields:
             raise util.APIError(
                 400, message="Cannot filter on field {}".format(field))
 
+        if field in false_fields:
+            manual_fields.append((field, operation, value))
+            continue
+
         column = fields[field]
-        conversion = None
         if isinstance(column.type, sqlalchemy.types.Integer):
             conversion = int
         elif isinstance(column.type, sqlalchemy.types.DateTime):
@@ -189,24 +216,9 @@ def get_sort_filter(fields, false_fields=()):
             raise RuntimeError("Filtering on column is not supported yet: " + repr(column))
 
         value = conversion(value)
-        operation = {
-            "=": operator.eq,
-            "<": operator.lt,
-            "<=": operator.le,
-            ">": operator.gt,
-            ">=": operator.ge,
-            "!=": operator.ne,
-        }.get(cmp, None)
-
-        if operation is None:
-            raise util.APIError(
-                400, message="Cannot compare column by '{}'".format(cmp))
 
         clause = operation(column, value)
-        if where_clause is True:
-            where_clause = clause
-        else:
-            where_clause &= clause
+        where_clause &= clause
 
     for order_param in flask.request.args.getlist("order_by"):
         direction = "asc"
@@ -230,7 +242,7 @@ def get_sort_filter(fields, false_fields=()):
 
         order_clause.append(column)
 
-    return where_clause, order_clause
+    return where_clause, order_clause, manual_fields
 
 ######################
 # USER API ENDPOINTS #
@@ -272,7 +284,7 @@ def list_users():
     result = []
     offset, limit = get_offset_limit()
 
-    where_clause, order_clause = get_sort_filter({
+    where_clause, order_clause, _ = get_sort_filter({
         "user_id": model.all_users.c.user_id,
         "username": model.all_users.c.username,
         "level": model.all_users.c.player_level,
@@ -782,12 +794,17 @@ def reset_api_key(intended_user, *, user_id):
 @cross_origin(methods=["GET"])
 def list_user_matches(intended_user):
     offset, limit = get_offset_limit()
-    where_clause, order_clause = get_sort_filter({
+    where_clause, order_clause, manual_sort = get_sort_filter({
         "game_id": model.games.c.id,
         "time_played": model.games.c.time_played,
         # TODO: filter by participants
-    })
+    }, ["timed_out"])
     result = []
+
+    participant_clause = sqlalchemy.true()
+    for (field, _, _) in manual_sort:
+        if field == "timed_out":
+            participant_clause &= model.game_participants.c.timed_out
 
     with model.engine.connect() as conn:
         query = sqlalchemy.sql.select([
@@ -799,7 +816,8 @@ def list_user_matches(intended_user):
         ]).select_from(model.games.join(
             model.game_participants,
             (model.games.c.id == model.game_participants.c.game_id) &
-            (model.game_participants.c.user_id == intended_user),
+            (model.game_participants.c.user_id == intended_user) &
+            participant_clause,
         )).where(where_clause).order_by(*order_clause).offset(offset).limit(limit).reduce_columns()
         matches = conn.execute(query)
 
@@ -833,8 +851,7 @@ def list_user_matches(intended_user):
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>", methods=["GET"])
 @cross_origin(methods=["GET"])
-@optional_login
-def get_user_match(intended_user, match_id, *, user_id):
+def get_user_match(intended_user, match_id):
     with model.engine.connect() as conn:
         query = conn.execute(sqlalchemy.sql.select([
             model.game_participants.c.user_id,
@@ -904,7 +921,6 @@ def get_match_replay(intended_user, match_id):
         return response
 
 
-
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>/error_log",
                methods=["GET"])
 @requires_login
@@ -958,7 +974,7 @@ def get_match_error_log(intended_user, match_id, *, user_id):
 def list_organizations():
     result = []
     offset, limit = get_offset_limit()
-    where_clause, order_clause = get_sort_filter({
+    where_clause, order_clause, _ = get_sort_filter({
         "organization_id": model.organizations.c.id,
         "name": model.organizations.c.organization_name,
         "type": model.organizations.c.kind,
@@ -1104,7 +1120,7 @@ def leaderboard():
     result = []
     offset, limit = get_offset_limit()
 
-    where_clause, order_clause = get_sort_filter({
+    where_clause, order_clause, _ = get_sort_filter({
         "user_id": model.ranked_bots_users.c.user_id,
         "username": model.ranked_bots_users.c.username,
         "level": model.ranked_bots_users.c.player_level,
