@@ -13,6 +13,8 @@ for directory in ../airesources/*; do
 
     if [[ -d "../airesources/sample_bots/${language}" ]]; then
         MOREFILES=../airesources/sample_bots/${language}/*.${EXTENSION}
+    else
+        MOREFILES=
     fi
 
     echo ${language}: ${FILES} ${MOREFILES}
