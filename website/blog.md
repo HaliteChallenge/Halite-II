@@ -13,3 +13,7 @@ permalink: /blog/
 <strong>{{ post.date | date: "%B %e, %Y" }}</strong> . {{ post.category }} . 
 <a href="{{ post.url }}"></a></p>
 {% endfor %}	
+
+{% if site.posts.size == 0 %}
+Sorry, no posts yet!
+{% endif %}
