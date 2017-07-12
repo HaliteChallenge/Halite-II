@@ -381,7 +381,7 @@ def upload_game():
             map_seed=game_output["map_seed"],
             map_generator=game_output["map_generator"],
             time_played=sqlalchemy.sql.func.NOW(),
-        )).inserted_primary_key
+        )).inserted_primary_key[0]
 
     # Update the participants' stats
     with model.engine.connect() as conn:
@@ -423,7 +423,7 @@ def upload_game():
                         user["username"],
                         "First bot timeout/error",
                         notify.FIRST_TIMEOUT.format(
-                            replay_link="{}/play?match_id={}".format(config.SITE_URL, game_id),
+                            replay_link="{}/play?game_id={}".format(config.SITE_URL, game_id),
                             log_link="{}/user/{}/match/{}/error_log".format(config.API_URL, user["user_id"], game_id),
                         ))
 
