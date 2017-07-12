@@ -18,24 +18,24 @@
     libhaliteviz.setAssetRoot("assets/js/");
 
     function showGame(buffer) {
-        let replay = libhaliteviz.parseReplay(buffer);
+        return libhaliteviz.parseReplay(buffer).then((replay) => {
+            console.log(replay);
 
-        console.log(replay);
+            let outerContainer = document.getElementById("visualizer");
+            for (let child of outerContainer.children) {
+                outerContainer.removeChild(child);
+            }
 
-        let outerContainer = document.getElementById("visualizer");
-        for (let child of outerContainer.children) {
-            outerContainer.removeChild(child);
-        }
-
-        let container = document.createElement("div");
-        document.getElementById("visualizer").appendChild(container);
-        new Vue({
-            el: container,
-            render: (h) => h(libhaliteviz.HaliteHud, {
-                props: {
-                    replay: Object.freeze(replay),
-                },
-            }),
+            let container = document.createElement("div");
+            document.getElementById("visualizer").appendChild(container);
+            new Vue({
+                el: container,
+                render: (h) => h(libhaliteviz.HaliteHud, {
+                    props: {
+                        replay: Object.freeze(replay),
+                    },
+                }),
+            });
         });
     }
 
@@ -63,9 +63,11 @@
                         this.progress = Math.floor(100 * progress);
                     }
                 }).then((replay) => {
-                    this.message = null;
+                    this.message = "Parsing replay, please wait…";
                     this.is_downloading = false;
-                    showGame(replay);
+                    showGame(replay).then(() => {
+                        this.message = null;
+                    });
                 }, () => {
                     this.message = `Could not download replay.`;
                     this.is_downloading = false;
