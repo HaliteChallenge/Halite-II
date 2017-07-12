@@ -8,10 +8,6 @@
 
 Prefer zone us-central1-b.
 
-### Deployment Service Account
-
-We need a service account to use locally.
-
 ### Create the Worker Image
 
 We need to create a machine image with all necessary compilers and other things set up already. Create an f1-micro instance based on Ubuntu 17.04. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Once the instance is started, run `setup_worker_image.sh`, then delete the instance and create an image from it.
@@ -23,6 +19,8 @@ At the end, the script also prints out all installed packages with their version
 We need four buckets: one for compiled bot storage, one for uploaded bots, one for replays, and one for error logs. (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
 
 ### Upload Coordinator and Worker to GCS (Non-Github Deploy Only)
+
+Zip the Halite repository folder into a .tgz file and upload it as `Halite.tgz` in the root of the GCS bucket (currently `halite-2-deployed-artifacts`).
 
 ## MySQL Server
 

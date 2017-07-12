@@ -6,10 +6,10 @@ cd
 
 # Fetch the coordinator
 # TODO: This is in GCloud right now, but we should use Git when we go public
-gsutil cp gs://halite-2-deployed-artifacts/coordinator.tgz .
+gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
 
-tar xvzf coordinator.tgz
-cd apiserver/
+tar xvzf Halite.tgz
+cd Halite/apiserver/
 
 virtualenv --python=python3.6 venv
 

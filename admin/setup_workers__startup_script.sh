@@ -6,9 +6,9 @@ sudo -iu worker bash <<"EOF"
 cd
 # Fetch the worker script
 # TODO: This is in GCloud right now, but we should use Git when we go public
-gsutil cp gs://halite-2-deployed-artifacts/worker.tgz .
+gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
 
-tar xvzf worker.tgz
+tar xvzf Halite.tgz
 
 cd Halite/apiserver/worker
 bash setup.sh
