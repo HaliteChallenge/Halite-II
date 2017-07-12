@@ -64,9 +64,13 @@
                     }
                 }).then((replay) => {
                     this.message = "Parsing replay, please wait…";
-                    this.is_downloading = false;
                     showGame(replay).then(() => {
+                        this.is_downloading = false;
                         this.message = null;
+                    }).catch((e) => {
+                        console.error(e);
+                        this.is_downloading = false;
+                        this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
                     });
                 }, () => {
                     this.message = `Could not download replay.`;
