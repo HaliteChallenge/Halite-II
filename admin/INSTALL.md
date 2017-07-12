@@ -84,3 +84,23 @@ Create the load balancer and note the IP address of the balancer.
 1. Run the script.
 
 At this point, everything should be set. You can `ssh` into individual instances to check on them. `sudo su` to switch to `worker`, and use `screen -list` to see what sessions are running. Coordinator servers should have 3 screen sessions, one for the SQL proxy, one for the API server, and one for the coordinator. Workers should have 1 session, for the worker itself.
+
+## Redeploying/Updating
+
+### Update the Worker
+
+If the startup script or disk image changes:
+
+1. Delete the instance group.
+2. Delete the instance template.
+3. Upload the new code to the GCloud bucket, if applicable (see above).
+4. Recreate it all.
+
+Otherwise:
+
+1. Upload the new code.
+2. Recreate the instances using the GCloud CLI.
+
+### Update the Coordinator
+
+If the startup script or disk image changes, we can't delete the instance group or template, because the load balancers are using the group. Instead, edit the setup script to create a new instance template. Run the template creation command manually, then edit the group to use the new template. Finally, recreate all the instances.
