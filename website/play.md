@@ -6,13 +6,15 @@ full_width: true
 mount_views: ["Visualizer", "Upload"]
 ---
 
+<div class="row">
+    <div id="visualizer-container">
+    </div>
+</div>
+
 <div id="visualizer">
 </div>
 
 <div class="row">
-    <div id="visualizer-container">
-    </div>
-    
     <div id="upload-container">
     </div>
 </div>

@@ -17,10 +17,10 @@ layout: default
         </div>
         {{ content | inject_anchors }}
     </div>
-    <div class="col-md-4">
+    <nav class="col-md-4 toc">
         {% if page.toc %}
         {{ content | toc_only }}
         {% endif %}
-    </div>
+    </nav>
     {% endif %}
 </div>

@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <halite-upload-zone
                 title="Drop REPLAY here or click to select"
                 v-on:change="play_replay"
@@ -77,6 +77,17 @@
                     this.is_downloading = false;
                 });
             }
+
+            document.addEventListener("dragover", (e) => {
+                e.preventDefault();
+            });
+            document.addEventListener("dragend", (e) => {
+                e.preventDefault();
+            });
+            document.addEventListener("drop", (e) => {
+                e.preventDefault();
+                console.log(e);
+            });
         },
         methods: {
             play_replay: function(files) {

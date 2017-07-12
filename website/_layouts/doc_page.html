@@ -3,19 +3,23 @@ layout: default
 ---
 
 <div class="row">
-    <div class="col-md-3 doctocleft">
+    <nav class="col-md-2 doc-nav">
+        <header>Learn</header>
+
         {% include navigation.html %}
-    </div>
-    <div class="col-md-6">
+    </nav>
+    <div class="col-md-7">
         <div class="page-header">
             <h1>{{ page.title }}</h1>
         </div>
         {{ content | inject_anchors }}
     </div>
-    <div class="col-md-3 doctocright">
+    <nav class="col-md-3 toc doc-toc">
         {% if page.toc %}
+        <header>Contents</header>
+
         {{ content | toc_only }}
         {% endif %}
-    </div>
+    </nav>
     
 </div>

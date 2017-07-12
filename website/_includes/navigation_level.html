@@ -1,8 +1,6 @@
-    <li class="{% if include.level.index.url == page.url %}active{% endif %}">
-        <a href="{{ include.level.index.url }}">
-            {{ include.level.name }}
-        </a>
-        <ul class="list-group">
+    <li class="{% if include.level.index.url == page.url %}active{% endif %} toc-group">
+        {{ include.level.name }}
+        <ul>
             {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">
                 <a href="{{ subpage.url }}">{{ subpage.title }}</a>

@@ -22,18 +22,11 @@ body {
     color: white;
 }
 
-.doctocleft
-{
-    margin-top: 78px;
+.doc-nav, .doc-toc {
+    margin-top: 99px;
 }
 
-.doctocright
-{
-    margin-top: 100px;
-}
-
-.searchbarbutton
-{
+.searchbarbutton {
     line-height: 1.48em;
 }
 
@@ -65,14 +58,13 @@ body {
 }
 
 .side-nav {
-    margin-top: 20px;
-
     .active > a {
         font-style: italic;
     }
 }
 
 /* Homepage */
+
 #hero {
     width: 100%;
     height: auto;
@@ -93,4 +85,21 @@ body {
 
 #visualizer {
     margin: 0 auto;
+}
+
+nav.side-nav {
+    > ul {
+        padding: 0;
+    }
+}
+
+.toc {
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .toc-group {
+        padding-left: 10px;
+    }
 }
