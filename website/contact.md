@@ -7,15 +7,8 @@ toc: false
 
 ## Two Sigma Internal (Employees Only)
 
-1. **HipChat:**
-2. **Email:** 
-
-## External
-
-1. **Email:** halite@halite.io
-2. **Discourse Forums:**
-3. **Slack:** 
-
+1. **HipChat:** "Halite Chat"
+2. **Email:** <mailto:halite@halite.io>
 
 ## Halite Logos
 
