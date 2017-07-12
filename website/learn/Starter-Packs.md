@@ -4,6 +4,8 @@ title: Starter Packs
 toc: true
 ---
 
+See the [Quick Start]({{ site.baseurl }}/learn) to get started.
+
 ## Game Environment
 
 {% for file in site.static_files %}
