@@ -100,8 +100,20 @@ nav.side-nav {
         padding: 0;
     }
 
-    .toc-group {
+    .toc-group > ul {
         padding-left: 10px;
+    }
+
+    .toc-h3 {
+        padding-left: 10px;
+    }
+
+    .toc-h4 {
+        padding-left: 20px;
+    }
+
+    .toc-h5 {
+        padding-left: 30px;
     }
 }
 
