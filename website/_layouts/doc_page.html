@@ -15,10 +15,10 @@ layout: default
         {{ content | inject_anchors }}
     </div>
     <nav class="col-md-3 toc doc-toc">
-        {% if page.toc %}
+        {% capture toc %}{{ content | toc_only | strip }}{% endcapture %}
+        {% if page.toc and toc contains 'li'  %}
         <header>Contents</header>
-
-        {{ content | toc_only }}
+        {{ toc }}
         {% endif %}
     </nav>
     
