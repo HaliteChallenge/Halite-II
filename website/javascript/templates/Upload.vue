@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-12">
+    <div class="col-md-12 upload-bot">
         <halite-upload-zone v-if="logged_in"
                             title="Drop BOT here or click to select"
                             :message="error"
@@ -75,4 +75,7 @@
 </script>
 
 <style lang="scss" scoped>
+    .upload-bot {
+        margin-top: 20px;
+    }
 </style>

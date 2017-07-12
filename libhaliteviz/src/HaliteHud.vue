@@ -1,11 +1,5 @@
 <template>
     <div class="halite-visualizer">
-        <h2>
-            <span v-for="(player_name, index) in replay.player_names" :style="'color: ' + colors[index]">
-                {{ player_name }}
-            </span>
-        </h2>
-
         <div class="halite-visualizer-controls">
             <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
             <button class="btn btn-default playbutton" v-else v-on:click="play" title="Play"><i class="fa fa-play" aria-hidden="true"></i> </button>
