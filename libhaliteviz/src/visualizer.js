@@ -8,11 +8,10 @@ const pako = require("pako");
 const msgpack = require("msgpack-lite");
 
 
-const CONTAINER_SIZE = 960;
 const VISUALIZER_SIZE = 640;
 const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
-export const PLANET_COLOR = 0x665646;
+export const PLANET_COLOR = 0xb7b7b7;
 
 
 let ASSET_ROOT = "dist/";
@@ -330,16 +329,16 @@ export class HaliteVisualizer {
 
         if (planet.health === 0) {
             this.planets[planet.id].alpha = 0;
-        }
-        else if (health_factor < 0.25) {
-            this.planets[planet.id].alpha = 0.5;
             this.planets[planet.id].visible = false;
             this.planets[planet.id].interactive = false;
             this.planets[planet.id].buttonMode = false;
         }
+        else if (health_factor < 0.25) {
+            this.planets[planet.id].alpha = 0.7;
+        }
 
-        this.planetOverlay.beginFill(0xFF0000);
-        this.planetOverlay.lineStyle(2, 0x000000);
+        this.planetOverlay.beginFill(0x990000);
+        this.planetOverlay.lineStyle(0, 0x000000);
         this.planetOverlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
         this.planetOverlay.endFill();
     }

@@ -1,10 +1,10 @@
 <template>
     <div class="halite-visualizer">
-        <h1>
+        <h2>
             <span v-for="(player_name, index) in replay.player_names" :style="'color: ' + colors[index]">
                 {{ player_name }}
             </span>
-        </h1>
+        </h2>
 
         <div class="halite-visualizer-controls">
             <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
@@ -14,6 +14,7 @@
         </div>
 
         <input type="range" min="0" :max="replay.frames.length - 1"
+               class="halite-frame-scrubber"
                :value="frame"
                v-on:input="scrub" />
 
@@ -165,8 +166,6 @@
 
 <style lang="scss" scoped>
     .halite-visualizer {
-        margin: 0 auto;
-        width: 940px;
     }
 
     .halite-visualizer-controls {
@@ -182,10 +181,16 @@
 
     .halite-visualizer-info {
         float: left;
+        width: 300px;
+        padding-left: 40px;
+
+        h3:first-child {
+            margin-top: 0;
+        }
     }
 
-    .halite-visualizer-info {
-        width: 300px;
+    .halite-frame-scrubber {
+        width: 640px;
     }
 
     .playbutton {
