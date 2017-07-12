@@ -144,7 +144,7 @@ def user_mismatch_error(message="Cannot perform action for other user."):
     raise util.APIError(400, message=message)
 
 
-def get_offset_limit(*, default_limit=10, max_limit=100):
+def get_offset_limit(*, default_limit=50, max_limit=250):
     offset = int(flask.request.values.get("offset", 0))
     offset = max(offset, 0)
     limit = int(flask.request.values.get("limit", default_limit))
