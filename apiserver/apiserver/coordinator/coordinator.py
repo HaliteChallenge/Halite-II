@@ -405,7 +405,27 @@ def upload_game():
                 games_played=model.bots.c.games_played + 1,
             ))
 
-    # TODO: send first game email, first timeout email
+            # If this is the user's first timeout, let them know
+            if user["timed_out"]:
+                timed_out_count = conn.execute(sqlalchemy.sql.select([
+                    sqlalchemy.sql.func.count(),
+                ]).select_from(model.game_participants).where(
+                    (model.game_participants.c.user_id == user["user_id"]) &
+                    (model.game_participants.c.bot_id == user["bot_id"]) &
+                    (model.game_participants.c.version_number ==
+                     user["version_number"]) &
+                    model.game_participants.c.timed_out
+                )).first()[0]
+
+                if timed_out_count == 1:
+                    notify.send_notification(
+                        user["email"],
+                        user["username"],
+                        "First bot timeout/error",
+                        notify.FIRST_TIMEOUT.format(
+                            replay_link="{}/play?match_id={}".format(config.SITE_URL, game_id),
+                            log_link="{}/user/{}/match/{}/error_log".format(config.API_URL, user["user_id"], game_id),
+                        ))
 
     # Update rankings
     users.sort(key=lambda user: user["rank"])

@@ -44,7 +44,7 @@
                                    :href="'user?user_id=' + player"
                                    class="game-participant"
                                    v-bind:class="{ 'timed-out': game.players[player].timed_out }"
-                                   :title="game.players[player].timed_out ? 'This player timed out in this game.' : ''">
+                                   :title="game.players[player].timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
                                     <img :alt="player" :src="profile_images[player]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
                                     <span class="rank">
                                         {{ game.players[player].rank }}

@@ -61,3 +61,15 @@ http://35.185.45.87/verify_email?user_id={user_id}&verification_code={verificati
 - Halite II Alpha
 </p>
 """
+
+
+FIRST_TIMEOUT = """
+<p>Your bot timed out or errored for the first time in a recent game. Either the bot took too long to initialize, too long to send its moves, or encounted an error and quit.</p>
+
+<p><a href="{replay_link}">Replay</a></p>
+<p><a href="{log_link}">Error log</a></p>
+
+<p>
+- Halite II Alpha
+</p>
+"""
