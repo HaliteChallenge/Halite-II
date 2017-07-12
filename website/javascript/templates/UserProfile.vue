@@ -40,15 +40,28 @@
                                 </time>
                             </td>
                             <td>
-                                <a v-for="player in Object.keys(game.players)" :href="'user?user_id=' + player" class="game-participant" >
+                                <a v-for="player in Object.keys(game.players)"
+                                   :href="'user?user_id=' + player"
+                                   class="game-participant"
+                                   v-bind:class="{ 'timed-out': game.players[player].timed_out }"
+                                   :title="game.players[player].timed_out ? 'This player timed out in this game.' : ''">
                                     <img :alt="player" :src="profile_images[player]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                    <span class="rank">{{ game.players[player].rank }}</span>
+                                    <span class="rank">
+                                        {{ game.players[player].rank }}
+                                    </span>
                                 </a>
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
                             <td>
                                 <a :href="'play?game_id=' + game.game_id">
                                     {{ game.game_id }}
+                                </a>
+
+                                <a v-if="game.players[user.user_id].timed_out"
+                                   target="_blank"
+                                   :href="error_log_link(game.game_id)"
+                                   class="text-danger">
+                                    Download error log
                                 </a>
                             </td>
                         </tr>
@@ -83,6 +96,7 @@
                     "organization": "",
                     "points": "",
                     "num_games": "",
+                    "user_id": "",
                 },
                 games: [],
                 bots: [],
@@ -152,6 +166,10 @@
                 this.fetch().then(() => {
                     this.page -= 1;
                 });
+            },
+
+            error_log_link: function(game_id) {
+                return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
             },
         },
     }
