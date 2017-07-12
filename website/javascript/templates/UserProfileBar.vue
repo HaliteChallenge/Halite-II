@@ -1,8 +1,7 @@
 <template>
     <form class="nav navbar-form navbar-right logged-in">
         <a href="/play" class="btn btn-default">Submit a Bot</a>
-        <a href="/user?me" title="Your User Profile" class="profile-link">
-            {{ username }}
+        <a href="/user?me" :title="username + '\'s Profile'" class="profile-link">
             <img :src="profile_image" class="img-circle" :alt="username + '\'s profile image'" />
         </a>
     </form>

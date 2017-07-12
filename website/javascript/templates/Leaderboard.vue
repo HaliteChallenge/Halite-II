@@ -25,7 +25,7 @@
                     <td>{{ player.organization }}</td>
                     <td>{{ player.level }}</td>
                     <td>{{ player.language }}</td>
-                    <td>{{ player.score }}</td>
+                    <td>{{ Math.round(100 * player.score) / 100 }}</td>
                     <td>{{ player.tier }}</td>
                 </tr>
             </tbody>
