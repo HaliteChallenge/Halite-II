@@ -941,7 +941,7 @@ def get_match_error_log(intended_user, match_id, *, user_id):
         match = conn.execute(sqlalchemy.sql.select([
             model.game_participants.c.log_name,
         ]).where(
-            (model.game_participants.c.id == match_id) &
+            (model.game_participants.c.game_id == match_id) &
             (model.game_participants.c.user_id == user_id)
         )).first()
 
