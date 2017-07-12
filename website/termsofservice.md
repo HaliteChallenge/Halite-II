@@ -99,4 +99,4 @@ This website is not an offer to, or solicitation of, any potential clients or in
 
 **Last Updated November 2, 2016**
 
-© 2016 Two Sigma Open Source, LLC. ALL RIGHTS RESERVED.
+© 2017 Two Sigma Open Source, LLC. ALL RIGHTS RESERVED.

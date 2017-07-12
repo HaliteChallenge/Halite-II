@@ -4,7 +4,7 @@ title: Halite Privacy Policy
 permalink: /privacy/
 ---
 
-### Effective Date November 2, 2016 (last updated November 2, 2016).
+### Effective Date July 17, 2017 (last updated November 2, 2016).
 
 This Privacy Policy applies to our websites and platforms.
 
@@ -99,4 +99,4 @@ Attn: Legal – Halite Privacy Matters
 We may update this Policy.
 From time to time we may change our privacy policies. We will notify you of any material changes to our Policy as required by law. We will also post an updated copy on our website. Please check our Site periodically for updates.
 
-© 2016 Two Sigma Open Source, LLC. ALL RIGHTS RESERVED.
+© 2017 Two Sigma Open Source, LLC. ALL RIGHTS RESERVED.

@@ -4,8 +4,6 @@ title: Starter Packs
 toc: true
 ---
 
-## Directions
-
 ## Game Environment
 
 {% for file in site.static_files %}
