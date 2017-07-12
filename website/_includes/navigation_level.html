@@ -3,7 +3,7 @@
         <ul>
             {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">
-                <a href="{{ subpage.url }}">{{ subpage.title }}</a>
+                <a href="{{ subpage.url }}">{% if subpage.short_title %}{{ subpage.short_title }}{% else %}{{ subpage.title }}{% endif %}</a>
             </li>
             {% endfor %}
         {% for level in include.level.sublevels %}
