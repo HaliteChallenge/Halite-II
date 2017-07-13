@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
 Halite II Python 3 starter kit
+
+See MyBot.py for a basic usage example. In short, you should initialize() at
+the start, then in a loop, call get_map() to get the current game state, then
+build up a list of commands and send them with send_command_queue().
 """
 
 import math
@@ -8,6 +12,9 @@ import sys
 
 import logging
 
+"""
+Useful Global State and Constants
+"""
 
 """This player's unique identifier, used to issue commands."""
 my_tag = None
@@ -29,6 +36,13 @@ DOCKING_STATUS = {
     3: "undocking",
 }
 
+"""
+Communication with the Game Environment
+
+These functions are used to send/receive data from the game itself. In either
+direction, communication is terminated with a newline character.
+"""
+
 
 def send_string(s):
     """Send data to the game. Call :function:`done_sending` once finished."""
@@ -46,6 +60,15 @@ def get_string():
     """Read input from the game."""
     result = sys.stdin.readline().rstrip('\n')
     return result
+
+
+"""
+Game Entities
+
+These classes represent the in-game entities, Planets and Ships, as well as
+the game map, which represents the current state of the game at the start of
+a given turn. This is what your bot will be interacting with the most.
+"""
 
 
 class Planet:
@@ -67,7 +90,8 @@ class Planet:
     :ivar docked_ships: A list of ship IDs of ships docked to the current
         planet, all owned by the owner.
     """
-    def __init__(self, id, x, y, hp, r, docking_spots, current, remaining, owned, owner, docked_ships):
+    def __init__(self, id, x, y, hp, r, docking_spots, current, remaining,
+                 owned, owner, docked_ships):
         self.id = id
         self.x = x
         self.y = y
@@ -214,6 +238,14 @@ class Ship:
 
 
 class Map:
+    """
+    The state of the game at the start of a given turn.
+
+    :ivar ships: A mapping of player tags to a dictionary of ships they own.
+                 The dictionary is keyed by the ship ID and contains Ship
+                 objects.
+    :ivar planets: A mapping of planet IDs to planet objects.
+    """
     def __init__(self):
         self.ships = {}
         self.planets = {}
@@ -290,6 +322,17 @@ class Location:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
+"""
+Behavior Helpers
+
+These functions provide useful functionality for bots, in particular, behaviors
+to manipulate ships. Warping provides a fast, but naive, way to move a ship
+taking advantage of inertia to cross large distances quickly. move_to is a
+basic movement command that moves a ship in a given direction, trying to 
+avoid collisions.
+"""
 
 
 """Auxiliary data structure holding the state of currently warping ships."""
@@ -685,6 +728,8 @@ def get_map():
 def run_bot(main_loop):
     """
     DEPRECATED method to run a bot structured as a generator.
+
+    You should not use this, but many of the old sample bots use this structure.
 
     :param main_loop:
     :return:
