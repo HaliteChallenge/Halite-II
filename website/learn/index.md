@@ -44,7 +44,7 @@ You can reach us anytime at <mailto:halite@halite.io> for questions or support o
 [login]: {{ site.login_server_url }}/v1/login/github
 [rules]: {{ site.baseurl }}/learn/Game-Rules
 [story]: {{ site.baseurl }}/learn/The-Story
-[downloads]: {{ site.baseurl }}/learn/Starter-Packs
+[downloads]: {{ site.baseurl }}/learn/downloads
 [contact]: {{ site.baseurl }}/contact
 [submit]: {{ site.baseurl }}/learn/in_depth/submit
 [make-bot]: #
