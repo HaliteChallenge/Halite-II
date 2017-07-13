@@ -41,6 +41,7 @@
 
             if (params.has("verification_code")) {
                 this.verification_code = params.get("verification_code");
+                this.submit();
             }
         },
         methods: {
