@@ -107,6 +107,7 @@
                 visualizer.frame = e.target.value;
                 visualizer.onUpdate();
             };
+            this.getVisualizer = () => visualizer;
         },
         methods: {
             // Stubs - see mounted()
@@ -115,7 +116,8 @@
             pause: function() {
             },
             scrub: function(e) {
-            }
+            },
+            getVisualizer: function() {}
         },
         computed: {
             statistics: function() {

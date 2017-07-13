@@ -17,7 +17,15 @@
     import UploadZone from "./UploadZone.vue";
     libhaliteviz.setAssetRoot("assets/js/");
 
+    let visualizer;
+
     function showGame(buffer) {
+        console.log(visualizer);
+        if (visualizer) {
+            console.info("Destroying old visualizer");
+            visualizer.getVisualizer().destroy();
+        }
+
         return libhaliteviz.parseReplay(buffer).then((replay) => {
             console.log(replay);
 
@@ -35,6 +43,10 @@
                         replay: Object.freeze(replay),
                     },
                 }),
+                mounted: function() {
+                    visualizer = this.$children[0];
+                    console.log(visualizer);
+                },
             });
         });
     }

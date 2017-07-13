@@ -136,6 +136,12 @@ export class HaliteVisualizer {
         this.onDeselect = function() {};
     }
 
+    destroy() {
+        this.pause();
+        this.application.destroy(true);
+        PIXI.ticker.shared.stop();
+    }
+
     get currentSubstep() {
         return this.replay.frames[this.frame][this.substep];
     }
