@@ -62,8 +62,8 @@ public class Behavior {
                     double newAngle = Movement.orientTowards(ship.getPosition(), this.target);
                     return new ThrustMove(
                             gameMap.getShip(gameMap.getMyPlayerId(), shipId),
-                            gameMap.adjustForCollision(ship.getPosition(), (short) 2,
-                                    (short) newAngle, MAX_ADJUSTMENT_TRIES));
+                            gameMap.adjustForCollision(ship.getPosition(),
+                                    (short) newAngle, (short) 2, MAX_ADJUSTMENT_TRIES));
                 }
                 else if (turnsLeft <= turnsToDecelerate || this.state == State.Braking) {
                     this.state = State.Braking;
