@@ -12,11 +12,10 @@ public class BehaviorManager {
     private void updateBehaviors(GameMap gameMap, Vector<Move> moves, long id, Behavior behavior) {
         if (!behavior.isFinished(gameMap))
             moves.add(behavior.next(gameMap));
-        else
-            this.behaviors.remove(id);
     }
 
     void update(GameMap gameMap, Vector<Move> moves) {
+        behaviors.entrySet().removeIf((entry) -> entry.getValue().isFinished(gameMap));
         behaviors.forEach((id, behavior) -> updateBehaviors(gameMap, moves, id, behavior));
     }
 
