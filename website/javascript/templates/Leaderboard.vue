@@ -1,11 +1,13 @@
 <template>
     <div>
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Find username" v-model="username_filter" />
-            <span class="input-group-btn">
-                <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter" ><i class="fa fa-search" aria-hidden="true"></i></button>
-            </span>
-        </div><!-- /input-group -->
+        <form v-on:submit="update_filter">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Find username" v-model="username_filter" />
+                <span class="input-group-btn">
+                    <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button>
+                </span>
+            </div><!-- /input-group -->
+        </form>
         <table class="table">
             <thead>
                 <tr>
@@ -48,7 +50,9 @@
             this.update_filter();
         },
         methods: {
-            update_filter: function() {
+            update_filter: function(e) {
+                if (e) e.preventDefault();
+
                 let filters;
                 if (this.username_filter.length > 0) {
                     filters = "username,=," + this.username_filter;
