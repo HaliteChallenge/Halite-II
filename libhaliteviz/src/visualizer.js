@@ -9,6 +9,7 @@ const msgpack = require("msgpack-lite");
 
 
 const VISUALIZER_SIZE = 640;
+const STATS_SIZE = 20;
 const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 export const PLANET_COLOR = 0xb7b7b7;
@@ -61,7 +62,8 @@ export class HaliteVisualizer {
         this.frame = 0;
         this.substep = 0;
         this.application = new PIXI.Application(
-            VISUALIZER_SIZE, 100 + VISUALIZER_SIZE * (this.replay.height / this.replay.width),
+            VISUALIZER_SIZE,
+            2 * STATS_SIZE + VISUALIZER_SIZE * (this.replay.height / this.replay.width),
             {
                 backgroundColor: 0x15223F,
             }
@@ -78,7 +80,7 @@ export class HaliteVisualizer {
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
         this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
         this.container = new PIXI.Container();
-        this.container.position.set(0, 100);
+        this.container.position.set(0, 2 * STATS_SIZE);
 
         this.planets = [];
         for (let i = 0; i < this.replay.planets.length; i++) {
@@ -116,8 +118,10 @@ export class HaliteVisualizer {
         this.statsDisplay = new PIXI.Graphics();
 
         this.shipStrengthLabel = new PIXI.Text("Relative Fleet Strength");
+        this.shipStrengthLabel.style.fontSize = STATS_SIZE * 0.6;
         this.planetStrengthLabel = new PIXI.Text("Relative Territory");
-        this.planetStrengthLabel.position.y = 50;
+        this.planetStrengthLabel.style.fontSize = STATS_SIZE * 0.6;
+        this.planetStrengthLabel.position.y = STATS_SIZE;
 
         this.application.stage.addChild(this.container);
         this.application.stage.addChild(this.statsDisplay);
@@ -547,24 +551,22 @@ export class HaliteVisualizer {
         for (let player = 0; player < this.replay.num_players; player++) {
             const width = VISUALIZER_SIZE * (stats.ships[player] || 0) / stats.total_ships;
             this.statsDisplay.beginFill(PLAYER_COLORS[player]);
-            this.statsDisplay.drawRect(x, 0, width, 40);
+            this.statsDisplay.drawRect(x, 0, width, STATS_SIZE * 0.8);
             this.statsDisplay.endFill();
             x += width;
         }
-        this.statsDisplay.beginFill(0x000000);
-        this.statsDisplay.drawRect(0, 40, VISUALIZER_SIZE, 10);
-        this.statsDisplay.endFill();
+
         x = 0;
         for (let player = 0; player < this.replay.num_players; player++) {
             const width = VISUALIZER_SIZE * (stats.planets[player] || 0) / this.replay.planets.length;
             this.statsDisplay.beginFill(PLAYER_COLORS[player]);
-            this.statsDisplay.drawRect(x, 50, width, 40);
+            this.statsDisplay.drawRect(x, STATS_SIZE, width, STATS_SIZE * 0.8);
             this.statsDisplay.endFill();
             x += width;
         }
         const width = VISUALIZER_SIZE * (stats.planets["unowned"] || 0) / this.replay.planets.length;
         this.statsDisplay.beginFill(PLANET_COLOR);
-        this.statsDisplay.drawRect(x, 50, width, 40);
+        this.statsDisplay.drawRect(x, STATS_SIZE, width, STATS_SIZE * 0.8);
         this.statsDisplay.endFill();
         this.statsDisplay.drawRect(0, 90, VISUALIZER_SIZE, 10);
     }
