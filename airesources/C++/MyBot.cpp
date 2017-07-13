@@ -27,11 +27,11 @@ int main() {
                     continue;
                 }
 
-                if (hlt::can_dock(ship, planet)) {
+                if (ship.can_dock(planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
                 }
                 else {
-                    const auto angle = hlt::orient_towards(ship, planet);
+                    const auto angle = ship.angle_to(planet);
                     moves.push_back(hlt::Move::thrust(ship_id, angle, 2));
                 }
 

@@ -48,7 +48,17 @@ namespace hlt {
         }
     };
 
+    /**
+     * Uniquely identifies each player.
+     */
     typedef unsigned char PlayerId;
+    /**
+     * Used to identify a ship or planet.
+     *
+     * Ships are uniquely identified by a combination of the PlayerId of their
+     * owner and their EntityIndex. Planets are uniquely identified by their
+     * EntityIndex alone.
+     */
     typedef unsigned long EntityIndex;
 
     /** Global state */
@@ -69,16 +79,19 @@ namespace hlt {
         int MAX_ACCELERATION = 10;
 
         unsigned short MAX_SHIP_HEALTH = 255;
-        unsigned short BASE_SHIP_HEALTH = 127;
-        unsigned short DOCKED_SHIP_REGENERATION = 32;
+        unsigned short BASE_SHIP_HEALTH = 255;
+        unsigned short DOCKED_SHIP_REGENERATION = 0;
 
         unsigned int WEAPON_COOLDOWN = 1;
         int WEAPON_RADIUS = 5;
-        int WEAPON_DAMAGE = 64;
+        int WEAPON_DAMAGE = 128;
+        unsigned int EXPLOSION_RADIUS = 5;
 
         unsigned int MAX_DOCKING_DISTANCE = 4;
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
+        unsigned int BASE_PRODUCTIVITY = 25;
+        unsigned int ADDITIONAL_PRODUCTIVITY = 15;
 
         static auto get_mut() -> GameConstants& {
             // Guaranteed initialized only once by C++11
@@ -96,6 +109,24 @@ namespace hlt {
      */
     struct Location {
         unsigned short pos_x, pos_y;
+
+        auto distance_to(const Location& l2) const -> double {
+            const auto dx = this->pos_x - l2.pos_x;
+            const auto dy = this->pos_y - l2.pos_y;
+            return std::sqrt(dx * dx + dy * dy);
+        }
+
+        auto angle_to(const Location& target) const -> double {
+            auto dx = target.pos_x - this->pos_x;
+            auto dy = target.pos_y - this->pos_y;
+
+            auto angle_rad = std::atan2(dy, dx);
+            if (angle_rad < 0) {
+                angle_rad += 2 * M_PI;
+            }
+
+            return angle_rad;
+        }
 
         friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream& {
             ostream << '(' << location.pos_x << ", " << location.pos_y << ')';
@@ -123,7 +154,8 @@ namespace hlt {
     }
 
     /**
-     * Superclass of a ship and a planet.
+     * Superclass of a ship and a planet. Represents the state of an entity
+     * at the beginning of a given turn.
      */
     struct Entity {
         Location location;
@@ -137,6 +169,19 @@ namespace hlt {
         bool is_alive() const {
             return health > 0;
         }
+
+        /**
+         * Return the angle between this entity and the target entity/location.
+         * @param target
+         * @return
+         */
+        auto angle_to(const Entity& target) const -> double {
+            return this->location.angle_to(target.location);
+        }
+
+        auto angle_to(const Location& target) const -> double {
+            return this->location.angle_to(target);
+        }
     };
 
     /**
@@ -147,20 +192,6 @@ namespace hlt {
         Docking = 1,
         Docked = 2,
         Undocking = 3,
-    };
-
-    struct Ship : Entity {
-        Velocity velocity;
-
-        //! The turns left before the ship can fire again.
-        unsigned int weapon_cooldown;
-
-        DockingStatus docking_status;
-        //! The number of turns left to complete (un)docking.
-        unsigned int docking_progress;
-        //! The index of the planet this ship is docked to. Only valid if
-        //! Ship::docking_status is -not- DockingStatus::Undocked.
-        EntityIndex docked_planet;
     };
 
     struct Planet : Entity {
@@ -180,10 +211,28 @@ namespace hlt {
         std::vector<EntityIndex> docked_ships;
     };
 
-    enum class EntityType {
-        InvalidEntity,
-        ShipEntity,
-        PlanetEntity,
+    struct Ship : Entity {
+        Velocity velocity;
+
+        //! The turns left before the ship can fire again.
+        unsigned int weapon_cooldown;
+
+        DockingStatus docking_status;
+        //! The number of turns left to complete (un)docking.
+        unsigned int docking_progress;
+        //! The index of the planet this ship is docked to. Only valid if
+        //! Ship::docking_status is -not- DockingStatus::Undocked.
+        EntityIndex docked_planet;
+
+        /**
+         * Check if this ship is close enough to dock to the given planet.
+         * @param planet
+         * @return
+         */
+        auto can_dock(const Planet& planet) const -> bool {
+            return this->location.distance_to(planet.location) <=
+                GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
+        }
     };
 
     enum class MoveType {
@@ -240,6 +289,16 @@ namespace hlt {
                            std::pair<double, unsigned short> direction) -> Move {
             return thrust(ship_id, direction.first, direction.second);
         }
+    };
+
+    /**
+     * The type of an entity represented by an entity ID.
+     */
+    enum class EntityType {
+        //! This entity ID does not represent an actual entity.
+        InvalidEntity,
+        ShipEntity,
+        PlanetEntity,
     };
 
     //! A way to uniquely identify an Entity, regardless of its type.
@@ -314,13 +373,28 @@ namespace hlt {
         }
     };
 
+    /**
+     * Represents the state of the game map at the beginning of a given turn.
+     */
     class Map {
     public:
+        /**
+         * A map of all the ships in the game, keyed by the player's tag and
+         * the ship's index.
+         */
         std::unordered_map<PlayerId, std::unordered_map<EntityIndex, Ship>> ships;
+        /**
+         * A map of all the planets in the game, keyed by the planet's index.
+         */
         std::unordered_map<EntityIndex, Planet> planets;
         // Number of rows and columns, NOT maximum index.
         unsigned short map_width, map_height;
 
+        /**
+         * A map of what locations are occupied by what entities, generated
+         * by #generate_occupancy_map. It is indexed by the x, then the y
+         * coordinate.
+         */
         std::vector<std::vector<EntityId>> occupancy_map;
 
         Map(unsigned short width, unsigned short height) {
@@ -497,13 +571,11 @@ namespace hlt {
                 auto xp = static_cast<int>(current_x);
                 auto yp = static_cast<int>(current_y);
 
-                if (xp < 0 || xp >= map_width || yp < 0 || yp >= map_height) {
-                    return true;
-                }
-
                 if (xp == start.pos_x && yp == start.pos_y) {
                     continue;
                 }
+
+                if (!occupiable(xp, yp)) return true;
 
                 auto occupancy = occupancy_map[xp][yp];
                 if (occupancy.is_valid()) {
@@ -534,13 +606,15 @@ namespace hlt {
             while (tries > 0) {
                 if (forecast_collision(start, angle, thrust)) {
                     std::stringstream log_msg;
-                    log_msg << "Forecasted collision for " << start << " at angle " << angle << " at thrust " << thrust;
+                    log_msg << "Forecasted collision for " << start
+                            << " at angle " << angle << " at thrust " << thrust;
                     Log::log(log_msg.str());
                     angle += M_PI / 12;
                 }
                 else {
                     std::stringstream log_msg;
-                    log_msg << "No forecasted collision for " << start << " at angle " << angle << " at thrust " << thrust;
+                    log_msg << "No forecasted collision for " << start
+                            << " at angle " << angle << " at thrust " << thrust;
                     Log::log(log_msg.str());
                     break;
                 }
@@ -550,67 +624,25 @@ namespace hlt {
 
             return std::make_pair(angle, thrust);
         }
-    };
 
-    static auto get_distance(Location l1, Location l2) -> double {
-        const auto dx = l1.pos_x - l2.pos_x;
-        const auto dy = l1.pos_y - l2.pos_y;
-        return std::sqrt(dx * dx + dy * dy);
-    }
-
-    /**
-     * Find the angle from something positioned at the start location to
-     * something positioned at the target location.
-     * @param start
-     * @param target
-     * @return
-     */
-    static auto orient_towards(const Location& start, const Location& target) -> double {
-        auto dx = target.pos_x - start.pos_x;
-        auto dy = target.pos_y - start.pos_y;
-
-        auto angle_rad = std::atan2(dy, dx);
-        if (angle_rad < 0) {
-            angle_rad += 2 * M_PI;
-        }
-
-        return angle_rad;
-    }
-
-    static auto orient_towards(const Ship& ship, const Entity& target) -> double {
-        return orient_towards(ship.location, target.location);
-    }
-
-    /**
-     * Check if the given ship is close enough to dock to the given planet.
-     * @param ship
-     * @param planet
-     * @return
-     */
-    static auto can_dock(const Ship& ship, const Planet& planet) -> bool {
-        return get_distance(ship.location, planet.location) <=
-            GameConstants::get().MAX_DOCKING_DISTANCE + planet.radius;
-    }
-
-    /**
-     * Find the closest point at the minimum given distance (radius) to the
-     * given target point from the given start point.
-     * @param game_map
-     * @param start
-     * @param target
-     * @param radius
-     * @return
-     */
-    // TODO: This API could be made more convenient/as a member function
-    auto closest_point(Map& game_map, const Location& start,
-                       const Location& target, unsigned short radius)
+        /**
+         * Find the closest point at the minimum given distance (radius) to the
+         * given target point from the given start point.
+         * @param start
+         * @param target
+         * @param radius
+         * @return
+         */
+        auto closest_point(const Location& start, const Location& target,
+                           unsigned short radius)
         -> std::pair<Location, bool> {
-        auto angle = orient_towards(start, target) + M_PI;
-        auto dx = static_cast<int>(radius * std::cos(angle));
-        auto dy = static_cast<int>(radius * std::sin(angle));
+            auto angle = start.angle_to(target) + M_PI;
+            auto dx = static_cast<int>(radius * std::cos(angle));
+            auto dy = static_cast<int>(radius * std::sin(angle));
 
-        return game_map.location_with_delta(target, dx, dy);
-    }
+            return this->location_with_delta(target, dx, dy);
+        }
+    };
 
     enum class BehaviorType {
         //! Stop the ship across multiple turns, as quickly as possible.
@@ -678,7 +710,7 @@ namespace hlt {
                     return brake(speed, angle, max_accel);
                 }
                 case BehaviorType::Warp: {
-                    auto distance = get_distance(ship.location, data.warp.target);
+                    auto distance = ship.location.distance_to(data.warp.target);
                     auto turns_left = 10000;
                     if (speed > 0) {
                         turns_left = static_cast<int>(distance / speed);
@@ -691,7 +723,7 @@ namespace hlt {
                     if (data.warp.braked || (data.warp.braking && speed == 0)) {
                         data.warp.braked = true;
                         // Move at low speed to target
-                        const auto angle = orient_towards(ship.location, data.warp.target);
+                        const auto angle = ship.angle_to(data.warp.target);
                         return hlt::Move::thrust(
                             ship_id,
                             game_map.adjust_for_collision(ship.location, angle, 2));
@@ -703,7 +735,7 @@ namespace hlt {
                     }
                     else {
                         // Accelerate
-                        auto angle = orient_towards(ship.location, data.warp.target);
+                        auto angle = ship.location.angle_to(data.warp.target);
                         auto thrust = static_cast<unsigned short>(
                             std::max(1, std::min(
                                 max_accel,

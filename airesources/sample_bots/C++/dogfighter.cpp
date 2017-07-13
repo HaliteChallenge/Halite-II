@@ -43,8 +43,10 @@ int main() {
             std::sort(
                 planets.begin(), planets.end(),
                 [&](const PlanetPair& planet1, const PlanetPair& planet2) -> bool {
-                    const auto distance1 = hlt::get_distance(ship.location, planet1.second.location);
-                    const auto distance2 = hlt::get_distance(ship.location, planet2.second.location);
+                    const auto distance1 =
+                        ship.location.distance_to(planet1.second.location);
+                    const auto distance2 =
+                        ship.location.distance_to(planet2.second.location);
                     return distance1 < distance2;
                 }
             );
@@ -60,11 +62,11 @@ int main() {
                 // the same frame
                 planet.owned = true;
 
-                if (hlt::can_dock(ship, planet)) {
+                if (ship.can_dock(planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
                 }
                 else {
-                    const auto angle = hlt::orient_towards(ship, planet);
+                    const auto angle = ship.angle_to(planet);
                     moves.push_back(hlt::Move::thrust(
                         ship_id,
                         game_map.adjust_for_collision(ship.location, angle, 2)));
@@ -77,16 +79,16 @@ int main() {
             std::sort(
                 enemies.begin(), enemies.end(),
                 [&](const hlt::Location& enemy1, const hlt::Location& enemy2) -> bool {
-                    const auto distance1 = hlt::get_distance(ship.location, enemy1);
-                    const auto distance2 = hlt::get_distance(ship.location, enemy2);
+                    const auto distance1 = ship.location.distance_to(enemy1);
+                    const auto distance2 = ship.location.distance_to(enemy2);
                     return distance1 < distance2;
                 }
             );
 
             for (const auto& enemy : enemies) {
-                if (hlt::get_distance(ship.location, enemy) > hlt::GameConstants::get().WEAPON_RADIUS) {
+                if (ship.location.distance_to(enemy) > hlt::GameConstants::get().WEAPON_RADIUS) {
                     // Stay near the ship
-                    const auto angle = hlt::orient_towards(ship.location, enemy);
+                    const auto angle = ship.location.angle_to(enemy);
                     moves.push_back(hlt::Move::thrust(
                         ship_id,
                         game_map.adjust_for_collision(ship.location, angle, 2)));
@@ -100,7 +102,3 @@ int main() {
         hlt::send_moves(moves);
     }
 }
-//
-// Created by David Li on 6/20/17.
-//
-

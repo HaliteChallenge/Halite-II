@@ -38,8 +38,8 @@ int main() {
             std::sort(
                 planets.begin(), planets.end(),
                 [&](const PlanetPair& planet1, const PlanetPair& planet2) -> bool {
-                    const auto distance1 = hlt::get_distance(ship.location, planet1.second.location);
-                    const auto distance2 = hlt::get_distance(ship.location, planet2.second.location);
+                    const auto distance1 = ship.location.distance_to(planet1.second.location);
+                    const auto distance2 = ship.location.distance_to(planet2.second.location);
                     return distance1 < distance2;
                 }
             );
@@ -55,20 +55,20 @@ int main() {
                 // the same frame
                 planet.owned = true;
 
-                auto closest_point = hlt::closest_point(
-                    game_map, ship.location, planet.location,
+                auto closest_point = game_map.closest_point(
+                    ship.location, planet.location,
                     planet.radius + hlt::GameConstants::get().MAX_DOCKING_DISTANCE);
 
-                if (hlt::can_dock(ship, planet)) {
+                if (ship.can_dock(planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
                 }
                 else if (closest_point.second &&
                     game_map.pathable(ship.location, closest_point.first) &&
-                    hlt::get_distance(ship.location, planet.location) > 10) {
+                    ship.location.distance_to(planet.location) > 10) {
                     behaviors.warp_to(ship_id, closest_point.first);
                 }
                 else {
-                    const auto angle = hlt::orient_towards(ship, planet);
+                    const auto angle = ship.angle_to(planet);
                     moves.push_back(hlt::Move::thrust(
                         ship_id,
                         game_map.adjust_for_collision(ship.location, angle, 2)));
