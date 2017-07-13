@@ -3,6 +3,7 @@ import os
 import os.path
 import glob
 import json
+import random
 import shutil
 import subprocess
 import traceback
@@ -168,5 +169,5 @@ if __name__ == "__main__":
             traceback.print_exc()
             print("Sleeping...\n")
 
-        sleep(5)
+        sleep(random.randint(4, 10))
 
