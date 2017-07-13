@@ -4,7 +4,7 @@ title: Halite Privacy Policy
 permalink: /privacy/
 ---
 
-### Effective Date July 17, 2017 (last updated November 2, 2016).
+### Effective Date July 17, 2017 (last updated July 13, 2017).
 
 This Privacy Policy applies to our websites and platforms.
 

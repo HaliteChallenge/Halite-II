@@ -26,7 +26,7 @@ Welcome to the Halite II closed Two Sigma alpha competition!  If you’re here, 
     - Java
     - C++
     
-    Don’t see your language yet? [Let us know][contact] or [make your own starter bot][make-bot].
+    Don’t see your language yet? [Let us know][contact]. We'll have documents on how to make your own bot after our alpha comeptition.
     
     Unzip the game environment into the same directory as the starter kit.
 4. Visualize and Play Your Bot
@@ -47,6 +47,5 @@ You can reach us anytime at <mailto:halite@halite.io> for questions or support o
 [downloads]: {{ site.baseurl }}/learn/downloads
 [contact]: {{ site.baseurl }}/contact
 [submit]: {{ site.baseurl }}/learn/in_depth/submit
-[make-bot]: #
 [play]: {{ site.baseurl }}/play
 [leaderboard]: {{ site.baseurl }}/leaderboard

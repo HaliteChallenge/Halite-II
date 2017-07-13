@@ -97,6 +97,6 @@ If any provision of these Terms is held to be invalid or unenforceable in any ju
 
 This website is not an offer to, or solicitation of, any potential clients or investors for the provision by Two Sigma of investment management, advisory or any other related services. No material listed on this website is or should be construed as investment advice, nor is anything on this website an offer to sell, or a solicitation of an offer to buy, any security or other instrument. Links from this website to third-party websites do not imply any endorsement by the third party of this website or of the link; nor do they imply any endorsement by this firm of the third-party website or of the link
 
-**Last Updated November 2, 2016**
+**Last Updated July 13, 2017**
 
 © 2017 Two Sigma Open Source, LLC. ALL RIGHTS RESERVED.

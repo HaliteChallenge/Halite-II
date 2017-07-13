@@ -10,12 +10,17 @@
   "author": "David Li <David.M.Li@TwoSigma.com>",
   "license": "MIT",
   "dependencies": {
+    "extend": "^3.0.1",
+    "hawk": "^6.0.1",
     "jquery": "^3.2.1",
+    "json-stringify-safe": "^5.0.1",
+    "mkdirp": "^0.5.1",
     "msgpack-lite": "^0.1.26",
     "pako": "^1.0.5",
     "pixi-extra-filters": "^1.1.4",
     "pixi.js": "^4.5.3",
     "seedrandom": "^2.4.3",
+    "tough-cookie": "^2.3.2",
     "vue": "^2.3.4"
   },
   "devDependencies": {

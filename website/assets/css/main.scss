@@ -21,6 +21,7 @@ body {
     margin-bottom: 60px;
     background: #002226;
     color: white;
+    padding-bottom: 10em;
 }
 
 .doc-nav, .doc-toc {
@@ -74,6 +75,10 @@ body {
 .home-about-halite {
     margin: $line-height-computed 0;
 }
+.container {
+    padding: 1em 0;
+}
+
 
 /* General Styles */
 .img-full {
