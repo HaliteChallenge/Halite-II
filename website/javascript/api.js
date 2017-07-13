@@ -115,7 +115,8 @@ export function register_me(data) {
 }
 
 export function get_replay(game_id, progress_callback) {
-    return new Promise((resolve, reject) => {
+    let game_data_promise = Promise.resolve($.get(`${API_SERVER_URL}/user/0/match/${game_id}`));
+    let replay_promise = new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("GET", `${API_SERVER_URL}/user/0/match/${game_id}/replay`, true);
@@ -138,6 +139,12 @@ export function get_replay(game_id, progress_callback) {
         };
 
         xhr.send();
+    });
+    return Promise.all([game_data_promise, replay_promise]).then(([game, replay]) => {
+        return {
+            game: game,
+            replay: replay,
+        }
     });
 }
 

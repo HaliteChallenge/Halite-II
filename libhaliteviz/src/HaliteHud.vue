@@ -15,8 +15,16 @@
         <div class="row">
             <div class="halite-visualizer-canvas col-md-8" ref="visualizer_container"></div>
             <div class="halite-visualizer-info col-md-4">
-                <div v-for="(player_name, index) in replay.player_names">
-                    <h3 :style="'color: ' + colors[index]">{{ player_name }}</h3>
+                <div v-for="(player_name, index) in player_names">
+                    <h3 :style="'color: ' + colors[index]">
+                        <a :style="'color: ' + colors[index]"
+                           :href="player_name.user_link || '#'">
+                            <img v-if="player_name.profile_image_link"
+                                 :src="player_name.profile_image_link"
+                                 class="img-circle">
+                            {{ player_name.bot_name }}
+                        </a>
+                    </h3>
                     <dl>
                         <dt>Ship Count</dt>
                         <dd>{{ statistics[index].ships }}</dd>
@@ -44,10 +52,7 @@
                 </div>
             </div>
         </div>
-        </div>
-
-       
-
+    </div>
 </template>
 
 <script>
@@ -55,7 +60,7 @@
 
     export default {
         name: "halite-hud",
-        props: ["replay"],
+        props: ["replay", "game", "makeUserLink", "getUserProfileImage"],
         data: function() {
             return {
                 colors: PLAYER_COLORS.map((color) => {
@@ -72,6 +77,7 @@
                     kind: null,
                     id: null,
                 },
+                player_names: null,
             };
         },
         mounted: function() {
@@ -108,6 +114,34 @@
                 visualizer.onUpdate();
             };
             this.getVisualizer = () => visualizer;
+
+            let player_names = [];
+            if (this.game) {
+                for (let player_id of Object.keys(this.game.players)) {
+                    const idx = this.game.players[player_id].player_index;
+                    let player_data = {
+                        bot_name: this.replay.player_names[idx],
+                        profile_image_link: "",
+                        user_id: player_id,
+                        user_link: this.makeUserLink(player_id),
+                    };
+                    player_names.push(player_data);
+
+                    this.getUserProfileImage(player_id).then((url) => {
+                        player_data.profile_image_link = url;
+                    });
+                }
+            }
+            else {
+                for (let idx = 0; idx < this.replay.player_names.length; idx++) {
+                    player_names.push({
+                        bot_name: this.replay.player_names[idx],
+                        username: "",
+                        user_id: null,
+                    });
+                }
+            }
+            this.player_names = player_names;
         },
         methods: {
             // Stubs - see mounted()
@@ -182,6 +216,11 @@
 
         h3:first-child {
             margin-top: 0;
+        }
+
+        img {
+            max-width: 40px;
+            max-height: 40px;
         }
     }
 

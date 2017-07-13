@@ -19,16 +19,15 @@
 
     let visualizer;
 
-    function showGame(buffer) {
+    function showGame(game) {
         console.log(visualizer);
         if (visualizer) {
             console.info("Destroying old visualizer");
             visualizer.getVisualizer().destroy();
         }
 
+        const buffer = game.replay;
         return libhaliteviz.parseReplay(buffer).then((replay) => {
-            console.log(replay);
-
             let outerContainer = document.getElementById("visualizer");
             for (let child of outerContainer.children) {
                 outerContainer.removeChild(child);
@@ -41,6 +40,15 @@
                 render: (h) => h(libhaliteviz.HaliteHud, {
                     props: {
                         replay: Object.freeze(replay),
+                        game: game.game,
+                        makeUserLink: function(user_id) {
+                            return `${api.API_SERVER_URL}/user/${user_id}`;
+                        },
+                        getUserProfileImage: function(user_id) {
+                            return api.get_user(user_id).then((user) => {
+                                return api.make_profile_image_url(user.username);
+                            });
+                        },
                     },
                 }),
                 mounted: function() {
@@ -74,9 +82,9 @@
                         this.is_downloading = true;
                         this.progress = Math.floor(100 * progress);
                     }
-                }).then((replay) => {
+                }).then((game) => {
                     this.message = "Parsing replay, please wait…";
-                    showGame(replay).then(() => {
+                    showGame(game).then(() => {
                         this.is_downloading = false;
                         this.message = null;
                     }).catch((e) => {
@@ -106,7 +114,10 @@
                 if (files.length > 0) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        showGame(e.target.result);
+                        showGame({
+                            game: null,
+                            replay: e.target.result,
+                        });
                     };
                     reader.readAsArrayBuffer(files[0]);
                 }
