@@ -15,6 +15,14 @@
         <div class="row">
             <div class="halite-visualizer-canvas col-md-8" ref="visualizer_container"></div>
             <div class="halite-visualizer-info col-md-4">
+                <dl>
+                    <dt>Map Size</dt>
+                    <dd>{{ replay.width }}x{{ replay.height }}</dd>
+
+                    <dt>Map Parameters</dt>
+                    <dd>{{ replay.map_generator }}, seed: {{ replay.seed }}</dd>
+                </dl>
+                <small>Replay version {{ replay.version }}</small>
                 <div v-for="(player_name, index) in player_names">
                     <h3 :style="'color: ' + colors[index]">
                         <a :style="'color: ' + colors[index]"
@@ -214,8 +222,8 @@
         width: 300px;
         padding-left: 40px;
 
-        h3:first-child {
-            margin-top: 0;
+        h3 {
+            margin-top: 0.15em;
         }
 
         img {
@@ -239,5 +247,9 @@
 
     .infosummary {
         float: right
+    }
+
+    dl {
+        margin: 0;
     }
 </style>
