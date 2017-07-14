@@ -60,10 +60,11 @@ public class Behavior {
                 if (this.state == State.Stopped || (this.state == State.Braking && speed == 0)) {
                     this.state = State.Stopped;
                     double newAngle = Movement.orientTowards(ship.getPosition(), this.target);
+                    short thrust = (short) Math.max(1, Math.min(distance, Constants.DRAG));
                     return new ThrustMove(
                             gameMap.getShip(gameMap.getMyPlayerId(), shipId),
                             gameMap.adjustForCollision(ship.getPosition(),
-                                    (short) newAngle, (short) 2, MAX_ADJUSTMENT_TRIES));
+                                    newAngle, thrust, MAX_ADJUSTMENT_TRIES));
                 }
                 else if (turnsLeft <= turnsToDecelerate || this.state == State.Braking) {
                     this.state = State.Braking;

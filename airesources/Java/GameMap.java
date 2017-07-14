@@ -164,7 +164,6 @@ public class GameMap {
     }
 
     GameMap updateMap(LinkedList<String> mapMetadata) {
-
         short numberOfPlayers = Short.parseShort(mapMetadata.pop());
 
         players.clear();
