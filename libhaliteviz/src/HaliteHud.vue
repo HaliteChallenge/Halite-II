@@ -1,8 +1,12 @@
 <template>
     <div class="halite-visualizer">
         <div class="halite-visualizer-controls">
-            <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
-            <button class="btn btn-default playbutton" v-else v-on:click="play" title="Play"><i class="fa fa-play" aria-hidden="true"></i> </button>
+            <div class="btn-group" role="group">
+                <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
+                <button class="btn btn-default playbutton" v-else v-on:click="play" title="Play"><i class="fa fa-play" aria-hidden="true"></i> </button>
+                <!--<button class="btn btn-default" v-if="!recording" v-on:click="beginCaptureGIF" title="Start capturing GIF"><i class="fa fa-video-camera" aria-hidden="true"></i> </button>-->
+                <!--<button class="btn btn-default" v-else v-on:click="renderGIF" title="Finish capturing GIF"><i class="fa fa-pause" aria-hidden="true"></i> </button>-->
+            </div>
 
             Frame: <input type="text" :value="frame + '.' + substep" />
         </div>
@@ -89,6 +93,9 @@
                     id: null,
                 },
                 player_names: null,
+                encoding: false,
+                recording: false,
+                start_frame: 0,
             };
         },
         mounted: function() {
@@ -113,9 +120,11 @@
             };
             visualizer.play();
             this.play = () => {
+                if (this.encoding) return;
                 visualizer.play();
             };
             this.pause = () => {
+                if (this.encoding) return;
                 visualizer.pause();
             };
             this.scrub = (e) => {
@@ -125,6 +134,27 @@
                 visualizer.onUpdate();
             };
             this.getVisualizer = () => visualizer;
+            this.beginCaptureGIF = () => {
+                if (!visualizer.isPlaying()) this.play();
+                this.start_frame = this.frame;
+                this.start_substep = this.substep;
+                this.recording = true;
+            };
+            this.renderGIF = () => {
+                this.pause();
+                this.recording = false;
+                this.encoding = true;
+                visualizer.encodeGIF({
+                    frame: this.start_frame,
+                    substep: this.start_substep,
+                }, {
+                    frame: this.frame,
+                    substep: this.substep,
+                }).then((blob) => {
+                    this.encoding = false;
+                    window.open(URL.createObjectURL(blob));
+                });
+            };
 
             let player_names = [];
             if (this.game) {
@@ -162,7 +192,9 @@
             },
             scrub: function(e) {
             },
-            getVisualizer: function() {}
+            getVisualizer: function() {},
+            beginCaptureGIF: function() {},
+            renderGIF: function() {},
         },
         computed: {
             statistics: function() {

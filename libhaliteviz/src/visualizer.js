@@ -146,6 +146,41 @@ export class HaliteVisualizer {
         PIXI.ticker.shared.stop();
     }
 
+    encodeGIF(start, stop) {
+        if (!window.GIF) {
+            const error = "GIF.js not loaded, can't encode GIF";
+            console.error(error);
+            return Promise.error(error);
+        }
+
+        this.pause();
+        PIXI.ticker.shared.stop();
+        const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            // TODO:
+            workerScript: "assets/js/gif.worker.js",
+        });
+
+        this.frame = start.frame;
+        this.substep = 0;
+
+        while (this.frame <= stop.frame) {
+            this.draw();
+            this.application.render();
+            const canvas = this.application.renderer.extract.canvas();
+            gif.addFrame(canvas, { copy: true });
+            this.advanceSubsteps(this.replay.frames[this.frame].length);
+        }
+
+        return new Promise((resolve) => {
+            gif.on("finished", function(blob) {
+                resolve(blob);
+            });
+            gif.render();
+        });
+    }
+
     get currentSubstep() {
         return this.replay.frames[this.frame][this.substep];
     }
@@ -232,28 +267,32 @@ export class HaliteVisualizer {
         if (this.timer) return;
 
         this.timer = window.setInterval(() => {
-            for (let i = 0; i < 8; i++) {
-                this.substep++;
-                if (this.substep >= this.replay.frames[this.frame].length) {
-                    this.substep = 0;
-                    this.frame++;
-                }
-
-                if (this.frame >= this.replay.frames.length) {
-                    this.pause();
-                    this.frame = this.replay.frames.length - 1;
-                    this.substep = this.replay.frames[this.frame].length - 1;
-                    this.onEnd();
-                    break;
-                }
-
-                this.update();
-            }
-
-            this.onUpdate();
+            this.advanceSubsteps(8);
         }, 1000/20);
 
         this.onPlay();
+    }
+
+    advanceSubsteps(substeps) {
+        for (let i = 0; i < substeps; i++) {
+            this.substep++;
+            if (this.substep >= this.replay.frames[this.frame].length) {
+                this.substep = 0;
+                this.frame++;
+            }
+
+            if (this.frame >= this.replay.frames.length) {
+                this.pause();
+                this.frame = this.replay.frames.length - 1;
+                this.substep = this.replay.frames[this.frame].length - 1;
+                this.update();
+                this.onEnd();
+                break;
+            }
+
+            this.update();
+        }
+        this.onUpdate();
     }
 
     pause() {
