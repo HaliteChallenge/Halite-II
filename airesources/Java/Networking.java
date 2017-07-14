@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -84,6 +86,13 @@ public class Networking {
 
         inputStringComponents = Networking.parseInput();
         gameMap.updateMap(inputStringComponents);
+
+        // Initialize debugging log
+        try {
+            DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return gameMap;
     }
