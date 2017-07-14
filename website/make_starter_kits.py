@@ -51,7 +51,7 @@ def scan_directory(full_path):
     for extension in extensions:
         included_files.extend(glob.glob(os.path.join(full_path, "*" + extension)))
 
-    # TODO: also get sample bots
+    # TODO: also get sample bots and READMEs
 
     return included_files
 

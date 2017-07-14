@@ -10,6 +10,8 @@ These downloads include both the Halite game environment (pre-compiled) as well 
 
 [Source code download]({{ site.data.downloads.source }})
 
+## Game Environments and Starter Kits
+
 <table class="table">
     <thead>
         <tr>
@@ -41,3 +43,9 @@ These downloads include both the Halite game environment (pre-compiled) as well 
         </tr>
     </tbody>
 </table>
+
+## Standalone Visualizer
+
+Only available for MacOS at the moment. (Sorry!)
+
+[MacOS DMG]({{ site.baseurl }}/assets/downloads/Standalone_MacOS.dmg)
