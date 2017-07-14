@@ -61,6 +61,9 @@ public class Behavior {
                     this.state = State.Stopped;
                     double newAngle = Movement.orientTowards(ship.getPosition(), this.target);
                     short thrust = (short) Math.max(1, Math.min(distance, Constants.DRAG));
+                    DebugLog.debug(String.format("%d: low speed maneuver %f %d (%d %d) targeting (%d %d)",
+                            shipId, newAngle, thrust, ship.getPosition().getXPos(), ship.getPosition().getYPos(),
+                            this.target.getXPos(), this.target.getYPos()));
                     return new ThrustMove(
                             gameMap.getShip(gameMap.getMyPlayerId(), shipId),
                             gameMap.adjustForCollision(ship.getPosition(),

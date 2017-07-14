@@ -94,7 +94,7 @@ public class GameMap {
         return positionDelta(target, new Position(dx, dy));
     }
 
-    private boolean isOccupiable(Position position) {
+    public boolean isOccupiable(Position position) {
         if (isOutOfBounds(position.getXPos(), position.getYPos()))
             return false;
 
@@ -106,7 +106,7 @@ public class GameMap {
         return true;
     }
 
-    private boolean isPathable(Position start, Position target) {
+    public boolean isPathable(Position start, Position target) {
         if (!isOccupiable(target))
             return false;
 
