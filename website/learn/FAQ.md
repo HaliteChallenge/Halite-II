@@ -15,7 +15,7 @@ Halite (the tournament) is an online programming competition where human coders 
 
 ### Where does the game come from? Who invented it?
 
-Halite I was created by Benjamin Spector and Michael Truell during a summer internship at Two Sigma in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by David Li and Jaques Clapauch in 2017 at Two Sigma, with assistance from Ben and Michael.
+Halite I was created by Benjamin Spector and Michael Truell during a summer internship at Two Sigma in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by Benjamin Spector, Michael Truell, David Li, and Jaques Clapauch in 2017 at Two Sigma.
 
 ### Why did you invent it?
 
