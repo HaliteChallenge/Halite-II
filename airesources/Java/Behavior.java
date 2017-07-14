@@ -1,6 +1,6 @@
 public class Behavior {
     private static final short MAX_ADJUSTMENT_TRIES = 2;
-    public enum BehaviorType {Brake, Warp};
+    public enum BehaviorType {Brake, Warp}
     public enum State {Moving, Braking, Stopped}
     private BehaviorType type;
     private long shipId;
@@ -24,7 +24,7 @@ public class Behavior {
                 return ship.getVelocity().getXVelocity() == 0 &&
                         ship.getVelocity().getYVelocity() == 0;
             case Warp:
-                return ship.getPosition() == this.target;
+                return ship.getPosition().equals(this.target);
             default:
                 return true;
         }
