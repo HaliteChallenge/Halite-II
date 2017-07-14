@@ -47,6 +47,9 @@
                         <dt>ID</dt>
                         <dd>{{ selected.id }}</dd>
 
+                        <dt>Location</dt>
+                        <dd>({{ selected_planet.base.x }}, {{ selected_planet.base.y }}) radius={{ selected_planet.base.r }}</dd>
+
                         <dt>Health</dt>
                         <dd>{{ selected_planet.state.health }}/{{ selected_planet.base.health }}</dd>
 
