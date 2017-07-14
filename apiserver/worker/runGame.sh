@@ -31,19 +31,17 @@ for BOT in ${@:$BOTSTART:$NUMBOTS}; do
 done;
 
 BOTSTARTCOMMANDS=""
-for i in `seq $BOTSTART $((4+$NUMBOTS-1))`;
+# TODO: figure out what exactly this does
+# TODO: just port this all to Python?
+for i in `seq 4 $((4+$NUMBOTS-1))`;
 do
     BOT=${!i};
-    
+
     BOTNAMEINDEX=$(($i+$NUMBOTS));
     BOTNAME=${!BOTNAMEINDEX};
     CGROUP=halitebot_$i
 
-    # Grant control over the group to our user
-    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker
-    cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
-
-    BOTSTARTCOMMANDS+="\"cgexec -g cpu,memory:$CGROUP sh -c 'cd $PWD/$BOT && ./$RUNFILE'\" "
+    BOTSTARTCOMMANDS+="\"cgexec -g cpu,memory:$CGROUP sh -c 'cd $PWD/$BOT && sudo -u bot_${i} -s ./$RUNFILE'\" "
     BOTSTARTCOMMANDS+="\"$BOTNAME\" ";
 done
 

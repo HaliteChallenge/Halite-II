@@ -22,6 +22,10 @@ gcloud beta compute --project "${GCLOUD_PROJECT}" \
     firewall-rules create "disallow-coordinator-internal-traffic" \
     --action deny --rules tcp:5001 --direction "INGRESS" --priority "2000" \
     --network "default" --source-ranges "0.0.0.0/0" --target-tags "coordinator"
+gcloud compute --project "${GCLOUD_PROJECT}" \
+    firewall-rules create "allow-health-check" \
+     --source-ranges 130.211.0.0/22,35.191.0.0/16 \
+     --target-tags coordinator --allow tcp
 
 
 gcloud compute --project "${GCLOUD_PROJECT}" \

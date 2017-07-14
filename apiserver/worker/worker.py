@@ -6,6 +6,7 @@ import json
 import random
 import shutil
 import subprocess
+import tempfile
 import traceback
 
 from time import sleep, gmtime, strftime
@@ -15,8 +16,6 @@ import backend
 import compiler
 
 
-RUN_GAME_FILE_NAME = "runGame.sh"
-
 def makePath(path):
     """Deletes anything residing at path, creates path, and chmods the directory"""
     if os.path.exists(path):
@@ -24,6 +23,8 @@ def makePath(path):
     os.makedirs(path)
     os.chmod(path, 0o777)
 
+
+# TODO: compile as user
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     print("Compiling a bot with userID %s\n" % str(user_id))
@@ -73,39 +74,64 @@ def executeCompileTask(user_id, bot_id, backend):
         shutil.rmtree(workingPath)
 
 
-def downloadUsers(users):
-    for user in users:
-        user_dir = "{}_{}".format(user["user_id"], user["bot_id"])
-        if os.path.isdir(user_dir):
-            shutil.rmtree(user_dir)
-        os.mkdir(user_dir)
-        archive.unpack(backend.storeBotLocally(
-            user["user_id"], user["bot_id"], user_dir))
+# The game environment executable.
+ENVIRONMENT = "halite"
+# The script used to start the bot. This is either user-provided or
+# created by compile.py.
+RUNFILE = "run.sh"
+# The command used to run the bot. On the outside is a cgroup limiting CPU
+# and memory access. On the inside, we run the bot as a user so that it may
+# not overwrite files. The worker image has a built-in iptables rule denying
+# network access to this user as well.
+BOT_COMMAND = "cgexec -g cpu:memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
 
 
 def runGame(width, height, users):
-    runGameCommand = [
-        "bash",
-        RUN_GAME_FILE_NAME,
-        str(width), str(height),
-        str(len(users)),
-    ]
-    runGameCommand.extend(
-        "{}_{}".format(a["user_id"], a["bot_id"])
-        for a in users)
-    runGameCommand.extend(
-        '{} v{}'.format(a["username"], a["version_number"])
-        for a in users)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        shutil.copy(ENVIRONMENT, os.path.join(temp_dir, ENVIRONMENT))
 
-    print("Run game command %s\n" % runGameCommand)
-    print("Waiting for game output...\n")
-    lines = subprocess.Popen(
-        runGameCommand,
-        stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
-    print("\n-----Here is game output: -----")
-    print("\n".join(lines))
-    print("--------------------------------\n")
-    return lines
+        command = [
+            "./" + ENVIRONMENT,
+            "-d", "{} {}".format(width, height),
+            "-q", "-o",
+        ]
+
+        for user_index, user in enumerate(users):
+            bot_dir = "{}_{}".format(user["user_id"], user["bot_id"])
+            bot_dir = os.path.join(temp_dir, bot_dir)
+            os.mkdir(bot_dir)
+            archive.unpack(backend.storeBotLocally(user["user_id"],
+                                                   user["bot_id"], bot_dir))
+
+            # Make the start script executable
+            os.chmod(os.path.join(bot_dir, RUNFILE), 0o755)
+
+            # TODO: give the bot user ownership of their directory
+            # We should set up each user's default group as a group that the
+            # worker is also a part of. Then we always have access to their files,
+            # but not vice versa.
+            # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
+
+            command.append(BOT_COMMAND.format(
+                cgroup="bot_" + str(user_index),
+                bot_dir=bot_dir,
+                bot_user="bot_" + str(user_index),
+                runfile=RUNFILE,
+            ))
+            command.append("{} v{}".format(user["username"],
+                                           user["version_number"]))
+
+        print("Run game command %s\n" % command)
+        print("Waiting for game output...\n")
+        lines = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+        print("\n-----Here is game output: -----")
+        print("\n".join(lines))
+        print("--------------------------------\n")
+
+        # TODO: clean up. Change ownership back
+        return lines
 
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
@@ -132,7 +158,6 @@ def executeGameTask(width, height, users, backend):
     print("Running game with width %d, height %d\n" % (width, height))
     print("Users objects %s\n" % (str(users)))
 
-    downloadUsers(users)
     raw_output = '\n'.join(runGame(width, height, users))
     users, parsed_output = parseGameOutput(raw_output, users)
 
