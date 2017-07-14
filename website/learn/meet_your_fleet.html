@@ -1,0 +1,171 @@
+---
+layout: doc_page
+title: Meet Your Fleet
+toc: false
+---
+
+<section class="unit-card">
+    <header><h2>Map</h2></header>
+
+    <div class="card-body">
+        <h3>Coordinates &amp; Distances</h3>
+
+        <p>Space is a 2D grid, where grid cells (not grid points) are identified by an X and Y coordinate. The top-left cell is cell (0, 0), with positive X extending towards the right and positive Y extending toward the bottom. All distances are Euclidean (<code>sqrt(dx^2 + dy^2)</code>). Note that this makes the coordinate system left-handed!</p>
+
+        <h3 id="the-ether">The Ether</h3>
+
+        <p>Unlike human space, Halatian space is filled with an Ether that slows down things passing through it. Your ships' velocity will not remain constant without acceleration, but instead slow by 3 units/turn. Take advantage of this, Commander: by moving at low speeds, you can avoid having to consider inertia, allowing you to perform precise movements so long as you are not in a hurry.</p>
+    </div>
+</section>
+
+<section class="unit-card">
+    <header><h2>Ship</h2></header>
+
+    <div class="card-body">
+        <p>The basic unit of your fleet; a nimble ship <a href="{{ site.baseurl }}/learn/The-Story">built by depositing layers of pure Halite</a>. You start with three, but you'll want to make more.</p>
+
+        <p>Ships are uniquely identified by the combination of player ID and the ship ID. However, in commands, you need only give the ship ID, as we assume you are not controlling the enemy ships.</p>
+
+        <table class="table">
+            <caption>Properties</caption>
+            <thead>
+            <tr>
+                <th>Property</th>
+                <th>Description</th>
+                <th>Default</th>
+                <th>Max</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Health</td>
+                <td>Don't let this hit 0.</td>
+                <td>255</td>
+                <td>255</td>
+            </tr>
+            <tr>
+                <td>Velocity</td>
+                <td>How fast you're going.</td>
+                <td>0</td>
+                <td>
+                    30 units/turn <br>
+                    <i>Also see:</i> <a href="#the-ether">The Ether</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Attack Damage</td>
+                <td>Reduce enemy ships' health.</td>
+                <td>128</td>
+                <td>128</td>
+            </tr>
+            <tr>
+                <td>Attack Range</td>
+                <td>How far away you can attack something.</td>
+                <td>5 units</td>
+                <td>5 units</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="table">
+            <caption>Commands</caption>
+            <thead>
+            <tr>
+                <th>Command</th>
+                <th>Description</th>
+                <th>Arguments</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Thrust</td>
+                <td>Accelerate a ship in a given direction. Don't forget about the Ether!</td>
+                <td>
+                    <dl>
+                        <dt>Angle</dt>
+                        <dd>
+                            The direction you want to accelerate in. Note that positive angles go clockwise! <br>
+                            The ship understands only angles that are provided as an integer number of degrees, 0-359, but you may find that your starter kit works with radians and floating-point, converting only when necessary.
+                        </dd>
+                        <dt>Magnitude</dt>
+                        <dd>
+                            How much you want to accelerate. 0-10 units/turn<sup>2</sup>.
+                        </dd>
+                    </dl>
+                </td>
+            </tr>
+            <tr>
+                <td>Dock</td>
+                <td>Dock a ship to a planet, so that we may use its resources. This takes 5 turns to complete. Note that the ship is vulnerable unless it completely undocks: a ship in the process of docking or which is docked cannot move, respond to commands (besides Undock), or attack.</td>
+                <td>
+                    <dl>
+                        <dt>Planet</dt>
+                        <dd>The ID of the planet to dock to. The planet must be unowned (neutral) or owned by you, and keep in mind that there is a limit on the number of ships docked to a given planet.</dd>
+                    </dl>
+                </td>
+            </tr>
+            <tr>
+                <td>Undock</td>
+                <td>Undock a ship from a planet, so that you may use it again. Remember that the ship will be vulnerable until it completes this process, which will take 5 turns.</td>
+                <td>No arguments.</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>Movement & Warping</h3>
+    </div>
+</section>
+
+<section class="unit-card">
+    <header><h2>Combat</h2></header>
+
+    <div class="card-body">
+    </div>
+</section>
+
+<section class="unit-card">
+    <header><h2>Planet</h2></header>
+
+    <div class="card-body">
+        <h3>Planet Shape</h3>
+
+        <table class="table">
+            <caption>Properties</caption>
+            <thead>
+            <tr>
+                <th>Property</th>
+                <th>Description</th>
+                <th>Default</th>
+                <th>Max</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Health</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Radius</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Resources</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="unit-card">
+    <header><h2>Resources</h2></header>
+
+    <div class="card-body">
+    </div>
+</section>

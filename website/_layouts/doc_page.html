@@ -8,6 +8,8 @@ layout: default
 
         {% include navigation.html %}
     </nav>
+    {% capture toc %}{{ content | toc_only | strip }}{% endcapture %}
+    {% if page.toc and toc contains 'li' %}
     <div class="col-md-7">
         <div class="page-header">
             <h1>{{ page.title }}</h1>
@@ -15,11 +17,17 @@ layout: default
         {{ content | inject_anchors }}
     </div>
     <nav class="col-md-3 toc doc-toc">
-        {% capture toc %}{{ content | toc_only | strip }}{% endcapture %}
         {% if page.toc and toc contains 'li'  %}
         <header>Contents</header>
         {{ toc }}
         {% endif %}
     </nav>
-    
+    {% else %}
+    <div class="col-md-10">
+        <div class="page-header">
+            <h1>{{ page.title }}</h1>
+        </div>
+        {{ content }}
+    </div>
+    {% endif %}
 </div>

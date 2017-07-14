@@ -123,3 +123,85 @@ nav.side-nav {
 .timed-out {
     color: $brand-danger;
 }
+
+.progress-halite {
+    width: 80px;
+    height: 40px;
+    font-size: 0;
+
+    .progress-bar-halite-component {
+        position: relative;
+        display: inline-block;
+        width: 50%;
+        height: 100%;
+        background: rgba(#FF704B, 0.4);
+
+        &::after {
+            display: block;
+            position: absolute;
+            background: #FF704B;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            left: 10px;
+            content: " ";
+        }
+    }
+}
+
+.unit-card {
+    background: $panel-bg;
+    color: $panel-default-text;
+    margin: 0.25em;
+    border-radius: $border-radius-base;
+    border: 1px solid #000;
+
+    display: flex;
+
+    header {
+        h2 {
+            margin: 0;
+            font-size: $font-size-h3;
+            align-self: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        background: $panel-default-heading-bg;
+        border-radius: $border-radius-base 0 0 $border-radius-base;
+        align-self: stretch;
+        display: flex;
+        width: 14rem;
+    }
+
+    div.card-body {
+        flex: 1;
+
+        > *:not(table) {
+            padding: 0 $panel-body-padding;
+            &:first-child {
+                 padding: $panel-body-padding $panel-body-padding 0 $panel-body-padding;
+            }
+        }
+
+        h3 {
+            font-size: $font-size-base;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        table {
+            caption {
+                padding: 0 $panel-body-padding;
+            }
+
+            td {
+                dl {
+                    margin: 0;
+                }
+            }
+        }
+    }
+}
