@@ -17,12 +17,12 @@ It may be passed a number of flags, including:
 
 ## Examples
 
-To run your bot against itself on a 40 by 40 map with no timeouts, run:
+To run your bot against itself on a 160 by 160 map with no timeouts, run:
 
-- Linux/macOS: `./halite -d '40 40' -t 'python3 MyBot.py' 'python3 MyBot.py'`
-- Windows: `.\halite.exe -d '40 40' -t 'python3 MyBot.py' 'python3 MyBot.py'`
+- Linux/macOS: `./halite -d '160 160' -t 'python3 MyBot.py' 'python3 MyBot.py'`
+- Windows: `.\halite.exe -d '160 160' -t 'python3 MyBot.py' 'python3 MyBot.py'`
 
-To run your Python bot against a Java bot (assuming it’s been compiled) on a 25 by 25 map with a predefined seed (2168), run:
+To run your Python bot against a Java bot (assuming it’s been compiled) on a 255 by 255 map with a predefined seed (2168), run:
 
-- Linux/macOS: `./halite -d '25 25' -s 2168 'python3 PythonBot.py' 'java JavaBot'`
-- Windows: `.\halite.exe -d '25 25' -s 2168 'python3 PythonBot.py' 'java JavaBot'`
+- Linux/macOS: `./halite -d '255 255' -s 2168 'python3 PythonBot.py' 'java JavaBot'`
+- Windows: `.\halite.exe -d '255 255' -s 2168 'python3 PythonBot.py' 'java JavaBot'`
