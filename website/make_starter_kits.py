@@ -26,6 +26,11 @@ def detect_environments(directory):
     environments = [(PLATFORM_AGNOSTIC, None, None)]
     for filename in os.listdir(directory):
         platform, platform_ext = os.path.splitext(filename)
+
+        if platform == ".DS_Store":
+            # Dang it, MacOS
+            continue
+
         print("Detected platform", platform)
         environments.append((platform,
                              os.path.join(directory, filename),
@@ -41,6 +46,8 @@ def scan_directory(full_path):
 
     extensions = set()
     for file in possible_files:
+        if os.path.isdir(file):
+            continue
         _, ext = os.path.splitext(file)
         if ext.lower() in IGNORED_EXTENSIONS:
             continue
