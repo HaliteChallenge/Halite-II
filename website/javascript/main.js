@@ -62,7 +62,7 @@ api.me().then((me) => {
            render: (h) => h(UserProfileBar),
        });
 
-       if (me.is_new_user && window.location.pathname !== "/associate") {
+       if (me.is_new_user === true && window.location.pathname !== "/associate") {
            window.location.replace("/associate");
        }
    }
