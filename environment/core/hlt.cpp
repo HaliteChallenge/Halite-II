@@ -95,11 +95,24 @@ namespace hlt {
                 break;
             }
             case EntityType::ShipEntity: {
-                ships[entity_id.player_id()].erase(entity_id.entity_index());
+                ships[entity_id.player_id()][entity_id.entity_index()].kill();
                 break;
             }
             case EntityType::InvalidEntity: {
                 break;
+            }
+        }
+    }
+
+    auto Map::cleanup_entities() -> void {
+        for (auto& player_ships : ships) {
+            for (auto it = player_ships.begin(); it != player_ships.end();) {
+                if (!it->second.is_alive()) {
+                    it = player_ships.erase(it);
+                }
+                else {
+                    ++it;
+                }
             }
         }
     }
@@ -115,5 +128,7 @@ namespace hlt {
                 result.push_back(EntityId::for_planet(planet_idx));
             }
         }
+
+        return result;
     }
 }

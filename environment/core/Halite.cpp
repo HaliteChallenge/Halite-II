@@ -157,8 +157,9 @@ void Halite::kill_player(hlt::PlayerId player) {
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
         game_map.kill_entity(hlt::EntityId::for_ship(player, ship.first));
-        ship.second.kill();
     }
+
+    game_map.cleanup_entities();
 
     // Make their planets unowned
     for (auto& planet : game_map.planets) {
@@ -227,6 +228,8 @@ auto Halite::process_docking() -> void {
         for (auto& pair : player_ships) {
             const auto& ship_idx = pair.first;
             auto& ship = pair.second;
+
+            if (!ship.is_alive()) continue;
 
             if (ship.docking_status == hlt::DockingStatus::Docking) {
                 ship.docking_progress--;
@@ -313,6 +316,9 @@ auto Halite::process_drag() -> void {
     for (auto& player_ships : game_map.ships) {
         for (auto& pair : player_ships) {
             auto& ship = pair.second;
+
+            if (!ship.is_alive()) continue;
+
             const auto magnitude = ship.velocity.magnitude();
             if (magnitude <= drag) {
                 ship.velocity.vel_x = ship.velocity.vel_y = 0;
@@ -903,7 +909,6 @@ auto Halite::output(std::string filename) -> void {
     moves.reserve(full_frames.size() - 1);
 
     for (const auto& frame_map : full_frames) {
-        nlohmann::json frame;
         nlohmann::json frame_planets;
         nlohmann::json frame_ships;
 
@@ -927,12 +932,10 @@ auto Halite::output(std::string filename) -> void {
             frame_planets[std::to_string(planet_index)] = output_planet(planet, planet_index);
         }
 
-        frame.push_back(nlohmann::json{
+        frames.push_back(nlohmann::json{
             { "ships", frame_ships },
             { "planets", frame_planets },
         });
-
-        frames.push_back(frame);
     }
 
     // Save the frame events. This is added to the frame data, alongside

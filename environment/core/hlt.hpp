@@ -63,6 +63,7 @@ namespace hlt {
         auto get_planet(EntityId entity_id) -> Planet&;
         auto get_entity(EntityId entity_id) -> Entity&;
         auto kill_entity(EntityId entity_id) -> void;
+        auto cleanup_entities() -> void;
         auto get_distance(Location l1, Location l2) const -> double;
         auto get_angle(Location l1, Location l2) const -> double;
 
