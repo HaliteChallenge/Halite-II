@@ -4,6 +4,7 @@
 #include <memory>
 #include <chrono>
 #include <unordered_set>
+#include <ostream>
 
 #include "mapgen/SolarSystem.h"
 
@@ -101,7 +102,6 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
     full_frame_events.back().push_back(
         std::unique_ptr<Event>(
             new DestroyedEvent(id, entity.location, entity.radius)));
-    game_map.kill_entity(id);
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
@@ -146,6 +146,8 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
             assert(false);
         }
     }
+
+    game_map.kill_entity(id);
 }
 
 void Halite::kill_player(hlt::PlayerId player) {
@@ -489,23 +491,43 @@ auto Halite::find_living_players() -> std::vector<bool> {
 
 // TODO: document
 enum class SimulationEventType {
+    Attack,
     Collision,
-    Combat,
 };
+
+auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream& {
+    switch (ty) {
+        case SimulationEventType::Attack:
+            os << "Attack";
+            break;
+        case SimulationEventType::Collision:
+            os << "Collision";
+            break;
+    }
+    return os;
+}
 
 struct SimulationEvent {
     SimulationEventType type;
     hlt::EntityId id1;
     hlt::EntityId id2;
+    double time;
 
-    bool operator==(const SimulationEvent &rhs) const {
+    auto operator==(const SimulationEvent &rhs) const -> bool {
         return type == rhs.type &&
             id1 == rhs.id1 &&
             id2 == rhs.id2;
     }
 
-    bool operator!=(const SimulationEvent &rhs) const {
+    auto operator!=(const SimulationEvent &rhs) const -> bool {
         return !(rhs == *this);
+    }
+
+    friend auto operator<<(std::ostream &os, const SimulationEvent &event) -> std::ostream& {
+        os << "SimulationEvent(type: " << event.type
+           << " id1: " << event.id1 << " id2: " << event.id2
+           << " time: " << event.time << ")";
+        return os;
     }
 };
 
@@ -520,7 +542,7 @@ namespace std {
 }
 
 auto collision_time(
-    double distance,
+    double r,
     const hlt::Location& loc1, const hlt::Location& loc2,
     const hlt::Velocity& vel1, const hlt::Velocity& vel2
 ) -> std::pair<bool, double> {
@@ -541,7 +563,7 @@ auto collision_time(
     // Quadratic formula
     const auto a = std::pow(dvx, 2) + std::pow(dvy, 2);
     const auto b = 2 * (dx * dvx + dy * dvy);
-    const auto c = std::pow(dx, 2) + std::pow(dy, 2) - std::pow(distance, 2);
+    const auto c = std::pow(dx, 2) + std::pow(dy, 2) - std::pow(r, 2);
 
     const auto disc = std::pow(b, 2) - 4 * a * c;
 
@@ -569,8 +591,8 @@ auto collision_time(
     }
 }
 
-auto collision_time(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, double> {
-    return collision_time(distance,
+auto collision_time(double r, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, double> {
+    return collision_time(r,
                           ship1.location, ship2.location,
                           ship1.velocity, ship2.velocity);
 }
@@ -583,6 +605,116 @@ auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship
 auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
     return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude() +
         ship1.radius + ship2.radius;
+}
+
+auto round_event_time(double t) -> double {
+    return std::round(t * EVENT_TIME_PRECISION) / EVENT_TIME_PRECISION;
+}
+
+auto find_events(
+    std::unordered_set<SimulationEvent>& unsorted_events,
+    const hlt::PlayerId player1, const hlt::PlayerId& player2,
+    const hlt::EntityId id1, const hlt::EntityId& id2,
+    const hlt::Ship& ship1, const hlt::Ship& ship2) -> void {
+    const auto distance = ship1.location.distance(ship2.location);
+
+    if (player1 != player2 && might_attack(distance, ship1, ship2)) {
+        // Combat event
+        const auto attack_radius = ship1.radius +
+            ship2.radius + hlt::GameConstants::get().WEAPON_RADIUS;
+        const auto t = collision_time(attack_radius, ship1, ship2);
+        if (t.first) {
+            if (t.second >= 0 && t.second <= 1) {
+                unsorted_events.insert(SimulationEvent{
+                    SimulationEventType::Attack,
+                    id1, id2, round_event_time(t.second),
+                });
+            }
+        }
+        else if (distance < attack_radius) {
+            unsorted_events.insert(SimulationEvent{
+                SimulationEventType::Attack,
+                id1, id2, 0
+            });
+        }
+    }
+
+    if (id1 != id2 && might_collide(distance, ship1, ship2)) {
+        // Collision event
+        const auto collision_radius = ship1.radius + ship2.radius;
+        const auto t = collision_time(collision_radius, ship1, ship2);
+        if (t.first) {
+            if (t.second >= 0 && t.second <= 1) {
+                unsorted_events.insert(SimulationEvent{
+                    SimulationEventType::Collision,
+                    id1, id2, round_event_time(t.second),
+                });
+            }
+        }
+        else if (distance < collision_radius) {
+            // This should never happen - the ships should already be dead
+            assert(false);
+        }
+    }
+}
+
+auto Halite::process_events() const -> void {
+    std::unordered_set<SimulationEvent> unsorted_events;
+
+    for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
+        for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
+            for (const auto& pair1 : game_map.ships[player1]) {
+                for (const auto& pair2 : game_map.ships[player2]) {
+                    const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
+                    const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
+                    const auto& ship1 = pair1.second;
+                    const auto& ship2 = pair2.second;
+
+                    find_events(unsorted_events, player1, player2,
+                                id1, id2, ship1, ship2);
+                }
+            }
+        }
+
+        // Possible ship-planet collisions
+        for (const auto& pair1 : game_map.ships[player1]) {
+            const auto& ship_id = hlt::EntityId::for_ship(player1, pair1.first);
+            const auto& ship = pair1.second;
+
+            for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
+                const auto& planet = game_map.planets[planet_idx];
+
+                const auto distance = ship.location.distance(planet.location);
+
+                if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
+                }
+            }
+        }
+    }
+
+    std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
+                                               unsorted_events.end());
+    std::sort(
+        sorted_events.begin(), sorted_events.end(),
+        [](const SimulationEvent& ev1, const SimulationEvent& ev2) -> bool {
+          // Sort in reverse since we're using as a queue
+          return ev1.time > ev2.time;
+        });
+
+    while (sorted_events.size() > 0) {
+        // Gather all events that occurred simultaneously
+        std::vector<SimulationEvent> simultaneous_events{ sorted_events.back() };
+        sorted_events.pop_back();
+
+        while (sorted_events.size() > 0 && sorted_events.back().time == simultaneous_events.back().time) {
+            simultaneous_events.push_back(sorted_events.back());
+            sorted_events.pop_back();
+        }
+
+        for (SimulationEvent ev : simultaneous_events) {
+            std::cout << ev << "\n";
+        }
+    }
 }
 
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
@@ -604,55 +736,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
         process_moves(alive, move_no);
 
-        std::unordered_set<SimulationEvent> unsorted_events;
+        process_events();
 
-        // Process events
-        for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
-            for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
-                for (const auto& pair1 : game_map.ships[player1]) {
-                    for (const auto& pair2 : game_map.ships[player2]) {
-                        const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
-                        const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
-                        const auto& ship1 = pair1.second;
-                        const auto& ship2 = pair2.second;
-
-                        const auto distance = ship1.location.distance(ship2.location);
-
-                        if (player1 != player2 && might_attack(distance, ship1, ship2)) {
-                            // Combat event
-                            auto t = collision_time(distance, ship1, ship2);
-                            if (t.first) {
-                                if (t.second >= 0 && t.second <= 1) {
-
-                                }
-                            }
-                            else {
-
-                            }
-                        }
-
-                        if (id1 != id2 && might_collide(distance, ship1, ship2)) {
-                            // Collision event
-                        }
-                    }
-                }
-            }
-
-            // Possible ship-planet collisions
-            for (const auto& pair1 : game_map.ships[player1]) {
-                const auto& ship_id = hlt::EntityId::for_ship(player1, pair1.first);
-                const auto& ship = pair1.second;
-
-                for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
-                    const auto& planet = game_map.planets[planet_idx];
-
-                    const auto distance = ship.location.distance(planet.location);
-
-                    if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
-                    }
-                }
-            }
-        }
     }
 
     process_production();

@@ -28,6 +28,11 @@
 
 extern bool quiet_output;
 
+/**
+ * How to round event times for the purpose of attack and collision resolution.
+ */
+constexpr auto EVENT_TIME_PRECISION = 10000;
+
 struct PlayerStatistics {
     int tag;
     int rank;
@@ -219,6 +224,7 @@ public:
     std::string get_name(hlt::PlayerId player_tag);
 
     ~Halite();
+    void process_events() const;
 };
 
 #endif
