@@ -20,25 +20,27 @@ std::string Networking::serialize_map(const hlt::Map& map) {
 
     // Encode individual ships
     oss << ' ' << player_count();
-    for (hlt::PlayerId playerId = 0; playerId < player_count();
-         playerId++) {
-        oss << ' ' << (int) playerId;
+    for (hlt::PlayerId player_id = 0; player_id < player_count();
+         player_id++) {
+        oss << ' ' << (int) player_id;
 
-        auto num_ships = std::count_if(
-            map.ships[playerId].begin(),
-            map.ships[playerId].end(),
-        [](const hlt::Ship& ship) -> bool {
-            return ship.is_alive();
-        });
+        auto num_ships = map.ships[player_id].size();
 
         oss << ' ' << num_ships;
 
-        for (hlt::EntityIndex ship_id = 0; ship_id < hlt::MAX_PLAYER_SHIPS;
-             ship_id++) {
-            const auto& ship = map.ships[playerId][ship_id];
-            if (!ship.is_alive()) continue;
+        auto player_ships = std::vector<std::pair<hlt::EntityIndex, hlt::Ship>>(
+            map.ships[player_id].begin(),
+            map.ships[player_id].end());
+        std::sort(player_ships.begin(), player_ships.end(),
+        [](const std::pair<hlt::EntityIndex, hlt::Ship> s1,
+           const std::pair<hlt::EntityIndex, hlt::Ship> s2) -> bool {
+            return s1.first < s2.first;
+        });
 
-            oss << ' ' << ship_id;
+        for (const auto& pair : player_ships) {
+            const auto& ship = pair.second;
+
+            oss << ' ' << pair.first;
             oss << ' ' << ship.location.pos_x;
             oss << ' ' << ship.location.pos_y;
             oss << ' ' << ship.health;
@@ -124,7 +126,7 @@ void Networking::deserialize_move_set(std::string& inputString,
 
     hlt::Move move;
     // Keep track of how many queued commands each ship has
-    std::array<int, hlt::MAX_PLAYER_SHIPS> queue_depth = { { 0 } };
+    hlt::entity_map<int> queue_depth;
 
     char command;
     while (iss >> command) {
@@ -154,6 +156,10 @@ void Networking::deserialize_move_set(std::string& inputString,
             default:
                 throw eject_bot(
                     "Bot sent an invalid command - ejecting from game.\n");
+        }
+
+        if (queue_depth.count(move.shipId) == 0) {
+            queue_depth[move.shipId] = 1;
         }
 
         auto queue_index = queue_depth.at(move.shipId);

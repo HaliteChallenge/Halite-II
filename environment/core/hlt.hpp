@@ -173,9 +173,6 @@ namespace hlt {
         PlanetEntity,
     };
 
-    struct EntityId;
-    template<> class ::std::hash<EntityId>;
-
     //! A way to uniquely identify an Entity, regardless of its type.
     struct EntityId {
     private:
@@ -203,11 +200,7 @@ namespace hlt {
         friend auto operator== (const EntityId& id1, const EntityId& id2) -> bool;
         friend auto operator!= (const EntityId& id1, const EntityId& id2) -> bool;
 
-        friend class ::std::hash<EntityId> {
-            auto operator()(const EntityId& ev) const -> std::size_t {
-                return ev._entity_index << 8 | (ev._player_id & 0xFF);
-            }
-        };
+        friend class std::hash<EntityId>;
     };
 
     enum class MoveType {
@@ -261,5 +254,16 @@ namespace hlt {
         auto test(const Location& location, double radius) -> std::vector<std::pair<EntityId, double>>;
     };
 }
+
+namespace std {
+    template<> class hash<hlt::EntityId> {
+    public:
+        auto operator()(const hlt::EntityId& id) const -> size_t {
+            return static_cast<size_t>(
+                (id._entity_index << 8) |
+                (id._player_id & 0xFF));
+        }
+    };
+};
 
 #endif

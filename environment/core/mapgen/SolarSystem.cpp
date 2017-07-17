@@ -38,46 +38,46 @@ namespace mapgen {
             if (prefer_horizontal) {
                 spawn_zones.emplace_back(
                     hlt::Location{
-                        map.map_width / 4,
-                        map.map_height / 2 },
+                        static_cast<double>(map.map_width / 4),
+                        static_cast<double>(map.map_height / 2) },
                     1);
                 spawn_zones.emplace_back(
                     hlt::Location{
-                        static_cast<unsigned short>(3 * map.map_width / 4),
-                        static_cast<unsigned short>(map.map_height / 2) },
+                        static_cast<double>(3 * map.map_width / 4),
+                        static_cast<double>(map.map_height / 2) },
                     1);
             } else {
                 spawn_zones.emplace_back(
                     hlt::Location{
-                        static_cast<unsigned short>(map.map_width / 2),
-                        static_cast<unsigned short>(map.map_height / 4) },
+                        static_cast<double>(map.map_width / 2),
+                        static_cast<double>(map.map_height / 4) },
                     1);
                 spawn_zones.emplace_back(
                     hlt::Location{
-                        static_cast<unsigned short>(map.map_width / 2),
-                        static_cast<unsigned short>(3 * map.map_height / 4) },
+                        static_cast<double>(map.map_width / 2),
+                        static_cast<double>(3 * map.map_height / 4) },
                     1);
             }
         } else {
             spawn_zones.emplace_back(
                 hlt::Location{
-                    static_cast<unsigned short>(map.map_width / 4),
-                    static_cast<unsigned short>(map.map_height / 4) },
+                    static_cast<double>(map.map_width / 4),
+                    static_cast<double>(map.map_height / 4) },
                 1);
             spawn_zones.emplace_back(
                 hlt::Location{
-                    static_cast<unsigned short>(3 * map.map_width / 4),
-                    static_cast<unsigned short>(map.map_height / 4) },
+                    static_cast<double>(3 * map.map_width / 4),
+                    static_cast<double>(map.map_height / 4) },
                 1);
             spawn_zones.emplace_back(
                 hlt::Location{
-                    static_cast<unsigned short>(map.map_width / 4),
-                    static_cast<unsigned short>(3 * map.map_height / 4) },
+                    static_cast<double>(map.map_width / 4),
+                    static_cast<double>(3 * map.map_height / 4) },
                 1);
             spawn_zones.emplace_back(
                 hlt::Location{
-                    static_cast<unsigned short>(3 * map.map_width / 4),
-                    static_cast<unsigned short>(3 * map.map_height / 4) },
+                    static_cast<double>(3 * map.map_width / 4),
+                    static_cast<double>(3 * map.map_height / 4) },
                 1);
         }
 
@@ -85,8 +85,8 @@ namespace mapgen {
             hlt::GameConstants::get().PLANETS_PER_PLAYER;
         const auto total_planets = effective_players * planets_per_player;
         auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
-        const auto center_x = map.map_width / 2;
-        const auto center_y = map.map_height / 2;
+        const auto center_x = map.map_width / 2.0;
+        const auto center_y = map.map_height / 2.0;
 
         const auto max_radius = static_cast<int>(
             std::sqrt(std::min(map.map_width, map.map_height)) / 2);
@@ -143,10 +143,7 @@ namespace mapgen {
                 std::sqrt(std::min(map.map_width, map.map_height) / 1.5));
 
             for (auto attempt = 0; attempt < 100; attempt++) {
-                const auto location = hlt::Location{
-                    static_cast<unsigned short>(center_x),
-                    static_cast<unsigned short>(center_y),
-                };
+                const auto location = hlt::Location{center_x, center_y};
                 const auto radius =
                     std::uniform_int_distribution<>(small_radius, big_radius)(
                         rng);
@@ -187,10 +184,8 @@ namespace mapgen {
                      planet_index < planets_to_generate;
                      planet_index++) {
                     const auto angle = offset + planet_index * step;
-                    const auto x = static_cast<unsigned short>(
-                        center_x + ellipse_x_axis * std::cos(angle));
-                    const auto y = static_cast<unsigned short>(
-                        center_y + ellipse_y_axis * std::sin(angle));
+                    const auto x = center_x + ellipse_x_axis * std::cos(angle);
+                    const auto y = center_y + ellipse_y_axis * std::sin(angle);
                     const auto location = hlt::Location{ x, y };
 
                     if (!is_ok_location(location, radius)) {
@@ -207,8 +202,8 @@ namespace mapgen {
                 }
 
                 orbits.push_back({ hlt::Location{
-                    static_cast<unsigned short>(center_x),
-                    static_cast<unsigned short>(center_y),
+                    static_cast<double>(center_x),
+                    static_cast<double>(center_y),
                 }, ellipse_x_axis, ellipse_y_axis });
 
                 break;
@@ -226,14 +221,8 @@ namespace mapgen {
                 // Line of planets down vertical axis
                 auto offset = std::uniform_int_distribution<>(max_radius, map.map_height / 2 - max_radius)(rng);
                 auto radius = rand_radius();
-                auto location1 = hlt::Location{
-                    static_cast<unsigned short>(center_x),
-                    static_cast<unsigned short>(center_y + offset),
-                };
-                auto location2 = hlt::Location{
-                    static_cast<unsigned short>(center_x),
-                    static_cast<unsigned short>(center_y - offset),
-                };
+                auto location1 = hlt::Location{center_x, center_y + offset};
+                auto location2 = hlt::Location{center_x, center_y - offset};
                 if (is_ok_location(location1, radius) &&
                     is_ok_location(location2, radius)) {
                     // Avoid underflow
@@ -248,14 +237,9 @@ namespace mapgen {
                 // Line of planets down horizontal axis
                 auto offset = std::uniform_int_distribution<>(max_radius, map.map_width / 2 - max_radius)(rng);
                 auto radius = rand_radius();
-                auto location1 = hlt::Location{
-                    static_cast<unsigned short>(center_x + offset),
-                    static_cast<unsigned short>(center_y),
-                };
-                auto location2 = hlt::Location{
-                    static_cast<unsigned short>(center_x - offset),
-                    static_cast<unsigned short>(center_y),
-                };
+                auto location1 = hlt::Location{center_x + offset, center_y};
+                auto location2 = hlt::Location{center_x - offset, center_y};
+
                 if (is_ok_location(location1, radius) &&
                     is_ok_location(location2, radius)) {
                     // Avoid underflow
@@ -279,7 +263,7 @@ namespace mapgen {
                 // in the start
                 map.ships[player_id][i].revive(hlt::Location{
                     zone.location.pos_x,
-                    static_cast<unsigned short>(zone.location.pos_y - 2 * (i - 1)),
+                    zone.location.pos_y - 2 * (i - 1),
                 });
             }
         }
