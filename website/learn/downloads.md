@@ -8,7 +8,7 @@ See the [Quick Start]({{ site.baseurl }}/learn) to get started.
 
 These downloads include both the Halite game environment (pre-compiled) as well as the starter kit for that language, unless no operating system is specified.
 
-[Source code download]({{ site.data.downloads.source }})
+[Source code download]({{ site.baseurl }}/{{ site.data.downloads.source }})
 
 ## Game Environments and Starter Kits
 
