@@ -89,6 +89,12 @@ def requires_oauth_login(view):
         if "user_id" not in flask.session:
             raise util.APIError(401, message="User not logged in.")
 
+        with model.engine.connect() as conn:
+            user = conn.execute(model.users.select(
+                model.users.c.id == flask.session["user_id"])).first()
+            if not user:
+                raise util.APIError(401, message="User not logged in.")
+
         kwargs["user_id"] = flask.session["user_id"]
         return view(*args, **kwargs)
 
