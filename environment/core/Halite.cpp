@@ -131,10 +131,7 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
                 planet.location,
                 planet.radius + hlt::GameConstants::get().EXPLOSION_RADIUS);
 
-            for (const auto& collision : caught_in_explosion) {
-                auto& target_id = collision.first;
-                auto& distance = collision.second;
-
+            for (const auto& target_id : caught_in_explosion) {
                 if (target_id != id) {
                     const auto& target = game_map.get_entity(target_id);
                     const auto damage =

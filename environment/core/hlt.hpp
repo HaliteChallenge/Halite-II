@@ -68,19 +68,8 @@ namespace hlt {
 
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
-        auto test(const Location& location, double radius) -> std::vector<std::pair<EntityId, double>>;
+        auto test(const Location& location, double radius) -> std::vector<EntityId>;
     };
 }
-
-namespace std {
-    template<> class hash<hlt::EntityId> {
-    public:
-        auto operator()(const hlt::EntityId& id) const -> size_t {
-            return static_cast<size_t>(
-                (id._entity_index << 8) |
-                (id._player_id & 0xFF));
-        }
-    };
-};
 
 #endif

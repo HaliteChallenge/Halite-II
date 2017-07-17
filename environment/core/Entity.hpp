@@ -24,6 +24,7 @@ namespace hlt {
         double pos_x, pos_y;
 
         auto distance(const Location& other) const -> double;
+        auto distance2(const Location& other) const -> double;
 
         friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
     };
@@ -159,5 +160,16 @@ namespace hlt {
         friend class std::hash<EntityId>;
     };
 }
+
+namespace std {
+    template<> class hash<hlt::EntityId> {
+    public:
+        auto operator()(const hlt::EntityId& id) const -> size_t {
+            return static_cast<size_t>(
+                (id._entity_index << 8) |
+                    (id._player_id & 0xFF));
+        }
+    };
+};
 
 #endif //ENVIRONMENT_ENTITY_H

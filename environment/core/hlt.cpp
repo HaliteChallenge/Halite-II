@@ -87,4 +87,33 @@ namespace hlt {
             true
         };
     }
+
+    auto Map::kill_entity(EntityId entity_id) -> void {
+        switch (entity_id.type) {
+            case EntityType::PlanetEntity: {
+                planets[entity_id.entity_index()].kill();
+                break;
+            }
+            case EntityType::ShipEntity: {
+                ships[entity_id.player_id()].erase(entity_id.entity_index());
+                break;
+            }
+            case EntityType::InvalidEntity: {
+                break;
+            }
+        }
+    }
+
+    auto Map::test(const Location &location, double radius) -> std::vector<EntityId> {
+        std::vector<EntityId> result;
+
+        for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
+            const auto& planet = planets[planet_idx];
+            if (!planet.is_alive()) continue;
+
+            if (location.distance2(planet.location) <= radius + planet.radius) {
+                result.push_back(EntityId::for_planet(planet_idx));
+            }
+        }
+    }
 }

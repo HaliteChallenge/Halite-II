@@ -6,9 +6,12 @@
 
 namespace hlt {
     auto Location::distance(const Location &other) const -> double {
-        return sqrt(
-            std::pow(other.pos_x - pos_x, 2) +
-                std::pow(other.pos_y - pos_y, 2));
+        return sqrt(distance2(other));
+    }
+
+    auto Location::distance2(const Location &other) const -> double {
+        return std::pow(other.pos_x - pos_x, 2) +
+            std::pow(other.pos_y - pos_y, 2);
     }
 
     auto operator<<(std::ostream &ostream,
