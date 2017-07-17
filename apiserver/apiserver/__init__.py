@@ -9,7 +9,7 @@ from . import config, util
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = config.MAX_BOT_UPLOAD_SIZE
-app.secret_key = "development"
+app.secret_key = config.FLASK_SECRET_KEY
 app.errorhandler(util.APIError)(util.handle_api_error)
 
 # Helpers

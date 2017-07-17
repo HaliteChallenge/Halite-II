@@ -3,7 +3,9 @@ from passlib.context import CryptContext
 COMPETITION_OPEN = True
 # Original PHP: "compState", "finalsPairing"
 COMPETITION_FINALS_PAIRING = False
+
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
+FLASK_SECRET_KEY = ""
 
 DATABASE_PROJECT_ID = ""
 DATABASE_REGION = ""
