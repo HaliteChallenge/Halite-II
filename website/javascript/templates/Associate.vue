@@ -169,6 +169,11 @@
             },
         },
         mounted: function() {
+            api.me().then((me) => {
+               if (!me.is_new_user) {
+                   window.location.replace("/user?me");
+               }
+            });
             api.list_organizations().then((orgs) => {
                this.organizations = orgs;
             });
