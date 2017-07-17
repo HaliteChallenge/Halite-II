@@ -28,7 +28,8 @@ Welcome to the Halite II closed Two Sigma alpha competition!  If you’re here, 
     
     Don’t see your language yet? [Let us know][contact]. We'll have documents on how to make your own bot after our alpha comeptition.
     
-    Unzip the game environment into the same directory as the starter kit.
+    The game environment and starter kit are bundled together, so you should be all set.
+    
 4. Visualize and Play Your Bot
 
     Try running the bot with the provided `run_game.sh` or `run_game.bat` file. This will compile the bot and play it against itself automatically. When the game ends, it will produce a replay file (*.hlt) in the bot directory. Drag it to the [online visualizer][play] to see how the game went.
