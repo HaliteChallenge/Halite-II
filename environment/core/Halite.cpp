@@ -3,10 +3,11 @@
 #include <functional>
 #include <memory>
 #include <chrono>
+#include <unordered_set>
 
 #include "mapgen/SolarSystem.h"
 
-#include "miniz/miniz.h"
+#include "../miniz/miniz.h"
 
 
 auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void {
@@ -84,26 +85,23 @@ auto Halite::compute_planet_explosion_damage(
     }
 }
 
-auto Halite::damage_entity(hlt::EntityId id,
-                           unsigned short damage,
-                           CollisionMap& collision_map) -> void {
+auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
 
     if (entity.health <= damage) {
-        kill_entity(id, collision_map);
+        kill_entity(id);
     } else {
         entity.health -= damage;
     }
 }
 
-auto Halite::kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void {
+auto Halite::kill_entity(hlt::EntityId id) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     if (!entity.is_alive()) return;
-    full_frame_events.back().back().push_back(
+    full_frame_events.back().push_back(
         std::unique_ptr<Event>(
             new DestroyedEvent(id, entity.location, entity.radius)));
-    entity.kill();
-    collision_map.clear(entity.location);
+    game_map.kill_entity(id);
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
@@ -129,21 +127,19 @@ auto Halite::kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void 
                 ship.reset_docking_status();
             }
 
-            const auto max_delta = planet.radius * 2;
-            for (int dx = -max_delta; dx <= max_delta; dx++) {
-                for (int dy = -max_delta; dy <= max_delta; dy++) {
-                    const auto loc = game_map.location_with_delta(planet.location, dx, dy);
+            auto caught_in_explosion = game_map.test(
+                planet.location,
+                planet.radius + hlt::GameConstants::get().EXPLOSION_RADIUS);
 
-                    if (!loc.second) continue;
+            for (const auto& collision : caught_in_explosion) {
+                auto& target_id = collision.first;
+                auto& distance = collision.second;
 
-                    const auto target_id = collision_map.at(loc.first);
-
-                    if (target_id.is_valid() && target_id != id) {
-                        const auto& target = game_map.get_entity(target_id);
-                        const auto explosion_damage =
-                            compute_planet_explosion_damage(planet, target.location);
-                        damage_entity(target_id, explosion_damage, collision_map);
-                    }
+                if (target_id != id) {
+                    const auto& target = game_map.get_entity(target_id);
+                    const auto damage =
+                        compute_planet_explosion_damage(planet, target.location);
+                    damage_entity(target_id, damage);
                 }
             }
 
@@ -161,7 +157,8 @@ void Halite::kill_player(hlt::PlayerId player) {
 
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
-        ship.kill();
+        game_map.kill_entity(hlt::EntityId::for_ship(player, ship.first));
+        ship.second.kill();
     }
 
     // Make their planets unowned
@@ -179,10 +176,9 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     // being sent and the end of the AI's message being received.
     std::vector<std::future<int>> frame_threads(alive.size());
 
-    // TODO: is there a more idiomatic way to clear out the move array?
     for (auto& row : player_moves) {
         for (auto& subrow : row) {
-            std::fill(subrow.begin(), subrow.end(), hlt::Move{});
+            subrow.clear();
         }
     }
 
@@ -216,111 +212,23 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     }
 }
 
-auto Halite::process_attacks(
-    std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void {
-    // Compute hits
-    std::vector<hlt::EntityId> targets;
-    std::vector<hlt::Location> target_locations;
-
-    auto collision_map = CollisionMap(game_map);
-    collision_map.reset(game_map);
-
-    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-         player_id++) {
-        auto& player_ships = game_map.ships.at(player_id);
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = player_ships.at(ship_id);
-            auto id = hlt::EntityId::for_ship(player_id, ship_id);
-
-            if (!ship.is_alive()) continue;
-            collision_map.fill(ship.location, id);
-        }
-    }
-
-    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-         player_id++) {
-        auto& player_ships = game_map.ships.at(player_id);
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = player_ships.at(ship_id);
-
-            if (!ship.is_alive()) continue;
-            if (ship.docking_status != hlt::DockingStatus::Undocked) continue;
-
-            if (ship.weapon_cooldown > 0) {
-                continue;
-            }
-
-            const auto radius = hlt::GameConstants::get().WEAPON_RADIUS;
-            for (int dx = -radius; dx <= radius; dx++) {
-                for (int dy = -radius; dy <= radius; dy++) {
-                    const auto pos = game_map.location_with_delta(ship.location, dx, dy);
-                    if (!pos.second) continue;
-
-                    const auto target_id = collision_map.at(pos.first);
-                    if (!target_id.is_valid()) continue;
-
-                    if (target_id.type == hlt::EntityType::ShipEntity) {
-                        if (target_id.player_id() != player_id) {
-                            targets.push_back(target_id);
-                            target_locations.emplace_back(pos.first);
-                        }
-                    }
-                }
-            }
-
-            for (const auto target : targets) {
-                const auto damage =
-                    hlt::GameConstants::get().WEAPON_DAMAGE / (float) targets.size();
-                ship_damage[target.player_id()][target.entity_index()] +=
-                    damage;
-
-                // TODO: how to round attributed damage?
-                damage_dealt[player_id] += static_cast<unsigned int>(damage);
-            }
-
-            if (targets.size() > 0) {
-                ship.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
-                auto id = hlt::EntityId::for_ship(player_id, ship_id);
-                full_frame_events.back().back().push_back(
-                    std::unique_ptr<Event>(
-                        new AttackEvent(id, ship.location, target_locations)
-                    ));
-            }
-
-            targets.clear();
-        }
-    }
-}
-
-auto Halite::process_damage(CollisionMap& collision_map, DamageMap& ship_damage) -> void {
-    // Resolve damage
-    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-         player_id++) {
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto id = hlt::EntityId::for_ship(player_id, ship_id);
-            auto& entity = game_map.get_entity(id);
-            if (!entity.is_alive()) continue;
-            auto damage = ship_damage[player_id][ship_id];
-            damage_entity(
-                id,
-                static_cast<unsigned short>(damage),
-                collision_map
-            );
-        }
-    }
-}
+//            if (targets.size() > 0) {
+//                ship.weapon_cooldown = hlt::gameconstants::get().weapon_cooldown;
+//                auto id = hlt::entityid::for_ship(player_id, ship_idx);
+//                full_frame_events.back().push_back(
+//                    std::unique_ptr<event>(
+//                        new attackevent(id, ship.location, target_locations)
+//                    ));
 
 auto Halite::process_docking() -> void {
     // Update docking/undocking status
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
         auto& player_ships = game_map.ships.at(player_id);
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = player_ships.at(ship_id);
+        for (auto& pair : player_ships) {
+            const auto& ship_idx = pair.first;
+            auto& ship = pair.second;
+
             if (ship.docking_status == hlt::DockingStatus::Docking) {
                 ship.docking_progress--;
                 if (ship.docking_progress == 0) {
@@ -335,7 +243,7 @@ auto Halite::process_docking() -> void {
                 if (ship.docking_progress == 0) {
                     ship.docking_status = hlt::DockingStatus::Undocked;
                     auto& planet = game_map.planets.at(ship.docked_planet);
-                    planet.remove_ship(ship_id);
+                    planet.remove_ship(ship_idx);
                 }
             }
             else if (ship.docking_status == hlt::DockingStatus::Docked) {
@@ -345,7 +253,7 @@ auto Halite::process_docking() -> void {
     }
 }
 
-auto Halite::process_production(CollisionMap& collision_map) -> void {
+auto Halite::process_production() -> void {
     // Update productions
     // Collision map should be up-to-date
     // We do this after processing moves so that a bot can't try to guess the
@@ -390,57 +298,12 @@ auto Halite::process_production(CollisionMap& collision_map) -> void {
             best_location.second = false;
             auto best_distance = game_map.map_width + game_map.map_height;
             const auto& center = hlt::Location{
-                static_cast<unsigned short>(game_map.map_width / 2),
-                static_cast<unsigned short>(game_map.map_height / 2),
+                static_cast<double>(game_map.map_width / 2),
+                static_cast<double>(game_map.map_height / 2),
             };
 
-            for (int dx = -planet.radius - 2; dx <= planet.radius + 2; dx++) {
-                for (int dy = -planet.radius - 2; dy <= planet.radius + 2;
-                     dy++) {
-                    const auto loc =
-                        game_map.location_with_delta(planet.location, dx, dy);
-                    if (!loc.second) continue;
-
-                    if (!collision_map.at(loc.first).is_valid()) {
-                        const auto distance = game_map.get_distance(loc.first, center);
-                        if (!best_location.second || distance < best_distance) {
-                            best_location = loc;
-                            best_distance = distance;
-                        }
-                    }
-                }
-            }
-
-            if (best_location.second) {
-                for (hlt::EntityIndex ship_id = 0;
-                     ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                    auto& ship = ships[ship_id];
-
-                    if (!ship.is_alive()) {
-                        ship.revive(best_location.first);
-                        total_ship_count[planet.owner]++;
-
-                        collision_map.fill(best_location.first,
-                                           hlt::EntityId::for_ship(
-                                               planet.owner,
-                                               ship_id));
-
-                        full_frame_events.back().back().emplace_back(
-                            new SpawnEvent(hlt::EntityId::for_ship(planet.owner, ship_id), best_location.first, planet.location)
-                        );
-
-                        planet.current_production -= production_per_ship;
-                        break;
-                    }
-                }
-            }
-            else {
-                // Can't find a place to spawn the ship, or the player has the
-                // maximum number of ships - leave the production there and try
-                // to spawn next turn
-
-                break;
-            }
+            // TODO: spawn the ship
+            break;
         }
     }
 }
@@ -449,8 +312,8 @@ auto Halite::process_drag() -> void {
     // Update inertia/implement drag
     const auto drag = hlt::GameConstants::get().DRAG;
     for (auto& player_ships : game_map.ships) {
-        for (auto& ship : player_ships) {
-            if (!ship.is_alive()) continue;
+        for (auto& pair : player_ships) {
+            auto& ship = pair.second;
             const auto magnitude = ship.velocity.magnitude();
             if (magnitude <= drag) {
                 ship.velocity.vel_x = ship.velocity.vel_y = 0;
@@ -464,8 +327,8 @@ auto Halite::process_drag() -> void {
 
 auto Halite::process_cooldowns() -> void {
     for (auto& player_ships : game_map.ships) {
-        for (auto& ship : player_ships) {
-            if (!ship.is_alive()) continue;
+        for (auto& pair : player_ships) {
+            auto& ship = pair.second;
 
             if (ship.weapon_cooldown > 0) {
                 ship.weapon_cooldown--;
@@ -474,25 +337,21 @@ auto Halite::process_cooldowns() -> void {
     }
 }
 
-auto Halite::process_moves(
-    std::vector<bool>& alive, int move_no,
-    std::vector<std::vector<std::pair<float, float>>>& intermediate_positions) -> void {
+auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
         if (!alive[player_id]) continue;
 
-        for (hlt::EntityIndex ship_id = 0;
-             ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-            auto& ship = game_map.get_ship(player_id, ship_id);
+        auto& player_ships = game_map.ships[player_id];
+
+        for (auto& pair : player_ships) {
+            const auto ship_idx = pair.first;
+            auto& ship = pair.second;
             if (!ship.is_alive()) continue;
 
-            // Position ships in the center of their cell
-            intermediate_positions[player_id][ship_id] = {
-                ship.location.pos_x + 0.5,
-                ship.location.pos_y + 0.5,
-            };
+            if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
 
-            auto move = player_moves[player_id][move_no][ship_id];
+            auto move = player_moves[player_id][move_no][ship_idx];
             switch (move.type) {
                 case hlt::MoveType::Noop: {
                     break;
@@ -501,22 +360,18 @@ auto Halite::process_moves(
                     break;
                 }
                 case hlt::MoveType::Thrust: {
-                    if (ship.docking_status
-                        != hlt::DockingStatus::Undocked) {
+                    if (ship.docking_status != hlt::DockingStatus::Undocked) {
                         break;
                     }
 
                     auto angle = move.move.thrust.angle * M_PI / 180;
 
-                    ship.velocity.accelerate_by(
-                        move.move.thrust.thrust,
-                        angle);
+                    ship.velocity.accelerate_by(move.move.thrust.thrust, angle);
 
                     break;
                 }
                 case hlt::MoveType::Dock: {
-                    if (ship.docking_status
-                        != hlt::DockingStatus::Undocked) {
+                    if (ship.docking_status != hlt::DockingStatus::Undocked) {
                         break;
                     }
 
@@ -540,8 +395,7 @@ auto Halite::process_moves(
                     const auto max_distance =
                         planet.radius + ship.radius +
                             hlt::GameConstants::get().MAX_DOCKING_DISTANCE;
-                    const auto ship_distance =
-                        game_map.get_distance(planet.location, ship.location);
+                    const auto ship_distance = planet.location.distance(ship.location);
                     if (ship_distance > max_distance) {
                         ship.reset_docking_status();
                         break;
@@ -555,36 +409,31 @@ auto Halite::process_moves(
                     // Don't initialize docking status again if already
                     // docking to same planet
                     if ((ship.docked_planet != planet_id ||
-                        ship.docking_status !=
-                            hlt::DockingStatus::Docking) &&
+                        ship.docking_status != hlt::DockingStatus::Docking) &&
                         planet.owner == player_id &&
-                        planet.docked_ships.size()
-                            < planet.docking_spots) {
+                        planet.docked_ships.size() < planet.docking_spots) {
                         ship.docked_planet = planet_id;
                         ship.docking_status = hlt::DockingStatus::Docking;
                         ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
-
-                        planet.add_ship(ship_id);
+                        planet.add_ship(ship_idx);
                     }
 
                     break;
                 }
 
                 case hlt::MoveType::Undock:
-                    if (ship.docking_status
-                        != hlt::DockingStatus::Docked)
+                    if (ship.docking_status != hlt::DockingStatus::Docked)
                         break;
 
                     ship.docking_status = hlt::DockingStatus::Undocking;
                     ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
-
                     break;
             }
 
             auto& move_set = full_player_moves.back();
             auto& player_moves = move_set[player_id];
             auto& ship_moves = player_moves[move_no];
-            ship_moves[ship_id] = move;
+            ship_moves[ship_idx] = move;
         }
     }
 }
@@ -594,12 +443,11 @@ auto Halite::find_living_players() -> std::vector<bool> {
 
     std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
     for (hlt::PlayerId player = 0; player < number_of_players; player++) {
-        for (const auto& ship : game_map.ships[player]) {
-            if (ship.is_alive()) {
-                still_alive[player] = true;
-                last_ship_count[player]++;
-                last_ship_health_total[player] += ship.health;
-            }
+        for (const auto& pair : game_map.ships[player]) {
+            const auto& ship = pair.second;
+            still_alive[player] = true;
+            last_ship_count[player]++;
+            last_ship_health_total[player] += ship.health;
         }
     }
 
@@ -642,6 +490,104 @@ auto Halite::find_living_players() -> std::vector<bool> {
     return still_alive;
 }
 
+// TODO: document
+enum class SimulationEventType {
+    Collision,
+    Combat,
+};
+
+struct SimulationEvent {
+    SimulationEventType type;
+    hlt::EntityId id1;
+    hlt::EntityId id2;
+
+    bool operator==(const SimulationEvent &rhs) const {
+        return type == rhs.type &&
+            id1 == rhs.id1 &&
+            id2 == rhs.id2;
+    }
+
+    bool operator!=(const SimulationEvent &rhs) const {
+        return !(rhs == *this);
+    }
+};
+
+namespace std {
+    template<> struct hash<SimulationEvent> {
+        auto operator()(const SimulationEvent& ev) const -> std::size_t {
+            return std::hash<hlt::EntityId>{}(ev.id1) ^
+                std::hash<hlt::EntityId>{}(ev.id2) ^
+                static_cast<size_t>(ev.type);
+        }
+    };
+}
+
+auto collision_time(
+    double distance,
+    const hlt::Location& loc1, const hlt::Location& loc2,
+    const hlt::Velocity& vel1, const hlt::Velocity& vel2
+) -> std::pair<bool, double> {
+    // With credit to Ben Spector
+    // Simplified derivation:
+    // 1. Set up the distance between the two entities in terms of time,
+    //    the difference between their velocities and the difference between
+    //    their positions
+    // 2. Equate the distance equal to the event radius (max possible distance
+    //    they could be)
+    // 3. Solve the resulting quadratic
+
+    const auto dx = loc1.pos_x - loc2.pos_x;
+    const auto dy = loc1.pos_y - loc2.pos_y;
+    const auto dvx = vel1.vel_x - vel2.vel_x;
+    const auto dvy = vel1.vel_y - vel2.vel_y;
+
+    // Quadratic formula
+    const auto a = std::pow(dvx, 2) + std::pow(dvy, 2);
+    const auto b = 2 * (dx * dvx + dy * dvy);
+    const auto c = std::pow(dx, 2) + std::pow(dy, 2) - std::pow(distance, 2);
+
+    const auto disc = std::pow(b, 2) - 4 * a * c;
+
+    if (disc == 0) {
+        // One solution
+        const auto t = -b / (2 * a);
+        return { true, t };
+    }
+    else if (disc > 0) {
+        const auto t1 = -b + std::sqrt(disc);
+        const auto t2 = -b - std::sqrt(disc);
+
+        if (t1 >= 0 && t2 >= 0) {
+            return { true, std::min(t1, t2) };
+        }
+        else if (t1 < 0 && t2 < 0) {
+            return { false, 0 };
+        }
+        else {
+            return { true, std::max(t1, t2) };
+        }
+    }
+    else {
+        return { false, 0 };
+    }
+}
+
+auto collision_time(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, double> {
+    return collision_time(distance,
+                          ship1.location, ship2.location,
+                          ship1.velocity, ship2.velocity);
+}
+
+auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
+    return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude()
+        + hlt::GameConstants::get().WEAPON_RADIUS;
+}
+
+auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
+    return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude() +
+        ship1.radius + ship2.radius;
+}
+
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
     for (hlt::PlayerId player_id = 0;
@@ -651,14 +597,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     retrieve_moves(alive);
 
-    auto collision_map = CollisionMap(game_map);
-
-    auto intermediate_positions =
-        std::vector<std::vector<std::pair<float, float>>>(
-            number_of_players,
-            std::vector<std::pair<float, float>>(hlt::MAX_PLAYER_SHIPS,
-                                                 { 0.0, 0.0 }));
-
     full_frames.push_back({});
     full_frame_events.emplace_back();
     full_player_moves.push_back({ { { } } });
@@ -667,98 +605,65 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     // Process queue of moves
     for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
-        // Reset auxiliary data structures
-        for (auto& row : intermediate_positions) {
-            std::fill(row.begin(), row.end(), std::make_pair(0, 0));
-        }
-        collision_map.reset(game_map);
+        process_moves(alive, move_no);
 
-        process_moves(alive, move_no, intermediate_positions);
+        std::unordered_set<SimulationEvent> unsorted_events;
 
-        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>
-            ship_damage = { {} };
+        // Process events
+        for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
+            for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
+                for (const auto& pair1 : game_map.ships[player1]) {
+                    for (const auto& pair2 : game_map.ships[player2]) {
+                        const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
+                        const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
+                        const auto& ship1 = pair1.second;
+                        const auto& ship2 = pair2.second;
 
-        // Resolve collisions - update in small increments; collisions
-        // happen if two entities are within the same grid square at any instant
-        for (int substep = 1; substep <= SUBSTEPS; substep++) {
-            full_frame_events.back().emplace_back();
-            if (substep > 1) {
-                full_frames.back().push_back(hlt::Map(game_map));
-            }
+                        const auto distance = ship1.location.distance(ship2.location);
 
-            process_attacks(ship_damage);
+                        if (player1 != player2 && might_attack(distance, ship1, ship2)) {
+                            // Combat event
+                            auto t = collision_time(distance, ship1, ship2);
+                            if (t.first) {
+                                if (t.second >= 0 && t.second <= 1) {
 
-            // Reset collision map so we can process all movements simultaneously
-            collision_map.reset(game_map);
+                                }
+                            }
+                            else {
 
-            for (hlt::PlayerId player_id = 0; player_id < number_of_players;
-                 player_id++) {
-                auto& player_ships = game_map.ships.at(player_id);
-                for (hlt::EntityIndex ship_id = 0;
-                     ship_id < hlt::MAX_PLAYER_SHIPS; ship_id++) {
-                    auto& ship = player_ships.at(ship_id);
-                    auto id = hlt::EntityId::for_ship(player_id, ship_id);
-
-                    if (!ship.is_alive()) continue;
-
-                    auto& pos =
-                        intermediate_positions.at(player_id).at(ship_id);
-                    auto& velocity = ship.velocity;
-
-                    if (velocity.vel_x != 0 || velocity.vel_y != 0) {
-                        pos.first += SUBSTEP_DT * velocity.vel_x;
-                        pos.second += SUBSTEP_DT * velocity.vel_y;
-
-                        // Check boundaries
-                        if (pos.first < 0 || pos.first >= game_map.map_width ||
-                            pos.second < 0 || pos.second >= game_map.map_height) {
-                            kill_entity(id, collision_map);
-                            continue;
+                            }
                         }
 
-                        auto xp = static_cast<unsigned short>(pos.first);
-                        auto yp = static_cast<unsigned short>(pos.second);
-
-                        // Move the ship (this is temporary, see below)
-                        ship.location.pos_x = xp;
-                        ship.location.pos_y = yp;
-                    }
-
-                    // We don't insert ships into the collision map until
-                    // after they've moved so that a ship that has had its
-                    // movement processed doesn't collide with one that hasn't
-                    // yet moved. As a side effect, killing a ship means you
-                    // can fly through that space.
-                    const auto& occupancy = collision_map.at(ship.location);
-                    // Collision occurred, process damage
-                    if (occupancy != id && occupancy.is_valid()) {
-                        auto damage = compute_damage(id, occupancy);
-                        auto self_damage = damage.first;
-                        auto other_damage = damage.second;
-
-                        damage_entity(occupancy, other_damage, collision_map);
-                        damage_entity(id, self_damage, collision_map);
-                    }
-
-                    if (ship.is_alive()) {
-                        collision_map.fill(ship.location, id);
+                        if (id1 != id2 && might_collide(distance, ship1, ship2)) {
+                            // Collision event
+                        }
                     }
                 }
             }
 
-            process_damage(collision_map, ship_damage);
-            for (auto& row : ship_damage) {
-                std::fill(row.begin(), row.end(), 0);
+            // Possible ship-planet collisions
+            for (const auto& pair1 : game_map.ships[player1]) {
+                const auto& ship_id = hlt::EntityId::for_ship(player1, pair1.first);
+                const auto& ship = pair1.second;
+
+                for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
+                    const auto& planet = game_map.planets[planet_idx];
+
+                    const auto distance = ship.location.distance(planet.location);
+
+                    if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
+                    }
+                }
             }
         }
     }
 
-    process_production(collision_map);
+    process_production();
     process_drag();
     process_cooldowns();
 
     // Save map for the replay
-    full_frames.back().push_back(hlt::Map(game_map));
+    full_frames.push_back(hlt::Map(game_map));
 
     // Check if the game is over
     auto still_alive = find_living_players();
@@ -879,7 +784,7 @@ auto Halite::output_header(nlohmann::json& replay) -> void {
     // Encode the planet map. This information doesn't change between frames,
     // so there's no need to re-encode it every time.
     auto planets = std::vector<nlohmann::json>();
-    const auto& initial_map = full_frames[0][0];
+    const auto& initial_map = full_frames[0];
     for (hlt::EntityIndex planet_index = 0;
          planet_index < initial_map.planets.size();
          planet_index++) {
@@ -908,51 +813,42 @@ auto Halite::output(std::string filename) -> void {
 
     output_header(j);
 
-    // Encode the frames. Note that there is no moves field for the last frame.
+    // Encode the frames.
 
-    // Try to avoid re-allocating as much here
-    std::vector<std::vector<nlohmann::json>> frames;
+    std::vector<nlohmann::json> frames;
     std::vector<std::vector<nlohmann::json>> moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
-    std::vector<nlohmann::json> frame;
-    std::vector<nlohmann::json> subframe_ships;
-    frame.reserve(SUBSTEPS);
 
-    for (const auto& frame_maps : full_frames) {
-        frame.clear();
+    for (const auto& frame_map : full_frames) {
+        nlohmann::json frame;
+        nlohmann::json frame_planets;
+        nlohmann::json frame_ships;
 
-        for (const auto& current_map : frame_maps) {
-            nlohmann::json subframe_planets;
-            subframe_ships.clear();
+        for (hlt::PlayerId player_idx = 0; player_idx < number_of_players; player_idx++) {
+            const auto& player_ships = frame_map.ships[player_idx];
 
-            for (hlt::PlayerId playerId = 0; playerId < number_of_players;
-                 playerId++) {
-                for (hlt::EntityIndex ship_id = 0;
-                     ship_id < hlt::MAX_PLAYER_SHIPS;
-                     ship_id++) {
-                    const auto& ship = current_map.ships[playerId][ship_id];
-                    if (!ship.is_alive()) continue;
+            for (const auto& ship_pair : player_ships) {
+                const auto ship_idx = ship_pair.first;
+                const auto& ship = ship_pair.second;
 
-                    subframe_ships.push_back(output_ship(ship, playerId, ship_id));
-                }
+                frame_ships[ship_idx] = output_ship(ship, player_idx, ship_idx);
             }
-
-            for (hlt::EntityIndex planet_index = 0;
-                 planet_index < current_map.planets.size();
-                 planet_index++) {
-                const auto& planet = current_map.planets[planet_index];
-                if (!planet.is_alive()) continue;
-
-                subframe_planets[std::to_string(planet_index)] =
-                    output_planet(planet, planet_index);
-            }
-
-            frame.push_back(nlohmann::json{
-                { "ships", subframe_ships },
-                { "planets", subframe_planets },
-            });
         }
+
+        for (hlt::EntityIndex planet_index = 0;
+             planet_index < frame_map.planets.size();
+             planet_index++) {
+            const auto& planet = frame_map.planets[planet_index];
+            if (!planet.is_alive()) continue;
+
+            frame_planets[std::to_string(planet_index)] = output_planet(planet, planet_index);
+        }
+
+        frame.push_back(nlohmann::json{
+            { "ships", frame_ships },
+            { "planets", frame_planets },
+        });
 
         frames.push_back(frame);
     }
@@ -963,21 +859,16 @@ auto Halite::output(std::string filename) -> void {
         auto& frame_events = full_frame_events[frame_idx];
         auto& frame_data = frames.at(frame_idx + 1);
 
-        for (auto substep_idx = 0; substep_idx < frame_events.size(); substep_idx++) {
-            auto& substep_events = frame_events[substep_idx];
-            auto& substep_data = frame_data.at(substep_idx);
+        std::vector<nlohmann::json> event_record;
 
-            std::vector<nlohmann::json> substep_event_record;
-
-            for (auto& event : substep_events) {
-                substep_event_record.push_back(event->serialize());
-            }
-
-            substep_data["events"] = nlohmann::json(substep_event_record);
+        for (auto& event : frame_events) {
+            event_record.push_back(event->serialize());
         }
+
+        frame_data["events"] = nlohmann::json(event_record);
     }
 
-    // Serialize moves
+    // Serialize moves.  Note that there is no moves field for the last frame.
     for (const auto& current_moves : full_player_moves) {
         // Each move array is an array of player moves
         auto frame_moves = nlohmann::json::array();
@@ -989,7 +880,8 @@ auto Halite::output(std::string filename) -> void {
             for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
                 // Each set of queued moves is an object mapping ship ID to move
                 auto player_moves = nlohmann::json::object();
-                for (const auto& move : current_moves[player_id][move_no]) {
+                for (const auto& move_pair : current_moves[player_id][move_no]) {
+                    const auto& move = move_pair.second;
                     if (move.type == hlt::MoveType::Noop) continue;
 
                     player_moves[std::to_string(move.shipId)] = output_move(move, player_id, move_no);
@@ -1249,54 +1141,6 @@ Halite::Halite(unsigned short width_,
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
     for (int a = 0; a < number_of_players; a++) networking.kill_player(a);
-}
-
-CollisionMap::CollisionMap(hlt::Map& game_map) {
-    map = std::vector<std::vector<hlt::EntityId>>(
-        game_map.map_width,
-        std::vector<hlt::EntityId>(game_map.map_height, hlt::EntityId::invalid())
-    );
-}
-
-auto CollisionMap::at(const hlt::Location& location) -> const hlt::EntityId& {
-    return at(location.pos_x, location.pos_y);
-}
-
-auto CollisionMap::at(unsigned short pos_x, unsigned short pos_y) -> const hlt::EntityId& {
-    return map.at(pos_x).at(pos_y);
-}
-
-auto CollisionMap::reset(const hlt::Map& game_map) -> void {
-    for (auto& row : map) {
-        std::fill(row.begin(), row.end(), hlt::EntityId::invalid());
-    }
-    for (hlt::EntityIndex entity_index = 0;
-         entity_index < game_map.planets.size(); entity_index++) {
-        const auto& planet = game_map.planets[entity_index];
-        if (!planet.is_alive()) continue;
-        for (int dx = -planet.radius; dx <= planet.radius; dx++) {
-            for (int dy = -planet.radius; dy <= planet.radius; dy++) {
-                const auto x = planet.location.pos_x + dx;
-                const auto y = planet.location.pos_y + dy;
-
-                if (x >= 0 && y >= 0 && x < game_map.map_width
-                    && y < game_map.map_height &&
-                    dx * dx + dy * dy <= planet.radius * planet.radius) {
-                    map[x][y] = hlt::EntityId::for_planet(entity_index);
-                }
-            }
-        }
-    }
-}
-
-auto CollisionMap::fill(const hlt::Location& location, hlt::EntityId id) -> void {
-    assert(!at(location).is_valid());
-    assert(id.is_valid());
-    map.at(location.pos_x).at(location.pos_y) = id;
-}
-
-auto CollisionMap::clear(const hlt::Location& location) -> void {
-    map.at(location.pos_x).at(location.pos_y) = hlt::EntityId::invalid();
 }
 
 auto to_json(const hlt::Location& location) -> nlohmann::json {

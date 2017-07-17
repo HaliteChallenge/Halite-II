@@ -87,8 +87,8 @@ namespace mapgen {
                 // Spread out ships to make it less likely they'll collide
                 // in the start
                 map.ships[playerId][i].revive(hlt::Location{
-                    static_cast<unsigned short>(region.center_x()),
-                    static_cast<unsigned short>(region.center_y() - 2 * (i - 1)),
+                    region.center_x(),
+                    region.center_y() - 2 * (i - 1),
                 });
             }
         }

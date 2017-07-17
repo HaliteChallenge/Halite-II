@@ -19,10 +19,11 @@
 #include <iostream>
 #include <thread>
 #include <future>
-#include <core/mapgen/Generator.h>
 
 #include "hlt.hpp"
 #include "json.hpp"
+
+#include "./mapgen/Generator.h"
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;
@@ -37,12 +38,6 @@ struct PlayerStatistics {
     int damage_dealt;
 };
 
-static std::ostream& operator<<(std::ostream& o, const PlayerStatistics& p) {
-    o << p.tag << ' ' << p.rank << ' '
-      << p.last_frame_alive;
-    return o;
-}
-
 struct GameStatistics {
     std::vector<PlayerStatistics> player_statistics;
     std::string output_filename;
@@ -50,39 +45,7 @@ struct GameStatistics {
     std::vector<std::string> timeout_log_filenames;
 };
 
-static std::ostream& operator<<(std::ostream& o, const GameStatistics& g) {
-    for (auto a = g.player_statistics.begin(); a != g.player_statistics.end();
-         a++)
-        o << (*a) << std::endl;
-    for (auto a = g.timeout_tags.begin(); a != g.timeout_tags.end(); a++)
-        o << (*a) << ' ';
-    if (g.timeout_tags.empty()) o << ' ';
-    std::cout << std::endl;
-    for (auto a = g.timeout_log_filenames.begin();
-         a != g.timeout_log_filenames.end(); a++)
-        o << (*a) << ' ';
-    if (g.timeout_log_filenames.empty()) o << ' ';
-    return o;
-}
-
 auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
-
-constexpr auto SUBSTEPS = 24;
-constexpr auto SUBSTEP_DT = 1.0 / SUBSTEPS;
-
-struct CollisionMap {
-private:
-    std::vector<std::vector<hlt::EntityId>> map;
-public:
-    CollisionMap(hlt::Map& game_map);
-
-    auto at(const hlt::Location& location) -> const hlt::EntityId&;
-    auto at(unsigned short pos_x, unsigned short pos_y) -> const hlt::EntityId&;
-    auto fill(const hlt::Location& location, hlt::EntityId id) -> void;
-    auto reset(const hlt::Map& game_map) -> void;
-    auto clear(const hlt::Location& location) -> void;
-};
-
 
 // JSON serialization
 // Have to place these here because json.hpp isn't safe to include more than
@@ -105,9 +68,9 @@ struct Event {
 struct DestroyedEvent : Event {
     hlt::EntityId id;
     hlt::Location location;
-    unsigned short radius;
+    double radius;
 
-    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, unsigned short radius_)
+    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, double radius_)
         : id(id_), location(location_), radius(radius_) {};
 
     auto serialize() -> nlohmann::json {
@@ -169,7 +132,7 @@ struct SpawnEvent : Event {
     }
 };
 
-typedef std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS> DamageMap;
+typedef std::array<hlt::entity_map<float>, hlt::MAX_PLAYERS> DamageMap;
 
 class Halite {
 private:
@@ -199,9 +162,9 @@ private:
     std::set<unsigned short> timeout_tags;
 
     //Full game
-    //! A record of the game state at every substep, used for replays.
-    std::vector<std::vector<hlt::Map>> full_frames;
-    std::vector<std::vector<std::vector<std::unique_ptr<Event>>>> full_frame_events;
+    //! A record of the game state at every turn, used for replays.
+    std::vector<hlt::Map> full_frames;
+    std::vector<std::vector<std::unique_ptr<Event>>> full_frame_events;
     std::vector<hlt::MoveQueue> full_player_moves;
     std::vector<mapgen::PointOfInterest> points_of_interest;
 
@@ -222,24 +185,21 @@ private:
         hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
     // Subparts of game loop
-    auto process_attacks(
-        std::array<std::array<float, hlt::MAX_PLAYER_SHIPS>, hlt::MAX_PLAYERS>& ship_damage) -> void;
-    auto process_damage(
-        CollisionMap& collision_map, DamageMap& ship_damage) -> void;
+    auto process_attacks(DamageMap& ship_damage) -> void;
+    auto process_damage(DamageMap& ship_damage) -> void;
     auto process_docking() -> void;
-    auto process_production(CollisionMap& collision_map) -> void;
+    auto process_production() -> void;
     auto process_drag() -> void;
     auto process_cooldowns() -> void;
-    auto process_moves(std::vector<bool>& alive, int move_no, std::vector<std::vector<std::pair<float, float>>>& intermediate_positions) -> void;
+    auto process_moves(std::vector<bool>& alive, int move_no) -> void;
     auto find_living_players() -> std::vector<bool>;
 
     //! Helper to damage an entity and kill it if necessary
     auto damage_entity(hlt::EntityId id,
-                       unsigned short damage,
-                       CollisionMap& collision_map) -> void;
+                       unsigned short damage) -> void;
     //! Helper to kill an entity and clean up any dependents (planet
     //! explosions, docked ships, etc.)
-    auto kill_entity(hlt::EntityId id, CollisionMap& collision_map) -> void;
+    auto kill_entity(hlt::EntityId id) -> void;
 
     //! Comparison function to rank two players, based on the number of ships and their total health.
     auto compare_rankings(const hlt::PlayerId& player1,

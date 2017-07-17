@@ -38,8 +38,8 @@ namespace mapgen {
             if (prefer_horizontal) {
                 spawn_zones.emplace_back(
                     hlt::Location{
-                        static_cast<unsigned short>(map.map_width / 4),
-                        static_cast<unsigned short>(map.map_height / 2) },
+                        map.map_width / 4,
+                        map.map_height / 2 },
                     1);
                 spawn_zones.emplace_back(
                     hlt::Location{

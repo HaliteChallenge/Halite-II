@@ -10,6 +10,12 @@
 #include "hlt.hpp"
 
 namespace hlt {
+    auto Location::distance(const Location& other) const -> double {
+        return sqrt(
+            std::pow(other.pos_x - pos_x, 2) +
+                std::pow(other.pos_y - pos_y, 2));
+    }
+
     EntityId::EntityId() {
         type = EntityType::InvalidEntity;
         _player_id = -1;
@@ -120,21 +126,21 @@ namespace hlt {
         }
     }
 
-    auto Map::get_distance(Location l1, Location l2) const -> float {
-        short dx = l1.pos_x - l2.pos_x;
-        short dy = l1.pos_y - l2.pos_y;
-        return sqrtf((dx * dx) + (dy * dy));
+    auto Map::get_distance(Location l1, Location l2) const -> double {
+        auto dx = l1.pos_x - l2.pos_x;
+        auto dy = l1.pos_y - l2.pos_y;
+        return sqrt((dx * dx) + (dy * dy));
     }
 
-    auto Map::get_angle(Location l1, Location l2) const -> float {
-        short dx = l2.pos_x - l1.pos_x;
-        short dy = l2.pos_y - l1.pos_y;
-        return atan2f(dy, dx);
+    auto Map::get_angle(Location l1, Location l2) const -> double {
+        auto dx = l2.pos_x - l1.pos_x;
+        auto dy = l2.pos_y - l1.pos_y;
+        return atan2(dy, dx);
     }
 
-    auto Map::location_with_delta(const Location& location,
-                                  int dx,
-                                  int dy) -> possibly<Location> {
+    auto Map::location_with_delta(const Location &location,
+                                  double dx,
+                                  double dy) -> possibly<Location> {
         const auto pos_x = location.pos_x + dx;
         if (pos_x < 0 || pos_x >= map_width) {
             return { Location{}, false };
@@ -146,10 +152,7 @@ namespace hlt {
         }
 
         return {
-            Location{
-                static_cast<unsigned short>(pos_x),
-                static_cast<unsigned short>(pos_y),
-            },
+            Location{pos_x, pos_y},
             true
         };
     }
@@ -181,13 +184,13 @@ namespace hlt {
         }
     }
 
-    auto Velocity::accelerate_by(unsigned short magnitude,
+    auto Velocity::accelerate_by(double magnitude,
                                  double angle) -> void {
-        double new_vel_x = vel_x + std::round(magnitude * std::cos(angle));
-        double new_vel_y = vel_y + std::round(magnitude * std::sin(angle));
+        double new_vel_x = vel_x + magnitude * std::cos(angle);
+        double new_vel_y = vel_y + magnitude * std::sin(angle);
 
-        vel_x = static_cast<short>(new_vel_x);
-        vel_y = static_cast<short>(new_vel_y);
+        vel_x = new_vel_x;
+        vel_y = new_vel_y;
 
         const auto max_speed = GameConstants::get().MAX_SPEED;
         if (this->magnitude() > max_speed) {
@@ -195,8 +198,8 @@ namespace hlt {
             new_vel_x *= scale;
             new_vel_y *= scale;
         }
-        vel_x = static_cast<short>(new_vel_x);
-        vel_y = static_cast<short>(new_vel_y);
+        vel_x = new_vel_x;
+        vel_y = new_vel_y;
     }
 
     auto Velocity::magnitude() const -> double {

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <assert.h>
 #include <array>
+#include <unordered_map>
 
 #include "json.hpp"
 
@@ -17,27 +18,26 @@ extern bool quiet_output;
 
 namespace hlt {
     constexpr auto MAX_PLAYERS = 4;
-    constexpr auto MAX_PLAYER_SHIPS = 200;
     constexpr auto MAX_QUEUED_MOVES = 1;
 
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
         unsigned int EXTRA_PLANETS = 4;
 
-        int DRAG = 3;
-        int MAX_SPEED = 30;
-        int MAX_ACCELERATION = 10;
+        double DRAG = 3.0;
+        double MAX_SPEED = 30.0;
+        double MAX_ACCELERATION = 10.0;
 
         unsigned short MAX_SHIP_HEALTH = 255;
         unsigned short BASE_SHIP_HEALTH = 255;
         unsigned short DOCKED_SHIP_REGENERATION = 0;
 
         unsigned int WEAPON_COOLDOWN = 1;
-        int WEAPON_RADIUS = 5;
+        double WEAPON_RADIUS = 5.0;
         int WEAPON_DAMAGE = 128;
         unsigned int EXPLOSION_RADIUS = 5;
 
-        unsigned int MAX_DOCKING_DISTANCE = 4;
+        double MAX_DOCKING_DISTANCE = 4;
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
         unsigned int BASE_PRODUCTIVITY = 25;
@@ -65,15 +65,17 @@ namespace hlt {
     using possibly = std::pair<T, bool>;
 
     struct Location {
-        unsigned short pos_x, pos_y;
+        double pos_x, pos_y;
+
+        auto distance(const Location& other) const -> double;
 
         friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
     };
 
     struct Velocity {
-        short vel_x, vel_y;
+        double vel_x, vel_y;
 
-        auto accelerate_by(unsigned short magnitude, double angle) -> void;
+        auto accelerate_by(double magnitude, double angle) -> void;
         auto magnitude() const -> double;
         auto angle() const -> double;
     };
@@ -85,11 +87,8 @@ namespace hlt {
     struct Entity {
         Location location;
         unsigned short health;
-        //! The radius of the entity, in terms of grid cells from the center.
-        //! Ships have a radius of 0 (they occupy only the center). A planet
-        //! with radius=1 will occupy 5 grid cells (the center and the four
-        //! adjacent cells in the cardinal directions)
-        unsigned short radius;
+        //! The radius of the entity, in terms of units.
+        double radius;
 
         void kill() {
             health = 0;
@@ -131,7 +130,7 @@ namespace hlt {
             health = GameConstants::get().BASE_SHIP_HEALTH;
             location = loc;
             weapon_cooldown = 0;
-            radius = 0;
+            radius = 1;
             velocity = { 0, 0 };
             docking_status = DockingStatus::Undocked;
             docking_progress = 0;
@@ -174,6 +173,9 @@ namespace hlt {
         PlanetEntity,
     };
 
+    struct EntityId;
+    template<> class ::std::hash<EntityId>;
+
     //! A way to uniquely identify an Entity, regardless of its type.
     struct EntityId {
     private:
@@ -200,6 +202,12 @@ namespace hlt {
         friend auto operator<< (std::ostream& ostream, const EntityId& id) -> std::ostream&;
         friend auto operator== (const EntityId& id1, const EntityId& id2) -> bool;
         friend auto operator!= (const EntityId& id1, const EntityId& id2) -> bool;
+
+        friend class ::std::hash<EntityId> {
+            auto operator()(const EntityId& ev) const -> std::size_t {
+                return ev._entity_index << 8 | (ev._player_id & 0xFF);
+            }
+        };
     };
 
     enum class MoveType {
@@ -224,16 +232,17 @@ namespace hlt {
         } move;
     };
 
-    typedef std::array<std::array<hlt::Move, MAX_PLAYER_SHIPS>,
-                       MAX_QUEUED_MOVES> PlayerMoveQueue;
+    template<typename T>
+    using entity_map = std::unordered_map<EntityIndex, T>;
+
+    typedef std::array<entity_map<hlt::Move>, MAX_QUEUED_MOVES> PlayerMoveQueue;
     typedef std::array<PlayerMoveQueue, MAX_PLAYERS> MoveQueue;
 
     class Map {
     public:
-        std::array<std::array<Ship, MAX_PLAYER_SHIPS>, MAX_PLAYERS> ships;
+        std::array<entity_map<Ship>, MAX_PLAYERS> ships;
         std::vector<Planet> planets;
-        unsigned short map_width,
-            map_height; //Number of rows and columns, NOT maximum index.
+        unsigned short map_width, map_height;
 
         Map();
         Map(const Map& other_map);
@@ -243,10 +252,13 @@ namespace hlt {
         auto get_ship(EntityId entity_id) -> Ship&;
         auto get_planet(EntityId entity_id) -> Planet&;
         auto get_entity(EntityId entity_id) -> Entity&;
-        auto get_distance(Location l1, Location l2) const -> float;
-        auto get_angle(Location l1, Location l2) const -> float;
+        auto kill_entity(EntityId entity_id) -> void;
+        auto get_distance(Location l1, Location l2) const -> double;
+        auto get_angle(Location l1, Location l2) const -> double;
 
-        auto location_with_delta(const Location& location, int dx, int dy) -> possibly<Location>;
+        auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
+
+        auto test(const Location& location, double radius) -> std::vector<std::pair<EntityId, double>>;
     };
 }
 
