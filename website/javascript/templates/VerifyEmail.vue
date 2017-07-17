@@ -8,7 +8,7 @@
             <label for="verification_code">Verification Code:</label>
             <input id="verification_code" type="text" class="form-control" placeholder="Verification code" v-model="verification_code" />
         </div><!-- /input-group -->
-        <button class="btn btn-submit" type="button" v-on:click="submit" >Verify</button>
+        <button class="btn btn-primary" type="button" v-on:click="submit">Verify</button>
         <p class="text-danger">{{ error_message }}</p>
     </form>
 </template>
