@@ -159,7 +159,7 @@ void Networking::deserialize_move_set(std::string& inputString,
         }
 
         if (queue_depth.count(move.shipId) == 0) {
-            queue_depth[move.shipId] = 1;
+            queue_depth[move.shipId] = 0;
         }
 
         auto queue_index = queue_depth.at(move.shipId);
