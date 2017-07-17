@@ -164,7 +164,7 @@ void Networking::deserialize_move_set(std::string& inputString,
 
         auto queue_index = queue_depth.at(move.shipId);
         if (queue_index < hlt::MAX_QUEUED_MOVES) {
-            moves.at(queue_index).at(move.shipId) = move;
+            moves.at(queue_index)[move.shipId] = move;
             queue_depth.at(move.shipId)++;
         } else {
             throw eject_bot(
@@ -493,7 +493,10 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
 
     std::string response;
     try {
-        if (is_process_dead(player_tag)) return -1;
+        if (is_process_dead(player_tag)) {
+            // TODO: more debug output
+            return -1;
+        }
 
         //Send this bot the game map and the messages addressed to this bot
         std::string mapString = serialize_map(m);
