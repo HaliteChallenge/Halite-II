@@ -623,6 +623,7 @@ auto Halite::process_events() -> void {
             }
 
             target_count[src] = num_prev_targets + 1;
+            damage_dealt[src.player_id()] += hlt::GameConstants::get().WEAPON_DAMAGE;
         };
 
         for (SimulationEvent ev : simultaneous_events) {
@@ -654,7 +655,7 @@ auto Halite::process_events() -> void {
             if (damage_map[target.player_id()].count(target.entity_index()) > 0) {
                 prev_damage = damage_map[target.player_id()][target.entity_index()];
             }
-            const auto new_damage = hlt::GameConstants::get().WEAPON_DAMAGE / static_cast<float>(target_count[src]);
+            const auto new_damage = hlt::GameConstants::get().WEAPON_DAMAGE / static_cast<double>(target_count[src]);
             damage_map[target.player_id()][target.entity_index()] = prev_damage + new_damage;
         };
 
@@ -666,7 +667,6 @@ auto Halite::process_events() -> void {
         }
 
         for (auto& pair : attackers) {
-
             full_frame_events.back().push_back(
                 // TODO: define a move constructor?
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
