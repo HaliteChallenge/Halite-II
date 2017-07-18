@@ -66,13 +66,10 @@ auto collision_time(
         const auto t2 = -b - std::sqrt(disc);
 
         if (t1 >= 0.0 && t2 >= 0.0) {
-            return { true, std::min(t1, t2) };
-        }
-        else if (t1 < 0.0 && t2 < 0.0) {
-            return { false, 0.0 };
+            return { true, std::min(t1, t2) / (2 * a) };
         }
         else {
-            return { true, std::max(t1, t2) };
+            return { true, std::max(t1, t2) / (2 * a) };
         }
     }
     else {
@@ -86,9 +83,9 @@ auto collision_time(double r, const hlt::Ship& ship1, const hlt::Ship& ship2) ->
                           ship1.velocity, ship2.velocity);
 }
 
-auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& ship2) -> std::pair<bool, double> {
+auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& planet) -> std::pair<bool, double> {
     return collision_time(r,
-                          ship1.location, ship2.location,
+                          ship1.location, planet.location,
                           ship1.velocity, { 0, 0 });
 }
 

@@ -431,7 +431,7 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
 
                     const auto max_distance =
                         planet.radius + ship.radius +
-                            hlt::GameConstants::get().MAX_DOCKING_DISTANCE;
+                            hlt::GameConstants::get().DOCK_RADIUS;
                     const auto ship_distance = planet.location.distance(ship.location);
                     if (ship_distance > max_distance) {
                         ship.reset_docking_status();
@@ -569,7 +569,7 @@ auto Halite::process_events() -> void {
                             });
                         }
                     }
-                    else {
+                    else if (distance <= collision_radius) {
                         // This should never happen - they should already have
                         // collided
                         assert(false);
