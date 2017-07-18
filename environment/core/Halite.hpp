@@ -47,14 +47,6 @@ struct GameStatistics {
 
 auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
 
-// JSON serialization
-// Have to place these here because json.hpp isn't safe to include more than
-// once; otherwise we could define these in the hlt namespace, and have the
-// library automatically call them
-
-auto to_json(const hlt::EntityId& id) -> nlohmann::json;
-auto to_json(const hlt::Location& location) -> nlohmann::json;
-
 /**
  * An event that happens during game simulation. Recorded for the replay, so
  * that visualizers have more information to use.
@@ -76,7 +68,7 @@ struct DestroyedEvent : Event {
     auto serialize() -> nlohmann::json {
         return nlohmann::json{
             { "event", "destroyed" },
-            { "entity", to_json(id) },
+            { "entity", id },
             { "x", location.pos_x },
             { "y", location.pos_y },
             { "radius", radius },
@@ -88,25 +80,28 @@ struct AttackEvent : Event {
     hlt::EntityId id;
     hlt::Location location;
 
-    std::vector<hlt::Location> targets;
+    std::vector<hlt::EntityId> targets;
+    std::vector<hlt::Location> target_locations;
 
-    AttackEvent(hlt::EntityId id_, hlt::Location location_, std::vector<hlt::Location> targets_)
-        : id(id_), location(location_) {
-        targets = targets_;
-    };
+    AttackEvent(hlt::EntityId id_, hlt::Location location_,
+                std::vector<hlt::EntityId> targets_,
+                std::vector<hlt::Location> target_locations_) :
+        id(id_), location(location_), targets(targets_),
+        target_locations(target_locations_) {};
 
     auto serialize() -> nlohmann::json {
         std::vector<nlohmann::json> target_locations;
         target_locations.reserve(targets.size());
         for (auto& location : targets) {
-            target_locations.push_back(to_json(location));
+            target_locations.push_back(location);
         }
         return nlohmann::json{
             { "event", "attack" },
-            { "entity", to_json(id) },
+            { "entity", id },
             { "x", location.pos_x },
             { "y", location.pos_y },
-            { "targets", target_locations },
+            { "targets", targets },
+            { "target_locations", target_locations },
         };
     }
 };
@@ -123,7 +118,7 @@ struct SpawnEvent : Event {
     auto serialize() -> nlohmann::json {
         return nlohmann::json{
             { "event", "spawned" },
-            { "entity", to_json(id) },
+            { "entity", id },
             { "x", location.pos_x },
             { "y", location.pos_y },
             { "planet_x", planet_location.pos_x },

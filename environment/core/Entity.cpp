@@ -130,4 +130,28 @@ namespace hlt {
             owner = 0;
         }
     }
+
+    auto to_json(nlohmann::json& json, const hlt::Location& location) -> void {
+        json["x"] = location.pos_x;
+        json["y"] = location.pos_y;
+    }
+
+    auto to_json(nlohmann::json& json, const hlt::EntityId& id) -> void {
+        switch (id.type) {
+            case hlt::EntityType::ShipEntity: {
+                json["type"] = "ship";
+                json["owner"] = id.player_id();
+                json["id"] = id.entity_index();
+                break;
+            }
+            case hlt::EntityType::InvalidEntity:
+                json["type"] = "invalid";
+                break;
+            case hlt::EntityType::PlanetEntity: {
+                json["type"] = "planet";
+                json["id"] = id.entity_index();
+                break;
+            }
+        }
+    }
 }

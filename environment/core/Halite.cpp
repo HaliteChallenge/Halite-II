@@ -1167,31 +1167,3 @@ Halite::~Halite() {
     //Get rid of dynamically allocated memory:
     for (int a = 0; a < number_of_players; a++) networking.kill_player(a);
 }
-
-auto to_json(const hlt::Location& location) -> nlohmann::json {
-    return {
-        { "x", location.pos_x },
-        { "y", location.pos_y },
-    };
-}
-
-auto to_json(const hlt::EntityId& id) -> nlohmann::json {
-    switch (id.type) {
-        case hlt::EntityType::ShipEntity:
-            return {
-                { "type", "ship" },
-                { "owner", id.player_id() },
-                { "id", id.entity_index() },
-            };
-        case hlt::EntityType::InvalidEntity:
-            return {
-                { "type", "invalid" },
-            };
-        case hlt::EntityType::PlanetEntity: {
-            return {
-                { "type", "planet" },
-                { "id", id.entity_index() },
-            };
-        }
-    }
-}

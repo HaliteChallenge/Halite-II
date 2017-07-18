@@ -12,6 +12,8 @@
 
 #include "Constants.hpp"
 
+#include "json.hpp"
+
 namespace hlt {
     typedef unsigned char PlayerId;
     typedef unsigned long EntityIndex;
@@ -159,6 +161,9 @@ namespace hlt {
 
         friend class std::hash<EntityId>;
     };
+
+    auto to_json(nlohmann::json& json, const hlt::EntityId& id) -> void;
+    auto to_json(nlohmann::json& json, const hlt::Location& location) -> void;
 }
 
 namespace std {
