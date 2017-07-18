@@ -27,14 +27,16 @@ namespace hlt {
 
         unsigned int WEAPON_COOLDOWN = 1;
         double WEAPON_RADIUS = 5.0;
-        int WEAPON_DAMAGE = 128;
-        unsigned int EXPLOSION_RADIUS = 5;
+        int WEAPON_DAMAGE = 64;
+        double EXPLOSION_RADIUS = 5;
 
-        double MAX_DOCKING_DISTANCE = 4;
+        double DOCK_RADIUS = 4;
         unsigned int DOCK_TURNS = 5;
         int PRODUCTION_PER_SHIP = 100;
         unsigned int BASE_PRODUCTIVITY = 25;
         unsigned int ADDITIONAL_PRODUCTIVITY = 15;
+
+        int SPAWN_RADIUS = 2;
 
         static auto get_mut() -> GameConstants& {
             // Guaranteed initialized only once by C++11
