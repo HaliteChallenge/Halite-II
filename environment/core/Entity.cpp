@@ -3,6 +3,7 @@
 //
 
 #include "Entity.hpp"
+#include "hlt.hpp"
 
 namespace hlt {
     auto Location::distance(const Location &other) const -> double {
@@ -129,6 +130,17 @@ namespace hlt {
             owned = false;
             owner = 0;
         }
+    }
+
+    auto Planet::num_docked_ships(const Map& game_map) const -> int {
+        return std::count_if(
+            docked_ships.begin(),
+            docked_ships.end(),
+            [&](hlt::EntityIndex ship_idx) -> bool {
+                const auto& ship = game_map.get_ship(owner, ship_idx);
+                return ship.docking_status == hlt::DockingStatus::Docked;
+            }
+        );
     }
 
     auto to_json(nlohmann::json& json, const hlt::Location& location) -> void {

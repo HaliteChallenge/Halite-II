@@ -33,6 +33,10 @@ namespace hlt {
         return ships[player][entity];
     }
 
+    auto Map::get_ship(PlayerId player, EntityIndex entity) const -> const Ship& {
+        return ships.at(player).at(entity);
+    }
+
     auto Map::get_ship(EntityId entity_id) -> Ship& {
         assert(entity_id.is_valid());
         assert(entity_id.type == EntityType::ShipEntity);
@@ -61,12 +65,6 @@ namespace hlt {
         auto dx = l1.pos_x - l2.pos_x;
         auto dy = l1.pos_y - l2.pos_y;
         return sqrt((dx * dx) + (dy * dy));
-    }
-
-    auto Map::get_angle(Location l1, Location l2) const -> double {
-        auto dx = l2.pos_x - l1.pos_x;
-        auto dy = l2.pos_y - l1.pos_y;
-        return atan2(dy, dx);
     }
 
     auto Map::location_with_delta(const Location &location,
@@ -157,7 +155,6 @@ namespace hlt {
 
         return result;
     }
-
     auto Map::spawn_ship(const Location& location, PlayerId owner) -> EntityIndex {
         auto new_id = 0;
         auto& player_ships = ships[owner];

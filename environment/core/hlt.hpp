@@ -59,6 +59,7 @@ namespace hlt {
         Map(unsigned short width, unsigned short height);
 
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
+        auto get_ship(PlayerId player, EntityIndex entity) const -> const Ship&;
         auto get_ship(EntityId entity_id) -> Ship&;
         auto get_planet(EntityId entity_id) -> Planet&;
         auto get_entity(EntityId entity_id) -> Entity&;
@@ -66,7 +67,6 @@ namespace hlt {
         auto unsafe_kill_entity(EntityId entity_id) -> void;
         auto cleanup_entities() -> void;
         auto get_distance(Location l1, Location l2) const -> double;
-        auto get_angle(Location l1, Location l2) const -> double;
 
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 

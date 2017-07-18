@@ -18,6 +18,8 @@ namespace hlt {
     typedef unsigned char PlayerId;
     typedef unsigned long EntityIndex;
 
+    class Map;
+
     //! A poor man's std::optional.
     template<typename T>
     using possibly = std::pair<T, bool>;
@@ -124,6 +126,7 @@ namespace hlt {
 
         auto add_ship(EntityIndex ship) -> void;
         auto remove_ship(EntityIndex ship) -> void;
+        auto num_docked_ships(const Map& game_map) const -> int;
     };
 
     enum class EntityType {
