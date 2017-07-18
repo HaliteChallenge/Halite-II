@@ -42,7 +42,7 @@
                         replay: Object.freeze(replay),
                         game: game.game,
                         makeUserLink: function(user_id) {
-                            return `${api.API_SERVER_URL}/user/${user_id}`;
+                            return `/user?user_id=${user_id}`;
                         },
                         getUserProfileImage: function(user_id) {
                             return api.get_user(user_id).then((user) => {
