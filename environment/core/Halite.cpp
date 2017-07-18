@@ -743,7 +743,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         process_moves(alive, move_no);
 
         process_events();
-
     }
 
     process_production();

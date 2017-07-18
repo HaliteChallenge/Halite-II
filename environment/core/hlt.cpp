@@ -124,8 +124,21 @@ namespace hlt {
             const auto& planet = planets[planet_idx];
             if (!planet.is_alive()) continue;
 
-            if (location.distance2(planet.location) <= radius + planet.radius) {
+            if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
                 result.push_back(EntityId::for_planet(planet_idx));
+            }
+        }
+
+        for (hlt::PlayerId player_id = 0; player_id < MAX_PLAYERS; player_id++) {
+            const auto& player_ships = ships[player_id];
+
+            for (const auto& ship_pair : player_ships) {
+                const auto& ship = ship_pair.second;
+                if (!ship.is_alive()) continue;
+
+                if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
+                    result.push_back(EntityId::for_ship(player_id, ship_pair.first));
+                }
             }
         }
 
