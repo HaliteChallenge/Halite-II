@@ -20,6 +20,9 @@ std::string Networking::serialize_map(const hlt::Map& map) {
 
     // Encode individual ships
     oss << ' ' << player_count();
+    oss << std::setprecision(2);
+    oss << std::fixed;
+
     for (hlt::PlayerId player_id = 0; player_id < player_count();
          player_id++) {
         oss << ' ' << (int) player_id;
