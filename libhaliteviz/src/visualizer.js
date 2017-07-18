@@ -186,12 +186,12 @@ export class HaliteVisualizer {
         });
     }
 
-    get currentSubstep() {
-        return this.replay.frames[this.frame][this.substep];
+    get currentFrame() {
+        return this.replay.frames[this.frame];
     }
 
     get currentStatistics() {
-        let substep = this.currentSubstep;
+        let substep = this.currentFrame;
         let planets = { "unowned": 0 };
         let ships = {};
         let total_ships = 0;
@@ -208,12 +208,11 @@ export class HaliteVisualizer {
             }
         }
 
-        for (let ship of substep.ships) {
-            if (typeof ships[ship.owner] === "undefined") {
-                ships[ship.owner] = 0;
+        for (let owner of Object.keys(substep.ships)) {
+            for (let ship of Object.values(substep.ships[owner])) {
+                ships[owner]++;
+                total_ships++;
             }
-            ships[ship.owner]++;
-            total_ships++;
         }
 
         return {
@@ -274,30 +273,23 @@ export class HaliteVisualizer {
 
         this.timer = window.setInterval(() => {
             this.advanceSubsteps(8);
-        }, 1000/20);
+        }, 1000/5);
 
         this.onPlay();
     }
 
     advanceSubsteps(substeps) {
-        for (let i = 0; i < substeps; i++) {
-            this.substep++;
-            if (this.substep >= this.replay.frames[this.frame].length) {
-                this.substep = 0;
-                this.frame++;
-            }
-
-            if (this.frame >= this.replay.frames.length) {
-                this.pause();
-                this.frame = this.replay.frames.length - 1;
-                this.substep = this.replay.frames[this.frame].length - 1;
-                this.update();
-                this.onEnd();
-                break;
-            }
-
+        // TODO: interpolate between frames for smoother feel
+        this.frame++;
+        if (this.frame >= this.replay.frames.length) {
+            this.pause();
+            this.frame = this.replay.frames.length - 1;
             this.update();
+            this.onUpdate();
+            this.onEnd();
+            return;
         }
+        this.update();
         this.onUpdate();
     }
 
@@ -467,8 +459,8 @@ export class HaliteVisualizer {
     }
 
     update() {
-        if (this.currentSubstep.events) {
-            for (let event of this.currentSubstep.events) {
+        if (this.currentFrame.events) {
+            for (let event of this.currentFrame.events) {
                 if (event.event === "destroyed") {
                     let draw = (frame) => {
                         const width = CELL_SIZE * this.scale;
@@ -568,19 +560,21 @@ export class HaliteVisualizer {
         this.shipContainer.clear();
         this.lights.clear();
 
-        for (let planet of Object.values(this.currentSubstep.planets)) {
+        for (let planet of Object.values(this.currentFrame.planets)) {
             this.drawPlanet(planet);
         }
 
         // Handle dead planets
         for (let planet of this.replay.planets) {
-            if (typeof this.currentSubstep.planets[planet.id] === "undefined") {
+            if (typeof this.currentFrame.planets[planet.id] === "undefined") {
                 this.drawPlanet({ id: planet.id, owner: null, health: 0 });
             }
         }
 
-        for (let ship of this.currentSubstep.ships) {
-            this.drawShip(ship);
+        for (let playerShips of Object.values(this.currentFrame.ships)) {
+            for (let ship of Object.values(playerShips)) {
+                this.drawShip(ship);
+            }
         }
 
         this.drawStats();
@@ -642,7 +636,7 @@ export function parseReplay(buffer) {
             worker.onmessage = function (e) {
                 const inflated = e.data;
                 const inflatedTime = Date.now();
-                const replay = msgpack.decode(new Uint8Array(inflated));
+                const replay = JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(inflated)));
                 const finishTime = Date.now();
                 console.info(`Decoded compressed replay in ${finishTime - startTime}ms, inflating took ${inflatedTime - startTime}ms, decoding took ${finishTime - inflatedTime}ms.`);
                 resolve(replay);
