@@ -684,7 +684,7 @@ auto find_events(
     }
 }
 
-auto Halite::process_events() const -> void {
+auto Halite::process_events() -> void {
     std::unordered_set<SimulationEvent> unsorted_events;
 
     for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
@@ -713,6 +713,7 @@ auto Halite::process_events() const -> void {
                 const auto distance = ship.location.distance(planet.location);
 
                 if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
+                    // TODO:
                 }
             }
         }
@@ -739,6 +740,32 @@ auto Halite::process_events() const -> void {
 
         for (SimulationEvent ev : simultaneous_events) {
             std::cout << ev << "\n";
+            switch (ev.type) {
+                case SimulationEventType::Collision: {
+                    const auto damage = compute_damage(ev.id1, ev.id2);
+                    damage_entity(ev.id1, damage.first);
+                    damage_entity(ev.id2, damage.second);
+                    break;
+                }
+
+                case SimulationEventType::Attack: {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+auto Halite::process_movement() -> void {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players;
+         player_id++) {
+        for (auto &ship_pair : game_map.ships[player_id]) {
+            auto& ship = ship_pair.second;
+
+            if (ship.is_alive()) {
+                ship.location.pos_x += ship.velocity.vel_x;
+                ship.location.pos_y += ship.velocity.vel_y;
+            }
         }
     }
 }
@@ -763,6 +790,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         process_moves(alive, move_no);
 
         process_events();
+        game_map.cleanup_entities();
+        process_movement();
     }
 
     process_production();
