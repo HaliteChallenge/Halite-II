@@ -228,9 +228,9 @@
                  };
              }
 
-             let substep = this.replay.frames[this.frame][this.substep];
-             for (let ship of substep.ships) {
-                 count[ship.owner].ships++;
+             let substep = this.replay.frames[this.frame];
+             for (let owner of Object.keys(substep.ships)) {
+                 count[owner].ships += Object.values(substep.ships[owner]).length;
              }
 
              for (let planet of Object.values(substep.planets)) {
@@ -244,8 +244,7 @@
          selected_planet: function() {
              if (this.selected.kind === "planet") {
                  let frame = this.replay.frames[this.frame];
-                 let substep = frame[this.substep];
-                 let state = substep.planets[this.selected.id];
+                 let state = frame.planets[this.selected.id];
                  if (state) {
                      return {
                          base: this.replay.planets[this.selected.id],

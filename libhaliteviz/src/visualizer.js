@@ -64,8 +64,8 @@ export class HaliteVisualizer {
         this.stats = new statistics.Statistics(replay);
 
         this.frame = 0;
-        this.substep = 0;
-
+        this.substep = 0; // TODO: delete this
+        this.time = 0;
         this.application = new PIXI.Application(
             VISUALIZER_SIZE,
             2 * STATS_SIZE + VISUALIZER_SIZE * (this.replay.height / this.replay.width),
@@ -272,25 +272,30 @@ export class HaliteVisualizer {
         this.application.start();
 
         this.timer = window.setInterval(() => {
-            this.advanceSubsteps(8);
-        }, 1000/5);
+            this.advanceSubsteps(0.2);
+        }, 1000/40);
 
         this.onPlay();
     }
 
-    advanceSubsteps(substeps) {
-        // TODO: interpolate between frames for smoother feel
-        this.frame++;
+    advanceSubsteps(time) {
+        // Interpolate between frames for smoother feel
+        this.time += time;
+        if (this.time >= 1.0) {
+            this.frame++;
+            this.time = 0;
+        }
         if (this.frame >= this.replay.frames.length) {
             this.pause();
             this.frame = this.replay.frames.length - 1;
-            this.update();
-            this.onUpdate();
             this.onEnd();
             return;
         }
-        this.update();
-        this.onUpdate();
+
+        if (this.time == 0) {
+            this.update();
+            this.onUpdate();
+        }
     }
 
     pause() {
@@ -406,10 +411,26 @@ export class HaliteVisualizer {
         const max_ship_health = this.replay.constants.MAX_SHIP_HEALTH;
         const health_factor = 0.1 + 0.3 * (max_ship_health - ship.health) / max_ship_health;
 
-        const x = side * ship.x;
-        const y = side * ship.y;
+        let vel_x = ship.vel_x;
+        let vel_y = ship.vel_y;
 
-        this.drawCell(this.shipContainer, ship.x, ship.y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown === 0);
+        if (this.frame > 0) {
+            let moves = this.replay.moves[this.frame - 1];
+            let move = moves[ship.owner][0][ship.id];
+            if (move && move.type === "thrust") {
+                let angle = move.angle * Math.PI / 180;
+                vel_x += move.magnitude * Math.cos(angle);
+                vel_y += move.magnitude * Math.sin(angle);
+            }
+        }
+
+        const x = ship.x + this.time * vel_x;
+        const y = ship.y + this.time * vel_y;
+
+        const pixelX = side * x;
+        const pixelY = side * y;
+
+        this.drawCell(this.shipContainer, x, y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown === 0);
 
         if (this.frame > 0) {
             let move = this.replay.moves[this.frame-1][ship.owner][0][ship.id];
@@ -417,8 +438,8 @@ export class HaliteVisualizer {
                 // Draw thrust trail
                 const magnitude = move.magnitude / this.replay.constants.MAX_ACCELERATION;
                 this.shipContainer.beginFill(0xFF0000, 0.5 + 0.3 * magnitude);
-                const cx = x + 0.5 * side;
-                const cy = y + 0.5 * side;
+                const cx = pixelX + 0.5 * side;
+                const cy = pixelY + 0.5 * side;
                 const angle = (move.angle + 180) * Math.PI / 180;
                 const deltaAngle = Math.PI / 10 + Math.PI / 10 * magnitude;
                 this.shipContainer.moveTo(cx, cy);
@@ -444,8 +465,8 @@ export class HaliteVisualizer {
             const planetX = side * (planetBase.x + 0.5);
             const planetY = side * (planetBase.y + 0.5);
 
-            const cx = x + 0.5*side;
-            const cy = y + 0.5*side;
+            const cx = pixelX + 0.5*side;
+            const cy = pixelY + 0.5*side;
 
             const dx = planetX - cx;
             const dy = planetY - cy;
