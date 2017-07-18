@@ -786,7 +786,7 @@ auto output_move(const hlt::Move& move, hlt::PlayerId player_id,
  * @param replay
  */
 auto Halite::output_header(nlohmann::json& replay) -> void {
-    replay["version"] = 20;
+    replay["version"] = 30;
     replay["seed"] = seed;
     replay["map_generator"] = map_generator;
 
@@ -920,21 +920,24 @@ auto Halite::output(std::string filename) -> void {
     j["moves"] = nlohmann::json(moves);
 
     // Use msgpack to cut down on the size of the replay file
-    std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
+    // std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
+    std::string data = j.dump();
+    auto data_size = data.size();
+    auto bin_data = reinterpret_cast<const unsigned char*>(data.data());
 
     // Use miniz to further compress replay file
-    auto compressed_length = compressBound(bin_data.size());
+    auto compressed_length = compressBound(data_size);
     auto compressed_data = reinterpret_cast<mz_uint8*>(std::malloc(compressed_length));
-    auto result = mz_compress(compressed_data, &compressed_length, bin_data.data(), bin_data.size());
-    if (result != MZ_OK) {
+    auto result = mz_compress(compressed_data, &compressed_length, bin_data, data_size);
+    if (result == MZ_OK) {
+        gameFile.write(reinterpret_cast<const char*>(compressed_data),
+                       compressed_length * sizeof(uint8_t));
+    }
+    else {
         if (!quiet_output) {
             std::cout << "Error: could not compress replay file!\n";
         }
-        gameFile.write(reinterpret_cast<const char*>(bin_data.data()),
-                       bin_data.size() * sizeof(uint8_t));
-    }
-    else {
-        gameFile.write(reinterpret_cast<const char*>(compressed_data), compressed_length);
+        gameFile.write(reinterpret_cast<const char*>(data.data()), data_size);
     }
 
     std::free(compressed_data);
