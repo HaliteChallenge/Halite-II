@@ -174,10 +174,6 @@ private:
     //! Compute the damage between two colliding ships
     auto compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
         -> std::pair<unsigned short, unsigned short>;
-    //! Compute the damage dealt to an entity at the given location
-    //! by a planet explosion
-    auto compute_planet_explosion_damage(
-        hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
     // Subparts of game loop
     auto process_damage(DamageMap& ship_damage) -> void;

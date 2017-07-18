@@ -33,7 +33,6 @@ auto Halite::compare_rankings(const hlt::PlayerId& player1,
 
 auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
 -> std::pair<unsigned short, unsigned short> {
-
     unsigned short self_damage = 0;
     unsigned short other_damage = 0;
 
@@ -62,30 +61,22 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
     return std::make_pair(self_damage, other_damage);
 }
 
-auto Halite::compute_planet_explosion_damage(
-    hlt::Planet& planet, hlt::Location location) -> unsigned short {
-    const auto dx = static_cast<short>(planet.location.pos_x) - location.pos_x;
-    const auto dy = static_cast<short>(planet.location.pos_y) - location.pos_y;
-    const auto distance_squared = dx*dx + dy*dy;
-    const auto radius_squared = planet.radius * planet.radius;
+auto planet_explosion_damage(hlt::Planet& planet, double distance) -> unsigned short {
+    const auto explosion_radius = hlt::GameConstants::get().EXPLOSION_RADIUS;
 
-    if (distance_squared <= radius_squared) {
+    if (distance < planet.radius) {
         return std::numeric_limits<unsigned short>::max();
     }
 
-    // Distance is at least 1
-    const auto distance_from_crust = static_cast<int>(
-        std::sqrt(distance_squared) - std::sqrt(radius_squared));
+    const auto distance_from_crust = distance - planet.radius;
 
-    const auto explosion_radius = hlt::GameConstants::get().EXPLOSION_RADIUS;
     if (distance_from_crust <= explosion_radius) {
-        // Ensure a ship next to a planet receives enough damage
-        // to kill it instantly
-        const auto distance_factor =
-            explosion_radius - (distance_from_crust - 1);
-        return static_cast<unsigned short>(
-            (hlt::GameConstants::get().MAX_SHIP_HEALTH / explosion_radius) *
-                distance_factor / explosion_radius);
+        // Ranges linearly from 2x max ship health (at distance 0) to 0.5x
+        // max ship health (at the maximum distance)
+        const auto max_ship_hp = hlt::GameConstants::get().MAX_SHIP_HEALTH;
+        const auto damage = max_ship_hp -
+            (distance_from_crust / (2 * explosion_radius)) * max_ship_hp;
+        return static_cast<unsigned short>(damage);
     }
     else {
         return 0;
@@ -140,8 +131,9 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
             for (const auto& target_id : caught_in_explosion) {
                 if (target_id != id) {
                     const auto& target = game_map.get_entity(target_id);
-                    const auto damage =
-                        compute_planet_explosion_damage(planet, target.location);
+                    const auto distance = planet.location.distance(target.location);
+                    const auto damage = planet_explosion_damage(
+                        planet, distance - target.radius);
                     damage_entity(target_id, damage);
                 }
             }
