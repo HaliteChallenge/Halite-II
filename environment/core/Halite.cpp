@@ -615,7 +615,6 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     retrieve_moves(alive);
 
-    full_frames.push_back({});
     full_frame_events.emplace_back();
     full_player_moves.push_back({ { { } } });
 
@@ -786,9 +785,8 @@ auto Halite::output(std::string filename) -> void {
     output_header(j);
 
     // Encode the frames.
-
     std::vector<nlohmann::json> frames;
-    std::vector<std::vector<nlohmann::json>> moves;
+    std::vector<nlohmann::json> moves;
     frames.reserve(full_frames.size());
     moves.reserve(full_frames.size() - 1);
 
@@ -798,13 +796,17 @@ auto Halite::output(std::string filename) -> void {
 
         for (hlt::PlayerId player_idx = 0; player_idx < number_of_players; player_idx++) {
             const auto& player_ships = frame_map.ships[player_idx];
+            auto frame_player_ships = nlohmann::json::object();
 
             for (const auto& ship_pair : player_ships) {
                 const auto ship_idx = ship_pair.first;
                 const auto& ship = ship_pair.second;
 
-                frame_ships[ship_idx] = output_ship(ship, player_idx, ship_idx);
+                frame_player_ships[std::to_string(ship_idx)] =
+                    output_ship(ship, player_idx, ship_idx);
             }
+
+            frame_ships[std::to_string(player_idx)] = frame_player_ships;
         }
 
         for (hlt::EntityIndex planet_index = 0;
@@ -837,14 +839,14 @@ auto Halite::output(std::string filename) -> void {
         frame_data["events"] = nlohmann::json(event_record);
     }
 
-    // Serialize moves.  Note that there is no moves field for the last frame.
+    // Serialize moves. Note that there is no moves field for the last frame.
     for (const auto& current_moves : full_player_moves) {
-        // Each move array is an array of player moves
-        auto frame_moves = nlohmann::json::array();
+        // Each entry is a map of player ID to move set
+        nlohmann::json frame_moves;
 
         for (hlt::PlayerId player_id = 0; player_id < current_moves.size();
              player_id++) {
-            // Each player move set is represented as an array of queued moves
+            // Each player move set is an array of queued moves
             std::vector<nlohmann::json> all_player_moves;
             for (auto move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
                 // Each set of queued moves is an object mapping ship ID to move
@@ -857,7 +859,8 @@ auto Halite::output(std::string filename) -> void {
                 }
                 all_player_moves.push_back(std::move(player_moves));
             }
-            frame_moves.push_back(all_player_moves);
+
+            frame_moves[std::to_string(player_id)] = all_player_moves;
         }
 
         moves.push_back(frame_moves);

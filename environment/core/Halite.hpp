@@ -28,11 +28,6 @@
 
 extern bool quiet_output;
 
-/**
- * How to round event times for the purpose of attack and collision resolution.
- */
-constexpr auto EVENT_TIME_PRECISION = 10000;
-
 struct PlayerStatistics {
     int tag;
     int rank;
@@ -197,11 +192,12 @@ private:
     auto process_drag() -> void;
     auto process_cooldowns() -> void;
     auto process_moves(std::vector<bool>& alive, int move_no) -> void;
+    auto process_events() -> void;
+    auto process_movement() -> void;
     auto find_living_players() -> std::vector<bool>;
 
     //! Helper to damage an entity and kill it if necessary
-    auto damage_entity(hlt::EntityId id,
-                       unsigned short damage) -> void;
+    auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
     //! Helper to kill an entity and clean up any dependents (planet
     //! explosions, docked ships, etc.)
     auto kill_entity(hlt::EntityId id) -> void;
@@ -224,7 +220,6 @@ public:
     std::string get_name(hlt::PlayerId player_tag);
 
     ~Halite();
-    void process_events() const;
 };
 
 #endif
