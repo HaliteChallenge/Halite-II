@@ -72,170 +72,179 @@
 </template>
 
 <script>
-    import {HaliteVisualizer, PLAYER_COLORS} from "./visualizer";
+ import {HaliteVisualizer, PLAYER_COLORS} from "./visualizer";
 
-    export default {
-        name: "halite-hud",
-        props: ["replay", "game", "makeUserLink", "getUserProfileImage"],
-        data: function() {
-            return {
-                colors: PLAYER_COLORS.map((color) => {
-                    color = color.toString(16);
-                    while (color.length < 6) {
-                        color = "0" + color;
-                    }
-                    return '#' + color;
-                }),
-                frame: 0,
-                substep: 0,
-                playing: false,
-                selected: {
-                    kind: null,
-                    id: null,
-                },
-                player_names: null,
-                encoding: false,
-                recording: false,
-                start_frame: 0,
-            };
-        },
-        mounted: function() {
-            console.log(this.replay);
-            const visualizer = new HaliteVisualizer(this.replay);
-            visualizer.attach(this.$refs.visualizer_container);
-            visualizer.onUpdate = () => {
-                this.frame = visualizer.frame;
-                this.substep = visualizer.substep;
-            };
-            visualizer.onSelect = (kind, args) => {
-                this.selected.kind = "planet";
-                this.selected.id = args.id;
-                visualizer.onUpdate();
-                this.$forceUpdate();
-            };
-            visualizer.onPlay = () => {
-                this.playing = true;
-            };
-            visualizer.onPause = () => {
-                this.playing = false;
-            };
-            visualizer.play();
-            this.play = () => {
-                if (this.encoding) return;
-                visualizer.play();
-            };
-            this.pause = () => {
-                if (this.encoding) return;
-                visualizer.pause();
-            };
-            this.scrub = (e) => {
-                visualizer.pause();
-                visualizer.substep = 0;
-                visualizer.frame = e.target.value;
-                visualizer.onUpdate();
-            };
-            this.getVisualizer = () => visualizer;
-            this.beginCaptureGIF = () => {
-                if (!visualizer.isPlaying()) this.play();
-                this.start_frame = this.frame;
-                this.start_substep = this.substep;
-                this.recording = true;
-            };
-            this.renderGIF = () => {
-                this.pause();
-                this.recording = false;
-                this.encoding = true;
-                visualizer.encodeGIF({
-                    frame: this.start_frame,
-                    substep: this.start_substep,
-                }, {
-                    frame: this.frame,
-                    substep: this.substep,
-                }).then((blob) => {
-                    this.encoding = false;
-                    window.open(URL.createObjectURL(blob));
-                });
-            };
+ export default {
+     name: "halite-hud",
+     props: ["replay", "game", "makeUserLink", "getUserProfileImage"],
+     data: function() {
+         return {
+             colors: PLAYER_COLORS.map((color) => {
+                 color = color.toString(16);
+                 while (color.length < 6) {
+                     color = "0" + color;
+                 }
+                 return '#' + color;
+             }),
+             frame: 0,
+             substep: 0,
+             playing: false,
+             selected: {
+                 kind: null,
+                 id: null,
+             },
+             player_names: null,
+             encoding: false,
+             recording: false,
+             start_frame: 0,
+         };
+     },
+     mounted: function() {
+         console.log(this.replay);
+         const visualizer = new HaliteVisualizer(this.replay);
+         visualizer.attach(this.$refs.visualizer_container);
+         visualizer.onUpdate = () => {
+             this.frame = visualizer.frame;
+             this.substep = visualizer.substep;
+         };
+         visualizer.onSelect = (kind, args) => {
+             this.selected.kind = "planet";
+             this.selected.id = args.id;
+             visualizer.onUpdate();
+             this.$forceUpdate();
+         };
+         visualizer.onPlay = () => {
+             this.playing = true;
+         };
+         visualizer.onPause = () => {
+             this.playing = false;
+         };
+         visualizer.play();
+         this.play = () => {
+             if (this.encoding) return;
+             visualizer.play();
+         };
+         this.pause = () => {
+             if (this.encoding) return;
+             visualizer.pause();
+         };
+         this.scrub = (e) => {
+             visualizer.pause();
+             visualizer.substep = 0;
+             visualizer.frame = e.target.value;
+             visualizer.onUpdate();
+         };
+         this.getVisualizer = () => visualizer;
+         this.beginCaptureGIF = () => {
+             if (!visualizer.isPlaying()) this.play();
+             this.start_frame = this.frame;
+             this.start_substep = this.substep;
+             this.recording = true;
+         };
+         this.renderGIF = () => {
+             this.pause();
+             this.recording = false;
+             this.encoding = true;
+             visualizer.encodeGIF({
+                 frame: this.start_frame,
+                 substep: this.start_substep,
+             }, {
+                 frame: this.frame,
+                 substep: this.substep,
+             }).then((blob) => {
+                 this.encoding = false;
+                 window.open(URL.createObjectURL(blob));
+             });
+         };
 
-            let player_names = [];
-            if (this.game) {
-                for (let player_id of Object.keys(this.game.players)) {
-                    const idx = this.game.players[player_id].player_index;
-                    let player_data = {
-                        bot_name: this.replay.player_names[idx],
-                        profile_image_link: "",
-                        user_id: player_id,
-                        user_link: this.makeUserLink(player_id),
-                    };
-                    player_names.push(player_data);
+         let player_names = [];
+         if (this.game) {
+             let ids = Object.keys(this.game.players);
+             ids.sort((player1, player2) => {
+                 let idx1 = this.game.players[player1].player_index;
+                 let idx2 = this.game.players[player2].player_index;
 
-                    this.getUserProfileImage(player_id).then((url) => {
-                        player_data.profile_image_link = url;
-                    });
-                }
-            }
-            else {
-                for (let idx = 0; idx < this.replay.player_names.length; idx++) {
-                    player_names.push({
-                        bot_name: this.replay.player_names[idx],
-                        username: "",
-                        user_id: null,
-                    });
-                }
-            }
-            this.player_names = player_names;
-        },
-        methods: {
-            // Stubs - see mounted()
-            play: function() {
-            },
-            pause: function() {
-            },
-            scrub: function(e) {
-            },
-            getVisualizer: function() {},
-            beginCaptureGIF: function() {},
-            renderGIF: function() {},
-        },
-        computed: {
-            statistics: function() {
-                let count = {};
-                for (let i = 0; i < this.replay.num_players; i++) {
-                    count[i] = {
-                        ships: 0,
-                        planets: 0,
-                    };
-                }
+                 if (idx1 < idx2) return -1;
+                 else if (idx1 == idx2) return 0;
+                 else return 1;
+             });
+             for (let player_id of ids) {
+                 const idx = this.game.players[player_id].player_index;
+                 let player_data = {
+                     bot_name: this.replay.player_names[idx],
+                     profile_image_link: "",
+                     user_id: player_id,
+                     user_link: this.makeUserLink(player_id),
+                 };
+                 player_names.push(player_data);
 
-                let substep = this.replay.frames[this.frame][this.substep];
-                for (let ship of substep.ships) {
-                    count[ship.owner].ships++;
-                }
+                 this.getUserProfileImage(player_id).then((url) => {
+                     player_data.profile_image_link = url;
+                 });
+             }
+         }
+         else {
+             for (let idx = 0; idx < this.replay.player_names.length; idx++) {
+                 player_names.push({
+                     bot_name: this.replay.player_names[idx],
+                     username: "",
+                     user_id: null,
+                 });
+             }
+         }
+         this.player_names = player_names;
+     },
+     methods: {
+         // Stubs - see mounted()
+         play: function() {
+         },
+         pause: function() {
+         },
+         scrub: function(e) {
+         },
+         getVisualizer: function() {},
+         beginCaptureGIF: function() {},
+         renderGIF: function() {},
+     },
+     computed: {
+         statistics: function() {
+             let count = {};
+             for (let i = 0; i < this.replay.num_players; i++) {
+                 count[i] = {
+                     ships: 0,
+                     planets: 0,
+                 };
+             }
 
-                for (let planet of Object.values(substep.planets)) {
-                    if (planet.owner !== null) {
-                        count[planet.owner].planets++;
-                    }
-                }
+             let substep = this.replay.frames[this.frame][this.substep];
+             for (let ship of substep.ships) {
+                 count[ship.owner].ships++;
+             }
 
-                return count;
-            },
-            selected_planet: function() {
-                if (this.selected.kind === "planet") {
-                    let frame = this.replay.frames[this.frame];
-                    let substep = frame[this.substep];
-                    let state = substep.planets[this.selected.id];
-                    if (state) {
-                        return {
-                            base: this.replay.planets[this.selected.id],
-                            state: state,
-                        };
-                    }
-                }
-                return null;
-            }
-        },
-    };
+             for (let planet of Object.values(substep.planets)) {
+                 if (planet.owner !== null) {
+                     count[planet.owner].planets++;
+                 }
+             }
+
+             return count;
+         },
+         selected_planet: function() {
+             if (this.selected.kind === "planet") {
+                 let frame = this.replay.frames[this.frame];
+                 let substep = frame[this.substep];
+                 let state = substep.planets[this.selected.id];
+                 if (state) {
+                     return {
+                         base: this.replay.planets[this.selected.id],
+                         state: state,
+                     };
+                 }
+             }
+             return null;
+         }
+     },
+ };
 </script>
 
 <style lang="scss" scoped>
