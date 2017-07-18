@@ -96,11 +96,24 @@ namespace hlt {
             }
             case EntityType::ShipEntity: {
                 ships[entity_id.player_id()][entity_id.entity_index()].kill();
+                ships[entity_id.player_id()].erase(entity_id.entity_index());
                 break;
             }
             case EntityType::InvalidEntity: {
                 break;
             }
+        }
+    }
+
+    auto Map::unsafe_kill_entity(EntityId entity_id) -> void {
+        switch (entity_id.type) {
+            case EntityType::ShipEntity: {
+                ships[entity_id.player_id()][entity_id.entity_index()].kill();
+                break;
+            }
+            default:
+                kill_entity(entity_id);
+                break;
         }
     }
 

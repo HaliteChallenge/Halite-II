@@ -161,7 +161,7 @@ void Halite::kill_player(hlt::PlayerId player) {
 
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
-        game_map.kill_entity(hlt::EntityId::for_ship(player, ship.first));
+        game_map.unsafe_kill_entity(hlt::EntityId::for_ship(player, ship.first));
     }
 
     game_map.cleanup_entities();
