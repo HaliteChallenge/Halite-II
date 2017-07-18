@@ -30,7 +30,8 @@
                 <div v-for="(player_name, index) in player_names">
                     <h3 :style="'color: ' + colors[index]">
                         <a :style="'color: ' + colors[index]"
-                           :href="player_name.user_link || '#'">
+                           :href="player_name.user_link || '#'"
+                           target="_blank">
                             <img v-if="player_name.profile_image_link"
                                  :src="player_name.profile_image_link"
                                  class="img-circle">
