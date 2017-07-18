@@ -218,14 +218,6 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
     }
 }
 
-//            if (targets.size() > 0) {
-//                ship.weapon_cooldown = hlt::gameconstants::get().weapon_cooldown;
-//                auto id = hlt::entityid::for_ship(player_id, ship_idx);
-//                full_frame_events.back().push_back(
-//                    std::unique_ptr<event>(
-//                        new attackevent(id, ship.location, target_locations)
-//                    ));
-
 auto Halite::process_docking() -> void {
     // Update docking/undocking status
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;

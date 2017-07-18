@@ -157,4 +157,17 @@ namespace hlt {
 
         return result;
     }
+
+    auto Map::spawn_ship(const Location& location, PlayerId owner) -> EntityIndex {
+        auto new_id = 0;
+        auto& player_ships = ships[owner];
+        while (player_ships.count(new_id) > 0) {
+            new_id++;
+        }
+
+        player_ships[new_id] = Ship{};
+        player_ships[new_id].revive(location);
+
+        return new_id;
+    }
 }

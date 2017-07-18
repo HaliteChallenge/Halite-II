@@ -71,6 +71,7 @@ namespace hlt {
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
         auto test(const Location& location, double radius) -> std::vector<EntityId>;
+        auto spawn_ship(const Location& location, PlayerId owner) -> EntityIndex;
     };
 }
 
