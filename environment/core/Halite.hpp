@@ -132,7 +132,7 @@ struct SpawnEvent : Event {
     }
 };
 
-typedef std::array<hlt::entity_map<float>, hlt::MAX_PLAYERS> DamageMap;
+typedef std::array<hlt::entity_map<double>, hlt::MAX_PLAYERS> DamageMap;
 
 class Halite {
 private:
@@ -185,7 +185,6 @@ private:
         hlt::Planet& planet, hlt::Location location) -> unsigned short;
 
     // Subparts of game loop
-    auto process_attacks(DamageMap& ship_damage) -> void;
     auto process_damage(DamageMap& ship_damage) -> void;
     auto process_docking() -> void;
     auto process_production() -> void;

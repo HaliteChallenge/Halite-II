@@ -574,8 +574,20 @@ auto Halite::process_events() -> void {
             sorted_events.pop_back();
         }
 
+        DamageMap damage_map;
+        std::unordered_map<hlt::EntityId, int> target_count;
+
+        auto update_targets = [&](hlt::EntityId src, hlt::EntityId target) -> void {
+            auto num_prev_targets = 0;
+            if (target_count.count(src) > 0) {
+                num_prev_targets = target_count[src];
+            }
+            target_count[src] = num_prev_targets + 1;
+        };
+
         for (SimulationEvent ev : simultaneous_events) {
             std::cout << ev << "\n";
+
             switch (ev.type) {
                 case SimulationEventType::Collision: {
                     const auto damage = compute_damage(ev.id1, ev.id2);
@@ -585,8 +597,46 @@ auto Halite::process_events() -> void {
                 }
 
                 case SimulationEventType::Attack: {
+                    update_targets(ev.id1, ev.id2);
+                    update_targets(ev.id2, ev.id1);
                     break;
                 }
+            }
+        }
+
+        auto update_damage = [&](hlt::EntityId src, hlt::EntityId target) -> void {
+            auto prev_damage = 0.0;
+            if (damage_map[target.player_id()].count(target.entity_index()) > 0) {
+                prev_damage = damage_map[target.player_id()][target.entity_index()];
+            }
+            const auto new_damage = hlt::GameConstants::get().WEAPON_DAMAGE / static_cast<float>(target_count[src]);
+            damage_map[target.player_id()][target.entity_index()] = prev_damage + new_damage;
+        };
+        for (SimulationEvent ev : simultaneous_events) {
+            if (ev.type != SimulationEventType::Attack) continue;
+
+            update_damage(ev.id1, ev.id2);
+            update_damage(ev.id2, ev.id1);
+        }
+
+        process_damage(damage_map);
+    }
+}
+
+auto Halite::process_damage(DamageMap& ship_damage) -> void {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        const auto player_damage = ship_damage[player_id];
+
+        for (const auto& pair : player_damage) {
+            const auto ship_idx = pair.first;
+            const auto damage = pair.second;
+
+            auto& ship = game_map.get_ship(player_id, ship_idx);
+            if (damage >= ship.health) {
+                kill_entity(hlt::EntityId::for_ship(player_id, ship_idx));
+            }
+            else {
+                ship.health -= static_cast<unsigned short>(damage);
             }
         }
     }
