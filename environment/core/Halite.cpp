@@ -296,14 +296,48 @@ auto Halite::process_production() -> void {
             auto& ships = game_map.ships[planet.owner];
             auto best_location = game_map.location_with_delta(planet.location, 0, 0);
             best_location.second = false;
-            auto best_distance = game_map.map_width + game_map.map_height;
+            auto best_distance =
+                static_cast<double>(game_map.map_width + game_map.map_height);
             const auto& center = hlt::Location{
                 static_cast<double>(game_map.map_width / 2),
                 static_cast<double>(game_map.map_height / 2),
             };
 
-            // TODO: spawn the ship
-            break;
+            // Spawn the ship
+            const auto max_delta = hlt::GameConstants::get().SPAWN_RADIUS;
+            const auto open_radius = hlt::GameConstants::get().SHIP_RADIUS * 2;
+            for (int dx = -max_delta; dx <= max_delta; dx++) {
+                for (int dy = -max_delta; dy <= max_delta; dy++) {
+                    double offset_angle = std::atan2(dy, dx);
+                    double offset_x = dx + planet.radius * std::cos(offset_angle);
+                    double offset_y = dy + planet.radius * std::sin(offset_angle);
+                    auto location = game_map.location_with_delta(
+                        planet.location, offset_x, offset_y);
+
+                    if (!location.second) continue;
+
+                    const auto distance = location.first.distance(center);
+                    const auto num_occupants = game_map.test(location.first, open_radius).size();
+                    if (distance < best_distance && num_occupants == 0) {
+                        best_distance = distance;
+                        best_location = location;
+                    }
+                }
+            }
+
+            if (best_location.second) {
+                planet.current_production -= production_per_ship;
+                const auto ship_idx =
+                    game_map.spawn_ship(best_location.first, planet.owner);
+                total_ship_count[planet.owner]++;
+                full_frame_events.back().emplace_back(new SpawnEvent(
+                    hlt::EntityId::for_ship(planet.owner, ship_idx),
+                    best_location.first, planet.location));
+            }
+            else {
+                // Can't spawn any more - just keep the production there
+                break;
+            }
         }
     }
 }
