@@ -526,8 +526,8 @@ struct SimulationEvent {
 
     auto operator==(const SimulationEvent &rhs) const -> bool {
         return type == rhs.type &&
-            id1 == rhs.id1 &&
-            id2 == rhs.id2;
+            ((id1 == rhs.id1 && id2 == rhs.id2) ||
+                (id1 == rhs.id2 && id2 == rhs.id1));
     }
 
     auto operator!=(const SimulationEvent &rhs) const -> bool {
@@ -545,6 +545,7 @@ struct SimulationEvent {
 namespace std {
     template<> struct hash<SimulationEvent> {
         auto operator()(const SimulationEvent& ev) const -> std::size_t {
+            // TODO: this is a TERRIBLE hash function
             return std::hash<hlt::EntityId>{}(ev.id1) ^
                 std::hash<hlt::EntityId>{}(ev.id2) ^
                 static_cast<size_t>(ev.type);
