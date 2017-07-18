@@ -33,20 +33,25 @@ auto Halite::compare_rankings(const hlt::PlayerId& player1,
 auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
 -> std::pair<unsigned short, unsigned short> {
 
-    assert(self_id.type == hlt::EntityType::ShipEntity);
-    const auto& self = game_map.get_ship(self_id);
-
-    unsigned short self_damage = self.health;
+    unsigned short self_damage = 0;
     unsigned short other_damage = 0;
 
-
-    switch (other_id.type) {
-        case hlt::EntityType::PlanetEntity:
-            other_damage = self.health;
-            break;
-        case hlt::EntityType::ShipEntity: {
+    switch (self_id.type) {
+        case hlt::EntityType::PlanetEntity: {
             const auto& other = game_map.get_ship(other_id);
+            self_damage = other.health;
             other_damage = other.health;
+            break;
+        }
+        case hlt::EntityType::ShipEntity: {
+            const auto& self = game_map.get_ship(self_id);
+            self_damage = self.health;
+            if (other_id.type == hlt::EntityType::ShipEntity) {
+                other_damage = game_map.get_ship(other_id).health;
+            }
+            else {
+                other_damage = self.health;
+            }
             break;
         }
         case hlt::EntityType::InvalidEntity:
