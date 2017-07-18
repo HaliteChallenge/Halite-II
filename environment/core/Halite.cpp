@@ -573,7 +573,21 @@ auto collision_time(
 
     const auto disc = std::pow(b, 2) - 4 * a * c;
 
-    if (disc == 0) {
+    if (a == 0.0) {
+        if (b == 0.0) {
+            if (c <= 0.0) {
+                // Implies r^2 >= dx^2 + dy^2 and the two are already colliding
+                return { true, 0.0 };
+            }
+            return { false, 0.0 };
+        }
+        const auto t = -c / b;
+        if (t >= 0.0) {
+            return { true, t };
+        }
+        return { false, 0.0 };
+    }
+    else if (disc == 0.0) {
         // One solution
         const auto t = -b / (2 * a);
         return { true, t };
@@ -582,18 +596,18 @@ auto collision_time(
         const auto t1 = -b + std::sqrt(disc);
         const auto t2 = -b - std::sqrt(disc);
 
-        if (t1 >= 0 && t2 >= 0) {
+        if (t1 >= 0.0 && t2 >= 0.0) {
             return { true, std::min(t1, t2) };
         }
-        else if (t1 < 0 && t2 < 0) {
-            return { false, 0 };
+        else if (t1 < 0.0 && t2 < 0.0) {
+            return { false, 0.0 };
         }
         else {
             return { true, std::max(t1, t2) };
         }
     }
     else {
-        return { false, 0 };
+        return { false, 0.0 };
     }
 }
 
