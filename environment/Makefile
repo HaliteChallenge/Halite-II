@@ -1,4 +1,4 @@
-CXXFLAGS += -std=c++11 -pthread -I ./ -O2
+CXXFLAGS += -std=c++11 -pthread -I ./ -g -fsanitize=address,undefined
 INSTALL_PATH?=/usr/local
 SOURCES=$(shell find . -name "*.cpp")
 CSOURCES=$(shell find . -name "*.c")
