@@ -607,7 +607,10 @@ auto Halite::process_events() -> void {
         auto update_targets = [&](hlt::EntityId src, hlt::EntityId target) -> void {
             auto& attacker = game_map.get_ship(src);
 
-            if (!attacker.is_alive() || attacker.weapon_cooldown > 0) return;
+            if (!attacker.is_alive() || attacker.weapon_cooldown > 0 ||
+                attacker.docking_status != hlt::DockingStatus::Undocked) {
+                return;
+            }
             // Don't update the actual cooldown until later
             if (attackers.count(src) == 0) {
                 attackers.insert({src, AttackEvent(src, attacker.location, {}, {})});
@@ -648,7 +651,10 @@ auto Halite::process_events() -> void {
         auto update_damage = [&](hlt::EntityId src, hlt::EntityId target) -> void {
             auto& attacker = game_map.get_ship(src);
 
-            if (!attacker.is_alive() || attacker.weapon_cooldown > 0) return;
+            if (!attacker.is_alive() || attacker.weapon_cooldown > 0 ||
+                attacker.docking_status != hlt::DockingStatus::Undocked) {
+                return;
+            }
             attacker.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
 
             auto prev_damage = 0.0;
