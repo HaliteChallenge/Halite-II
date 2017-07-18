@@ -527,13 +527,32 @@ auto Halite::process_events() -> void {
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
                 const auto& planet = game_map.planets[planet_idx];
 
+                if (!planet.is_alive()) continue;
+
                 const auto distance = ship.location.distance(planet.location);
 
                 if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
-                    // TODO:
+                    const auto collision_radius = ship.radius + planet.radius;
+                    const auto t = collision_time(collision_radius, ship, planet);
+                    if (t.first) {
+                        if (t.second >= 0 && t.second <= 1) {
+                            unsorted_events.insert(SimulationEvent{
+                                SimulationEventType::Collision,
+                                ship_id, hlt::EntityId::for_planet(planet_idx),
+                                round_event_time(t.second),
+                            });
+                        }
+                    }
+                    else {
+                        // This should never happen - they should already have
+                        // collided
+                        assert(false);
+                    }
                 }
             }
         }
+
+        // TODO: look for ships flying off the boundary
     }
 
     std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
