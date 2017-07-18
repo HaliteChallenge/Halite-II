@@ -21,6 +21,7 @@
 #include <future>
 
 #include "hlt.hpp"
+#include "GameEvent.hpp"
 #include "json.hpp"
 
 #include "./mapgen/Generator.h"
@@ -46,86 +47,6 @@ struct GameStatistics {
 };
 
 auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
-
-/**
- * An event that happens during game simulation. Recorded for the replay, so
- * that visualizers have more information to use.
- */
-struct Event {
-    virtual auto serialize() -> nlohmann::json = 0;
-
-    Event() {};
-};
-
-struct DestroyedEvent : Event {
-    hlt::EntityId id;
-    hlt::Location location;
-    double radius;
-
-    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, double radius_)
-        : id(id_), location(location_), radius(radius_) {};
-
-    auto serialize() -> nlohmann::json {
-        return nlohmann::json{
-            { "event", "destroyed" },
-            { "entity", id },
-            { "x", location.pos_x },
-            { "y", location.pos_y },
-            { "radius", radius },
-        };
-    }
-};
-
-struct AttackEvent : Event {
-    hlt::EntityId id;
-    hlt::Location location;
-
-    std::vector<hlt::EntityId> targets;
-    std::vector<hlt::Location> target_locations;
-
-    AttackEvent(hlt::EntityId id_, hlt::Location location_,
-                std::vector<hlt::EntityId> targets_,
-                std::vector<hlt::Location> target_locations_) :
-        id(id_), location(location_), targets(targets_),
-        target_locations(target_locations_) {};
-
-    auto serialize() -> nlohmann::json {
-        std::vector<nlohmann::json> target_locations;
-        target_locations.reserve(targets.size());
-        for (auto& location : targets) {
-            target_locations.push_back(location);
-        }
-        return nlohmann::json{
-            { "event", "attack" },
-            { "entity", id },
-            { "x", location.pos_x },
-            { "y", location.pos_y },
-            { "targets", targets },
-            { "target_locations", target_locations },
-        };
-    }
-};
-
-struct SpawnEvent : Event {
-    hlt::EntityId id;
-    hlt::Location location;
-    hlt::Location planet_location;
-
-    SpawnEvent(hlt::EntityId id_, hlt::Location location_,
-               hlt::Location planet_location_)
-        : id(id_), location(location_), planet_location(planet_location_) {}
-
-    auto serialize() -> nlohmann::json {
-        return nlohmann::json{
-            { "event", "spawned" },
-            { "entity", id },
-            { "x", location.pos_x },
-            { "y", location.pos_y },
-            { "planet_x", planet_location.pos_x },
-            { "planet_y", planet_location.pos_y },
-        };
-    }
-};
 
 typedef std::array<hlt::entity_map<double>, hlt::MAX_PLAYERS> DamageMap;
 
@@ -192,7 +113,8 @@ private:
     //! explosions, docked ships, etc.)
     auto kill_entity(hlt::EntityId id) -> void;
 
-    //! Comparison function to rank two players, based on the number of ships and their total health.
+    //! Comparison function to rank two players, based on the number of ships
+    //! and their total health.
     auto compare_rankings(const hlt::PlayerId& player1,
                           const hlt::PlayerId& player2) const -> bool;
 public:
