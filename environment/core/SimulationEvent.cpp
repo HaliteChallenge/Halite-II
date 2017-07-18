@@ -115,13 +115,11 @@ auto find_events(
         const auto attack_radius = ship1.radius +
             ship2.radius + hlt::GameConstants::get().WEAPON_RADIUS;
         const auto t = collision_time(attack_radius, ship1, ship2);
-        if (t.first) {
-            if (t.second >= 0 && t.second <= 1) {
-                unsorted_events.insert(SimulationEvent{
-                    SimulationEventType::Attack,
-                    id1, id2, round_event_time(t.second),
-                });
-            }
+        if (t.first && t.second >= 0 && t.second <= 1) {
+            unsorted_events.insert(SimulationEvent{
+                SimulationEventType::Attack,
+                id1, id2, round_event_time(t.second),
+            });
         }
         else if (distance < attack_radius) {
             unsorted_events.insert(SimulationEvent{
