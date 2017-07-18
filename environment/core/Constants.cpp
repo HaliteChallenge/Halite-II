@@ -13,6 +13,8 @@ auto hlt::GameConstants::to_json() const -> nlohmann::json {
         { "MAX_SPEED", MAX_SPEED },
         { "MAX_ACCELERATION", MAX_ACCELERATION },
 
+        { "SHIP_RADIUS", SHIP_RADIUS },
+
         { "MAX_SHIP_HEALTH", MAX_SHIP_HEALTH },
         { "BASE_SHIP_HEALTH", BASE_SHIP_HEALTH },
         { "DOCKED_SHIP_REGENERATION", DOCKED_SHIP_REGENERATION },
@@ -34,6 +36,8 @@ auto hlt::GameConstants::from_json(const nlohmann::json& json) -> void {
     DRAG = json.value("DRAG", DRAG);
     MAX_SPEED = json.value("MAX_SPEED", MAX_SPEED);
     MAX_ACCELERATION = json.value("MAX_ACCELERATION", MAX_ACCELERATION);
+
+    SHIP_RADIUS = json.value("SHIP_RADIUS", SHIP_RADIUS);
 
     MAX_SHIP_HEALTH = json.value("MAX_SHIP_HEALTH", MAX_SHIP_HEALTH);
     BASE_SHIP_HEALTH = json.value("BASE_SHIP_HEALTH", BASE_SHIP_HEALTH);

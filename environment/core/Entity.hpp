@@ -87,7 +87,7 @@ namespace hlt {
             health = GameConstants::get().BASE_SHIP_HEALTH;
             location = loc;
             weapon_cooldown = 0;
-            radius = 0.5;
+            radius = GameConstants::get().SHIP_RADIUS;
             velocity = { 0, 0 };
             docking_status = DockingStatus::Undocked;
             docking_progress = 0;

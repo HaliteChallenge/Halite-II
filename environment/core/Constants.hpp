@@ -19,6 +19,8 @@ namespace hlt {
         double MAX_SPEED = 30.0;
         double MAX_ACCELERATION = 10.0;
 
+        double SHIP_RADIUS = 0.5;
+
         unsigned short MAX_SHIP_HEALTH = 255;
         unsigned short BASE_SHIP_HEALTH = 255;
         unsigned short DOCKED_SHIP_REGENERATION = 0;
