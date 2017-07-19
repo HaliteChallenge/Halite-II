@@ -17,7 +17,7 @@ def analyze_planets(ship):
 
         angle, distance = hlt.orient_towards(ship, planet)
         dock_x, dock_y = hlt.closest_point_to(ship, planet)
-        pathable = hlt.pathable(ship, dock_x, dock_y)
+        pathable = hlt.last_map.pathable(ship, dock_x, dock_y)
         score = distance
         score -= 5 * (planet.remaining_production / 100)
 

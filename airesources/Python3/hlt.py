@@ -267,6 +267,65 @@ class Ship:
         return remainder
 
 
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def scaled_by(self, factor):
+        return Vector(factor * self.x, factor * self.y)
+
+    def projection_onto(self, vec):
+        return vec.scaled_by(self.scalar_projection_onto(vec) / vec.magnitude())
+
+    def scalar_projection_onto(self, vec):
+        return self.dot(vec) / vec.magnitude()
+
+    def magnitude(self):
+        return math.sqrt(self.x * self.x + self.y * self.y)
+
+    def dot(self, vec):
+        return self.x * vec.x + self.y * vec.y
+
+    def is_zero(self):
+        return self.x == 0.0 and self.y == 0.0
+
+    def __sub__(self, vec):
+        return Vector(vec.x - self.x, vec.y - self.y)
+
+    def __repr__(self):
+        return "Vector({}, {})".format(self.x, self.y)
+
+
+def intersect_segment_circle(start, end, circle, *, fudge=0):
+    # Derived with SymPy
+    # Parameterize the segment as start + t * (end - start),
+    # and substitute into the equation of a circle
+    # Solve for t
+    dx = end.x - start.x
+    dy = end.y - start.y
+
+    a = dx**2 + dy**2
+    b = -2 * (start.x**2 - start.x*end.x - start.x*circle.x + end.x*circle.x +
+              start.y**2 - start.y*end.y - start.y*circle.y + end.y*circle.y)
+    c = (start.x - circle.x)**2 + (start.y - circle.y)**2
+
+    if a == 0.0:
+        # Start and end are the same point
+        return distance(start, circle) < circle.r + fudge
+
+    # Time along segment when closest to the circle (vertex of the quadratic)
+    t = -b / (2 * a)
+    if t < 0 or t > 1:
+        return False
+
+    closest_x = start.x + dx * t
+    closest_y = start.y + dy * t
+    closest_distance = distance(Location(closest_x, closest_y), circle)
+
+    return closest_distance <= circle.r + fudge
+
+
 class Map:
     """
     The state of the game at the start of a given turn.
@@ -305,7 +364,7 @@ class Map:
                     continue
 
                 d = distance(ship, entity)
-                if d <= ship.r + entity.r:
+                if d <= ship.r + entity.r + 0.1:
                     return ship
         return None
 
@@ -314,19 +373,11 @@ class Map:
         Check whether there is a straight-line path to the given point,
         without planetary obstacles in between. Does not account for ships.
         """
-        dx = target_x - ship.x
-        dy = target_y - ship.y
-
-        if self.intersects_planets(target_x, target_y, ship.r):
-            return False
-
-        for i in range(PATHING_STEPS + 1):
-            x = ship.x + i * dx / PATHING_STEPS
-            y = ship.y + i * dy / PATHING_STEPS
-
-            if self.intersects_planets(x, y, ship.r):
+        target = Location(target_x, target_y)
+        for planet in self.planets.values():
+            if intersect_segment_circle(ship, target, planet,
+                                        fudge=ship.r + 1.0):
                 return False
-
         return True
 
 
@@ -363,7 +414,7 @@ Behavior Helpers
 These functions provide useful functionality for bots, in particular, behaviors
 to manipulate ships. Warping provides a fast, but naive, way to move a ship
 taking advantage of inertia to cross large distances quickly. move_to is a
-basic movement command that moves a ship in a given direction, trying to 
+basic movement command that moves a ship in a given direction, trying to
 avoid collisions.
 """
 
@@ -422,7 +473,7 @@ def brake(ship, *, max_acceleration=8):
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
         angle = math.atan2(ship.vel_y, ship.vel_x)
 
-        if speed < GameConstants.DRAG:
+        if speed == 0.0:
             break
 
         thrust = int(min(speed, max_acceleration))
@@ -473,18 +524,18 @@ def _warp(ship, x, y, *, max_acceleration=8):
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
         angle, dist = orient_towards(ship, Location(x, y))
         # Guard against divide-by-zero
-        turns_left = dist // speed if speed else 100000
-        turns_to_decelerate = speed // (max_acceleration + 3)
+        turns_left = dist / speed if speed else 100000
+        turns_to_decelerate = math.ceil(speed / (max_acceleration + GameConstants.DRAG))
 
         if turns_left <= turns_to_decelerate:
             logging.debug("Warp {}: close enough, decelerating".format(ship.id))
             break
-        if dist <= 5:
+        if dist <= speed:
             logging.debug("Warp {}: too close, decelerating".format(ship.id))
             break
 
         thrust = int(
-            max(1, min(max_acceleration, dist / 30 * max_acceleration)))
+            max(GameConstants.DRAG + 1, min(max_acceleration, dist / 30 * max_acceleration)))
         logging.debug(
             "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
             .format(ship.id, thrust, angle, dist, speed, turns_left,
@@ -540,7 +591,7 @@ def is_warping(ship):
     return ship.id in warp_queue
 
 
-def move_to(ship, angle, speed, avoidance=25):
+def move_to(ship, angle, speed, avoidance=40):
     """
     Move the ship in the given direction for one turn.
 
@@ -567,6 +618,35 @@ def move_to(ship, angle, speed, avoidance=25):
     dx = speed * math.cos(angle * math.pi / 180) / PATHING_STEPS
     dy = speed * math.sin(angle * math.pi / 180) / PATHING_STEPS
 
+    end_x = ship.x + dx
+    end_y = ship.y + dy
+
+    def avert_collision():
+        # We only try to avoid collisions a certain number of times to
+        # avoid getting stuck and timing out
+        if avoidance > 0:
+            new_angle = (angle + 10) % 360
+            if new_angle < 0:
+                new_angle += 360
+
+            logging.warning(
+                "Averting collision for ship {} pos {} "
+                "angle {} speed {} "
+                "because of {} ({} tries left)".format(
+                    ship.id, (ship.x, ship.y), angle, speed,
+                    (pos_x, pos_y), avoidance))
+
+            return move_to(ship, new_angle, 1, avoidance - 1)
+        else:
+            logging.warning(
+                "Ship {}: could not avert collision, continuing...".format(
+                    ship.id))
+            return ship.thrust(0, 0)
+            return ship.thrust(speed, angle)
+
+    if not last_map.pathable(ship, end_x, end_y):
+        return avert_collision()
+
     for i in range(1, PATHING_STEPS + 1):
         pos_x += dx
         pos_y += dy
@@ -577,28 +657,8 @@ def move_to(ship, angle, speed, avoidance=25):
         # Collision avoidance - check if the ship is about to move off the
         # map boundary, into a planet, or into one of our own ships
         # (we don't care about enemy ones)
-        if last_map.out_of_bounds(pos_x, pos_y) or \
-           last_map.intersects_planets(pos_x, pos_y, ship.r) or \
-           last_map.intersects_ships(ship):
-            # We only try to avoid collisions a certain number of times to
-            # avoid getting stuck and timing out
-            if avoidance > 0:
-                new_angle = (angle + 15) % 360
-                if new_angle < 0:
-                    new_angle += 360
-
-                logging.warning(
-                    "Averting collision for ship {} pos {} "
-                    "angle {} speed {} "
-                    "because of {} ({} tries left)".format(
-                        ship.id, (ship.x, ship.y), angle, speed,
-                        (pos_x, pos_y), avoidance))
-
-                return move_to(ship, new_angle, 1, avoidance - 1)
-            else:
-                logging.warning(
-                    "Ship {}: could not avert collision, continuing...".format(
-                        ship.id))
+        if last_map.out_of_bounds(pos_x, pos_y) or last_map.intersects_ships(ship):
+            return avert_collision()
 
     return ship.thrust(speed, angle)
 
