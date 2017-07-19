@@ -61,6 +61,7 @@ namespace hlt {
         Map(unsigned short width, unsigned short height);
 
         auto is_valid(EntityId entity_id) -> bool;
+        auto within_bounds(const Location& location) -> bool;
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
         auto get_ship(PlayerId player, EntityIndex entity) const -> const Ship&;
         auto get_ship(EntityId entity_id) -> Ship&;

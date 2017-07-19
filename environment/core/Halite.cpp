@@ -478,14 +478,13 @@ auto Halite::process_events() -> void {
             }
         }
 
-        // Possible ship-planet collisions
         for (const auto& pair1 : game_map.ships[player1]) {
             const auto& ship_id = hlt::EntityId::for_ship(player1, pair1.first);
             const auto& ship = pair1.second;
 
+            // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
                 const auto& planet = game_map.planets[planet_idx];
-
                 if (!planet.is_alive()) continue;
 
                 const auto distance = ship.location.distance(planet.location);
@@ -509,9 +508,40 @@ auto Halite::process_events() -> void {
                     }
                 }
             }
-        }
 
-        // TODO: look for ships flying off the boundary
+            // Look for ships trying to desert (final location is off map edge)
+            // No case where the ship can be off the map edge in the middle of a
+            // turn but end inside the map (map is convex) given that they start
+            // within the boundaries
+            auto final_location = ship.location;
+            final_location.move_by(ship.velocity, 1.0);
+
+            if (!game_map.within_bounds(final_location)) {
+                auto time = 1000000.0;
+                if (ship.velocity.vel_x > 0) {
+                    const auto t1 = -ship.location.pos_x / ship.velocity.vel_x;
+                    if (t1 < time && t1 >= 0) time = t1;
+                    const auto t2 = (game_map.map_width - ship.location.pos_x)
+                        / ship.velocity.vel_x;
+                    if (t2 < time && t2 >= 0) time = t2;
+                }
+
+                if (ship.velocity.vel_y > 0) {
+                    const auto t3 = -ship.location.pos_y / ship.velocity.vel_y;
+                    if (t3 < time && t3 >= 0) time = t3;
+                    const auto t4 = (game_map.map_height - ship.location.pos_y)
+                        / ship.velocity.vel_y;
+                    if (t4 < time && t4 >= 0) time = t4;
+                }
+
+                assert(time >= 0.0 && time <= 1.0);
+
+                unsorted_events.insert(SimulationEvent{
+                    SimulationEventType::Desertion,
+                    ship_id, ship_id, round_event_time(time),
+                });
+            }
+        }
     }
 
     std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
@@ -580,6 +610,12 @@ auto Halite::process_events() -> void {
                     const auto damage = compute_damage(ev.id1, ev.id2);
                     damage_entity(ev.id1, damage.first, ev.time);
                     damage_entity(ev.id2, damage.second, ev.time);
+                    break;
+                }
+
+                case SimulationEventType::Desertion: {
+                    const auto damage = game_map.get_entity(ev.id1).health;
+                    damage_entity(ev.id1, damage, ev.time);
                     break;
                 }
 
@@ -849,36 +885,35 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
                                 unsigned int id,
                                 bool enable_replay,
                                 std::string replay_directory) {
-    //For rankings
+    // For rankings
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
 
     // Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-        initThreads[player_id] = std::async(&Networking::handle_init_networking,
-                                            &networking,
-                                            player_id,
-                                            game_map,
-                                            ignore_timeout,
-                                            &player_names[player_id]);
+        initThreads[player_id] = std::async(
+            &Networking::handle_init_networking,
+            &networking,
+            player_id, game_map, ignore_timeout, &player_names[player_id]);
     }
-    for (hlt::PlayerId player_id = 0;
-         player_id < number_of_players;
-         player_id++) {
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         int time = initThreads[player_id].get();
         if (time == -1) {
             kill_player(player_id);
             living_players[player_id] = false;
             rankings.push_back(player_id);
-        } else init_response_times[player_id] = time;
+        }
+        else {
+            init_response_times[player_id] = time;
+        }
     }
 
     // Override player names with the provided ones
     if (names_ != nullptr) {
         player_names.clear();
-        for (auto a = names_->begin(); a != names_->end(); a++)
-            player_names.push_back(a->substr(0, 30));
+        for (const auto a : *names_) player_names.push_back(a.substr(0, 30));
     }
 
     const int max_turn_number = 100 + (int) (sqrt(game_map.map_width * game_map.map_height));
@@ -895,12 +930,10 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
     while (!game_complete()) {
         turn_number++;
-
         if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
 
         // Frame logic.
-        std::vector<bool> new_living_players =
-            process_next_frame(living_players);
+        auto new_living_players = process_next_frame(living_players);
 
         // Add to vector of players that should be dead.
         std::vector<hlt::PlayerId> new_rankings;
@@ -919,8 +952,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // Add remaining players to the ranking. Break ties using the same
     // comparison function.
     std::vector<hlt::PlayerId> new_rankings;
-    for (hlt::PlayerId player_id = 0;
-         player_id < number_of_players; player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (living_players[player_id]) new_rankings.push_back(player_id);
     }
     std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
@@ -933,9 +965,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         PlayerStatistics p;
         p.tag = player_id;
-        p.rank = std::distance(rankings.begin(),
-                               std::find(rankings.begin(), rankings.end(), player_id))
-            + 1;
+        p.rank = std::distance(
+            rankings.begin(),
+            std::find(rankings.begin(), rankings.end(), player_id)) + 1;
         // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
         // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
         // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but finishers who are alive in last frame of game who only need -1
@@ -948,8 +980,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         stats.player_statistics.push_back(p);
     }
     stats.timeout_tags = timeout_tags;
-    stats.timeout_log_filenames =
-        std::vector<std::string>(timeout_tags.size());
+    stats.timeout_log_filenames = std::vector<std::string>(timeout_tags.size());
 
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;

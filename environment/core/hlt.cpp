@@ -59,6 +59,11 @@ namespace hlt {
         map_height = height;
     }
 
+    auto Map::within_bounds(const Location& location) -> bool {
+        return location.pos_x >= 0 && location.pos_y >= 0 &&
+            location.pos_x < map_width && location.pos_y < map_height;
+    }
+
     auto Map::is_valid(EntityId entity_id) -> bool {
         switch (entity_id.type) {
             case EntityType::InvalidEntity:
@@ -168,7 +173,6 @@ namespace hlt {
             }
         }
     }
-
     auto Map::test(const Location &location, double radius) -> std::vector<EntityId> {
         std::vector<EntityId> result;
 
@@ -196,6 +200,7 @@ namespace hlt {
 
         return result;
     }
+
     auto Map::spawn_ship(const Location& location, PlayerId owner) -> EntityIndex {
         auto new_id = 0;
         auto& player_ships = ships[owner];

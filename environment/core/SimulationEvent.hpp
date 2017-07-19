@@ -20,6 +20,8 @@ constexpr auto EVENT_TIME_PRECISION = 10000;
 enum class SimulationEventType {
     Attack,
     Collision,
+    //! A ship tries to fly off the map boundary.
+    Desertion,
 };
 
 auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream&;
