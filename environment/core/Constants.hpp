@@ -11,6 +11,10 @@ namespace hlt {
     constexpr auto MAX_PLAYERS = 4;
     constexpr auto MAX_QUEUED_MOVES = 1;
 
+    /**
+     * Gameplay constants that may be tweaked (though they should be at their
+     * default values in a tournament setting).
+     */
     struct GameConstants {
         int PLANETS_PER_PLAYER = 6;
         unsigned int EXTRA_PLANETS = 4;

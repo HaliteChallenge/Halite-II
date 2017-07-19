@@ -20,6 +20,18 @@ namespace hlt {
         pos_y += time * velocity.vel_y;
     }
 
+    auto Location::angle_to(const Location& target) const -> double {
+        auto dx = target.pos_x - this->pos_x;
+        auto dy = target.pos_y - this->pos_y;
+
+        auto angle_rad = std::atan2(dy, dx);
+        if (angle_rad < 0) {
+            angle_rad += 2 * M_PI;
+        }
+
+        return angle_rad;
+    }
+
     auto operator<<(std::ostream &ostream,
                     const Location &location) -> std::ostream & {
         ostream << '(' << location.pos_x << ", " << location.pos_y << ')';

@@ -32,6 +32,9 @@ namespace hlt {
         Error,
     };
 
+    /**
+     * Represents a command that may be issued to a ship.
+     */
     struct Move {
         MoveType type;
         EntityIndex shipId;
@@ -50,9 +53,20 @@ namespace hlt {
     typedef std::array<entity_map<hlt::Move>, MAX_QUEUED_MOVES> PlayerMoveQueue;
     typedef std::array<PlayerMoveQueue, MAX_PLAYERS> MoveQueue;
 
+    /**
+     * Represents the state of the game map during a given turn.
+     */
     class Map {
     public:
+        /**
+         * A map of all the ships in the game, keyed by the player's tag and
+         * the ship's index.
+         */
         std::array<entity_map<Ship>, MAX_PLAYERS> ships;
+        /**
+         * A map of all the planets in the game, keyed by the planet's
+         * index. Planets which have died are still in this array.
+         */
         std::vector<Planet> planets;
         unsigned short map_width, map_height;
 

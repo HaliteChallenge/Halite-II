@@ -15,7 +15,17 @@
 #include "json.hpp"
 
 namespace hlt {
+    /**
+     * Uniquely identifies each player.
+     */
     typedef unsigned char PlayerId;
+    /**
+     * Used to identify a ship or planet.
+     *
+     * Ships are uniquely identified by a combination of the PlayerId of their
+     * owner and their EntityIndex. Planets are uniquely identified by their
+     * EntityIndex alone.
+     */
     typedef unsigned long EntityIndex;
 
     class Map;
@@ -32,6 +42,9 @@ namespace hlt {
         auto angle() const -> double;
     };
 
+    /**
+     * A location in Halatian space.
+     */
     struct Location {
         double pos_x, pos_y;
 
@@ -39,6 +52,7 @@ namespace hlt {
         auto distance2(const Location& other) const -> double;
 
         auto move_by(const Velocity& velocity, double time) -> void;
+        auto angle_to(const Location& target) const -> double;
 
         friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
     };
@@ -47,6 +61,10 @@ namespace hlt {
         return l1.pos_x == l2.pos_x && l1.pos_y == l2.pos_y;
     }
 
+    /**
+     * Superclass of a ship and a planet. Represents the state of an entity
+     * at the beginning of a given turn.
+     */
     struct Entity {
         Location location;
         unsigned short health;
@@ -65,8 +83,24 @@ namespace hlt {
             health = std::min(GameConstants::get().MAX_SHIP_HEALTH,
                               static_cast<unsigned short>(health + points));
         }
+
+        /**
+         * Return the angle between this entity and the target entity/location.
+         * @param target
+         * @return
+         */
+        auto angle_to(const Entity& target) const -> double {
+            return this->location.angle_to(target.location);
+        }
+
+        auto angle_to(const Location& target) const -> double {
+            return this->location.angle_to(target);
+        }
     };
 
+    /**
+     * The states a ship can be in regarding docking.
+     */
     enum class DockingStatus {
         Undocked = 0,
         Docking = 1,
@@ -74,28 +108,16 @@ namespace hlt {
         Undocking = 3,
     };
 
-    struct Ship : Entity {
-        Velocity velocity;
-
-        unsigned int weapon_cooldown;
-
-        DockingStatus docking_status;
-        unsigned int docking_progress;
-        EntityIndex docked_planet;
-
-        auto reset_docking_status() -> void;
-        auto revive(const Location& loc) -> void;
-        auto output_json(
-            const hlt::PlayerId player_id,
-            const hlt::EntityIndex ship_idx) const -> nlohmann::json;
-    };
-
     struct Planet : Entity {
         PlayerId owner;
         bool owned;
 
+        //! The remaining resources.
         unsigned short remaining_production;
+        //! The currently expended resources. A new ship will spawn
+        //! once this reaches GameConstants::PRODUCTION_PER_SHIP.
         unsigned short current_production;
+        //! The maximum number of ships that may be docked.
         unsigned short docking_spots;
 
         //! Contains IDs of all ships in the process of docking or undocking,
@@ -121,7 +143,41 @@ namespace hlt {
         auto output_json(const hlt::EntityIndex planet_id) const -> nlohmann::json;
     };
 
+    struct Ship : Entity {
+        Velocity velocity;
+
+        //! The turns left before the ship can fire again.
+        unsigned int weapon_cooldown;
+
+        DockingStatus docking_status;
+        //! The number of turns left to complete (un)docking.
+        unsigned int docking_progress;
+        //! The index of the planet this ship is docked to. Only valid if
+        //! Ship::docking_status is -not- DockingStatus::Undocked.
+        EntityIndex docked_planet;
+
+        auto reset_docking_status() -> void;
+        auto revive(const Location& loc) -> void;
+        auto output_json(
+            const hlt::PlayerId player_id,
+            const hlt::EntityIndex ship_idx) const -> nlohmann::json;
+
+        /**
+         * Check if this ship is close enough to dock to the given planet.
+         * @param planet
+         * @return
+         */
+        auto can_dock(const Planet& planet) const -> bool {
+            return this->location.distance(planet.location) <=
+                GameConstants::get().DOCK_RADIUS + planet.radius + radius;
+        }
+    };
+
+    /**
+     * The type of an entity represented by an entity ID.
+     */
     enum class EntityType {
+        //! This entity ID does not represent an actual entity.
         InvalidEntity,
         ShipEntity,
         PlanetEntity,

@@ -377,11 +377,8 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                     }
 
                     auto& planet = game_map.planets[planet_id];
-                    const auto max_distance = planet.radius + ship.radius +
-                        hlt::GameConstants::get().DOCK_RADIUS;
-                    const auto ship_distance = planet.location.distance(ship.location);
-                    if (!planet.is_alive() || ship_distance > max_distance) {
-                        if (!quiet_output && ship_distance > max_distance) {
+                    if (!planet.is_alive() || !ship.can_dock(planet)) {
+                        if (!quiet_output && !ship.can_dock(planet)) {
                             std::cout << "Warning: ship too far to dock\n";
                         }
                         break;
