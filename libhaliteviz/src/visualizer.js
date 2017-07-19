@@ -191,12 +191,12 @@ export class HaliteVisualizer {
     }
 
     get currentStatistics() {
-        let substep = this.currentFrame;
+        let frame = this.currentFrame;
         let planets = { "unowned": 0 };
         let ships = {};
         let total_ships = 0;
 
-        for (let planet of Object.values(substep.planets)) {
+        for (let planet of Object.values(frame.planets)) {
             if (planet.owner !== null) {
                 if (typeof planets[planet.owner] === "undefined") {
                     planets[planet.owner] = 0;
@@ -208,8 +208,11 @@ export class HaliteVisualizer {
             }
         }
 
-        for (let owner of Object.keys(substep.ships)) {
-            for (let ship of Object.values(substep.ships[owner])) {
+        for (let owner of Object.keys(frame.ships)) {
+            for (let ship of Object.values(frame.ships[owner])) {
+                if (typeof ships[owner] === "undefined") {
+                    ships[owner] = 0;
+                }
                 ships[owner]++;
                 total_ships++;
             }
@@ -224,42 +227,6 @@ export class HaliteVisualizer {
 
     attach(containerEl) {
         $(containerEl).append(this.application.view);
-
-        document.body.addEventListener("keypress", (e) => {
-            if (e.keyCode === 97) {
-                this.pause();
-                this.substep--;
-                if (this.substep < 0) {
-                    this.frame--;
-                    if (this.frame < 0) {
-                        this.frame = 0;
-                    }
-                    this.substep = this.replay.frames[this.frame].length - 1;
-                }
-            }
-            else if (e.keyCode === 100) {
-                this.pause();
-                this.substep++;
-                if (this.substep >= this.replay.frames[this.frame].length) {
-                    this.substep = 0;
-                    this.frame++;
-                }
-
-                if (this.frame >= this.replay.frames.length) {
-                    this.frame = this.replay.frames.length - 1;
-                    this.substep = this.replay.frames[this.frame].length - 1;
-                }
-            }
-            else if (e.keyCode === 32) {
-                if (this.timer) this.pause();
-                else this.play();
-            }
-            else {
-                console.log(e);
-                return;
-            }
-            this.update();
-        });
 
         this.application.ticker.add((dt) => {
             this.draw(dt);
@@ -502,7 +469,8 @@ export class HaliteVisualizer {
                         this.lights.drawRect(x, y, width, height);
                         this.lights.endFill();
                     };
-                    if (event.radius > 0) {
+
+                    if (event.entity.type === "planet") {
                         let r = event.radius;
                         draw = (frame) => {
                             const side = CELL_SIZE * this.scale;
@@ -521,6 +489,13 @@ export class HaliteVisualizer {
                                 }
                             }
                         };
+                    }
+                    else if (event.entity.type === "ship") {
+                        // Use default draw function
+                    }
+                    else {
+                        console.log("Unknown entity destroyed");
+                        console.log(event);
                     }
 
                     this.animationQueue.push(new FrameAnimation(
