@@ -36,6 +36,35 @@ DOCKING_STATUS = {
     3: "undocking",
 }
 
+
+class GameConstants:
+    PLANETS_PER_PLAYER = 6
+    EXTRA_PLANETS = 4
+
+    DRAG = 3.0
+    MAX_SPEED = 30.0
+    MAX_ACCELERATION = 10.0
+
+    SHIP_RADIUS = 0.5
+
+    MAX_SHIP_HEALTH = 255
+    BASE_SHIP_HEALTH = 255
+    DOCKED_SHIP_REGENERATION = 0
+
+    WEAPON_COOLDOWN = 1
+    WEAPON_RADIUS = 5.0
+    WEAPON_DAMAGE = 64
+    EXPLOSION_RADIUS = 5
+
+    DOCK_RADIUS = 4
+    DOCK_TURNS = 5
+    PRODUCTION_PER_SHIP = 100
+    BASE_PRODUCTIVITY = 25
+    ADDITIONAL_PRODUCTIVITY = 15
+
+    SPAWN_RADIUS = 2
+
+
 """
 Communication with the Game Environment
 
@@ -122,8 +151,8 @@ class Planet:
             docked_ships.append(int(ship_id))
 
         planet = Planet(int(plid),
-                        int(x), int(y),
-                        int(hp), int(r), int(docking),
+                        float(x), float(y),
+                        int(hp), float(r), int(docking),
                         int(current), int(remaining),
                         bool(int(owned)), int(owner),
                         docked_ships)
@@ -176,6 +205,7 @@ class Ship:
         self.planet = planet
         self.docking_progress = progress
         self.weapon_cooldown = cooldown
+        self.r = GameConstants.SHIP_RADIUS
 
     def thrust(self, magnitude, angle):
         """Generate a command to accelerate this ship."""
@@ -203,9 +233,9 @@ class Ship:
         docked = DOCKING_STATUS.get(int(docked), "undocked")
 
         ship = Ship(sid,
-                    int(x), int(y),
+                    float(x), float(y),
                     int(hp),
-                    int(vel_x), int(vel_y),
+                    float(vel_x), float(vel_y),
                     docked, int(docked_planet),
                     int(progress), int(cooldown))
 
@@ -249,50 +279,55 @@ class Map:
     def __init__(self):
         self.ships = {}
         self.planets = {}
-        self.collision_map = []
 
-    def generate_collision_map(self):
+    def out_of_bounds(self, x, y):
+        return x < 0 or x >= map_size[0] or y < 0 or y >= map_size[1]
+
+    def intersects_planets(self, x, y, r):
         """
-        Generate the collision map.
+        Check if the coordinate can be occupied by an object of the given radius.
 
-        The map is indexed by the x and y coordinates. Each cell is a 2-tuple
-        of (owner, entity_type). If the cell is empty, the cell will contain
-        (None, None). If the entity is a planet, the owner will be either -1
-        (if unowned) or the owner's tag, and the entity type will be "planet".
-        If the entity is a ship, the 2-tuple will contain the owner's tag and
-        the string "ship".
+        That is, check whether it is theoretically possible for a ship to be at
+        the given coordinate, regardless of whether it could actually reach that
+        coordinate. Essentially, this checks if there is a planet at the given
+        location.
         """
-        # Initialize the map
-        for _ in range(map_size[0]):
-            col = []
-            for _ in range(map_size[1]):
-                col.append((None, None))
-            self.collision_map.append(col)
+        for plid, planet in self.planets.items():
+            d = distance(planet, Location(x, y))
+            if d <= planet.r + r:
+                return plid
+        return None
 
-        # Fill in spots occupied by planets
-        for planet in self.planets.values():
-            for dx in range(-planet.r, planet.r + 1):
-                for dy in range(-planet.r, planet.r + 1):
-                    x = planet.x + dx
-                    y = planet.y + dy
-                    if dx*dx + dy*dy > planet.r*planet.r:
-                        continue
-
-                    if 0 <= x < map_size[0] and 0 <= y < map_size[1]:
-                        self.collision_map[x][y] = \
-                            (planet.owner if planet.owned else -1, "planet")
-
-        # Fill in spots occupied by ships
-        for player_tag, player_ships in self.ships.items():
+    def intersects_ships(self, entity):
+        for player_ships in self.ships.values():
             for ship in player_ships.values():
-                self.collision_map[ship.x][ship.y] = (player_tag, "ship")
+                if ship is entity:
+                    continue
 
-    def print_collision(self):
-        """Debug method that prints the collision map to the log."""
-        for row in range(map_size[1]):
-            logging.info(''.join(
-                '.' if self.collision_map[col][row] == (None, None) else 'X'
-                for col in range(map_size[0])))
+                d = distance(ship, entity)
+                if d <= ship.r + entity.r:
+                    return ship
+        return None
+
+    def pathable(self, ship, target_x, target_y):
+        """
+        Check whether there is a straight-line path to the given point,
+        without planetary obstacles in between. Does not account for ships.
+        """
+        dx = target_x - ship.x
+        dy = target_y - ship.y
+
+        if self.intersects_planets(target_x, target_y, ship.r):
+            return False
+
+        for i in range(PATHING_STEPS + 1):
+            x = ship.x + i * dx / PATHING_STEPS
+            y = ship.y + i * dy / PATHING_STEPS
+
+            if self.intersects_planets(x, y, ship.r):
+                return False
+
+        return True
 
 
 def parse(map):
@@ -304,8 +339,6 @@ def parse(map):
     tokens = Planet.parse_all(game_map, tokens)
     # There should be no remaining tokens
     assert(len(tokens) == 0)
-
-    game_map.generate_collision_map()
 
     global last_map
     last_map = game_map
@@ -389,7 +422,7 @@ def brake(ship, *, max_acceleration=8):
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
         angle = math.atan2(ship.vel_y, ship.vel_x)
 
-        if speed == 0:
+        if speed < GameConstants.DRAG:
             break
 
         thrust = int(min(speed, max_acceleration))
@@ -429,6 +462,7 @@ def _warp(ship, x, y, *, max_acceleration=8):
     :return:
     """
 
+    logging.debug("Warp {}: beginning (distance {})".format(ship.id, distance(ship, Location(x, y))))
     # Acceleration stage
     while True:
         # Get the most up-to-date ship
@@ -437,27 +471,28 @@ def _warp(ship, x, y, *, max_acceleration=8):
             return
 
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
-        angle, distance = orient_towards(ship, Location(x, y))
+        angle, dist = orient_towards(ship, Location(x, y))
         # Guard against divide-by-zero
-        turns_left = distance // speed if speed else 100000
+        turns_left = dist // speed if speed else 100000
         turns_to_decelerate = speed // (max_acceleration + 3)
 
         if turns_left <= turns_to_decelerate:
             logging.debug("Warp {}: close enough, decelerating".format(ship.id))
             break
-        if distance <= 5:
+        if dist <= 5:
             logging.debug("Warp {}: too close, decelerating".format(ship.id))
             break
 
         thrust = int(
-            max(1, min(max_acceleration, distance / 30 * max_acceleration)))
+            max(1, min(max_acceleration, dist / 30 * max_acceleration)))
         logging.debug(
             "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
-            .format(ship.id, thrust, angle, distance, speed, turns_left,
+            .format(ship.id, thrust, angle, dist, speed, turns_left,
                     ship.x, ship.y, x, y))
         yield "t {} {} {}".format(ship.id, thrust, angle)
 
     # Braking stage
+    logging.debug("Warp {}: entering braking stage".format(ship.id))
     yield from brake(ship, max_acceleration=max_acceleration)
 
     # Low-velocity maneuvering stage - fall back on move_to
@@ -466,13 +501,13 @@ def _warp(ship, x, y, *, max_acceleration=8):
         if not ship:
             return
 
-        if ship.x == x and ship.y == y:
+        if distance(ship, Location(x, y)) <= 1.5:
             break
 
         logging.debug(
             "Warp {}: move from {} {} to {} {}"
             .format(ship.id, ship.x, ship.y, x, y))
-        angle, distance = orient_towards(ship, Location(x, y))
+        angle, dist = orient_towards(ship, Location(x, y))
         yield move_to(ship, angle, 1)
 
 
@@ -520,9 +555,8 @@ def move_to(ship, angle, speed, avoidance=25):
     :param avoidance: How many tries to avoid collisions.
     :return:
     """
-    # Ships are centered on the center of a grid square
-    pos_x = ship.x + 0.5
-    pos_y = ship.y + 0.5
+    pos_x = ship.x
+    pos_y = ship.y
 
     if ship.vel_x != 0 or ship.vel_y != 0:
         logging.warning(
@@ -530,27 +564,22 @@ def move_to(ship, angle, speed, avoidance=25):
                 ship.id, speed, angle
             ))
 
-    dx = round(speed * math.cos(angle * math.pi / 180)) / PATHING_STEPS
-    dy = round(speed * math.sin(angle * math.pi / 180)) / PATHING_STEPS
+    dx = speed * math.cos(angle * math.pi / 180) / PATHING_STEPS
+    dy = speed * math.sin(angle * math.pi / 180) / PATHING_STEPS
 
     for i in range(1, PATHING_STEPS + 1):
         pos_x += dx
         pos_y += dy
 
-        effective_x = int(pos_x)
-        effective_y = int(pos_y)
-
-        if effective_x == ship.x and effective_y == ship.y:
+        if distance(Location(pos_x, pos_y), Location(ship.x, ship.y)) < ship.r:
             continue
 
         # Collision avoidance - check if the ship is about to move off the
         # map boundary, into a planet, or into one of our own ships
         # (we don't care about enemy ones)
-        within_bounds = 0 <= effective_x < map_size[0] and \
-            0 <= effective_y < map_size[1]
-        if (not within_bounds or
-            last_map.collision_map[effective_x][effective_y][1] == "planet" or
-                last_map.collision_map[effective_x][effective_y][0] == my_tag):
+        if last_map.out_of_bounds(pos_x, pos_y) or \
+           last_map.intersects_planets(pos_x, pos_y, ship.r) or \
+           last_map.intersects_ships(ship):
             # We only try to avoid collisions a certain number of times to
             # avoid getting stuck and timing out
             if avoidance > 0:
@@ -563,17 +592,9 @@ def move_to(ship, angle, speed, avoidance=25):
                     "angle {} speed {} "
                     "because of {} ({} tries left)".format(
                         ship.id, (ship.x, ship.y), angle, speed,
-                        (effective_x, effective_y), avoidance))
-                if within_bounds:
-                    logging.warning("We would collide with {} at {} {}".format(
-                        last_map.collision_map[effective_x][effective_y],
-                        effective_x, effective_y))
-                else:
-                    logging.warning(
-                        "We would be out of bounds at {} {}".format(
-                            effective_x, effective_y))
+                        (pos_x, pos_y), avoidance))
 
-                return move_to(ship, new_angle, 1, avoidance-1)
+                return move_to(ship, new_angle, 1, avoidance - 1)
             else:
                 logging.warning(
                     "Ship {}: could not avert collision, continuing...".format(
@@ -594,14 +615,14 @@ def undock(ship):
 
 def can_dock(ship, planet):
     """Check whether the ship is within docking range."""
-    return distance(ship, planet) < planet.r + 4
+    return distance(ship, planet) <= planet.r + GameConstants.DOCK_RADIUS
 
 
 def distance(a, b):
     """Compute the distance between two entities (ships or planets)."""
     dx = a.x - b.x
     dy = a.y - b.y
-    d = int(math.sqrt(dx*dx + dy*dy))
+    d = math.sqrt(dx*dx + dy*dy)
     return d
 
 
@@ -609,7 +630,8 @@ def orient_towards(ship, target):
     """Find the angle and distance between a ship and the given target."""
     dx = target.x - ship.x
     dy = target.y - ship.y
-    d = int(math.sqrt(dx*dx + dy*dy))
+    d = math.sqrt(dx*dx + dy*dy)
+    d = d - getattr(ship, 'r', 0) - getattr(target, 'r', 0)
 
     angle = math.atan2(dy, dx)
     # Normalize the angle and convert to degrees
@@ -623,45 +645,6 @@ def orient_towards(ship, target):
     return angle, d
 
 
-def occupiable(x, y):
-    """
-    Check whether the given coordinate can be occupied.
-
-    That is, check whether it is theoretically possible for a ship to be at
-    the given coordinate, regardless of whether it could actually reach that
-    coordinate. Essentially, this checks if there is a planet at the given
-    location.
-    """
-    if x < 0 or x >= map_size[0] or y < 0 or y >= map_size[1]:
-        return False
-
-    if last_map.collision_map[int(x)][int(y)][1] == "planet":
-        return False
-
-    return True
-
-
-def pathable(ship, target_x, target_y):
-    """
-    Check whether there is a straight-line path to the given point,
-    without planetary obstacles in between. Does not account for ships.
-    """
-    dx = target_x - ship.x
-    dy = target_y - ship.y
-
-    if not occupiable(target_x, target_y):
-        return False
-
-    for i in range(PATHING_STEPS + 1):
-        x = int(ship.x + i * dx / PATHING_STEPS)
-        y = int(ship.y + i * dy / PATHING_STEPS)
-
-        if not occupiable(x, y):
-            return False
-
-    return True
-
-
 def closest_point_to(ship, target, *, r=3):
     """
     Find the closest point to the given ship near the given target, within
@@ -673,8 +656,8 @@ def closest_point_to(ship, target, *, r=3):
     """
     angle, _ = orient_towards(ship, target)
     r = getattr(target, 'r', 0) + r
-    x = target.x + int(r * math.cos((angle * math.pi / 180) + math.pi))
-    y = target.y + int(r * math.sin((angle * math.pi / 180) + math.pi))
+    x = target.x + r * math.cos((angle * math.pi / 180) + math.pi)
+    y = target.y + r * math.sin((angle * math.pi / 180) + math.pi)
 
     return x, y
 
@@ -722,6 +705,7 @@ def get_map():
     Parse the map given by the engine.
     :return:
     """
+    logging.info("---NEW TURN---")
     return parse(get_string())
 
 
