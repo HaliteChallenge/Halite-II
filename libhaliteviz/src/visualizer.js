@@ -64,7 +64,6 @@ export class HaliteVisualizer {
         this.stats = new statistics.Statistics(replay);
 
         this.frame = 0;
-        this.substep = 0; // TODO: delete this
         this.time = 0;
         this.application = new PIXI.Application(
             VISUALIZER_SIZE,
@@ -239,13 +238,13 @@ export class HaliteVisualizer {
         this.application.start();
 
         this.timer = window.setInterval(() => {
-            this.advanceSubsteps(0.1);
+            this.advanceTime(0.1);
         }, 1000/40);
 
         this.onPlay();
     }
 
-    advanceSubsteps(time) {
+    advanceTime(time) {
         // Interpolate between frames for smoother feel
         this.time += time;
         if (this.time >= 1.0) {
@@ -261,8 +260,8 @@ export class HaliteVisualizer {
 
         if (this.time == 0) {
             this.update();
-            this.onUpdate();
         }
+        this.onUpdate();
     }
 
     pause() {

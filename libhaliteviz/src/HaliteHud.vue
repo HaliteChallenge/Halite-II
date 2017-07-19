@@ -8,7 +8,7 @@
                 <!--<button class="btn btn-default" v-else v-on:click="renderGIF" title="Finish capturing GIF"><i class="fa fa-pause" aria-hidden="true"></i> </button>-->
             </div>
 
-            Frame: <input type="text" :value="frame + '.' + substep" />
+            Frame: <input type="text" :value="frame + '.' + Math.floor(time * 100)" />
         </div>
 
         <input type="range" min="0" :max="replay.frames.length - 1"
@@ -97,7 +97,7 @@
                  return '#' + color;
              }),
              frame: 0,
-             substep: 0,
+             time: 0,
              playing: false,
              selected: {
                  kind: null,
@@ -118,7 +118,7 @@
          visualizer.attach(this.$refs.visualizer_container);
          visualizer.onUpdate = () => {
              this.frame = visualizer.frame;
-             this.substep = visualizer.substep;
+             this.time = visualizer.time;
          };
          visualizer.onSelect = (kind, args) => {
              this.selected.kind = "planet";
@@ -148,7 +148,7 @@
          this.beginCaptureGIF = () => {
              if (!visualizer.isPlaying()) this.play();
              this.start_frame = this.frame;
-             this.start_substep = this.substep;
+             this.start_time = this.time;
              this.recording = true;
          };
          this.renderGIF = () => {
@@ -157,10 +157,10 @@
              this.encoding = true;
              visualizer.encodeGIF({
                  frame: this.start_frame,
-                 substep: this.start_substep,
+                 time: this.start_time,
              }, {
                  frame: this.frame,
-                 substep: this.substep,
+                 time: this.time,
              }).then((blob) => {
                  this.encoding = false;
                  window.open(URL.createObjectURL(blob));
@@ -229,12 +229,12 @@
                  };
              }
 
-             let substep = this.replay.frames[this.frame];
-             for (let owner of Object.keys(substep.ships)) {
-                 count[owner].ships += Object.values(substep.ships[owner]).length;
+             let frame = this.replay.frames[this.frame];
+             for (let owner of Object.keys(frame.ships)) {
+                 count[owner].ships += Object.values(frame.ships[owner]).length;
              }
 
-             for (let planet of Object.values(substep.planets)) {
+             for (let planet of Object.values(frame.planets)) {
                  if (planet.owner !== null) {
                      count[planet.owner].planets++;
                  }
