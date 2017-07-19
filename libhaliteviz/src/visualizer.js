@@ -7,6 +7,8 @@ const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
 const msgpack = require("msgpack-lite");
 
+const statistics = require("./statistics");
+
 
 const VISUALIZER_SIZE = 640;
 const STATS_SIZE = 20;
@@ -59,8 +61,11 @@ class FrameAnimation {
 export class HaliteVisualizer {
     constructor(replay) {
         this.replay = replay;
+        this.stats = new statistics.Statistics(replay);
+
         this.frame = 0;
         this.substep = 0;
+
         this.application = new PIXI.Application(
             VISUALIZER_SIZE,
             2 * STATS_SIZE + VISUALIZER_SIZE * (this.replay.height / this.replay.width),

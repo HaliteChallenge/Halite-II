@@ -47,10 +47,13 @@
                         </template>
 
                         <dt>Ship Count</dt>
-                        <dd>{{ statistics[index].ships }}</dd>
+                        <dd>{{ statistics[index].ships }} (total produced: {{ stats.frames[frame].players[index].totalShips }})</dd>
 
                         <dt>Planet Count</dt>
                         <dd>{{ statistics[index].planets }}</dd>
+
+                        <dt>Total Attacks Made</dt>
+                        <dd>{{ stats.frames[frame].players[index].totalAttacks }} (total targets: {{ stats.frames[frame].players[index].totalTargets }})</dd>
                     </dl>
                 </div>
                 <div v-if="selected.kind === 'planet' && selected_planet !== null">
@@ -100,6 +103,7 @@
                  kind: null,
                  id: null,
              },
+             stats: null,
              player_names: null,
              encoding: false,
              recording: false,
@@ -109,6 +113,8 @@
      mounted: function() {
          console.log(this.replay);
          const visualizer = new HaliteVisualizer(this.replay);
+         this.stats = visualizer.stats;
+
          visualizer.attach(this.$refs.visualizer_container);
          visualizer.onUpdate = () => {
              this.frame = visualizer.frame;
