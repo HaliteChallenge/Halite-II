@@ -15,6 +15,11 @@ namespace hlt {
             std::pow(other.pos_y - pos_y, 2);
     }
 
+    auto Location::move_by(const Velocity& velocity, double time) -> void {
+        pos_x += time * velocity.vel_x;
+        pos_y += time * velocity.vel_y;
+    }
+
     auto operator<<(std::ostream &ostream,
                     const Location &location) -> std::ostream & {
         ostream << '(' << location.pos_x << ", " << location.pos_y << ')';

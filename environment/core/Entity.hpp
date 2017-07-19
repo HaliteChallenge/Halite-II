@@ -24,21 +24,23 @@ namespace hlt {
     template<typename T>
     using possibly = std::pair<T, bool>;
 
-    struct Location {
-        double pos_x, pos_y;
-
-        auto distance(const Location& other) const -> double;
-        auto distance2(const Location& other) const -> double;
-
-        friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
-    };
-
     struct Velocity {
         double vel_x, vel_y;
 
         auto accelerate_by(double magnitude, double angle) -> void;
         auto magnitude() const -> double;
         auto angle() const -> double;
+    };
+
+    struct Location {
+        double pos_x, pos_y;
+
+        auto distance(const Location& other) const -> double;
+        auto distance2(const Location& other) const -> double;
+
+        auto move_by(const Velocity& velocity, double time) -> void;
+
+        friend auto operator<< (std::ostream& ostream, const Location& location) -> std::ostream&;
     };
 
     static bool operator==(const Location& l1, const Location& l2) {
