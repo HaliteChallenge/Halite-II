@@ -63,13 +63,11 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
 
 auto planet_explosion_damage(hlt::Planet& planet, double distance) -> unsigned short {
     const auto explosion_radius = hlt::GameConstants::get().EXPLOSION_RADIUS;
-
     if (distance < planet.radius) {
         return std::numeric_limits<unsigned short>::max();
     }
 
     const auto distance_from_crust = distance - planet.radius;
-
     if (distance_from_crust <= explosion_radius) {
         // Ranges linearly from 2x max ship health (at distance 0) to 0.5x
         // max ship health (at the maximum distance)
@@ -78,9 +76,7 @@ auto planet_explosion_damage(hlt::Planet& planet, double distance) -> unsigned s
             (distance_from_crust / (2 * explosion_radius)) * max_ship_hp;
         return static_cast<unsigned short>(damage);
     }
-    else {
-        return 0;
-    }
+    return 0;
 }
 
 auto Halite::damage_entity(hlt::EntityId id, unsigned short damage,
@@ -89,7 +85,8 @@ auto Halite::damage_entity(hlt::EntityId id, unsigned short damage,
 
     if (entity.health <= damage) {
         kill_entity(id, time);
-    } else {
+    }
+    else {
         entity.health -= damage;
     }
 }
@@ -127,10 +124,7 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
 
             // Undock any ships
             for (const auto entity_index : planet.docked_ships) {
-                const auto ship_id =
-                    hlt::EntityId::for_ship(planet.owner, entity_index);
-                auto& ship = game_map.get_ship(ship_id);
-
+                auto& ship = game_map.get_ship(planet.owner, entity_index);
                 ship.reset_docking_status();
             }
 
@@ -204,9 +198,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
 
     //Join threads. Figure out if the player responded in an allowable amount
     // of time or if the player has timed out.
-    for (hlt::PlayerId player_id = 0;
-         player_id < number_of_players;
-         player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (alive[player_id]) {
             int time = frame_threads[player_id].get();
             if (time == -1) {
@@ -227,15 +219,12 @@ auto Halite::process_docking() -> void {
             const auto& ship_idx = pair.first;
             auto& ship = pair.second;
 
-            if (!ship.is_alive()) continue;
-
+            // Planet should be alive - if it died, associated ships should
+            // have been disengaged
             if (ship.docking_status == hlt::DockingStatus::Docking) {
                 ship.docking_progress--;
                 if (ship.docking_progress == 0) {
                     ship.docking_status = hlt::DockingStatus::Docked;
-                    // Invariant: planet should be alive (destroying a
-                    // planet should have destroyed any ships in the
-                    // middle of docking)
                 }
             }
             else if (ship.docking_status == hlt::DockingStatus::Undocking) {
@@ -257,13 +246,8 @@ auto Halite::process_production() -> void {
     // Update productions
     // We do this after processing moves so that a bot can't try to guess the
     // resulting ship ID and issue commands to it immediately
-    for (hlt::EntityIndex entity_index = 0;
-         entity_index < game_map.planets.size();
-         entity_index++) {
-        auto& planet = game_map.planets[entity_index];
-        if (!planet.is_alive()) continue;
-
-        if (!planet.owned) continue;
+    for (auto& planet : game_map.planets) {
+        if (!planet.is_alive() || !planet.owned) continue;
 
         const auto num_docked_ships = planet.num_docked_ships(game_map);
         if (num_docked_ships == 0) continue;
@@ -284,15 +268,12 @@ auto Halite::process_production() -> void {
             // Try to spawn the ship
             auto& ships = game_map.ships.at(planet.owner);
             auto best_location = std::make_pair(planet.location, false);
-            auto best_distance =
-                static_cast<double>(game_map.map_width + game_map.map_height);
+            auto best_distance = std::numeric_limits<double>::max();
             const auto& center = hlt::Location{
-                static_cast<double>(game_map.map_width / 2),
-                static_cast<double>(game_map.map_height / 2),
-            };
+                game_map.map_width / 2.0, game_map.map_height / 2.0};
 
-            const auto max_delta = hlt::GameConstants::get().SPAWN_RADIUS;
-            const auto open_radius = hlt::GameConstants::get().SHIP_RADIUS * 2;
+            const auto max_delta = constants.SPAWN_RADIUS;
+            const auto open_radius = constants.SHIP_RADIUS * 2;
             for (int dx = -max_delta; dx <= max_delta; dx++) {
                 for (int dy = -max_delta; dy <= max_delta; dy++) {
                     double offset_angle = std::atan2(dy, dx);
@@ -367,7 +348,6 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
         for (auto& pair : player_ships) {
             const auto ship_idx = pair.first;
             auto& ship = pair.second;
-            if (!ship.is_alive()) continue;
 
             if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
 
@@ -380,7 +360,7 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                         break;
                     }
 
-                    auto angle = move.move.thrust.angle * M_PI / 180;
+                    auto angle = move.move.thrust.angle * M_PI / 180.0;
                     ship.velocity.accelerate_by(move.move.thrust.thrust, angle);
                     break;
                 }
@@ -393,21 +373,14 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                     const auto planet_id = move.move.dock_to;
                     if (planet_id >= game_map.planets.size()) {
                         // Planet is invalid, do nothing
-                        ship.reset_docking_status();
                         break;
                     }
 
                     auto& planet = game_map.planets[planet_id];
-                    if (!planet.is_alive()) {
-                        ship.reset_docking_status();
-                        break;
-                    }
-
                     const auto max_distance = planet.radius + ship.radius +
                         hlt::GameConstants::get().DOCK_RADIUS;
                     const auto ship_distance = planet.location.distance(ship.location);
-                    if (ship_distance > max_distance) {
-                        ship.reset_docking_status();
+                    if (!planet.is_alive() || ship_distance > max_distance) {
                         break;
                     }
 
@@ -681,11 +654,10 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
         if (alive[player_id]) alive_frame_count[player_id]++;
 
-    retrieve_moves(alive);
-
     full_frame_events.emplace_back();
     full_player_moves.push_back({ { { } } });
 
+    retrieve_moves(alive);
     process_docking();
 
     // Process queue of moves
