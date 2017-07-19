@@ -272,7 +272,7 @@ auto Halite::process_production() -> void {
         const auto production_per_ship = hlt::GameConstants::get().PRODUCTION_PER_SHIP;
         while (planet.current_production >= production_per_ship) {
             // Try to spawn the ship
-            auto& ships = game_map.ships[planet.owner];
+            auto& ships = game_map.ships.at(planet.owner);
             auto best_location = std::make_pair(planet.location, false);
             auto best_distance =
                 static_cast<double>(game_map.map_width + game_map.map_height);
@@ -352,7 +352,7 @@ auto Halite::process_cooldowns() -> void {
 auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (!alive[player_id]) continue;
-        auto& player_ships = game_map.ships[player_id];
+        auto& player_ships = game_map.ships.at(player_id);
 
         for (auto& pair : player_ships) {
             const auto ship_idx = pair.first;
@@ -442,7 +442,7 @@ auto Halite::find_living_players() -> std::vector<bool> {
     auto total_planets = 0;
 
     for (hlt::PlayerId player = 0; player < number_of_players; player++) {
-        for (const auto& pair : game_map.ships[player]) {
+        for (const auto& pair : game_map.ships.at(player)) {
             still_alive[player] = true;
             last_ship_count[player]++;
             last_ship_health_total[player] += pair.second.health;
@@ -482,8 +482,8 @@ auto Halite::process_events() -> void {
 
     for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
         for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
-            for (const auto& pair1 : game_map.ships[player1]) {
-                for (const auto& pair2 : game_map.ships[player2]) {
+            for (const auto& pair1 : game_map.ships.at(player1)) {
+                for (const auto& pair2 : game_map.ships.at(player2)) {
                     const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
                     const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
                     const auto& ship1 = pair1.second;
@@ -649,13 +649,9 @@ auto Halite::process_damage(DamageMap& ship_damage) -> void {
 auto Halite::process_movement() -> void {
     for (hlt::PlayerId player_id = 0; player_id < number_of_players;
          player_id++) {
-        for (auto &ship_pair : game_map.ships[player_id]) {
+        for (auto &ship_pair : game_map.ships.at(player_id)) {
             auto& ship = ship_pair.second;
-
-            if (ship.is_alive()) {
-                ship.location.pos_x += ship.velocity.vel_x;
-                ship.location.pos_y += ship.velocity.vel_y;
-            }
+            ship.location.move_by(ship.velocity, 1.0);
         }
     }
 }
