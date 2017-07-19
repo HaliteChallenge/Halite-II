@@ -107,18 +107,40 @@ Your main file must be called MyBot. Your language is recognized using the file 
 - C - .c
 - Julia - .jl
 
-The following compilers are used:
+The following compilers/interpreters are used:
 
-- (whatever is in the Ubuntu 16.04 repositories - exact versions published later)
+- build-essential	`12.1ubuntu2`
+- gcc	`4:6.3.0-2ubuntu1`
+- g++	`4:6.3.0-2ubuntu1`
+- python3	`3.5.3-1`
+- python3.6	`3.6.1-1`
+- python3-pip	`9.0.1-2`
+- git	`1:2.11.0-2ubuntu0.1`
+- golang	`2:1.7~1ubuntu1`
+- julia	`0.4.7-6ubuntu1`
+- ocaml	`4.02.3-6ubuntu2`
+- openjdk-8-jdk:amd64	`8u131-b11-0ubuntu1.17.04.1`
+- php	`1:7.0+49`
+- ruby	`1:2.3.3`
+- scala	`2.11.8-1`
+- nodejs	`8.1.2-1nodesource1~zesty1`
+- mono-complete	`5.0.1.1-0xamarin5+ubuntu1604b1`
+- virtualenv	`15.1.0+ds-1`
+- rustc `1.18.0 (03fc9d622 2017-06-06)`
+- cargo `0.19.0 (28d1d60d4 2017-05-16)`
+- rustup `1.5.0 (92d0d1e9e 2017-06-24)`
+- Leiningen `2.7.1`
 
-The following build automators are used:
+For Python, the following packages are available:
 
-- Rust
-- Clojure
-
-The following versions of each language are supported:
-
-- (whatever is in the Ubuntu 16.04 repositories - exact versions published later)
+- numpy `1.13.0`
+- scipy `0.19.1`
+- scikit-learn `0.18.2`
+- pillow `4.1.1`
+- h5py `2.7.0`
+- tensorflow `1.2.0`
+- keras `2.0.5`
+- theano `0.9.0`
 
 Both Python 3.5 and 3.6 are installed. To use 3.6, you will have to explicitly use a `run.sh` file to invoke `python3.6`.
 
