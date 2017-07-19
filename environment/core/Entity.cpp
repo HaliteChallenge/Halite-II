@@ -26,9 +26,6 @@ namespace hlt {
         double new_vel_x = vel_x + magnitude * std::cos(angle);
         double new_vel_y = vel_y + magnitude * std::sin(angle);
 
-        vel_x = new_vel_x;
-        vel_y = new_vel_y;
-
         const auto max_speed = GameConstants::get().MAX_SPEED;
         if (this->magnitude() > max_speed) {
             double scale = max_speed / this->magnitude();

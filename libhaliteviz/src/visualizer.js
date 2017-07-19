@@ -272,7 +272,7 @@ export class HaliteVisualizer {
         this.application.start();
 
         this.timer = window.setInterval(() => {
-            this.advanceSubsteps(0.2);
+            this.advanceSubsteps(0.1);
         }, 1000/40);
 
         this.onPlay();
@@ -414,14 +414,21 @@ export class HaliteVisualizer {
         let vel_x = ship.vel_x;
         let vel_y = ship.vel_y;
 
-        if (this.frame > 0) {
-            let moves = this.replay.moves[this.frame - 1];
+        if (this.frame < this.replay.frames.length - 1) {
+            let moves = this.replay.moves[this.frame];
             let move = moves[ship.owner][0][ship.id];
             if (move && move.type === "thrust") {
                 let angle = move.angle * Math.PI / 180;
                 vel_x += move.magnitude * Math.cos(angle);
                 vel_y += move.magnitude * Math.sin(angle);
             }
+        }
+
+        const max_speed = this.replay.constants.MAX_SPEED;
+        const magnitude = Math.sqrt(vel_x*vel_x + vel_y*vel_y);
+        if (magnitude > max_speed) {
+            vel_x *= magnitude / max_speed;
+            vel_y *= magnitude / max_speed;
         }
 
         const x = ship.x + this.time * vel_x;
