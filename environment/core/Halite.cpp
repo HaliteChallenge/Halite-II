@@ -550,6 +550,16 @@ auto Halite::process_events() -> void {
             sorted_events.pop_back();
         }
 
+        // Get rid of events involving dead entities
+        simultaneous_events.erase(
+            std::remove_if(
+                simultaneous_events.begin(), simultaneous_events.end(),
+                [&](const SimulationEvent& ev) -> bool {
+                    return !game_map.is_valid(ev.id1) || !game_map.is_valid(ev.id2);
+                }),
+            simultaneous_events.end());
+        if (simultaneous_events.size() == 0) continue;
+
         DamageMap damage_map;
         std::unordered_map<hlt::EntityId, int> target_count;
         std::unordered_map<hlt::EntityId, AttackEvent> attackers;
