@@ -83,22 +83,32 @@ auto planet_explosion_damage(hlt::Planet& planet, double distance) -> unsigned s
     }
 }
 
-auto Halite::damage_entity(hlt::EntityId id, unsigned short damage) -> void {
+auto Halite::damage_entity(hlt::EntityId id, unsigned short damage,
+                           double time) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
 
     if (entity.health <= damage) {
-        kill_entity(id);
+        kill_entity(id, time);
     } else {
         entity.health -= damage;
     }
 }
 
-auto Halite::kill_entity(hlt::EntityId id) -> void {
+auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     if (!entity.is_alive()) return;
+
+    auto location = entity.location;
+    if (id.type == hlt::EntityType::ShipEntity) {
+        // Make sure destruction location reflects the entity position at time
+        // of death, not start of frame
+        const auto& ship = game_map.get_ship(id);
+        location.move_by(ship.velocity, time);
+    }
+
     full_frame_events.back().push_back(
         std::unique_ptr<Event>(
-            new DestroyedEvent(id, entity.location, entity.radius)));
+            new DestroyedEvent(id, location, entity.radius, time)));
 
     switch (id.type) {
         case hlt::EntityType::ShipEntity: {
@@ -134,7 +144,7 @@ auto Halite::kill_entity(hlt::EntityId id) -> void {
                     const auto distance = planet.location.distance(target.location);
                     const auto damage = planet_explosion_damage(
                         planet, distance - target.radius);
-                    damage_entity(target_id, damage);
+                    damage_entity(target_id, damage, time);
                 }
             }
 
@@ -564,7 +574,7 @@ auto Halite::process_events() -> void {
         std::unordered_map<hlt::EntityId, int> target_count;
         std::unordered_map<hlt::EntityId, AttackEvent> attackers;
 
-        auto update_targets = [&](hlt::EntityId src, hlt::EntityId target) -> void {
+        auto update_targets = [&](hlt::EntityId src, hlt::EntityId target, double time) -> void {
             auto& attacker = game_map.get_ship(src);
 
             if (!attacker.is_alive() || attacker.weapon_cooldown > 0 ||
@@ -573,7 +583,7 @@ auto Halite::process_events() -> void {
             }
             // Don't update the actual cooldown until later
             if (attackers.count(src) == 0) {
-                attackers.insert({src, AttackEvent(src, attacker.location, {}, {})});
+                attackers.insert({src, AttackEvent(src, attacker.location, time, {}, {})});
             }
             auto& attack_event = attackers.at(src);
             attack_event.targets.push_back(target);
@@ -595,14 +605,14 @@ auto Halite::process_events() -> void {
             switch (ev.type) {
                 case SimulationEventType::Collision: {
                     const auto damage = compute_damage(ev.id1, ev.id2);
-                    damage_entity(ev.id1, damage.first);
-                    damage_entity(ev.id2, damage.second);
+                    damage_entity(ev.id1, damage.first, ev.time);
+                    damage_entity(ev.id2, damage.second, ev.time);
                     break;
                 }
 
                 case SimulationEventType::Attack: {
-                    update_targets(ev.id1, ev.id2);
-                    update_targets(ev.id2, ev.id1);
+                    update_targets(ev.id1, ev.id2, ev.time);
+                    update_targets(ev.id2, ev.id1, ev.time);
                     break;
                 }
             }
@@ -638,11 +648,11 @@ auto Halite::process_events() -> void {
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
         }
 
-        process_damage(damage_map);
+        process_damage(damage_map, simultaneous_events.back().time);
     }
 }
 
-auto Halite::process_damage(DamageMap& ship_damage) -> void {
+auto Halite::process_damage(DamageMap& ship_damage, double time) -> void {
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         const auto player_damage = ship_damage[player_id];
 
@@ -650,8 +660,8 @@ auto Halite::process_damage(DamageMap& ship_damage) -> void {
             const auto ship_idx = pair.first;
             const auto damage = static_cast<unsigned short>(pair.second);
 
-            auto& ship = game_map.get_ship(player_id, ship_idx);
-            damage_entity(hlt::EntityId::for_ship(player_id, ship_idx), damage);
+            damage_entity(hlt::EntityId::for_ship(player_id, ship_idx),
+                          damage, time);
         }
     }
 }

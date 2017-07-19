@@ -23,10 +23,12 @@ struct Event {
 struct DestroyedEvent : Event {
     hlt::EntityId id;
     hlt::Location location;
+    double time;
     double radius;
 
-    DestroyedEvent(hlt::EntityId id_, hlt::Location location_, double radius_)
-        : id(id_), location(location_), radius(radius_) {};
+    DestroyedEvent(hlt::EntityId id_, hlt::Location location_,
+                   double radius_, double time_)
+        : id(id_), location(location_), radius(radius_), time(time_) {};
 
     auto serialize() -> nlohmann::json override {
         return nlohmann::json{
@@ -35,6 +37,7 @@ struct DestroyedEvent : Event {
             { "x", location.pos_x },
             { "y", location.pos_y },
             { "radius", radius },
+            { "time", time },
         };
     }
 };
@@ -42,14 +45,15 @@ struct DestroyedEvent : Event {
 struct AttackEvent : Event {
     hlt::EntityId id;
     hlt::Location location;
+    double time;
 
     std::vector<hlt::EntityId> targets;
     std::vector<hlt::Location> target_locations;
 
-    AttackEvent(hlt::EntityId id_, hlt::Location location_,
+    AttackEvent(hlt::EntityId id_, hlt::Location location_, double time_,
                 std::vector<hlt::EntityId> targets_,
                 std::vector<hlt::Location> target_locations_) :
-        id(id_), location(location_), targets(targets_),
+        id(id_), location(location_), time(time_), targets(targets_),
         target_locations(target_locations_) {};
 
     auto serialize() -> nlohmann::json override {
@@ -65,6 +69,7 @@ struct AttackEvent : Event {
             { "y", location.pos_y },
             { "targets", targets },
             { "target_locations", target_locations },
+            { "time", time },
         };
     }
 };

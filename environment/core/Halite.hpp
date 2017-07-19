@@ -97,7 +97,7 @@ private:
         -> std::pair<unsigned short, unsigned short>;
 
     // Subparts of game loop
-    auto process_damage(DamageMap& ship_damage) -> void;
+    auto process_damage(DamageMap& ship_damage, double time) -> void;
     auto process_docking() -> void;
     auto process_production() -> void;
     auto process_drag() -> void;
@@ -108,10 +108,10 @@ private:
     auto find_living_players() -> std::vector<bool>;
 
     //! Helper to damage an entity and kill it if necessary
-    auto damage_entity(hlt::EntityId id, unsigned short damage) -> void;
+    auto damage_entity(hlt::EntityId id, unsigned short damage, double time) -> void;
     //! Helper to kill an entity and clean up any dependents (planet
     //! explosions, docked ships, etc.)
-    auto kill_entity(hlt::EntityId id) -> void;
+    auto kill_entity(hlt::EntityId id, double time) -> void;
 
     //! Comparison function to rank two players, based on the number of ships
     //! and their total health.
