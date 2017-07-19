@@ -59,8 +59,19 @@ namespace hlt {
         map_height = height;
     }
 
+    auto Map::is_valid(EntityId entity_id) -> bool {
+        switch (entity_id.type) {
+            case EntityType::InvalidEntity:
+                return false;
+            case EntityType::PlanetEntity:
+                return entity_id.entity_index() < planets.size() && planets[entity_id.entity_index()].is_alive();
+            case EntityType::ShipEntity:
+                return ships.at(entity_id.player_id()).count(entity_id.entity_index()) > 0;
+        }
+    }
+
     auto Map::get_ship(PlayerId player, EntityIndex entity) -> Ship& {
-        return ships[player][entity];
+        return ships.at(player).at(entity);
     }
 
     auto Map::get_ship(PlayerId player, EntityIndex entity) const -> const Ship& {
