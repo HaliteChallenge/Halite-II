@@ -170,19 +170,11 @@ namespace hlt {
             return false;
         }
 
-        std::stringstream logmsg;
-        logmsg << "Checking pathability from " << start << " to " << target;
-        Log::log(logmsg.str());
-
         for (const auto& planet_pair : planets) {
-            const auto intersects = intersect_segment_circle(
+            if (intersect_segment_circle(
                 start, target,
                 planet_pair.second.location,
-                planet_pair.second.radius, fudge);
-            std::stringstream msg;
-            msg << "\tChecking against " << planet_pair.second.location << " r=" << planet_pair.second.radius << ' ' << intersects;
-            Log::log(msg.str());
-            if (intersects) {
+                planet_pair.second.radius, fudge)) {
                 return false;
             }
         }
@@ -191,22 +183,25 @@ namespace hlt {
     }
 
     auto Map::forecast_collision(const Location& start, const Location& target) -> bool {
-        if (!within_bounds(target)) {
-            return false;
+        if (!within_bounds(target) || !pathable(start, target, 0.6)) {
+            return true;
         }
 
         for (const auto& player_ships : ships) {
             for (const auto& ship_pair : player_ships) {
                 const auto& ship = ship_pair.second;
+
+                if (ship.location == start) continue;
+
                 if (intersect_segment_circle(
                     start, target,
                     ship.location, ship.radius, 0.6)) {
-                    return false;
+                    return true;
                 }
             }
         }
 
-        return true;
+        return false;
     }
 
     auto Map::adjust_for_collision(
@@ -217,7 +212,7 @@ namespace hlt {
                 start.pos_x + thrust * std::cos(angle),
                 start.pos_y + thrust * std::sin(angle),
             };
-            if (!pathable(start, target, 0.6) || forecast_collision(start, target)) {
+            if (forecast_collision(start, target)) {
                 std::stringstream log_msg;
                 log_msg << "Forecasted collision for " << start
                         << " at angle " << angle << " at thrust " << thrust;
