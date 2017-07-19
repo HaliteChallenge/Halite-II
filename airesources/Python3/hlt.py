@@ -312,11 +312,11 @@ def intersect_segment_circle(start, end, circle, *, fudge=0):
 
     if a == 0.0:
         # Start and end are the same point
-        return distance(start, circle) < circle.r + fudge
+        return distance(start, circle) <= circle.r + fudge
 
     # Time along segment when closest to the circle (vertex of the quadratic)
-    t = -b / (2 * a)
-    if t < 0 or t > 1:
+    t = min(-b / (2 * a), 1.0)
+    if t < 0:
         return False
 
     closest_x = start.x + dx * t
