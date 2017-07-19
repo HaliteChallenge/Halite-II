@@ -270,7 +270,7 @@
     }
 
     .halite-visualizer-canvas {
-        width: 640px;
+        width: 720px;
         float: left;
     }
 
@@ -290,7 +290,7 @@
     }
 
     .halite-frame-scrubber {
-        width: 640px;
+        width: 720px;
     }
 
     .playbutton {

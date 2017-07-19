@@ -10,7 +10,7 @@ const msgpack = require("msgpack-lite");
 const statistics = require("./statistics");
 
 
-const VISUALIZER_SIZE = 640;
+const VISUALIZER_SIZE = 720;
 const STATS_SIZE = 20;
 const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
