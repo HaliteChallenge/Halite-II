@@ -2,49 +2,16 @@
 // Created by David Li on 6/5/17.
 //
 
-#ifdef _WIN32
-#define _USE_MATH_DEFINES
-#endif
-
 #include <cmath>
-#include "hlt.hpp"
+#include "Map.hpp"
+#include "Log.hpp"
 
 namespace hlt {
-    auto Move::output_json(hlt::PlayerId player_id, int move_no) const -> nlohmann::json {
-        auto record = nlohmann::json{
-            { "owner", player_id },
-            { "queue_number", move_no },
-            { "shipId", shipId },
-        };
-
-        switch (type) {
-            case hlt::MoveType::Noop:
-                assert(false);
-            case hlt::MoveType::Thrust:
-                record["type"] = "thrust";
-                record["magnitude"] = move.thrust.thrust;
-                record["angle"] = move.thrust.angle;
-                break;
-            case hlt::MoveType::Dock:
-                record["type"] = "dock";
-                record["planet_id"] = move.dock_to;
-                break;
-            case hlt::MoveType::Undock:
-                record["type"] = "undock";
-                break;
-            case hlt::MoveType::Error:
-                // TODO: wrap the move that could not be executed
-                assert(false);
-        }
-
-        return record;
-    }
-
     Map::Map() {
         map_width = 0;
         map_height = 0;
         ships = { {} };
-        planets = std::vector<Planet>();
+        planets = {};
     }
 
     Map::Map(const Map& other_map) {

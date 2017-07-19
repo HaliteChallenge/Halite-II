@@ -1,0 +1,17 @@
+CXXFLAGS += -std=c++11 -pthread -I ./ -g -fsanitize=address,undefined
+INSTALL_PATH?=/usr/local
+SOURCES=$(shell find . -name "*.cpp")
+CSOURCES=$(shell find . -name "*.c")
+COBJECTS=$(CSOURCES:%.c=%.o)
+OBJECTS=$(SOURCES:%.cpp=%.o) $(COBJECTS)
+TARGET=halite
+
+.PHONY: all
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+.PHONY: clean
+clean:
+	rm -f $(TARGET) $(OBJECTS)

@@ -75,7 +75,7 @@ namespace hlt {
         Map(unsigned short width, unsigned short height);
 
         auto is_valid(EntityId entity_id) -> bool;
-        auto within_bounds(const Location& location) -> bool;
+        auto within_bounds(const Location& location) const -> bool;
         auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
         auto get_ship(PlayerId player, EntityIndex entity) const -> const Ship&;
         auto get_ship(EntityId entity_id) -> Ship&;
@@ -85,7 +85,15 @@ namespace hlt {
         auto unsafe_kill_entity(EntityId entity_id) -> void;
         auto cleanup_entities() -> void;
         auto get_distance(Location l1, Location l2) const -> double;
-
+        /**
+         * Create a location with an offset applied, checking if the location
+         * is within bounds. If not, the second member of the pair will be
+         * false.
+         * @param location
+         * @param dx
+         * @param dy
+         * @return
+         */
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
         auto test(const Location& location, double radius) -> std::vector<EntityId>;

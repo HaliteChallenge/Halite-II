@@ -1,4 +1,4 @@
-#include "hlt.hpp"
+#include "hlt/hlt.hpp"
 
 int main() {
     hlt::PlayerId my_tag;
