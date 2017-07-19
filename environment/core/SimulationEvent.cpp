@@ -12,6 +12,9 @@ auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream
         case SimulationEventType::Collision:
             os << "Collision";
             break;
+        case SimulationEventType::Desertion:
+            os << "Desertion";
+            break;
     }
     return os;
 }
