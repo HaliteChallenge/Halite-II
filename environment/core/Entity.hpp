@@ -81,22 +81,11 @@ namespace hlt {
         unsigned int docking_progress;
         EntityIndex docked_planet;
 
-        auto reset_docking_status() -> void {
-            docking_status = DockingStatus::Undocked;
-            docking_progress = 0;
-            docked_planet = 0;
-        }
-
-        auto revive(const Location& loc) -> void {
-            health = GameConstants::get().BASE_SHIP_HEALTH;
-            location = loc;
-            weapon_cooldown = 0;
-            radius = GameConstants::get().SHIP_RADIUS;
-            velocity = { 0, 0 };
-            docking_status = DockingStatus::Undocked;
-            docking_progress = 0;
-            docked_planet = 0;
-        }
+        auto reset_docking_status() -> void;
+        auto revive(const Location& loc) -> void;
+        auto output_json(
+            const hlt::PlayerId player_id,
+            const hlt::EntityIndex ship_idx) const -> nlohmann::json;
     };
 
     struct Planet : Entity {
@@ -126,7 +115,8 @@ namespace hlt {
 
         auto add_ship(EntityIndex ship) -> void;
         auto remove_ship(EntityIndex ship) -> void;
-        auto num_docked_ships(const Map& game_map) const -> int;
+        auto num_docked_ships(const Map& game_map) const -> long;
+        auto output_json(const hlt::EntityIndex planet_id) const -> nlohmann::json;
     };
 
     enum class EntityType {

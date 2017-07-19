@@ -108,6 +108,61 @@ namespace hlt {
         return !(id1 == id2);
     }
 
+    auto Ship::reset_docking_status() -> void {
+        docking_status = DockingStatus::Undocked;
+        docking_progress = 0;
+        docked_planet = 0;
+    }
+
+    auto Ship::revive(const Location& loc) -> void {
+        health = GameConstants::get().BASE_SHIP_HEALTH;
+        location = loc;
+        weapon_cooldown = 0;
+        radius = GameConstants::get().SHIP_RADIUS;
+        velocity = { 0, 0 };
+        docking_status = DockingStatus::Undocked;
+        docking_progress = 0;
+        docked_planet = 0;
+    }
+
+    auto Ship::output_json(const hlt::PlayerId player_id, const hlt::EntityIndex ship_idx) const -> nlohmann::json {
+        nlohmann::json docking;
+
+        switch (docking_status) {
+            case hlt::DockingStatus::Undocked:
+                docking["status"] = "undocked";
+                break;
+            case hlt::DockingStatus::Docking:
+                docking["status"] = "docking";
+                docking["planet_id"] = docked_planet;
+                docking["turns_left"] = docking_progress;
+                break;
+            case hlt::DockingStatus::Undocking:
+                docking["status"] = "undocking";
+                docking["planet_id"] = docked_planet;
+                docking["turns_left"] = docking_progress;
+                break;
+            case hlt::DockingStatus::Docked:
+                docking["status"] = "docked";
+                docking["planet_id"] = docked_planet;
+                break;
+        }
+
+        auto record = nlohmann::json{
+            { "id", ship_idx },
+            { "owner", (int) player_id },
+            { "x", location.pos_x },
+            { "y", location.pos_y },
+            { "vel_x", velocity.vel_x },
+            { "vel_y", velocity.vel_y },
+            { "health", health },
+            { "docking", docking },
+            { "cooldown", weapon_cooldown },
+        };
+
+        return record;
+    }
+
     auto Planet::add_ship(EntityIndex ship) -> void {
         assert(docked_ships.size() < docking_spots);
         docked_ships.push_back(ship);
@@ -129,7 +184,7 @@ namespace hlt {
         }
     }
 
-    auto Planet::num_docked_ships(const Map& game_map) const -> int {
+    auto Planet::num_docked_ships(const Map& game_map) const -> long {
         return std::count_if(
             docked_ships.begin(),
             docked_ships.end(),
@@ -138,6 +193,24 @@ namespace hlt {
                 return ship.docking_status == hlt::DockingStatus::Docked;
             }
         );
+    }
+
+    auto Planet::output_json(const hlt::EntityIndex planet_id) const -> nlohmann::json {
+        auto record = nlohmann::json{
+            { "id", planet_id },
+            { "health", health },
+            { "docked_ships", docked_ships },
+            { "remaining_production", remaining_production },
+            { "current_production", current_production },
+        };
+
+        if (owned) {
+            record["owner"] = owner;
+        } else {
+            record["owner"] = nullptr;
+        }
+
+        return record;
     }
 
     auto to_json(nlohmann::json& json, const hlt::Location& location) -> void {

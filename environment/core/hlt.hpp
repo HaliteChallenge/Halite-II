@@ -40,6 +40,8 @@ namespace hlt {
             struct { unsigned short thrust; unsigned short angle; } thrust;
             EntityIndex dock_to;
         } move;
+
+        auto output_json(hlt::PlayerId player_id, int move_no) const -> nlohmann::json;
     };
 
     template<typename T>
