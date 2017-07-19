@@ -17,8 +17,8 @@
                v-on:input="scrub" />
 
         <div class="row">
-            <div class="halite-visualizer-canvas col-md-8" ref="visualizer_container"></div>
-            <div class="halite-visualizer-info col-md-4">
+            <div class="halite-visualizer-canvas col-md-8">
+                <div ref="visualizer_container"></div>
                 <dl>
                     <dt>Map Size</dt>
                     <dd>{{ replay.width }}x{{ replay.height }}</dd>
@@ -27,6 +27,8 @@
                     <dd>{{ replay.map_generator }}, seed: {{ replay.seed }}</dd>
                 </dl>
                 <small>Replay version {{ replay.version }}</small>
+            </div>
+            <div class="halite-visualizer-info col-md-4">
                 <div v-for="(player_name, index) in player_names">
                     <h3 :style="'color: ' + colors[index]">
                         <a :style="'color: ' + colors[index]"
@@ -39,6 +41,11 @@
                         </a>
                     </h3>
                     <dl>
+                        <template v-if="frame == replay.frames.length - 1">
+                            <dt>Rank</dt>
+                            <dd>{{ player_name.rank }}</dd>
+                        </template>
+
                         <dt>Ship Count</dt>
                         <dd>{{ statistics[index].ships }}</dd>
 
@@ -169,12 +176,14 @@
                  else return 1;
              });
              for (let player_id of ids) {
-                 const idx = this.game.players[player_id].player_index;
+                 const player_record = this.game.players[player_id];
+                 const idx = player_record.player_index;
                  let player_data = {
                      bot_name: this.replay.player_names[idx],
                      profile_image_link: "",
                      user_id: player_id,
                      user_link: this.makeUserLink(player_id),
+                     rank: player_record.rank,
                  };
                  player_names.push(player_data);
 
