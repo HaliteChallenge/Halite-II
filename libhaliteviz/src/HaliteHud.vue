@@ -201,6 +201,7 @@
                      bot_name: this.replay.player_names[idx],
                      username: "",
                      user_id: null,
+                     rank: this.replay.stats[idx].rank,
                  });
              }
          }

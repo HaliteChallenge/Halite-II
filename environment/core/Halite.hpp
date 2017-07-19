@@ -89,7 +89,7 @@ private:
 
     std::vector<bool> process_next_frame(std::vector<bool> alive);
     auto output_header(nlohmann::json& replay) -> void;
-    auto output(std::string filename) -> void;
+    auto output(std::string filename, const GameStatistics& stats) -> void;
     void kill_player(hlt::PlayerId player);
 
     //! Compute the damage between two colliding ships

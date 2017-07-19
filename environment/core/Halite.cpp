@@ -787,7 +787,7 @@ auto output_move(const hlt::Move& move, hlt::PlayerId player_id,
  * @param replay
  */
 auto Halite::output_header(nlohmann::json& replay) -> void {
-    replay["version"] = 30;
+    replay["version"] = 31;
     replay["seed"] = seed;
     replay["map_generator"] = map_generator;
 
@@ -825,15 +825,15 @@ auto Halite::output_header(nlohmann::json& replay) -> void {
     replay["poi"] = points_of_interest;
 }
 
-auto Halite::output(std::string filename) -> void {
+auto Halite::output(std::string filename, const GameStatistics& stats) -> void {
     std::ofstream gameFile;
     gameFile.open(filename, std::ios_base::binary);
     if (!gameFile.is_open())
         throw std::runtime_error("Could not open file for replay");
 
     nlohmann::json j;
-
     output_header(j);
+    j["stats"] = stats;
 
     // Encode the frames.
     std::vector<nlohmann::json> frames;
@@ -920,8 +920,6 @@ auto Halite::output(std::string filename) -> void {
     j["frames"] = nlohmann::json(frames);
     j["moves"] = nlohmann::json(moves);
 
-    // Use msgpack to cut down on the size of the replay file
-    // std::vector<uint8_t> bin_data = nlohmann::json::to_msgpack(j);
     std::string data = j.dump();
     auto data_size = data.size();
     auto bin_data = reinterpret_cast<const unsigned char*>(data.data());
@@ -1052,8 +1050,8 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     stats.timeout_tags = timeout_tags;
     stats.timeout_log_filenames =
         std::vector<std::string>(timeout_tags.size());
-    // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
 
+    // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
     auto time = std::time(nullptr);
     auto localtime = *std::localtime(&time);
@@ -1062,14 +1060,13 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     auto filename = filename_buf.str();
 
     if (enable_replay) {
-        stats.output_filename =
-            replay_directory + "Replays/" + filename;
+        stats.output_filename = replay_directory + "Replays/" + filename;
         try {
-            output(stats.output_filename);
+            output(stats.output_filename, stats);
         }
         catch (std::runtime_error& e) {
             stats.output_filename = replay_directory + filename;
-            output(stats.output_filename);
+            output(stats.output_filename, stats);
         }
         if (!quiet_output) {
             std::cout << "Map seed was " << seed << std::endl
