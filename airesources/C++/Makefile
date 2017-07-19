@@ -4,7 +4,7 @@ SOURCES=$(shell find . -name "*.cpp")
 CSOURCES=$(shell find . -name "*.c")
 COBJECTS=$(CSOURCES:%.c=%.o)
 OBJECTS=$(SOURCES:%.cpp=%.o) $(COBJECTS)
-TARGET=halite
+TARGET=MyBot
 
 .PHONY: all
 all: $(TARGET)

@@ -7,6 +7,44 @@
 #include "Log.hpp"
 
 namespace hlt {
+    auto intersect_segment_circle(
+        const Location& start, const Location& end,
+        const Location& center, double r,
+        double fudge) -> bool {
+        // Derived with SymPy
+        // Parameterize the segment as start + t * (end - start),
+        // and substitute into the equation of a circle
+        // Solve for t
+        const auto dx = end.pos_x - start.pos_x;
+        const auto dy = end.pos_y - start.pos_y;
+
+        const auto a = std::pow(dx, 2) + std::pow(dy, 2);
+        const auto b = -2 * (std::pow(start.pos_x, 2) - start.pos_x*end.pos_x -
+            start.pos_x*center.pos_x + end.pos_x*center.pos_x +
+            std::pow(start.pos_y, 2) - start.pos_y*end.pos_y -
+            start.pos_y*center.pos_y + end.pos_y*center.pos_y);
+        const auto c = std::pow(start.pos_x - center.pos_x, 2) +
+            std::pow(start.pos_y - center.pos_y, 2);
+
+        if (a == 0.0) {
+            // Start and end are the same point
+            return start.distance(center) <= r + fudge;
+        }
+
+        // Time along segment when closest to the circle (vertex of the quadratic)
+        const auto t = std::min(-b / (2 * a), 1.0);
+        if (t < 0) {
+            return false;
+        }
+
+        const auto closest_x = start.pos_x + dx * t;
+        const auto closest_y = start.pos_y + dy * t;
+        const auto closest_location = Location{closest_x, closest_y};
+        const auto closest_distance = closest_location.distance(center);
+
+        return closest_distance <= r + fudge;
+    }
+
     Map::Map() {
         map_width = 0;
         map_height = 0;
@@ -99,47 +137,6 @@ namespace hlt {
         };
     }
 
-    auto Map::kill_entity(EntityId entity_id) -> void {
-        switch (entity_id.type) {
-            case EntityType::PlanetEntity: {
-                planets[entity_id.entity_index()].kill();
-                break;
-            }
-            case EntityType::ShipEntity: {
-                ships[entity_id.player_id()][entity_id.entity_index()].kill();
-                ships[entity_id.player_id()].erase(entity_id.entity_index());
-                break;
-            }
-            case EntityType::InvalidEntity: {
-                break;
-            }
-        }
-    }
-
-    auto Map::unsafe_kill_entity(EntityId entity_id) -> void {
-        switch (entity_id.type) {
-            case EntityType::ShipEntity: {
-                ships[entity_id.player_id()][entity_id.entity_index()].kill();
-                break;
-            }
-            default:
-                kill_entity(entity_id);
-                break;
-        }
-    }
-
-    auto Map::cleanup_entities() -> void {
-        for (auto& player_ships : ships) {
-            for (auto it = player_ships.begin(); it != player_ships.end();) {
-                if (!it->second.is_alive()) {
-                    it = player_ships.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
-        }
-    }
     auto Map::test(const Location &location, double radius) -> std::vector<EntityId> {
         std::vector<EntityId> result;
 
@@ -168,16 +165,76 @@ namespace hlt {
         return result;
     }
 
-    auto Map::spawn_ship(const Location& location, PlayerId owner) -> EntityIndex {
-        auto new_id = 0;
-        auto& player_ships = ships[owner];
-        while (player_ships.count(new_id) > 0) {
-            new_id++;
+    auto Map::pathable(const Location& start, const Location& target, double fudge) const -> bool {
+        if (!within_bounds(target)) {
+            return false;
         }
 
-        player_ships[new_id] = Ship{};
-        player_ships[new_id].revive(location);
+        std::stringstream logmsg;
+        logmsg << "Checking pathability from " << start << " to " << target;
+        Log::log(logmsg.str());
 
-        return new_id;
+        for (const auto& planet_pair : planets) {
+            const auto intersects = intersect_segment_circle(
+                start, target,
+                planet_pair.second.location,
+                planet_pair.second.radius, fudge);
+            std::stringstream msg;
+            msg << "\tChecking against " << planet_pair.second.location << " r=" << planet_pair.second.radius << ' ' << intersects;
+            Log::log(msg.str());
+            if (intersects) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    auto Map::forecast_collision(const Location& start, const Location& target) -> bool {
+        if (!within_bounds(target)) {
+            return false;
+        }
+
+        for (const auto& player_ships : ships) {
+            for (const auto& ship_pair : player_ships) {
+                const auto& ship = ship_pair.second;
+                if (intersect_segment_circle(
+                    start, target,
+                    ship.location, ship.radius, 0.6)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    auto Map::adjust_for_collision(
+        const Location& start, double angle, unsigned short thrust,
+        int tries) -> std::pair<double, unsigned short> {
+        while (tries > 0) {
+            const auto target = Location{
+                start.pos_x + thrust * std::cos(angle),
+                start.pos_y + thrust * std::sin(angle),
+            };
+            if (!pathable(start, target, 0.6) || forecast_collision(start, target)) {
+                std::stringstream log_msg;
+                log_msg << "Forecasted collision for " << start
+                        << " at angle " << angle << " at thrust " << thrust;
+                Log::log(log_msg.str());
+                angle += M_PI / 12;
+            }
+            else {
+                std::stringstream log_msg;
+                log_msg << "No forecasted collision for " << start
+                        << " at angle " << angle << " at thrust " << thrust;
+                Log::log(log_msg.str());
+                break;
+            }
+
+            tries--;
+        }
+
+        return std::make_pair(angle, thrust);
     }
 }

@@ -32,7 +32,10 @@ int main() {
                 }
                 else {
                     const auto angle = ship.angle_to(planet);
-                    moves.push_back(hlt::Move::thrust(ship_id, angle, 2));
+                    moves.push_back(hlt::Move::thrust(
+                        ship_id,
+                        game_map.adjust_for_collision(ship.location, angle, 2)
+                    ));
                 }
 
                 break;

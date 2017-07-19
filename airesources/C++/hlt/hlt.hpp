@@ -52,6 +52,8 @@ namespace hlt {
         iss >> ship.docking_progress;
         iss >> ship.weapon_cooldown;
 
+        ship.radius = GameConstants::get().SHIP_RADIUS;
+
         return std::make_pair(ship_id, ship);
     }
 
@@ -129,6 +131,7 @@ namespace hlt {
     }
 
     static auto get_map() -> Map {
+        Log::log("--- NEW TURN ---");
         auto input = get_string();
         return parse_map(input);
     }

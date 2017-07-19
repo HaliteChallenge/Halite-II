@@ -36,7 +36,7 @@ namespace hlt {
 
         static auto log(std::string message) -> void {
             if (!ENABLED) return;
-            get().file << message << '\n';
+            get().file << message << std::endl;
         }
     };
 }

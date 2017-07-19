@@ -39,9 +39,6 @@ namespace hlt {
         auto get_ship(EntityId entity_id) -> Ship&;
         auto get_planet(EntityId entity_id) -> Planet&;
         auto get_entity(EntityId entity_id) -> Entity&;
-        auto kill_entity(EntityId entity_id) -> void;
-        auto unsafe_kill_entity(EntityId entity_id) -> void;
-        auto cleanup_entities() -> void;
         auto get_distance(Location l1, Location l2) const -> double;
         /**
          * Create a location with an offset applied, checking if the location
@@ -55,27 +52,9 @@ namespace hlt {
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
         auto test(const Location& location, double radius) -> std::vector<EntityId>;
-        auto spawn_ship(const Location& location, PlayerId owner) -> EntityIndex;
 
         constexpr static auto FORECAST_STEPS = 64;
         constexpr static auto FORECAST_DELTA = 1.0 / FORECAST_STEPS;
-
-        /**
-         * Checks if a given spot is a valid location that can be occupied by
-         * a ship (i.e. is not within a planet).
-         * @param x
-         * @param y
-         * @return
-         */
-        auto occupiable(const Location& location) const -> bool {
-            if (!within_bounds(location)) {
-                return false;
-            }
-
-            // TODO:
-
-            return true;
-        }
 
         /**
          * Checks if there is a valid straight-line path between the two
@@ -83,63 +62,20 @@ namespace hlt {
          * account for planets.
          * @param start
          * @param target
+         * @param fudge How much distance to leave between planets and the path
          * @return
          */
-        auto pathable(const Location& start, const Location& target) const -> bool {
-            if (!occupiable(target)) {
-                return false;
-            }
-
-            auto dx = (target.pos_x - start.pos_x) * FORECAST_DELTA;
-            auto dy = (target.pos_y - start.pos_y) * FORECAST_DELTA;
-
-            for (auto step = 0; step < FORECAST_STEPS; step++) {
-                auto x = start.pos_x + step * dx;
-                auto y = start.pos_y + step * dy;
-
-                if (!occupiable(Location{x, y})) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+        auto pathable(const Location& start, const Location& target, double fudge) const -> bool;
 
         /**
          * Check if a collision might occur if a ship at the given location
-         * were to accelerate in the given direction.
+         * were to move to the target position.
          *
          * Does not account for the ship's current velocity, so it is only
          * useful for sub-inertial speeds. Does not account for the movements
          * of other ships.
-         * @param start
-         * @param angle
-         * @param thrust
-         * @return
          */
-        auto forecast_collision(const Location& start, double angle,
-                                unsigned short thrust) -> bool {
-            double current_x = start.pos_x + 0.5;
-            double current_y = start.pos_y + 0.5;
-            auto dx = std::round(thrust * std::cos(angle)) * FORECAST_DELTA;
-            auto dy = std::round(thrust * std::sin(angle)) * FORECAST_DELTA;
-
-            for (int time = 1; time <= FORECAST_STEPS; time++) {
-                current_x += dx;
-                current_y += dy;
-
-                // TODO:
-//                if (xp == start.pos_x && yp == start.pos_y) {
-//                    continue;
-//                }
-
-                if (!occupiable(Location{current_x, current_y})) return true;
-
-                // TODO:
-            }
-
-            return false;
-        }
+        auto forecast_collision(const Location& start, const Location& target) -> bool;
 
         /**
          * Try to avoid forecasted collisions (as predicted by
@@ -157,28 +93,7 @@ namespace hlt {
          */
         auto adjust_for_collision(
             const Location& start, double angle, unsigned short thrust,
-            int tries=25) -> std::pair<double, unsigned short> {
-            while (tries > 0) {
-                if (forecast_collision(start, angle, thrust)) {
-                    std::stringstream log_msg;
-                    log_msg << "Forecasted collision for " << start
-                            << " at angle " << angle << " at thrust " << thrust;
-                    Log::log(log_msg.str());
-                    angle += M_PI / 12;
-                }
-                else {
-                    std::stringstream log_msg;
-                    log_msg << "No forecasted collision for " << start
-                            << " at angle " << angle << " at thrust " << thrust;
-                    Log::log(log_msg.str());
-                    break;
-                }
-
-                tries--;
-            }
-
-            return std::make_pair(angle, thrust);
-        }
+            int tries=25) -> std::pair<double, unsigned short>;
 
         /**
          * Find the closest point at the minimum given distance (radius) to the
@@ -192,8 +107,8 @@ namespace hlt {
                            unsigned short radius)
         -> std::pair<Location, bool> {
             auto angle = start.angle_to(target) + M_PI;
-            auto dx = static_cast<int>(radius * std::cos(angle));
-            auto dy = static_cast<int>(radius * std::sin(angle));
+            auto dx = radius * std::cos(angle);
+            auto dy = radius * std::sin(angle);
 
             return this->location_with_delta(target, dx, dy);
         }
