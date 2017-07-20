@@ -29,6 +29,11 @@
 
 extern bool quiet_output;
 
+/**
+ * How many digits of precision to send to the client.
+ */
+constexpr auto SERIALIZATION_PRECISION = 4;
+
 class Networking {
 public:
     void launch_bot(std::string command);
