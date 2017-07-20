@@ -41,8 +41,8 @@ def handle_api_error(error):
 
 
 def tier(rank, total_users):
-    for tier, percentage in (("Platinum", config.PLATINUM),
-                             ("Diamond", config.DIAMOND),
+    for tier, percentage in (("Diamond", config.DIAMOND),
+                             ("Platinum", config.PLATINUM),
                              ("Gold", config.GOLD),
                              ("Silver", config.SILVER)):
         num_players = math.ceil(percentage * total_users)
@@ -51,4 +51,4 @@ def tier(rank, total_users):
         else:
             rank -= num_players
 
-    return "Bronze"
+    return "Salt"

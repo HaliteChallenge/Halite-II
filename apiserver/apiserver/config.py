@@ -43,7 +43,7 @@ DISCOURSE_URL = "https://forums.halite.io/sso"
 SENDGRID_API_KEY = ""
 SENDGRID_SANDBOX_MODE = True
 # Ranking Tiers
-PLATINUM = 1/512
-DIAMOND = 1/256
+DIAMOND = 1/512
+PLATINUM = 1/256
 GOLD = 1/128
 SILVER = 1/64
