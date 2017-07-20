@@ -44,6 +44,12 @@ These downloads include both the Halite game environment (pre-compiled) as well 
     </tbody>
 </table>
 
+## Sample Bots
+
+C++, Java, and Python3.
+
+[Download here]({{ site.baseurl }}/assets/downloads/sample_bots.zip)
+
 ## Standalone Visualizer
 
 Only available for MacOS at the moment. (Sorry!)
