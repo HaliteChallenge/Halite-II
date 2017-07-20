@@ -19,6 +19,9 @@ BotInputError::BotInputError(
     message += std::to_string(location + 1);
     message += ".)\nInput received from bot:\n";
     message += input;
+    if (input.back() != '\n') message += '\n';
+    message.resize(message.size() + location, ' ');
+    message += "^\n";
 }
 
 auto BotInputError::what() const noexcept -> const char* {

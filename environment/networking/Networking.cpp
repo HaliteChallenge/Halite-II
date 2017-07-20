@@ -148,8 +148,13 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
                 iss >> move.move.thrust.thrust;
                 iss >> move.move.thrust.angle;
                 const auto thrust = move.move.thrust.thrust;
-                if (thrust > hlt::GameConstants::get().MAX_ACCELERATION) {
-                    throw eject_bot("Bot sent an invalid movement thrust - ejecting from game.\n");
+                const auto max_accel = hlt::GameConstants::get().MAX_ACCELERATION;
+                if (thrust > max_accel) {
+                    std::stringstream message;
+                    message << "Invalid thrust " << move.move.thrust.thrust
+                            << " for ship " << move.shipId
+                            << " (maximum is " << max_accel << ").";
+                    throw BotInputError(player_tag, inputString, message.str(), iss.tellg());
                 }
                 break;
             }
@@ -165,8 +170,9 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
                 break;
             }
             default:
-                throw eject_bot(
-                    "Bot sent an invalid command - ejecting from game.\n");
+                std::stringstream message;
+                message << "Unknown command " << command << " for ship " << move.shipId;
+                throw BotInputError(player_tag, inputString, message.str(), iss.tellg());
         }
 
         if (queue_depth.count(move.shipId) == 0) {
@@ -178,8 +184,9 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
             moves.at(queue_index)[move.shipId] = move;
             queue_depth.at(move.shipId)++;
         } else {
-            throw eject_bot(
-                "Bot tried to queue too many moves for a particular ship - ejecting from game.\n");
+            std::stringstream message;
+            message << "Tried to queue too many commands for ship " << move.shipId;
+            throw BotInputError(player_tag, inputString, message.str(), iss.tellg());
         }
         move = {};
     }
