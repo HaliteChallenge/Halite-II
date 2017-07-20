@@ -68,7 +68,8 @@ private:
 #endif
 
     std::string serialize_map(const hlt::Map& map);
-    void deserialize_move_set(std::string& inputString,
+    void deserialize_move_set(hlt::PlayerId player_tag,
+                              std::string& inputString,
                               const hlt::Map& m,
                               hlt::PlayerMoveQueue& moves);
 

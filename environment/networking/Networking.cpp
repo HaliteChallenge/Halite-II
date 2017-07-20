@@ -1,10 +1,13 @@
 #include "Networking.hpp"
+#include "BotInputError.hpp"
 
+#include <exception>
 #include <sstream>
 #include <thread>
 #include <core/hlt.hpp>
 
 std::mutex coutMutex;
+
 
 std::string serializeMapSize(const hlt::Map& map) {
     std::string returnString = "";
@@ -113,16 +116,21 @@ auto eject_bot(std::string message) -> std::string {
     return message;
 }
 
-void Networking::deserialize_move_set(std::string& inputString,
+void Networking::deserialize_move_set(hlt::PlayerId player_tag,
+                                      std::string& inputString,
                                       const hlt::Map& m,
                                       hlt::PlayerMoveQueue& moves) {
-    if (std::find_if(inputString.begin(),
-                     inputString.end(),
-                     [](const char& c) -> bool {
-                         return !is_valid_move_character(c);
-                     }) != inputString.end()) {
-        throw eject_bot(
-            "Bot sent an invalid character - ejecting from game.\n");
+    const auto position = std::find_if(
+        inputString.begin(), inputString.end(),
+        [](const char& c) -> bool {
+            return !is_valid_move_character(c);
+        });
+    if (position != inputString.end()) {
+        const auto index = std::distance(inputString.begin(), position);
+        std::string message("Received invalid character '");
+        message += *position;
+        message += "'.";
+        throw BotInputError(player_tag, inputString, message, index);
     }
 
     std::stringstream iss(inputString);
@@ -512,7 +520,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
         response = get_string(player_tag, ALLOTTED_MILLIS);
-        unsigned int millisTaken =
+        const auto millisTaken =
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
@@ -521,9 +529,18 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             response + "\n --- Bot used " + std::to_string(millisTaken)
                 + " milliseconds ---";
 
-        deserialize_move_set(response, m, moves);
+        deserialize_move_set(player_tag, response, m, moves);
 
         return millisTaken;
+    }
+    catch (BotInputError err) {
+        if (!quiet_output) {
+            std::lock_guard<std::mutex> guard(coutMutex);
+            std::cout << err.what() << std::endl;
+        }
+        player_logs[player_tag] += "\nERRORED!\n";
+        player_logs[player_tag] += err.what();
+        player_logs[player_tag] += '\n';
     }
     catch (std::string s) {
         if (s.empty())
