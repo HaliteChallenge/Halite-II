@@ -429,6 +429,9 @@ export class HaliteVisualizer {
                 progress = ship.docking.turns_left / dock_turns;
             }
             else {
+                if (ship.docking.status === "docking") {
+                    progress += this.time;
+                }
                 progress /= dock_turns;
             }
 
@@ -445,7 +448,7 @@ export class HaliteVisualizer {
             const dy = planetY - cy;
 
             this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
-            this.shipContainer.lineStyle(2, 0xFFFFFF, 1);
+            this.shipContainer.lineStyle(1, 0xFFFFFF, 0.8);
             this.shipContainer.moveTo(cx, cy);
             this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
             this.shipContainer.endFill();
