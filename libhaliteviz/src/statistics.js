@@ -25,22 +25,19 @@ export class Statistics {
                 frameStats.players[playerId] = playerStats;
             }
 
-            for (let subframe of curFrame) {
-                if (subframe.events) {
-                    for (let event of subframe.events) {
-                        if (event.event === "spawned") {
-                            frameStats.players[event.entity.owner].totalShips++;
-                        }
-                        else if (event.event === "attack") {
-                            frameStats.players[event.entity.owner].totalTargets += event.targets.length;
-                            frameStats.players[event.entity.owner].totalAttacks++;
-                        }
+            if (curFrame.events) {
+                for (let event of curFrame.events) {
+                    if (event.event === "spawned") {
+                        frameStats.players[event.entity.owner].totalShips++;
+                    }
+                    else if (event.event === "attack") {
+                        frameStats.players[event.entity.owner].totalTargets += event.targets.length;
+                        frameStats.players[event.entity.owner].totalAttacks++;
                     }
                 }
             }
 
             this.frames.push(frameStats);
         }
-        console.log(this);
     }
 }

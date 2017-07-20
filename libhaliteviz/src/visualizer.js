@@ -253,6 +253,11 @@ export class HaliteVisualizer {
                 }
                 else {
                     this.keyState[event] = false;
+                    if (!this.isPlaying() &&
+                        Object.values(this.keyState).every((v) => !v)) {
+                        // Stop the Pixi event loop if no keys are down
+                        this.application.stop();
+                    }
                 }
                 e.preventDefault();
             }
@@ -263,6 +268,10 @@ export class HaliteVisualizer {
                 const event = this.keyBindings[e.code];
                 if (typeof event !== "function") {
                     this.keyState[event] = true;
+                    if (!this.isPlaying()) {
+                        // Run the Pixi event loop while keys are down
+                        this.application.start();
+                    }
                 }
                 e.preventDefault();
             }
@@ -284,10 +293,12 @@ export class HaliteVisualizer {
         if (this.keyState["scrubBackwards"]) {
             this.pause();
             this.advanceTime(-dt);
+            this.scrub(this.frame, this.time);
         }
         else if (this.keyState["scrubForwards"]) {
             this.pause();
             this.advanceTime(dt);
+            this.scrub(this.frame, this.time, dt);
         }
 
         this.update();
@@ -345,13 +356,13 @@ export class HaliteVisualizer {
         this.onPause();
     }
 
-    scrub(frame, substep) {
+    scrub(frame, time, dt=1000/60) {
         this.pause();
         this.frame = frame;
-        this.substep = substep;
+        this.time = time;
         this.update();
         this.onUpdate();
-        this.draw(1000/60);
+        this.draw(dt);
         this.application.render();
     }
 
