@@ -1,9 +1,11 @@
 import java.util.*;
 
 public class GameMap {
-    private static final short FORECAST_STEPS = 64;
     private static final short MAXIMUM_NUMBER_OF_PLAYERS = 4;
-    private static final double FORECAST_DELTA = 1.0 / FORECAST_STEPS;
+    /**
+     * A "safety zone" to leave around other ships when performing collision forecasting.
+     */
+    private static final double FORECAST_FUDGE_FACTOR = Constants.SHIP_RADIUS + 0.1;
 
     private short width, height;
     private short playerId;
@@ -11,12 +13,10 @@ public class GameMap {
 
     private Map<Long, Planet> planets;
 
-    private EntityId[][] occupancyMap;
     public GameMap(short width, short height, short playerId){
         this.width = width;
         this.height = height;
         this.playerId = playerId;
-        this.occupancyMap = new EntityId[width][height];
         this.players = new ArrayList<>(MAXIMUM_NUMBER_OF_PLAYERS);
         this.planets = new TreeMap<>();
     }
@@ -53,37 +53,15 @@ public class GameMap {
         return planets;
     }
 
-    private boolean isOutOfBounds(int x, int y) {
+    private boolean isOutOfBounds(double x, double y) {
         return x < 0 || x >= this.width || y < 0 || y >= this.height;
     }
 
     public Position positionDelta(Position originalPosition, Position deltaPosition) {
-        int x = originalPosition.getXPos() + deltaPosition.getXPos();
-        int y = originalPosition.getYPos() + deltaPosition.getYPos();
+        double x = originalPosition.getXPos() + deltaPosition.getXPos();
+        double y = originalPosition.getYPos() + deltaPosition.getYPos();
 
-        return isOutOfBounds(x, y) ? null : new Position((short)x, (short)y);
-    }
-
-    private void populatePlanetInOccupancyMap(Planet planet) {
-        for (int dx = -planet.getRadius(); dx <= planet.getRadius(); dx++) {
-            for (int dy = -planet.getRadius(); dy <= planet.getRadius(); dy++) {
-                Position delta = positionDelta(planet.getPosition(), new Position((short)dx, (short)dy));
-                if ((delta != null) && ((Math.pow(dx, 2) + Math.pow(dy, 2)) <= Math.pow(planet.getRadius(), 2))) {
-                    occupancyMap[delta.getXPos()][delta.getYPos()] = planet.getId();
-                }
-            }
-        }
-    }
-
-    private void populateShipInOccupancyMap(Ship ship) {
-        occupancyMap[ship.getPosition().getXPos()][ship.getPosition().getYPos()] = ship.getId();
-    }
-
-    public void populateOccupancyMap() {
-        for (EntityId[] row: this.occupancyMap)
-            Arrays.fill(row, null);
-        this.planets.forEach((planetId, planet) -> populatePlanetInOccupancyMap(planet));
-        this.players.forEach((player) -> player.getShips().forEach((shipId, ship) -> populateShipInOccupancyMap(ship)));
+        return isOutOfBounds(x, y) ? null : new Position(x, y);
     }
 
     public Position getClosestPoint(Position start, Position target, short radius) {
@@ -94,30 +72,14 @@ public class GameMap {
         return positionDelta(target, new Position(dx, dy));
     }
 
-    public boolean isOccupiable(Position position) {
-        if (isOutOfBounds(position.getXPos(), position.getYPos()))
-            return false;
-
-        EntityId occupancy = occupancyMap[position.getXPos()][position.getYPos()];
-
-        if (occupancy != null && occupancy.getType() == Entity.Type.Planet)
-            return false;
-
-        return true;
-    }
-
     public boolean isPathable(Position start, Position target) {
-        if (!isOccupiable(target))
+        if (isOutOfBounds(target.getXPos(), target.getYPos()))
             return false;
 
-        double dx = (target.getXPos() - start.getXPos()) * FORECAST_DELTA;
-        double dy = (target.getYPos() - start.getYPos()) * FORECAST_DELTA;
-
-        for (int step = 0; step < FORECAST_STEPS; step++) {
-            double x = start.getXPos() + step * dx;
-            double y = start.getYPos() + step * dy;
-
-            if (!isOccupiable(new Position((short)x, (short)y))) {
+        for (Map.Entry<Long, Planet> planetEntry : planets.entrySet()) {
+            Planet planet = planetEntry.getValue();
+            if (Collision.segmentCircleTest(start, target,
+                    planet.getPosition(), planet.getRadius(), FORECAST_FUDGE_FACTOR)) {
                 return false;
             }
         }
@@ -126,28 +88,29 @@ public class GameMap {
     }
 
     private boolean willCollide(Position start, double angle, short thrust) {
-        double currentX = start.getXPos() + 0.5;
-        double currentY = start.getYPos() + 0.5;
-        double dx = Math.round(thrust * Math.cos(angle)) * FORECAST_DELTA;
-        double dy = Math.round(thrust * Math.sin(angle)) * FORECAST_DELTA;
+        Position target = new Position(start.getXPos() + thrust * Math.cos(angle),
+                start.getYPos() + thrust * Math.sin(angle));
 
-        for (int time = 1; time <= FORECAST_STEPS; time++) {
-            currentX += dx;
-            currentY += dy;
+        if (isOutOfBounds(target.getXPos(), target.getYPos())) return true;
 
-            int roundedCurrentX = (int)currentX;
-            int roundedCurrentY = (int)currentY;
+        if (!isPathable(start, target)) return true;
 
-            if (isOutOfBounds(roundedCurrentX, roundedCurrentY))
-                return true;
+        for (Player player : players) {
+            for (Map.Entry<Long, Ship> shipEntry : player.getShips().entrySet()) {
+                Ship ship = shipEntry.getValue();
 
-            if (roundedCurrentX == start.getXPos() && roundedCurrentY == start.getYPos())
-                continue;
+                if (Movement.getDistance(ship.getPosition(), start) <= Constants.SHIP_RADIUS) {
+                    // Not an actual collision, this is the ship itself
+                    continue;
+                }
 
-            EntityId occupancy = occupancyMap[roundedCurrentX][roundedCurrentY];
-            if (occupancy != null)
-                return true;
+                if (Collision.segmentCircleTest(start, target,
+                        ship.getPosition(), ship.getRadius(), FORECAST_FUDGE_FACTOR)) {
+                    return true;
+                }
+            }
         }
+
         return false;
     }
 
@@ -164,6 +127,7 @@ public class GameMap {
     }
 
     GameMap updateMap(LinkedList<String> mapMetadata) {
+        DebugLog.debug("--- NEW TURN ---");
         short numberOfPlayers = Short.parseShort(mapMetadata.pop());
 
         players.clear();

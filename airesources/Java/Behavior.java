@@ -1,5 +1,7 @@
 public class Behavior {
     private static final short MAX_ADJUSTMENT_TRIES = 2;
+    // How close warp tries to get to the target coordinate
+    private static final double WARP_TARGET_DISTANCE = 1.5;
     public enum BehaviorType {Brake, Warp}
     public enum State {Moving, Braking, Stopped}
     private BehaviorType type;
@@ -24,7 +26,7 @@ public class Behavior {
                 return ship.getVelocity().getXVelocity() == 0 &&
                         ship.getVelocity().getYVelocity() == 0;
             case Warp:
-                return ship.getPosition().equals(this.target);
+                return Movement.getDistance(ship.getPosition(), this.target) <= WARP_TARGET_DISTANCE;
             default:
                 return true;
         }
@@ -61,7 +63,7 @@ public class Behavior {
                     this.state = State.Stopped;
                     double newAngle = Movement.orientTowards(ship.getPosition(), this.target);
                     short thrust = (short) Math.max(1, Math.min(distance, Constants.DRAG));
-                    DebugLog.debug(String.format("%d: low speed maneuver %f %d (%d %d) targeting (%d %d)",
+                    DebugLog.debug(String.format("%d: low speed maneuver %f %d (%f %f) targeting (%f %f)",
                             shipId, newAngle, thrust, ship.getPosition().getXPos(), ship.getPosition().getYPos(),
                             this.target.getXPos(), this.target.getYPos()));
                     return new ThrustMove(

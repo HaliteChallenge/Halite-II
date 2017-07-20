@@ -74,6 +74,12 @@ public class Networking {
     GameMap initialize(String botName) {
         short myId = Short.parseShort(getString());
 
+        try {
+            DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         LinkedList<String> inputStringComponents = parseInput();
 
         short width = Short.parseShort(inputStringComponents.pop());
@@ -88,11 +94,6 @@ public class Networking {
         gameMap.updateMap(inputStringComponents);
 
         // Initialize debugging log
-        try {
-            DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         return gameMap;
     }

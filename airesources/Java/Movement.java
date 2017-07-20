@@ -21,7 +21,7 @@ public class Movement {
         return orientTowards(ship.getPosition(), target.getPosition());
     }
     public static boolean canDock(Ship ship, Planet planet) {
-        return getDistance(ship.getPosition(), planet.getPosition()) <= Constants.MAX_DOCKING_DISTANCE + planet.getRadius();
+        return getDistance(ship.getPosition(), planet.getPosition()) <= Constants.DOCK_RADIUS + planet.getRadius();
     }
 
 }

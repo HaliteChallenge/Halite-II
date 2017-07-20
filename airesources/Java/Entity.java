@@ -1,7 +1,7 @@
 public abstract class Entity {
     protected Position position;
     protected short health;
-    protected short radius;
+    protected double radius;
     protected EntityId id;
     public enum Type {Planet, Ship};
 
@@ -25,7 +25,7 @@ public abstract class Entity {
         this.health = health;
     }
 
-    public short getRadius() {
+    public double getRadius() {
         return radius;
     }
 

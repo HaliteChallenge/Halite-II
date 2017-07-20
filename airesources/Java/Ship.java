@@ -3,19 +3,19 @@ import java.util.LinkedList;
 public class Ship extends Entity {
     public enum DockingStatus {Undocked, Docking, Docked, Undocking};
     public class Velocity {
-        private short xVelocity;
-        private short yVelocity;
+        private double xVelocity;
+        private double yVelocity;
 
-        public Velocity(short xVelocity, short yVelocity) {
+        public Velocity(double xVelocity, double yVelocity) {
             this.xVelocity = xVelocity;
             this.yVelocity = yVelocity;
         }
 
-        public short getXVelocity() {
+        public double getXVelocity() {
             return xVelocity;
         }
 
-        public short getYVelocity() {
+        public double getYVelocity() {
             return yVelocity;
         }
 
@@ -34,13 +34,14 @@ public class Ship extends Entity {
 
     public Ship(short owner, LinkedList<String> shipMetadata) {
         this.id = new EntityId(owner, Long.parseLong(shipMetadata.pop()), Entity.Type.Ship);
-        this.position = new Position(Short.parseShort(shipMetadata.pop()), Short.parseShort(shipMetadata.pop()));
+        this.position = new Position(Double.parseDouble(shipMetadata.pop()), Double.parseDouble(shipMetadata.pop()));
         this.health = Short.parseShort(shipMetadata.pop());
-        this.velocity = new Velocity(Short.parseShort(shipMetadata.pop()),Short.parseShort(shipMetadata.pop()));
+        this.velocity = new Velocity(Double.parseDouble(shipMetadata.pop()), Double.parseDouble(shipMetadata.pop()));
         this.dockingStatus = DockingStatus.values()[Short.parseShort(shipMetadata.pop())];
         this.dockedPlanet = Long.parseLong(shipMetadata.pop());
         this.dockingProgress = Short.parseShort(shipMetadata.pop());
         this.weaponCooldown = Short.parseShort(shipMetadata.pop());
+        this.radius = Constants.SHIP_RADIUS;
     }
 
     public Velocity getVelocity() {

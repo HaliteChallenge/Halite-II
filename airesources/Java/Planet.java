@@ -10,9 +10,9 @@ public class Planet extends Entity {
 
     public Planet(LinkedList<String> planetMetadata) {
         this.id = new EntityId((short)0, Long.parseLong(planetMetadata.pop()), Entity.Type.Planet);
-        this.position = new Position(Short.parseShort(planetMetadata.pop()),Short.parseShort(planetMetadata.pop()));
+        this.position = new Position(Double.parseDouble(planetMetadata.pop()), Double.parseDouble(planetMetadata.pop()));
         this.health = Short.parseShort(planetMetadata.pop());
-        this.radius = Short.parseShort(planetMetadata.pop());
+        this.radius = Double.parseDouble(planetMetadata.pop());
         this.dockingSpots = Short.parseShort(planetMetadata.pop());
         this.currentProduction = Short.parseShort(planetMetadata.pop());
         this.remainingProduction = Short.parseShort(planetMetadata.pop());

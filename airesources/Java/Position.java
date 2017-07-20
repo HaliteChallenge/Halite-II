@@ -1,17 +1,17 @@
 public class Position {
-    private short xPos;
-    private short yPos;
+    private double xPos;
+    private double yPos;
 
-    public Position(short xPos, short yPos){
+    public Position(double xPos, double yPos){
         this.xPos = xPos;
         this.yPos = yPos;
     }
 
-    public short getXPos() {
+    public double getXPos() {
         return xPos;
     }
 
-    public short getYPos() {
+    public double getYPos() {
         return yPos;
     }
 
@@ -22,14 +22,26 @@ public class Position {
 
         Position position = (Position) o;
 
-        return xPos == position.xPos && yPos == position.yPos;
+        if (Double.compare(position.xPos, xPos) != 0) return false;
+        return Double.compare(position.yPos, yPos) == 0;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) xPos;
-        result = 31 * result + (int) yPos;
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(xPos);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(yPos);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Position{" +
+                "xPos=" + xPos +
+                ", yPos=" + yPos +
+                '}';
+    }
 }
