@@ -504,7 +504,7 @@ def get_warp_extra_data(ship):
     return None
 
 
-def _warp(ship, x, y, *, max_acceleration=8):
+def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
     """
     The actual warp implementation. You should not use this directly.
     :param ship:
