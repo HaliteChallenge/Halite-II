@@ -1,5 +1,5 @@
 #include <algorithm>
-#include "../../C++/hlt.hpp"
+#include "../../C++/hlt/hlt.hpp"
 
 typedef std::pair<hlt::EntityIndex, hlt::Planet> PlanetPair;
 
@@ -12,21 +12,16 @@ int main() {
     auto moves = std::vector<hlt::Move>();
     while (true) {
         auto game_map = hlt::get_map();
-        // Generate the map of which spaces are occupied, used for basic
-        // collision avoidance
-        game_map.generate_occupancy_map();
-        game_map.log_occupancy_map();
-
         moves.clear();
 
         auto planets = std::vector<PlanetPair>(
             game_map.planets.begin(), game_map.planets.end());
         auto enemies = std::vector<hlt::Location>();
 
-        for (const auto& player_ships_pair : game_map.ships) {
-            if (player_ships_pair.first == my_tag) continue;
+        for (const auto& player_ships : game_map.ships) {
+            if (player_ships.first == my_tag) continue;
 
-            for (const auto& ship : player_ships_pair.second) {
+            for (const auto& ship : player_ships.second) {
                 enemies.push_back(ship.second.location);
             }
         }
@@ -43,10 +38,8 @@ int main() {
             std::sort(
                 planets.begin(), planets.end(),
                 [&](const PlanetPair& planet1, const PlanetPair& planet2) -> bool {
-                    const auto distance1 =
-                        ship.location.distance_to(planet1.second.location);
-                    const auto distance2 =
-                        ship.location.distance_to(planet2.second.location);
+                    const auto distance1 = ship.location.distance(planet1.second.location);
+                    const auto distance2 = ship.location.distance(planet2.second.location);
                     return distance1 < distance2;
                 }
             );
@@ -79,14 +72,14 @@ int main() {
             std::sort(
                 enemies.begin(), enemies.end(),
                 [&](const hlt::Location& enemy1, const hlt::Location& enemy2) -> bool {
-                    const auto distance1 = ship.location.distance_to(enemy1);
-                    const auto distance2 = ship.location.distance_to(enemy2);
+                    const auto distance1 = ship.location.distance(enemy1);
+                    const auto distance2 = ship.location.distance(enemy2);
                     return distance1 < distance2;
                 }
             );
 
             for (const auto& enemy : enemies) {
-                if (ship.location.distance_to(enemy) > hlt::GameConstants::get().WEAPON_RADIUS) {
+                if (ship.location.distance(enemy) > hlt::GameConstants::get().WEAPON_RADIUS) {
                     // Stay near the ship
                     const auto angle = ship.location.angle_to(enemy);
                     moves.push_back(hlt::Move::thrust(

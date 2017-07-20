@@ -188,7 +188,7 @@ namespace hlt {
         }
 
         for (const auto& player_ships : ships) {
-            for (const auto& ship_pair : player_ships) {
+            for (const auto& ship_pair : player_ships.second) {
                 const auto& ship = ship_pair.second;
 
                 if (ship.location == start) continue;

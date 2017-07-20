@@ -24,7 +24,7 @@ namespace hlt {
 
     class Map {
     public:
-        std::array<entity_map<Ship>, MAX_PLAYERS> ships;
+        std::unordered_map<PlayerId, entity_map<Ship>> ships;
         entity_map<Planet> planets;
         unsigned short map_width, map_height;
 
@@ -104,7 +104,7 @@ namespace hlt {
          * @return
          */
         auto closest_point(const Location& start, const Location& target,
-                           unsigned short radius)
+                           double radius)
         -> std::pair<Location, bool> {
             auto angle = start.angle_to(target) + M_PI;
             auto dx = radius * std::cos(angle);

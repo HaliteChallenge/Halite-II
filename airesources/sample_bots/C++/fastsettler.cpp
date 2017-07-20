@@ -1,5 +1,4 @@
-#include <algorithm>
-#include "../../C++/hlt.hpp"
+#include "../../C++/hlt/hlt.hpp"
 
 typedef std::pair<hlt::EntityIndex, hlt::Planet> PlanetPair;
 
@@ -14,10 +13,6 @@ int main() {
     auto moves = std::vector<hlt::Move>();
     while (true) {
         auto game_map = hlt::get_map();
-        // Generate the map of which spaces are occupied, used for basic
-        // collision avoidance
-        game_map.generate_occupancy_map();
-
         moves.clear();
 
         auto planets = std::vector<PlanetPair>(
@@ -38,8 +33,8 @@ int main() {
             std::sort(
                 planets.begin(), planets.end(),
                 [&](const PlanetPair& planet1, const PlanetPair& planet2) -> bool {
-                    const auto distance1 = ship.location.distance_to(planet1.second.location);
-                    const auto distance2 = ship.location.distance_to(planet2.second.location);
+                    const auto distance1 = ship.location.distance(planet1.second.location);
+                    const auto distance2 = ship.location.distance(planet2.second.location);
                     return distance1 < distance2;
                 }
             );
@@ -57,21 +52,25 @@ int main() {
 
                 auto closest_point = game_map.closest_point(
                     ship.location, planet.location,
-                    planet.radius + hlt::GameConstants::get().MAX_DOCKING_DISTANCE);
+                    planet.radius + hlt::GameConstants::get().DOCK_RADIUS);
+
+                const auto distance = ship.location.distance(planet.location) - planet.radius;
 
                 if (ship.can_dock(planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
                 }
                 else if (closest_point.second &&
-                    game_map.pathable(ship.location, closest_point.first) &&
-                    ship.location.distance_to(planet.location) > 10) {
+                    game_map.pathable(ship.location, closest_point.first, 0.6) &&
+                    distance > 10) {
                     behaviors.warp_to(ship_id, closest_point.first);
                 }
                 else {
                     const auto angle = ship.angle_to(planet);
+                    const auto thrust = static_cast<unsigned short>(
+                        std::min(distance, hlt::GameConstants::get().DRAG));
                     moves.push_back(hlt::Move::thrust(
                         ship_id,
-                        game_map.adjust_for_collision(ship.location, angle, 2)));
+                        game_map.adjust_for_collision(ship.location, angle, thrust)));
                 }
 
                 break;

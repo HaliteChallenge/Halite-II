@@ -1,9 +1,6 @@
-CXXFLAGS += -std=c++11 -pthread -I ./ -g -fsanitize=address,undefined
-INSTALL_PATH?=/usr/local
+CXXFLAGS += -std=c++11 -I ./ -g -fsanitize=address,undefined
 SOURCES=$(shell find . -name "*.cpp")
-CSOURCES=$(shell find . -name "*.c")
-COBJECTS=$(CSOURCES:%.c=%.o)
-OBJECTS=$(SOURCES:%.cpp=%.o) $(COBJECTS)
+OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=MyBot
 
 .PHONY: all

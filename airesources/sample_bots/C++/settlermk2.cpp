@@ -1,5 +1,5 @@
+#include "../../C++/hlt/hlt.hpp"
 #include <algorithm>
-#include "../../C++/hlt.hpp"
 
 typedef std::pair<hlt::EntityIndex, hlt::Planet> PlanetPair;
 
@@ -12,10 +12,6 @@ int main() {
     auto moves = std::vector<hlt::Move>();
     while (true) {
         auto game_map = hlt::get_map();
-        // Generate the map of which spaces are occupied, used for basic
-        // collision avoidance
-        game_map.generate_occupancy_map();
-
         moves.clear();
 
         auto planets = std::vector<PlanetPair>(
@@ -32,8 +28,8 @@ int main() {
             std::sort(
                 planets.begin(), planets.end(),
                 [&](const PlanetPair& planet1, const PlanetPair& planet2) -> bool {
-                    const auto distance1 = ship.location.distance_to(planet1.second.location);
-                    const auto distance2 = ship.location.distance_to(planet2.second.location);
+                    const auto distance1 = ship.location.distance(planet1.second.location);
+                    const auto distance2 = ship.location.distance(planet2.second.location);
                     return distance1 < distance2;
                 }
             );
