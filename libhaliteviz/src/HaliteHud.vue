@@ -142,10 +142,7 @@
              visualizer.pause();
          };
          this.scrub = (e) => {
-             visualizer.pause();
-             visualizer.substep = 0;
-             visualizer.frame = e.target.value;
-             visualizer.onUpdate();
+             visualizer.scrub(e.target.value, 0);
          };
          this.getVisualizer = () => visualizer;
          this.beginCaptureGIF = () => {

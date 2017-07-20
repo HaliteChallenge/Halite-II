@@ -270,6 +270,7 @@ export class HaliteVisualizer {
 
     play() {
         if (this.timer) return;
+        this.application.start();
 
         this.timer = window.setInterval(() => {
             this.advanceSubsteps(8);
@@ -301,11 +302,22 @@ export class HaliteVisualizer {
     }
 
     pause() {
+        this.application.stop();
         if (!this.timer) return;
 
         window.clearInterval(this.timer);
         this.timer = null;
         this.onPause();
+    }
+
+    scrub(frame, substep) {
+        this.pause();
+        this.frame = frame;
+        this.substep = substep;
+        this.update();
+        this.onUpdate();
+        this.draw(1000/60);
+        this.application.render();
     }
 
     /**
