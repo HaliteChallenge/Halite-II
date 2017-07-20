@@ -255,8 +255,6 @@ export class HaliteVisualizer {
                     this.keyState[event] = false;
                     if (!this.isPlaying() &&
                         Object.values(this.keyState).every((v) => !v)) {
-                        // Stop the Pixi event loop if no keys are down
-                        this.application.stop();
                     }
                 }
                 e.preventDefault();
@@ -283,6 +281,11 @@ export class HaliteVisualizer {
         this.application.ticker.add((dt) => {
             this.handleKeys(dt);
             this.draw(dt);
+
+            if (!this.isPlaying() && this.animationQueue.length === 0) {
+                console.log("Stopping event loop");
+                this.application.stop();
+            }
         });
         this.draw();
     }
@@ -300,8 +303,6 @@ export class HaliteVisualizer {
             this.advanceTime(dt);
             this.scrub(this.frame, this.time, dt);
         }
-
-        this.update();
     }
 
     play() {
@@ -348,7 +349,6 @@ export class HaliteVisualizer {
     }
 
     pause() {
-        this.application.stop();
         if (!this.timer) return;
 
         window.clearInterval(this.timer);
@@ -360,8 +360,10 @@ export class HaliteVisualizer {
         this.pause();
         this.frame = frame;
         this.time = time;
-        this.update();
-        this.onUpdate();
+        if (time == 0.0) {
+            this.update();
+            this.onUpdate();
+        }
         this.draw(dt);
         this.application.render();
     }
@@ -671,7 +673,7 @@ export class HaliteVisualizer {
         let queue = this.animationQueue;
         this.animationQueue = [];
         for (let anim of queue) {
-            if (anim.frames > 0) {
+            if (anim.frames >= dt) {
                 anim.draw(anim.frames);
                 anim.frames -= dt;
                 this.animationQueue.push(anim);
