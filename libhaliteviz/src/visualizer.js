@@ -16,7 +16,6 @@ const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 export const PLANET_COLOR = 0xb7b7b7;
 
-
 let ASSET_ROOT = "dist/";
 
 let BACKGROUND_IMAGES = [];
@@ -65,6 +64,21 @@ export class HaliteVisualizer {
 
         this.frame = 0;
         this.time = 0;
+
+        this.timeStep = 0.1;
+        this.scrubSpeed = 0.5;
+        this.keyBindings = {
+            "ArrowLeft": "scrubBackwards",
+            "KeyA": "scrubBackwards",
+            "ArrowRight": "scrubForwards",
+            "KeyD": "scrubForwards",
+            "Space": () => {
+                if (this.isPlaying()) this.pause();
+                else this.play();
+            },
+        };
+        this.keyState = {};
+
         this.application = new PIXI.Application(
             VISUALIZER_SIZE,
             2 * STATS_SIZE + VISUALIZER_SIZE * (this.replay.height / this.replay.width),
@@ -142,9 +156,13 @@ export class HaliteVisualizer {
         this.onEnd = function() {};
         this.onSelect = function() {};
         this.onDeselect = function() {};
+
+        this._onKeyUp = null;
+        this._onKeyDown = null;
     }
 
     destroy() {
+        // TODO: remove key handlers
         this.pause();
         this.application.destroy(true);
         PIXI.ticker.shared.stop();
@@ -227,10 +245,52 @@ export class HaliteVisualizer {
     attach(containerEl) {
         $(containerEl).append(this.application.view);
 
+        this._onKeyUp = (e) => {
+            if (typeof this.keyBindings[e.code] !== "undefined") {
+                const event = this.keyBindings[e.code];
+                if (typeof event === "function") {
+                    event();
+                }
+                else {
+                    this.keyState[event] = false;
+                }
+                e.preventDefault();
+            }
+        };
+
+        this._onKeyDown = (e) => {
+            if (typeof this.keyBindings[e.code] !== "undefined") {
+                const event = this.keyBindings[e.code];
+                if (typeof event !== "function") {
+                    this.keyState[event] = true;
+                }
+                e.preventDefault();
+            }
+        };
+
+        document.body.addEventListener("keyup", this._onKeyUp);
+        document.body.addEventListener("keydown", this._onKeyDown);
+
         this.application.ticker.add((dt) => {
+            this.handleKeys(dt);
             this.draw(dt);
         });
         this.draw();
+    }
+
+    handleKeys(dt) {
+        dt *= this.timeStep * this.scrubSpeed;
+
+        if (this.keyState["scrubBackwards"]) {
+            this.pause();
+            this.advanceTime(-dt);
+        }
+        else if (this.keyState["scrubForwards"]) {
+            this.pause();
+            this.advanceTime(dt);
+        }
+
+        this.update();
     }
 
     play() {
@@ -251,14 +311,26 @@ export class HaliteVisualizer {
             this.frame++;
             this.time = 0;
         }
+        else if (this.time < 0.0) {
+            this.frame--;
+            this.time = 1.0;
+        }
+
         if (this.frame >= this.replay.frames.length) {
             this.pause();
             this.frame = this.replay.frames.length - 1;
+            this.time = 1.0;
             this.onEnd();
             return;
         }
+        else if (this.frame < 0) {
+            this.pause();
+            this.frame = 0;
+            this.time = 0.0;
+        }
 
         if (this.time == 0) {
+            // TODO: run events better
             this.update();
         }
         this.onUpdate();
