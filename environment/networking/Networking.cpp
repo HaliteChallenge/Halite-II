@@ -291,15 +291,13 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
 
             if (buffer == '\n') break;
             else newString += buffer;
-        } else {
-            if (!quiet_output) {
-                std::string errorMessage = "Bot #" + std::to_string(player_tag)
-                    + " timeout or error (Unix) "
-                    + std::to_string(selectionResult) + '\n';
-                std::lock_guard<std::mutex> guard(coutMutex);
-                std::cout << errorMessage;
-            }
-            throw newString;
+        }
+        else {
+            std::stringstream error_msg;
+            error_msg << "Timeout reading commands for bot; select() result: "
+                      << selectionResult
+                      << " (max time: " << timeout_millis << " milliseconds).";
+            throw BotInputError(player_tag, newString, error_msg.str(), 0);
         }
     }
 #endif
