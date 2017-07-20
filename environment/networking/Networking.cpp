@@ -440,7 +440,6 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                                        const hlt::Map& m,
                                        bool ignoreTimeout,
                                        std::string* playerName) {
-
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 30000;
 
     std::string response;
@@ -477,6 +476,17 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
         }
 
         return millisTaken;
+    }
+    catch (BotInputError err) {
+        if (!quiet_output) {
+            std::lock_guard<std::mutex> guard(coutMutex);
+            std::cout << err.what() << std::endl;
+        }
+        player_logs[player_tag] += "\nERRORED!\n";
+        player_logs[player_tag] += err.what();
+        player_logs[player_tag] += '\n';
+        *playerName =
+            "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (std::string s) {
         if (s.empty())
