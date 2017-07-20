@@ -240,6 +240,11 @@ auto Halite::process_docking() -> void {
             }
         }
     }
+
+    // Unfreeze frozen planets
+    for (hlt::Planet planet : game_map.planets) {
+        planet.frozen = false;
+    }
 }
 
 auto Halite::process_production() -> void {
@@ -377,7 +382,7 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                     }
 
                     auto& planet = game_map.planets[planet_id];
-                    if (!planet.is_alive() || !ship.can_dock(planet)) {
+                    if (!planet.is_alive() || !ship.can_dock(planet) || planet.frozen) {
                         if (!quiet_output && !ship.can_dock(planet)) {
                             std::cout << "Warning: ship too far to dock\n";
                         }
@@ -395,6 +400,24 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                         ship.docking_status = hlt::DockingStatus::Docking;
                         ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
                         planet.add_ship(ship_idx);
+                    }
+                    else if (planet.owner != player_id) {
+                        // If all the ships just started docking, then both players
+                        // tried to dock to the planet on the same turn
+                        if (std::all_of(
+                            planet.docked_ships.begin(),
+                            planet.docked_ships.end(),
+                        [&](hlt::EntityIndex ship_idx) -> bool {
+                            const auto& ship = game_map.get_ship(planet.owner, ship_idx);
+                            return ship.docking_status == hlt::DockingStatus::Docking &&
+                                ship.docking_progress == hlt::GameConstants::get().DOCK_TURNS;
+                        })) {
+                            // In that case, nobody gets to dock
+                            planet.frozen = true;
+                            planet.docked_ships.clear();
+                            planet.owned = false;
+                            planet.owner = 0;
+                        }
                     }
 
                     break;

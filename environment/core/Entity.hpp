@@ -111,6 +111,9 @@ namespace hlt {
     struct Planet : Entity {
         PlayerId owner;
         bool owned;
+        //! Nobody can dock to this planet this turn, since two or more players
+        //! tried to dock to it at the same time.
+        bool frozen;
 
         //! The remaining resources.
         unsigned short remaining_production;
