@@ -1014,18 +1014,26 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     auto filename = filename_buf.str();
 
     if (enable_replay) {
-        stats.output_filename = replay_directory + "Replays/" + filename;
-        try {
-            output(stats.output_filename, stats);
+        // Don't bother writing the replay if someone errored right away,
+        // except if verbose output is disabled, in which case the game
+        // coordinator would still like the info.
+        if (turn_number <= 1 && !quiet_output && timeout_tags.size() > 0) {
+            std::cout << "Skipping replay (bot errored on first turn).\n";
         }
-        catch (std::runtime_error& e) {
-            stats.output_filename = replay_directory + filename;
-            output(stats.output_filename, stats);
-        }
-        if (!quiet_output) {
-            std::cout << "Map seed was " << seed << std::endl
-                      << "Opening a file at " << stats.output_filename
-                      << std::endl;
+        else {
+            stats.output_filename = replay_directory + "Replays/" + filename;
+            try {
+                output(stats.output_filename, stats);
+            }
+            catch (std::runtime_error& e) {
+                stats.output_filename = replay_directory + filename;
+                output(stats.output_filename, stats);
+            }
+            if (!quiet_output) {
+                std::cout << "Map seed was " << seed << std::endl
+                          << "Opening a file at " << stats.output_filename
+                          << std::endl;
+            }
         }
     }
 
