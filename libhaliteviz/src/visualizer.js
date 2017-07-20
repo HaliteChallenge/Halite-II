@@ -64,8 +64,10 @@ export class HaliteVisualizer {
 
         this.frame = 0;
         this.time = 0;
+        this._playing = false;
 
         this.timeStep = 0.1;
+        this.playSpeed = 1.0;
         this.scrubSpeed = 0.5;
         this.keyBindings = {
             "ArrowLeft": "scrubBackwards",
@@ -279,6 +281,9 @@ export class HaliteVisualizer {
         document.body.addEventListener("keydown", this._onKeyDown);
 
         this.application.ticker.add((dt) => {
+            if (this.isPlaying()) {
+                this.advanceTime(this.timeStep * this.playSpeed * dt);
+            }
             this.handleKeys(dt);
             this.draw(dt);
 
@@ -306,12 +311,10 @@ export class HaliteVisualizer {
     }
 
     play() {
-        if (this.timer) return;
+        if (this._playing) return;
         this.application.start();
 
-        this.timer = window.setInterval(() => {
-            this.advanceTime(0.1);
-        }, 1000/40);
+        this._playing = true;
 
         this.onPlay();
     }
@@ -349,10 +352,8 @@ export class HaliteVisualizer {
     }
 
     pause() {
-        if (!this.timer) return;
-
-        window.clearInterval(this.timer);
-        this.timer = null;
+        if (!this._playing) return;
+        this._playing = false;
         this.onPause();
     }
 
@@ -712,7 +713,7 @@ export class HaliteVisualizer {
     }
 
     isPlaying() {
-        return this.timer !== null;
+        return this._playing;
     }
 }
 
