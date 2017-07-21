@@ -7,8 +7,8 @@ GCLOUD_ZONE="us-central1-c"
 
 SERVICE_ACCOUNT="apiserver"
 
-MACHINE_TYPE="f1-micro"
-IMAGE="worker"
+MACHINE_TYPE="custom-1-2048"
+IMAGE="halite-worker"
 
 gcloud beta compute --project "${GCLOUD_PROJECT}" \
     firewall-rules create "allow-coordinator-external-traffic" \
@@ -31,7 +31,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --metadata "^#&&#^startup-script=$(cat setup_coordinator__startup_script.sh)" \
     --maintenance-policy "MIGRATE" \
     --service-account "${SERVICE_ACCOUNT}@${GCLOUD_PROJECT}.iam.gserviceaccount.com" \
-    --image "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
+    --image-family "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
     --boot-disk-size "10" --boot-disk-type "pd-standard" \
     --tags "coordinator" \
     --scopes "https://www.googleapis.com/auth/sqlservice.admin","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring.write","https://www.googleapis.com/auth/trace.append","https://www.googleapis.com/auth/devstorage.read_write"
