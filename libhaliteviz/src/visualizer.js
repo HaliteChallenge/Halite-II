@@ -8,6 +8,7 @@ const pako = require("pako");
 const msgpack = require("msgpack-lite");
 
 const statistics = require("./statistics");
+const keyboard = require("./keyboardControls");
 
 
 const VISUALIZER_SIZE = 720;
@@ -69,7 +70,7 @@ export class HaliteVisualizer {
         this.timeStep = 0.1;
         this.playSpeed = 1.0;
         this.scrubSpeed = 0.5;
-        this.keyBindings = {
+        this.keyboardControls = new keyboard.KeyboardControls(this, {
             "ArrowLeft": "scrubBackwards",
             "KeyA": "scrubBackwards",
             "ArrowRight": "scrubForwards",
@@ -78,8 +79,7 @@ export class HaliteVisualizer {
                 if (this.isPlaying()) this.pause();
                 else this.play();
             },
-        };
-        this.keyState = {};
+        });
 
         this.application = new PIXI.Application(
             VISUALIZER_SIZE,
@@ -164,7 +164,8 @@ export class HaliteVisualizer {
     }
 
     destroy() {
-        // TODO: remove key handlers
+        this.keyboardControls.destroy();
+        this.keyboardControls = null;
         this.pause();
         this.application.destroy(true);
         PIXI.ticker.shared.stop();
@@ -247,44 +248,13 @@ export class HaliteVisualizer {
     attach(containerEl) {
         $(containerEl).append(this.application.view);
 
-        this._onKeyUp = (e) => {
-            if (typeof this.keyBindings[e.code] !== "undefined") {
-                const event = this.keyBindings[e.code];
-                if (typeof event === "function") {
-                    event();
-                }
-                else {
-                    this.keyState[event] = false;
-                    if (!this.isPlaying() &&
-                        Object.values(this.keyState).every((v) => !v)) {
-                    }
-                }
-                e.preventDefault();
-            }
-        };
-
-        this._onKeyDown = (e) => {
-            if (typeof this.keyBindings[e.code] !== "undefined") {
-                const event = this.keyBindings[e.code];
-                if (typeof event !== "function") {
-                    this.keyState[event] = true;
-                    if (!this.isPlaying()) {
-                        // Run the Pixi event loop while keys are down
-                        this.application.start();
-                    }
-                }
-                e.preventDefault();
-            }
-        };
-
-        document.body.addEventListener("keyup", this._onKeyUp);
-        document.body.addEventListener("keydown", this._onKeyDown);
+        this.keyboardControls.attach(document.body);
 
         this.application.ticker.add((dt) => {
             if (this.isPlaying()) {
                 this.advanceTime(this.timeStep * this.playSpeed * dt);
             }
-            this.handleKeys(dt);
+            this.keyboardControls.handleKeys(dt);
             this.draw(dt);
 
             if (!this.isPlaying() && this.animationQueue.length === 0) {
@@ -293,21 +263,6 @@ export class HaliteVisualizer {
             }
         });
         this.draw();
-    }
-
-    handleKeys(dt) {
-        dt *= this.timeStep * this.scrubSpeed;
-
-        if (this.keyState["scrubBackwards"]) {
-            this.pause();
-            this.advanceTime(-dt);
-            this.scrub(this.frame, this.time);
-        }
-        else if (this.keyState["scrubForwards"]) {
-            this.pause();
-            this.advanceTime(dt);
-            this.scrub(this.frame, this.time, dt);
-        }
     }
 
     play() {
