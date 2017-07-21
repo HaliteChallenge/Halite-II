@@ -151,6 +151,9 @@ export class HaliteVisualizer {
         this.timer = null;
 
         this.animationQueue = [];
+        // Keep track of when ships die this frame, so that we don't
+        // draw them after they die
+        this.deathFlags = {};
 
         this.onUpdate = function() {};
         this.onPlay = function() {};
@@ -497,6 +500,7 @@ export class HaliteVisualizer {
     }
 
     update() {
+        this.deathFlags = {};
         if (this.currentFrame.events) {
             for (let event of this.currentFrame.events) {
                 if (event.event === "destroyed") {
@@ -535,6 +539,10 @@ export class HaliteVisualizer {
                     }
                     else if (event.entity.type === "ship") {
                         // Use default draw function
+                        if (typeof this.deathFlags[event.entity.owner] === "undefined") {
+                            this.deathFlags[event.entity.owner] = {};
+                        }
+                        this.deathFlags[event.entity.owner][event.entity.id] = event.time;
                     }
                     else {
                         console.log("Unknown entity destroyed");
@@ -619,7 +627,14 @@ export class HaliteVisualizer {
 
         for (let playerShips of Object.values(this.currentFrame.ships)) {
             for (let ship of Object.values(playerShips)) {
-                this.drawShip(ship);
+                let deathTime = 1.1;
+                if (this.deathFlags[ship.owner] && this.deathFlags[ship.owner][ship.id]) {
+                    deathTime = this.deathFlags[ship.owner][ship.id];
+                }
+
+                if (this.time < deathTime) {
+                    this.drawShip(ship);
+                }
             }
         }
 
