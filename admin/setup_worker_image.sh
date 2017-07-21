@@ -86,7 +86,7 @@ EOF
 for i in $(seq 0 $((NUM_BOTS-1))); do
     CGROUP="bot_${i}"
     # Grant control over the cgroup to the worker user
-    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker
+    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker -a worker:worker
     sudo -u worker cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
 done
 
