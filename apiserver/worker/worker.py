@@ -16,6 +16,23 @@ import backend
 import compiler
 
 
+# Where to create temporary directories
+TEMP_DIR = os.getcwd()
+
+# The game environment executable.
+ENVIRONMENT = "halite"
+
+# The script used to start the bot. This is either user-provided or
+# created by compile.py.
+RUNFILE = "run.sh"
+
+# The command used to run the bot. On the outside is a cgroup limiting CPU
+# and memory access. On the inside, we run the bot as a user so that it may
+# not overwrite files. The worker image has a built-in iptables rule denying
+# network access to this user as well.
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
+
+
 COMPILE_ERROR_MESSAGE = """
 Your bot caused unexpected behavior in our servers. If you cannot figure out 
 why this happened, please email us at halite@halite.io. We can help.
@@ -32,19 +49,31 @@ def makePath(path):
     os.chmod(path, 0o777)
 
 
+def give_ownership(top_dir, group, dir_perms):
+    for dirpath, _, filenames in os.walk(top_dir):
+        shutil.chown(dirpath, group=group)
+        os.chmod(dirpath, dir_perms)
+        for filename in filenames:
+            shutil.chown(os.path.join(dirpath, filename), group=group)
+
+
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     print("Compiling a bot with userID %s\n" % str(user_id))
 
     errors = []
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(dir=TEMP_DIR) as temp_dir:
         try:
             bot_path = backend.storeBotLocally(user_id, bot_id, temp_dir,
                                                is_compile=True)
             archive.unpack(bot_path)
-            
-            while len([name for name in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, name))]) == 0 and len(glob.glob(os.path.join(temp_dir, "*"))) == 1:
+
+            # Make sure things are in the top-level directory
+            while len([
+                name for name in os.listdir(temp_dir)
+                if os.path.isfile(os.path.join(temp_dir, name))
+            ]) == 0 and len(glob.glob(os.path.join(temp_dir, "*"))) == 1:
                 singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
                 bufferFolder = os.path.join(temp_dir, backend.SECRET_FOLDER)
                 os.mkdir(bufferFolder)
@@ -58,8 +87,12 @@ def executeCompileTask(user_id, bot_id, backend):
                 os.rmdir(bufferFolder)
 
             # Delete any symlinks
-            # TODO: check how well this works
-            subprocess.call(["find", temp_dir, "-type", "l", "delete"])
+            subprocess.call(["find", temp_dir, "-type", "l", "-delete"])
+
+            # Give the compilation user access
+            os.chmod(temp_dir, 0o755)
+            # User needs to be able to write to the directory
+            give_ownership(temp_dir, "bots", 0o774)
 
             language, more_errors = compiler.compile_anything(temp_dir)
             didCompile = more_errors is None
@@ -82,22 +115,8 @@ def executeCompileTask(user_id, bot_id, backend):
                               errors=(None if didCompile else "\n".join(errors)))
 
 
-# The game environment executable.
-ENVIRONMENT = "halite"
-
-# The script used to start the bot. This is either user-provided or
-# created by compile.py.
-RUNFILE = "run.sh"
-
-# The command used to run the bot. On the outside is a cgroup limiting CPU
-# and memory access. On the inside, we run the bot as a user so that it may
-# not overwrite files. The worker image has a built-in iptables rule denying
-# network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu:memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
-
-
 def runGame(width, height, users):
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(dir=TEMP_DIR) as temp_dir:
         shutil.copy(ENVIRONMENT, os.path.join(temp_dir, ENVIRONMENT))
 
         command = [
