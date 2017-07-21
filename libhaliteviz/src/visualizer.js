@@ -50,8 +50,9 @@ setAssetRoot("dist/");
 
 
 class FrameAnimation {
-    constructor(frames, update, draw, finish) {
+    constructor(frames, delayTime, update, draw, finish) {
         this.frames = frames;
+        this.delayFrames = delayTime;
         this.update = update;
         this.draw = draw;
         this.finish = finish;
@@ -252,6 +253,8 @@ export class HaliteVisualizer {
         $(containerEl).append(this.application.view);
 
         this.keyboardControls.attach(document.body);
+
+        this.update();
 
         this.application.ticker.add((dt) => {
             if (this.isPlaying()) {
@@ -500,9 +503,16 @@ export class HaliteVisualizer {
     }
 
     update() {
-        this.deathFlags = {};
+        this.deathFlags = {
+            "planets": {},
+        };
+
         if (this.currentFrame.events) {
             for (let event of this.currentFrame.events) {
+                // How much to delay (in terms of ticks) before
+                // actually playing the event
+                const delayTime = event.time ? event.time / (this.timeStep * this.playSpeed) : 0;
+
                 if (event.event === "destroyed") {
                     let draw = (frame) => {
                         const width = CELL_SIZE * this.scale;
@@ -536,6 +546,8 @@ export class HaliteVisualizer {
                                 }
                             }
                         };
+
+                        this.deathFlags["planets"][event.entity.id] = event.time;
                     }
                     else if (event.entity.type === "ship") {
                         // Use default draw function
@@ -550,7 +562,7 @@ export class HaliteVisualizer {
                     }
 
                     this.animationQueue.push(new FrameAnimation(
-                        48, () => {}, draw, () => {}
+                        48, delayTime, () => {}, draw, () => {}
                     ));
                 }
                 else if (event.event === "attack") {
@@ -570,7 +582,7 @@ export class HaliteVisualizer {
                     this.container.addChild(attackSprite);
 
                     this.animationQueue.push(new FrameAnimation(
-                        24,
+                        24, delayTime,
                         () => {
                         },
                         (frame) => {
@@ -583,7 +595,7 @@ export class HaliteVisualizer {
                 }
                 else if (event.event === "spawned") {
                     this.animationQueue.push(new FrameAnimation(
-                        24,
+                        24, delayTime,
                         () => {
                         },
                         (frame) => {
@@ -615,7 +627,14 @@ export class HaliteVisualizer {
         this.lights.clear();
 
         for (let planet of Object.values(this.currentFrame.planets)) {
-            this.drawPlanet(planet);
+            if (typeof this.deathFlags["planets"][planet.id] !== "undefined") {
+                if (this.time < this.deathFlags["planets"][planet.id]) {
+                    this.drawPlanet(planet);
+                }
+            }
+            else {
+                this.drawPlanet(planet);
+            }
         }
 
         // Handle dead planets
@@ -628,7 +647,8 @@ export class HaliteVisualizer {
         for (let playerShips of Object.values(this.currentFrame.ships)) {
             for (let ship of Object.values(playerShips)) {
                 let deathTime = 1.1;
-                if (this.deathFlags[ship.owner] && this.deathFlags[ship.owner][ship.id]) {
+                if (this.deathFlags[ship.owner] &&
+                    typeof this.deathFlags[ship.owner][ship.id] !== "undefined") {
                     deathTime = this.deathFlags[ship.owner][ship.id];
                 }
 
@@ -644,9 +664,23 @@ export class HaliteVisualizer {
         let queue = this.animationQueue;
         this.animationQueue = [];
         for (let anim of queue) {
-            if (anim.frames >= dt) {
+            let subdelta = dt;
+            if (anim.delayFrames > 0) {
+                if (anim.delayFrames >= subdelta) {
+                    anim.delayFrames -= subdelta;
+                }
+                else if (anim.delayFrames < subdelta) {
+                    subdelta -= anim.delayFrames;
+                    anim.delayFrames = -1;
+                }
+            }
+
+            if (anim.delayFrames <= 0 && anim.frames >= subdelta) {
                 anim.draw(anim.frames);
-                anim.frames -= dt;
+                anim.frames -= subdelta;
+                this.animationQueue.push(anim);
+            }
+            else if (anim.delayFrames > 0) {
                 this.animationQueue.push(anim);
             }
             else {
