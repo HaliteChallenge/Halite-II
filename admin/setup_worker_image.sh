@@ -12,10 +12,10 @@ sudo useradd -m worker
 sudo sh -c 'echo "worker ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/worker'
 sudo chmod 0400 /etc/sudoers.d/worker
 
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete libgeos-dev"
 WORKER_PACKAGES="virtualenv cgroup-tools"
 
-PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano"
+PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely"
 RUBY_PACKAGES="bundler"
 
 sudo apt-get -y install ${PACKAGES} ${WORKER_PACKAGES}
@@ -32,6 +32,9 @@ sudo -iu worker sh -c 'curl https://sh.rustup.rs -sSf > rustup.sh; sh rustup.sh 
 sudo sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
 sudo chmod a+x /usr/bin/lein
 sudo -iu worker lein
+
+# Miniconda
+sudo -iu worker sh -c 'curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -sSf > miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda'
 
 echo "Packages"
 for package in ${PACKAGES}; do
