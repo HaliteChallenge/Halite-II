@@ -835,7 +835,7 @@ auto Halite::output(std::string filename, const GameStatistics& stats) -> void {
     // ships and planets.
     for (auto frame_idx = 0; frame_idx < full_frame_events.size(); frame_idx++) {
         auto& frame_events = full_frame_events[frame_idx];
-        auto& frame_data = frames.at(frame_idx + 1);
+        auto& frame_data = frames.at(frame_idx);
 
         std::vector<nlohmann::json> event_record;
 
