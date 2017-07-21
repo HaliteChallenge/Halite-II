@@ -91,7 +91,7 @@ for i in $(seq 0 $((NUM_BOTS-1))); do
 done
 
 ## Create a user to be used by compilation. This user will have limited Internet access.
-sudo useradd -m bot_compilation
+sudo useradd -m bot_compilation -G bots
 ## No access to 10. addresses (which are our own servers)
 ## We are giving them general network access (to download dependencies)
 sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DROP
