@@ -427,6 +427,21 @@ def upload_game():
                             log_link="{}/user/{}/match/{}/error_log".format(config.API_URL, user["user_id"], game_id),
                         ))
 
+                elif timed_out_count > config.MAX_ERRORS_PER_BOT:
+                    # Prevent the bot from playing more games until a new bot
+                    # is uploaded
+                    conn.execute(model.bots.update().values(
+                        compile_status="Failed",
+                    ).where((model.bots.c.user_id == user["user_id"]) &
+                            (model.bots.c.id == user["bot_id"])))
+
+                    notify.send_notification(
+                        user["email"],
+                        user["username"],
+                        "Bot timeout/error limit reached",
+                        notify.TIMEOUT_LIMIT.format(
+                            limit=config.MAX_ERRORS_PER_BOT))
+
     # Update rankings
     users.sort(key=lambda user: user["rank"])
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
