@@ -6,7 +6,7 @@ GCLOUD_PROJECT="nth-observer-171418"
 GCLOUD_ZONE="us-central1-c"
 
 MACHINE_TYPE="custom-1-2560"
-IMAGE="worker"
+IMAGE="halite-worker"
 COORDINATOR_URL="http://10.142.0.5:5001/v1/coordinator/"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
@@ -18,7 +18,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --maintenance-policy "TERMINATE" \
     --preemptible \
     --tags "worker" \
-    --image "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
+    --image-family "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
     --boot-disk-size "10" --boot-disk-type "pd-standard"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
