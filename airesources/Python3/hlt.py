@@ -535,7 +535,7 @@ def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
             break
 
         thrust = int(
-            max(GameConstants.DRAG + 1, min(max_acceleration, dist / 30 * max_acceleration)))
+            max(GameConstants.DRAG + 1, min(max_acceleration, dist / GameConstants.MAX_SPEED * max_acceleration)))
         logging.debug(
             "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
             .format(ship.id, thrust, angle, dist, speed, turns_left,
