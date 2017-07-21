@@ -626,8 +626,6 @@ auto Halite::process_events() -> void {
         };
 
         for (SimulationEvent ev : simultaneous_events) {
-            std::cout << ev << "\n";
-
             switch (ev.type) {
                 case SimulationEventType::Collision: {
                     const auto damage = compute_damage(ev.id1, ev.id2);

@@ -138,7 +138,6 @@ auto find_events(
         const auto t = collision_time(collision_radius, ship1, ship2);
         if (t.first) {
             if (t.second >= 0 && t.second <= 1) {
-                std::cout << "collision " << id1 << id2 << collision_radius << " " << t.second << ship1.location.distance(ship2.location) << '\n';
                 unsorted_events.insert(SimulationEvent{
                     SimulationEventType::Collision,
                     id1, id2, round_event_time(t.second),
