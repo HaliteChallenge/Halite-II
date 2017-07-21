@@ -2,7 +2,6 @@
 // Created by David Li on 6/5/17.
 //
 
-#include <cmath>
 #include "Map.hpp"
 #include "Log.hpp"
 

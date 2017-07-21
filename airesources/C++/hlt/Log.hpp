@@ -6,6 +6,8 @@
 #define AIRESOURCES_LOG_HPP
 
 #include <fstream>
+#include <iostream>
+#include <string>
 
 namespace hlt {
     /**

@@ -5,6 +5,12 @@
 #ifndef AIRESOURCES_BEHAVIOR_HPP
 #define AIRESOURCES_BEHAVIOR_HPP
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
+#include <cmath>
+
 #include "Globals.hpp"
 #include "Entity.hpp"
 #include "Map.hpp"

@@ -5,6 +5,10 @@
 #ifndef ENVIRONMENT_ENTITY_H
 #define ENVIRONMENT_ENTITY_H
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include <cmath>
 #include <iostream>
 #include <utility>
