@@ -150,15 +150,14 @@ def runGame(width, height, users):
             # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
 
             bot_user = "bot_{}".format(user_index)
-            for dirpath, _, filenames in os.walk(bot_dir):
-                shutil.chown(dirpath, user=bot_user, group="bots")
-                for filename in filenames:
-                    shutil.chown(os.path.join(dirpath, filename), user=bot_user, group="bots")
+            bot_cgroup = "bot_{}".format(user_index)
+
+            give_ownership(top_dir, "bots", 0o755)
 
             command.append(BOT_COMMAND.format(
-                cgroup="bot_" + str(user_index),
+                cgroup=bot_cgroup,
                 bot_dir=bot_dir,
-                bot_user="bot_" + str(user_index),
+                bot_user=bot_user,
                 runfile=RUNFILE,
             ))
             command.append("{} v{}".format(user["username"],
@@ -172,8 +171,13 @@ def runGame(width, height, users):
         print("\n-----Here is game output: -----")
         print("\n".join(lines))
         print("--------------------------------\n")
-
-        # tempdir will automatically be cleaned up
+        # tempdir will automatically be cleaned up, but we need to do things
+        # manually because the bot might have made files it owns
+        for user_index, user in enumerate(users):
+            bot_user = "bot_{}".format(user_index)
+            subprocess.call(["sudo", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
         return lines
 
 
