@@ -262,7 +262,6 @@ export class HaliteVisualizer {
                 this.application.stop();
             }
         });
-        this.draw();
     }
 
     play() {
@@ -276,6 +275,8 @@ export class HaliteVisualizer {
 
     advanceTime(time) {
         // Interpolate between frames for smoother feel
+        const prevFrame = this.frame;
+
         this.time += time;
         if (this.time >= 1.0) {
             this.frame++;
@@ -299,8 +300,7 @@ export class HaliteVisualizer {
             this.time = 0.0;
         }
 
-        if (this.time == 0) {
-            // TODO: run events better
+        if (prevFrame != this.frame) {
             this.update();
         }
         this.onUpdate();
@@ -665,6 +665,11 @@ export class HaliteVisualizer {
         this.statsDisplay.drawRect(x, STATS_SIZE, width, STATS_SIZE * 0.8);
         this.statsDisplay.endFill();
         this.statsDisplay.drawRect(0, 90, VISUALIZER_SIZE, 10);
+    }
+
+    render(dt=1000/60) {
+        this.draw(dt);
+        this.application.render();
     }
 
     isPlaying() {

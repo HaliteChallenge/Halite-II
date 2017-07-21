@@ -59,12 +59,12 @@ export class KeyboardControls {
         if (this.keyState["scrubBackwards"]) {
             this.visualizer.pause();
             this.visualizer.advanceTime(-dt);
-            this.visualizer.scrub(this.visualizer.frame, this.visualizer.time);
+            this.visualizer.render();
         }
         else if (this.keyState["scrubForwards"]) {
             this.visualizer.pause();
             this.visualizer.advanceTime(dt);
-            this.visualizer.scrub(this.visualizer.frame, this.visualizer.time, dt);
+            this.visualizer.render(dt);
         }
     }
 }
