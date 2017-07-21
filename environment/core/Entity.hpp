@@ -127,12 +127,14 @@ namespace hlt {
         //! as well as docked ships.
         std::vector<EntityIndex> docked_ships;
 
-        Planet(unsigned short x, unsigned short y, unsigned short radius) {
+        Planet(double x, double y, double radius) {
             location.pos_x = x;
             location.pos_y = y;
             this->radius = radius;
-            docking_spots = radius;
-            remaining_production = static_cast<unsigned short>(std::sqrt(10 * radius)) * 100;
+            docking_spots = static_cast<unsigned short>(radius);
+            remaining_production = static_cast<unsigned short>(
+                static_cast<unsigned short>(std::sqrt(10 * radius)) *
+                    GameConstants::get().RESOURCES_PER_RADIUS);
             current_production = 0;
             health = static_cast<unsigned short>(radius * GameConstants::get().MAX_SHIP_HEALTH);
             docked_ships = std::vector<EntityIndex>();

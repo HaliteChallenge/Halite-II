@@ -36,6 +36,7 @@ namespace hlt {
 
         double DOCK_RADIUS = 4;
         unsigned int DOCK_TURNS = 5;
+        int RESOURCES_PER_RADIUS = 144;
         int PRODUCTION_PER_SHIP = 100;
         unsigned int BASE_PRODUCTIVITY = 25;
         unsigned int ADDITIONAL_PRODUCTIVITY = 15;
