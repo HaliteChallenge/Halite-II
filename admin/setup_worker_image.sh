@@ -2,6 +2,13 @@
 
 NUM_BOTS=4
 
+## Create a user to be used by the worker exclusively.
+sudo groupadd bots
+sudo useradd -m worker -U -G bots -s /bin/bash
+
+# Don't just grant random people sudo access.
+sudo rm /etc/sudoers.d/google_sudoers
+
 ## Add necessary repositories for Node.js and Mono.
 # https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
@@ -11,44 +18,10 @@ echo "deb http://download.mono-project.com/repo/ubuntu xenial main" | sudo tee /
 sudo apt-get update
 sudo apt-get -y upgrade
 
-## Create a user to be used by the worker exclusively.
-sudo useradd -m worker
-
-## Create four cgroups to isolate bots.
-for i in $(seq 0 $((NUM_BOTS-1))); do
-    CGROUP="bot_${i}"
-    # Grant control over the cgroup to the worker user
-    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker
-    cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
-done
-
-## Create a user to be used by compilation. This user will have limited Internet access.
-sudo useradd -m bot_compilation
-## No access to 10. addresses (which are our own servers)
-sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DROP
-## Grant sudo access to the worker.
-sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_bot_compilation"
-sudo chmod 0400 /etc/sudoers.d/worker_bot_compilation
-
-## Create four users to isolate bots.
-sudo groupadd bots
-export BOT_GROUP=getent group bots | awk -F: '{printf $3}'
-for i in $(seq 0 $((NUM_BOTS-1))); do
-    USERNAME="bot_${i}"
-    sudo useradd -m -g ${BOT_GROUP} ${USERNAME}
-    ## Deny all network access to this user.
-    sudo iptables -A OUTPUT -m owner --uid-owner ${USERNAME} -j DROP
-    ## Grant sudo access to the worker.
-    sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_${USERNAME}"
-    sudo chmod 0400 /etc/sudoers.d/worker_${USERNAME}
-done
-
-## Create firewall rules to isolate bots.
-
 ## List the packages to install for running bots.
 PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete"
 ## List the packages to install for the worker itself.
-WORKER_PACKAGES="virtualenv cgroup-tools"
+WORKER_PACKAGES="virtualenv cgroup-tools unzip"
 
 ## List Python packages to preinstall.
 PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano"
@@ -108,3 +81,31 @@ echo "Clojure Packages"
 sudo -iu worker bash << EOF
 lein version
 EOF
+
+## Create four cgroups to isolate bots.
+for i in $(seq 0 $((NUM_BOTS-1))); do
+    CGROUP="bot_${i}"
+    # Grant control over the cgroup to the worker user
+    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker
+    sudo -u worker cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
+done
+
+## Create a user to be used by compilation. This user will have limited Internet access.
+sudo useradd -m bot_compilation
+## No access to 10. addresses (which are our own servers)
+## We are giving them general network access (to download dependencies)
+sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DROP
+## Grant sudo access to the worker as this user.
+sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_bot_compilation"
+sudo chmod 0400 /etc/sudoers.d/worker_bot_compilation
+
+## Create four users to isolate bots.
+for i in $(seq 0 $((NUM_BOTS-1))); do
+    USERNAME="bot_${i}"
+    sudo useradd -m -g bots ${USERNAME}
+    ## Deny all network access to this user.
+    sudo iptables -A OUTPUT -m owner --uid-owner ${USERNAME} -j DROP
+    ## Grant sudo access to the worker.
+    sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_${USERNAME}"
+    sudo chmod 0400 /etc/sudoers.d/worker_${USERNAME}
+done

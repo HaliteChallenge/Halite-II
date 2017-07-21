@@ -16,6 +16,14 @@ import backend
 import compiler
 
 
+COMPILE_ERROR_MESSAGE = """
+Your bot caused unexpected behavior in our servers. If you cannot figure out 
+why this happened, please email us at halite@halite.io. We can help.
+
+For our reference, here is the trace of the error: 
+"""
+
+
 def makePath(path):
     """Deletes anything residing at path, creates path, and chmods the directory"""
     if os.path.exists(path):
@@ -24,61 +32,63 @@ def makePath(path):
     os.chmod(path, 0o777)
 
 
-# TODO: compile as user
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     print("Compiling a bot with userID %s\n" % str(user_id))
 
-    try:
-        # TODO: use tempdir
-        workingPath = "compilation_path"
-        makePath(workingPath)
+    errors = []
 
-        botPath = backend.storeBotLocally(user_id, bot_id, workingPath,
-                                          is_compile=True)
-        archive.unpack(botPath)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        try:
+            bot_path = backend.storeBotLocally(user_id, bot_id, temp_dir,
+                                               is_compile=True)
+            archive.unpack(bot_path)
+            
+            while len([name for name in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, name))]) == 0 and len(glob.glob(os.path.join(temp_dir, "*"))) == 1:
+                singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
+                bufferFolder = os.path.join(temp_dir, backend.SECRET_FOLDER)
+                os.mkdir(bufferFolder)
 
-        while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
-            singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
-            bufferFolder = os.path.join(workingPath, backend.SECRET_FOLDER)
-            os.mkdir(bufferFolder)
+                for filename in os.listdir(singleFolder):
+                    shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
+                os.rmdir(singleFolder)
 
-            for filename in os.listdir(singleFolder):
-                shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
-            os.rmdir(singleFolder)
+                for filename in os.listdir(bufferFolder):
+                    shutil.move(os.path.join(bufferFolder, filename), os.path.join(temp_dir, filename))
+                os.rmdir(bufferFolder)
 
-            for filename in os.listdir(bufferFolder):
-                shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
-            os.rmdir(bufferFolder)
+            # Delete any symlinks
+            # TODO: check how well this works
+            subprocess.call(["find", temp_dir, "-type", "l", "delete"])
 
-        # Rm symlinks
-        os.system("find "+workingPath+" -type l -delete")
+            language, more_errors = compiler.compile_anything(temp_dir)
+            didCompile = more_errors is None
+            if more_errors:
+                errors.extend(more_errors)
+        except Exception as e:
+            language = "Other"
+            errors = [COMPILE_ERROR_MESSAGE + traceback.format_exc()] + errors
+            didCompile = False
 
-        language, errors = compiler.compile_anything(workingPath)
-        didCompile = True if errors == None else False
-    except Exception as e:
-        language = "Other"
-        errors = ["Your bot caused unexpected behavior in our servers. If you cannot figure out why this happened, please email us at halite@halite.io. We can help.", "For our reference, here is the trace of the error: " + traceback.format_exc()]
-        didCompile = False
+        if didCompile:
+            print("Bot did compile\n")
+            archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
+            backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
+        else:
+            print("Bot did not compile\n")
+            print("Bot errors %s\n" % str(errors))
 
-    if didCompile:
-        print("Bot did compile\n")
-        archive.zipFolder(workingPath, os.path.join(workingPath, str(user_id)+".zip"))
-        backend.storeBotRemotely(user_id, bot_id, os.path.join(workingPath, str(user_id)+".zip"))
-    else:
-        print("Bot did not compile\n")
-        print("Bot errors %s\n" % str(errors))
-
-    backend.compileResult(user_id, bot_id, didCompile, language, errors=(None if didCompile else "\n".join(errors)))
-    if os.path.isdir(workingPath):
-        shutil.rmtree(workingPath)
+        backend.compileResult(user_id, bot_id, didCompile, language,
+                              errors=(None if didCompile else "\n".join(errors)))
 
 
 # The game environment executable.
 ENVIRONMENT = "halite"
+
 # The script used to start the bot. This is either user-provided or
 # created by compile.py.
 RUNFILE = "run.sh"
+
 # The command used to run the bot. On the outside is a cgroup limiting CPU
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
@@ -106,11 +116,17 @@ def runGame(width, height, users):
             # Make the start script executable
             os.chmod(os.path.join(bot_dir, RUNFILE), 0o755)
 
-            # TODO: give the bot user ownership of their directory
+            # Give the bot user ownership of their directory
             # We should set up each user's default group as a group that the
             # worker is also a part of. Then we always have access to their files,
             # but not vice versa.
             # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
+
+            bot_user = "bot_{}".format(user_index)
+            for dirpath, _, filenames in os.walk(bot_dir):
+                shutil.chown(dirpath, user=bot_user, group="bots")
+                for filename in filenames:
+                    shutil.chown(os.path.join(dirpath, filename), user=bot_user, group="bots")
 
             command.append(BOT_COMMAND.format(
                 cgroup="bot_" + str(user_index),
@@ -130,8 +146,9 @@ def runGame(width, height, users):
         print("\n".join(lines))
         print("--------------------------------\n")
 
-        # TODO: clean up. Change ownership back
+        # tempdir will automatically be cleaned up
         return lines
+
 
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
@@ -152,6 +169,7 @@ def parseGameOutput(output, users):
         users[player_tag]["log_name"] = os.path.basename(error_log)
 
     return users, result
+
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
@@ -195,4 +213,3 @@ if __name__ == "__main__":
             print("Sleeping...\n")
 
         sleep(random.randint(4, 10))
-
