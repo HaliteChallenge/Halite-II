@@ -138,6 +138,7 @@ namespace hlt {
             docked_ships = std::vector<EntityIndex>();
 
             owned = false;
+            frozen = false;
         }
 
         auto add_ship(EntityIndex ship) -> void;

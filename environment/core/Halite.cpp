@@ -381,7 +381,7 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                         break;
                     }
 
-                    auto& planet = game_map.planets[planet_id];
+                    auto& planet = game_map.planets.at(planet_id);
                     if (!planet.is_alive() || !ship.can_dock(planet) || planet.frozen) {
                         if (!quiet_output && !ship.can_dock(planet)) {
                             std::cout << "Warning: ship too far to dock\n";
