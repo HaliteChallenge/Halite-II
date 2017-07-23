@@ -220,7 +220,7 @@ namespace hlt {
         friend auto operator== (const EntityId& id1, const EntityId& id2) -> bool;
         friend auto operator!= (const EntityId& id1, const EntityId& id2) -> bool;
 
-        friend class std::hash<EntityId>;
+        friend struct std::hash<EntityId>;
     };
 
     auto to_json(nlohmann::json& json, const hlt::EntityId& id) -> void;
@@ -228,7 +228,7 @@ namespace hlt {
 }
 
 namespace std {
-    template<> class hash<hlt::EntityId> {
+    template<> struct hash<hlt::EntityId> {
     public:
         auto operator()(const hlt::EntityId& id) const -> size_t {
             return static_cast<size_t>(

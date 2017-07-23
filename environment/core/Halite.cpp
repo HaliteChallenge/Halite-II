@@ -414,6 +414,11 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                         })) {
                             // In that case, nobody gets to dock
                             planet.frozen = true;
+                            for (auto& docked_ship_index : planet.docked_ships) {
+                                auto& ship = game_map.get_ship(planet.owner, docked_ship_index);
+                                ship.reset_docking_status();
+                            }
+
                             planet.docked_ships.clear();
                             planet.owned = false;
                             planet.owner = 0;
