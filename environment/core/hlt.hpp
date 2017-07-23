@@ -57,6 +57,12 @@ namespace hlt {
      * Represents the state of the game map during a given turn.
      */
     class Map {
+    private:
+        /**
+         * The index of the next entity to be spawned.
+         */
+        EntityIndex next_index;
+
     public:
         /**
          * A map of all the ships in the game, keyed by the player's tag and

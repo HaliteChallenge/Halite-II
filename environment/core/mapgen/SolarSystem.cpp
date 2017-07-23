@@ -263,10 +263,10 @@ namespace mapgen {
             for (int i = 0; i < 3; i++) {
                 // Spread out ships to make it less likely they'll collide
                 // in the start
-                map.ships[player_id][i].revive(hlt::Location{
+                map.spawn_ship(hlt::Location{
                     zone.location.pos_x,
                     zone.location.pos_y - 2 * (i - 1),
-                });
+                }, player_id);
             }
         }
 
