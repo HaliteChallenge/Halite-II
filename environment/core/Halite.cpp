@@ -505,27 +505,22 @@ auto Halite::process_events() -> void {
                 const auto& ship2 = potential_ship.second;
                 find_events(unsorted_events, id1, id2, ship1, ship2);
             }
-        }
-
-        for (const auto& pair1 : game_map.ships[player1]) {
-            const auto& ship_id = hlt::EntityId::for_ship(player1, pair1.first);
-            const auto& ship = pair1.second;
 
             // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
                 const auto& planet = game_map.planets[planet_idx];
                 if (!planet.is_alive()) continue;
 
-                const auto distance = ship.location.distance(planet.location);
+                const auto distance = ship1.location.distance(planet.location);
 
-                if (distance <= ship.velocity.magnitude() + ship.radius + planet.radius) {
-                    const auto collision_radius = ship.radius + planet.radius;
-                    const auto t = collision_time(collision_radius, ship, planet);
+                if (distance <= ship1.velocity.magnitude() + ship1.radius + planet.radius) {
+                    const auto collision_radius = ship1.radius + planet.radius;
+                    const auto t = collision_time(collision_radius, ship1, planet);
                     if (t.first) {
                         if (t.second >= 0 && t.second <= 1) {
                             unsorted_events.insert(SimulationEvent{
                                 SimulationEventType::Collision,
-                                ship_id, hlt::EntityId::for_planet(planet_idx),
+                                id1, hlt::EntityId::for_planet(planet_idx),
                                 round_event_time(t.second),
                             });
                         }
@@ -542,24 +537,24 @@ auto Halite::process_events() -> void {
             // No case where the ship can be off the map edge in the middle of a
             // turn but end inside the map (map is convex) given that they start
             // within the boundaries
-            auto final_location = ship.location;
-            final_location.move_by(ship.velocity, 1.0);
+            auto final_location = ship1.location;
+            final_location.move_by(ship1.velocity, 1.0);
 
             if (!game_map.within_bounds(final_location)) {
                 auto time = 1000000.0;
-                if (ship.velocity.vel_x > 0) {
-                    const auto t1 = -ship.location.pos_x / ship.velocity.vel_x;
+                if (ship1.velocity.vel_x > 0) {
+                    const auto t1 = -ship1.location.pos_x / ship1.velocity.vel_x;
                     if (t1 < time && t1 >= 0) time = t1;
-                    const auto t2 = (game_map.map_width - ship.location.pos_x)
-                        / ship.velocity.vel_x;
+                    const auto t2 = (game_map.map_width - ship1.location.pos_x)
+                        / ship1.velocity.vel_x;
                     if (t2 < time && t2 >= 0) time = t2;
                 }
 
-                if (ship.velocity.vel_y > 0) {
-                    const auto t3 = -ship.location.pos_y / ship.velocity.vel_y;
+                if (ship1.velocity.vel_y > 0) {
+                    const auto t3 = -ship1.location.pos_y / ship1.velocity.vel_y;
                     if (t3 < time && t3 >= 0) time = t3;
-                    const auto t4 = (game_map.map_height - ship.location.pos_y)
-                        / ship.velocity.vel_y;
+                    const auto t4 = (game_map.map_height - ship1.location.pos_y)
+                        / ship1.velocity.vel_y;
                     if (t4 < time && t4 >= 0) time = t4;
                 }
 
@@ -567,7 +562,7 @@ auto Halite::process_events() -> void {
 
                 unsorted_events.insert(SimulationEvent{
                     SimulationEventType::Desertion,
-                    ship_id, ship_id, round_event_time(time),
+                    id1, id1, round_event_time(time),
                 });
             }
         }
