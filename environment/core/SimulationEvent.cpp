@@ -106,12 +106,28 @@ auto round_event_time(double t) -> double {
     return std::round(t * EVENT_TIME_PRECISION) / EVENT_TIME_PRECISION;
 }
 
+auto broadphase_collision(const hlt::Map& game_map, const hlt::Ship& ship1,
+                          std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions) -> void {
+    hlt::PlayerId player = 0;
+    for (const auto& player_ships : game_map.ships) {
+        for (const auto& ship_pair : player_ships) {
+            potential_collisions.push_back({
+                hlt::EntityId::for_ship(player, ship_pair.first),
+                ship_pair.second
+            });
+        }
+
+        player++;
+    }
+}
+
 auto find_events(
     std::unordered_set<SimulationEvent>& unsorted_events,
-    const hlt::PlayerId player1, const hlt::PlayerId& player2,
     const hlt::EntityId id1, const hlt::EntityId& id2,
     const hlt::Ship& ship1, const hlt::Ship& ship2) -> void {
     const auto distance = ship1.location.distance(ship2.location);
+    const auto player1 = id1.player_id();
+    const auto player2 = id2.player_id();
 
     if (player1 != player2 && might_attack(distance, ship1, ship2)) {
         // Combat event

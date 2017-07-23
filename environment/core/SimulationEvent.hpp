@@ -8,8 +8,10 @@
 #include <cassert>
 #include <iostream>
 #include <unordered_set>
+#include <vector>
 
 #include "Entity.hpp"
+#include "hlt.hpp"
 
 /**
  * How to round event times for the purpose of attack and collision resolution.
@@ -72,9 +74,11 @@ auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship
 auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
 auto round_event_time(double t) -> double;
 
+auto broadphase_collision(const hlt::Map& game_map, const hlt::Ship& ship1,
+                          std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions) -> void;
+
 auto find_events(
     std::unordered_set<SimulationEvent>& unsorted_events,
-    const hlt::PlayerId player1, const hlt::PlayerId& player2,
     const hlt::EntityId id1, const hlt::EntityId& id2,
     const hlt::Ship& ship1, const hlt::Ship& ship2) -> void;
 

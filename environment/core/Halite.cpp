@@ -491,18 +491,19 @@ auto Halite::find_living_players() -> std::vector<bool> {
 auto Halite::process_events() -> void {
     std::unordered_set<SimulationEvent> unsorted_events;
 
-    for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
-        for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
-            for (const auto& pair1 : game_map.ships.at(player1)) {
-                for (const auto& pair2 : game_map.ships.at(player2)) {
-                    const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
-                    const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
-                    const auto& ship1 = pair1.second;
-                    const auto& ship2 = pair2.second;
+    std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions;
 
-                    find_events(unsorted_events, player1, player2,
-                                id1, id2, ship1, ship2);
-                }
+    for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
+        for (const auto& pair1 : game_map.ships.at(player1)) {
+            const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
+            const auto& ship1 = pair1.second;
+
+            potential_collisions.clear();
+            broadphase_collision(game_map, pair1.second, potential_collisions);
+            for (const auto& potential_ship : potential_collisions) {
+                const auto& id2 = potential_ship.first;
+                const auto& ship2 = potential_ship.second;
+                find_events(unsorted_events, id1, id2, ship1, ship2);
             }
         }
 
