@@ -28,6 +28,24 @@ enum class SimulationEventType {
 
 auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream&;
 
+/**
+ * This structure is INVALID as soon as the underlying game map is
+ * mutated.
+ */
+struct CollisionMap {
+    constexpr static auto CELL_SIZE = 16;
+
+    std::vector<std::vector<std::vector<hlt::EntityId>>> cells;
+
+    int width, height;
+
+    CollisionMap(const hlt::Map& game_map);
+
+    auto rebuild(const hlt::Map& game_map) -> void;
+    auto test(const hlt::Location& location, double radius,
+              std::vector<hlt::EntityId>& potential_collisions) -> void;
+};
+
 struct SimulationEvent {
     SimulationEventType type;
     hlt::EntityId id1;
@@ -73,9 +91,6 @@ auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& ship2) 
 auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
 auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
 auto round_event_time(double t) -> double;
-
-auto broadphase_collision(const hlt::Map& game_map, const hlt::Ship& ship1,
-                          std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions) -> void;
 
 auto find_events(
     std::unordered_set<SimulationEvent>& unsorted_events,

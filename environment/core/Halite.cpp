@@ -149,7 +149,7 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
         }
     }
 
-    game_map.kill_entity(id);
+    game_map.unsafe_kill_entity(id);
 }
 
 void Halite::kill_player(hlt::PlayerId player) {
@@ -491,7 +491,10 @@ auto Halite::find_living_players() -> std::vector<bool> {
 auto Halite::process_events() -> void {
     std::unordered_set<SimulationEvent> unsorted_events;
 
-    std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions;
+    CollisionMap collision_map(game_map);
+    std::vector<hlt::EntityId> potential_collisions;
+
+    auto processed_tests = 0;
 
     for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
         for (const auto& pair1 : game_map.ships.at(player1)) {
@@ -499,11 +502,11 @@ auto Halite::process_events() -> void {
             const auto& ship1 = pair1.second;
 
             potential_collisions.clear();
-            broadphase_collision(game_map, pair1.second, potential_collisions);
-            for (const auto& potential_ship : potential_collisions) {
-                const auto& id2 = potential_ship.first;
-                const auto& ship2 = potential_ship.second;
+            collision_map.test(pair1.second.location, pair1.second.radius, potential_collisions);
+            for (const auto& id2 : potential_collisions) {
+                const auto& ship2 = game_map.get_ship(id2);
                 find_events(unsorted_events, id1, id2, ship1, ship2);
+                processed_tests++;
             }
 
             // Possible ship-planet collisions
@@ -567,6 +570,12 @@ auto Halite::process_events() -> void {
             }
         }
     }
+
+    auto worst_case = 0;
+    for (const auto& player_ships : game_map.ships) {
+        worst_case += player_ships.size();
+    }
+    std::cout << "Collision tests: " << processed_tests << '/' << worst_case*worst_case << '\n';
 
     std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
                                                unsorted_events.end());
@@ -676,10 +685,12 @@ auto Halite::process_events() -> void {
         for (auto& pair : attackers) {
             full_frame_events.back().push_back(
                 // TODO: define a move constructor?
-                std::unique_ptr<Event>(new AttackEvent(pair.second)));
+                std::unique_ptr<Event>(new AttackEvent(std::move(pair.second))));
         }
 
         process_damage(damage_map, simultaneous_events.back().time);
+
+        game_map.cleanup_entities();
     }
 }
 

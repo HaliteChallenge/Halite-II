@@ -19,6 +19,83 @@ auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream
     return os;
 }
 
+CollisionMap::CollisionMap(const hlt::Map& game_map) {
+    width = static_cast<int>(std::ceil(game_map.map_width / CELL_SIZE));
+    height = static_cast<int>(std::ceil(game_map.map_height / CELL_SIZE));
+
+    std::vector<std::vector<hlt::EntityId>> row(height, std::vector<hlt::EntityId>());
+    cells.resize(width, row);
+
+    rebuild(game_map);
+}
+
+auto CollisionMap::rebuild(const hlt::Map& game_map) -> void {
+    hlt::PlayerId player = 0;
+    for (const auto& player_ships : game_map.ships) {
+        for (const auto& ship_pair : player_ships) {
+            const auto& location = ship_pair.second.location;
+            const auto x = static_cast<int>(location.pos_x / CELL_SIZE);
+            const auto y = static_cast<int>(location.pos_y / CELL_SIZE);
+
+            const auto id = hlt::EntityId::for_ship(player, ship_pair.first);
+            cells.at(x).at(y).push_back(id);
+        }
+
+        player++;
+    }
+}
+
+auto CollisionMap::test(const hlt::Location& location, double radius,
+                        std::vector<hlt::EntityId>& potential_collisions) -> void {
+    const auto cell_x = static_cast<int>(location.pos_x / CELL_SIZE);
+    const auto cell_y = static_cast<int>(location.pos_y / CELL_SIZE);
+    const auto real_x = CELL_SIZE * cell_x;
+    const auto real_y = CELL_SIZE * cell_y;
+
+    const auto exceeds_left = location.pos_x - radius < real_x && cell_x > 0;
+    const auto exceeds_right = location.pos_x + radius >= real_x + CELL_SIZE && cell_x < width;
+    const auto exceeds_top = location.pos_y - radius < real_y && cell_y > 0;
+    const auto exceeds_bottom = location.pos_y + radius >= real_y + CELL_SIZE && cell_y < height;
+
+    const auto add_collisions = [&](int cell_x, int cell_y) -> void {
+        for (const auto& id : cells.at(cell_x).at(cell_y)) {
+            potential_collisions.push_back(id);
+        }
+    };
+
+    add_collisions(cell_x, cell_y);
+
+    if (exceeds_left) {
+        add_collisions(cell_x - 1, cell_y);
+
+        if (exceeds_top) {
+            add_collisions(cell_x - 1, cell_y - 1);
+        }
+        if (exceeds_bottom) {
+            add_collisions(cell_x - 1, cell_y + 1);
+        }
+    }
+
+    if (exceeds_top) {
+        add_collisions(cell_x, cell_y - 1);
+    }
+
+    if (exceeds_bottom) {
+        add_collisions(cell_x, cell_y + 1);
+    }
+
+    if (exceeds_right) {
+        add_collisions(cell_x + 1, cell_y);
+
+        if (exceeds_top) {
+            add_collisions(cell_x + 1, cell_y - 1);
+        }
+        if (exceeds_bottom) {
+            add_collisions(cell_x + 1, cell_y + 1);
+        }
+    }
+}
+
 auto collision_time(
     double r,
     const hlt::Location& loc1, const hlt::Location& loc2,
@@ -104,21 +181,6 @@ auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& shi
 
 auto round_event_time(double t) -> double {
     return std::round(t * EVENT_TIME_PRECISION) / EVENT_TIME_PRECISION;
-}
-
-auto broadphase_collision(const hlt::Map& game_map, const hlt::Ship& ship1,
-                          std::vector<std::pair<hlt::EntityId, const hlt::Ship&>> potential_collisions) -> void {
-    hlt::PlayerId player = 0;
-    for (const auto& player_ships : game_map.ships) {
-        for (const auto& ship_pair : player_ships) {
-            potential_collisions.push_back({
-                hlt::EntityId::for_ship(player, ship_pair.first),
-                ship_pair.second
-            });
-        }
-
-        player++;
-    }
 }
 
 auto find_events(
