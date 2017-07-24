@@ -31,7 +31,6 @@
             };
         },
         mounted: function() {
-            this.logged_in = true;
             api.me().then((me) => {
                 if (me !== null) {
                     this.logged_in = true;
