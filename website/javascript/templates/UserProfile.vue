@@ -57,7 +57,7 @@
                                     {{ game.game_id }}
                                 </a>
 
-                                <a v-if="game.players[user.user_id].timed_out"
+                                <a v-if="game.players[user.user_id].timed_out && user.user_id == my_id"
                                    target="_blank"
                                    :href="error_log_link(game.game_id)"
                                    class="text-danger">
@@ -103,6 +103,7 @@
                 profile_images: {},
                 page: 0,
                 offset: 0,
+                my_id: null,
             };
         },
         mounted: function() {
@@ -133,6 +134,10 @@
                     this.bots = bots;
                 });
                 this.fetch();
+            });
+
+            api.me().then((me) => {
+                this.my_id = me.user_id;
             });
         },
         methods: {
