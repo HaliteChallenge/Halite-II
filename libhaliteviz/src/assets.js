@@ -1,5 +1,11 @@
 export let ASSET_ROOT = "dist/";
 
+export const VISUALIZER_SIZE = 720;
+export const STATS_SIZE = 20;
+export const CELL_SIZE = 1;
+export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
+export const PLANET_COLOR = 0xb7b7b7;
+
 export let BACKGROUND_IMAGES = [];
 export let PLANET_IMAGES = [];
 export let SHIP_IMAGE = "";

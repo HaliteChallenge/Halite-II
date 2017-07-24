@@ -82,7 +82,8 @@
 </template>
 
 <script>
- import {HaliteVisualizer, PLAYER_COLORS} from "./visualizer";
+ import {HaliteVisualizer} from "./visualizer";
+ import {PLAYER_COLORS} from "./assets";
 
  export default {
      name: "halite-hud",

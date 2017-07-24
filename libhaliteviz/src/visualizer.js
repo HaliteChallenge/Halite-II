@@ -13,13 +13,6 @@ import * as keyboard from "./keyboardControls";
 import * as assets from "./assets";
 
 
-const VISUALIZER_SIZE = 720;
-const STATS_SIZE = 20;
-const CELL_SIZE = 1;
-export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
-export const PLANET_COLOR = 0xb7b7b7;
-
-
 class FrameAnimation {
     constructor(frames, delayTime, update, draw, finish) {
         this.frames = frames;
@@ -53,15 +46,16 @@ export class HaliteVisualizer {
             },
         });
 
+        const aspectRatio = this.replay.height / this.replay.width;
         this.application = new PIXI.Application(
-            VISUALIZER_SIZE,
-            2 * STATS_SIZE + VISUALIZER_SIZE * (this.replay.height / this.replay.width),
+            assets.VISUALIZER_SIZE,
+            2 * assets.STATS_SIZE + assets.VISUALIZER_SIZE * aspectRatio,
             {
                 backgroundColor: 0x15223F,
             }
         );
 
-        this.scale = VISUALIZER_SIZE / Math.max(replay.width, replay.height);
+        this.scale = assets.VISUALIZER_SIZE / Math.max(replay.width, replay.height);
         this.starfield = PIXI.Sprite.fromImage(
             assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
 
@@ -72,19 +66,19 @@ export class HaliteVisualizer {
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
         this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
         this.container = new PIXI.Container();
-        this.container.position.set(0, 2 * STATS_SIZE);
+        this.container.position.set(0, 2 * assets.STATS_SIZE);
 
         this.planets = [];
         for (let i = 0; i < this.replay.planets.length; i++) {
             const planetBase = this.replay.planets[i];
             const planetSprite =
                 PIXI.Sprite.fromImage(assets.PLANET_IMAGES[i % assets.PLANET_IMAGES.length]);
-            const r = planetBase.r * CELL_SIZE * this.scale;
+            const r = planetBase.r * assets.CELL_SIZE * this.scale;
             planetSprite.width = planetSprite.height = 2 * r;
             planetSprite.anchor.x = 0.5;
             planetSprite.anchor.y = 0.5;
-            planetSprite.position.x = this.scale * CELL_SIZE * (planetBase.x + 0.5);
-            planetSprite.position.y = this.scale * CELL_SIZE * (planetBase.y + 0.5);
+            planetSprite.position.x = this.scale * assets.CELL_SIZE * planetBase.x;
+            planetSprite.position.y = this.scale * assets.CELL_SIZE * planetBase.y;
 
             planetSprite.interactive = true;
             planetSprite.buttonMode = true;
@@ -101,7 +95,8 @@ export class HaliteVisualizer {
 
         let poi = new PIXI.Graphics();
         this.drawPOI(poi);
-        let renderer = new PIXI.CanvasRenderer(VISUALIZER_SIZE, VISUALIZER_SIZE);
+        let renderer = new PIXI.CanvasRenderer(
+            assets.VISUALIZER_SIZE, assets.VISUALIZER_SIZE);
         let texture = renderer.generateTexture(poi);
         this.poi = PIXI.Sprite.from(texture);
 
@@ -110,10 +105,10 @@ export class HaliteVisualizer {
         this.statsDisplay = new PIXI.Graphics();
 
         this.shipStrengthLabel = new PIXI.Text("Relative Fleet Strength");
-        this.shipStrengthLabel.style.fontSize = STATS_SIZE * 0.6;
+        this.shipStrengthLabel.style.fontSize = assets.STATS_SIZE * 0.6;
         this.planetStrengthLabel = new PIXI.Text("Relative Territory");
-        this.planetStrengthLabel.style.fontSize = STATS_SIZE * 0.6;
-        this.planetStrengthLabel.position.y = STATS_SIZE;
+        this.planetStrengthLabel.style.fontSize = assets.STATS_SIZE * 0.6;
+        this.planetStrengthLabel.position.y = assets.STATS_SIZE;
 
         this.application.stage.addChild(this.container);
         this.application.stage.addChild(this.statsDisplay);
@@ -310,7 +305,7 @@ export class HaliteVisualizer {
      * @param health_factor
      */
     drawCell(container, x, y, color, health_factor, glow=false) {
-        const side = CELL_SIZE * this.scale;
+        const side = assets.CELL_SIZE * this.scale;
         x = x * side;
         y = y * side;
         container.lineStyle(0);
@@ -338,7 +333,7 @@ export class HaliteVisualizer {
     }
 
     drawPOI(graphics) {
-        const side = CELL_SIZE * this.scale;
+        const side = assets.CELL_SIZE * this.scale;
         for (let poi of this.replay.poi) {
             if (poi.type === "orbit") {
                 graphics.beginFill(0, 0);
@@ -359,8 +354,9 @@ export class HaliteVisualizer {
     drawPlanet(planet) {
         let planetBase = this.replay.planets[planet.id];
 
-        const side = CELL_SIZE * this.scale;
-        const color = planet.owner === null ? PLANET_COLOR : PLAYER_COLORS[planet.owner];
+        const side = assets.CELL_SIZE * this.scale;
+        const color = planet.owner === null ?
+            assets.PLANET_COLOR : assets.PLAYER_COLORS[planet.owner];
 
         const center_x = side * planetBase.x;
         const center_y = side * (planetBase.y + 0.5);
@@ -391,7 +387,7 @@ export class HaliteVisualizer {
     }
 
     drawShip(ship) {
-        const side = CELL_SIZE * this.scale;
+        const side = assets.CELL_SIZE * this.scale;
         const max_ship_health = this.replay.constants.MAX_SHIP_HEALTH;
         const health_factor = 0.1 + 0.3 * (max_ship_health - ship.health) / max_ship_health;
 
@@ -486,8 +482,8 @@ export class HaliteVisualizer {
 
                 if (event.event === "destroyed") {
                     let draw = (frame) => {
-                        const width = CELL_SIZE * this.scale;
-                        const height = CELL_SIZE * this.scale;
+                        const width = assets.CELL_SIZE * this.scale;
+                        const height = assets.CELL_SIZE * this.scale;
 
                         const x = width * event.x;
                         const y = width * event.y;
@@ -501,7 +497,7 @@ export class HaliteVisualizer {
                     if (event.entity.type === "planet") {
                         let r = event.radius;
                         draw = (frame) => {
-                            const side = CELL_SIZE * this.scale;
+                            const side = assets.CELL_SIZE * this.scale;
                             this.planetOverlay.lineStyle(0);
                             for (let dx = -r; dx <= r; dx++) {
                                 for (let dy = -r; dy <= r; dy++) {
@@ -537,19 +533,19 @@ export class HaliteVisualizer {
                     ));
                 }
                 else if (event.event === "attack") {
-                    const side = CELL_SIZE * this.scale;
+                    const side = assets.CELL_SIZE * this.scale;
 
                     const x = side * (event.x + 0.5);
                     const y = side * (event.y + 0.5);
 
-                    let attackSprite = PIXI.Sprite.fromImage(ATTACK_IMAGE);
+                    let attackSprite = PIXI.Sprite.fromImage(assets.ATTACK_IMAGE);
                     attackSprite.anchor.x = 0.5;
                     attackSprite.anchor.y = 0.5;
                     attackSprite.position.x = x;
                     attackSprite.position.y = y;
                     attackSprite.width = 2 * side * this.replay.constants.WEAPON_RADIUS;
                     attackSprite.height = 2 * side * this.replay.constants.WEAPON_RADIUS;
-                    attackSprite.tint = PLAYER_COLORS[event.entity.owner];
+                    attackSprite.tint = assets.PLAYER_COLORS[event.entity.owner];
                     this.container.addChild(attackSprite);
 
                     this.animationQueue.push(new FrameAnimation(
@@ -570,7 +566,7 @@ export class HaliteVisualizer {
                         () => {
                         },
                         (frame) => {
-                            const side = CELL_SIZE * this.scale;
+                            const side = assets.CELL_SIZE * this.scale;
                             const planetX = side * (event.planet_x + 0.5);
                             const planetY = side * (event.planet_y + 0.5);
                             const ship_x = side * (event.x + 0.5);
@@ -665,26 +661,26 @@ export class HaliteVisualizer {
 
         let x = 0;
         for (let player = 0; player < this.replay.num_players; player++) {
-            const width = VISUALIZER_SIZE * (stats.ships[player] || 0) / stats.total_ships;
-            this.statsDisplay.beginFill(PLAYER_COLORS[player]);
-            this.statsDisplay.drawRect(x, 0, width, STATS_SIZE * 0.8);
+            const width = assets.VISUALIZER_SIZE * (stats.ships[player] || 0) / stats.total_ships;
+            this.statsDisplay.beginFill(assets.PLAYER_COLORS[player]);
+            this.statsDisplay.drawRect(x, 0, width, assets.STATS_SIZE * 0.8);
             this.statsDisplay.endFill();
             x += width;
         }
 
         x = 0;
         for (let player = 0; player < this.replay.num_players; player++) {
-            const width = VISUALIZER_SIZE * (stats.planets[player] || 0) / this.replay.planets.length;
-            this.statsDisplay.beginFill(PLAYER_COLORS[player]);
-            this.statsDisplay.drawRect(x, STATS_SIZE, width, STATS_SIZE * 0.8);
+            const width = assets.VISUALIZER_SIZE * (stats.planets[player] || 0) / this.replay.planets.length;
+            this.statsDisplay.beginFill(assets.PLAYER_COLORS[player]);
+            this.statsDisplay.drawRect(x, assets.STATS_SIZE, width, assets.STATS_SIZE * 0.8);
             this.statsDisplay.endFill();
             x += width;
         }
-        const width = VISUALIZER_SIZE * (stats.planets["unowned"] || 0) / this.replay.planets.length;
-        this.statsDisplay.beginFill(PLANET_COLOR);
-        this.statsDisplay.drawRect(x, STATS_SIZE, width, STATS_SIZE * 0.8);
+        const width = assets.VISUALIZER_SIZE * (stats.planets["unowned"] || 0) / this.replay.planets.length;
+        this.statsDisplay.beginFill(assets.PLANET_COLOR);
+        this.statsDisplay.drawRect(x, assets.STATS_SIZE, width, assets.STATS_SIZE * 0.8);
         this.statsDisplay.endFill();
-        this.statsDisplay.drawRect(0, 90, VISUALIZER_SIZE, 10);
+        this.statsDisplay.drawRect(0, 90, assets.VISUALIZER_SIZE, 10);
     }
 
     render(dt=1000/60) {
