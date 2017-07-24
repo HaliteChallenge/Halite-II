@@ -42,7 +42,7 @@ CREATE TABLE `user` (
 CREATE TABLE bot (
   user_id MEDIUMINT(8) UNSIGNED NOT NULL,
   id MEDIUMINT(8) UNSIGNED NOT NULL,
-  compile_status ENUM('Uploaded', 'InProgress', 'Successful', 'Failed') NOT NULL,
+  compile_status ENUM('Uploaded', 'InProgress', 'Successful', 'Failed', 'Disabled') NOT NULL,
   compile_start DATETIME,
   language VARCHAR(16) DEFAULT NULL,
   -- # of times submitted = version number
@@ -51,6 +51,8 @@ CREATE TABLE bot (
   mu FLOAT NOT NULL DEFAULT 25.000,
   sigma FLOAT UNSIGNED NOT NULL DEFAULT 8.333,
   score FLOAT NOT NULL DEFAULT 0,
+  creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   PRIMARY KEY (user_id, id)
 );
