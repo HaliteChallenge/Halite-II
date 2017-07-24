@@ -1,11 +1,8 @@
-//
-// Created by David Li on 7/18/17.
-//
-
 #ifndef ENVIRONMENT_SIMULATIONEVENT_HPP
 #define ENVIRONMENT_SIMULATIONEVENT_HPP
 
 #include <cassert>
+#include <functional>
 #include <iostream>
 #include <unordered_set>
 #include <vector>
@@ -33,18 +30,21 @@ auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream
  * mutated.
  */
 struct CollisionMap {
-    constexpr static auto CELL_SIZE = 16;
+    constexpr static auto CELL_SIZE = 32;
 
     std::vector<std::vector<std::vector<hlt::EntityId>>> cells;
 
     int width, height;
 
-    CollisionMap(const hlt::Map& game_map);
+    CollisionMap(const hlt::Map& game_map,
+                 const std::function<double(const hlt::Ship&)> radius_func);
 
-    auto rebuild(const hlt::Map& game_map) -> void;
+    auto rebuild(const hlt::Map& game_map,
+                 const std::function<double(const hlt::Ship&)> radius_func) -> void;
     auto test(const hlt::Location& location, double radius,
               std::vector<hlt::EntityId>& potential_collisions) -> void;
-    auto add(const hlt::Location& location, double radius, hlt::EntityId id) -> void;
+    auto add(const hlt::Location& location, double radius,
+             hlt::EntityId id) -> void;
 };
 
 struct SimulationEvent {

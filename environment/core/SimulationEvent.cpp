@@ -1,7 +1,3 @@
-//
-// Created by David Li on 7/18/17.
-//
-
 #include "SimulationEvent.hpp"
 
 auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream& {
@@ -19,75 +15,66 @@ auto operator<<(std::ostream& os, const SimulationEventType& ty) -> std::ostream
     return os;
 }
 
-CollisionMap::CollisionMap(const hlt::Map& game_map) {
+auto test_aabb_circle(
+    int rect_x, int rect_y, int rect_w, int rect_h,
+    const hlt::Location& circ_center, double radius) -> bool {
+    // https://stackoverflow.com/a/21096179
+
+    // Find axis-aligned distances between circle and rectangle center
+    const auto x_half_rect = rect_w / 2.0;
+    const auto y_half_rect = rect_h / 2.0;
+    const auto x_dist = std::abs(circ_center.pos_x - rect_x - x_half_rect);
+    const auto y_dist = std::abs(circ_center.pos_y - rect_y - y_half_rect);
+
+    if (x_dist > x_half_rect + radius) return false;
+    if (y_dist > y_half_rect + radius) return false;
+
+    if (x_dist <= x_half_rect) return true;
+    if (y_dist <= y_half_rect) return true;
+
+    // Distance from rectangle side to circle center
+    const auto dx = x_dist - x_half_rect;
+    const auto dy = y_dist - y_half_rect;
+
+    return std::pow(dx, 2) + std::pow(dy, 2) <= std::pow(radius, 2);
+}
+
+CollisionMap::CollisionMap(const hlt::Map& game_map,
+                           const std::function<double(const hlt::Ship&)> radius_func) {
     width = static_cast<int>(std::ceil(game_map.map_width / CELL_SIZE));
     height = static_cast<int>(std::ceil(game_map.map_height / CELL_SIZE));
 
     std::vector<std::vector<hlt::EntityId>> row(height, std::vector<hlt::EntityId>());
     cells.resize(width, row);
 
-    rebuild(game_map);
+    rebuild(game_map, radius_func);
 }
 
-auto CollisionMap::rebuild(const hlt::Map& game_map) -> void {
+auto CollisionMap::rebuild(const hlt::Map& game_map,
+                           const std::function<double(const hlt::Ship&)> radius_func) -> void {
     hlt::PlayerId player = 0;
     for (const auto& player_ships : game_map.ships) {
         for (const auto& ship_pair : player_ships) {
             const auto& location = ship_pair.second.location;
             const auto id = hlt::EntityId::for_ship(player, ship_pair.first);
 
-            add(location, ship_pair.second.radius, id);
+            add(location, radius_func(ship_pair.second), id);
         }
 
         player++;
     }
 }
 
-auto CollisionMap::add(const hlt::Location& location, double radius, hlt::EntityId id) -> void {
+auto CollisionMap::add(const hlt::Location& location, double radius,
+                       hlt::EntityId id) -> void {
     // Add the entity ID to all grid cells that the entity overlaps
-    const auto cell_x = static_cast<int>(location.pos_x / CELL_SIZE);
-    const auto cell_y = static_cast<int>(location.pos_y / CELL_SIZE);
-    const auto real_x = CELL_SIZE * cell_x;
-    const auto real_y = CELL_SIZE * cell_y;
-
-    const auto exceeds_left = location.pos_x - radius < real_x && cell_x > 0;
-    const auto exceeds_right = location.pos_x + radius >= real_x + CELL_SIZE && cell_x < width;
-    const auto exceeds_top = location.pos_y - radius < real_y && cell_y > 0;
-    const auto exceeds_bottom = location.pos_y + radius >= real_y + CELL_SIZE && cell_y < height;
-
-    const auto add_collisions = [&](int cell_x, int cell_y) -> void {
-        cells.at(cell_x).at(cell_y).push_back(id);
-    };
-
-    add_collisions(cell_x, cell_y);
-
-    if (exceeds_left) {
-        add_collisions(cell_x - 1, cell_y);
-
-        if (exceeds_top) {
-            add_collisions(cell_x - 1, cell_y - 1);
-        }
-        if (exceeds_bottom) {
-            add_collisions(cell_x - 1, cell_y + 1);
-        }
-    }
-
-    if (exceeds_top) {
-        add_collisions(cell_x, cell_y - 1);
-    }
-
-    if (exceeds_bottom) {
-        add_collisions(cell_x, cell_y + 1);
-    }
-
-    if (exceeds_right) {
-        add_collisions(cell_x + 1, cell_y);
-
-        if (exceeds_top) {
-            add_collisions(cell_x + 1, cell_y - 1);
-        }
-        if (exceeds_bottom) {
-            add_collisions(cell_x + 1, cell_y + 1);
+    for (auto cell_x = 0; cell_x < width; cell_x++) {
+        for (auto cell_y = 0; cell_y < height; cell_y++) {
+            if (test_aabb_circle(cell_x * CELL_SIZE, cell_y * CELL_SIZE,
+                                 CELL_SIZE, CELL_SIZE,
+                                 location, radius)) {
+                cells.at(cell_x).at(cell_y).push_back(id);
+            }
         }
     }
 }
@@ -95,51 +82,17 @@ auto CollisionMap::add(const hlt::Location& location, double radius, hlt::Entity
 auto CollisionMap::test(const hlt::Location& location, double radius,
                         std::vector<hlt::EntityId>& potential_collisions) -> void {
     // Add all IDs of any cell that overlaps the circle
-    const auto cell_x = static_cast<int>(location.pos_x / CELL_SIZE);
-    const auto cell_y = static_cast<int>(location.pos_y / CELL_SIZE);
-    const auto real_x = CELL_SIZE * cell_x;
-    const auto real_y = CELL_SIZE * cell_y;
-
-    const auto exceeds_left = location.pos_x - radius < real_x && cell_x > 0;
-    const auto exceeds_right = location.pos_x + radius >= real_x + CELL_SIZE && cell_x < width;
-    const auto exceeds_top = location.pos_y - radius < real_y && cell_y > 0;
-    const auto exceeds_bottom = location.pos_y + radius >= real_y + CELL_SIZE && cell_y < height;
-
-    const auto add_collisions = [&](int cell_x, int cell_y) -> void {
-        for (const auto& id : cells.at(cell_x).at(cell_y)) {
-            potential_collisions.push_back(id);
-        }
-    };
-
-    add_collisions(cell_x, cell_y);
-
-    if (exceeds_left) {
-        add_collisions(cell_x - 1, cell_y);
-
-        if (exceeds_top) {
-            add_collisions(cell_x - 1, cell_y - 1);
-        }
-        if (exceeds_bottom) {
-            add_collisions(cell_x - 1, cell_y + 1);
-        }
-    }
-
-    if (exceeds_top) {
-        add_collisions(cell_x, cell_y - 1);
-    }
-
-    if (exceeds_bottom) {
-        add_collisions(cell_x, cell_y + 1);
-    }
-
-    if (exceeds_right) {
-        add_collisions(cell_x + 1, cell_y);
-
-        if (exceeds_top) {
-            add_collisions(cell_x + 1, cell_y - 1);
-        }
-        if (exceeds_bottom) {
-            add_collisions(cell_x + 1, cell_y + 1);
+    for (auto cell_x = 0; cell_x < width; cell_x++) {
+        for (auto cell_y = 0; cell_y < height; cell_y++) {
+            if (test_aabb_circle(cell_x * CELL_SIZE, cell_y * CELL_SIZE,
+                                 CELL_SIZE, CELL_SIZE,
+                                 location, radius)) {
+                const auto& cell = cells.at(cell_x).at(cell_y);
+                potential_collisions.insert(
+                    potential_collisions.end(),
+                    cell.begin(), cell.end()
+                );
+            }
         }
     }
 }

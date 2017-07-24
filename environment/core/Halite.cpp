@@ -251,7 +251,12 @@ auto Halite::process_production() -> void {
     // Update productions
     // We do this after processing moves so that a bot can't try to guess the
     // resulting ship ID and issue commands to it immediately
-    CollisionMap collision_map = CollisionMap(game_map);
+    CollisionMap collision_map = CollisionMap(
+        game_map,
+        [](const hlt::Ship& ship) -> double {
+            return ship.radius;
+        }
+    );
     std::vector<hlt::EntityId> occupants;
 
     for (auto& planet : game_map.planets) {
@@ -507,10 +512,19 @@ auto Halite::find_living_players() -> std::vector<bool> {
 auto Halite::process_events() -> void {
     std::unordered_set<SimulationEvent> unsorted_events;
 
-    CollisionMap collision_map(game_map);
+    const auto event_horizon = [](const hlt::Ship& ship) -> double {
+        // The size of the ship's event horizon
+        return ship.radius + ship.velocity.magnitude() +
+            hlt::GameConstants::get().WEAPON_RADIUS;
+    };
+
+    CollisionMap collision_map = CollisionMap(game_map, event_horizon);
     std::vector<hlt::EntityId> potential_collisions;
 
     auto processed_tests = 0;
+    auto naive_tests = 0;
+    std::chrono::microseconds map_time(0);
+    std::chrono::microseconds naive_time(0);
 
     for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
         for (const auto& pair1 : game_map.ships.at(player1)) {
@@ -518,16 +532,40 @@ auto Halite::process_events() -> void {
             const auto& ship1 = pair1.second;
 
             potential_collisions.clear();
-            // TODO: this is wrong. We need to add the ship to ALL
-            // cells it could potentially be in, and we need to test
-            // against the area consisting of the ship's travel radius
-            // + attack radius.
-            collision_map.test(pair1.second.location, pair1.second.radius, potential_collisions);
+            collision_map.test(
+                pair1.second.location, event_horizon(pair1.second),
+                potential_collisions);
             for (const auto& id2 : potential_collisions) {
                 const auto& ship2 = game_map.get_ship(id2);
                 find_events(unsorted_events, id1, id2, ship1, ship2);
                 processed_tests++;
             }
+
+            std::unordered_set<SimulationEvent> set1;
+            std::unordered_set<SimulationEvent> set2;
+
+            const auto start = std::chrono::high_resolution_clock::now();
+            for (const auto& id2 : potential_collisions) {
+                const auto& ship2 = game_map.get_ship(id2);
+                find_events(set1, id1, id2, ship1, ship2);
+            }
+            const auto mid = std::chrono::high_resolution_clock::now();
+
+            for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
+                for (const auto pair2 : game_map.ships.at(player2)) {
+                    const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
+                    const auto& ship2 = pair2.second;
+                    find_events(set2, id1, id2, ship1, ship2);
+                    naive_tests++;
+                }
+            }
+            const auto end = std::chrono::high_resolution_clock::now();
+
+            map_time += std::chrono::duration_cast<std::chrono::microseconds>(mid - start);
+            naive_time += std::chrono::duration_cast<std::chrono::microseconds>(end - mid);
+
+            assert(set1.size() == set2.size());
+            assert(set1 == set2);
 
             // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
@@ -591,19 +629,20 @@ auto Halite::process_events() -> void {
         }
     }
 
-    auto worst_case = 0;
+    auto num_ships = 0;
     for (const auto& player_ships : game_map.ships) {
-        worst_case += player_ships.size();
+        num_ships += player_ships.size();
     }
-    std::cout << "Collision tests: " << processed_tests << '/' << worst_case*worst_case << '\n';
+    std::cout << "Collision tests: " << processed_tests << '/' << naive_tests << '(' << num_ships << " ships)\n";
+    std::cout << "Fast time: " << map_time.count() << "us naive time: " << naive_time.count() << "us\n";
 
     std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
                                                unsorted_events.end());
     std::sort(
         sorted_events.begin(), sorted_events.end(),
         [](const SimulationEvent& ev1, const SimulationEvent& ev2) -> bool {
-          // Sort in reverse since we're using as a queue
-          return ev1.time > ev2.time;
+            // Sort in reverse since we're using as a queue
+            return ev1.time > ev2.time;
         });
 
     while (sorted_events.size() > 0) {
