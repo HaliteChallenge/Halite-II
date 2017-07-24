@@ -518,6 +518,10 @@ auto Halite::process_events() -> void {
             const auto& ship1 = pair1.second;
 
             potential_collisions.clear();
+            // TODO: this is wrong. We need to add the ship to ALL
+            // cells it could potentially be in, and we need to test
+            // against the area consisting of the ship's travel radius
+            // + attack radius.
             collision_map.test(pair1.second.location, pair1.second.radius, potential_collisions);
             for (const auto& id2 : potential_collisions) {
                 const auto& ship2 = game_map.get_ship(id2);
