@@ -44,6 +44,7 @@ struct CollisionMap {
     auto rebuild(const hlt::Map& game_map) -> void;
     auto test(const hlt::Location& location, double radius,
               std::vector<hlt::EntityId>& potential_collisions) -> void;
+    auto add(const hlt::Location& location, double radius, hlt::EntityId id) -> void;
 };
 
 struct SimulationEvent {

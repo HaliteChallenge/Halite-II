@@ -251,6 +251,9 @@ auto Halite::process_production() -> void {
     // Update productions
     // We do this after processing moves so that a bot can't try to guess the
     // resulting ship ID and issue commands to it immediately
+    CollisionMap collision_map = CollisionMap(game_map);
+    std::vector<hlt::EntityId> occupants;
+
     for (auto& planet : game_map.planets) {
         if (!planet.is_alive() || !planet.owned) continue;
 
@@ -271,7 +274,6 @@ auto Halite::process_production() -> void {
         const auto production_per_ship = hlt::GameConstants::get().PRODUCTION_PER_SHIP;
         while (planet.current_production >= production_per_ship) {
             // Try to spawn the ship
-            auto& ships = game_map.ships.at(planet.owner);
             auto best_location = std::make_pair(planet.location, false);
             auto best_distance = std::numeric_limits<double>::max();
             const auto& center = hlt::Location{
@@ -290,8 +292,19 @@ auto Halite::process_production() -> void {
                     if (!location.second) continue;
 
                     const auto distance = location.first.distance(center);
-                    const auto num_occupants = game_map.test(location.first, open_radius).size();
-                    if (distance < best_distance && num_occupants == 0) {
+
+                    occupants.clear();
+                    collision_map.test(location.first, open_radius, occupants);
+                    const auto has_occupants =
+                        game_map.any_planet_collision(location.first, open_radius) ||
+                        game_map.any_collision(location.first, open_radius, occupants);
+
+                    // const auto num_occupants = game_map.test(location.first, open_radius).size();
+
+                    // if (has_occupants && num_occupants == 0) assert(false);
+                    // if (!has_occupants && num_occupants > 0) assert(false);
+
+                    if (distance < best_distance && !has_occupants) {
                         best_distance = distance;
                         best_location = location;
                     }
@@ -303,9 +316,12 @@ auto Halite::process_production() -> void {
                 const auto ship_idx =
                     game_map.spawn_ship(best_location.first, planet.owner);
                 total_ship_count[planet.owner]++;
+                const auto id = hlt::EntityId::for_ship(planet.owner, ship_idx);
                 full_frame_events.back().emplace_back(new SpawnEvent(
-                    hlt::EntityId::for_ship(planet.owner, ship_idx),
+                    id,
                     best_location.first, planet.location));
+
+                collision_map.add(best_location.first, game_map.get_ship(id).radius, id);
             }
             else {
                 // Can't spawn any more - just keep the production there
@@ -685,7 +701,7 @@ auto Halite::process_events() -> void {
         for (auto& pair : attackers) {
             full_frame_events.back().push_back(
                 // TODO: define a move constructor?
-                std::unique_ptr<Event>(new AttackEvent(std::move(pair.second))));
+                std::unique_ptr<Event>(new AttackEvent(pair.second)));
         }
 
         process_damage(damage_map, simultaneous_events.back().time);

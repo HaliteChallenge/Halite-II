@@ -34,19 +34,67 @@ auto CollisionMap::rebuild(const hlt::Map& game_map) -> void {
     for (const auto& player_ships : game_map.ships) {
         for (const auto& ship_pair : player_ships) {
             const auto& location = ship_pair.second.location;
-            const auto x = static_cast<int>(location.pos_x / CELL_SIZE);
-            const auto y = static_cast<int>(location.pos_y / CELL_SIZE);
-
             const auto id = hlt::EntityId::for_ship(player, ship_pair.first);
-            cells.at(x).at(y).push_back(id);
+
+            add(location, ship_pair.second.radius, id);
         }
 
         player++;
     }
 }
 
+auto CollisionMap::add(const hlt::Location& location, double radius, hlt::EntityId id) -> void {
+    // Add the entity ID to all grid cells that the entity overlaps
+    const auto cell_x = static_cast<int>(location.pos_x / CELL_SIZE);
+    const auto cell_y = static_cast<int>(location.pos_y / CELL_SIZE);
+    const auto real_x = CELL_SIZE * cell_x;
+    const auto real_y = CELL_SIZE * cell_y;
+
+    const auto exceeds_left = location.pos_x - radius < real_x && cell_x > 0;
+    const auto exceeds_right = location.pos_x + radius >= real_x + CELL_SIZE && cell_x < width;
+    const auto exceeds_top = location.pos_y - radius < real_y && cell_y > 0;
+    const auto exceeds_bottom = location.pos_y + radius >= real_y + CELL_SIZE && cell_y < height;
+
+    const auto add_collisions = [&](int cell_x, int cell_y) -> void {
+        cells.at(cell_x).at(cell_y).push_back(id);
+    };
+
+    add_collisions(cell_x, cell_y);
+
+    if (exceeds_left) {
+        add_collisions(cell_x - 1, cell_y);
+
+        if (exceeds_top) {
+            add_collisions(cell_x - 1, cell_y - 1);
+        }
+        if (exceeds_bottom) {
+            add_collisions(cell_x - 1, cell_y + 1);
+        }
+    }
+
+    if (exceeds_top) {
+        add_collisions(cell_x, cell_y - 1);
+    }
+
+    if (exceeds_bottom) {
+        add_collisions(cell_x, cell_y + 1);
+    }
+
+    if (exceeds_right) {
+        add_collisions(cell_x + 1, cell_y);
+
+        if (exceeds_top) {
+            add_collisions(cell_x + 1, cell_y - 1);
+        }
+        if (exceeds_bottom) {
+            add_collisions(cell_x + 1, cell_y + 1);
+        }
+    }
+}
+
 auto CollisionMap::test(const hlt::Location& location, double radius,
                         std::vector<hlt::EntityId>& potential_collisions) -> void {
+    // Add all IDs of any cell that overlaps the circle
     const auto cell_x = static_cast<int>(location.pos_x / CELL_SIZE);
     const auto cell_y = static_cast<int>(location.pos_y / CELL_SIZE);
     const auto real_x = CELL_SIZE * cell_x;

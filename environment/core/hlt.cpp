@@ -175,17 +175,11 @@ namespace hlt {
             }
         }
     }
-    auto Map::test(const Location &location, double radius) -> std::vector<EntityId> {
+
+    auto Map::test(const Location& location, double radius) -> std::vector<EntityId> {
         std::vector<EntityId> result;
 
-        for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
-            const auto& planet = planets[planet_idx];
-            if (!planet.is_alive()) continue;
-
-            if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
-                result.push_back(EntityId::for_planet(planet_idx));
-            }
-        }
+        test_planets(location, radius, result);
 
         for (hlt::PlayerId player_id = 0; player_id < MAX_PLAYERS; player_id++) {
             const auto& player_ships = ships[player_id];
@@ -201,6 +195,57 @@ namespace hlt {
         }
 
         return result;
+    }
+
+    auto Map::test_planets(const Location& location, double radius, std::vector<EntityId>& collisions) -> void {
+        for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
+            const auto& planet = planets[planet_idx];
+            if (!planet.is_alive()) continue;
+
+            if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
+                collisions.push_back(EntityId::for_planet(planet_idx));
+            }
+        }
+    }
+
+    auto Map::test_ids(const Location& location, double radius,
+                       const std::vector<EntityId>& potential,
+                       std::vector<EntityId>& collisions) -> void {
+        for (const auto& id : potential) {
+            const auto& ship = get_ship(id);
+            if (!ship.is_alive()) continue;
+
+            if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
+                collisions.push_back(id);
+            }
+        }
+    }
+
+    auto Map::any_collision(const Location& location, double radius,
+                            const std::vector<EntityId>& potential) -> bool {
+        for (const auto& id : potential) {
+            const auto& ship = get_ship(id);
+            if (!ship.is_alive()) continue;
+
+            if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    auto Map::any_planet_collision(const Location& location, double radius) -> bool {
+        for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
+            const auto& planet = planets[planet_idx];
+            if (!planet.is_alive()) continue;
+
+            if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     auto Map::spawn_ship(const Location& location, PlayerId owner) -> EntityIndex {

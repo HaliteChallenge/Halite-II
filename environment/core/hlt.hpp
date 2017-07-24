@@ -103,6 +103,14 @@ namespace hlt {
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
         auto test(const Location& location, double radius) -> std::vector<EntityId>;
+        auto test_planets(const Location& location, double radius,
+                          std::vector<EntityId>& collisions) -> void;
+        auto test_ids(const Location& location, double radius,
+                      const std::vector<EntityId>& potential,
+                      std::vector<EntityId>& result) -> void;
+        auto any_collision(const Location& location, double radius,
+                           const std::vector<EntityId>& potential) -> bool;
+        auto any_planet_collision(const Location& location, double radius) -> bool;
         auto spawn_ship(const Location& location, PlayerId owner) -> EntityIndex;
     };
 }
