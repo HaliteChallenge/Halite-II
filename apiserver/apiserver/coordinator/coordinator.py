@@ -102,10 +102,14 @@ def task():
             players = conn.execute(query).fetchall()
             players.insert(0, seed_player)
 
-            # Pick map size. Maps are square (currently), and duplicate entries
-            # are used to weight the probability of a particular size
-            map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160, 192, 192, 192, 256]
-            map_size = random.choice(map_sizes)
+            # Pick map size. Duplicate entries are used to weight the
+            # probability of a particular size
+            map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160,
+                         192, 192, 192, 256]
+            map_width = random.choice(map_sizes)
+            map_height = random.choice(map_sizes)
+
+            map_width, map_height = max(map_width, map_height), min(map_width, map_height)
 
             players = [{
                 "user_id": player["user_id"],
@@ -117,8 +121,8 @@ def task():
             if len(players) == player_count:
                 return response_success({
                     "type": "game",
-                    "width": map_size,
-                    "height": map_size,
+                    "width": map_width,
+                    "height": map_height,
                     "users": players,
                 })
 
