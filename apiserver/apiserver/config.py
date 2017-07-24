@@ -5,7 +5,7 @@ COMPETITION_OPEN = True
 COMPETITION_FINALS_PAIRING = False
 # Max number of games a bot version can error out in before being
 # stopped from playing
-MAX_ERRORS_PER_BOT = 25
+MAX_ERRORS_PER_BOT = 50
 MAX_ERROR_PERCENTAGE = 0.1
 
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
@@ -21,7 +21,7 @@ OAUTH_GITHUB_CONSUMER_KEY = ""
 OAUTH_GITHUB_CONSUMER_SECRET = ""
 CORS_ORIGINS = ["http://lvh.me:4000"]
 SITE_URL = "http://35.185.45.87"
-API_URL = "http://35.190.3.178"
+API_URL = "http://35.190.3.178/v1/api"
 
 # Google Cloud
 GCLOUD_PROJECT = 'TODO'
