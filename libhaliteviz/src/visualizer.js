@@ -7,8 +7,10 @@ const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
 const msgpack = require("msgpack-lite");
 
-const statistics = require("./statistics");
-const keyboard = require("./keyboardControls");
+import * as statistics from "./statistics";
+import * as keyboard from "./keyboardControls";
+
+import * as assets from "./assets";
 
 
 const VISUALIZER_SIZE = 720;
@@ -16,37 +18,6 @@ const STATS_SIZE = 20;
 const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0xFF704B, 0x9010B9, 0x005DD0, 0x00B553];
 export const PLANET_COLOR = 0xb7b7b7;
-
-let ASSET_ROOT = "dist/";
-
-let BACKGROUND_IMAGES = [];
-let PLANET_IMAGES = [];
-let HALO_IMAGE = "";
-let ATTACK_IMAGE = "";
-
-
-export function setAssetRoot(path) {
-    ASSET_ROOT = path;
-
-    BACKGROUND_IMAGES = [
-        ASSET_ROOT + require("../assets/backgrounds/Space001.png"),
-        ASSET_ROOT + require("../assets/backgrounds/Space002.png"),
-        ASSET_ROOT + require("../assets/backgrounds/Space003.png"),
-        ASSET_ROOT + require("../assets/backgrounds/Space004.png"),
-        ASSET_ROOT + require("../assets/backgrounds/Space005.png"),
-    ];
-    PLANET_IMAGES = [
-        ASSET_ROOT + require("../assets/planets/p1.png"),
-        ASSET_ROOT + require("../assets/planets/p2.png"),
-        ASSET_ROOT + require("../assets/planets/p3.png"),
-        ASSET_ROOT + require("../assets/planets/p4.png"),
-    ];
-    HALO_IMAGE = ASSET_ROOT + require("../assets/halo.png");
-    ATTACK_IMAGE = ASSET_ROOT + require("../assets/attack.png");
-}
-
-
-setAssetRoot("dist/");
 
 
 class FrameAnimation {
@@ -92,7 +63,7 @@ export class HaliteVisualizer {
 
         this.scale = VISUALIZER_SIZE / Math.max(replay.width, replay.height);
         this.starfield = PIXI.Sprite.fromImage(
-            BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)]);
+            assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
 
         this.planetContainer = new PIXI.Container();
         this.planetOverlay = new PIXI.Graphics();
@@ -107,7 +78,7 @@ export class HaliteVisualizer {
         for (let i = 0; i < this.replay.planets.length; i++) {
             const planetBase = this.replay.planets[i];
             const planetSprite =
-                PIXI.Sprite.fromImage(PLANET_IMAGES[i % PLANET_IMAGES.length]);
+                PIXI.Sprite.fromImage(assets.PLANET_IMAGES[i % assets.PLANET_IMAGES.length]);
             const r = planetBase.r * CELL_SIZE * this.scale;
             planetSprite.width = planetSprite.height = 2 * r;
             planetSprite.anchor.x = 0.5;
@@ -306,7 +277,7 @@ export class HaliteVisualizer {
             this.time = 0.0;
         }
 
-        if (prevFrame != this.frame) {
+        if (prevFrame !== this.frame) {
             this.update();
         }
         this.onUpdate();
@@ -322,7 +293,7 @@ export class HaliteVisualizer {
         this.pause();
         this.frame = frame;
         this.time = time;
-        if (time == 0.0) {
+        if (time === 0.0) {
             this.update();
             this.onUpdate();
         }
