@@ -431,7 +431,7 @@ def upload_game():
                     # Prevent the bot from playing more games until a new bot
                     # is uploaded
                     conn.execute(model.bots.update().values(
-                        compile_status="Failed",
+                        compile_status="Disabled",
                     ).where((model.bots.c.user_id == user["user_id"]) &
                             (model.bots.c.id == user["bot_id"])))
 
