@@ -47,7 +47,7 @@ CREATE TABLE bot (
   language VARCHAR(16) DEFAULT NULL,
   -- # of times submitted = version number
   version_number SMALLINT(5) NOT NULL DEFAULT 0,
-  games_played INT NOT NULL DEFAULT 0,
+  games_played BIGINT NOT NULL DEFAULT 0,
   mu FLOAT NOT NULL DEFAULT 25.000,
   sigma FLOAT UNSIGNED NOT NULL DEFAULT 8.333,
   score FLOAT NOT NULL DEFAULT 0,
@@ -95,7 +95,7 @@ CREATE TABLE bot_history (
   -- The count of active players when this bot was retired.
   last_num_players INT NOT NULL,
   -- The number of games this bot has played.
-  last_games_played INT DEFAULT NULL,
+  last_games_played BIGINT DEFAULT NULL,
   language VARCHAR(16) NOT NULL,
   when_retired DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
