@@ -4,7 +4,7 @@ title: Changelog
 toc: true
 ---
 
-## Alpha 2.0
+## Alpha #2
 
 - Continuous collision detection
   - No more subdivision of turns
@@ -40,9 +40,9 @@ toc: true
   - Keyboard controls
     - A/D/Left/Right to scrub
     - Space to play/pause
-    - Less CPU intensive, especially when paused
-    - Interpolates between frames for smoother movement
+  - Less CPU intensive, especially when paused
+  - Interpolates between frames for smoother movement
 - Error logs
   - Friendlier and more informative messages
   
-## Alpha 1.0 (Initial Release)
+## Alpha #1 (Initial Release)
