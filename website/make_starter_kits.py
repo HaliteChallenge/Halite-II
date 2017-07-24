@@ -13,6 +13,8 @@ import zipfile
 ENVIRONMENT_DIR_HELP = "Directory containing precompiled Halite environment " \
                        "executables, each named after their platform. "
 IGNORED_EXTENSIONS = [".exe", ".class", ".pyc", ".obj"]
+INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp"]
+INCLUDED_FILES = ["Makefile", "README"]
 STARTER_KIT_DIR = "../airesources"
 DOWNLOAD_DATA = "_data/downloads.json"
 PLATFORM_AGNOSTIC = "None"
@@ -41,22 +43,13 @@ def detect_environments(directory):
 
 def scan_directory(full_path):
     """Figure out what the starter kit files in a directory are."""
-    possible_files = glob.glob(os.path.join(full_path, "MyBot.*"))
-    possible_files.extend(glob.glob(os.path.join(full_path, "hlt.*")))
-
-    extensions = set()
-    for file in possible_files:
-        if os.path.isdir(file):
-            continue
-        _, ext = os.path.splitext(file)
-        if ext.lower() in IGNORED_EXTENSIONS:
-            continue
-
-        extensions.add(ext)
 
     included_files = []
-    for extension in extensions:
-        included_files.extend(glob.glob(os.path.join(full_path, "*" + extension)))
+    for containing_dir, _, possible_files in os.walk(full_path):
+        for filename in possible_files:
+            _, ext = os.path.splitext(filename)
+            if ext.lower() in INCLUDED_EXTENSIONS or filename in INCLUDED_FILES:
+                included_files.append(os.path.join(containing_dir, filename))
 
     # TODO: also get sample bots and READMEs
 
@@ -72,7 +65,8 @@ def make_archive(output, environment, base_path, included_files):
             archive.write(source, target)
 
         for file in included_files:
-            archive.write(file, os.path.split(file)[1])
+            target_path = os.path.relpath(file, base_path)
+            archive.write(file, target_path)
 
         if "Windows" in platform:
             run_game = os.path.join(base_path, "run_game.bat")
