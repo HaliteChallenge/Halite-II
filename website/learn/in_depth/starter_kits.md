@@ -31,5 +31,4 @@ All starter kits offer basic utilities including:
 - Checking if a ship is in range to dock to a planet
 - Computing the angle between two entities
 - Generating an occupancy map to quickly check if grid squares are occupied
-
-Additionally, the C++ and Java starter kits have various game constant values built-in, allowing your bot to check things like weapon range, maximum acceleration, and resource consumption rates.
+- Game parameter values to check things like weapon range, maximum acceleration, and resource consumption rates.
