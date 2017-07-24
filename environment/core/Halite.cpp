@@ -521,11 +521,6 @@ auto Halite::process_events() -> void {
     CollisionMap collision_map = CollisionMap(game_map, event_horizon);
     std::vector<hlt::EntityId> potential_collisions;
 
-    auto processed_tests = 0;
-    auto naive_tests = 0;
-    std::chrono::microseconds map_time(0);
-    std::chrono::microseconds naive_time(0);
-
     for (hlt::PlayerId player1 = 0; player1 < number_of_players; player1++) {
         for (const auto& pair1 : game_map.ships.at(player1)) {
             const auto& id1 = hlt::EntityId::for_ship(player1, pair1.first);
@@ -538,34 +533,7 @@ auto Halite::process_events() -> void {
             for (const auto& id2 : potential_collisions) {
                 const auto& ship2 = game_map.get_ship(id2);
                 find_events(unsorted_events, id1, id2, ship1, ship2);
-                processed_tests++;
             }
-
-            std::unordered_set<SimulationEvent> set1;
-            std::unordered_set<SimulationEvent> set2;
-
-            const auto start = std::chrono::high_resolution_clock::now();
-            for (const auto& id2 : potential_collisions) {
-                const auto& ship2 = game_map.get_ship(id2);
-                find_events(set1, id1, id2, ship1, ship2);
-            }
-            const auto mid = std::chrono::high_resolution_clock::now();
-
-            for (hlt::PlayerId player2 = 0; player2 < number_of_players; player2++) {
-                for (const auto pair2 : game_map.ships.at(player2)) {
-                    const auto& id2 = hlt::EntityId::for_ship(player2, pair2.first);
-                    const auto& ship2 = pair2.second;
-                    find_events(set2, id1, id2, ship1, ship2);
-                    naive_tests++;
-                }
-            }
-            const auto end = std::chrono::high_resolution_clock::now();
-
-            map_time += std::chrono::duration_cast<std::chrono::microseconds>(mid - start);
-            naive_time += std::chrono::duration_cast<std::chrono::microseconds>(end - mid);
-
-            assert(set1.size() == set2.size());
-            assert(set1 == set2);
 
             // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
@@ -628,13 +596,6 @@ auto Halite::process_events() -> void {
             }
         }
     }
-
-    auto num_ships = 0;
-    for (const auto& player_ships : game_map.ships) {
-        num_ships += player_ships.size();
-    }
-    std::cout << "Collision tests: " << processed_tests << '/' << naive_tests << '(' << num_ships << " ships)\n";
-    std::cout << "Fast time: " << map_time.count() << "us naive time: " << naive_time.count() << "us\n";
 
     std::vector<SimulationEvent> sorted_events(unsorted_events.begin(),
                                                unsorted_events.end());
