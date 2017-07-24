@@ -7,6 +7,7 @@ const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
 const msgpack = require("msgpack-lite");
 
+import {Ship} from "./ship";
 import * as statistics from "./statistics";
 import * as keyboard from "./keyboardControls";
 
@@ -61,13 +62,14 @@ export class HaliteVisualizer {
 
         this.planetContainer = new PIXI.Container();
         this.planetOverlay = new PIXI.Graphics();
-        this.shipContainer = new PIXI.Graphics();
+        this.shipContainer = new PIXI.Container();
         this.lights = new PIXI.Graphics();
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
         this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
         this.container = new PIXI.Container();
         this.container.position.set(0, 2 * assets.STATS_SIZE);
 
+        this.ships = {};
         this.planets = [];
         for (let i = 0; i < this.replay.planets.length; i++) {
             const planetBase = this.replay.planets[i];
@@ -571,10 +573,11 @@ export class HaliteVisualizer {
                             const planetY = side * (event.planet_y + 0.5);
                             const ship_x = side * (event.x + 0.5);
                             const ship_y = side * (event.y + 0.5);
-                            this.shipContainer.lineStyle(3, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
-                            this.shipContainer.moveTo(planetX, planetY);
-                            this.shipContainer.lineTo(ship_x, ship_y);
-                            this.shipContainer.endFill();
+                            // TODO:
+                            // this.shipContainer.lineStyle(3, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
+                            // this.shipContainer.moveTo(planetX, planetY);
+                            // this.shipContainer.lineTo(ship_x, ship_y);
+                            // this.shipContainer.endFill();
                         },
                         () => {
 
@@ -590,7 +593,6 @@ export class HaliteVisualizer {
 
     draw(dt=0) {
         this.planetOverlay.clear();
-        this.shipContainer.clear();
         this.lights.clear();
 
         for (let planet of Object.values(this.currentFrame.planets)) {
@@ -620,8 +622,20 @@ export class HaliteVisualizer {
                 }
 
                 if (this.time < deathTime) {
-                    this.drawShip(ship);
+                    if (typeof this.ships[ship.id] === "undefined") {
+                        this.ships[ship.id] = new Ship(this, ship);
+                        this.ships[ship.id].attach(this.shipContainer);
+                    }
+                    this.ships[ship.id].update(ship);
                 }
+            }
+        }
+
+        for (let shipIndex of Object.keys(this.ships)) {
+            const ship = this.ships[shipIndex];
+            if (!this.currentFrame.ships[ship.owner][ship.id]) {
+                ship.destroy();
+                delete this.ships[shipIndex];
             }
         }
 
