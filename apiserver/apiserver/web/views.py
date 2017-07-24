@@ -725,7 +725,7 @@ def store_user_bot(user_id, intended_user, bot_id):
             raise util.APIError(404, message="Bot not found.")
 
         # Check if the user already has a bot compiling
-        if bot["compile_status"] not in ("Successful", "Failed"):
+        if bot["compile_status"] not in ("Successful", "Failed", "Disabled"):
             raise util.APIError(400, message="Cannot upload new bot until "
                                              "previous one is compiled.")
 
