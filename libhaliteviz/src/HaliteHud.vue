@@ -136,6 +136,11 @@
          visualizer.play();
          this.play = () => {
              if (this.encoding) return;
+             if (visualizer.frame === visualizer.replay.frames.length - 1 && visualizer.time >= 1.0) {
+                 // Restart
+                 visualizer.frame = 0;
+                 visualizer.time = 0.0;
+             }
              visualizer.play();
          };
          this.pause = () => {
