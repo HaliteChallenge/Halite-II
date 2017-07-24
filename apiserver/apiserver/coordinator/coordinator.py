@@ -417,6 +417,19 @@ def upload_game():
                     model.game_participants.c.timed_out
                 )).first()[0]
 
+                total_count = conn.execute(sqlalchemy.sql.select([
+                    model.bots.c.games_played,
+                ]).select_from(model.game_participants).where(
+                    (model.bots.c.user_id == user["user_id"]) &
+                    (model.bots.c.id == user["bot_id"])
+                )).first()["games_played"]
+
+                hit_timeout_limit = timed_out_count > config.MAX_ERRORS_PER_BOT
+                hit_timeout_percent = (
+                    total_count > 0 and
+                    timed_out_count / total_count > config.MAX_ERROR_PERCENTAGE
+                )
+
                 if timed_out_count == 1:
                     notify.send_notification(
                         user["email"],
@@ -427,7 +440,7 @@ def upload_game():
                             log_link="{}/user/{}/match/{}/error_log".format(config.API_URL, user["user_id"], game_id),
                         ))
 
-                elif timed_out_count > config.MAX_ERRORS_PER_BOT:
+                elif hit_timeout_limit or hit_timeout_percent:
                     # Prevent the bot from playing more games until a new bot
                     # is uploaded
                     conn.execute(model.bots.update().values(
@@ -440,7 +453,9 @@ def upload_game():
                         user["username"],
                         "Bot timeout/error limit reached",
                         notify.TIMEOUT_LIMIT.format(
-                            limit=config.MAX_ERRORS_PER_BOT))
+                            limit=config.MAX_ERRORS_PER_BOT,
+                            percent=int(config.MAX_ERROR_PERCENTAGE * 100),
+                        ))
 
     # Update rankings
     users.sort(key=lambda user: user["rank"])

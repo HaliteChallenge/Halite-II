@@ -75,7 +75,7 @@ FIRST_TIMEOUT = """
 """
 
 TIMEOUT_LIMIT = """
-<p>Your bot has timed out or errored at least {limit} times and will no longer play games until a new version is uploaded.</p>
+<p>Your bot has timed out or errored at least {limit} times or in at least {percent} percent of its games and will no longer play games until a new version is uploaded.</p>
 
 <p>
 - Halite II Alpha

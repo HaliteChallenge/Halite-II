@@ -6,6 +6,7 @@ COMPETITION_FINALS_PAIRING = False
 # Max number of games a bot version can error out in before being
 # stopped from playing
 MAX_ERRORS_PER_BOT = 25
+MAX_ERROR_PERCENTAGE = 0.1
 
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
 FLASK_SECRET_KEY = ""
