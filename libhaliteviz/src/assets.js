@@ -10,6 +10,7 @@ export let BACKGROUND_IMAGES = [];
 export let PLANET_IMAGES = [];
 export let SHIP_IMAGE = "";
 export let HALO_IMAGE = "";
+export let EXHAUST_IMAGE = "";
 export let ATTACK_IMAGE = "";
 
 
@@ -29,8 +30,9 @@ export function setAssetRoot(path) {
         ASSET_ROOT + require("../assets/planets/p3.png"),
         ASSET_ROOT + require("../assets/planets/p4.png"),
     ];
-    HALO_IMAGE = ASSET_ROOT + require("../assets/halo.png");
     SHIP_IMAGE = ASSET_ROOT + require("../assets/halo.png");
+    HALO_IMAGE = ASSET_ROOT + require("../assets/halo.png");
+    EXHAUST_IMAGE = ASSET_ROOT + require("../assets/exhaust.png");
     ATTACK_IMAGE = ASSET_ROOT + require("../assets/attack.png");
 }
 

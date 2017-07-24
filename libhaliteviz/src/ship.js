@@ -5,40 +5,50 @@ import {CELL_SIZE, PLAYER_COLORS} from "./assets";
 
 export class Ship {
     constructor(visualizer, record) {
-        this.displayObject = PIXI.Sprite.fromImage(assets.SHIP_IMAGE);
+        this.sprite = PIXI.Sprite.fromImage(assets.SHIP_IMAGE);
+        this.halo = PIXI.Sprite.fromImage(assets.HALO_IMAGE);
+        this.exhaust = PIXI.Sprite.fromImage(assets.EXHAUST_IMAGE);
         this.container = null;
         this.visualizer = visualizer;
 
         this.owner = record.owner;
         this.id = record.id;
 
+        let setupSprite = (sprite, radius) => {
+            sprite.width = sprite.height = 2 * radius * this.visualizer.scale;
+            sprite.anchor.x = sprite.anchor.y = 0.5;
+        };
+
+        setupSprite(this.sprite, this.visualizer.replay.constants.SHIP_RADIUS);
+        setupSprite(this.halo, this.visualizer.replay.constants.WEAPON_RADIUS);
+        setupSprite(this.exhaust, this.visualizer.replay.constants.WEAPON_RADIUS);
+        this.sprite.tint = PLAYER_COLORS[this.owner];
+        this.halo.tint = PLAYER_COLORS[this.owner];
+
         this.update(record);
-        this.displayObject.width = this.displayObject.height =
-            2 * this.visualizer.replay.constants.SHIP_RADIUS *
-            this.visualizer.scale;
-        this.displayObject.anchor.x = this.displayObject.anchor.y = 0.5;
-        this.displayObject.tint = PLAYER_COLORS[this.owner];
     }
 
     attach(container) {
-        container.addChild(this.displayObject);
+        container.addChild(this.halo, this.exhaust, this.sprite);
         this.container = container;
     }
 
     destroy() {
-        this.container.removeChild(this.displayObject);
+        this.container.removeChild(this.halo);
+        this.container.removeChild(this.sprite);
+        this.container.removeChild(this.exhaust);
     }
 
     update(record) {
         const max_ship_health = this.visualizer.replay.constants.MAX_SHIP_HEALTH;
-        const health_factor = Math.min(
-            1.0, 0.5 + 0.7 * record.health / max_ship_health);
+        const health_factor = 0.1 + 0.2 * record.health / max_ship_health;
 
-        this.displayObject.alpha = health_factor;
+        this.halo.alpha = health_factor;
 
         let vel_x = record.vel_x;
         let vel_y = record.vel_y;
 
+        this.exhaust.visible = false;
         if (this.visualizer.frame < this.visualizer.replay.frames.length - 1) {
             let moves = this.visualizer.replay.moves[this.visualizer.frame];
             let move = moves[record.owner][0][record.id];
@@ -46,6 +56,11 @@ export class Ship {
                 let angle = move.angle * Math.PI / 180;
                 vel_x += move.magnitude * Math.cos(angle);
                 vel_y += move.magnitude * Math.sin(angle);
+
+                if (move.magnitude > this.visualizer.replay.constants.DRAG) {
+                    this.exhaust.visible = true;
+                    this.exhaust.rotation = angle + Math.PI;
+                }
             }
         }
 
@@ -59,8 +74,10 @@ export class Ship {
         const x = record.x + this.visualizer.time * vel_x;
         const y = record.y + this.visualizer.time * vel_y;
 
-        this.displayObject.position.x = this.visualizer.scale * CELL_SIZE * x;
-        this.displayObject.position.y = this.visualizer.scale * CELL_SIZE * y;
+        const pixelX = this.visualizer.scale * CELL_SIZE * x;
+        const pixelY = this.visualizer.scale * CELL_SIZE * y;
+        this.halo.position.x = this.sprite.position.x = this.exhaust.position.x = pixelX;
+        this.halo.position.y = this.sprite.position.y = this.exhaust.position.y = pixelY;
 
         this.drawDocking(record);
     }
@@ -89,8 +106,8 @@ export class Ship {
             const planetX = side * planetBase.x;
             const planetY = side * planetBase.y;
 
-            const cx = this.displayObject.position.x;
-            const cy = this.displayObject.position.y;
+            const cx = this.sprite.position.x;
+            const cy = this.sprite.position.y;
 
             const dx = planetX - cx;
             const dy = planetY - cy;

@@ -65,7 +65,7 @@ export class HaliteVisualizer {
         this.overlay = new PIXI.Graphics();
         this.lights = new PIXI.Graphics();
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
-        this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
+        this.lights.filters = [new GlowFilter(20, 1.5, 0.5, 0xFFFFFF, 0.3)];
         this.container = new PIXI.Container();
         this.container.position.set(0, 2 * assets.STATS_SIZE);
 
@@ -297,42 +297,6 @@ export class HaliteVisualizer {
         this.application.render();
     }
 
-    /**
-     *
-     * @param container
-     * @param x
-     * @param y
-     * @param color
-     * @param health_factor
-     */
-    drawCell(container, x, y, color, health_factor, glow=false) {
-        const side = assets.CELL_SIZE * this.scale;
-        x = x * side;
-        y = y * side;
-        container.lineStyle(0);
-        // Hide the background
-        container.beginFill(0x000000);
-        container.drawRect(x, y, side, side);
-        container.endFill();
-        // Draw the actual cell
-        container.beginFill(color, 0.5);
-        container.drawRect(x, y, side, side);
-        container.endFill();
-        container.beginFill(color, 1);
-        container.drawRect(
-            x + health_factor * side,
-            y + health_factor * side,
-            (1 - 2*health_factor) * side,
-            (1 - 2*health_factor) * side);
-        container.endFill();
-
-        if (glow) {
-            container.beginFill(color, 0.1);
-            container.drawCircle(x + 0.5 * side, y + 0.5 * side, this.replay.constants.WEAPON_RADIUS * side);
-            container.endFill();
-        }
-    }
-
     drawPOI(graphics) {
         const side = assets.CELL_SIZE * this.scale;
         for (let poi of this.replay.poi) {
@@ -385,87 +349,6 @@ export class HaliteVisualizer {
         this.overlay.lineStyle(0, 0x000000);
         this.overlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
         this.overlay.endFill();
-    }
-
-    drawShip(ship) {
-        const side = assets.CELL_SIZE * this.scale;
-
-        let vel_x = ship.vel_x;
-        let vel_y = ship.vel_y;
-
-        if (this.frame < this.replay.frames.length - 1) {
-            let moves = this.replay.moves[this.frame];
-            let move = moves[ship.owner][0][ship.id];
-            if (move && move.type === "thrust") {
-                let angle = move.angle * Math.PI / 180;
-                vel_x += move.magnitude * Math.cos(angle);
-                vel_y += move.magnitude * Math.sin(angle);
-            }
-        }
-
-        const max_speed = this.replay.constants.MAX_SPEED;
-        const magnitude = Math.sqrt(vel_x*vel_x + vel_y*vel_y);
-        if (magnitude > max_speed) {
-            vel_x *= magnitude / max_speed;
-            vel_y *= magnitude / max_speed;
-        }
-
-        const x = ship.x + this.time * vel_x;
-        const y = ship.y + this.time * vel_y;
-
-        const pixelX = side * x;
-        const pixelY = side * y;
-
-        this.drawCell(this.shipContainer, x, y, PLAYER_COLORS[ship.owner], health_factor, ship.cooldown === 0);
-
-        if (this.frame > 0) {
-            let move = this.replay.moves[this.frame-1][ship.owner][0][ship.id];
-            if (move && move.type === "thrust" && move.magnitude > this.replay.constants.DRAG) {
-                // Draw thrust trail
-                const magnitude = move.magnitude / this.replay.constants.MAX_ACCELERATION;
-                this.shipContainer.beginFill(0xFF0000, 0.5 + 0.3 * magnitude);
-                const cx = pixelX + 0.5 * side;
-                const cy = pixelY + 0.5 * side;
-                const angle = (move.angle + 180) * Math.PI / 180;
-                const deltaAngle = Math.PI / 10 + Math.PI / 10 * magnitude;
-                this.shipContainer.moveTo(cx, cy);
-                this.shipContainer.arc(cx, cy, (2 + 2 * magnitude) * side, angle - deltaAngle, angle + deltaAngle);
-                this.shipContainer.endFill();
-            }
-        }
-
-        const dock_turns = this.replay.constants.DOCK_TURNS;
-
-        if (ship.docking.status !== "undocked") {
-            let progress = ship.docking.status === "docked" ? dock_turns : dock_turns - ship.docking.turns_left;
-            if (ship.docking.status === "undocking") {
-                progress = ship.docking.turns_left / dock_turns;
-            }
-            else {
-                if (ship.docking.status === "docking") {
-                    progress += this.time;
-                }
-                progress /= dock_turns;
-            }
-
-            const planetId = ship.docking.planet_id;
-            const planetBase = this.replay.planets[planetId];
-
-            const planetX = side * (planetBase.x + 0.5);
-            const planetY = side * (planetBase.y + 0.5);
-
-            const cx = pixelX + 0.5*side;
-            const cy = pixelY + 0.5*side;
-
-            const dx = planetX - cx;
-            const dy = planetY - cy;
-
-            this.shipContainer.beginFill(PLAYER_COLORS[ship.owner]);
-            this.shipContainer.lineStyle(1, 0xFFFFFF, 0.8);
-            this.shipContainer.moveTo(cx, cy);
-            this.shipContainer.lineTo(cx + progress*dx, cy + progress*dy);
-            this.shipContainer.endFill();
-        }
     }
 
     update() {
@@ -570,11 +453,10 @@ export class HaliteVisualizer {
                             const planetY = side * (event.planet_y + 0.5);
                             const ship_x = side * (event.x + 0.5);
                             const ship_y = side * (event.y + 0.5);
-                            // TODO:
-                            // this.shipContainer.lineStyle(3, PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
-                            // this.shipContainer.moveTo(planetX, planetY);
-                            // this.shipContainer.lineTo(ship_x, ship_y);
-                            // this.shipContainer.endFill();
+                            this.lights.lineStyle(2, assets.PLAYER_COLORS[event.entity.owner], 0.5 * frame / 24);
+                            this.lights.moveTo(planetX, planetY);
+                            this.lights.lineTo(ship_x, ship_y);
+                            this.lights.endFill();
                         },
                         () => {
 
