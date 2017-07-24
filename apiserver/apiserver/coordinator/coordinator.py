@@ -444,6 +444,8 @@ def upload_game():
 
     # Update rankings
     users.sort(key=lambda user: user["rank"])
+    # Set tau=0, based on discussion from Halite 1
+    trueskill.setup(tau=0)
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
              for user in users]
     new_ratings = trueskill.rate(teams)
