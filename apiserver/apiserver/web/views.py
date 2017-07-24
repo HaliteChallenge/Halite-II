@@ -737,7 +737,10 @@ def store_user_bot(user_id, intended_user, bot_id):
         # Flag the user as compiling
         update = model.bots.update() \
             .where(bot_where_clause) \
-            .values(compile_status="Uploaded")
+            .values(
+                compile_status="Uploaded",
+                update_time=sqlalchemy.sql.func.now(),
+            )
         conn.execute(update)
 
     # TODO: Email the user
