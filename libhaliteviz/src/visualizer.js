@@ -61,8 +61,8 @@ export class HaliteVisualizer {
             assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
 
         this.planetContainer = new PIXI.Container();
-        this.planetOverlay = new PIXI.Graphics();
         this.shipContainer = new PIXI.Container();
+        this.overlay = new PIXI.Graphics();
         this.lights = new PIXI.Graphics();
         this.lights.blendMode = PIXI.BLEND_MODES.SCREEN;
         this.lights.filters = [new GlowFilter(15, 2, 1, 0xFF0000, 0.5)];
@@ -93,7 +93,6 @@ export class HaliteVisualizer {
             this.planets.push(planetSprite);
             this.planetContainer.addChild(planetSprite);
         }
-        this.planetContainer.addChild(this.planetOverlay);
 
         let poi = new PIXI.Graphics();
         this.drawPOI(poi);
@@ -102,7 +101,7 @@ export class HaliteVisualizer {
         let texture = renderer.generateTexture(poi);
         this.poi = PIXI.Sprite.from(texture);
 
-        this.container.addChild(this.starfield, poi, this.planetContainer, this.shipContainer, this.lights);
+        this.container.addChild(this.starfield, poi, this.planetContainer, this.shipContainer, this.overlay, this.lights);
 
         this.statsDisplay = new PIXI.Graphics();
 
@@ -382,16 +381,14 @@ export class HaliteVisualizer {
             this.planets[planet.id].alpha = 0.7;
         }
 
-        this.planetOverlay.beginFill(0x990000);
-        this.planetOverlay.lineStyle(0, 0x000000);
-        this.planetOverlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
-        this.planetOverlay.endFill();
+        this.overlay.beginFill(0x990000);
+        this.overlay.lineStyle(0, 0x000000);
+        this.overlay.drawRect(center_x, center_y - health_bar, side, 2 * health_bar);
+        this.overlay.endFill();
     }
 
     drawShip(ship) {
         const side = assets.CELL_SIZE * this.scale;
-        const max_ship_health = this.replay.constants.MAX_SHIP_HEALTH;
-        const health_factor = 0.1 + 0.3 * (max_ship_health - ship.health) / max_ship_health;
 
         let vel_x = ship.vel_x;
         let vel_y = ship.vel_y;
@@ -500,7 +497,7 @@ export class HaliteVisualizer {
                         let r = event.radius;
                         draw = (frame) => {
                             const side = assets.CELL_SIZE * this.scale;
-                            this.planetOverlay.lineStyle(0);
+                            this.overlay.lineStyle(0);
                             for (let dx = -r; dx <= r; dx++) {
                                 for (let dy = -r; dy <= r; dy++) {
                                     if (dx*dx + dy*dy <= r*r) {
@@ -592,7 +589,7 @@ export class HaliteVisualizer {
     }
 
     draw(dt=0) {
-        this.planetOverlay.clear();
+        this.overlay.clear();
         this.lights.clear();
 
         for (let planet of Object.values(this.currentFrame.planets)) {
