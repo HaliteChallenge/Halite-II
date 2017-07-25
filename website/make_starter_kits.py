@@ -19,9 +19,9 @@ INCLUDED_FILES = ["Makefile", "README"]
 STARTER_KIT_DIR = "../airesources"
 DOWNLOAD_DATA = "_data/downloads.json"
 PLATFORM_AGNOSTIC = "None"
-OUTPUT_FILE_FORMAT = "assets/downloads/{language}_{platform}.zip"
+OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{language}_{platform}.zip"
 ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/{platform}.zip"
-SOURCE_FILE = "assets/downloads/source.zip"
+SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
 
 def detect_environments(directory):
