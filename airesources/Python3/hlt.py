@@ -25,9 +25,6 @@ map_size = None
 """The most recent map received from the server. See :class:`Map`."""
 last_map = None
 
-"""The number of steps to use when checking pathability."""
-PATHING_STEPS = 64
-
 """Constants used in parsing ship docking status."""
 DOCKING_STATUS = {
     0: "undocked",
@@ -381,6 +378,21 @@ class Map:
                 return False
         return True
 
+    def forecast_collision(self, start, target):
+        if (self.out_of_bounds(target.x, target.y) or
+                not self.pathable(start, target.x, target.y)):
+            return True
+
+        for player_ships in self.ships.values():
+            for ship in player_ships.values():
+                if ship is start or ship.x == start.x and ship.y == start.y:
+                    continue
+
+                if intersect_segment_circle(start, target, ship, fudge=ship.r + 0.1):
+                    return True
+
+        return False
+
 
 def parse(map):
     """Parse the map description from the game."""
@@ -619,7 +631,7 @@ def move_to(ship, angle, speed, avoidance=40):
         target_x = ship.x + dx
         target_y = ship.y + dy
 
-        if not last_map.pathable(ship, target_x, target_y):
+        if last_map.forecast_collision(ship, Location(target_x, target_y)):
             angle += 15
         else:
             break
