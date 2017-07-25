@@ -42,7 +42,7 @@ Welcome to the Halite II closed Two Sigma alpha competition!  If you’re here, 
  
 You can reach us anytime at <mailto:halite@halite.io> for questions or support or use the HipChat room (Halite Chat) to ask us or other players a question.
 
-[login]: {{ site.login_server_url }}/v1/login/github
+[login]: {{ site.login_server_url }}/github
 [rules]: {{ site.baseurl }}/learn/Game-Rules
 [story]: {{ site.baseurl }}/learn/The-Story
 [downloads]: {{ site.baseurl }}/learn/downloads
