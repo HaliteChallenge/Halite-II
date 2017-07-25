@@ -62,4 +62,17 @@ toc: true
 - Error logs
   - Friendlier and more informative messages
   
+    Example for invalid input:
+
+        ERROR: Bot #0: Received invalid character 'j'. (at character 1.)
+        Input received from bot:
+        jt 0 1 90jt 1 1 90jt 2 1 90
+        ^
+
+    Timeout:
+
+        ERROR: Bot #1: Timeout reading commands for bot; select() result: 0 (max time: 30 milliseconds).
+        No input received from bot.
+        Skipping replay (bot errored on first turn).
+
 ## Alpha #1 (Initial Release)
