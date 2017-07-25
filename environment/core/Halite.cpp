@@ -571,7 +571,7 @@ auto Halite::process_events() -> void {
 
             if (!game_map.within_bounds(final_location)) {
                 auto time = 1000000.0;
-                if (ship1.velocity.vel_x > 0) {
+                if (ship1.velocity.vel_x != 0.0) {
                     const auto t1 = -ship1.location.pos_x / ship1.velocity.vel_x;
                     if (t1 < time && t1 >= 0) time = t1;
                     const auto t2 = (game_map.map_width - ship1.location.pos_x)
@@ -579,7 +579,7 @@ auto Halite::process_events() -> void {
                     if (t2 < time && t2 >= 0) time = t2;
                 }
 
-                if (ship1.velocity.vel_y > 0) {
+                if (ship1.velocity.vel_y != 0.0) {
                     const auto t3 = -ship1.location.pos_y / ship1.velocity.vel_y;
                     if (t3 < time && t3 >= 0) time = t3;
                     const auto t4 = (game_map.map_height - ship1.location.pos_y)
