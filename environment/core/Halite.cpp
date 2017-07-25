@@ -242,7 +242,7 @@ auto Halite::process_docking() -> void {
     }
 
     // Unfreeze frozen planets
-    for (hlt::Planet planet : game_map.planets) {
+    for (auto& planet : game_map.planets) {
         planet.frozen = false;
     }
 }
@@ -434,7 +434,9 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                                 ship.docking_progress == hlt::GameConstants::get().DOCK_TURNS;
                         })) {
                             // In that case, nobody gets to dock
+                            assert(!planet.frozen);
                             planet.frozen = true;
+
                             for (auto& docked_ship_index : planet.docked_ships) {
                                 auto& ship = game_map.get_ship(planet.owner, docked_ship_index);
                                 ship.reset_docking_status();
