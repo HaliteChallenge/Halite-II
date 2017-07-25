@@ -4,6 +4,15 @@ title: Changelog
 toc: true
 ---
 
+## Alpha 0.2.2
+
+- Starter kits
+  - Collision avoidance has been greatly improved in Python
+    - Now `move_to` is on par with `adjust_for_collision` in C++/`adjustForCollision` in Java
+  - Python has a new experimental `warp` that also performs pathfinding
+- Game environment
+  - Fixed a bug where simultaneous docking to a planet would make the planet unavailable for docking the entire game
+
 ## Alpha 0.2.1
 
 - Performance improvements
