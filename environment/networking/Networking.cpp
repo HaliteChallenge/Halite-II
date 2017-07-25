@@ -556,6 +556,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         player_logs[player_tag] += "\nERRORED!\n";
         player_logs[player_tag] += err.what();
         player_logs[player_tag] += '\n';
+        player_logs[player_tag] += response;
     }
     catch (std::string s) {
         if (s.empty())
@@ -655,10 +656,20 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
     connections[player_tag].write = -1;
 #endif
 
-    if (!newString.empty())
+    if (!newString.empty()) {
+        if (!quiet_output) {
+            std::cout << "Bot " << (int) player_tag << " was killed.\n";
+            std::cout << "Here is the rest of its output (if any):\n";
+            std::cout << newString;
+            if (newString.back() != '\n') {
+                std::cout << '\n';
+            }
+            std::cout << "--- End bot output ---\n";
+        }
         player_logs[player_tag] +=
             "\n --- Bot was killed. Below is the rest of its output (if any): ---\n"
                 + newString + "\n --- End bot output ---";
+    }
 }
 
 bool Networking::is_process_dead(hlt::PlayerId player_tag) {
