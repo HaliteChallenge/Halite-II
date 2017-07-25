@@ -543,12 +543,42 @@ def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
         if turns_left <= turns_to_decelerate:
             logging.debug("Warp {}: close enough, decelerating".format(ship.id))
             break
-        if dist <= speed:
+        elif dist <= speed:
             logging.debug("Warp {}: too close, decelerating".format(ship.id))
             break
 
         thrust = int(
-            max(GameConstants.DRAG + 1, min(max_acceleration, dist / GameConstants.MAX_SPEED * max_acceleration)))
+            max(GameConstants.DRAG + 1,
+                min(max_acceleration,
+                    dist / GameConstants.MAX_SPEED * max_acceleration)))
+
+        tries = 20
+        orig_angle = angle
+        while tries > 0:
+            angle_rad = angle * math.pi / 180
+            vel_x = ship.vel_x + thrust * math.cos(angle_rad)
+            vel_y = ship.vel_y + thrust * math.sin(angle_rad)
+            speed = math.sqrt(vel_x**2 + vel_y**2)
+            if speed > GameConstants.MAX_SPEED:
+                factor = GameConstants.MAX_SPEED / speed
+                vel_x *= factor
+                vel_y *= factor
+
+            target_x = ship.x + vel_x
+            target_y = ship.y + vel_y
+
+            if last_map.forecast_collision(ship, Location(target_x, target_y)):
+                angle = orig_angle + (tries - 5) * 10
+            else:
+                break
+
+            tries -= 1
+
+        target_circle = Location(x, y)
+        target_circle.r = 1.0
+        if intersect_segment_circle(ship, Location(target_x, target_y), target_circle):
+            break
+
         logging.debug(
             "Warp {}: acceleration {} {} d {} s {} turns_left {} pos {} {} target {} {}"
             .format(ship.id, thrust, angle, dist, speed, turns_left,
@@ -572,7 +602,7 @@ def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
             "Warp {}: move from {} {} to {} {}"
             .format(ship.id, ship.x, ship.y, x, y))
         angle, dist = orient_towards(ship, Location(x, y))
-        yield move_to(ship, angle, 1)
+        yield move_to(ship, angle, GameConstants.DRAG)
 
 
 def update_warps():
