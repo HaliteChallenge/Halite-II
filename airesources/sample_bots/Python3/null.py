@@ -1,17 +1,15 @@
 import hlt
 
 
-def settler():
-    my_tag, map_size, initial_map, log = yield "Null"
+my_tag, map_size, initial_map = hlt.initialize("Null")
 
-    while True:
-        game_map = yield
-        command_queue = []
+while True:
+    game_map = hlt.get_map()
+    command_queue = []
 
-        for ship in game_map.ships[my_tag].values():
-            if ship.y < map_size[1] - 1:
-                command_queue.append(hlt.move_to(ship, 90, 1))
+    for ship in game_map.ships[my_tag].values():
+        if ship.y < map_size[1] - 1:
+            command_queue.append(hlt.move_to(ship, 90, 1))
 
-        yield command_queue
+    hlt.send_command_queue(command_queue)
 
-hlt.run_bot(settler)

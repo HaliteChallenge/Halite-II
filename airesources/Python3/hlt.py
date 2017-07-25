@@ -377,7 +377,7 @@ class Map:
         target = Location(target_x, target_y)
         for planet in self.planets.values():
             if intersect_segment_circle(ship, target, planet,
-                                        fudge=ship.r + 1.0):
+                                        fudge=ship.r + 0.1):
                 return False
         return True
 
@@ -607,59 +607,22 @@ def move_to(ship, angle, speed, avoidance=40):
     :param avoidance: How many tries to avoid collisions.
     :return:
     """
-    pos_x = ship.x
-    pos_y = ship.y
-
     if ship.vel_x != 0 or ship.vel_y != 0:
         logging.warning(
             "Ship {}: inertial interference in moving {}@{}deg".format(
                 ship.id, speed, angle
             ))
 
-    dx = speed * math.cos(angle * math.pi / 180) / PATHING_STEPS
-    dy = speed * math.sin(angle * math.pi / 180) / PATHING_STEPS
+    while avoidance > 0:
+        dx = speed * math.cos(angle * math.pi / 180)
+        dy = speed * math.sin(angle * math.pi / 180)
+        target_x = ship.x + dx
+        target_y = ship.y + dy
 
-    end_x = ship.x + dx
-    end_y = ship.y + dy
-
-    def avert_collision():
-        # We only try to avoid collisions a certain number of times to
-        # avoid getting stuck and timing out
-        if avoidance > 0:
-            new_angle = (angle + 10) % 360
-            if new_angle < 0:
-                new_angle += 360
-
-            logging.warning(
-                "Averting collision for ship {} pos {} "
-                "angle {} speed {} "
-                "because of {} ({} tries left)".format(
-                    ship.id, (ship.x, ship.y), angle, speed,
-                    (pos_x, pos_y), avoidance))
-
-            return move_to(ship, new_angle, 1, avoidance - 1)
+        if not last_map.pathable(ship, target_x, target_y):
+            angle += 15
         else:
-            logging.warning(
-                "Ship {}: could not avert collision, continuing...".format(
-                    ship.id))
-            return ship.thrust(0, 0)
-            return ship.thrust(speed, angle)
-
-    if not last_map.pathable(ship, end_x, end_y):
-        return avert_collision()
-
-    for i in range(1, PATHING_STEPS + 1):
-        pos_x += dx
-        pos_y += dy
-
-        if distance(Location(pos_x, pos_y), Location(ship.x, ship.y)) < ship.r:
-            continue
-
-        # Collision avoidance - check if the ship is about to move off the
-        # map boundary, into a planet, or into one of our own ships
-        # (we don't care about enemy ones)
-        if last_map.out_of_bounds(pos_x, pos_y) or last_map.intersects_ships(ship):
-            return avert_collision()
+            break
 
     return ship.thrust(speed, angle)
 
