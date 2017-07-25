@@ -436,7 +436,9 @@ avoid collisions.
 warp_queue = {}
 
 
-def warp(ship, x, y, *, extra_data=None):
+def warp(ship, x, y, *,
+         fallback=True,
+         extra_data=None):
     """
     Move the given ship to the target location, taking advantage of inertia.
 
@@ -464,7 +466,7 @@ def warp(ship, x, y, *, extra_data=None):
         cancel_warp(ship)
         return
 
-    warp_state = _warp(ship, x, y)
+    warp_state = _warp(ship, x, y, fallback=fallback)
     warp_queue[ship.id] = [warp_state, extra_data]
 
 
@@ -517,12 +519,15 @@ def get_warp_extra_data(ship):
     return None
 
 
-def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
+def _warp(ship, x, y, *,
+          fallback=True,
+          max_acceleration=GameConstants.MAX_ACCELERATION):
     """
     The actual warp implementation. You should not use this directly.
     :param ship:
     :param x:
     :param y:
+    :param fallback: Whether to use :func:`move_to` at the end.
     :return:
     """
 
@@ -552,31 +557,10 @@ def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
                 min(max_acceleration,
                     dist / GameConstants.MAX_SPEED * max_acceleration)))
 
-        tries = 20
-        orig_angle = angle
-        while tries > 0:
-            angle_rad = angle * math.pi / 180
-            vel_x = ship.vel_x + thrust * math.cos(angle_rad)
-            vel_y = ship.vel_y + thrust * math.sin(angle_rad)
-            speed = math.sqrt(vel_x**2 + vel_y**2)
-            if speed > GameConstants.MAX_SPEED:
-                factor = GameConstants.MAX_SPEED / speed
-                vel_x *= factor
-                vel_y *= factor
-
-            target_x = ship.x + vel_x
-            target_y = ship.y + vel_y
-
-            if last_map.forecast_collision(ship, Location(target_x, target_y)):
-                angle = orig_angle + (tries - 5) * 10
-            else:
-                break
-
-            tries -= 1
-
+        angle, thrust, target = adjust_for_collision(ship, angle, thrust)
         target_circle = Location(x, y)
         target_circle.r = 1.0
-        if intersect_segment_circle(ship, Location(target_x, target_y), target_circle):
+        if intersect_segment_circle(ship, target, target_circle):
             break
 
         logging.debug(
@@ -590,7 +574,7 @@ def _warp(ship, x, y, *, max_acceleration=GameConstants.MAX_ACCELERATION):
     yield from brake(ship, max_acceleration=max_acceleration)
 
     # Low-velocity maneuvering stage - fall back on move_to
-    while True:
+    while True and fallback:
         ship = last_map.ships[my_tag].get(ship.id, None)
         if not ship:
             return
@@ -634,7 +618,34 @@ def is_warping(ship):
     return ship.id in warp_queue
 
 
-def move_to(ship, angle, speed, avoidance=40):
+def adjust_for_collision(ship, orig_angle, thrust, tries=20):
+    angle = orig_angle
+    orig_tries = tries
+    target = Location(ship.x + ship.vel_x, ship.y + ship.vel_y)
+
+    while tries > 0:
+        angle_rad = angle * math.pi / 180
+        vel_x = ship.vel_x + thrust * math.cos(angle_rad)
+        vel_y = ship.vel_y + thrust * math.sin(angle_rad)
+        speed = math.sqrt(vel_x**2 + vel_y**2)
+
+        if speed > GameConstants.MAX_SPEED:
+            factor = GameConstants.MAX_SPEED / speed
+            vel_x *= factor
+            vel_y *= factor
+
+        target = Location(ship.x + vel_x, ship.y + vel_y)
+
+        if last_map.forecast_collision(ship, target):
+            angle = orig_angle + (tries - 5) * (orig_tries // 2)
+            tries -= 1
+        else:
+            break
+
+    return angle, thrust, target
+
+
+def move_to(ship, angle, speed, tries=40):
     """
     Move the ship in the given direction for one turn.
 
@@ -646,7 +657,7 @@ def move_to(ship, angle, speed, avoidance=40):
     :param ship:
     :param angle:
     :param speed:
-    :param avoidance: How many tries to avoid collisions.
+    :param tries: How many tries to avoid collisions.
     :return:
     """
     if ship.vel_x != 0 or ship.vel_y != 0:
@@ -655,17 +666,7 @@ def move_to(ship, angle, speed, avoidance=40):
                 ship.id, speed, angle
             ))
 
-    while avoidance > 0:
-        dx = speed * math.cos(angle * math.pi / 180)
-        dy = speed * math.sin(angle * math.pi / 180)
-        target_x = ship.x + dx
-        target_y = ship.y + dy
-
-        if last_map.forecast_collision(ship, Location(target_x, target_y)):
-            angle += 15
-        else:
-            break
-
+    angle, thrust, _ = adjust_for_collision(ship, angle, speed, tries)
     return ship.thrust(speed, angle)
 
 

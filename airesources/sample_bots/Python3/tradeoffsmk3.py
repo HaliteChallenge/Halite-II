@@ -23,7 +23,7 @@ def analyze_planets(ship):
 
         if hlt.can_dock(ship, planet):
             choices.append((-1000, planet, lambda planet=planet: hlt.dock(ship, planet)))
-        elif pathable:
+        elif distance > 10:
             def warp_action(dock_x=dock_x, dock_y=dock_y):
                 hlt.warp(ship, dock_x, dock_y, extra_data=planet.id)
             score *= 0.8
