@@ -102,12 +102,12 @@ while True:
                     command_queue.append(hlt.dock(ship, planet))
     ```
 
-9. If we’re not in range to dock, we keep moving towards the planet until we can dock. Here, we use the `move_to` helper, which takes the angle and the thrust we want to use, and adjusts the angle to avoid collisions. Instead of hardcoding a thrust, we specify that the thrust is equal to the drag force, which is the fastest we can move without having to deal with inertia.
+9. If we’re not in range to dock, we keep moving towards the planet until we can dock. Here, we use the `move_to` helper, which takes the angle and the thrust we want to use, and adjusts the angle to avoid collisions. 
 
     ```python
                 else:
                     command_queue.append(
-                        hlt.move_to(ship, angle, hlt.GameConstants.DRAG))
+                        hlt.move_to(ship, angle, 1))
 
                 break
     ```
@@ -149,6 +149,16 @@ if ship.docked == "docked" and game_map.planets[ship.planet].remaining_productio
     continue
 ```
 
+### Fly Faster
+
+When using `move_to`, instead of hardcoding a thrust, we can specify that the thrust is equal to the drag force, which is the fastest we can move without having to deal with inertia.
+
+```python
+command_queue.append(hlt.move_to(ship, angle, hlt.GameConstants.DRAG))
+```
+
+Remember, drag is applied at the end of the turn, so if you accelerate by less than or equal to the drag force, then at the end of the turn, drag will take over, and you won't have any momentum carry over into next turn.
+
 ### Use warp!
 
 Warp lets us move far more quickly, allowing us to be more offensive and caputure territory more quickly. In Python, it also performs collision avoidance (this feature coming to other starter kits soon).
@@ -185,6 +195,6 @@ if hlt.can_dock(ship, planet):
 elif distance > 10:
     hlt.warp(ship, target_x, target_y)
 else:
-    command_queue.append(hlt.move_to(ship, angle, 2))
+    command_queue.append(hlt.move_to(ship, angle, 1))
 ```
 
