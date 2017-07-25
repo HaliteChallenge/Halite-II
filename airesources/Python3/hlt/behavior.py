@@ -128,8 +128,8 @@ def _warp(ship, x, y, *,
         angle, dist = orient_towards(ship, Location(x, y))
         # Guard against divide-by-zero
         turns_left = dist / speed if speed else 100000
-        turns_to_decelerate = math.ceil(speed /
-                                        (max_acceleration + constants.DRAG))
+        turns_to_decelerate = math.ceil(
+            speed / (max_acceleration + constants.DRAG))
 
         if turns_left <= turns_to_decelerate:
             logging.debug(
@@ -145,7 +145,7 @@ def _warp(ship, x, y, *,
                 min(max_acceleration,
                     dist / constants.MAX_SPEED * max_acceleration)))
 
-        angle, thrust, target = adjust_for_collision(ship, angle, thrust)
+        angle, thrust, target = adjust_for_collision(ship, angle, thrust, tries=60)
         target_circle = Location(x, y)
         target_circle.r = 1.0
         if collision.intersect_segment_circle(ship, target, target_circle):
