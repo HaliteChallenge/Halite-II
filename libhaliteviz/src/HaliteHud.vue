@@ -76,6 +76,22 @@
                         <dd v-else>(indepdendent)</dd>
                     </dl>
                 </div>
+                <div v-if="selected.kind === 'ship' && selected_ship !== null">
+                    <h3>Selected Ship</h3>
+                    <dl>
+                        <dt>ID</dt>
+                        <dd>{{ replay.player_names[selected.owner] }}&mdash;{{ selected.id }}</dd>
+
+                        <dt>Location</dt>
+                        <dd>({{ selected_ship.x.toFixed(4) }}, {{ selected_ship.y.toFixed(4) }})</dd>
+
+                        <dt>Velocity</dt>
+                        <dd>({{ selected_ship.vel_x.toFixed(4) }}, {{ selected_ship.vel_y.toFixed(4) }})</dd>
+
+                        <dt>Health</dt>
+                        <dd>{{ selected_ship.health }}</dd>
+                    </dl>
+                </div>
             </div>
         </div>
     </div>
@@ -102,6 +118,7 @@
              playing: false,
              selected: {
                  kind: null,
+                 owner: null,
                  id: null,
              },
              stats: null,
@@ -122,8 +139,9 @@
              this.time = visualizer.time;
          };
          visualizer.onSelect = (kind, args) => {
-             this.selected.kind = "planet";
+             this.selected.kind = kind;
              this.selected.id = args.id;
+             this.selected.owner = args.owner;
              visualizer.onUpdate();
              this.$forceUpdate();
          };
@@ -260,7 +278,19 @@
                  }
              }
              return null;
-         }
+         },
+         selected_ship: function() {
+            if (this.selected.kind === "ship") {
+                let frame = this.replay.frames[this.frame];
+                let state = frame.ships[this.selected.owner][this.selected.id];
+
+                if (state) {
+                    return state;
+                }
+            }
+
+            return null;
+         },
      },
  };
 </script>

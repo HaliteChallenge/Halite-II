@@ -34,8 +34,8 @@ export class HaliteVisualizer {
         this._playing = false;
 
         this.timeStep = 0.1;
-        this.playSpeed = 1.0;
-        this.scrubSpeed = 0.5;
+        this.playSpeed = 0.5;
+        this.scrubSpeed = 0.25;
         this.keyboardControls = new keyboard.KeyboardControls(this, {
             "ArrowLeft": "scrubBackwards",
             "KeyA": "scrubBackwards",

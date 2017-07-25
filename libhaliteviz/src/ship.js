@@ -25,6 +25,10 @@ export class Ship {
         this.sprite.tint = PLAYER_COLORS[this.owner];
         this.halo.tint = PLAYER_COLORS[this.owner];
 
+        this.halo.interactive = true;
+        this.halo.buttonMode = true;
+        this.halo.on("pointerdown", this.onClick.bind(this));
+
         this.update(record);
     }
 
@@ -37,6 +41,13 @@ export class Ship {
         this.container.removeChild(this.halo);
         this.container.removeChild(this.sprite);
         this.container.removeChild(this.exhaust);
+    }
+
+    onClick() {
+        this.visualizer.onSelect("ship", {
+            owner: this.owner,
+            id: this.id,
+        });
     }
 
     update(record) {
