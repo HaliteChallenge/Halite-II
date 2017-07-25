@@ -531,7 +531,8 @@ def _warp(ship, x, y, *,
     :return:
     """
 
-    logging.debug("Warp {}: beginning (distance {})".format(ship.id, distance(ship, Location(x, y))))
+    logging.debug("Warp {}: beginning (distance {})".format(
+        ship.id, distance(ship, Location(x, y))))
     # Acceleration stage
     while True:
         # Get the most up-to-date ship
