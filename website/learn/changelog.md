@@ -4,7 +4,15 @@ title: Changelog
 toc: true
 ---
 
-## Alpha #2
+## Alpha 0.2.1
+
+- Performance improvements
+  - Collision detection code has been improved (game environment runs slightly faster)
+  - Crash fixed in collision with map boundary
+- Visualizer
+  - Can now click on ships
+
+## Alpha 0.2
 
 - Continuous collision detection
   - No more subdivision of turns
@@ -75,4 +83,4 @@ toc: true
         No input received from bot.
         Skipping replay (bot errored on first turn).
 
-## Alpha #1 (Initial Release)
+## Alpha 0.1 (Initial Release)

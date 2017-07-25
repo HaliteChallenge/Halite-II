@@ -12,6 +12,7 @@ import zipfile
 
 ENVIRONMENT_DIR_HELP = "Directory containing precompiled Halite environment " \
                        "executables, each named after their platform. "
+VERSION_HELP = "The version string to embed in the downloads page."
 IGNORED_EXTENSIONS = [".exe", ".class", ".pyc", ".obj"]
 INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp"]
 INCLUDED_FILES = ["Makefile", "README"]
@@ -100,6 +101,7 @@ def make_source_download():
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("version", help=VERSION_HELP)
     parser.add_argument("environment_dir", help=ENVIRONMENT_DIR_HELP)
 
     args = parser.parse_args()
@@ -146,6 +148,7 @@ def main():
         "languages": [],
         "environments": [],
         "source": SOURCE_FILE,
+        "version": args.version,
     }
     generated_languages.sort()
     for language in generated_languages:

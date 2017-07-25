@@ -10,6 +10,8 @@ These downloads include both the Halite game environment (pre-compiled) as well 
 
 [Source code download]({{ site.baseurl }}/{{ site.data.downloads.source }})
 
+__Current version:__ {{ site.data.downloads.version }}
+
 ## Game Environments and Starter Kits
 
 <table class="table">
