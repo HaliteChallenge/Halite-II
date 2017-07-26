@@ -22,6 +22,11 @@
             <section>
                 <h2>Game Feed</h2>
 
+                <template v-if="is_my_page">
+                    <input type="checkbox" v-bind:checked="only_timed_out" id="only-timed-out" v-on:change="toggle_filter" />
+                    <label for="only-timed-out">Only show games where I timed out</label>
+                </template>
+
                 <table class="table">
                     <thead>
                         <tr>
@@ -57,7 +62,7 @@
                                     {{ game.game_id }}
                                 </a>
 
-                                <a v-if="game.players[user.user_id].timed_out && user.user_id == my_id"
+                                <a v-if="game.players[user.user_id].timed_out && is_my_page"
                                    target="_blank"
                                    :href="error_log_link(game.game_id)"
                                    class="text-danger">
@@ -103,7 +108,8 @@
                 profile_images: {},
                 page: 0,
                 offset: 0,
-                my_id: null,
+                only_timed_out: false,
+                is_my_page: false,
             };
         },
         mounted: function() {
@@ -137,12 +143,17 @@
             });
 
             api.me().then((me) => {
-                this.my_id = me.user_id;
+                this.is_my_page = me.user_id === this.user.user_id;
             });
         },
         methods: {
             fetch: function() {
-                return $.get(`${api.API_SERVER_URL}/user/${this.user.user_id}/match?order_by=desc,time_played&offset=${this.offset}`)
+                let query = `order_by=desc,time_played&offset=${this.offset}`;
+                if (this.only_timed_out) {
+                    query += `&filter=timed_out,=,${this.user.user_id}`;
+                }
+                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
+                return $.get(url)
                  .then((data) => {
                      this.games = data;
                      for (let game of data) {
@@ -170,6 +181,14 @@
                 this.offset -= 10;
                 this.fetch().then(() => {
                     this.page -= 1;
+                });
+            },
+
+            toggle_filter: function() {
+                this.only_timed_out = !this.only_timed_out;
+                this.offset = 0;
+                this.fetch().then(() => {
+                    this.page = 0;
                 });
             },
 
