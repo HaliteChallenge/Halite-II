@@ -27,6 +27,7 @@ class APIError(Exception):
 
 
 def cross_origin(*args, **kwargs):
+    """Mark a view as cross-origin accessible."""
     kwargs["origins"] = config.CORS_ORIGINS
     kwargs["supports_credentials"] = True
     kwargs["allow_headers"] = ["Origin", "Accept", "Content-Type"]
@@ -47,14 +48,24 @@ def handle_api_error(error):
 
 
 def tier(rank, total_users):
-    for tier, percentage in (("Diamond", config.DIAMOND),
-                             ("Platinum", config.PLATINUM),
-                             ("Gold", config.GOLD),
-                             ("Silver", config.SILVER)):
-        num_players = math.ceil(percentage * total_users)
-        if rank <= num_players:
+    """Given a rank (1-based), return the tier name."""
+    thresholds = tier_thresholds(total_users)
+    for tier, threshold in sorted(thresholds.items(), key=lambda item: item[1]):
+        if rank <= threshold:
             return tier
-        else:
-            rank -= num_players
 
-    return "Salt"
+    return config.TIER_4_NAME
+
+
+def tier_thresholds(total_users):
+    """Return the lowest rank that fits each tier."""
+    num_players = 0
+    result = {}
+    for tier, percentage in ((config.TIER_0_NAME, config.TIER_0_PERCENT),
+                             (config.TIER_1_NAME, config.TIER_1_PERCENT),
+                             (config.TIER_2_NAME, config.TIER_2_PERCENT),
+                             (config.TIER_3_NAME, config.TIER_3_PERCENT)):
+        num_players += math.ceil(percentage * total_users)
+        result[tier] = num_players
+
+    return result
