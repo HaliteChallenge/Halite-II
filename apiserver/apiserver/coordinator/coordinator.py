@@ -20,111 +20,133 @@ from .. import config, model, notify, response_success, util
 coordinator_api = flask.Blueprint("coordinator_api", __name__)
 
 
+def reset_compilation_tasks(conn):
+    """Check ongoing compilation tasks, and reset ones that are "stuck"."""
+    reset_stuck_tasks = model.bots.update().where(
+        (model.bots.c.compile_status == "InProgress") &
+        (model.bots.c.compile_start <
+         datetime.datetime.now() - datetime.timedelta(
+             minutes=config.COMPILATION_STUCK_THRESHOLD))
+    ).values(
+        compile_status="Uploaded",
+        compile_start=None,
+    )
+    conn.execute(reset_stuck_tasks)
+
+
+def serve_compilation_task(conn):
+    """Try to find and return a compilation task."""
+    with conn.begin() as transaction:
+        # Try to assign a compilation task.
+        find_compilation_task = model.bots.select() \
+            .where(model.bots.c.compile_status == "Uploaded") \
+            .order_by(model.bots.c.user_id.asc()) \
+            .limit(1)
+        bot = conn.execute(find_compilation_task).first()
+        if bot:
+            user_id = bot["user_id"]
+            bot_id = bot["id"]
+            # Keep track of when compilation started, so that we can
+            # restart it if it gets stuck
+            update = model.bots.update() \
+                .where((model.bots.c.user_id == user_id) &
+                       (model.bots.c.id == bot_id)) \
+                .values(compile_status="InProgress",
+                        compile_start=sqlalchemy.sql.func.now())
+            conn.execute(update)
+            return response_success({
+                "type": "compile",
+                "user": user_id,
+                "bot": bot_id,
+            })
+    return None
+
+
+def rand_map_size():
+    # Pick map size. Duplicate entries are used to weight the
+    # probability of a particular size
+    map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160,
+                 192, 192, 192, 256]
+    map_width = random.choice(map_sizes)
+    map_height = random.choice(map_sizes)
+
+    # Width, height
+    return max(map_width, map_height), min(map_width, map_height)
+
+
+def serve_game_task(conn):
+    """Try to find a set of players to play a game together."""
+    # Only allow 2 or 4 player games
+    player_count = 2 if random.random() > 0.5 else 4
+
+    seed_player = find_seed_player(conn)
+
+    if seed_player:
+        # Select the rest of the players
+        mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
+
+        logging.warning(
+            "Matchmaking: seed player: ID {}, mu {}, "
+            "maximum rank distance {}".format(
+                seed_player.user_id, seed_player.mu, mu_rank_limit))
+
+        # Find closely matched players
+        sqlfunc = sqlalchemy.sql.func
+        close_players = sqlalchemy.sql.select([
+            model.bots.c.id.label("bot_id"),
+            model.bots.c.user_id,
+            model.bots.c.version_number,
+            model.bots.c.mu,
+            model.users.c.username,
+        ]).select_from(
+            model.bots.join(
+                model.users,
+                model.bots.c.user_id == model.users.c.id,
+                )
+        ).where(
+            (model.bots.c.compile_status == "Successful") &
+            (~((model.bots.c.user_id == seed_player["user_id"]) &
+               (model.bots.c.id == seed_player["bot_id"])))
+        ).order_by(
+            sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
+        ).limit(mu_rank_limit).alias("muranktable")
+        query = close_players.select().order_by(sqlfunc.rand()) \
+            .limit(player_count - 1)
+
+        players = conn.execute(query).fetchall()
+        players.insert(0, seed_player)
+
+        map_width, map_height = rand_map_size()
+        players = [{
+            "user_id": player["user_id"],
+            "bot_id": player["bot_id"],
+            "username": player["username"],
+            "version_number": player["version_number"],
+        } for player in players]
+
+        if len(players) == player_count:
+            return response_success({
+                "type": "game",
+                "width": map_width,
+                "height": map_height,
+                "users": players,
+            })
+
+
 @coordinator_api.route("/task")
 def task():
     """Serve compilation and game tasks to worker instances."""
     with model.engine.connect() as conn:
-        # Check ongoing compilation tasks, and reset ones that are "stuck".
-        reset_stuck_tasks = model.bots.update().where(
-            (model.bots.c.compile_status == "InProgress") &
-            (model.bots.c.compile_start <
-             datetime.datetime.now() - datetime.timedelta(minutes=30))
-        ).values(
-            compile_status="Uploaded",
-            compile_start=None,
-        )
-        conn.execute(reset_stuck_tasks)
+        # Prioritize compiling new bots
+        reset_compilation_tasks(conn)
+        response = serve_compilation_task(conn)
+        if response:
+            return response
 
-        with conn.begin() as transaction:
-            # Try to assign a compilation task.
-            find_compilation_task = model.bots.select()\
-                .where(model.bots.c.compile_status == "Uploaded")\
-                .order_by(model.bots.c.user_id.asc())\
-                .limit(1)
-            bot = conn.execute(find_compilation_task).first()
-            if bot:
-                user_id = bot["user_id"]
-                bot_id = bot["id"]
-                # Keep track of when compilation started, so that we can
-                # restart it if it gets stuck
-                update = model.bots.update() \
-                    .where((model.bots.c.user_id == user_id) &
-                           (model.bots.c.id == bot_id)) \
-                    .values(compile_status="InProgress",
-                            compile_start=sqlalchemy.sql.func.now())
-                conn.execute(update)
-                return response_success({
-                    "type": "compile",
-                    "user": user_id,
-                    "bot": bot_id,
-                })
-
-    # Try to play a game.
-
-    # Only allow 2 or 4 player games
-    player_count = 2 if random.random() > 0.5 else 4
-
-    with model.engine.connect() as conn:
-        seed_player = find_seed_player(conn)
-
-        if seed_player:
-            # Select the rest of the players
-            mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
-
-            logging.warning(
-                "Matchmaking: seed player: ID {}, mu {}, "
-                "maximum rank distance {}".format(
-                    seed_player.user_id, seed_player.mu, mu_rank_limit))
-
-            # Find closely matched players
-            sqlfunc = sqlalchemy.sql.func
-            close_players = sqlalchemy.sql.select([
-                model.bots.c.id.label("bot_id"),
-                model.bots.c.user_id,
-                model.bots.c.version_number,
-                model.bots.c.mu,
-                model.users.c.username,
-            ]).select_from(
-                model.bots.join(
-                    model.users,
-                    model.bots.c.user_id == model.users.c.id,
-                )
-            ).where(
-                (model.bots.c.compile_status == "Successful") &
-                (~((model.bots.c.user_id == seed_player["user_id"]) &
-                   (model.bots.c.id == seed_player["bot_id"])))
-            ).order_by(
-                sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
-            ).limit(mu_rank_limit).alias("muranktable")
-            query = close_players.select().order_by(sqlfunc.rand())\
-                .limit(player_count - 1)
-
-            players = conn.execute(query).fetchall()
-            players.insert(0, seed_player)
-
-            # Pick map size. Duplicate entries are used to weight the
-            # probability of a particular size
-            map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160,
-                         192, 192, 192, 256]
-            map_width = random.choice(map_sizes)
-            map_height = random.choice(map_sizes)
-
-            map_width, map_height = max(map_width, map_height), min(map_width, map_height)
-
-            players = [{
-                "user_id": player["user_id"],
-                "bot_id": player["bot_id"],
-                "username": player["username"],
-                "version_number": player["version_number"],
-            } for player in players]
-
-            if len(players) == player_count:
-                return response_success({
-                    "type": "game",
-                    "width": map_width,
-                    "height": map_height,
-                    "users": players,
-                })
+        # Otherwise, play a game
+        response = serve_game_task(conn)
+        if response:
+            return response
 
     return response_success({
         "type": "notask",
@@ -237,6 +259,7 @@ def update_compilation_status():
 
 @coordinator_api.route("/botFile", methods=["POST"])
 def upload_bot():
+    """Save a compiled bot to object storage."""
     user_id = flask.request.form.get("user_id", None)
     bot_id = flask.request.form.get("bot_id", None)
 
@@ -254,6 +277,7 @@ def upload_bot():
 
 @coordinator_api.route("/botFile", methods=["GET"])
 def download_bot():
+    """Retrieve a compiled or uncompiled bot from object storage."""
     user_id = flask.request.values.get("user_id", None)
     bot_id = flask.request.values.get("bot_id", None)
     compile = flask.request.values.get("compile", False)
@@ -304,6 +328,7 @@ def hash_bot():
 
 @coordinator_api.route("/game", methods=["POST"])
 def upload_game():
+    """Save the results of a game into the database and object storage."""
     if ("game_output" not in flask.request.values or
             "users" not in flask.request.values):
         raise util.APIError(
@@ -411,8 +436,7 @@ def upload_game():
             time_played=sqlalchemy.sql.func.NOW(),
         )).inserted_primary_key[0]
 
-    # Update the participants' stats
-    with model.engine.connect() as conn:
+        # Update the participants' stats
         for user in users:
             conn.execute(model.game_participants.insert().values(
                 game_id=game_id,
@@ -435,55 +459,7 @@ def upload_game():
 
             # If this is the user's first timeout, let them know
             if user["timed_out"]:
-                timed_out_count = conn.execute(sqlalchemy.sql.select([
-                    sqlalchemy.sql.func.count(),
-                ]).select_from(model.game_participants).where(
-                    (model.game_participants.c.user_id == user["user_id"]) &
-                    (model.game_participants.c.bot_id == user["bot_id"]) &
-                    (model.game_participants.c.version_number ==
-                     user["version_number"]) &
-                    model.game_participants.c.timed_out
-                )).first()[0]
-
-                total_count = conn.execute(sqlalchemy.sql.select([
-                    model.bots.c.games_played,
-                ]).select_from(model.game_participants).where(
-                    (model.bots.c.user_id == user["user_id"]) &
-                    (model.bots.c.id == user["bot_id"])
-                )).first()["games_played"]
-
-                hit_timeout_limit = timed_out_count > config.MAX_ERRORS_PER_BOT
-                hit_timeout_percent = (
-                    total_count > 0 and
-                    timed_out_count / total_count > config.MAX_ERROR_PERCENTAGE
-                )
-
-                if timed_out_count == 1:
-                    notify.send_notification(
-                        user["email"],
-                        user["username"],
-                        "First bot timeout/error",
-                        notify.FIRST_TIMEOUT.format(
-                            replay_link="{}/play?game_id={}".format(config.SITE_URL, game_id),
-                            log_link="{}/user/{}/match/{}/error_log".format(config.API_URL, user["user_id"], game_id),
-                        ))
-
-                elif hit_timeout_limit or hit_timeout_percent:
-                    # Prevent the bot from playing more games until a new bot
-                    # is uploaded
-                    conn.execute(model.bots.update().values(
-                        compile_status="Disabled",
-                    ).where((model.bots.c.user_id == user["user_id"]) &
-                            (model.bots.c.id == user["bot_id"])))
-
-                    notify.send_notification(
-                        user["email"],
-                        user["username"],
-                        "Bot timeout/error limit reached",
-                        notify.TIMEOUT_LIMIT.format(
-                            limit=config.MAX_ERRORS_PER_BOT,
-                            percent=int(config.MAX_ERROR_PERCENTAGE * 100),
-                        ))
+                update_user_timeout(conn, game_id, user)
 
     # Update rankings
     users.sort(key=lambda user: user["rank"])
@@ -508,10 +484,67 @@ def upload_game():
     return response_success()
 
 
-def find_seed_player(conn):
+def update_user_timeout(conn, game_id, user):
+    """Notify users of a timeout if applicable."""
+    timed_out_count = conn.execute(sqlalchemy.sql.select([
+        sqlalchemy.sql.func.count(),
+    ]).select_from(model.game_participants).where(
+        (model.game_participants.c.user_id == user["user_id"]) &
+        (model.game_participants.c.bot_id == user["bot_id"]) &
+        (model.game_participants.c.version_number ==
+         user["version_number"]) &
+        model.game_participants.c.timed_out
+    )).first()[0]
+
+    total_count = conn.execute(sqlalchemy.sql.select([
+        model.bots.c.games_played,
+    ]).select_from(model.game_participants).where(
+        (model.bots.c.user_id == user["user_id"]) &
+        (model.bots.c.id == user["bot_id"])
+    )).first()["games_played"]
+
+    hit_timeout_limit = timed_out_count > config.MAX_ERRORS_PER_BOT
+    hit_timeout_percent = (
+        total_count > 0 and
+        timed_out_count / total_count > config.MAX_ERROR_PERCENTAGE
+    )
+
+    if timed_out_count == 1:
+        notify.send_notification(
+            user["email"],
+            user["username"],
+            "First bot timeout/error",
+            notify.FIRST_TIMEOUT.format(
+                replay_link="{}/play?game_id={}".format(
+                    config.SITE_URL, game_id),
+                log_link="{}/user/{}/match/{}/error_log".format(
+                    config.API_URL, user["user_id"], game_id),
+            ))
+
+    elif hit_timeout_limit or hit_timeout_percent:
+        # Prevent the bot from playing more games until a new bot
+        # is uploaded
+        conn.execute(model.bots.update().values(
+            compile_status="Disabled",
+        ).where((model.bots.c.user_id == user["user_id"]) &
+                (model.bots.c.id == user["bot_id"])))
+
+        notify.send_notification(
+            user["email"],
+            user["username"],
+            "Bot timeout/error limit reached",
+            notify.TIMEOUT_LIMIT.format(
+                limit=config.MAX_ERRORS_PER_BOT,
+                percent=int(config.MAX_ERROR_PERCENTAGE * 100),
+            ))
+
+
+def find_seed_player(conn, high_level=False):
     """
     Find a seed player for a game.
     :param conn: A database connection.
+    :param high_level: If True, only pick gold and above players. If False,
+    only pick silver and below.
     :return: A seed player, or None.
     """
     sqlfunc = sqlalchemy.sql.func
