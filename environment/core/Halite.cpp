@@ -5,6 +5,7 @@
 #include <chrono>
 #include <unordered_set>
 #include <ostream>
+#include <ctime>
 
 #include "mapgen/SolarSystem.h"
 #include "SimulationEvent.hpp"
@@ -20,6 +21,21 @@ auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void {
             { "rank", player_stats.rank },
         };
     }
+}
+
+/**
+ * Format the current time (to use for the replay file name) in a way
+ * compatible with compilers not supporting C++11.
+ * @return
+ */
+auto put_time() -> std::string {
+    // While compilers like G++4.8 report C++11 compatibility, they do not
+    // support std::put_time, so we have to use strftime instead.
+    auto time = std::time(nullptr);
+    auto localtime = std::localtime(&time);
+    char result[30];
+    std::strftime(result, 30, "%Y%m%d-%H%M%S%z-", localtime);
+    return std::string(result);
 }
 
 /*
@@ -1045,9 +1061,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
 
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
-    auto time = std::time(nullptr);
-    auto localtime = *std::localtime(&time);
-    filename_buf << "replay-" << std::put_time(&localtime, "%Y%m%d-%H%M%S%z-");
+    filename_buf << "replay-" << put_time();
     filename_buf << id << ".hlt";
     auto filename = filename_buf.str();
 
