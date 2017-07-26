@@ -62,11 +62,16 @@ export function list_bots(user_id) {
     });
 }
 
+export function makeRequest() {
+    const xhr = new XMLHttpRequest();
+    return xhr;
+}
+
 export function update_bot(user_id, bot_id, file, progress_callback) {
     const method = bot_id === null ? "POST" : "PUT";
     const endpoint = bot_id === null ? "bot" : `bot/${bot_id}`;
 
-    const xhr = new XMLHttpRequest();
+    const xhr = makeRequest();
     xhr.upload.addEventListener("progress", function(e) {
         if (e.lengthComputable) {
             progress_callback(e.loaded / e.total);
@@ -117,7 +122,7 @@ export function register_me(data) {
 export function get_replay(game_id, progress_callback) {
     let game_data_promise = Promise.resolve($.get(`${API_SERVER_URL}/user/0/match/${game_id}`));
     let replay_promise = new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
+        const xhr = makeRequest();
         xhr.withCredentials = true;
         xhr.open("GET", `${API_SERVER_URL}/user/0/match/${game_id}/replay`, true);
         xhr.responseType = "arraybuffer";
