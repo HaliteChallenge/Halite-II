@@ -26,7 +26,13 @@ def adjust_for_collision(ship, orig_angle, thrust, tries=20):
         target = Location(ship.x + vel_x, ship.y + vel_y)
 
         if hlt.last_map.forecast_collision(ship, target):
-            angle = orig_angle + (tries - 5) * (orig_tries // 2)
+            # Factor ranges from 0 to 10, then from -1 to -9
+            if tries >= orig_tries // 2:
+                factor = orig_tries - tries
+            else:
+                factor = tries - (orig_tries // 2)
+
+            angle = orig_angle + factor * 10
             tries -= 1
         else:
             break

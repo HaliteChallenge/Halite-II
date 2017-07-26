@@ -28,6 +28,7 @@ def analyze_planets(game_map, ship):
         # E. Prevent multiple ships from converging on the same planet, by
         # pretending that this planet is already owned
         planet.owned = True
+        planet.owner = None
 
         angle, distance = hlt.orient_towards(ship, planet)
 

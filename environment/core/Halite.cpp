@@ -22,7 +22,9 @@ auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void {
     }
 }
 
-//Private Functions ------------------
+/*
+ * PRIVATE FUNCTIONS
+ */
 
 auto Halite::compare_rankings(const hlt::PlayerId& player1,
                               const hlt::PlayerId& player2) const -> bool {
@@ -935,6 +937,10 @@ auto Halite::output(std::string filename, const GameStatistics& stats) -> void {
     gameFile.flush();
     gameFile.close();
 }
+
+/*
+ * PUBLIC FUNCTIONS
+ */
 
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
                                 unsigned int id,
