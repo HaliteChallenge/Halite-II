@@ -17,20 +17,13 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 import pycountry
-from flask_cors import cross_origin as flask_cross_origin
 
 from .. import config, model, notify, util
 from .. import response_success
+from ..util import cross_origin
 
 
 web_api = flask.Blueprint("web_api", __name__)
-
-
-def cross_origin(*args, **kwargs):
-    kwargs["origins"] = config.CORS_ORIGINS
-    kwargs["supports_credentials"] = True
-    kwargs["allow_headers"] = ["Origin", "Accept", "Content-Type"]
-    return flask_cross_origin(*args, **kwargs)
 
 
 def validate_country(country_code, subdivision_code):

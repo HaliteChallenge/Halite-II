@@ -1,7 +1,7 @@
 import flask
 import math
 
-from flask_cors import cross_origin
+from flask_cors import cross_origin as flask_cross_origin
 
 from . import config
 
@@ -26,8 +26,14 @@ class APIError(Exception):
         return result
 
 
-@cross_origin(methods=["GET", "POST", "PUT", "OPTIONS"],
-              supports_credentials=True)
+def cross_origin(*args, **kwargs):
+    kwargs["origins"] = config.CORS_ORIGINS
+    kwargs["supports_credentials"] = True
+    kwargs["allow_headers"] = ["Origin", "Accept", "Content-Type"]
+    return flask_cross_origin(*args, **kwargs)
+
+
+@cross_origin(methods=["GET", "POST", "PUT", "OPTIONS"])
 def handle_api_error(error):
     """
     The Flask error handler for APIErrors. Use with @app.errorhandler.

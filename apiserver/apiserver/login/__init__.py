@@ -3,10 +3,9 @@ import urllib.parse
 import flask
 import sqlalchemy
 from flask_oauthlib.client import OAuth
-from flask_cors import cross_origin
 
 from .. import app, config, model, util
-
+from ..util import cross_origin
 
 oauth_login = flask.Blueprint("github_login", __name__)
 oauth = OAuth(app)
