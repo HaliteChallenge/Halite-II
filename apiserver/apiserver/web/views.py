@@ -902,12 +902,13 @@ def get_match_replay(intended_user, match_id):
     with model.engine.connect() as conn:
         match = conn.execute(sqlalchemy.sql.select([
             model.games.c.replay_name,
+            model.games.c.replay_bucket,
         ]).where(
             model.games.c.id == match_id
         )).first()
 
-        blob = gcloud_storage.Blob(match["replay_name"],
-                                   model.get_replay_bucket(),
+        bucket = model.get_replay_bucket(match["replay_bucket"])
+        blob = gcloud_storage.Blob(match["replay_name"], bucket,
                                    chunk_size=262144)
         buffer = io.BytesIO()
         blob.download_to_file(buffer)
@@ -1084,31 +1085,16 @@ def delete_organization(org_id):
 # MATCH DATA API ENDPOINTS #
 ############################
 
-@web_api.route("/latestMatch")
-def list_matches():
-    with model.engine.connect() as conn:
-        match = conn.execute(sqlalchemy.sql.select([
-            model.games.c.id,
-            model.games.c.replay_name,
-        ]).order_by(model.games.c.timestamp.desc())).first()
 
-        blob = gcloud_storage.Blob(match["replayName"],
-                                   model.get_replay_bucket(),
-                                   chunk_size=262144)
-        buffer = io.BytesIO()
-        blob.download_to_file(buffer)
-        buffer.seek(0)
-        return flask.send_file(buffer, mimetype="application/x-halite-2-replay",
-                               as_attachment=True,
-                               attachment_filename=str(match["id"])+".hlt")
+@web_api.route("/match")
+def list_matches():
+    # TODO: move list_user_matches impl here, parameterized by (optional) user
+    pass
 
 
 @web_api.route("/match/<int:match_id>")
-@optional_login
-def get_match(match_id, *, user_id):
-    if user_id is None:
-        user_id = -1
-    return get_user_match(user_id, match_id, user_id=user_id)
+def get_match(match_id):
+    return get_user_match(0, match_id)
 
 
 #############################

@@ -30,7 +30,11 @@ GCLOUD_ZONE = 'us-central1-c'
 
 GCLOUD_COMPILATION_BUCKET = 'TODO'
 GCLOUD_BOT_BUCKET = 'TODO'
-GCLOUD_REPLAY_BUCKET = 'TODO'
+# Replays are saved in different buckets based on player level
+GCLOUD_REPLAY_BUCKETS = {
+    0: 'TODO',
+    1: 'TODO',
+}
 GCLOUD_ERROR_LOG_BUCKET = 'TODO'
 
 # API Key authentication

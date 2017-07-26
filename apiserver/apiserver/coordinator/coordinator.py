@@ -313,6 +313,7 @@ def upload_game():
     users = json.loads(flask.request.values["users"])
 
     with model.engine.connect() as conn:
+        total_users = conn.execute(model.total_ranked_bots).first()[0]
         for user in users:
             stored_user = conn.execute(
                 sqlalchemy.sql.select([
@@ -333,6 +334,15 @@ def upload_game():
                 )
             ).first()
 
+            stored_rank = conn.execute(
+                sqlalchemy.sql.select([
+
+                ]).where(
+                    (model.bots.c.id == user["bot_id"]) &
+                    (model.bots.c.user_id == user["user_id"])
+                )
+            ).first()
+
             if not stored_user or not stored_bot:
                 raise util.APIError(400, message="User or bot doesn't exist")
 
@@ -346,6 +356,12 @@ def upload_game():
 
             user.update(dict(stored_user))
             user.update(dict(stored_bot))
+            if stored_rank:
+                user["rank"] = stored_rank["rank"]
+                user["tier"] = util.tier(user["rank"], total_users)
+            else:
+                user["rank"] = None
+                user["tier"] = util.tier(total_users, total_users)
 
     # Store the replay and any error logs
     replay_name = os.path.basename(game_output["replay"])
@@ -353,8 +369,16 @@ def upload_game():
     if replay_name not in flask.request.files:
         raise util.APIError(
             400, message="Replay file not found in uploaded files.")
-    blob = gcloud_storage.Blob(replay_key, model.get_replay_bucket(),
-                               chunk_size=262144)
+
+    # Store replay in separate bucket if user is Gold/Plat/Diamond
+    bucket_class = 0
+    for user in users:
+        if user["tier"] in ("Gold", "Platinum", "Diamond"):
+            bucket_class = 1
+            break
+
+    bucket = model.get_replay_bucket(bucket_class)
+    blob = gcloud_storage.Blob(replay_key, bucket, chunk_size=262144)
     blob.upload_from_file(flask.request.files[replay_name])
 
     for user in users:

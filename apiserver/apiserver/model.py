@@ -19,12 +19,6 @@ games = sqlalchemy.Table("game", metadata, autoload=True)
 game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True)
 
 
-def monkeypatch_text(text):
-    text.asc = lambda: sqlalchemy.sql.text(text.text + " ASC")
-    text.desc = lambda: sqlalchemy.sql.text(text.text + " DESC")
-    return text
-
-
 ranked_bots = sqlalchemy.sql.select([
     sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
     bots.c.user_id,
@@ -74,6 +68,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     users.c.country_code,
     users.c.country_subdivision_code,
     users.c.email,
+    ranked_bots.c.bot_id,
     ranked_bots.c.games_played.label("num_games"),
     ranked_bots.c.version_number.label("num_submissions"),
     ranked_bots.c.score,
@@ -109,9 +104,9 @@ def get_bot_bucket():
     return get_storage_client().get_bucket(config.GCLOUD_BOT_BUCKET)
 
 
-def get_replay_bucket():
+def get_replay_bucket(kind=0):
     """Get the object storage bucket for game replays."""
-    return get_storage_client().get_bucket(config.GCLOUD_REPLAY_BUCKET)
+    return get_storage_client().get_bucket(config.GCLOUD_REPLAY_BUCKETS[kind])
 
 
 def get_error_log_bucket():

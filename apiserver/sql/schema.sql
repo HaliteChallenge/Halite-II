@@ -60,6 +60,8 @@ CREATE TABLE bot (
 CREATE TABLE game (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   replay_name VARCHAR(128) NOT NULL,
+  -- Which bucket to store the replay in.
+  replay_bucket SMALLINT(5) NOT NULL DEFAULT 0,
   map_width SMALLINT(5) NOT NULL,
   map_height SMALLINT(5) NOT NULL,
   map_seed INT UNSIGNED NOT NULL,
