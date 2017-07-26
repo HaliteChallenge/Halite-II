@@ -28,7 +28,7 @@ struct DestroyedEvent : Event {
 
     DestroyedEvent(hlt::EntityId id_, hlt::Location location_,
                    double radius_, double time_)
-        : id(id_), location(location_), radius(radius_), time(time_) {};
+        : id(id_), location(location_), time(time_), radius(radius_) {};
 
     auto serialize() -> nlohmann::json override {
         return nlohmann::json{

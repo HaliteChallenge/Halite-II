@@ -20,33 +20,16 @@
 #include <thread>
 #include <future>
 
-#include "hlt.hpp"
-#include "GameEvent.hpp"
 #include "json.hpp"
 
+#include "hlt.hpp"
+#include "GameEvent.hpp"
+#include "Statistics.hpp"
 #include "./mapgen/Generator.h"
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;
 
-struct PlayerStatistics {
-    int tag;
-    int rank;
-    int last_frame_alive;
-    int init_response_time;
-    double average_frame_response_time;
-    int total_ship_count;
-    int damage_dealt;
-};
-
-struct GameStatistics {
-    std::vector<PlayerStatistics> player_statistics;
-    std::string output_filename;
-    std::set<unsigned short> timeout_tags;
-    std::vector<std::string> timeout_log_filenames;
-};
-
-auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
 
 typedef std::array<hlt::entity_map<double>, hlt::MAX_PLAYERS> DamageMap;
 
@@ -88,8 +71,6 @@ private:
     auto retrieve_moves(std::vector<bool> alive) -> void;
 
     std::vector<bool> process_next_frame(std::vector<bool> alive);
-    auto output_header(nlohmann::json& replay) -> void;
-    auto output(std::string filename, const GameStatistics& stats) -> void;
     void kill_player(hlt::PlayerId player);
 
     //! Compute the damage between two colliding ships
