@@ -23,6 +23,7 @@ ranked_bots = sqlalchemy.sql.select([
     sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
     bots.c.user_id,
     bots.c.id.label("bot_id"),
+    bots.c.mu,
     bots.c.score,
     bots.c.games_played,
     bots.c.version_number,
@@ -71,6 +72,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.bot_id,
     ranked_bots.c.games_played.label("num_games"),
     ranked_bots.c.version_number.label("num_submissions"),
+    ranked_bots.c.mu,
     ranked_bots.c.score,
     ranked_bots.c.language,
     # Perform a no-op operation so we can label the column easily
