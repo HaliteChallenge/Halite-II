@@ -63,6 +63,12 @@ We provide out-of-the-box starter packages for the following languages: Python, 
 ### How do I submit my bot?
 To submit your bot, you'll first need to zip your source code. Then, after signing in, click the "Submit" button on the top-right part of the page. Learn more about [getting started here][learn].
 
+### My bot keeps getting ejected because my <framework/library/toolkit> is printing things <to stdout/stderr>!
+
+Halite reads commands from your bot's stdout and stderr, so anything else written there will get interpreted as a command. Unfortunately, anything that is *not* a command will cause the game to eject you for writing badly formatted commands.
+
+We recommend you suppress this output. Most frameworks allow you to change the verbosity, or change where output is redirected to. In some cases (e.g. Keras), you may need to monkeypatch stderr/stdout temporarily to another location when importing/using them.
+
 [privacy]: {{ site.baseurl }}/privacy
 [own-bot]: #
 [learn]: {{ site.baseurl }}/learn
