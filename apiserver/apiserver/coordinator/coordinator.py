@@ -427,10 +427,8 @@ def upload_game():
             user.update(dict(stored_user))
             user.update(dict(stored_bot))
             if stored_rank:
-                user["rank"] = stored_rank["rank"]
-                user["tier"] = util.tier(user["rank"], total_users)
+                user["tier"] = util.tier(stored_rank["rank"], total_users)
             else:
-                user["rank"] = None
                 user["tier"] = util.tier(total_users, total_users)
 
     # Store the replay and any error logs
