@@ -110,7 +110,7 @@ CREATE TABLE user_notification (
   user_id INT unsigned NOT NULL,
   title varchar(64) NOT NULL,
   body varchar(2048) NOT NULL,
-  mood ENUM("error", "neutral", "success") NOT NULL DEFAULT "neutral",
+  mood ENUM('error', 'neutral', 'success') NOT NULL DEFAULT 'neutral',
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   PRIMARY KEY (id)

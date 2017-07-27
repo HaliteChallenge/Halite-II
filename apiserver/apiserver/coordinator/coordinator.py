@@ -80,22 +80,23 @@ def serve_game_task(conn, has_gpu=False):
     player_count = 2 if random.random() > 0.5 else 4
 
     # Limit player rank based on the presence of a GPU
-    thresholds = util.tier_thresholds(
-        conn.execute(model.total_ranked_bots).first()[0])
+    total_players = conn.execute(model.total_ranked_bots).first()[0]
+    thresholds = util.tier_thresholds(total_players)
     if has_gpu:
-        rank_limit = (model.ranked_bots_users.c.rank >
+        rank_limit = (model.ranked_bots_users.c.rank <=
                       thresholds[config.GPU_TIER_NAME])
     else:
-        rank_limit = (model.ranked_bots_users.c.rank <=
+        rank_limit = (model.ranked_bots_users.c.rank >
                       thresholds[config.GPU_TIER_NAME])
 
     seed_player = find_seed_player(conn, rank_limit)
 
     if seed_player:
+        print(seed_player)
         # Select the rest of the players
         mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
 
-        logging.warning(
+        logging.info(
             "Matchmaking: seed player: ID {}, mu {}, "
             "maximum rank distance {}".format(
                 seed_player.user_id, seed_player.mu, mu_rank_limit))
@@ -105,6 +106,7 @@ def serve_game_task(conn, has_gpu=False):
         close_players = sqlalchemy.sql.select([
             model.ranked_bots_users.c.bot_id,
             model.ranked_bots_users.c.user_id,
+            model.ranked_bots_users.c.rank,
             model.ranked_bots_users.c.num_submissions.label("version_number"),
             model.ranked_bots_users.c.mu,
             model.ranked_bots_users.c.username,
@@ -133,6 +135,8 @@ def serve_game_task(conn, has_gpu=False):
             "bot_id": player["bot_id"],
             "username": player["username"],
             "version_number": player["version_number"],
+            "rank": player["rank"],
+            "tier": util.tier(player["rank"], total_players),
         } for player in players]
 
         if len(players) == player_count:
@@ -641,8 +645,9 @@ def find_newbie_seed_player(conn, rank_limit):
     ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
     query = sqlalchemy.sql.select([
         model.ranked_bots_users.c.user_id,
-        model.ranked_bots_users.c.bot_id,
+        model.bots.c.id.label("bot_id"),
         model.ranked_bots_users.c.username,
+        model.ranked_bots_users.c.rank,
         model.bots.c.version_number,
         model.bots.c.mu,
     ]).select_from(
@@ -671,14 +676,14 @@ def find_seed_player(conn, rank_limit):
         rand_value = random.random()
 
         if rand_value > 0.5:
-            logging.warning("Matchmaking: seed player: looking for random bot"
-                            " with under 400 games played")
+            logging.info("Matchmaking: seed player: looking for random bot"
+                         " with under 400 games played")
             result = find_newbie_seed_player(conn, rank_limit)
             if result:
                 return result
         elif 0.25 < rand_value <= 0.5:
-            logging.warning("Matchmaking: seed player: looking for random bot"
-                            " from recent game with under 400 games played")
+            logging.info("Matchmaking: seed player: looking for random bot"
+                         " from recent game with under 400 games played")
             result = find_recent_seed_player(conn, rank_limit,
                                              restrictions=True)
             if result:
@@ -687,8 +692,8 @@ def find_seed_player(conn, rank_limit):
         # Fallback case
         # Same as the previous case, but we do not restrict how many
         # games the user can have played, and we do not sort randomly.
-        logging.warning("Matchmaking: seed player: looking for random bot"
-                        " from recent game")
+        logging.info("Matchmaking: seed player: looking for random bot"
+                     " from recent game")
         result = find_recent_seed_player(conn, rank_limit,
                                          restrictions=False)
         if result:

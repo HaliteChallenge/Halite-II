@@ -48,7 +48,7 @@ all_users = sqlalchemy.sql.select([
     _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
     _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
     _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
-    _func.max(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+    sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), int).label("rank"),
 ]).select_from(users.join(
     ranked_bots,
     ranked_bots.c.user_id == users.c.id,
@@ -76,7 +76,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.score,
     ranked_bots.c.language,
     # Perform a no-op operation so we can label the column easily
-    _func.abs(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+    sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), sqlalchemy.Integer).label("rank"),
 ]).select_from(ranked_bots.join(
     users,
     ranked_bots.c.user_id == users.c.id,
