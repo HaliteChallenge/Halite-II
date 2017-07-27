@@ -586,22 +586,21 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
         max_time,
         user_id,
         bot_id,
-        model.users.c.username,
-        model.bots.c.version_number,
-        model.bots.c.mu,
+        model.ranked_bots_users.c.username,
+        model.ranked_bots_users.c.num_submissions.label("version_number"),
+        model.ranked_bots_users.c.mu,
+        model.ranked_bots_users.c.rank,
     ]).select_from(
         model.game_participants.join(
             model.games,
             model.games.c.id == model.game_participants.c.game_id,
-            ).join(
-            model.users,
-            model.users.c.id == model.game_participants.c.user_id,
-            ).join(
-            model.bots,
-            (model.bots.c.id == model.game_participants.c.bot_id) &
-            (model.bots.c.user_id == model.game_participants.c.user_id)
+        ).join(
+            model.ranked_bots_users,
+            (model.ranked_bots_users.c.user_id == model.game_participants.c.user_id) &
+            (model.ranked_bots_users.c.bot_id == model.game_participants.c.bot_id) &
+            rank_limit
         )
-    ).group_by(user_id, bot_id).reduce_columns().alias("temptable")
+    ).group_by(user_id, bot_id, model.ranked_bots_users.c.rank).reduce_columns().alias("temptable")
 
     # Of those users, select ones with under 400 games, preferring
     # ones in older games, and get their data
@@ -616,6 +615,7 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
         recent_gamers.c.username,
         recent_gamers.c.version_number,
         recent_gamers.c.mu,
+        recent_gamers.c.rank,
     ]).select_from(
         recent_gamers.join(
             outer_bots,
