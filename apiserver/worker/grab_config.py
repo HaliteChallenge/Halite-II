@@ -15,7 +15,7 @@ MANAGER_URL = requests.get(MANAGER_URL_METADATA_URL, headers={
 SECRET_FOLDER = requests.get(SECRET_FOLDER_METADATA_URL, headers={
     "Metadata-Flavor": "Google"
 }).text
-HAS_GPU = requests.get(SECRET_FOLDER_METADATA_URL, headers={
+HAS_GPU = requests.get(GPU_CAPABILITY_METADATA_URL, headers={
     "Metadata-Flavor": "Google"
 }).text == "true"
 
