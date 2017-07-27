@@ -10,11 +10,15 @@ with open("config.json") as configfile:
     config = json.load(configfile)
     MANAGER_URL = config["MANAGER_URL"]
     SECRET_FOLDER = config["SECRET_FOLDER"]
+    CAPABILITIES = config.get("CAPABILITIES", [])
 
 
 def getTask():
     """Gets either a run or a compile task from the API"""
-    content = requests.get(MANAGER_URL+"task").text
+    params = {
+        "capability": CAPABILITIES,
+    }
+    content = requests.get(MANAGER_URL+"task", params=params).text
 
     print("Task call %s\n" % content)
     if content == "null":
@@ -30,7 +34,7 @@ def getBotHash(user_id, bot_id, is_compile=False):
         "bot_id": bot_id
     }
     if is_compile:
-            params["compile"] = 1
+        params["compile"] = 1
 
     result = requests.get(MANAGER_URL+"botHash", params=params)
 
