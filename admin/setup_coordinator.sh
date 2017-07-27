@@ -2,13 +2,7 @@
 
 set -e
 
-GCLOUD_PROJECT="nth-observer-171418"
-GCLOUD_ZONE="us-central1-c"
-
-SERVICE_ACCOUNT="apiserver"
-
-MACHINE_TYPE="custom-1-2048"
-IMAGE="halite-worker"
+source ./config.sh
 
 gcloud beta compute --project "${GCLOUD_PROJECT}" \
     firewall-rules create "allow-coordinator-external-traffic" \

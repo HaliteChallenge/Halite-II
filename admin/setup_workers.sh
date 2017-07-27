@@ -2,12 +2,7 @@
 
 set -e
 
-GCLOUD_PROJECT="nth-observer-171418"
-GCLOUD_ZONE="us-central1-c"
-
-MACHINE_TYPE="custom-1-2560"
-IMAGE="halite-worker"
-COORDINATOR_URL="http://10.142.0.5:5001/v1/coordinator/"
+source ./config.sh
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
