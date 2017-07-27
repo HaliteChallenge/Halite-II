@@ -405,10 +405,10 @@ def upload_game():
 
             stored_rank = conn.execute(
                 sqlalchemy.sql.select([
-
+                    model.ranked_bots_users.c.rank,
                 ]).where(
-                    (model.bots.c.id == user["bot_id"]) &
-                    (model.bots.c.user_id == user["user_id"])
+                    (model.ranked_bots_users.c.bot_id == user["bot_id"]) &
+                    (model.ranked_bots_users.c.user_id == user["user_id"])
                 )
             ).first()
 
@@ -442,7 +442,8 @@ def upload_game():
     # Store replay in separate bucket if user is Gold/Plat/Diamond
     bucket_class = 0
     for user in users:
-        if user["tier"] in ("Gold", "Platinum", "Diamond"):
+        if user["tier"] in (config.TIER_0_NAME, config.TIER_1_NAME,
+                            config.TIER_2_NAME):
             bucket_class = 1
             break
 
@@ -478,6 +479,7 @@ def upload_game():
             map_seed=game_output["map_seed"],
             map_generator=game_output["map_generator"],
             time_played=sqlalchemy.sql.func.NOW(),
+            replay_bucket=bucket_class,
         )).inserted_primary_key[0]
 
         # Update the participants' stats

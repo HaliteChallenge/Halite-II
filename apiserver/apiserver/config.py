@@ -63,4 +63,8 @@ TIER_2_PERCENT = 1/128
 TIER_3_NAME = "Silver"
 TIER_3_PERCENT = 1/64
 TIER_4_NAME = "Salt"
+# What tier a player must be in to be eligible for GPUs
 GPU_TIER_NAME = TIER_2_NAME
+
+# What tier a player must be in to be eligible to participate in the finals
+FINALS_TIER_NAME = TIER_2_NAME
