@@ -79,73 +79,94 @@ def serve_game_task(conn, has_gpu=False):
     # Only allow 2 or 4 player games
     player_count = 2 if random.random() > 0.5 else 4
 
-    # Limit player rank based on the presence of a GPU
+    # If there is a GPU, only take bots from players who qualify for the GPU.
+    # Else, do not run games for players who qualify for one.
     total_players = conn.execute(model.total_ranked_bots).first()[0]
     thresholds = util.tier_thresholds(total_players)
+    ranked_users = model.ranked_users_query()
     if has_gpu:
-        rank_limit = (model.ranked_bots_users.c.rank <=
+        rank_limit = (ranked_users.c.rank <=
                       thresholds[config.GPU_TIER_NAME])
     else:
-        rank_limit = (model.ranked_bots_users.c.rank >
+        rank_limit = (ranked_users.c.rank >
                       thresholds[config.GPU_TIER_NAME])
 
-    seed_player = find_seed_player(conn, rank_limit)
+    seed_player = find_seed_player(conn, ranked_users, rank_limit)
+    if not seed_player:
+        return
 
-    if seed_player:
-        print(seed_player)
-        # Select the rest of the players
-        mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
+    print(seed_player)
+    # Select the rest of the players
+    mu_rank_limit = int(5.0 / (0.01 + random.random()) ** 0.65)
 
-        logging.info(
-            "Matchmaking: seed player: ID {}, mu {}, "
-            "maximum rank distance {}".format(
-                seed_player.user_id, seed_player.mu, mu_rank_limit))
+    logging.info(
+        "Matchmaking: seed player: ID {}, mu {}, "
+        "maximum rank distance {}".format(
+            seed_player.user_id, seed_player.mu, mu_rank_limit))
 
-        # Find closely matched players
-        sqlfunc = sqlalchemy.sql.func
-        close_players = sqlalchemy.sql.select([
-            model.ranked_bots_users.c.bot_id,
-            model.ranked_bots_users.c.user_id,
-            model.ranked_bots_users.c.rank,
-            model.ranked_bots_users.c.num_submissions.label("version_number"),
-            model.ranked_bots_users.c.mu,
-            model.ranked_bots_users.c.username,
-        ]).select_from(
-            model.ranked_bots_users.join(
-                model.bots,
-                (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
-                (model.ranked_bots_users.c.bot_id == model.bots.c.id))
-        ).where(
-            (model.bots.c.compile_status == "Successful") &
-            (~((model.bots.c.user_id == seed_player["user_id"]) &
-               (model.bots.c.id == seed_player["bot_id"]))) &
-            rank_limit
-        ).order_by(
-            sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
-        ).limit(mu_rank_limit).alias("muranktable")
-        query = close_players.select().order_by(sqlfunc.rand()) \
-            .limit(player_count - 1)
+    # Find closely matched players
+    sqlfunc = sqlalchemy.sql.func
+    close_players = sqlalchemy.sql.select([
+        model.ranked_bots_users.c.bot_id,
+        model.ranked_bots_users.c.user_id,
+        model.ranked_bots_users.c.rank,
+        model.ranked_bots_users.c.num_submissions.label("version_number"),
+        model.ranked_bots_users.c.mu,
+        ranked_users.c.username,
+        ranked_users.c.rank.label("player_rank"),
+    ]).select_from(
+        model.ranked_bots_users.join(
+            model.bots,
+            (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
+            (model.ranked_bots_users.c.bot_id == model.bots.c.id)
+        ).join(
+            ranked_users,
+            (ranked_users.c.user_id == model.ranked_bots_users.c.user_id)
+        )
+    ).where(
+        (model.bots.c.compile_status == "Successful") &
+        (~((model.bots.c.user_id == seed_player["user_id"]) &
+           (model.bots.c.id == seed_player["bot_id"]))) &
+        rank_limit
+    ).order_by(
+        sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
+    ).limit(mu_rank_limit).alias("muranktable")
 
-        players = conn.execute(query).fetchall()
-        players.insert(0, seed_player)
-
-        map_width, map_height = rand_map_size()
-        players = [{
-            "user_id": player["user_id"],
-            "bot_id": player["bot_id"],
-            "username": player["username"],
-            "version_number": player["version_number"],
-            "rank": player["rank"],
-            "tier": util.tier(player["rank"], total_players),
-        } for player in players]
+    # Select more bots than needed, discard ones from same player
+    query = close_players.select().order_by(sqlfunc.rand())\
+        .limit(player_count * 2)
+    potential_players = conn.execute(query).fetchall()
+    players = [seed_player]
+    player_ids = {seed_player["user_id"]}
+    for player in potential_players:
+        if player["user_id"] in player_ids:
+            continue
+        else:
+            players.append(player)
+            player_ids.add(player["user_id"])
 
         if len(players) == player_count:
-            return response_success({
-                "type": "game",
-                "width": map_width,
-                "height": map_height,
-                "users": players,
-            })
+            break
+
+    map_width, map_height = rand_map_size()
+    players = [{
+        "user_id": player["user_id"],
+        "bot_id": player["bot_id"],
+        "username": player["username"],
+        "version_number": player["version_number"],
+        "rank": player["rank"],
+        "tier": util.tier(player["rank"], total_players),
+        "player_rank": player["player_rank"],
+        "player_tier": util.tier(player["player_rank"], total_players),
+    } for player in players]
+
+    if len(players) == player_count:
+        return response_success({
+            "type": "game",
+            "width": map_width,
+            "height": map_height,
+            "users": players,
+        })
 
 
 @coordinator_api.route("/task")
@@ -564,7 +585,7 @@ def update_user_timeout(conn, game_id, user):
             ))
 
 
-def find_recent_seed_player(conn, rank_limit, restrictions=False):
+def find_recent_seed_player(conn, ranked_users, rank_limit, restrictions=False):
     """
     Find a seed player that has played in a recent game.
     :param conn:
@@ -574,7 +595,8 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
     :return:
     """
     # Find the users in the most recent games, and pick a seed player
-    # from those. Ported from Halite 1 PHP backend.
+    # from those. Ported from Halite 1 PHP backend (which seems to have
+    # been derived from aichallenge/Ants).
 
     sqlfunc = sqlalchemy.sql.func
 
@@ -586,7 +608,8 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
         max_time,
         user_id,
         bot_id,
-        model.ranked_bots_users.c.username,
+        ranked_users.c.username,
+        ranked_users.c.rank.label("player_rank"),
         model.ranked_bots_users.c.num_submissions.label("version_number"),
         model.ranked_bots_users.c.mu,
         model.ranked_bots_users.c.rank,
@@ -596,8 +619,12 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
             model.games.c.id == model.game_participants.c.game_id,
         ).join(
             model.ranked_bots_users,
-            (model.ranked_bots_users.c.user_id == model.game_participants.c.user_id) &
-            (model.ranked_bots_users.c.bot_id == model.game_participants.c.bot_id) &
+            (model.ranked_bots_users.c.user_id ==
+             model.game_participants.c.user_id) &
+            (model.ranked_bots_users.c.bot_id == model.game_participants.c.bot_id)
+        ).join(
+            ranked_users,
+            (model.ranked_bots_users.c.user_id == ranked_users.c.user_id) &
             rank_limit
         )
     ).group_by(user_id, bot_id, model.ranked_bots_users.c.rank).reduce_columns().alias("temptable")
@@ -616,6 +643,7 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
         recent_gamers.c.version_number,
         recent_gamers.c.mu,
         recent_gamers.c.rank,
+        recent_gamers.c.player_rank,
     ]).select_from(
         recent_gamers.join(
             outer_bots,
@@ -634,7 +662,7 @@ def find_recent_seed_player(conn, rank_limit, restrictions=False):
     return conn.execute(query).first()
 
 
-def find_newbie_seed_player(conn, rank_limit):
+def find_newbie_seed_player(conn, ranked_users, rank_limit):
     """
     Find a seed player that has not played that many games.
     :param conn:
@@ -644,10 +672,11 @@ def find_newbie_seed_player(conn, rank_limit):
     sqlfunc = sqlalchemy.sql.func
     ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
     query = sqlalchemy.sql.select([
-        model.ranked_bots_users.c.user_id,
+        ranked_users.c.user_id,
         model.bots.c.id.label("bot_id"),
-        model.ranked_bots_users.c.username,
+        ranked_users.c.username,
         model.ranked_bots_users.c.rank,
+        ranked_users.c.rank.label("player_rank"),
         model.bots.c.version_number,
         model.bots.c.mu,
     ]).select_from(
@@ -655,6 +684,9 @@ def find_newbie_seed_player(conn, rank_limit):
             model.bots,
             (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
             (model.ranked_bots_users.c.bot_id == model.bots.c.id)
+        ).join(
+            ranked_users,
+            model.ranked_bots_users.c.user_id == ranked_users.c.user_id
         )
     ).where(
         (model.bots.c.compile_status == "Successful") &
@@ -665,10 +697,11 @@ def find_newbie_seed_player(conn, rank_limit):
     return conn.execute(query).first()
 
 
-def find_seed_player(conn, rank_limit):
+def find_seed_player(conn, ranked_users, rank_limit):
     """
     Find a seed player for a game.
     :param conn: A database connection.
+    :param rank_users: The table clause to base player ranks on.
     :param rank_limit: A WHERE clause to restrict player ranks.
     :return: A seed player, or None.
     """
@@ -678,13 +711,13 @@ def find_seed_player(conn, rank_limit):
         if rand_value > 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
                          " with under 400 games played")
-            result = find_newbie_seed_player(conn, rank_limit)
+            result = find_newbie_seed_player(conn, ranked_users, rank_limit)
             if result:
                 return result
         elif 0.25 < rand_value <= 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
                          " from recent game with under 400 games played")
-            result = find_recent_seed_player(conn, rank_limit,
+            result = find_recent_seed_player(conn, ranked_users, rank_limit,
                                              restrictions=True)
             if result:
                 return result
@@ -694,7 +727,7 @@ def find_seed_player(conn, rank_limit):
         # games the user can have played, and we do not sort randomly.
         logging.info("Matchmaking: seed player: looking for random bot"
                      " from recent game")
-        result = find_recent_seed_player(conn, rank_limit,
+        result = find_recent_seed_player(conn, ranked_users, rank_limit,
                                          restrictions=False)
         if result:
             return result

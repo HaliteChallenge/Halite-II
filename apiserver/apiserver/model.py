@@ -19,22 +19,24 @@ games = sqlalchemy.Table("game", metadata, autoload=True)
 game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True)
 
 
-ranked_bots = sqlalchemy.sql.select([
-    sqlalchemy.sql.text("(@rank:=@rank + 1) AS bot_rank"),
-    bots.c.user_id,
-    bots.c.id.label("bot_id"),
-    bots.c.mu,
-    bots.c.score,
-    bots.c.games_played,
-    bots.c.version_number,
-    bots.c.language,
-]).select_from(bots).select_from(sqlalchemy.sql.select([
-    sqlalchemy.sql.text("@rank:=0")
-]).alias("rn")).order_by(bots.c.score.desc()).alias("ranked_bots")
+def ranked_bots_query(variable="rank", alias="ranked_bots"):
+    return sqlalchemy.sql.select([
+        sqlalchemy.sql.text("(@{v}:=@{v} + 1) AS bot_rank".format(v=variable)),
+        bots.c.user_id,
+        bots.c.id.label("bot_id"),
+        bots.c.mu,
+        bots.c.score,
+        bots.c.games_played,
+        bots.c.version_number,
+        bots.c.language,
+    ]).select_from(bots).select_from(sqlalchemy.sql.select([
+        sqlalchemy.sql.text("@{}:=0".format(variable))
+    ]).alias("rn")).order_by(bots.c.score.desc()).alias(alias)
 
+
+ranked_bots = ranked_bots_query()
 _func = sqlalchemy.sql.func
-
-
+# Summary of all users, regardless of whether they have bots
 all_users = sqlalchemy.sql.select([
     users.c.id.label("user_id"),
     users.c.username,
@@ -48,7 +50,7 @@ all_users = sqlalchemy.sql.select([
     _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
     _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
     _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
-    sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), int).label("rank"),
+    sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), sqlalchemy.Integer).label("rank"),
 ]).select_from(users.join(
     ranked_bots,
     ranked_bots.c.user_id == users.c.id,
@@ -60,6 +62,7 @@ all_users = sqlalchemy.sql.select([
 )).group_by(users.c.id).alias("all_users")
 
 
+# All users with submitted bots, ranked
 ranked_bots_users = sqlalchemy.sql.select([
     users.c.id.label("user_id"),
     users.c.username,
@@ -85,6 +88,19 @@ ranked_bots_users = sqlalchemy.sql.select([
     organizations.c.id == users.c.organization_id,
     isouter=True
 )).alias("ranked_bots_users")
+
+
+# Users, ranked by their best bot
+def ranked_users_query(alias="ranked_users"):
+    ranked_bots = ranked_bots_query("rurank")
+    return sqlalchemy.sql.select([
+        users.c.id.label("user_id"),
+        users.c.username,
+        # Perform a no-op operation so we can label the column easily
+        _func.min(sqlalchemy.sql.text("ranked_bots.bot_rank")).label("rank"),
+    ]).select_from(
+        users.join(ranked_bots, ranked_bots.c.user_id == users.c.id)
+    ).group_by(users.c.id).alias(alias)
 
 
 total_ranked_bots = sqlalchemy.sql.select([
