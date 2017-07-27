@@ -272,6 +272,7 @@ def update_compilation_status():
                     )
                 )
 
+            # We do not reset the bot rank for new submissions now.
             conn.execute(
                 model.bots.update().where(
                     (model.bots.c.user_id == user_id) &
@@ -280,9 +281,6 @@ def update_compilation_status():
                     language=language,
                     version_number=model.bots.c.version_number + 1,
                     games_played=0,
-                    mu=25.000,
-                    sigma=8.333,
-                    score=0,
                 )
             )
 
