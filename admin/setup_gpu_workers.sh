@@ -9,7 +9,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --machine-type "${GPU_MACHINE_TYPE}" \
     --accelerator type=nvidia-tesla-k80,count=1 \
     --network "default" --no-address \
-    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-gpu=true#&&#halite-secret-folder=secret_folder#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
+    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-gpu=true#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
     --maintenance-policy "TERMINATE" \
     --tags "worker" \
     --image-family "${GPU_IMAGE}" --image-project "${GCLOUD_PROJECT}" \

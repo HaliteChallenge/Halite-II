@@ -8,7 +8,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
     --machine-type "${MACHINE_TYPE}" \
     --network "default" \
-    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=secret_folder#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
+    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
     --no-restart-on-failure \
     --maintenance-policy "TERMINATE" \
     --preemptible \
