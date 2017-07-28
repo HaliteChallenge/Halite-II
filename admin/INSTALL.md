@@ -18,7 +18,7 @@ For the GPU instances, boot up a VM using the worker image, also making sure to 
 
 ### Create GCS Buckets
 
-We need five buckets: one for compiled bot storage, one for uploaded bots, two for replays, and one for error logs. (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github. Right now, this is `halite-2-deployed-artifacts`.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
+We need five buckets: one for compiled bot storage(`halite-2-compiled-bots`), one for uploaded bots(`halite-2-uploaded-bots`), two for replays (`halite-2-replays` and `halite-2-gold-replays`), and one for error logs (`halite-2-error-logs`). (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github. Right now, this is `halite-2-deployed-artifacts`.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
 
 ### Upload Coordinator and Worker to GCS (Non-Github Deploy Only)
 
