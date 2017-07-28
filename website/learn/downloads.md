@@ -14,6 +14,8 @@ __Current version:__ {{ site.data.downloads.version }}
 
 ## Game Environments and Starter Kits
 
+__Linux users note:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
+
 <table class="table">
     <thead>
         <tr>
