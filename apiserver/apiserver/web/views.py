@@ -480,8 +480,10 @@ def get_user(intended_user, *, user_id):
         total_users = conn.execute(model.total_ranked_bots).first()[0]
 
         logged_in = user_id is not None and intended_user == user_id
-        return flask.jsonify(make_user_record(row, logged_in=logged_in,
-                                              total_users=total_users))
+        user = make_user_record(row, logged_in=logged_in,
+                                total_users=total_users)
+
+        return flask.jsonify(user)
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
@@ -1146,7 +1148,7 @@ def create_organization():
         org_id = conn.execute(model.organizations.insert().values(
             organization_name=org_body["name"],
             organization_kind=org_body["type"],
-        )).inserted_primary_key
+        )).inserted_primary_key[0]
 
     return response_success({
         "organization_id": org_id[0],
