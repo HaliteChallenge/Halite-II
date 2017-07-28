@@ -181,9 +181,9 @@ def task():
         # task, though
         if not has_gpu:
             reset_compilation_tasks(conn)
-            # response = serve_compilation_task(conn)
-            # if response:
-            #     return response
+            response = serve_compilation_task(conn)
+            if response:
+                return response
 
         # Otherwise, play a game
         # If the worker has a GPU, try really hard to give it some work to do
