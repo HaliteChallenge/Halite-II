@@ -10,6 +10,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --network "default" \
     --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
     --no-restart-on-failure \
+    --no-service-account --no-scopes \
     --maintenance-policy "TERMINATE" \
     --preemptible \
     --tags "worker" \
