@@ -1,4 +1,5 @@
 import base64
+import datetime
 import functools
 import hashlib
 import hmac
@@ -113,9 +114,7 @@ def requires_admin(view):
             raise util.APIError(401, message="User not logged in.")
         with model.engine.connect() as conn:
             user_id = flask.session["user_id"]
-            user = conn.execute(
-                model.users.select(model.users.c.id == user_id)).first()
-            if not user or not user["is_admin"]:
+            if not is_user_admin(user_id, conn=conn):
                 raise util.APIError(
                     401, message="User cannot take this action.")
         return view(*args, **kwargs)
@@ -137,6 +136,11 @@ def requires_association(view):
         return view(*args, **kwargs)
 
     return decorated_view
+
+
+def is_user_admin(user_id, *, conn):
+    user = conn.execute(model.users.select(model.users.c.id == user_id)).first()
+    return user and user["is_admin"]
 
 
 def user_mismatch_error(message="Cannot perform action for other user."):
@@ -243,6 +247,17 @@ def get_sort_filter(fields, false_fields=()):
 
     return where_clause, order_clause, manual_fields
 
+
+def hackathon_status(start_date, end_date):
+    """Return the status of the hackathon based on its start/end dates."""
+    status = "open"
+    if end_date < datetime.date.today():
+        status = "closed"
+    elif start_date > datetime.date.today():
+        status = "upcoming"
+    return status
+
+
 ######################
 # USER API ENDPOINTS #
 ######################
@@ -311,7 +326,7 @@ def list_users():
 
 @web_api.route("/user", methods=["POST"])
 @cross_origin(methods=["GET", "POST"])
-@requires_login
+@requires_oauth_login
 def create_user(*, user_id):
     """
     Set up a user created from an OAuth authorization flow.
@@ -451,7 +466,6 @@ def create_user(*, user_id):
 
 
 @web_api.route("/user/<int:intended_user>", methods=["GET"])
-# TODO: need CSRF protection
 @cross_origin(methods=["GET"])
 @optional_login
 def get_user(intended_user, *, user_id):
@@ -506,7 +520,7 @@ def verify_user_email(user_id):
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
-@requires_login
+@requires_oauth_login
 def update_user(intended_user_id, *, user_id):
     if user_id != intended_user_id:
         raise user_mismatch_error()
@@ -557,6 +571,106 @@ def delete_user(intended_user_id, *, user_id):
         conn.execute(model.users.delete().where(
             model.users.c.id == user_id))
 
+
+# ---------------------------- #
+# USER HACKATHON API ENDPOINTS #
+# ---------------------------- #
+
+@web_api.route("/user/<int:intended_user>/hackathon", methods=["GET"])
+@cross_origin(methods=["GET", "POST"])
+@requires_oauth_login
+def get_user_hackathons(intended_user, *, user_id):
+    if user_id != intended_user:
+        raise user_mismatch_error()
+
+    record = []
+    with model.engine.connect() as conn:
+        hackathons = conn.execute(sqlalchemy.sql.select([
+            model.hackathons.c.id,
+            model.hackathons.c.title,
+            model.hackathons.c.start_date,
+            model.hackathons.c.end_date,
+        ]).select_from(
+            model.hackathon_participants.join(
+                model.hackathons,
+                model.hackathons.c.id == model.hackathon_participants.c.hackathon_id
+            )
+        ).where(
+            model.hackathon_participants.c.user_id == intended_user
+        )).fetchall()
+
+        for hackathon in hackathons:
+            record.append({
+                "hackathon_id": hackathon["id"],
+                "title": hackathon["title"],
+                "status": hackathon_status(hackathon["start_date"],
+                                           hackathon["end_date"]),
+            })
+
+    return flask.jsonify(record)
+
+
+@web_api.route("/user/<int:intended_user>/hackathon", methods=["POST"])
+@cross_origin(methods=["GET", "POST"])
+@requires_oauth_login
+def associate_user_hackathon(intended_user, *, user_id):
+    if user_id != intended_user:
+        raise user_mismatch_error()
+
+    verification_code = flask.request.form.get("verification_code")
+    if not verification_code:
+        raise util.APIError(
+            message="Please provide the verification code."
+        )
+
+    with model.engine.connect() as conn:
+        hackathon = conn.execute(model.hackathons.select(
+            model.hackathons.c.verification_code == verification_code)).first()
+
+        if not hackathon:
+            raise util.APIError(
+                404,
+                message="Hackathon does not exist. Please check the verification code."
+            )
+
+        status = hackathon_status(hackathon["start_date"], hackathon["end_date"])
+
+        if status == "closed":
+            raise util.APIError(
+                400,
+                message="Sorry, this hackathon has already ended."
+            )
+
+        if hackathon["organization_id"] is not None:
+            user = conn.execute(model.users.select().where(
+                model.users.c.id == user_id
+            )).first()
+            if hackathon["organization_id"] != user["organization_id"]:
+                raise util.APIError(
+                    400,
+                    message="Sorry, this hackathon is only open to members of a certain organization."
+                )
+
+        already_exists = conn.execute(
+            model.hackathon_participants.select(
+                (model.hackathon_participants.c.hackathon_id == hackathon["id"]) &
+                (model.hackathon_participants.c.user_id == user_id)
+            )
+        ).first()
+
+        if already_exists:
+            return response_success({
+                "message": "You're already signed up for this hackathon!"
+            })
+
+        conn.execute(
+            model.hackathon_participants.insert().values(
+                hackathon_id=hackathon["id"],
+                user_id=user_id,
+            )
+        )
+
+    return response_success()
 
 # ---------------------- #
 # USER BOT API ENDPOINTS #
@@ -1095,6 +1209,199 @@ def list_matches():
 @web_api.route("/match/<int:match_id>")
 def get_match(match_id):
     return get_user_match(0, match_id)
+
+
+###########################
+# HACKATHON API ENDPOINTS #
+###########################
+
+
+def can_view_hackathon(user_id, hackathon_id, conn):
+    is_user_joined = conn.execute(model.hackathon_participants.select(
+        (model.hackathon_participants.c.user_id == user_id) &
+        (model.hackathon_participants.c.hackathon_id == hackathon_id)
+    )).first()
+
+    is_admin = is_user_admin(user_id, conn=conn)
+
+    return is_user_joined or is_admin
+
+
+hackathon_query = sqlalchemy.sql.select([
+    model.hackathons.c.id,
+    model.hackathons.c.title,
+    model.hackathons.c.description,
+    model.hackathons.c.start_date,
+    model.hackathons.c.end_date,
+    model.hackathons.c.organization_id,
+    model.organizations.c.organization_name,
+]).select_from(
+    model.hackathons.join(
+        model.organizations,
+        model.hackathons.c.organization_id == model.organizations.c.id,
+        isouter=True,
+    )
+)
+
+
+@web_api.route("/hackathon", methods=["GET"])
+@requires_admin
+def list_hackathons():
+    result = []
+    offset, limit = get_offset_limit()
+
+    with model.engine.connect() as conn:
+        hackathons = conn.execute(
+            hackathon_query.offset(offset).limit(limit)).fetchall()
+
+        for hackathon in hackathons:
+            record = {
+                "hackathon_id": hackathon["id"],
+                "title": hackathon["title"],
+                "description": hackathon["description"],
+                "status": hackathon_status(hackathon["start_date"],
+                                           hackathon["end_date"]),
+                "start_date": hackathon["start_date"],
+                "end_date": hackathon["end_date"],
+                "organization_id": hackathon["organization_id"],
+                "organization_name": hackathon["organization_name"],
+            }
+
+            result.append(record)
+
+    return flask.jsonify(result)
+
+
+@web_api.route("/hackathon", methods=["POST"])
+@requires_admin
+def create_hackathon():
+    title = flask.request.form["title"]
+    description = flask.request.form["description"]
+    start_date = datetime.date.fromtimestamp(int(flask.request.form["start_date"]))
+    end_date = datetime.date.fromtimestamp(int(flask.request.form["end_date"]))
+    organization_id = flask.request.form.get("organization_id")
+
+    if end_date < start_date:
+        raise util.APIError(
+            400,
+            message="End date should be after start date."
+        )
+
+    with model.engine.connect() as conn:
+        if organization_id is not None:
+            organization_id = int(organization_id)
+            organization = conn.execute(
+                model.organizations.select(model.organizations.c.id == organization_id)
+            ).first()
+
+            if not organization:
+                raise util.APIError(
+                    400,
+                    message="Invalid organization ID."
+                )
+
+        verification_code = uuid.uuid4().hex
+        hackathon_id = conn.execute(model.hackathons.insert().values(
+            title=title,
+            description=description,
+            start_date=start_date,
+            end_date=end_date,
+            verification_code=verification_code,
+            organization_id=organization_id,
+        )).inserted_primary_key[0]
+
+        return response_success({
+            "hackathon_id": hackathon_id,
+            "verification_code": verification_code,
+        })
+
+
+@web_api.route("/hackathon/<int:hackathon_id>", methods=["GET"])
+@cross_origin(methods=["GET"])
+@requires_oauth_login
+def get_hackathon(hackathon_id, *, user_id):
+    with model.engine.connect() as conn:
+        hackathon = conn.execute(hackathon_query.where(
+            model.hackathons.c.id == hackathon_id)).first()
+
+        if not hackathon or not can_view_hackathon(user_id, hackathon["id"], conn):
+            raise util.APIError(404)
+
+        # TODO: num of participants
+
+        return flask.jsonify({
+            "hackathon_id": hackathon["id"],
+            "title": hackathon["title"],
+            "description": hackathon["description"],
+            "status": hackathon_status(hackathon["start_date"],
+                                       hackathon["end_date"]),
+            "start_date": hackathon["start_date"],
+            "end_date": hackathon["end_date"],
+            "organization_id": hackathon["organization_id"],
+            "organization_name": hackathon["organization_name"],
+        })
+
+
+@web_api.route("/hackathon/<int:hackathon_id>/leaderboard", methods=["GET"])
+@cross_origin(methods=["GET"])
+@requires_oauth_login
+def get_hackathon_leaderboard(hackathon_id, *, user_id):
+    with model.engine.connect() as conn:
+        if not can_view_hackathon(user_id, hackathon_id, conn):
+            raise util.APIError(404)
+
+        table = model.hackathon_ranked_bots_users_query(hackathon_id)
+
+        result = []
+        offset, limit = get_offset_limit()
+
+        where_clause, order_clause, _ = get_sort_filter({
+            "user_id": table.c.user_id,
+            "username": table.c.username,
+            "level": table.c.player_level,
+            "organization_id": table.c.organization_id,
+            "version_number": table.c.num_submissions,
+            "num_games": table.c.num_games,
+            "global_rank": table.c.global_rank,
+            "local_rank": table.c.local_rank,
+            "language": table.c.language,
+        })
+
+        if not order_clause:
+            order_clause = [table.c.local_rank]
+
+        total_users = conn.execute(model.total_ranked_bots).first()[0]
+
+        query = conn.execute(
+            table.select()
+                .where(where_clause).order_by(*order_clause)
+                .offset(offset).limit(limit).reduce_columns())
+
+        for row in query.fetchall():
+            user = {
+                "user_id": row["user_id"],
+                "username": row["username"],
+                "level": row["player_level"],
+                "organization_id": row["organization_id"],
+                "organization": row["organization_name"],
+                "version_number": int(row["num_submissions"]),
+                "num_games": int(row["num_games"]),
+                "score": float(row["score"]),
+                "language": row["language"],
+                "global_rank": int(row["global_rank"])
+                if row["global_rank"] is not None else None,
+                "local_rank": int(row["local_rank"])
+                if row["local_rank"] is not None else None,
+            }
+
+            if total_users and row["global_rank"] is not None:
+                user["global_tier"] = util.tier(row["global_rank"], total_users)
+            else:
+                user["global_tier"] = None
+
+            result.append(user)
+
+        return flask.jsonify(result)
 
 
 #############################

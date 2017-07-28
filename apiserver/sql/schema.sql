@@ -115,3 +115,37 @@ CREATE TABLE user_notification (
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE hackathon (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(256) NOT NULL,
+  description VARCHAR(2048) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  verification_code VARCHAR(32) NOT NULL UNIQUE,
+  organization_id INT,
+  FOREIGN KEY (organization_id) REFERENCES organization(id),
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE hackathon_participant (
+  hackathon_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  PRIMARY KEY (hackathon_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE hackathon_snapshot (
+  hackathon_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  bot_id INT UNSIGNED NOT NULL,
+  rank INT UNSIGNED NOT NULL,
+  score INT UNSIGNED NOT NULL,
+  version_number MEDIUMINT(8) NOT NULL,
+  games_played INT UNSIGNED NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
+  PRIMARY KEY (hackathon_id, user_id, bot_id)
+);
