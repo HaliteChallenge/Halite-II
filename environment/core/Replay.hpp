@@ -7,6 +7,7 @@
 
 #include "json.hpp"
 #include "../miniz/miniz.h"
+#include "../zstd-1.3.0/lib/zstd.h"
 
 #include "Constants.hpp"
 #include "Entity.hpp"
