@@ -880,17 +880,17 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
         return response_success()
 
 
+@web_api.route("/api_key", methods=["POST"])
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
 @requires_oauth_login
 @requires_association
-def reset_api_key(intended_user, *, user_id):
-    if user_id != intended_user:
+def reset_api_key(intended_user=None, *, user_id):
+    if user_id != intended_user and intended_user is not None:
         raise user_mismatch_error(
             message="Cannot reset another user's API key.")
 
-    chars = string.ascii_letters + string.digits
     with model.engine.connect() as conn:
-        api_key = "".join(random.choice(chars) for _ in range(32))
+        api_key = uuid.uuid4().hex
 
         conn.execute(model.users.update().where(
             model.users.c.id == user_id
