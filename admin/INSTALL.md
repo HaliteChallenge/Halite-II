@@ -6,21 +6,35 @@
 1. Make sure the Google Cloud command line client is installed.
 1. Set up the client with the project and necessary credentials.
 
-Prefer zone us-central1-b.
+Prefer zone us-east1-b.
 
 ### Create the Worker Image
 
-We need to create a machine image with all necessary compilers and other things set up already. Create an f1-micro instance based on Ubuntu 17.04. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Once the instance is started, run `setup_worker_image.sh`, then delete the instance and create an image from it.
+We need to create a machine image with all necessary compilers and other things set up already. Create an instance based on Ubuntu 17.04, or the latest version of Ubuntu available. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Once the instance is started, run [`setup_worker_image.sh`](./setup_worker_image.sh), then delete the instance and create an image from its boot disk. Make sure this image is part of an image family, e.g. `halite-worker`.
 
 At the end, the script also prints out all installed packages with their versions, which is useful for documentation.
 
+For the GPU instances, boot up a VM using the worker image, also making sure to uncheck "Delete boot disk". Make sure this VM has more disk space (~30 GB). Run [`setup_gpu_worker_image.sh`](./setup_gpu_worker_image.sh), then delete the instance and create an image from its boot disk. Also make sure this image is part of an image family, e.g. `halite-gpu-worker`.
+
 ### Create GCS Buckets
 
-We need four buckets: one for compiled bot storage, one for uploaded bots, one for replays, and one for error logs. (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
+We need five buckets: one for compiled bot storage, one for uploaded bots, two for replays, and one for error logs. (You may also need one for storing the worker/coordinator, when deploying without being able to pull from Github. Right now, this is `halite-2-deployed-artifacts`.) Create the buckets and put their names in `apiserver/apiserver/config.py`.
 
 ### Upload Coordinator and Worker to GCS (Non-Github Deploy Only)
 
 Zip the Halite repository folder into a .tgz file and upload it as `Halite.tgz` in the root of the GCS bucket (currently `halite-2-deployed-artifacts`).
+
+The structure of the `tgz` should be as follows:
+
+    Halite/
+        apiserver/
+            apiserver/
+                server.py
+                coordinator_server.py
+                ⋮
+            worker/
+            ⋮
+        ⋮
 
 ## MySQL Server
 
@@ -49,8 +63,9 @@ We need a service account so the coordinators can access everything they need.
 
 This sets up an automatically scaling pool of game coordinator servers.
 
-1. In `admin/setup_coordinator.sh`, set up the project ID, region, and service account created earlier.
-1. Run the script.
+1. In `admin/config.sh`, set up the project ID, region, and service account created earlier.
+    1. Make sure `IMAGE` is set to the image family created earlier. The instances will boot with the latest image in this family.
+1. Run the script from your local machine. This will create an instance template, an instance group `coordinator-instances`, and a set of firewall rules.
 
 ### External Load Balancing
 
@@ -79,28 +94,50 @@ Create the load balancer and note the IP address of the balancer.
 
 ## Creating the Worker Instances
 
-1. In `admin/setup_workers.sh`, set up the project ID, region, and details of the machine instances. 
+1. In `admin/config.sh`, set up the project ID, region, and details of the machine instances (same as before). 
 1. Set the coordinator URL to the URL of the externally facing HTTP load balancer created earlier.
 1. Run the script.
+
+### Creating GPU Worker Instances
+
+1. In `admin/config.sh`, double check `GPU_MACHINE_TYPE` (the machine type you would like to use for the GPU instances), and make sure `GPU_IMAGE` is set to the image family of the GPU disk images. The coordinator URL should be set up from before.
+1. Run [`setup_gpu_workers.sh`](./setup_gpu_workers.sh). This will create the instance template and instance group. Unlike the regular workers, this group will not autoscale.
 
 At this point, everything should be set. You can `ssh` into individual instances to check on them. `sudo su` to switch to `worker`, and use `screen -list` to see what sessions are running. Coordinator servers should have 3 screen sessions, one for the SQL proxy, one for the API server, and one for the coordinator. Workers should have 1 session, for the worker itself. These scripts create the necessary firewall rules as well.
 
 ## Redeploying/Updating
 
-### Update the Worker
+### Add Packages to the Image
 
-If the startup script or disk image changes:
+Edit [`setup_worker_image.sh`](./setup_worker_image.sh). If the package can be installed via apt-get, then add it to the `PACKAGES` variable, so that the script will print out the version installed at the end. Otherwise, add the necessary installation commands, and print out the version at the end; this will depend on what exactly is being added.
 
-1. Delete the instance group.
-2. Delete the instance template.
-3. Upload the new code to the GCloud bucket, if applicable (see above).
-4. Recreate it all.
+Afterwards, create a new image in the same family; deprecate the previous one. The instance template is built against the family, so when the instances are recreated, they should use the new image.
 
-Otherwise:
+### Updating the Coordinator, API Server, or Worker
 
-1. Upload the new code.
+The startup scripts for the coordinator/API server/worker pull the Halite code from a Google Cloud bucket, extract it, and start it. So long as the startup script does not need to change, you can update these services by:
+
+1. Create a new "Halite.tgz", as described previous.
+1. Upload the new "Halite.tgz" to the GCloud bucket.
+1. Recreate the relevant instances (see below).
+
+### Update the Coordinator/Worker
+
+If the startup script changes, we have to create a new instance template, as follows:
+
+1. Upload the new code to the GCloud bucket, if applicable (see above).
+1. Create a new instance template with a new name, based on the settings of the previous one. (Take the relevant `gcloud` command from the `setup_*.sh` script and edit the name and any other parameters.)
+1. Edit the instance group in the Google Cloud Console to use the new instance template.
+1. Delete the old instance template.
+1. Recreate all instances in the group (see below).
+
+Otherwise, if the code or disk image change:
+
+1. Upload the new code, if applicable.
 2. Recreate the instances using the GCloud CLI.
 
-### Update the Coordinator
+### Recreating Instances
 
-If the startup script or disk image changes, we can't delete the instance group or template, because the load balancers are using the group. Instead, edit the setup script to create a new instance template. Run the template creation command manually, then edit the group to use the new template. Finally, recreate all the instances.
+    gcloud compute instance-groups managed recreate-instances coordinator-instances --instances=<list instance IDs here>
+    
+Change `coordinator-instances` to the appropriate group.
