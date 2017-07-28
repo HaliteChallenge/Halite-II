@@ -29,12 +29,15 @@ The structure of the `tgz` should be as follows:
     Halite/
         apiserver/
             apiserver/
+                config.py
                 server.py
                 coordinator_server.py
                 ⋮
             worker/
             ⋮
         ⋮
+
+MAKE SURE `Halite/apiserver/apiserver/config.py` is present and has production values.
 
 ## MySQL Server
 
@@ -46,6 +49,8 @@ The structure of the `tgz` should be as follows:
 1. Enable the Cloud SQL Administration API: https://console.developers.google.com/apis/api/sqladmin.googleapis.com/overview
 
 ## Creating the Coordinator Instances
+
+These steps should be run only once.
 
 ### Create the Service Account
 
@@ -65,7 +70,7 @@ This sets up an automatically scaling pool of game coordinator servers.
 
 1. In `admin/config.sh`, set up the project ID, region, and service account created earlier.
     1. Make sure `IMAGE` is set to the image family created earlier. The instances will boot with the latest image in this family.
-1. Run the script from your local machine. This will create an instance template, an instance group `coordinator-instances`, and a set of firewall rules.
+1. Run `admin/setup_coordinator.sh` from your local machine. This will create an instance template, an instance group `coordinator-instances`, and a set of firewall rules.
 
 ### External Load Balancing
 
@@ -82,7 +87,7 @@ This load balancer is for the user-facing REST API.
 
 ### Internal Load Balancer
 
-This load balancer is for the internal game/compilation workers.
+This load balancer is for the internal game coordinator.
 
 1. Networking > Load Balancing > Create load balancer
 1. Choose a TCP load balancer, "Only between my VMs".
@@ -94,9 +99,11 @@ Create the load balancer and note the IP address of the balancer.
 
 ## Creating the Worker Instances
 
+These steps should be run only once.
+
 1. In `admin/config.sh`, set up the project ID, region, and details of the machine instances (same as before). 
-1. Set the coordinator URL to the URL of the externally facing HTTP load balancer created earlier.
-1. Run the script.
+1. Set the coordinator URL to the URL of the internally facing TCP load balancer created earlier.
+1. Run [`admin/setup_workers.sh`](./setup_workers.sh).
 
 ### Creating GPU Worker Instances
 
@@ -117,11 +124,9 @@ Afterwards, create a new image in the same family; deprecate the previous one. T
 
 The startup scripts for the coordinator/API server/worker pull the Halite code from a Google Cloud bucket, extract it, and start it. So long as the startup script does not need to change, you can update these services by:
 
-1. Create a new "Halite.tgz", as described previous.
+1. Create a new "Halite.tgz", as described previously.
 1. Upload the new "Halite.tgz" to the GCloud bucket.
 1. Recreate the relevant instances (see below).
-
-### Update the Coordinator/Worker
 
 If the startup script changes, we have to create a new instance template, as follows:
 
@@ -140,4 +145,5 @@ Otherwise, if the code or disk image change:
 
     gcloud compute instance-groups managed recreate-instances coordinator-instances --instances=<list instance IDs here>
     
-Change `coordinator-instances` to the appropriate group.
+Change `coordinator-instances` to the appropriate group. For coordinator servers, you probably want to recreate them one-by-one, to make sure the game API does not go down during the process.
+
