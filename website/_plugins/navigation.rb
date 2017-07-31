@@ -2,7 +2,6 @@ module Jekyll
   class NavigationGenerator < Generator
     def generate(site)
       pages = generate_level site, "/learn/"
-      p pages
       site.config["navigation"] = pages
     end
 
@@ -23,6 +22,14 @@ module Jekyll
       immediate_dirs.uniq!
       
       root, remainder = this_level.partition {|page| page.name == "index.md" and page.dir == full_dir }
+
+      remainder = remainder.sort_by do |page|
+        if page.data.key?("sort_key")
+          page.data["sort_key"]
+        else
+          page.data["title"]
+        end
+      end
 
       level = {
         "pages" => remainder,
