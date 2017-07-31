@@ -250,7 +250,9 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
         if not order_clause:
             order_clause = [table.c.local_rank]
 
-        total_users = conn.execute(model.total_ranked_bots).first()[0]
+        total_users = conn.execute(model.total_ranked_users).first()[0]
+        hackathon_users = conn.execute(
+            model.hackathon_total_ranked_users_query(hackathon_id)).first()[0]
 
         query = conn.execute(
             table.select()
@@ -275,9 +277,16 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
             }
 
             if total_users and row["global_rank"] is not None:
-                user["global_tier"] = util.tier(row["global_rank"], total_users)
+                user["global_tier"] = util.tier(
+                    row["global_rank"], total_users)
             else:
                 user["global_tier"] = None
+
+            if hackathon_users and row["local_rank"] is not None:
+                user["local_tier"] = util.tier(
+                    row["local_rank"], hackathon_users)
+            else:
+                user["local_tier"] = None
 
             result.append(user)
 

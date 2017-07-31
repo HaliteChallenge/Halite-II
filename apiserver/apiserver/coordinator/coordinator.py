@@ -82,7 +82,7 @@ def serve_game_task(conn, has_gpu=False):
 
     # If there is a GPU, only take bots from players who qualify for the GPU.
     # Else, do not run games for players who qualify for one.
-    total_players = conn.execute(model.total_ranked_bots).first()[0]
+    total_players = conn.execute(model.total_ranked_users).first()[0]
     thresholds = util.tier_thresholds(total_players)
     ranked_users = model.ranked_users_query()
     if has_gpu or config.COMPETITION_FINALS_PAIRING:
@@ -386,7 +386,7 @@ def upload_game():
     users = json.loads(flask.request.values["users"])
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_bots).first()[0]
+        total_users = conn.execute(model.total_ranked_users).first()[0]
         for user in users:
             stored_user = conn.execute(
                 sqlalchemy.sql.select([
@@ -736,7 +736,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
             return result
     else:
         # For finals: take 15 players with least games played, and select one
-        total_players = conn.execute(model.total_ranked_bots).first()[0]
+        total_players = conn.execute(model.total_ranked_users).first()[0]
         thresholds = util.tier_thresholds(total_players)
         rank_limit = (model.ranked_bots_users.c.rank <=
                       thresholds[config.FINALS_TIER_NAME])

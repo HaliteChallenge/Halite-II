@@ -167,12 +167,27 @@ def ranked_users_query(alias="ranked_users"):
     ).group_by(users.c.id).alias(alias)
 
 
-total_ranked_bots = sqlalchemy.sql.select([
-    _func.count()
+# Total number of ranked users that have played a game
+total_ranked_users = sqlalchemy.sql.select([
+    _func.count(sqlalchemy.distinct(bots.c.user_id))
 ]).select_from(bots).where(bots.c.games_played > 0)
 
 
+def hackathon_total_ranked_users_query(hackathon_id):
+    """Build a query counting all users in a hackathon."""
+    return sqlalchemy.sql.select([
+        _func.count(sqlalchemy.distinct(bots.c.user_id))
+    ]).select_from(
+        bots.join(
+            hackathon_participants,
+            (bots.c.user_id == hackathon_participants.c.user_id) &
+            (hackathon_participants.c.hackathon_id == hackathon_id)
+        )
+    ).where(bots.c.games_played > 0)
+
+
 def hackathon_ranked_bots_users_query(hackathon_id, *, alias="hackathon_ranked_bots_users"):
+    """Build a query that ranks all users in a hackathon by their best bot."""
     local_rank = hackathon_ranked_bots_query(hackathon_id, alias="local_rank")
     return sqlalchemy.sql.select([
         users.c.id.label("user_id"),

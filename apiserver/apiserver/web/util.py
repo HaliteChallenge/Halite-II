@@ -273,10 +273,14 @@ def get_sort_filter(fields, false_fields=()):
 
 
 def hackathon_status(start_date, end_date):
-    """Return the status of the hackathon based on its start/end dates."""
+    """
+    Return the status of the hackathon based on its start/end dates.
+
+    `end_date` may be null (for ongoing hackathons).
+    """
     status = "open"
-    if end_date < datetime.date.today():
+    if end_date and end_date < datetime.datetime.now():
         status = "closed"
-    elif start_date > datetime.date.today():
+    elif start_date > datetime.datetime.now():
         status = "upcoming"
     return status

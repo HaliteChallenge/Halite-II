@@ -32,7 +32,7 @@ def leaderboard():
         order_clause = [model.ranked_bots_users.c.rank]
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_bots).first()[0]
+        total_users = conn.execute(model.total_ranked_users).first()[0]
 
         query = conn.execute(
             model.ranked_bots_users.select()

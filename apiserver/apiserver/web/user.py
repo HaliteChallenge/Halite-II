@@ -64,7 +64,7 @@ def list_users():
     })
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_bots).first()[0]
+        total_users = conn.execute(model.total_ranked_users).first()[0]
 
         query = conn.execute(
             model.all_users.select()
@@ -235,7 +235,7 @@ def get_user(intended_user, *, user_id):
         if not row:
             raise util.APIError(404, message="No user found.")
 
-        total_users = conn.execute(model.total_ranked_bots).first()[0]
+        total_users = conn.execute(model.total_ranked_users).first()[0]
 
         logged_in = user_id is not None and intended_user == user_id
         user = make_user_record(row, logged_in=logged_in,
