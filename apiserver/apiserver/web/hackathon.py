@@ -83,11 +83,24 @@ def create_hackathon(*, admin_id):
     end_date = arrow.get(flask.request.form["end_date"]).datetime
     organization_id = flask.request.form.get("organization_id")
 
+    if end_date < datetime.datetime.now():
+        raise util.APIError(
+            400,
+            message="End date is in the past!"
+        )
+
+    if start_date >= end_date:
+        raise util.APIError(
+            400,
+            message="Start date must be before end date."
+        )
+
     with model.engine.connect() as conn:
         if organization_id is not None:
             organization_id = int(organization_id)
             organization = conn.execute(
-                model.organizations.select(model.organizations.c.id == organization_id)
+                model.organizations.select(
+                    model.organizations.c.id == organization_id)
             ).first()
 
             if not organization:
@@ -178,47 +191,6 @@ def update_hackathon(hackathon_id, *, admin_id):
                     400,
                     message="Invalid organization ID."
                 )
-
-        start_date = values.get("start_date", hackathon["start_date"])
-        end_date = values.get("end_date", hackathon["end_date"])
-        if end_date and start_date >= end_date:
-            raise util.APIError(
-                400,
-                message="Start date must be before end date."
-            )
-
-        # # Close the competition
-        # if close_hackathon:
-        #     if end_date and end_date > datetime.datetime.now():
-        #         raise util.APIError(
-        #             400,
-        #             message="Cannot end a competition with an end date in "
-        #                     "the future. If the hackathon had an end date "
-        #                     "specified, then either specify a new end date "
-        #                     "or wait for the end date to pass. Otherwise, "
-        #                     "specify an end date in the past. "
-        #         )
-        #     elif not end_date:
-        #         values["end_date"] = arrow.now().datetime
-        #
-        #     # Snapshot all the ranks
-        #     table = model.hackathon_ranked_bots_users_query(hackathon_id)
-        #     query = conn.execute(table.select())
-        #
-        #     conn.execute(
-        #         model.hackathon_snapshot.insert(),
-        #         [
-        #             {
-        #                 "hackathon_id": hackathon_id,
-        #                 "user_id": row["user_id"],
-        #                 "bot_id": row["bot_id"],
-        #                 "score": row["score"],
-        #                 "version_number": row["num_submissions"],
-        #                 "language": row["language"],
-        #             }
-        #             for row in query.fetchall()
-        #         ]
-        #     )
 
         if values:
             conn.execute(model.hackathons.update().values(**values).where(

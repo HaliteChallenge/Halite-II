@@ -71,6 +71,7 @@ def upload_game():
             stored_bot = conn.execute(
                 sqlalchemy.sql.select([
                     model.bots.c.version_number,
+                    model.bots.c.language,
                     model.bots.c.mu,
                     model.bots.c.sigma,
                 ]).where(
@@ -270,6 +271,10 @@ def update_rankings(users):
                         "user_id": user["user_id"],
                         "bot_id": user["bot_id"],
                         "score": new_score,
+                        "mu": rating[0].mu,
+                        "sigma": rating[0].sigma,
+                        "version_number": user["version_number"],
+                        "language": user["language"],
                     }
 
                     conn.execute(
@@ -285,7 +290,12 @@ def update_rankings(users):
                                   user["bot_id"]))
                     conn.execute(
                         model.hackathon_snapshot.update().values(
-                            score=new_score
+                            score=new_score,
+                            mu=rating[0].mu,
+                            sigma=rating[0].sigma,
+                            version_number=user["version_number"],
+                            language=user["language"],
+                            games_played=model.hackathon_snapshot.c.games_played + 1,
                         ).where(condition))
 
 

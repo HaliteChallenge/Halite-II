@@ -65,24 +65,20 @@ def hackathon_ranked_bots_query(hackathon_id,
     """
 
     temptable = sqlalchemy.sql.select([
-        bots.c.user_id,
-        bots.c.id.label("bot_id"),
-        bots.c.mu,
-        bots.c.score,
-        bots.c.games_played,
-        bots.c.version_number,
-        bots.c.language,
+        hackathon_snapshot.c.user_id,
+        hackathon_snapshot.c.bot_id,
+        hackathon_snapshot.c.score,
+        hackathon_snapshot.c.mu,
+        hackathon_snapshot.c.games_played,
+        hackathon_snapshot.c.version_number,
+        hackathon_snapshot.c.language,
     ]).select_from(
-        bots.join(
-            hackathon_participants,
-            (bots.c.user_id == hackathon_participants.c.user_id) &
-            (hackathon_participants.c.hackathon_id == hackathon_id)
-        )
+        hackathon_snapshot
     ).select_from(sqlalchemy.sql.select([
         sqlalchemy.sql.text("@{}:=0".format(variable))
-    ]).alias("rn")).order_by(bots.c.score.desc()).alias("temptable")
-
-    print(str(temptable))
+    ]).alias("rn")).where(
+        hackathon_snapshot.c.hackathon_id == hackathon_id
+    ).order_by(hackathon_snapshot.c.score.desc()).alias("temptable")
 
     return sqlalchemy.sql.select([
         sqlalchemy.sql.text("(@{v}:=@{v} + 1) AS local_rank".format(v=variable)),
