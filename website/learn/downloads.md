@@ -56,6 +56,12 @@ C++, Java, and Python3.
 
 ## Standalone Visualizer
 
+Removed pending automated builds.
+
+<!--
+
 Only available for MacOS at the moment. (Sorry!)
 
 [MacOS DMG]({{ site.baseurl }}/assets/downloads/Standalone_MacOS.dmg)
+
+-->
