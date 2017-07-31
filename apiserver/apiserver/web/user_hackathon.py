@@ -57,6 +57,7 @@ def associate_user_hackathon(intended_user, *, user_id):
     verification_code = flask.request.form.get("verification_code")
     if not verification_code:
         raise util.APIError(
+            400,
             message="Please provide the verification code."
         )
 
