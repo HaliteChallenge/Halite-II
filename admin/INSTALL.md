@@ -70,7 +70,8 @@ This sets up an automatically scaling pool of game coordinator servers.
 
 1. In `admin/config.sh`, set up the project ID, region, and service account created earlier.
     1. Make sure `IMAGE` is set to the image family created earlier. The instances will boot with the latest image in this family.
-1. Run `admin/setup_coordinator.sh` from your local machine. This will create an instance template, an instance group `coordinator-instances`, and a set of firewall rules.
+1. Run `admin/setup_firewall_rules.sh` from your local machine. This will create the necessary firewall rules for the coordinator and worker.
+1. Run `admin/setup_coordinator.sh` from your local machine. This will create an instance template and an instance group `coordinator-instances`.
 
 ### External Load Balancing
 
