@@ -161,3 +161,12 @@ export function leaderboard(filters) {
         }
     });
 }
+
+export function reset_api_key() {
+    return $.post({
+        url: `${API_SERVER_URL}/api_key`,
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
+}

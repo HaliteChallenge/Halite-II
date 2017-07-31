@@ -1,4 +1,5 @@
 import Vue from "vue";
+import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import Upload from "./templates/Upload.vue";
@@ -15,6 +16,12 @@ import * as api from "./api";
 Vue.use(require('vue-moment'));
 
 window.views = {
+    ApiKey: function () {
+        new Vue({
+            el: "#api-key-container",
+            render: (h) => h(ApiKey),
+        });
+    },
     Associate: function () {
         new Vue({
             el: "#associate-container",
