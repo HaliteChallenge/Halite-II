@@ -133,9 +133,18 @@ If the startup script changes, we have to create a new instance template, as fol
 
 1. Upload the new code to the GCloud bucket, if applicable (see above).
 1. Create a new instance template with a new name, based on the settings of the previous one. (Take the relevant `gcloud` command from the `setup_*.sh` script and edit the name and any other parameters.)
+
+        # In admin/ directory
+        source ./config.sh
+        gcloud compute --project "${GCLOUD_PROJECT}" \
+            instance-templates create "worker-instance-template" \
+        ⋮
+
 1. Edit the instance group in the Google Cloud Console to use the new instance template.
 1. Delete the old instance template.
 1. Recreate all instances in the group (see below).
+
+   When you edit the instance group, the console will give you the necessary gcloud command to run.
 
 Otherwise, if the code or disk image change:
 

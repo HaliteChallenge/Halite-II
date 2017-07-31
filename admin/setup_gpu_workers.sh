@@ -8,7 +8,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "gpu-worker-instance-template" \
     --machine-type "${GPU_MACHINE_TYPE}" \
     --accelerator type=nvidia-tesla-k80,count=1 \
-    --network "default" --no-address \
+    --network "default" \
     --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-gpu=true#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
     --maintenance-policy "TERMINATE" \
     --tags "worker" \
