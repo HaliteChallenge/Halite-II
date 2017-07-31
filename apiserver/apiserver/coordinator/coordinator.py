@@ -275,6 +275,7 @@ def update_rankings(users):
                         "sigma": rating[0].sigma,
                         "version_number": user["version_number"],
                         "language": user["language"],
+                        "games_played": 1,
                     }
 
                     conn.execute(
