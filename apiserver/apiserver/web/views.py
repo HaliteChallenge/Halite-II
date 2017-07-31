@@ -801,7 +801,7 @@ def create_user_bot(intended_user, *, user_id):
         conn.execute(model.bots.insert().values(
             user_id=user_id,
             id=0,
-            compile_status="Failed",
+            compile_status=model.CompileStatus.DISABLED.value,
         ))
 
     store_user_bot(intended_user=intended_user, user_id=user_id, bot_id=0)
@@ -834,7 +834,7 @@ def store_user_bot(user_id, intended_user, bot_id):
             raise util.APIError(404, message="Bot not found.")
 
         # Check if the user already has a bot compiling
-        if bot["compile_status"] not in ("Successful", "Failed", "Disabled"):
+        if bot["compile_status"] == model.CompileStatus.IN_PROGRESS.value:
             raise util.APIError(400, message="Cannot upload new bot until "
                                              "previous one is compiled.")
 
@@ -847,7 +847,7 @@ def store_user_bot(user_id, intended_user, bot_id):
         update = model.bots.update() \
             .where(bot_where_clause) \
             .values(
-                compile_status="Uploaded",
+                compile_status=model.CompileStatus.UPLOADED.value,
                 update_time=sqlalchemy.sql.func.now(),
             )
         conn.execute(update)

@@ -1,7 +1,18 @@
+import enum
+
 import google.cloud.storage as gcloud_storage
 import sqlalchemy
 
 from . import config
+
+
+class CompileStatus(enum.Enum):
+    """The compilation status of a bot."""
+    UPLOADED = "Uploaded"
+    IN_PROGRESS = "InProgress"
+    SUCCESSFUL = "Successful"
+    FAILED = "Failed"
+    DISABLED = "Disabled"
 
 
 # Database setup

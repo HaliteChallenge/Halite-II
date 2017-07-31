@@ -23,12 +23,12 @@ coordinator_api = flask.Blueprint("coordinator_api", __name__)
 def reset_compilation_tasks(conn):
     """Check ongoing compilation tasks, and reset ones that are "stuck"."""
     reset_stuck_tasks = model.bots.update().where(
-        (model.bots.c.compile_status == "InProgress") &
+        (model.bots.c.compile_status == model.CompileStatus.IN_PROGRESS.value) &
         (model.bots.c.compile_start <
          datetime.datetime.now() - datetime.timedelta(
              minutes=config.COMPILATION_STUCK_THRESHOLD))
     ).values(
-        compile_status="Uploaded",
+        compile_status=model.CompileStatus.UPLOADED.value,
         compile_start=None,
     )
     conn.execute(reset_stuck_tasks)
@@ -39,7 +39,8 @@ def serve_compilation_task(conn):
     with conn.begin() as transaction:
         # Try to assign a compilation task.
         find_compilation_task = model.bots.select() \
-            .where(model.bots.c.compile_status == "Uploaded") \
+            .where(model.bots.c.compile_status ==
+                   model.CompileStatus.UPLOADED.value) \
             .order_by(model.bots.c.user_id.asc()) \
             .limit(1)
         bot = conn.execute(find_compilation_task).first()
@@ -51,7 +52,7 @@ def serve_compilation_task(conn):
             update = model.bots.update() \
                 .where((model.bots.c.user_id == user_id) &
                        (model.bots.c.id == bot_id)) \
-                .values(compile_status="InProgress",
+                .values(compile_status=model.CompileStatus.IN_PROGRESS.value,
                         compile_start=sqlalchemy.sql.func.now())
             conn.execute(update)
             return response_success({
@@ -124,7 +125,7 @@ def serve_game_task(conn, has_gpu=False):
             (ranked_users.c.user_id == model.ranked_bots_users.c.user_id)
         )
     ).where(
-        (model.bots.c.compile_status == "Successful") &
+        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         (~((model.bots.c.user_id == seed_player["user_id"]) &
            (model.bots.c.id == seed_player["bot_id"]))) &
         rank_limit
@@ -238,7 +239,9 @@ def update_compilation_status():
             .where((model.bots.c.user_id == user_id) &
                    (model.bots.c.id == bot_id)) \
             .values(
-            compile_status="Successful" if did_compile else "Failed",
+            compile_status=(model.CompileStatus.SUCCESSFUL.value
+                            if did_compile
+                            else model.CompileStatus.FAILED.value),
             compile_start=None,
         )
         conn.execute(update)
@@ -570,7 +573,7 @@ def update_user_timeout(conn, game_id, user):
         # Prevent the bot from playing more games until a new bot
         # is uploaded
         conn.execute(model.bots.update().values(
-            compile_status="Disabled",
+            compile_status=model.CompileStatus.DISABLED.value,
         ).where((model.bots.c.user_id == user["user_id"]) &
                 (model.bots.c.id == user["bot_id"])))
 
@@ -631,7 +634,8 @@ def find_recent_seed_player(conn, ranked_users, rank_limit, restrictions=False):
     # Of those users, select ones with under 400 games, preferring
     # ones in older games, and get their data
     outer_bots = model.bots.alias("bot")
-    bot_restrictions = outer_bots.c.compile_status == "Successful"
+    bot_restrictions = (outer_bots.c.compile_status ==
+                        model.CompileStatus.SUCCESSFUL.value)
     if restrictions:
         bot_restrictions &= outer_bots.c.games_played < 400
 
@@ -688,7 +692,7 @@ def find_newbie_seed_player(conn, ranked_users, rank_limit):
             model.ranked_bots_users.c.user_id == ranked_users.c.user_id
         )
     ).where(
-        (model.bots.c.compile_status == "Successful") &
+        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         (model.bots.c.games_played < 400) &
         rank_limit
     ).order_by(ordering).limit(1).reduce_columns()
@@ -752,7 +756,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
                 rank_limit
             )
         ).where(
-            model.bots.c.compile_status == "Successful"
+            model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value
         ).order_by(model.bots.c.games_played.asc()).limit(15).alias("least_played")
 
         query = least_played.select().order_by(
