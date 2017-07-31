@@ -5,6 +5,7 @@ Hackathon API endpoints - create/update/delete/list hackathons+leaderboards
 import datetime
 import uuid
 
+import arrow
 import flask
 import sqlalchemy
 
@@ -78,15 +79,8 @@ def list_hackathons(*, admin_id):
 def create_hackathon(*, admin_id):
     title = flask.request.form["title"]
     description = flask.request.form["description"]
-    start_date = datetime.date.fromtimestamp(int(flask.request.form["start_date"]))
-    end_date = datetime.date.fromtimestamp(int(flask.request.form["end_date"]))
+    start_date = arrow.get(flask.request.form["start_date"]).datetime
     organization_id = flask.request.form.get("organization_id")
-
-    if end_date < start_date:
-        raise util.APIError(
-            400,
-            message="End date should be after start date."
-        )
 
     with model.engine.connect() as conn:
         if organization_id is not None:
@@ -106,7 +100,7 @@ def create_hackathon(*, admin_id):
             title=title,
             description=description,
             start_date=start_date,
-            end_date=end_date,
+            end_date=None,
             verification_code=verification_code,
             organization_id=organization_id,
         )).inserted_primary_key[0]
@@ -118,7 +112,7 @@ def create_hackathon(*, admin_id):
 
 
 @web_api.route("/hackathon/<int:hackathon_id>", methods=["GET"])
-@cross_origin(methods=["GET"])
+@cross_origin(methods=["GET", "PUT"])
 @requires_oauth_login
 def get_hackathon(hackathon_id, *, user_id):
     with model.engine.connect() as conn:
@@ -140,6 +134,91 @@ def get_hackathon(hackathon_id, *, user_id):
             "end_date": hackathon["end_date"],
             "organization_id": hackathon["organization_id"],
             "organization_name": hackathon["organization_name"],
+        })
+
+
+@web_api.route("/hackathon/<int:hackathon_id>", methods=["PUT"])
+@cross_origin(methods=["GET", "PUT"])
+@requires_admin(accept_key=True)
+def update_hackathon(hackathon_id, *, admin_id):
+    values = {}
+
+    if "title" in flask.request.form:
+        values["title"] = flask.request.form["title"]
+
+    if "description" in flask.request.form:
+        values["description"] = flask.request.form["description"]
+
+    if "start_date" in flask.request.form:
+        values["start_date"] = \
+            arrow.get(flask.request.form["start_date"]).datetime
+
+    if "end_date" in flask.request.form:
+        values["end_date"] = \
+            arrow.get(flask.request.form["end_date"]).datetime
+
+    if "organization_id" in flask.request.form:
+        values["organization_id"] = int(flask.request.form["organization_id"])
+
+    close_hackathon = False
+    if "close" in flask.request.form:
+        close_hackathon = flask.request.form["close"] == "true"
+
+    with model.engine.connect() as conn:
+        hackathon = conn.execute(
+            model.hackathons.select(model.hackathons.c.id == hackathon_id)
+        ).first()
+
+        if not hackathon:
+            raise util.APIError(
+                404,
+                message="Hackathon does not exist."
+            )
+
+        if "organization_id" in values:
+            organization_id = int(values["organization_id"])
+            organization = conn.execute(
+                model.organizations.select(model.organizations.c.id == organization_id)
+            ).first()
+
+            if not organization:
+                raise util.APIError(
+                    400,
+                    message="Invalid organization ID."
+                )
+
+        start_date = values.get("start_date", hackathon["start_date"])
+        end_date = values.get("end_date", hackathon["end_date"])
+        if end_date and start_date >= end_date:
+            raise util.APIError(
+                400,
+                message="Start date must be before end date."
+            )
+
+        # Close the competition
+        if close_hackathon:
+            if end_date and end_date > datetime.datetime.now():
+                raise util.APIError(
+                    400,
+                    message="Cannot end a competition with an end date in "
+                            "the future. If the hackathon had an end date "
+                            "specified, then either specify a new end date "
+                            "or wait for the end date to pass. Otherwise, "
+                            "specify an end date in the past. "
+                )
+            elif not end_date:
+                values["end_date"] = arrow.now()
+
+            # Snapshot all the ranks
+            # TODO:
+
+        conn.execute(model.hackathons.update().values(**values).where(
+            model.hackathons.c.id == hackathon_id
+        ))
+
+        return response_success({
+            "hackathon_id": hackathon_id,
+            "updated_values": values,
         })
 
 
