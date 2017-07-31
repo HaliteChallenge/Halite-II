@@ -323,8 +323,8 @@ def update_user(intended_user_id, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
-@requires_admin
-def delete_user(intended_user_id, *, user_id):
+@requires_admin(accept_key=True)
+def delete_user(intended_user_id, *, admin_id):
     # TODO: what happens to their games?
     if user_id != intended_user_id:
         raise user_mismatch_error()

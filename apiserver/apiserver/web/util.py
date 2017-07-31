@@ -31,29 +31,55 @@ def validate_user_level(level):
                      'Professional')
 
 
+def check_api_key():
+    """
+    Check for an API key; if present, validate it and return the user record.
+    """
+    if "api_key" in flask.request.args:
+        api_key = flask.request.args["api_key"]
+        if ":" not in api_key:
+            raise util.APIError(401, message="Invalid API key.")
+
+        user_id, api_key = api_key.split(":", 1)
+        user_id = int(user_id)
+        with model.engine.connect() as conn:
+            user = conn.execute(sqlalchemy.sql.select([
+                model.users.c.id.label("user_id"),
+                model.users.c.is_admin,
+                model.users.c.api_key_hash,
+            ]).where(model.users.c.id == user_id)).first()
+
+            if user and config.api_key_context.verify(api_key, user["api_key_hash"]):
+                return user
+
+    return None
+
+
+def check_cookie():
+    """
+    Check for a session; if present, validate it and return the user record.
+    """
+    if "user_id" in flask.session:
+        with model.engine.connect() as conn:
+            user_id = flask.session["user_id"]
+            user = conn.execute(sqlalchemy.sql.select([
+                model.users.c.id.label("user_id"),
+                model.users.c.is_admin,
+                model.users.c.api_key_hash,
+            ]).where(model.users.c.id == user_id)).first()
+
+            return user
+    return None
+
+
 def requires_login(view):
+    """Indicates that an endpoint requires login via OAuth or API key."""
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
-        if "api_key" in flask.request.args:
-            api_key = flask.request.args["api_key"]
-            if ":" not in api_key:
-                raise util.APIError(401, message="Invalid API key.")
-
-            user_id, api_key = api_key.split(":", 1)
-            user_id = int(user_id)
-            with model.engine.connect() as conn:
-                user = conn.execute(sqlalchemy.sql.select([
-                    model.users.c.api_key_hash,
-                ]).where(model.users.c.id == user_id)).first()
-
-                if not user:
-                    raise util.APIError(401, message="User not logged in.")
-
-                if config.api_key_context.verify(api_key, user["api_key_hash"]):
-                    kwargs["user_id"] = user_id
-                    return view(*args, **kwargs)
-                else:
-                    raise util.APIError(401, message="User not logged in.")
+        user_record = check_api_key()
+        if user_record:
+            kwargs["user_id"] = user_record["user_id"]
+            return view(*args, **kwargs)
         else:
             return requires_oauth_login(view)(*args, **kwargs)
 
@@ -61,28 +87,26 @@ def requires_login(view):
 
 
 def requires_oauth_login(view):
+    """Indicates that an endpoint requires OAuth login, not API key."""
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
-        if "user_id" not in flask.session:
+        user = check_cookie()
+        if user:
+            kwargs["user_id"] = user["user_id"]
+            return view(*args, **kwargs)
+        else:
             raise util.APIError(401, message="User not logged in.")
-
-        with model.engine.connect() as conn:
-            user = conn.execute(model.users.select(
-                model.users.c.id == flask.session["user_id"])).first()
-            if not user:
-                raise util.APIError(401, message="User not logged in.")
-
-        kwargs["user_id"] = flask.session["user_id"]
-        return view(*args, **kwargs)
 
     return decorated_view
 
 
 def optional_login(view):
+    """Indicates that an endpoint can optionally take login via OAuth."""
     @functools.wraps(view)
     def decorated_view(*args, **kwargs):
-        if "user_id" in flask.session:
-            kwargs["user_id"] = flask.session["user_id"]
+        user = check_cookie()
+        if user:
+            kwargs["user_id"] = user["user_id"]
         else:
             kwargs["user_id"] = None
         return view(*args, **kwargs)
@@ -90,19 +114,35 @@ def optional_login(view):
     return decorated_view
 
 
-def requires_admin(view):
-    @functools.wraps(view)
-    def decorated_view(*args, **kwargs):
-        if "user_id" not in flask.session:
-            raise util.APIError(401, message="User not logged in.")
-        with model.engine.connect() as conn:
-            user_id = flask.session["user_id"]
-            if not is_user_admin(user_id, conn=conn):
+def requires_admin(*, accept_key=False):
+    """
+    Indicates that an endpoint requires an admin user.
+
+    If accept_key is True, then an API key is accepted for authentication.
+    """
+    def _requires_admin(view):
+        @functools.wraps(view)
+        def decorated_view(*args, **kwargs):
+            user = None
+            if accept_key:
+                user = check_api_key()
+
+            if not user:
+                user = check_cookie()
+
+            if user and user["is_admin"]:
+                kwargs["admin_id"] = user["user_id"]
+            elif user:
                 raise util.APIError(
                     401, message="User cannot take this action.")
-        return view(*args, **kwargs)
+            else:
+                raise util.APIError(401, message="User not logged in.")
 
-    return decorated_view
+            return view(*args, **kwargs)
+
+        return decorated_view
+
+    return _requires_admin
 
 
 def requires_association(view):
@@ -131,6 +171,7 @@ def user_mismatch_error(message="Cannot perform action for other user."):
 
 
 def get_offset_limit(*, default_limit=50, max_limit=250):
+    """Get an offset/limit from the query string (or default)."""
     offset = int(flask.request.values.get("offset", 0))
     offset = max(offset, 0)
     limit = int(flask.request.values.get("limit", default_limit))

@@ -60,8 +60,8 @@ def get_organization(org_id):
 
 
 @web_api.route("/organization", methods=["POST"])
-@requires_admin
-def create_organization():
+@requires_admin(accept_key=True)
+def create_organization(*, admin_id):
     org_body = flask.request.get_json()
     if "name" not in org_body:
         raise util.APIError(400, message="Organization must be named.")
@@ -81,8 +81,8 @@ def create_organization():
 
 
 @web_api.route("/organization/<int:org_id>", methods=["PUT"])
-@requires_admin
-def update_organization(org_id):
+@requires_admin(accept_key=True)
+def update_organization(org_id, *, admin_id):
     fields = flask.request.get_json()
     columns = {
         "name": model.organizations.c.organization_name,
@@ -102,8 +102,8 @@ def update_organization(org_id):
 
 
 @web_api.route("/organization/<int:org_id>", methods=["DELETE"])
-@requires_admin
-def delete_organization(org_id):
+@requires_admin(accept_key=True)
+def delete_organization(org_id, *, admin_id):
     with model.engine.connect() as conn:
         with conn.begin() as transaction:
             count = conn.execute(sqlalchemy.sql.select([

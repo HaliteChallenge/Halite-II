@@ -46,8 +46,8 @@ hackathon_query = sqlalchemy.sql.select([
 
 
 @web_api.route("/hackathon", methods=["GET"])
-@requires_admin
-def list_hackathons():
+@requires_admin(accept_key=True)
+def list_hackathons(*, admin_id):
     result = []
     offset, limit = get_offset_limit()
 
@@ -74,8 +74,8 @@ def list_hackathons():
 
 
 @web_api.route("/hackathon", methods=["POST"])
-@requires_admin
-def create_hackathon():
+@requires_admin(accept_key=True)
+def create_hackathon(*, admin_id):
     title = flask.request.form["title"]
     description = flask.request.form["description"]
     start_date = datetime.date.fromtimestamp(int(flask.request.form["start_date"]))
