@@ -248,8 +248,17 @@ def update_rankings(users):
             ))
 
             # Update the hackathon scoring tables
-            hackathons = conn.execute(model.hackathon_participants.select(
-                model.hackathon_participants.c.user_id == user["user_id"]
+            hackathons = conn.execute(sqlalchemy.sql.select([
+                model.hackathons.c.id.label("hackathon_id"),
+            ]).select_from(
+                model.hackathon_participants.join(
+                    model.hackathons,
+                    (model.hackathon_participants.c.hackathon_id == model.hackathons.c.id) &
+                    (model.hackathon_participants.c.user_id == user["user_id"])
+                )
+            ).where(
+                (model.hackathons.c.start_date <= sqlalchemy.sql.func.now()) &
+                (model.hackathons.c.end_date > sqlalchemy.sql.func.now())
             ))
 
             for hackathon in hackathons.fetchall():
