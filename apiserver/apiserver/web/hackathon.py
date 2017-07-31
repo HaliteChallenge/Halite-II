@@ -80,6 +80,7 @@ def create_hackathon(*, admin_id):
     title = flask.request.form["title"]
     description = flask.request.form["description"]
     start_date = arrow.get(flask.request.form["start_date"]).datetime
+    end_date = arrow.get(flask.request.form["end_date"]).datetime
     organization_id = flask.request.form.get("organization_id")
 
     with model.engine.connect() as conn:
@@ -100,7 +101,7 @@ def create_hackathon(*, admin_id):
             title=title,
             description=description,
             start_date=start_date,
-            end_date=None,
+            end_date=end_date,
             verification_code=verification_code,
             organization_id=organization_id,
         )).inserted_primary_key[0]
@@ -122,7 +123,9 @@ def get_hackathon(hackathon_id, *, user_id):
         if not hackathon or not can_view_hackathon(user_id, hackathon["id"], conn):
             raise util.APIError(404)
 
-        # TODO: num of participants
+        hackathon_users = conn.execute(
+            model.hackathon_total_ranked_users_query(hackathon_id)
+        ).first()[0]
 
         return flask.jsonify({
             "hackathon_id": hackathon["id"],
@@ -134,6 +137,7 @@ def get_hackathon(hackathon_id, *, user_id):
             "end_date": hackathon["end_date"],
             "organization_id": hackathon["organization_id"],
             "organization_name": hackathon["organization_name"],
+            "num_participants": hackathon_users,
         })
 
 
@@ -149,20 +153,8 @@ def update_hackathon(hackathon_id, *, admin_id):
     if "description" in flask.request.form:
         values["description"] = flask.request.form["description"]
 
-    if "start_date" in flask.request.form:
-        values["start_date"] = \
-            arrow.get(flask.request.form["start_date"]).datetime
-
-    if "end_date" in flask.request.form:
-        values["end_date"] = \
-            arrow.get(flask.request.form["end_date"]).datetime
-
     if "organization_id" in flask.request.form:
         values["organization_id"] = int(flask.request.form["organization_id"])
-
-    close_hackathon = False
-    if "close" in flask.request.form:
-        close_hackathon = flask.request.form["close"] == "true"
 
     with model.engine.connect() as conn:
         hackathon = conn.execute(
@@ -195,26 +187,43 @@ def update_hackathon(hackathon_id, *, admin_id):
                 message="Start date must be before end date."
             )
 
-        # Close the competition
-        if close_hackathon:
-            if end_date and end_date > datetime.datetime.now():
-                raise util.APIError(
-                    400,
-                    message="Cannot end a competition with an end date in "
-                            "the future. If the hackathon had an end date "
-                            "specified, then either specify a new end date "
-                            "or wait for the end date to pass. Otherwise, "
-                            "specify an end date in the past. "
-                )
-            elif not end_date:
-                values["end_date"] = arrow.now()
+        # # Close the competition
+        # if close_hackathon:
+        #     if end_date and end_date > datetime.datetime.now():
+        #         raise util.APIError(
+        #             400,
+        #             message="Cannot end a competition with an end date in "
+        #                     "the future. If the hackathon had an end date "
+        #                     "specified, then either specify a new end date "
+        #                     "or wait for the end date to pass. Otherwise, "
+        #                     "specify an end date in the past. "
+        #         )
+        #     elif not end_date:
+        #         values["end_date"] = arrow.now().datetime
+        #
+        #     # Snapshot all the ranks
+        #     table = model.hackathon_ranked_bots_users_query(hackathon_id)
+        #     query = conn.execute(table.select())
+        #
+        #     conn.execute(
+        #         model.hackathon_snapshot.insert(),
+        #         [
+        #             {
+        #                 "hackathon_id": hackathon_id,
+        #                 "user_id": row["user_id"],
+        #                 "bot_id": row["bot_id"],
+        #                 "score": row["score"],
+        #                 "version_number": row["num_submissions"],
+        #                 "language": row["language"],
+        #             }
+        #             for row in query.fetchall()
+        #         ]
+        #     )
 
-            # Snapshot all the ranks
-            # TODO:
-
-        conn.execute(model.hackathons.update().values(**values).where(
-            model.hackathons.c.id == hackathon_id
-        ))
+        if values:
+            conn.execute(model.hackathons.update().values(**values).where(
+                model.hackathons.c.id == hackathon_id
+            ))
 
         return response_success({
             "hackathon_id": hackathon_id,
@@ -241,8 +250,6 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
             "level": table.c.player_level,
             "organization_id": table.c.organization_id,
             "version_number": table.c.num_submissions,
-            "num_games": table.c.num_games,
-            "global_rank": table.c.global_rank,
             "local_rank": table.c.local_rank,
             "language": table.c.language,
         })
@@ -250,7 +257,6 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
         if not order_clause:
             order_clause = [table.c.local_rank]
 
-        total_users = conn.execute(model.total_ranked_users).first()[0]
         hackathon_users = conn.execute(
             model.hackathon_total_ranked_users_query(hackathon_id)).first()[0]
 
@@ -267,20 +273,11 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
                 "organization_id": row["organization_id"],
                 "organization": row["organization_name"],
                 "version_number": int(row["num_submissions"]),
-                "num_games": int(row["num_games"]),
                 "score": float(row["score"]),
                 "language": row["language"],
-                "global_rank": int(row["global_rank"])
-                if row["global_rank"] is not None else None,
                 "local_rank": int(row["local_rank"])
                 if row["local_rank"] is not None else None,
             }
-
-            if total_users and row["global_rank"] is not None:
-                user["global_tier"] = util.tier(
-                    row["global_rank"], total_users)
-            else:
-                user["global_tier"] = None
 
             if hackathon_users and row["local_rank"] is not None:
                 user["local_tier"] = util.tier(

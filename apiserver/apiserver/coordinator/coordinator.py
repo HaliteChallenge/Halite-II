@@ -3,6 +3,7 @@ import os
 
 import flask
 import sqlalchemy
+import sqlalchemy.exc
 import trueskill
 
 import google.cloud.storage as gcloud_storage
@@ -107,6 +108,26 @@ def upload_game():
 
     # Store the replay and any error logs
     replay_name = os.path.basename(game_output["replay"])
+    replay_key, bucket_class = store_game_artifacts(replay_name, users)
+
+    # Store game results in database
+    store_game_results(game_output, replay_key, bucket_class, users)
+    # Update rankings
+    update_rankings(users)
+
+    return response_success()
+
+
+def store_game_artifacts(replay_name, users):
+    """
+    Upload the replay and any error logs to object storage.
+
+    `users` should be a list of user objects with the user ID, a flag to
+    indicate timeout, and the filename of the error log.
+
+    Returns the key of the replay in object storage and the bucket the replays
+    were saved in.
+    """
     replay_key, _ = os.path.splitext(replay_name)
     if replay_name not in flask.request.files:
         raise util.APIError(
@@ -124,6 +145,7 @@ def upload_game():
     blob = gcloud_storage.Blob(replay_key, bucket, chunk_size=262144)
     blob.upload_from_file(flask.request.files[replay_name])
 
+    # Store error logs
     for user in users:
         if user["timed_out"]:
             error_log_name = user["log_name"]
@@ -131,7 +153,7 @@ def upload_game():
                 raise util.APIError(
                     400,
                     message="Error log {} not found in uploaded files."
-                            .format(error_log_name))
+                        .format(error_log_name))
 
             error_log_key = user["log_name"] = \
                 replay_key + "_error_log_" + str(user["user_id"])
@@ -140,6 +162,19 @@ def upload_game():
                                        chunk_size=262144)
             blob.upload_from_file(flask.request.files[error_log_name])
 
+    return replay_key, bucket_class
+
+
+def store_game_results(game_output, replay_key, bucket_class, users):
+    """
+    Store the outcome of a game in the database.
+
+    :param game_output: The JSON output of the Halite game environment.
+    :param replay_key: The key of the replay file in object storage.
+    :param bucket_class: Which bucket the replay was stored in.
+    :param users: The list of user objects for this game.
+    :return:
+    """
     # TODO: the original code deletes games if there are over 600k in the
     # database. Is that really a concern for us?
 
@@ -164,6 +199,8 @@ def upload_game():
                 version_number=user["version_number"],
                 log_name=user["log_name"],
                 rank=user["rank"],
+                # Which player in the game (numbered starting from 0) was
+                # this user?
                 player_index=user["player_tag"],
                 timed_out=user["timed_out"],
             ))
@@ -180,7 +217,15 @@ def upload_game():
             if user["timed_out"]:
                 update_user_timeout(conn, game_id, user)
 
-    # Update rankings
+
+def update_rankings(users):
+    """
+    Update the rankings via TrueSkill and store in the database.
+
+    `users` should be a list of user objects with the game rank (which place
+    the user got in the game), the bot's mu and sigma, the user and bot IDs,
+    and the bot version number.
+    """
     users.sort(key=lambda user: user["rank"])
     # Set tau=0, based on discussion from Halite 1
     trueskill.setup(tau=0)
@@ -189,18 +234,50 @@ def upload_game():
     new_ratings = trueskill.rate(teams)
     with model.engine.connect() as conn:
         for user, rating in zip(users, new_ratings):
+            new_score = rating[0].mu - 3*rating[0].sigma
             conn.execute(model.bots.update().where(
                 (model.bots.c.user_id == user["user_id"]) &
                 (model.bots.c.id == user["bot_id"]) &
-                # TODO: why filter version? (Use a DB transaction?)
+                # Filter on version so we don't update the score for an old
+                # version of the bot
                 (model.bots.c.version_number == user["version_number"])
             ).values(
                 mu=rating[0].mu,
                 sigma=rating[0].sigma,
-                score=rating[0].mu - 3*rating[0].sigma,
+                score=new_score,
             ))
 
-    return response_success()
+            # Update the hackathon scoring tables
+            hackathons = conn.execute(model.hackathon_participants.select(
+                model.hackathon_participants.c.user_id == user["user_id"]
+            ))
+
+            for hackathon in hackathons.fetchall():
+                hackathon_id = hackathon["hackathon_id"]
+                try:
+                    # Try and insert
+                    insert_values = {
+                        "hackathon_id": hackathon_id,
+                        "user_id": user["user_id"],
+                        "bot_id": user["bot_id"],
+                        "score": new_score,
+                    }
+
+                    conn.execute(
+                        model.hackathon_snapshot.insert().values(
+                            **insert_values))
+                except sqlalchemy.exc.IntegrityError:
+                    # Row exists, update
+                    condition = ((model.hackathon_snapshot.c.hackathon_id ==
+                                  hackathon_id) &
+                                 (model.hackathon_snapshot.c.user_id ==
+                                  user["user_id"]) &
+                                 (model.hackathon_snapshot.c.bot_id ==
+                                  user["bot_id"]))
+                    conn.execute(
+                        model.hackathon_snapshot.update().values(
+                            score=new_score
+                        ).where(condition))
 
 
 def update_user_timeout(conn, game_id, user):
