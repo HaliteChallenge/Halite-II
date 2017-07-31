@@ -6,7 +6,10 @@ cd
 
 # Fetch the coordinator
 # TODO: This is in GCloud right now, but we should use Git when we go public
-gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
+while [ ! -f ./Halite.tgz ]; do
+    sleep 5
+    gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
+done
 
 tar xvzf Halite.tgz
 cd Halite/apiserver/
