@@ -336,6 +336,7 @@ def delete_user(intended_user_id, *, user_id):
 
 @web_api.route("/api_key", methods=["POST"])
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
+@cross_origin(methods=["POST"])
 @requires_oauth_login
 @requires_association
 def reset_api_key(intended_user=None, *, user_id):
