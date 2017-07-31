@@ -14,16 +14,16 @@ public class BehaviorManager {
             moves.add(behavior.next(gameMap));
     }
 
-    void update(GameMap gameMap, Vector<Move> moves) {
+    public void update(GameMap gameMap, Vector<Move> moves) {
         behaviors.entrySet().removeIf((entry) -> entry.getValue().isFinished(gameMap));
         behaviors.forEach((id, behavior) -> updateBehaviors(gameMap, moves, id, behavior));
     }
 
-    boolean isExecuting(long shipId) {
+    public boolean isExecuting(long shipId) {
         return behaviors.containsKey(shipId);
     }
 
-    void warpTo(long shipId, Position target) {
+    public void warpTo(long shipId, Position target) {
         behaviors.put(shipId, new Behavior(shipId, Behavior.BehaviorType.Warp, target, Behavior.State.Moving));
     }
 }

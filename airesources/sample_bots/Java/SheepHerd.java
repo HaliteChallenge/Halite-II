@@ -1,7 +1,7 @@
 import java.util.Map;
 import java.util.Vector;
 
-public class MyBot {
+public class SheepHerd {
     public static void main(String[] args) {
         Networking networking = new Networking();
         GameMap gameMap = networking.initialize("SheepHerd");
@@ -13,7 +13,6 @@ public class MyBot {
             DebugLog.debug("--- New turn ---");
             moves.clear();
             gameMap.updateMap(Networking.parseInput());
-            gameMap.populateOccupancyMap();
 
             behaviors.update(gameMap, moves);
 
@@ -22,7 +21,7 @@ public class MyBot {
                 Ship ship = shipEntry.getValue();
 
                 if (behaviors.isExecuting(ship.getId().getId())) {
-                    DebugLog.debug(String.format("%d: at %d %d vel %d %d", ship.getId().getId(),
+                    DebugLog.debug(String.format("%d: at %f %f vel %f %f", ship.getId().getId(),
                             ship.getPosition().getXPos(), ship.getPosition().getYPos(),
                             ship.getVelocity().getXVelocity(), ship.getVelocity().getYVelocity()));
                     continue;
@@ -81,10 +80,9 @@ public class MyBot {
                     }
                     else if (Movement.getDistance(ship.getPosition(), planet.getPosition()) > 10) {
                         Position targetPosition = gameMap.getClosestPoint(ship.getPosition(), planet.getPosition(),
-                                (short) (planet.getRadius() + Constants.MAX_DOCKING_DISTANCE - 1));
-
+                                (short) (planet.getRadius() + Constants.DOCK_RADIUS - 1));
                         if (gameMap.isPathable(ship.getPosition(), targetPosition)) {
-                            DebugLog.debug(String.format("%d: Warping to planet %d %d %d",
+                            DebugLog.debug(String.format("%d: Warping to planet %d %f %f",
                                     ship.getId().getId(), planet.getId().getId(),
                                     planet.getPosition().getXPos(), planet.getPosition().getYPos()));
                             behaviors.warpTo(ship.getId().getId(), targetPosition);
