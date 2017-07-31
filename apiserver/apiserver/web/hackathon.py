@@ -2,7 +2,6 @@
 Hackathon API endpoints - create/update/delete/list hackathons+leaderboards
 """
 
-import datetime
 import uuid
 
 import arrow
@@ -83,7 +82,7 @@ def create_hackathon(*, admin_id):
     end_date = arrow.get(flask.request.form["end_date"]).datetime
     organization_id = flask.request.form.get("organization_id")
 
-    if end_date < datetime.datetime.now():
+    if end_date < arrow.now().datetime:
         raise util.APIError(
             400,
             message="End date is in the past!"
