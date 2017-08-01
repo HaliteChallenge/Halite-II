@@ -5,10 +5,9 @@
 sudo -iu worker bash <<"EOF"
 cd
 # Fetch the worker script
-# TODO: This is in GCloud right now, but we should use Git when we go public
 while [ ! -f ./Halite.tgz ]; do
     sleep 5
-    gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
+    curl -v http://COORDINATOR_BALANCER:5001/v1/coordinator/download/worker --output Halite.tgz
 done
 
 tar xvzf Halite.tgz

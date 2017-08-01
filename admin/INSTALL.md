@@ -104,6 +104,7 @@ Create the load balancer and note the IP address of the balancer.
 
 These steps should be run only once.
 
+1. In `admin/setup_workers__startup_script.sh`, set the URL to the URL of the internal coordinator load balancer. (The worker startup script downloads the worker code blob from the coordinator, to avoid giving it any API access.)
 1. In `admin/config.sh`, set up the project ID, region, and details of the machine instances (same as before). 
 1. Set the coordinator URL to the URL of the internally facing TCP load balancer created earlier.
 1. Run [`admin/setup_workers.sh`](./setup_workers.sh).
