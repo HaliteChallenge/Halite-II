@@ -1,5 +1,7 @@
 # Setting up the Game Coordinator
 
+For website help, see `website/README.md`.
+
 ## Prerequisites
 
 1. Create a Google Cloud project.
