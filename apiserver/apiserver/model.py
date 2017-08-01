@@ -239,3 +239,9 @@ def get_replay_bucket(kind=0):
 def get_error_log_bucket():
     """Get the object storage bucket for game error log files."""
     return get_storage_client().get_bucket(config.GCLOUD_ERROR_LOG_BUCKET)
+
+
+def get_deployed_artifacts_bucket():
+    """Get the object storage bucket for deployed worker artifacts."""
+    return get_storage_client().get_bucket(
+        config.GCLOUD_DEPLOYED_ARTIFACTS_BUCKET)

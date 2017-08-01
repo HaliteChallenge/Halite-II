@@ -1,15 +1,52 @@
 import base64
 import binascii
 import io
+import tempfile
 
 import flask
-
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
-from .. import model, response_success, util
+from werkzeug.contrib.cache import FileSystemCache
+
+from .. import config, model, response_success, util
 
 from .blueprint import coordinator_api
+
+
+# Cache the worker blob to avoid repeated requests to object storage
+cache_dir = tempfile.TemporaryDirectory()
+cache = FileSystemCache(cache_dir.name, default_timeout=60*5)
+
+
+@coordinator_api.route("/download/worker", methods=["GET"])
+def download_source_blob():
+    """Retrieve the worker blob from object storage."""
+
+    cached_blob = cache.get(config.WORKER_ARTIFACT_KEY)
+    if cached_blob is None:
+        print("Getting from GCloud", config.WORKER_ARTIFACT_KEY)
+        # Retrieve from GCloud
+        try:
+            gcloud_blob = gcloud_storage.Blob(
+                config.WORKER_ARTIFACT_KEY,
+                model.get_deployed_artifacts_bucket(),
+                chunk_size=262144)
+            cached_blob = gcloud_blob.download_as_string()
+            cache.set(config.WORKER_ARTIFACT_KEY, cached_blob)
+        except gcloud_exceptions.NotFound:
+            raise util.APIError(404, message="Worker blob not found.")
+
+    if cached_blob is None:
+        raise util.APIError(404, message="Worker blob not found.")
+
+    print("Building buffer")
+    buffer = io.BytesIO()
+    buffer.write(cached_blob)
+    buffer.seek(0)
+    return flask.send_file(buffer, mimetype="application/gzip",
+                           as_attachment=True,
+                           attachment_filename="Halite.tgz")
 
 
 @coordinator_api.route("/botFile", methods=["POST"])
