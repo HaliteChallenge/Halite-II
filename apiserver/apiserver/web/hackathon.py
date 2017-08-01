@@ -118,7 +118,7 @@ def create_hackathon(*, user_id):
         return util.response_success({
             "hackathon_id": hackathon_id,
             "verification_code": verification_code,
-        })
+        }, status_code=201)
 
 
 @web_api.route("/hackathon/<int:hackathon_id>", methods=["GET"])

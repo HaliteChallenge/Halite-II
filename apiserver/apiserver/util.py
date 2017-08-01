@@ -71,10 +71,10 @@ def tier_thresholds(total_users):
     return result
 
 
-def response_success(more=None):
+def response_success(more=None, status_code=200):
     response = {
         "status": "success",
     }
     if more is not None:
         response.update(more)
-    return flask.jsonify(response)
+    return flask.jsonify(response), status_code

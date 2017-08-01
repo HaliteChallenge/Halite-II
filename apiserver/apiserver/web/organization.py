@@ -75,7 +75,7 @@ def create_organization(*, user_id):
 
     return util.response_success({
         "organization_id": org_id[0],
-    })
+    }, status_code=201)
 
 
 @web_api.route("/organization/<int:org_id>", methods=["PUT"])

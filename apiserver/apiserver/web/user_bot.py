@@ -136,7 +136,7 @@ def create_user_bot(intended_user, *, user_id):
     store_user_bot(intended_user=intended_user, user_id=user_id, bot_id=0)
     return util.response_success({
         "bot_id": 0,
-    })
+    }, status_code=201)
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])

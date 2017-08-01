@@ -216,7 +216,7 @@ def create_user(*, user_id):
 
     return util.response_success({
         "message": message,
-    })
+    }, status_code=201)
 
 
 @web_api.route("/user/<int:intended_user>", methods=["GET"])
@@ -349,4 +349,4 @@ def reset_api_key(intended_user=None, *, user_id):
 
         return util.response_success({
             "api_key": "{}:{}".format(user_id, api_key),
-        })
+        }, status_code=201)
