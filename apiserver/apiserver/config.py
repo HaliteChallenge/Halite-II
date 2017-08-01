@@ -1,8 +1,10 @@
 from passlib.context import CryptContext
 
+# General coordinator settings
 COMPETITION_OPEN = True
 # Original PHP: "compState", "finalsPairing"
 COMPETITION_FINALS_PAIRING = False
+
 # Max number of games a bot version can error out in before being
 # stopped from playing
 MAX_ERRORS_PER_BOT = 50
@@ -11,20 +13,14 @@ MAX_ERROR_PERCENTAGE = 0.1
 # How many minutes old a compilation job must be to be considered stuck.
 COMPILATION_STUCK_THRESHOLD = 30
 
+# Flask settings
+# Max size of an upload, in bytes
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
+# Secret key for Flask session cookies
 FLASK_SECRET_KEY = ""
-
-DATABASE_PROJECT_ID = ""
-DATABASE_REGION = ""
-DATABASE_INSTANCE_NAME = ""
-DATABASE_URL = ""
-
-# OAuth
-OAUTH_GITHUB_CONSUMER_KEY = ""
-OAUTH_GITHUB_CONSUMER_SECRET = ""
-CORS_ORIGINS = ["http://lvh.me:4000"]
-SITE_URL = "http://35.185.45.87"
-API_URL = "http://35.190.3.178/v1/api"
+# Where to look for API keys
+API_KEY_PARAMETER = "api_key"
+API_KEY_HEADER = "X-Api-Key"
 
 # Google Cloud
 GCLOUD_PROJECT = 'TODO'
@@ -39,6 +35,24 @@ GCLOUD_REPLAY_BUCKETS = {
     1: 'TODO',
 }
 GCLOUD_ERROR_LOG_BUCKET = 'TODO'
+GCLOUD_DEPLOYED_ARTIFACTS_BUCKET = 'TODO'
+
+# The name of the worker source blob in the object storage bucket.
+WORKER_ARTIFACT_KEY = ""
+
+DATABASE_PROJECT_ID = ""
+DATABASE_REGION = ""
+DATABASE_INSTANCE_NAME = ""
+DATABASE_URL = ""
+
+# OAuth
+OAUTH_GITHUB_CONSUMER_KEY = ""
+OAUTH_GITHUB_CONSUMER_SECRET = ""
+
+# CORS setup
+CORS_ORIGINS = []
+SITE_URL = ""
+API_URL = ""
 
 # API Key authentication
 api_key_context = CryptContext(
@@ -53,6 +67,7 @@ DISCOURSE_URL = "https://forums.halite.io/sso"
 # SendGrid
 SENDGRID_API_KEY = ""
 SENDGRID_SANDBOX_MODE = True
+
 # Ranking Tiers
 TIER_0_NAME = "Diamond"
 TIER_0_PERCENT = 1/512

@@ -35,22 +35,34 @@ def check_api_key():
     """
     Check for an API key; if present, validate it and return the user record.
     """
-    if "api_key" in flask.request.args:
-        api_key = flask.request.args["api_key"]
-        if ":" not in api_key:
-            raise util.APIError(401, message="Invalid API key.")
+    api_key = None
 
-        user_id, api_key = api_key.split(":", 1)
-        user_id = int(user_id)
-        with model.engine.connect() as conn:
-            user = conn.execute(sqlalchemy.sql.select([
-                model.users.c.id.label("user_id"),
-                model.users.c.is_admin,
-                model.users.c.api_key_hash,
-            ]).where(model.users.c.id == user_id)).first()
+    if config.API_KEY_PARAMETER in flask.request.args:
+        api_key = flask.request.args[config.API_KEY_PARAMETER]
 
-            if user and config.api_key_context.verify(api_key, user["api_key_hash"]):
-                return user
+    if config.API_KEY_HEADER in flask.request.headers:
+        api_key = flask.request.headers[config.API_KEY_HEADER]
+
+    if api_key is None:
+        return None
+
+    if ":" not in api_key:
+        raise util.APIError(401, message="Invalid API key.")
+
+    user_id, api_key = api_key.split(":", 1)
+    user_id = int(user_id)
+    with model.engine.connect() as conn:
+        user = conn.execute(sqlalchemy.sql.select([
+            model.users.c.id.label("user_id"),
+            model.users.c.is_admin,
+            model.users.c.api_key_hash,
+        ]).where(model.users.c.id == user_id)).first()
+
+        if not user:
+            return None
+
+        if config.api_key_context.verify(api_key, user["api_key_hash"]):
+            return user
 
     return None
 
