@@ -19,8 +19,9 @@ MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
 # Secret key for Flask session cookies
 FLASK_SECRET_KEY = ""
 # Where to look for API keys
-API_KEY_PARAMETER = "api_key"
 API_KEY_HEADER = "X-Api-Key"
+# What session cookie to use
+SESSION_COOKIE = "user_id"
 
 # Google Cloud
 GCLOUD_PROJECT = 'TODO'

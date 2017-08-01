@@ -69,3 +69,12 @@ def tier_thresholds(total_users):
         result[tier] = num_players
 
     return result
+
+
+def response_success(more=None):
+    response = {
+        "status": "success",
+    }
+    if more is not None:
+        response.update(more)
+    return flask.jsonify(response)

@@ -6,20 +6,17 @@ import flask
 import sqlalchemy
 
 from .. import model, util
-from .. import response_success
-from ..util import cross_origin
 
-from .util import user_mismatch_error, requires_oauth_login, \
-    hackathon_status, requires_competition_open
+from . import util as api_util
 from .blueprint import web_api
 
 
 @web_api.route("/user/<int:intended_user>/hackathon", methods=["GET"])
-@cross_origin(methods=["GET", "POST"])
-@requires_oauth_login
+@util.cross_origin(methods=["GET", "POST"])
+@api_util.requires_login(accept_key=True)
 def get_user_hackathons(intended_user, *, user_id):
     if user_id != intended_user:
-        raise user_mismatch_error()
+        raise api_util.user_mismatch_error()
 
     record = []
     with model.engine.connect() as conn:
@@ -41,20 +38,20 @@ def get_user_hackathons(intended_user, *, user_id):
             record.append({
                 "hackathon_id": hackathon["id"],
                 "title": hackathon["title"],
-                "status": hackathon_status(hackathon["start_date"],
-                                           hackathon["end_date"]),
+                "status": api_util.hackathon_status(hackathon["start_date"],
+                                                    hackathon["end_date"]),
             })
 
     return flask.jsonify(record)
 
 
 @web_api.route("/user/<int:intended_user>/hackathon", methods=["POST"])
-@cross_origin(methods=["GET", "POST"])
-@requires_oauth_login
-@requires_competition_open
+@util.cross_origin(methods=["GET", "POST"])
+@api_util.requires_login(accept_key=False)
+@api_util.requires_competition_open
 def associate_user_hackathon(intended_user, *, user_id):
     if user_id != intended_user:
-        raise user_mismatch_error()
+        raise api_util.user_mismatch_error()
 
     verification_code = flask.request.form.get("verification_code")
     if not verification_code:
@@ -70,10 +67,12 @@ def associate_user_hackathon(intended_user, *, user_id):
         if not hackathon:
             raise util.APIError(
                 404,
-                message="Hackathon does not exist. Please check the verification code."
+                message="Hackathon does not exist. Please check the "
+                        "verification code. "
             )
 
-        status = hackathon_status(hackathon["start_date"], hackathon["end_date"])
+        status = api_util.hackathon_status(hackathon["start_date"],
+                                           hackathon["end_date"])
 
         if status == "closed":
             raise util.APIError(
@@ -88,7 +87,8 @@ def associate_user_hackathon(intended_user, *, user_id):
             if hackathon["organization_id"] != user["organization_id"]:
                 raise util.APIError(
                     400,
-                    message="Sorry, this hackathon is only open to members of a certain organization."
+                    message="Sorry, this hackathon is only open to members "
+                            "of a certain organization. "
                 )
 
         already_exists = conn.execute(
@@ -99,7 +99,7 @@ def associate_user_hackathon(intended_user, *, user_id):
         ).first()
 
         if already_exists:
-            return response_success({
+            return util.response_success({
                 "message": "You're already signed up for this hackathon!"
             })
 
@@ -110,4 +110,4 @@ def associate_user_hackathon(intended_user, *, user_id):
             )
         )
 
-    return response_success()
+    return util.response_success()

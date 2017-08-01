@@ -5,19 +5,18 @@ Leaderboard API endpoints - get/sort/filter the leaderboard
 import flask
 
 from .. import model, util
-from ..util import cross_origin
 
-from .util import get_offset_limit, get_sort_filter
+from . import util as api_util
 from .blueprint import web_api
 
 
 @web_api.route("/leaderboard")
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def leaderboard():
     result = []
-    offset, limit = get_offset_limit()
+    offset, limit = api_util.get_offset_limit()
 
-    where_clause, order_clause, _ = get_sort_filter({
+    where_clause, order_clause, _ = api_util.get_sort_filter({
         "user_id": model.ranked_bots_users.c.user_id,
         "username": model.ranked_bots_users.c.username,
         "level": model.ranked_bots_users.c.player_level,

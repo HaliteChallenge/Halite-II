@@ -10,14 +10,13 @@ import urllib.parse
 import flask
 
 from .. import config, model, util
-from .. import response_success
 
 from .blueprint import web_api
-from .util import requires_login
+from . import util as api_util
 
 
 @web_api.route("/login/discourse_sso")
-@requires_login
+@api_util.requires_login(accept_key=False)
 def discourse_sso(*, user_id):
     """
     Implements an SSO endpoint for Discourse forums, as described at

@@ -8,17 +8,16 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 
 from .. import model, util
-from ..util import cross_origin
 
-from .util import get_offset_limit, get_sort_filter, requires_login
+from . import util as api_util
 from .blueprint import web_api
 
 
 @web_api.route("/user/<int:intended_user>/match", methods=["GET"])
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def list_user_matches(intended_user):
-    offset, limit = get_offset_limit()
-    where_clause, order_clause, manual_sort = get_sort_filter({
+    offset, limit = api_util.get_offset_limit()
+    where_clause, order_clause, manual_sort = api_util.get_sort_filter({
         "game_id": model.games.c.id,
         "time_played": model.games.c.time_played,
         # TODO: filter by participants
@@ -74,7 +73,7 @@ def list_user_matches(intended_user):
 
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>", methods=["GET"])
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def get_user_match(intended_user, match_id):
     with model.engine.connect() as conn:
         query = conn.execute(sqlalchemy.sql.select([
@@ -119,7 +118,7 @@ def get_user_match(intended_user, match_id):
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>/replay",
                methods=["GET"])
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def get_match_replay(intended_user, match_id):
     with model.engine.connect() as conn:
         match = conn.execute(sqlalchemy.sql.select([
@@ -148,7 +147,7 @@ def get_match_replay(intended_user, match_id):
 
 @web_api.route("/user/<int:intended_user>/match/<int:match_id>/error_log",
                methods=["GET"])
-@requires_login
+@api_util.requires_login(accept_key=True)
 def get_match_error_log(intended_user, match_id, *, user_id):
     """
     Serve the error log for a user's bot in a particular match.

@@ -9,17 +9,14 @@ import sqlalchemy
 import google.cloud.storage as gcloud_storage
 import google.cloud.exceptions as gcloud_exceptions
 
-from .. import config, model, util
-from .. import response_success
-from ..util import cross_origin
+from .. import model, util
 
-from .util import user_mismatch_error, requires_login, requires_association, \
-    requires_competition_open, requires_admin
+from . import util as api_util
 from .blueprint import web_api
 
 
 @web_api.route("/user/<int:user_id>/bot", methods=["GET"])
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def list_user_bots(user_id):
     result = []
     with model.engine.connect() as conn:
@@ -56,7 +53,7 @@ def list_user_bots(user_id):
 
 
 @web_api.route("/user/<int:user_id>/bot/<int:bot_id>", methods=["GET"])
-@cross_origin(methods=["GET", "PUT"])
+@util.cross_origin(methods=["GET", "PUT"])
 def get_user_bot(user_id, bot_id):
     with model.engine.connect() as conn:
         bot = conn.execute(sqlalchemy.sql.select([
@@ -113,19 +110,20 @@ def validate_bot_submission():
 
 
 @web_api.route("/user/<int:intended_user>/bot", methods=["POST"])
-@cross_origin(methods=["POST"])
-@requires_login
-@requires_association
-@requires_competition_open
+@util.cross_origin(methods=["POST"])
+@api_util.requires_login(accept_key=True, association=True)
+@api_util.requires_competition_open
 def create_user_bot(intended_user, *, user_id):
     if user_id != intended_user:
-        raise user_mismatch_error(
+        raise api_util.user_mismatch_error(
             message="Cannot create bot for another user.")
 
     _ = validate_bot_submission()
 
     with model.engine.connect() as conn:
-        if conn.execute(model.bots.select(model.bots.c.user_id == user_id)).first():
+        current_bot = conn.execute(
+            model.bots.select(model.bots.c.user_id == user_id)).first()
+        if current_bot:
             raise util.APIError(
                 400, message="Only one bot allowed per user.")
 
@@ -136,20 +134,19 @@ def create_user_bot(intended_user, *, user_id):
         ))
 
     store_user_bot(intended_user=intended_user, user_id=user_id, bot_id=0)
-    return response_success({
+    return util.response_success({
         "bot_id": 0,
     })
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["PUT"])
-@cross_origin(methods=["GET", "PUT"])
-@requires_login
-@requires_association
-@requires_competition_open
+@util.cross_origin(methods=["GET", "PUT"])
+@api_util.requires_login(accept_key=True, association=True)
+@api_util.requires_competition_open
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
     if user_id != intended_user:
-        raise user_mismatch_error(
+        raise api_util.user_mismatch_error(
             message="Cannot upload bot for another user.")
 
     if bot_id != 0:
@@ -186,15 +183,15 @@ def store_user_bot(user_id, intended_user, bot_id):
 
     # TODO: Email the user
 
-    return response_success()
+    return util.response_success()
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["DELETE"])
-@requires_admin()
-@requires_competition_open
+@api_util.requires_login(accept_key=True, admin=True)
+@api_util.requires_competition_open
 def delete_user_bot(intended_user, bot_id, *, user_id):
     if user_id != intended_user:
-        raise user_mismatch_error(
+        raise api_util.user_mismatch_error(
             message="Cannot delete bot for another user.")
 
     with model.engine.connect() as conn:
@@ -211,4 +208,4 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
             except gcloud_exceptions.NotFound:
                 pass
 
-        return response_success()
+        return util.response_success()

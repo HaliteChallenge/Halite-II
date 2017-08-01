@@ -9,11 +9,8 @@ import flask
 import sqlalchemy
 
 from .. import model, util
-from .. import response_success
-from ..util import cross_origin
 
-from .util import get_offset_limit, get_sort_filter, hackathon_status, \
-    is_user_admin, requires_admin, requires_oauth_login
+from . import util as api_util
 from .blueprint import web_api
 
 
@@ -23,7 +20,7 @@ def can_view_hackathon(user_id, hackathon_id, conn):
         (model.hackathon_participants.c.hackathon_id == hackathon_id)
     )).first()
 
-    is_admin = is_user_admin(user_id, conn=conn)
+    is_admin = api_util.is_user_admin(user_id, conn=conn)
 
     return is_user_joined or is_admin
 
@@ -46,10 +43,10 @@ hackathon_query = sqlalchemy.sql.select([
 
 
 @web_api.route("/hackathon", methods=["GET"])
-@requires_admin(accept_key=True)
-def list_hackathons(*, admin_id):
+@api_util.requires_login(accept_key=True, admin=True)
+def list_hackathons(*, user_id):
     result = []
-    offset, limit = get_offset_limit()
+    offset, limit = api_util.get_offset_limit()
 
     with model.engine.connect() as conn:
         hackathons = conn.execute(
@@ -60,8 +57,8 @@ def list_hackathons(*, admin_id):
                 "hackathon_id": hackathon["id"],
                 "title": hackathon["title"],
                 "description": hackathon["description"],
-                "status": hackathon_status(hackathon["start_date"],
-                                           hackathon["end_date"]),
+                "status": api_util.hackathon_status(hackathon["start_date"],
+                                                    hackathon["end_date"]),
                 "start_date": hackathon["start_date"],
                 "end_date": hackathon["end_date"],
                 "organization_id": hackathon["organization_id"],
@@ -74,8 +71,8 @@ def list_hackathons(*, admin_id):
 
 
 @web_api.route("/hackathon", methods=["POST"])
-@requires_admin(accept_key=True)
-def create_hackathon(*, admin_id):
+@api_util.requires_login(accept_key=True, admin=True)
+def create_hackathon(*, user_id):
     title = flask.request.form["title"]
     description = flask.request.form["description"]
     start_date = arrow.get(flask.request.form["start_date"]).datetime
@@ -118,21 +115,22 @@ def create_hackathon(*, admin_id):
             organization_id=organization_id,
         )).inserted_primary_key[0]
 
-        return response_success({
+        return util.response_success({
             "hackathon_id": hackathon_id,
             "verification_code": verification_code,
         })
 
 
 @web_api.route("/hackathon/<int:hackathon_id>", methods=["GET"])
-@cross_origin(methods=["GET", "PUT"])
-@requires_oauth_login
+@util.cross_origin(methods=["GET", "PUT"])
+@api_util.requires_login(accept_key=True)
 def get_hackathon(hackathon_id, *, user_id):
     with model.engine.connect() as conn:
         hackathon = conn.execute(hackathon_query.where(
             model.hackathons.c.id == hackathon_id)).first()
 
-        if not hackathon or not can_view_hackathon(user_id, hackathon["id"], conn):
+        if (not hackathon or
+                not can_view_hackathon(user_id, hackathon["id"], conn)):
             raise util.APIError(404)
 
         hackathon_users = conn.execute(
@@ -143,8 +141,8 @@ def get_hackathon(hackathon_id, *, user_id):
             "hackathon_id": hackathon["id"],
             "title": hackathon["title"],
             "description": hackathon["description"],
-            "status": hackathon_status(hackathon["start_date"],
-                                       hackathon["end_date"]),
+            "status": api_util.hackathon_status(hackathon["start_date"],
+                                                hackathon["end_date"]),
             "start_date": hackathon["start_date"],
             "end_date": hackathon["end_date"],
             "organization_id": hackathon["organization_id"],
@@ -154,9 +152,9 @@ def get_hackathon(hackathon_id, *, user_id):
 
 
 @web_api.route("/hackathon/<int:hackathon_id>", methods=["PUT"])
-@cross_origin(methods=["GET", "PUT"])
-@requires_admin(accept_key=True)
-def update_hackathon(hackathon_id, *, admin_id):
+@util.cross_origin(methods=["GET", "PUT"])
+@api_util.requires_login(admin=True, accept_key=True)
+def update_hackathon(hackathon_id, *, user_id):
     values = {}
 
     if "title" in flask.request.form:
@@ -182,7 +180,8 @@ def update_hackathon(hackathon_id, *, admin_id):
         if "organization_id" in values:
             organization_id = int(values["organization_id"])
             organization = conn.execute(
-                model.organizations.select(model.organizations.c.id == organization_id)
+                model.organizations.select(model.organizations.c.id ==
+                                           organization_id)
             ).first()
 
             if not organization:
@@ -196,15 +195,15 @@ def update_hackathon(hackathon_id, *, admin_id):
                 model.hackathons.c.id == hackathon_id
             ))
 
-        return response_success({
+        return util.response_success({
             "hackathon_id": hackathon_id,
             "updated_values": values,
         })
 
 
 @web_api.route("/hackathon/<int:hackathon_id>/leaderboard", methods=["GET"])
-@cross_origin(methods=["GET"])
-@requires_oauth_login
+@util.cross_origin(methods=["GET"])
+@api_util.requires_login(accept_key=True)
 def get_hackathon_leaderboard(hackathon_id, *, user_id):
     with model.engine.connect() as conn:
         if not can_view_hackathon(user_id, hackathon_id, conn):
@@ -213,9 +212,9 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
         table = model.hackathon_ranked_bots_users_query(hackathon_id)
 
         result = []
-        offset, limit = get_offset_limit()
+        offset, limit = api_util.get_offset_limit()
 
-        where_clause, order_clause, _ = get_sort_filter({
+        where_clause, order_clause, _ = api_util.get_sort_filter({
             "user_id": table.c.user_id,
             "username": table.c.username,
             "level": table.c.player_level,
@@ -233,8 +232,8 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
 
         query = conn.execute(
             table.select()
-                .where(where_clause).order_by(*order_clause)
-                .offset(offset).limit(limit).reduce_columns())
+            .where(where_clause).order_by(*order_clause)
+            .offset(offset).limit(limit).reduce_columns())
 
         for row in query.fetchall():
             user = {

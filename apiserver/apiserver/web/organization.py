@@ -6,19 +6,17 @@ import flask
 import sqlalchemy
 
 from .. import model, util
-from .. import response_success
-from ..util import cross_origin
 
-from .util import get_offset_limit, get_sort_filter, requires_admin
+from . import util as web_util
 from .blueprint import web_api
 
 
 @web_api.route("/organization")
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def list_organizations():
     result = []
-    offset, limit = get_offset_limit()
-    where_clause, order_clause, _ = get_sort_filter({
+    offset, limit = web_util.get_offset_limit()
+    where_clause, order_clause, _ = web_util.get_sort_filter({
         "organization_id": model.organizations.c.id,
         "name": model.organizations.c.organization_name,
         "type": model.organizations.c.kind,
@@ -42,7 +40,7 @@ def list_organizations():
 
 
 @web_api.route("/organization/<int:org_id>", methods=["GET"])
-@cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET"])
 def get_organization(org_id):
     with model.engine.connect() as conn:
         org = conn.execute(model.organizations.select().where(
@@ -60,8 +58,8 @@ def get_organization(org_id):
 
 
 @web_api.route("/organization", methods=["POST"])
-@requires_admin(accept_key=True)
-def create_organization(*, admin_id):
+@web_util.requires_login(accept_key=True, admin=True)
+def create_organization(*, user_id):
     org_body = flask.request.get_json()
     if "name" not in org_body:
         raise util.APIError(400, message="Organization must be named.")
@@ -75,14 +73,14 @@ def create_organization(*, admin_id):
             organization_kind=org_body["type"],
         )).inserted_primary_key[0]
 
-    return response_success({
+    return util.response_success({
         "organization_id": org_id[0],
     })
 
 
 @web_api.route("/organization/<int:org_id>", methods=["PUT"])
-@requires_admin(accept_key=True)
-def update_organization(org_id, *, admin_id):
+@web_util.requires_login(accept_key=True, admin=True)
+def update_organization(org_id, *, user_id):
     fields = flask.request.get_json()
     columns = {
         "name": model.organizations.c.organization_name,
@@ -98,12 +96,12 @@ def update_organization(org_id, *, admin_id):
             model.organizations.c.id == org_id
         ).values(**fields))
 
-    return response_success()
+    return util.response_success()
 
 
 @web_api.route("/organization/<int:org_id>", methods=["DELETE"])
-@requires_admin(accept_key=True)
-def delete_organization(org_id, *, admin_id):
+@web_util.requires_login(accept_key=True, admin=True)
+def delete_organization(org_id, *, user_id):
     with model.engine.connect() as conn:
         with conn.begin() as transaction:
             count = conn.execute(sqlalchemy.sql.select([
@@ -120,4 +118,4 @@ def delete_organization(org_id, *, admin_id):
                 model.organizations.c.id == org_id
             ))
 
-    return response_success()
+    return util.response_success()

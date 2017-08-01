@@ -8,12 +8,8 @@ import flask
 import sqlalchemy
 
 from .. import config, model, notify, util
-from .. import response_success
-from ..util import cross_origin
 
-from .util import get_offset_limit, get_sort_filter, \
-    validate_user_level, validate_country, requires_association, \
-    optional_login, user_mismatch_error, requires_admin, requires_oauth_login
+from . import util as web_util
 from .blueprint import web_api
 
 
@@ -47,12 +43,12 @@ def make_user_record(row, *, logged_in, total_users=None):
 
 
 @web_api.route("/user")
-@cross_origin(methods=["GET", "POST"])
+@util.cross_origin(methods=["GET", "POST"])
 def list_users():
     result = []
-    offset, limit = get_offset_limit()
+    offset, limit = web_util.get_offset_limit()
 
-    where_clause, order_clause, _ = get_sort_filter({
+    where_clause, order_clause, _ = web_util.get_sort_filter({
         "user_id": model.all_users.c.user_id,
         "username": model.all_users.c.username,
         "level": model.all_users.c.player_level,
@@ -79,8 +75,8 @@ def list_users():
 
 
 @web_api.route("/user", methods=["POST"])
-@cross_origin(methods=["GET", "POST"])
-@requires_oauth_login
+@util.cross_origin(methods=["GET", "POST"])
+@web_util.requires_login(accept_key=False)
 def create_user(*, user_id):
     """
     Set up a user created from an OAuth authorization flow.
@@ -113,7 +109,7 @@ def create_user(*, user_id):
     values = {}
 
     # Perform validation on given values
-    if "level" in body and not validate_user_level(body["level"]):
+    if "level" in body and not web_util.validate_user_level(body["level"]):
         raise util.APIError(400, message="Invalid user level.")
 
     if email is not None and "@" not in email:
@@ -128,7 +124,7 @@ def create_user(*, user_id):
                 400,
                 message="Must provide country code if country subdivision code is given.")
 
-        if not validate_country(country_code, subdivision_code):
+        if not web_util.validate_country(country_code, subdivision_code):
             raise util.APIError(
                 400, message="Invalid country/country subdivision code.")
 
@@ -218,14 +214,14 @@ def create_user(*, user_id):
             model.users.c.id == user_id
         ).values(**values))
 
-    return response_success({
+    return util.response_success({
         "message": message,
     })
 
 
 @web_api.route("/user/<int:intended_user>", methods=["GET"])
-@cross_origin(methods=["GET"])
-@optional_login
+@util.cross_origin(methods=["GET"])
+@web_util.requires_login(optional=True, accept_key=True)
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
         query = model.all_users.select(
@@ -245,7 +241,7 @@ def get_user(intended_user, *, user_id):
 
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
-@cross_origin(methods=["POST"])
+@util.cross_origin(methods=["POST"])
 def verify_user_email(user_id):
     verification_code = flask.request.form.get("verification_code")
     if not verification_code:
@@ -268,11 +264,11 @@ def verify_user_email(user_id):
                 is_email_good=1,
                 verification_code="",
             ))
-            return response_success({
+            return util.response_success({
                 "message": "Email verified."
             })
         elif row["is_email_good"]:
-            return response_success({
+            return util.response_success({
                 "message": "Email already verified.",
             })
 
@@ -280,10 +276,10 @@ def verify_user_email(user_id):
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
-@requires_oauth_login
+@web_util.requires_login(accept_key=False)
 def update_user(intended_user_id, *, user_id):
     if user_id != intended_user_id:
-        raise user_mismatch_error()
+        raise web_util.user_mismatch_error()
 
     fields = flask.request.get_json()
     columns = {
@@ -300,17 +296,19 @@ def update_user(intended_user_id, *, user_id):
 
         update[columns[key]] = fields[key]
 
-    if "player_level" in update and not validate_user_level(update["player_level"]):
+    if ("player_level" in update and
+            not web_util.validate_user_level(update["player_level"])):
         raise util.APIError(400, message="Invalid player level.")
 
     if "country_code" in update or "country_subdivision_code" in update:
         with model.engine.connect() as conn:
-            user = conn.execute(model.users.select(model.users.c.id == user_id)).first()
+            user = conn.execute(
+                model.users.select(model.users.c.id == user_id)).first()
         country_code = update.get("country_code", user["country_code"])
         subdivision_code = update.get("country_subdivision_code",
                                       user["country_subdivision_code"])
 
-        if not validate_country(country_code, subdivision_code):
+        if not web_util.validate_country(country_code, subdivision_code):
             raise util.APIError(
                 400, message="Invalid country/country subdivision code.")
 
@@ -319,11 +317,11 @@ def update_user(intended_user_id, *, user_id):
             model.users.c.id == user_id
         ).values(**update))
 
-    return response_success()
+    return util.response_success()
 
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
-@requires_admin(accept_key=True)
+@web_util.requires_login(accept_key=True, admin=True)
 def delete_user(intended_user_id, *, admin_id):
     # TODO: what happens to their games?
     with model.engine.connect() as conn:
@@ -333,12 +331,11 @@ def delete_user(intended_user_id, *, admin_id):
 
 @web_api.route("/api_key", methods=["POST"])
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])
-@cross_origin(methods=["POST"])
-@requires_oauth_login
-@requires_association
+@util.cross_origin(methods=["POST"])
+@web_util.requires_login(accept_key=False, association=True)
 def reset_api_key(intended_user=None, *, user_id):
     if user_id != intended_user and intended_user is not None:
-        raise user_mismatch_error(
+        raise web_util.user_mismatch_error(
             message="Cannot reset another user's API key.")
 
     with model.engine.connect() as conn:
@@ -350,6 +347,6 @@ def reset_api_key(intended_user=None, *, user_id):
             api_key_hash=config.api_key_context.hash(api_key),
         ))
 
-        return response_success({
+        return util.response_success({
             "api_key": "{}:{}".format(user_id, api_key),
         })

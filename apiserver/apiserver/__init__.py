@@ -12,17 +12,6 @@ app.config["MAX_CONTENT_LENGTH"] = config.MAX_BOT_UPLOAD_SIZE
 app.secret_key = config.FLASK_SECRET_KEY
 app.errorhandler(util.APIError)(util.handle_api_error)
 
-# Helpers
-
-
-def response_success(more=None):
-    response = {
-        "status": "success",
-    }
-    if more is not None:
-        response.update(more)
-    return flask.jsonify(response)
-
 
 @app.route('/health_check')
 def health_check():
