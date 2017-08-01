@@ -31,8 +31,10 @@ GCLOUD_COMPILATION_BUCKET = 'TODO'
 GCLOUD_BOT_BUCKET = 'TODO'
 # Replays are saved in different buckets based on player level
 GCLOUD_REPLAY_BUCKETS = {
-    0: 'TODO',
-    1: 'TODO',
+    # 0 is the normal bucket
+    0: 'todo',
+    # 1 is the bucket for gold and above players
+    1: 'todo',
 }
 GCLOUD_ERROR_LOG_BUCKET = 'TODO'
 GCLOUD_DEPLOYED_ARTIFACTS_BUCKET = 'TODO'

@@ -173,6 +173,19 @@ def requires_association(view):
     return decorated_view
 
 
+def requires_competition_open(view):
+    """Indicates that an endpoint requires the competition is running."""
+    @functools.wraps(view)
+    def decorated_view(*args, **kwargs):
+        if not config.COMPETITION_OPEN:
+            raise util.APIError(
+                403,
+                message="Sorry, the competition has ended. Thanks for playing!")
+        return view(*args, **kwargs)
+
+    return decorated_view
+
+
 def is_user_admin(user_id, *, conn):
     user = conn.execute(model.users.select(model.users.c.id == user_id)).first()
     return user and user["is_admin"]

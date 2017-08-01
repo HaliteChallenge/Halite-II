@@ -326,12 +326,9 @@ def update_user(intended_user_id, *, user_id):
 @requires_admin(accept_key=True)
 def delete_user(intended_user_id, *, admin_id):
     # TODO: what happens to their games?
-    if user_id != intended_user_id:
-        raise user_mismatch_error()
-
     with model.engine.connect() as conn:
         conn.execute(model.users.delete().where(
-            model.users.c.id == user_id))
+            model.users.c.id == intended_user_id))
 
 
 @web_api.route("/api_key", methods=["POST"])

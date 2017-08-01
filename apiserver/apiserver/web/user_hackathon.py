@@ -9,7 +9,8 @@ from .. import model, util
 from .. import response_success
 from ..util import cross_origin
 
-from .util import user_mismatch_error, requires_oauth_login, hackathon_status
+from .util import user_mismatch_error, requires_oauth_login, \
+    hackathon_status, requires_competition_open
 from .blueprint import web_api
 
 
@@ -50,6 +51,7 @@ def get_user_hackathons(intended_user, *, user_id):
 @web_api.route("/user/<int:intended_user>/hackathon", methods=["POST"])
 @cross_origin(methods=["GET", "POST"])
 @requires_oauth_login
+@requires_competition_open
 def associate_user_hackathon(intended_user, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error()

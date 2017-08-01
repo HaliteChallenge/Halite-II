@@ -13,7 +13,8 @@ from .. import config, model, util
 from .. import response_success
 from ..util import cross_origin
 
-from .util import user_mismatch_error, requires_login, requires_association
+from .util import user_mismatch_error, requires_login, requires_association, \
+    requires_competition_open, requires_admin
 from .blueprint import web_api
 
 
@@ -93,11 +94,6 @@ def get_user_bot(user_id, bot_id):
 
 def validate_bot_submission():
     """Validate the uploaded bot, returning the bot file if so."""
-    if not config.COMPETITION_OPEN:
-        raise util.APIError(
-            400, message="Sorry, but bot submissions are closed."
-        )
-
     if "botFile" not in flask.request.files:
         raise util.APIError(400, message="Bot file not provided (must "
                                          "provide as botFile).")
@@ -120,6 +116,7 @@ def validate_bot_submission():
 @cross_origin(methods=["POST"])
 @requires_login
 @requires_association
+@requires_competition_open
 def create_user_bot(intended_user, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
@@ -148,6 +145,7 @@ def create_user_bot(intended_user, *, user_id):
 @cross_origin(methods=["GET", "PUT"])
 @requires_login
 @requires_association
+@requires_competition_open
 def store_user_bot(user_id, intended_user, bot_id):
     """Store an uploaded bot in object storage."""
     if user_id != intended_user:
@@ -192,8 +190,8 @@ def store_user_bot(user_id, intended_user, bot_id):
 
 
 @web_api.route("/user/<int:intended_user>/bot/<int:bot_id>", methods=["DELETE"])
-@requires_login
-@requires_association
+@requires_admin()
+@requires_competition_open
 def delete_user_bot(intended_user, bot_id, *, user_id):
     if user_id != intended_user:
         raise user_mismatch_error(
