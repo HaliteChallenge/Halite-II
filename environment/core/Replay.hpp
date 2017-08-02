@@ -13,7 +13,7 @@
 #include "hlt.hpp"
 #include "GameEvent.hpp"
 #include "Statistics.hpp"
-#include "mapgen/Generator.h"
+#include "mapgen/Generator.hpp"
 
 struct Replay {
     GameStatistics& stats;

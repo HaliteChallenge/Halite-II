@@ -25,7 +25,7 @@
 #include "hlt.hpp"
 #include "GameEvent.hpp"
 #include "Statistics.hpp"
-#include "./mapgen/Generator.h"
+#include "mapgen/Generator.hpp"
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;

@@ -1,11 +1,7 @@
-//
-// Created by David Li on 6/15/17.
-//
-
 #ifndef HALITE_SOLARSYSTEM_H
 #define HALITE_SOLARSYSTEM_H
 
-#include "Generator.h"
+#include "Generator.hpp"
 
 namespace mapgen {
     constexpr auto MAX_TOTAL_ATTEMPTS = 50000;

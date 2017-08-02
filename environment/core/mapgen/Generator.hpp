@@ -35,6 +35,14 @@ namespace mapgen {
         }
     };
 
+    struct Zone {
+        hlt::Location location;
+        double radius;
+
+        Zone(hlt::Location _location, double _radius)
+            : location(_location), radius(_radius) {}
+    };
+
     /**
      * Base class for Halite map generators.
      */

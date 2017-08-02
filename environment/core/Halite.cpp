@@ -7,7 +7,8 @@
 #include <ostream>
 #include <ctime>
 
-#include "mapgen/SolarSystem.h"
+#include "mapgen/AsteroidCluster.hpp"
+#include "mapgen/SolarSystem.hpp"
 #include "SimulationEvent.hpp"
 #include "Replay.hpp"
 

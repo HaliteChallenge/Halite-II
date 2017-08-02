@@ -2,7 +2,7 @@
 // Created by David Li on 6/15/17.
 //
 
-#include "Generator.h"
+#include "Generator.hpp"
 
 namespace mapgen {
     Generator::Generator(unsigned int _seed) {

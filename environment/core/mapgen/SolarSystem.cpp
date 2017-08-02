@@ -1,8 +1,4 @@
-//
-// Created by David Li on 6/15/17.
-//
-
-#include "SolarSystem.h"
+#include "SolarSystem.hpp"
 
 #include <functional>
 
@@ -14,14 +10,6 @@
 namespace mapgen {
     SolarSystem::SolarSystem(unsigned int _seed)
         : Generator(_seed) {}
-
-    struct Zone {
-        hlt::Location location;
-        double radius;
-
-        Zone(hlt::Location _location, double _radius)
-            : location(_location), radius(_radius) {}
-    };
 
     auto SolarSystem::generate(
         hlt::Map& map,
