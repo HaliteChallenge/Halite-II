@@ -1,7 +1,5 @@
 const PIXI = require("pixi.js");
 const $ = require("jquery");
-const seedrandom = require("seedrandom");
-const alea = seedrandom.alea;
 const extraFilters = require("pixi-extra-filters");
 const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
@@ -13,16 +11,11 @@ import * as keyboard from "./keyboardControls";
 
 import * as assets from "./assets";
 
-
-class FrameAnimation {
-    constructor(frames, delayTime, update, draw, finish) {
-        this.frames = frames;
-        this.delayFrames = delayTime;
-        this.update = update;
-        this.draw = draw;
-        this.finish = finish;
-    }
-}
+import {
+    FrameAnimation,
+    PlanetExplosionFrameAnimation,
+    ShipExplosionFrameAnimation,
+} from "./animation";
 
 export class HaliteVisualizer {
     constructor(replay) {
@@ -55,10 +48,14 @@ export class HaliteVisualizer {
                 backgroundColor: 0x15223F,
             }
         );
+        // Seems to help with pixelation when downscaling
+        // Also: make sure textures have power-of-2 dimensions
+        this.application.renderer.roundPixels = true;
 
         this.scale = assets.VISUALIZER_SIZE / Math.max(replay.width, replay.height);
-        this.starfield = PIXI.Sprite.fromImage(
+        this.starfield = PIXI.Sprite.from(
             assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
+        this.starfield.width = assets.VISUALIZER_SIZE;
 
         this.planetContainer = new PIXI.Container();
         this.shipContainer = new PIXI.Container();
@@ -74,7 +71,7 @@ export class HaliteVisualizer {
         for (let i = 0; i < this.replay.planets.length; i++) {
             const planetBase = this.replay.planets[i];
             const planetSprite =
-                PIXI.Sprite.fromImage(assets.PLANET_IMAGES[i % assets.PLANET_IMAGES.length]);
+                PIXI.Sprite.from(assets.PLANET_IMAGES[i % assets.PLANET_IMAGES.length]);
             const r = planetBase.r * assets.CELL_SIZE * this.scale;
             planetSprite.width = planetSprite.height = 2 * r;
             planetSprite.anchor.x = 0.5;
@@ -361,45 +358,20 @@ export class HaliteVisualizer {
                 // How much to delay (in terms of ticks) before
                 // actually playing the event
                 const delayTime = event.time ? event.time / (this.timeStep * this.playSpeed) : 0;
+                const cellSize = assets.CELL_SIZE * this.scale;
 
                 if (event.event === "destroyed") {
-                    let draw = (frame) => {
-                        const width = assets.CELL_SIZE * this.scale;
-                        const height = assets.CELL_SIZE * this.scale;
-
-                        const x = width * event.x;
-                        const y = width * event.y;
-
-                        this.lights.beginFill(0xFFA500, frame / 24);
-                        this.lights.lineStyle(0);
-                        this.lights.drawRect(x, y, width, height);
-                        this.lights.endFill();
-                    };
-
                     if (event.entity.type === "planet") {
-                        let r = event.radius;
-                        draw = (frame) => {
-                            const side = assets.CELL_SIZE * this.scale;
-                            this.overlay.lineStyle(0);
-                            for (let dx = -r; dx <= r; dx++) {
-                                for (let dy = -r; dy <= r; dy++) {
-                                    if (dx*dx + dy*dy <= r*r) {
-                                        const distance = (48 - frame) / 24;
-                                        const x = Math.floor(side * (distance * dx + event.x));
-                                        const y = Math.floor(side * (distance * dy + event.y));
-
-                                        this.lights.beginFill(0xFFA500, (frame / 48) * (1 / (1 + distance + 1 / (1 + dx*dx + dy*dy))));
-                                        this.lights.drawRect(x, y, side, side);
-                                        this.lights.endFill();
-                                    }
-                                }
-                            }
-                        };
-
+                        this.animationQueue.push(
+                            new PlanetExplosionFrameAnimation(
+                                event, delayTime, cellSize, this.lights));
                         this.deathFlags["planets"][event.entity.id] = event.time;
                     }
                     else if (event.entity.type === "ship") {
                         // Use default draw function
+                        this.animationQueue.push(
+                            new ShipExplosionFrameAnimation(
+                                event, delayTime, cellSize, this.lights));
                         if (typeof this.deathFlags[event.entity.owner] === "undefined") {
                             this.deathFlags[event.entity.owner] = {};
                         }
@@ -409,10 +381,6 @@ export class HaliteVisualizer {
                         console.log("Unknown entity destroyed");
                         console.log(event);
                     }
-
-                    this.animationQueue.push(new FrameAnimation(
-                        48, delayTime, () => {}, draw, () => {}
-                    ));
                 }
                 else if (event.event === "attack") {
                     const side = assets.CELL_SIZE * this.scale;

@@ -1,3 +1,5 @@
+const PIXI = require("pixi.js");
+
 export let ASSET_ROOT = "dist/";
 
 export const VISUALIZER_SIZE = 720;
@@ -13,6 +15,9 @@ export let HALO_IMAGE = "";
 export let EXHAUST_IMAGE = "";
 export let ATTACK_IMAGE = "";
 
+export let PLANET_SHEET = null;
+export let SHIP_EXPLOSION_SHEET = null;
+export let SHIP_SHEET = null;
 
 export function setAssetRoot(path) {
     ASSET_ROOT = path;
