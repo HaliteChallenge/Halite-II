@@ -102,6 +102,8 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
     hlt::Entity& entity = game_map.get_entity(id);
     if (!entity.is_alive()) return;
 
+    entity.kill();
+
     auto location = entity.location;
     if (id.type == hlt::EntityType::ShipEntity) {
         // Make sure destruction location reflects the entity position at time
