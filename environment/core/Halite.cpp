@@ -268,7 +268,9 @@ auto Halite::process_production() -> void {
 
     const auto infinite_resources = hlt::GameConstants::get().INFINITE_RESOURCES;
 
-    for (auto& planet : game_map.planets) {
+    for (hlt::EntityIndex planet_idx = 0;
+         planet_idx < game_map.planets.size(); planet_idx++) {
+        auto& planet = game_map.planets[planet_idx];
         if (!planet.is_alive() || !planet.owned) continue;
 
         const auto num_docked_ships = planet.num_docked_ships(game_map);
@@ -334,7 +336,7 @@ auto Halite::process_production() -> void {
                 total_ship_count[planet.owner]++;
                 const auto id = hlt::EntityId::for_ship(planet.owner, ship_idx);
                 full_frame_events.back().emplace_back(new SpawnEvent(
-                    id,
+                    id, hlt::EntityId::for_planet(planet_idx),
                     best_location.first, planet.location));
 
                 collision_map.add(best_location.first, game_map.get_ship(id).radius, id);

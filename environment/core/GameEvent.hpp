@@ -76,17 +76,20 @@ struct AttackEvent : Event {
 
 struct SpawnEvent : Event {
     hlt::EntityId id;
+    hlt::EntityId planet;
     hlt::Location location;
     hlt::Location planet_location;
 
-    SpawnEvent(hlt::EntityId id_, hlt::Location location_,
-               hlt::Location planet_location_)
-        : id(id_), location(location_), planet_location(planet_location_) {}
+    SpawnEvent(hlt::EntityId id_, hlt::EntityId planet_,
+               hlt::Location location_, hlt::Location planet_location_)
+        : id(id_), planet(planet_),
+          location(location_), planet_location(planet_location_) {}
 
     auto serialize() -> nlohmann::json override {
         return nlohmann::json{
             { "event", "spawned" },
             { "entity", id },
+            { "planet", planet },
             { "x", location.pos_x },
             { "y", location.pos_y },
             { "planet_x", planet_location.pos_x },
