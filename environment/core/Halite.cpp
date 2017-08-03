@@ -296,7 +296,7 @@ auto Halite::process_production() -> void {
                 game_map.map_width / 2.0, game_map.map_height / 2.0};
 
             const auto max_delta = constants.SPAWN_RADIUS;
-            const auto open_radius = constants.SHIP_RADIUS * 2;
+            const auto open_radius = constants.SHIP_RADIUS * 3;
             for (int dx = -max_delta; dx <= max_delta; dx++) {
                 for (int dy = -max_delta; dy <= max_delta; dy++) {
                     double offset_angle = std::atan2(dy, dx);
