@@ -9,8 +9,8 @@ from .. import config, model, util
 def rand_map_size():
     # Pick map size. Duplicate entries are used to weight the
     # probability of a particular size
-    map_sizes = [96, 96, 128, 128, 128, 160, 160, 160, 160,
-                 192, 192, 192, 256]
+    map_sizes = [160, 160, 192, 192, 192, 256, 256, 256, 256,
+                 384, 384, 384]
     map_width = random.choice(map_sizes)
     map_height = random.choice(map_sizes)
 
