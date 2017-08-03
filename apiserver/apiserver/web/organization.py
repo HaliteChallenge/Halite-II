@@ -1,6 +1,7 @@
 """
 Organization API endpoints - create/update/delete/list organizations
 """
+import uuid
 
 import flask
 import sqlalchemy
@@ -67,15 +68,23 @@ def create_organization(*, user_id):
     if "type" not in org_body:
         raise util.APIError(400, message="Organization must have a type.")
 
+    verification_code = None
+    if org_body.get("require_code", False):
+        verification_code = uuid.uuid4().hex
+
     with model.engine.connect() as conn:
         org_id = conn.execute(model.organizations.insert().values(
             organization_name=org_body["name"],
             organization_kind=org_body["type"],
+            verification_code=verification_code,
         )).inserted_primary_key[0]
 
-    return util.response_success({
+    response = {
         "organization_id": org_id[0],
-    }, status_code=201)
+    }
+    if verification_code:
+        response["verification_code"] = verification_code
+    return util.response_success(response, status_code=201)
 
 
 @web_api.route("/organization/<int:org_id>", methods=["PUT"])

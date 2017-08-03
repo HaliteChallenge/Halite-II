@@ -103,6 +103,7 @@ def create_user(*, user_id):
     org_id = body.get("organization_id")
     email = body.get("email")
     level = body.get("level", model.users.c.player_level)
+    provided_code = body.get("verification_code", None)
     verification_code = uuid.uuid4().hex
 
     # Values to insert into the database
@@ -173,11 +174,25 @@ def create_user(*, user_id):
                 (model.organization_email_domains.c.domain == domain)
             )).first()[0]
 
-            if count == 0:
-                raise util.APIError(
-                    400, message="Invalid email for organization.")
+            can_verify_by_code = org["verification_code"] is not None
+            email_error = util.APIError(
+                        400, message="Invalid email for organization.")
+            verification_error = util.APIError(
+                        400, message="Invalid verification code.")
+            code_correct = org["verification_code"] == provided_code
 
-    # Set the verification code (if necessary).
+            if count == 0:
+                if can_verify_by_code and not code_correct:
+                    raise verification_error
+                else:
+                    raise email_error
+            elif can_verify_by_code:
+                if not code_correct:
+                    raise verification_error
+            # Otherwise, no verification method defined,
+            # or passed verification
+
+    # Set the email verification code (if necessary).
     if email:
         values.update({
             "email": email,
@@ -203,11 +218,6 @@ def create_user(*, user_id):
             "organization_id": org_id,
         })
         message = "You've been added to the organization automatically!"
-
-    if org_id is None:
-        raise util.APIError(
-            401,
-            message="For the alpha, you must be associated with an organization.")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
