@@ -102,7 +102,7 @@ namespace hlt {
          */
         auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
 
-        auto test(const Location& location, double radius) -> std::vector<EntityId>;
+        auto test(const Location& location, double radius, double time) -> std::vector<EntityId>;
         auto test_planets(const Location& location, double radius,
                           std::vector<EntityId>& collisions) -> void;
         auto test_ids(const Location& location, double radius,

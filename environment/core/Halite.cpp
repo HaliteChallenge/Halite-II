@@ -68,22 +68,19 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
     return std::make_pair(self_damage, other_damage);
 }
 
-auto planet_explosion_damage(hlt::Planet& planet, double distance) -> unsigned short {
-    const auto explosion_radius = hlt::GameConstants::get().EXPLOSION_RADIUS;
+auto planet_explosion_damage(hlt::Planet& planet, double distance,
+                             double max_distance) -> unsigned short {
     if (distance < planet.radius) {
         return std::numeric_limits<unsigned short>::max();
     }
 
     const auto distance_from_crust = distance - planet.radius;
-    if (distance_from_crust <= explosion_radius) {
-        // Ranges linearly from 2x max ship health (at distance 0) to 0.5x
-        // max ship health (at the maximum distance)
-        const auto max_ship_hp = hlt::GameConstants::get().MAX_SHIP_HEALTH;
-        const auto damage = max_ship_hp -
-            (distance_from_crust / (2 * explosion_radius)) * max_ship_hp;
-        return static_cast<unsigned short>(damage);
-    }
-    return 0;
+    // Ranges linearly from 5x max ship health (at distance 0) to 0.5x
+    // max ship health (at the maximum distance)
+    const auto max_ship_hp = hlt::GameConstants::get().MAX_SHIP_HEALTH;
+    const auto damage = 5 * max_ship_hp -
+        (distance_from_crust / (2 * max_distance)) * max_ship_hp;
+    return static_cast<unsigned short>(damage);
 }
 
 auto Halite::damage_entity(hlt::EntityId id, unsigned short damage,
@@ -137,16 +134,17 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
                 ship.reset_docking_status();
             }
 
+            const auto max_distance = std::max(
+                planet.radius, hlt::GameConstants::get().DOCK_RADIUS);
             auto caught_in_explosion = game_map.test(
-                planet.location,
-                planet.radius + hlt::GameConstants::get().EXPLOSION_RADIUS);
+                planet.location, planet.radius + max_distance, time);
 
             for (const auto& target_id : caught_in_explosion) {
                 if (target_id != id) {
                     const auto& target = game_map.get_entity(target_id);
                     const auto distance = planet.location.distance(target.location);
                     const auto damage = planet_explosion_damage(
-                        planet, distance - target.radius);
+                        planet, distance - target.radius, max_distance);
                     damage_entity(target_id, damage, time);
                 }
             }

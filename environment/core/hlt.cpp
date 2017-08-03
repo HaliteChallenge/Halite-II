@@ -176,7 +176,7 @@ namespace hlt {
         }
     }
 
-    auto Map::test(const Location& location, double radius) -> std::vector<EntityId> {
+    auto Map::test(const Location& location, double radius, double time) -> std::vector<EntityId> {
         std::vector<EntityId> result;
 
         test_planets(location, radius, result);
@@ -187,6 +187,10 @@ namespace hlt {
             for (const auto& ship_pair : player_ships) {
                 const auto& ship = ship_pair.second;
                 if (!ship.is_alive()) continue;
+
+                // Need to forecast ship position
+                auto location2 = ship.location;
+                location2.move_by(ship.velocity, time);
 
                 if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
                     result.push_back(EntityId::for_ship(player_id, ship_pair.first));
