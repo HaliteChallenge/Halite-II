@@ -9,7 +9,7 @@ import google.cloud.exceptions as gcloud_exceptions
 
 from werkzeug.contrib.cache import FileSystemCache
 
-from .. import config, model, response_success, util
+from .. import config, model, util
 
 from .blueprint import coordinator_api
 
@@ -64,7 +64,7 @@ def upload_bot():
                                model.get_bot_bucket(),
                                chunk_size=262144)
     blob.upload_from_file(uploaded_file)
-    return response_success()
+    return util.response_success()
 
 
 @coordinator_api.route("/botFile", methods=["GET"])
@@ -113,6 +113,6 @@ def hash_bot():
     if blob is None:
         raise util.APIError(400, message="Bot does not exist.")
 
-    return response_success({
+    return util.response_success({
         "hash": binascii.hexlify(base64.b64decode(blob.md5_hash)).decode('utf-8'),
     })

@@ -8,7 +8,7 @@ import trueskill
 
 import google.cloud.storage as gcloud_storage
 
-from .. import config, model, notify, response_success, util
+from .. import config, model, notify, util
 
 from .blueprint import coordinator_api
 from .compilation import serve_compilation_task, reset_compilation_tasks
@@ -41,7 +41,7 @@ def task():
                 return response
             tries += 1
 
-    return response_success({
+    return util.response_success({
         "type": "notask",
     })
 
@@ -95,7 +95,7 @@ def upload_game():
             # If the user has submitted a new bot in the meanwhile,
             # ignore the game
             if stored_bot["version_number"] != user["version_number"]:
-                return response_success({
+                return util.response_success({
                     "message": "User {} has uploaded a new bot, discarding "
                                "match.".format(user["user_id"])
                 })
@@ -116,7 +116,7 @@ def upload_game():
     # Update rankings
     update_rankings(users)
 
-    return response_success()
+    return util.response_success()
 
 
 def store_game_artifacts(replay_name, users):

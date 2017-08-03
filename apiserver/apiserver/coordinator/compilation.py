@@ -3,7 +3,7 @@ import datetime
 import flask
 import sqlalchemy
 
-from .. import config, model, notify, response_success, util
+from .. import config, model, notify, util
 
 from .blueprint import coordinator_api
 
@@ -43,7 +43,7 @@ def serve_compilation_task(conn):
                 .values(compile_status=model.CompileStatus.IN_PROGRESS.value,
                         compile_start=sqlalchemy.sql.func.now())
             conn.execute(update)
-            return response_success({
+            return util.response_success({
                 "type": "compile",
                 "user": user_id,
                 "bot": bot_id,
@@ -144,7 +144,7 @@ def update_compilation_status():
                 "Bot successfully compiled",
                 notify.COMPILATION_SUCCESS)
 
-            return response_success()
+            return util.response_success()
         else:
             notify.send_notification(
                 user["email"],
@@ -152,4 +152,4 @@ def update_compilation_status():
                 "Bot failed to compile",
                 notify.COMPILATION_FAILURE.format(language=language,
                                                   errors=errors))
-            return response_success()
+            return util.response_success()

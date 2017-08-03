@@ -3,7 +3,7 @@ import random
 
 import sqlalchemy
 
-from .. import config, model, response_success, util
+from .. import config, model, util
 
 
 def rand_map_size():
@@ -105,7 +105,7 @@ def serve_game_task(conn, has_gpu=False):
     } for player in players]
 
     if len(players) == player_count:
-        return response_success({
+        return util.response_success({
             "type": "game",
             "width": map_width,
             "height": map_height,
@@ -212,7 +212,7 @@ def serve_game_task(conn, has_gpu=False):
     } for player in players]
 
     if len(players) == player_count:
-        return response_success({
+        return util.response_success({
             "type": "game",
             "width": map_width,
             "height": map_height,
