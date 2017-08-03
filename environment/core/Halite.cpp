@@ -268,6 +268,8 @@ auto Halite::process_production() -> void {
     );
     std::vector<hlt::EntityId> occupants;
 
+    const auto infinite_resources = hlt::GameConstants::get().INFINITE_RESOURCES;
+
     for (auto& planet : game_map.planets) {
         if (!planet.is_alive() || !planet.owned) continue;
 
@@ -282,7 +284,9 @@ auto Halite::process_production() -> void {
             static_cast<unsigned short>(base_productivity +
                 (num_docked_ships - 1) * additional_productivity));
 
-        planet.remaining_production -= production;
+        if (!infinite_resources) {
+            planet.remaining_production -= production;
+        }
         planet.current_production += production;
 
         const auto production_per_ship = hlt::GameConstants::get().PRODUCTION_PER_SHIP;
