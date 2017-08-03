@@ -46,7 +46,7 @@
                             </td>
                             <td>
                                 <a v-for="player in Object.keys(game.players)"
-                                   :href="'user?user_id=' + player"
+                                   :href="'/user?user_id=' + player"
                                    class="game-participant"
                                    v-bind:class="{ 'timed-out': game.players[player].timed_out }"
                                    :title="game.players[player].timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
@@ -58,7 +58,7 @@
                             </td>
                             <td>{{ game.map_width }}x{{ game.map_height }}</td>
                             <td>
-                                <a :href="'play?game_id=' + game.game_id">
+                                <a :href="'/play?game_id=' + game.game_id">
                                     {{ game.game_id }}
                                 </a>
 
