@@ -260,7 +260,7 @@ namespace mapgen {
             }
         }
 
-        return orbits;
+        return {};
     }
 
     auto SolarSystem::name() -> std::string {
