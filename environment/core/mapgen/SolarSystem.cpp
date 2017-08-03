@@ -76,10 +76,12 @@ namespace mapgen {
         const auto center_x = map.map_width / 2.0;
         const auto center_y = map.map_height / 2.0;
 
+        const auto min_radius =
+            std::sqrt(std::min(map.map_width, map.map_height)) / 4;
         const auto max_radius =
-            std::sqrt(std::min(map.map_width, map.map_height)) / 2.8;
+            std::sqrt(std::min(map.map_width, map.map_height));
         const auto min_separation =
-            std::sqrt(std::min(map.map_width, map.map_height)) / 1.25;
+            std::sqrt(std::min(map.map_width, map.map_height)) / 0.5;
         auto rand_x_axis = std::bind(
             std::uniform_int_distribution<int>(1, map.map_width / 2 - 1), std::ref(rng));
         auto rand_y_axis = std::bind(
@@ -87,7 +89,7 @@ namespace mapgen {
         auto rand_angle = std::bind(
             std::uniform_real_distribution<double>(0, 2 * M_PI), std::ref(rng));
         auto rand_radius =
-            std::bind(std::uniform_real_distribution<double>(3, std::max(4.0, max_radius)), std::ref(rng));
+            std::bind(std::uniform_real_distribution<double>(min_radius, max_radius), std::ref(rng));
         auto rand_planets_generated =
             std::bind(std::uniform_int_distribution<>(2, std::max(2, planets_per_player / 2)), std::ref(rng));
 
