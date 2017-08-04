@@ -171,12 +171,17 @@ int main(int argc, char** argv) {
 
     if (mapWidth == 0 && mapHeight == 0) {
         std::vector<unsigned short> mapSizeChoices =
-            { 100, 125, 128, 150, 175, 200, 225, 250, 256 };
+            { 160, 160, 192, 192, 192, 256, 256, 256, 256,
+              384, 384, 384 };
         std::mt19937 prg(seed);
         std::uniform_int_distribution<unsigned short> size_dist(0, mapSizeChoices.size() - 1);
-        auto random_choice = size_dist(prg);
-        mapWidth = mapSizeChoices[random_choice];
-        mapHeight = mapWidth;
+        mapWidth = mapSizeChoices[size_dist(prg)];
+        mapHeight = mapSizeChoices[size_dist(prg)];
+        if (mapHeight > mapWidth) {
+            auto temp = mapWidth;
+            mapWidth = mapHeight;
+            mapHeight = temp;
+        }
     }
 
     const auto override_factor = overrideSwitch.getValue() ? 2 : 1;
