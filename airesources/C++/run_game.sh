@@ -2,5 +2,5 @@
 
 set -e
 
-clang++ -std=c++11 -g -Wall -pedantic -fsanitize=address,undefined MyBot.cpp -o MyBot
-./halite -d "96 96" "./MyBot" "./MyBot"
+make MyBot
+./halite -d "256 256" "./MyBot" "./MyBot"

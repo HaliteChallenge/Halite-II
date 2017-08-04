@@ -1,4 +1,4 @@
-CXXFLAGS += -std=c++11 -I ./ -g -fsanitize=address,undefined
+CXXFLAGS += -std=c++11 -I ./ -g
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=MyBot
