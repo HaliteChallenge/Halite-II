@@ -97,6 +97,8 @@ namespace mapgen {
         auto planets = std::vector<Zone>();
 
         auto is_ok_location = [&](const hlt::Location& location, double radius) -> bool {
+            // Make sure the entirety of the docking area is within map bounds
+            radius += hlt::GameConstants::get().DOCK_RADIUS;
             if (location.pos_x - radius < 0 || location.pos_x + radius > map.map_width ||
                 location.pos_y - radius < 0 || location.pos_y + radius > map.map_height) {
                 return false;
