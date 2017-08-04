@@ -1,11 +1,17 @@
+import logging
+import traceback
 import urllib.parse
 
 import flask
 import sqlalchemy
-from flask_oauthlib.client import OAuth
+from flask_oauthlib.client import OAuth, OAuthException
 
 from .. import app, config, model, util
 from ..util import cross_origin
+
+
+login_log = logging.getLogger("login")
+
 
 oauth_login = flask.Blueprint("github_login", __name__)
 oauth = OAuth(app)
@@ -41,8 +47,16 @@ def me():
 
 @oauth_login.route("/response/github")
 def github_login_callback():
-    response = github.authorized_response()
+    try:
+        response = github.authorized_response()
+    except OAuthException:
+        login_log.error(traceback.format_exc())
+        raise
+
     if response is None or response.get("access_token") is None:
+        if response and "error" in response:
+            login_log.error("Got OAuth error: {}".format(response))
+
         raise util.APIError(
             401,
             message="Access denied. Reason: {}. Error: {}.".format(

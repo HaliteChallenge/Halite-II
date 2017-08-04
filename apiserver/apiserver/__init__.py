@@ -1,7 +1,6 @@
 import logging
 import logging.handlers
 
-import flask
 from flask import Flask
 
 from . import config, util
@@ -26,8 +25,10 @@ def log_exception(sender, exception, **extra):
     pass
 
 
-def setup_logging(log_name):
-    handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=1024*1024*10, backupCount=10)
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
-    logging.basicConfig(handlers=[handler], level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
+
+
+def setup_logging(log_name, logger):
+    handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=1024*1024*20, backupCount=20)
+    handler.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
