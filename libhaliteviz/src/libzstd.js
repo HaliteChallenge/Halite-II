@@ -1,3 +1,7 @@
+var libzstd = function(libzstd) {
+  libzstd = libzstd || {};
+  var Module = libzstd;
+
 // The Module object: Our interface to the outside world. We import
 // and export values on it, and do the work to get that through
 // closure compiler if necessary. There are various ways Module can be used:
@@ -14,7 +18,7 @@
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
 var Module;
-if (!Module) Module = (typeof ZStd !== 'undefined' ? ZStd : null) || {};
+if (!Module) Module = (typeof libzstd !== 'undefined' ? libzstd : null) || {};
 
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here
@@ -8085,6 +8089,27 @@ function _ZSTD_versionNumber() {
  sp = STACKTOP;
  return 10300;
 }
+function _ZSTD_isError($0) {
+ $0 = $0|0;
+ var $1 = 0, $2 = 0, $3 = 0, label = 0, sp = 0;
+ sp = STACKTOP;
+ STACKTOP = STACKTOP + 16|0; if ((STACKTOP|0) >= (STACK_MAX|0)) abortStackOverflow(16|0);
+ $1 = $0;
+ $2 = $1;
+ $3 = (_ERR_isError_27($2)|0);
+ STACKTOP = sp;return ($3|0);
+}
+function _ERR_isError_27($0) {
+ $0 = $0|0;
+ var $1 = 0, $2 = 0, $3 = 0, $4 = 0, label = 0, sp = 0;
+ sp = STACKTOP;
+ STACKTOP = STACKTOP + 16|0; if ((STACKTOP|0) >= (STACK_MAX|0)) abortStackOverflow(16|0);
+ $1 = $0;
+ $2 = $1;
+ $3 = ($2>>>0)>(4294967271);
+ $4 = $3&1;
+ STACKTOP = sp;return ($4|0);
+}
 function _ZSTD_malloc($0,$1) {
  $0 = $0|0;
  $1 = $1|0;
@@ -13342,6 +13367,275 @@ function _MEM_read16_129($0) {
  $2 = $1;
  $3 = HEAPU8[$2>>0]|(HEAPU8[$2+1>>0]<<8);
  STACKTOP = sp;return ($3|0);
+}
+function _ZSTD_getFrameContentSize($0,$1) {
+ $0 = $0|0;
+ $1 = $1|0;
+ var $10 = 0, $11 = 0, $12 = 0, $13 = 0, $14 = 0, $15 = 0, $16 = 0, $17 = 0, $18 = 0, $19 = 0, $2 = 0, $20 = 0, $21 = 0, $22 = 0, $23 = 0, $24 = 0, $25 = 0, $26 = 0, $27 = 0, $28 = 0;
+ var $29 = 0, $3 = 0, $30 = 0, $31 = 0, $32 = 0, $33 = 0, $34 = 0, $35 = 0, $36 = 0, $37 = 0, $38 = 0, $39 = 0, $4 = 0, $40 = 0, $41 = 0, $42 = 0, $43 = 0, $44 = 0, $45 = 0, $46 = 0;
+ var $47 = 0, $48 = 0, $49 = 0, $5 = 0, $50 = 0, $51 = 0, $52 = 0, $53 = 0, $54 = 0, $55 = 0, $56 = 0, $57 = 0, $58 = 0, $59 = 0, $6 = 0, $60 = 0, $61 = 0, $62 = 0, $63 = 0, $64 = 0;
+ var $65 = 0, $66 = 0, $67 = 0, $68 = 0, $69 = 0, $7 = 0, $70 = 0, $71 = 0, $72 = 0, $73 = 0, $74 = 0, $75 = 0, $76 = 0, $77 = 0, $78 = 0, $79 = 0, $8 = 0, $80 = 0, $81 = 0, $9 = 0;
+ var label = 0, sp = 0;
+ sp = STACKTOP;
+ STACKTOP = STACKTOP + 48|0; if ((STACKTOP|0) >= (STACK_MAX|0)) abortStackOverflow(48|0);
+ $2 = sp + 32|0;
+ $5 = sp + 24|0;
+ $6 = sp;
+ $3 = $0;
+ $4 = $1;
+ $7 = $3;
+ $8 = $4;
+ $9 = (_ZSTD_isLegacy($7,$8)|0);
+ $10 = ($9|0)!=(0);
+ $11 = $3;
+ $12 = $4;
+ do {
+  if ($10) {
+   $13 = (_ZSTD_getDecompressedSize_legacy($11,$12)|0);
+   $14 = tempRet0;
+   $15 = $5;
+   $16 = $15;
+   HEAP32[$16>>2] = $13;
+   $17 = (($15) + 4)|0;
+   $18 = $17;
+   HEAP32[$18>>2] = $14;
+   $19 = $5;
+   $20 = $19;
+   $21 = HEAP32[$20>>2]|0;
+   $22 = (($19) + 4)|0;
+   $23 = $22;
+   $24 = HEAP32[$23>>2]|0;
+   $25 = ($21|0)==(0);
+   $26 = ($24|0)==(0);
+   $27 = $25 & $26;
+   $28 = $5;
+   $29 = $28;
+   $30 = HEAP32[$29>>2]|0;
+   $31 = (($28) + 4)|0;
+   $32 = $31;
+   $33 = HEAP32[$32>>2]|0;
+   $34 = $27 ? -1 : $30;
+   $35 = $27 ? -1 : $33;
+   $36 = $2;
+   $37 = $36;
+   HEAP32[$37>>2] = $34;
+   $38 = (($36) + 4)|0;
+   $39 = $38;
+   HEAP32[$39>>2] = $35;
+  } else {
+   $40 = (_ZSTD_getFrameHeader($6,$11,$12)|0);
+   $41 = ($40|0)!=(0);
+   if ($41) {
+    $42 = $2;
+    $43 = $42;
+    HEAP32[$43>>2] = -2;
+    $44 = (($42) + 4)|0;
+    $45 = $44;
+    HEAP32[$45>>2] = -1;
+    break;
+   }
+   $46 = ((($6)) + 8|0);
+   $47 = HEAP32[$46>>2]|0;
+   $48 = ($47|0)==(0);
+   if ($48) {
+    $49 = $2;
+    $50 = $49;
+    HEAP32[$50>>2] = 0;
+    $51 = (($49) + 4)|0;
+    $52 = $51;
+    HEAP32[$52>>2] = 0;
+    break;
+   }
+   $53 = $6;
+   $54 = $53;
+   $55 = HEAP32[$54>>2]|0;
+   $56 = (($53) + 4)|0;
+   $57 = $56;
+   $58 = HEAP32[$57>>2]|0;
+   $59 = ($55|0)!=(0);
+   $60 = ($58|0)!=(0);
+   $61 = $59 | $60;
+   if ($61) {
+    $62 = $6;
+    $63 = $62;
+    $64 = HEAP32[$63>>2]|0;
+    $65 = (($62) + 4)|0;
+    $66 = $65;
+    $67 = HEAP32[$66>>2]|0;
+    $68 = $2;
+    $69 = $68;
+    HEAP32[$69>>2] = $64;
+    $70 = (($68) + 4)|0;
+    $71 = $70;
+    HEAP32[$71>>2] = $67;
+    break;
+   } else {
+    $72 = $2;
+    $73 = $72;
+    HEAP32[$73>>2] = -1;
+    $74 = (($72) + 4)|0;
+    $75 = $74;
+    HEAP32[$75>>2] = -1;
+    break;
+   }
+  }
+ } while(0);
+ $76 = $2;
+ $77 = $76;
+ $78 = HEAP32[$77>>2]|0;
+ $79 = (($76) + 4)|0;
+ $80 = $79;
+ $81 = HEAP32[$80>>2]|0;
+ tempRet0 = ($81);
+ STACKTOP = sp;return ($78|0);
+}
+function _ZSTD_getDecompressedSize_legacy($0,$1) {
+ $0 = $0|0;
+ $1 = $1|0;
+ var $10 = 0, $11 = 0, $12 = 0, $13 = 0, $14 = 0, $15 = 0, $16 = 0, $17 = 0, $18 = 0, $19 = 0, $2 = 0, $20 = 0, $21 = 0, $22 = 0, $23 = 0, $24 = 0, $25 = 0, $26 = 0, $27 = 0, $28 = 0;
+ var $29 = 0, $3 = 0, $30 = 0, $31 = 0, $32 = 0, $33 = 0, $34 = 0, $35 = 0, $36 = 0, $37 = 0, $38 = 0, $39 = 0, $4 = 0, $40 = 0, $41 = 0, $42 = 0, $43 = 0, $44 = 0, $45 = 0, $46 = 0;
+ var $47 = 0, $48 = 0, $49 = 0, $5 = 0, $50 = 0, $51 = 0, $52 = 0, $53 = 0, $54 = 0, $55 = 0, $56 = 0, $57 = 0, $58 = 0, $59 = 0, $6 = 0, $60 = 0, $61 = 0, $62 = 0, $63 = 0, $64 = 0;
+ var $65 = 0, $66 = 0, $67 = 0, $68 = 0, $69 = 0, $7 = 0, $70 = 0, $71 = 0, $72 = 0, $73 = 0, $74 = 0, $75 = 0, $76 = 0, $77 = 0, $78 = 0, $79 = 0, $8 = 0, $80 = 0, $81 = 0, $82 = 0;
+ var $83 = 0, $84 = 0, $85 = 0, $86 = 0, $87 = 0, $88 = 0, $89 = 0, $9 = 0, $90 = 0, $91 = 0, $92 = 0, $93 = 0, label = 0, sp = 0;
+ sp = STACKTOP;
+ STACKTOP = STACKTOP + 112|0; if ((STACKTOP|0) >= (STACK_MAX|0)) abortStackOverflow(112|0);
+ $2 = sp + 80|0;
+ $6 = sp + 40|0;
+ $8 = sp + 24|0;
+ $10 = sp;
+ $3 = $0;
+ $4 = $1;
+ $12 = $3;
+ $13 = $4;
+ $14 = (_ZSTD_isLegacy($12,$13)|0);
+ $5 = $14;
+ $15 = $5;
+ $16 = ($15>>>0)<(5);
+ do {
+  if ($16) {
+   $17 = $2;
+   $18 = $17;
+   HEAP32[$18>>2] = 0;
+   $19 = (($17) + 4)|0;
+   $20 = $19;
+   HEAP32[$20>>2] = 0;
+  } else {
+   $21 = $5;
+   $22 = ($21|0)==(5);
+   if ($22) {
+    $23 = $3;
+    $24 = $4;
+    $25 = (_ZSTDv05_getFrameParams($6,$23,$24)|0);
+    $7 = $25;
+    $26 = $7;
+    $27 = ($26|0)!=(0);
+    if ($27) {
+     $28 = $2;
+     $29 = $28;
+     HEAP32[$29>>2] = 0;
+     $30 = (($28) + 4)|0;
+     $31 = $30;
+     HEAP32[$31>>2] = 0;
+     break;
+    } else {
+     $32 = $6;
+     $33 = $32;
+     $34 = HEAP32[$33>>2]|0;
+     $35 = (($32) + 4)|0;
+     $36 = $35;
+     $37 = HEAP32[$36>>2]|0;
+     $38 = $2;
+     $39 = $38;
+     HEAP32[$39>>2] = $34;
+     $40 = (($38) + 4)|0;
+     $41 = $40;
+     HEAP32[$41>>2] = $37;
+     break;
+    }
+   }
+   $42 = $5;
+   $43 = ($42|0)==(6);
+   if ($43) {
+    $44 = $3;
+    $45 = $4;
+    $46 = (_ZSTDv06_getFrameParams($8,$44,$45)|0);
+    $9 = $46;
+    $47 = $9;
+    $48 = ($47|0)!=(0);
+    if ($48) {
+     $49 = $2;
+     $50 = $49;
+     HEAP32[$50>>2] = 0;
+     $51 = (($49) + 4)|0;
+     $52 = $51;
+     HEAP32[$52>>2] = 0;
+     break;
+    } else {
+     $53 = $8;
+     $54 = $53;
+     $55 = HEAP32[$54>>2]|0;
+     $56 = (($53) + 4)|0;
+     $57 = $56;
+     $58 = HEAP32[$57>>2]|0;
+     $59 = $2;
+     $60 = $59;
+     HEAP32[$60>>2] = $55;
+     $61 = (($59) + 4)|0;
+     $62 = $61;
+     HEAP32[$62>>2] = $58;
+     break;
+    }
+   }
+   $63 = $5;
+   $64 = ($63|0)==(7);
+   if (!($64)) {
+    $84 = $2;
+    $85 = $84;
+    HEAP32[$85>>2] = 0;
+    $86 = (($84) + 4)|0;
+    $87 = $86;
+    HEAP32[$87>>2] = 0;
+    break;
+   }
+   $65 = $3;
+   $66 = $4;
+   $67 = (_ZSTDv07_getFrameParams($10,$65,$66)|0);
+   $11 = $67;
+   $68 = $11;
+   $69 = ($68|0)!=(0);
+   if ($69) {
+    $70 = $2;
+    $71 = $70;
+    HEAP32[$71>>2] = 0;
+    $72 = (($70) + 4)|0;
+    $73 = $72;
+    HEAP32[$73>>2] = 0;
+    break;
+   } else {
+    $74 = $10;
+    $75 = $74;
+    $76 = HEAP32[$75>>2]|0;
+    $77 = (($74) + 4)|0;
+    $78 = $77;
+    $79 = HEAP32[$78>>2]|0;
+    $80 = $2;
+    $81 = $80;
+    HEAP32[$81>>2] = $76;
+    $82 = (($80) + 4)|0;
+    $83 = $82;
+    HEAP32[$83>>2] = $79;
+    break;
+   }
+  }
+ } while(0);
+ $88 = $2;
+ $89 = $88;
+ $90 = HEAP32[$89>>2]|0;
+ $91 = (($88) + 4)|0;
+ $92 = $91;
+ $93 = HEAP32[$92>>2]|0;
+ tempRet0 = ($93);
+ STACKTOP = sp;return ($90|0);
 }
 function _ERR_isError_130($0) {
  $0 = $0|0;
@@ -52361,7 +52655,7 @@ var FUNCTION_TABLE_vii = [b2,b2,b2,b2,b2,b2,b2,b2,_ZSTDv07_defaultFreeFunction,b
 var FUNCTION_TABLE_iii = [b3,b3,b3,b3,b3,b3,b3,_ZSTDv07_defaultAllocFunction];
 var FUNCTION_TABLE_iiiii = [b4,_HUF_decompress4X2_283,_HUF_decompress4X4_284,_HUFv05_decompress4X2,_HUFv05_decompress4X4,_HUFv06_decompress4X2,_HUFv06_decompress4X4,b4];
 
-  return { _llvm_bswap_i32: _llvm_bswap_i32, getTempRet0: getTempRet0, setThrew: setThrew, _bitshift64Lshr: _bitshift64Lshr, _bitshift64Shl: _bitshift64Shl, _fflush: _fflush, _memset: _memset, _sbrk: _sbrk, _memcpy: _memcpy, ___errno_location: ___errno_location, ___muldi3: ___muldi3, stackAlloc: stackAlloc, _i64Subtract: _i64Subtract, setTempRet0: setTempRet0, _i64Add: _i64Add, _emscripten_get_global_libc: _emscripten_get_global_libc, _ZSTD_decompress: _ZSTD_decompress, stackSave: stackSave, ___muldsi3: ___muldsi3, _free: _free, runPostSets: runPostSets, establishStackSpace: establishStackSpace, _memmove: _memmove, stackRestore: stackRestore, _ZSTD_versionNumber: _ZSTD_versionNumber, _malloc: _malloc, stackAlloc: stackAlloc, stackSave: stackSave, stackRestore: stackRestore, establishStackSpace: establishStackSpace, setThrew: setThrew, setTempRet0: setTempRet0, getTempRet0: getTempRet0, dynCall_ii: dynCall_ii, dynCall_iiii: dynCall_iiii, dynCall_vii: dynCall_vii, dynCall_iii: dynCall_iii, dynCall_iiiii: dynCall_iiiii };
+  return { _llvm_bswap_i32: _llvm_bswap_i32, stackSave: stackSave, getTempRet0: getTempRet0, setThrew: setThrew, _bitshift64Lshr: _bitshift64Lshr, _bitshift64Shl: _bitshift64Shl, _fflush: _fflush, _ZSTD_getFrameContentSize: _ZSTD_getFrameContentSize, _memset: _memset, _sbrk: _sbrk, _memcpy: _memcpy, stackAlloc: stackAlloc, ___muldi3: ___muldi3, _i64Subtract: _i64Subtract, setTempRet0: setTempRet0, _i64Add: _i64Add, _emscripten_get_global_libc: _emscripten_get_global_libc, _ZSTD_decompress: _ZSTD_decompress, ___errno_location: ___errno_location, ___muldsi3: ___muldsi3, _free: _free, runPostSets: runPostSets, establishStackSpace: establishStackSpace, _memmove: _memmove, _ZSTD_isError: _ZSTD_isError, stackRestore: stackRestore, _ZSTD_versionNumber: _ZSTD_versionNumber, _malloc: _malloc, stackAlloc: stackAlloc, stackSave: stackSave, stackRestore: stackRestore, establishStackSpace: establishStackSpace, setThrew: setThrew, setTempRet0: setTempRet0, getTempRet0: getTempRet0, dynCall_ii: dynCall_ii, dynCall_iiii: dynCall_iiii, dynCall_vii: dynCall_vii, dynCall_iii: dynCall_iii, dynCall_iiiii: dynCall_iiiii };
 })
 // EMSCRIPTEN_END_ASM
 (Module.asmGlobalArg, Module.asmLibraryArg, buffer);
@@ -52370,6 +52664,12 @@ var real__llvm_bswap_i32 = asm["_llvm_bswap_i32"]; asm["_llvm_bswap_i32"] = func
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
 return real__llvm_bswap_i32.apply(null, arguments);
+};
+
+var real_stackSave = asm["stackSave"]; asm["stackSave"] = function() {
+assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+return real_stackSave.apply(null, arguments);
 };
 
 var real_getTempRet0 = asm["getTempRet0"]; asm["getTempRet0"] = function() {
@@ -52402,28 +52702,28 @@ assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it a
 return real__fflush.apply(null, arguments);
 };
 
+var real__ZSTD_getFrameContentSize = asm["_ZSTD_getFrameContentSize"]; asm["_ZSTD_getFrameContentSize"] = function() {
+assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+return real__ZSTD_getFrameContentSize.apply(null, arguments);
+};
+
 var real__sbrk = asm["_sbrk"]; asm["_sbrk"] = function() {
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
 return real__sbrk.apply(null, arguments);
 };
 
-var real____errno_location = asm["___errno_location"]; asm["___errno_location"] = function() {
+var real_stackAlloc = asm["stackAlloc"]; asm["stackAlloc"] = function() {
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-return real____errno_location.apply(null, arguments);
+return real_stackAlloc.apply(null, arguments);
 };
 
 var real____muldi3 = asm["___muldi3"]; asm["___muldi3"] = function() {
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
 return real____muldi3.apply(null, arguments);
-};
-
-var real_stackAlloc = asm["stackAlloc"]; asm["stackAlloc"] = function() {
-assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-return real_stackAlloc.apply(null, arguments);
 };
 
 var real__i64Subtract = asm["_i64Subtract"]; asm["_i64Subtract"] = function() {
@@ -52456,10 +52756,10 @@ assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it a
 return real__ZSTD_decompress.apply(null, arguments);
 };
 
-var real_stackSave = asm["stackSave"]; asm["stackSave"] = function() {
+var real____errno_location = asm["___errno_location"]; asm["___errno_location"] = function() {
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-return real_stackSave.apply(null, arguments);
+return real____errno_location.apply(null, arguments);
 };
 
 var real____muldsi3 = asm["___muldsi3"]; asm["___muldsi3"] = function() {
@@ -52486,6 +52786,12 @@ assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it a
 return real__memmove.apply(null, arguments);
 };
 
+var real__ZSTD_isError = asm["_ZSTD_isError"]; asm["_ZSTD_isError"] = function() {
+assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+return real__ZSTD_isError.apply(null, arguments);
+};
+
 var real_stackRestore = asm["stackRestore"]; asm["stackRestore"] = function() {
 assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
 assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -52504,28 +52810,30 @@ assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it a
 return real__malloc.apply(null, arguments);
 };
 var _llvm_bswap_i32 = Module["_llvm_bswap_i32"] = asm["_llvm_bswap_i32"];
+var stackSave = Module["stackSave"] = asm["stackSave"];
 var getTempRet0 = Module["getTempRet0"] = asm["getTempRet0"];
 var setThrew = Module["setThrew"] = asm["setThrew"];
 var _bitshift64Lshr = Module["_bitshift64Lshr"] = asm["_bitshift64Lshr"];
 var _bitshift64Shl = Module["_bitshift64Shl"] = asm["_bitshift64Shl"];
 var _fflush = Module["_fflush"] = asm["_fflush"];
+var _ZSTD_getFrameContentSize = Module["_ZSTD_getFrameContentSize"] = asm["_ZSTD_getFrameContentSize"];
 var _memset = Module["_memset"] = asm["_memset"];
 var _sbrk = Module["_sbrk"] = asm["_sbrk"];
 var _memcpy = Module["_memcpy"] = asm["_memcpy"];
-var ___errno_location = Module["___errno_location"] = asm["___errno_location"];
-var ___muldi3 = Module["___muldi3"] = asm["___muldi3"];
 var stackAlloc = Module["stackAlloc"] = asm["stackAlloc"];
+var ___muldi3 = Module["___muldi3"] = asm["___muldi3"];
 var _i64Subtract = Module["_i64Subtract"] = asm["_i64Subtract"];
 var setTempRet0 = Module["setTempRet0"] = asm["setTempRet0"];
 var _i64Add = Module["_i64Add"] = asm["_i64Add"];
 var _emscripten_get_global_libc = Module["_emscripten_get_global_libc"] = asm["_emscripten_get_global_libc"];
 var _ZSTD_decompress = Module["_ZSTD_decompress"] = asm["_ZSTD_decompress"];
-var stackSave = Module["stackSave"] = asm["stackSave"];
+var ___errno_location = Module["___errno_location"] = asm["___errno_location"];
 var ___muldsi3 = Module["___muldsi3"] = asm["___muldsi3"];
 var _free = Module["_free"] = asm["_free"];
 var runPostSets = Module["runPostSets"] = asm["runPostSets"];
 var establishStackSpace = Module["establishStackSpace"] = asm["establishStackSpace"];
 var _memmove = Module["_memmove"] = asm["_memmove"];
+var _ZSTD_isError = Module["_ZSTD_isError"] = asm["_ZSTD_isError"];
 var stackRestore = Module["stackRestore"] = asm["stackRestore"];
 var _ZSTD_versionNumber = Module["_ZSTD_versionNumber"] = asm["_ZSTD_versionNumber"];
 var _malloc = Module["_malloc"] = asm["_malloc"];
@@ -52551,6 +52859,28 @@ Module['asm'] = asm;
 
 
 
+// Modularize mode returns a function, which can be called to
+// create instances. The instances provide a then() method,
+// must like a Promise, that receives a callback. The callback
+// is called when the module is ready to run, with the module
+// as a parameter. (Like a Promise, it also returns the module
+// so you can use the output of .then(..)).
+Module['then'] = function(func) {
+  // We may already be ready to run code at this time. if
+  // so, just queue a call to the callback.
+  if (Module['calledRun']) {
+    func(Module);
+  } else {
+    // we are not ready to call then() yet. we must call it
+    // at the same time we would call onRuntimeInitialized.
+    var old = Module['onRuntimeInitialized'];
+    Module['onRuntimeInitialized'] = function() {
+      if (old) old();
+      func(Module);
+    };
+  }
+  return Module;
+};
 
 /**
  * @constructor
@@ -52768,3 +53098,9 @@ run();
 
 
 
+
+  return libzstd;
+};
+if (typeof module === "object" && module.exports) {
+  module['exports'] = libzstd;
+};
