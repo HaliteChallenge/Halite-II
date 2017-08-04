@@ -461,3 +461,8 @@ node_modules
 musicgenerator/haliteamp/*
 /musicgenerator/*.wav
 haliteII/*
+
+cmake-build-*/
+apiserver/venv/
+compiled_environments/
+*.bc
