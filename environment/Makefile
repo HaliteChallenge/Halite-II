@@ -4,11 +4,7 @@ CXXFLAGS += -std=c++11 -pthread -I ./ -g -O2 -Wall -pedantic -fsanitize=address,
 INSTALL_PATH?=/usr/local
 
 ZSTD_PATH=./zstd-1.3.0
-ifeq ($(PLATFORM),Darwin)
-ZSTD_STATIC_OBJECT=libzstd.dylib
-else
 ZSTD_STATIC_OBJECT=libzstd.a
-endif
 
 LDFLAGS=-L .
 LDLIBS=-lzstd
@@ -33,8 +29,15 @@ $(ZSTD_STATIC_OBJECT):
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) $(OBJECTS) libzstd.a libzstd.dylib
+	rm -f $(TARGET) $(OBJECTS) libzstd.a libzstd.dylib *.bc libzstd.js
 
 .PHONY: install
 install:
 	install -m 0755 halite $(INSTALL_PATH)/bin
+
+libzstd.bc:
+	cd $(ZSTD_PATH)/lib && emmake $(MAKE) SHARED_EXT='bc' lib-release
+	mv $(ZSTD_PATH)/lib/*.bc .
+
+libzstd.js: libzstd.bc
+	emcc libzstd.bc -s 'EXPORT_NAME="libzstd"' -s 'EXPORTED_FUNCTIONS=["_ZSTD_versionNumber", "_ZSTD_decompress", "_ZSTD_getFrameContentSize", "_ZSTD_isError"]' -s 'MODULARIZE=1' -o libzstd.js
