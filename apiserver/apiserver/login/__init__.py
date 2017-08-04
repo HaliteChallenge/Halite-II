@@ -53,12 +53,17 @@ def github_login_callback():
         login_log.error(traceback.format_exc())
         raise
 
-    if response is None or response.get("access_token") is None:
+    if response is None or not response.get("access_token"):
         if response and "error" in response:
             login_log.error("Got OAuth error: {}".format(response))
 
+            raise util.APIError(
+                403,
+                message="Access denied. Reason: {error}. Error: {error_description}".format(**response)
+            )
+
         raise util.APIError(
-            401,
+            403,
             message="Access denied. Reason: {}. Error: {}.".format(
                 flask.request.args["error"],
                 flask.request.args["error_description"],

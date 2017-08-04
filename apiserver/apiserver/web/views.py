@@ -33,7 +33,7 @@ def discourse_sso(*, user_id):
                         digestmod=hashlib.sha256)
     computed_signature = hmac_obj.hexdigest()
     if computed_signature != sso_signature:
-        raise util.APIError(401)
+        raise util.APIError(403)
 
     with model.engine.connect() as conn:
         user = conn.execute(model.users.select().where(
@@ -41,13 +41,13 @@ def discourse_sso(*, user_id):
         )).first()
 
         if not user:
-            raise util.APIError(401)
+            raise util.APIError(403)
 
     payload = urllib.parse.parse_qs(
         base64.b64decode(urllib.parse.unquote(sso_payload)))
     nonce = payload.get(b"nonce")
     if not nonce:
-        raise util.APIError(401)
+        raise util.APIError(403)
     nonce = nonce[0]
 
     raw_payload = {

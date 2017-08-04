@@ -41,7 +41,7 @@ def validate_api_key(api_key):
         return None
 
     if ":" not in api_key:
-        raise util.APIError(401, message="API key is in invalid format.")
+        raise util.APIError(403, message="API key is in invalid format.")
 
     user_id, api_key = api_key.split(":", 1)
     user_id = int(user_id)
@@ -86,7 +86,7 @@ def requires_login(accept_key=False, optional=False, admin=False,
 
     :param accept_key: if True, then accept an API key, otherwise only accept
     a session cookie (OAuth).
-    :param optional: if True, do not return HTTP 401 if the user is not
+    :param optional: if True, do not return HTTP 403 if the user is not
     logged in.
     :param admin: if True, only accept admin users.
     :param association: if True, only accept users that have associated and
@@ -108,20 +108,20 @@ def requires_login(accept_key=False, optional=False, admin=False,
                 if association and not (user["is_email_good"] and
                                         user["is_active"]):
                     raise util.APIError(
-                        401,
+                        403,
                         message="Please verify your email first.")
 
                 if admin and user["is_admin"]:
                     kwargs["user_id"] = user["user_id"]
                 elif admin:
                     raise util.APIError(
-                        401, message="User cannot take this action.")
+                        403, message="User cannot take this action.")
                 else:
                     kwargs["user_id"] = user["user_id"]
             elif optional:
                 kwargs["user_id"] = None
             else:
-                raise util.APIError(401, message="User not logged in.")
+                raise util.APIError(403, message="User not logged in.")
 
             return view(*args, **kwargs)
 
