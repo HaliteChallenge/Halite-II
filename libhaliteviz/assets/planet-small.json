@@ -1,0 +1,48 @@
+{"frames": {
+
+"CoreSmall.png":
+{
+	"frame": {"x":1,"y":1,"w":110,"h":111},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":110,"h":111},
+	"sourceSize": {"w":110,"h":111},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"SoundSmall.png":
+{
+	"frame": {"x":113,"y":1,"w":192,"h":195},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":195},
+	"sourceSize": {"w":192,"h":195},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"3 bg.png":
+{
+	"frame": {"x":1,"y":198,"w":13,"h":75},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":13,"h":75},
+	"sourceSize": {"w":13,"h":75},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"4 bar.png":
+{
+	"frame": {"x":16,"y":198,"w":11,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":11,"h":71},
+	"sourceSize": {"w":11,"h":71},
+	"pivot": {"x":0.5,"y":0.5}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "Neutral Planet.png",
+	"format": "RGBA8888",
+	"size": {"w":306,"h":306},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:2fb3f1a7d322aa3c38f2d6f4aa84fd11:aab28031deb18a1436ad9faa1f3c0fce:4fa8a2edd4e5d46b3fbe4222cb269bfc$"
+}
+}

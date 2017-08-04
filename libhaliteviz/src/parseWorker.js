@@ -23,10 +23,12 @@ addEventListener("message", (e) => {
     const buffer = e.data;
     try {
         const inflated = pako.inflate(buffer);
+        console.log("Replay was gzipped");
         self.postMessage(inflated.buffer, [inflated.buffer]);
         return;
     }
     catch (e) {
+        console.debug("miniz failed, trying zSTD");
         // Not compressed with miniz, let's try zstd
     }
 
@@ -54,15 +56,24 @@ addEventListener("message", (e) => {
                 inflatedBufferView.byteOffset, decompressedSize,
                 heapBufferView.byteOffset, bufferBytes);
             if (!ZSTD_isError(result)) {
+                console.log("Replay was zSTanDarded");
                 // Copy decompressed data into a new buffer and transfer it
                 const newBuffer = inflatedBufferView.buffer.slice(
                     inflatedBufferView.byteOffset,
                     inflatedBufferView.byteOffset + inflatedBufferView.byteLength);
                 self.postMessage(newBuffer, [newBuffer]);
+                return;
             }
+            else {
+                console.debug("zSTD: Failed to decompress");
+            }
+        }
+        else {
+            console.debug("zSTD: failed to determine decompressed size.");
         }
     }
     catch (e) {
+        console.debug("zSTD failed: ", e);
         // Not compressed with zSTD, plain data?
     }
 

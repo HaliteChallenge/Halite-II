@@ -28,7 +28,7 @@
                 </dl>
                 <small>Replay version {{ replay.version }}</small>
             </div>
-            <div class="halite-visualizer-info col-md-4">
+            <div class="halite-visualizer-info col-md-6">
                 <div v-for="(player_name, index) in player_names">
                     <h3 :style="'color: ' + colors[index]">
                         <a :style="'color: ' + colors[index]"
@@ -306,7 +306,7 @@
     }
 
     .halite-visualizer-canvas {
-        width: 720px;
+        width: 960px;
         float: left;
     }
 
@@ -326,7 +326,7 @@
     }
 
     .halite-frame-scrubber {
-        width: 720px;
+        width: 960px;
     }
 
     .playbutton {

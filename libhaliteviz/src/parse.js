@@ -9,7 +9,6 @@ export function parseReplay(buffer) {
                 const inflated = e.data;
                 const inflatedTime = Date.now();
                 const decoded = new TextDecoder("utf-8").decode(new Uint8Array(inflated));
-                console.log(decoded.slice(0, 10));
                 const replay = JSON.parse(decoded);
                 const finishTime = Date.now();
                 console.info(`Decoded compressed replay in ${finishTime - startTime}ms, inflating took ${inflatedTime - startTime}ms, decoding took ${finishTime - inflatedTime}ms.`);

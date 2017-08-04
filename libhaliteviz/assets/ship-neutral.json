@@ -1,0 +1,48 @@
+{"frames": {
+
+"ship.png":
+{
+	"frame": {"x":1,"y":1,"w":26,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":16},
+	"sourceSize": {"w":26,"h":16},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"mining beam.png":
+{
+	"frame": {"x":29,"y":1,"w":71,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":71,"h":71},
+	"sourceSize": {"w":71,"h":71},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"aura.png":
+{
+	"frame": {"x":102,"y":1,"w":76,"h":76},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":76,"h":76},
+	"sourceSize": {"w":76,"h":76},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"trail.png":
+{
+	"frame": {"x":180,"y":1,"w":11,"h":130},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":11,"h":130},
+	"sourceSize": {"w":11,"h":130},
+	"pivot": {"x":0.5,"y":0.5}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "Aura 5x.png",
+	"format": "RGBA8888",
+	"size": {"w":192,"h":192},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:948b9bcb4fe29f766331e8c8e7ac933d:1da163cc446106946f5418db6e4547d0:24ef11c7e25843698597398b45a84954$"
+}
+}
