@@ -146,13 +146,13 @@ auto Replay::output(std::string filename) -> void {
     auto bin_data = reinterpret_cast<const unsigned char*>(data.data());
 
     // Use miniz to further compress replay file
-    auto compressed_length = compressBound(data_size);
-    auto compressed_data = reinterpret_cast<mz_uint8*>(std::malloc(compressed_length));
-    auto result = mz_compress2(compressed_data, &compressed_length,
-                               bin_data, data_size, MZ_BEST_COMPRESSION);
-    if (result == MZ_OK) {
+    auto compressed_length = ZSTD_compressBound(data_size);
+    auto compressed_data = reinterpret_cast<uint8_t*>(std::malloc(compressed_length));
+    auto result = ZSTD_compress(compressed_data, compressed_length,
+                                bin_data, data_size, ZSTD_maxCLevel());
+    if (!ZSTD_isError(result)) {
         gameFile.write(reinterpret_cast<const char*>(compressed_data),
-                       compressed_length * sizeof(uint8_t));
+                       result * sizeof(uint8_t));
     }
     else {
         if (!quiet_output) {
