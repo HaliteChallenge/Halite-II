@@ -143,7 +143,7 @@
             });
 
             api.me().then((me) => {
-                this.is_my_page = me.user_id === this.user.user_id;
+                this.is_my_page = me && me.user_id === this.user.user_id;
             });
         },
         methods: {
