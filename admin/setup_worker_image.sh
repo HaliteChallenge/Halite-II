@@ -5,6 +5,10 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 # http://www.mono-project.com/download/#download-lin
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 echo "deb http://download.mono-project.com/repo/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/mono-official.list
+# https://www.microsoft.com/net/core#linuxubuntu
+sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ yakkety main"  > /etc/apt/sources.list.d/dotnetdev.list'
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B02C46DF417A0893
+
 sudo apt-get update
 sudo apt-get -y upgrade
 
@@ -12,7 +16,7 @@ sudo useradd -m worker
 sudo sh -c 'echo "worker ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/worker'
 sudo chmod 0400 /etc/sudoers.d/worker
 
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete libgeos-dev"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev"
 WORKER_PACKAGES="virtualenv cgroup-tools"
 
 PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely"
