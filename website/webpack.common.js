@@ -8,6 +8,7 @@ module.exports = {
         filename: "bundle.js",
     },
     module: {
+        noParse: /libzstd/,
         rules: [
             {
                 test: /\.vue$/,

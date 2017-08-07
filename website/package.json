@@ -13,11 +13,6 @@
   "license": "MIT",
   "dependencies": {
     "libhaliteviz": "file:../libhaliteviz",
-    "msgpack-lite": "^0.1.26",
-    "pako": "^1.0.5",
-    "pixi-extra-filters": "^1.1.4",
-    "pixi.js": "^4.5.3",
-    "seedrandom": "^2.4.3",
     "vue": "^2.3.4",
     "vue-moment": "^2.0.2"
   },
