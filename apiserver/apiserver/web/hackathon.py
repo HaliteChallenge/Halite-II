@@ -15,6 +15,13 @@ from .blueprint import web_api
 
 
 def can_view_hackathon(user_id, hackathon_id, conn):
+    """
+    Validate whether a given user is allowed to view a given hackathon.
+    :param user_id:
+    :param hackathon_id:
+    :param conn:
+    :return: True if the user can view the hackathon; False otherwise
+    """
     is_user_joined = conn.execute(model.hackathon_participants.select(
         (model.hackathon_participants.c.user_id == user_id) &
         (model.hackathon_participants.c.hackathon_id == hackathon_id)
@@ -73,11 +80,16 @@ def list_hackathons(*, user_id):
 @web_api.route("/hackathon", methods=["POST"])
 @api_util.requires_login(accept_key=True, admin=True)
 def create_hackathon(*, user_id):
-    title = flask.request.form["title"]
-    description = flask.request.form["description"]
-    start_date = arrow.get(flask.request.form["start_date"]).datetime
-    end_date = arrow.get(flask.request.form["end_date"]).datetime
-    organization_id = flask.request.form.get("organization_id")
+    # Accept JSON if possible; fall back to form-encoded data
+    hackathon_body = flask.request.get_json()
+    if not hackathon_body:
+        hackathon_body = flask.request.form
+
+    title = hackathon_body["title"]
+    description = hackathon_body["description"]
+    start_date = arrow.get(hackathon_body["start_date"]).datetime
+    end_date = arrow.get(hackathon_body["end_date"]).datetime
+    organization_id = hackathon_body.get("organization_id", None)
 
     if end_date < arrow.now().datetime:
         raise util.APIError(
@@ -156,15 +168,18 @@ def get_hackathon(hackathon_id, *, user_id):
 @api_util.requires_login(admin=True, accept_key=True)
 def update_hackathon(hackathon_id, *, user_id):
     values = {}
+    hackathon_body = flask.request.get_form()
+    if not hackathon_body:
+        hackathon_body = flask.request.form
 
-    if "title" in flask.request.form:
-        values["title"] = flask.request.form["title"]
+    if "title" in hackathon_body:
+        values["title"] = hackathon_body["title"]
 
-    if "description" in flask.request.form:
-        values["description"] = flask.request.form["description"]
+    if "description" in hackathon_body:
+        values["description"] = hackathon_body["description"]
 
-    if "organization_id" in flask.request.form:
-        values["organization_id"] = int(flask.request.form["organization_id"])
+    if "organization_id" in hackathon_body:
+        values["organization_id"] = int(hackathon_body["organization_id"])
 
     with model.engine.connect() as conn:
         hackathon = conn.execute(
