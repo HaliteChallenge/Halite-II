@@ -29,9 +29,7 @@
         const buffer = game.replay;
         return libhaliteviz.parseReplay(buffer).then((replay) => {
             let outerContainer = document.getElementById("visualizer");
-            for (let child of outerContainer.children) {
-                outerContainer.removeChild(child);
-            }
+            outerContainer.innerHTML = "";
 
             let container = document.createElement("div");
             document.getElementById("visualizer").appendChild(container);
