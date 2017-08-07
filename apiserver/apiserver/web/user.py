@@ -42,6 +42,53 @@ def make_user_record(row, *, logged_in, total_users=None):
     return user
 
 
+def verify_affiliation(org_id, email_to_verify, provided_code):
+    """
+    Verify whether a user is allowed to associate with an organization.
+
+    :param org_id: The ID of the organization in question.
+    :param email_to_verify: The email of the user.
+    :param provided_code: A verification code for the org, if provided.
+    :return: Nothing (raises util.APIError if user cannot affiliate)
+    """
+    with model.engine.connect() as conn:
+        org = conn.execute(model.organizations.select().where(
+            model.organizations.c.id == org_id
+        )).first()
+
+        if org is None:
+            raise util.APIError(404, message="Organization does not exist.")
+
+        # Verify the email against the org
+        if "@" not in email_to_verify:
+            raise util.APIError(400, message="Email invalid.")
+        domain = email_to_verify.split("@")[1].strip().lower()
+        count = conn.execute(sqlalchemy.sql.select([
+            sqlalchemy.sql.func.count()
+        ]).select_from(model.organization_email_domains).where(
+            (model.organization_email_domains.c.organization_id == org_id) &
+            (model.organization_email_domains.c.domain == domain)
+        )).first()[0]
+
+        can_verify_by_code = org["verification_code"] is not None
+        email_error = util.APIError(
+            400, message="Invalid email for organization.")
+        verification_error = util.APIError(
+            400, message="Invalid verification code.")
+        code_correct = org["verification_code"] == provided_code
+
+        if count == 0:
+            if can_verify_by_code and not code_correct:
+                raise verification_error
+            else:
+                raise email_error
+        elif can_verify_by_code:
+            if not code_correct:
+                raise verification_error
+
+    # Otherwise, no verification method defined, or passed verification
+
+
 @web_api.route("/user")
 @util.cross_origin(methods=["GET", "POST"])
 def list_users():
@@ -152,45 +199,8 @@ def create_user(*, user_id):
         })
     else:
         # Check the org
-        with model.engine.connect() as conn:
-            org = conn.execute(model.organizations.select().where(
-                model.organizations.c.id == org_id
-            )).first()
-
-            if org is None:
-                raise util.APIError(
-                    400, message="Organization does not exist.")
-
-            # Verify the email against the org
-            email_to_verify = email or user_data["github_email"]
-            if not email or "@" not in email_to_verify:
-                raise util.APIError(
-                    400, message="Email invalid.")
-            domain = email.split("@")[1].strip().lower()
-            count = conn.execute(sqlalchemy.sql.select([
-                sqlalchemy.sql.func.count()
-            ]).select_from(model.organization_email_domains).where(
-                (model.organization_email_domains.c.organization_id == org_id) &
-                (model.organization_email_domains.c.domain == domain)
-            )).first()[0]
-
-            can_verify_by_code = org["verification_code"] is not None
-            email_error = util.APIError(
-                        400, message="Invalid email for organization.")
-            verification_error = util.APIError(
-                        400, message="Invalid verification code.")
-            code_correct = org["verification_code"] == provided_code
-
-            if count == 0:
-                if can_verify_by_code and not code_correct:
-                    raise verification_error
-                else:
-                    raise email_error
-            elif can_verify_by_code:
-                if not code_correct:
-                    raise verification_error
-            # Otherwise, no verification method defined,
-            # or passed verification
+        verify_affiliation(org_id, email or user_data["github_email"],
+                           provided_code)
 
     # Set the email verification code (if necessary).
     if email:
@@ -296,6 +306,9 @@ def update_user(intended_user_id, *, user_id):
         "level": "player_level",
         "country_code": "country_code",
         "country_subdivision_code": "country_subdivision_code",
+        "organization_id": "organization_id",
+        "email": "email",
+        "verification_code": "organization_verification_code",
     }
 
     update = {}
@@ -306,10 +319,12 @@ def update_user(intended_user_id, *, user_id):
 
         update[columns[key]] = fields[key]
 
+    # Validate new player level
     if ("player_level" in update and
             not web_util.validate_user_level(update["player_level"])):
         raise util.APIError(400, message="Invalid player level.")
 
+    # Validate new country/region, if provided
     if "country_code" in update or "country_subdivision_code" in update:
         with model.engine.connect() as conn:
             user = conn.execute(
@@ -322,10 +337,37 @@ def update_user(intended_user_id, *, user_id):
             raise util.APIError(
                 400, message="Invalid country/country subdivision code.")
 
+    if "organization_id" in update:
+        # Associate the user with the organization
+        if "email" not in update:
+            raise util.APIError(
+                400, message="Provide email to associate with organization."
+            )
+        verify_affiliation(update["organization_id"], update["email"],
+                           update.get("organization_verification_code"))
+
+    if "organization_verification_code" in update:
+        del update["organization_verification_code"]
+
+    if "email" in update:
+        update["verification_code"] = uuid.uuid4().hex
+
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
             model.users.c.id == user_id
         ).values(**update))
+
+        if "email" in update:
+            user_data = conn.execute(model.users.select(
+                model.users.c.id == intended_user_id)).first()
+
+            notify.send_notification(
+                update["email"],
+                user_data["username"],
+                "Email verification",
+                notify.VERIFY_EMAIL.format(
+                    user_id=user_id,
+                    verification_code=update["verification_code"]))
 
     return util.response_success()
 
