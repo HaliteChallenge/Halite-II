@@ -1,4 +1,6 @@
 import sendgrid
+import sendgrid.helpers
+import sendgrid.helpers.mail
 
 from . import config
 
@@ -28,56 +30,22 @@ def send_notification(recipient_email, recipient_name, subject, body,
     print(response.body)
 
 
-COMPILATION_SUCCESS = """
-Your bot successfully compiled!
+def send_templated_notification(recipient_email, username, template_id, substitutions):
+    mail = sendgrid.helpers.mail.Mail()
 
-- Halite II Alpha
-"""
+    mail.from_email = sendgrid.Email("halite@halite.io", "Halite Challenge")
+    personalization = sendgrid.helpers.mail.Personalization()
+    personalization.add_to(sendgrid.helpers.mail.Email(recipient_email, username))
+    personalization.add_substitution(sendgrid.helpers.mail.Substitution("-username-", username))
+    for substitution_key, substitution_value in substitutions.items():
+        personalization.add_substitution(sendgrid.helpers.mail.Substitution(
+            "-{}-".format(substitution_key), substitution_value))
+    mail.add_personalization(personalization)
+    mail.template_id = template_id
 
+    settings = sendgrid.helpers.mail.MailSettings()
+    settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
+    mail.mail_settings = settings
 
-COMPILATION_FAILURE = """
-Your bot failed to compile!
+    sg.client.mail.send.post(request_body=mail.get())
 
-Detected language: {language}
-
-Error logs:
-
-{errors}
-
-- Halite II Alpha
-"""
-
-
-VERIFY_EMAIL = """
-<p>Please verify your email!</p>
-
-<p>Visit or copy to your browser: 
-<a href="http://35.185.45.87/verify_email?user_id={user_id}&verification_code={verification_code}">
-http://35.185.45.87/verify_email?user_id={user_id}&verification_code={verification_code}
-</a>
-</p>
-
-<p>
-- Halite II Alpha
-</p>
-"""
-
-
-FIRST_TIMEOUT = """
-<p>Your bot timed out or errored for the first time in a recent game. Either the bot took too long to initialize, too long to send its moves, or encounted an error and quit.</p>
-
-<p><a href="{replay_link}">Replay</a></p>
-<p><a href="{log_link}">Error log</a></p>
-
-<p>
-- Halite II Alpha
-</p>
-"""
-
-TIMEOUT_LIMIT = """
-<p>Your bot has timed out or errored at least {limit} times or in at least {percent} percent of its games and will no longer play games until a new version is uploaded.</p>
-
-<p>
-- Halite II Alpha
-</p>
-"""

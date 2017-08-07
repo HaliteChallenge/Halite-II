@@ -1,6 +1,7 @@
-import flask
 import math
+import urllib.parse
 
+import flask
 from flask_cors import cross_origin as flask_cross_origin
 
 from . import config
@@ -72,9 +73,30 @@ def tier_thresholds(total_users):
 
 
 def response_success(more=None, status_code=200):
+    """
+    Build a JSON response for a successful REST call.
+
+    :param more: Additional data to be included in the JSON.
+    :param status_code: The status code to use.
+    :return: The Flask response (tuple of JSON and status code)
+    """
     response = {
         "status": "success",
     }
     if more is not None:
         response.update(more)
     return flask.jsonify(response), status_code
+
+
+def build_site_url(page, params, base_url=config.SITE_URL):
+    """
+
+    :param page:
+    :param params:
+    :param base_url:
+    :return:
+    """
+
+    return "{}?{}".format(
+        urllib.parse.urljoin(base_url, page),
+        urllib.parse.urlencode(params))

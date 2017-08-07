@@ -138,18 +138,22 @@ def update_compilation_status():
                 )
             )
 
-            notify.send_notification(
-                user["email"],
-                user["username"],
-                "Bot successfully compiled",
-                notify.COMPILATION_SUCCESS)
+            notify.send_templated_notification(
+                user["email"], user["username"],
+                config.COMPILATION_SUCCESS_TEMPLATE,
+                {
+                    "detected_language": language,
+                }
+            )
 
             return util.response_success()
         else:
-            notify.send_notification(
-                user["email"],
-                user["username"],
-                "Bot failed to compile",
-                notify.COMPILATION_FAILURE.format(language=language,
-                                                  errors=errors))
+            notify.send_templated_notification(
+                user["email"], user["username"],
+                config.COMPILATION_FAILURE_TEMPLATE,
+                {
+                    "detected_language": language,
+                    "errors": errors,
+                }
+            )
             return util.response_success()

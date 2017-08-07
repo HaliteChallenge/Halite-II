@@ -319,23 +319,31 @@ def update_user_timeout(conn, game_id, user):
         (model.bots.c.id == user["bot_id"])
     )).first()["games_played"]
 
+    # Disable bots that error out too much
     hit_timeout_limit = timed_out_count > config.MAX_ERRORS_PER_BOT
+    # Disable bots that error in too great a percentage of their games
     hit_timeout_percent = (
-        total_count > 0 and
+        total_count > 10 and
         timed_out_count / total_count > config.MAX_ERROR_PERCENTAGE
     )
 
     if timed_out_count == 1:
-        notify.send_notification(
+        notify.send_templated_notification(
             user["email"],
             user["username"],
-            "First bot timeout/error",
-            notify.FIRST_TIMEOUT.format(
-                replay_link="{}/play?game_id={}".format(
-                    config.SITE_URL, game_id),
-                log_link="{}/user/{}/match/{}/error_log".format(
+            config.FIRST_TIMEOUT_TEMPLATE,
+            {
+                "limit": config.MAX_ERRORS_PER_BOT,
+                "percent": int(config.MAX_ERROR_PERCENTAGE * 100),
+                "game_id": game_id,
+                "user_id": user["user_id"],
+                "bot_id": user["bot_id"],
+                "replay_link": util.build_site_url("/play", {
+                    "game_id": game_id
+                }),
+                "log_link": "{}/user/{}/match/{}/error_log".format(
                     config.API_URL, user["user_id"], game_id),
-            ))
+            })
 
     elif hit_timeout_limit or hit_timeout_percent:
         # Prevent the bot from playing more games until a new bot
@@ -345,12 +353,19 @@ def update_user_timeout(conn, game_id, user):
         ).where((model.bots.c.user_id == user["user_id"]) &
                 (model.bots.c.id == user["bot_id"])))
 
-        notify.send_notification(
+        notify.send_templated_notification(
             user["email"],
             user["username"],
-            "Bot timeout/error limit reached",
-            notify.TIMEOUT_LIMIT.format(
-                limit=config.MAX_ERRORS_PER_BOT,
-                percent=int(config.MAX_ERROR_PERCENTAGE * 100),
-            ))
-
+            config.BOT_DISABLED_TEMPLATE,
+            {
+                "limit": config.MAX_ERRORS_PER_BOT,
+                "percent": int(config.MAX_ERROR_PERCENTAGE * 100),
+                "game_id": game_id,
+                "user_id": user["user_id"],
+                "bot_id": user["bot_id"],
+                "replay_link": util.build_site_url("/play", {
+                    "game_id": game_id
+                }),
+                "log_link": "{}/user/{}/match/{}/error_log".format(
+                    config.API_URL, user["user_id"], game_id),
+            })

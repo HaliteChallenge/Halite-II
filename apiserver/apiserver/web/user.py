@@ -89,6 +89,28 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
     # Otherwise, no verification method defined, or passed verification
 
 
+def send_verification_email(user_id, username, email, verification_code):
+    """
+    Send the verification email to the user.
+
+    :param user_id:
+    :param username:
+    :param email:
+    :param verification_code:
+    :return:
+    """
+
+    notify.send_templated_notification(
+        email, username,
+        config.VERIFY_EMAIL_TEMPLATE,
+        {
+            "verification_url": util.build_site_url("/verify_email", {
+                "user_id": user_id,
+                "verification_code": verification_code,
+            }),
+        }
+    )
+
 @web_api.route("/user")
 @util.cross_origin(methods=["GET", "POST"])
 def list_users():
@@ -211,14 +233,8 @@ def create_user(*, user_id):
             "organization_id": org_id,
         })
 
-        notify.send_notification(
-            email,
-            user_data["username"],
-            "Email verification",
-            notify.VERIFY_EMAIL.format(
-                user_id=user_id,
-                verification_code=verification_code),
-        )
+        send_verification_email(user_id, user_data["username"],
+                                email, verification_code)
 
         message = "Please check your email for a verification code."
     else:
@@ -361,13 +377,9 @@ def update_user(intended_user_id, *, user_id):
             user_data = conn.execute(model.users.select(
                 model.users.c.id == intended_user_id)).first()
 
-            notify.send_notification(
-                update["email"],
-                user_data["username"],
-                "Email verification",
-                notify.VERIFY_EMAIL.format(
-                    user_id=user_id,
-                    verification_code=update["verification_code"]))
+            send_verification_email(user_id, user_data["username"],
+                                    update["email"],
+                                    update["verification_code"])
 
     return util.response_success()
 

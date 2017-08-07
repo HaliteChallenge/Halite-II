@@ -53,9 +53,9 @@ OAUTH_GITHUB_CONSUMER_KEY = ""
 OAUTH_GITHUB_CONSUMER_SECRET = ""
 
 # CORS setup
-CORS_ORIGINS = []
 SITE_URL = ""
 API_URL = ""
+CORS_ORIGINS = [SITE_URL]
 
 # API Key authentication
 api_key_context = CryptContext(
@@ -70,6 +70,12 @@ DISCOURSE_URL = "https://forums.halite.io/sso"
 # SendGrid
 SENDGRID_API_KEY = ""
 SENDGRID_SANDBOX_MODE = True
+
+COMPILATION_SUCCESS_TEMPLATE = ""
+COMPILATION_FAILURE_TEMPLATE = ""
+VERIFY_EMAIL_TEMPLATE = ""
+FIRST_TIMEOUT_TEMPLATE = ""
+BOT_DISABLED_TEMPLATE = ""
 
 # Ranking Tiers
 TIER_0_NAME = "Diamond"
