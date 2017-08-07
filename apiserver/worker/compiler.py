@@ -250,6 +250,7 @@ comp_args = {
     "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
                              ["gcc", "-O2", "-lm", "-o", BOT]],
     "C#"            : [["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT]],
+    ".NET Core"     : [["dotnet", "restore"], ["dotnet", "build", "-c", "Release", "-o", "."]],
     "Clojure"     : [["lein", "uberjar"]],
     "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
     "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
@@ -290,6 +291,14 @@ languages = (
         ["*.o", BOT],
         [(["*.c"], TargetCompiler(comp_args["C"][0], targets["C"])),
             (["*.o"], ExternalCompiler(comp_args["C"][1]))]
+    ),
+    Language(".NET Core", BOT + ".dll", "MyBot.csproj",
+             "dotnet MyBot.dll",
+             [BOT + ".dll"],
+             [
+                 ([], ExternalCompiler(comp_args[".NET Core"][0])),
+                 ([], ExternalCompiler(comp_args[".NET Core"][1])),
+             ]
     ),
     Language("C#", BOT +".exe", "MyBot.cs",
         "mono MyBot.exe",
