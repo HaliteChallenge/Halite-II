@@ -108,7 +108,7 @@ def update_organization(org_id, *, user_id):
     return util.response_success()
 
 
-@web_api.route("/organization/<int:org_id>/email_domains", methods=["GET"])
+@web_api.route("/organization/<int:org_id>/email_domain", methods=["GET"])
 @web_util.requires_login(accept_key=True, admin=True)
 def list_organization_email_domains(org_id, *, user_id):
     result = []
@@ -123,7 +123,7 @@ def list_organization_email_domains(org_id, *, user_id):
     return flask.jsonify(result)
 
 
-@web_api.route("/organization/<int:org_id>/email_domains", methods=["POST"])
+@web_api.route("/organization/<int:org_id>/email_domain", methods=["POST"])
 @web_util.requires_login(accept_key=True, admin=True)
 def create_organization_email_domain(org_id, *, user_id):
     domains = []
@@ -152,7 +152,7 @@ def create_organization_email_domain(org_id, *, user_id):
             model.organization_email_domains.insert(),
             [
                 {
-                    "organzation_id": org_id,
+                    "organization_id": org_id,
                     "domain": domain,
                 }
                 for domain in domains
