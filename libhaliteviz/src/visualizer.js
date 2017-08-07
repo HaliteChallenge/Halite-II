@@ -3,7 +3,6 @@ const $ = require("jquery");
 const extraFilters = require("pixi-extra-filters");
 const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
-const msgpack = require("msgpack-lite");
 
 import {Ship} from "./ship";
 import {Planet} from "./planet";

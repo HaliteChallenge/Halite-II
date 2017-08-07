@@ -11,24 +11,32 @@ export class Planet {
         this.constants = constants;
 
         const pixelsPerUnit = assets.CELL_SIZE * scale;
-        if (planetBase.r * pixelsPerUnit <= 100) {
+        if (planetBase.r * pixelsPerUnit <= 20) {
             this.core = PIXI.Sprite.from(assets.PLANET_IMAGE_SMALL);
-            this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE_SMALL);
-            this.halo.anchor.x = 94 / 192;
-            this.halo.anchor.y = 98 / 195;
         }
         else {
             this.core = PIXI.Sprite.from(assets.PLANET_IMAGE);
+        }
+
+        if (planetBase.r * pixelsPerUnit <= 30) {
+            this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE_SMALL);
+            this.halo.anchor.x = 94 / 192;
+            this.halo.anchor.y = 98 / 195;
+            this.halo.width = this.halo.height = (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.baseHaloAlpha = 0.1;
+        }
+        else {
             this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE);
             // Center of sprite != center of circle
             this.halo.anchor.x = 108.5 / 207;
             this.halo.anchor.y = 96.5 / 206;
             this.halo.alpha = 0.2;
+            this.halo.width = this.halo.height = (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.baseHaloAlpha = 0.5;
         }
 
         this.core.width = this.core.height = 2 * planetBase.r * pixelsPerUnit;
         // Scale halo such that inner circular area represents docking radius
-        this.halo.width = this.halo.height = (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
         this.core.anchor.x = 0.5;
         this.core.anchor.y = 0.5;
 
@@ -37,6 +45,7 @@ export class Planet {
         this.halo.position.x = scale * assets.CELL_SIZE * planetBase.x;
         this.halo.position.y = scale * assets.CELL_SIZE * planetBase.y;
 
+        this.core.rotation = Math.random() * 2 * Math.PI;
         this.core.interactive = true;
         this.core.buttonMode = true;
         this.core.on("pointerdown", () => {
@@ -64,10 +73,11 @@ export class Planet {
             this.halo.rotation += dt / 400;
             if (this.halo.rotation > 2 * Math.PI) this.halo.rotation -= 2 * Math.PI;
 
-            this.halo.alpha = 0.2 + 0.4 * Math.min(1.0, planetStatus.current_production / this.constants.PRODUCTION_PER_SHIP);
+            this.halo.alpha = this.baseHaloAlpha +
+                0.4 * Math.min(1.0, planetStatus.current_production / this.constants.PRODUCTION_PER_SHIP);
         }
         else {
-            this.halo.alpha = 0.2;
+            this.halo.alpha = this.baseHaloAlpha;
         }
 
         const side = assets.CELL_SIZE * this.scale;
