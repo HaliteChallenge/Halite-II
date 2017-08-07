@@ -108,6 +108,60 @@ def update_organization(org_id, *, user_id):
     return util.response_success()
 
 
+@web_api.route("/organization/<int:org_id>/email_domains", methods=["GET"])
+@web_util.requires_login(accept_key=True, admin=True)
+def list_organization_email_domains(org_id, *, user_id):
+    result = []
+    with model.engine.connect() as conn:
+        domains = conn.execute(model.organization_email_domains.select(
+            model.organization_email_domains.c.organization_id == org_id
+        ))
+
+        for domain in domains.fetchall():
+            result.append(domain["domain"])
+
+    return flask.jsonify(result)
+
+
+@web_api.route("/organization/<int:org_id>/email_domains", methods=["POST"])
+@web_util.requires_login(accept_key=True, admin=True)
+def create_organization_email_domain(org_id, *, user_id):
+    domains = []
+
+    json_body = flask.request.get_json()
+    if json_body:
+        if "domain" in json_body:
+            domains.append(json_body["domain"])
+        elif "domains" in json_body:
+            domains.extend(json_body["domains"])
+    else:
+        if "domain" in flask.request.form:
+            domains.append(flask.request.form["domain"])
+        elif "domains" in flask.request.form:
+            domains.extend(flask.request.form.getlist("domain"))
+
+    with model.engine.connect() as conn:
+        org = conn.execute(model.organizations.select().where(
+            model.organizations.c.id == org_id
+        )).first()
+
+        if org is None:
+            raise util.APIError(404, message="Organization does not exist.")
+
+        conn.execute(
+            model.organization_email_domains.insert(),
+            [
+                {
+                    "organzation_id": org_id,
+                    "domain": domain,
+                }
+                for domain in domains
+            ]
+        )
+
+    return util.response_success(status_code=201)
+
+
 @web_api.route("/organization/<int:org_id>", methods=["DELETE"])
 @web_util.requires_login(accept_key=True, admin=True)
 def delete_organization(org_id, *, user_id):
