@@ -4,16 +4,11 @@
 import collections
 import errno
 import fnmatch
-import glob
-import json
 import os
 import os.path
 import re
-import shutil
 import subprocess
 import sys
-import time
-from optparse import OptionParser
 
 try:
     from server_info import server_info
@@ -24,6 +19,7 @@ except ImportError:
 BOT = "MyBot"
 LANGUAGE_FILE = "LANGUAGE"
 SAFEPATH = re.compile('[a-zA-Z0-9_.$-]+$')
+
 
 class CD(object):
     def __init__(self, new_dir):
@@ -37,6 +33,7 @@ class CD(object):
     def __exit__(self, type, value, traceback):
         os.chdir(self.org_dir)
 
+
 def safeglob(pattern):
     safepaths = []
     for root, dirs, files in os.walk("."):
@@ -48,11 +45,13 @@ def safeglob(pattern):
                 safepaths.append(os.path.join(root, fname))
     return safepaths
 
+
 def safeglob_multi(patterns):
     safepaths = []
     for pattern in patterns:
         safepaths.extend(safeglob(pattern))
     return safepaths
+
 
 def nukeglob(pattern):
     paths = safeglob(pattern)
@@ -62,6 +61,7 @@ def nukeglob(pattern):
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
+
 
 def _run_cmd(cmd, working_dir, timelimit):
     absoluteWorkingDir = os.path.abspath(working_dir)
@@ -92,9 +92,11 @@ def check_path(path, errors):
     else:
         return True
 
+
 class Compiler(object):
     def compile(self, globs, errors):
         raise NotImplementedError
+
 
 class ChmodCompiler(Compiler):
     def __init__(self, language):
@@ -111,6 +113,7 @@ class ChmodCompiler(Compiler):
                 except Exception as e:
                     errors.append("Error chmoding %s - %s\n" % (f, e))
         return True
+
 
 class ExternalCompiler(Compiler):
     def __init__(self, args, separate=False, out_files=[], out_ext=None):
@@ -208,6 +211,7 @@ class ErrorFilterCompiler(ExternalCompiler):
             return [line for line in cmd_out if line is not None] + cmd_errors
 
         return cmd_errors
+
 
 class TargetCompiler(Compiler):
     def __init__(self, args, replacements, outflag="-o"):
