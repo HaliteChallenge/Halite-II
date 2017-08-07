@@ -148,11 +148,14 @@ def main():
             make_archive(output, (platform, source, target),
                          full_path, included_files)
 
+    panlanguage_kits = []
     for (platform, source, target) in environments:
         # Make downloads including all languages
-        all_output = "./" + ALL_LANGUAGES_OUTPUT_FILE_FORMAT.format(platform=platform)
+        filename = ALL_LANGUAGES_OUTPUT_FILE_FORMAT.format(platform=platform)
+        all_output = "./" + filename
         print("\tMaking:", all_output)
         make_archive(all_output, (platform, source, target), "../airesources", all_files)
+        panlanguage_kits.append(filename)
 
         # Make downloads including no languages
         if source is None:
@@ -180,6 +183,11 @@ def main():
             "language": language,
             "files": language_kits,
         })
+
+    output["languages"].append({
+        "language": "(all)",
+        "files": panlanguage_kits,
+    })
 
     for (platform, source, _) in environments:
         if source is None:
