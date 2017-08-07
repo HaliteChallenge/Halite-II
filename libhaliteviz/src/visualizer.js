@@ -369,15 +369,17 @@ export class HaliteVisualizer {
                 else if (event.event === "spawned") {
                     if (event.planet) {
                         const planet = this.planets[event.planet.id];
-                        const duration = 50;
+                        const duration = 24;
                         this.animationQueue.push(new animation.FrameAnimation(
                             duration, delayTime,
                             () => {
                             },
                             (frame) => {
-                                let factor = Math.cos((frame / duration) * Math.PI);
+                                let ship = this.ships[event.entity.id];
+                                if (!ship) return;
 
-                                planet.halo.alpha = 0.5 + 0.3 * factor;
+                                let factor = frame / duration;
+                                ship.halo.alpha = factor;
                             },
                             () => {
 

@@ -8,6 +8,7 @@ export class Planet {
         this.overlay = null;
         this.planetBase = planetBase;
         this.scale = scale;
+        this.constants = constants;
 
         const pixelsPerUnit = assets.CELL_SIZE * scale;
         if (planetBase.r * pixelsPerUnit <= 100) {
@@ -22,11 +23,12 @@ export class Planet {
             // Center of sprite != center of circle
             this.halo.anchor.x = 108.5 / 207;
             this.halo.anchor.y = 96.5 / 206;
+            this.halo.alpha = 0.2;
         }
 
         this.core.width = this.core.height = 2 * planetBase.r * pixelsPerUnit;
         // Scale halo such that inner circular area represents docking radius
-        this.halo.width = this.halo.height = (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
+        this.halo.width = this.halo.height = (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
         this.core.anchor.x = 0.5;
         this.core.anchor.y = 0.5;
 
@@ -61,6 +63,11 @@ export class Planet {
         if (planetStatus.owner !== null) {
             this.halo.rotation += dt / 400;
             if (this.halo.rotation > 2 * Math.PI) this.halo.rotation -= 2 * Math.PI;
+
+            this.halo.alpha = 0.2 + 0.4 * Math.min(1.0, planetStatus.current_production / this.constants.PRODUCTION_PER_SHIP);
+        }
+        else {
+            this.halo.alpha = 0.2;
         }
 
         const side = assets.CELL_SIZE * this.scale;
