@@ -9,6 +9,7 @@ module.exports = {
     },
     devtool: "source-map",
     module: {
+        noParse: /libzstd/,
         loaders: [
             {
                 test: /\.js$/,
