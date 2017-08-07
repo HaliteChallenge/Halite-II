@@ -47,7 +47,7 @@ export class Ship {
         this.baseDockingWidth = 0.5 * (240 / 76) * this.sprite.width;
         this.leftDocking.height = this.baseDockingHeight = (240 / 76) * this.sprite.height;
 
-        this.leftDocking.width = this.rightDocking.width = 4 * radius * this.visualizer.scale * CELL_SIZE;
+        this.leftDocking.width = this.rightDocking.width = 5 * radius * this.visualizer.scale * CELL_SIZE;
 
         this.sprite.tint = PLAYER_COLORS[this.owner];
         this.halo.tint = PLAYER_COLORS[this.owner];
@@ -179,20 +179,22 @@ export class Ship {
             this.tractorBeam.rotation = shipPlanetAngle + Math.PI / 2;
             this.tractorBeam.texture = assets.TRACTOR_BEAM_FRAMES[Math.floor(progress * (assets.TRACTOR_BEAM_FRAMES.length - 1))];
 
-            // TODO: refactor and explain what's going on here
-            const dx2 = ship.x - planetBase.x;
-            const dy2 = ship.y - planetBase.y;
-            const distance = Math.sqrt(Math.pow(dx2, 2) + Math.pow(dy2, 2));
+            const distanceToPlanet = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+            const armHeight = distanceToPlanet;
+            const armAngle = shipPlanetAngle + Math.PI / 2;
+
+            // Orient the docking arms to the planet
             this.leftDocking.texture = this.dockingFrames[frame];
-            this.leftDocking.position.x = this.sprite.position.x; // + pixelRadius * Math.cos(shipPlanetAngle + Math.PI / 2);
-            this.leftDocking.position.y = this.sprite.position.y; // + pixelRadius * Math.sin(shipPlanetAngle + Math.PI / 2);
-            this.leftDocking.height = distance * side;
-            this.leftDocking.rotation = shipPlanetAngle + Math.PI / 2;
+            this.leftDocking.position.x = this.sprite.position.x + pixelRadius * Math.cos(shipPlanetAngle + Math.PI / 2);
+            this.leftDocking.position.y = this.sprite.position.y + pixelRadius * Math.sin(shipPlanetAngle + Math.PI / 2);
+            this.leftDocking.height = armHeight;
+            this.leftDocking.rotation = armAngle;
+
             this.rightDocking.texture = this.dockingMirroredFrames[frame];
             this.rightDocking.position.x = this.sprite.position.x + pixelRadius * Math.cos(shipPlanetAngle - Math.PI / 2);
             this.rightDocking.position.y = this.sprite.position.y + pixelRadius * Math.sin(shipPlanetAngle - Math.PI / 2);
-            this.rightDocking.height = distance * side;
-            this.rightDocking.rotation = shipPlanetAngle + Math.PI / 2;
+            this.rightDocking.height = armHeight;
+            this.rightDocking.rotation = armAngle;
         }
         else {
             this.leftDocking.visible = false;
