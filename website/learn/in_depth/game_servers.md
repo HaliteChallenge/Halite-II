@@ -100,4 +100,17 @@ Bots are given 350 MB of RAM and equal amounts of CPU.
 
 Games are always run using the most recent environment build.
 
+### GPU-Enabled Games
+
+The following packages are available during __runtime__ (__not__ compile time) for GPU-enabled bots:
+
+- cuda	8.0.61-1
+- libcupti-dev:amd64	8.0.44-3
+
+Python 3.5 Packages:
+- tensorflow-gpu 1.2.1
+
+Python 3.6 Packages:
+- tensorflow-gpu 1.2.1
+
 [autocompile-script]: https://github.com/HaliteChallenge/Halite/blob/02b8a4a8c14498ddc471039c9a453137379420c1/worker/compiler.py
