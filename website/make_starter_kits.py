@@ -19,8 +19,14 @@ INCLUDED_FILES = ["Makefile", "README"]
 STARTER_KIT_DIR = "../airesources"
 DOWNLOAD_DATA = "_data/downloads.json"
 PLATFORM_AGNOSTIC = "None"
+
+# Names of generated downloads
+# Standard language + platform
 OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{language}_{platform}.zip"
+# Platform only
 ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
+# All languages + platform
+ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
 
@@ -111,6 +117,10 @@ def main():
 
     make_source_download()
 
+    # Keep paths of all source files around so we can make a single combined
+    # download at the end
+    all_files = []
+
     for directory in os.listdir(STARTER_KIT_DIR):
         full_path = os.path.join(STARTER_KIT_DIR, directory)
         if not os.path.isdir(full_path):
@@ -129,6 +139,8 @@ def main():
 
         print()
 
+        all_files.extend(included_files)
+
         for (platform, source, target) in environments:
             output = "./" + OUTPUT_FILE_FORMAT.format(
                 language=language, platform=platform)
@@ -137,6 +149,12 @@ def main():
                          full_path, included_files)
 
     for (platform, source, target) in environments:
+        # Make downloads including all languages
+        all_output = "./" + ALL_LANGUAGES_OUTPUT_FILE_FORMAT.format(platform=platform)
+        print("\tMaking:", all_output)
+        make_archive(all_output, (platform, source, target), "../airesources", all_files)
+
+        # Make downloads including no languages
         if source is None:
             continue
         output = "./" + ENVIRONMENT_OUTPUT_FILE_FORMAT.format(platform=platform)
