@@ -12,7 +12,11 @@ Prefer zone us-east1-b.
 
 ### Create the Worker Image
 
-We need to create a machine image with all necessary compilers and other things set up already. Create an instance based on Ubuntu 17.04, or the latest version of Ubuntu available. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Once the instance is started, run [`setup_worker_image.sh`](./setup_worker_image.sh), then delete the instance and create an image from its boot disk. Make sure this image is part of an image family, e.g. `halite-worker`.
+We need to create a machine image with all necessary compilers and other things set up already. Create an instance based on Ubuntu 17.04, or the latest version of Ubuntu available. Under "Management, disks, networking, and SSH keys", uncheck "Delete boot disk". Under "SSH keys", check "Block project-wide SSH keys".
+
+Once the instance is started, run [`setup_worker_image.sh`](./setup_worker_image.sh). This is mostly automated, but one of the packages installed will prompt you - simply answer "no" to both of them.
+
+ Delete the instance and create an image from its boot disk. Make sure this image is part of an image family, e.g. `halite-worker`.
 
 At the end, the script also prints out all installed packages with their versions, which is useful for documentation.
 
