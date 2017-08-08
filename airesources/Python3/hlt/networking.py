@@ -1,77 +1,89 @@
-"""
-Communication with the Game Environment
-
-These functions are used to send/receive data from the game itself. In either
-direction, communication is terminated with a newline character.
-"""
-
-import logging
 import sys
+import logging
+import copy
 
-import hlt
 from . import game_map
 
 
-def send_string(s):
-    """Send data to the game. Call :function:`done_sending` once finished."""
-    sys.stdout.write(s)
-    sys.stdout.flush()
-
-
-def done_sending():
-    """Finish sending commands to the game."""
-    sys.stdout.write('\n')
-    sys.stdout.flush()
-
-
-def get_string():
-    """Read input from the game."""
-    result = sys.stdin.readline().rstrip('\n')
-    return result
-
-
-def initialize(name):
+class Game:
     """
-    Initialize the bot with the given name.
-    :param name: The name of the bot.
-    :return: The player tag, map dimensions, and initial map.
+    :ivar map: Current map representation
+    :ivar initial_map: The initial version of the map before game starts
     """
+    @staticmethod
+    def _send_string(s):
+        """
+        Send data to the game. Call :function:`done_sending` once finished.
+        :param str s: String to send
+        :return: nothing
+        """
+        sys.stdout.write(s)
+        sys.stdout.flush()
 
-    tag = int(get_string())
-    hlt.my_tag = tag
-    hlt.map_size = [int(x) for x in get_string().strip().split()]
-    initial_map = get_string()
-    send_string(name)
-    done_sending()
+    @staticmethod
+    def _done_sending():
+        """
+        Finish sending commands to the game.
+        :return: nothing
+        """
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
-    # Set up and truncate the log
-    log_file = "{}_{}.log".format(hlt.my_tag, name)
-    with open(log_file, 'w'):
-        pass
-    logging.basicConfig(filename=log_file, level=logging.DEBUG)
-    logging.info("Initialized bot {}".format(name))
+    @staticmethod
+    def _get_string():
+        """
+        Read input from the game.
+        :return: The input read from the Halite engine
+        :rtype: str
+        """
+        result = sys.stdin.readline().rstrip('\n')
+        return result
 
-    hlt.last_map = initial_map
+    @staticmethod
+    def send_command_queue(command_queue):
+        """
+        Issue the given list of commands.
+        :param list[str] command_queue: List of commands to send the Halite engine
+        :return: nothing
+        """
+        for command in command_queue:
+            Game._send_string(command)
 
-    return tag, hlt.map_size, initial_map
+        Game._done_sending()
 
+    @staticmethod
+    def _set_up_logging(tag, name):
+        """
+        Set up and truncate the log
+        :param tag: The user tag (used for naming the log)
+        :param name: The bot name (used for naming the log)
+        :return: nothing
+        """
+        log_file = "{}_{}.log".format(tag, name)
+        logging.basicConfig(filename=log_file, level=logging.DEBUG, filemode='w')
+        logging.info("Initialized bot {}".format(name))
 
-def send_command_queue(command_queue):
-    """
-    Issue the given list of commands.
-    :param command_queue:
-    :return:
-    """
-    for command in command_queue:
-        send_string(command)
+    def __init__(self, name):
+        """
+        Initialize the bot with the given name.
+        :param name: The name of the bot.
+        """
+        tag = int(self._get_string())
+        Game._set_up_logging(tag, name)
+        width, height = [int(x) for x in self._get_string().strip().split()]
+        self._send_string(name)
+        self._done_sending()
+        self.map = game_map.Map(tag, width, height)
+        self.update_map()
+        self.initial_map = copy.deepcopy(self.map)
 
-    done_sending()
-
-
-def get_map():
-    """
-    Parse the map given by the engine.
-    :return:
-    """
-    logging.info("---NEW TURN---")
-    return game_map.parse(get_string())
+    def update_map(self):
+        """
+        Parse the map given by the engine.
+        :return: new parsed map
+        :rtype: game_map.Map
+        """
+        import logging
+        logging.info("---NEW TURN---")
+        self.map.parse(self._get_string())
+        return self.map

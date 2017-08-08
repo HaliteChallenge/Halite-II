@@ -13,7 +13,7 @@ import math
 import hlt
 from . import collision, constants
 from .movement import adjust_for_collision, move_to, orient_towards
-from .utils import distance, Location
+from .utils import distance, Position
 
 
 """Auxiliary data structure holding the state of currently warping ships."""
@@ -116,7 +116,7 @@ def _warp(ship, x, y, *,
     """
 
     logging.debug("Warp {}: beginning (distance {})".format(
-        ship.id, distance(ship, Location(x, y))))
+        ship.id, distance(ship, Position(x, y))))
     # Acceleration stage
     while True:
         # Get the most up-to-date ship
@@ -125,7 +125,7 @@ def _warp(ship, x, y, *,
             return
 
         speed = math.sqrt(ship.vel_x*ship.vel_x + ship.vel_y*ship.vel_y)
-        angle, dist = orient_towards(ship, Location(x, y))
+        angle, dist = orient_towards(ship, Position(x, y))
         # Guard against divide-by-zero
         turns_left = dist / speed if speed else 100000
         turns_to_decelerate = math.ceil(
@@ -146,7 +146,7 @@ def _warp(ship, x, y, *,
                     dist / constants.MAX_SPEED * max_acceleration)))
 
         angle, thrust, target = adjust_for_collision(ship, angle, thrust, tries=60)
-        target_circle = Location(x, y)
+        target_circle = Position(x, y)
         target_circle.r = 1.0
         if collision.intersect_segment_circle(ship, target, target_circle):
             break
@@ -168,13 +168,13 @@ def _warp(ship, x, y, *,
         if not ship:
             return
 
-        if distance(ship, Location(x, y)) <= 1.5:
+        if distance(ship, Position(x, y)) <= 1.5:
             break
 
         logging.debug(
             "Warp {}: move from {} {} to {} {}".format(
                 ship.id, ship.x, ship.y, x, y))
-        angle, dist = orient_towards(ship, Location(x, y))
+        angle, dist = orient_towards(ship, Position(x, y))
         yield move_to(ship, angle, constants.DRAG)
 
 

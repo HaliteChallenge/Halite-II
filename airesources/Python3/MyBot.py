@@ -1,27 +1,60 @@
+"""
+Welcome to your first Halie-II bot!
+
+This bot's name is Settler. It's purpose is simple (don't expect it to win complex games :) ):
+1. Initialize game
+2. If a ship is not docked and there are unowned planets
+2.a. Try to Dock in the planet if close enough
+2.b If not, go towards the planet
+
+Note: Please do not place print statements here as they are used to communicate with the Halite engine. If you need
+to log anything use the logging module.
+"""
+# Let's start by importing the Halite Starter Kit so we can interface with the Halite engine
 import hlt
 
-
-my_tag, map_size, initial_map = hlt.initialize("Settler")
+# GAME START
+# Here we define the bot's name as Settler and initialize the game, including communication with the Halite engine.
+game = hlt.Game("Settler")
 
 while True:
-    game_map = hlt.get_map()
-    command_queue = []
+    # TURN START
+    # Update the map for the new turn and get the latest version
+    game_map = game.update_map()
 
-    for ship in game_map.ships[my_tag].values():
-        if ship.docked != "undocked":
+    # Here we define the set of commands to be sent to the Halite engine at the end of the turn
+    command_queue = []
+    # For every ship that I control
+    for ship in game_map.get_me().all_ships():
+        # If the ship is undocked
+        if ship.docking_status != ship.DockingStatus.UNDOCKED:
+            # Skip this ship
             continue
 
-        planets = game_map.planets.values()
-        for planet in planets:
-            if planet.owned:
+        # For each planet in the game (only non-destroyed planets are included)
+        for planet in game_map.all_planets():
+            # If the planet is owned
+            if planet.is_owned():
+                # Skip this planet
                 continue
 
-            angle, distance = hlt.orient_towards(ship, planet)
-            if hlt.can_dock(ship, planet):
-                command_queue.append(hlt.dock(ship, planet))
+            # If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
+            if ship.can_dock(planet):
+                # We add the command by appending it to the command_queue
+                command_queue.append(ship.dock(planet))
             else:
-                command_queue.append(hlt.move_to(ship, angle, 1))
-
+                # If we can't dock, we move towards the closest empty point near this planet (by using closest_point_to)
+                # with constant speed. Don't worry about pathfinding for now, as the command will do it for you.
+                # We run this navigate command each turn until we arrive to get the latest move.
+                navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=4)
+                # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
+                # or we are trapped (or we reached our destination!), navigate_command will return null;
+                # don't fret though, we can run the command again the next turn)
+                if navigate_command:
+                    command_queue.append(navigate_command)
             break
 
-    hlt.send_command_queue(command_queue)
+    # Send our set of commands to the Halite engine for this turn
+    game.send_command_queue(command_queue)
+    # TURN END
+# GAME END

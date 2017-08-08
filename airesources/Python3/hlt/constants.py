@@ -25,10 +25,3 @@ ADDITIONAL_PRODUCTIVITY = 6
 
 SPAWN_RADIUS = 2
 
-"""Constants used in parsing ship docking status."""
-DOCKING_STATUS = {
-    0: "undocked",
-    1: "docking",
-    2: "docked",
-    3: "undocking",
-}
