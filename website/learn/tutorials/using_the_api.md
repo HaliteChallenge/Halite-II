@@ -110,3 +110,76 @@ Returns this player's ship object designated by the given id. The ship object ca
 ### all_ships
 
 Returns a list of all the ships this player contains.
+
+## Entity
+
+The entity is an abstract base class which contains basic functionality which Ship, Planet and Position inherit. 
+
+Following are a set of methods and their explanations:
+
+### calculate_distance_between
+Given this entity and another entity, return the distance between them.
+
+### calculate_angle_between
+Given this entity and another entity, return the angle (in degrees) bewteen them.
+
+### closest_point_to
+Returns the first unnocupied (meaning unoccupied by the entity itself) Position near the entity, considering a designated min_distance from that first unnicupied position.
+
+## Planet
+
+The planet object designates a planet, its metadata and contents. The planet contains the following information:
+1. id - the global id of the planet
+2. x - the planet's x-coordinate
+3. y - the planet's y-coordinate
+4. radius - the planet's radius
+5. num_docking_spots - the total number of docking spots the planet has
+6. current_production - the current halite the ship has produced. Once it reaches the single ship treshold, it will reset to zero and a ship will be produced
+7. remaining_resources - How many resources the planet has remaining.
+8. health - The remaining health of the planet.
+9. owner - Who owns the planet. If no owner, contains None/Null equivalent
+
+Following are a set of methods and their explanations:
+
+### all_docked_ships
+
+Returns the list of all ship ids of the ships which are docked in the planet
+
+### is_full
+
+Returns True if the planet has as many ships docked as it can contain
+
+### is_owned
+
+Returns True if the planet has an owner
+
+## Ship
+
+The ship object holds all metadata relative to a ship and is the only object capable of issuing commands. The ship object holds the following information:
+1. id - the local id of the ship
+2. x - the ship's x-coordinate
+3. y - the ship's y-coordinate
+4. radius - the ship's radius (assumed to always be 0.5)
+5. docking_status - The current status of the ship. Will be one of UNDOCKED, DOCKED, DOCKING, UNDOCKING.
+6. planet - the id of the planet which owns the ship.
+7. owner - The id of the user who owns the ship.
+
+Following are a set of methods and their explanations:
+
+### thrust
+Creates a command which moves a ship towards the designated angle (in degrees) with the designated speed.
+
+### can_dock
+Determines whether a ship can dock to a planet. If so, returns True.
+
+### dock
+Creates a command to dock this ship to the designated planet.
+
+### undock
+Creates a command to undock this ship from the designated planet.
+
+### navigate
+Create a command to move a ship to a specific target position. It is recommended to place the position itself (rather than another entity) here, else navigate will crash into the target. If avoid_obstacles is set to True (default) will avoid obstacles on the way, with up to max_corrections corrections. Note that each correction ammounts to 1 degree of difference, meaning that the algorithm will naively try max_correction degrees before giving up (and returning None). The navigation will only consist of up to one command; call this method again in the next turn to continue navigating to the position.
+
+## Position
+Basic entity which is meant to hold an x, y coordinate with 0 radius. Used for determining targets for moves and passing positional information.
