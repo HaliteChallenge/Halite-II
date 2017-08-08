@@ -22,7 +22,7 @@ export class Planet {
             this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE_SMALL);
             this.halo.anchor.x = 94 / 192;
             this.halo.anchor.y = 98 / 195;
-            this.halo.width = this.halo.height = (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.halo.width = this.halo.height = 1.1 * (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
             this.baseHaloAlpha = 0.1;
         }
         else {
@@ -31,7 +31,7 @@ export class Planet {
             this.halo.anchor.x = 108.5 / 207;
             this.halo.anchor.y = 96.5 / 206;
             this.halo.alpha = 0.2;
-            this.halo.width = this.halo.height = (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.halo.width = this.halo.height = 1.1 * (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
             this.baseHaloAlpha = 0.5;
         }
 
