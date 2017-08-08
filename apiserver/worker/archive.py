@@ -3,6 +3,7 @@ import os
 import platform
 import shutil
 
+
 def unpack(filePath):
     """Unpacks and deletes a zip file into the files current path"""
     folderPath = os.path.dirname(filePath)
@@ -26,6 +27,7 @@ def unpack(filePath):
 
     shutil.rmtree(tempPath)
     os.remove(filePath)
+
 
 def zipFolder(folderPath, destinationFilePath):
     """Zips a folder to a path"""

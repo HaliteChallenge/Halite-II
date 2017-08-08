@@ -50,6 +50,7 @@ def makePath(path):
 
 
 def give_ownership(top_dir, group, dir_perms):
+    """Give ownership of everything in a directory to a given group."""
     for dirpath, _, filenames in os.walk(top_dir):
         shutil.chown(dirpath, group=group)
         os.chmod(dirpath, dir_perms)
@@ -98,7 +99,7 @@ def executeCompileTask(user_id, bot_id, backend):
             didCompile = more_errors is None
             if more_errors:
                 errors.extend(more_errors)
-        except Exception as e:
+        except Exception:
             language = "Other"
             errors = [COMPILE_ERROR_MESSAGE + traceback.format_exc()] + errors
             didCompile = False
@@ -152,7 +153,10 @@ def runGame(width, height, users):
             bot_user = "bot_{}".format(user_index)
             bot_cgroup = "bot_{}".format(user_index)
 
-            give_ownership(top_dir, "bots", 0o755)
+            # We want 775 so that the bot can create files still; leading 2
+            # is equivalent to g+s which forces new files to be owned by the
+            # group
+            give_ownership(bot_dir, "bots", 0o2775)
 
             command.append(BOT_COMMAND.format(
                 cgroup=bot_cgroup,
@@ -222,7 +226,7 @@ def executeGameTask(width, height, users, backend):
     subprocess.run(["pkill", "--signal", "9", "-f", "cgexec"])
 
 if __name__ == "__main__":
-    print("\n\n\n\nStarting up worker...\n\n\n")
+    print("Starting up worker...\n\n\n")
     while True:
         try:
             print("\n\n\nQuerying for new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
