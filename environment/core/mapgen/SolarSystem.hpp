@@ -4,7 +4,7 @@
 #include "Generator.hpp"
 
 namespace mapgen {
-    constexpr auto MAX_TOTAL_ATTEMPTS = 50000;
+    constexpr auto MAX_TOTAL_ATTEMPTS = 75000;
     /**
      * Map generator using a "solar system" model. This generates random orbits
      * around the center of the map, placing planets evenly spaced along those

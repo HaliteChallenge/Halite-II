@@ -77,11 +77,11 @@ namespace mapgen {
         const auto center_y = map.map_height / 2.0;
 
         const auto min_radius =
-            std::sqrt(std::min(map.map_width, map.map_height)) / 4;
+            std::max(4.0, std::sqrt(std::min(map.map_width, map.map_height)) / 4);
         const auto max_radius =
-            std::sqrt(std::min(map.map_width, map.map_height));
+            std::max(5.0, std::sqrt(std::min(map.map_width, map.map_height)));
         const auto min_separation =
-            std::sqrt(std::min(map.map_width, map.map_height)) / 0.5;
+            std::sqrt(std::min(map.map_width, map.map_height)) / 1.5;
         auto rand_x_axis = std::bind(
             std::uniform_int_distribution<int>(1, map.map_width / 2 - 1), std::ref(rng));
         auto rand_y_axis = std::bind(
@@ -251,15 +251,25 @@ namespace mapgen {
 
         for (hlt::PlayerId player_id = 0; player_id < num_players;
              player_id++) {
+            // Spread out ships to make it less likely they'll collide
+            // in the start
             const auto& zone = spawn_zones[player_id];
-            for (int i = 0; i < 3; i++) {
-                // Spread out ships to make it less likely they'll collide
-                // in the start
-                map.spawn_ship(hlt::Location{
-                    zone.location.pos_x,
-                    zone.location.pos_y - 2 * (i - 1),
-                }, player_id);
-            }
+            map.spawn_ship(hlt::Location{
+                zone.location.pos_x - 1,
+                zone.location.pos_y - 1,
+            }, player_id);
+            map.spawn_ship(hlt::Location{
+                zone.location.pos_x + 1,
+                zone.location.pos_y - 1,
+            }, player_id);
+            map.spawn_ship(hlt::Location{
+                zone.location.pos_x - 1,
+                zone.location.pos_y + 1,
+            }, player_id);
+            map.spawn_ship(hlt::Location{
+                zone.location.pos_x + 1,
+                zone.location.pos_y + 1,
+            }, player_id);
         }
 
         return {};
