@@ -45,12 +45,15 @@ function loadSpritesheet(meta, textureImage, onload) {
  *
  * @param {PIXI.prepare.BasePrepare} prepare
  */
-export function prepareAll(prepare) {
+export function prepareAll(renderer, prepare) {
+    // Right thing is prepare.add, but that does't seem to work.
+    // Possibly related to https://github.com/pixijs/pixi.js/issues/3829
+    // Workaround: https://stackoverflow.com/a/42762277
     Object.keys(SHIP_EXPLOSION_SHEET.data.frames)
-        .forEach((frame) => prepare.add(PIXI.Texture.from(frame).baseTexture));
+        .forEach((frame) => renderer.bindTexture(PIXI.Texture.from(frame).baseTexture));
 
     Object.keys(PLANET_EXPLOSION_SHEET.data.frames)
-        .forEach((frame) => prepare.add(PIXI.Texture.from(frame).baseTexture));
+        .forEach((frame) => renderer.bindTexture(PIXI.Texture.from(frame).baseTexture));
 }
 
 export function setAssetRoot(path) {

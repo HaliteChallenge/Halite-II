@@ -47,7 +47,7 @@ export class HaliteVisualizer {
         // Also: make sure textures have power-of-2 dimensions
         this.application.renderer.roundPixels = true;
 
-        assets.prepareAll(this.application.renderer.plugins.prepare);
+        assets.prepareAll(this.application.renderer, this.application.renderer.plugins.prepare);
 
         this.scale = assets.VISUALIZER_HEIGHT / (replay.height * assets.CELL_SIZE);
         if (replay.width * this.scale * assets.CELL_SIZE > assets.VISUALIZER_SIZE) {
