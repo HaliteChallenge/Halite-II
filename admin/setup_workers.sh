@@ -15,7 +15,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --preemptible \
     --tags "worker" \
     --image-family "${IMAGE}" --image-project "${GCLOUD_PROJECT}" \
-    --boot-disk-size "10" --boot-disk-type "pd-standard"
+    --boot-disk-size "40" --boot-disk-type "pd-standard"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-groups managed create "worker-instances" \

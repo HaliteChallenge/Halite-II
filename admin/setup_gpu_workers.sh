@@ -14,7 +14,7 @@ gcloud compute --project "${GCLOUD_PROJECT}" \
     --maintenance-policy "TERMINATE" \
     --tags "worker" \
     --image-family "${GPU_IMAGE}" --image-project "${GCLOUD_PROJECT}" \
-    --boot-disk-size "30" --boot-disk-type "pd-standard"
+    --boot-disk-size "50" --boot-disk-type "pd-standard"
 
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-groups managed create "gpu-worker-instances" \
