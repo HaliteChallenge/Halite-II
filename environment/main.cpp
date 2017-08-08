@@ -164,24 +164,19 @@ int main(int argc, char** argv) {
 
     std::vector<std::string> unlabeledArgsVector = otherArgs.getValue();
     std::list<std::string> unlabeledArgs;
-    for (auto a = unlabeledArgsVector.begin(); a != unlabeledArgsVector.end();
-         a++) {
-        unlabeledArgs.push_back(*a);
+    for (auto arg : unlabeledArgsVector) {
+        unlabeledArgs.push_back(arg);
     }
 
     if (mapWidth == 0 && mapHeight == 0) {
+        // Always generate a 3:2 aspect ratio
         std::vector<unsigned short> mapSizeChoices =
-            { 160, 160, 192, 192, 192, 256, 256, 256, 256,
-              384, 384, 384 };
+            { 80, 80, 88, 88, 96, 96, 96, 112, 112, 112, 120, 120, 128, 128 };
         std::mt19937 prg(seed);
-        std::uniform_int_distribution<unsigned short> size_dist(0, mapSizeChoices.size() - 1);
-        mapWidth = mapSizeChoices[size_dist(prg)];
-        mapHeight = mapSizeChoices[size_dist(prg)];
-        if (mapHeight > mapWidth) {
-            auto temp = mapWidth;
-            mapWidth = mapHeight;
-            mapHeight = temp;
-        }
+        std::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
+        auto mapBase = mapSizeChoices[size_dist(prg)];
+        mapWidth = 3 * mapBase;
+        mapHeight = 2 * mapBase;
     }
 
     const auto override_factor = overrideSwitch.getValue() ? 2 : 1;
