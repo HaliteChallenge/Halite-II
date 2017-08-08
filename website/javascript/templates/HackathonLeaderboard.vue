@@ -69,8 +69,8 @@
             this.update_filter();
             api.getHackathon(this.hackathon_id).then((hackathon) => {
                 this.hackathon = hackathon;
-            }, () => {
-
+            }, (xhr) => {
+                this.hackathon.title = "Not found/not allowed to view";
             });
         },
         methods: {
