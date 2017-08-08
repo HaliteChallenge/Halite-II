@@ -20,6 +20,7 @@
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
+    "babel-preset-babili": "^0.1.4",
     "babel-preset-env": "^1.6.0",
     "browserify-versionify": "^1.0.6",
     "css-loader": "^0.28.4",
@@ -30,7 +31,7 @@
     "vue-loader": "^13.0.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.3.4",
-    "webpack": "^3.1.0",
+    "webpack": "^3.5.1",
     "worker-loader": "^0.8.1"
   }
 }

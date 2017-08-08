@@ -11,6 +11,28 @@ module.exports = {
         noParse: /libzstd/,
         rules: [
             {
+                test: /\.js$/,
+                exclude: /(node_modules|libzstd)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['env', {
+                                targets: {
+                                    browsers: ["last 2 versions", "safari >= 7"]
+                                }
+                            }],
+                        ],
+                        env: {
+                            "production": {
+                                // TODO: figure out why we can't enable babili here
+                                // "presets": ["babili"]
+                            }
+                        },
+                    }
+                }
+            },
+            {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
