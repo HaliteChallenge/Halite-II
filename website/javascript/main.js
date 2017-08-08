@@ -1,6 +1,7 @@
 import Vue from "vue";
 import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
+import HackathonLeaderboard from "./templates/HackathonLeaderboard.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
@@ -26,6 +27,12 @@ window.views = {
         new Vue({
             el: "#associate-container",
             render: (h) => h(Associate),
+        });
+    },
+    HackathonLeaderboard: function () {
+        new Vue({
+            el: "#hackathon-leaderboard-container",
+            render: (h) => h(HackathonLeaderboard),
         });
     },
     Leaderboard: function () {

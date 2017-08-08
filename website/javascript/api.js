@@ -6,7 +6,13 @@ let cached_me = null;
 let logged_in = null;
 
 export function me_cached() {
-    if (window.localStorage["cache"]) {
+    if (cached_me) {
+        return {
+            user_id: cached_me["user_id"],
+            username: cached_me["username"],
+        }
+    }
+    else if (window.localStorage["cache"]) {
         return {
             user_id: window.localStorage["user_id"],
             username: window.localStorage["username"],
@@ -153,18 +159,52 @@ export function get_replay(game_id, progress_callback) {
     });
 }
 
-export function leaderboard(filters) {
+export function leaderboard(filters, hackathon=null) {
+    let url = `${API_SERVER_URL}/leaderboard`;
+    let fields = {};
+    if (hackathon) {
+        url = `${API_SERVER_URL}/hackathon/${hackathon}/leaderboard`;
+        fields.withCredentials = true;
+    }
     return $.get({
-        url: `${API_SERVER_URL}/leaderboard`,
+        url: url,
         data: {
             filter: filters,
-        }
+        },
+        xhrFields: fields,
     });
 }
 
 export function reset_api_key() {
     return $.post({
         url: `${API_SERVER_URL}/api_key`,
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
+}
+
+export function registerHackathon(code) {
+    const me = me_cached();
+    if (!me) {
+        return Promise.reject({
+            message: "You must be logged in to register for a hackathon.",
+        });
+    }
+    return $.post({
+        url: `${API_SERVER_URL}/user/${me.user_id}/hackathon`,
+        data: {
+            verification_code: code,
+        },
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
+}
+
+export function getHackathon(id) {
+    return $.get({
+        url: `${API_SERVER_URL}/hackathon/${id}`,
         xhrFields: {
             withCredentials: true,
         },

@@ -5,6 +5,12 @@
             <h1>{{ user.username }}</h1>
 
             <p>{{ user.level }} at {{ user.organization }}</p>
+
+            <form v-if="is_my_page">
+                <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
+                <button class="btn btn-default" v-on:click="join_hackathon">Join Hackathon</button>
+                <span>{{ messages.hackathon }}</span>
+            </form>
         </div>
         <div class="col-md-8">
             <section>
@@ -110,6 +116,9 @@
                 offset: 0,
                 only_timed_out: false,
                 is_my_page: false,
+                messages: {
+                    hackathon: "",
+                },
             };
         },
         mounted: function() {
@@ -194,6 +203,18 @@
 
             error_log_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
+            },
+
+            join_hackathon: function(event) {
+                event.preventDefault();
+
+                const code = this.$refs.hackathon_signup_code.value;
+                console.log(code);
+                api.registerHackathon(code).then(() => {
+                    this.messages.hackathon = "Successfully registered!";
+                }, (error) => {
+                    this.messages.hackathon = `Error: ${error.message || error.responseJSON.message}`;
+                });
             },
         },
     }
