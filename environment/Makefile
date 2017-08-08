@@ -1,6 +1,6 @@
 PLATFORM=$(shell uname)
 
-CXXFLAGS += -std=c++11 -pthread -I ./ -g -O2 -Wall -pedantic -fsanitize=address,undefined
+CXXFLAGS += -std=c++11 -pthread -I ./ -g -O2 -Wall -pedantic
 INSTALL_PATH?=/usr/local
 
 ZSTD_PATH=./zstd-1.3.0
@@ -29,7 +29,8 @@ $(ZSTD_STATIC_OBJECT):
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) $(OBJECTS) libzstd.a libzstd.dylib *.bc libzstd.js
+	rm -f $(TARGET) $(OBJECTS) libzstd.a libzstd.dylib *.bc libzstd.js $(ZSTD_PATH)/lib/*.a
+	cd $(ZSTD_PATH)/lib && make clean
 
 .PHONY: install
 install:
