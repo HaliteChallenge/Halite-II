@@ -102,22 +102,13 @@ class Planet(Entity):
         self.owner = owner if bool(int(owned)) else None
         self._docked_ships = docked_ships
 
-    def get_docked_ship(self, ship_id):
-        """
-        Return the docked ship designated by its id.
-        :param int ship_id: The id of the ship to be returned.
-        :return: The Ship object representing that id or None if not docked.
-        :rtype: Ship
-        """
-        return self._docked_ships.get(ship_id)
-
     def all_docked_ships(self):
         """
         The list of all ships docked into the planet
         :return: The list of all ships docked
-        :rtype: list[Ship]
+        :rtype: list[int]
         """
-        return list(self._docked_ships.values())
+        return self._docked_ships
 
     def is_owned(self):
         """
