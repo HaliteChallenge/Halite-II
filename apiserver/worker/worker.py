@@ -6,6 +6,7 @@ import json
 import random
 import shutil
 import subprocess
+import tempfile
 import traceback
 
 from time import sleep, gmtime, strftime
@@ -15,7 +16,30 @@ import backend
 import compiler
 
 
-RUN_GAME_FILE_NAME = "runGame.sh"
+# Where to create temporary directories
+TEMP_DIR = os.getcwd()
+
+# The game environment executable.
+ENVIRONMENT = "halite"
+
+# The script used to start the bot. This is either user-provided or
+# created by compile.py.
+RUNFILE = "run.sh"
+
+# The command used to run the bot. On the outside is a cgroup limiting CPU
+# and memory access. On the inside, we run the bot as a user so that it may
+# not overwrite files. The worker image has a built-in iptables rule denying
+# network access to this user as well.
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
+
+
+COMPILE_ERROR_MESSAGE = """
+Your bot caused unexpected behavior in our servers. If you cannot figure out 
+why this happened, please email us at halite@halite.io. We can help.
+
+For our reference, here is the trace of the error: 
+"""
+
 
 def makePath(path):
     """Deletes anything residing at path, creates path, and chmods the directory"""
@@ -24,88 +48,138 @@ def makePath(path):
     os.makedirs(path)
     os.chmod(path, 0o777)
 
+
+def give_ownership(top_dir, group, dir_perms):
+    for dirpath, _, filenames in os.walk(top_dir):
+        shutil.chown(dirpath, group=group)
+        os.chmod(dirpath, dir_perms)
+        for filename in filenames:
+            shutil.chown(os.path.join(dirpath, filename), group=group)
+
+
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     print("Compiling a bot with userID %s\n" % str(user_id))
 
-    try:
-        # TODO: use tempdir
-        workingPath = "compilation_path"
-        makePath(workingPath)
+    errors = []
 
-        botPath = backend.storeBotLocally(user_id, bot_id, workingPath,
-                                          is_compile=True)
-        archive.unpack(botPath)
+    with tempfile.TemporaryDirectory(dir=TEMP_DIR) as temp_dir:
+        try:
+            bot_path = backend.storeBotLocally(user_id, bot_id, temp_dir,
+                                               is_compile=True)
+            archive.unpack(bot_path)
 
-        while len([name for name in os.listdir(workingPath) if os.path.isfile(os.path.join(workingPath, name))]) == 0 and len(glob.glob(os.path.join(workingPath, "*"))) == 1:
-            singleFolder = glob.glob(os.path.join(workingPath, "*"))[0]
-            bufferFolder = os.path.join(workingPath, backend.SECRET_FOLDER)
-            os.mkdir(bufferFolder)
+            # Make sure things are in the top-level directory
+            while len([
+                name for name in os.listdir(temp_dir)
+                if os.path.isfile(os.path.join(temp_dir, name))
+            ]) == 0 and len(glob.glob(os.path.join(temp_dir, "*"))) == 1:
+                singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
+                bufferFolder = os.path.join(temp_dir, backend.SECRET_FOLDER)
+                os.mkdir(bufferFolder)
 
-            for filename in os.listdir(singleFolder):
-                shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
-            os.rmdir(singleFolder)
+                for filename in os.listdir(singleFolder):
+                    shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
+                os.rmdir(singleFolder)
 
-            for filename in os.listdir(bufferFolder):
-                shutil.move(os.path.join(bufferFolder, filename), os.path.join(workingPath, filename))
-            os.rmdir(bufferFolder)
+                for filename in os.listdir(bufferFolder):
+                    shutil.move(os.path.join(bufferFolder, filename), os.path.join(temp_dir, filename))
+                os.rmdir(bufferFolder)
 
-        # Rm symlinks
-        os.system("find "+workingPath+" -type l -delete")
+            # Delete any symlinks
+            subprocess.call(["find", temp_dir, "-type", "l", "-delete"])
 
-        language, errors = compiler.compile_anything(workingPath)
-        didCompile = True if errors == None else False
-    except Exception as e:
-        language = "Other"
-        errors = ["Your bot caused unexpected behavior in our servers. If you cannot figure out why this happened, please email us at halite@halite.io. We can help.", "For our reference, here is the trace of the error: " + traceback.format_exc()]
-        didCompile = False
+            # Give the compilation user access
+            os.chmod(temp_dir, 0o755)
+            # User needs to be able to write to the directory
+            give_ownership(temp_dir, "bots", 0o774)
 
-    if didCompile:
-        print("Bot did compile\n")
-        archive.zipFolder(workingPath, os.path.join(workingPath, str(user_id)+".zip"))
-        backend.storeBotRemotely(user_id, bot_id, os.path.join(workingPath, str(user_id)+".zip"))
-    else:
-        print("Bot did not compile\n")
-        print("Bot errors %s\n" % str(errors))
+            language, more_errors = compiler.compile_anything(temp_dir)
+            didCompile = more_errors is None
+            if more_errors:
+                errors.extend(more_errors)
+        except Exception as e:
+            language = "Other"
+            errors = [COMPILE_ERROR_MESSAGE + traceback.format_exc()] + errors
+            didCompile = False
 
-    backend.compileResult(user_id, bot_id, didCompile, language, errors=(None if didCompile else "\n".join(errors)))
-    if os.path.isdir(workingPath):
-        shutil.rmtree(workingPath)
+        if didCompile:
+            print("Bot did compile\n")
+            archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
+            backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
+        else:
+            print("Bot did not compile\n")
+            print("Bot errors %s\n" % str(errors))
 
-
-def downloadUsers(users):
-    for user in users:
-        user_dir = "{}_{}".format(user["user_id"], user["bot_id"])
-        if os.path.isdir(user_dir):
-            shutil.rmtree(user_dir)
-        os.mkdir(user_dir)
-        archive.unpack(backend.storeBotLocally(
-            user["user_id"], user["bot_id"], user_dir))
+        backend.compileResult(user_id, bot_id, didCompile, language,
+                              errors=(None if didCompile else "\n".join(errors)))
 
 
 def runGame(width, height, users):
-    runGameCommand = [
-        "bash",
-        RUN_GAME_FILE_NAME,
-        str(width), str(height),
-        str(len(users)),
-    ]
-    runGameCommand.extend(
-        "{}_{}".format(a["user_id"], a["bot_id"])
-        for a in users)
-    runGameCommand.extend(
-        '{} v{}'.format(a["username"], a["version_number"])
-        for a in users)
+    with tempfile.TemporaryDirectory(dir=TEMP_DIR) as temp_dir:
+        shutil.copy(ENVIRONMENT, os.path.join(temp_dir, ENVIRONMENT))
 
-    print("Run game command %s\n" % runGameCommand)
-    print("Waiting for game output...\n")
-    lines = subprocess.Popen(
-        runGameCommand,
-        stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
-    print("\n-----Here is game output: -----")
-    print("\n".join(lines))
-    print("--------------------------------\n")
-    return lines
+        command = [
+            "./" + ENVIRONMENT,
+            "-d", "{} {}".format(width, height),
+            "-q", "-o",
+        ]
+
+        # Make sure bots have access to the temp dir as a whole
+        # Otherwise, Python can't import modules from the bot dir
+        # TODO: is it possible to limit permissions more?
+        # Based on strace, Python lstat()s the full dir path to the dir it's
+        # in, and fails when it tries to lstat the temp dir, which this
+        # fixes
+        os.chmod(temp_dir, 0o755)
+
+        for user_index, user in enumerate(users):
+            bot_dir = "{}_{}".format(user["user_id"], user["bot_id"])
+            bot_dir = os.path.join(temp_dir, bot_dir)
+            os.mkdir(bot_dir)
+            archive.unpack(backend.storeBotLocally(user["user_id"],
+                                                   user["bot_id"], bot_dir))
+
+            # Make the start script executable
+            os.chmod(os.path.join(bot_dir, RUNFILE), 0o755)
+
+            # Give the bot user ownership of their directory
+            # We should set up each user's default group as a group that the
+            # worker is also a part of. Then we always have access to their files,
+            # but not vice versa.
+            # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
+
+            bot_user = "bot_{}".format(user_index)
+            bot_cgroup = "bot_{}".format(user_index)
+
+            give_ownership(top_dir, "bots", 0o755)
+
+            command.append(BOT_COMMAND.format(
+                cgroup=bot_cgroup,
+                bot_dir=bot_dir,
+                bot_user=bot_user,
+                runfile=RUNFILE,
+            ))
+            command.append("{} v{}".format(user["username"],
+                                           user["version_number"]))
+
+        print("Run game command %s\n" % command)
+        print("Waiting for game output...\n")
+        lines = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
+        print("\n-----Here is game output: -----")
+        print("\n".join(lines))
+        print("--------------------------------\n")
+        # tempdir will automatically be cleaned up, but we need to do things
+        # manually because the bot might have made files it owns
+        for user_index, user in enumerate(users):
+            bot_user = "bot_{}".format(user_index)
+            subprocess.call(["sudo", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+        return lines
+
 
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
@@ -127,12 +201,12 @@ def parseGameOutput(output, users):
 
     return users, result
 
+
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
     print("Running game with width %d, height %d\n" % (width, height))
     print("Users objects %s\n" % (str(users)))
 
-    downloadUsers(users)
     raw_output = '\n'.join(runGame(width, height, users))
     users, parsed_output = parseGameOutput(raw_output, users)
 
@@ -170,4 +244,3 @@ if __name__ == "__main__":
             print("Sleeping...\n")
 
         sleep(random.randint(4, 10))
-
