@@ -9,6 +9,7 @@
 #define _USE_MATH_DEFINES
 #endif
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <utility>
@@ -135,12 +136,12 @@ namespace hlt {
             location.pos_x = x;
             location.pos_y = y;
             this->radius = radius;
-            docking_spots = static_cast<unsigned short>(radius);
+            docking_spots = static_cast<unsigned short>(std::max(1.0, std::ceil(radius / 3.0)));
             remaining_production = static_cast<unsigned short>(
-                static_cast<unsigned short>(std::sqrt(10 * radius)) *
-                    GameConstants::get().RESOURCES_PER_RADIUS);
+                radius * GameConstants::get().RESOURCES_PER_RADIUS);
             current_production = 0;
-            health = static_cast<unsigned short>(radius * GameConstants::get().MAX_SHIP_HEALTH);
+            health = static_cast<unsigned short>(
+                radius * GameConstants::get().MAX_SHIP_HEALTH);
             docked_ships = std::vector<EntityIndex>();
 
             owned = false;
