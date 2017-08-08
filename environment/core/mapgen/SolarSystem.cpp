@@ -255,20 +255,16 @@ namespace mapgen {
             // in the start
             const auto& zone = spawn_zones[player_id];
             map.spawn_ship(hlt::Location{
-                zone.location.pos_x - 1,
-                zone.location.pos_y - 1,
+                zone.location.pos_x,
+                zone.location.pos_y - 3,
             }, player_id);
             map.spawn_ship(hlt::Location{
-                zone.location.pos_x + 1,
-                zone.location.pos_y - 1,
+                zone.location.pos_x,
+                zone.location.pos_y,
             }, player_id);
             map.spawn_ship(hlt::Location{
-                zone.location.pos_x - 1,
-                zone.location.pos_y + 1,
-            }, player_id);
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x + 1,
-                zone.location.pos_y + 1,
+                zone.location.pos_x,
+                zone.location.pos_y + 3,
             }, player_id);
         }
 
