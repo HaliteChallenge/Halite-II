@@ -9,10 +9,12 @@ from .. import config, model, util
 def rand_map_size():
     # Pick map size. Duplicate entries are used to weight the
     # probability of a particular size
-    map_sizes = [160, 160, 192, 192, 192, 256, 256, 256, 256,
-                 384, 384, 384]
-    map_width = random.choice(map_sizes)
-    map_height = random.choice(map_sizes)
+    map_sizes = [80, 80, 88, 88, 96, 96, 96, 112, 112, 112, 120, 120,
+                 128, 128]
+    base_size = random.choice(map_sizes)
+    # Always generate 3:2 aspect ratio
+    map_width = 3 * base_size
+    map_height = 2 * base_size
 
     # Width, height
     return max(map_width, map_height), min(map_width, map_height)
