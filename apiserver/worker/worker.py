@@ -30,7 +30,7 @@ RUNFILE = "run.sh"
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
 # network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -H -u {bot_user} -s ./{runfile}'"
 
 
 COMPILE_ERROR_MESSAGE = """
@@ -179,7 +179,7 @@ def runGame(width, height, users):
         # manually because the bot might have made files it owns
         for user_index, user in enumerate(users):
             bot_user = "bot_{}".format(user_index)
-            subprocess.call(["sudo", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
+            subprocess.call(["sudo", "-H", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
                             stderr=subprocess.PIPE,
                             stdout=subprocess.PIPE)
         return lines
