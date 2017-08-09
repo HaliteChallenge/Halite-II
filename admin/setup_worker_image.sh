@@ -11,21 +11,32 @@ sudo useradd -m worker -U -G bots -s /bin/bash
 # Don't just grant random people sudo access.
 sudo rm /etc/sudoers.d/google_sudoers
 
-## Add necessary repositories for Node.js and Mono.
+## Add necessary repositories for Node.js.
 # https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 # http://www.mono-project.com/download/#download-lin
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+
+## Add Mono repository.
 echo "deb http://download.mono-project.com/repo/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/mono-official.list
 # https://www.microsoft.com/net/core#linuxubuntu
 sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ yakkety main"  > /etc/apt/sources.list.d/dotnetdev.list'
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B02C46DF417A0893
 
+## Add Dart repository.
+# https://www.dartlang.org/install/linux
+sudo sh -c 'curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
+sudo sh -c 'curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
+
+## Add D/DMD repository.
+sudo wget http://master.dl.sourceforge.net/project/d-apt/files/d-apt.list -O /etc/apt/sources.list.d/d-apt.list
+wget -qO - https://dlang.org/d-keyring.gpg | sudo apt-key add -
+
 sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
@@ -35,7 +46,7 @@ PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano sh
 RUBY_PACKAGES="bundler"
 
 ## Install everything
-sudo apt-get -y install ${PACKAGES} ${WORKER_PACKAGES}
+sudo apt-get -y --allow-unauthenticated install ${PACKAGES} ${WORKER_PACKAGES}
 
 sudo pip3 install ${PYTHON_PACKAGES}
 sudo python3.6 -m pip install ${PYTHON_PACKAGES}
@@ -53,43 +64,14 @@ sudo -iu worker lein
 # Miniconda
 sudo -iu worker sh -c 'curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -sSf > miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda'
 
-## Print out packages installed.
-echo "Packages"
-for package in ${PACKAGES}; do
-    dpkg-query -W ${package}
-done
-
-echo "Worker Packages"
-for package in ${WORKER_PACKAGES}; do
-    dpkg-query -W ${package}
-done
-
-echo "Python 3.5 Packages"
-for package in ${PYTHON_PACKAGES}; do
-    echo ${package} $(pip3 show ${package} | grep Version | awk '{print $2}')
-done
-
-echo "Python 3.6 Packages"
-for package in ${PYTHON_PACKAGES}; do
-    echo ${package} $(python3.6 -m pip show ${package} | grep Version | awk '{print $2}')
-done
-
-echo "Ruby Gems"
-for package in ${RUBY_PACKAGES}; do
-    gem list | grep ${package}
-done
-
-echo "Rust Packages"
-sudo -iu worker bash << EOF
-rustc -V
-cargo -V
-rustup -V
+# Groovy
+curl -s get.sdkman.io | sudo -iu worker bash
+cat <<EOF | sudo -iu worker tee -a /home/worker/.profile
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/worker/.sdkman"
+[[ -s "/home/worker/.sdkman/bin/sdkman-init.sh" ]] && source "/home/worker/.sdkman/bin/sdkman-init.sh"
 EOF
-
-echo "Clojure Packages"
-sudo -iu worker bash << EOF
-lein version
-EOF
+sudo -iu worker sdk install groovy
 
 ## Create four cgroups to isolate bots.
 sudo touch /etc/cgconfig.conf
@@ -157,3 +139,47 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl enable cgroups.service
+
+## Print out packages installed.
+echo "Packages"
+for package in ${PACKAGES}; do
+    dpkg-query -W ${package}
+done
+
+echo "Worker Packages"
+for package in ${WORKER_PACKAGES}; do
+    dpkg-query -W ${package}
+done
+
+echo "Python 3.5 Packages"
+for package in ${PYTHON_PACKAGES}; do
+    echo ${package} $(pip3 show ${package} | grep Version | awk '{print $2}')
+done
+
+echo "Python 3.6 Packages"
+for package in ${PYTHON_PACKAGES}; do
+    echo ${package} $(python3.6 -m pip show ${package} | grep Version | awk '{print $2}')
+done
+
+echo "Ruby Gems"
+for package in ${RUBY_PACKAGES}; do
+    gem list | grep ${package}
+done
+
+echo "Rust Packages"
+sudo -iu worker bash << EOF
+rustc -V
+cargo -V
+rustup -V
+EOF
+
+echo "Clojure Packages"
+sudo -iu worker bash << EOF
+lein version
+EOF
+
+echo "Groovy Packages"
+sudo -iu worker sdk current | grep groovy
+
+echo "Miniconda"
+sudo -iu worker bash -c 'source ~/miniconda/bin/activate; conda -V'
