@@ -112,6 +112,13 @@ def executeCompileTask(user_id, bot_id, backend):
             print("Bot did not compile\n")
             print("Bot errors %s\n" % str(errors))
 
+        # Remove files as bot user (Python will clean up tempdir, but we don't
+        # necessarily have permissions to clean up files)
+        # TODO: factor this out into helper function, don't hardcode username
+        subprocess.call(["sudo", "-H", "-u", "bot_compilation", "-s", "rm", "-rf", temp_dir],
+                        stderr=subprocess.PIPE,
+                        stdout=subprocess.PIPE)
+
         backend.compileResult(user_id, bot_id, didCompile, language,
                               errors=(None if didCompile else "\n".join(errors)))
 
