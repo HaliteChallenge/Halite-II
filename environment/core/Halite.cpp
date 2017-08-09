@@ -793,6 +793,9 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
     for (const auto& planet_entry : simultaneous_docking) {
         DamageMap damage_map;
 
+        std::vector<hlt::EntityId> participants;
+        std::vector<hlt::Location> participant_locations;
+
         auto damage_others = [&](hlt::PlayerId src_player, double split_damage) {
             for (auto& other_player : planet_entry.second) {
                 if (other_player.first == src_player) continue;
@@ -819,6 +822,10 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
                 if (!ship.is_alive() || ship.weapon_cooldown != 0) {
                     continue;
                 }
+
+                participants.push_back(ship_id);
+                participant_locations.push_back(ship.location);
+
                 ship.weapon_cooldown = cooldown;
                 damage_others(player_entry.first, split_damage);
             }
@@ -826,6 +833,16 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
 
         process_damage(damage_map, 0.0);
         game_map.cleanup_entities();
+
+        const auto planet_id = hlt::EntityId::for_planet(planet_entry.first);
+        full_frame_events.back().emplace_back(
+            std::unique_ptr<Event>(new ContentionAttackEvent(
+                planet_id,
+                game_map.get_planet(planet_id).location,
+                participants,
+                participant_locations
+            ))
+        );
     }
 }
 

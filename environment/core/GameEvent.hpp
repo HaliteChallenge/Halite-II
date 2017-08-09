@@ -74,6 +74,36 @@ struct AttackEvent : Event {
     }
 };
 
+/**
+ * Ships that simultaneously dock to a planet attack each other.
+ */
+struct ContentionAttackEvent : Event {
+    hlt::EntityId planet;
+    hlt::Location planet_location;
+
+    std::vector<hlt::EntityId> participants;
+    std::vector<hlt::Location> participant_locations;
+
+    ContentionAttackEvent(
+        hlt::EntityId planet, hlt::Location planet_location,
+        std::vector<hlt::EntityId> participants,
+        std::vector<hlt::Location> participant_locations
+    ) : planet(planet), planet_location(planet_location),
+        participants(participants),
+        participant_locations(participant_locations) {};
+
+    auto serialize() -> nlohmann::json override {
+        return nlohmann::json{
+            { "event", "contention" },
+            { "entity", planet },
+            { "x", planet_location.pos_x },
+            { "y", planet_location.pos_y },
+            { "participants", participants },
+            { "participant_locations", participant_locations },
+        };
+    }
+};
+
 struct SpawnEvent : Event {
     hlt::EntityId id;
     hlt::EntityId planet;
