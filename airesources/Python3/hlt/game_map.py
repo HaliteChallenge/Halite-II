@@ -71,7 +71,15 @@ class Map:
             result.setdefault(entity.calculate_angle_between(foreign_entity), []).append(foreign_entity)
         return result
 
-    def parse(self, map_string):
+    def _link(self):
+        """
+        Updates all the entities with the correct ship and planet objects
+        :return:
+        """
+        for celestial_object in self.all_planets() + self._all_ships():
+            celestial_object._link(self._players, self._planets)
+
+    def _parse(self, map_string):
         """
         Parse the map description from the game.
         :param map_string: The string which the Halite engine outputs
@@ -79,10 +87,11 @@ class Map:
         """
         tokens = map_string.split()
 
-        self._players, tokens = Player.parse(tokens)
-        self._planets, tokens = entity.Planet.parse(tokens)
+        self._players, tokens = Player._parse(tokens)
+        self._planets, tokens = entity.Planet._parse(tokens)
 
         assert(len(tokens) == 0)  # There should be no remaining tokens at this point
+        self._link()
 
     def _all_ships(self):
         """
@@ -164,12 +173,12 @@ class Player:
         """
         player_id, *remainder = tokens
         player_id = int(player_id)
-        ships, remainder = entity.Ship.parse(player_id, remainder)
+        ships, remainder = entity.Ship._parse(player_id, remainder)
         player = Player(player_id, ships)
         return player_id, player, remainder
 
     @staticmethod
-    def parse(tokens):
+    def _parse(tokens):
         """
         Parse an entire user input string from the Halite engine for all users.
         :param list[str] tokens: The input string as a list of str from the Halite engine.
@@ -184,3 +193,9 @@ class Player:
             player, players[player], remainder = Player._parse_single(remainder)
 
         return players, remainder
+
+    def __str__(self):
+        return "Player {} with ships {}".format(self.id, self.all_ships())
+
+    def __repr__(self):
+        return self.__str__()

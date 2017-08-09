@@ -20,7 +20,6 @@ class Entity:
     """
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
     def _init__(self, x, y, radius, health, player, entity_id):
         self.x = x
         self.y = y
@@ -63,9 +62,13 @@ class Entity:
 
         return Position(x, y)
 
+    @abc.abstractmethod
+    def _link(self, players, planets):
+        pass
+
     def __str__(self):
-        return "element {} ({}) at position: x = {}, y = {}, with radius = {}"\
-            .format(type(self), self.id, self.x, self.y, self.radius)
+        return "Entity {} (id: {}) at position: (x = {}, y = {}), with radius = {}"\
+            .format(self.__class__.__name__, self.id, self.x, self.y, self.radius)
 
     def __repr__(self):
         return self.__str__()
@@ -100,15 +103,25 @@ class Planet(Entity):
         self.remaining_resources = remaining
         self.health = hp
         self.owner = owner if bool(int(owned)) else None
-        self._docked_ships = docked_ships
+        self._docked_ship_ids = docked_ships
+        self._docked_ships = {}
+
+    def get_docked_ship(self, ship_id):
+        """
+        Return the docked ship designated by its id.
+        :param int ship_id: The id of the ship to be returned.
+        :return: The Ship object representing that id or None if not docked.
+        :rtype: Ship
+        """
+        return self._docked_ships.get(ship_id)
 
     def all_docked_ships(self):
         """
         The list of all ships docked into the planet
         :return: The list of all ships docked
-        :rtype: list[int]
+        :rtype: list[Ship]
         """
-        return self._docked_ships
+        return list(self._docked_ships.values())
 
     def is_owned(self):
         """
@@ -124,7 +137,19 @@ class Planet(Entity):
         :return: True if full, False otherwise.
         :rtype: bool
         """
-        return len(self._docked_ships) >= self.num_docking_spots
+        return len(self._docked_ship_ids) >= self.num_docking_spots
+
+    def _link(self, players, planets):
+        """
+        This function serves to take the id values set in the parse function and use it to populate the planet
+        owner and docked_ships params with the actual objects representing each, rather than IDs
+        :param dict[int, gane_map.Player] players: A dictionary of player objects keyed by id
+        :return: nothing
+        """
+        if self.owner is not None:
+            self.owner = players.get(self.owner)
+            for ship in self._docked_ship_ids:
+                self._docked_ships[ship] = self.owner.get_ship(ship)
 
     @staticmethod
     def _parse_single(tokens):
@@ -153,7 +178,7 @@ class Planet(Entity):
         return plid, planet, remainder
 
     @staticmethod
-    def parse(tokens):
+    def _parse(tokens):
         """
         Parse planet data given a tokenized input.
         :param list[str] tokens: The tokenized input
@@ -199,7 +224,7 @@ class Ship(Entity):
         self.radius = constants.SHIP_RADIUS
         self.health = hp
         self.docking_status = docking_status
-        self.planet = planet
+        self.planet = planet if (docking_status is not Ship.DockingStatus.UNDOCKED) else None
         self._docking_progress = progress
         self._weapon_cooldown = cooldown
 
@@ -230,20 +255,21 @@ class Ship(Entity):
         """
         return "u {}".format(self.id)
 
-    def navigate(self, target, game_map, speed, avoid_obstacles=True, max_corrections=90):
+    def navigate(self, target, game_map, speed, avoid_obstacles=True, max_corrections=90, angular_step=1):
         """
         Move a ship to a specific target position (Entity). It is recommended to place the position
         itself here, else navigate will crash into the target. If avoid_obstacles is set to True (default)
         will avoid obstacles on the way, with up to max_corrections corrections. Note that each correction accounts
-        for 1 degree difference, meaning that the algorithm will naively try max_correction degrees before giving
+        for angular_step degrees difference, meaning that the algorithm will naively try max_correction degrees before giving
         up (and returning None). The navigation will only consist of up to one command; call this method again
         in teh next turn to continue navigating to the position.
         :param Entity target: The entity to which you will navigate
-        :param Map game_map: The map of the game, from which obstacles will be extracted
+        :param game_map.Map game_map: The map of the game, from which obstacles will be extracted
         :param int speed: The (max) speed to navigate. If the obstacle is nearer, will adjust accordingly.
         :param bool avoid_obstacles: Whether to avoid the obstacles in the way (simple pathfinding).
         :param int max_corrections: The maximum number of degrees to deviate per turn while trying to pathfind.
         If exceeded returns None.
+        :param int angular_step: The degree difference to deviate if the original destination has obstacles
         :return string: The command trying to be passed to the Halite engine or None if movement is not possible
         within max_corrections degrees.
         :rtype: str
@@ -254,10 +280,10 @@ class Ship(Entity):
         distance = self.calculate_distance_between(target)
         angle = self.calculate_angle_between(target)
         if avoid_obstacles and game_map.obstacles_between(self, target):
-            new_target_dx = math.cos(math.radians(angle + 1)) * distance
-            new_target_dy = math.sin(math.radians(angle + 1)) * distance
+            new_target_dx = math.cos(math.radians(angle + angular_step)) * distance
+            new_target_dy = math.sin(math.radians(angle + angular_step)) * distance
             new_target = Position(self.x + new_target_dx, self.y + new_target_dy)
-            return self.navigate(new_target, game_map, speed, True, max_corrections - 1)
+            return self.navigate(new_target, game_map, speed, True, max_corrections - 1, angular_step)
         speed = speed if (distance >= speed) else distance
         return self.thrust(speed, angle)
 
@@ -269,6 +295,17 @@ class Ship(Entity):
         :rtype: bool
         """
         return self.calculate_distance_between(planet) <= planet.radius + constants.DOCK_RADIUS
+
+    def _link(self, players, planets):
+        """
+        This function serves to take the id values set in the parse function and use it to populate the ship
+        owner and docked_ships params with the actual objects representing each, rather than IDs
+        :param dict[int, game_map.Player] players: A dictionary of player objects keyed by id
+        :param dict[int, Planet] players: A dictionary of planet objects keyed by id
+        :return: nothing
+        """
+        self.owner = players.get(self.owner)  # All ships should have an owner. If not, this will just reset to None
+        self.planet = planets.get(self.planet)  # If not will just reset to none
 
     @staticmethod
     def _parse_single(player_id, tokens):
@@ -296,7 +333,7 @@ class Ship(Entity):
         return sid, ship, remainder
 
     @staticmethod
-    def parse(player_id, tokens):
+    def _parse(player_id, tokens):
         """
         Parse ship data given a tokenized input.
         :param int player_id: The id of the player who owns the ships
@@ -332,3 +369,5 @@ class Position(Entity):
         self.owner = None
         self.id = None
 
+    def _link(self, players, planets):
+        raise NotImplementedError("Position should not have link attributes.")

@@ -85,5 +85,5 @@ class Game:
         """
         import logging
         logging.info("---NEW TURN---")
-        self.map.parse(self._get_string())
+        self.map._parse(self._get_string())
         return self.map
