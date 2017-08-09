@@ -137,13 +137,17 @@ The planet object designates a planet, its metadata and contents. The planet con
 6. current_production - the current halite the ship has produced. Once it reaches the single ship treshold, it will reset to zero and a ship will be produced
 7. remaining_resources - How many resources the planet has remaining.
 8. health - The remaining health of the planet.
-9. owner - Who owns the planet. If no owner, contains None/Null equivalent
+9. owner - The Player object representing the user who owns the planet. If no owner, contains None/Null equivalent.
 
 Following are a set of methods and their explanations:
 
+### get_docked_ship
+
+Returns the Ship objects for the designated ship id
+
 ### all_docked_ships
 
-Returns the list of all ship ids of the ships which are docked in the planet
+Returns the list of all Ship objects which are docked to the planet
 
 ### is_full
 
@@ -161,8 +165,8 @@ The ship object holds all metadata relative to a ship and is the only object cap
 3. y - the ship's y-coordinate
 4. radius - the ship's radius (assumed to always be 0.5)
 5. docking_status - The current status of the ship. Will be one of UNDOCKED, DOCKED, DOCKING, UNDOCKING.
-6. planet - the id of the planet which owns the ship.
-7. owner - The id of the user who owns the ship.
+6. planet - the Planet object of the planet into which this ship is docked.
+7. owner - The Player object, representing the user who owns the ship. If no owner, contains None/Null equivalent.
 
 Following are a set of methods and their explanations:
 
@@ -179,7 +183,7 @@ Creates a command to dock this ship to the designated planet.
 Creates a command to undock this ship from the designated planet.
 
 ### navigate
-Create a command to move a ship to a specific target position. It is recommended to place the position itself (rather than another entity) here, else navigate will crash into the target. If avoid_obstacles is set to True (default) will avoid obstacles on the way, with up to max_corrections corrections. Note that each correction ammounts to 1 degree of difference, meaning that the algorithm will naively try max_correction degrees before giving up (and returning None). The navigation will only consist of up to one command; call this method again in the next turn to continue navigating to the position.
+Create a command to move a ship to a specific target position. It is recommended to place the position itself (rather than another entity) here, else navigate will crash into the target. If avoid_obstacles is set to True (default) will avoid obstacles on the way, with up to max_corrections corrections. Note that each correction ammounts to 1 degree of difference (unless specified differently through the angular_step parameter), meaning that the algorithm will naively try max_correction * angular_step degrees before giving up (and returning None). The navigation will only consist of up to one command; call this method again in the next turn to continue navigating to the position.
 
 ## Position
 Basic entity which is meant to hold an x, y coordinate with 0 radius. Used for determining targets for moves and passing positional information.
