@@ -130,27 +130,27 @@ namespace mapgen {
             return true;
         };
 
-        // Planet in center
+        // Generate a cluster of small planets in the center
+        // Cluster helps make sure trivial bots don't get stuck from all
+        // docking to a single center planet at the same time
         if (extra_planets > 0) {
-            extra_planets--;
             const auto big_radius =
-                std::sqrt(std::min(map.map_width, map.map_height));
+                std::max(4.0, std::sqrt(std::min(map.map_width, map.map_height)) / 2);
             const auto small_radius =
-                std::sqrt(std::min(map.map_width, map.map_height) / 1.5);
+                std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 3));
+            const auto radius =
+                std::uniform_real_distribution<>(small_radius, big_radius)(rng);
+            const auto distance_from_center = 2 * radius +
+                2 * hlt::GameConstants::get().SHIP_RADIUS;
 
-            for (auto attempt = 0; attempt < 100; attempt++) {
-                const auto location = hlt::Location{center_x, center_y};
-                const auto radius =
-                    std::uniform_real_distribution<>(small_radius, big_radius)(
-                        rng);
-                if (is_ok_location(location, radius)) {
-                    map.planets.emplace_back(
-                        location.pos_x,
-                        location.pos_y,
-                        radius
-                    );
-                    break;
-                }
+            for (auto i = 0; i < 4; i++) {
+                const auto angle = i * M_PI / 2;
+                const auto location = hlt::Location{
+                    center_x + distance_from_center * std::cos(angle),
+                    center_y + distance_from_center * std::sin(angle),
+                };
+
+                map.planets.emplace_back(location.pos_x, location.pos_y, radius);
             }
         }
 

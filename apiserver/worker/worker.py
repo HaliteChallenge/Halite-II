@@ -30,7 +30,7 @@ RUNFILE = "run.sh"
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
 # network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -u {bot_user} -s ./{runfile}'"
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} bash -c 'cd {bot_dir} && sudo -H -u {bot_user} -s ./{runfile}'"
 
 
 COMPILE_ERROR_MESSAGE = """
@@ -112,6 +112,13 @@ def executeCompileTask(user_id, bot_id, backend):
             print("Bot did not compile\n")
             print("Bot errors %s\n" % str(errors))
 
+        # Remove files as bot user (Python will clean up tempdir, but we don't
+        # necessarily have permissions to clean up files)
+        # TODO: factor this out into helper function, don't hardcode username
+        subprocess.call(["sudo", "-H", "-u", "bot_compilation", "-s", "rm", "-rf", temp_dir],
+                        stderr=subprocess.PIPE,
+                        stdout=subprocess.PIPE)
+
         backend.compileResult(user_id, bot_id, didCompile, language,
                               errors=(None if didCompile else "\n".join(errors)))
 
@@ -146,8 +153,8 @@ def runGame(width, height, users):
 
             # Give the bot user ownership of their directory
             # We should set up each user's default group as a group that the
-            # worker is also a part of. Then we always have access to their files,
-            # but not vice versa.
+            # worker is also a part of. Then we always have access to their
+            # files, but not vice versa.
             # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
 
             bot_user = "bot_{}".format(user_index)
@@ -179,9 +186,17 @@ def runGame(width, height, users):
         # manually because the bot might have made files it owns
         for user_index, user in enumerate(users):
             bot_user = "bot_{}".format(user_index)
-            subprocess.call(["sudo", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
+            subprocess.call(["sudo", "-H", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
                             stderr=subprocess.PIPE,
                             stdout=subprocess.PIPE)
+
+            # The processes won't necessarily be automatically cleaned up, so
+            # let's do it ourselves
+            subprocess.call(["sudo", "-H", "-u", bot_user, "-s",
+                             "killall", "-9", "bash"],
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+
         return lines
 
 

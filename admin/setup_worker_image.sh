@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 NUM_BOTS=4
 
 ## Create a user to be used by the worker exclusively.
@@ -25,7 +27,7 @@ sudo apt-get -y upgrade
 ## List the packages to install for running bots.
 PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev"
 ## List the packages to install for the worker itself.
-WORKER_PACKAGES="virtualenv cgroup-tools unzip"
+WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
 ## List Python packages to preinstall.
 PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely"
@@ -90,11 +92,31 @@ lein version
 EOF
 
 ## Create four cgroups to isolate bots.
+sudo touch /etc/cgconfig.conf
 for i in $(seq 0 $((NUM_BOTS-1))); do
     CGROUP="bot_${i}"
-    # Grant control over the cgroup to the worker user
-    sudo cgcreate -g cpu,memory:/${CGROUP} -t worker:worker -a worker:worker
-    sudo -u worker cgset -r cpu.shares=1024 memory.limit_in_bytes=$((350*1024*1024)) ${CGROUP}
+    echo "Creating cgroup ${CGROUP}"
+    cat <<EOF | sudo tee -a /etc/cgconfig.conf
+group ${CGROUP} {
+        # Grant control over the cgroup to the worker user
+        perm {
+                admin {
+                        uid = root;
+                        gid = root;
+                }
+                task {
+                        uid = worker;
+                        gid = worker;
+                }
+        }
+        cpu {
+                cpu.shares="1024";
+        }
+        memory {
+                memory.limit_in_bytes=$((350*1024*1024));
+        }
+}
+EOF
 done
 
 ## Create a user to be used by compilation. This user will have limited Internet access.
@@ -116,3 +138,22 @@ for i in $(seq 0 $((NUM_BOTS-1))); do
     sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_${USERNAME}"
     sudo chmod 0400 /etc/sudoers.d/worker_${USERNAME}
 done
+
+## Make sure iptables rules persist
+sudo iptables-save | sudo tee /etc/iptables/rules.v4
+sudo ip6tables-save | sudo tee /etc/iptables/rules.v6
+
+## Make sure cgroups persist
+cat <<EOF | sudo tee /etc/systemd/system/cgroups.service
+[Unit]
+Description=Recreate cgroups on startup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/cgconfigparser -l /etc/cgconfig.conf
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable cgroups.service
