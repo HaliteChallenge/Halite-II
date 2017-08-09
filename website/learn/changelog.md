@@ -4,6 +4,13 @@ title: Changelog
 toc: true
 ---
 
+## Alpha 0.3.4
+
+- Map generation
+  - Instead of the large central planet, there is now a cluster of 4 small planets.
+- Docking changes
+  - If two or more enemy ships dock to the same planet at the same time, they will do combat with each other, under normal rules, but ignoring range (they target all and only the enemy ships who docked to the same planet on that turn).
+
 ## Alpha 0.3.3
 
 - Balance tweaks
