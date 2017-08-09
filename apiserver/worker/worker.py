@@ -30,7 +30,7 @@ RUNFILE = "run.sh"
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
 # network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sh -c 'cd {bot_dir} && sudo -H -u {bot_user} -s ./{runfile}'"
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} bash -c 'cd {bot_dir} && sudo -H -u {bot_user} -s ./{runfile}'"
 
 
 COMPILE_ERROR_MESSAGE = """
@@ -146,8 +146,8 @@ def runGame(width, height, users):
 
             # Give the bot user ownership of their directory
             # We should set up each user's default group as a group that the
-            # worker is also a part of. Then we always have access to their files,
-            # but not vice versa.
+            # worker is also a part of. Then we always have access to their
+            # files, but not vice versa.
             # https://superuser.com/questions/102253/how-to-make-files-created-in-a-directory-owned-by-directory-group
 
             bot_user = "bot_{}".format(user_index)
@@ -182,6 +182,14 @@ def runGame(width, height, users):
             subprocess.call(["sudo", "-H", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
                             stderr=subprocess.PIPE,
                             stdout=subprocess.PIPE)
+
+            # The processes won't necessarily be automatically cleaned up, so
+            # let's do it ourselves
+            subprocess.call(["sudo", "-H", "-u", bot_user, "-s",
+                             "killall", "-9", "bash"],
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+
         return lines
 
 
