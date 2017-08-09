@@ -18,21 +18,21 @@ export class Planet {
             this.core = PIXI.Sprite.from(assets.PLANET_IMAGE);
         }
 
-        if (planetBase.r * pixelsPerUnit <= 30) {
+        if (planetBase.r * pixelsPerUnit <= 20) {
             this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE_SMALL);
-            this.halo.anchor.x = 94 / 192;
-            this.halo.anchor.y = 98 / 195;
-            this.halo.width = this.halo.height = 1.1 * (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
-            this.baseHaloAlpha = 0.1;
+            this.halo.anchor.x = (18 + 36) / 104;
+            this.halo.anchor.y = (18 + 36) / 108;
+            this.halo.width = this.halo.height = 1.3 * (195 / 142) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.baseHaloAlpha = 0.2;
         }
         else {
             this.halo = PIXI.Sprite.from(assets.PLANET_HALO_IMAGE);
             // Center of sprite != center of circle
-            this.halo.anchor.x = 108.5 / 207;
-            this.halo.anchor.y = 96.5 / 206;
+            this.halo.anchor.x = (18 + 36) / 104;
+            this.halo.anchor.y = (18 + 36) / 108;
             this.halo.alpha = 0.2;
-            this.halo.width = this.halo.height = 1.1 * (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
-            this.baseHaloAlpha = 0.5;
+            this.halo.width = this.halo.height = 1.4 * (207 / 167) * 2 * (planetBase.r) * pixelsPerUnit;
+            this.baseHaloAlpha = 0.2;
         }
 
         this.core.width = this.core.height = 2 * planetBase.r * pixelsPerUnit;
@@ -73,8 +73,8 @@ export class Planet {
             this.halo.rotation += dt / 400;
             if (this.halo.rotation > 2 * Math.PI) this.halo.rotation -= 2 * Math.PI;
 
-            this.halo.alpha = this.baseHaloAlpha +
-                0.4 * Math.min(1.0, planetStatus.current_production / this.constants.PRODUCTION_PER_SHIP);
+            // this.halo.alpha = this.baseHaloAlpha +
+            //    0.4 * Math.min(1.0, planetStatus.current_production / this.constants.PRODUCTION_PER_SHIP);
         }
         else {
             this.halo.alpha = this.baseHaloAlpha;

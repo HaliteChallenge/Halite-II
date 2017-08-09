@@ -74,7 +74,7 @@ export function setAssetRoot(path) {
         ASSET_ROOT + require("../assets/planet-obj.png"),
         () => {
             PLANET_IMAGE = PIXI.Texture.fromFrame("Core.png");
-            PLANET_HALO_IMAGE = PIXI.Texture.fromFrame("Sound.png");
+            PLANET_HALO_IMAGE = PIXI.Texture.fromFrame("Ring.png");
         }
     );
 
@@ -83,7 +83,7 @@ export function setAssetRoot(path) {
         ASSET_ROOT + require("../assets/planet-small.png"),
         () => {
             PLANET_IMAGE_SMALL = PIXI.Texture.fromFrame("CoreSmall.png");
-            PLANET_HALO_IMAGE_SMALL = PIXI.Texture.fromFrame("SoundSmall.png");
+            PLANET_HALO_IMAGE_SMALL = PIXI.Texture.fromFrame("RingSmall.png");
         }
     );
 

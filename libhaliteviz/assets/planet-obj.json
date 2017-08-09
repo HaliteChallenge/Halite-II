@@ -1,66 +1,30 @@
 {"frames": {
 
-"bar.png":
-{
-	"frame": {"x":11,"y":11,"w":11,"h":71},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":11,"h":71},
-	"sourceSize": {"w":11,"h":71},
-	"pivot": {"x":0.5,"y":0.5}
-},
-"bg.png":
-{
-	"frame": {"x":34,"y":11,"w":13,"h":75},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":13,"h":75},
-	"sourceSize": {"w":13,"h":75},
-	"pivot": {"x":0.5,"y":0.5}
-},
 "Core.png":
 {
-	"frame": {"x":59,"y":11,"w":110,"h":110},
+	"frame": {"x":1,"y":1,"w":62,"h":62},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":110,"h":110},
-	"sourceSize": {"w":110,"h":110},
+	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":62},
+	"sourceSize": {"w":62,"h":62},
 	"pivot": {"x":0.5,"y":0.5}
 },
-"Metter.png":
+"Ring.png":
 {
-	"frame": {"x":181,"y":11,"w":13,"h":75},
+	"frame": {"x":65,"y":1,"w":104,"h":108},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":13,"h":75},
-	"sourceSize": {"w":13,"h":75},
-	"pivot": {"x":0.5,"y":0.5}
-},
-"Neutral Planet.png":
-{
-	"frame": {"x":206,"y":11,"w":207,"h":206},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":207,"h":206},
-	"sourceSize": {"w":207,"h":206},
-	"pivot": {"x":0.5,"y":0.5}
-},
-"Sound.png":
-{
-	"frame": {"x":11,"y":229,"w":207,"h":206},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":207,"h":206},
-	"sourceSize": {"w":207,"h":206},
+	"spriteSourceSize": {"x":0,"y":0,"w":104,"h":108},
+	"sourceSize": {"w":104,"h":108},
 	"pivot": {"x":0.5,"y":0.5}
 }},
 "meta": {
 	"app": "http://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "planet-obj.png",
+	"image": "Big.png",
 	"format": "RGBA8888",
-	"size": {"w":446,"h":446},
+	"size": {"w":170,"h":170},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:72348297973960ac863ef52687120f08:2ffd5b975541638dd971c1ef652be527:f55188b64f04d6b28b1a9afb76a08bbf$"
+	"smartupdate": "$TexturePacker:SmartUpdate:269829f27a0d8e928c3317226e32b98d:e548222bcd48ff4d47bd4e0320e2be89:7ee40f797e580f56202ca51cb5cc1c13$"
 }
 }

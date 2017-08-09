@@ -41,13 +41,14 @@ export class Ship {
         this.tractorBeam.anchor.y = 0.0;
         this.tractorBeam.width = 5;
 
-        this.leftDocking.anchor.x = 157/240;
-        this.rightDocking.anchor.x = 83/240;
-        this.leftDocking.anchor.y = this.rightDocking.anchor.y = 108/240;
-        this.baseDockingWidth = 0.5 * (240 / 76) * this.sprite.width;
-        this.leftDocking.height = this.baseDockingHeight = (240 / 76) * this.sprite.height;
+        this.leftDocking.anchor.x = 48/81;
+        this.rightDocking.anchor.x = 34/81;
+        this.leftDocking.anchor.y = 14/110;
+        this.rightDocking.anchor.y = 14/110;
+        this.leftDocking.height = (240 / 76) * this.sprite.height;
 
-        this.leftDocking.width = this.rightDocking.width = 5 * radius * this.visualizer.scale * CELL_SIZE;
+        this.leftDocking.width = 2 * radius * this.visualizer.scale * CELL_SIZE;
+        this.rightDocking.width = 2 * radius * this.visualizer.scale * CELL_SIZE;
 
         this.sprite.tint = PLAYER_COLORS[this.owner];
         this.halo.tint = PLAYER_COLORS[this.owner];
@@ -180,7 +181,7 @@ export class Ship {
             this.tractorBeam.texture = assets.TRACTOR_BEAM_FRAMES[Math.floor(progress * (assets.TRACTOR_BEAM_FRAMES.length - 1))];
 
             const distanceToPlanet = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-            const armHeight = distanceToPlanet;
+            const armHeight = 0.8 * distanceToPlanet;
             const armAngle = shipPlanetAngle + Math.PI / 2;
 
             // Orient the docking arms to the planet
