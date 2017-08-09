@@ -125,7 +125,7 @@ sudo useradd -m bot_compilation -G bots
 ## We are giving them general network access (to download dependencies)
 sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DROP
 ## Grant sudo access to the worker as this user.
-sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_bot_compilation"
+sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: ALL\" > /etc/sudoers.d/worker_bot_compilation"
 sudo chmod 0400 /etc/sudoers.d/worker_bot_compilation
 
 ## Create four users to isolate bots.
@@ -135,7 +135,7 @@ for i in $(seq 0 $((NUM_BOTS-1))); do
     ## Deny all network access to this user.
     sudo iptables -A OUTPUT -m owner --uid-owner ${USERNAME} -j DROP
     ## Grant sudo access to the worker.
-    sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: /bin/bash\" > /etc/sudoers.d/worker_${USERNAME}"
+    sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: ALL\" > /etc/sudoers.d/worker_${USERNAME}"
     sudo chmod 0400 /etc/sudoers.d/worker_${USERNAME}
 done
 
