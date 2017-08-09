@@ -1,3 +1,6 @@
+import collections
+import itertools
+
 import sendgrid
 import sendgrid.helpers
 import sendgrid.helpers.mail
@@ -6,6 +9,16 @@ from . import config
 
 
 sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_API_KEY)
+
+
+Recipient = collections.namedtuple("Recipient", [
+    "user_id",
+    "username",
+    "email",
+    "organization",
+    "level",
+    "date_created",
+])
 
 
 def send_notification(recipient_email, recipient_name, subject, body,
@@ -30,16 +43,29 @@ def send_notification(recipient_email, recipient_name, subject, body,
     print(response.body)
 
 
-def send_templated_notification(recipient_email, username, template_id, substitutions):
+def send_templated_notification(recipient, template_id, substitutions):
+    """
+    Send an email based on a template.
+    :param Recipient recipient: The recipient of the email
+    :param str template_id: The template ID of the email.
+    :param Dict[str, Any] substitutions: Any other substitution variables to
+    pass to the email template.
+    """
     mail = sendgrid.helpers.mail.Mail()
+
+    if not recipient.organization:
+        recipient.organization = "(no affiliation)"
 
     mail.from_email = sendgrid.Email("halite@halite.io", "Halite Challenge")
     personalization = sendgrid.helpers.mail.Personalization()
-    personalization.add_to(sendgrid.helpers.mail.Email(recipient_email, username))
-    personalization.add_substitution(sendgrid.helpers.mail.Substitution("-username-", username))
-    for substitution_key, substitution_value in substitutions.items():
+    personalization.add_to(sendgrid.helpers.mail.Email(recipient.email, recipient.username))
+
+    all_substitutions = itertools.chain(
+        recipient._asdict().items(), substitutions.items())
+    for substitution_key, substitution_value in all_substitutions:
         personalization.add_substitution(sendgrid.helpers.mail.Substitution(
             "-{}-".format(substitution_key), substitution_value))
+
     mail.add_personalization(personalization)
     mail.template_id = template_id
 

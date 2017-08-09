@@ -67,7 +67,10 @@ def update_compilation_status():
     with model.engine.connect() as conn:
         user = conn.execute(model.users.select(
             model.users.c.id == user_id
-        )).first()
+        ).join(
+            model.organizations,
+            model.users.c.organization_id == model.organizations.id,
+            isouter=True)).first()
         bot = conn.execute(model.bots.select(
             (model.bots.c.user_id == user_id) &
             (model.bots.c.id == bot_id)
@@ -139,7 +142,9 @@ def update_compilation_status():
             )
 
             notify.send_templated_notification(
-                user["email"], user["username"],
+                notify.Recipient(user["id"], user["username"], user["email"],
+                                 user["organization_name"], user["level"],
+                                 user["creation_time"]),
                 config.COMPILATION_SUCCESS_TEMPLATE,
                 {
                     "detected_language": language,
@@ -149,7 +154,9 @@ def update_compilation_status():
             return util.response_success()
         else:
             notify.send_templated_notification(
-                user["email"], user["username"],
+                notify.Recipient(user["id"], user["username"], user["email"],
+                                 user["organization_name"], user["level"],
+                                 user["creation_time"]),
                 config.COMPILATION_FAILURE_TEMPLATE,
                 {
                     "detected_language": language,

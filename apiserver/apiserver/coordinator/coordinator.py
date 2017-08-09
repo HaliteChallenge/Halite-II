@@ -65,7 +65,15 @@ def upload_game():
                     model.users.c.id.label("user_id"),
                     model.users.c.on_email_list,
                     model.users.c.email,
-                ]).where(model.users.c.id == user["user_id"])
+                    model.users.c.level,
+                    model.users.c.creation_date,
+                    model.users.c.username,
+                    model.organizations.c.organization_name,
+                ]).join(
+                    model.organizations,
+                    model.organizations.c.id == model.users.c.organization_id,
+                    isouter=True
+                ).where(model.users.c.id == user["user_id"])
             ).first()
 
             stored_bot = conn.execute(
@@ -327,10 +335,14 @@ def update_user_timeout(conn, game_id, user):
         timed_out_count / total_count > config.MAX_ERROR_PERCENTAGE
     )
 
+    recipient = notify.Recipient(user["user_id"], user["username"],
+                                 user["email"],
+                                 user["organization_name"],
+                                 user["level"],
+                                 user["creation_date"])
     if timed_out_count == 1:
         notify.send_templated_notification(
-            user["email"],
-            user["username"],
+            recipient,
             config.FIRST_TIMEOUT_TEMPLATE,
             {
                 "limit": config.MAX_ERRORS_PER_BOT,
@@ -354,8 +366,7 @@ def update_user_timeout(conn, game_id, user):
                 (model.bots.c.id == user["bot_id"])))
 
         notify.send_templated_notification(
-            user["email"],
-            user["username"],
+            recipient,
             config.BOT_DISABLED_TEMPLATE,
             {
                 "limit": config.MAX_ERRORS_PER_BOT,

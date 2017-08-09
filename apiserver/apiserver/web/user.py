@@ -89,23 +89,20 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
     # Otherwise, no verification method defined, or passed verification
 
 
-def send_verification_email(user_id, username, email, verification_code):
+def send_verification_email(recipient, verification_code):
     """
     Send the verification email to the user.
 
-    :param user_id:
-    :param username:
-    :param email:
+    :param notify.Recipient recipient:
     :param verification_code:
     :return:
     """
 
     notify.send_templated_notification(
-        email, username,
+        recipient,
         config.VERIFY_EMAIL_TEMPLATE,
         {
             "verification_url": util.build_site_url("/verify_email", {
-                "user_id": user_id,
                 "verification_code": verification_code,
             }),
         }
@@ -171,7 +168,7 @@ def create_user(*, user_id):
 
     org_id = body.get("organization_id")
     email = body.get("email")
-    level = body.get("level", model.users.c.player_level)
+    level = body.get("level", user_data["level"])
     provided_code = body.get("verification_code", None)
     verification_code = uuid.uuid4().hex
 
@@ -233,8 +230,20 @@ def create_user(*, user_id):
             "organization_id": org_id,
         })
 
-        send_verification_email(user_id, user_data["username"],
-                                email, verification_code)
+        organization_name = None
+        if org_id:
+            with model.engine.connect() as conn:
+                organization_data = conn.execute(model.organizations.select(
+                    model.organizations.c.id == org_id
+                )).first()
+                if organization_data:
+                    organization_name = organization_data["organization_name"]
+
+        send_verification_email(
+            notify.Recipient(user_id, user_data["username"], email,
+                             organization_name, level,
+                             user_data["creation_date"]),
+            verification_code)
 
         message = "Please check your email for a verification code."
     else:
@@ -375,11 +384,19 @@ def update_user(intended_user_id, *, user_id):
 
         if "email" in update:
             user_data = conn.execute(model.users.select(
-                model.users.c.id == intended_user_id)).first()
+                model.users.c.id == intended_user_id).join(
+                model.organizations,
+                model.users.c.organization_id == model.organizations.c.id,
+                isouter=True
+            )).first()
 
-            send_verification_email(user_id, user_data["username"],
-                                    update["email"],
-                                    update["verification_code"])
+            send_verification_email(
+                notify.Recipient(user_id, user_data["username"],
+                                 user_data["email"],
+                                 user_data["organization_name"],
+                                 user_data["level"],
+                                 user_data["creation_date"]),
+                update["verification_code"])
 
     return util.response_success()
 
