@@ -4,6 +4,44 @@ title: Changelog
 toc: true
 ---
 
+## Alpha 0.3.3
+
+- Balance tweaks
+  - No more inertia/drag
+  
+    Ships will move at exactly the given velocity in the given direction and then stop. There is no need to brake anymore. The maximum speed is 7 units/turn.
+  - Ship damage 64 (before 48)
+  - Base resource rate and additional resource rate 6 (before 8 and 6)
+    
+    Now, docking to a new planet is worth the same as docking to an existing planet.
+    
+  - Planet resources are now infinite
+  
+    Planets will never run out of resources; destroying them may be useful.
+    
+  - Planet sizes can vary much more
+  - Number of docking spots is now `ceil(radius / 3)`
+  
+    For larger planets, this means you can't dock ridiculous numbers of ships (like 20) at once.
+    
+  - Planet explosions tweaked
+  
+    Planet explosions now reach `planet.radius` units away from the planet's surface. Additionally, damage has been increased: it now ranges from 5 times base ship health (1275 HP) at 0 units away from the planet surface to 0.5 times base ship health (127 HP) at the maximum distance away. Note, planet explosions can damage other planets…
+- Game environment
+  - Fixed a bug where floating point calculation differences triggered an assertion failure (commit e090d622)
+  - Switched to [zSTD](http://facebook.github.io/zstd/) compression for replays
+  - Map sizes are now always in a 3:2 ratio
+- Competition environment
+  - .NET Core now supported
+  
+    To make sure your bot is compiled via .NET Core, include a `MyBot.csproj` file, and make sure the generated build artifact is `MyBot.dll`.
+- Visualizer
+  - New assets!
+  - Compatibility with Safari
+- Starter kits
+  - New and improved Python starter kit, with extensive documentation & annotated starter bot
+  - C# starter kit coming soon
+
 ## Alpha 0.2.2
 
 - Starter kits
