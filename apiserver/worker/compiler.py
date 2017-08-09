@@ -78,7 +78,7 @@ def _run_cmd(cmd, working_dir, timelimit):
     :return: The value of stdout as well as any errors that occurred.
     """
     absoluteWorkingDir = os.path.abspath(working_dir)
-    cmd = "sudo -H -iu bot_compilation -s bash -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
+    cmd = "sudo -H -iu bot_compilation bash -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
