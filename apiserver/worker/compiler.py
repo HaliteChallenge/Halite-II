@@ -10,6 +10,8 @@ import re
 import subprocess
 import sys
 
+import util
+
 try:
     from server_info import server_info
     MEMORY_LIMIT = server_info.get('memory_limit', 1500)
@@ -17,11 +19,15 @@ except ImportError:
     MEMORY_LIMIT = 1500
 
 BOT = "MyBot"
+# Which file is used to override the detected language?
 LANGUAGE_FILE = "LANGUAGE"
 SAFEPATH = re.compile('[a-zA-Z0-9_.$-]+$')
 
 
 class CD(object):
+    """
+    A context manager that enters a given directory and restores the old one.
+    """
     def __init__(self, new_dir):
         self.new_dir = new_dir
 
@@ -64,8 +70,15 @@ def nukeglob(pattern):
 
 
 def _run_cmd(cmd, working_dir, timelimit):
+    """
+    Run a compilation command in the sandbox.
+    :param cmd: The command to run.
+    :param working_dir: The directory to run the command in.
+    :param timelimit: The number of seconds the command is allowed to run.
+    :return: The value of stdout as well as any errors that occurred.
+    """
     absoluteWorkingDir = os.path.abspath(working_dir)
-    cmd = "sudo -H -u bot_compilation -s sh -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
+    cmd = "sudo -H -iu bot_compilation -s bash -c \"cd "+absoluteWorkingDir+"; "+cmd+"\""
     print(cmd)
     process = subprocess.Popen(cmd, cwd=working_dir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
@@ -80,7 +93,9 @@ def _run_cmd(cmd, working_dir, timelimit):
         out = []
         errors = ["Compilation timed out with command %s" % (cmd,)]
 
-    # TODO: kill the process? (before it removed the docker container)
+    # Clean up any processes that didn't exit cleanly
+    util.kill_processes_as("bot_compilation", "bash")
+
     return out, errors
 
 
@@ -94,11 +109,17 @@ def check_path(path, errors):
 
 
 class Compiler(object):
-    def compile(self, globs, errors):
+    """
+    A way to compile an uploaded bot.
+    """
+    def compile(self, bot_dir, globs, errors, timelimit):
         raise NotImplementedError
 
 
 class ChmodCompiler(Compiler):
+    """
+    A compiler that simply sets the executable flag on a file.
+    """
     def __init__(self, language):
         self.language = language
 
@@ -116,6 +137,9 @@ class ChmodCompiler(Compiler):
 
 
 class ExternalCompiler(Compiler):
+    """
+    A compiler that calls an external process.
+    """
     def __init__(self, args, separate=False, out_files=[], out_ext=None):
         self.args = args
         self.separate = separate
@@ -247,41 +271,78 @@ PYTHON_EXT_COMPILER = '''"from distutils.core import setup
 from distutils.extension import read_setup_file
 setup(ext_modules = read_setup_file('setup_exts'), script_args = ['-q', 'build_ext', '-i'])"'''
 
+# Arrays of compiler commands to run for each language.
 comp_args = {
-    "Ada"           : [["gcc-4.4", "-O3", "-funroll-loops", "-c"],
-                             ["gnatbind"],
-                             ["gnatlink", "-o", BOT]],
-    "C"             : [["gcc", "-O3", "-funroll-loops", "-c"],
-                             ["gcc", "-O2", "-lm", "-o", BOT]],
-    "C#"            : [["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT]],
-    ".NET Core"     : [["dotnet", "restore"], ["dotnet", "build", "-c", "Release", "-o", "."]],
-    "Clojure"     : [["lein", "uberjar"]],
-    "VB"            : [["vbnc", "-out:%s.exe" % BOT]],
-    "C++"         : [["g++", "-O3", "-w", "-std=c++11", "-c"],
-                             ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT]],
-    "D"             : [["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT]],
-    "Groovy"    : [["groovyc"],
-                             ["jar", "cfe", BOT + ".jar", BOT]],
-    "Haskell" : [["ghc", "--make", BOT + ".hs", "-O", "-v0"]],
-    "Java"        : [["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)]],
-    "Lisp"      : [['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp']],
-    "OCaml"     : [["ocamlbuild -lib unix", BOT + ".native"]],
-    "Pascal"    : [["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT]],
-    "Python"   : [["python3", "-c", PYTHON_EXT_COMPILER]],
-    "Rust"      : [["cargo", "build", "--release", "-q"]],
-    "Scala"     : [["scalac"]],
-    }
+    "Ada": [
+        ["gcc-4.4", "-O3", "-funroll-loops", "-c"],
+        ["gnatbind"],
+        ["gnatlink", "-o", BOT],
+    ],
+    "C": [
+        ["gcc", "-O3", "-funroll-loops", "-c"],
+        ["gcc", "-O2", "-lm", "-o", BOT],
+    ],
+    "C#/Mono": [
+        ["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT],
+    ],
+    "C#/.NET Core": [
+        ["dotnet", "restore"],
+        ["dotnet", "build", "-c", "Release", "-o", "."],
+    ],
+    "Clojure": [
+        ["lein", "uberjar"],
+    ],
+    "VB/Mono": [
+        ["vbnc", "-out:%s.exe" % BOT],
+    ],
+    "C++": [
+        ["g++", "-O3", "-w", "-std=c++11", "-c"],
+        ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT],
+    ],
+    "D": [
+        ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
+    ],
+    "Groovy": [
+        ["groovyc"],
+        ["jar", "cfe", BOT + ".jar", BOT],
+    ],
+    "Haskell": [
+        ["ghc", "--make", BOT + ".hs", "-O", "-v0"],
+    ],
+    "Java": [
+        ["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)],
+    ],
+    "Lisp": [
+        ['sbcl', '--dynamic-space-size', str(MEMORY_LIMIT), '--script', BOT + '.lisp'],
+    ],
+    "OCaml": [
+        ["ocamlbuild -lib unix", BOT + ".native"],
+    ],
+    "Pascal": [
+        ["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT],
+    ],
+    "Python": [
+        ["python3", "-c", PYTHON_EXT_COMPILER],
+    ],
+    "Rust": [
+        ["cargo", "build", "--release", "-q"],
+    ],
+    "Scala": [
+        ["scalac"],
+    ],
+}
 
 targets = {
     "C"     : { ".c" : ".o" },
     "C++" : { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
     }
 
-Language = collections.namedtuple("Language",
-        ['name', 'out_file', 'main_code_file', 'command', 'nukeglobs',
-            'compilers']
-        )
+Language = collections.namedtuple(
+    "Language",
+    ['name', 'out_file', 'main_code_file', 'command',
+     'nukeglobs', 'compilers'])
 
+# The actual languages supported.
 languages = (
     Language("Ada", BOT, "MyBot.adb",
         "./MyBot",
@@ -296,24 +357,24 @@ languages = (
         [(["*.c"], TargetCompiler(comp_args["C"][0], targets["C"])),
             (["*.o"], ExternalCompiler(comp_args["C"][1]))]
     ),
-    Language(".NET Core", BOT + ".dll", "MyBot.csproj",
+    Language("C#/.NET Core", BOT + ".dll", "MyBot.csproj",
              "dotnet MyBot.dll",
              [BOT + ".dll"],
              [
-                 ([], ExternalCompiler(comp_args[".NET Core"][0])),
-                 ([], ExternalCompiler(comp_args[".NET Core"][1])),
+                 ([], ExternalCompiler(comp_args["C#/.NET Core"][0])),
+                 ([], ExternalCompiler(comp_args["C#/.NET Core"][1])),
              ]
     ),
-    Language("C#", BOT +".exe", "MyBot.cs",
+    Language("C#/Mono", BOT +".exe", "MyBot.cs",
         "mono MyBot.exe",
         [BOT + ".exe"],
-        [(["*.cs"], ExternalCompiler(comp_args["C#"][0]))]
+        [(["*.cs"], ExternalCompiler(comp_args["C#/Mono"][0]))]
     ),
-    Language("VB", BOT +".exe", "MyBot.vb",
+    Language("VB/Mono", BOT +".exe", "MyBot.vb",
         "mono MyBot.exe",
         [BOT + ".exe"],
         [(["*.vb"],
-            ExternalCompiler(comp_args["VB"][0], out_files=['MyBot.exe']))]
+            ExternalCompiler(comp_args["VB/Mono"][0], out_files=['MyBot.exe']))]
     ),
     Language("C++", BOT, "MyBot.cpp",
         "./MyBot",
@@ -340,7 +401,7 @@ languages = (
         [(["*.d"], ExternalCompiler(comp_args["D"][0]))]
     ),
     Language("Dart", BOT +".dart", "MyBot.dart",
-        "frogsh MyBot.dart",
+        "dart MyBot.dart",
         [], [(["*.dart"], ChmodCompiler("Dart"))]),
     Language("Erlang", "my_bot.beam", "my_bot.erl",
         "erl -hms"+ str(MEMORY_LIMIT) +"m -smp disable -noshell -s my_bot start -s init stop",
@@ -388,11 +449,17 @@ languages = (
         [BOT],
         [([""], ExternalCompiler(comp_args["Lisp"][0]))]
     ),
-    Language("Lua", BOT +".lua", "MyBot.lua",
-        "luajit-2.0.0-beta5 MyBot.lua",
+    # TODO: how to differentiate Lua5.2 and LuaJIT?
+    Language("Lua/LuaJIT", BOT +".lua", "MyBot.lua",
+        "luajit MyBot.lua",
         [],
         [(["*.lua"], ChmodCompiler("Lua"))]
     ),
+    # Language("Lua/Lua5.2", BOT +".lua", "MyBot.lua",
+    #     "lua5.2 MyBot.lua",
+    #     [],
+    #     [(["*.lua"], ChmodCompiler("Lua"))]
+    # ),
     Language("OCaml", BOT +".native", "MyBot.ml",
         "./MyBot.native",
         [BOT + ".native"],

@@ -14,6 +14,7 @@ from time import sleep, gmtime, strftime
 import archive
 import backend
 import compiler
+import util
 
 
 # Where to create temporary directories
@@ -30,7 +31,7 @@ RUNFILE = "run.sh"
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
 # network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} bash -c 'cd {bot_dir} && sudo -H -u {bot_user} -s ./{runfile}'"
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} bash -c 'cd {bot_dir} && sudo -H -iu {bot_user} -s ./{runfile}'"
 
 
 COMPILE_ERROR_MESSAGE = """
@@ -192,10 +193,7 @@ def runGame(width, height, users):
 
             # The processes won't necessarily be automatically cleaned up, so
             # let's do it ourselves
-            subprocess.call(["sudo", "-H", "-u", bot_user, "-s",
-                             "killall", "-9", "bash"],
-                            stderr=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
+            util.kill_processes_as(bot_user, "bash")
 
         return lines
 
