@@ -31,7 +31,7 @@ RUNFILE = "run.sh"
 # and memory access. On the inside, we run the bot as a user so that it may
 # not overwrite files. The worker image has a built-in iptables rule denying
 # network access to this user as well.
-BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} bash -c 'cd {bot_dir} && sudo -H -iu {bot_user} ./{runfile}'"
+BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sudo -Hiu {bot_user} bash -c 'cd {bot_dir} && ./{runfile}'"
 
 
 COMPILE_ERROR_MESSAGE = """
