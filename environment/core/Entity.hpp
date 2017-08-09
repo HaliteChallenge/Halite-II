@@ -179,8 +179,11 @@ namespace hlt {
          * @return
          */
         auto can_dock(const Planet& planet) const -> bool {
-            return this->location.distance(planet.location) <=
-                GameConstants::get().DOCK_RADIUS + planet.radius + radius;
+            const auto dock_radius = GameConstants::get().DOCK_RADIUS + planet.radius + radius;
+            return docking_status == DockingStatus::Undocked &&
+                velocity.vel_x == 0.0 &&
+                velocity.vel_y == 0.0 &&
+                location.distance(planet.location) <= dock_radius;
         }
     };
 

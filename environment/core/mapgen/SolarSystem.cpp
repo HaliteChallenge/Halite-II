@@ -144,7 +144,7 @@ namespace mapgen {
                 2 * hlt::GameConstants::get().SHIP_RADIUS;
 
             for (auto i = 0; i < 4; i++) {
-                const auto angle = i * M_PI / 2;
+                const auto angle = i * M_PI / 2 + (M_PI / 4);
                 const auto location = hlt::Location{
                     center_x + distance_from_center * std::cos(angle),
                     center_y + distance_from_center * std::sin(angle),

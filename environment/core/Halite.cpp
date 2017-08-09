@@ -379,7 +379,79 @@ auto Halite::process_cooldowns() -> void {
     }
 }
 
-auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
+auto Halite::process_docking_move(
+    hlt::EntityId ship_id, hlt::Ship& ship,
+    hlt::EntityIndex planet_id,
+    SimultaneousDockMap& simultaenous_docking) -> void {
+    const auto player_id = ship_id.player_id();
+    const auto ship_idx = ship_id.entity_index();
+
+    if (planet_id >= game_map.planets.size()) {
+        // Planet is invalid, do nothing
+        return;
+    }
+
+    auto& planet = game_map.planets.at(planet_id);
+    if (!planet.is_alive() || !ship.can_dock(planet)) {
+        // Ship too far/not stationary/etc
+        return;
+    }
+
+    if (planet.frozen) {
+        // Planet is frozen, accumulate damage
+        simultaenous_docking[planet_id][player_id].push_back(ship_id);
+        return;
+    }
+
+    if (!planet.owned) {
+        planet.owned = true;
+        planet.owner = player_id;
+    }
+
+    if (planet.owner == player_id &&
+        planet.docked_ships.size() < planet.docking_spots) {
+        ship.docked_planet = planet_id;
+        ship.docking_status = hlt::DockingStatus::Docking;
+        ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
+        planet.add_ship(ship_idx);
+    }
+    else if (planet.owner != player_id) {
+        // If all the ships just started docking, then both
+        // players tried to dock to the planet on the same turn
+        if (std::all_of(
+            planet.docked_ships.begin(),
+            planet.docked_ships.end(),
+            [&](hlt::EntityIndex ship_idx) -> bool {
+                const auto& ship = game_map.get_ship(planet.owner, ship_idx);
+                return ship.docking_status == hlt::DockingStatus::Docking &&
+                    ship.docking_progress == hlt::GameConstants::get().DOCK_TURNS;
+            })) {
+            // In that case, nobody gets to dock
+            assert(!planet.frozen);
+            planet.frozen = true;
+
+            for (auto& docked_ship_index : planet.docked_ships) {
+                auto& ship = game_map.get_ship(planet.owner, docked_ship_index);
+                ship.reset_docking_status();
+                simultaenous_docking[planet_id][planet.owner].push_back(
+                    hlt::EntityId::for_ship(planet.owner, docked_ship_index)
+                );
+            }
+
+            planet.docked_ships.clear();
+            planet.owned = false;
+            planet.owner = 0;
+
+            // Accumulate damage
+            simultaenous_docking[planet_id][player_id].push_back(ship_id);
+        }
+    }
+}
+
+auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> SimultaneousDockMap {
+    // Keep track of which ships docked simultaneously
+    SimultaneousDockMap simulataneous_docking;
+
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (!alive[player_id]) continue;
         auto& player_ships = game_map.ships.at(player_id);
@@ -404,63 +476,12 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
                     break;
                 }
                 case hlt::MoveType::Dock: {
-                    if (ship.docking_status != hlt::DockingStatus::Undocked ||
-                        ship.velocity.vel_x != 0 || ship.velocity.vel_y != 0) {
-                        break;
-                    }
-
                     const auto planet_id = move.move.dock_to;
-                    if (planet_id >= game_map.planets.size()) {
-                        // Planet is invalid, do nothing
-                        break;
-                    }
-
-                    auto& planet = game_map.planets.at(planet_id);
-                    if (!planet.is_alive() || !ship.can_dock(planet) || planet.frozen) {
-                        if (!quiet_output && !ship.can_dock(planet)) {
-                            std::cout << "Warning: ship too far to dock\n";
-                        }
-                        break;
-                    }
-
-                    if (!planet.owned) {
-                        planet.owned = true;
-                        planet.owner = player_id;
-                    }
-
-                    if (planet.owner == player_id &&
-                        planet.docked_ships.size() < planet.docking_spots) {
-                        ship.docked_planet = planet_id;
-                        ship.docking_status = hlt::DockingStatus::Docking;
-                        ship.docking_progress = hlt::GameConstants::get().DOCK_TURNS;
-                        planet.add_ship(ship_idx);
-                    }
-                    else if (planet.owner != player_id) {
-                        // If all the ships just started docking, then both players
-                        // tried to dock to the planet on the same turn
-                        if (std::all_of(
-                            planet.docked_ships.begin(),
-                            planet.docked_ships.end(),
-                        [&](hlt::EntityIndex ship_idx) -> bool {
-                            const auto& ship = game_map.get_ship(planet.owner, ship_idx);
-                            return ship.docking_status == hlt::DockingStatus::Docking &&
-                                ship.docking_progress == hlt::GameConstants::get().DOCK_TURNS;
-                        })) {
-                            // In that case, nobody gets to dock
-                            assert(!planet.frozen);
-                            planet.frozen = true;
-
-                            for (auto& docked_ship_index : planet.docked_ships) {
-                                auto& ship = game_map.get_ship(planet.owner, docked_ship_index);
-                                ship.reset_docking_status();
-                            }
-
-                            planet.docked_ships.clear();
-                            planet.owned = false;
-                            planet.owner = 0;
-                        }
-                    }
-
+                    process_docking_move(
+                        hlt::EntityId::for_ship(player_id, ship_idx),
+                        ship,
+                        planet_id,
+                        simulataneous_docking);
                     break;
                 }
 
@@ -480,6 +501,8 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> void {
             ship_moves[ship_idx] = move;
         }
     }
+
+    return simulataneous_docking;
 }
 
 auto Halite::find_living_players() -> std::vector<bool> {
@@ -500,7 +523,7 @@ auto Halite::find_living_players() -> std::vector<bool> {
         if (!planet.is_alive()) continue;
 
         total_planets++;
-        if (planet.owned && planet.docked_ships.size() > 0) {
+        if (planet.owned && !planet.docked_ships.empty()) {
             // Only count a planet as owned if a ship has completed docking
             const auto num_docked_ships = planet.num_docked_ships(game_map);
             if (num_docked_ships > 0) {
@@ -628,12 +651,13 @@ auto Halite::process_events() -> void {
             return ev1.time > ev2.time;
         });
 
-    while (sorted_events.size() > 0) {
+    while (!sorted_events.empty()) {
         // Gather all events that occurred simultaneously
         std::vector<SimulationEvent> simultaneous_events{ sorted_events.back() };
         sorted_events.pop_back();
 
-        while (sorted_events.size() > 0 && sorted_events.back().time == simultaneous_events.back().time) {
+        while (!sorted_events.empty() &&
+            sorted_events.back().time == simultaneous_events.back().time) {
             simultaneous_events.push_back(sorted_events.back());
             sorted_events.pop_back();
         }
@@ -646,7 +670,7 @@ auto Halite::process_events() -> void {
                     return !game_map.is_valid(ev.id1) || !game_map.is_valid(ev.id2);
                 }),
             simultaneous_events.end());
-        if (simultaneous_events.size() == 0) continue;
+        if (simultaneous_events.empty()) continue;
 
         DamageMap damage_map;
         std::unordered_map<hlt::EntityId, int> target_count;
@@ -760,6 +784,51 @@ auto Halite::process_movement() -> void {
     }
 }
 
+auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> void {
+    // Have ships that tried to dock simultaneously fight each other
+    const auto damage = hlt::GameConstants::get().WEAPON_DAMAGE;
+    const auto cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
+
+    // Process each planet separately
+    for (const auto& planet_entry : simultaneous_docking) {
+        DamageMap damage_map;
+
+        auto damage_others = [&](hlt::PlayerId src_player, double split_damage) {
+            for (auto& other_player : planet_entry.second) {
+                if (other_player.first == src_player) continue;
+
+                for (auto& other_ship : other_player.second) {
+                    damage_map[other_player.first][other_ship.entity_index()] += split_damage;
+                }
+            }
+        };
+
+        auto total = 0;
+        for (const auto& player_entry : planet_entry.second) {
+            total += player_entry.second.size();
+        }
+
+        // Process each player individually, summing the damage from enemy ships
+        for (const auto& player_entry : planet_entry.second) {
+            const auto total_enemies = total - player_entry.second.size();
+            const auto split_damage = ((double) damage) / total_enemies;
+            for (const auto& ship_id : player_entry.second) {
+                if (!game_map.is_valid(ship_id)) continue;
+
+                auto& ship = game_map.get_ship(ship_id);
+                if (!ship.is_alive() || ship.weapon_cooldown != 0) {
+                    continue;
+                }
+                ship.weapon_cooldown = cooldown;
+                damage_others(player_entry.first, split_damage);
+            }
+        }
+
+        process_damage(damage_map, 0.0);
+        game_map.cleanup_entities();
+    }
+}
+
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
@@ -773,7 +842,8 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     // Process queue of moves
     for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
-        process_moves(alive, move_no);
+        auto simultaneous_docked = process_moves(alive, move_no);
+        process_dock_fighting(simultaneous_docked);
 
         process_events();
         process_movement();

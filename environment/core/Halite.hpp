@@ -32,6 +32,8 @@ extern bool quiet_output;
 
 
 typedef std::array<hlt::entity_map<double>, hlt::MAX_PLAYERS> DamageMap;
+// Map from planet ID to (player ID to list of ships)
+typedef std::unordered_map<hlt::EntityIndex, std::unordered_map<hlt::PlayerId, std::vector<hlt::EntityId>>> SimultaneousDockMap;
 
 class Halite {
 private:
@@ -83,7 +85,12 @@ private:
     auto process_production() -> void;
     auto process_drag() -> void;
     auto process_cooldowns() -> void;
-    auto process_moves(std::vector<bool>& alive, int move_no) -> void;
+    auto process_docking_move(
+        hlt::EntityId ship_id, hlt::Ship& ship,
+        hlt::EntityIndex planet_id,
+        SimultaneousDockMap& simultaenous_docking) -> void;
+    auto process_moves(std::vector<bool>& alive, int move_no) -> SimultaneousDockMap;
+    auto process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> void;
     auto process_events() -> void;
     auto process_movement() -> void;
     auto find_living_players() -> std::vector<bool>;

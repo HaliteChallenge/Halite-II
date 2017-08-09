@@ -1,7 +1,3 @@
-//
-// Created by David Li on 7/17/17.
-//
-
 #include "Entity.hpp"
 #include "hlt.hpp"
 
