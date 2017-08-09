@@ -602,7 +602,14 @@ auto Halite::process_events() -> void {
                     if (t4 < time && t4 >= 0) time = t4;
                 }
 
-                assert(time >= 0.0 && time <= 1.0);
+                // The time here might actually be slightly off. Example:
+                // pos_y is 156.5, map_height is 160, and vel_y is
+                // -3.4999999999999996. When added, pos_y + vel_y is 160, but
+                // (map_height - pos_y) / vel_y is 1.0000000000000002.
+
+                // I have chosen to let the ship crash, allowing the rounding
+                // to take care of the time, since we know the final location
+                // would be definitively out of bounds.
 
                 unsorted_events.insert(SimulationEvent{
                     SimulationEventType::Desertion,
