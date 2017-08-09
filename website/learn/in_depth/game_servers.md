@@ -33,6 +33,78 @@ Your main file must be called MyBot. Your language is recognized using the file 
 
 The following compilers/interpreters are used:
 
+Packages
+build-essential	12.1ubuntu2
+gcc	4:6.3.0-2ubuntu1
+g++	4:6.3.0-2ubuntu1
+python3	3.5.3-1
+python3.6	3.6.1-1
+	python3-pip	9.0.1-2
+git	1:2.11.0-2ubuntu0.1
+golang	2:1.7~1ubuntu1
+julia	0.4.7-6ubuntu1
+ocaml	4.02.3-6ubuntu2
+openjdk-8-jdk:amd64	8u131-b11-2ubuntu1.17.04.3
+php	1:7.0+49
+ruby	1:2.3.3
+scala	2.11.8-1
+nodejs	8.2.1-2nodesource1~zesty1
+mono-complete	5.0.1.1-0xamarin5+ubuntu1604b1
+dotnet-dev-1.1.0	1.1.0-1
+libgeos-dev	3.5.1-3
+tcl8.5	8.5.19-2
+mit-scheme:amd64	9.1.1-5build1
+racket	6.7-1
+octave	4.0.3-3ubuntu1
+luajit	2.0.4+dfsg-1
+lua5.2	5.2.4-1.1build1
+ghc	8.0.2-1~build1
+erlang-base-hipe	1:19.2.1+dfsg-2ubuntu1
+coffeescript	1.10.0~dfsg-1
+dart	1.24.2-1
+fp-compiler:amd64	3.0.2+dfsg-2
+sbcl	2:1.3.3-1ubuntu2
+dmd-bin	2.075.0-0
+mono-vbnc	4.6-0xamarin3+ubuntu1604b1
+gnat-6	6.3.0-12ubuntu2
+Worker Packages
+virtualenv	15.1.0+ds-1
+cgroup-tools	0.41-8ubuntu1
+unzip	6.0-20ubuntu1
+iptables-persistent	1.0.4+nmu1
+Python 3.5 Packages
+numpy 1.13.1
+scipy 0.19.1
+scikit-learn 0.18.2
+pillow 4.2.1
+h5py 2.7.0
+tensorflow 1.2.1
+keras 2.0.6
+theano 0.9.0
+shapely 1.5.17.post1
+Python 3.6 Packages
+numpy 1.13.1
+scipy 0.19.1
+scikit-learn 0.18.2
+pillow 4.2.1
+h5py 2.7.0
+tensorflow 1.2.1
+keras 2.0.6
+theano 0.9.0
+shapely 1.5.17
+Ruby Gems
+bundler (1.15.3)
+Rust Packages
+rustc 1.19.0 (0ade33941 2017-07-17)
+cargo 0.20.0 (a60d185c8 2017-07-13)
+rustup 1.5.0 (92d0d1e9e 2017-06-24)
+Clojure Packages
+Leiningen 2.7.1 on Java 1.8.0_131 OpenJDK 64-Bit Server VM
+Groovy Packages
+groovy: 2.4.12
+Miniconda
+conda 4.3.21
+
 - build-essential	12.1ubuntu2
 - gcc	4:6.3.0-2ubuntu1
 - g++	4:6.3.0-2ubuntu1
