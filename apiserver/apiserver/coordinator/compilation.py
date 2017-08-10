@@ -141,12 +141,18 @@ def update_compilation_status():
                 )
             )
 
+            bot = conn.execute(model.bots.select().where(
+                (model.bots.c.user_id == user_id) &
+                (model.bots.c.id == bot_id)
+            )).first()
+
             notify.send_templated_notification(
                 notify.Recipient(user["id"], user["username"], user["email"],
                                  user["organization_name"], user["level"],
                                  user["creation_time"]),
                 config.COMPILATION_SUCCESS_TEMPLATE,
                 {
+                    "version_number": bot["version_number"],
                     "detected_language": language,
                 }
             )
@@ -159,6 +165,7 @@ def update_compilation_status():
                                  user["creation_time"]),
                 config.COMPILATION_FAILURE_TEMPLATE,
                 {
+                    "version_number": bot["version_number"],
                     "detected_language": language,
                     "errors": errors,
                 }
