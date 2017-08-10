@@ -65,12 +65,15 @@ def update_compilation_status():
         raise util.APIError(400, message="Must provide user ID.")
 
     with model.engine.connect() as conn:
-        user = conn.execute(model.users.select(
-            model.users.c.id == user_id
-        ).join(
+        user = conn.execute(sqlalchemy.sql.select(
+
+        ).select_from(model.users.join(
             model.organizations,
             model.users.c.organization_id == model.organizations.id,
-            isouter=True)).first()
+            isouter=True)
+        ).where(
+            model.users.c.id == user_id
+        )).first()
         bot = conn.execute(model.bots.select(
             (model.bots.c.user_id == user_id) &
             (model.bots.c.id == bot_id)

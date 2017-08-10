@@ -69,11 +69,11 @@ def upload_game():
                     model.users.c.creation_time,
                     model.users.c.username,
                     model.organizations.c.organization_name,
-                ]).join(
+                ]).select_from(model.users.join(
                     model.organizations,
                     model.organizations.c.id == model.users.c.organization_id,
                     isouter=True
-                ).where(model.users.c.id == user["user_id"])
+                )).where(model.users.c.id == user["user_id"])
             ).first()
 
             stored_bot = conn.execute(
