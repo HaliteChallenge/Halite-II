@@ -183,7 +183,7 @@ def create_user(*, user_id):
 
     org_id = body.get("organization_id")
     email = body.get("email")
-    level = body.get("level", user_data["level"])
+    level = body.get("level", user_data["player_level"])
     provided_code = body.get("verification_code", None)
     verification_code = uuid.uuid4().hex
 
@@ -409,7 +409,7 @@ def update_user(intended_user_id, *, user_id):
                 notify.Recipient(user_id, user_data["username"],
                                  user_data["email"],
                                  user_data["organization_name"],
-                                 user_data["level"],
+                                 user_data["player_level"],
                                  user_data["creation_date"]),
                 update["verification_code"])
         else:
@@ -417,7 +417,7 @@ def update_user(intended_user_id, *, user_id):
                 notify.Recipient(user_id, user_data["username"],
                                  user_data["email"],
                                  user_data["organization_name"],
-                                 user_data["level"],
+                                 user_data["player_level"],
                                  user_data["creation_date"]))
 
     return util.response_success()
