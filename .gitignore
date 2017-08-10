@@ -466,3 +466,4 @@ cmake-build-*/
 apiserver/venv/
 compiled_environments/
 *.bc
+*.dylib
