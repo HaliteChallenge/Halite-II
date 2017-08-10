@@ -1,8 +1,8 @@
 # Specify version format
 version: "{build}"
 
-only_commits:
-  message: /build/
+# Only build when a tag is pushed
+skip_non_tags: true
 
 # Build worker image (VM template)
 image: Windows Server 2012 R2
