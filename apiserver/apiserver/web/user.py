@@ -108,6 +108,21 @@ def send_verification_email(recipient, verification_code):
         }
     )
 
+
+def send_confirmation_email(recipient):
+    """
+    Send a confirmation email to the user (let them know that they registered)
+
+    :param notify.Recipient recipient:
+    """
+
+    notify.send_templated_notification(
+        recipient,
+        config.CONFIRMATION_TEMPLATE,
+        {}
+    )
+
+
 @web_api.route("/user")
 @util.cross_origin(methods=["GET", "POST"])
 def list_users():
@@ -382,14 +397,14 @@ def update_user(intended_user_id, *, user_id):
             model.users.c.id == user_id
         ).values(**update))
 
-        if "email" in update:
-            user_data = conn.execute(model.users.select(
-                model.users.c.id == intended_user_id).join(
-                model.organizations,
-                model.users.c.organization_id == model.organizations.c.id,
-                isouter=True
-            )).first()
+        user_data = conn.execute(model.users.select(
+            model.users.c.id == intended_user_id).join(
+            model.organizations,
+            model.users.c.organization_id == model.organizations.c.id,
+            isouter=True
+        )).first()
 
+        if "email" in update:
             send_verification_email(
                 notify.Recipient(user_id, user_data["username"],
                                  user_data["email"],
@@ -397,6 +412,13 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["level"],
                                  user_data["creation_date"]),
                 update["verification_code"])
+        else:
+            send_confirmation_email(
+                notify.Recipient(user_id, user_data["username"],
+                                 user_data["email"],
+                                 user_data["organization_name"],
+                                 user_data["level"],
+                                 user_data["creation_date"]))
 
     return util.response_success()
 
