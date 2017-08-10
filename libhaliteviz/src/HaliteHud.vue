@@ -4,8 +4,8 @@
             <div class="btn-group" role="group">
                 <button class="btn btn-default playbutton" v-if="playing" v-on:click="pause" title="Pause"><i class="fa fa-pause" aria-hidden="true"></i></button>
                 <button class="btn btn-default playbutton" v-else v-on:click="play" title="Play"><i class="fa fa-play" aria-hidden="true"></i> </button>
-                <!--<button class="btn btn-default" v-if="!recording" v-on:click="beginCaptureGIF" title="Start capturing GIF"><i class="fa fa-video-camera" aria-hidden="true"></i> </button>-->
-                <!--<button class="btn btn-default" v-else v-on:click="renderGIF" title="Finish capturing GIF"><i class="fa fa-pause" aria-hidden="true"></i> </button>-->
+                <button class="btn btn-default" v-if="!recording" v-on:click="captureVideo" title="Record video of game"><i class="fa fa-video-camera" aria-hidden="true"></i> </button>
+                <span v-else class="recording-indicator">● REC</span>
             </div>
 
             Frame: <input type="text" :value="frame + '.' + Math.floor(time * 100)" />
@@ -169,25 +169,12 @@
              visualizer.scrub(e.target.value, 0);
          };
          this.getVisualizer = () => visualizer;
-         this.beginCaptureGIF = () => {
-             if (!visualizer.isPlaying()) this.play();
-             this.start_frame = this.frame;
-             this.start_time = this.time;
+         this.captureVideo = () => {
              this.recording = true;
-         };
-         this.renderGIF = () => {
-             this.pause();
-             this.recording = false;
-             this.encoding = true;
-             visualizer.encodeGIF({
-                 frame: this.start_frame,
-                 time: this.start_time,
-             }, {
-                 frame: this.frame,
-                 time: this.time,
-             }).then((blob) => {
-                 this.encoding = false;
-                 window.open(URL.createObjectURL(blob));
+             visualizer.encodeVideo().then((blob) => {
+                console.log(blob);
+                window.open(URL.createObjectURL(blob));
+                this.recording = false;
              });
          };
 
@@ -240,8 +227,7 @@
          scrub: function(e) {
          },
          getVisualizer: function() {},
-         beginCaptureGIF: function() {},
-         renderGIF: function() {},
+         captureVideo: function() {},
      },
      computed: {
          statistics: function() {
@@ -340,6 +326,21 @@
 
     .infosummary {
         float: right
+    }
+
+    .recording-indicator {
+        color: #F00;
+        animation: blinker 2s linear infinite alternate;
+    }
+
+    @keyframes blinker {
+        0% {
+            opacity: 1.0;
+        }
+
+        50% {
+            opacity: 0.0;
+        }
     }
 
     dl {

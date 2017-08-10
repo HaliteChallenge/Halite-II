@@ -146,7 +146,38 @@ export class HaliteVisualizer {
         // TODO: profile CPU, memory usage to make sure all is well
     }
 
-    encodeGIF(start, stop) {
+    encodeVideo(type="canvas") {
+        console.log("Encoding video");
+        if (!window.RecordRTC) {
+            const error = "RecordRTC.js not loaded!";
+            console.error(error);
+            return Promise.error(error);
+        }
+        this.pause();
+
+        this.frame = 0;
+        this.time = 0;
+        const recorder = RecordRTC(this.application.renderer.view, {
+            type: type,
+        });
+        recorder.startRecording();
+        this.play();
+        const oldEnd = this.onEnd;
+
+        return new Promise((resolve) => {
+            this.onEnd = () => {
+                recorder.stopRecording(() => {
+                    const blob = recorder.getBlob();
+                    console.log(blob);
+
+                    resolve(blob);
+                });
+                this.onEnd = oldEnd;
+            };
+        });
+    }
+
+    encodeGIF(start, stop, resolution=10) {
         if (!window.GIF) {
             const error = "GIF.js not loaded, can't encode GIF";
             console.error(error);
@@ -157,20 +188,31 @@ export class HaliteVisualizer {
         PIXI.ticker.shared.stop();
         const gif = new GIF({
             workers: 2,
-            quality: 10,
+            quality: 2,
             // TODO:
             workerScript: "assets/js/gif.worker.js",
         });
 
         this.frame = start.frame;
-        this.substep = 0;
+        this.time = 0;
+
+        const timestep = 1.0 / resolution;
 
         while (this.frame <= stop.frame) {
-            this.draw();
-            this.application.render();
-            const canvas = this.application.renderer.extract.canvas();
-            gif.addFrame(canvas, { copy: true });
-            this.advanceSubsteps(this.replay.frames[this.frame].length);
+            this.update();
+            this.time = 0;
+            for (let step = 0; step < resolution; step++) {
+                this.time = timestep * step;
+                // 4 game frames per second
+                this.draw(4 * 60 / resolution);
+                this.application.render();
+                const canvas = this.application.renderer.extract.canvas();
+                gif.addFrame(canvas, {
+                    copy: true,
+                    delay: 1000 / (4.0 * 10),
+                });
+            }
+            this.frame++;
         }
 
         return new Promise((resolve) => {
