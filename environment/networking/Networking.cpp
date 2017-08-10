@@ -211,7 +211,21 @@ void Networking::send_string(hlt::PlayerId player_tag,
     UniConnection connection = connections[player_tag];
     ssize_t charsWritten =
         write(connection.write, sendString.c_str(), sendString.length());
-    if (charsWritten < sendString.length()) {
+    if (charsWritten == -1) {
+        std::stringstream error_msg;
+        if (errno == EWOULDBLOCK || errno == EAGAIN) {
+            error_msg
+                << "Could not send map to bot: blocked writing to pipe.\n"
+                << "This usually happens if the bot is not reading STDIN,\n"
+                << "or is accidentally putting all commands on newlines.";
+        }
+        else {
+            error_msg
+                << "Encountered an error while writing to pipe: " << errno;
+        }
+        throw BotInputError(player_tag, "", error_msg.str(), 0);
+    }
+    else if (charsWritten < sendString.length()) {
         if (!quiet_output) std::cout << "Problem writing to pipe\n";
         throw 1;
     }
@@ -388,6 +402,9 @@ void Networking::launch_bot(std::string command) {
         if (!quiet_output) std::cout << "Error creating pipe\n";
         throw 1;
     }
+
+    // Make the write pipe nonblocking
+    fcntl(writePipe[1], F_SETFL, O_NONBLOCK);
 
     pid_t ppid_before_fork = getpid();
 

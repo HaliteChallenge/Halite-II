@@ -1109,5 +1109,7 @@ Halite::Halite(unsigned short width_,
 
 Halite::~Halite() {
     //Get rid of dynamically allocated memory:
-    for (int a = 0; a < number_of_players; a++) networking.kill_player(a);
+    for (hlt::PlayerId a = 0; a < number_of_players; a++) {
+        networking.kill_player(a);
+    }
 }
