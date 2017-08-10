@@ -39,7 +39,7 @@ __Linux users note:__ Your system must support GCC 4.9 or later (with correspond
         </tr>
         {% endfor %}
         <tr>
-            <td>(no language)</td>
+            <td>(no language, only game environment)</td>
             <td>empty zip…?</td>
             {% for file in site.data.downloads.environments %}
             <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
