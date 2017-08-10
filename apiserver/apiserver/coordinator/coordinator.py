@@ -66,7 +66,7 @@ def upload_game():
                     model.users.c.on_email_list,
                     model.users.c.email,
                     model.users.c.player_level,
-                    model.users.c.creation_date,
+                    model.users.c.creation_time,
                     model.users.c.username,
                     model.organizations.c.organization_name,
                 ]).join(
@@ -339,7 +339,7 @@ def update_user_timeout(conn, game_id, user):
                                  user["email"],
                                  user["organization_name"],
                                  user["player_level"],
-                                 user["creation_date"])
+                                 user["creation_time"])
     if timed_out_count == 1:
         notify.send_templated_notification(
             recipient,

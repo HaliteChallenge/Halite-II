@@ -257,7 +257,7 @@ def create_user(*, user_id):
         send_verification_email(
             notify.Recipient(user_id, user_data["username"], email,
                              organization_name, level,
-                             user_data["creation_date"]),
+                             user_data["creation_time"]),
             verification_code)
 
         message = "Please check your email for a verification code."
@@ -410,7 +410,7 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["email"],
                                  user_data["organization_name"],
                                  user_data["player_level"],
-                                 user_data["creation_date"]),
+                                 user_data["creation_time"]),
                 update["verification_code"])
         else:
             send_confirmation_email(
@@ -418,7 +418,7 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["email"],
                                  user_data["organization_name"],
                                  user_data["player_level"],
-                                 user_data["creation_date"]))
+                                 user_data["creation_time"]))
 
     return util.response_success()
 
