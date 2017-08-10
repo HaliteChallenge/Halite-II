@@ -25,6 +25,8 @@ export class HaliteVisualizer {
         this.timeStep = 0.1;
         this.playSpeed = 2.0;
         this.scrubSpeed = 0.25;
+        // Keyboard controls - map a key name to an action, or directly to
+        // a handler
         this.keyboardControls = new keyboard.KeyboardControls(this, {
             "ArrowLeft": "scrubBackwards",
             "KeyA": "scrubBackwards",
@@ -47,22 +49,26 @@ export class HaliteVisualizer {
         // Also: make sure textures have power-of-2 dimensions
         this.application.renderer.roundPixels = true;
 
+        // Preload assets to avoid a hang when they're used for the first time
+        // (since for large textures, image decode and GPU upload take a while)
         assets.prepareAll(this.application.renderer, this.application.renderer.plugins.prepare);
 
+        // Scale things to fit exactly in the visible area
         this.scale = assets.VISUALIZER_HEIGHT / (replay.height * assets.CELL_SIZE);
         if (replay.width * this.scale * assets.CELL_SIZE > assets.VISUALIZER_SIZE) {
             this.scale = assets.VISUALIZER_SIZE / (replay.width * assets.CELL_SIZE);
         }
 
         this.container = new PIXI.Container();
-        // Letterbox
-        this.container.position.x = Math.max(0, (assets.VISUALIZER_SIZE - replay.width * this.scale * assets.CELL_SIZE) / 2);
-        this.container.position.y = Math.max(0, (assets.VISUALIZER_HEIGHT - replay.height * this.scale * assets.CELL_SIZE) / 2);
 
+        // Background image
         this.starfield = PIXI.Sprite.from(
             assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
         this.starfield.width = replay.width * this.scale * assets.CELL_SIZE;
 
+        // Set up letterboxing in case replay aspect ratio does't match ours
+        this.container.position.x = Math.max(0, (assets.VISUALIZER_SIZE - replay.width * this.scale * assets.CELL_SIZE) / 2);
+        this.container.position.y = Math.max(0, (assets.VISUALIZER_HEIGHT - replay.height * this.scale * assets.CELL_SIZE) / 2);
         this.letterbox = new PIXI.Graphics();
         if (this.container.position.y > 0) {
             this.letterbox.beginFill(0x000000);
@@ -103,6 +109,8 @@ export class HaliteVisualizer {
 
         let poi = new PIXI.Graphics();
         this.drawPOI(poi);
+
+        // Prerender the points of interest once, and keep it as a texture
         let renderer = new PIXI.CanvasRenderer(
             assets.VISUALIZER_SIZE, assets.VISUALIZER_SIZE);
         let texture = renderer.generateTexture(poi);
@@ -136,6 +144,12 @@ export class HaliteVisualizer {
         this._onKeyDown = null;
     }
 
+    /**
+     * Clean up the visualizer and stop it from rendering.
+     *
+     * Call this before creating a new instance, or you'll wonder why
+     * everything is so slow!
+     */
     destroy() {
         this.keyboardControls.destroy();
         this.keyboardControls = null;

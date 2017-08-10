@@ -3,7 +3,15 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 import {CELL_SIZE, PLAYER_COLORS} from "./assets";
 
+/**
+ * Manages a ship on screen.
+ */
 export class Ship {
+    /**
+     *
+     * @param visualizer The visualizer object
+     * @param record The ship record from the replay
+     */
     constructor(visualizer, record) {
         this.sprite = PIXI.Sprite.from(assets.SHIP_IMAGE);
         this.halo = PIXI.Sprite.from(assets.HALO_IMAGE);
@@ -41,6 +49,9 @@ export class Ship {
         this.tractorBeam.anchor.y = 0.0;
         this.tractorBeam.width = 5;
 
+        // We have to manually adjust the anchor points of the docking arms,
+        // since they're not specified in the spritesheet
+        // XXX: if the sprite changes, these need to be updated too!
         this.leftDocking.anchor.x = 48/81;
         this.rightDocking.anchor.x = 34/81;
         this.leftDocking.anchor.y = 14/110;
@@ -61,6 +72,13 @@ export class Ship {
         this.update(record);
     }
 
+    /**
+     * Add the ship to the visualizer.
+     * @param container {PIXI.Container}
+     * @param dockingContainer {PIXI.Container} The container to use for the
+     * docking arms. (This lets you control their z-order, though right now
+     * it doesn't seem to work.)
+     */
     attach(container, dockingContainer) {
         dockingContainer.addChildAt(this.leftDocking, 0);
         dockingContainer.addChildAt(this.rightDocking, 0);
@@ -69,6 +87,9 @@ export class Ship {
         this.dockingContainer = dockingContainer;
     }
 
+    /**
+     * Remove this ship from the visualizer.
+     */
     destroy() {
         this.container.removeChild(this.halo);
         this.container.removeChild(this.sprite);
@@ -84,6 +105,10 @@ export class Ship {
         });
     }
 
+    /**
+     * Update this ship's display with the latest state from the replay.
+     * @param record
+     */
     update(record) {
         const max_ship_health = this.visualizer.replay.constants.MAX_SHIP_HEALTH;
         const health_factor = 0.1 + 0.2 * record.health / max_ship_health;
@@ -93,11 +118,14 @@ export class Ship {
         let vel_x = record.vel_x;
         let vel_y = record.vel_y;
 
+        // Draw the exhaust trail based on the thrust command issued this turn
         this.exhaust.visible = false;
         if (this.visualizer.frame < this.visualizer.replay.frames.length - 1) {
             let moves = this.visualizer.replay.moves[this.visualizer.frame];
             let move = moves[record.owner][0][record.id];
             if (move && move.type === "thrust") {
+                // Adds the command to the ship velocity, though without
+                // drag/inertia, this is entirely pointless
                 let angle = move.angle * Math.PI / 180;
                 vel_x += move.magnitude * Math.cos(angle);
                 vel_y += move.magnitude * Math.sin(angle);
@@ -111,9 +139,13 @@ export class Ship {
             }
         }
 
+        // Orient the sprite in the direction that it's moving
         let angle = Math.atan2(vel_y, vel_x);
         this.sprite.rotation = angle + Math.PI / 2;
 
+        // Adjust speed to not go over max speed - this also doesn't matter
+        // without drag/inertia (it's to make sure our forecasted positions
+        // line up with what the game environment did)
         const max_speed = this.visualizer.replay.constants.MAX_SPEED;
         const magnitude = Math.sqrt(vel_x*vel_x + vel_y*vel_y);
         if (magnitude > max_speed) {
@@ -121,6 +153,7 @@ export class Ship {
             vel_y *= magnitude / max_speed;
         }
 
+        // Adjust our position based on the time (interpolate between frames)
         const x = record.x + this.visualizer.time * vel_x;
         const y = record.y + this.visualizer.time * vel_y;
 

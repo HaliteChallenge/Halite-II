@@ -1,3 +1,6 @@
+/**
+ * A helper to parse the replay and compute statistics for a match.
+ */
 export class Statistics {
     constructor(replay) {
         this.frames = [];
