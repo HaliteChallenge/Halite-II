@@ -1,38 +1,80 @@
-sudo: required
-
+sudo: false
 dist: trusty
-
 language: cpp
 
-services: 
-  - mysql
+# https://docs.travis-ci.com/user/languages/cpp/
+# Test on multiple GCC and Clang versions
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
-addons:
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
 
-install:
-  - cd ~/build/HaliteChallenge/Halite/tests
-  - cp travisTests.ini tests.ini
-  - cp travisTests.ini ../halite.ini
- 
-  - cd ~/build/HaliteChallenge/Halite/website
-  - sudo ./install.sh
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
-  - cd ~/build/HaliteChallenge/Halite/worker
-  - sudo ./install.sh 123
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
 
-  - cd ~/build/HaliteChallenge/Halite/tests
-  - sudo ./install.sh
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
-  - export CXX="g++-4.9"
+    # works on Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty
+          packages:
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
 
 script:
-  - cd ~/build/HaliteChallenge/Halite/tests/
-  - sudo ./runTests.sh
-
-notifications:
-    slack: halite:HnrNM3effc9q8ZVvT7PqsSYC
+  - cd environment/
+  - make -j2
