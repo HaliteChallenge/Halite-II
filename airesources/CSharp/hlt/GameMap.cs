@@ -41,23 +41,33 @@ public class GameMap {
     /// Size of the Map
     /// </summary>
     /// <returns></returns>
-    public MapSize Size {
+    public Size Size {
         get {
             return size;
         }
     }
 
-    MapSize size;
+     /// <summary>
+    /// Size of the Map
+    /// </summary>
+    /// <returns></returns>
+    public int Turn {
+        get {
+            return turnCount;
+        }
+    }
+
+    Size size;
     List<Ship> ships;
     List<Planet> planets;
     List<Player> players;
-    static int turnCount = -1;
+    int turnCount = -1;
 
     /// <summary>
     /// Constrctor for Game Map
     /// </summary>
     /// <param name="size">Size of the Map</param>
-    public GameMap (MapSize size) {
+    public GameMap (Size size) {
         this.size = size;
         ships = new List<Ship> ();
         planets = new List<Planet> ();
@@ -69,21 +79,24 @@ public class GameMap {
     /// </summary>
     /// <param name="str">STDOUT contents</param>
     public void Update () {
+        turnCount++;
         players.Clear ();
-        Log.Information ("Turn-" + ++turnCount,LogingLevel.Game);
-        var mapData = Halite.GetString();
+        planets.Clear ();
+        ships.Clear ();
+        Log.Information ("Turn-" + ++turnCount, LogingLevel.Game);
+        var mapData = Halite.GetString ();
         var tokens = mapData.Trim ().Split (' ').ToList ();
         var queue = new Queue<string> (tokens);
         var numberOfPlayers = int.Parse (queue.Dequeue ());
         if (turnCount <= 0) {
-            Log.Information ("Number of Players: " + numberOfPlayers,LogingLevel.Game);
+            Log.Information ("Number of Players: " + numberOfPlayers, LogingLevel.Game);
         }
         for (int i = 0; i < numberOfPlayers; i++) {
             int playerTag = int.Parse (queue.Dequeue ());
             Player currentPlayer = new Player (playerTag);
             List<Ship> ships = Ship.Parse (playerTag, queue);
             foreach (var ship in ships) {
-                currentPlayer.Ships.Add(ship);
+                currentPlayer.Ships.Add (ship);
             }
 
             players.Add (currentPlayer);

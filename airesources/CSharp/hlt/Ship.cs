@@ -53,12 +53,11 @@ public class Ship : Entity {
     }
 
     public bool CanDock (Planet planet) {
-        Log.Information ("Trying to dock " + this.GetDistance (planet.Position) + " To Planet: " + planet.Radius + Constants.DockRadius, LogingLevel.User);
         return this.GetDistance (planet.Position) <= planet.Radius + Constants.DockRadius;
     }
 
-    public string Thrust (double magnitude, double angle) {
-        return String.Format ("t {0} {1} {2}", this.EntityInfo.Id, magnitude, angle);
+    public string Thrust (double speed, int angle) {
+        return String.Format ("t {0} {1} {2}", this.EntityInfo.Id, speed, angle);
     }
 
     public string Dock (Planet planet) {
@@ -76,14 +75,14 @@ public class Ship : Entity {
         var distance = this.GetDistance (target);
         var angle = this.GetAngle (target);
         Log.Information ("distance: " + distance + " angle:" + angle, LogingLevel.User);
-        var obstacles = map.GetObstaclesBetween (this, target);
-        if (avoidObstacles == true && obstacles.Count > 0) {
-            Log.Information ("Avoiding Obstacles", LogingLevel.User);
-            var newTargetDX = Math.Cos (angle + 1 * distance);
-            var newTargetDY = Math.Sin (angle + 1 * distance);
-            var newTarget = new Position (this.Position.X + newTargetDX, this.Position.Y + newTargetDY);
-            return this.Navigate (newTarget, map, speed, true, maxCorrection - 1);
-        }
+        // var obstacles = map.GetObstaclesBetween (this, target);
+        // if (avoidObstacles == true && obstacles.Count > 0) {
+        //     Log.Information ("Avoiding Obstacles", LogingLevel.User);
+        //     var newTargetDX = Math.Cos (angle + 1 * distance);
+        //     var newTargetDY = Math.Sin (angle + 1 * distance);
+        //     var newTarget = new Position (this.Position.X + newTargetDX, this.Position.Y + newTargetDY);
+        //     return this.Navigate (newTarget, map, speed, true, maxCorrection - 1);
+        // }
 
         speed = distance >= speed ? speed : distance;
         Log.Information ("nav distance: " + speed + "nav angle:" + angle, LogingLevel.User);

@@ -2,50 +2,76 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Sample C# bot using the starter kit
+/// </summary>
 public class MyBot {
+
+    /// <summary>
+    /// Setting the name of the bot (be nice!)
+    /// </summary>
     public const string RandomBotName = "RandomC#Bot";
+
+    /// <summary>
+    /// Entry point for bot execution in C#ß
+    /// </summary>
     public static void Main (string[] args) {
+
+        // Intialize the game with the name of your bot
         var hlt = Halite.Initialize (RandomBotName);
-        Log.Setup ("Log" + hlt.Item1 + ".txt", LogingLevel.User);
-        GameMap map = new GameMap (hlt.Item2);
-        System.Diagnostics.Debugger.Break ();
-        List<String> commands = new List<String> ();
-        var i = 0;
+        // Create the Game Map
+        var map = new GameMap (hlt.Item2);
+        // Intialize a command queue to store all the commands per turn
+        var commands = new List<String> ();
+        // Game loop
         while (true) {
-            commands.Clear();
-            Log.Information ("Turn-" + i++, LogingLevel.User);
+            // Make sure commands are cleared prior to each turn
+            commands.Clear ();
+            // Update your map
             map.Update ();
+            // Get your player info
             var myplayer = map.Players.FirstOrDefault (player => player.Id == hlt.Item1);
+            // Now do the following for each ship that is owned by you
             foreach (var ship in myplayer.Ships) {
-                if (ship.DockingStatus != DockingStatus.undocked)
-                {
-                    Log.Information ("Ship Docked: " + ship.EntityInfo.Id, LogingLevel.User);
+                // If the ship is already docked, skip the loop and start with the next ship
+                if (ship.DockingStatus != DockingStatus.undocked) {
                     continue;
                 }
+
+                // Since the ship is not docked, lets checkout whast the planets are doing
                 foreach (var planet in map.Planets) {
-                    if (planet.isOwned ())
-                    {
-                        Log.Information ("Planet Owned: " + planet.Owner, LogingLevel.User);
-                        continue;
+                    // If the planet is owned, lets not bother attacking it or going near it.
+                    if (planet.isOwned ()) {
+                        break;
                     }
+
+                    // If you are close enough to the planet you can dock and produce more ships.
+                    // lets try that out now
                     if (ship.CanDock (planet)) {
-                        Log.Information ("Trying to dock Ship: " + ship.EntityInfo.Id + " To Planet: " + planet.EntityInfo.Id, LogingLevel.User);
+                        // Sweet, you can dock. Lets add the dock command to your queue
                         commands.Add (ship.Dock (planet));
                         break;
                     } else {
-                        Log.Information ("Trying to Navigate: " + ship.EntityInfo.Id + " To Planet: " + planet.EntityInfo.Id, LogingLevel.User);
+
+                        // Not close enough to dock.
+                        // So lets find the closest point in the planet relative to the current ships location
                         var entityPoint = ship.GetClosestPointToEntity (planet);
-                        Log.Information ("Planet Position: " + planet.Position.ToString() + " Closets Point: " + entityPoint.ToString(), LogingLevel.User);
-                        var navigatecommand = ship.Navigate (entityPoint, map, 7, true, 85);
+                        // Since we have the point, lets try navigating to it. 
+                        // Our pathfinding algorthm takes care of going around obstsancles for you.
+                        var navigatecommand = ship.Navigate (entityPoint, map, Constants.MaxSpeed / 2);
+                        // Lets check If we were able to find a route to the point
                         if (!string.IsNullOrEmpty (navigatecommand)) {
-                            Log.Information ("Commands: " + navigatecommand, LogingLevel.User);
+                            // Looks like we found a way, let add this to our command queue
                             commands.Add (navigatecommand);
-                            break;
                         }
+
+                        break;
                     }
                 }
             }
-            Log.Information ("Number of Commands: " + commands.Count, LogingLevel.User);
+
+            // All done with the commands to your ships Fleet Admiral, 
+            // lets get our battle computers to execute your commands
             Halite.SendCommandQueue (commands);
         }
     }

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 
 public static class Halite {
-    public static Tuple<int, MapSize> Initialize (string botName) {
+    public static Tuple<int, Size> Initialize (string botName) {
         var tag = int.Parse (GetString ());
         var size = GetString ();
-        MapSize mapSize = new MapSize () { Width = int.Parse (size.Split (' ')[0]), Height = int.Parse (size.Split (' ')[1]) };
+        Size mapSize = new Size (int.Parse (size.Split (' ')[0]), int.Parse (size.Split (' ')[1]));
         SendString (botName);
         DoneSending();
-        return new Tuple<int, MapSize> (tag, mapSize);
+        Log.Setup ("Log" + tag + ".txt", LogingLevel.Game);
+        return new Tuple<int, Size> (tag, mapSize);
     }
 
     public static void SendString (string str) {
