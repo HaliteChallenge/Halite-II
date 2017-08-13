@@ -9,7 +9,7 @@ public static class Halite {
         Size mapSize = new Size (int.Parse (size.Split (' ')[0]), int.Parse (size.Split (' ')[1]));
         SendString (botName);
         DoneSending();
-        Log.Setup ("Log" + tag + ".txt", LogingLevel.Game);
+        Log.Setup ("Log" + tag + ".txt", LogingLevel.User);
         return new Tuple<int, Size> (tag, mapSize);
     }
 

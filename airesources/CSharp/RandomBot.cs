@@ -52,7 +52,6 @@ public class MyBot {
                         commands.Add (ship.Dock (planet));
                         break;
                     } else {
-
                         // Not close enough to dock.
                         // So lets find the closest point in the planet relative to the current ships location
                         var entityPoint = ship.GetClosestPointToEntity (planet);
