@@ -3,7 +3,7 @@
 /// </summary>
 public class Constants {
     // Number of units of distance a ship can move in a turn
-    public const double MaxAcceleration = 7.0;
+    public const double MaxSpeed = 7.0;
     // Radius of a ship from the center
     public const double ShipRadius = 0.5;
     // Health of a ship when spawned
