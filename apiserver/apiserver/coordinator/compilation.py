@@ -65,11 +65,23 @@ def update_compilation_status():
         raise util.APIError(400, message="Must provide user ID.")
 
     with model.engine.connect() as conn:
-        user = conn.execute(sqlalchemy.sql.select(
-
-        ).select_from(model.users.join(
+        user = conn.execute(sqlalchemy.sql.select([
+            model.users.c.id,
+            model.users.c.username,
+            model.users.c.email,
+            model.users.c.github_email,
+            model.users.c.is_active,
+            model.users.c.on_email_list,
+            model.users.c.is_email_good,
+            model.users.c.player_level,
+            model.users.c.country_code,
+            model.users.c.country_subdivision_code,
+            model.users.c.creation_time,
+            model.users.c.update_time,
+            model.organizations.c.organization_name,
+        ]).select_from(model.users.join(
             model.organizations,
-            model.users.c.organization_id == model.organizations.id,
+            model.users.c.organization_id == model.organizations.c.id,
             isouter=True)
         ).where(
             model.users.c.id == user_id
