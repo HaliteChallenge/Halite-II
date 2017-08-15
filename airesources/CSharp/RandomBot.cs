@@ -21,6 +21,8 @@ public class MyBot {
         var hlt = Halite.Initialize (RandomBotName);
         // Create the Game Map
         var map = new GameMap (hlt.Item2);
+        // Set up logging
+        Log.Setup ("RandomC#Bot" + hlt.Item1 + ".log", LogingLevel.User);        
         // Intialize a command queue to store all the commands per turn
         var commands = new List<String> ();
         // Game loop
@@ -42,7 +44,7 @@ public class MyBot {
                 foreach (var planet in map.Planets) {
                     // If the planet is owned, lets not bother attacking it or going near it.
                     if (planet.isOwned ()) {
-                        break;
+                        continue;
                     }
 
                     // If you are close enough to the planet you can dock and produce more ships.
@@ -57,7 +59,7 @@ public class MyBot {
                         var entityPoint = ship.GetClosestPointToEntity (planet);
                         // Since we have the point, lets try navigating to it. 
                         // Our pathfinding algorthm takes care of going around obstsancles for you.
-                        var navigatecommand = ship.Navigate (entityPoint, map, Constants.MaxSpeed / 2);
+                        var navigatecommand = ship.Navigate (entityPoint, map, Constants.MaxSpeed/2);
                         // Lets check If we were able to find a route to the point
                         if (!string.IsNullOrEmpty (navigatecommand)) {
                             // Looks like we found a way, let add this to our command queue
@@ -69,7 +71,7 @@ public class MyBot {
                 }
             }
 
-            // All done with the commands to your ships Fleet Admiral, 
+            // You are now done with the commands to your ships Fleet Admiral, 
             // lets get our battle computers to execute your commands
             Halite.SendCommandQueue (commands);
         }

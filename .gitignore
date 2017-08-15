@@ -26,6 +26,7 @@ bld/
 [Oo]bj/
 airesources/CSharp/bin/*
 airesources/CSharp/obj/*
+airesources/CSharp/*.txt
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -469,3 +470,5 @@ apiserver/venv/
 compiled_environments/
 *.bc
 *.dylib
+
+admin/adminenv/*

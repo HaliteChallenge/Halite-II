@@ -8,17 +8,16 @@ public static class Halite {
         var size = GetString ();
         Size mapSize = new Size (int.Parse (size.Split (' ')[0]), int.Parse (size.Split (' ')[1]));
         SendString (botName);
-        DoneSending();
-        Log.Setup ("Log" + tag + ".txt", LogingLevel.User);
+        DoneSending ();
         return new Tuple<int, Size> (tag, mapSize);
     }
 
     public static void SendString (string str) {
-        Console.Write(str);
+        Console.Write (str);
     }
 
     public static void DoneSending () {
-        Console.Write("\n");
+        Console.Write ("\n");
     }
 
     public static string GetString () {
@@ -33,7 +32,7 @@ public static class Halite {
             SendString (command.ToString ());
         }
 
-       DoneSending();
+        DoneSending ();
     }
 }
 
