@@ -170,7 +170,7 @@ def delete_organization(org_id, *, user_id):
             count = conn.execute(sqlalchemy.sql.select([
                 sqlalchemy.sql.func.count()
             ]).select_from(model.users).where(
-                model.users.c.id == org_id
+                model.users.c.organization_id == org_id
             )).first()[0]
 
             if count > 0:
