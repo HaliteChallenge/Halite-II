@@ -80,7 +80,7 @@ def create_organization(*, user_id):
         )).inserted_primary_key[0]
 
     response = {
-        "organization_id": org_id[0],
+        "organization_id": org_id,
     }
     if verification_code:
         response["verification_code"] = verification_code
