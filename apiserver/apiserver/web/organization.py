@@ -75,7 +75,7 @@ def create_organization(*, user_id):
     with model.engine.connect() as conn:
         org_id = conn.execute(model.organizations.insert().values(
             organization_name=org_body["name"],
-            organization_kind=org_body["type"],
+            kind=org_body["type"],
             verification_code=verification_code,
         )).inserted_primary_key[0]
 
