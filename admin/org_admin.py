@@ -16,24 +16,23 @@ email_endpoint = "/email_domain"
 def main(argv):
     add_org(args.name, args.type, args.domain, args.key)
     
-def bulk_add_halite1_data():
+def bulk_add_halite1_data(key):
     with open('halite1orgdata.csv', 'rU') as f:
         reader = csv.reader(f)
         extlist = list(reader)
         count = 0
         for row in extlist:
             if(count>0):
-                print(row[0] + row[1] + row[2])
-                add_org(row[0], row[2], row[1])
+                add_org(row[0], row[2], row[1], key)
             count = count + 1
 
-def bulk_add_publicuni_data():
+def bulk_add_publicuni_data(key):
     count = 0
     response = requests.request("GET", "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json")
     response_data = json.loads(response.text)
     for org in response_data:
         try:
-            add_org(org["name"], "University",org["domain"])
+            add_org(org["name"], "University",org["domain"],key)
         except ValueError:
             count = count + 1
             print("Oops! " + str(count))
