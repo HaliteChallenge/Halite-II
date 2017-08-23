@@ -7,3 +7,4 @@ from . import match
 from . import organization
 from . import user, user_bot, user_hackathon, user_match
 from . import views
+from . import badges

@@ -152,3 +152,20 @@ CREATE TABLE hackathon_snapshot (
   FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
   PRIMARY KEY (hackathon_id, user_id, bot_id)
 );
+
+CREATE TABLE badge (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(256) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE user_badge (
+  user_id INT UNSIGNED NOT NULL,
+  badge_id INT UNSIGNED NOT NULL,
+  is_enabled BOOL NOT NULL DEFAULT TRUE,
+  creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (badge_id) REFERENCES badge (id),
+  PRIMARY KEY (user_id, badge_id)
+);

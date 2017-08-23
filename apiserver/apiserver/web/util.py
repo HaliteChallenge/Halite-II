@@ -79,8 +79,13 @@ def validate_session_cookie(user_id):
         return user
 
 
+def validate_request_from_localhost():
+    return (flask.request.remote_addr == "127.0.0.1" and
+            flask.request.url_root == "http://127.0.0.1:5000/")
+
+
 def requires_login(accept_key=False, optional=False, admin=False,
-                   association=False):
+                   association=False, accept_local=False):
     """
     Indicates that an endpoint requires the user to be logged in.
 
@@ -96,6 +101,9 @@ def requires_login(accept_key=False, optional=False, admin=False,
         @functools.wraps(view)
         def decorated_view(*args, **kwargs):
             user = None
+            if accept_local and validate_request_from_localhost():
+                kwargs["user_id"] = None
+                return view(*args, **kwargs)
             if accept_key:
                 user = validate_api_key(
                     flask.request.headers.get(config.API_KEY_HEADER))
