@@ -1,14 +1,25 @@
 <template>
     <div class="editorArea">
         <div v-if="editorViewer">
-            Bot Language:
-            <select v-model="selected_language" v-on:change="reset_language">
-                <option v-for="opt in all_bot_languages"
-                        v-bind:value="opt.lang_name">
-                {{ opt.lang_name }}
-                </option>
-            </select>
-            <button v-on:click="reset_code">Reset Code</button>
+            <span class="optGroup">
+                Editor Theme:
+                <select v-model="selected_theme" v-on:change="reset_theme">
+                    <option>Dark</option>
+                    <option>Light</option>
+                </select>
+            </span>
+            <span class="optGroup">
+                Bot Language:
+                <select v-model="selected_language" v-on:change="reset_language">
+                    <option v-for="opt in all_bot_languages"
+                            v-bind:value="opt.lang_name">
+                    {{ opt.lang_name }}
+                    </option>
+                </select>
+            </span>
+            <span class="optGroup">
+                <button v-on:click="reset_code">Reset Code</button>
+            </span>
         </div>
         <div class="editorBody" id="embeddedEditor">
             <div class="editorTitle">
@@ -52,6 +63,8 @@
 
     var logVerbose = false;
     const BOT_LANG_KEY = 'bot_language';
+    const THEME_KEY = 'editor_theme';
+    const DARK_THEME = 'Dark';
     const RESET_MSG = "Are you sure you want to reset your bot code to the sample code?\n(All changes will be lost!)";
 
     function saveCode(ctx) {
@@ -60,6 +73,7 @@
         const code = ctx.get_editor_code();
         window.localStorage.setItem(fileName, code);
         window.localStorage.setItem(BOT_LANG_KEY, ctx.bot_lang);
+        window.localStorage.setItem(THEME_KEY, ctx.selected_theme);
     }
 
     function loadBotLang() {
@@ -71,6 +85,17 @@
         }
         else {
             return default_lang;
+        }
+    }
+
+    function loadEditorTheme() {
+        const theme = window.localStorage.getItem(THEME_KEY);
+        if (theme) {
+            logInfo("Set theme to " + theme);
+            return theme;
+        }
+        else {
+            return DARK_THEME;
         }
     }
 
@@ -97,6 +122,7 @@
         name: "bot_editor",
         data: function() {
             const lang = loadBotLang();
+            const theme = loadEditorTheme();
             return {
                 all_bot_languages: botLanguagePacks,
                 status_message: null,
@@ -105,6 +131,7 @@
                 // Currently defaulting to Python3 starter kit
                 bot_lang: lang,
                 selected_language: lang,
+                selected_theme: theme,
             };
         },
         mounted: function() {
@@ -135,6 +162,10 @@
                         //editorViewer.settings.contentAssistAutoTrigger = true;
                         editorViewer.settings.showOccurrences = true;
                     }
+                    // make sure we're using the correct color theme
+                    this.reset_theme();
+
+                    logInfo("Adding save handlers...");
 
                     logInfo("Adding save handler...");
                     // Set up save action (note: auto-save is enabled by default)
@@ -229,6 +260,17 @@
                 saveCode(this);
                 this.bot_lang = this.selected_language;
                 this.reset_code(false);
+                return true;
+            },
+            reset_theme: function () {
+                const editorElement = jQuery(".textview");
+                const darkThemeClass = "editorTheme";
+                if (this.selected_theme == DARK_THEME) {
+                    editorElement.addClass(darkThemeClass);
+                }
+                else {
+                    editorElement.removeClass(darkThemeClass);
+                }
                 return true;
             },
             upload_bot: function() {
