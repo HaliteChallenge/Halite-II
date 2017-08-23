@@ -11,9 +11,9 @@
             <span class="optGroup">
                 Bot Language:
                 <select v-model="selected_language" v-on:change="reset_language">
-                    <option v-for="opt in all_bot_languages"
-                            v-bind:value="opt.lang_name">
-                    {{ opt.lang_name }}
+                    <option v-for="(_, lang) in all_bot_languages"
+                            v-bind:value="lang">
+                    {{ lang }}
                     </option>
                 </select>
             </span>
@@ -41,23 +41,23 @@
     import * as api from "../api";
 
     const botLanguagePacks = {
-        Python3: {
-            lang_name: "Python3",
+        'Python3': {
             mimeType: "text/x-python",
             fileName: "MyBot.py",
             zipName: "my-py3-bot.zip",
+            starterZipPath: "/assets/downloads/Halite2_Python3_None.zip",
         },
-        Java: {
-            lang_name: "Java",
+        'Java': {
             mimeType: "text/x-java-source",
             fileName: "MyBot.java",
             zipName: "my-java-bot.zip",
+            starterZipPath: "/assets/downloads/Halite2_Java_None.zip",
         },
         'C++': {
-            lang_name: "C++",
             mimeType: "text/x-c++src",
             fileName: "MyBot.cpp",
             zipName: "my-c++-bot.zip",
+            starterZipPath: "/assets/downloads/Halite2_C++_None.zip",
         },
     };
 
@@ -65,11 +65,11 @@
     const BOT_LANG_KEY = 'bot_language';
     const THEME_KEY = 'editor_theme';
     const DARK_THEME = 'Dark';
-    const RESET_MSG = "Are you sure you want to reset your bot code to the sample code?\n(All changes will be lost!)";
+    const RESET_MSG = "Are you sure you want to reset your bot code to the default sample code?\n(All changes will be lost!)";
 
     function saveCode(ctx) {
         const fileName = ctx.bot_info().fileName;
-        logInfo("Saving " + fileName);
+        logInfo("Saving bot file to web local storage: " + fileName);
         const code = ctx.get_editor_code();
         window.localStorage.setItem(fileName, code);
         window.localStorage.setItem(BOT_LANG_KEY, ctx.bot_lang);
@@ -78,30 +78,26 @@
 
     function loadBotLang() {
         const default_lang = 'Python3';
-        const lang = window.localStorage.getItem(BOT_LANG_KEY);
-        if (lang) {
-            logInfo("Set language to " + lang);
-            return lang;
+        var lang = window.localStorage.getItem(BOT_LANG_KEY);
+        if (!lang) {
+            lang = default_lang;
         }
-        else {
-            return default_lang;
-        }
+        logInfo("Setting editor language to " + lang);
+        return lang;
     }
 
     function loadEditorTheme() {
         const theme = window.localStorage.getItem(THEME_KEY);
-        if (theme) {
-            logInfo("Set theme to " + theme);
-            return theme;
+        if (!theme) {
+            theme = DARK_THEME;
         }
-        else {
-            return DARK_THEME;
-        }
+        logInfo("Setting editor theme to " + theme);
+        return theme;
     }
 
     function loadCode(ctx) {
         const fileName = ctx.bot_info().fileName;
-        logInfo("Loading " + fileName);
+        logInfo("Loading code into editor from web local storage: " + fileName);
         return window.localStorage.getItem(fileName);
     }
 
@@ -157,20 +153,13 @@
                     this.editorViewer = editorViewer;
                     const editor = editorViewer.editor;
 
-                    // Other settings
-                    if (editorViewer.settings) {
-                        //editorViewer.settings.contentAssistAutoTrigger = true;
-                        editorViewer.settings.showOccurrences = true;
-                    }
                     // make sure we're using the correct color theme
                     this.reset_theme();
 
-                    logInfo("Adding save handlers...");
+                    logInfo("Adding editor save handlers...");
 
-                    logInfo("Adding save handler...");
                     // Set up save action (note: auto-save is enabled by default)
                     const saveEventHandler = () => {
-                        logInfo("Save handler");
                         saveCode(this);
                         return true;
                     }
@@ -180,7 +169,7 @@
                         if(evt.contentsSaved) {
                             // save editor contents
                             saveEventHandler();
-                            // clear uploaded status message
+                            // clear upload status message when user edits code
                             if (this.status_message) {
                                 this.status_message = null;
                             }
@@ -193,13 +182,19 @@
                     // Be sure to save before closing/leaving the page
                     window.addEventListener("unload", saveEventHandler);
 
+                    // Other settings
+                    if (editorViewer.settings) {
+                        editorViewer.settings.showOccurrences = true;
+                    }
+
                     logInfo("Editor ready!");
                 });
             },
             download_bot: function() {
                 this.get_user_zip_promise().then((blob) => {
-                    logInfo("Saving zip file "+blob);
-                    saveAs(blob, this.bot_info().zipName);
+                    const zipName = this.bot_info().zipName;
+                    logInfo("Saving zip file of editor code: " + zipName);
+                    saveAs(blob, zipName);
                 });
                 return true;
             },
@@ -209,7 +204,7 @@
                 return (startCode === null) ? this.get_default_code_promise() : Promise.resolve(startCode);
             },
             get_default_code_promise: function () {
-                logInfo("Loading default bot code.");
+                logInfo("Loading default bot code...");
                 const fileName = this.bot_info().fileName;
                 return this.get_starter_zip().then((starterZip) => {
                     logInfo("Got starter zip. Getting sample bot file: " + fileName);
@@ -221,10 +216,10 @@
             },
             get_starter_zip: function fn(forceClean=false) {
                 if (fn.cached === undefined) { fn.cached = {}; }
-                const lang = this.bot_info().lang_name;
+                const lang = this.bot_lang;
                 if (fn.cached[lang] === undefined || forceClean) {
                     fn.cached[lang] = new Promise((resolve, reject) => {
-                        const starterZipPath = "/assets/downloads/Halite2_"+lang+"_None.zip";
+                        const starterZipPath = this.bot_info().starterZipPath;
                         JSZipUtils.getBinaryContent(starterZipPath, (err, data) => {
                             logInfo("Getting starter zip: " + starterZipPath);
                             if (err) {
@@ -250,17 +245,18 @@
             },
             reset_code: function (ask=true) {
                 if (!ask || window.confirm(RESET_MSG)) {
-                    this.get_default_code_promise().then((contents) => {
+                    return this.get_code_promise().then((contents) => {
                         this.editorViewer.setContents(contents, this.bot_info().mimeType);
                     });
                 }
                 return true;
             },
             reset_language: function () {
-                saveCode(this);
+                saveCode(this); // save code for previous language's bot
                 this.bot_lang = this.selected_language;
-                this.reset_code(false);
-                return true;
+                return this.reset_code(false).then(() => {
+                    saveCode(this); // save code for new language's bot
+                });
             },
             reset_theme: function () {
                 const editorElement = jQuery(".textview");
@@ -289,19 +285,17 @@
                         return null;
                     });
 
-                    has_bot_promise
-                        .then((bot_id) => {
-                            logInfo("Uploading zip file "+botFile);
-                            return api.update_bot(user_id, bot_id, botFile, (progress) => {
-                                const p = Math.floor(progress * 100);
-                                this.status_message = "Uploading... ("+p+"%)";
-                            });
-                        })
-                        .then(() => {
-                            this.status_message = "Successfully uploaded!";
-                        }, (err) => {
-                            this.status_message = err.message;
+                    has_bot_promise.then((bot_id) => {
+                        logInfo("Uploading zip file: " + botFile);
+                        return api.update_bot(user_id, bot_id, botFile, (progress) => {
+                            const p = Math.floor(progress * 100);
+                            this.status_message = `Uploading... (${p}%)`;
                         });
+                    }).then(() => {
+                        this.status_message = "Successfully uploaded!";
+                    }, (err) => {
+                        this.status_message = err.message;
+                    });
                 });
                 return true;
             },
@@ -330,7 +324,13 @@
         position: relative;
         height: 30em;
     }
+    .editorArea {
+        margin: 0px 15px;
+    }
     .editorArea button, .editorArea select {
         color: black;
+    }
+    .optGroup {
+        margin-right: 1em;
     }
 </style>
