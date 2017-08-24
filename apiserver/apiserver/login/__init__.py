@@ -1,6 +1,8 @@
 import logging
 import traceback
 import urllib.parse
+import requests
+import threading
 
 import flask
 import sqlalchemy
@@ -83,7 +85,7 @@ def github_login_callback():
         if record["primary"]:
             email = record["email"]
             break
-
+    add_badge = False
     with model.engine.connect() as conn:
         user = conn.execute(sqlalchemy.sql.select([
             model.users.c.id,
@@ -101,9 +103,18 @@ def github_login_callback():
                 oauth_provider=1,
             )).inserted_primary_key
             flask.session["user_id"] = new_user_id[0]
+            add_badge = True
         else:
             flask.session["user_id"] = user["id"]
-
+    if add_badge:
+        threading.Thread(
+            target=requests.post,
+            kwargs=({
+                "url": "http://127.0.0.1:5000/v1/api/user/{}/badge"
+                    .format(flask.session["user_id"]),
+                "json": {"badge_id": config.REGISTER_BADGE},
+            })
+        ).start()
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
     return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/associate"))
