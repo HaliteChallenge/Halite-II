@@ -243,22 +243,27 @@
                     .generateAsync({type: 'blob'});
                 });
             },
-            reset_code: function (ask=true) {
-                if (!ask || window.confirm(RESET_MSG)) {
-                    return this.get_code_promise().then((contents) => {
-                        this.editorViewer.setContents(contents, this.bot_info().mimeType);
-                    });
+            reload_code: function(use_default=false) {
+                const codePromise = use_default ? this.get_default_code_promise() : this.get_code_promise();
+                return codePromise.then((contents) => {
+                    this.editorViewer.setContents(contents, this.bot_info().mimeType);
+                });
+            },
+            reset_code: function() {
+                if (window.confirm(RESET_MSG)) {
+                    // reset to starter pack sample code for current language
+                    this.reload_code(true);
                 }
                 return true;
             },
-            reset_language: function () {
+            reset_language: function() {
                 saveCode(this); // save code for previous language's bot
                 this.bot_lang = this.selected_language;
-                return this.reset_code(false).then(() => {
+                return this.reload_code().then(() => {
                     saveCode(this); // save code for new language's bot
                 });
             },
-            reset_theme: function () {
+            reset_theme: function() {
                 const editorElement = jQuery(".textview");
                 const darkThemeClass = "editorTheme";
                 if (this.selected_theme == DARK_THEME) {
