@@ -873,6 +873,108 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));
 
+    // Print out turn info
+
+    std::cout << "Turn " << turn_number << "\n";
+
+
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++){
+        std::cout << "Player (id=" << (int)player_id << ", name=" << get_name(player_id) << ": " << std::endl;
+        if (!alive[player_id]){
+            std::cout << "NOT ALIVE!" << std::endl;
+            continue;
+        }
+
+        auto& player_ships = game_map.ships.at(player_id);
+        auto& planets = game_map.planets;
+
+        unsigned short planet_count = 0;
+
+
+        for (auto& planet : planets){
+            if (planet.owner == player_id && planet.is_alive()) planet_count++;
+        }
+
+        int undocked_cnt = 0, docking_cnt = 0, undocking_cnt = 0, docked_cnt = 0;
+
+        for (auto& ship : player_ships){
+            switch (ship.second.docking_status){
+                case hlt::DockingStatus::Undocked: {
+                    undocked_cnt++;
+                    break;
+                }
+                case hlt::DockingStatus::Docking: {
+                    docking_cnt++;
+                    break;
+                }
+                case hlt::DockingStatus::Docked: {
+                    undocking_cnt++;
+                    break;
+                }
+                case hlt::DockingStatus::Undocking: {
+                    docked_cnt++;
+                    break;
+                }
+            }
+        }
+        std::cout << "Ships: [";
+        std::cout << "Undocked: " << undocked_cnt << ", ";
+        std::cout << "Docking: " << docking_cnt << ", ";
+        std::cout << "Docked: " << undocking_cnt << ", ";
+        std::cout << "Undocking: " << docked_cnt << ", ";
+        std::cout << "Total: " << player_ships.size();
+        std::cout << "]" <<std::endl;
+
+        std::cout << "Planet count: " << planet_count << std::endl;
+
+        int move_no = 0;
+
+        int noop_cnt = 0, dock_cnt = 0, error_cnt = 0, thrust_cnt = 0, undock_cnt = 0;
+
+        for (auto& pair : player_ships) {
+            const auto ship_idx = pair.first;
+            auto& ship = pair.second;
+
+            if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
+
+            auto move = player_moves[player_id][move_no][ship_idx];
+            switch (move.type) {
+                case hlt::MoveType::Noop: {
+                    noop_cnt++;
+                    break;
+                }
+                case hlt::MoveType::Error: {
+                    dock_cnt++;
+                    break;
+                }
+                case hlt::MoveType::Thrust: {
+                    error_cnt++;
+                    break;
+                }
+                case hlt::MoveType::Dock: {
+                    thrust_cnt++;
+                    break;
+                }
+
+                case hlt::MoveType::Undock: {
+                    undock_cnt++;
+                    break;
+                }
+            }
+        }
+
+        std::cout << "Commands: [";
+        std::cout << "Noop: " << noop_cnt << ", ";
+        std::cout << "Error: " << dock_cnt << ", ";
+        std::cout << "Dock: " << error_cnt << ", ";
+        std::cout << "Thrust: " << thrust_cnt << ", ";
+        std::cout << "Undock: " << undock_cnt << ", ";
+        std::cout << "Total: " << noop_cnt+dock_cnt+error_cnt+thrust_cnt+undocked_cnt;
+        std::cout << "]" <<std::endl;
+    }
+
+
     // Check if the game is over
     return find_living_players();
 }
