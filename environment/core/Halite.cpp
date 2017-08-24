@@ -875,14 +875,15 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     // Print out turn info
 
-    std::cout << "Turn " << turn_number << "\n";
+//    std::cout << "Turn " << turn_number << "\n";
 
 
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++){
-        std::cout << "Player (id=" << (int)player_id << ", name=" << get_name(player_id) << ": " << std::endl;
+//        std::cout << "Player (id=" << (int)player_id << ", name=" << get_name(player_id) << ": " << std::endl;
         if (!alive[player_id]){
-            std::cout << "NOT ALIVE!" << std::endl;
+//            std::cout << "NOT ALIVE!" << std::endl;
+            networking.player_logs[player_id] += "NOT ALIVE!\n";
             continue;
         }
 
@@ -918,15 +919,27 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
                 }
             }
         }
-        std::cout << "Ships: [";
-        std::cout << "Undocked: " << undocked_cnt << ", ";
-        std::cout << "Docking: " << docking_cnt << ", ";
-        std::cout << "Docked: " << undocking_cnt << ", ";
-        std::cout << "Undocking: " << docked_cnt << ", ";
-        std::cout << "Total: " << player_ships.size();
-        std::cout << "]" <<std::endl;
+//        std::cout << "Ships: [";
+//        std::cout << "Undocked: " << undocked_cnt << ", ";
+//        std::cout << "Docking: " << docking_cnt << ", ";
+//        std::cout << "Docked: " << undocking_cnt << ", ";
+//        std::cout << "Undocking: " << docked_cnt << ", ";
+//        std::cout << "Total: " << player_ships.size();
+//        std::cout << "]" <<std::endl;
 
-        std::cout << "Planet count: " << planet_count << std::endl;
+        networking.player_logs[player_id] += "\nShips: [";
+        networking.player_logs[player_id] += "Undocked: " + std::to_string(undocking_cnt) + ", ";
+        networking.player_logs[player_id] += "Docking: " + std::to_string(docking_cnt) + ", ";
+        networking.player_logs[player_id] += "Docked: " + std::to_string(undocking_cnt) + ", ";
+        networking.player_logs[player_id] += "Undocking: " + std::to_string(docked_cnt) + ", ";
+        networking.player_logs[player_id] += "Total: " + std::to_string(player_ships.size()) + ", ";
+        networking.player_logs[player_id] += "]\n";
+
+
+
+
+//        std::cout << "Planet count: " << planet_count << std::endl;
+        networking.player_logs[player_id] += "Planet count: " + std::to_string(planet_count) + "\n";
 
         int move_no = 0;
 
@@ -964,14 +977,25 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             }
         }
 
-        std::cout << "Commands: [";
-        std::cout << "Noop: " << noop_cnt << ", ";
-        std::cout << "Error: " << dock_cnt << ", ";
-        std::cout << "Dock: " << error_cnt << ", ";
-        std::cout << "Thrust: " << thrust_cnt << ", ";
-        std::cout << "Undock: " << undock_cnt << ", ";
-        std::cout << "Total: " << noop_cnt+dock_cnt+error_cnt+thrust_cnt+undocked_cnt;
-        std::cout << "]" <<std::endl;
+//        std::cout << "Commands: [";
+//        std::cout << "Noop: " << noop_cnt << ", ";
+//        std::cout << "Error: " << dock_cnt << ", ";
+//        std::cout << "Dock: " << error_cnt << ", ";
+//        std::cout << "Thrust: " << thrust_cnt << ", ";
+//        std::cout << "Undock: " << undock_cnt << ", ";
+//        std::cout << "Total: " << noop_cnt+dock_cnt+error_cnt+thrust_cnt+undocked_cnt;
+//        std::cout << "]" <<std::endl;
+
+
+        networking.player_logs[player_id] += "Commands: [";
+        networking.player_logs[player_id] += "Noop: " + std::to_string(noop_cnt) + ", ";
+        networking.player_logs[player_id] += "Error: " + std::to_string(dock_cnt) + ", ";
+        networking.player_logs[player_id] += "Dock: " + std::to_string(error_cnt) + ", ";
+        networking.player_logs[player_id] += "Thrust: " + std::to_string(thrust_cnt) + ", ";
+        networking.player_logs[player_id] += "Undock: " + std::to_string(undock_cnt) + ", ";
+        networking.player_logs[player_id] += "Total: " + std::to_string(noop_cnt+dock_cnt+error_cnt+thrust_cnt+undock_cnt) + ", ";
+        networking.player_logs[player_id] += "]\n";
+
     }
 
 
