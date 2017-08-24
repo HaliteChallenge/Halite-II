@@ -1,5 +1,14 @@
 # Halite Website
 
+## Instance
+
+* Clone halite-web-server
+* Install nginix
+* Create /var/www/html sturcture if not already set up and add permissions to the ubuntu username
+* Copy the nginix config from /etc/nginix/site-enabled/default from staging or prod to the new instance
+* Start nginix
+* Follow steps below to deploy site
+
 ## Setup
 
 Assuming you have RubyGems and NPM installed:
