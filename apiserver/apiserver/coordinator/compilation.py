@@ -1,4 +1,6 @@
 import datetime
+import threading
+import requests
 
 import flask
 import sqlalchemy
@@ -49,6 +51,19 @@ def serve_compilation_task(conn):
                 "bot": bot_id,
             })
     return None
+
+
+def add_successful_submission_badge(user_id, badge_id,
+                                    submissions_count, version_number):
+    if version_number < submissions_count:
+        return
+    ret = requests.get("http://127.0.0.1:5000/v1/api/user/{}/badge/{}"
+         .format(user_id, badge_id))
+    if ret.status_code == 404:
+        requests.post(
+            url="http://127.0.0.1:5000/v1/api/user/{}/badge".format(user_id),
+            json={"badge_id": badge_id},
+        )
 
 
 # TODO: these aren't RESTful URLs, but it's what the worker expects
@@ -155,6 +170,28 @@ def update_compilation_status():
                     games_played=0,
                 )
             )
+
+            # Check if submission badges should be awarded
+            threading.Thread(
+                    target=add_successful_submission_badge,
+                    args=(user_id, config.SUBMISSION_1_BADGE,
+                        1, bot["version_number"] + 1),
+            ).start()
+            threading.Thread(
+                    target=add_successful_submission_badge,
+                    args=(user_id, config.SUBMISSION_10_BADGE,
+                        10, bot["version_number"] + 1),
+            ).start()
+            threading.Thread(
+                    target=add_successful_submission_badge,
+                    args=(user_id, config.SUBMISSION_20_BADGE,
+                        20, bot["version_number"] + 1),
+            ).start()
+            threading.Thread(
+                    target=add_successful_submission_badge,
+                    args=(user_id, config.SUBMISSION_50_BADGE,
+                        50, bot["version_number"] + 1),
+            ).start()
 
             bot = conn.execute(model.bots.select().where(
                 (model.bots.c.user_id == user_id) &
