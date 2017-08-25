@@ -87,7 +87,7 @@
     }
 
     function loadEditorTheme() {
-        const theme = window.localStorage.getItem(THEME_KEY);
+        var theme = window.localStorage.getItem(THEME_KEY);
         if (!theme) {
             theme = DARK_THEME;
         }
