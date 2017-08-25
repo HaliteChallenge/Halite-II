@@ -1,14 +1,12 @@
 import logging
 import traceback
 import urllib.parse
-import requests
-import threading
 
 import flask
 import sqlalchemy
 from flask_oauthlib.client import OAuth, OAuthException
 
-from .. import app, config, model, util
+from .. import app, badge_util, config, model, util
 from ..util import cross_origin
 
 
@@ -106,15 +104,10 @@ def github_login_callback():
             add_badge = True
         else:
             flask.session["user_id"] = user["id"]
+
     if add_badge:
-        threading.Thread(
-            target=requests.post,
-            kwargs=({
-                "url": "http://127.0.0.1:5000/v1/api/user/{}/badge"
-                    .format(flask.session["user_id"]),
-                "json": {"badge_id": config.REGISTER_BADGE},
-            })
-        ).start()
+        badge_util.add_registration_badge(flask.session["user_id"])
+
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
     return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/associate"))
