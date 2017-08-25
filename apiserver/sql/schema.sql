@@ -86,6 +86,30 @@ CREATE TABLE game_participant (
   PRIMARY KEY (game_id, user_id, bot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- Extra stats for each game
+
+CREATE TABLE game_stat (
+  game_id INT UNSIGNED NOT NULL,
+  turns_total INT UNSIGNED NOT NULL,
+  planets_destroyed INT UNSIGNED NOT NULL,
+  ships_produced INT UNSIGNED NOT NULL,
+  ships_destroyed INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra stats for each game, at bot level
+
+CREATE TABLE game_bot_stat (
+  game_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  bot_id INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  PRIMARY KEY (game_id, user_id, bot_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- A history of submitted bots, recorded whenever a new one is submitted.
 -- This intends to prevent players from keeping their bots in "stealth", where
 -- they submit bots, wait for the rank to stabilize, then take them down.
