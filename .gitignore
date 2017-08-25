@@ -406,6 +406,8 @@ Values.sql
 storage/
 config.php
 workingPath/
+builds/*
+website/_data/*
 
 *.ini
 !travisTests.ini
