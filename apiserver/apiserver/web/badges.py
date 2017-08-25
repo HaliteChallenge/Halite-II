@@ -124,25 +124,43 @@ def list_badges():
             result.append({
                 "id" : row["id"],
                 "name": row["name"],
+                "family": row["family"],
+                "family_id": row["family_id"],
                 })
     return flask.jsonify(result)
 
 
 # TODO: ADD URL to schema
 @web_api.route("/badge", methods=['POST'])
-@web_util.requires_login(admin=True)
+@web_util.requires_login(admin=True, accept_local=True)
 def add_badge(*, user_id):
     badge_id = None
     body = flask.request.get_json()
-
     for key in body:
-        if key != 'name':
+        if key not in ['name', 'family', 'family_id']:
             raise util.APIError(400, message="Cannot update '{}'".format(key))
     with model.engine.connect() as conn:
-        badge_id = conn.execute(model.badge.insert().values(name=body['name'])
-            ).inserted_primary_key
+        badge_id = conn.execute(model.badge.insert().values(
+            name=body['name'],
+            family=body.get('family'),
+            family_id=body.get('family_id'),
+            )).inserted_primary_key
 
     return util.response_success({
         "id": badge_id
     }, status_code=201)
 
+
+@web_api.route("/badge/<int:badge_id>", methods=['PUT'])
+@web_util.requires_login(admin=True, accept_local=True)
+def update_badge(badge_id, *, user_id):
+    body = flask.request.get_json()
+    for key in body:
+        if key not in ['name', 'family', 'family_id']:
+            raise util.APIError(400, message="Cannot update '{}'".format(key))
+
+    with model.engine.connect() as conn:
+       res = conn.execute(model.badge.update().values(**body)
+            .where( model.badge.c.id == badge_id))
+
+    return util.response_success()

@@ -3,7 +3,7 @@ import logging.handlers
 
 from flask import Flask
 
-from . import config, util
+from . import badge_util, config, util
 
 
 app = Flask(__name__)
