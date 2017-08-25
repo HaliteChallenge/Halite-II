@@ -5,6 +5,7 @@ import flask
 import sqlalchemy
 import sqlalchemy.exc
 import trueskill
+import zstd
 
 import google.cloud.storage as gcloud_storage
 
@@ -120,7 +121,9 @@ def upload_game():
     replay_key, bucket_class = store_game_artifacts(replay_name, users)
 
     # Store game results in database
-    store_game_results(game_output, replay_key, bucket_class, users)
+    game_id = store_game_results(game_output, replay_key, bucket_class, users)
+    # Store game stats in database
+    store_game_stats(game_output, game_id)
     # Update rankings
     update_rankings(users)
 
@@ -182,7 +185,7 @@ def store_game_results(game_output, replay_key, bucket_class, users):
     :param replay_key: The key of the replay file in object storage.
     :param bucket_class: Which bucket the replay was stored in.
     :param users: The list of user objects for this game.
-    :return:
+    :return game_id: ID of the record in game table
     """
     # TODO: the original code deletes games if there are over 600k in the
     # database. Is that really a concern for us?
@@ -225,6 +228,89 @@ def store_game_results(game_output, replay_key, bucket_class, users):
             # If this is the user's first timeout, let them know
             if user["timed_out"]:
                 update_user_timeout(conn, game_id, user)
+
+        return game_id
+
+
+def store_game_stats(game_output, game_id):
+    """
+    Store additional game stats into database.
+
+    :param game_output: The JSON output of the Halite game environment.
+    :param game_id: ID of the current match in game table
+    :return:
+    """
+    replay_name = os.path.basename(game_output["replay"])
+    replay_key, _ = os.path.splitext(replay_name)
+    if replay_name not in flask.request.files:
+        raise util.APIError(
+            400, message="Replay file not found in uploaded files.")
+
+    stats = parse_replay(decode_replay(flask.request.files[replay_name]))
+
+    # Store game stats in database
+    with model.engine.connect() as conn:
+        conn.execute(model.game_stats.insert().values(
+            game_id=game_id,
+            turns_total=stats['turns_total'],
+            planets_destroyed=stats['planets_destroyed'],
+            ships_produced=stats['ships_produced'],
+            ships_destroyed=stats['ships_destroyed']
+        ))
+
+
+def decode_replay(replay_file_obj):
+    """
+    Parse replay file into JSON format.
+    Current replay file format is Zstandard
+
+    :param replay_file_obj: The replay file (flask.FileStorage).
+    :return: JSON output
+    """
+    decoder = zstd.ZstdDecompressor()
+    # Rewind to the beginning of the file obj, because
+    # gcloud might have read it first
+    replay_file_obj.seek(0)
+    replay_data = replay_file_obj.read()
+    try:
+        decoded_data = decoder.decompress(replay_data)
+        json_data = json.loads(decoded_data.decode('utf-8').strip())
+        return json_data
+    except zstd.ZstdError:
+        # Maybe the data is corrupted, or not in Zstandard format
+        # Ignore it for now
+        # TODO(tuan): Try different decoding methods
+        return None
+
+
+def parse_replay(replay):
+    """
+    Read replay (turn by turn) and compute stats for a match.
+
+    :param replay: Decoded replay data
+    :return: Interesting stats to put into database
+    """
+    stats = {
+        'turns_total': 0,
+        'planets_destroyed': 0,
+        'ships_produced': 0,
+        'ships_destroyed': 0
+    }
+    if replay is None:
+        return stats
+
+    stats['turns_total'] = len(replay['frames']) - 1
+    for frame in replay['frames']:
+        for event in frame.get('events', []):
+            if event['event'] == 'spawned':
+                stats['ships_produced'] += 1
+            elif event['event'] == 'destroyed':
+                if event['entity']['type'] == 'ship':
+                    stats['ships_destroyed'] += 1
+                elif event['entity']['type'] == 'planet':
+                    stats['planets_destroyed'] += 1
+
+    return stats
 
 
 def update_rankings(users):
