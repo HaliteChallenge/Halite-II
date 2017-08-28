@@ -27,7 +27,7 @@
         display: block;
         padding: 5px 15px;
       }
-      .line-bottom{
+      .xline-bottom{
         bottom: -1px;
         opacity: 0;
         @media (max-width: $screen-sm-max){
@@ -36,7 +36,7 @@
       }
     }
     li.active{
-      .line-bottom{
+      .xline-bottom{
         opacity: 1;
       }
       a{

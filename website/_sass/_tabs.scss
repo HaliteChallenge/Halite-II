@@ -9,7 +9,7 @@
       background-color: transparent;
       border: none;
       margin-left: 0;
-      .line{
+      .xline{
         background-color: #474951;
         &:before, &:after{
           background-color: #474951;
@@ -33,7 +33,7 @@
         span{
           @include highlight-bg();
         }
-        .line{
+        .xline{
           background-color: #889295;
           z-index: 1;
           &:before, &:after{
