@@ -294,6 +294,8 @@ def decode_replay(replay_file_obj):
         json_data = json.loads(decoded_data.decode('utf-8').strip())
         return json_data
     except zstd.ZstdError:
+        # TODO(tuan): What will we do when replay can't be decoded for some
+        # reason?
         # Maybe the data is corrupted, or not in Zstandard format
         # Ignore it for now
         # TODO(tuan): Try different decoding methods
