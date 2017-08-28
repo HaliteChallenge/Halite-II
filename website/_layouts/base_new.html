@@ -17,6 +17,11 @@
   <!-- Bootstrap -->
   <link href="{{ site.baseurl }}/assets/css/main_new.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  {% if page.additional_css %}
+  {% for dep in page.additional_css %}
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/css/{{ dep }}.css"/>
+  {% endfor %}
+  {% endif %}
 </head>
 
 <body>
@@ -43,6 +48,7 @@
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li class="{% if page.menu == 'learn' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
+          <li class="{% if page.menu == 'editor' %} active {% endif %}"><a href="{{ site.baseurl }}/editor"><span>Code</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'tv' %} active {% endif %}"><a href="{{ site.baseurl }}/halite-tv-coding-game-videos"><span>Halite TV</span><i class="xline xline-bottom"></i></a></li>
