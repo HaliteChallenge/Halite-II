@@ -1046,7 +1046,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         stats.player_statistics.push_back(p);
     }
     stats.error_tags = error_tags;
-//    stats.log_filenames = std::vector<std::string>(error_tags.size());
 
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
@@ -1087,8 +1086,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     }
 
     // Output logs for players that timed out or errored.
-//    int logIndex = 0;
-    auto :qos_class_main()logs = nlohmann::json::object();
+    auto logs = nlohmann::json::object();
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (!always_log && error_tags.find(player_id) == error_tags.end()){
@@ -1105,7 +1103,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         file << networking.player_logs_json.dump(1) + "\n";
         file.flush();
         file.close();
-//        logIndex++;
     }
 
     if (quiet_output) {
