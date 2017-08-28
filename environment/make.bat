@@ -18,4 +18,4 @@ cl.exe /std:c++14 /O2 /MT /EHsc /I . /Fo.\obj\ ^
  .\core\Replay.cpp .\core\Statistics.cpp ^
  .\networking\Networking.cpp .\networking\BotInputError.cpp ^
  .\core\mapgen\Generator.cpp .\core\mapgen\SolarSystem.cpp .\core\mapgen\AsteroidCluster.cpp ^
- .\miniz\miniz.c /link /implib:obj\halite.lib /out:halite.exe
+ .\miniz\miniz.c /link /ltcg /implib:obj\halite.lib /out:halite.exe
