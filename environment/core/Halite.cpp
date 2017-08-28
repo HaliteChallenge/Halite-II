@@ -874,7 +874,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));
 
-    // Print out turn info
+    // Log game state for the turn
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (!alive[player_id] || timeout_tags.find(player_id) != timeout_tags.end()) {
             continue;
@@ -883,50 +883,20 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         auto &player_ships = game_map.ships.at(player_id);
         auto &planets = game_map.planets;
 
-
-
-        int undocked_cnt = 0, docking_cnt = 0, undocking_cnt = 0, docked_cnt = 0;
-
-
-        std::vector<hlt::EntityIndex> undocked_ships, undocking_ships, docked_ships, docking_ships;
-
-
         nlohmann::json ships_json;
         nlohmann::json commands_json;
         nlohmann::json planets_json;
-
-
+        
         for (auto &ship : player_ships) {
-            switch (ship.second.docking_status) {
-                case hlt::DockingStatus::Undocked: {
-                    undocked_cnt++;
-                    undocked_ships.push_back(ship.first);
-                    break;
-                }
-                case hlt::DockingStatus::Docking: {
-                    docking_cnt++;
-                    docking_ships.push_back(ship.first);
-                    break;
-                }
-                case hlt::DockingStatus::Docked: {
-                    undocking_cnt++;
-                    docked_ships.push_back(ship.first);
-                    break;
-                }
-                case hlt::DockingStatus::Undocking: {
-                    docked_cnt++;
-                    undocking_ships.push_back(ship.first);
-                    break;
-                }
-            }
             ships_json += ship.second.output_json(player_id, ship.first);
         }
 
         unsigned short planet_count = 0;
 
-
         for (auto &planet : planets) {
-            if (planet.owned && planet.owner == player_id && planet.is_alive()) planet_count++;
+            if (planet.owned && planet.owner == player_id && planet.is_alive()){
+                planet_count++;
+            }
         }
 
         for (hlt::EntityIndex planet_idx = 0;
@@ -937,42 +907,14 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             }
         }
 
-        int move_no = 0;
-
-        int dock_cnt = 0, thrust_cnt = 0, undock_cnt = 0;
-
-        std::vector<hlt::EntityIndex> dock_ships;
-        std::vector<hlt::EntityIndex> thrust_ships;
-        std::vector<hlt::EntityIndex> undock_ships;
-
-
-        for (auto &pair : player_ships) {
+        for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++){
+            for (auto &pair : player_ships) {
             const auto ship_idx = pair.first;
             auto &ship = pair.second;
-
             if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
-
-            auto move = player_moves[player_id][move_no][ship_idx];
-
-            switch (move.type) {
-                case hlt::MoveType::Dock: {
-                    dock_cnt++;
-                    dock_ships.push_back(move.shipId);
-                    break;
-                }
-                case hlt::MoveType::Thrust: {
-                    thrust_cnt++;
-                    thrust_ships.push_back(move.shipId);
-                    break;
-                }
-
-                case hlt::MoveType::Undock: {
-                    undock_cnt++;
-                    undock_ships.push_back(move.shipId);
-                    break;
-                }
+                auto move = player_moves[player_id][move_no][ship_idx];
+                commands_json += move.output_json(player_id, move_no);
             }
-            commands_json += move.output_json(player_id, move_no);
         }
 
         networking.player_logs_json[player_id]["Frames"].back()["Turn"] = turn_number;
@@ -997,6 +939,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
 
+    // Game state logs for each player
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         nlohmann::json playerJson;
         playerJson["PlayerID"] = player_id;
