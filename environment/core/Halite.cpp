@@ -886,7 +886,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         nlohmann::json ships_json;
         nlohmann::json commands_json;
         nlohmann::json planets_json;
-        
+
         for (auto &ship : player_ships) {
             ships_json += ship.second.output_json(player_id, ship.first);
         }
@@ -942,7 +942,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // Game state logs for each player
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         nlohmann::json playerJson;
-        playerJson["PlayerID"] = player_id;
         playerJson["Frames"] = nlohmann::json::array();
         playerJson["Error"] = nlohmann::json::object();
         networking.player_logs_json += playerJson;

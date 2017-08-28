@@ -492,7 +492,8 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
         }
 
         player_logs_json[player_tag]["Frames"]  += init_log_json;
-
+        player_logs_json[player_tag]["PlayerID"] = player_tag;
+        player_logs_json[player_tag]["PlayerName"] = *playerName;
         return millisTaken;
     }
     catch (BotInputError err) {
@@ -502,6 +503,7 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
         }
         player_logs_json[player_tag]["Error"]["Message"] = err.what();
         player_logs_json[player_tag]["Error"]["Turn"] = 0;
+
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
