@@ -3,6 +3,7 @@ layout: page
 title: Visualize a Game or Submit Your Bot
 toc: false
 full_width: true
+menu: play
 mount_views: ["Visualizer", "Upload"]
 additional_js: ["gif", "RecordRTC.min"]
 ---

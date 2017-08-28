@@ -2,6 +2,7 @@
 layout: doc_page
 title: Learn
 toc: true
+menu: learn
 ---
 
 Welcome to the Halite II closed Two Sigma alpha competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II alpha leaderboard. We’ll walk you through a few first steps, but there are many more documents for you to explore as you get better and better at building Halite bots.

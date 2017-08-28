@@ -1,0 +1,48 @@
+.btn{
+  border: 0;
+  color: #30242F;
+  font-weight: bold;
+  border-radius: 0;
+  text-transform: uppercase;
+  padding: 0 10px;
+  position: relative;
+  background-color: transparent;
+  font-family: $font-heading;
+  >span{
+    background-color: $yellow;
+    display: block;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
+  }
+  &:before, &:after{
+    content: "";
+    display: block;
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    top: 0;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+  }
+  &:before{
+    left:0;
+    border-right: 10px solid $yellow;
+    border-left: 0 solid $yellow;
+  }
+  &:after{
+    right:0;
+    border-left: 10px solid $yellow;
+    border-right: 0 solid $yellow;
+  }
+}
+
+.btn-sm{
+  span{
+    height: 34px;
+  }
+  &:before, &:after{
+    border-top-width: 17px;
+    border-bottom-width: 17px;
+  }
+}

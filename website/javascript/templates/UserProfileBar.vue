@@ -1,10 +1,14 @@
 <template>
-    <form class="nav navbar-form navbar-right logged-in">
-        <a href="/play" class="btn btn-default">Submit a Bot</a>
-        <a href="/user?me" :title="username + '\'s Profile'" class="profile-link">
-            <img :src="profile_image" class="img-circle" :alt="username + '\'s profile image'" />
-        </a>
-    </form>
+    <ul class="nav navbar-nav navbar-right logged-in">
+        <li>
+            <a href="/play">Submit a Bot</a>
+        </li>
+        <li>
+            <a href="/user?me" :title="username + '\'s Profile'">
+                <img :src="profile_image" class="img-circle" :alt="username + '\'s profile image'" />
+            </a>
+        </li>
+    </ul>
 </template>
 
 <script>

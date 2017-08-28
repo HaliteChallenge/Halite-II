@@ -1,0 +1,62 @@
+@mixin line(){
+  $border: #889295;
+  position: absolute;
+  width: 100%;
+  display: block;
+  background-color: $border;
+  height: 1px;
+  &:before, &:after{
+    content: "";
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: $border;
+    border-radius: 3px;
+  }
+  &:before{
+    top: -1px;
+    left: -2px;
+  }
+  &:after{
+    top: -1px;
+    right: -2px;
+  }
+}
+@mixin line-top(){
+  @include line();
+  top: 0;
+  width: 100%;
+  left: 0;
+}
+@mixin line-bottom(){
+  @include line();
+  bottom: 0;
+  width: 100%;
+  left: 0;
+}
+@mixin highlight-bg(){
+  padding: 5px 15px;
+  color: #FFBE00;
+  background-color: rgba(255,190,0,0.1);
+}
+@mixin corner-dot($color: #889295){
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 3px;
+  position: absolute;
+  background-color: $color;
+}
+@mixin bt($color: #889295){
+  border-top: 1px solid $color;
+}
+@mixin bb($color: #889295){
+  border-bottom: 1px solid $color; 
+}
+@mixin bl($color: #889295){
+  border-left: 1px solid $color; 
+}
+@mixin br($color: #889295){
+  border-right: 1px solid $color; 
+}

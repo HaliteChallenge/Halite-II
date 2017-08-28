@@ -1,0 +1,26 @@
+.map-props{
+  display: flex;
+  &-icon{
+    width: 40px;
+    text-align: center;
+    color: #E37222;
+    font-size: 20px;
+    padding-top: 5px;
+  }
+  &-list{
+    flex: 1;
+    table{
+      width: 100%;
+      tr{
+        td{
+          padding: 5px 0;
+          color: $foreground-light;
+        }
+        td+td{
+          text-align: right;
+          color: $foreground;
+        }
+      }
+    }
+  }
+}

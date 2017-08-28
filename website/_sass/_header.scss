@@ -1,0 +1,120 @@
+.navbar-brand{
+  padding: 6px 15px 0 15px;
+  img{
+    max-width: 100px;
+    width: 100px;
+  }
+  @media (min-width: $screen-md-min){
+    img{
+      max-width: 150px;
+      width: 150px;
+    }
+  }
+}
+
+.navbar-inverse{
+  background-color: $gray-bg;
+  color: $foreground;
+  .navbar-nav{
+    li a {
+      position: relative;
+      padding: 5px;
+      min-height: 50px;
+      @media (min-width: $screen-md-min){
+        padding: 15px;
+      }
+      span{
+        display: block;
+        padding: 5px 15px;
+      }
+      .line-bottom{
+        bottom: -1px;
+        opacity: 0;
+        @media (max-width: $screen-sm-max){
+          display: none;
+        }
+      }
+    }
+    li.active{
+      .line-bottom{
+        opacity: 1;
+      }
+      a{
+        background-color: transparent;
+        &:hover{
+          background-color: transparent;
+        }
+        span{
+          color: #FFBE00;
+          background-color: rgba(255,190,0,0.1);
+        }
+      }
+    }
+  }
+}
+
+header.navbar{
+  border-bottom: 1px solid $border;
+  height: 61px;
+  @media (min-width: $screen-md-min){
+    min-height: 50px;
+  }
+
+  .logged-in {
+    img {
+      height: 20px;
+    }
+  }
+
+  // button sign in in mobile
+  .navbar-signin{
+    @media (min-width: $screen-md-min){
+      display: none;
+    }
+    margin: 8px 15px 8px 0;
+    float: right;
+    .fa{
+      font-size: 1.2em;
+    }
+  }
+
+  .navbar-toggle{
+    border: 0;
+  }
+
+  .navbar-right{
+    background-image: url("../images/register_bg.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 5px 20px;
+    display: none;
+    margin-right: 0;
+    @media (min-width: $screen-md-min){
+      display: block;
+    }
+    li{
+      &:after{
+        content: "";
+        display: block;
+        position: absolute;
+        height: 16px;
+        width: 1px;
+        top: 17px;
+        right: 0;
+        background-color: $dark-gray;
+      }
+      &:last-child:after{
+        display: none;
+      }
+      a{
+        color: #30242F;
+        &:hover{
+          color: #30242F;
+        }
+      }
+    }
+  }
+
+
+}

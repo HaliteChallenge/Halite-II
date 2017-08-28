@@ -13,6 +13,7 @@
 
 Assuming you have RubyGems and NPM installed:
 
+    $ cd website/
     $ sudo gem install bundler
     $ bundle install --path=vendor/bundle
     $ npm install

@@ -1,0 +1,3 @@
+bundle.js
+*.worker.js
+*.map
