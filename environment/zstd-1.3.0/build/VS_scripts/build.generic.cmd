@@ -19,17 +19,16 @@ GOTO build
 :display_help
 
 echo Syntax: build.generic.cmd msbuild_version msbuild_platform msbuild_configuration msbuild_toolset
-echo   msbuild_version:          VS installed version (VS2012, VS2013, VS2015, VS2017)
+echo   msbuild_version:          VS installed version (VS2015, VS2017)
 echo   msbuild_platform:         Platform (x64 or Win32)
 echo   msbuild_configuration:    VS configuration (Release or Debug)
-echo   msbuild_toolset:          Platform Toolset (v100, v110, v120, v140, v141)
+echo   msbuild_toolset:          Platform Toolset (v140, v141)
 
 EXIT /B 1
 
 :build
 
 SET msbuild="%windir%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
-IF %msbuild_version% == VS2013 SET msbuild="%programfiles(x86)%\MSBuild\12.0\Bin\MSBuild.exe"
 IF %msbuild_version% == VS2015 SET msbuild="%programfiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
 rem TODO: try other possible locations for 2017 MSBuild outside of "Community" dir - MSBuild location depends on MSVS edition now
 IF %msbuild_version% == VS2017 SET msbuild="%programfiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
