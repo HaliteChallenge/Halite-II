@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: default
 title: Halite Privacy Policy
 permalink: /privacy/
 ---
