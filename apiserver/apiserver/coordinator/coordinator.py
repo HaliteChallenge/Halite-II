@@ -123,7 +123,7 @@ def upload_game():
     # Store game results in database
     game_id = store_game_results(game_output, replay_key, bucket_class, users)
     # Store game stats in database
-    store_game_stats(game_output, game_id)
+    store_game_stats(game_output, game_id, users)
     # Update rankings
     update_rankings(users)
 
@@ -232,12 +232,13 @@ def store_game_results(game_output, replay_key, bucket_class, users):
         return game_id
 
 
-def store_game_stats(game_output, game_id):
+def store_game_stats(game_output, game_id, users):
     """
     Store additional game stats into database.
 
     :param game_output: The JSON output of the Halite game environment.
     :param game_id: ID of the current match in game table
+    :param users: The list of user objects for this game.
     :return:
     """
     replay_name = os.path.basename(game_output["replay"])
@@ -257,6 +258,22 @@ def store_game_stats(game_output, game_id):
             ships_produced=stats['ships_produced'],
             ships_destroyed=stats['ships_destroyed']
         ))
+
+        # Use player_tag to get the correct user_id from replay
+        for user in users:
+            player_tag = user['player_tag']
+            conn.execute(model.game_bot_stats.insert().values(
+                game_id=game_id,
+                user_id=user["user_id"],
+                bot_id=user["bot_id"],
+                planets_controlled=stats['players'][player_tag]['planets_controlled'],
+                ships_produced=stats['players'][player_tag]['ships_produced'],
+                ships_alive=stats['players'][player_tag]['ships_alive'],
+                ships_alive_ratio=stats['players'][player_tag]['ships_alive_ratio'],
+                ships_relative_ratio=stats['players'][player_tag]['ships_relative_ratio'],
+                planets_destroyed=stats['players'][player_tag]['planets_destroyed'],
+                attacks_total=stats['players'][player_tag]['attacks_total']
+            ))
 
 
 def decode_replay(replay_file_obj):
@@ -294,8 +311,22 @@ def parse_replay(replay):
         'turns_total': 0,
         'planets_destroyed': 0,
         'ships_produced': 0,
-        'ships_destroyed': 0
+        'ships_destroyed': 0,
+        'players': {}
     }
+
+    for player_tag in range(replay['num_players']):
+        # Init player stats
+        stats['players'][player_tag] = {
+            'planets_controlled': 0,
+            'ships_produced': 0,
+            'ships_alive': 0,
+            'ships_alive_ratio': 0.0,
+            'ships_relative_ratio': 0.0,
+            'planets_destroyed': 0,
+            'attacks_total': 0
+        }
+
     if replay is None:
         return stats
 
@@ -304,11 +335,26 @@ def parse_replay(replay):
         for event in frame.get('events', []):
             if event['event'] == 'spawned':
                 stats['ships_produced'] += 1
+                stats['players'][event['entity']['owner']]['ships_produced'] += 1
             elif event['event'] == 'destroyed':
                 if event['entity']['type'] == 'ship':
                     stats['ships_destroyed'] += 1
                 elif event['entity']['type'] == 'planet':
                     stats['planets_destroyed'] += 1
+                    stats['players'][event['entity']['owner']]['planets_destroyed'] += 1
+            elif event['event'] == 'attack':
+                stats['players'][event['entity']['owner']]['attacks_total'] += 1
+
+    ships_alive_total = sum([len(ships) for ships in replay['frames'][-1]['ships'].values()])
+    for player_tag in stats['players'].keys():
+        stats['players'][player_tag]['ships_alive'] = len(replay['frames'][-1]['ships'][str(player_tag)])
+        # use max(1.0, ...) to avoid ZeroDivisionError
+        stats['players'][player_tag]['ships_alive_ratio'] = 1.0 * stats['players'][player_tag]['ships_alive'] / max(1.0, stats['players'][player_tag]['ships_produced'])
+        stats['players'][player_tag]['ships_relative_ratio'] = 1.0 * stats['players'][player_tag]['ships_alive'] / max(1.0, ships_alive_total)
+
+    for planet in replay['frames'][-1]['planets'].values():
+        if planet['owner'] is not None:
+            stats['players'][planet['owner']]['planets_controlled'] += 1
 
     return stats
 
