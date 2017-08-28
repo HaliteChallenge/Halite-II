@@ -161,7 +161,7 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
 
 void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
-    timeout_tags.insert((unsigned short)player);
+    error_tags.insert((unsigned short)player);
 
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
@@ -876,7 +876,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
     // Log game state for the turn
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-        if (!alive[player_id] || timeout_tags.find(player_id) != timeout_tags.end()) {
+        if (!alive[player_id] || error_tags.find(player_id) != error_tags.end()) {
             continue;
         }
 
@@ -1045,8 +1045,8 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         p.damage_dealt = damage_dealt[player_id];
         stats.player_statistics.push_back(p);
     }
-    stats.timeout_tags = timeout_tags;
-    stats.timeout_log_filenames = std::vector<std::string>(timeout_tags.size());
+    stats.error_tags = error_tags;
+//    stats.log_filenames = std::vector<std::string>(error_tags.size());
 
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
@@ -1058,7 +1058,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         // Don't bother writing the replay if someone errored right away,
         // except if verbose output is disabled, in which case the game
         // coordinator would still like the info.
-        if (turn_number <= 1 && !quiet_output && timeout_tags.size() > 0) {
+        if (turn_number <= 1 && !quiet_output && error_tags.size() > 0) {
             std::cout << "Skipping replay (bot errored on first turn).\n";
         }
         else {
@@ -1087,19 +1087,25 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     }
 
     // Output logs for players that timed out or errored.
-    int timeoutIndex = 0;
-    auto error_logs = nlohmann::json::object();
-    for (auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
-        auto timeout_log_filename =
-            std::to_string(*a) + '-' + std::to_string(id) + ".log";
-        stats.timeout_log_filenames[timeoutIndex] = timeout_log_filename;
-        error_logs[std::to_string((int) *a)] = timeout_log_filename;
-        std::ofstream file(stats.timeout_log_filenames[timeoutIndex],
+//    int logIndex = 0;
+    auto :qos_class_main()logs = nlohmann::json::object();
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        if (!always_log && error_tags.find(player_id) == error_tags.end()){
+            continue;
+        }
+
+        auto log_filename =
+                std::to_string(player_id) + '-' + std::to_string(id) + ".log";
+
+        stats.log_filenames.push_back(log_filename);
+        logs[std::to_string((int) player_id)] = log_filename;
+        std::ofstream file(log_filename,
                            std::ios_base::binary);
         file << networking.player_logs_json.dump(1) + "\n";
         file.flush();
         file.close();
-        timeoutIndex++;
+//        logIndex++;
     }
 
     if (quiet_output) {
@@ -1111,7 +1117,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         results["map_width"] = game_map.map_width;
         results["map_height"] = game_map.map_height;
         results["gameplay_parameters"] = hlt::GameConstants::get().to_json();
-        results["error_logs"] = error_logs;
+        results["error_logs"] = logs;
         results["stats"] = stats;
 
         std::cout << results.dump(4) << std::endl;
@@ -1169,7 +1175,7 @@ Halite::Halite(unsigned short width_,
     kill_count = std::vector<unsigned int>(number_of_players);
     damage_dealt = std::vector<unsigned int>(number_of_players);
     total_frame_response_times = std::vector<unsigned int>(number_of_players);
-    timeout_tags = std::set<unsigned short>();
+    error_tags = std::set<unsigned short>();
 
 }
 

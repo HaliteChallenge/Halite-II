@@ -29,6 +29,10 @@ namespace TCLAP {
 
 bool quiet_output =
     false; //Need to be passed to a bunch of classes; extern is cleaner.
+
+bool always_log =
+        false; //Flag to always log game state (regardless of whether bots are error-ing out)
+
 Halite*
     my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
 
@@ -119,6 +123,13 @@ int main(int argc, char** argv) {
                                                     "Array of strings",
                                                     cmd);
 
+    TCLAP::SwitchArg logSwitch("",
+                                 "log",
+                                 "Always produce game logs, instead of only in case of errors",
+                                 cmd,
+                                 false);
+
+
     cmd.parse(argc, argv);
 
     unsigned short mapWidth = dimensionArgs.getValue().first;
@@ -134,6 +145,7 @@ int main(int argc, char** argv) {
     unsigned short n_players_for_map_creation = nPlayersArg.getValue();
 
     quiet_output = quietSwitch.getValue();
+    always_log = logSwitch.getValue();
     bool override_names = overrideSwitch.getValue();
     bool ignore_timeout = timeoutSwitch.getValue();
 

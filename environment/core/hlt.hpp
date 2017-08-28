@@ -18,6 +18,7 @@
 #include "json.hpp"
 
 extern bool quiet_output;
+extern bool always_log;
 
 namespace hlt {
     enum class MoveType {
