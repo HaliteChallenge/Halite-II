@@ -3,8 +3,8 @@ USE halite2;
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   organization_name VARCHAR(64) NOT NULL,
-  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other'
-  verification_code VARCHAR(32) UNIQUE,
+  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other',
+  verification_code VARCHAR(32) UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE organization_email_domain (
