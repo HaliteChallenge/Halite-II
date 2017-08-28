@@ -474,3 +474,5 @@ compiled_environments/
 *.dylib
 
 admin/adminenv/*
+
+promo-website/_site/*

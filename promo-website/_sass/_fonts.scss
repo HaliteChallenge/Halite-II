@@ -1,0 +1,29 @@
+@font-face {
+  font-family: 'Equinox';
+  src: url('/assets/fonts/EquinoxRegular.eot');
+  src: url('/assets/fonts/EquinoxRegular.eot') format('embedded-opentype'),
+       url('/assets/fonts/EquinoxRegular.woff2') format('woff2'),
+       url('/assets/fonts/EquinoxRegular.woff') format('woff'),
+       url('/assets/fonts/EquinoxRegular.ttf') format('truetype'),
+       url('/assets/fonts/EquinoxRegular.svg#EquinoxRegular') format('svg');
+}
+
+@font-face {
+  font-family: 'Equinox';
+  src: url('/assets/fonts/EquinoxBold.eot');
+  src: url('/assets/fonts/EquinoxBold.eot') format('embedded-opentype'),
+       url('/assets/fonts/EquinoxBold.woff2') format('woff2'),
+       url('/assets/fonts/EquinoxBold.woff') format('woff'),
+       url('/assets/fonts/EquinoxBold.ttf') format('truetype'),
+       url('/assets/fonts/EquinoxBold.svg#EquinoxBold') format('svg');
+}
+
+@font-face {
+    font-family: 'Helvetica';
+    src: url('/assets/fonts/HelveticaNeue.eot');
+    src: url('/assets/fonts/HelveticaNeue.eot') format('embedded-opentype'),
+         url('/assets/fonts/HelveticaNeue.woff2') format('woff2'),
+         url('/assets/fonts/HelveticaNeue.woff') format('woff'),
+         url('/assets/fonts/HelveticaNeue.ttf') format('truetype'),
+         url('/assets/fonts/HelveticaNeue.svg#HelveticaNeue') format('svg');
+}
