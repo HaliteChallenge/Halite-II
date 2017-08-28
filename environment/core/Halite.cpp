@@ -161,7 +161,7 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
 
 void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
-    timeout_tags.insert(player);
+    timeout_tags.insert((unsigned short)player);
 
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
@@ -848,6 +848,7 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
 
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     //Update alive frame counts
+
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
         if (alive[player_id]) alive_frame_count[player_id]++;
 
@@ -874,131 +875,112 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     full_frames.push_back(hlt::Map(game_map));
 
     // Print out turn info
-
-//    std::cout << "Turn " << turn_number << "\n";
-
-
-
-    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++){
-//        std::cout << "Player (id=" << (int)player_id << ", name=" << get_name(player_id) << ": " << std::endl;
-        if (!alive[player_id]){
-//            std::cout << "NOT ALIVE!" << std::endl;
-            networking.player_logs[player_id] += "NOT ALIVE!\n";
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        if (!alive[player_id] || timeout_tags.find(player_id) != timeout_tags.end()) {
             continue;
         }
 
-        auto& player_ships = game_map.ships.at(player_id);
-        auto& planets = game_map.planets;
-
-        unsigned short planet_count = 0;
+        auto &player_ships = game_map.ships.at(player_id);
+        auto &planets = game_map.planets;
 
 
-        for (auto& planet : planets){
-            if (planet.owner == player_id && planet.is_alive()) planet_count++;
-        }
 
         int undocked_cnt = 0, docking_cnt = 0, undocking_cnt = 0, docked_cnt = 0;
 
-        for (auto& ship : player_ships){
-            switch (ship.second.docking_status){
+
+        std::vector<hlt::EntityIndex> undocked_ships, undocking_ships, docked_ships, docking_ships;
+
+
+        nlohmann::json ships_json;
+        nlohmann::json commands_json;
+        nlohmann::json planets_json;
+
+
+        for (auto &ship : player_ships) {
+            switch (ship.second.docking_status) {
                 case hlt::DockingStatus::Undocked: {
                     undocked_cnt++;
+                    undocked_ships.push_back(ship.first);
                     break;
                 }
                 case hlt::DockingStatus::Docking: {
                     docking_cnt++;
+                    docking_ships.push_back(ship.first);
                     break;
                 }
                 case hlt::DockingStatus::Docked: {
                     undocking_cnt++;
+                    docked_ships.push_back(ship.first);
                     break;
                 }
                 case hlt::DockingStatus::Undocking: {
                     docked_cnt++;
+                    undocking_ships.push_back(ship.first);
                     break;
                 }
             }
+            ships_json += ship.second.output_json(player_id, ship.first);
         }
-//        std::cout << "Ships: [";
-//        std::cout << "Undocked: " << undocked_cnt << ", ";
-//        std::cout << "Docking: " << docking_cnt << ", ";
-//        std::cout << "Docked: " << undocking_cnt << ", ";
-//        std::cout << "Undocking: " << docked_cnt << ", ";
-//        std::cout << "Total: " << player_ships.size();
-//        std::cout << "]" <<std::endl;
 
-        networking.player_logs[player_id] += "\nShips: [";
-        networking.player_logs[player_id] += "Undocked: " + std::to_string(undocking_cnt) + ", ";
-        networking.player_logs[player_id] += "Docking: " + std::to_string(docking_cnt) + ", ";
-        networking.player_logs[player_id] += "Docked: " + std::to_string(undocking_cnt) + ", ";
-        networking.player_logs[player_id] += "Undocking: " + std::to_string(docked_cnt) + ", ";
-        networking.player_logs[player_id] += "Total: " + std::to_string(player_ships.size()) + ", ";
-        networking.player_logs[player_id] += "]\n";
+        unsigned short planet_count = 0;
 
 
+        for (auto &planet : planets) {
+            if (planet.owned && planet.owner == player_id && planet.is_alive()) planet_count++;
+        }
 
-
-//        std::cout << "Planet count: " << planet_count << std::endl;
-        networking.player_logs[player_id] += "Planet count: " + std::to_string(planet_count) + "\n";
+        for (hlt::EntityIndex planet_idx = 0;
+             planet_idx < planets.size(); planet_idx++) {
+            auto planet = planets[planet_idx];
+            if (planet.owned && planet.owner == player_id && planet.is_alive()){
+                planets_json += planet.output_json(planet_idx);
+            }
+        }
 
         int move_no = 0;
 
-        int noop_cnt = 0, dock_cnt = 0, error_cnt = 0, thrust_cnt = 0, undock_cnt = 0;
+        int dock_cnt = 0, thrust_cnt = 0, undock_cnt = 0;
 
-        for (auto& pair : player_ships) {
+        std::vector<hlt::EntityIndex> dock_ships;
+        std::vector<hlt::EntityIndex> thrust_ships;
+        std::vector<hlt::EntityIndex> undock_ships;
+
+
+        for (auto &pair : player_ships) {
             const auto ship_idx = pair.first;
-            auto& ship = pair.second;
+            auto &ship = pair.second;
 
             if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
 
             auto move = player_moves[player_id][move_no][ship_idx];
+
             switch (move.type) {
-                case hlt::MoveType::Noop: {
-                    noop_cnt++;
-                    break;
-                }
-                case hlt::MoveType::Error: {
+                case hlt::MoveType::Dock: {
                     dock_cnt++;
+                    dock_ships.push_back(move.shipId);
                     break;
                 }
                 case hlt::MoveType::Thrust: {
-                    error_cnt++;
-                    break;
-                }
-                case hlt::MoveType::Dock: {
                     thrust_cnt++;
+                    thrust_ships.push_back(move.shipId);
                     break;
                 }
 
                 case hlt::MoveType::Undock: {
                     undock_cnt++;
+                    undock_ships.push_back(move.shipId);
                     break;
                 }
             }
+            commands_json += move.output_json(player_id, move_no);
         }
 
-//        std::cout << "Commands: [";
-//        std::cout << "Noop: " << noop_cnt << ", ";
-//        std::cout << "Error: " << dock_cnt << ", ";
-//        std::cout << "Dock: " << error_cnt << ", ";
-//        std::cout << "Thrust: " << thrust_cnt << ", ";
-//        std::cout << "Undock: " << undock_cnt << ", ";
-//        std::cout << "Total: " << noop_cnt+dock_cnt+error_cnt+thrust_cnt+undocked_cnt;
-//        std::cout << "]" <<std::endl;
-
-
-        networking.player_logs[player_id] += "Commands: [";
-        networking.player_logs[player_id] += "Noop: " + std::to_string(noop_cnt) + ", ";
-        networking.player_logs[player_id] += "Error: " + std::to_string(dock_cnt) + ", ";
-        networking.player_logs[player_id] += "Dock: " + std::to_string(error_cnt) + ", ";
-        networking.player_logs[player_id] += "Thrust: " + std::to_string(thrust_cnt) + ", ";
-        networking.player_logs[player_id] += "Undock: " + std::to_string(undock_cnt) + ", ";
-        networking.player_logs[player_id] += "Total: " + std::to_string(noop_cnt+dock_cnt+error_cnt+thrust_cnt+undock_cnt) + ", ";
-        networking.player_logs[player_id] += "]\n";
+        networking.player_logs_json[player_id]["Frames"].back()["Turn"] = turn_number;
+        networking.player_logs_json[player_id]["Frames"].back()["Ships"] = ships_json;
+        networking.player_logs_json[player_id]["Frames"].back()["Planets"] = planets_json;
+        networking.player_logs_json[player_id]["Frames"].back()["Commands"] = commands_json;
 
     }
-
-
     // Check if the game is over
     return find_living_players();
 }
@@ -1014,6 +996,15 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // For rankings
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        nlohmann::json playerJson;
+        playerJson["PlayerID"] = player_id;
+        playerJson["Frames"] = nlohmann::json::array();
+        playerJson["Error"] = nlohmann::json::object();
+        networking.player_logs_json += playerJson;
+
+    }
 
     // Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
@@ -1055,6 +1046,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
+
+
+
     while (!game_complete()) {
         turn_number++;
         if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
@@ -1075,6 +1069,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
 
         living_players = new_living_players;
     }
+
+
+
 
     // Add remaining players to the ranking. Break ties using the same
     // comparison function.
@@ -1157,7 +1154,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         error_logs[std::to_string((int) *a)] = timeout_log_filename;
         std::ofstream file(stats.timeout_log_filenames[timeoutIndex],
                            std::ios_base::binary);
-        file << networking.player_logs[*a];
+        file << networking.player_logs_json.dump(1) + "\n";
         file.flush();
         file.close();
         timeoutIndex++;
@@ -1231,6 +1228,7 @@ Halite::Halite(unsigned short width_,
     damage_dealt = std::vector<unsigned int>(number_of_players);
     total_frame_response_times = std::vector<unsigned int>(number_of_players);
     timeout_tags = std::set<unsigned short>();
+
 }
 
 Halite::~Halite() {
