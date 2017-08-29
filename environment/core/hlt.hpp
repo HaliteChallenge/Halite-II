@@ -114,6 +114,10 @@ namespace hlt {
         auto any_planet_collision(const Location& location, double radius) -> bool;
         auto spawn_ship(const Location& location, PlayerId owner) -> EntityIndex;
     };
+
+    struct GameAbort {
+        int status;
+    };
 }
 
 #endif
