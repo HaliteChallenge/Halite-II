@@ -171,3 +171,12 @@ CREATE TABLE user_badge (
   FOREIGN KEY (badge_id) REFERENCES badge (id),
   PRIMARY KEY (user_id, badge_id)
 );
+
+CREATE TABLE user_tier_history (
+  user_id INT UNSIGNED NOT NULL,
+  tier VARCHAR(256) NOT NULL,
+  last_in_tier DATETIME DEFAULT CURRENT_TIMESTAMP,
+  total_time_in_tier INT UNSIGNED DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  PRIMARY KEY (user_id, tier)
+);

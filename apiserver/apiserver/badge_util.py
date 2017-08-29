@@ -1,11 +1,46 @@
 import sqlalchemy
 import threading
 import requests
-from . import model, config
+from . import config, model
 
 HACK_FIRST = "First"
 HACK_SECOND = "Second"
 HACK_THIRD = "Third"
+
+
+def assign_place_badge(hackathon_id, badge_type, user_id):
+    badge = None
+    with model.engine.connect() as conn:
+        badge = conn.execute(model.badge.select().where(
+            model.badge.c.family_id == get_hackathon_badge_family_id(
+                hackathon_id, badge_type)
+            )).first()
+    if badge:
+        add_badge_if_not_exist(user_id, badge['id'])
+
+
+def assign_badges_for_hackathon(hackathon_id):
+    badges = None
+    ret = requests.get('http://127.0.0.1:5000/v1/api/hackathon/{}/leaderboard?'
+        'limit=3'.format(hackathon_id)).json()
+    if len(ret) > 0:
+        assign_place_badge(
+            hackathon_id,
+            badge_type=HACK_FIRST,
+            user_id=ret[0]['user_id'],
+        )
+    if len(ret) > 1:
+        assign_place_badge(
+            hackathon_id,
+            badge_type=HACK_SECOND,
+            user_id=ret[1]['user_id'],
+        )
+    if len(ret) > 2:
+        assign_place_badge(
+            hackathon_id,
+            badge_type=HACK_THIRD,
+            user_id=ret[2]['user_id'],
+        )
 
 
 def add_badge_if_not_exist(user_id, badge_id):
@@ -28,7 +63,6 @@ def transalte_name_to_badge_id(name, add_if_not_exist=False):
                     url="http://127.0.0.1:5000/v1/api/badge",
                     json={"name": name}
             ).json()
-            badge = ret;
         return badge['id']
 
 
@@ -79,8 +113,6 @@ def get_hackathon_badge_name(hackathon_title, badge_type):
 
 def __update_hackathon_badge(hackathon_title, hackathon_id, badge_type):
     resp = requests.get(url="http://127.0.0.1:5000/v1/api/badge").json()
-    print(resp)
-    print(get_hackathon_badge_family_id(hackathon_id, badge_type))
     for badge in resp:
         if badge['family_id'] == \
             get_hackathon_badge_family_id(hackathon_id, badge_type):
@@ -98,3 +130,31 @@ def update_hackathon_badges(new_hackathon_title, hackathon_id):
             target=__update_hackathon_badge,
             args=(new_hackathon_title, hackathon_id, badge_type),
         ).start()
+
+
+def __update_tier_stay_badge(badge_name, user_stays):
+    print(badge_name, user_stays)
+    for user_stay in user_stays:
+        __add_user_badge(user_stay['user_id'], badge_name)
+
+def update_tier_stay_badge():
+    with model.engine.connect() as conn:
+        res = list(conn.execute(model.user_tier_history.select().where(
+            model.user_tier_history.c.total_time_in_tier >= config.STAY_FOR_BADGE
+        )))
+    __update_tier_stay_badge(
+        config.TIER_0_STAY_BADGE,
+        [x for x in res if x['tier'] == config.TIER_0_NAME],
+    )
+    __update_tier_stay_badge(
+        config.TIER_1_STAY_BADGE,
+        [x for x in res if x['tier'] == config.TIER_1_NAME],
+    )
+    __update_tier_stay_badge(
+        config.TIER_2_STAY_BADGE,
+        [x for x in res if x['tier'] == config.TIER_2_NAME],
+    )
+    __update_tier_stay_badge(
+        config.TIER_3_STAY_BADGE,
+        [x for x in res if x['tier'] == config.TIER_3_NAME],
+    )

@@ -1,43 +1,14 @@
-from .. import badge_util, model
+from .. import badge_util, config, model
 import requests
 import sched
 import time
+import sqlalchemy
+import arrow
 
-UPDATE_HACKATHON_BADGE_SLEEP = 120
-
-def assign_place_badge(hackathon_id, badge_type, user_id):
-    badge = None
-    with model.engine.connect() as conn:
-        badge = conn.execute(model.badge.select().where(
-            model.badge.c.family_id == badge_util.get_hackathon_badge_family_id(
-                hackathon_id, badge_type)
-            )).first()
-    if badge:
-        badge_util.add_badge_if_not_exist(user_id, badge['id'])
-
-
-def assign_badges_for_hackathon(hackathon_id):
-    badges = None
-    ret = requests.get('http://127.0.0.1:5000/v1/api/hackathon/{}/leaderboard?\
-        limit=3' .format(hackathon_id)).json()
-    if len(ret) > 0:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=badge_util.HACK_FIRST,
-            user_id=ret[0]['user_id'],
-        )
-    if len(ret) > 1:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=badge_util.HACK_SECOND,
-            user_id=ret[1]['user_id'],
-        )
-    if len(ret) > 2:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=badge_util.HACK_THIRD,
-            user_id=ret[2]['user_id'],
-        )
+UPDATE_HACKATHON_BADGE_SLEEP = 12 
+UPDATE_TIER_TIME = 6
+USERS_PER_QUERY  = 1
+scheduler = sched.scheduler(time.time, time.sleep)
 
 
 def update_hackathons_badges():
@@ -45,9 +16,62 @@ def update_hackathons_badges():
     hackathons = requests.get('http://127.0.0.1:5000/v1/api/hackathon?limit=250').json()
     for hackathon in hackathons:
         if hackathon['status'] == "closed":
-            assign_badges_for_hackathon(hackathon['hackathon_id'])
+            badge_util.assign_badges_for_hackathon(hackathon['hackathon_id'])
+
+# Update tier times for a range of users in the ranking;
+# returns number of users in that range
+
+def recalculate_tier_time_range(offset, limit):
+    ret = requests.get('http://127.0.0.1:5000/v1/api/leaderboard?'
+        'offset={}&limit={}' .format(offset, limit)).json()
+    for user in ret:
+        with model.engine.connect() as conn:
+            last_user_tier = conn.execute(model.user_tier_history.select()
+                .where(model.user_tier_history.c.user_id == user['user_id'])
+                    .order_by(model.user_tier_history.c.last_in_tier.desc())
+                        .limit(1)).first()
+
+            if last_user_tier and last_user_tier['tier'] == user['tier']:
+                # Append to timedelta time spent in tier
+                conn.execute(model.user_tier_history.update().where(
+                    sqlalchemy.and_(
+                        model.user_tier_history.c.user_id == user['user_id'],
+                        model.user_tier_history.c.tier == user['tier'],
+                    )).values(total_time_in_tier=
+                        model.user_tier_history.c.total_time_in_tier +
+                        sqlalchemy.sql.func.timediff(
+                            sqlalchemy.sql.func.now(),
+                            model.user_tier_history.c.last_in_tier,
+                )))
+            
+            # Update last time stamp for tier
+            rc = conn.execute(model.user_tier_history.update().where(
+                sqlalchemy.and_(
+                    model.user_tier_history.c.user_id == user['user_id'],
+                    model.user_tier_history.c.tier == user['tier'],
+                )).values(last_in_tier=sqlalchemy.sql.func.now())).rowcount
+            if rc == 0:
+                conn.execute(model.user_tier_history.insert().values(
+                    user_id=user['user_id'],
+                    tier=user['tier'],
+                ))
+    return len(ret)
 
 
-scheduler = sched.scheduler(time.time, time.sleep)
+def recalculate_tier_time_all():
+    offset = 0
+    while recalculate_tier_time_range(offset, USERS_PER_QUERY) > 0:
+        offset += USERS_PER_QUERY
+
+
+def update_tier_badges():
+    scheduler.enter(UPDATE_TIER_TIME, 1, update_tier_badges)
+    recalculate_tier_time_all()
+    if config.HALITE_END > arrow.now().datetime:
+        badge_util.update_tier_stay_badge()
+
+
+scheduler.enter(UPDATE_TIER_TIME, 1, update_tier_badges)
 scheduler.enter(UPDATE_HACKATHON_BADGE_SLEEP, 1, update_hackathons_badges)
 scheduler.run()
+
