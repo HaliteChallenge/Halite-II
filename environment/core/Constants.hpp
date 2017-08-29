@@ -16,6 +16,7 @@ namespace hlt {
      * default values in a tournament setting).
      */
     struct GameConstants {
+        int SHIPS_PER_PLAYER = 3;
         int PLANETS_PER_PLAYER = 6;
         unsigned int EXTRA_PLANETS = 4;
 

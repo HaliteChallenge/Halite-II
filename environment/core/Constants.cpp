@@ -6,6 +6,7 @@
 
 auto hlt::GameConstants::to_json() const -> nlohmann::json {
     return {
+        { "SHIPS_PER_PLAYER", SHIPS_PER_PLAYER },
         { "PLANETS_PER_PLAYER", PLANETS_PER_PLAYER },
         { "EXTRA_PLANETS", EXTRA_PLANETS },
 
@@ -37,6 +38,7 @@ auto hlt::GameConstants::to_json() const -> nlohmann::json {
 }
 
 auto hlt::GameConstants::from_json(const nlohmann::json& json) -> void {
+    SHIPS_PER_PLAYER = json.value("SHIPS_PER_PLAYER", SHIPS_PER_PLAYER);
     PLANETS_PER_PLAYER = json.value("PLANETS_PER_PLAYER", PLANETS_PER_PLAYER);
     EXTRA_PLANETS = json.value("EXTRA_PLANETS", EXTRA_PLANETS);
 

@@ -288,23 +288,21 @@ namespace mapgen {
             }
         }
 
+        const size_t ship_count = hlt::GameConstants::get().SHIPS_PER_PLAYER;
         for (hlt::PlayerId player_id = 0; player_id < num_players;
              player_id++) {
             // Spread out ships to make it less likely they'll collide
             // in the start
             const auto& zone = spawn_zones[player_id];
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y - 3,
-            }, player_id);
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y,
-            }, player_id);
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y + 3,
-            }, player_id);
+            const int base_offset = 3;
+            int offset = 0;
+            for (size_t i = 0; i < ship_count; i++) {
+                map.spawn_ship(hlt::Location{
+                    zone.location.pos_x,
+                    zone.location.pos_y + offset,
+                }, player_id);
+                offset = (offset >= 0) ? -offset - base_offset : -offset;
+            }
         }
 
         return {};
