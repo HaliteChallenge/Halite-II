@@ -5,7 +5,9 @@
 source ~/.profile
 
 cd ../../environment
-make -j2
+
+cmake -H. -Bbuild
+cmake --build build -- -j2
 
 cd ../apiserver/worker
 
