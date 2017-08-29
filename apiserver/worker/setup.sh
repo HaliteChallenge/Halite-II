@@ -9,6 +9,8 @@ cd ../../environment
 cmake -H. -Bbuild
 cmake --build build -- -j2
 
+cp build/halite .
+
 cd ../apiserver/worker
 
 cp ../../environment/halite .
