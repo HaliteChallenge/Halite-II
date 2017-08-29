@@ -33,7 +33,7 @@ input:focus{
   box-shadow: none;
 }
 
-.line{
+.xline{
   @include line();
   &-top{
     @include line-top();
@@ -77,8 +77,8 @@ input:focus{
   right: -2.5px;
 }
 
-.line-container{
-  .line{
+.xline-container{
+  .xline{
     width: 100%;
   }
 }

@@ -60,7 +60,7 @@
   position: relative;
   background: #24252C;
   cursor: pointer;
-  .line{
+  .xline{
     background-color: transparent;
   }
   &:hover{
@@ -68,7 +68,7 @@
     box-shadow: 0 2px 30px rgba(0,0,0,0.20);
   }
   &.active{
-    .line{
+    .xline{
       background-color: #889295;
     }
     opacity: 1;

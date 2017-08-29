@@ -3,8 +3,8 @@
   <div class="row">
     <div class="col-md-8">
       <div class="game-heading">
-        <i class="line line-top"></i>
-        <i class="line line-bottom"></i>
+        <i class="xline xline-top"></i>
+        <i class="xline xline-bottom"></i>
         <p class="game-heading-date">8/3/2017 - 8:08:35 PM</p>
         <div class="game-heading-players">
           <div class="short"></div>
@@ -26,16 +26,16 @@
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="active">
             <a href="#player_stats" aria-controls="player_stats" role="tab" data-toggle="tab">
-              <i class="line line-top"></i>
+              <i class="xline xline-top"></i>
               <span>Player stats</span>
-              <i class="line line-bottom"></i>
+              <i class="xline xline-bottom"></i>
             </a>
           </li>
           <li role="presentation">
             <a href="#game_stats" aria-controls="game_stats" role="tab" data-toggle="tab">
-              <i class="line line-top"></i>
+              <i class="xline xline-top"></i>
               <span>Game/Map Stats</span>
-              <i class="line line-bottom"></i>
+              <i class="xline xline-bottom"></i>
             </a>
           </li>
         </ul>
@@ -257,10 +257,10 @@
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
             <a data-toggle="collapse" data-parent="#accordion" href="#widget_player_details" aria-expanded="false" aria-controls="widget_player_details">
-              <i class="line line-top"></i>
+              <i class="xline xline-top"></i>
               <h4>player details</h4>
               <span class="toggle-icon chevron"></span>
-              <i class="line line-bottom"></i>
+              <i class="xline xline-bottom"></i>
             </a>
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="widget_player_details" aria-labelledby="heading_player_details">
@@ -312,10 +312,10 @@
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_map_properties">
             <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="false" aria-controls="widget_map_properties">
-              <i class="line line-top"></i>
+              <i class="xline xline-top"></i>
               <h4>map object properties</h4>
               <span class="toggle-icon chevron"></span>
-              <i class="line line-bottom"></i>
+              <i class="xline xline-bottom"></i>
             </a>
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="widget_map_properties" aria-labelledby="heading_map_properties">
@@ -363,18 +363,18 @@
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
             <a data-toggle="collapse" href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details">
-              <i class="line line-top"></i>
+              <i class="xline xline-top"></i>
               <h4>post game dashboard</h4>
               <span class="toggle-icon expand"></span>
-              <i class="line line-bottom"></i>
+              <i class="xline xline-bottom"></i>
             </a>
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
               <div class="col-md-3">
                 <div class="card-dashboard active">
-                  <i class="line line-top"></i>
-                  <i class="line line-bottom"></i>
+                  <i class="xline xline-top"></i>
+                  <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
                     <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
                   </div>
@@ -388,8 +388,8 @@
               </div>
               <div class="col-md-3">
                 <div class="card-dashboard active">
-                  <i class="line line-top"></i>
-                  <i class="line line-bottom"></i>
+                  <i class="xline xline-top"></i>
+                  <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
                     <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
                   </div>
@@ -403,8 +403,8 @@
               </div>
               <div class="col-md-3">
                 <div class="card-dashboard">
-                  <i class="line line-top"></i>
-                  <i class="line line-bottom"></i>
+                  <i class="xline xline-top"></i>
+                  <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
                     <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
                   </div>
@@ -418,8 +418,8 @@
               </div>
               <div class="col-md-3">
                 <div class="card-dashboard active">
-                  <i class="line line-top"></i>
-                  <i class="line line-bottom"></i>
+                  <i class="xline xline-top"></i>
+                  <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
                     <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
                   </div>
