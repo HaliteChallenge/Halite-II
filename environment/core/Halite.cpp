@@ -921,7 +921,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
         }
 
         for (hlt::EntityIndex planet_idx = 0;
-             planet_idx < planets.size(); planet_idx++) {
+            planet_idx < planets.size(); planet_idx++) {
             auto planet = planets[planet_idx];
             if (planet.owned && planet.owner == player_id && planet.is_alive()) {
                 planets_json += planet.output_json(planet_idx);
@@ -930,13 +930,13 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
         for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
             for (auto &pair : player_ships) {
-            const auto ship_idx = pair.first;
-            auto &ship = pair.second;
-            if (player_moves[player_id][move_no].count(ship_idx) == 0){
-                continue;
-            }
-            auto move = player_moves[player_id][move_no][ship_idx];
-            commands_json += move.output_json(player_id, move_no);
+                const auto ship_idx = pair.first;
+                auto &ship = pair.second;
+                if (player_moves[player_id][move_no].count(ship_idx) == 0){
+                    continue;
+                }
+                auto move = player_moves[player_id][move_no][ship_idx];
+                commands_json += move.output_json(player_id, move_no);
             }
         }
 
