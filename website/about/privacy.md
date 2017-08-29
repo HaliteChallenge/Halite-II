@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: Halite Privacy Policy
-permalink: /privacy/
+permalink: /about/privacy
 ---
 
 ### Effective Date July 17, 2017 (last updated July 13, 2017).

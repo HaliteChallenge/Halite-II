@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Contact Us
-permalink: /contact/
+permalink: /about/contact
 toc: false
 ---
 
