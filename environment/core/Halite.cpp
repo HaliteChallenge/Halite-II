@@ -990,7 +990,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
 
     while (!game_complete()) {
         turn_number++;
-        if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
+        if (!quiet_output) std::cout << "Turn " << turn_number << std::endl;
 
         // Frame logic.
         auto new_living_players = process_next_frame(living_players);
@@ -1094,7 +1094,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         logs[std::to_string((int) player_id)] = log_filename;
         std::ofstream file(log_filename,
                            std::ios_base::binary);
-        file << networking.player_logs_json.dump(1) + "\n";
+        file << networking.player_logs_json.dump(1) << std::endl;
         file.flush();
         file.close();
     }
@@ -1137,7 +1137,7 @@ Halite::Halite(unsigned short width_,
     if (!quiet_output) {
         std::cout
             << "Seed: " << seed_
-            << " Dimensions: " << width_ << 'x' << height_ << '\n';
+            << " Dimensions: " << width_ << 'x' << height_ << std::endl;
     }
 
     auto generator = mapgen::SolarSystem(seed_);

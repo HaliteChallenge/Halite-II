@@ -389,7 +389,7 @@ void Networking::launch_bot(std::string command) {
 
 #else
 
-    if (!quiet_output) std::cout << command << "\n";
+    if (!quiet_output) std::cout << command << std::endl;
 
     pid_t pid;
     int writePipe[2];
