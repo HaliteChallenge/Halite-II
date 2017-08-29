@@ -128,6 +128,7 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
     if (position != inputString.end()) {
         const auto index = std::distance(inputString.begin(), position);
         std::string message("Received invalid character '");
+        message += inputString;
         message += *position;
         message += "'.";
         throw BotInputError(player_tag, inputString, message, index);
@@ -388,7 +389,7 @@ void Networking::launch_bot(std::string command) {
 
 #else
 
-    if (!quiet_output) std::cout << command << "\n";
+    if (!quiet_output) std::cout << command << std::endl;
 
     pid_t pid;
     int writePipe[2];
@@ -460,6 +461,7 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 30000;
 
     std::string response;
+    nlohmann::json init_log_json;
     try {
         std::string playerTagString = std::to_string(player_tag),
             mapSizeString = serializeMapSize(m), mapString = serialize_map(m);
@@ -471,8 +473,6 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                 + ".\n";
         if (!quiet_output) std::cout << outMessage;
 
-        player_logs[player_tag] += " --- Init ---\n";
-
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
         response = get_string(player_tag, ALLOTTED_MILLIS);
@@ -481,9 +481,8 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[player_tag] +=
-            response + "\n --- Bot used " + std::to_string(millisTaken)
-                + " milliseconds ---";
+        init_log_json["Time"] = millisTaken;
+        init_log_json["Turn"] = 0;
 
         *playerName = response.substr(0, 30);
         if (!quiet_output) {
@@ -492,6 +491,10 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             std::cout << inMessage;
         }
 
+        player_logs_json[player_tag]["Frames"] += init_log_json;
+        player_logs_json[player_tag]["PlayerID"] = player_tag;
+        player_logs_json[player_tag]["PlayerName"] = *playerName;
+
         return millisTaken;
     }
     catch (BotInputError err) {
@@ -499,30 +502,28 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-        player_logs[player_tag] += "\nERRORED!\n";
-        player_logs[player_tag] += err.what();
-        player_logs[player_tag] += '\n';
+        player_logs_json[player_tag]["Error"]["Message"] = err.what();
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
+
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (std::string s) {
-        if (s.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (...) {
-        if (response.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
+
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
+
+    player_logs_json[player_tag]["Frames"] += init_log_json;
+
     return -1;
 }
 
@@ -535,6 +536,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
 
     std::string response;
+    nlohmann::json log_json;
     try {
         if (is_process_dead(player_tag)) {
             // TODO: more debug output
@@ -545,9 +547,6 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         std::string mapString = serialize_map(m);
         send_string(player_tag, mapString);
 
-        player_logs[player_tag] +=
-            "\n-----------------------------------------------------------------------------\n --- Frame #"
-                + std::to_string(turnNumber) + " ---\n";
 
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
@@ -557,11 +556,11 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[player_tag] +=
-            response + "\n --- Bot used " + std::to_string(millisTaken)
-                + " milliseconds ---";
 
+        log_json["Time"] = millisTaken;
         deserialize_move_set(player_tag, response, m, moves);
+
+        player_logs_json[player_tag]["Frames"] += log_json;
 
         return millisTaken;
     }
@@ -570,25 +569,21 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-        player_logs[player_tag] += "\nERRORED!\n";
-        player_logs[player_tag] += err.what();
-        player_logs[player_tag] += '\n';
-        player_logs[player_tag] += response;
+
+        player_logs_json[player_tag]["Error"]["Message"] = err.what();
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (std::string s) {
-        if (s.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (...) {
-        if (response.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
+
+    player_logs_json[player_tag]["Frames"] += log_json;
+
     return -1;
 }
 
@@ -683,9 +678,6 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
             }
             std::cout << "--- End bot output ---\n";
         }
-        player_logs[player_tag] +=
-            "\n --- Bot was killed. Below is the rest of its output (if any): ---\n"
-                + newString + "\n --- End bot output ---";
     }
 }
 

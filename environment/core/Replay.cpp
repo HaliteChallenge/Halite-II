@@ -83,7 +83,9 @@ auto Replay::output(std::string filename) -> void {
              planet_index < frame_map.planets.size();
              planet_index++) {
             const auto& planet = frame_map.planets[planet_index];
-            if (!planet.is_alive()) continue;
+            if (!planet.is_alive()){
+                continue;
+            }
 
             frame_planets[std::to_string(planet_index)] =
                 planet.output_json(planet_index);
@@ -124,7 +126,9 @@ auto Replay::output(std::string filename) -> void {
                 auto player_moves = nlohmann::json::object();
                 for (const auto& move_pair : current_moves[player_id][move_no]) {
                     const auto& move = move_pair.second;
-                    if (move.type == hlt::MoveType::Noop) continue;
+                    if (move.type == hlt::MoveType::Noop){
+                        continue;
+                    }
 
                     player_moves[std::to_string(move.shipId)] =
                         move.output_json(player_id, move_no);
