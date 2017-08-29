@@ -130,27 +130,33 @@ namespace mapgen {
             return true;
         };
 
-        // Generate a cluster of small planets in the center
-        // Cluster helps make sure trivial bots don't get stuck from all
-        // docking to a single center planet at the same time
         if (extra_planets > 0) {
             const auto big_radius =
                 std::max(4.0, std::sqrt(std::min(map.map_width, map.map_height)) / 2);
             const auto small_radius =
                 std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 3));
-            const auto radius =
-                std::uniform_real_distribution<>(small_radius, big_radius)(rng);
-            const auto distance_from_center = 2 * radius +
-                2 * hlt::GameConstants::get().SHIP_RADIUS;
+            // Stick one planet in the center
+            if (extra_planets == 1) {
+                map.planets.emplace_back(center_x, center_y, big_radius);
+            }
+            // Generate a cluster of small planets in the center
+            // Cluster helps make sure trivial bots don't get stuck from all
+            // docking to a single center planet at the same time
+            else if (extra_planets > 1) {
+                const auto radius =
+                    std::uniform_real_distribution<>(small_radius, big_radius)(rng);
+                const auto distance_from_center = 2 * radius +
+                    2 * hlt::GameConstants::get().SHIP_RADIUS;
 
-            for (auto i = 0; i < 4; i++) {
-                const auto angle = i * M_PI / 2 + (M_PI / 4);
-                const auto location = hlt::Location{
-                    center_x + distance_from_center * std::cos(angle),
-                    center_y + distance_from_center * std::sin(angle),
-                };
+                for (auto i = 0; i < 4; i++) {
+                    const auto angle = i * M_PI / 2 + (M_PI / 4);
+                    const auto location = hlt::Location{
+                        center_x + distance_from_center * std::cos(angle),
+                        center_y + distance_from_center * std::sin(angle),
+                    };
 
-                map.planets.emplace_back(location.pos_x, location.pos_y, radius);
+                    map.planets.emplace_back(location.pos_x, location.pos_y, radius);
+                }
             }
         }
 
