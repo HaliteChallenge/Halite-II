@@ -491,9 +491,10 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             std::cout << inMessage;
         }
 
-        player_logs_json[player_tag]["Frames"]  += init_log_json;
+        player_logs_json[player_tag]["Frames"] += init_log_json;
         player_logs_json[player_tag]["PlayerID"] = player_tag;
         player_logs_json[player_tag]["PlayerName"] = *playerName;
+
         return millisTaken;
     }
     catch (BotInputError err) {
@@ -508,20 +509,21 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (std::string s) {
-        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any):" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
         player_logs_json[player_tag]["Error"]["Turn"] = 0;
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (...) {
-        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any):" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
         player_logs_json[player_tag]["Error"]["Turn"] = 0;
 
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
 
-    player_logs_json[player_tag]["Frames"]  += init_log_json;
+    player_logs_json[player_tag]["Frames"] += init_log_json;
+
     return -1;
 }
 
@@ -534,7 +536,6 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
 
     std::string response;
-
     nlohmann::json log_json;
     try {
         if (is_process_dead(player_tag)) {
@@ -559,7 +560,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         log_json["Time"] = millisTaken;
         deserialize_move_set(player_tag, response, m, moves);
 
-        player_logs_json[player_tag]["Frames"]  += log_json;
+        player_logs_json[player_tag]["Frames"] += log_json;
 
         return millisTaken;
     }
@@ -573,16 +574,16 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (std::string s) {
-//        if (s.empty())
-
-        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any):" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (...) {
-        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any):" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
+
     player_logs_json[player_tag]["Frames"] += log_json;
+
     return -1;
 }
 

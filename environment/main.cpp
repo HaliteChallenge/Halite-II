@@ -31,7 +31,7 @@ bool quiet_output =
     false; //Need to be passed to a bunch of classes; extern is cleaner.
 
 bool always_log =
-        false; //Flag to always log game state (regardless of whether bots are error-ing out)
+    false; //Flag to always log game state (regardless of whether bots are error-ing out)
 
 Halite*
     my_game; //Is a pointer to avoid problems with assignment, dynamic memory, and default constructors.
@@ -124,11 +124,10 @@ int main(int argc, char** argv) {
                                                     cmd);
 
     TCLAP::SwitchArg logSwitch("",
-                                 "log",
-                                 "Always produce game logs, instead of only in case of errors",
-                                 cmd,
-                                 false);
-
+                               "log",
+                               "Always produce game logs, instead of only in case of errors",
+                               cmd,
+                               false);
 
     cmd.parse(argc, argv);
 
