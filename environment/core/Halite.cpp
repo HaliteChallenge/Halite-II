@@ -1009,7 +1009,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         living_players = new_living_players;
     }
 
-
     // Add remaining players to the ranking. Break ties using the same
     // comparison function.
     std::vector<hlt::PlayerId> new_rankings;
