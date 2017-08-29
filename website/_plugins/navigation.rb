@@ -1,7 +1,7 @@
 module Jekyll
   class NavigationGenerator < Generator
     def generate(site)
-      pages = generate_level site, "/learn/"
+      pages = generate_level site, "/learn-programming-challenge/"
       site.config["navigation"] = pages
     end
 
