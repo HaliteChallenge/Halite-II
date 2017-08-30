@@ -155,7 +155,7 @@ CREATE TABLE hackathon_snapshot (
 
 CREATE TABLE badge (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name VARCHAR(256) NOT NULL,
+  name VARCHAR(256) UNIQUE NOT NULL,
   family ENUM('hackathon', 'organization', 'country', 'language') DEFAULT NULL,
   family_id VARCHAR(256) UNIQUE DEFAULT NULL
   PRIMARY KEY (id)
