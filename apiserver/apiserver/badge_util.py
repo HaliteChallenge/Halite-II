@@ -6,6 +6,11 @@ from . import config, model
 HACK_FIRST = "First"
 HACK_SECOND = "Second"
 HACK_THIRD = "Third"
+TIERS = [config.TIER_0_NAME, config.TIER_1_NAME, config.TIER_2_NAME, 
+         config.TIER_3_NAME, config.TIER_4_NAME]
+
+def get_temp_tier_badge_name(tier_name):
+    return config.TIER_TEMP_BADGE.format(tier_name)
 
 
 def assign_place_badge(hackathon_id, badge_type, user_id):
@@ -53,7 +58,7 @@ def add_badge_if_not_exist(user_id, badge_id):
         )
 
 
-def transalte_name_to_badge_id(name, add_if_not_exist=False):
+def translate_name_to_badge_id(name, add_if_not_exist=False):
     with model.engine.connect() as conn:
         badge = conn.execute(model.badge.select().where(
             sqlalchemy.sql.func.lower(model.badge.c.name) ==
@@ -67,7 +72,7 @@ def transalte_name_to_badge_id(name, add_if_not_exist=False):
 
 
 def __add_user_badge(user_id, badge_name):
-    badge_id = transalte_name_to_badge_id(
+    badge_id = translate_name_to_badge_id(
         badge_name,
         add_if_not_exist=True
     )
@@ -136,6 +141,26 @@ def __update_tier_stay_badge(badge_name, user_stays):
     print(badge_name, user_stays)
     for user_stay in user_stays:
         __add_user_badge(user_stay['user_id'], badge_name)
+
+
+def replace_temp_tier_badge(user_id, tier_name):
+    for tier in TIERS:
+        if tier_name == tier:
+            continue
+        requests.delete('http://127.0.0.1:5000/v1/api/user/{}/badge/{}'
+                .format(
+                    user_id, 
+                    translate_name_to_badge_id(
+                        get_temp_tier_badge_name(tier),
+                        add_if_not_exist=True
+                    )))
+    add_badge_if_not_exist(
+        user_id,
+        translate_name_to_badge_id(
+            get_temp_tier_badge_name(tier_name),
+            add_if_not_exist=True
+        ))
+
 
 def update_tier_stay_badge():
     with model.engine.connect() as conn:

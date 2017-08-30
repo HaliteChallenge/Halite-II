@@ -55,6 +55,7 @@ def recalculate_tier_time_range(offset, limit):
                     user_id=user['user_id'],
                     tier=user['tier'],
                 ))
+            badge_util.replace_temp_tier_badge(user['user_id'], user['tier'])
     return len(ret)
 
 

@@ -81,7 +81,7 @@ def add_badge_for_user(intended_user_id, *, user_id):
 
 
 @web_api.route("/user/<int:intended_user_id>/badge/<int:badge_id>", methods=["DELETE"])
-@web_util.requires_login(admin=True)
+@web_util.requires_login(admin=True, accept_local=True)
 def delete_badge_for_user(intended_user_id, badge_id, *, user_id):
     with model.engine.connect() as conn:
         res = conn.execute(model.user_badge.delete().where(
