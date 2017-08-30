@@ -28,6 +28,8 @@ We need five buckets: one for compiled bot storage(`halite-2-compiled-bots`), on
 
 ### Upload Coordinator and Worker to GCS (Non-Github Deploy Only)
 
+E.g tar -cvzf Halite.tgz Halite-II 
+
 Zip the Halite repository folder into a .tgz file and upload it as `Halite.tgz` in the root of the GCS bucket (currently `halite-2-deployed-artifacts`).
 
 The structure of the `tgz` should be as follows:

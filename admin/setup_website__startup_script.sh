@@ -11,8 +11,8 @@ while [ ! -f ./Halite.tgz ]; do
     gsutil cp gs://halite-2-deployed-artifacts/Halite.tgz .
 done
 
-tar xvzf Halite.tgz
-cd Halite/apiserver/
-cp Halite/website/_site /var/www/html/
-
+tar -xzf Halite.tgz
+cd Halite-II/
+sudo cp -rf website/_site/* /var/www/html/
+echo $(datetime) > ~/_SUCCESS
 EOF
