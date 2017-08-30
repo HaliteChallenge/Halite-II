@@ -206,7 +206,6 @@ def store_game_results(game_output, replay_key, bucket_class, users):
         conn.execute(model.game_view_stats.insert().values(
             game_id=game_id,
             views_total=0,
-            last_viewed=sqlalchemy.sql.func.NOW()
         ))
 
         # Update the participants' stats

@@ -91,7 +91,6 @@ CREATE TABLE game_participant (
 CREATE TABLE game_view_stat (
   game_id INT UNSIGNED NOT NULL,
   views_total INT UNSIGNED NOT NULL,
-  last_viewed DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (game_id) REFERENCES game(id),
   PRIMARY KEY (game_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
