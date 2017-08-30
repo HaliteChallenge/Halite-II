@@ -7,13 +7,13 @@ import arrow
 
 UPDATE_HACKATHON_BADGE_SLEEP = 120
 UPDATE_TIER_TIME = 60
-USERS_PER_QUERY  = 50
+USERS_PER_QUERY  = 1
 scheduler = sched.scheduler(time.time, time.sleep)
 
 
 def update_hackathons_badges():
     scheduler.enter(UPDATE_HACKATHON_BADGE_SLEEP, 1, update_hackathons_badges)
-    hackathons = requests.get('http://127.0.0.1:5000/v1/api/hackathon?limit=250').json()
+    hackathons = requests.get(badge_util.URL_HACKATHON).json()
     for hackathon in hackathons:
         if hackathon['status'] == "closed":
             badge_util.assign_badges_for_hackathon(
@@ -25,8 +25,7 @@ def update_hackathons_badges():
 # Update tier times for a range of users in the ranking;
 # returns number of users in that range
 def recalculate_tier_time_range(offset, limit):
-    ret = requests.get('http://127.0.0.1:5000/v1/api/leaderboard?'
-        'offset={}&limit={}' .format(offset, limit)).json()
+    ret = requests.get(badge_util.URL_LEADERBOARD.format(offset, limit)).json()
     for user in ret:
         with model.engine.connect() as conn:
             last_user_tier = conn.execute(model.user_tier_history.select()

@@ -10,6 +10,9 @@ import pycountry
 from .. import config, model, util
 
 
+_LOCAL = '127.0.0.1'
+_LOCAL_URL_ROOT = ('http://{}:5000/').format(_LOCAL)
+
 def validate_country(country_code, subdivision_code):
     try:
         country = pycountry.countries.get(alpha_3=country_code)
@@ -80,8 +83,10 @@ def validate_session_cookie(user_id):
 
 
 def validate_request_from_localhost():
-    return (flask.request.remote_addr == "127.0.0.1" and
-            flask.request.url_root == "http://127.0.0.1:5000/")
+    """Check if a request is local - this way we can securely accept
+       api calls requiring admin permissions, without supplying a user"""
+    return (flask.request.remote_addr == _LOCAL and
+            flask.request.url_root == _LOCAL_URL_ROOT)
 
 
 def requires_login(accept_key=False, optional=False, admin=False,
