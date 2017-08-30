@@ -21,7 +21,7 @@
       padding: 5px;
       min-height: 50px;
       @media (min-width: $screen-md-min){
-        padding: 15px 10px;
+        padding: 15px 8px;
       }
       span{
         display: block;
@@ -62,7 +62,61 @@ header.navbar{
 
   .logged-in {
     img {
-      height: 20px;
+      height: 34px;
+    }
+    .profile-container{
+      float: right;
+      padding: 13px 0 0 10px;
+      cursor: pointer;
+      i{
+        color: #FFF;
+        margin-left: 3px;
+      }
+      ul{
+        display: none;
+        margin-top: 15px;
+        position: absolute;
+        transform: translateX(-75px);
+        list-style: none;
+        background-color: #25242f;
+        border-radius: 4px;
+        &:before, &:after{
+          position: absolute;
+          display: inline-block;
+          content: "";
+        }
+        &:before{
+          top: -16px;
+          right: 9px;
+          left: auto;
+          border: 8px solid transparent;
+          border-bottom-color: rgba(27,31,35,0.15);
+        }
+        li{
+          a{
+            color: #9d9d9d;
+            .line-bottom{
+              padding: 0;
+              background-color: #889295;
+              transform: translateX(-3px);
+              opacity: 0;
+            }
+            &:hover{
+              background-color: #25242f;
+              color: #FFF;
+              .line-bottom{
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    ul li a i{
+      background: #30242F;
+      color: #ffbe00;
+      padding: 3px 2px;
+      margin-right: 5px;
     }
   }
 
