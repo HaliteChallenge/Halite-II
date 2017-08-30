@@ -186,7 +186,9 @@ namespace hlt {
 
             for (const auto& ship_pair : player_ships) {
                 const auto& ship = ship_pair.second;
-                if (!ship.is_alive()) continue;
+                if (!ship.is_alive()){
+                    continue;
+                }
 
                 // Need to forecast ship position
                 auto location2 = ship.location;
@@ -204,7 +206,9 @@ namespace hlt {
     auto Map::test_planets(const Location& location, double radius, std::vector<EntityId>& collisions) -> void {
         for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
             const auto& planet = planets[planet_idx];
-            if (!planet.is_alive()) continue;
+            if (!planet.is_alive()){
+                continue;
+            }
 
             if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
                 collisions.push_back(EntityId::for_planet(planet_idx));
@@ -217,7 +221,9 @@ namespace hlt {
                        std::vector<EntityId>& collisions) -> void {
         for (const auto& id : potential) {
             const auto& ship = get_ship(id);
-            if (!ship.is_alive()) continue;
+            if (!ship.is_alive()){
+                continue;
+            }
 
             if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
                 collisions.push_back(id);
@@ -229,7 +235,9 @@ namespace hlt {
                             const std::vector<EntityId>& potential) -> bool {
         for (const auto& id : potential) {
             const auto& ship = get_ship(id);
-            if (!ship.is_alive()) continue;
+            if (!ship.is_alive()){
+                continue;
+            }
 
             if (location.distance2(ship.location) <= std::pow(radius + ship.radius, 2)) {
                 return true;
@@ -242,7 +250,9 @@ namespace hlt {
     auto Map::any_planet_collision(const Location& location, double radius) -> bool {
         for (hlt::EntityIndex planet_idx = 0; planet_idx < planets.size(); planet_idx++) {
             const auto& planet = planets[planet_idx];
-            if (!planet.is_alive()) continue;
+            if (!planet.is_alive()){
+                continue;
+            }
 
             if (location.distance2(planet.location) <= std::pow(radius + planet.radius, 2)) {
                 return true;

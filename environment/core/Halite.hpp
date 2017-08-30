@@ -29,6 +29,7 @@
 #include "../networking/Networking.hpp"
 
 extern bool quiet_output;
+extern bool always_log;
 
 
 typedef std::array<hlt::entity_map<double>, hlt::MAX_PLAYERS> DamageMap;
@@ -60,14 +61,15 @@ private:
     std::vector<unsigned int> kill_count;
     std::vector<unsigned int> damage_dealt;
     std::vector<unsigned int> total_frame_response_times;
-    std::set<unsigned short> timeout_tags;
+    std::set<unsigned short> error_tags;
 
     //Full game
     //! A record of the game state at every turn, used for replays.
     std::vector<hlt::Map> full_frames;
     std::vector<std::vector<std::unique_ptr<Event>>> full_frame_events;
-    std::vector<hlt::MoveQueue> full_player_moves;
+
     std::vector<mapgen::PointOfInterest> points_of_interest;
+    std::vector<hlt::MoveQueue> full_player_moves;
 
     //! Grab the next set of moves from the bots
     auto retrieve_moves(std::vector<bool> alive) -> void;

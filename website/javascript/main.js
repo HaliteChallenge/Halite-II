@@ -9,6 +9,7 @@ import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
+import HaliteTV from './templates/HaliteTV.vue';
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -72,6 +73,12 @@ window.views = {
             render: (h) => h(Visualizer),
         });
     },
+    HaliteTV: function() {
+        new Vue({
+            el: "#halitetv-container",
+            render: (h) => h(HaliteTV, {props: {baseUrl: _global.baseUrl}})
+        });
+    }
 };
 
 api.me().then((me) => {

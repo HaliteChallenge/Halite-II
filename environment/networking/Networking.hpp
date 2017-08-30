@@ -57,6 +57,7 @@ public:
     int player_count();
 
     std::vector<std::string> player_logs;
+    nlohmann::json player_logs_json;
 
 private:
 #ifdef _WIN32

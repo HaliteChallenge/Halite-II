@@ -161,7 +161,7 @@ auto Halite::kill_entity(hlt::EntityId id, double time) -> void {
 
 void Halite::kill_player(hlt::PlayerId player) {
     networking.kill_player(player);
-    timeout_tags.insert(player);
+    error_tags.insert((unsigned short)player);
 
     // Kill player's ships (don't process any side effects)
     for (auto& ship : game_map.ships.at(player)) {
@@ -271,10 +271,14 @@ auto Halite::process_production() -> void {
     for (hlt::EntityIndex planet_idx = 0;
          planet_idx < game_map.planets.size(); planet_idx++) {
         auto& planet = game_map.planets[planet_idx];
-        if (!planet.is_alive() || !planet.owned) continue;
+        if (!planet.is_alive() || !planet.owned){
+            continue;
+        }
 
         const auto num_docked_ships = planet.num_docked_ships(game_map);
-        if (num_docked_ships == 0) continue;
+        if (num_docked_ships == 0){
+            continue;
+        }
 
         const auto& constants = hlt::GameConstants::get();
         const auto base_productivity = constants.BASE_PRODUCTIVITY;
@@ -307,7 +311,9 @@ auto Halite::process_production() -> void {
                     auto location = game_map.location_with_delta(
                         planet.location, offset_x, offset_y);
 
-                    if (!location.second) continue;
+                    if (!location.second){
+                        continue;
+                    }
 
                     const auto distance = location.first.distance(center);
 
@@ -453,14 +459,18 @@ auto Halite::process_moves(std::vector<bool>& alive, int move_no) -> Simultaneou
     SimultaneousDockMap simulataneous_docking;
 
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-        if (!alive[player_id]) continue;
+        if (!alive[player_id]){
+            continue;
+        }
         auto& player_ships = game_map.ships.at(player_id);
 
         for (auto& pair : player_ships) {
             const auto ship_idx = pair.first;
             auto& ship = pair.second;
 
-            if (player_moves[player_id][move_no].count(ship_idx) == 0) continue;
+            if (player_moves[player_id][move_no].count(ship_idx) == 0){
+                continue;
+            }
 
             auto move = player_moves[player_id][move_no][ship_idx];
             switch (move.type) {
@@ -520,7 +530,9 @@ auto Halite::find_living_players() -> std::vector<bool> {
     }
 
     for (const auto& planet : game_map.planets) {
-        if (!planet.is_alive()) continue;
+        if (!planet.is_alive()){
+            continue;
+        }
 
         total_planets++;
         if (planet.owned && !planet.docked_ships.empty()) {
@@ -576,7 +588,9 @@ auto Halite::process_events() -> void {
             // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
                 const auto& planet = game_map.planets[planet_idx];
-                if (!planet.is_alive()) continue;
+                if (!planet.is_alive()){
+                    continue;
+                }
 
                 const auto distance = ship1.location.distance(planet.location);
 
@@ -670,7 +684,9 @@ auto Halite::process_events() -> void {
                     return !game_map.is_valid(ev.id1) || !game_map.is_valid(ev.id2);
                 }),
             simultaneous_events.end());
-        if (simultaneous_events.empty()) continue;
+        if (simultaneous_events.empty()){
+            continue;
+        }
 
         DamageMap damage_map;
         std::unordered_map<hlt::EntityId, int> target_count;
@@ -742,7 +758,9 @@ auto Halite::process_events() -> void {
         };
 
         for (SimulationEvent ev : simultaneous_events) {
-            if (ev.type != SimulationEventType::Attack) continue;
+            if (ev.type != SimulationEventType::Attack){
+                continue;
+            }
 
             update_damage(ev.id1, ev.id2);
             update_damage(ev.id2, ev.id1);
@@ -798,7 +816,9 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
 
         auto damage_others = [&](hlt::PlayerId src_player, double split_damage) {
             for (auto& other_player : planet_entry.second) {
-                if (other_player.first == src_player) continue;
+                if (other_player.first == src_player){
+                    continue;
+                }
 
                 for (auto& other_ship : other_player.second) {
                     damage_map[other_player.first][other_ship.entity_index()] += split_damage;
@@ -816,7 +836,9 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
             const auto total_enemies = total - player_entry.second.size();
             const auto split_damage = ((double) damage) / total_enemies;
             for (const auto& ship_id : player_entry.second) {
-                if (!game_map.is_valid(ship_id)) continue;
+                if (!game_map.is_valid(ship_id)){
+                    continue;
+                }
 
                 auto& ship = game_map.get_ship(ship_id);
                 if (!ship.is_alive() || ship.weapon_cooldown != 0) {
@@ -847,7 +869,7 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
 }
 
 std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
-    //Update alive frame counts
+    // Update alive frame counts
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++)
         if (alive[player_id]) alive_frame_count[player_id]++;
 
@@ -873,6 +895,57 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
     // Save map for the replay
     full_frames.push_back(hlt::Map(game_map));
 
+    // Log game state for the turn
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        if (!alive[player_id] || error_tags.find(player_id) != error_tags.end()) {
+            continue;
+        }
+
+        auto &player_ships = game_map.ships.at(player_id);
+        auto &planets = game_map.planets;
+
+        nlohmann::json ships_json;
+        nlohmann::json commands_json;
+        nlohmann::json planets_json;
+
+        for (auto &ship : player_ships) {
+            ships_json += ship.second.output_json(player_id, ship.first);
+        }
+
+        unsigned short planet_count = 0;
+
+        for (auto &planet : planets) {
+            if (planet.owned && planet.owner == player_id && planet.is_alive()) {
+                planet_count++;
+            }
+        }
+
+        for (hlt::EntityIndex planet_idx = 0;
+            planet_idx < planets.size(); planet_idx++) {
+            auto planet = planets[planet_idx];
+            if (planet.owned && planet.owner == player_id && planet.is_alive()) {
+                planets_json += planet.output_json(planet_idx);
+            }
+        }
+
+        for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
+            for (auto &pair : player_ships) {
+                const auto ship_idx = pair.first;
+                auto &ship = pair.second;
+                if (player_moves[player_id][move_no].count(ship_idx) == 0){
+                    continue;
+                }
+                auto move = player_moves[player_id][move_no][ship_idx];
+                commands_json += move.output_json(player_id, move_no);
+            }
+        }
+
+        networking.player_logs_json[player_id]["Frames"].back()["Turn"] = turn_number;
+        networking.player_logs_json[player_id]["Frames"].back()["Ships"] = ships_json;
+        networking.player_logs_json[player_id]["Frames"].back()["Planets"] = planets_json;
+        networking.player_logs_json[player_id]["Frames"].back()["Commands"] = commands_json;
+    }
+
     // Check if the game is over
     return find_living_players();
 }
@@ -888,6 +961,15 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // For rankings
     std::vector<bool> living_players(number_of_players, true);
     std::vector<hlt::PlayerId> rankings;
+
+    // Game state logs for each player
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        nlohmann::json playerJson;
+        playerJson["Frames"] = nlohmann::json::array();
+        playerJson["Error"] = nlohmann::json::object();
+        networking.player_logs_json += playerJson;
+
+    }
 
     // Send initial package
     std::vector<std::future<int> > initThreads(number_of_players);
@@ -929,9 +1011,10 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // Sort ranking by number of ships, using total ship health to break ties.
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
+
     while (!game_complete()) {
         turn_number++;
-        if (!quiet_output) std::cout << "Turn " << turn_number << "\n";
+        if (!quiet_output) std::cout << "Turn " << turn_number << std::endl;
 
         // Frame logic.
         auto new_living_players = process_next_frame(living_players);
@@ -980,8 +1063,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         p.damage_dealt = damage_dealt[player_id];
         stats.player_statistics.push_back(p);
     }
-    stats.timeout_tags = timeout_tags;
-    stats.timeout_log_filenames = std::vector<std::string>(timeout_tags.size());
+    stats.error_tags = error_tags;
 
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
@@ -993,7 +1075,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         // Don't bother writing the replay if someone errored right away,
         // except if verbose output is disabled, in which case the game
         // coordinator would still like the info.
-        if (turn_number <= 1 && !quiet_output && timeout_tags.size() > 0) {
+        if (turn_number <= 1 && !quiet_output && error_tags.size() > 0) {
             std::cout << "Skipping replay (bot errored on first turn).\n";
         }
         else {
@@ -1022,19 +1104,23 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     }
 
     // Output logs for players that timed out or errored.
-    int timeoutIndex = 0;
-    auto error_logs = nlohmann::json::object();
-    for (auto a = timeout_tags.begin(); a != timeout_tags.end(); a++) {
-        auto timeout_log_filename =
-            std::to_string(*a) + '-' + std::to_string(id) + ".log";
-        stats.timeout_log_filenames[timeoutIndex] = timeout_log_filename;
-        error_logs[std::to_string((int) *a)] = timeout_log_filename;
-        std::ofstream file(stats.timeout_log_filenames[timeoutIndex],
+    auto logs = nlohmann::json::object();
+
+    for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+        if (!always_log && error_tags.find(player_id) == error_tags.end()) {
+            continue;
+        }
+
+        auto log_filename =
+            std::to_string(player_id) + '-' + std::to_string(id) + ".log";
+
+        stats.log_filenames.push_back(log_filename);
+        logs[std::to_string((int) player_id)] = log_filename;
+        std::ofstream file(log_filename,
                            std::ios_base::binary);
-        file << networking.player_logs[*a];
+        file << networking.player_logs_json.dump(1) << std::endl;
         file.flush();
         file.close();
-        timeoutIndex++;
     }
 
     if (quiet_output) {
@@ -1046,7 +1132,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         results["map_width"] = game_map.map_width;
         results["map_height"] = game_map.map_height;
         results["gameplay_parameters"] = hlt::GameConstants::get().to_json();
-        results["error_logs"] = error_logs;
+        results["error_logs"] = logs;
         results["stats"] = stats;
 
         std::cout << results.dump(4) << std::endl;
@@ -1075,7 +1161,7 @@ Halite::Halite(unsigned short width_,
     if (!quiet_output) {
         std::cout
             << "Seed: " << seed_
-            << " Dimensions: " << width_ << 'x' << height_ << '\n';
+            << " Dimensions: " << width_ << 'x' << height_ << std::endl;
     }
 
     auto generator = mapgen::SolarSystem(seed_);
@@ -1104,7 +1190,7 @@ Halite::Halite(unsigned short width_,
     kill_count = std::vector<unsigned int>(number_of_players);
     damage_dealt = std::vector<unsigned int>(number_of_players);
     total_frame_response_times = std::vector<unsigned int>(number_of_players);
-    timeout_tags = std::set<unsigned short>();
+    error_tags = std::set<unsigned short>();
 }
 
 Halite::~Halite() {

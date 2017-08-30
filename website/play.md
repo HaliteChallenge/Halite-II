@@ -6,6 +6,7 @@ full_width: true
 menu: play
 mount_views: ["Visualizer", "Upload"]
 additional_js: ["gif", "RecordRTC.min"]
+permalink: /play-programming-challenge
 ---
 
 <div class="row">
