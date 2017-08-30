@@ -1,5 +1,5 @@
 """
-Match API endpoints - list matches and get replays/error logs
+Match API endpoints - list matches and get replays/error logs.
 """
 
 import flask
@@ -18,7 +18,6 @@ def get_match_helper(match_id):
     :param match_id: The ID of the match.
     :return: A dictionary with the game information.
     """
-
     with model.engine.connect() as conn:
         query = conn.execute(sqlalchemy.sql.select([
             model.game_participants.c.user_id,
@@ -57,6 +56,13 @@ def get_match_helper(match_id):
                 "timed_out": bool(row["timed_out"]),
             }
 
+        # Update game_view_stat table
+        conn.execute(model.game_view_stats.update().where(
+            model.game_view_stats.c.game_id == match_id
+        ).values(
+            views_total=model.game_view_stats.c.views_total + 1,
+        ))
+
     return result
 
 
@@ -83,12 +89,24 @@ def list_matches_helper(offset, limit, participant_clause,
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
+            model.game_stats.c.turns_total,
+            model.game_stats.c.planets_destroyed,
+            model.game_stats.c.ships_produced,
+            model.game_stats.c.ships_destroyed,
         ]).select_from(model.games.join(
             model.game_participants,
             (model.games.c.id == model.game_participants.c.game_id) &
             participant_clause,
-            )
-        ).where(
+        ).join(
+            model.game_stats,
+            (model.games.c.id == model.game_stats.c.game_id)
+        ).join(
+            model.game_bot_stats,
+            (model.games.c.id == model.game_bot_stats.c.game_id)
+        ).join(
+            model.game_view_stats,
+            (model.games.c.id == model.game_view_stats.c.game_id)
+        )).where(
             where_clause
         ).order_by(
             *order_clause
@@ -110,6 +128,10 @@ def list_matches_helper(offset, limit, participant_clause,
                 "map_height": match["map_height"],
                 "replay": match["replay_name"],
                 "time_played": match["time_played"],
+                "turns_total": match["turns_total"],
+                "planets_destroyed": match["planets_destroyed"],
+                "ships_produced": match["ships_produced"],
+                "ships_destroyed": match["ships_destroyed"],
                 "players": {},
             }
 
@@ -133,6 +155,11 @@ def list_matches():
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({
         "game_id": model.games.c.id,
         "time_played": model.games.c.time_played,
+        "views_total": model.game_view_stats.c.views_total,
+        "turns_total": model.game_stats.c.turns_total,
+        "planets_destroyed": model.game_stats.c.planets_destroyed,
+        "ships_produced": model.game_stats.c.ships_produced,
+        "ships_destroyed": model.game_stats.c.ships_destroyed,
     }, ["timed_out"])
 
     participant_clause = sqlalchemy.true()
