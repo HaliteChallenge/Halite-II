@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-import arrow
 
 # General coordinator settings
 COMPETITION_OPEN = True
@@ -18,44 +17,44 @@ COMPILATION_STUCK_THRESHOLD = 30
 # Max size of an upload, in bytes
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
 # Secret key for Flask session cookies
-FLASK_SECRET_KEY = "0ccd512f8c3493797a23557c32db38e7d51ed74f14fa7580"
+FLASK_SECRET_KEY = ""
 # Where to look for API keys
 API_KEY_HEADER = "X-Api-Key"
 # What session cookie to use
 SESSION_COOKIE = "user_id"
 
 # Google Cloud
-GCLOUD_PROJECT = 'test-hlt'
-GCLOUD_PROJECT_ID = 'test-hlt'
-GCLOUD_ZONE = 'us-east1-b'
+GCLOUD_PROJECT = 'TODO'
+GCLOUD_PROJECT_ID = 'TODO'
+GCLOUD_ZONE = 'us-central1-c'
 
-GCLOUD_COMPILATION_BUCKET = 'halite-2-compiled-bots-georgi'
-GCLOUD_BOT_BUCKET = 'halite-2-uploaded-bots-georgi'
+GCLOUD_COMPILATION_BUCKET = 'TODO'
+GCLOUD_BOT_BUCKET = 'TODO'
 # Replays are saved in different buckets based on player level
 GCLOUD_REPLAY_BUCKETS = {
     # 0 is the normal bucket
-    0: 'halite-2-uploaded-bots-georgi',
+    0: 'todo',
     # 1 is the bucket for gold and above players
-    1: 'halite-2-gold-replays-georgi',
+    1: 'todo',
 }
-GCLOUD_ERROR_LOG_BUCKET = 'halite-2-error-logs-georgi'
-GCLOUD_DEPLOYED_ARTIFACTS_BUCKET = 'halite-2-deployed-artifacts-georgi'
+GCLOUD_ERROR_LOG_BUCKET = 'TODO'
+GCLOUD_DEPLOYED_ARTIFACTS_BUCKET = 'TODO'
 
 # The name of the worker source blob in the object storage bucket.
 WORKER_ARTIFACT_KEY = ""
 
-DATABASE_PROJECT_ID = "test-hlt"
-DATABASE_REGION = "us-east1-b"
-DATABASE_INSTANCE_NAME = "instance-mysql"
-DATABASE_URL = "mysql+pymysql://root:23212823@localhost:3307/halite2"
+DATABASE_PROJECT_ID = ""
+DATABASE_REGION = ""
+DATABASE_INSTANCE_NAME = ""
+DATABASE_URL = ""
 
 # OAuth
-OAUTH_GITHUB_CONSUMER_KEY = "ca22534a3f5ab901760c"
-OAUTH_GITHUB_CONSUMER_SECRET = "6c95dadd66857b9bb4f122d6e5d9ada713485fb4"
+OAUTH_GITHUB_CONSUMER_KEY = ""
+OAUTH_GITHUB_CONSUMER_SECRET = ""
 
 # CORS setup
-SITE_URL = "http://localhost:4000"
-API_URL = "http:/35.201.100.217"
+SITE_URL = ""
+API_URL = ""
 CORS_ORIGINS = [SITE_URL]
 
 # API Key authentication
@@ -94,20 +93,3 @@ GPU_TIER_NAME = TIER_2_NAME
 
 # What tier a player must be in to be eligible to participate in the finals
 FINALS_TIER_NAME = TIER_2_NAME
-
-# Expected end date of the Halite competition
-HALITE_END = arrow.get('2017-10-25T21:00:00')
-
-# Badge_id for default badges
-REGISTER_BADGE = 1
-SUBMISSION_1_BADGE = 2
-SUBMISSION_10_BADGE= 3
-SUBMISSION_20_BADGE= 4
-SUBMISSION_50_BADGE = 5;
-# TIER BADGES
-TIER_0_BADGE = 6
-TIER_1_BADGE = 7
-TIER_2_BADGE = 8
-TIER_3_BADGE = 9
-TIER_4_BADGE = 10
-

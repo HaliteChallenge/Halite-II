@@ -5,9 +5,9 @@ import time
 import sqlalchemy
 import arrow
 
-UPDATE_HACKATHON_BADGE_SLEEP = 12 
-UPDATE_TIER_TIME = 6
-USERS_PER_QUERY  = 1
+UPDATE_HACKATHON_BADGE_SLEEP = 120
+UPDATE_TIER_TIME = 60
+USERS_PER_QUERY  = 50
 scheduler = sched.scheduler(time.time, time.sleep)
 
 
@@ -16,11 +16,14 @@ def update_hackathons_badges():
     hackathons = requests.get('http://127.0.0.1:5000/v1/api/hackathon?limit=250').json()
     for hackathon in hackathons:
         if hackathon['status'] == "closed":
-            badge_util.assign_badges_for_hackathon(hackathon['hackathon_id'])
+            badge_util.assign_badges_for_hackathon(
+                hackathon['hackathon_id'],
+                hackathon['title']
+            )
+
 
 # Update tier times for a range of users in the ranking;
 # returns number of users in that range
-
 def recalculate_tier_time_range(offset, limit):
     ret = requests.get('http://127.0.0.1:5000/v1/api/leaderboard?'
         'offset={}&limit={}' .format(offset, limit)).json()
@@ -43,7 +46,7 @@ def recalculate_tier_time_range(offset, limit):
                             sqlalchemy.sql.func.now(),
                             model.user_tier_history.c.last_in_tier,
                 )))
-            
+ 
             # Update last time stamp for tier
             rc = conn.execute(model.user_tier_history.update().where(
                 sqlalchemy.and_(

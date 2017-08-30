@@ -6,46 +6,39 @@ from . import config, model
 HACK_FIRST = "First"
 HACK_SECOND = "Second"
 HACK_THIRD = "Third"
-TIERS = [config.TIER_0_NAME, config.TIER_1_NAME, config.TIER_2_NAME, 
+
+TIERS = [config.TIER_0_NAME, config.TIER_1_NAME, config.TIER_2_NAME,
          config.TIER_3_NAME, config.TIER_4_NAME]
 
 def get_temp_tier_badge_name(tier_name):
     return config.TIER_TEMP_BADGE.format(tier_name)
 
 
-def assign_place_badge(hackathon_id, badge_type, user_id):
-    badge = None
-    with model.engine.connect() as conn:
-        badge = conn.execute(model.badge.select().where(
-            model.badge.c.family_id == get_hackathon_badge_family_id(
-                hackathon_id, badge_type)
-            )).first()
-    if badge:
-        add_badge_if_not_exist(user_id, badge['id'])
-
-
-def assign_badges_for_hackathon(hackathon_id):
+def assign_badges_for_hackathon(hackathon_id, hackathon_name):
     badges = None
     ret = requests.get('http://127.0.0.1:5000/v1/api/hackathon/{}/leaderboard?'
         'limit=3'.format(hackathon_id)).json()
     if len(ret) > 0:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=HACK_FIRST,
-            user_id=ret[0]['user_id'],
-        )
+        add_badge_if_not_exist(
+                ret[0]['user_id'],
+                translate_name_to_badge_id(
+                    get_hackathon_badge_name(hackathon_name, HACK_FIRST),
+                    add_if_not_exist=True,
+                ))
     if len(ret) > 1:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=HACK_SECOND,
-            user_id=ret[1]['user_id'],
-        )
+        add_badge_if_not_exist(
+                ret[1]['user_id'],
+                translate_name_to_badge_id(
+                    get_hackathon_badge_name(hackathon_name, HACK_SECOND),
+                    add_if_not_exist=True,
+                ))
     if len(ret) > 2:
-        assign_place_badge(
-            hackathon_id,
-            badge_type=HACK_THIRD,
-            user_id=ret[2]['user_id'],
-        )
+        add_badge_if_not_exist(
+                ret[2]['user_id'],
+                translate_name_to_badge_id(
+                    get_hackathon_badge_name(hackathon_name, HACK_THIRD),
+                    add_if_not_exist=True,
+                ))
 
 
 def add_badge_if_not_exist(user_id, badge_id):
@@ -103,37 +96,26 @@ def init_hackathon_badges(hackathon_title, hackathon_id):
                 "url": "http://127.0.0.1:5000/v1/api/badge",
                 "json": {
                     "name": get_hackathon_badge_name(hackathon_title, badge_type),
-                    "family": "hackathon",
-                    "family_id": 
-                        get_hackathon_badge_family_id(hackathon_id, badge_type),
                 }})).start()
 
 
-def get_hackathon_badge_family_id(hackathon_id, badge_type):
-    return "{}_{}".format(hackathon_id, badge_type)
-
 def get_hackathon_badge_name(hackathon_title, badge_type):
-    return "{} {} Place".format(hackathon_title, badge_type)
+    return config.HACKATHON_RANK_BADGE.format(hackathon_title, badge_type)
 
 
-def __update_hackathon_badge(hackathon_title, hackathon_id, badge_type):
-    resp = requests.get(url="http://127.0.0.1:5000/v1/api/badge").json()
-    for badge in resp:
-        if badge['family_id'] == \
-            get_hackathon_badge_family_id(hackathon_id, badge_type):
-            requests.put(
-                url="http://127.0.0.1:5000/v1/api/badge/{}"
-                    .format(badge['id']),
-                json = {
-                    "name":get_hackathon_badge_name(hackathon_title, badge_type)
-                })
+def __update_hackathon_badge(new_hackathon_title, old_hackathon_title, badge_type):
+    with model.engine.connext() as conn:
+        conn.execute(model.badge.update().where(
+            sqlalchemy.sql.func.lower(model.badge.c.name) ==
+            get_hackathon_badge_name(old_hackathon_title, badge_type)
+        ).values(name=get_hackathon_badge_name(new_hackathon_title, badge_type)))
 
 
 def update_hackathon_badges(new_hackathon_title, hackathon_id):
     for badge_type in [HACK_FIRST, HACK_SECOND, HACK_THIRD]:
         threading.Thread(
             target=__update_hackathon_badge,
-            args=(new_hackathon_title, hackathon_id, badge_type),
+            args=(new_hackathon_title, old_hackathon_title, badge_type),
         ).start()
 
 
@@ -149,7 +131,7 @@ def replace_temp_tier_badge(user_id, tier_name):
             continue
         requests.delete('http://127.0.0.1:5000/v1/api/user/{}/badge/{}'
                 .format(
-                    user_id, 
+                    user_id,
                     translate_name_to_badge_id(
                         get_temp_tier_badge_name(tier),
                         add_if_not_exist=True
