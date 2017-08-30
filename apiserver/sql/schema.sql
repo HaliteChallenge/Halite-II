@@ -3,8 +3,8 @@ USE halite2;
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   organization_name VARCHAR(64) NOT NULL,
-  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other',
-  verification_code VARCHAR(32) UNIQUE
+  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other'
+  verification_code VARCHAR(32) UNIQUE,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE organization_email_domain (
@@ -84,6 +84,16 @@ CREATE TABLE game_participant (
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
   PRIMARY KEY (game_id, user_id, bot_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra table to store number of views of each game
+
+CREATE TABLE game_view_stat (
+  game_id INT UNSIGNED NOT NULL,
+  views_total INT UNSIGNED NOT NULL,
+  last_viewed DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Extra stats for each game
