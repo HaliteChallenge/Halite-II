@@ -14,6 +14,7 @@ from .. import config, model, notify, util
 from .blueprint import coordinator_api
 from .compilation import serve_compilation_task, reset_compilation_tasks
 from .matchmaking import serve_game_task
+from .player_stat import PlayerStat
 
 
 @coordinator_api.route("/task")
@@ -259,27 +260,28 @@ def store_game_stats(game_output, game_id, users):
     with model.engine.connect() as conn:
         conn.execute(model.game_stats.insert().values(
             game_id=game_id,
-            turns_total=stats['turns_total'],
-            planets_destroyed=stats['planets_destroyed'],
-            ships_produced=stats['ships_produced'],
-            ships_destroyed=stats['ships_destroyed']
+            turns_total=stats["turns_total"],
+            planets_destroyed=stats["planets_destroyed"],
+            ships_produced=stats["ships_produced"],
+            ships_destroyed=stats["ships_destroyed"]
         ))
 
         # Use player_tag to get the correct user_id from replay
         for user in users:
-            player_tag = user['player_tag']
-            conn.execute(model.game_bot_stats.insert().values(
-                game_id=game_id,
-                user_id=user["user_id"],
-                bot_id=user["bot_id"],
-                planets_controlled=stats['players'][player_tag]['planets_controlled'],
-                ships_produced=stats['players'][player_tag]['ships_produced'],
-                ships_alive=stats['players'][player_tag]['ships_alive'],
-                ships_alive_ratio=stats['players'][player_tag]['ships_alive_ratio'],
-                ships_relative_ratio=stats['players'][player_tag]['ships_relative_ratio'],
-                planets_destroyed=stats['players'][player_tag]['planets_destroyed'],
-                attacks_total=stats['players'][player_tag]['attacks_total']
-            ))
+            player_tag = user["player_tag"]
+            if player_tag in stats['players']:
+                conn.execute(model.game_bot_stats.insert().values(
+                    game_id=game_id,
+                    user_id=user["user_id"],
+                    bot_id=user["bot_id"],
+                    planets_controlled=stats['players'][player_tag].planets_controlled,
+                    ships_produced=stats['players'][player_tag].ships_produced,
+                    ships_alive=stats['players'][player_tag].ships_alive,
+                    ships_alive_ratio=stats['players'][player_tag].ships_alive_ratio,
+                    ships_relative_ratio=stats['players'][player_tag].ships_relative_ratio,
+                    planets_destroyed=stats['players'][player_tag].planets_destroyed,
+                    attacks_total=stats['players'][player_tag].attacks_total
+                ))
 
 
 def decode_replay(replay_file_obj):
@@ -321,15 +323,7 @@ def parse_replay(replay):
 
     for player_tag in range(replay['num_players']):
         # Init player stats
-        stats['players'][player_tag] = {
-            'planets_controlled': 0,
-            'ships_produced': 0,
-            'ships_alive': 0,
-            'ships_alive_ratio': 0.0,
-            'ships_relative_ratio': 0.0,
-            'planets_destroyed': 0,
-            'attacks_total': 0
-        }
+        stats['players'][player_tag] = PlayerStat()
 
     if replay is None:
         return stats
@@ -337,28 +331,29 @@ def parse_replay(replay):
     stats['turns_total'] = len(replay['frames']) - 1
     for frame in replay['frames']:
         for event in frame.get('events', []):
+            player_tag = event['entity'].get('owner')
             if event['event'] == 'spawned':
                 stats['ships_produced'] += 1
-                stats['players'][event['entity']['owner']]['ships_produced'] += 1
+                stats['players'][player_tag].ships_produced += 1
             elif event['event'] == 'destroyed':
                 if event['entity']['type'] == 'ship':
                     stats['ships_destroyed'] += 1
                 elif event['entity']['type'] == 'planet':
                     stats['planets_destroyed'] += 1
-                    stats['players'][event['entity']['owner']]['planets_destroyed'] += 1
+                    stats['players'][player_tag].planets_destroyed += 1
             elif event['event'] == 'attack':
-                stats['players'][event['entity']['owner']]['attacks_total'] += 1
+                stats['players'][player_tag].attacks_total += 1
 
     ships_alive_total = sum([len(ships) for ships in replay['frames'][-1]['ships'].values()])
     for player_tag in stats['players'].keys():
-        stats['players'][player_tag]['ships_alive'] = len(replay['frames'][-1]['ships'][str(player_tag)])
+        stats['players'][player_tag].ships_alive = len(replay['frames'][-1]['ships'][str(player_tag)])
         # use max(1.0, ...) to avoid ZeroDivisionError
-        stats['players'][player_tag]['ships_alive_ratio'] = 1.0 * stats['players'][player_tag]['ships_alive'] / max(1.0, stats['players'][player_tag]['ships_produced'])
-        stats['players'][player_tag]['ships_relative_ratio'] = 1.0 * stats['players'][player_tag]['ships_alive'] / max(1.0, ships_alive_total)
+        stats['players'][player_tag].ships_alive_ratio = 1.0 * stats['players'][player_tag].ships_alive / max(1.0, stats['players'][player_tag].ships_produced)
+        stats['players'][player_tag].ships_relative_ratio = 1.0 * stats['players'][player_tag].ships_alive / max(1.0, ships_alive_total)
 
     for planet in replay['frames'][-1]['planets'].values():
         if planet['owner'] is not None:
-            stats['players'][planet['owner']]['planets_controlled'] += 1
+            stats['players'][planet['owner']].planets_controlled += 1
 
     return stats
 
