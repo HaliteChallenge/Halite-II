@@ -998,8 +998,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         for (const auto a : *names_) player_names.push_back(a.substr(0, 30));
     }
 
-    const int max_turn_number = std::min(
-        300, 100 + (int) (sqrt(game_map.map_width * game_map.map_height)));
+    const auto& constants = hlt::GameConstants::get();
+    const unsigned int max_turn_number = std::min(
+        constants.MAX_TURNS, 100U + (int) (sqrt(game_map.map_width * game_map.map_height)));
 
     auto game_complete = [&]() -> bool {
         const auto num_living_players = std::count(living_players.begin(), living_players.end(), true);
