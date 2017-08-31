@@ -12,7 +12,7 @@ while [ ! -f ./Halite.tgz ]; do
 done
 
 tar -xzf Halite.tgz
-cd Halite-II/
+cd Halite/
 sudo cp -rf website/_site/* /var/www/html/
 echo $(datetime) > ~/_SUCCESS
 EOF
