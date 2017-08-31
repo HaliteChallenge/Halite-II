@@ -1,0 +1,132 @@
+html{
+  background-image: url("/assets/images/site_bg.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+body{
+  font-family: $font-body;
+  background-color: transparent;
+  color: #ECFFFB;
+
+  > .body {
+    margin-top: 61px;
+  }
+}
+
+.nav{
+  font-family: $font-heading;
+}
+
+.container{
+  @media (min-width: $screen-md-min) and (max-width: $screen-md-max){
+    width: 100%;
+  }
+}
+
+.page-header {
+  margin-top: 0px;
+}
+
+input:focus{
+  outline: none;
+  box-shadow: none;
+}
+
+.xline{
+  @include line();
+  &-top{
+    @include line-top();
+  }
+  &-bottom{
+    @include line-bottom();
+  }
+}
+
+.bt{
+  border-top: 1px solid #889295;
+}
+.bb{
+  border-bottom: 1px solid #889295; 
+}
+.bl{
+  border-left: 1px solid #889295; 
+}
+.br{
+  border-right: 1px solid #889295; 
+}
+
+.dot-tl{
+  @include corner-dot();  
+  top: -2.5px;
+  left: -2.5px;
+}
+.dot-tr{
+  @include corner-dot();
+  top: -2.5px;
+  right: -2.5px;
+}
+.dot-bl{
+  @include corner-dot();
+  bottom: -1.5px;
+  left: -2.5px;
+}
+.dot-br{
+  @include corner-dot();
+  bottom: -1.5px;
+  right: -2.5px;
+}
+
+.xline-container{
+  .xline{
+    width: 100%;
+  }
+}
+
+.bg-player-1, .bg-1{
+  background-color: $player-1;
+}
+.bg-player-2, .bg-2{
+  background-color: $player-2;
+}
+.bg-player-3, .bg-3{
+  background-color: $player-3;
+}
+.bg-player-4, .bg-4{
+  background-color: $player-4;
+}
+.color-1{
+  color: $player-1;
+}
+.color-2{
+  color: $player-2;
+}
+.color-3{
+  color: $player-3;
+}
+.color-4{
+  color: $player-4;
+}
+.dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  line-height: 14px;
+}
+
+.message-box{
+  text-align: center;
+  p{
+    margin-bottom: 0;
+  }
+  p+p{
+    margin-bottom: 10px
+  }
+}
+.sidebar{
+  .message-box{
+    max-width: 240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

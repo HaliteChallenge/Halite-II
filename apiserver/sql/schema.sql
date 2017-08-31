@@ -3,8 +3,8 @@ USE halite2;
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   organization_name VARCHAR(64) NOT NULL,
-  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other'
-  verification_code VARCHAR(32) UNIQUE,
+  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other',
+  verification_code VARCHAR(32) UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE organization_email_domain (
@@ -80,6 +80,46 @@ CREATE TABLE game_participant (
   rank INT UNSIGNED NOT NULL,
   player_index MEDIUMINT(8) UNSIGNED NOT NULL,
   timed_out BOOL NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  PRIMARY KEY (game_id, user_id, bot_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra table to store number of views of each game
+
+CREATE TABLE game_view_stat (
+  game_id INT UNSIGNED NOT NULL,
+  views_total INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra stats for each game
+
+CREATE TABLE game_stat (
+  game_id INT UNSIGNED NOT NULL,
+  turns_total INT UNSIGNED NOT NULL,
+  planets_destroyed INT UNSIGNED NOT NULL,
+  ships_produced INT UNSIGNED NOT NULL,
+  ships_destroyed INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra stats for each game, at bot level
+
+CREATE TABLE game_bot_stat (
+  game_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  bot_id INT UNSIGNED NOT NULL,
+  planets_controlled INT UNSIGNED NOT NULL,
+  ships_produced INT UNSIGNED NOT NULL,
+  ships_alive INT UNSIGNED NOT NULL,
+  ships_alive_ratio FLOAT NOT NULL,
+  ships_relative_ratio FLOAT NOT NULL,
+  planets_destroyed INT UNSIGNED NOT NULL,
+  attacks_total INT UNSIGNED NOT NULL,
   FOREIGN KEY (game_id) REFERENCES game(id),
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),

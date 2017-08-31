@@ -111,7 +111,7 @@ public class GameMap {
     }
 
     /// <summary>
-    /// Checks if a co-ordinate is out of bounds
+    /// Checks if a co-ordinate is out of bounds of the game map
     /// </summary>
     /// <param name="x">X position</param>
     /// <param name="y">Y position</param>
@@ -127,15 +127,10 @@ public class GameMap {
     /// <param name="b"></param>
     /// <returns></returns>
     public List<Entity> GetObstaclesBetween (Ship ship, Position target) {
-        List<Entity> obstacles = new List<Entity> ();
+        var obstacles = new List<Entity> ();
         foreach (var planet in planets) {
             if (Collision.IntersectSegmentCircle (ship, target, planet, Constants.ShipRadius + 0.1))
                 obstacles.Add (planet);
-        }
-
-        foreach (var shipEntity in ships) {
-            if (Collision.IntersectSegmentCircle (ship, target, shipEntity, Constants.ShipRadius + 0.1))
-                obstacles.Add (ship);
         }
 
         return obstacles;

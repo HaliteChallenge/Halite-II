@@ -8,7 +8,6 @@
 
 std::mutex coutMutex;
 
-
 std::string serializeMapSize(const hlt::Map& map) {
     std::string returnString = "";
     std::ostringstream oss;
@@ -128,6 +127,7 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
     if (position != inputString.end()) {
         const auto index = std::distance(inputString.begin(), position);
         std::string message("Received invalid character '");
+        message += inputString;
         message += *position;
         message += "'.";
         throw BotInputError(player_tag, inputString, message, index);
@@ -194,7 +194,7 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
 
 void Networking::send_string(hlt::PlayerId player_tag,
                              std::string& sendString) {
-    //End message with newline character
+    // End message with newline character
     sendString += '\n';
 
 #ifdef _WIN32
@@ -247,13 +247,13 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
     bool success;
     char buffer;
 
-    //Keep reading char by char until a newline
+    // Keep reading char by char until a newline
     while(true) {
         timeoutMillisRemaining = timeout_millis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
         if(timeoutMillisRemaining < 0) throw newString;
-        //Check to see that there are bytes in the pipe before reading
-        //Throw error if no bytes in alloted time
-        //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
+        // Check to see that there are bytes in the pipe before reading
+        // Throw error if no bytes in alloted time
+        // Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
         DWORD bytesAvailable = 0;
         PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
         if(bytesAvailable < 1) {
@@ -286,10 +286,10 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
     char buffer;
 
-    //Keep reading char by char until a newline
+    // Keep reading char by char until a newline
     while (true) {
 
-        //Check if there are bytes in the pipe
+        // Check if there are bytes in the pipe
         timeoutMillisRemaining = timeout_millis
             - std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - tp).count();
@@ -315,7 +315,7 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
         }
     }
 #endif
-    //Python turns \n into \r\n
+    // Python turns \n into \r\n
     if (newString.back() == '\r') newString.pop_back();
 
     return newString;
@@ -333,21 +333,21 @@ void Networking::launch_bot(std::string command) {
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    //Child stdout pipe
+    // Child stdout pipe
     if(!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
         if(!quiet_output) std::cout << "Could not create pipe\n";
         throw 1;
     }
     if(!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-    //Child stdin pipe
+    // Child stdin pipe
     if(!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
         if(!quiet_output) std::cout << "Could not create pipe\n";
         throw 1;
     }
     if(!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-    //MAKE SURE THIS MEMORY IS ERASED
+    // MAKE SURE THIS MEMORY IS ERASED
     PROCESS_INFORMATION piProcInfo;
     ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
 
@@ -359,21 +359,21 @@ void Networking::launch_bot(std::string command) {
     siStartInfo.hStdInput = childConnection.read;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-    //C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
-    //C:/Users/Michael/Anaconda3/python.exe
-    //C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
+    // C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
+    // C:/Users/Michael/Anaconda3/python.exe
+    // C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
     bool success = CreateProcess(
         "C:\\windows\\system32\\cmd.exe",
-        LPSTR(command.c_str()),     //command line
-        NULL,          //process security attributes
-        NULL,          //primary thread security attributes
-        TRUE,          //handles are inherited
-        0,             //creation flags
-        NULL,          //use parent's environment
-        NULL,          //use parent's current directory
-        &siStartInfo,  //STARTUPINFO pointer
+        LPSTR(command.c_str()),     // command line
+        NULL,          // process security attributes
+        NULL,          // primary thread security attributes
+        TRUE,          // handles are inherited
+        0,             // creation flags
+        NULL,          // use parent's environment
+        NULL,          // use parent's current directory
+        &siStartInfo,  // STARTUPINFO pointer
         &piProcInfo
-    );  //receives PROCESS_INFORMATION
+    ); // receives PROCESS_INFORMATION
     if(!success) {
         if(!quiet_output) std::cout << "Could not start process\n";
         throw 1;
@@ -388,7 +388,7 @@ void Networking::launch_bot(std::string command) {
 
 #else
 
-    if (!quiet_output) std::cout << command << "\n";
+    if (!quiet_output) std::cout << command << std::endl;
 
     pid_t pid;
     int writePipe[2];
@@ -408,9 +408,9 @@ void Networking::launch_bot(std::string command) {
 
     pid_t ppid_before_fork = getpid();
 
-    //Fork a child process
+    // Fork a child process
     pid = fork();
-    if (pid == 0) { //This is the child
+    if (pid == 0) { // This is the child
         setpgid(getpid(), getpid());
 
 #ifdef __linux__
@@ -460,6 +460,7 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 30000;
 
     std::string response;
+    nlohmann::json init_log_json;
     try {
         std::string playerTagString = std::to_string(player_tag),
             mapSizeString = serializeMapSize(m), mapString = serialize_map(m);
@@ -471,8 +472,6 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                 + ".\n";
         if (!quiet_output) std::cout << outMessage;
 
-        player_logs[player_tag] += " --- Init ---\n";
-
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
         response = get_string(player_tag, ALLOTTED_MILLIS);
@@ -481,9 +480,8 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[player_tag] +=
-            response + "\n --- Bot used " + std::to_string(millisTaken)
-                + " milliseconds ---";
+        init_log_json["Time"] = millisTaken;
+        init_log_json["Turn"] = 0;
 
         *playerName = response.substr(0, 30);
         if (!quiet_output) {
@@ -492,6 +490,10 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             std::cout << inMessage;
         }
 
+        player_logs_json[player_tag]["Frames"] += init_log_json;
+        player_logs_json[player_tag]["PlayerID"] = player_tag;
+        player_logs_json[player_tag]["PlayerName"] = *playerName;
+
         return millisTaken;
     }
     catch (BotInputError err) {
@@ -499,30 +501,28 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-        player_logs[player_tag] += "\nERRORED!\n";
-        player_logs[player_tag] += err.what();
-        player_logs[player_tag] += '\n';
+        player_logs_json[player_tag]["Error"]["Message"] = err.what();
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
+
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (std::string s) {
-        if (s.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
     catch (...) {
-        if (response.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
+        player_logs_json[player_tag]["Error"]["Turn"] = 0;
+
         *playerName =
             "Bot #" + std::to_string(player_tag) + "; timed out during Init";
     }
+
+    player_logs_json[player_tag]["Frames"] += init_log_json;
+
     return -1;
 }
 
@@ -535,6 +535,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
     const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
 
     std::string response;
+    nlohmann::json log_json;
     try {
         if (is_process_dead(player_tag)) {
             // TODO: more debug output
@@ -545,9 +546,6 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
         std::string mapString = serialize_map(m);
         send_string(player_tag, mapString);
 
-        player_logs[player_tag] +=
-            "\n-----------------------------------------------------------------------------\n --- Frame #"
-                + std::to_string(turnNumber) + " ---\n";
 
         std::chrono::high_resolution_clock::time_point
             initialTime = std::chrono::high_resolution_clock::now();
@@ -557,11 +555,11 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
                 std::chrono::high_resolution_clock::now()
                     - initialTime).count();
 
-        player_logs[player_tag] +=
-            response + "\n --- Bot used " + std::to_string(millisTaken)
-                + " milliseconds ---";
 
+        log_json["Time"] = millisTaken;
         deserialize_move_set(player_tag, response, m, moves);
+
+        player_logs_json[player_tag]["Frames"] += log_json;
 
         return millisTaken;
     }
@@ -570,25 +568,21 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-        player_logs[player_tag] += "\nERRORED!\n";
-        player_logs[player_tag] += err.what();
-        player_logs[player_tag] += '\n';
-        player_logs[player_tag] += response;
+
+        player_logs_json[player_tag]["Error"]["Message"] = err.what();
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (std::string s) {
-        if (s.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + s;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (...) {
-        if (response.empty())
-            player_logs[player_tag] += "\nERRORED!\nNo response received.";
-        else
-            player_logs[player_tag] +=
-                "\nERRORED!\nResponse received (if any):\n" + response;
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;
+        player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
+
+    player_logs_json[player_tag]["Frames"] += log_json;
+
     return -1;
 }
 
@@ -596,12 +590,12 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
     if (is_process_dead(player_tag)) return;
 
     std::string newString;
-    const int PER_CHAR_WAIT = 10; //millis
-    const int MAX_READ_TIME = 1000; //millis
+    const int PER_CHAR_WAIT = 10; // millis
+    const int MAX_READ_TIME = 1000; // millis
 
 #ifdef _WIN32
 
-    //Try to read entire contents of pipe.
+    // Try to read entire contents of pipe.
     WinConnection connection = connections[player_tag];
     DWORD charsRead;
     bool success;
@@ -616,7 +610,7 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
                 if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > PER_CHAR_WAIT) break;
                 PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
             }
-            if(bytesAvailable < 1) break; //Took too long to get a character; breaking.
+            if(bytesAvailable < 1) break; // Took too long to get a character; breaking.
         }
 
         success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
@@ -644,7 +638,7 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
 
 #else
 
-    //Try to read entire contents of pipe.
+    // Try to read entire contents of pipe.
     UniConnection connection = connections[player_tag];
     fd_set set;
     FD_ZERO(&set); /* clear the set */
@@ -683,9 +677,6 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
             }
             std::cout << "--- End bot output ---\n";
         }
-        player_logs[player_tag] +=
-            "\n --- Bot was killed. Below is the rest of its output (if any): ---\n"
-                + newString + "\n --- End bot output ---";
     }
 }
 
