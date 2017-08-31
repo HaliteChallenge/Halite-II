@@ -34,7 +34,7 @@ def make_user_badge_record(row):
 def get_user_badges(user_id):
     """Get all badge a users has. By default only enabled ones are returned."""
     result = []
-    enabled_only = bool(flask.request.args.get('enabled_only', 0, int))
+    enabled_only = bool(flask.request.args.get(__ENABLED_KEY, 0, int))
     with model.engine.connect() as conn:
         query = conn.execute(model.user_badge.select().where(
             model.user_badge.c.user_id == user_id

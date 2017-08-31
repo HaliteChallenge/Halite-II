@@ -30,17 +30,17 @@ def assign_badges_for_hackathon(hackathon_id, hackathon_name):
     """Assign the badges for the first three ranks of a hackahton."""
     ret = requests.get(URL_HACK_LEADERBOARD.format(hackathon_id, 3)).json()
     if len(ret) > 0:
-        __add_user_badge(
+        _add_user_badge(
             ret[0][badges._USER_KEY],
             get_hackathon_badge_name(hackathon_name, HACK_FIRST),
         )
     if len(ret) > 1:
-        __add_user_badge(
+        _add_user_badge(
             ret[1][badges._USER_KEY],
             get_hackathon_badge_name(hackathon_name, HACK_SECOND),
         )
     if len(ret) > 2:
-        __add_user_badge(
+        _add_user_badge(
             ret[2][badges._USER_KEY],
             get_hackathon_badge_name(hackathon_name, HACK_THIRD),
         )
@@ -67,7 +67,7 @@ def translate_name_to_badge_id(name, add_if_not_exist=False):
         return badge[badges._ID_KEY]
 
 
-def __add_user_badge(user_id, badge_name):
+def _add_user_badge(user_id, badge_name):
     badge_id = translate_name_to_badge_id(
         badge_name,
         add_if_not_exist=True
@@ -79,13 +79,13 @@ def add_successful_submission_badge(user_id, badge_name,
                                     submissions_count, version_number):
     if version_number >= submissions_count:
         threading.Thread(
-            target=__add_user_badge,
+            target=_add_user_badge,
             args=(user_id, badge_name)
         ).start()
 
 def add_registration_badge(user_id):
     threading.Thread(
-        target=__add_user_badge,
+        target=_add_user_badge,
         args=(user_id, config.REGISTER_BADGE)
     ).start()
 
@@ -105,7 +105,7 @@ def get_hackathon_badge_name(hackathon_title, badge_type):
     return config.HACKATHON_RANK_BADGE.format(hackathon_title, badge_type)
 
 
-def __update_hackathon_badge(new_hackathon_title, old_hackathon_title, badge_type):
+def _update_hackathon_badge(new_hackathon_title, old_hackathon_title, badge_type):
     with model.engine.connext() as conn:
         conn.execute(model.badge.update().where(
             sqlalchemy.sql.func.lower(model.badge.c.name) ==
@@ -116,14 +116,14 @@ def __update_hackathon_badge(new_hackathon_title, old_hackathon_title, badge_typ
 def update_hackathon_badges(new_hackathon_title, hackathon_id):
     for badge_type in [HACK_FIRST, HACK_SECOND, HACK_THIRD]:
         threading.Thread(
-            target=__update_hackathon_badge,
+            target=_update_hackathon_badge,
             args=(new_hackathon_title, old_hackathon_title, badge_type),
         ).start()
 
 
-def __update_tier_stay_badge(badge_name, user_stays):
+def _update_tier_stay_badge(badge_name, user_stays):
     for user_stay in user_stays:
-        __add_user_badge(user_stay[badges._USER_KEY], badge_name)
+        _add_user_badge(user_stay[badges._USER_KEY], badge_name)
 
 
 def replace_temp_tier_badge(user_id, tier_name):
@@ -136,7 +136,7 @@ def replace_temp_tier_badge(user_id, tier_name):
                 get_temp_tier_badge_name(tier),
                 add_if_not_exist=True
             )))
-    __add_user_badge(
+    _add_user_badge(
         user_id,
         get_temp_tier_badge_name(tier_name),
     )
@@ -149,7 +149,7 @@ def update_tier_stay_badge():
             model.user_tier_history.c.total_time_in_tier >= config.STAY_FOR_BADGE
         )))
         for (tier, badge) in zip(TIERS[:-1], TIER_BADGES):
-            __update_tier_stay_badge(
+            _update_tier_stay_badge(
                 badge, 
                 [x for x in res if x['tier'] == tier],
             )
