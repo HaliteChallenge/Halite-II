@@ -137,7 +137,7 @@ namespace mapgen {
                 std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 3));
             // Stick one planet in the center
             if (extra_planets == 1) {
-                map.planets.emplace_back(center_x, center_y, big_radius);
+                map.planets.emplace_back(center_x, center_y, big_radius * 1.5);
             }
             // Generate a cluster of small planets in the center
             // Cluster helps make sure trivial bots don't get stuck from all
