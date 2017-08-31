@@ -8,7 +8,6 @@
 
 std::mutex coutMutex;
 
-
 std::string serializeMapSize(const hlt::Map& map) {
     std::string returnString = "";
     std::ostringstream oss;
@@ -195,7 +194,7 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
 
 void Networking::send_string(hlt::PlayerId player_tag,
                              std::string& sendString) {
-    //End message with newline character
+    // End message with newline character
     sendString += '\n';
 
 #ifdef _WIN32
@@ -248,13 +247,13 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
     bool success;
     char buffer;
 
-    //Keep reading char by char until a newline
+    // Keep reading char by char until a newline
     while(true) {
         timeoutMillisRemaining = timeout_millis - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tp).count();
         if(timeoutMillisRemaining < 0) throw newString;
-        //Check to see that there are bytes in the pipe before reading
-        //Throw error if no bytes in alloted time
-        //Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
+        // Check to see that there are bytes in the pipe before reading
+        // Throw error if no bytes in alloted time
+        // Check for bytes before sampling clock, because reduces latency (vast majority the pipe is alread full)
         DWORD bytesAvailable = 0;
         PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
         if(bytesAvailable < 1) {
@@ -287,10 +286,10 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
     char buffer;
 
-    //Keep reading char by char until a newline
+    // Keep reading char by char until a newline
     while (true) {
 
-        //Check if there are bytes in the pipe
+        // Check if there are bytes in the pipe
         timeoutMillisRemaining = timeout_millis
             - std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now() - tp).count();
@@ -316,7 +315,7 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
         }
     }
 #endif
-    //Python turns \n into \r\n
+    // Python turns \n into \r\n
     if (newString.back() == '\r') newString.pop_back();
 
     return newString;
@@ -334,21 +333,21 @@ void Networking::launch_bot(std::string command) {
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    //Child stdout pipe
+    // Child stdout pipe
     if(!CreatePipe(&parentConnection.read, &childConnection.write, &saAttr, 0)) {
         if(!quiet_output) std::cout << "Could not create pipe\n";
         throw 1;
     }
     if(!SetHandleInformation(parentConnection.read, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-    //Child stdin pipe
+    // Child stdin pipe
     if(!CreatePipe(&childConnection.read, &parentConnection.write, &saAttr, 0)) {
         if(!quiet_output) std::cout << "Could not create pipe\n";
         throw 1;
     }
     if(!SetHandleInformation(parentConnection.write, HANDLE_FLAG_INHERIT, 0)) throw 1;
 
-    //MAKE SURE THIS MEMORY IS ERASED
+    // MAKE SURE THIS MEMORY IS ERASED
     PROCESS_INFORMATION piProcInfo;
     ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
 
@@ -360,21 +359,21 @@ void Networking::launch_bot(std::string command) {
     siStartInfo.hStdInput = childConnection.read;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
-    //C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
-    //C:/Users/Michael/Anaconda3/python.exe
-    //C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
+    // C:/xampp/htdocs/Halite/Halite/Debug/ExampleBot.exe
+    // C:/Users/Michael/Anaconda3/python.exe
+    // C:/Program Files/Java/jre7/bin/java.exe -cp C:/xampp/htdocs/Halite/AIResources/Java MyBot
     bool success = CreateProcess(
         "C:\\windows\\system32\\cmd.exe",
-        LPSTR(command.c_str()),     //command line
-        NULL,          //process security attributes
-        NULL,          //primary thread security attributes
-        TRUE,          //handles are inherited
-        0,             //creation flags
-        NULL,          //use parent's environment
-        NULL,          //use parent's current directory
-        &siStartInfo,  //STARTUPINFO pointer
+        LPSTR(command.c_str()),     // command line
+        NULL,          // process security attributes
+        NULL,          // primary thread security attributes
+        TRUE,          // handles are inherited
+        0,             // creation flags
+        NULL,          // use parent's environment
+        NULL,          // use parent's current directory
+        &siStartInfo,  // STARTUPINFO pointer
         &piProcInfo
-    );  //receives PROCESS_INFORMATION
+    ); // receives PROCESS_INFORMATION
     if(!success) {
         if(!quiet_output) std::cout << "Could not start process\n";
         throw 1;
@@ -409,9 +408,9 @@ void Networking::launch_bot(std::string command) {
 
     pid_t ppid_before_fork = getpid();
 
-    //Fork a child process
+    // Fork a child process
     pid = fork();
-    if (pid == 0) { //This is the child
+    if (pid == 0) { // This is the child
         setpgid(getpid(), getpid());
 
 #ifdef __linux__
@@ -591,12 +590,12 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
     if (is_process_dead(player_tag)) return;
 
     std::string newString;
-    const int PER_CHAR_WAIT = 10; //millis
-    const int MAX_READ_TIME = 1000; //millis
+    const int PER_CHAR_WAIT = 10; // millis
+    const int MAX_READ_TIME = 1000; // millis
 
 #ifdef _WIN32
 
-    //Try to read entire contents of pipe.
+    // Try to read entire contents of pipe.
     WinConnection connection = connections[player_tag];
     DWORD charsRead;
     bool success;
@@ -611,7 +610,7 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
                 if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - initialTime).count() > PER_CHAR_WAIT) break;
                 PeekNamedPipe(connection.read, NULL, 0, NULL, &bytesAvailable, NULL);
             }
-            if(bytesAvailable < 1) break; //Took too long to get a character; breaking.
+            if(bytesAvailable < 1) break; // Took too long to get a character; breaking.
         }
 
         success = ReadFile(connection.read, &buffer, 1, &charsRead, NULL);
@@ -639,7 +638,7 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
 
 #else
 
-    //Try to read entire contents of pipe.
+    // Try to read entire contents of pipe.
     UniConnection connection = connections[player_tag];
     fd_set set;
     FD_ZERO(&set); /* clear the set */

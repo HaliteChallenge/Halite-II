@@ -4,7 +4,6 @@
 
 #include "BotInputError.hpp"
 
-
 BotInputError::BotInputError(
     hlt::PlayerId player,
     const std::string& input,

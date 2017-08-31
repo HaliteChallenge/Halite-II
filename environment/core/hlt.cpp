@@ -186,7 +186,7 @@ namespace hlt {
 
             for (const auto& ship_pair : player_ships) {
                 const auto& ship = ship_pair.second;
-                if (!ship.is_alive()){
+                if (!ship.is_alive()) {
                     continue;
                 }
 

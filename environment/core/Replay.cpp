@@ -10,13 +10,13 @@ auto Replay::output_header(nlohmann::json& replay) -> void {
     replay["seed"] = seed;
     replay["map_generator"] = map_generator;
 
-    //Encode some details about the game that will make it convenient to parse.
+    // Encode some details about the game that will make it convenient to parse.
     replay["width"] = map_width;
     replay["height"] = map_height;
     replay["num_players"] = player_names.size();
     replay["num_frames"] = full_frames.size();
 
-    //Encode player names.
+    // Encode player names.
     replay["player_names"] = nlohmann::json(player_names);
 
     // Encode the constants used to run this particular game iteration.
@@ -83,7 +83,7 @@ auto Replay::output(std::string filename) -> void {
              planet_index < frame_map.planets.size();
              planet_index++) {
             const auto& planet = frame_map.planets[planet_index];
-            if (!planet.is_alive()){
+            if (!planet.is_alive()) {
                 continue;
             }
 

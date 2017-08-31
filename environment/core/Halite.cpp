@@ -190,7 +190,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
         }
     }
 
-    //Get the messages sent by bots this frame
+    // Get the messages sent by bots this frame
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (alive[player_id]) {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
@@ -203,7 +203,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
         }
     }
 
-    //Join threads. Figure out if the player responded in an allowable amount
+    // Join threads. Figure out if the player responded in an allowable amount
     // of time or if the player has timed out.
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (alive[player_id]) {
@@ -271,7 +271,7 @@ auto Halite::process_production() -> void {
     for (hlt::EntityIndex planet_idx = 0;
          planet_idx < game_map.planets.size(); planet_idx++) {
         auto& planet = game_map.planets[planet_idx];
-        if (!planet.is_alive() || !planet.owned){
+        if (!planet.is_alive() || !planet.owned) {
             continue;
         }
 
@@ -1175,13 +1175,13 @@ Halite::Halite(unsigned short width_,
     turn_number = 0;
     player_names = std::vector<std::string>(number_of_players);
 
-    //Add to full game:
+    // Add to full game:
     full_frames.push_back({ hlt::Map(game_map) });
 
-    //Check if timeout should be ignored.
+    // Check if timeout should be ignored.
     ignore_timeout = should_ignore_timeout;
 
-    //Init statistics
+    // Init statistics
     alive_frame_count = std::vector<unsigned short>(number_of_players, 1);
     init_response_times = std::vector<unsigned int>(number_of_players);
     last_ship_count = std::vector<unsigned int>(number_of_players);
@@ -1194,7 +1194,7 @@ Halite::Halite(unsigned short width_,
 }
 
 Halite::~Halite() {
-    //Get rid of dynamically allocated memory:
+    // Get rid of dynamically allocated memory:
     for (hlt::PlayerId a = 0; a < number_of_players; a++) {
         networking.kill_player(a);
     }
