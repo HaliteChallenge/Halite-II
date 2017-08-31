@@ -1,6 +1,7 @@
 import Vue from "vue";
 import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
+import BotEditor from "./templates/BotEditor.vue";
 import HackathonLeaderboard from "./templates/HackathonLeaderboard.vue";
 import Leaderboard from "./templates/Leaderboard.vue";
 import Upload from "./templates/Upload.vue";
@@ -8,6 +9,7 @@ import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
+import HaliteTV from './templates/HaliteTV.vue';
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -27,6 +29,12 @@ window.views = {
         new Vue({
             el: "#associate-container",
             render: (h) => h(Associate),
+        });
+    },
+    BotEditor: function () {
+        new Vue({
+            el: "#bot-editor-container",
+            render: (h) => h(BotEditor),
         });
     },
     HackathonLeaderboard: function () {
@@ -65,6 +73,12 @@ window.views = {
             render: (h) => h(Visualizer),
         });
     },
+    HaliteTV: function() {
+        new Vue({
+            el: "#halitetv-container",
+            render: (h) => h(HaliteTV, {props: {baseUrl: _global.baseUrl}})
+        });
+    }
 };
 
 api.me().then((me) => {

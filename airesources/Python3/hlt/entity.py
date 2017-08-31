@@ -39,7 +39,7 @@ class Entity:
 
     def calculate_angle_between(self, target):
         """
-        Calculates the angle between this object and teh target in degrees.
+        Calculates the angle between this object and the target in degrees.
         :param Entity target: The target to get the angle between.
         :return: Angle between entities in degrees
         :rtype: float
@@ -211,8 +211,8 @@ class Ship(Entity):
 
     class DockingStatus(Enum):
         UNDOCKED = 0
-        DOCKED = 1
-        DOCKING = 2
+        DOCKING = 1
+        DOCKED = 2
         UNDOCKING = 3
 
     def __init__(self, player_id, ship_id, x, y, hp, vel_x, vel_y,

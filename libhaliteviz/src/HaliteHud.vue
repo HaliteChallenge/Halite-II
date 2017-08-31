@@ -54,6 +54,18 @@
 
                         <dt>Total Attacks Made</dt>
                         <dd>{{ stats.frames[frame].players[index].totalAttacks }} (total targets: {{ stats.frames[frame].players[index].totalTargets }})</dd>
+
+                        <dt>Health</dt>
+                        <dd>{{ stats.frames[frame].players[index].totalHealths }}</dd>
+
+                        <dt>Total Damages</dt>
+                        <dd>{{ stats.frames[frame].players[index].totalDamages }}</dd>
+
+                        <dt>Production Rates (per turn)</dt>
+                        <dd>{{ stats.frames[frame].players[index].currentProductions }}</dd>
+
+                        <dt>Attack (per turn)</dt>
+                        <dd>{{ stats.frames[frame].players[index].currentAttacks }}</dd>
                     </dl>
                 </div>
                 <div v-if="selected.kind === 'planet' && selected_planet !== null">
@@ -67,6 +79,9 @@
 
                         <dt>Health</dt>
                         <dd>{{ selected_planet.state.health }}/{{ selected_planet.base.health }}</dd>
+
+                        <dt>Docking Spots</dt>
+                        <dd>{{ selected_planet.base.docking_spots - selected_planet.state.docked_ships.length }}/{{ selected_planet.base.docking_spots }}</dd>
 
                         <dt>Remaining Production</dt>
                         <dd>{{ selected_planet.state.remaining_production }}/{{ selected_planet.base.production }}</dd>

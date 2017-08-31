@@ -26,6 +26,7 @@ bld/
 [Oo]bj/
 airesources/CSharp/bin/*
 airesources/CSharp/obj/*
+airesources/CSharp/*.txt
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -405,6 +406,8 @@ Values.sql
 storage/
 config.php
 workingPath/
+builds/*
+website/_data/*
 
 *.ini
 !travisTests.ini
@@ -469,3 +472,7 @@ apiserver/venv/
 compiled_environments/
 *.bc
 *.dylib
+
+admin/adminenv/*
+
+promo-website/_site/*

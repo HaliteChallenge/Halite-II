@@ -29,7 +29,7 @@ def discourse_sso(*, user_id):
         raise util.APIError(400, message="SSO payload and signature required.")
 
     hmac_obj = hmac.new(config.DISCOURSE_SSO_SECRET,
-                        msg=sso_payload,
+                        msg=sso_payload.encode("utf-8"),
                         digestmod=hashlib.sha256)
     computed_signature = hmac_obj.hexdigest()
     if computed_signature != sso_signature:
@@ -60,10 +60,10 @@ def discourse_sso(*, user_id):
         raw_payload["require_activation"] = "true"
 
     encoded_payload = base64.b64encode(
-        urllib.parse.urlencode(raw_payload).encode("utf-8")).decode("utf-8")
+        urllib.parse.urlencode(raw_payload).encode("utf-8"))
     new_signature = hmac.new(config.DISCOURSE_SSO_SECRET,
                              msg=encoded_payload,
                              digestmod=hashlib.sha256).hexdigest()
     return flask.redirect(
         config.DISCOURSE_URL +
-        "?sso={}&sig={}".format(encoded_payload, new_signature))
+        "?sso={}&sig={}".format(encoded_payload.decode("utf-8"), new_signature))

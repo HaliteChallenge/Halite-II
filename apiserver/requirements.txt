@@ -41,3 +41,4 @@ trueskill==0.4.4
 uritemplate==3.0.0
 urllib3==1.21.1
 Werkzeug==0.12.2
+zstandard==0.8.1

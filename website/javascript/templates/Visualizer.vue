@@ -15,7 +15,7 @@
     import * as api from "../api";
     import * as libhaliteviz from "../../../libhaliteviz";
     import UploadZone from "./UploadZone.vue";
-    libhaliteviz.setAssetRoot("assets/js/");
+    libhaliteviz.setAssetRoot("/assets/js/");
 
     let visualizer;
 

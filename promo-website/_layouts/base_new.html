@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>{{ page.title }}&mdash;{{ site.title }}</title>
+  <!-- Google Analytics -->
+  <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-80656237-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <!-- Bootstrap -->
+  <link href="{{ site.baseurl }}/assets/css/main_new.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="body">
+    {{ content }}
+  </div>
+
+  <footer class="footer">
+    <div class="footer-below">
+      <div class="container">
+        <div class="footer-below-wrap">      
+          <div class="footer-copy">
+            <img src="{{ site.baseurl }}/assets/images/full_logo.svg" class="footer-copy-logo" alt="">
+            <p>Copyright &copy; 2017 Halite. All Rights Reserved.</p>
+          </div>
+          <div class="footer-social">
+            <p class="footer-social-top">
+              Follow us
+            </p>
+            <p class="footer-social-icons">
+              <a href="#"><i class="fa fa-facebook-official"></i></a>
+              <a href="#"><i class="fa fa-twitter"></i></a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  {% if page.additional_js %}
+  {% for dep in page.additional_js %}
+  <script src="{{ site.baseurl }}/assets/js/{{ dep }}.js"></script>
+  {% endfor %}
+  {% endif %}
+
+  <script src="{{ site.baseurl }}/assets/js/bundle.js"></script>
+
+  {% if page.mount_view %}
+  <script>
+    window.views["{{ page.mount_view }}"]();
+  </script>
+  {% endif %}
+
+  {% if page.mount_views %}
+  <script>
+    {% for mount_view in page.mount_views %}
+    window.views["{{ mount_view }}"]();
+    {% endfor %}
+  </script>
+  {% endif %}
+</body>
+
+</html>

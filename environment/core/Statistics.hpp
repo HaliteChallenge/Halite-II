@@ -21,8 +21,8 @@ struct PlayerStatistics {
 struct GameStatistics {
     std::vector<PlayerStatistics> player_statistics;
     std::string output_filename;
-    std::set<unsigned short> timeout_tags;
-    std::vector<std::string> timeout_log_filenames;
+    std::set<unsigned short> error_tags;
+    std::vector<std::string> log_filenames;
 };
 
 auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void;
