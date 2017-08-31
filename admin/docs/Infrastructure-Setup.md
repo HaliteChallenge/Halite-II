@@ -166,5 +166,7 @@ Otherwise, if the code or disk image change:
     
 Change `coordinator-instances` to the appropriate group. For coordinator servers, you probably want to recreate them one-by-one, to make sure the game API does not go down during the process.
 
+This same process applies to Website instances as well.
+
 For GPU instances, since those are in a separate zone, you will have to append `--zone us-east1-c` to any `gcloud` commands.
 

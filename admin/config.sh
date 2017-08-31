@@ -12,5 +12,5 @@ GPU_IMAGE="halite-gpu-worker"
 WEBSITE_IMAGE="website-image-1"
 
 SERVICE_ACCOUNT="apiserver"
-COORDINATOR_URL="http://10.142.0.5:5001/v1/coordinator/"
+COORDINATOR_URL=""
 SECRET_FOLDER=""
