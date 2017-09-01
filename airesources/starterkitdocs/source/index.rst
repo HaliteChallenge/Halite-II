@@ -7,7 +7,7 @@ Welcome to Halite Starter Kits Docs's documentation!
 ====================================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Contents:
    
        Python 3<python-starterkit.rst>

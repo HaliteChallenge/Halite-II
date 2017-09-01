@@ -14,6 +14,7 @@ class Game:
     def _send_string(s):
         """
         Send data to the game. Call :function:`done_sending` once finished.
+
         :param str s: String to send
         :return: nothing
         """
@@ -24,6 +25,7 @@ class Game:
     def _done_sending():
         """
         Finish sending commands to the game.
+
         :return: nothing
         """
         sys.stdout.write('\n')
@@ -33,6 +35,7 @@ class Game:
     def _get_string():
         """
         Read input from the game.
+
         :return: The input read from the Halite engine
         :rtype: str
         """
@@ -43,6 +46,7 @@ class Game:
     def send_command_queue(command_queue):
         """
         Issue the given list of commands.
+
         :param list[str] command_queue: List of commands to send the Halite engine
         :return: nothing
         """
@@ -55,6 +59,7 @@ class Game:
     def _set_up_logging(tag, name):
         """
         Set up and truncate the log
+
         :param tag: The user tag (used for naming the log)
         :param name: The bot name (used for naming the log)
         :return: nothing
@@ -66,6 +71,7 @@ class Game:
     def __init__(self, name):
         """
         Initialize the bot with the given name.
+
         :param name: The name of the bot.
         """
         tag = int(self._get_string())
@@ -80,6 +86,7 @@ class Game:
     def update_map(self):
         """
         Parse the map given by the engine.
+        
         :return: new parsed map
         :rtype: game_map.Map
         """
