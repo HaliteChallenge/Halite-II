@@ -1,2 +1,2 @@
-mkdir Halite/website/_data
-mkdir Halite/website/assets/downloads
+mkdir website/_data
+mkdir website/assets/downloads
