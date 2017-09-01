@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Constants {
     public static final int PLANETS_PER_PLAYER = 8;
     public static final int EXTRA_PLANETS = 4;

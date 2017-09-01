@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Position {
     private double xPos;
     private double yPos;

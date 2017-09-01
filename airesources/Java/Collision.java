@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Collision {
     /**
      * Test whether a given line segment intersects a circular area.

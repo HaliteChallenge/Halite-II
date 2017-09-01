@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public abstract class Entity {
     protected Position position;
     protected short health;

@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class ThrustMove extends Move {
     private short angle;
     private short thrust;

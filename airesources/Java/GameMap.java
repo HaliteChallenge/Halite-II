@@ -1,3 +1,5 @@
+package halitejavabot;
+
 import java.util.*;
 
 public class GameMap {

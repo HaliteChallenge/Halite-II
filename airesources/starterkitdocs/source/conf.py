@@ -28,6 +28,12 @@ print(sys.path[0])
 html_theme = "sphinx_rtd_theme"
 html_theme_path = ["_themes/sphinx_rtd_theme", ]
 
+html_theme_options = {
+    'collapse_navigation': False,
+    'display_version': True,
+    'navigation_depth': 4,
+}
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -45,7 +51,13 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages',
+    'javasphinx',
+    'sphinx_csharp.csharp',
+    'autoapi.extension']
+
+autoapi_type = 'dotnet'
+autoapi_dirs = ['../../CSharp/']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -60,8 +72,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Halite Starter Kits Docs'
-copyright = u'2017, Halite Team & Community'
+project = u'Halite II Starter Kits Docs'
+copyright = u'2017, Halite II Team & Community'
 author = u'Halite Team & Community'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -124,7 +136,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'HaliteStarterKitsDocsdoc'
+htmlhelp_basename = 'HaliteIIStarterKitsDocsdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -151,7 +163,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'HaliteStarterKitsDocs.tex', u'Halite Starter Kits Docs Documentation',
+    (master_doc, 'HaliteIIStarterKitsDocs.tex', u'Halite II Starter Kits Docs Documentation',
      u'Halite Team \\& Community', 'manual'),
 ]
 
@@ -161,7 +173,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'halitestarterkitsdocs', u'Halite Starter Kits Docs Documentation',
+    (master_doc, 'haliteiistarterkitsdocs', u'Halite II Starter Kits Docs Documentation',
      [author], 1)
 ]
 
@@ -172,8 +184,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'HaliteStarterKitsDocs', u'Halite Starter Kits Docs Documentation',
-     author, 'HaliteStarterKitsDocs', 'One line description of project.',
+    (master_doc, 'HaliteIIStarterKitsDocs', u'Halite II Starter Kits Docs Documentation',
+     author, 'HaliteIIStarterKitsDocs', 'One line description of project.',
      'Miscellaneous'),
 ]
 
