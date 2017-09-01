@@ -464,6 +464,7 @@ node_modules
 *.dSYM/
 
 musicgenerator/haliteamp/*
+airesources/startenv/*
 /musicgenerator/*.wav
 haliteII/*
 

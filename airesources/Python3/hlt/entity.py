@@ -90,6 +90,7 @@ class Planet(Entity):
     planet.
     :ivar health: The planet's health.
     :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
+
     """
 
     def __init__(self, planet_id, x, y, hp, radius, docking_spots, current,
@@ -199,6 +200,7 @@ class Planet(Entity):
 class Ship(Entity):
     """
     A ship in the game.
+    
     :ivar id: The ship ID.
     :ivar x: The ship x-coordinate.
     :ivar y: The ship y-coordinate.
@@ -353,6 +355,7 @@ class Position(Entity):
     A simple wrapper for a coordinate.
 
     Intended to be passed to some functions in place of a ship or planet.
+
     :ivar id: Unused
     :ivar x: The x-coordinate.
     :ivar y: The y-coordinate.
