@@ -1,7 +1,7 @@
 <template>
   <table class="player-stats-table">
-    <tr class="player-stats" v-for="(player, index) in stats">
-      <td class="player-stats-name">{{replay.players[index]}}:</td>
+    <tr class="player-stats" v-for="(player, index) in statistics">
+      <td class="player-stats-name">{{player_names[index]}}:</td>
       <td class="player-stats-break-down">
         <div class="player-stats-ship">
           <div v-for="i in 20" v-bind:class="{'bar': true, 'bar-1': isActive(i, player.shipsRate)}"></div>
@@ -25,56 +25,22 @@
 </template>
 
 <script>
+  import Vue from "vue";
+  import * as api from "../api";
+  import * as libhaliteviz from "../../../libhaliteviz";
+  libhaliteviz.setAssetRoot("/assets/js/");
+  const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
+
   export default {
     name: 'PlayerStatsPane',
-    props: ['replay'],
+    props: ['replay', 'game', 'frame', 'time', 'stats', 'statistics'],
     data: function(){
-      return {};
+      return {
+        player_names: this.replay.player_names
+      };
     },
     mounted: function(){
-
-    },
-    computed: {
-      stats: function(){
-        let count = {};
-        for (let i = 0; i < this.replay.num_players; i++) {
-          count[i] = {
-            ships: 0,
-            planets: 0,
-            shipsRate: 0,
-            planetsRate: 0
-          };
-        }
-
-        // TODO: replace this
-        let frame = this.replay.frame
-        for (let owner of Object.keys(frame.ships)) {
-          count[owner].ships = frame.ships[owner]
-          // count[owner].ships += Object.values(frame.ships[owner]).length;
-        }
-
-        // for (let planet of Object.values(frame.planets)) {
-        for (let owner of Object.keys(frame.planets)) {
-          count[owner].planets = frame.planets[owner]
-          // if (planet.owner !== null) {
-          //   count[planet.owner].planets++;
-          // }
-        }
-
-        // total
-        let total = {ships: 0, planets: 0};
-        for (let item of Object.values(count)){
-          total.ships += item.ships;
-          total.planets += item.planets;
-        }
-
-        for (let owner in Object.keys(count)){
-          count[owner].shipsRate = count[owner].ships/total.ships;
-          count[owner].planetsRate = count[owner].planets/total.planets;
-        }
-
-        return count;
-      },
+      console.log(this.statistics)
     },
     methods: {
       isActive: function(i, rate){

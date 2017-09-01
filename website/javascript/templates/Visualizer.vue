@@ -58,7 +58,7 @@
             </a>
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="widget_player_details" aria-labelledby="heading_player_details">
-            <div class="player-cards-list row">
+            <div class="player-cards-list row" id="player_details">
               <div class="col-sm-6">
                 <div class="card-player">
                   <h4 class="card-player-name">
@@ -308,7 +308,10 @@
   import * as api from "../api";
   import * as libhaliteviz from "../../../libhaliteviz";
   import PlayerStatsPane from "./PlayerStatsPane.vue"
+  import PlayerDetailPane from "./PlayerDetailPane.vue"
   libhaliteviz.setAssetRoot("/assets/js/");
+  const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
+
 
   const loadGame = (game) => {
     const buffer = game.replay;
@@ -320,7 +323,11 @@
     props: ['baseUrl'],
     data: function(){
       return {
-        game: null
+        game: null,
+        replay: null,
+        frame: 0,
+        time: 0,
+        playing: false
       }
     },
     mounted: function(){
@@ -330,40 +337,58 @@
 
       /// for test: api doesn't work so I fake the sample data
       const playerStatsContainer = document.getElementById('player_stats_pane');
-      new Vue({
-        el: playerStatsContainer,
-        render: (h) => h(PlayerStatsPane, {
-          props: {
-            // game: game,
-            replay: {
-              num_players: 4,
-              players: ['Juliak', 'Mzotkiew', 'Timfoden', 'Erdman'],
-              frame: {
-                ships: {
-                  0: 10,
-                  1: 15,
-                  2: 12,
-                  3: 20
-                },
-                planets: {
-                  0: 120,
-                  1: 150,
-                  2: 123,
-                  3: 302
-                }
-              }
-            }
-          }
-        })
-      });
+      // new Vue({
+      //   el: playerStatsContainer,
+      //   render: (h) => h(PlayerStatsPane, {
+      //     props: {
+      //       // game: game,
+      //       replay: {
+      //         num_players: 4,
+      //         players: ['Juliak', 'Mzotkiew', 'Timfoden', 'Erdman'],
+      //         frame: {
+      //           ships: {
+      //             0: 10,
+      //             1: 15,
+      //             2: 12,
+      //             3: 20
+      //           },
+      //           planets: {
+      //             0: 120,
+      //             1: 150,
+      //             2: 123,
+      //             3: 302
+      //           }
+      //         }
+      //       }
+      //     }
+      //   })
+      // });
 
       api.get_replay(game_id, (loaded, total) => {
-        console.log(loaded);
       }).then((game) => {
-        console.log(game);
 
         loadGame(game).then((replay) => {
-          console.log('loaded game');
+          this.replay = replay;
+
+          // init visualizer and events
+          const visualizer = new HaliteVisualizer(replay);
+          visualizer.onUpdate(() => {
+            this.frame = visualizer.frame;
+            this.time = visualizer.time;
+          });
+          visualizer.onPlay(() => {
+            console.log('playing');
+          })
+          visualizer.onPlay = () => {
+            this.playing = true;
+          };
+          visualizer.onPause = () => {
+            this.playing = false;
+          };
+
+          // play the replay
+          visualizer.play();
+
           // render player stat pane
           const playerStatsContainer = document.getElementById('player_stats_pane');
           new Vue({
@@ -371,7 +396,25 @@
             render: (h) => h(PlayerStatsPane, {
               props: {
                 game: game,
-                replay: replay
+                replay: replay,
+                frame: 55, //visualizer.frame, // for testing
+                time: visualizer.time,
+                stats: visualizer.stats,
+                statistics: this.statistics
+              }
+            })
+          });
+          const playerDetailContainer = document.getElementById('player_details');
+          new Vue({
+            el: playerDetailContainer,
+            render: (h) => h(PlayerDetailPane, {
+              props: {
+                game: game,
+                replay: replay,
+                frame: 55, //visualizer.frame, // for testing
+                time: visualizer.time,
+                stats: visualizer.stats,
+                statistics: this.statistics
               }
             })
           })
@@ -379,6 +422,48 @@
       }, () => {
         console.log('error loading game');
       });
+    },
+    computed: {
+      statistics: function(){
+        let count = {};
+        for (let i = 0; i < this.replay.num_players; i++) {
+          count[i] = {
+            ships: 0,
+            planets: 0,
+            shipsRate: 0,
+            planetsRate: 0
+          };
+        }
+
+        // // TODO: replace this
+        let frame = this.replay.frames[55]; // this.replay.frames[this.frame]
+        for (let owner of Object.keys(frame.ships)) {
+          // count[owner].ships = frame.ships[owner]
+          count[owner].ships += Object.values(frame.ships[owner]).length;
+        }
+
+        for (let planet of Object.values(frame.planets)) {
+        // for (let owner of Object.keys(frame.planets)) {
+          // count[owner].planets = frame.planets[owner]
+          if (planet.owner !== null) {
+            count[planet.owner].planets++;
+          }
+        }
+
+        // total
+        let total = {ships: 0, planets: 0};
+        for (let item of Object.values(count)){
+          total.ships += item.ships;
+          total.planets += item.planets;
+        }
+
+        for (let owner in Object.keys(count)){
+          count[owner].shipsRate = total.ships == 0 ? 0 : count[owner].ships/total.ships;
+          count[owner].planetsRate = total.planets == 0 ? 0 : count[owner].planets/total.planets;
+        }
+
+        return count;
+      },
     }
   }
 </script>

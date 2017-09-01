@@ -16,6 +16,10 @@
     color: #ECFFFB;
     letter-spacing: 1px;
     position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 15px;
   }
   &-stats{
     font-size: 14px;
