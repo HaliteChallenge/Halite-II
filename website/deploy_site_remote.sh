@@ -10,5 +10,4 @@ npm install
 cd ../website
 npm run build
 bundle exec jekyll build
-gcloud compute scp --recurse _site/* ubuntu@halite-web-server-staging:/var/www/html
-
+gcloud compute scp --recurse _site/* ubuntu@halite-web-server:/var/www/html
