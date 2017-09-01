@@ -164,9 +164,22 @@ Otherwise, if the code or disk image change:
 
     gcloud compute instance-groups managed recreate-instances coordinator-instances --instances=<list instance IDs here>
     
+    gcloud alpha compute instance-groups managed rolling-action replace [INSTANCE_GROUP]
+    
 Change `coordinator-instances` to the appropriate group. For coordinator servers, you probably want to recreate them one-by-one, to make sure the game API does not go down during the process.
 
 This same process applies to Website instances as well.
 
 For GPU instances, since those are in a separate zone, you will have to append `--zone us-east1-c` to any `gcloud` commands.
+
+# Forum Setup
+
+1. Use Bitnami template in gcloud to start a discourse instance
+2. Set a permanent IP
+3. Follow the instrcutions here to set up mail access from Gcloud: https://cloud.google.com/compute/docs/tutorials/sending-mail/using-sendgrid
+5. Change the email on the admin account - https://community.bitnami.com/t/change-admin-email-from-command-prompt/43144
+6. Add a couple of users (make sure their GitHub emails match) and make them admins
+7. Go through the setup wizard and set everything up. Make sure you ad the GA UA ID to it
+7. Fix IP issues with mails (emails sent with old IPS)
+4. Setup SSL https://docs.bitnami.com/aws/components/apache/#how-to-install-the-lets-encrypt-client
 
