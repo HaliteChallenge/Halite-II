@@ -16,8 +16,10 @@ namespace hlt {
      * default values in a tournament setting).
      */
     struct GameConstants {
+        int SHIPS_PER_PLAYER = 3;
         int PLANETS_PER_PLAYER = 6;
         unsigned int EXTRA_PLANETS = 4;
+        unsigned int MAX_TURNS = 300;
 
         double DRAG = 7.0;
         double MAX_SPEED = 7.0;

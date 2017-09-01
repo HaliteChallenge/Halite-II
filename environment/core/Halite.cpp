@@ -998,8 +998,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         for (const auto a : *names_) player_names.push_back(a.substr(0, 30));
     }
 
-    const int max_turn_number = std::min(
-        300, 100 + (int) (sqrt(game_map.map_width * game_map.map_height)));
+    const auto& constants = hlt::GameConstants::get();
+    const unsigned int max_turn_number = std::min(
+        constants.MAX_TURNS, 100U + (int) (sqrt(game_map.map_width * game_map.map_height)));
 
     auto game_complete = [&]() -> bool {
         const auto num_living_players = std::count(living_players.begin(), living_players.end(), true);
@@ -1012,25 +1013,32 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
 
-    while (!game_complete()) {
-        turn_number++;
-        if (!quiet_output) std::cout << "Turn " << turn_number << std::endl;
+    try {
+        while (!game_complete()) {
+            turn_number++;
+            if (!quiet_output) std::cout << "Turn " << turn_number << std::endl;
 
-        // Frame logic.
-        auto new_living_players = process_next_frame(living_players);
+            // Frame logic.
+            auto new_living_players = process_next_frame(living_players);
 
-        // Add to vector of players that should be dead.
-        std::vector<hlt::PlayerId> new_rankings;
-        for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
-            if (living_players[player_id] && !new_living_players[player_id]) {
-                new_rankings.push_back(player_id);
+            // Add to vector of players that should be dead.
+            std::vector<hlt::PlayerId> new_rankings;
+            for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
+                if (living_players[player_id] && !new_living_players[player_id]) {
+                    new_rankings.push_back(player_id);
+                }
             }
+
+            std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
+            rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
+
+            living_players = new_living_players;
         }
-
-        std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
-        rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
-
-        living_players = new_living_players;
+    }
+    catch (hlt::GameAbort err) {
+        // early abort in single-player mode
+        // (used for evaluating partial games for tutorial mode)
+        std::cout << "Game aborted by player." << std::endl;
     }
 
     // Add remaining players to the ranking. Break ties using the same

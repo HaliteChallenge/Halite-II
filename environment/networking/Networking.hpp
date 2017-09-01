@@ -59,6 +59,10 @@ public:
     std::vector<std::string> player_logs;
     nlohmann::json player_logs_json;
 
+    bool is_single_player() {
+        return player_logs.size() == 1;
+    }
+
 private:
 #ifdef _WIN32
     struct WinConnection {

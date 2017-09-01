@@ -104,7 +104,8 @@ auto is_valid_move_character(const char& c) -> bool {
         || c == '-'
         || c == 't'
         || c == 'u'
-        || c == 'd';
+        || c == 'd'
+        || c == 'q';
 }
 
 auto eject_bot(std::string message) -> std::string {
@@ -168,6 +169,14 @@ void Networking::deserialize_move_set(hlt::PlayerId player_tag,
                 move.type = hlt::MoveType::Undock;
                 iss >> move.shipId;
                 break;
+            }
+            case 'q': {
+                if (is_single_player()) {
+                    // allow early abort in single-player mode
+                    // (used for evaluating partial games for tutorial mode)
+                    throw hlt::GameAbort { 0 };
+                }
+                // fall through to default
             }
             default:
                 std::stringstream message;
@@ -575,6 +584,9 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
     catch (std::string s) {
         player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + s;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
+    }
+    catch (hlt::GameAbort) {
+        throw; // propogate early termination
     }
     catch (...) {
         player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Response received (if any): " + response;

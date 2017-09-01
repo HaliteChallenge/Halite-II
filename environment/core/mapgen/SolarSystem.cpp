@@ -130,27 +130,33 @@ namespace mapgen {
             return true;
         };
 
-        // Generate a cluster of small planets in the center
-        // Cluster helps make sure trivial bots don't get stuck from all
-        // docking to a single center planet at the same time
         if (extra_planets > 0) {
             const auto big_radius =
                 std::max(4.0, std::sqrt(std::min(map.map_width, map.map_height)) / 2);
             const auto small_radius =
                 std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 3));
-            const auto radius =
-                std::uniform_real_distribution<>(small_radius, big_radius)(rng);
-            const auto distance_from_center = 2 * radius +
-                2 * hlt::GameConstants::get().SHIP_RADIUS;
+            // Stick one planet in the center
+            if (extra_planets == 1) {
+                map.planets.emplace_back(center_x, center_y, big_radius * 1.5);
+            }
+            // Generate a cluster of small planets in the center
+            // Cluster helps make sure trivial bots don't get stuck from all
+            // docking to a single center planet at the same time
+            else if (extra_planets > 1) {
+                const auto radius =
+                    std::uniform_real_distribution<>(small_radius, big_radius)(rng);
+                const auto distance_from_center = 2 * radius +
+                    2 * hlt::GameConstants::get().SHIP_RADIUS;
 
-            for (auto i = 0; i < 4; i++) {
-                const auto angle = i * M_PI / 2 + (M_PI / 4);
-                const auto location = hlt::Location{
-                    center_x + distance_from_center * std::cos(angle),
-                    center_y + distance_from_center * std::sin(angle),
-                };
+                for (auto i = 0; i < 4; i++) {
+                    const auto angle = i * M_PI / 2 + (M_PI / 4);
+                    const auto location = hlt::Location{
+                        center_x + distance_from_center * std::cos(angle),
+                        center_y + distance_from_center * std::sin(angle),
+                    };
 
-                map.planets.emplace_back(location.pos_x, location.pos_y, radius);
+                    map.planets.emplace_back(location.pos_x, location.pos_y, radius);
+                }
             }
         }
 
@@ -288,23 +294,21 @@ namespace mapgen {
             }
         }
 
+        const size_t ship_count = hlt::GameConstants::get().SHIPS_PER_PLAYER;
         for (hlt::PlayerId player_id = 0; player_id < num_players;
              player_id++) {
             // Spread out ships to make it less likely they'll collide
             // in the start
             const auto& zone = spawn_zones[player_id];
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y - 3,
-            }, player_id);
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y,
-            }, player_id);
-            map.spawn_ship(hlt::Location{
-                zone.location.pos_x,
-                zone.location.pos_y + 3,
-            }, player_id);
+            const int base_offset = 3;
+            int offset = 0;
+            for (size_t i = 0; i < ship_count; i++) {
+                map.spawn_ship(hlt::Location{
+                    zone.location.pos_x,
+                    zone.location.pos_y + offset,
+                }, player_id);
+                offset = (offset >= 0) ? -offset - base_offset : -offset;
+            }
         }
 
         return {};
