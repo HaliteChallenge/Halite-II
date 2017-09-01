@@ -9,7 +9,7 @@ import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
-import HaliteTV from './templates/HaliteTV.vue';
+import OldVisualizer from "./templates/OldVisualizer.vue";
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -70,13 +70,13 @@ window.views = {
     Visualizer: function () {
         new Vue({
             el: "#visualizer-container",
-            render: (h) => h(Visualizer),
+            render: (h) => h(OldVisualizer),
         });
     },
     HaliteTV: function() {
         new Vue({
             el: "#halitetv-container",
-            render: (h) => h(HaliteTV, {props: {baseUrl: _global.baseUrl}})
+            render: (h) => h(Visualizer, {props: {baseUrl: _global.baseUrl}})
         });
     }
 };
@@ -87,7 +87,7 @@ api.me().then((me) => {
 
        new Vue({
            el: "#user-profile-bar-container",
-           render: (h) => h(UserProfileBar),
+           render: (h) => h(UserProfileBar, {props: {baseUrl: _global.baseUrl}}),
        });
 
        if (me.is_new_user === true && window.location.pathname !== "/associate") {

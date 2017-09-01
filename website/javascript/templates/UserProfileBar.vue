@@ -13,9 +13,24 @@
         </div>
         <ul class="nav navbar-nav navbar-right ">
             <li>
-                <a href="/play"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
+                <a v-on:click.stop.prevent="show_submit"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
         </ul>
+        <div class="popup-container" v-on:click.stop.prevent="close_submit">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-offset-2 col-md-8 popup-pane" v-on:click.stop>
+                        <i class="fa fa-window-close-o" v-on:click.stop.prevent="close_submit"></i>
+                        <div class="content">
+                            <img class="icon" :src="`${baseUrl}/assets/images/temp/submit-bot.png`"/>
+                            <p class="p1">SUBMIT A BOT</p>
+                            <p class="p2">Drop a .bot file here to upload</p>
+                            <div v-on:click="select_file" class="button"><span>SELECT FILE</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -24,6 +39,7 @@
 
     export default {
         name: "user-profile-bar",
+        props: ['baseUrl'],
         data: function() {
             const me = api.me_cached();
             if (me) {
@@ -60,6 +76,14 @@
             sign_out: function (e) {
                 window.location.replace("/");
             },
+            show_submit: function () {
+                $(".popup-container").show();
+            },
+            close_submit: function () {
+                $(".popup-container").hide();
+            },
+            select_file: function () {
+            }
         },
     }
 </script>

@@ -21,7 +21,7 @@
       padding: 5px;
       min-height: 50px;
       @media (min-width: $screen-md-min){
-        padding: 15px 8px;
+        padding: 15px 3px;
       }
       span{
         display: block;
@@ -78,7 +78,7 @@ header.navbar{
         position: absolute;
         transform: translateX(-75px);
         list-style: none;
-        background-color: #25242f;
+        background-color: $gray-bg;
         border-radius: 4px;
         &:before, &:after{
           position: absolute;
@@ -102,7 +102,7 @@ header.navbar{
               opacity: 0;
             }
             &:hover{
-              background-color: #25242f;
+              background-color: $gray-bg;
               color: #FFF;
               .line-bottom{
                 opacity: 1;
@@ -113,10 +113,70 @@ header.navbar{
       }
     }
     ul li a i{
-      background: #30242F;
-      color: #ffbe00;
+      background: $dark-gray;
+      color: $yellow;
       padding: 3px 2px;
       margin-right: 5px;
+    }
+    .popup-container{
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-color: rgba(37,36,47,0.3);
+      .container{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        .popup-pane{
+          background-color: #1c1A27;
+          padding:10px;
+          i{
+            float: right;
+            color: #9d9d9d;
+            font-size: 16px;
+            cursor: pointer;
+          }
+          .content{
+            margin: 20px;
+            padding: 40px;
+            border: 2px dashed #9d9d9d;
+            .icon{
+              width: 60px;
+              height: 72px;
+            }
+            p{
+              margin-top:10px;
+              &.p2{
+                color: #9d9d9d;
+              }
+            }
+            .button{
+              background-image: url(../images/register_bg.png);
+              background-size: contain;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 5px 20px;
+              width: 190px;
+              margin-left: auto;
+              margin-right: auto;
+              margin-top: 60px;
+              cursor: pointer;
+              span{
+                color: $dark-gray;
+                line-height: 20px;
+                padding: 3px;
+                display: inline-block;
+                letter-spacing: 1px;
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -162,6 +222,7 @@ header.navbar{
         display: none;
       }
       a{
+        cursor: pointer;
         color: #30242F;
         &:hover{
           color: #30242F;
