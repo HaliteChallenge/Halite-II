@@ -10,6 +10,7 @@ import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
 import OldVisualizer from "./templates/OldVisualizer.vue";
+import Home from "./templates/Home.vue";
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -78,7 +79,13 @@ window.views = {
             el: "#halitetv-container",
             render: (h) => h(Visualizer, {props: {baseUrl: _global.baseUrl}})
         });
-    }
+    },
+    Home: function () {
+        new Vue({
+            el: "#home-container",
+            render: (h) => h(Home, {props: {baseUrl: _global.baseUrl}}),
+        });
+    },
 };
 
 api.me().then((me) => {

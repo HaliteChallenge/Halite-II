@@ -1,0 +1,53 @@
+.home-container{
+  $o-color: #E37222;
+  $w-color: #FFFFFF;
+  padding-top: 20px;
+  text-align: center;
+  .c-org{
+    color: $o-color;
+  }
+  .c-wht{
+    color: $w-color;
+  }
+  .d1{
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  .t1{
+    font-size: 6rem;
+    letter-spacing: 2px;
+  }
+  .row>[class*="col"]{
+    padding: 20px 0;
+  }
+  .not-me{
+    width: 200px;
+  }
+  .me-in{
+    width: 400px;
+    display: flex;
+    .ha-button{
+      flex: 1;
+    }
+  }
+  .ha-button-container{
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .ha-button{
+    background-image: url(../images/register_bg.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-top: 25px;
+    padding: 5px 20px;
+    cursor: pointer;
+    span{
+      color: $dark-gray;
+      line-height: 20px;
+      padding: 3px;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+  }
+}
