@@ -469,6 +469,10 @@ airesources/starterkits/docfx/*
 /musicgenerator/*.wav
 haliteII/*
 
+environment/CMakeFiles/*
+environment/cmake_install.cmake
+environment/CMakeCache.txt
+environment/Makefile
 cmake-build-*/
 apiserver/venv/
 compiled_environments/
