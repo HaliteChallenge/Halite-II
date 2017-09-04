@@ -469,7 +469,11 @@ airesources/starterkits/docfx/*
 /musicgenerator/*.wav
 haliteII/*
 environment/CMakeFiles/*
-
+website/_site
+website/.sass-cache
+website/.jekyll-metadata
+website/.bundle
+website/assets/js/*.png
 environment/CMakeFiles/*
 environment/cmake_install.cmake
 environment/CMakeCache.txt
