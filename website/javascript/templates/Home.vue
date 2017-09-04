@@ -116,10 +116,14 @@
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
                      <div class="col-md-4">
-                         <img :src="`${baseUrl}/assets/images/temp/join_1.png`"/>
+                         <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
+                            <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
+                                <a href="https://www.facebook.com/haliteAI/"></a>
+                            </blockquote>
+                         </div>
                      </div>
                      <div class="col-md-4">
-                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI">Tweets by HaliteAI</a> 
+                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
                      </div>
                      <div class="col-md-4">
                          <img :src="`${baseUrl}/assets/images/temp/join_3.png`"/>
