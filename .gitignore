@@ -470,6 +470,10 @@ airesources/starterkits/docfx/*
 haliteII/*
 environment/CMakeFiles/*
 
+environment/CMakeFiles/*
+environment/cmake_install.cmake
+environment/CMakeCache.txt
+environment/Makefile
 cmake-build-*/
 apiserver/venv/
 compiled_environments/
