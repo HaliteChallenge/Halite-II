@@ -82,6 +82,17 @@ before_install:
     - eval "${MATRIX_EVAL}"
 
 script:
+# build game environment
   - cd environment/
   - cmake .
   - make -j2
+  - cd ../website
+  - gem install bundler
+  - bundle install --path=vendor/bundle
+  - npm install
+  - cd ../libhaliteviz
+  - npm install
+  - cd ../website
+  - npm run build
+  - bundle exec jekyll build
+# build website
