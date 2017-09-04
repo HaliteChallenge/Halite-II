@@ -119,7 +119,7 @@
                          <img :src="`${baseUrl}/assets/images/temp/join_1.png`"/>
                      </div>
                      <div class="col-md-4">
-                         <img :src="`${baseUrl}/assets/images/temp/join_2.png`"/>
+                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI">Tweets by HaliteAI</a> 
                      </div>
                      <div class="col-md-4">
                          <img :src="`${baseUrl}/assets/images/temp/join_3.png`"/>
