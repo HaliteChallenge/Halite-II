@@ -12,6 +12,7 @@
   "author": "David Li <David.M.Li@TwoSigma.com>",
   "license": "MIT",
   "dependencies": {
+    "d3": "^4.10.2",
     "libhaliteviz": "file:../libhaliteviz",
     "vue": "^2.3.4",
     "vue-moment": "^2.0.2"

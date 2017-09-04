@@ -482,6 +482,7 @@ compiled_environments/
 
 admin/adminenv/*
 promo-website/_site/*
+yarn.lock
 environment/cmake_install.cmake
 environment/CMakeCache.txt
 environment/Makefile

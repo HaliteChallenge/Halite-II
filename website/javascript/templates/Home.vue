@@ -1,6 +1,7 @@
  <template>
      <div class="home-container">
          <div class="notification">THERE'S AN AMA ON REDDIT TODAY, <a>CLICK HERE</a> TO JOIN THE CONVERSATION.</div>
+
          <div class="row">
              <div class="col-md-12">
                  <p class="d1 c-org">INTRODUCING</p>
@@ -123,7 +124,7 @@
                          </div>
                      </div>
                      <div class="col-md-4">
-                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
+                        <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
                      </div>
                      <div class="col-md-4">
                          <img :src="`${baseUrl}/assets/images/temp/join_3.png`"/>

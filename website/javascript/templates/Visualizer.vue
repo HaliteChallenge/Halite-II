@@ -18,7 +18,32 @@
         </div>
       </div>
       <div class="game-replay">
-        <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt="">
+        <i class="xline xline-left"></i>
+        <i class="xline xline-right"></i>
+        <div class="game-replay-viewer"></div>
+        <div class="game-replay-controller">
+          <i class="xline xline-top"></i>
+          <i class="xline xline-bottom"></i> 
+          <div class="game-replay-btn-table">
+            <div class="game-replay-btn-cell">
+              <span class="replay-btn">3x</span>
+              <span class="replay-btn">prev</span>
+              <span class="replay-btn"><a href="javascript:;" @click="playVideo">play</a></span>
+              <span class="replay-btn">next</span>
+              <span class="replay-btn">volumn</span>
+              <i class="xline xline-right" style="right: 0; top: 40%"></i>
+            </div>
+            <div class="game-replay-progress">
+              0:05 --------------------------- 18:02
+            </div>
+            <div class="game-replay-share">
+              <button class="btn">
+                <span>SHARE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
       </div>
     </div>
     <div class="col-md-4 sidebar">
@@ -163,7 +188,7 @@
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
+          <div class="panel-collapse " role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
               <div class="col-md-3">
                 <div class="card-dashboard active">
@@ -238,7 +263,9 @@
                 </h4>
                 <div class="post-game-graph">
                   <!-- TODO: Real Graph -->
-                  <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">
+                  <PlayerLineChart :chart-data="[]" />
+                  <div class="game-graph-graph-container" />
+                  <!--<img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">-->
                 </div>
               </div>
             </div>
@@ -309,9 +336,11 @@
   import * as libhaliteviz from "../../../libhaliteviz";
   import PlayerStatsPane from "./PlayerStatsPane.vue"
   import PlayerDetailPane from "./PlayerDetailPane.vue"
+  import PlayerLineChart from "./PlayerLineChart.vue"
   libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
 
+  let visualizer;
 
   const loadGame = (game) => {
     const buffer = game.replay;
@@ -329,6 +358,9 @@
         time: 0,
         playing: false
       }
+    },
+    components: {
+      PlayerLineChart,
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
@@ -371,14 +403,11 @@
           this.replay = replay;
 
           // init visualizer and events
-          const visualizer = new HaliteVisualizer(replay);
+          visualizer = new HaliteVisualizer(replay);
           visualizer.onUpdate(() => {
             this.frame = visualizer.frame;
             this.time = visualizer.time;
           });
-          visualizer.onPlay(() => {
-            console.log('playing');
-          })
           visualizer.onPlay = () => {
             this.playing = true;
           };
@@ -386,6 +415,7 @@
             this.playing = false;
           };
 
+          visualizer.attach('.game-replay-viewer');
           // play the replay
           visualizer.play();
 
@@ -464,6 +494,13 @@
 
         return count;
       },
+    },
+    methods: {
+      playVideo: function(event) {
+        if(visualizer) {
+          visualizer.play();
+        }
+      }
     }
   }
 </script>
