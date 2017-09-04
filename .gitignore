@@ -468,6 +468,7 @@ airesources/startenv/*
 airesources/starterkits/docfx/*
 /musicgenerator/*.wav
 haliteII/*
+environment/CMakeFiles/*
 
 cmake-build-*/
 apiserver/venv/
@@ -476,5 +477,7 @@ compiled_environments/
 *.dylib
 
 admin/adminenv/*
-
 promo-website/_site/*
+environment/cmake_install.cmake
+environment/CMakeCache.txt
+environment/Makefile
