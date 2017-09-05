@@ -1,10 +1,9 @@
-.home-container{
+.hackathon-container{
   $o-color: #E37222;
   $w-color: #FFFFFF;
-  $g-color: #d0cccc;
+  $g-color: #9d9d9d;
 
   padding-top: 20px;
-  margin-bottom: 20px;
   text-align: center;
   .c-org{
     color: $o-color;
@@ -32,29 +31,18 @@
     letter-spacing: 2px;
   }
   .t3{
-    font-size: 2rem;
-    letter-spacing: 1px;
-  }
-  .t4{
     font-size: 1.5rem;
     letter-spacing: 1px;
   }
-  .t5{
+  .t4{
     font-size: 1.4rem;
     letter-spacing: 1px;
   }
   .mgt-10{
     margin-top: 10px;
   }
-  .pdl30{
-    padding-left: 30px;
-  }
-  .pdr30{
-    padding-right: 30px;
-  }
   .notification{
     background-color: $yellow;
-    margin-bottom: 30px;
     height: 60px;
     text-align: center;
     line-height: 60px;
@@ -161,52 +149,5 @@
   }
   .clear{
     clear: both;
-  }
-  .img-container{
-    position: relative;
-    .img-btn{
-      cursor: pointer;
-      width: 16%;
-      max-width: 45px;
-      min-width: 30px;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      &:hover{
-        width: 17%;
-      }
-    }
-  }
-  .menu-header{
-    margin-top: 30px;
-    .line-container{
-      display: inline-block;
-      width: 25%;
-      transform: translateY(15px);
-      margin-left: 30px;
-      margin-right: 30px;
-    }
-    img{
-      width: 60px;
-    }
-  }
-  .menu-body{
-    margin-bottom:30px;
-    .content{
-      width: 75%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .line-container{
-      width: 25%;
-      float: left;
-      transform: translate(-60px, 45px) rotate(90deg);
-      display: inline-block;
-      &.line-2{
-        float: right;
-        transform: translate(42px, 45px) rotate(90deg);
-      }
-    }
   }
 }

@@ -3,6 +3,9 @@
   padding: 10px 0;
   &-name{
     padding-right: 10px;
+    max-width: 100px;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   &-break-down{
     
@@ -13,7 +16,7 @@
     margin-bottom: 5px;
   }
   .bar{
-    width: 10px;
+    flex: 1;
     height: 20px;
     margin-right: 2px;
     margin-left: 2px;

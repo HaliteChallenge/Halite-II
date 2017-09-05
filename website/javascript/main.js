@@ -11,6 +11,7 @@ import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
 import OldVisualizer from "./templates/OldVisualizer.vue";
 import Home from "./templates/Home.vue";
+import HackathonIndividual from "./templates/HackathonIndividual.vue";
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -84,6 +85,12 @@ window.views = {
         new Vue({
             el: "#home-container",
             render: (h) => h(Home, {props: {baseUrl: _global.baseUrl}}),
+        });
+    },
+    HackathonIndividual: function () {
+        new Vue({
+            el: "#hackathon-container",
+            render: (h) => h(HackathonIndividual, {props: {baseUrl: _global.baseUrl}}),
         });
     },
 };

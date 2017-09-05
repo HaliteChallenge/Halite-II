@@ -18,7 +18,45 @@
         </div>
       </div>
       <div class="game-replay">
-        <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt="">
+        <i class="xline xline-left"></i>
+        <i class="xline xline-right"></i>
+        <div class="game-replay-viewer"></div>
+        <div class="game-replay-controller">
+          <i class="xline xline-top"></i>
+          <i class="xline xline-bottom"></i> 
+          <div class="game-replay-btn-table">
+            <div class="game-replay-btn-cell">
+              <span class="replay-btn">
+                <a href="javascript:;" @click="toggleSpeed"><span v-html="speedLabel"></span></a>
+              </span>
+              <span class="replay-btn">
+                <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
+              </span>
+              <span v-if="!playing" class="replay-btn">
+                <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
+              </span>
+              <span v-if="playing" class="replay-btn">
+                <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
+              </span>
+              <span class="replay-btn">
+                <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
+              </span>
+              <span class="replay-btn">
+                <span class="icon-volumn"></span>
+              </span>
+              <i class="xline xline-right" style="right: 0; top: 35%"></i>
+            </div>
+            <div class="game-replay-progress">
+              <vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider>
+            </div>
+            <div class="game-replay-share">
+              <button class="btn">
+                <span>SHARE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
       </div>
     </div>
     <div class="col-md-4 sidebar">
@@ -156,16 +194,16 @@
     <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details">
+            <a data-toggle="collapse" href="#panel_post_game" aria-expanded="true" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4>post game dashboard</h4>
               <span class="toggle-icon expand"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
+          <div class="panel-collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
-              <div class="col-md-3">
+              <div class="col-md-3" v-for="(_player, _pIndex) in (replay && replay.player_names) || []">
                 <div class="card-dashboard active">
                   <i class="xline xline-top"></i>
                   <i class="xline xline-bottom"></i>
@@ -173,56 +211,11 @@
                     <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
                   </div>
                   <div class="card-dashboard-info">
-                    <span class="dot bg-1"></span>
-                    <p class="card-dashboard-name">Juliak</p>
+                    <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
+                    <p class="card-dashboard-name">{{_player}}</p>
                     <p class="card-dashboard-version-heading">Bot version:</p>
                   </div>
                   <div class="card-dashboard-version">v9</div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card-dashboard active">
-                  <i class="xline xline-top"></i>
-                  <i class="xline xline-bottom"></i>
-                  <div class="card-dashboard-thumb">
-                    <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
-                  </div>
-                  <div class="card-dashboard-info">
-                    <span class="dot bg-2"></span>
-                    <p class="card-dashboard-name">Juliak</p>
-                    <p class="card-dashboard-version-heading">Bot version:</p>
-                  </div>
-                  <div class="card-dashboard-version">v9</div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card-dashboard">
-                  <i class="xline xline-top"></i>
-                  <i class="xline xline-bottom"></i>
-                  <div class="card-dashboard-thumb">
-                    <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
-                  </div>
-                  <div class="card-dashboard-info">
-                    <span class="dot bg-3"></span>
-                    <p class="card-dashboard-name">Juliak</p>
-                    <p class="card-dashboard-version-heading">Bot version:</p>
-                  </div>
-                  <div class="card-dashboard-version">v33</div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="card-dashboard active">
-                  <i class="xline xline-top"></i>
-                  <i class="xline xline-bottom"></i>
-                  <div class="card-dashboard-thumb">
-                    <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
-                  </div>
-                  <div class="card-dashboard-info">
-                    <span class="dot bg-4"></span>
-                    <p class="card-dashboard-name">Juliak</p>
-                    <p class="card-dashboard-version-heading">Bot version:</p>
-                  </div>
-                  <div class="card-dashboard-version">v2</div>
                 </div>
               </div>
             </div>
@@ -238,7 +231,9 @@
                 </h4>
                 <div class="post-game-graph">
                   <!-- TODO: Real Graph -->
-                  <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => frame = index" />
+                  <!-- <div class="game-graph-graph-container" /> -->
+                  <!--<img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">-->
                 </div>
               </div>
             </div>
@@ -255,7 +250,8 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-2.png`">
+                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => frame = index" />
+                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-2.png`"> -->
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -265,7 +261,8 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-3.png`">
+                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => frame = index" />
+                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-3.png`"> -->
                   </div>
                 </div>
               </div>
@@ -281,7 +278,8 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-4.png`">
+                    <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => frame = index" />
+                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-4.png`"> -->
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -291,7 +289,8 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-5.png`">
+                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => frame = index" />
+                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-5.png`"> -->
                   </div>
                 </div>
               </div>
@@ -307,11 +306,15 @@
   import Vue from "vue";
   import * as api from "../api";
   import * as libhaliteviz from "../../../libhaliteviz";
+  import vueSlider from 'vue-slider-component';
   import PlayerStatsPane from "./PlayerStatsPane.vue"
   import PlayerDetailPane from "./PlayerDetailPane.vue"
+  import PlayerLineChart from "./PlayerLineChart.vue"
+
   libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
 
+  let visualizer;
 
   const loadGame = (game) => {
     const buffer = game.replay;
@@ -327,8 +330,36 @@
         replay: null,
         frame: 0,
         time: 0,
-        playing: false
+        playing: false,
+        speedIndex: 1,
+        speedLabel: '1x',
+        stats: null,
+        sliderOptions: {
+          min: 0,
+          max: 0,
+          sliderStyle: {
+            backgroundColor: 'transparent',
+            top: 0,
+            width: "6px",
+            height: "6px"
+          },
+          processStyle: {
+            backgroundColor: '#E6AB00'
+          },
+          tooltipStyle: {
+            backgroundColor: '#E6AB00',
+            border: '1px solid #E6AB00',
+            color: '#30242F'
+          },
+          piecewiseStyle: {
+            backgroundColor: '#23242b'
+          }
+        }
       }
+    },
+    components: {
+      PlayerLineChart,
+      vueSlider
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
@@ -337,48 +368,27 @@
 
       /// for test: api doesn't work so I fake the sample data
       const playerStatsContainer = document.getElementById('player_stats_pane');
-      // new Vue({
-      //   el: playerStatsContainer,
-      //   render: (h) => h(PlayerStatsPane, {
-      //     props: {
-      //       // game: game,
-      //       replay: {
-      //         num_players: 4,
-      //         players: ['Juliak', 'Mzotkiew', 'Timfoden', 'Erdman'],
-      //         frame: {
-      //           ships: {
-      //             0: 10,
-      //             1: 15,
-      //             2: 12,
-      //             3: 20
-      //           },
-      //           planets: {
-      //             0: 120,
-      //             1: 150,
-      //             2: 123,
-      //             3: 302
-      //           }
-      //         }
-      //       }
-      //     }
-      //   })
-      // });
 
       api.get_replay(game_id, (loaded, total) => {
       }).then((game) => {
 
         loadGame(game).then((replay) => {
           this.replay = replay;
+          console.log('replay', replay.frames[0]);
+
+          // update slider
+          this.sliderOptions.max = this.replay.num_frames - 1;
+          this.sliderOptions.value = this.frame;
 
           // init visualizer and events
-          const visualizer = new HaliteVisualizer(replay);
-          visualizer.onUpdate(() => {
+          visualizer = new HaliteVisualizer(replay);
+
+          this.stats = visualizer.stats;
+          
+          visualizer.onUpdate = () => {
             this.frame = visualizer.frame;
             this.time = visualizer.time;
-          });
-          visualizer.onPlay(() => {
-            console.log('playing');
-          })
+          };
           visualizer.onPlay = () => {
             this.playing = true;
           };
@@ -386,8 +396,11 @@
             this.playing = false;
           };
 
+          visualizer.attach('.game-replay-viewer');
           // play the replay
           visualizer.play();
+
+          console.log('visualizer', {time: visualizer.time, stats: visualizer.stats, frame: visualizer.frame});
 
           // render player stat pane
           const playerStatsContainer = document.getElementById('player_stats_pane');
@@ -397,7 +410,7 @@
               props: {
                 game: game,
                 replay: replay,
-                frame: 55, //visualizer.frame, // for testing
+                frame: visualizer.frame, // for testing
                 time: visualizer.time,
                 stats: visualizer.stats,
                 statistics: this.statistics
@@ -411,7 +424,7 @@
               props: {
                 game: game,
                 replay: replay,
-                frame: 55, //visualizer.frame, // for testing
+                frame: visualizer.frame, // for testing
                 time: visualizer.time,
                 stats: visualizer.stats,
                 statistics: this.statistics
@@ -435,16 +448,12 @@
           };
         }
 
-        // // TODO: replace this
-        let frame = this.replay.frames[55]; // this.replay.frames[this.frame]
+        let frame = this.replay.frames[this.frame]
         for (let owner of Object.keys(frame.ships)) {
-          // count[owner].ships = frame.ships[owner]
           count[owner].ships += Object.values(frame.ships[owner]).length;
         }
 
         for (let planet of Object.values(frame.planets)) {
-        // for (let owner of Object.keys(frame.planets)) {
-          // count[owner].planets = frame.planets[owner]
           if (planet.owner !== null) {
             count[planet.owner].planets++;
           }
@@ -464,6 +473,96 @@
 
         return count;
       },
+      chartData: function(){
+        let output = {
+          production: [],
+          health: [],
+          damage: [],
+          attack: [],
+        };
+
+        try {
+          if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
+            
+          for (let _pIndex in this.stats.frames[0].players) {
+            let playerP = [];
+            let playerH = [];
+            let playerD = [];
+            let playerA = [];
+            this.stats.frames.forEach((_frame, _fIndex) => {
+              playerP.push({x: _fIndex, y: _frame.players[_pIndex].currentProductions});
+              playerH.push({x: _fIndex, y: _frame.players[_pIndex].totalHealths});
+              playerD.push({x: _fIndex, y: _frame.players[_pIndex].totalDamages});
+              playerA.push({x: _fIndex, y: _frame.players[_pIndex].totalAttacks});
+            });
+            output.production.push(playerP);
+            output.health.push(playerH);
+            output.damage.push(playerD);
+            output.attack.push(playerA);
+          }
+          console.log('output', output)
+          return output;
+        } catch(e) {
+          console.error(e)
+          return output
+        }
+      }
+    },
+    methods: {
+      playVideo: function(event) {
+        if(visualizer) {
+          if(this.frame >= this.replay.num_frames - 1) {
+            visualizer.frame = 0;
+            visualizer.time = 0.0;
+            this.frame = 0;
+            this.time = 0.0; 
+          }
+          visualizer.play();
+        }
+      },
+      pauseVideo: function(event){
+        if(visualizer) {
+          visualizer.pause();
+        } 
+      },
+      toggleSpeed: function(event) {
+        const speedList =  {
+          1: '&frac12x',
+          2: '1x',
+          4: '2x',
+          6: '3x',
+          8: '4x',
+          10: '10x',
+        };
+
+        // set speed
+        this.speedIndex++;
+        if (this.speedIndex >= Object.keys(speedList).length ) this.speedIndex = 0;
+
+        const value = Object.keys(speedList)[this.speedIndex];
+        const label = speedList[value];
+        this.speedLabel = label;
+
+        if(visualizer) {
+          visualizer.playSpeed = value;
+        }
+      },
+      prevFrame: function(){
+        if (visualizer && this.frame > 0){
+          visualizer.scrub(this.frame + -1, 0);
+        }
+      },
+      nextFrame: function(){
+        if (visualizer && this.frame < this.replay.num_frames - 1){
+          visualizer.scrub(this.frame + 1, 0);
+        }
+      },
+      changeFrame: function(event){
+        console.log('frame change to ' + this.frame);
+        if (visualizer){
+          visualizer.scrub(this.frame, 0);
+        }
+      }
     }
   }
 </script>

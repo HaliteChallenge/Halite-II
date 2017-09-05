@@ -63,8 +63,119 @@
   }
 }
 
+.xline-left {
+  position: absolute;
+  width: 1px;
+  display: block;
+  background-color: #889295;
+  height: 30%;
+  top: 30%;
+  left: 10px; 
+  &.xline-left:before, &.xline-left:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #889295;
+    border-radius: 3px; 
+  }
+  &.xline-left:before {
+    top: -2px;
+    left: -1px; 
+  }
+  &.xline-left:after {
+    bottom: -2px;
+    left: -1px; 
+    top: auto;
+  }
+}
+
+.xline-right {
+  position: absolute;
+  width: 1px;
+  display: block;
+  background-color: #889295;
+  height: 30%;
+  top: 30%;
+  right: 10px; 
+  &.xline-right:before, &.xline-right:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #889295;
+    border-radius: 3px; 
+  }
+  &.xline-right:before {
+    top: -2px;
+    right: -1px; 
+    left: auto;
+  }
+  &.xline-right:after {
+    bottom: -2px;
+    right: -1px; 
+    top: auto;
+  }
+}
+
 .game-replay{
   padding: 15px 0;
+  position: relative;
+
+  .game-replay-viewer {
+    padding: 20px 30px;
+  }
+
+  .game-replay-controller {
+    position: relative;
+    height: 60px;
+    width: 100%;
+    .xline{
+      background-color: #474951;
+      &:after, &:before{
+        background-color: #474951;
+      }
+    }
+
+    .game-replay-btn-table {
+      display: table;
+      height: 100%;
+      width: 100%;
+
+      .game-replay-btn-cell {
+        display: table-cell;
+        vertical-align: middle;
+        position: relative;
+        width: 240px;
+  
+        .replay-btn {
+          margin-right: 30px;
+          a{
+            color: inherit;
+            &:hover, &:focus{
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+
+    .game-replay-progress {
+      display: table-cell;
+      vertical-align: middle;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .game-replay-share {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      width: 100px;
+    }
+  }
 }
 
 .card-dashboard-list{

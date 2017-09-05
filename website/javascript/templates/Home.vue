@@ -1,6 +1,7 @@
  <template>
      <div class="home-container">
          <div class="notification">THERE'S AN AMA ON REDDIT TODAY, <a>CLICK HERE</a> TO JOIN THE CONVERSATION.</div>
+
          <div class="row">
              <div class="col-md-12">
                  <p class="d1 c-org">INTRODUCING</p>
@@ -24,7 +25,7 @@
                  <div class="words col-md-offset-1 col-md-5">
                     <p class="t2 c-wht">WHAT IS HALITE?</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
-                     <p class="t4 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                     <p class="t5 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <div class="ha-button-container">
                          <div class="ha-button no-bg-button"><span>READ DOCUMENT</span></div>
@@ -38,8 +39,8 @@
                  <div class="words col-md-offset-1 col-md-5">
                      <p class="t2 c-wht">MINING HALITE IN SPACE</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
-                     <p class="t4 c-gry">This year's game is a space story.</p>
-                     <p class="t4 c-gry">Every product that is labeled as a Pocket PC must be accompanied with specific software to operate the unit and must feature a touchscreen and touchpad. </p>
+                     <p class="t5 c-gry">This year's game is a space story.</p>
+                     <p class="t5 c-gry">Every product that is labeled as a Pocket PC must be accompanied with specific software to operate the unit and must feature a touchscreen and touchpad. </p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <div class="ha-button-container">
                          <div class="ha-button no-bg-button"><span>READ STORY</span></div>
@@ -54,49 +55,61 @@
              <div class="col-md-12 big-menu">
                  <p class="t2 c-wht">WATCH HALITE TV!</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <p class="t4 c-gry">See what's happening right now or watch some of the base</p>
+                 <p class="t5 c-gry">See what's happening right now or watch some of the base</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
                      <div class="col-md-3">
-                         <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                         <div class="img-container">
+                             <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                             <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
+                         </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t3 c-wht">Juliak vs Erdman</span>
+                             <span class="t4 c-wht">Juliak vs Erdman</span>
                              <div class="mgt-10">
-                                 <span class="t4 c-gry">July 5, 08:08:34</span>
+                                 <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
                          </div>
                      </div>
                      <div class="col-md-3">
-                         <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                         <div class="img-container">
+                             <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                             <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
+                         </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t3 c-wht">CariosW... vs Erdman, +2</span>
+                             <span class="t4 c-wht">CariosW... vs Erdman, +2</span>
                              <div class="mgt-10">
-                                 <span class="t4 c-gry">July 5, 08:08:34</span>
+                                 <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
                          </div>
                      </div>
                      <div class="col-md-3">
-                         <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                         <div class="img-container">
+                             <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                             <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
+                         </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t3 c-wht">Harikmeon vs Erdman</span>
+                             <span class="t4 c-wht">Harikmeon vs Erdman</span>
                              <div class="mgt-10">
-                                 <span class="t4 c-gry">July 5, 08:08:34</span>
+                                 <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
                          </div>
                      </div>
                      <div class="col-md-3">
-                         <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                         <div class="img-container">
+                             <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
+                             <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
+                         </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t3 c-wht">Harikmeon vs Erdman</span>
+                             <span class="t4 c-wht">Harikmeon vs Erdman</span>
                              <div class="mgt-10">
-                                 <span class="t4 c-gry">July 5, 08:08:34</span>
+                                 <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
                          </div>
@@ -112,7 +125,7 @@
              <div class="col-md-12 big-menu">
                  <p class="t2 c-wht">JOIN THE CONVERSATION</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <p class="t4 c-gry">There are many ways to make Halite a social experience</p>
+                 <p class="t5 c-gry">There are many ways to make Halite a social experience</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
                      <div class="col-md-4">
@@ -123,7 +136,7 @@
                          </div>
                      </div>
                      <div class="col-md-4">
-                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
+                        <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
                      </div>
                      <div class="col-md-4">
                          <img :src="`${baseUrl}/assets/images/temp/join_3.png`"/>
@@ -131,7 +144,47 @@
                  </div>
                  <div class="clear"></div>
              </div>
-             <div class="col-md-12 ha-line">
+             <div class="col-md-12 big-menu">
+                 <div class="col-md-6 pdr30">
+                     <div class="menu-header">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <img :src="`${baseUrl}/assets/images/temp/career.png`"/>
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                     </div>
+                     <div class="menu-body">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                         <div class="clear"></div>
+                         <div class="content">
+                             <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
+                             <p class="t5 c-gry">Interested to work at Two Sigma?</p>
+                             <div class="clear"></div>
+                             <div class="ha-button-container">
+                                 <div class="ha-button no-bg-button"><span>EXPLORE CAREERS</span></div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-6 pdl30">
+                     <div class="menu-header">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <img :src="`${baseUrl}/assets/images/temp/competition.png`"/>
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                     </div>
+                     <div class="menu-body">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                         <div class="clear"></div>
+                         <div class="content">
+                             <p class="t3 c-wht">ABOUT THE HALITE COMPETITION</p>
+                             <p class="t5 c-gry">Learn more about why Two Sigma is sponsoring the Halite competition</p>
+                             <div class="clear"></div>
+                             <div class="ha-button-container">
+                                 <div class="ha-button no-bg-button"><span>EXPLORE CAREERS</span></div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
              </div>
              <div class="col-md-12 big-menu">
                  <p class="t2 c-wht">JOIN US NOW</p>
