@@ -24,6 +24,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-pause:before {
+  content: "\e913";
+}
+.icon-next:before {
+  content: "\e90f";
+}
+.icon-play:before {
+  content: "\e910";
+}
+.icon-prev:before {
+  content: "\e911";
+}
+.icon-volumn:before {
+  content: "\e912";
+}
 .icon-damage:before {
   content: "\e90c";
 }
@@ -34,6 +49,9 @@
   content: "\e90e";
 }
 .icon-medal-1:before {
+  content: "\e909";
+}
+.icon-medal-4:before {
   content: "\e909";
 }
 .icon-medal-2:before {

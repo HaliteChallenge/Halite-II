@@ -465,9 +465,19 @@ node_modules
 
 musicgenerator/haliteamp/*
 airesources/startenv/*
+airesources/starterkits/docfx/*
 /musicgenerator/*.wav
 haliteII/*
-
+environment/CMakeFiles/*
+website/_site
+website/.sass-cache
+website/.jekyll-metadata
+website/.bundle
+website/assets/js/*.png
+environment/CMakeFiles/*
+environment/cmake_install.cmake
+environment/CMakeCache.txt
+environment/Makefile
 cmake-build-*/
 apiserver/venv/
 compiled_environments/
@@ -475,5 +485,8 @@ compiled_environments/
 *.dylib
 
 admin/adminenv/*
-
 promo-website/_site/*
+yarn.lock
+environment/cmake_install.cmake
+environment/CMakeCache.txt
+environment/Makefile

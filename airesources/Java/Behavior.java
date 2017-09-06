@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Behavior {
     private static final short MAX_ADJUSTMENT_TRIES = 2;
     // How close warp tries to get to the target coordinate

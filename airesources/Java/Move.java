@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Move {
     public enum MoveType {Noop, Thrust, Dock, Undock}
     protected MoveType type;

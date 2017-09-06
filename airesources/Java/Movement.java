@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class Movement {
 
     public static double getDistance(Position start, Position target) {

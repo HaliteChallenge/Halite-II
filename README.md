@@ -1,6 +1,7 @@
 # Halite
 
-[![Travis Badge](https://travis-ci.org/HaliteChallenge/Halite.svg?branch=master)](https://travis-ci.org/HaliteChallenge/Halite)
+[![Travis Build Status](https://travis-ci.com/twosigma/Halite-II.svg?token=g5W4G4nTZRf9GdJEqCVK&branch=master)](https://travis-ci.com/twosigma/Halite-II)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/q4xl422raui15933?svg=true)](https://ci.appveyor.com/project/Halite/halite-ii)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/HaliteChallenge/Halite/master/LICENSE)
 
 Halite is a programming competition. Contestants write bots to play an original multi-player turn-based strategy game played on a rectangular grid. For more information about the game, visit [our website](http://halite.io).

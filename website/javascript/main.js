@@ -9,7 +9,8 @@ import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import Visualizer from "./templates/Visualizer.vue";
-import OldVisualizer from "./templates/OldVisualizer.vue";
+import Home from "./templates/Home.vue";
+import HackathonIndividual from "./templates/HackathonIndividual.vue";
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -70,7 +71,7 @@ window.views = {
     Visualizer: function () {
         new Vue({
             el: "#visualizer-container",
-            render: (h) => h(OldVisualizer),
+            render: (h) => h(Visualizer),
         });
     },
     HaliteTV: function() {
@@ -78,7 +79,19 @@ window.views = {
             el: "#halitetv-container",
             render: (h) => h(Visualizer, {props: {baseUrl: _global.baseUrl}})
         });
-    }
+    },
+    Home: function () {
+        new Vue({
+            el: "#home-container",
+            render: (h) => h(Home, {props: {baseUrl: _global.baseUrl}}),
+        });
+    },
+    HackathonIndividual: function () {
+        new Vue({
+            el: "#hackathon-container",
+            render: (h) => h(HackathonIndividual, {props: {baseUrl: _global.baseUrl}}),
+        });
+    },
 };
 
 api.me().then((me) => {

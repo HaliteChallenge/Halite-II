@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class DockMove extends Move {
     private EntityId destination;
 

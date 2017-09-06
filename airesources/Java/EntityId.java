@@ -1,3 +1,5 @@
+package halitejavabot;
+
 public class EntityId {
     private short owner;
     private long id;
