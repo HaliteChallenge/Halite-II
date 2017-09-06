@@ -8,8 +8,8 @@
         </h4>
         <div class="card-player-stats-list">
           <div class="card-player-stats"><span class="icon-ship"></span> Ships: {{player.ships}}</div>
-          <div class="card-player-stats"><span class="icon-planet"></span> Planet own: {{player.planets}}</div>
-          <div class="card-player-stats"><span class="icon-lightning"></span> Attack: {{stats.frames[frame].players[index].totalDamages}}</div>
+          <div class="card-player-stats"><span class="icon-planet"></span> Planets Owned: {{player.planets}}</div>
+          <div class="card-player-stats"><span class="icon-lightning"></span> Attacks: {{numberSep(stats.frames[frame].players[index].totalDamages)}}</div>
         </div>
       </div>
     </div>
@@ -54,7 +54,10 @@
         player_names: this.replay.player_names
       }
     },
-    mounted: function(){
+    methods: {
+      numberSep: function(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
     }
   }
 </script>

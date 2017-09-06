@@ -87,6 +87,7 @@
   }
   &-info{
     padding: 0 5px 0 10px;
+    min-width: 0;
     p{
       margin-bottom: 0;
       margin-top: 4px;
@@ -105,6 +106,9 @@
     font-size: 20px;
     font-weight: 500;
     letter-spacing: 1px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .dot{
     display: block;

@@ -144,7 +144,7 @@
               let _base = 0
               let _width = width
               let _offset = _x < _base ? _base : _x > _width ? _width : _x
-              self.$emit('updateIndex', x.invert(_offset))
+              self.$emit('updateIndex', Math.round(x.invert(_offset)))
               // innerSvg.attr('width', _offset)
               // d3.select(this)
               //   .attr('transform', () => {

@@ -24,7 +24,7 @@
   }
   &-players{
     font-family: $font-heading;
-    font-size: 18px;
+    font-size: 16px;
     color: $foreground;
     letter-spacing: 2px;
     text-shadow: 0 2px 30px rgba(0,0,0,0.20);
@@ -40,7 +40,7 @@
         margin-left: 0;
       }
       >span+span{
-        margin-left: 3px; 
+        margin-left: 9px; 
       }
     }
     .short{
@@ -167,6 +167,16 @@
       vertical-align: middle;
       padding-left: 20px;
       padding-right: 20px;
+    }
+
+    .game-replay-progress-inner{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .game-replay-progress-bar{
+      flex: 1;
+      padding: 0 5px;
     }
 
     .game-replay-share {

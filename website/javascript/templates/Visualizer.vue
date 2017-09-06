@@ -5,15 +5,21 @@
       <div class="game-heading">
         <i class="xline xline-top"></i>
         <i class="xline xline-bottom"></i>
-        <p class="game-heading-date">8/3/2017 - 8:08:35 PM</p>
+        <p class="game-heading-date" v-if="game">{{game.game.time_played | moment("MM/DD/YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
-          <div class="short"></div>
-          <div class="long">
-            <span class="player color-1"><span class="icon-medal-1"></span>juliak</span>
+          <div class="short">
+            <span class="player color-1" v-if="players.length"><span class="icon-medal-1"></span>{{players[0].name}}</span>
             <span class="action">defeats</span>
-            <span class="player color-2"><span class="icon-medal-2"></span>harikmenon</span>
-            <span class="player color-3"><span class="icon-medal-3"></span>CarlosWatton</span>
-            <span class="player color-4"><span class="icon-medal-1"></span>erdman</span>
+            <span class="player color-2" v-if="players.length"><span class="icon-medal-1"></span>{{players[1].name}}</span>
+            <span class="action" v-if="players.length > 2">+{{players.length - 2}}</span>
+          </div>
+          <div class="long">
+            <span class="player color-1" v-if="players.length"><span class="icon-medal-1"></span>{{players[0].name}}</span>
+            <span class="action">defeats</span>
+            <span :class='"player color-" + (index+1)' v-for="(player, index) in players" v-if="index > 0" :key="index">
+              <span :class='"icon-medal-" + (index+1)'></span>
+              {{player.name}}
+            </span>
           </div>
         </div>
       </div>
@@ -47,7 +53,11 @@
               <i class="xline xline-right" style="right: 0; top: 35%"></i>
             </div>
             <div class="game-replay-progress">
-              <vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider>
+              <div class="game-replay-progress-inner">
+                <div>0</div>
+                <div class="game-replay-progress-bar"><vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
+                <div>{{sliderOptions.max}}</div>
+              </div>
             </div>
             <div class="game-replay-share">
               <button class="btn">
@@ -231,7 +241,7 @@
                 </h4>
                 <div class="post-game-graph">
                   <!-- TODO: Real Graph -->
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => frame = index" />
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}"/>
                   <!-- <div class="game-graph-graph-container" /> -->
                   <!--<img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">-->
                 </div>
@@ -250,7 +260,7 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => frame = index" />
+                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}" />
                     <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-2.png`"> -->
                   </div>
                 </div>
@@ -261,7 +271,7 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => frame = index" />
+                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => {frame = index}" />
                     <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-3.png`"> -->
                   </div>
                 </div>
@@ -278,7 +288,7 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => frame = index" />
+                    <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => {frame = index}" />
                     <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-4.png`"> -->
                   </div>
                 </div>
@@ -289,7 +299,7 @@
                   </h4>
                   <div class="post-game-graph">
                     <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => frame = index" />
+                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => {frame = index}" />
                     <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-5.png`"> -->
                   </div>
                 </div>
@@ -306,10 +316,12 @@
   import Vue from "vue";
   import * as api from "../api";
   import * as libhaliteviz from "../../../libhaliteviz";
+  import moment from 'vue-moment';
   import vueSlider from 'vue-slider-component';
-  import PlayerStatsPane from "./PlayerStatsPane.vue"
-  import PlayerDetailPane from "./PlayerDetailPane.vue"
-  import PlayerLineChart from "./PlayerLineChart.vue"
+  import PlayerStatsPane from "./PlayerStatsPane.vue";
+  import PlayerDetailPane from "./PlayerDetailPane.vue";
+  import PlayerLineChart from "./PlayerLineChart.vue";
+  import _ from "lodash";
 
   libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
@@ -359,7 +371,10 @@
     },
     components: {
       PlayerLineChart,
-      vueSlider
+      vueSlider,
+      PlayerStatsPane,
+      PlayerDetailPane,
+      PlayerLineChart
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
@@ -372,9 +387,15 @@
       api.get_replay(game_id, (loaded, total) => {
       }).then((game) => {
 
+        this.game = game;
+
         loadGame(game).then((replay) => {
           this.replay = replay;
           console.log('replay', replay.frames[0]);
+
+          // update slider
+          this.sliderOptions.max = this.replay.num_frames - 1;
+          this.sliderOptions.value = this.frame;
 
           // update slider
           this.sliderOptions.max = this.replay.num_frames - 1;
@@ -506,9 +527,28 @@
           console.error(e)
           return output
         }
+      },
+      players: function(){
+        if (!this.replay) return [];
+
+        let ranks = this.replay.stats;
+
+        for(let id of Object.keys(this.replay.stats)){
+          ranks[id].index = parseInt(id);
+          ranks[id].botname = this.replay.player_names[id];
+          ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
+        }
+
+        ranks = _.sortBy(ranks, ['rank']);
+
+        return Object.values(ranks);
       }
     },
     methods: {
+      getPlayerName: function(botname){
+
+        return botname.replace(/\sv\d+$/, '');
+      },
       playVideo: function(event) {
         if(visualizer) {
           if(this.frame >= this.replay.num_frames - 1) {

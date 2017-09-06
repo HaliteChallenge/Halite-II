@@ -14,6 +14,7 @@
   "dependencies": {
     "d3": "^4.10.2",
     "libhaliteviz": "file:../libhaliteviz",
+    "lodash": "^4.17.4",
     "vue": "^2.3.4",
     "vue-moment": "^2.0.2",
     "vue-slider-component": "^2.3.9"
