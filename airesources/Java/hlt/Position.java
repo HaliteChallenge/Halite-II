@@ -1,4 +1,8 @@
+package hlt;
+
+
 public class Position {
+
     private double xPos;
     private double yPos;
 
@@ -17,13 +21,15 @@ public class Position {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Position position = (Position) o;
 
-        Position position = (Position) o;
-
-        if (Double.compare(position.xPos, xPos) != 0) return false;
-        return Double.compare(position.yPos, yPos) == 0;
+        return (Double.compare(position.xPos, xPos) == 0) && (Double.compare(position.yPos, yPos) == 0);
     }
 
     @Override
@@ -34,14 +40,15 @@ public class Position {
         result = (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(yPos);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+
         return result;
     }
 
     @Override
     public String toString() {
         return "Position{" +
-                "xPos=" + xPos +
-                ", yPos=" + yPos +
+                "xPos="    + xPos +
+                ", yPos="  + yPos +
                 '}';
     }
 }

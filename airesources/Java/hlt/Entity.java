@@ -1,11 +1,22 @@
-public abstract class Entity {
-    protected Position position;
-    protected short health;
-    protected double radius;
-    protected EntityId id;
-    public enum Type {Planet, Ship};
+package hlt;
 
-    public boolean is_alive() {
+import java.util.LinkedList;
+
+
+public abstract class Entity {
+
+    final private EntityId entityId;
+    private Position position;
+    private short health;
+    public enum Type { Planet, Ship }
+
+    public Entity(short owner, LinkedList<String> metadata, Type type) {
+        this.entityId = new EntityId(owner, Long.parseLong(metadata.pop()), type);
+        this.position = new Position(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
+        this.health = Short.parseShort(metadata.pop());
+    }
+
+    public boolean isAlive() {
         return health > 0;
     }
 
@@ -25,11 +36,9 @@ public abstract class Entity {
         this.health = health;
     }
 
-    public double getRadius() {
-        return radius;
-    }
+    public abstract double getRadius();
 
-    public EntityId getId() {
-        return id;
+    public EntityId getEntityId() {
+        return entityId;
     }
 }

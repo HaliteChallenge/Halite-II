@@ -1,35 +1,47 @@
-public class ThrustMove extends Move {
-    private short angle;
-    private short thrust;
+package hlt;
 
-    public static class Pair {
-        private final double angle;
+
+public class ThrustMove extends Move {
+
+    private final short angleDeg;
+    private final short thrust;
+
+    public static class ThrustVector {
+        private final double angleRad;
         private final short thrust;
 
-        public Pair(double angle, short thrust) {
-            this.angle = angle;
+        public ThrustVector(double angleRad, short thrust) {
+            this.angleRad = angleRad;
             this.thrust = thrust;
+        }
+
+        public double getAngleRad() {
+            return angleRad;
         }
     }
 
-    public ThrustMove(Ship ship, double angle, short thrust) {
-        this.type = MoveType.Thrust;
-        this.ship = ship;
+    public ThrustMove(Ship ship, double angleRad, short thrust) {
+        super(MoveType.Thrust, ship);
         this.thrust = thrust;
-        this.angle = (short)((angle * 180 / Math.PI) % 360);
-        if (this.angle < 0) this.angle += 360;
+
+        final short angleDegUnclipped = (short)((angleRad * 180 / Math.PI) % 360);
+
+        if (angleDegUnclipped < 0) {
+            angleDeg = (short)(angleDegUnclipped + 360);
+        } else {
+            angleDeg = angleDegUnclipped;
+        }
     }
 
-    public ThrustMove(Ship ship, Pair direction) {
-        this(ship, direction.angle, direction.thrust);
+    public ThrustMove(Ship ship, ThrustVector direction) {
+        this(ship, direction.angleRad, direction.thrust);
     }
 
     public short getAngle() {
-        return angle;
+        return angleDeg;
     }
 
     public short getThrust() {
         return thrust;
     }
-
 }

@@ -1,101 +1,101 @@
+package hlt;
+
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Vector;
+
 
 public class Networking {
-    private static final char NEW_LINE = '\n';
-    private static final char CARRIAGE_RETURN = '\r';
+
     private static final char UNDOCK_KEY = 'u';
     private static final char DOCK_KEY = 'd';
     private static final char THRUST_KEY = 't';
-    private static final String SPACE = " ";
 
-    public static void sendMoves(Vector<Move> moves) {
+    public static void sendMoves(ArrayList<Move> moves) {
         StringBuilder moveString = new StringBuilder();
+
         for (Move move : moves) {
             switch (move.getType()) {
                 case Noop:
                     continue;
                 case Undock:
                     moveString.append(UNDOCK_KEY)
-                            .append(SPACE)
-                            .append(move.getShip().getId().getId())
-                            .append(SPACE);
+                            .append(" ")
+                            .append(move.getShip().getEntityId().getId())
+                            .append(" ");
                     break;
                 case Dock:
                     moveString.append(DOCK_KEY)
-                            .append(SPACE)
-                            .append(move.getShip().getId().getId())
-                            .append(SPACE)
+                            .append(" ")
+                            .append(move.getShip().getEntityId().getId())
+                            .append(" ")
                             .append(((DockMove) move).getDestination().getId())
-                            .append(SPACE);
+                            .append(" ");
                     break;
                 case Thrust:
                     moveString.append(THRUST_KEY)
-                            .append(SPACE)
-                            .append(move.getShip().getId().getId())
-                            .append(SPACE)
+                            .append(" ")
+                            .append(move.getShip().getEntityId().getId())
+                            .append(" ")
                             .append(((ThrustMove) move).getThrust())
-                            .append(SPACE)
+                            .append(" ")
                             .append(((ThrustMove) move).getAngle())
-                            .append(SPACE);
+                            .append(" ");
                     break;
             }
         }
         System.out.println(moveString);
     }
 
-    private static String getString() {
+    private static String readLine() {
         try {
             StringBuilder builder = new StringBuilder();
             int buffer;
-            while ((buffer = System.in.read()) >= 0) {
-                if (buffer == NEW_LINE) {
+
+            for ( ; (buffer = System.in.read()) >= 0; ) {
+                if (buffer == '\n') {
                     break;
-                } else {
-                    builder = builder.append((char)buffer);
                 }
+                if (buffer == '\r') {
+                    // Ignore carriage return if on windows for manual testing.
+                    continue;
+                }
+                builder = builder.append((char)buffer);
             }
-            if(builder.charAt(builder.length() - 1) == CARRIAGE_RETURN)
-                builder.setLength(builder.length() - 1); //Removes a carriage return if on windows for manual testing.
             return builder.toString();
-        } catch(Exception e) {
+        }
+        catch(Exception e) {
             System.exit(1);
             return null;
         }
     }
 
-    static LinkedList<String> parseInput() {
-        return new LinkedList<>(Arrays.asList(getString().trim().split(SPACE)));
+    public static LinkedList<String> readAndSplitLine() {
+        return new LinkedList<>(Arrays.asList(readLine().trim().split(" ")));
     }
-
-    GameMap initialize(String botName) {
-        short myId = Short.parseShort(getString());
-
+    
+    public GameMap initialize(String botName) {
+        final short myId = Short.parseShort(readLine());
         try {
             DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
-        LinkedList<String> inputStringComponents = parseInput();
-
-        short width = Short.parseShort(inputStringComponents.pop());
-        short height = Short.parseShort(inputStringComponents.pop());
-
+        final LinkedList<String> inputStringMapSize = readAndSplitLine();
+        final short width = Short.parseShort(inputStringMapSize.pop());
+        final short height = Short.parseShort(inputStringMapSize.pop());
         GameMap gameMap = new GameMap(width, height, myId);
 
         // Associate bot name
         System.out.println(botName);
 
-        inputStringComponents = Networking.parseInput();
-        gameMap.updateMap(inputStringComponents);
-
-        // Initialize debugging log
+        final LinkedList<String> inputStringMetadata = readAndSplitLine();
+        gameMap.updateMap(inputStringMetadata);
 
         return gameMap;
     }
-
 }

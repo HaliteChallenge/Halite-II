@@ -1,28 +1,37 @@
+package hlt;
+
+
 public class Collision {
     /**
      * Test whether a given line segment intersects a circular area.
-     * @param start The start of the segment.
-     * @param end The end of the segment.
+     *
+     * @param start  The start of the segment.
+     * @param end    The end of the segment.
      * @param center The center of the circular area.
      * @param radius The radius of the circular area.
-     * @param fudge An additional safety zone to leave when looking for collisions.
+     * @param fudge  An additional safety zone to leave when looking for collisions.
      * @return true if the segment intersects, false otherwise
      */
-    public static boolean segmentCircleTest(Position start, Position end, Position center, double radius, double fudge) {
+    public static boolean segmentCircleIntersect(Position start, Position end, Position center, double radius, double fudge) {
         // Derived with SymPy
         // Parameterize the segment as start + t * (end - start),
         // and substitute into the equation of a circle
         // Solve for t
-        double dx = end.getXPos() - start.getXPos();
-        double dy = end.getYPos() - start.getYPos();
+        final double startX = start.getXPos();
+        final double startY = start.getYPos();
+        final double endX = end.getXPos();
+        final double endY = end.getYPos();
+        final double centerX = center.getXPos();
+        final double centerY = center.getXPos();
+        final double dx = startX - endX;
+        final double dy = startY - endY;
 
-        double a = Math.pow(dx, 2) + Math.pow(dy, 2);
-        double b = -2 * (Math.pow(start.getXPos(), 2) - start.getXPos()*end.getXPos() -
-                start.getXPos()*center.getXPos() + end.getXPos()*center.getXPos() +
-                Math.pow(start.getYPos(), 2) - start.getYPos()*end.getYPos() -
-                start.getYPos()*center.getYPos() + end.getYPos()*center.getYPos());
-        double c = Math.pow(start.getXPos() - center.getXPos(), 2) +
-                Math.pow(start.getYPos() - center.getYPos(), 2);
+        final double a = square(dx) + square(dy);
+
+        final double b = -2 * (square(startX) - (startX * endX)
+                        - (startX * centerX) + (endX * centerX)
+                        + square(startY) - (startY * endY)
+                        - (startY * centerY) + (endY * centerY));
 
         if (a == 0.0) {
             // Start and end are the same point
@@ -30,18 +39,23 @@ public class Collision {
         }
 
         // Time along segment when closest to the circle (vertex of the quadratic)
-        double t = Math.min(-b / (2 * a), 1.0);
+        final double t = Math.min(-b / (2 * a), 1.0);
         if (t < 0) {
-            DebugLog.debug(String.format("Collision test: %s %s vs %s %f, false", start, end, center, radius));
+            DebugLog.addLog(String.format("Collision test: %s %s vs %s %f, false", start, end, center, radius));
             return false;
         }
 
-        double closest_x = start.getXPos() + dx * t;
-        double closest_y = start.getYPos() + dy * t;
-        Position closest_location = new Position(closest_x, closest_y);
-        double closest_distance = Movement.getDistance(closest_location, center);
+        final double closestX = startX + dx * t;
+        final double closestY = startY + dy * t;
+        final Position closestLocation = new Position(closestX, closestY);
+        final double closestDistance = Movement.getDistance(closestLocation, center);
 
-        DebugLog.debug(String.format("Collision test: %s %s vs %s %f, %b", start, end, center, radius, closest_distance <= radius + fudge));
-        return closest_distance <= radius + fudge;
+        DebugLog.addLog(String.format("Collision test: %s %s vs %s %f, %b",
+                                start, end, center, radius, closestDistance <= radius + fudge));
+        return closestDistance <= radius + fudge;
+    }
+
+    public static double square(double num) {
+        return num * num;
     }
 }

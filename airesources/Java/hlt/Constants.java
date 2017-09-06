@@ -1,10 +1,15 @@
+package hlt;
+
 public class Constants {
     public static final int PLANETS_PER_PLAYER = 8;
     public static final int EXTRA_PLANETS = 4;
+    public static final short MAXIMUM_NUMBER_OF_PLAYERS = 4;
 
     public static final double DRAG = 2.0;
     public static final double MAX_SPEED = 15.0;
     public static final int MAX_ACCELERATION = 5;
+    public static final short MAX_ADJUSTMENT_TRIES = 2;
+    public static final int MAX_CORRECTIONS = 90;
 
     public static final double SHIP_RADIUS = 0.5;
 

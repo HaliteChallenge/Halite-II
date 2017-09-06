@@ -1,10 +1,13 @@
+package hlt;
+
+
 public class DockMove extends Move {
+
     private EntityId destination;
 
     public DockMove(Ship ship, Planet planet) {
-        this.type = Move.MoveType.Dock;
-        this.ship = ship;
-        this.destination = planet.getId();
+        super(MoveType.Dock, ship);
+        destination = planet.getEntityId();
     }
 
     public EntityId getDestination() {

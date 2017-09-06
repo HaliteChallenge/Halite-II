@@ -1,11 +1,15 @@
-public class Move {
-    public enum MoveType {Noop, Thrust, Dock, Undock}
-    protected MoveType type;
-    protected Ship ship;
+package hlt;
 
-    public Move() {
-        this.type = MoveType.Noop;
-        this.ship = null;
+
+public class Move {
+
+    public enum MoveType { Noop, Thrust, Dock, Undock }
+    private final MoveType type;
+    private final Ship ship;
+
+    public Move(MoveType type, Ship ship) {
+        this.type = type;
+        this.ship = ship;
     }
 
     public MoveType getType() {
@@ -15,5 +19,4 @@ public class Move {
     public Ship getShip() {
         return ship;
     }
-
 }

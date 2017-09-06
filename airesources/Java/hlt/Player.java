@@ -1,7 +1,11 @@
+package hlt;
+
 import java.util.Map;
 import java.util.TreeMap;
 
+
 public class Player {
+
     private Map<Long, Ship> ships;
     private short id;
 

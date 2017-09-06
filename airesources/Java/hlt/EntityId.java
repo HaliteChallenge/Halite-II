@@ -1,7 +1,10 @@
+package hlt;
+
+
 public class EntityId {
+
     private short owner;
     private long id;
-
     private Entity.Type type;
 
     public EntityId(short owner, long id, Entity.Type type) {
@@ -33,5 +36,4 @@ public class EntityId {
     public void setType(Entity.Type type) {
         this.type = type;
     }
-
 }
