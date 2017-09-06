@@ -1,7 +1,9 @@
 ---
 layout: page
-title: About
+title: What is the Halite AI Programming Challenge?
 permalink: /about
+toc: true
+description: Halite is an Artificial Intelligence programming game run by Two Sigma where players build smart bots that battle on a virtual two-dimensional board.
 ---
 
 Halite is a programming game where players build smart bots that battle head-to-head on a virtual two-dimensional board. [Halite I][halite-i] was played on a virtual grid and provided a fun way to learn and apply AI, machine learning, and other advanced algorithms in a collaborative, competitive game setting by writing smart bots. Designed for coding enthusiasts of all levels of experience, Halite created an engaging game environment to learn, write, and visualize code in action. In 2017’s Halite II, bots battle for control of a virtual universe made of Halite, where they mine planets to gain strength and defeat their opponents based on the relative sophistication of their code.

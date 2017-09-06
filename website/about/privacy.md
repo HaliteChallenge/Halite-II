@@ -2,6 +2,7 @@
 layout: page
 title: Halite Privacy Policy
 permalink: /about/privacy
+description: Halite and Two Sigma take your privacy seriously. Read our privacy policy to learn how we treat personal information.
 ---
 
 ### Effective Date July 17, 2017 (last updated July 13, 2017).

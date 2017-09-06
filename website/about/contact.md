@@ -3,7 +3,10 @@ layout: page
 title: Contact Us
 permalink: /about/contact
 toc: false
+description: Contact the Halite team with questions, suggestions, press requests or technical support.
 ---
+
+Contact the Halite team with questions, suggestions, press requests or technical support.
 
 ## Two Sigma Internal (Employees Only)
 

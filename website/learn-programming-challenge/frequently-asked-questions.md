@@ -3,7 +3,7 @@ layout: doc_page
 title: Frequently Asked Questions
 short_title: FAQ
 toc: true
-description: PQRS
+description: Answers to frequent questions about the Halite AI programming challenge.
 ---
 
 ## General Questions

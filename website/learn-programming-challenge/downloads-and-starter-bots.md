@@ -1,18 +1,22 @@
 ---
 layout: doc_page
-title: Downloads
+title: Downloads and Starter Kits
 toc: true
+description: Download a Python AI bot, C++ AI bot, or Java AI bot as a quick and easy way to get started playing in the Halite AI competition.
 ---
+Download a Python, C++, or Java AI starter kit as a quick and easy way to get started playing in the Halite AI competition.
 
-See the [Quick Start]({{ site.baseurl }}/learn) to get started.
+## About Your Starter Kit
 
 These downloads include both the Halite game environment (pre-compiled) as well as the starter kit for that language, unless no operating system is specified.
+
+## Download All Kits
 
 [Source code download]({{ site.baseurl }}/{{ site.data.downloads.source }})
 
 __Current version:__ {{ site.data.downloads.version }}
 
-## Game Environments and Starter Kits
+## Starter Kits by Language / Game Environment
 
 __Linux users note:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
 
@@ -48,9 +52,9 @@ __Linux users note:__ Your system must support GCC 4.9 or later (with correspond
     </tbody>
 </table>
 
-## Sample Bots
+## Sample Bots with Additional Basic Strategies
 
-C++, Java, and Python3.
+File includes examples in C++, Java, and Python3.
 
 [Download here]({{ site.baseurl }}/assets/downloads/sample_bots.zip)
 

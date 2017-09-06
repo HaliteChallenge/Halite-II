@@ -2,6 +2,7 @@
 layout: doc_page
 title: Changelog
 toc: true
+permalink: changelog
 ---
 
 ## Alpha 0.3.4
