@@ -93,3 +93,8 @@ GPU_TIER_NAME = TIER_2_NAME
 
 # What tier a player must be in to be eligible to participate in the finals
 FINALS_TIER_NAME = TIER_2_NAME
+
+TIER_0_STAY_BADGE = "A"
+TIER_1_STAY_BADGE = "B"
+TIER_2_STAY_BADGE = "C"
+TIER_3_STAY_BADGE = "D"
