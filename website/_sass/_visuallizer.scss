@@ -24,6 +24,7 @@
   }
   &-players{
     font-family: $font-heading;
+    text-transform: uppercase;
     font-size: 16px;
     color: $foreground;
     letter-spacing: 2px;
@@ -199,6 +200,7 @@
 .dashboard-graph{
   &-heading{
     font-family: $font-heading;
+    text-transform: uppercase;
     font-size: 14px;
     letter-spacing: 0.88px;
     text-shadow: 0 2px 30px rgba(0,0,0,0.20);

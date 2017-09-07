@@ -20,6 +20,7 @@
       position: relative;
       padding: 5px;
       min-height: 50px;
+      text-transform: uppercase;
       @media (min-width: $screen-md-min){
         padding: 15px 3px;
       }

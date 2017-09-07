@@ -48,17 +48,20 @@
 .icon-health:before {
   content: "\e90e";
 }
-.icon-medal-1:before {
+.icon-tier-1:before {
   content: "\e909";
 }
-.icon-medal-4:before {
-  content: "\e909";
+.icon-tier-2:before {
+  content: "\e914";
 }
-.icon-medal-2:before {
+.icon-tier-3:before {
   content: "\e90a";
 }
-.icon-medal-3:before {
+.icon-tier-4:before {
   content: "\e90b";
+}
+.icon-tier-5:before {
+  content: "\e915";
 }
 .icon-minus:before {
   content: "\e908";

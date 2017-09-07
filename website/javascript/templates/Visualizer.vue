@@ -8,16 +8,16 @@
         <p class="game-heading-date" v-if="game">{{game.game.time_played | moment("MM/DD/YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
           <div class="short">
-            <span class="player color-1" v-if="players.length"><span class="icon-medal-1"></span>{{players[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
             <span class="action">defeats</span>
-            <span class="player color-2" v-if="players.length"><span class="icon-medal-1"></span>{{players[1].name}}</span>
-            <span class="action" v-if="players.length > 2">+{{players.length - 2}}</span>
+            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[1].tier"></span>{{sortedPlayers[1].name}}</span>
+            <span class="action" v-if="sortedPlayers.length > 2">+{{sortedPlayers.length - 2}}</span>
           </div>
           <div class="long">
-            <span class="player color-1" v-if="players.length"><span class="icon-medal-1"></span>{{players[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
             <span class="action">defeats</span>
-            <span :class='"player color-" + (index+1)' v-for="(player, index) in players" v-if="index > 0" :key="index">
-              <span :class='"icon-medal-" + (index+1)'></span>
+            <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
+              <span :class="'icon-tier-' + player.tier"></span>
               {{player.name}}
             </span>
           </div>
@@ -162,38 +162,15 @@
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="widget_map_properties" aria-labelledby="heading_map_properties">
             <!-- DISPLAY MESSAGE BOX -->
-            <!-- <div class="message-box">
+            <div v-if="selectedPlanet">
+              <SelectedPlanet :selected-planet="selectedPlanet" :players="players"></SelectedPlanet>
+            </div>
+            <div v-else-if="selectedShip">
+              <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
+            </div>
+            <div class="message-box" v-else>
               <p><span class="icon-info"></span></p>
               <p>Click on a ship, planet, or other map location to see properties</p>
-            </div> -->
-            <div class="map-props">
-              <div class="map-props-icon">
-                <span class="icon-planet"></span>
-              </div>
-              <div class="map-props-list">
-                <table>
-                  <tr>
-                    <td>Location:</td>
-                    <td>181.7349, 166.489</td>
-                  </tr>
-                  <tr>
-                    <td>Selected Planet Owner:</td>
-                    <td>Juliak</td>
-                  </tr>
-                  <tr>
-                    <td>Planet ID:</td>
-                    <td>11</td>
-                  </tr>
-                  <tr>
-                    <td>Velocity:</td>
-                    <td>(0.0000, 0.0000)</td>
-                  </tr>
-                  <tr>
-                    <td>Health:</td>
-                    <td>255</td>
-                  </tr>
-                </table>
-              </div>
             </div>
           </div>
         </div>
@@ -213,7 +190,7 @@
           </div>
           <div class="panel-collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
-              <div class="col-md-3" v-for="(_player, _pIndex) in (replay && replay.player_names) || []">
+              <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
                 <div class="card-dashboard active">
                   <i class="xline xline-top"></i>
                   <i class="xline xline-bottom"></i>
@@ -222,10 +199,10 @@
                   </div>
                   <div class="card-dashboard-info">
                     <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
-                    <p class="card-dashboard-name">{{_player}}</p>
+                    <p class="card-dashboard-name">{{_player.name}}</p>
                     <p class="card-dashboard-version-heading">Bot version:</p>
                   </div>
-                  <div class="card-dashboard-version">v9</div>
+                  <div class="card-dashboard-version">V{{_player.version}}</div>
                 </div>
               </div>
             </div>
@@ -321,6 +298,8 @@
   import PlayerStatsPane from "./PlayerStatsPane.vue";
   import PlayerDetailPane from "./PlayerDetailPane.vue";
   import PlayerLineChart from "./PlayerLineChart.vue";
+  import SelectedPlanet from "./SelectedPlanet.vue";
+  import SelectedShip from "./SelectedShip.vue";
   import _ from "lodash";
 
   libhaliteviz.setAssetRoot("/assets/js/");
@@ -330,7 +309,7 @@
 
   const loadGame = (game) => {
     const buffer = game.replay;
-    return libhaliteviz.parseReplay(buffer)
+    return libhaliteviz.parseReplay(buffer);
   }
 
   export default {
@@ -346,6 +325,11 @@
         speedIndex: 1,
         speedLabel: '1x',
         stats: null,
+        selected: {
+          kind: '',
+          id: 0,
+          owner: ''
+        },
         sliderOptions: {
           min: 0,
           max: 0,
@@ -374,7 +358,9 @@
       vueSlider,
       PlayerStatsPane,
       PlayerDetailPane,
-      PlayerLineChart
+      PlayerLineChart,
+      SelectedPlanet,
+      SelectedShip
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
@@ -415,6 +401,14 @@
           };
           visualizer.onPause = () => {
             this.playing = false;
+          };
+
+          visualizer.onSelect = (kind, args) => {
+            this.selected.kind = kind;
+            this.selected.id = args.id;
+            this.selected.owner = args.owner;
+            visualizer.onUpdate();
+            this.$forceUpdate();
           };
 
           visualizer.attach('.game-replay-viewer');
@@ -532,21 +526,49 @@
         if (!this.replay) return [];
 
         let ranks = this.replay.stats;
+        let playerInfo = this.game.game.players;
 
         for(let id of Object.keys(this.replay.stats)){
           ranks[id].index = parseInt(id);
           ranks[id].botname = this.replay.player_names[id];
           ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
+          const player = _.find(playerInfo, (player) => player.player_index == id )
+          ranks[id].tier = parseInt(player.rank)
+          ranks[id].version = player.version_number
         }
 
-        ranks = _.sortBy(ranks, ['rank']);
-
         return Object.values(ranks);
+      },
+      sortedPlayers: function(){
+        return _.sortBy(this.players, ['rank']);
+      },
+      selectedPlanet: function(){
+        if (this.selected.kind === "planet") {
+          let frame = this.replay.frames[this.frame];
+          let state = frame.planets[this.selected.id];
+          if (state) {
+            return {
+              base: this.replay.planets[this.selected.id],
+              state: state
+            };
+          }
+        }
+        return null;
+      },
+      selectedShip: function(){
+        if (this.selected.kind === "ship") {
+          let frame = this.replay.frames[this.frame];
+          let state = frame.ships[this.selected.owner][this.selected.id];
+
+          if (state) {
+            return state;
+          }
+        }
+        return null;
       }
     },
     methods: {
       getPlayerName: function(botname){
-
         return botname.replace(/\sv\d+$/, '');
       },
       playVideo: function(event) {
