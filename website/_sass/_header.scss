@@ -59,8 +59,15 @@ header.navbar{
   @media (min-width: $screen-md-min){
     min-height: 50px;
   }
-
+  .not-logged-in{
+    >li>a>i{
+      margin-top: -2px;
+    }
+  }
   .logged-in {
+    .navbar-right{
+      transform: translateY(-3px);
+    }
     img {
       height: 34px;
     }
@@ -151,6 +158,10 @@ header.navbar{
             }
             p{
               margin-top:10px;
+              &.p1{
+                font-family: $font-headline;
+                font-size: 2rem;
+              }
               &.p2{
                 color: #9d9d9d;
               }
@@ -166,7 +177,10 @@ header.navbar{
               margin-right: auto;
               margin-top: 60px;
               cursor: pointer;
+              font-family: $font-headline;
+              font-size: 1.8rem;
               span{
+                transform: translateY(2px);
                 color: $dark-gray;
                 line-height: 20px;
                 padding: 3px;
@@ -230,6 +244,8 @@ header.navbar{
       }
     }
   }
-
+  .header-menus{
+    float: right;
+  }
 
 }

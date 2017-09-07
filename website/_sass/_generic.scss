@@ -15,7 +15,10 @@ body{
 }
 
 .nav{
-  font-family: $font-heading;
+  font-family: $font-headline;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .container{
@@ -129,4 +132,11 @@ input:focus{
     margin-left: auto;
     margin-right: auto;
   }
+}
+.container-fluid .row{
+  margin-left: 0;
+  margin-right: 0;
+}
+.font-headline{
+  font-family: Teko !important;
 }

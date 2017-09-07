@@ -5,7 +5,7 @@
          <div class="row">
              <div class="col-md-12">
                  <p class="d1 c-org">INTRODUCING</p>
-                 <p class="t1 c-wht">HALITE 2</p>
+                 <p class="t1 c-wht font-headline">HALITE 2</p>
                  <p class="d1 c-org">MAY THE BEST BOT WIN</p>
                  <div v-if="!me_in" class="not-me ha-button-container">
                      <div class="ha-button"><span>PLAY NOW</span></div>
@@ -16,14 +16,14 @@
                  </div>
              </div>
              <div class="col-md-12">
-                 <img class="array" :src="`${baseUrl}/assets/images/temp/array.png`"/>
+                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_1.gif`"/>
              </div>
              <div class="col-md-12 des">
-                 <div class="col-md-offset-1 col-md-5">
+                 <div class="col-md-offset-1 col-md-4">
                      <img :src="`${baseUrl}/assets/images/temp/bot_1.png`"/>
                  </div>
-                 <div class="words col-md-offset-1 col-md-5">
-                    <p class="t2 c-wht">WHAT IS HALITE?</p>
+                 <div class="words col-md-offset-2 col-md-4">
+                    <p class="t2 c-wht font-headline">WHAT IS HALITE?</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <p class="t5 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
@@ -33,11 +33,11 @@
                  </div>
              </div>
              <div class="col-md-12">
-                 <img class="array" :src="`${baseUrl}/assets/images/temp/array.png`"/>
+                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_2.gif`"/>
              </div>
              <div class="col-md-12 des">
-                 <div class="words col-md-offset-1 col-md-5">
-                     <p class="t2 c-wht">MINING HALITE IN SPACE</p>
+                 <div class="words col-md-offset-1 col-md-4">
+                     <p class="t2 c-wht font-headline">MINING HALITE IN SPACE</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <p class="t5 c-gry">This year's game is a space story.</p>
                      <p class="t5 c-gry">Every product that is labeled as a Pocket PC must be accompanied with specific software to operate the unit and must feature a touchscreen and touchpad. </p>
@@ -46,14 +46,14 @@
                          <div class="ha-button no-bg-button"><span>READ STORY</span></div>
                      </div>
                  </div>
-                 <div class="col-md-offset-1 col-md-5">
+                 <div class="col-md-offset-2 col-md-4">
                      <img :src="`${baseUrl}/assets/images/temp/bot_2.png`"/>
                  </div>
              </div>
              <div class="col-md-12 ha-line">
              </div>
              <div class="col-md-12 big-menu">
-                 <p class="t2 c-wht">WATCH HALITE TV!</p>
+                 <p class="t2 c-wht font-headline">WATCH HALITE TV!</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <p class="t5 c-gry">See what's happening right now or watch some of the base</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
@@ -65,8 +65,8 @@
                          </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t4 c-wht">Juliak vs Erdman</span>
-                             <div class="mgt-10">
+                             <span class="t4 c-wht i-label">Juliak vs Erdman</span>
+                             <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
@@ -79,8 +79,8 @@
                          </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t4 c-wht">CariosW... vs Erdman, +2</span>
-                             <div class="mgt-10">
+                             <span class="t4 c-wht i-label">CariosW... vs Erdman, +2</span>
+                             <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
@@ -93,8 +93,8 @@
                          </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t4 c-wht">Harikmeon vs Erdman</span>
-                             <div class="mgt-10">
+                             <span class="t4 c-wht i-label">Harikmeon vs Erdman</span>
+                             <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
@@ -107,8 +107,8 @@
                          </div>
                          <div class="img-des">
                              <i class="icon-medal-1"></i>
-                             <span class="t4 c-wht">Harikmeon vs Erdman</span>
-                             <div class="mgt-10">
+                             <span class="t4 c-wht i-label">Harikmeon vs Erdman</span>
+                             <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
                                  <i class="right-btn fa fa-share-square-o c-yel"></i>
                              </div>
@@ -123,11 +123,11 @@
              <div class="col-md-12 ha-line">
              </div>
              <div class="col-md-12 big-menu">
-                 <p class="t2 c-wht">JOIN THE CONVERSATION</p>
+                 <p class="t2 c-wht font-headline">JOIN THE CONVERSATION</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <p class="t5 c-gry">There are many ways to make Halite a social experience</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <div class="col-md-12">
+                 <div class="col-md-12 img-list">
                      <div class="col-md-4">
                          <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
                             <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
@@ -145,7 +145,7 @@
                  <div class="clear"></div>
              </div>
              <div class="col-md-12 big-menu">
-                 <div class="col-md-6 pdr30">
+                 <div class="col-md-6">
                      <div class="menu-header">
                          <div class="line-container"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/career.png`"/>
@@ -156,7 +156,7 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
-                             <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
+                             <p class="t3 c-wht font-headline">CAREERS AT TWO SIGMA</p>
                              <p class="t5 c-gry">Interested to work at Two Sigma?</p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
@@ -165,7 +165,7 @@
                          </div>
                      </div>
                  </div>
-                 <div class="col-md-6 pdl30">
+                 <div class="col-md-6">
                      <div class="menu-header">
                          <div class="line-container"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/competition.png`"/>
@@ -176,7 +176,7 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
-                             <p class="t3 c-wht">ABOUT THE HALITE COMPETITION</p>
+                             <p class="t3 c-wht font-headline">ABOUT THE HALITE COMPETITION</p>
                              <p class="t5 c-gry">Learn more about why Two Sigma is sponsoring the Halite competition</p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
@@ -187,7 +187,7 @@
                  </div>
              </div>
              <div class="col-md-12 big-menu">
-                 <p class="t2 c-wht">JOIN US NOW</p>
+                 <p class="t2 c-wht font-headline">JOIN US NOW</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="ha-button-container">
                      <div v-if="!me_in" class="ha-button"><span>SIGN UP</span></div>

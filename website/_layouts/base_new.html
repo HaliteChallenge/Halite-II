@@ -36,7 +36,7 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
   <header class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
+    <div class="container-fluid">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
           <span class="sr-only">Toggle navigation</span>
@@ -55,7 +55,12 @@
         </a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav navbar-right not-logged-in">
+          <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
+          <li><a href="{{ site.login_server_url }}/github">Sign In</a></li>
+        </ul>
+        <div id="user-profile-bar-container"></div>
+        <ul class="nav navbar-nav header-menus">
           <li class="{% if page.menu == 'learn' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'editor' %} active {% endif %}"><a href="{{ site.baseurl }}/editor"><span>Code</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
@@ -64,11 +69,6 @@
           <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Event &amp; Hackathons</span><i class="xline xline-bottom"></i></a></li>
           <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right not-logged-in">
-          <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
-          <li><a href="{{ site.login_server_url }}/github">Sign In</a></li>
-        </ul>
-        <div id="user-profile-bar-container"></div>
       </div>
       <!--/.nav-collapse -->
     </div>
@@ -80,7 +80,7 @@
 
   <footer class="footer">
     <nav class="navbar">
-      <div class="container">
+      <div class="container-fluid">
         <ul class="nav">
           <li><a href="{{ site.baseurl }}/about">About</a></li>
           <li><a href="{{ site.baseurl }}/about/terms-and-conditions">Terms &amp; Conditions</a></li>
@@ -90,7 +90,7 @@
       </div>
     </nav>
     <div class="footer-below">
-      <div class="container">
+      <div class="container-fluid">
         <div class="footer-below-wrap">
           <div class="footer-subscribe">
             <p class="footer-subscribe-top">Subscribe to our newsletter</p>

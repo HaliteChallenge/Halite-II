@@ -24,16 +24,17 @@
     letter-spacing: 1px;
   }
   .t1{
-    font-size: 6rem;
-    letter-spacing: 2px;
+    font-size: 10rem;
+    letter-spacing: 6px;
+    margin-bottom: 0;
   }
   .t2{
-    font-size: 2.5rem;
-    letter-spacing: 2px;
+    font-size: 3.5rem;
+    letter-spacing: 4px;
   }
   .t3{
-    font-size: 2rem;
-    letter-spacing: 1px;
+    font-size: 3rem;
+    letter-spacing: 2px;
   }
   .t4{
     font-size: 1.5rem;
@@ -84,6 +85,8 @@
   .ha-button-container{
     margin-left: auto;
     margin-right: auto;
+    font-family: $font-headline;
+    font-size: 2rem;
   }
   .ha-button{
     background-image: url(../images/register_bg.png);
@@ -94,6 +97,7 @@
     padding: 5px 20px;
     cursor: pointer;
     span{
+      transform: translateY(2px);
       color: $dark-gray;
       line-height: 20px;
       padding: 3px;
@@ -117,7 +121,6 @@
       width: 100%;
     }
     .words{
-      margin-top: 90px;
       .ha-button-container{
         width:200px;
         margin-left: 0;
@@ -136,6 +139,9 @@
     img{
       width: 100%;
     }
+    .img-list{
+      padding:30px;
+    }
     .line-container{
       width:10%;
       margin-left: auto;
@@ -149,9 +155,23 @@
     border: 1px solid #757577;
     text-align: left;
     padding: 10px;
+    position: relative;
     i{
       font-size:20px;
       margin-right: 5px;
+    }
+    .i-label{
+      position: absolute;
+      top: 10px;
+      left: 35px;
+      right: 10px;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .i-des{
+      margin: 15px 0 10px;
     }
     .right-btn{
       float: right;
@@ -167,7 +187,7 @@
     .img-btn{
       cursor: pointer;
       width: 16%;
-      max-width: 45px;
+      max-width: 52px;
       min-width: 30px;
       transform: translate(-50%, -50%);
       position: absolute;
@@ -199,7 +219,7 @@
       margin-right: auto;
     }
     .line-container{
-      width: 25%;
+      width: 160px;
       float: left;
       transform: translate(-60px, 45px) rotate(90deg);
       display: inline-block;

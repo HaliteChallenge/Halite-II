@@ -1,5 +1,4 @@
 .footer{
-  background-color: $gray-bg;
   color: $foreground;
   a{
     color: $foreground;
@@ -7,19 +6,17 @@
   .navbar{
     border-radius: 0;
     margin-bottom: 0;
-    border-top: 1px solid $border;
     height: auto;
   }
   .nav{
     text-align: center;
     padding: 30px 0;
-    font-family: $font-heading;
+    font-family: $font-headline;
     border-bottom: 1px solid #474951;
     li{
       display: inline-block;
       a{
         display: block;
-        font-weight: bold;
         &:hover{
           background-color: transparent;
         }
