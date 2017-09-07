@@ -97,13 +97,13 @@ def list_matches_helper(offset, limit, participant_clause,
             model.game_participants,
             (model.games.c.id == model.game_participants.c.game_id) &
             participant_clause,
-        ).join(
+        ).outerjoin(
             model.game_stats,
             (model.games.c.id == model.game_stats.c.game_id)
-        ).join(
+        ).outerjoin(
             model.game_bot_stats,
             (model.games.c.id == model.game_bot_stats.c.game_id)
-        ).join(
+        ).outerjoin(
             model.game_view_stats,
             (model.games.c.id == model.game_view_stats.c.game_id)
         )).where(
