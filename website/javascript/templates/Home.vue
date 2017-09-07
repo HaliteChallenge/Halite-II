@@ -138,9 +138,6 @@
                      <div class="col-md-4">
                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
                      </div>
-                     <div class="col-md-4">
-                         <img :src="`${baseUrl}/assets/images/temp/join_3.png`"/>
-                     </div>
                  </div>
                  <div class="clear"></div>
              </div>
