@@ -477,7 +477,6 @@
         if (!this.replay) return [];
 
         let ranks = this.replay.stats;
-        let playerInfo = this.game.game.players;
 
         for(let id of Object.keys(this.replay.stats)){
           ranks[id].index = parseInt(id);
