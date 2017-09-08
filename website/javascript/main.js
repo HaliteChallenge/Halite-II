@@ -8,7 +8,7 @@ import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
-import Visualizer from "./templates/Visualizer.vue";
+import VisualizerContainer from "./templates/VisualizerContainer.vue";
 import Home from "./templates/Home.vue";
 import HackathonIndividual from "./templates/HackathonIndividual.vue";
 
@@ -71,13 +71,13 @@ window.views = {
     Visualizer: function () {
         new Vue({
             el: "#visualizer-container",
-            render: (h) => h(Visualizer),
+            render: (h) => h(VisualizerContainer),
         });
     },
     HaliteTV: function() {
         new Vue({
             el: "#halitetv-container",
-            render: (h) => h(Visualizer, {props: {baseUrl: _global.baseUrl}})
+            render: (h) => h(VisualizerContainer, {props: {baseUrl: _global.baseUrl}})
         });
     },
     Home: function () {

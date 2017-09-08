@@ -5,7 +5,7 @@
       <div class="game-heading">
         <i class="xline xline-top"></i>
         <i class="xline xline-bottom"></i>
-        <p class="game-heading-date" v-if="game">{{game.game.time_played | moment("MM/DD/YY - HH:mm:ss")}}</p>
+        <p class="game-heading-date" v-if="game">{{game.time_played | moment("MM/DD/YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
           <div class="short">
             <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
@@ -90,7 +90,9 @@
         <!-- Tab panes -->
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="player_stats">
-            <div id="player_stats_pane"></div>
+            <div id="player_stats_pane">
+              <PlayerStatsPane :replay="replay" :statistics="statistics"></PlayerStatsPane>
+            </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="game_stats">...</div>
         </div>
@@ -106,49 +108,7 @@
             </a>
           </div>
           <div class="panel-collapse collapse" role="tabpanel" id="widget_player_details" aria-labelledby="heading_player_details">
-            <div class="player-cards-list row" id="player_details">
-              <div class="col-sm-6">
-                <div class="card-player">
-                  <h4 class="card-player-name">
-                    Juliak V9
-                    <span class="circle bg-player-1"></span>
-                  </h4>
-                  <div class="card-player-stats-list">
-                    <div class="card-player-stats"><span class="icon-ship"></span> Ships: 5</div>
-                    <div class="card-player-stats"><span class="icon-planet"></span> Planet own: 1</div>
-                    <div class="card-player-stats"><span class="icon-lightning"></span> Attack: 666</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="card-player">
-                  <h4 class="card-player-name">Juliak V9 <span class="circle bg-player-2"></span></h4>
-                  <div class="card-player-stats-list">
-                    <div class="card-player-stats"><span class="icon-ship"></span> Ships: 5</div>
-                    <div class="card-player-stats"><span class="icon-planet"></span> Planet own: 1</div>
-                    <div class="card-player-stats"><span class="icon-lightning"></span> Attack: 666</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="card-player">
-                  <h4 class="card-player-name">Juliak V9 <span class="circle bg-player-3"></span></h4>
-                  <div class="card-player-stats-list">
-                    <div class="card-player-stats"><span class="icon-ship"></span> Ships: 5</div>
-                    <div class="card-player-stats"><span class="icon-planet"></span> Planet own: 1</div>
-                    <div class="card-player-stats"><span class="icon-lightning"></span> Attack: 666</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="card-player">
-                  <h4 class="card-player-name">Juliak V9 <span class="circle bg-player-4"></span></h4>
-                  <div class="card-player-stats"><span class="icon-ship"></span> Ships: 5</div>
-                  <div class="card-player-stats"><span class="icon-planet"></span> Planet own: 1</div>
-                  <div class="card-player-stats"><span class="icon-lightning"></span> Attack: 666</div>
-                </div>
-              </div>
-            </div>
+            <PlayerDetailPane :replay="replay" :statistics="statistics" :stats="stats" :frame="frame"></PlayerDetailPane>
           </div>
         </div>
         <div class="panel panel-stats">
@@ -305,20 +265,12 @@
   libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
 
-  let visualizer;
-
-  const loadGame = (game) => {
-    const buffer = game.replay;
-    return libhaliteviz.parseReplay(buffer);
-  }
-
   export default {
     name: 'haliteTV',
-    props: ['baseUrl'],
+    props: ['game', 'replay', 'makeUserLink', 'getUserProfileImage'],
     data: function(){
       return {
-        game: null,
-        replay: null,
+        baseUrl: '',
         frame: 0,
         time: 0,
         playing: false,
@@ -360,96 +312,95 @@
       PlayerDetailPane,
       PlayerLineChart,
       SelectedPlanet,
-      SelectedShip
+      SelectedShip,
     },
     mounted: function(){
-      const params = new URLSearchParams(window.location.search);
+      console.log(this.replay);
 
-      const game_id = params.get("game_id") || '590933';
-
-      /// for test: api doesn't work so I fake the sample data
-      const playerStatsContainer = document.getElementById('player_stats_pane');
-
-      api.get_replay(game_id, (loaded, total) => {
-      }).then((game) => {
-
-        this.game = game;
-
-        loadGame(game).then((replay) => {
-          this.replay = replay;
-          console.log('replay', replay.frames[0]);
-
-          // update slider
-          this.sliderOptions.max = this.replay.num_frames - 1;
-          this.sliderOptions.value = this.frame;
-
-          // update slider
-          this.sliderOptions.max = this.replay.num_frames - 1;
-          this.sliderOptions.value = this.frame;
-
-          // init visualizer and events
-          visualizer = new HaliteVisualizer(replay);
-
-          this.stats = visualizer.stats;
-          
-          visualizer.onUpdate = () => {
-            this.frame = visualizer.frame;
-            this.time = visualizer.time;
-          };
-          visualizer.onPlay = () => {
-            this.playing = true;
-          };
-          visualizer.onPause = () => {
-            this.playing = false;
-          };
-
-          visualizer.onSelect = (kind, args) => {
-            this.selected.kind = kind;
-            this.selected.id = args.id;
-            this.selected.owner = args.owner;
-            visualizer.onUpdate();
-            this.$forceUpdate();
-          };
-
-          visualizer.attach('.game-replay-viewer');
-          // play the replay
-          visualizer.play();
-
-          console.log('visualizer', {time: visualizer.time, stats: visualizer.stats, frame: visualizer.frame});
-
-          // render player stat pane
-          const playerStatsContainer = document.getElementById('player_stats_pane');
-          new Vue({
-            el: playerStatsContainer,
-            render: (h) => h(PlayerStatsPane, {
-              props: {
-                game: game,
-                replay: replay,
-                frame: visualizer.frame, // for testing
-                time: visualizer.time,
-                stats: visualizer.stats,
-                statistics: this.statistics
-              }
-            })
-          });
-          const playerDetailContainer = document.getElementById('player_details');
-          new Vue({
-            el: playerDetailContainer,
-            render: (h) => h(PlayerDetailPane, {
-              props: {
-                game: game,
-                replay: replay,
-                frame: visualizer.frame, // for testing
-                time: visualizer.time,
-                stats: visualizer.stats,
-                statistics: this.statistics
-              }
-            })
-          })
-        });
-      }, () => {
-        console.log('error loading game');
+      this.sliderOptions = Object.assign(this.sliderOptions, {
+        max: this.replay.num_frames - 1,
+        value: this.frame
       });
+
+      const visualizer = new HaliteVisualizer(this.replay);
+      this.stats = visualizer.stats;
+
+      visualizer.onUpdate = () => {
+        this.frame = visualizer.frame;
+        this.time = visualizer.time;
+      };
+      visualizer.onPlay = () => {
+        this.playing = true;
+      };
+      visualizer.onPause = () => {
+        this.playing = false;
+      };
+      visualizer.onSelect = (kind, args) => {
+        this.selected.kind = kind;
+        this.selected.id = args.id;
+        this.selected.owner = args.owner;
+        visualizer.onUpdate();
+        this.$forceUpdate();
+      };
+      visualizer.attach('.game-replay-viewer');
+      // play the replay
+      visualizer.play();
+
+      // action
+      this.playVideo = (e) => {
+        if(visualizer) {
+          if(this.frame >= this.replay.num_frames - 1) {
+            visualizer.frame = 0;
+            visualizer.time = 0.0;
+            this.frame = 0;
+            this.time = 0.0; 
+          }
+          visualizer.play();
+        }
+      }
+      this.pauseVideo = (e) => {
+        if(visualizer) {
+          visualizer.pause();
+        } 
+      }
+      this.toggleSpeed = (e) => {
+        const speedList =  {
+          1: '&frac12x',
+          2: '1x',
+          4: '2x',
+          6: '3x',
+          8: '4x',
+          10: '5x',
+        };
+
+        // set speed
+        this.speedIndex++;
+        if (this.speedIndex >= Object.keys(speedList).length ) this.speedIndex = 0;
+
+        const value = Object.keys(speedList)[this.speedIndex];
+        const label = speedList[value];
+        this.speedLabel = label;
+
+        if(visualizer) {
+          visualizer.playSpeed = value;
+        }
+      }
+      this.prevFrame = () =>{
+        if (visualizer && this.frame > 0){
+          visualizer.scrub(this.frame + -1, 0);
+        }
+      }
+      this.nextFrame = () => {
+        if (visualizer && this.frame < this.replay.num_frames - 1){
+          visualizer.scrub(this.frame + 1, 0);
+        }
+      }
+      this.changeFrame = (event) => {
+        console.log('frame change to ' + this.frame);
+        if (visualizer){
+          visualizer.scrub(this.frame, 0);
+        }
+      }
     },
     computed: {
       statistics: function(){
@@ -532,10 +483,15 @@
           ranks[id].index = parseInt(id);
           ranks[id].botname = this.replay.player_names[id];
           ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
-          const player = _.find(playerInfo, (player) => player.player_index == id )
-          ranks[id].tier = parseInt(player.rank)
-          ranks[id].version = player.version_number
+          if (this.game){
+            const player = _.find(this.game.players, (player) => player.player_index == id )
+            ranks[id].tier = parseInt(player.rank)
+            ranks[id].version = player.version_number
+          } else {
+            ranks[id].version = ranks[id].botname.match(/v(\d+)$/, "$1")[1]
+          }
         }
+        
 
         return Object.values(ranks);
       },
@@ -572,58 +528,16 @@
         return botname.replace(/\sv\d+$/, '');
       },
       playVideo: function(event) {
-        if(visualizer) {
-          if(this.frame >= this.replay.num_frames - 1) {
-            visualizer.frame = 0;
-            visualizer.time = 0.0;
-            this.frame = 0;
-            this.time = 0.0; 
-          }
-          visualizer.play();
-        }
       },
       pauseVideo: function(event){
-        if(visualizer) {
-          visualizer.pause();
-        } 
       },
       toggleSpeed: function(event) {
-        const speedList =  {
-          1: '&frac12x',
-          2: '1x',
-          4: '2x',
-          6: '3x',
-          8: '4x',
-          10: '10x',
-        };
-
-        // set speed
-        this.speedIndex++;
-        if (this.speedIndex >= Object.keys(speedList).length ) this.speedIndex = 0;
-
-        const value = Object.keys(speedList)[this.speedIndex];
-        const label = speedList[value];
-        this.speedLabel = label;
-
-        if(visualizer) {
-          visualizer.playSpeed = value;
-        }
       },
       prevFrame: function(){
-        if (visualizer && this.frame > 0){
-          visualizer.scrub(this.frame + -1, 0);
-        }
       },
       nextFrame: function(){
-        if (visualizer && this.frame < this.replay.num_frames - 1){
-          visualizer.scrub(this.frame + 1, 0);
-        }
       },
       changeFrame: function(event){
-        console.log('frame change to ' + this.frame);
-        if (visualizer){
-          visualizer.scrub(this.frame, 0);
-        }
       }
     }
   }

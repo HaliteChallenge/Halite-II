@@ -33,7 +33,7 @@
 
   export default {
     name: 'PlayerStatsPane',
-    props: ['replay', 'game', 'frame', 'time', 'stats', 'statistics'],
+    props: ['replay', 'statistics'],
     data: function(){
       return {
         player_names: this.replay.player_names
