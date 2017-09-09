@@ -16,7 +16,11 @@
                  </div>
              </div>
              <div class="col-md-12">
-                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_1.gif`"/>
+                <div class="arrows-icon">
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                </div>
              </div>
              <div class="col-md-12 des">
                  <div class="col-md-offset-1 col-md-4">
@@ -33,7 +37,11 @@
                  </div>
              </div>
              <div class="col-md-12">
-                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_2.gif`"/>
+                <div class="arrows-icon">
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                </div>
              </div>
              <div class="col-md-12 des">
                  <div class="words col-md-offset-1 col-md-4">
@@ -121,7 +129,11 @@
                  </div>
              </div>
              <div class="col-md-12">
-                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_2.gif`"/>
+                <div class="arrows-icon">
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                    <div class="scroll-arrow"></div>
+                </div>
              </div>
              <div class="col-md-12 big-menu">
                  <div class="col-md-4">

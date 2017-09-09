@@ -270,4 +270,43 @@
       }
     }
   }
+
+  @keyframes arrow
+  {
+    0% {opacity:0}
+    40% {opacity:1}
+    80% {opacity:0}
+    100% {opacity:0}
+  }
+
+  .arrows-icon{
+    $animation-delay: 0.5s;
+    $arrow-size: 12px;
+
+    .scroll-arrow {
+      margin-left: auto;
+      margin-right: auto;
+      width: $arrow-size;
+      height: $arrow-size;
+      transform: rotate(45deg);
+      border-right: 2px solid white;
+      border-bottom: 2px solid white;
+      animation: arrow 2s infinite;;
+      // animation-direction: alternate;
+      // &:nth-child(1){
+      //   animation-delay: -1s;
+      // }
+      // &:nth-child(2){
+      //   animation-delay: -0.5s;
+      // }
+      // &:nth-child(3){
+      //   animation-delay: 0s;
+      // }
+      @for $i from 1 through 3 {
+        &:nth-child(#{$i}) {
+          animation-delay: -$animation-delay*(3-$i);
+        }
+      }
+    }
+  }
 }

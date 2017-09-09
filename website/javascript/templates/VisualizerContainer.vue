@@ -28,7 +28,6 @@
 
   const showGame = (game) => {
     if (visualizer) {
-      console.info("Destroying old visualizer");
       visualizer.getVisualizer().destroy();
     }
 
@@ -79,7 +78,6 @@
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
-      console.log(params.get("game_id"));
       if (params.has("game_id")) {
         const game_id = params.get("game_id");
         this.message = `Downloading game ${game_id}.`;
@@ -96,7 +94,6 @@
             this.is_downloading = false;
             this.message = null;
           }).catch((e) => {
-            console.error(e);
             this.is_downloading = false;
             this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
           });

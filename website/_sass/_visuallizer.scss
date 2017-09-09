@@ -216,3 +216,20 @@
 
   }
 }
+
+.map-stats-props{
+  tbody > tr > th, tbody > tr > td{
+    padding: 8px 0;
+  }
+
+  tbody > tr > th{
+    color: $foreground;
+    padding-right: 10px;
+    @media (min-width: $screen-sm-min){
+      padding-right: 30px;
+    }
+  }
+  tbody > tr > td{
+    color: $yellow;
+  }
+}

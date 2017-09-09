@@ -94,7 +94,30 @@
               <PlayerStatsPane :replay="replay" :statistics="statistics"></PlayerStatsPane>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="game_stats">...</div>
+          <div role="tabpanel" class="tab-pane" id="game_stats">
+            <div id="map_stats_pane">
+              <table class="map-stats-props">
+                <tbody>
+                  <tr>
+                    <th>Map Size:</th>
+                    <td>{{`${replay.width}x${replay.height}`}}</td>
+                  </tr>
+                  <tr>
+                    <th>Map Paremeters:</th>
+                    <td>{{replay.map_generator}}</td>
+                  </tr>
+                  <tr>
+                    <th>Seed:</th>
+                    <td>{{replay.seed}}</td>
+                  </tr>
+                  <tr>
+                    <th>Replay Version:</th>
+                    <td>{{replay.version}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
       <div class="panel-group" aria-multiselectable="true">
@@ -315,8 +338,6 @@
       SelectedShip,
     },
     mounted: function(){
-      console.log(this.replay);
-
       this.sliderOptions = Object.assign(this.sliderOptions, {
         max: this.replay.num_frames - 1,
         value: this.frame
@@ -396,7 +417,6 @@
         }
       }
       this.changeFrame = (event) => {
-        console.log('frame change to ' + this.frame);
         if (visualizer){
           visualizer.scrub(this.frame, 0);
         }
@@ -466,7 +486,6 @@
             output.damage.push(playerD);
             output.attack.push(playerA);
           }
-          console.log('output', output)
           return output;
         } catch(e) {
           console.error(e)
@@ -490,8 +509,6 @@
             ranks[id].version = ranks[id].botname.match(/v(\d+)$/, "$1")[1]
           }
         }
-        
-
         return Object.values(ranks);
       },
       sortedPlayers: function(){
