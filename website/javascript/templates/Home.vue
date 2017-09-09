@@ -4,9 +4,9 @@
 
          <div class="row">
              <div class="col-md-12">
-                 <p class="d1 c-org">INTRODUCING</p>
+                 <p class="d1 c-org font-headline">INTRODUCING</p>
                  <p class="t1 c-wht font-headline">HALITE 2</p>
-                 <p class="d1 c-org">MAY THE BEST BOT WIN</p>
+                 <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                  <div v-if="!me_in" class="not-me ha-button-container">
                      <div class="ha-button"><span>PLAY NOW</span></div>
                  </div>
@@ -28,7 +28,7 @@
                      <p class="t5 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <div class="ha-button-container">
-                         <div class="ha-button no-bg-button"><span>GET STARTED</span></div>
+                         <div class="ha-button no-bg-button"><span>READ OUR DOCUMENT</span></div>
                      </div>
                  </div>
              </div>
@@ -42,8 +42,8 @@
                      <p class="t5 c-gry">This year's game is a space story.</p>
                      <p class="t5 c-gry">Every product that is labeled as a Pocket PC must be accompanied with specific software to operate the unit and must feature a touchscreen and touchpad. </p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
-                     <div class="ha-button-container">
-                         <div class="ha-button no-bg-button"><span>READ THE STORY</span></div>
+                     <div class="ha-button-container wider">
+                         <div class="ha-button no-bg-button"><span>READ THE WHOLE STORY</span></div>
                      </div>
                  </div>
                  <div class="col-md-offset-2 col-md-4">
@@ -55,7 +55,7 @@
              <div class="col-md-12 big-menu">
                  <p class="t2 c-wht">WATCH HALITE TV - SEE THE LATEST GAMES PLAYED</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <p class="t5 c-gry">See what's happening right now behind the scenes. When you submit a bot, it compiles and then starts playing against all other bots. Thousands of games are played at a time. Check out a few!</p>
+                 <p class="t5 c-gry">See what's happening right now or watch some of the best</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
                      <div class="col-md-3">
@@ -64,11 +64,11 @@
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                          </div>
                          <div class="img-des">
-                             <i class="icon-medal-1"></i>
+                             <img :src="`${baseUrl}/assets/images/temp/icon_play_1.png`"/>
                              <span class="t4 c-wht i-label">Juliak vs Erdman</span>
                              <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
-                                 <i class="right-btn fa fa-share-square-o c-yel"></i>
+                                 <img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>
                              </div>
                          </div>
                      </div>
@@ -78,11 +78,11 @@
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                          </div>
                          <div class="img-des">
-                             <i class="icon-medal-1"></i>
+                             <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
                              <span class="t4 c-wht i-label">CariosW... vs Erdman, +2</span>
                              <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
-                                 <i class="right-btn fa fa-share-square-o c-yel"></i>
+                                 <img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>
                              </div>
                          </div>
                      </div>
@@ -92,11 +92,11 @@
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                          </div>
                          <div class="img-des">
-                             <i class="icon-medal-1"></i>
+                             <img :src="`${baseUrl}/assets/images/temp/icon_play_3.png`"/>
                              <span class="t4 c-wht i-label">Harikmeon vs Erdman</span>
                              <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
-                                 <i class="right-btn fa fa-share-square-o c-yel"></i>
+                                 <img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>
                              </div>
                          </div>
                      </div>
@@ -106,11 +106,11 @@
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                          </div>
                          <div class="img-des">
-                             <i class="icon-medal-1"></i>
+                             <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
                              <span class="t4 c-wht i-label">Harikmeon vs Erdman</span>
                              <div class="i-des">
                                  <span class="t5 c-gry">July 5, 08:08:34</span>
-                                 <i class="right-btn fa fa-share-square-o c-yel"></i>
+                                 <img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>
                              </div>
                          </div>
                      </div>
@@ -118,6 +118,74 @@
                  <div class="clear"></div>
                  <div class="ha-button-container">
                      <div class="ha-button no-bg-button"><span>SEE ALL VIDEOS</span></div>
+                 </div>
+             </div>
+             <div class="col-md-12">
+                 <img class="array" :src="`${baseUrl}/assets/images/temp/arrow_2.gif`"/>
+             </div>
+             <div class="col-md-12 big-menu">
+                 <div class="col-md-4">
+                     <div class="menu-header">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <img :src="`${baseUrl}/assets/images/temp/forums.png`"/>
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                     </div>
+                     <div class="menu-body">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                         <div class="clear"></div>
+                         <div class="content">
+                             <p class="t3 c-wht font-headline">JOIN THE FORUMS</p>
+                             <p class="t5 c-gry">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis</p>
+                             <div class="clear"></div>
+                             <div class="ha-button-container">
+                                 <div class="ha-button no-bg-button"><span>JOIN</span></div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-4">
+                     <div class="menu-header">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <img :src="`${baseUrl}/assets/images/temp/events.png`"/>
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                     </div>
+                     <div class="menu-body">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                         <div class="clear"></div>
+                         <div class="content">
+                             <p class="t3 c-wht font-headline">HACKATHON & EVENTS</p>
+                             <p class="t5 c-gry">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis</p>
+                             <div class="clear"></div>
+                             <div class="ha-button-container">
+                                 <div class="ha-button no-bg-button"><span>LEARN MORE</span></div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-4">
+                     <div class="menu-header">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <img :src="`${baseUrl}/assets/images/temp/invite.png`"/>
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                     </div>
+                     <div class="menu-body">
+                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                         <div class="clear"></div>
+                         <div class="content">
+                             <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
+                             <p class="t5 c-gry">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis</p>
+                             <div class="clear"></div>
+                             <div class="ha-input-container">
+                                 <div class="input-field">
+                                     <input type="text" placeholder="Enter friend’s email address">
+                                     <button class="btn"><span>  INVITE  </span></button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
                  </div>
              </div>
              <div class="col-md-12 ha-line">
@@ -136,7 +204,7 @@
                          </div>
                      </div>
                      <div class="col-md-4">
-                        <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a> 
+                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
                      </div>
                  </div>
                  <div class="clear"></div>

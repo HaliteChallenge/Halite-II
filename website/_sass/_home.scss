@@ -20,7 +20,7 @@
   }
 
   .d1{
-    font-size: 1.4rem;
+    font-size: 2.3rem;
     letter-spacing: 1px;
   }
   .t1{
@@ -125,7 +125,13 @@
         width:200px;
         margin-left: 0;
         text-align: center;
-        transform: translateX(-15px);
+        transform: translateX(-11px);
+        &.wider{
+          transform: translateX(-15px);
+          div{
+            width:210px;
+          }
+        }
       }
     }
   }
@@ -156,14 +162,14 @@
     text-align: left;
     padding: 10px;
     position: relative;
-    i{
-      font-size:20px;
+    >img{
+      max-width:25px;
       margin-right: 5px;
     }
     .i-label{
       position: absolute;
-      top: 10px;
-      left: 35px;
+      top: 14px;
+      left: 46px;
       right: 10px;
       display: inline-block;
       white-space: nowrap;
@@ -175,7 +181,7 @@
     }
     .right-btn{
       float: right;
-      font-size: 1.5rem;
+      max-width:17px;
       cursor: pointer;
     }
   }
@@ -199,16 +205,17 @@
     }
   }
   .menu-header{
-    margin-top: 30px;
+    margin-top: 10px;
     .line-container{
       display: inline-block;
       width: 25%;
       transform: translateY(15px);
-      margin-left: 30px;
-      margin-right: 30px;
+      margin-left: 8%;
+      margin-right: 8%;
     }
     img{
-      width: 60px;
+      max-width: 60px;
+      width: 14%;
     }
   }
   .menu-body{
@@ -226,6 +233,40 @@
       &.line-2{
         float: right;
         transform: translate(42px, 45px) rotate(90deg);
+      }
+    }
+  }
+  .ha-input-container{
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 20px;
+    .input-field{
+      background-color: #000;
+      display: flex;
+      padding: 5px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+      input{
+        color: #fff;
+        background-color: transparent;
+        border: 0;
+        flex: 1;
+        &:-moz-placeholder {
+          color: #fff; opacity:1;
+        }
+        &::-moz-placeholder {
+          color: #fff;opacity:1;
+        }
+        &:-ms-input-placeholder{
+          color: #fff;opacity:1;
+        }
+        &::-webkit-input-placeholder{
+          color: #fff;opacity:1;
+        }
+      }
+      button{
+        letter-spacing: 2px;
       }
     }
   }

@@ -2,6 +2,10 @@
   color: $foreground;
   a{
     color: $foreground;
+    &.base-link{
+      color: #337AB7;
+      text-decoration: underline;
+    }
   }
   .navbar{
     border-radius: 0;
@@ -75,12 +79,18 @@
 
   .footer-social{
     text-align: center;
+    margin-left: 80px;
     &-icons{
       .fa{
         font-size: 28px;
         margin-left: 5px;
         margin-right: 5px;
       }
+    }
+  }
+  .footer-social-icons{
+    a{
+      padding: 0 5px;
     }
   }
 }
