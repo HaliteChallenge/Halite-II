@@ -43,7 +43,7 @@ def send_notification(recipient_email, recipient_name, subject, body,
     print(response.body)
 
 
-def send_templated_notification(recipient, template_id, substitutions):
+def send_templated_notification(recipient, template_id, substitutions, group_id):
     """
     Send an email based on a template.
     :param Recipient recipient: The recipient of the email
@@ -68,7 +68,7 @@ def send_templated_notification(recipient, template_id, substitutions):
 
     mail.add_personalization(personalization)
     mail.template_id = template_id
-
+    mail.asm = sendgrid.helpers.mail.ASM(group_id, [10307, 10445, 10445, 10447, 10449])
     settings = sendgrid.helpers.mail.MailSettings()
     settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
     mail.mail_settings = settings

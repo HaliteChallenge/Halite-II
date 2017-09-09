@@ -105,7 +105,8 @@ def send_verification_email(recipient, verification_code):
             "verification_url": util.build_site_url("/verify_email", {
                 "verification_code": verification_code,
             }),
-        }
+        },
+        config.GOODNEWS_ACCOMPLISHMENTS
     )
 
 
@@ -119,7 +120,8 @@ def send_confirmation_email(recipient):
     notify.send_templated_notification(
         recipient,
         config.CONFIRMATION_TEMPLATE,
-        {}
+        {},
+        config.GOODNEWS_ACCOMPLISHMENTS
     )
 
 

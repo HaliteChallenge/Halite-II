@@ -478,7 +478,8 @@ def update_user_timeout(conn, game_id, user):
                 }),
                 "log_link": "{}/user/{}/match/{}/error_log".format(
                     config.API_URL, user["user_id"], game_id),
-            })
+            },
+            config.GAME_ERROR_MESSAGES)
 
     elif hit_timeout_limit or hit_timeout_percent:
         # Prevent the bot from playing more games until a new bot
@@ -502,4 +503,5 @@ def update_user_timeout(conn, game_id, user):
                 }),
                 "log_link": "{}/user/{}/match/{}/error_log".format(
                     config.API_URL, user["user_id"], game_id),
-            })
+            },
+            config.GAME_ERROR_MESSAGES)
