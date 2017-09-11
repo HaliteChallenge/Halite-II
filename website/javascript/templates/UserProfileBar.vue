@@ -2,7 +2,7 @@
     <div class="logged-in">
         <div class="profile-container">
             <a v-on:click.stop="slide_profile">
-                <img :src="profile_image" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
+                <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
                 <i class="fa fa-sort-down"></i>
                 <ul class="nav">
                     <li><a href="/user?me"><span>view profile</span><i class="line line-bottom"></i></a></li>

@@ -60,7 +60,7 @@
              </div>
              <div class="col-md-12 ha-line">
              </div>
-             <div class="col-md-12 big-menu">
+             <!--<div class="col-md-12 big-menu">
                  <p class="t2 c-wht">WATCH HALITE TV - SEE THE LATEST GAMES PLAYED</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <p class="t5 c-gry">See what's happening right now or watch some of the best</p>
@@ -134,7 +134,6 @@
                     <div class="scroll-arrow"></div>
                     <div class="scroll-arrow"></div>
                 </div>
-             </div>
              <div class="col-md-12 big-menu">
                  <div class="col-md-4">
                      <div class="menu-header">
@@ -208,7 +207,7 @@
                  <p class="t5 c-gry">Besides our forums, our community is very vocal. Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12 img-list">
-                     <div class="col-md-4">
+                     <div class="col-md-offset-2 col-md-4">
                          <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
                             <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
                                 <a href="https://www.facebook.com/haliteAI/"></a>
