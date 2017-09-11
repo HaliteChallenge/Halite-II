@@ -3,8 +3,8 @@ USE halite2;
 CREATE TABLE organization (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   organization_name VARCHAR(64) NOT NULL,
-  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other'
-  verification_code VARCHAR(32) UNIQUE,
+  kind ENUM('High School', 'Middle School', 'University', 'Professional School', 'Company', 'Other') NOT NULL DEFAULT 'Other',
+  verification_code VARCHAR(32) UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE organization_email_domain (
@@ -86,6 +86,46 @@ CREATE TABLE game_participant (
   PRIMARY KEY (game_id, user_id, bot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- Extra table to store number of views of each game
+
+CREATE TABLE game_view_stat (
+  game_id INT UNSIGNED NOT NULL,
+  views_total INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra stats for each game
+
+CREATE TABLE game_stat (
+  game_id INT UNSIGNED NOT NULL,
+  turns_total INT UNSIGNED NOT NULL,
+  planets_destroyed INT UNSIGNED NOT NULL,
+  ships_produced INT UNSIGNED NOT NULL,
+  ships_destroyed INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  PRIMARY KEY (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Extra stats for each game, at bot level
+
+CREATE TABLE game_bot_stat (
+  game_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  bot_id INT UNSIGNED NOT NULL,
+  planets_controlled INT UNSIGNED NOT NULL,
+  ships_produced INT UNSIGNED NOT NULL,
+  ships_alive INT UNSIGNED NOT NULL,
+  ships_alive_ratio FLOAT NOT NULL,
+  ships_relative_ratio FLOAT NOT NULL,
+  planets_destroyed INT UNSIGNED NOT NULL,
+  attacks_total INT UNSIGNED NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  PRIMARY KEY (game_id, user_id, bot_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- A history of submitted bots, recorded whenever a new one is submitted.
 -- This intends to prevent players from keeping their bots in "stealth", where
 -- they submit bots, wait for the rank to stabilize, then take them down.
@@ -151,4 +191,30 @@ CREATE TABLE hackathon_snapshot (
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
   FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
   PRIMARY KEY (hackathon_id, user_id, bot_id)
+);
+
+CREATE TABLE badge (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(256) UNIQUE NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE user_badge (
+  user_id INT UNSIGNED NOT NULL,
+  badge_id INT UNSIGNED NOT NULL,
+  is_enabled BOOL NOT NULL DEFAULT TRUE,
+  creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (badge_id) REFERENCES badge (id),
+  PRIMARY KEY (user_id, badge_id)
+);
+
+CREATE TABLE user_tier_history (
+  user_id INT UNSIGNED NOT NULL,
+  tier VARCHAR(256) NOT NULL,
+  last_in_tier DATETIME DEFAULT CURRENT_TIMESTAMP,
+  total_time_in_tier INT UNSIGNED DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  PRIMARY KEY (user_id, tier)
 );

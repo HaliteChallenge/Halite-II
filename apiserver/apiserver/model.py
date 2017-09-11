@@ -27,11 +27,16 @@ user_notifications = sqlalchemy.Table("user_notification", metadata, autoload=Tr
 bots = sqlalchemy.Table("bot", metadata, autoload=True)
 bot_history = sqlalchemy.Table("bot_history", metadata, autoload=True)
 games = sqlalchemy.Table("game", metadata, autoload=True)
+game_stats = sqlalchemy.Table("game_stat", metadata, autoload=True)
+game_view_stats = sqlalchemy.Table("game_view_stat", metadata, autoload=True)
+game_bot_stats = sqlalchemy.Table("game_bot_stat", metadata, autoload=True)
 game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True)
 hackathons = sqlalchemy.Table("hackathon", metadata, autoload=True)
 hackathon_participants = sqlalchemy.Table("hackathon_participant", metadata, autoload=True)
 hackathon_snapshot = sqlalchemy.Table("hackathon_snapshot", metadata, autoload=True)
-
+badge = sqlalchemy.Table("badge", metadata, autoload=True)
+user_badge = sqlalchemy.Table("user_badge", metadata, autoload=True)
+user_tier_history = sqlalchemy.Table('user_tier_history', metadata, autoload=True)
 
 def ranked_bots_query(variable="rank", alias="ranked_bots"):
     """

@@ -22,3 +22,6 @@ screen -S api -d -m /bin/bash -c \
 
 screen -S coordinator_internal -d -m /bin/bash -c \
     "PYTHONPATH=$(pwd) FLASK_APP=apiserver.coordinator_server flask run -h 0.0.0.0 -p 5001"
+
+screen -S badge_daemon -d -m /bin/bash -c \
+    "PYTHONPATH=$(pwd) python3 -m apiserver.scripts.badge_daemon.py"

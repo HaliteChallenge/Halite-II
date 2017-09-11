@@ -18,6 +18,7 @@
 #include "json.hpp"
 
 extern bool quiet_output;
+extern bool always_log;
 
 namespace hlt {
     enum class MoveType {
@@ -112,6 +113,10 @@ namespace hlt {
                            const std::vector<EntityId>& potential) -> bool;
         auto any_planet_collision(const Location& location, double radius) -> bool;
         auto spawn_ship(const Location& location, PlayerId owner) -> EntityIndex;
+    };
+
+    struct GameAbort {
+        int status;
     };
 }
 

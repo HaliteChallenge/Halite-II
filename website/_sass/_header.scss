@@ -1,0 +1,235 @@
+.navbar-brand{
+  padding: 6px 15px 0 15px;
+  img{
+    max-width: 100px;
+    width: 100px;
+  }
+  @media (min-width: $screen-md-min){
+    img{
+      max-width: 150px;
+      width: 150px;
+    }
+  }
+}
+
+.navbar-inverse{
+  background-color: $gray-bg;
+  color: $foreground;
+  .navbar-nav{
+    li a {
+      position: relative;
+      padding: 5px;
+      min-height: 50px;
+      @media (min-width: $screen-md-min){
+        padding: 15px 3px;
+      }
+      span{
+        display: block;
+        padding: 5px 15px;
+      }
+      .xline-bottom{
+        bottom: -1px;
+        opacity: 0;
+        @media (max-width: $screen-sm-max){
+          display: none;
+        }
+      }
+    }
+    li.active{
+      .xline-bottom{
+        opacity: 1;
+      }
+      a{
+        background-color: transparent;
+        &:hover{
+          background-color: transparent;
+        }
+        span{
+          color: #FFBE00;
+          background-color: rgba(255,190,0,0.1);
+        }
+      }
+    }
+  }
+}
+
+header.navbar{
+  border-bottom: 1px solid $border;
+  height: 61px;
+  @media (min-width: $screen-md-min){
+    min-height: 50px;
+  }
+
+  .logged-in {
+    img {
+      height: 34px;
+    }
+    .profile-container{
+      float: right;
+      padding: 13px 0 0 10px;
+      cursor: pointer;
+      i{
+        color: #FFF;
+        margin-left: 3px;
+      }
+      ul{
+        display: none;
+        margin-top: 15px;
+        position: absolute;
+        transform: translateX(-75px);
+        list-style: none;
+        background-color: $gray-bg;
+        border-radius: 4px;
+        &:before, &:after{
+          position: absolute;
+          display: inline-block;
+          content: "";
+        }
+        &:before{
+          top: -16px;
+          right: 9px;
+          left: auto;
+          border: 8px solid transparent;
+          border-bottom-color: rgba(27,31,35,0.15);
+        }
+        li{
+          a{
+            color: #9d9d9d;
+            .line-bottom{
+              padding: 0;
+              background-color: #889295;
+              transform: translateX(-3px);
+              opacity: 0;
+            }
+            &:hover{
+              background-color: $gray-bg;
+              color: #FFF;
+              .line-bottom{
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    ul li a i{
+      background: $dark-gray;
+      color: $yellow;
+      padding: 3px 2px;
+      margin-right: 5px;
+    }
+    .popup-container{
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-color: rgba(37,36,47,0.3);
+      .container{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        .popup-pane{
+          background-color: #1c1A27;
+          padding:10px;
+          i{
+            float: right;
+            color: #9d9d9d;
+            font-size: 16px;
+            cursor: pointer;
+          }
+          .content{
+            margin: 20px;
+            padding: 40px;
+            border: 2px dashed #9d9d9d;
+            .icon{
+              width: 60px;
+              height: 72px;
+            }
+            p{
+              margin-top:10px;
+              &.p2{
+                color: #9d9d9d;
+              }
+            }
+            .button{
+              background-image: url(../images/register_bg.png);
+              background-size: contain;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 5px 20px;
+              width: 190px;
+              margin-left: auto;
+              margin-right: auto;
+              margin-top: 60px;
+              cursor: pointer;
+              span{
+                color: $dark-gray;
+                line-height: 20px;
+                padding: 3px;
+                display: inline-block;
+                letter-spacing: 1px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // button sign in in mobile
+  .navbar-signin{
+    @media (min-width: $screen-md-min){
+      display: none;
+    }
+    margin: 8px 15px 8px 0;
+    float: right;
+    .fa{
+      font-size: 1.2em;
+    }
+  }
+
+  .navbar-toggle{
+    border: 0;
+  }
+
+  .navbar-right{
+    background-image: url("../images/register_bg.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 5px 20px;
+    display: none;
+    margin-right: 0;
+    @media (min-width: $screen-md-min){
+      display: block;
+    }
+    li{
+      &:after{
+        content: "";
+        display: block;
+        position: absolute;
+        height: 16px;
+        width: 1px;
+        top: 17px;
+        right: 0;
+        background-color: $dark-gray;
+      }
+      &:last-child:after{
+        display: none;
+      }
+      a{
+        cursor: pointer;
+        color: #30242F;
+        &:hover{
+          color: #30242F;
+        }
+      }
+    }
+  }
+
+
+}

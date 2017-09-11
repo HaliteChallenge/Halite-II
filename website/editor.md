@@ -3,6 +3,7 @@ layout: page
 title: Online Halite Bot Editor
 toc: false
 full_width: true
+menu: editor
 mount_views: ["BotEditor"]
 additional_js: ["FileSaver.min", "jszip.min", "jszip-utils.min", "editorBuild/code_edit/built-codeEdit.min"]
 additional_css: ["built-codeEdit", "dark-codeEdit"]

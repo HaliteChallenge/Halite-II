@@ -464,6 +464,7 @@ node_modules
 *.dSYM/
 
 musicgenerator/haliteamp/*
+airesources/startenv/*
 /musicgenerator/*.wav
 haliteII/*
 
@@ -474,3 +475,5 @@ compiled_environments/
 *.dylib
 
 admin/adminenv/*
+
+promo-website/_site/*

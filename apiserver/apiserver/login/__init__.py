@@ -6,7 +6,7 @@ import flask
 import sqlalchemy
 from flask_oauthlib.client import OAuth, OAuthException
 
-from .. import app, config, model, util
+from .. import app, badge_util, config, model, util
 from ..util import cross_origin
 
 
@@ -83,7 +83,7 @@ def github_login_callback():
         if record["primary"]:
             email = record["email"]
             break
-
+    add_badge = False
     with model.engine.connect() as conn:
         user = conn.execute(sqlalchemy.sql.select([
             model.users.c.id,
@@ -101,8 +101,12 @@ def github_login_callback():
                 oauth_provider=1,
             )).inserted_primary_key
             flask.session["user_id"] = new_user_id[0]
+            add_badge = True
         else:
             flask.session["user_id"] = user["id"]
+
+    if add_badge:
+        badge_util.add_registration_badge(flask.session["user_id"])
 
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
