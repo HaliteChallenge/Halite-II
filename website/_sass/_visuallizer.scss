@@ -24,7 +24,8 @@
   }
   &-players{
     font-family: $font-heading;
-    font-size: 18px;
+    text-transform: uppercase;
+    font-size: 16px;
     color: $foreground;
     letter-spacing: 2px;
     text-shadow: 0 2px 30px rgba(0,0,0,0.20);
@@ -40,7 +41,7 @@
         margin-left: 0;
       }
       >span+span{
-        margin-left: 3px; 
+        margin-left: 9px; 
       }
     }
     .short{
@@ -63,8 +64,130 @@
   }
 }
 
+.xline-left {
+  position: absolute;
+  width: 1px;
+  display: block;
+  background-color: #889295;
+  height: 30%;
+  top: 30%;
+  left: 10px; 
+  &.xline-left:before, &.xline-left:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #889295;
+    border-radius: 3px; 
+  }
+  &.xline-left:before {
+    top: -2px;
+    left: -1px; 
+  }
+  &.xline-left:after {
+    bottom: -2px;
+    left: -1px; 
+    top: auto;
+  }
+}
+
+.xline-right {
+  position: absolute;
+  width: 1px;
+  display: block;
+  background-color: #889295;
+  height: 30%;
+  top: 30%;
+  right: 10px; 
+  &.xline-right:before, &.xline-right:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #889295;
+    border-radius: 3px; 
+  }
+  &.xline-right:before {
+    top: -2px;
+    right: -1px; 
+    left: auto;
+  }
+  &.xline-right:after {
+    bottom: -2px;
+    right: -1px; 
+    top: auto;
+  }
+}
+
 .game-replay{
   padding: 15px 0;
+  position: relative;
+
+  .game-replay-viewer {
+    text-align: center;
+    padding: 20px 30px;
+  }
+
+  .game-replay-controller {
+    position: relative;
+    height: 60px;
+    width: 100%;
+    .xline{
+      background-color: #474951;
+      &:after, &:before{
+        background-color: #474951;
+      }
+    }
+
+    .game-replay-btn-table {
+      display: table;
+      height: 100%;
+      width: 100%;
+
+      .game-replay-btn-cell {
+        display: table-cell;
+        vertical-align: middle;
+        position: relative;
+        width: 240px;
+  
+        .replay-btn {
+          margin-right: 30px;
+          a{
+            color: inherit;
+            &:hover, &:focus{
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+
+    .game-replay-progress {
+      display: table-cell;
+      vertical-align: middle;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .game-replay-progress-inner{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .game-replay-progress-bar{
+      flex: 1;
+      padding: 0 5px;
+    }
+
+    .game-replay-share {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      width: 100px;
+    }
+  }
 }
 
 .card-dashboard-list{
@@ -77,6 +200,7 @@
 .dashboard-graph{
   &-heading{
     font-family: $font-heading;
+    text-transform: uppercase;
     font-size: 14px;
     letter-spacing: 0.88px;
     text-shadow: 0 2px 30px rgba(0,0,0,0.20);
@@ -90,5 +214,22 @@
   }
   &-full{
 
+  }
+}
+
+.map-stats-props{
+  tbody > tr > th, tbody > tr > td{
+    padding: 8px 0;
+  }
+
+  tbody > tr > th{
+    color: $foreground;
+    padding-right: 10px;
+    @media (min-width: $screen-sm-min){
+      padding-right: 30px;
+    }
+  }
+  tbody > tr > td{
+    color: $yellow;
   }
 }

@@ -2,6 +2,7 @@
 layout: page
 title: Terms and Conditions
 permalink: /about/terms-and-conditions
+description: Read about Halite's terms and conditions and contact us if you have any questions.
 ---
 
 Your use of the game, Halite, and the website on which these terms reside (collectively, the "Site"), and the features at this Site are subject to these Terms of Use, which we may update from time to time. Please read these Terms of Use carefully before using this Site. By accessing Halite, this website and any materials presented herein, or by downloading any products or materials from the Site, you agree to and are bound by the terms, conditions, policies and notices contained on this page (the "Terms"), including, but not limited to, conducting this transaction electronically, disclaimers of warranties, damage and remedy exclusions and limitations, and a choice of New York law. The Site is owned or controlled by Two Sigma Open Source, LLC and its affiliates (collectively “Two Sigma”). This Site is intended for users age thirteen or older. If you are under 13 years of age you may not use this Site. If you are under age 18 (or the age of majority under applicable law), Two Sigma may need your parent or guardian’s consent before your use of the Site is permitted.

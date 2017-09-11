@@ -9,6 +9,7 @@
   .panel-heading{
     padding: 0;
     font-family: $font-heading;
+    text-transform: uppercase;
     a{
       position: relative;
       display: block;
@@ -54,7 +55,7 @@
       }
     }
     h4{
-      font-size: 16px;
+      font-size: 20px;
     }
     .fa-chevron-down{
       position: absolute;

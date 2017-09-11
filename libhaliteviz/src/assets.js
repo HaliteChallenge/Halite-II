@@ -2,8 +2,8 @@ const PIXI = require("pixi.js");
 
 export let ASSET_ROOT = "dist/";
 
-export const VISUALIZER_SIZE = 768;
-export const VISUALIZER_HEIGHT = 512;
+export const VISUALIZER_SIZE = 690;
+export const VISUALIZER_HEIGHT = 460;
 export const STATS_SIZE = 20;
 export const CELL_SIZE = 1;
 export const PLAYER_COLORS = [0x009aa6, 0xffbe00, 0xe37222, 0xff00ff];

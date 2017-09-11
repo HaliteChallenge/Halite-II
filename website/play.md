@@ -1,12 +1,13 @@
 ---
 layout: page
-title: Visualize a Game or Submit Your Bot
+title: Submit Your Bot or Visualize an Offline Replay File
 toc: false
 full_width: true
 menu: play
 mount_views: ["Visualizer", "Upload"]
 additional_js: ["gif", "RecordRTC.min"]
 permalink: /play-programming-challenge
+description: Submit a bot to the Halite AI programming challenge or visualize a replay of a game file created online.
 ---
 
 <div class="row">

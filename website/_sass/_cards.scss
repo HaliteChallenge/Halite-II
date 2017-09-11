@@ -16,6 +16,10 @@
     color: #ECFFFB;
     letter-spacing: 1px;
     position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 15px;
   }
   &-stats{
     font-size: 14px;
@@ -83,6 +87,7 @@
   }
   &-info{
     padding: 0 5px 0 10px;
+    min-width: 0;
     p{
       margin-bottom: 0;
       margin-top: 4px;
@@ -91,6 +96,7 @@
   &-version{
     align-self: flex-end;
     font-size: 34px;
+    margin-bottom: -4px;
     line-height: 1em;
     font-family: $font-heading;
     font-weight: bold;
@@ -101,6 +107,9 @@
     font-size: 20px;
     font-weight: 500;
     letter-spacing: 1px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .dot{
     display: block;
