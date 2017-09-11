@@ -46,7 +46,7 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
     :param Recipient recipient: The recipient of the email
     :param str template_id: The template ID of the email.
     :param Dict[str, Any] substitutions: Any other substitution variables to
-    :param str template_id: The group ID of the email.
+    :param str group_id: The group ID of the email.
     pass to the email template.
     """
     mail = sendgrid.helpers.mail.Mail()
