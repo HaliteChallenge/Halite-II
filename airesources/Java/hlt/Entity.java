@@ -16,10 +16,6 @@ public abstract class Entity {
         this.health = Short.parseShort(metadata.pop());
     }
 
-    public boolean isAlive() {
-        return health > 0;
-    }
-
     public Position getPosition() {
         return position;
     }

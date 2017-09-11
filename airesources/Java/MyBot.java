@@ -3,6 +3,7 @@ import hlt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
+
 public class MyBot {
 
     public static void main(String[] args) {
@@ -31,7 +32,7 @@ public class MyBot {
                         moveList.add(new DockMove(ship, planet));
                     }
                     else {
-                        final double orientation = Movement.orientTowardsInRad(ship, planet);
+                        final double orientation = Movement.orientTowardsInDeg(ship, planet);
                         moveList.add(new ThrustMove(ship,
                                                     gameMap.adjustForCollision(ship.getPosition(),
                                                     orientation,

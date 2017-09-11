@@ -5,11 +5,11 @@ import java.util.*;
 
 public class GameMap {
     // A "safety zone" to leave around other ships when performing collision forecasting.
-    private static final double FORECAST_FUDGE_FACTOR = Constants.SHIP_RADIUS + 0.1;
     private short width, height;
     private short playerId;
     private List<Player> players;
     private Map<Long, Planet> planets;
+    private LinkedList<Ship> ships;
 
     public GameMap(short width, short height, short playerId){
         this.width = width;
@@ -32,7 +32,7 @@ public class GameMap {
     }
 
     public List<Player> getAllPlayers() {
-        return players;
+        return Collections.unmodifiableList(players);
     }
 
     public Player getMyPlayer() {
@@ -51,8 +51,48 @@ public class GameMap {
         return planets;
     }
 
+    public List<Ship> getAllShips(){
+        return Collections.unmodifiableList(ships);
+    }
+
+    public ArrayList<Entity> objectsBetween(Entity start, Entity target) {
+        final Position startPos = start.getPosition();
+        final Position targetPos = target.getPosition();
+
+        return objectsBetween(startPos, targetPos);
+    }
+
+    public ArrayList<Entity> objectsBetween(Position startPos, Position targetPos) {
+        ArrayList<Entity> objectsList = new ArrayList<>();
+        final double fudge = Constants.SHIP_RADIUS;
+
+        for (Planet planet : planets.values()) {
+            final Position planetPos = planet.getPosition();
+            if (planetPos.equals(startPos) || planetPos.equals(targetPos)) {
+                continue;
+            }
+            if (Collision.segmentCircleIntersect(startPos, targetPos, planetPos, planet.getRadius(), fudge)) {
+                objectsList.add(planet);
+            }
+        }
+
+        for (Ship ship : ships) {
+            final Position shipPos = ship.getPosition();
+            if (shipPos.equals(startPos) || shipPos.equals(targetPos)) {
+                continue;
+            }
+            if (Collision.segmentCircleIntersect(startPos, targetPos, shipPos, ship.getRadius(), fudge)) {
+                objectsList.add(ship);
+            }
+        }
+
+        DebugLog.addLog("Objects: " + objectsList.size());
+
+        return objectsList;
+    }
+
     private boolean isOutOfBounds(double x, double y) {
-        return (x < 0 || x >= this.width || y < 0 || y >= this.height);
+        return (x < 0 || x >= width || y < 0 || y >= height);
     }
 
     public Position positionDelta(Position originalPosition, Position deltaPosition) {
@@ -62,13 +102,25 @@ public class GameMap {
         return isOutOfBounds(x, y) ? null : new Position(x, y);
     }
 
-    public Position getClosestPoint(Position start, Position target, short radius) {
-        final double angle = Movement.orientTowardsInRad(start, target) + Math.PI;
-        final short dx = (short)(radius * Math.cos(angle));
-        final short dy = (short)(radius * Math.sin(angle));
+    public Position getClosestPoint(Entity start, Entity target) {
+        final Position startPosition = start.getPosition();
+        final Position targetPosition = target.getPosition();
+        final double targetRadius = target.getRadius();
 
-        return positionDelta(target, new Position(dx, dy));
+        return getClosestPoint(startPosition, targetPosition, targetRadius);
     }
+
+    public Position getClosestPoint(Position start, Position target, double targetRadius) {
+        final int MIN_DISTANCE = 3;
+        final double radius = targetRadius + MIN_DISTANCE;
+        final double angle = Movement.orientTowardsInDeg(start, target);
+
+        final short dx = (short) (target.getXPos() + radius * Math.cos(Math.toRadians(angle)));
+        final short dy = (short) (target.getYPos() + radius * Math.sin(Math.toRadians(angle)));
+
+        return new Position(dx, dy);
+    }
+
 
     public boolean isPathable(Position start, Position target) {
         if (isOutOfBounds(target.getXPos(), target.getYPos()))
@@ -76,51 +128,11 @@ public class GameMap {
 
         for (Map.Entry<Long, Planet> planetEntry : planets.entrySet()) {
             final Planet planet = planetEntry.getValue();
-            if (Collision.segmentCircleIntersect(start, target, planet.getPosition(), planet.getRadius(), FORECAST_FUDGE_FACTOR)) {
+            if (Collision.segmentCircleIntersect(start, target, planet.getPosition(), planet.getRadius(), Constants.FORECAST_FUDGE_FACTOR)) {
                 return false;
             }
         }
         return true;
-    }
-
-    private boolean willCollide(Position start, double angle, short thrust) {
-        final Position target = new Position(start.getXPos() + thrust * Math.cos(angle),
-                                             start.getYPos() + thrust * Math.sin(angle));
-
-        if (isOutOfBounds(target.getXPos(), target.getYPos())) {
-            return true;
-        }
-        if (!isPathable(start, target)) {
-            return true;
-        }
-
-        for (Player player : players) {
-            for (Map.Entry<Long, Ship> shipEntry : player.getShips().entrySet()) {
-                final Ship ship = shipEntry.getValue();
-                final Position shipPosition = ship.getPosition();
-
-                if (Movement.getDistance(shipPosition, start) <= Constants.SHIP_RADIUS) {
-                    // Not an actual collision, this is the ship itself
-                    continue;
-                }
-                if (Collision.segmentCircleIntersect(start, target,
-                        shipPosition, ship.getRadius(), FORECAST_FUDGE_FACTOR)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public ThrustMove.ThrustVector adjustForCollision(Position start, double angle, short thrust) {
-        return adjustForCollision(start, angle, thrust, 25);
-    }
-
-    public ThrustMove.ThrustVector adjustForCollision(Position start, double angle, short thrust, int tries) {
-        for (; tries > 0 && willCollide(start, angle, thrust); tries--) {
-            angle += Math.PI / 12;
-        }
-        return new ThrustMove.ThrustVector(angle, thrust);
     }
 
     public GameMap updateMap(LinkedList<String> mapMetadata) {
@@ -134,9 +146,9 @@ public class GameMap {
             final short playerTag = Short.parseShort(mapMetadata.pop());
 
             Player currentPlayer = new Player(playerTag);
-            final LinkedList<Ship> shipList = Ship.getShipList(playerTag, mapMetadata);
+            ships = Ship.getShipList(playerTag, mapMetadata);
 
-            for(Ship ship : shipList) {
+            for(Ship ship : ships) {
                 currentPlayer.addShip(ship.getEntityId().getId(), ship);
             }
             players.add(currentPlayer);
