@@ -465,6 +465,7 @@ node_modules
 
 musicgenerator/haliteamp/*
 airesources/startenv/*
+airesources/starterkits/docfx/*
 /musicgenerator/*.wav
 haliteII/*
 
