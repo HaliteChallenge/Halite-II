@@ -134,7 +134,6 @@
                     <div class="scroll-arrow"></div>
                     <div class="scroll-arrow"></div>
                 </div>
-             </div>
              <div class="col-md-12 big-menu">
                  <div class="col-md-4">
                      <div class="menu-header">
