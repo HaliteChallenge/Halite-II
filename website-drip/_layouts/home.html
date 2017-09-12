@@ -5,7 +5,7 @@ layout: default
 <script>
 function check()
 {
-  if(!document.getElementById("subscribe-email").checkValidity())
+  if(!document.getElementById("tmpid").checkValidity())
   {
     document.getElementById("status").style.color = "red"
     document.getElementById("status").textContent = "Invalid email.."
@@ -14,7 +14,7 @@ function check()
   {
     let content = document.getElementById("subscribe-email").value
     const xhr = new XMLHttpRequest()
-    var url = "http://35.190.3.178/v1/api/user/addsubscriber/" + content
+    var url = "http://api.halite.io/v1/api/user/addsubscriber/" + content
     xhr.open("POST", url, true)
     xhr.send()
     document.getElementById("status").style.color = "green"
@@ -50,7 +50,7 @@ var x = setInterval(function()
                     <p class="d1 c-org font-headline">AND SUBSCRIBE...</p>
                     <div class="ha-button-container">
                         <div>
-                            <input id="subscribe-email" type="email" type="text" required="required" placeholder="hplayer@example.com" > 
+                            <input id="tmpid" type="email" type="text" required="required" placeholder="hplayer@example.com" > 
                             <button class="btn btn-primary" type="submit" id="subscribe-submit" onClick="javascript:check();"><span>SUBSCRIBE</span></button>
                         </div>
                         <br/>
