@@ -60,7 +60,7 @@
              </div>
              <div class="col-md-12 ha-line">
              </div>
-             <!--<div class="col-md-12 big-menu">
+                <div class="col-md-12 big-menu">
                  <p class="t2 c-wht font-headline">WATCH HALITE TV - SEE THE LATEST GAMES PLAYED</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <p class="t5 c-gry">See what's happening right now or watch some of the best</p>
