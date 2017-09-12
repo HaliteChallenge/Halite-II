@@ -71,7 +71,7 @@ public class GameMap {
             if (planetPos.equals(startPos) || planetPos.equals(targetPos)) {
                 continue;
             }
-            if (Collision.segmentCircleIntersect(startPos, targetPos, planetPos, planet.getRadius(), fudge)) {
+            if (Collision.segmentCircleIntersect(startPos, targetPos, planet, fudge)) {
                 objectsList.add(planet);
             }
         }
@@ -81,7 +81,7 @@ public class GameMap {
             if (shipPos.equals(startPos) || shipPos.equals(targetPos)) {
                 continue;
             }
-            if (Collision.segmentCircleIntersect(startPos, targetPos, shipPos, ship.getRadius(), fudge)) {
+            if (Collision.segmentCircleIntersect(startPos, targetPos, ship, fudge)) {
                 objectsList.add(ship);
             }
         }
@@ -91,15 +91,29 @@ public class GameMap {
         return objectsList;
     }
 
-    private boolean isOutOfBounds(double x, double y) {
-        return (x < 0 || x >= width || y < 0 || y >= height);
+    public Map<Double, Entity> nearbyEntitiesByDistance(Entity entity) {
+        Map<Double, Entity> entityByDistance = new TreeMap<>();
+        final Position entityPos = entity.getPosition();
+
+        for (Planet planet : planets.values()) {
+            if (planet.equals(entity)) {
+                continue;
+            }
+            entityByDistance.put(entityPos.getDistanceTo(planet.getPosition()), planet);
+        }
+
+        for (Ship ship : ships) {
+            if (ship.equals(entity)) {
+                continue;
+            }
+            entityByDistance.put(entityPos.getDistanceTo(ship.getPosition()), ship);
+        }
+
+        return entityByDistance;
     }
 
-    public Position positionDelta(Position originalPosition, Position deltaPosition) {
-        final double x = originalPosition.getXPos() + deltaPosition.getXPos();
-        final double y = originalPosition.getYPos() + deltaPosition.getYPos();
-
-        return isOutOfBounds(x, y) ? null : new Position(x, y);
+    private boolean isOutOfBounds(double x, double y) {
+        return (x < 0 || x >= width || y < 0 || y >= height);
     }
 
     public Position getClosestPoint(Entity start, Entity target) {
@@ -113,14 +127,13 @@ public class GameMap {
     public Position getClosestPoint(Position start, Position target, double targetRadius) {
         final int MIN_DISTANCE = 3;
         final double radius = targetRadius + MIN_DISTANCE;
-        final double angle = Movement.orientTowardsInDeg(start, target);
+        final double angleDeg = Movement.orientTowardsInDeg(start, target);
 
-        final short dx = (short) (target.getXPos() + radius * Math.cos(Math.toRadians(angle)));
-        final short dy = (short) (target.getYPos() + radius * Math.sin(Math.toRadians(angle)));
+        final short dx = (short) (target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg)));
+        final short dy = (short) (target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg)));
 
         return new Position(dx, dy);
     }
-
 
     public boolean isPathable(Position start, Position target) {
         if (isOutOfBounds(target.getXPos(), target.getYPos()))
@@ -128,7 +141,7 @@ public class GameMap {
 
         for (Map.Entry<Long, Planet> planetEntry : planets.entrySet()) {
             final Planet planet = planetEntry.getValue();
-            if (Collision.segmentCircleIntersect(start, target, planet.getPosition(), planet.getRadius(), Constants.FORECAST_FUDGE_FACTOR)) {
+            if (Collision.segmentCircleIntersect(start, target, planet, Constants.FORECAST_FUDGE_FACTOR)) {
                 return false;
             }
         }
@@ -143,10 +156,10 @@ public class GameMap {
 
         // update players info
         for(short i = 0; i < numberOfPlayers; i++) {
-            final short playerTag = Short.parseShort(mapMetadata.pop());
+            final short playerId = Short.parseShort(mapMetadata.pop());
 
-            Player currentPlayer = new Player(playerTag);
-            ships = Ship.getShipList(playerTag, mapMetadata);
+            Player currentPlayer = new Player(playerId);
+            ships = Ship.getShipList(playerId, mapMetadata);
 
             for(Ship ship : ships) {
                 currentPlayer.addShip(ship.getEntityId().getId(), ship);
@@ -155,7 +168,6 @@ public class GameMap {
         }
 
         final long numberOfPlanets = Long.parseLong(mapMetadata.pop());
-        DebugLog.addLog("Number of planets: " + Long.toString(numberOfPlanets));
 
         for(long i = 0; i < numberOfPlanets; i++) {
             final Planet planet = new Planet(mapMetadata);

@@ -62,4 +62,8 @@ public class Planet extends Entity {
     public boolean isFull() {
         return dockedShips.size() == dockingSpots;
     }
+
+    public boolean isOwned() {
+        return owner != null;
+    }
 }

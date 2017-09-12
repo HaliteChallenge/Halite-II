@@ -19,6 +19,19 @@ public class Position {
         return yPos;
     }
 
+    public double getDistanceTo(final Position target) {
+        final double dx = xPos - target.getXPos();
+        final double dy = yPos - target.getYPos();
+        return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    }
+
+    public double orientTowardsInDeg(final Position target) {
+        final double dx = target.getXPos() - xPos;
+        final double dy = target.getYPos() - yPos;
+
+        return Math.toDegrees(Math.atan2(dy, dx)) % 360;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
