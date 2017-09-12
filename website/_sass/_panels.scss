@@ -71,3 +71,15 @@
 .panel.panel-stats+.panel.panel-stats{
   margin-top: -1px;
 }
+
+
+/** upload zone **/
+.panel.upload-zone{
+  background-color: transparent;
+  border: 5px dashed #413f4a;
+  border-radius: 4px;
+  margin-bottom: 0;
+}
+.panel.upload-zone h2{
+  font-family: "Teko";
+}

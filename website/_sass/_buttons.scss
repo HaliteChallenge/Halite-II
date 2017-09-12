@@ -47,3 +47,25 @@
     border-bottom-width: 17px;
   }
 }
+
+.btn-ha{
+  background-image: url("/assets/images/button.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  height: 38px;
+  width: 200px;
+  text-align: center;
+  font-family: 'Teko';
+  color: #30242F;
+  letter-spacing: 1px;
+  font-size: 18px;
+  text-transform: uppercase;
+  background-color: transparent;
+  font-weight: 600;
+  border: none;
+  &-lg{
+    height: 55px;
+    width: 234px;
+    font-size: 24px;
+  }
+}

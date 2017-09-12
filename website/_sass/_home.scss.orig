@@ -20,21 +20,20 @@
   }
 
   .d1{
-    font-size: 2.3rem;
+    font-size: 1.4rem;
     letter-spacing: 1px;
   }
   .t1{
-    font-size: 10rem;
-    letter-spacing: 6px;
-    margin-bottom: 0;
+    font-size: 6rem;
+    letter-spacing: 2px;
   }
   .t2{
-    font-size: 3.5rem;
-    letter-spacing: 4px;
+    font-size: 2.5rem;
+    letter-spacing: 2px;
   }
   .t3{
-    font-size: 3rem;
-    letter-spacing: 2px;
+    font-size: 2rem;
+    letter-spacing: 1px;
   }
   .t4{
     font-size: 1.5rem;
@@ -85,8 +84,6 @@
   .ha-button-container{
     margin-left: auto;
     margin-right: auto;
-    font-family: $font-headline;
-    font-size: 2rem;
   }
   .ha-button{
     background-image: url(../images/register_bg.png);
@@ -97,7 +94,6 @@
     padding: 5px 20px;
     cursor: pointer;
     span{
-      transform: translateY(2px);
       color: $dark-gray;
       line-height: 20px;
       padding: 3px;
@@ -121,17 +117,12 @@
       width: 100%;
     }
     .words{
+      margin-top: 90px;
       .ha-button-container{
         width:200px;
         margin-left: 0;
         text-align: center;
-        transform: translateX(-11px);
-        &.wider{
-          transform: translateX(-15px);
-          div{
-            width:210px;
-          }
-        }
+        transform: translateX(-15px);
       }
     }
   }
@@ -142,19 +133,8 @@
     padding-bottom: 20px;
   }
   .big-menu{
-    .reddit-widget{
-      text-align: left;
-      .reddit-title{
-        img{
-          width: auto;
-        }
-      }
-    }
     img{
       width: 100%;
-    }
-    .img-list{
-      padding:30px;
     }
     .line-container{
       width:10%;
@@ -169,39 +149,28 @@
     border: 1px solid #757577;
     text-align: left;
     padding: 10px;
-    position: relative;
-    >img{
-      max-width:25px;
+    i{
+      font-size:20px;
       margin-right: 5px;
-    }
-    .i-label{
-      position: absolute;
-      top: 14px;
-      left: 46px;
-      right: 10px;
-      display: inline-block;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-    .i-des{
-      margin: 15px 0 10px;
     }
     .right-btn{
       float: right;
-      max-width:17px;
+      font-size: 1.5rem;
       cursor: pointer;
     }
   }
   .clear{
     clear: both;
   }
+<<<<<<< HEAD
+}
+=======
   .img-container{
     position: relative;
     .img-btn{
       cursor: pointer;
       width: 16%;
-      max-width: 52px;
+      max-width: 45px;
       min-width: 30px;
       transform: translate(-50%, -50%);
       position: absolute;
@@ -213,28 +182,27 @@
     }
   }
   .menu-header{
-    margin-top: 10px;
+    margin-top: 30px;
     .line-container{
       display: inline-block;
       width: 25%;
       transform: translateY(15px);
-      margin-left: 8%;
-      margin-right: 8%;
+      margin-left: 30px;
+      margin-right: 30px;
     }
     img{
-      max-width: 60px;
-      width: 14%;
+      width: 60px;
     }
   }
   .menu-body{
+    margin-bottom:30px;
     .content{
       width: 75%;
       margin-left: auto;
       margin-right: auto;
-      transform: translateY(-20px);
     }
     .line-container{
-      width: 160px;
+      width: 25%;
       float: left;
       transform: translate(-60px, 45px) rotate(90deg);
       display: inline-block;
@@ -244,77 +212,5 @@
       }
     }
   }
-  .ha-input-container{
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 20px;
-    .input-field{
-      background-color: #000;
-      display: flex;
-      padding: 5px;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-      input{
-        color: #fff;
-        background-color: transparent;
-        border: 0;
-        flex: 1;
-        &:-moz-placeholder {
-          color: #fff; opacity:1;
-        }
-        &::-moz-placeholder {
-          color: #fff;opacity:1;
-        }
-        &:-ms-input-placeholder{
-          color: #fff;opacity:1;
-        }
-        &::-webkit-input-placeholder{
-          color: #fff;opacity:1;
-        }
-      }
-      button{
-        letter-spacing: 2px;
-      }
-    }
-  }
-
-  @keyframes arrow
-  {
-    0% {opacity:0}
-    40% {opacity:1}
-    80% {opacity:0}
-    100% {opacity:0}
-  }
-
-  .arrows-icon{
-    $animation-delay: 0.5s;
-    $arrow-size: 12px;
-
-    .scroll-arrow {
-      margin-left: auto;
-      margin-right: auto;
-      width: $arrow-size;
-      height: $arrow-size;
-      transform: rotate(45deg);
-      border-right: 2px solid white;
-      border-bottom: 2px solid white;
-      animation: arrow 2s infinite;;
-      // animation-direction: alternate;
-      // &:nth-child(1){
-      //   animation-delay: -1s;
-      // }
-      // &:nth-child(2){
-      //   animation-delay: -0.5s;
-      // }
-      // &:nth-child(3){
-      //   animation-delay: 0s;
-      // }
-      @for $i from 1 through 3 {
-        &:nth-child(#{$i}) {
-          animation-delay: -$animation-delay*(3-$i);
-        }
-      }
-    }
-  }
 }
+>>>>>>> new-website

@@ -11,6 +11,7 @@ import VerifyEmail from "./templates/VerifyEmail.vue";
 import VisualizerContainer from "./templates/VisualizerContainer.vue";
 import Home from "./templates/Home.vue";
 import HackathonIndividual from "./templates/HackathonIndividual.vue";
+import Play from "./templates/Play.vue";
 
 // Include bootstrap.js - do not remove
 import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap";
@@ -92,6 +93,12 @@ window.views = {
             render: (h) => h(HackathonIndividual, {props: {baseUrl: _global.baseUrl}}),
         });
     },
+    Play: function(){
+        new Vue({
+            el: "#play-container",
+            render: (h) => h(Play, {props: {baseUrl: _global.baseUrl}}),
+        });
+    }
 };
 
 api.me().then((me) => {

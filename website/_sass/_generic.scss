@@ -14,6 +14,10 @@ body{
   }
 }
 
+a{
+  color: #FFBE00;
+}
+
 .nav{
   font-family: $font-headline;
   font-size: 2rem;
@@ -25,10 +29,44 @@ body{
   @media (min-width: $screen-md-min) and (max-width: $screen-md-max){
     width: 100%;
   }
+  @media (min-width: $screen-llg-min){
+    width: 1380px;
+  }
 }
 
 .page-header {
-  margin-top: 0px;
+  margin-top: 0;
+  border-bottom: 0;
+  h1{
+    font-family: "Teko";
+    font-size: 3.6rem;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}
+
+.line-container{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 25%;
+  &-sm{
+    width: 10%;
+  }
+}
+
+.page-description{
+  text-align: center;
+  padding: 30px 0;
+  opacity: 0.8;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  &-sm{
+    width: 474px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 input:focus{
@@ -139,4 +177,30 @@ input:focus{
 }
 .font-headline{
   font-family: Teko !important;
+}
+
+/** form **/
+.ha-checkbox{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background-color: #33313d;
+  border: 1px solid $foreground;
+  padding: 3px;
+  vertical-align: middle;
+  span{
+    background-color: transparent;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  &-checked{
+    border-color: $yellow;
+    span{
+      background-color: $yellow;
+    }
+  }
 }

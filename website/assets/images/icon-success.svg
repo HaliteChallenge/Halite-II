@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="71px" height="84px" viewBox="0 0 71 84" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>4</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Play-Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01_Submit-a-Bot-States" transform="translate(-1530.000000, -767.000000)">
+            <g id="5" transform="translate(1085.000000, 646.000000)">
+                <g id="4" transform="translate(445.000000, 121.000000)">
+                    <g id="Icon-frame">
+                        <path d="M69,60 C70.104,60 71,60.896 71,62 C71,63.104 70.104,64 69,64 C67.896,64 67,63.104 67,62 C67,60.896 67.896,60 69,60" id="Fill-1" fill="#2ECC71"></path>
+                        <path d="M69,20 C70.104,20 71,20.896 71,22 C71,23.104 70.104,24 69,24 C67.896,24 67,23.104 67,22 C67,20.896 67.896,20 69,20" id="Fill-3" fill="#2ECC71"></path>
+                        <path d="M2,60 C3.104,60 4,60.896 4,62 C4,63.104 3.104,64 2,64 C0.896,64 0,63.104 0,62 C0,60.896 0.896,60 2,60" id="Fill-5" fill="#2ECC71"></path>
+                        <path d="M35,80 C36.104,80 37,80.896 37,82 C37,83.104 36.104,84 35,84 C33.896,84 33,83.104 33,82 C33,80.896 33.896,80 35,80" id="Fill-7" fill="#2ECC71"></path>
+                        <path d="M35,0 C36.104,0 37,0.896 37,2 C37,3.104 36.104,4 35,4 C33.896,4 33,3.104 33,2 C33,0.896 33.896,0 35,0" id="Fill-9" fill="#2ECC71"></path>
+                        <path d="M2,20 C3.104,20 4,20.896 4,22 C4,23.104 3.104,24 2,24 C0.896,24 0,23.104 0,22 C0,20.896 0.896,20 2,20" id="Fill-12" fill="#2ECC71"></path>
+                        <polygon id="Stroke-14" stroke="#2ECC71" points="69 22 69 62 35 82 2 62 2 22 35 2"></polygon>
+                    </g>
+                    <g id="check-bold" transform="translate(22.000000, 32.000000)" stroke-linecap="square" stroke-width="2" stroke="#2ECC71">
+                        <polyline id="Shape" points="0 10 3 7 10 12 25 0 28 2 10 21 6.8554577 17.5410035 2.54633148 12.8009646"></polyline>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

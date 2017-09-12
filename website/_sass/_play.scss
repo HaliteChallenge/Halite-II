@@ -1,0 +1,115 @@
+.upload-container{
+  background-color: #1c1a27;
+  border-radius: 12px;
+  padding: 15px;
+  @media (min-width: $screen-md-min){
+    padding: 30px;
+  }
+}
+
+.upload-container{
+  h2{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+}
+
+.play-upload-section{
+  margin-top: 40px;
+  .upload-container{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    > * {
+      flex: 1;
+    }
+  }
+  .upload-note{
+    margin-top: 30px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.8;
+    font-size: 16px;
+    line-height: 1.5em;
+    letter-spacing: 0.5px;
+  }
+}
+
+.upload-zone{
+  &-icon{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+  }
+  &-desc{
+    text-align: center;
+  }
+  &-btn{
+    margin-top: 60px;
+  }
+}
+
+.upload-state{
+  text-align: center;
+  padding: 20px;
+  background-color: #1c1a27;
+  border-radius: 5px;
+  @media (min-width: $screen-sm-min){
+    padding: 40px;
+  }
+  @media (min-width: $screen-md-min){
+    padding: 60px;
+  }
+
+  h2{
+    font-size: 24px;
+    letter-spacing: 2px;
+    font-family: $font-heading;
+    text-transform: uppercase;
+  }
+
+  &-filename{
+    font-size: 20px;
+    color: #63CECA;
+    letter-spacing: 0.5px;
+    margin: 10px 0 25px 0;
+  }
+
+  &-options{
+    text-align: center;
+    margin: 0 0 40px 0;
+  }
+  &-option-item{
+    display: inline-block;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+
+  &-buttons{
+    a{
+      margin-right: 30px;
+    }
+  }
+
+  // form
+  &-select-bot{
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+  }
+
+  select.form-control{
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+    border: 0;
+    padding: 5px;
+    height: 45px;
+  }
+}

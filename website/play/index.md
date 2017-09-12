@@ -7,3 +7,6 @@ mount_view: HaliteTV
 ---
 
 <div id="halitetv-container"></div>
+
+<div id="halitetv-visualizer">
+</div>
