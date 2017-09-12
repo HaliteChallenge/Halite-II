@@ -9,7 +9,7 @@ Halite Season 2 is also open source, and we are working on overhauling the game 
 
 ## Questions
 
-Reach out to us at halite@halite.io.
+Reach out to us at halite@halite.io or at our [Discord chat](https://discordapp.com/invite/rbVDB4n)
 
 ## Authors
 
