@@ -134,6 +134,7 @@
                     <div class="scroll-arrow"></div>
                     <div class="scroll-arrow"></div>
                 </div>
+            </div>
              <div class="col-md-12 big-menu">
                  <div class="col-md-4">
                      <div class="menu-header">
@@ -166,7 +167,7 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
-                             <p class="t3 c-wht font-headline">HACKATHON & EVENTS</p>
+                             <p class="t3 c-wht font-headline">HACKATHON &amp; EVENTS</p>
                              <p class="t5 c-gry">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis</p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
@@ -207,7 +208,7 @@
                  <p class="t5 c-gry">Besides our forums, our community is very vocal. Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12 img-list">
-                     <div class="col-md-offset-2 col-md-4">
+                     <div class="col-md-4">
                          <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
                             <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
                                 <a href="https://www.facebook.com/haliteAI/"></a>
@@ -216,6 +217,9 @@
                      </div>
                      <div class="col-md-4">
                          <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
+                     </div>
+                     <div class="col-md-4">
+                        <div id="redditWidget" class="reddit-widget"></div>
                      </div>
                  </div>
                  <div class="clear"></div>
@@ -293,8 +297,37 @@
             };
         },
         mounted: function() {
+          let content = '';
+          document.write = function(s) {
+              content += s;
+          };
+          const callback = function() {
+            console.log('hi');
+            //document.getElementById("redditWidget").innerHTML = content;
+          };
+          this.createRedditWidget(callback);
         },
         methods: {
+            createRedditWidget: function(callback) {
+              var s = document.createElement('script'),
+              content = '';
+
+              s.src = 'https://www.reddit.com/domain/halite.io/hot/.embed?limit=5&t=all';
+
+              document.write = function(s) {
+                  content += s;
+              };
+
+              s.onload = function(){
+                  document.getElementById('redditWidget').innerHTML = content;
+              };
+
+              document.getElementsByTagName('head')[0].appendChild(s);
+              // let ckeditor = document.createElement('script');
+              // ckeditor.setAttribute('src', "https://www.reddit.com/domain/halite.io/hot/.embed?limit=5&t=all");
+              // ckeditor.setAttribute('onload', function(){console.log('hi')});
+              // document.body.appendChild(ckeditor);
+            }
         },
     }
 </script>
