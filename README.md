@@ -10,12 +10,12 @@ Reach out to us at halite@halite.io.
 
 ## Authors
 
-### Halite Season 1 
+### Halite Season 1 - 2016
 
 Halite was created by [Ben Spector](https://github.com/Sydriax) and [Michael Truell](https://github.com/truell20) for Two Sigma during their summer 2016 internship. 
 
 Many others contributed to Halite's developement, including [Matt Adereth](https://github.com/adereth), [Trammell Hudson](https://github.com/osresearch), and Jaques Clapauch from Two Sigma and [Arnaud Sahuguet](https://github.com/sahuguet) and [Scot Spinner](https://github.com/awesomescot) from Cornell Tech. Halite's participants, including [Nick Malaguti](https://github.com/nmalaguti), [Travis Erdman](https://github.com/erdman), and [Janzert](https://github.com/janzert), have also been instrumental to the project.
 
-### Halite Season 2
+### Halite Season 2 - 2017
 
 The second seasion of Halite was developed by a core team of summer intern [David Li](https://github.com/lidavidm) and Two Sigma employees [Jaques Clapauch](https://github.com/j-clap), [Julia Kastner](https://github.com/julskast), and [Harikrishna Menon](https://github.com/harikmenon) in 2017. Special thanks to many other contributors at Two Sigma and beyond, including Camille Fournier,  Alfred Spector, Matt Adereth, Trammel Hudson, Arnaud Sahuguet, Barbara Zhan, Serguei Narojnyi, Xinyun Wu, Georgi Georgiev, Jason Zhang, Nick Vrilo, Tuan Anh Hoang-Vu, and Scott Rich.
