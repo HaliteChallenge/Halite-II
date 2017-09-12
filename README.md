@@ -4,6 +4,9 @@
 
 Halite is a programming game where players build smart bots that battle head-to-head on a virtual two-dimensional board. Halite I was played on a virtual grid and provided a fun way to learn and apply AI, machine learning, and other advanced algorithms in a collaborative, competitive game setting by writing smart bots. Designed for coding enthusiasts of all levels of experience, Halite created an engaging game environment to learn, write, and visualize code in action. For more information about the game, visit [our website](http://halite.io).
 
+## Where is all the code?
+Halite Season 2 is also open source, and we are working on overhauling the game and the user experience. Before launch, just like Halite Season 1, all our code will be pushed to this repository.
+
 ## Questions
 
 Reach out to us at halite@halite.io.
