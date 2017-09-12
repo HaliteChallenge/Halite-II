@@ -140,3 +140,12 @@ input:focus{
 .font-headline{
   font-family: Teko !important;
 }
+
+.navbar-nav>li, .navbar-nav {
+  float: right !important;
+}
+
+.nav>li {
+  position: relative;
+  display: inline-block;
+}
