@@ -68,4 +68,8 @@
     width: 234px;
     font-size: 24px;
   }
+  &-clear{
+    background-image: url("/assets/images/button-clear.png");
+    color: $yellow;
+  }
 }

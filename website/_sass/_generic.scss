@@ -88,17 +88,17 @@ input:focus{
   border-top: 1px solid #889295;
 }
 .bb{
-  border-bottom: 1px solid #889295; 
+  border-bottom: 1px solid #889295;
 }
 .bl{
-  border-left: 1px solid #889295; 
+  border-left: 1px solid #889295;
 }
 .br{
-  border-right: 1px solid #889295; 
+  border-right: 1px solid #889295;
 }
 
 .dot-tl{
-  @include corner-dot();  
+  @include corner-dot();
   top: -2.5px;
   left: -2.5px;
 }
@@ -202,5 +202,34 @@ input:focus{
     span{
       background-color: $yellow;
     }
+  }
+}
+
+.ha-text{
+  display: inline-block;
+  padding: 10px 25px;
+  position: relative;
+  font-family: $font-heading;
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  &:after, &:before{
+    content: "";
+    top: 0;
+    width: 12px;
+    height: 100%;
+    display: block;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+  &:after{
+    background-image: url("/assets/images/ha-right.svg");
+    right: 0;
+  }
+  &:before{
+    background-image: url("/assets/images/ha-left.svg");
+    left: 0;
   }
 }

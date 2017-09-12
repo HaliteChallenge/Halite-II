@@ -55,8 +55,29 @@
           <button class="btn-ha btn-ha-lg">Submit</button>
         </div>
       </div>
+      <p></p>
+
+      <div class="upload-state">
+        <img :src="`${baseUrl}/assets/images/icon-wait.svg`" alt="success" class="upload-state-icon">
+        <h2>bot submiited. currently compiling.</h2>
+        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
+        <div class="upload-state-buttons">
+          <span class="ha-text">10 minutes remaning</span>
+        </div>
+      </div>
+      <p></p>
+
+      <div class="upload-state">
+        <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
+        <h2>Success!</h2>
+        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
+        <div class="upload-state-buttons">
+          <button class="btn-ha btn-ha-clear btn-ha-lg">Watch Halite TV</button>
+          <button class="btn-ha btn-ha-lg">See your result</button>
+        </div>
+      </div>
     </div>
-    
+
     <div id="halitetv-visualizer">
     </div>
   </div>
