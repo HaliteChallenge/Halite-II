@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="12px" viewBox="0 0 21 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>tail-triangle-right</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Hackathon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square" opacity="0.800000012">
+        <g id="04_Hackathon-New-(Beta-Ready)" transform="translate(-89.000000, -113.000000)" stroke="#FFBE00">
+            <g id="breadcrumb" transform="translate(30.000000, 107.000000)">
+                <g id="tail-triangle-right" transform="translate(60.000000, 7.000000)">
+                    <path d="M0,5 L13,5" id="Shape"></path>
+                    <polygon id="Shape" points="13 10 13 0 20 5"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,10 +1,10 @@
-.hackathon-container{
+.hackathon-individual-container {
+
   $o-color: #E37222;
   $w-color: #FFFFFF;
   $g-color: #9d9d9d;
 
-  padding-top: 20px;
-  text-align: center;
+  padding: 20px 20px 0;
   .c-org{
     color: $o-color;
   }
@@ -38,41 +38,7 @@
     font-size: 1.4rem;
     letter-spacing: 1px;
   }
-  .mgt-10{
-    margin-top: 10px;
-  }
-  .notification{
-    background-color: $yellow;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    letter-spacing: 2px;
-    color: $gray-bg;
-    a{
-      text-decoration: underline;
-      cursor: pointer;
-    }
-  }
-  .row>[class*="col"]{
-    margin: 20px 0;
-    >[class*="array"]{
-      height: 100px;
-    }
-  }
-  .not-me{
-    width: 200px;
-  }
-  .me-in{
-    width: 400px;
-    display: flex;
-    .ha-button{
-      flex: 1;
-    }
-  }
-  .ha-button-container{
-    margin-left: auto;
-    margin-right: auto;
-  }
+
   .ha-button{
     background-image: url(../images/register_bg.png);
     background-size: contain;
@@ -82,6 +48,7 @@
     padding: 5px 20px;
     cursor: pointer;
     span{
+      transform: translateY(2px);
       color: $dark-gray;
       line-height: 20px;
       padding: 3px;
@@ -89,65 +56,57 @@
       letter-spacing: 1px;
     }
   }
-  .no-bg-button{
-    background-image: url(../images/temp/btn_bg.png);
-    span{
-      color: $yellow;
+
+  .hackathon-info {
+    text-align: center;
+    margin: 50px 0;
+
+    .hackathon-info-text {
+      padding: 5px 0;
+      line-height: 24px;
     }
   }
-  .ha-line{
-    background-color: #889295;
-    height: 1px;
-  }
-  .des{
-    text-align: left;
-    img{
-      width: 100%;
-    }
-    .words{
-      margin-top: 90px;
-      .ha-button-container{
-        width:200px;
-        margin-left: 0;
-        text-align: center;
-        transform: translateX(-15px);
-      }
-    }
-  }
-  .line-container{
-    width:25%;
+
+  .hackathon-desc {
+    padding: 50px 0;
     position: relative;
+
+    .hackathon-desc-text {
+      position: relative;
+      padding: 20px 0;
+      font-size: 16px;
+      color: #ECFFFB;
+      line-height: 24px;
+    }
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .mg-left-tiny {
+    margin-left: 10px;
+  }
+
+  .mg-top-normal {
     margin-top: 20px;
-    padding-bottom: 20px;
   }
-  .big-menu{
-    img{
-      width: 100%;
-    }
-    .line-container{
-      width:10%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .ha-button-container{
-      width:200px;
+
+  .join-btn {
+    padding: 15px 20px;
+    width: 260px;
+    margin: 25px auto 0;
+    span {
+      font-family: Teko;
+      font-size: 24px;
     }
   }
-  .img-des{
-    border: 1px solid #757577;
-    text-align: left;
-    padding: 10px;
-    i{
-      font-size:20px;
-      margin-right: 5px;
-    }
-    .right-btn{
-      float: right;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+
+  .short-line {
+    width: 200px;
   }
-  .clear{
-    clear: both;
+
+  .right {
+    float: right;
   }
 }
