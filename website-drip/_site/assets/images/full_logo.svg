@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 746 223" enable-background="new 0 0 746 223" xml:space="preserve">
+<g>
+	<path fill="#E37222" d="M134.1,66.5v86.9h-10.4v-39.1H52.1v39.1H41.7V66.5h10.4v37.9h71.5V66.5H134.1z"/>
+	<path fill="#E37222" d="M391.2,143.7v9.7h-77V66.5h10.4v77.3H391.2z"/>
+	<path fill="#E37222" d="M433.3,153.4V66.5h10.4v86.9H433.3z"/>
+	<path fill="#E37222" d="M578.3,75.9h-41.1v77.5h-10.4V75.9h-41v-9.4h92.5V75.9z"/>
+	<path fill="#E37222" d="M704.3,143.7v9.7h-84.1V66.5h82.9v9.7h-72.4v28.2H692v9.7h-61.4v29.7H704.3z"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="223.5256" y1="205" x2="223.5256" y2="102.3279">
+		<stop  offset="0" style="stop-color:#FFBE00;stop-opacity:0"/>
+		<stop  offset="1" style="stop-color:#FFBE00;stop-opacity:0.4"/>
+	</linearGradient>
+	<polygon fill="url(#SVGID_1_)" points="223.5,205 172.2,153.7 223.5,102.3 274.9,153.7 	"/>
+	<polygon fill="#E37222" points="223.5,52.9 223.5,102.4 274.8,153.7 274.8,104.2 	"/>
+	<polygon fill="#FFBE00" points="223.5,52.9 223.5,102.4 172.2,153.7 172.2,104.2 	"/>
+</g>
+</svg>
