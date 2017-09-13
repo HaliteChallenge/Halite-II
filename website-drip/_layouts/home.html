@@ -3,22 +3,33 @@ layout: default
 ---
 
 <script>
+function handleOutboundLinkClicks(event) {
+    alert(event)
+  ga('send', 'event', {
+    eventCategory: 'pre_launch_lander',
+    eventAction: 'click',
+    eventLabel: event
+  });
+}
 function check()
 {
+  handleOutboundLinkClicks("click_to_subscribe")
   if(!document.getElementById("tmpid").checkValidity())
   {
     document.getElementById("status").style.color = "red"
     document.getElementById("status").textContent = "Invalid email.."
+    handleOutboundLinkClicks("subscribe_failure")
   }
   else
   {
-    let content = document.getElementById("subscribe-email").value
+    let content = document.getElementById("tmpid").value
     const xhr = new XMLHttpRequest()
     var url = "http://api.halite.io/v1/api/user/addsubscriber/" + content
     xhr.open("POST", url, true)
     xhr.send()
     document.getElementById("status").style.color = "green"
     document.getElementById("status").textContent = "You are subscribed to Halite II updates"
+    handleOutboundLinkClicks("subscribe_succes")
   }
 }
 
@@ -43,9 +54,9 @@ var x = setInterval(function()
                     <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                     <p class="d1 c-wht font-headline">Follow us for up to date status heading into the launch</p>
                     <p class="t2 c-gry font-headline">
-                        <a href="https://www.facebook.com/haliteAI/" target="_blank"><i class="fa fa-facebook-official t2 c-gry"></i></a>
-                        <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank"><i class="fa fa-twitter t2 c-gry"></i></a>
-                        <a href="https://github.com/halitechallenge/Halite-II" target="_blank"><i class="fa fa-github t2 c-gry"></i></a>
+                        <a href="https://www.facebook.com/haliteAI/" target="_blank" onclick="javascript:handleOutboundLinkClicks('follow_facebook');return true;"><i class="fa fa-facebook-official t2 c-gry"></i></a>
+                        <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank" onclick="javascript:handleOutboundLinkClicks('follow_twitter'); return true;"><i class="fa fa-twitter t2 c-gry"></i></a>
+                        <a href="https://github.com/halitechallenge/Halite-II" target="_blank" onclick="javascript:handleOutboundLinkClicks('follow_gitHub');return true;"><i class="fa fa-github t2 c-gry"></i></a>
                     </p>
                     <p class="d1 c-org font-headline">AND SUBSCRIBE...</p>
                     <div class="ha-button-container">

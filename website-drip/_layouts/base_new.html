@@ -48,32 +48,8 @@
 
   <div class="body">
         {{ content }}
-      </div>
+   </div>
 
-<script>
-   import * as api from "../api";
-
-   export default {
-       name: "home",
-       props: ['baseUrl'],
-       data: function() {
-           const me = api.me_cached();
-           let me_in = false;
-           if (me) {
-               return {
-                   me_in: true,
-               };
-           }
-           return {
-               me_in
-           };
-       },
-       mounted: function() {
-       },
-       methods: {
-       },
-   }
-</script>
 
   <footer class="footer">
     <nav class="navbar">

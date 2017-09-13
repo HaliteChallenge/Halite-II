@@ -491,3 +491,10 @@ yarn.lock
 environment/cmake_install.cmake
 environment/CMakeCache.txt
 environment/Makefile
+website-drip/_site/about/contact.html
+website-drip/_site/404.html
+website-drip/_site/feed.xml
+website-drip/_site/index.html
+website-drip/_site/about/privacy.html
+website-drip/_site/about/terms-and-conditions.html
+website-drip/_site/assets/css/main_new.css
