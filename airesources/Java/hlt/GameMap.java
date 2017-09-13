@@ -53,56 +53,44 @@ public class GameMap {
         return Collections.unmodifiableList(ships);
     }
 
-    public ArrayList<Entity> objectsBetween(Entity start, Entity target) {
-        final Position startPos = start.getPosition();
-        final Position targetPos = target.getPosition();
+    public ArrayList<Entity> objectsBetween(Position start, Position target) {
+        final ArrayList<Entity> entitiesFound = new ArrayList<>();
 
-        return objectsBetween(startPos, targetPos);
+        addEntitiesBetween(entitiesFound, start, target, planets.values());
+        addEntitiesBetween(entitiesFound, start, target, ships);
+
+        return entitiesFound;
     }
 
-    public ArrayList<Entity> objectsBetween(Position startPos, Position targetPos) {
-        final ArrayList<Entity> objectsList = new ArrayList<>();
-        final double fudge = Constants.FORECAST_FUDGE_FACTOR;
+    private static void addEntitiesBetween(List<Entity> entitiesFound,
+                                           Position start, Position target,
+                                           Collection<? extends Entity> entitiesToCheck) {
 
-        for (final Planet planet : planets.values()) {
-            final Position planetPos = planet.getPosition();
-            if (planetPos.equals(startPos) || planetPos.equals(targetPos)) {
+        for (final Entity entity : entitiesToCheck) {
+            if (entity.equals(start) || entity.equals(target)) {
                 continue;
             }
-            if (Collision.segmentCircleIntersect(startPos, targetPos, planet, fudge)) {
-                objectsList.add(planet);
+            if (Collision.segmentCircleIntersect(start, target, entity, Constants.FORECAST_FUDGE_FACTOR)) {
+                entitiesFound.add(entity);
             }
         }
-
-        for (final Ship ship : ships) {
-            final Position shipPos = ship.getPosition();
-            if (shipPos.equals(startPos) || shipPos.equals(targetPos)) {
-                continue;
-            }
-            if (Collision.segmentCircleIntersect(startPos, targetPos, ship, fudge)) {
-                objectsList.add(ship);
-            }
-        }
-
-        return objectsList;
     }
 
     public Map<Double, Entity> nearbyEntitiesByDistance(Entity entity) {
         final Map<Double, Entity> entityByDistance = new TreeMap<>();
-        final Position entityPos = entity.getPosition();
 
         for (final Planet planet : planets.values()) {
             if (planet.equals(entity)) {
                 continue;
             }
-            entityByDistance.put(entityPos.getDistanceTo(planet.getPosition()), planet);
+            entityByDistance.put(entity.getDistanceTo(planet), planet);
         }
 
         for (final Ship ship : ships) {
             if (ship.equals(entity)) {
                 continue;
             }
-            entityByDistance.put(entityPos.getDistanceTo(ship.getPosition()), ship);
+            entityByDistance.put(entity.getDistanceTo(ship), ship);
         }
 
         return entityByDistance;

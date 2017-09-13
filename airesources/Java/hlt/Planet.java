@@ -10,10 +10,10 @@ public class Planet extends Entity {
     private final short dockingSpots;
     private final List<Long> dockedShips;
 
-    public Planet(Short owner, long id, Position position, short health, double radius,
+    public Planet(Short owner, long id, double xPos, double yPos, short health, double radius,
                   short dockingSpots, short currentProduction, short remainingProduction, List<Long> dockedShips) {
 
-        super(owner, id, position, health, radius);
+        super(owner, id, xPos, yPos, health, radius);
 
         this.dockingSpots = dockingSpots;
         this.currentProduction = currentProduction;

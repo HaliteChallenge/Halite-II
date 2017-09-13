@@ -14,7 +14,7 @@ public class Navigation {
         final int maxCorrections = Constants.MAX_CORRECTIONS;
         final boolean avoidObstacles = true;
         final int angularStep = 1;
-        final Position targetPos = ship.getPosition().getClosestPoint(target);
+        final Position targetPos = ship.getClosestPoint(target);
 
         return navigateTowards(gameMap, targetPos, thrust, avoidObstacles, maxCorrections, angularStep);
     }
@@ -25,14 +25,13 @@ public class Navigation {
             return null;
         }
 
-        final Position shipPos = ship.getPosition();
-        final double distance = shipPos.getDistanceTo(targetPos);
-        final double angleDeg = shipPos.orientTowardsInDeg(targetPos);
+        final double distance = ship.getDistanceTo(targetPos);
+        final double angleDeg = ship.orientTowardsInDeg(targetPos);
 
-        if (avoidObstacles && !gameMap.objectsBetween(shipPos, targetPos).isEmpty()) {
+        if (avoidObstacles && !gameMap.objectsBetween(ship, targetPos).isEmpty()) {
             final double newTargetDx = Math.cos(Math.toRadians(angleDeg + angularStep)) * distance;
             final double newTargetDy = Math.sin(Math.toRadians(angleDeg + angularStep)) * distance;
-            final Position newTarget = new Position(shipPos.getXPos() + newTargetDx, shipPos.getYPos() + newTargetDy);
+            final Position newTarget = new Position(ship.getXPos() + newTargetDx, ship.getYPos() + newTargetDy);
 
             return navigateTowards(gameMap, newTarget, thrust, true, (maxCorrections - 1), angularStep);
         }
@@ -40,8 +39,6 @@ public class Navigation {
         if (distance < thrust) {
             thrust = (int)(distance + 0.5);
         }
-
-        thrust -= Constants.SHIP_RADIUS;
 
         return new ThrustMove(ship, (int)(angleDeg + 0.5), thrust);
     }

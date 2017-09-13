@@ -17,7 +17,8 @@ public class MetadataParser {
 
     private static Ship newShipFromMetadata(final short owner, final LinkedList<String> metadata) {
         final long id = Long.parseLong(metadata.pop());
-        final Position position = new Position(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
+        final double xPos = Double.parseDouble(metadata.pop());
+        final double yPos = Double.parseDouble(metadata.pop());
         final short health = Short.parseShort(metadata.pop());
 
         final Velocity velocity = new Velocity(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
@@ -26,12 +27,13 @@ public class MetadataParser {
         final short dockingProgress = Short.parseShort(metadata.pop());
         final short weaponCooldown = Short.parseShort(metadata.pop());
 
-        return new Ship(owner, id, position, health, velocity, dockingStatus, dockedPlanet, dockingProgress, weaponCooldown);
+        return new Ship(owner, id, xPos, yPos, health, velocity, dockingStatus, dockedPlanet, dockingProgress, weaponCooldown);
     }
 
     public static Planet newPlanetFromMetadata(final LinkedList<String> metadata) {
         final long id = Long.parseLong(metadata.pop());
-        final Position position = new Position(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
+        final double xPos = Double.parseDouble(metadata.pop());
+        final double yPos = Double.parseDouble(metadata.pop());
         final short health = Short.parseShort(metadata.pop());
 
         final double radius = Double.parseDouble(metadata.pop());
@@ -54,7 +56,7 @@ public class MetadataParser {
             dockedShips.add(Long.parseLong(metadata.pop()));
         }
 
-        return new Planet(owner, id, position, health, radius, dockingSpots, currentProduction, remainingProduction, dockedShips);
+        return new Planet(owner, id, xPos, yPos, health, radius, dockingSpots, currentProduction, remainingProduction, dockedShips);
     }
 
     public static Short parsePlayerNum(final LinkedList<String> metadata) {

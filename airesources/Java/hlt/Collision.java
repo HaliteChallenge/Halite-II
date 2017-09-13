@@ -15,14 +15,13 @@ public class Collision {
         // Parameterize the segment as start + t * (end - start),
         // and substitute into the equation of a circle
         // Solve for t
-        final Position circleCenter = circle.getPosition();
         final double circleRadius = circle.getRadius();
         final double startX = start.getXPos();
         final double startY = start.getYPos();
         final double endX = end.getXPos();
         final double endY = end.getYPos();
-        final double centerX = circleCenter.getXPos();
-        final double centerY = circleCenter.getXPos();
+        final double centerX = circle.getXPos();
+        final double centerY = circle.getXPos();
         final double dx = startX - endX;
         final double dy = startY - endY;
 
@@ -35,7 +34,7 @@ public class Collision {
 
         if (a == 0.0) {
             // Start and end are the same point
-            return start.getDistanceTo(circleCenter) <= circleRadius + fudge;
+            return start.getDistanceTo(circle) <= circleRadius + fudge;
         }
 
         // Time along segment when closest to the circle (vertex of the quadratic)
@@ -46,7 +45,7 @@ public class Collision {
 
         final double closestX = startX + dx * t;
         final double closestY = startY + dy * t;
-        final double closestDistance = new Position(closestX, closestY).getDistanceTo(circleCenter);
+        final double closestDistance = new Position(closestX, closestY).getDistanceTo(circle);
 
         return closestDistance <= circleRadius + fudge;
     }

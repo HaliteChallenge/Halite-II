@@ -1,6 +1,5 @@
 package hlt;
 
-
 public class Position {
 
     private final double xPos;
@@ -32,16 +31,9 @@ public class Position {
         return Math.toDegrees(Math.atan2(dy, dx)) % 360;
     }
 
-    public Position getClosestPoint(Entity target) {
-        final Position targetPosition = target.getPosition();
-        final double targetRadius = target.getRadius();
-
-        return getClosestPoint(targetPosition, targetRadius);
-    }
-
-    public Position getClosestPoint(Position target, double targetRadius) {
+    public Position getClosestPoint(final Entity target) {
         final int MIN_DISTANCE = 3;
-        final double radius = targetRadius + MIN_DISTANCE;
+        final double radius = target.getRadius() + MIN_DISTANCE;
         final double angleDeg = target.orientTowardsInDeg(this);
 
         final short dx = (short)(target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg)));
