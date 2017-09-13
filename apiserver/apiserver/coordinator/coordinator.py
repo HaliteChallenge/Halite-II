@@ -332,7 +332,8 @@ def parse_replay(replay):
                     stats.ships_destroyed += 1
                 elif event["entity"]["type"] == "planet":
                     stats.planets_destroyed += 1
-                    stats.players[player_tag].planets_destroyed += 1
+                    if player_tag:
+                        stats.players[player_tag].planets_destroyed += 1
             elif event["event"] == "attack":
                 stats.players[player_tag].attacks_total += 1
 
