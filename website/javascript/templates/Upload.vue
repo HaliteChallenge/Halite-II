@@ -1,11 +1,13 @@
 <template>
-    <div class="col-md-12 upload-bot">
+    <div class="upload-bot">
         <halite-upload-zone v-if="logged_in"
-                            title="Drop BOT here or click to select"
-                            :message="error"
-                            :progressBar="is_uploading"
-                            :progress="progress"
-                v-on:change="upload_bot">
+            title="Submit a bot"
+            description="Drop a .bot file here to upload"
+            :icon="`${baseUrl}/assets/images/icon-submit.svg`"
+            :message="error"
+            :progressBar="is_uploading"
+            :progress="progress"
+            v-on:change="upload_bot">
         </halite-upload-zone>
         <div v-else>
             <h2>Log In to upload bot</h2>
@@ -28,6 +30,7 @@
                 logged_in: false,
                 is_uploading: false,
                 progress: 0,
+                baseUrl: _global.baseUrl
             };
         },
         mounted: function() {
@@ -75,6 +78,6 @@
 
 <style lang="scss" scoped>
     .upload-bot {
-        margin-top: 20px;
+        // margin-top: 20px;
     }
 </style>

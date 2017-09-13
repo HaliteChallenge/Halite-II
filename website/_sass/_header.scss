@@ -61,8 +61,14 @@ header.navbar{
     min-height: 50px;
   }
   .not-logged-in{
-    >li>a>i{
-      margin-top: -2px;
+    >li{
+      padding: 0px 5px;
+      >img {
+        height: 34px;
+      }
+      >a>i{
+        margin-top: -2px;
+      }
     }
   }
   .logged-in {

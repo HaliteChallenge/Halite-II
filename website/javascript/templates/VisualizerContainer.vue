@@ -2,16 +2,14 @@
   <div>
     <div v-if="is_upload">
       <halite-upload-zone
-        title="Drop REPLAY here or click to select"
+        title="Replay a File"
+        description="Drop a .zip file here to upload"
+        :icon="`${baseUrl}/assets/images/icon-replay.svg`"
         v-on:change="play_replay"
         :progressBar="is_downloading"
         :progress="progress"
         :message="message">
       </halite-upload-zone>
-    </div>
-    <div>
-      <div id="halitetv-visualizer">
-      </div>
     </div>
   </div>
   
@@ -64,7 +62,7 @@
 
   export default {
     name: 'visualizer',
-    props: ['baseUrl'],
+    props: ["isReplayUploaded", "toggleUploadReplay"],
     components: {
       "halite-upload-zone": UploadZone,
     },
@@ -74,6 +72,7 @@
         progress: 0,
         message: null,
         is_upload: true,
+        baseUrl: _global.baseUrl
       }
     },
     mounted: function(){
@@ -93,6 +92,7 @@
           showGame(game).then(() => {
             this.is_downloading = false;
             this.message = null;
+            this.toggleUploadReplay();
           }).catch((e) => {
             this.is_downloading = false;
             this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
@@ -110,6 +110,7 @@
           const inst = this;
           reader.onload = (e) => {
             inst.is_upload = false;
+            inst.toggleUploadReplay();
             showGame({
               game: null,
               replay: e.target.result,
@@ -123,13 +124,5 @@
 </script>
 
 <style>
-  .panel.upload-zone{
-    margin-top: 40px;
-    margin-bottom: 40px;
-    background-color: transparent;
-    border-style: dashed;
-  }
-  .panel.upload-zone h2{
-    font-family: "Teko";
-  }
+  
 </style>

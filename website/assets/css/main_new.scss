@@ -10,6 +10,7 @@ $border: #474951;
 $font-heading: "Teko";
 $font-body: "Helvetica";
 $font-headline: "Teko";
+$screen-llg-min: 1400px;
 
 $player-1: #63CECA;
 $player-2: #FFBE00;
@@ -32,4 +33,6 @@ $player-4: #FF00FF;
 @import "_cards.scss";
 @import "_map-props.scss";
 @import "_home.scss";
+@import "_hackathon-portal.scss";
 @import "_hackathon-individual.scss";
+@import "_play.scss";

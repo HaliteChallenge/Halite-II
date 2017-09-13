@@ -142,6 +142,14 @@
     padding-bottom: 20px;
   }
   .big-menu{
+    .reddit-widget{
+      text-align: left;
+      .reddit-title{
+        img{
+          width: auto;
+        }
+      }
+    }
     img{
       width: 100%;
     }
@@ -219,11 +227,11 @@
     }
   }
   .menu-body{
-    margin-bottom:30px;
     .content{
       width: 75%;
       margin-left: auto;
       margin-right: auto;
+      transform: translateY(-20px);
     }
     .line-container{
       width: 160px;

@@ -1,0 +1,82 @@
+---
+layout: default
+---
+
+<script>
+function check()
+{
+  if(!document.getElementById("tmpid").checkValidity())
+  {
+    document.getElementById("status").style.color = "red"
+    document.getElementById("status").textContent = "Invalid email.."
+  }
+  else
+  {
+    let content = document.getElementById("subscribe-email").value
+    const xhr = new XMLHttpRequest()
+    var url = "http://api.halite.io/v1/api/user/addsubscriber/" + content
+    xhr.open("POST", url, true)
+    xhr.send()
+    document.getElementById("status").style.color = "green"
+    document.getElementById("status").textContent = "You are subscribed to Halite II updates"
+  }
+}
+
+var countDownDate = new Date("October 23, 2017 12:00:00").getTime();
+var x = setInterval(function() 
+{
+  var now = new Date().getTime();
+  var distance = countDownDate - now;
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  document.getElementById("launchTimer").textContent = "October 23rd, 2017: " + days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+}, 1000);
+</script>
+
+<div class="home-container">
+        <div class="row">
+            <div class="col-md-12">
+                    <p id="launchTimer" class="t3 c-gry font-headline"></p>
+                    <p class="t1 c-wht font-headline">HALITE II</p>
+                    <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
+                    <p class="d1 c-wht font-headline">Follow us for up to date status heading into the launch</p>
+                    <p class="t2 c-gry font-headline">
+                        <a href="https://www.facebook.com/haliteAI/" target="_blank"><i class="fa fa-facebook-official t2 c-gry"></i></a>
+                        <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank"><i class="fa fa-twitter t2 c-gry"></i></a>
+                        <a href="https://github.com/halitechallenge/Halite-II" target="_blank"><i class="fa fa-github t2 c-gry"></i></a>
+                    </p>
+                    <p class="d1 c-org font-headline">AND SUBSCRIBE...</p>
+                    <div class="ha-button-container">
+                        <div>
+                            <input id="tmpid" type="email" type="text" required="required" placeholder="hplayer@example.com" > 
+                            <button class="btn btn-primary" type="submit" id="subscribe-submit" onClick="javascript:check();"><span>SUBSCRIBE</span></button>
+                        </div>
+                        <br/>
+                        <p id="status" class="t4 c-gry"></p>
+                    </div>
+                </div>
+            <div class="col-md-12">
+               <div class="arrows-icon">
+                   <div class="scroll-arrow"></div>
+                   <div class="scroll-arrow"></div>
+                   <div class="scroll-arrow"></div>
+               </div>
+            </div>
+            <div class="col-md-12 des">
+                <div class="col-md-offset-1 col-md-4">
+                    <img src="/assets/images/temp/bot_1.png"/>
+                </div>
+                <!-- <div class="col-md-offset-2 col-md-4 halite-easter-egg">
+                    <img src="/assets/images/temp/bot_2.png"/>
+                </div> -->
+                <div class="words col-md-offset-2 col-md-4">
+                   <p class="t2 c-wht font-headline">WHAT IS HALITE?</p>
+                    <div class="line-container"><i class="xline xline-top"></i></div>
+                    <p class="t5 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                    <div class="line-container"><i class="xline xline-top"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>

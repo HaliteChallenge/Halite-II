@@ -1,6 +1,6 @@
 import collections
 import itertools
-
+import json
 import sendgrid
 import sendgrid.helpers
 import sendgrid.helpers.mail
@@ -38,9 +38,6 @@ def send_notification(recipient_email, recipient_name, subject, body,
     mail.mail_settings = settings
 
     response = sg.client.mail.send.post(request_body=mail.get())
-    print(response.status_code)
-    print(response.headers)
-    print(response.body)
 
 
 def send_templated_notification(recipient, template_id, substitutions, group_id):
@@ -49,6 +46,7 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
     :param Recipient recipient: The recipient of the email
     :param str template_id: The template ID of the email.
     :param Dict[str, Any] substitutions: Any other substitution variables to
+    :param str group_id: The group ID of the email.
     pass to the email template.
     """
     mail = sendgrid.helpers.mail.Mail()
@@ -68,10 +66,50 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
 
     mail.add_personalization(personalization)
     mail.template_id = template_id
-    mail.asm = sendgrid.helpers.mail.ASM(group_id, [10307, 10445, 10445, 10447, 10449])
+    mail.asm = sendgrid.helpers.mail.ASM(group_id, [config.GOODNEWS_ACCOMPLISHMENTS, config.GAME_ERROR_MESSAGES, config.RESEARCH_EMAILS, config.NEWSLETTERS_ARTICLES])
     settings = sendgrid.helpers.mail.MailSettings()
     settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
     mail.mail_settings = settings
 
-    sg.client.mail.send.post(request_body=mail.get())
+    response = sg.client.mail.send.post(request_body=mail.get())
+    print(response.status_code)
 
+
+def send_templated_notification_simple(email, template_id, group_id):
+    """
+    Send an email based on a template.
+    :param str email: The email recipient
+    :param str template_id: The template ID of the email.
+    :param str template_id: The group ID of the email.
+    pass to the email template.
+    """
+    mail = sendgrid.helpers.mail.Mail()
+
+    mail.from_email = sendgrid.Email("halite@halite.io", "Halite Challenge")
+    personalization = sendgrid.helpers.mail.Personalization()
+    personalization.add_to(sendgrid.helpers.mail.Email(email, email))
+
+    mail.add_personalization(personalization)
+    mail.template_id = template_id
+    mail.asm = sendgrid.helpers.mail.ASM(group_id, [config.GOODNEWS_ACCOMPLISHMENTS, config.GAME_ERROR_MESSAGES, config.RESEARCH_EMAILS, config.NEWSLETTERS_ARTICLES])
+    settings = sendgrid.helpers.mail.MailSettings()
+    settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
+    mail.mail_settings = settings
+    
+    response = sg.client.mail.send.post(request_body=mail.get())
+    print(response.status_code)
+
+def add_user_to_contact_list(recipient):
+    """
+    Send an email based on a template.
+
+    :param Recipient recipient: The recipient of the email
+    pass to the email template.
+    """
+    data = [
+                {
+                    "email": recipient
+                }
+            ]
+    response = sg.client.contactdb.recipients.post(request_body=data)
+    print(response.status_code)

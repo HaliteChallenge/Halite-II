@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>calendar-grid-61</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Hackathon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="04_Hackathon-New-(Beta-Ready)" transform="translate(-627.000000, -259.000000)">
+            <g id="Headline" transform="translate(473.000000, 201.000000)">
+                <g id="Group-2" transform="translate(155.000000, 59.000000)">
+                    <g id="calendar-grid-61">
+                        <polyline id="Shape" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" points="18 2 22 2 22 22 0 22 0 2 4 2"></polyline>
+                        <path d="M6,2 L16,2" id="Shape" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square"></path>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="4" y="0" width="2" height="4"></rect>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="16" y="0" width="2" height="4"></rect>
+                        <path d="M0,8 L22,8" id="Shape" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square"></path>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="4" y="12" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="10" y="12" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="4" y="17" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="10" y="17" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="square" x="16" y="12" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" fill="#FFFFFF" fill-rule="nonzero" x="4" y="12" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" fill="#FFFFFF" fill-rule="nonzero" x="10" y="12" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" fill="#FFFFFF" fill-rule="nonzero" x="4" y="17" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" fill="#FFFFFF" fill-rule="nonzero" x="10" y="17" width="2" height="1"></rect>
+                        <rect id="Rectangle-path" fill="#FFFFFF" fill-rule="nonzero" x="16" y="12" width="2" height="1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

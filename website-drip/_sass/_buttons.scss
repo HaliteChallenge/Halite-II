@@ -1,0 +1,19 @@
+.btn{
+  border: 0;
+  color: #30242F;
+  font-weight: bold;
+  border-radius: 0;
+  text-transform: uppercase;
+  position: relative;
+  background-color: transparent;
+  font-size: 1.6rem;
+  font-family: $font-headline;
+  background-color: $yellow;
+  >span{
+    display: block;
+  }
+}
+
+input, select, textarea{
+  color: #000;
+}

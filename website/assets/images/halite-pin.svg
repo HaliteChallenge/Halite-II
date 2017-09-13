@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="16px" viewBox="0 0 14 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>pin-5</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Hackathon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="04_Hackathon-Portal-Beta-Ready" transform="translate(-70.000000, -552.000000)" fill-rule="nonzero" fill="#AFBEBD">
+            <g id="4" transform="translate(47.000000, 142.000000)">
+                <g id="Group-2" transform="translate(0.000000, 151.000000)">
+                    <g id="1">
+                        <g id="Group" transform="translate(0.000000, 206.000000)">
+                            <g id="pin-5" transform="translate(23.000000, 53.000000)">
+                                <path d="M7,0 C3.1,0 0,3.1 0,7 C0,8.9 0.7,10.7 2.1,12 C2.2,12.1 6.2,15.7 6.3,15.8 C6.7,16.1 7.3,16.1 7.6,15.8 C7.7,15.7 11.8,12.1 11.8,12 C13.2,10.7 13.9,8.9 13.9,7 C14,3.1 10.9,0 7,0 Z M7,9 C5.9,9 5,8.1 5,7 C5,5.9 5.9,5 7,5 C8.1,5 9,5.9 9,7 C9,8.1 8.1,9 7,9 Z" id="Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -10,3 +10,6 @@ description: Watch videos from the Halite AI Programming Challenge, including fe
 
 <div id="visualizer-container"></div>
 
+<div id="halitetv-visualizer">
+</div>
+

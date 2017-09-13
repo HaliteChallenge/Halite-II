@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-document:before {
+  content: "\e916";
+}
 .icon-pause:before {
   content: "\e913";
 }

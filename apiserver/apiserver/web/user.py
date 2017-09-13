@@ -12,7 +12,6 @@ from .. import config, model, notify, util
 from . import util as web_util
 from .blueprint import web_api
 
-
 def make_user_record(row, *, logged_in, total_users=None):
     """Given a database result row, create the JSON user object."""
     user = {
@@ -433,6 +432,15 @@ def delete_user(intended_user_id, *, admin_id):
         conn.execute(model.users.delete().where(
             model.users.c.id == intended_user_id))
 
+@web_api.route("/user/addsubscriber/<string:recipient>", methods=["POST"])
+@util.cross_origin(methods=["POST"])
+def add_subscriber(recipient):
+    notify.add_user_to_contact_list(recipient)
+    notify.send_templated_notification_simple(
+        recipient,
+        config.NEW_SUBSCRIBER_TEMPLATE,
+        config.GOODNEWS_ACCOMPLISHMENTS)
+    return util.response_success()
 
 @web_api.route("/api_key", methods=["POST"])
 @web_api.route("/user/<int:intended_user>/api_key", methods=["POST"])

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="49px" viewBox="0 0 12 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Play-Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01_Submit-a-Bot-States" transform="translate(-1434.000000, -429.000000)" fill-rule="nonzero" fill="#AEBABC">
+            <g id="4" transform="translate(1085.000000, 45.000000)">
+                <g id="btn-copy-2" transform="translate(349.000000, 381.000000)">
+                    <g id="Group-15" transform="translate(0.000000, 3.000000)">
+                        <path d="M8.88017163,3.65702305 L2.00266809,23.0000017 C2.00177886,23.0000006 2.0008895,23 2,23 C0.896,23 2.22044605e-16,23.896 2.22044605e-16,25 C2.22044605e-16,26.104 0.896,27 2,27 C2.11851833,27 2.2346395,26.9896738 2.3475123,26.9698726 L8.88017163,45.3429769 C8.34918457,45.7026692 8,46.3108042 8,47 C8,48.104 8.896,49 10,49 C11.104,49 12,48.104 12,47 C12,45.896 11.104,45 10,45 C9.94012681,45 9.8808654,45.0026353 9.8223255,45.0077962 L3.2604533,26.5525307 C3.71160673,26.1857243 4,25.6263364 4,25 C4,24.2495353 3.58597131,23.5951843 2.97402255,23.2530558 L9.8223255,3.99220376 C9.8808654,3.99736467 9.94012681,4 10,4 C11.104,4 12,3.104 12,2 C12,0.896 11.104,1.77635684e-15 10,1.77635684e-15 C8.896,1.77635684e-15 8,0.896 8,2 C8,2.68919575 8.34918457,3.2973308 8.88017163,3.65702305 Z" id="Combined-Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -14,6 +14,10 @@ body{
   }
 }
 
+a{
+  color: #FFBE00;
+}
+
 .nav{
   font-family: $font-headline;
   font-size: 2rem;
@@ -25,10 +29,44 @@ body{
   @media (min-width: $screen-md-min) and (max-width: $screen-md-max){
     width: 100%;
   }
+  @media (min-width: $screen-llg-min){
+    width: 1380px;
+  }
 }
 
 .page-header {
-  margin-top: 0px;
+  margin-top: 0;
+  border-bottom: 0;
+  h1{
+    font-family: "Teko";
+    font-size: 3.6rem;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}
+
+.line-container{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 25%;
+  &-sm{
+    width: 10%;
+  }
+}
+
+.page-description{
+  text-align: center;
+  padding: 30px 0;
+  opacity: 0.8;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  &-sm{
+    width: 474px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 input:focus{
@@ -50,17 +88,17 @@ input:focus{
   border-top: 1px solid #889295;
 }
 .bb{
-  border-bottom: 1px solid #889295; 
+  border-bottom: 1px solid #889295;
 }
 .bl{
-  border-left: 1px solid #889295; 
+  border-left: 1px solid #889295;
 }
 .br{
-  border-right: 1px solid #889295; 
+  border-right: 1px solid #889295;
 }
 
 .dot-tl{
-  @include corner-dot();  
+  @include corner-dot();
   top: -2.5px;
   left: -2.5px;
 }
@@ -139,4 +177,59 @@ input:focus{
 }
 .font-headline{
   font-family: Teko !important;
+}
+
+/** form **/
+.ha-checkbox{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background-color: #33313d;
+  border: 1px solid $foreground;
+  padding: 3px;
+  vertical-align: middle;
+  span{
+    background-color: transparent;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  &-checked{
+    border-color: $yellow;
+    span{
+      background-color: $yellow;
+    }
+  }
+}
+
+.ha-text{
+  display: inline-block;
+  padding: 10px 25px;
+  position: relative;
+  font-family: $font-heading;
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  &:after, &:before{
+    content: "";
+    top: 0;
+    width: 12px;
+    height: 100%;
+    display: block;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+  &:after{
+    background-image: url("/assets/images/ha-right.svg");
+    right: 0;
+  }
+  &:before{
+    background-image: url("/assets/images/ha-left.svg");
+    left: 0;
+  }
 }

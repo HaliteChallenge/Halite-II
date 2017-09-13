@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>calendar-60</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Hackathon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="04_Hackathon-Portal-Beta-Ready" transform="translate(-750.000000, -896.000000)" fill-rule="nonzero" fill="#AFBEBD">
+            <g id="4-copy" transform="translate(35.000000, 701.000000)">
+                <g id="1" transform="translate(0.000000, 167.000000)">
+                    <g id="Group-5" transform="translate(715.000000, 20.000000)">
+                        <g id="calendar-60" transform="translate(0.000000, 8.000000)">
+                            <path d="M15,2 L13,2 L13,0 L10,0 L10,2 L6,2 L6,0 L3,0 L3,2 L1,2 C0.448,2 0,2.448 0,3 L0,15 C0,15.552 0.448,16 1,16 L15,16 C15.552,16 16,15.552 16,15 L16,3 C16,2.448 15.552,2 15,2 Z M14,14 L2,14 L2,7 L14,7 L14,14 Z" id="Shape"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
