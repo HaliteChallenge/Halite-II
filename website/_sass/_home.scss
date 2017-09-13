@@ -56,14 +56,19 @@
   .notification{
     background-color: $yellow;
     margin-bottom: 30px;
+    font-size: 2.5rem;
     height: 60px;
     text-align: center;
     line-height: 60px;
     letter-spacing: 2px;
     color: $gray-bg;
     a{
-      text-decoration: underline;
+      color: #337ab7;
+      text-decoration: none;
       cursor: pointer;
+      &:hover{
+        text-decoration: underline;
+      }
     }
   }
   .row>[class*="col"]{
@@ -132,6 +137,10 @@
             width:210px;
           }
         }
+      }
+      .line-container {
+        width: 35%;
+        margin-left: 0;
       }
     }
   }

@@ -10,7 +10,11 @@
             v-on:change="upload_bot">
         </halite-upload-zone>
         <div v-else>
-            <h2>Log In to upload bot</h2>
+            <div class="panel panel-default upload-zone">
+                <div class="panel-body">
+                    <h2>Log In to upload bot</h2>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -79,5 +83,9 @@
 <style lang="scss" scoped>
     .upload-bot {
         // margin-top: 20px;
+    }
+    h2 {
+        text-align: center;
+        font-weight: 300;
     }
 </style>
