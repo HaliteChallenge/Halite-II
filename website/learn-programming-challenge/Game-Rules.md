@@ -2,7 +2,7 @@
 layout: doc_page
 title: Game Rules
 toc: true
-description: Description of how to compete in the Halite AI programming challenge.
+description: Learn the rules of the game to win the Halite AI Programming Challenge.
 ---
 
 A guide on how to compete in the Halite AI programming challenge.

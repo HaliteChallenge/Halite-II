@@ -6,7 +6,7 @@ menu: learn
 description: Welcome to the Halite II closed Two Sigma alpha competition! Learn how to quickly get started.
 ---
 
-Welcome to the Halite II closed Two Sigma alpha competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II alpha leaderboard. We’ll walk you through a few first steps, but there are many more documents for you to explore as you get better and better at building Halite bots.
+Welcome to the Halite II closed Two Sigma beta competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. We’ll walk you through a few first steps, but there are many more documents for you to explore as you get better and better at building Halite bots.
 
 ## 1) Log In
     
@@ -43,7 +43,7 @@ You can reach us anytime at <mailto:halite@halite.io> for questions or support o
 [login]: {{ site.login_server_url }}/github
 [rules]: {{ site.baseurl }}/learn-programming-challenge/game-rules
 [story]: {{ site.baseurl }}/learn-programming-challenge/the-halite-codex
-[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits
+[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots
 [contact]: {{ site.baseurl }}/contact
 [submit]: {{ site.baseurl }}/learn-programming-challenge/in_depth/submit
 [play]: {{ site.baseurl }}/play

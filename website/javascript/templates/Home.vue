@@ -29,10 +29,10 @@
                  <div class="words col-md-offset-2 col-md-4">
                     <p class="t2 c-wht font-headline">WHAT IS HALITE?</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
-                     <p class="t5 c-gry">Halite is an artificial intelligence programming challenge. Players control a bot using the programming language of their choice. Bots fight for control of a 2D grid. The bot with the most territory at the end wins. Victory will require micromanaging of the movement of your pieces, optimizing your bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                     <p class="t5 c-gry">Halite is an artificial intelligence programming challenge, created by [Two Sigma](www.twosigma.com), where players build bots using the coding language of their choice to battle on a two-dimensional virtual board. The last bot standing or the bot with all the territory wins. Victory will require micromanaging of the movement of ships, optimizing a bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <div class="ha-button-container">
-                         <div class="ha-button no-bg-button"><span>READ OUR DOCUMENT</span></div>
+                         <div class="ha-button no-bg-button"><span>GET STARTED</span></div>
                      </div>
                  </div>
              </div>
@@ -48,10 +48,10 @@
                      <p class="t2 c-wht font-headline">MINING HALITE IN SPACE</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
                      <p class="t5 c-gry">This year's game is a space story.</p>
-                     <p class="t5 c-gry">Every product that is labeled as a Pocket PC must be accompanied with specific software to operate the unit and must feature a touchscreen and touchpad. </p>
+                     <p class="t5 c-gry">Bots control ships that colonize and mine planets in order to produce more ships and battle opponents. A game's victor will need optimal pathfinding to move efficiently from planet to planet, and will need to master evasive maneuvers, especially if a ship is docked to a planet that is about to explode.</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
-                     <div class="ha-button-container wider">
-                         <div class="ha-button no-bg-button"><span>READ THE WHOLE STORY</span></div>
+                     <div class="ha-button-container">
+                         <div class="ha-button no-bg-button"><span>READ THE CODEX</span></div>
                      </div>
                  </div>
                  <div class="col-md-offset-2 col-md-4">
@@ -60,10 +60,10 @@
              </div>
              <div class="col-md-12 ha-line">
              </div>
-                <div class="col-md-12 big-menu">
-                 <p class="t2 c-wht font-headline">WATCH HALITE TV - SEE THE LATEST GAMES PLAYED</p>
+             <div class="col-md-12 big-menu">
+                 <p class="t2 c-wht">WATCH GAMES ON HALITE TV</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <p class="t5 c-gry">See what's happening right now or watch some of the best</p>
+                 <p class="t5 c-gry">See what's happening right now behind the scenes. When you submit a bot, it compiles and then starts playing against all other bots. Thousands of games are played at a time. Check out a few!</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
                      <div class="col-md-3">
@@ -236,7 +236,7 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
-                             <p class="t3 c-wht font-headline">CAREERS AT TWO SIGMA</p>
+                             <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
                              <p class="t5 c-gry">Two Sigma, the creator of the Halite competition, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above. </p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
@@ -256,6 +256,8 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
+                             <p class="t3 c-wht">ABOUT THE HALITE COMPETITION</p>
+                             <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by Two Sigma in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                              <p class="t3 c-wht font-headline">ABOUT THE HALITE COMPETITION</p>
                              <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by Two Sigma in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                              <div class="clear"></div>
@@ -267,7 +269,7 @@
                  </div>
              </div>
              <div class="col-md-12 big-menu">
-                 <p class="t2 c-wht font-headline">GET STARTED WITH HALITE</p>
+                 <p class="t2 c-wht">GET STARTED WITH HALITE</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="ha-button-container">
                      <div v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></div>
