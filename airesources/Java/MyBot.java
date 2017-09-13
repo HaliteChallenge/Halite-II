@@ -3,7 +3,6 @@ import hlt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
-
 public class MyBot {
 
     public static void main(String[] args) {
@@ -15,28 +14,22 @@ public class MyBot {
             moveList.clear();
             gameMap.updateMap(Networking.readAndSplitLine());
 
-            for (Map.Entry<Long, Ship> shipEntry : gameMap.getMyPlayer().getShips().entrySet()) {
-                final Ship ship = shipEntry.getValue();
+            for (Ship ship : gameMap.getMyPlayer().getShips().values()) {
 
                 if (ship.getDockingStatus() != Ship.DockingStatus.Undocked) {
                     continue;
                 }
 
-                for (Map.Entry<Long, Planet> planetEntry : gameMap.getAllPlanets().entrySet()) {
-                    final Planet planet = planetEntry.getValue();
+                for (Planet planet : gameMap.getAllPlanets().values()) {
 
                     if (planet.getOwner() != null) {
                         continue;
                     }
-                    if (Movement.canDock(ship, planet)) {
+                    if (ship.canDock(planet)) {
                         moveList.add(new DockMove(ship, planet));
                     }
                     else {
-                        final double orientation = Movement.orientTowardsInDeg(ship, planet);
-                        moveList.add(new ThrustMove(ship,
-                                                    gameMap.adjustForCollision(ship.getPosition(),
-                                                    orientation,
-                                                    (short) 2)));
+                        moveList.add(new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED / 2));
                     }
                     break;
                 }

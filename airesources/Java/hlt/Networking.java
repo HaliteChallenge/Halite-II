@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-
 public class Networking {
 
     private static final char UNDOCK_KEY = 'u';
@@ -14,30 +13,30 @@ public class Networking {
     private static final char THRUST_KEY = 't';
 
     public static void sendMoves(ArrayList<Move> moves) {
-        StringBuilder moveString = new StringBuilder();
+        final StringBuilder moveString = new StringBuilder();
 
-        for (Move move : moves) {
+        for (final Move move : moves) {
             switch (move.getType()) {
                 case Noop:
                     continue;
                 case Undock:
                     moveString.append(UNDOCK_KEY)
                             .append(" ")
-                            .append(move.getShip().getEntityId().getId())
+                            .append(move.getShip().getId())
                             .append(" ");
                     break;
                 case Dock:
                     moveString.append(DOCK_KEY)
                             .append(" ")
-                            .append(move.getShip().getEntityId().getId())
+                            .append(move.getShip().getId())
                             .append(" ")
-                            .append(((DockMove) move).getDestination().getId())
+                            .append(((DockMove) move).getDestinationId())
                             .append(" ");
                     break;
                 case Thrust:
                     moveString.append(THRUST_KEY)
                             .append(" ")
-                            .append(move.getShip().getEntityId().getId())
+                            .append(move.getShip().getId())
                             .append(" ")
                             .append(((ThrustMove) move).getThrust())
                             .append(" ")
@@ -54,7 +53,7 @@ public class Networking {
             StringBuilder builder = new StringBuilder();
             int buffer;
 
-            for ( ; (buffer = System.in.read()) >= 0; ) {
+            for (; (buffer = System.in.read()) >= 0;) {
                 if (buffer == '\n') {
                     break;
                 }

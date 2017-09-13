@@ -1,40 +1,38 @@
 package hlt;
 
-import java.util.LinkedList;
+public class Entity {
 
+    private final Short owner;
+    private final long id;
+    private final Position position;
+    private final short health;
+    private final double radius;
 
-public abstract class Entity {
+    public Entity(Short owner, long id, Position position, short health, double radius) {
+        this.owner = owner;
+        this.id = id;
+        this.position = position;
+        this.health = health;
+        this.radius = radius;
+    }
 
-    final private EntityId entityId;
-    private Position position;
-    private short health;
-    public enum Type { Planet, Ship }
+    public Short getOwner() {
+        return owner;
+    }
 
-    public Entity(short owner, LinkedList<String> metadata, Type type) {
-        this.entityId = new EntityId(owner, Long.parseLong(metadata.pop()), type);
-        this.position = new Position(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
-        this.health = Short.parseShort(metadata.pop());
+    public long getId() {
+        return id;
     }
 
     public Position getPosition() {
         return position;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
     public short getHealth() {
         return health;
     }
 
-    public void setHealth(short health) {
-        this.health = health;
-    }
-
-    public abstract double getRadius();
-
-    public EntityId getEntityId() {
-        return entityId;
+    public double getRadius() {
+        return radius;
     }
 }

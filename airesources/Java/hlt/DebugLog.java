@@ -3,10 +3,9 @@ package hlt;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 public class DebugLog {
 
-    private FileWriter file;
+    private final FileWriter file;
     private static DebugLog instance;
 
     private DebugLog(FileWriter f) {

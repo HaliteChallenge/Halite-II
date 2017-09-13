@@ -3,8 +3,8 @@ package hlt;
 
 public class Position {
 
-    private double xPos;
-    private double yPos;
+    private final double xPos;
+    private final double yPos;
 
     public Position(double xPos, double yPos){
         this.xPos = xPos;
@@ -32,6 +32,24 @@ public class Position {
         return Math.toDegrees(Math.atan2(dy, dx)) % 360;
     }
 
+    public Position getClosestPoint(Entity target) {
+        final Position targetPosition = target.getPosition();
+        final double targetRadius = target.getRadius();
+
+        return getClosestPoint(targetPosition, targetRadius);
+    }
+
+    public Position getClosestPoint(Position target, double targetRadius) {
+        final int MIN_DISTANCE = 3;
+        final double radius = targetRadius + MIN_DISTANCE;
+        final double angleDeg = target.orientTowardsInDeg(this);
+
+        final short dx = (short)(target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg)));
+        final short dy = (short)(target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg)));
+
+        return new Position(dx, dy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -50,9 +68,9 @@ public class Position {
         int result;
         long temp;
         temp = Double.doubleToLongBits(xPos);
-        result = (int) (temp ^ (temp >>> 32));
+        result = (int)(temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(yPos);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (int)(temp ^ (temp >>> 32));
 
         return result;
     }

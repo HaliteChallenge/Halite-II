@@ -1,41 +1,25 @@
 package hlt;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
+import java.util.List;
 
 public class Planet extends Entity {
 
-    private Short owner;
-    private double radius;
-    private short remainingProduction;
-    private short currentProduction;
-    private short dockingSpots;
-    private ArrayList<Long> dockedShips;
+    private final Short owner;
+    private final short remainingProduction;
+    private final short currentProduction;
+    private final short dockingSpots;
+    private final List<Long> dockedShips;
 
-    public Planet(LinkedList<String> planetMetadata) {
-        super((short) 0, planetMetadata, Type.Planet);
-        radius = Double.parseDouble(planetMetadata.pop());
-        dockingSpots = Short.parseShort(planetMetadata.pop());
-        currentProduction = Short.parseShort(planetMetadata.pop());
-        remainingProduction = Short.parseShort(planetMetadata.pop());
+    public Planet(Short owner, long id, Position position, short health, double radius,
+                  short dockingSpots, short currentProduction, short remainingProduction, List<Long> dockedShips) {
 
-        if(Integer.parseInt(planetMetadata.pop()) == 1) {
-            owner = Short.parseShort(planetMetadata.pop());
-        } else {
-            owner = null;
-            planetMetadata.pop();
-        }
+        super(owner, id, position, health, radius);
 
-        final int dockedShipCount = Integer.parseInt(planetMetadata.pop());
-        dockedShips = new ArrayList<>(dockedShipCount);
-        for(int i = 0; i < dockedShipCount; i++) {
-            dockedShips.add(Long.parseLong(planetMetadata.pop()));
-        }
-    }
-
-    public Short getOwner() {
-        return owner;
+        this.dockingSpots = dockingSpots;
+        this.currentProduction = currentProduction;
+        this.remainingProduction = remainingProduction;
+        this.owner = owner;
+        this.dockedShips = dockedShips;
     }
 
     public short getRemainingProduction() {
@@ -50,13 +34,8 @@ public class Planet extends Entity {
         return dockingSpots;
     }
 
-    public ArrayList<Long> getDockedShips() {
+    public List<Long> getDockedShips() {
         return dockedShips;
-    }
-
-    @Override
-    public double getRadius() {
-        return radius;
     }
 
     public boolean isFull() {

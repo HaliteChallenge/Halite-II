@@ -3,11 +3,10 @@ package hlt;
 import java.util.Map;
 import java.util.TreeMap;
 
-
 public class Player {
 
-    private Map<Long, Ship> ships;
-    private short id;
+    private final Map<Long, Ship> ships;
+    private final short id;
 
     public Player(short id){
         this.id = id;

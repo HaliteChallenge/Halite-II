@@ -1,10 +1,9 @@
 package hlt;
 
-
 public class Velocity {
 
-    private double xVelocity;
-    private double yVelocity;
+    private final double xVelocity;
+    private final double yVelocity;
 
     public Velocity(double xVelocity, double yVelocity) {
         this.xVelocity = xVelocity;
@@ -20,11 +19,11 @@ public class Velocity {
     }
 
     // The speed through which to move the ship
-    double getMagnitude() {
+    public double getMagnitude() {
         return Math.sqrt(Math.pow(xVelocity, 2) + Math.pow(yVelocity, 2));
     }
 
-    double getAngle() {
+    public double getAngleRad() {
         return Math.atan2(yVelocity, xVelocity);
     }
 }

@@ -1,24 +1,25 @@
 package hlt;
 
-import java.util.LinkedList;
-
-
 public class Ship extends Entity {
 
     public enum DockingStatus { Undocked, Docking, Docked, Undocking }
-    private Velocity velocity;
-    private short weaponCooldown;
-    private DockingStatus dockingStatus;
-    private short dockingProgress;
-    private long dockedPlanet;
 
-    public Ship(short owner, LinkedList<String> shipMetadata) {
-        super(owner, shipMetadata, Type.Ship);
-        velocity = new Velocity(Double.parseDouble(shipMetadata.pop()), Double.parseDouble(shipMetadata.pop()));
-        dockingStatus = DockingStatus.values()[Short.parseShort(shipMetadata.pop())];
-        dockedPlanet = Long.parseLong(shipMetadata.pop());
-        dockingProgress = Short.parseShort(shipMetadata.pop());
-        weaponCooldown = Short.parseShort(shipMetadata.pop());
+    private final Velocity velocity;
+    private final DockingStatus dockingStatus;
+    private final long dockedPlanet;
+    private final short dockingProgress;
+    private final short weaponCooldown;
+
+    public Ship(short owner, long id, Position position, short health, Velocity velocity,
+                DockingStatus dockingStatus, long dockedPlanet, short dockingProgress, short weaponCooldown) {
+
+        super(owner, id, position, health, Constants.SHIP_RADIUS);
+
+        this.velocity = velocity;
+        this.dockingStatus = dockingStatus;
+        this.dockedPlanet = dockedPlanet;
+        this.dockingProgress = dockingProgress;
+        this.weaponCooldown = weaponCooldown;
     }
 
     public Velocity getVelocity() {
@@ -41,22 +42,7 @@ public class Ship extends Entity {
         return dockedPlanet;
     }
 
-    static LinkedList<Ship> getShipList(short owner, LinkedList<String> shipsMetadata) {
-        final long numberOfShips = Long.parseLong(shipsMetadata.pop());
-        LinkedList<Ship> ships = new LinkedList<>();
-
-        for(int i = 0; i < numberOfShips; i++) {
-            ships.add(new Ship(owner, shipsMetadata));
-        }
-        return ships;
-    }
-
     public boolean canDock(Planet planet) {
         return getPosition().getDistanceTo(planet.getPosition()) <= Constants.DOCK_RADIUS + planet.getRadius();
-    }
-
-    @Override
-    public double getRadius() {
-        return Constants.SHIP_RADIUS;
     }
 }

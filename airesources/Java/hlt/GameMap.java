@@ -2,14 +2,12 @@ package hlt;
 
 import java.util.*;
 
-
 public class GameMap {
-    // A "safety zone" to leave around other ships when performing collision forecasting.
-    private short width, height;
-    private short playerId;
-    private List<Player> players;
-    private Map<Long, Planet> planets;
-    private LinkedList<Ship> ships;
+    private final short width, height;
+    private final short playerId;
+    private final List<Player> players;
+    private final Map<Long, Planet> planets;
+    private List<Ship> ships;
 
     public GameMap(short width, short height, short playerId){
         this.width = width;
@@ -63,10 +61,10 @@ public class GameMap {
     }
 
     public ArrayList<Entity> objectsBetween(Position startPos, Position targetPos) {
-        ArrayList<Entity> objectsList = new ArrayList<>();
-        final double fudge = Constants.SHIP_RADIUS;
+        final ArrayList<Entity> objectsList = new ArrayList<>();
+        final double fudge = Constants.FORECAST_FUDGE_FACTOR;
 
-        for (Planet planet : planets.values()) {
+        for (final Planet planet : planets.values()) {
             final Position planetPos = planet.getPosition();
             if (planetPos.equals(startPos) || planetPos.equals(targetPos)) {
                 continue;
@@ -76,7 +74,7 @@ public class GameMap {
             }
         }
 
-        for (Ship ship : ships) {
+        for (final Ship ship : ships) {
             final Position shipPos = ship.getPosition();
             if (shipPos.equals(startPos) || shipPos.equals(targetPos)) {
                 continue;
@@ -86,23 +84,21 @@ public class GameMap {
             }
         }
 
-        DebugLog.addLog("Objects: " + objectsList.size());
-
         return objectsList;
     }
 
     public Map<Double, Entity> nearbyEntitiesByDistance(Entity entity) {
-        Map<Double, Entity> entityByDistance = new TreeMap<>();
+        final Map<Double, Entity> entityByDistance = new TreeMap<>();
         final Position entityPos = entity.getPosition();
 
-        for (Planet planet : planets.values()) {
+        for (final Planet planet : planets.values()) {
             if (planet.equals(entity)) {
                 continue;
             }
             entityByDistance.put(entityPos.getDistanceTo(planet.getPosition()), planet);
         }
 
-        for (Ship ship : ships) {
+        for (final Ship ship : ships) {
             if (ship.equals(entity)) {
                 continue;
             }
@@ -112,66 +108,30 @@ public class GameMap {
         return entityByDistance;
     }
 
-    private boolean isOutOfBounds(double x, double y) {
-        return (x < 0 || x >= width || y < 0 || y >= height);
-    }
-
-    public Position getClosestPoint(Entity start, Entity target) {
-        final Position startPosition = start.getPosition();
-        final Position targetPosition = target.getPosition();
-        final double targetRadius = target.getRadius();
-
-        return getClosestPoint(startPosition, targetPosition, targetRadius);
-    }
-
-    public Position getClosestPoint(Position start, Position target, double targetRadius) {
-        final int MIN_DISTANCE = 3;
-        final double radius = targetRadius + MIN_DISTANCE;
-        final double angleDeg = Movement.orientTowardsInDeg(start, target);
-
-        final short dx = (short) (target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg)));
-        final short dy = (short) (target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg)));
-
-        return new Position(dx, dy);
-    }
-
-    public boolean isPathable(Position start, Position target) {
-        if (isOutOfBounds(target.getXPos(), target.getYPos()))
-            return false;
-
-        for (Map.Entry<Long, Planet> planetEntry : planets.entrySet()) {
-            final Planet planet = planetEntry.getValue();
-            if (Collision.segmentCircleIntersect(start, target, planet, Constants.FORECAST_FUDGE_FACTOR)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public GameMap updateMap(LinkedList<String> mapMetadata) {
         DebugLog.addLog("--- NEW TURN ---");
-        final short numberOfPlayers = Short.parseShort(mapMetadata.pop());
+        final short numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
 
         players.clear();
 
         // update players info
-        for(short i = 0; i < numberOfPlayers; i++) {
-            final short playerId = Short.parseShort(mapMetadata.pop());
+        for (short i = 0; i < numberOfPlayers; i++) {
+            final short playerId = MetadataParser.parsePlayerId(mapMetadata);
 
-            Player currentPlayer = new Player(playerId);
-            ships = Ship.getShipList(playerId, mapMetadata);
+            final Player currentPlayer = new Player(playerId);
+            ships = MetadataParser.getShipList(playerId, mapMetadata);
 
-            for(Ship ship : ships) {
-                currentPlayer.addShip(ship.getEntityId().getId(), ship);
+            for (final Ship ship : ships) {
+                currentPlayer.addShip(ship.getId(), ship);
             }
             players.add(currentPlayer);
         }
 
         final long numberOfPlanets = Long.parseLong(mapMetadata.pop());
 
-        for(long i = 0; i < numberOfPlanets; i++) {
-            final Planet planet = new Planet(mapMetadata);
-            planets.put(planet.getEntityId().getId(), planet);
+        for (long i = 0; i < numberOfPlanets; i++) {
+            final Planet planet = MetadataParser.newPlanetFromMetadata(mapMetadata);
+            planets.put(planet.getId(), planet);
         }
         return this;
     }
