@@ -8,7 +8,7 @@ public class Player {
     private final Map<Long, Ship> ships;
     private final short id;
 
-    public Player(short id){
+    public Player(final short id){
         this.id = id;
         ships = new TreeMap<>();
     }
@@ -17,7 +17,7 @@ public class Player {
         return ships;
     }
 
-    public Ship getShip(long entityId) {
+    public Ship getShip(final long entityId) {
         return ships.get(entityId);
     }
 
@@ -25,7 +25,7 @@ public class Player {
         return id;
     }
 
-    public void addShip(long shipId, Ship ship) {
+    public void addShip(final long shipId, final Ship ship) {
         ships.put(shipId, ship);
     }
 }

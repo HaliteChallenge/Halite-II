@@ -5,7 +5,7 @@ public class Velocity {
     private final double xVelocity;
     private final double yVelocity;
 
-    public Velocity(double xVelocity, double yVelocity) {
+    public Velocity(final double xVelocity, final double yVelocity) {
         this.xVelocity = xVelocity;
         this.yVelocity = yVelocity;
     }

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public class MetadataParser {
 
-    public static LinkedList<Ship> getShipList(short owner, LinkedList<String> shipsMetadata) {
+    public static LinkedList<Ship> getShipList(final short owner, final LinkedList<String> shipsMetadata) {
         final long numberOfShips = Long.parseLong(shipsMetadata.pop());
         LinkedList<Ship> ships = new LinkedList<>();
 

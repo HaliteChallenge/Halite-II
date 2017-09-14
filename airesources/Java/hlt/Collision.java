@@ -10,7 +10,7 @@ public class Collision {
      * @param fudge  An additional safety zone to leave when looking for collisions. (Probably set it to ship radius 0.5)
      * @return true if the segment intersects, false otherwise
      */
-    public static boolean segmentCircleIntersect(Position start, Position end, Entity circle, double fudge) {
+    public static boolean segmentCircleIntersect(final Position start, final Position end, final Entity circle, final double fudge) {
         // Derived with SymPy
         // Parameterize the segment as start + t * (end - start),
         // and substitute into the equation of a circle
@@ -50,7 +50,7 @@ public class Collision {
         return closestDistance <= circleRadius + fudge;
     }
 
-    public static double square(double num) {
+    public static double square(final double num) {
         return num * num;
     }
 }

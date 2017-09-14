@@ -10,8 +10,10 @@ public class Planet extends Entity {
     private final short dockingSpots;
     private final List<Long> dockedShips;
 
-    public Planet(Short owner, long id, double xPos, double yPos, short health, double radius,
-                  short dockingSpots, short currentProduction, short remainingProduction, List<Long> dockedShips) {
+    public Planet(final Short owner, final long id, final double xPos, final double yPos,
+                  final short health, final double radius, final short dockingSpots,
+                  final short currentProduction, final short remainingProduction,
+                  final List<Long> dockedShips) {
 
         super(owner, id, xPos, yPos, health, radius);
 

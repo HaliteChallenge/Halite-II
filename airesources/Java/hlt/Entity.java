@@ -7,7 +7,7 @@ public class Entity extends Position {
     private final short health;
     private final double radius;
 
-    public Entity(Short owner, long id, double xPos, double yPos, short health, double radius) {
+    public Entity(final Short owner, final long id, final double xPos, final double yPos, final short health, final double radius) {
         super(xPos, yPos);
         this.owner = owner;
         this.id = id;

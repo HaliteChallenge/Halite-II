@@ -10,8 +10,9 @@ public class Ship extends Entity {
     private final short dockingProgress;
     private final short weaponCooldown;
 
-    public Ship(short owner, long id, double xPos, double yPos, short health, Velocity velocity,
-                DockingStatus dockingStatus, long dockedPlanet, short dockingProgress, short weaponCooldown) {
+    public Ship(final short owner, final long id, final double xPos, final double yPos,
+                final short health, final Velocity velocity, final DockingStatus dockingStatus,
+                final long dockedPlanet, final short dockingProgress, final short weaponCooldown) {
 
         super(owner, id, xPos, yPos, health, Constants.SHIP_RADIUS);
 
@@ -42,7 +43,7 @@ public class Ship extends Entity {
         return dockedPlanet;
     }
 
-    public boolean canDock(Planet planet) {
+    public boolean canDock(final Planet planet) {
         return getDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.getRadius();
     }
 }

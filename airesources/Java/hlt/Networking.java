@@ -12,7 +12,7 @@ public class Networking {
     private static final char DOCK_KEY = 'd';
     private static final char THRUST_KEY = 't';
 
-    public static void sendMoves(ArrayList<Move> moves) {
+    public static void sendMoves(final ArrayList<Move> moves) {
         final StringBuilder moveString = new StringBuilder();
 
         for (final Move move : moves) {
@@ -75,7 +75,7 @@ public class Networking {
         return new LinkedList<>(Arrays.asList(readLine().trim().split(" ")));
     }
     
-    public GameMap initialize(String botName) {
+    public GameMap initialize(final String botName) {
         final short myId = Short.parseShort(readLine());
         try {
             DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));

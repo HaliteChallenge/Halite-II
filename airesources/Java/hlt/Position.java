@@ -5,7 +5,7 @@ public class Position {
     private final double xPos;
     private final double yPos;
 
-    public Position(double xPos, double yPos){
+    public Position(final double xPos, final double yPos){
         this.xPos = xPos;
         this.yPos = yPos;
     }
@@ -43,7 +43,7 @@ public class Position {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }

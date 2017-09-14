@@ -7,7 +7,7 @@ public class Move {
     private final MoveType type;
     private final Ship ship;
 
-    public Move(MoveType type, Ship ship) {
+    public Move(final MoveType type, final Ship ship) {
         this.type = type;
         this.ship = ship;
     }

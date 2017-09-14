@@ -2,7 +2,7 @@ package hlt;
 
 public class UndockMove extends Move {
 
-    public UndockMove(Ship ship) {
+    public UndockMove(final Ship ship) {
         super(MoveType.Undock, ship);
     }
 }

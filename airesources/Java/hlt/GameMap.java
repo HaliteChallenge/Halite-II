@@ -1,6 +1,12 @@
 package hlt;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class GameMap {
     private final short width, height;
@@ -9,7 +15,7 @@ public class GameMap {
     private final Map<Long, Planet> planets;
     private List<Ship> ships;
 
-    public GameMap(short width, short height, short playerId){
+    public GameMap(final short width, final short height, final short playerId){
         this.width = width;
         this.height = height;
         this.playerId = playerId;
@@ -37,11 +43,11 @@ public class GameMap {
         return getAllPlayers().get(getMyPlayerId());
     }
 
-    public Ship getShip(short playerId, long entityId) throws IndexOutOfBoundsException {
+    public Ship getShip(final short playerId, final long entityId) throws IndexOutOfBoundsException {
         return players.get(playerId).getShip(entityId);
     }
 
-    public Planet getPlanet(long entityId) {
+    public Planet getPlanet(final long entityId) {
         return planets.get(entityId);
     }
 
@@ -62,9 +68,9 @@ public class GameMap {
         return entitiesFound;
     }
 
-    private static void addEntitiesBetween(List<Entity> entitiesFound,
-                                           Position start, Position target,
-                                           Collection<? extends Entity> entitiesToCheck) {
+    private static void addEntitiesBetween(final List<Entity> entitiesFound,
+                                           final Position start, final Position target,
+                                           final Collection<? extends Entity> entitiesToCheck) {
 
         for (final Entity entity : entitiesToCheck) {
             if (entity.equals(start) || entity.equals(target)) {
@@ -76,7 +82,7 @@ public class GameMap {
         }
     }
 
-    public Map<Double, Entity> nearbyEntitiesByDistance(Entity entity) {
+    public Map<Double, Entity> nearbyEntitiesByDistance(final Entity entity) {
         final Map<Double, Entity> entityByDistance = new TreeMap<>();
 
         for (final Planet planet : planets.values()) {
@@ -96,7 +102,7 @@ public class GameMap {
         return entityByDistance;
     }
 
-    public GameMap updateMap(LinkedList<String> mapMetadata) {
+    public GameMap updateMap(final LinkedList<String> mapMetadata) {
         DebugLog.addLog("--- NEW TURN ---");
         final short numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
 
