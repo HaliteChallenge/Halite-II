@@ -3,7 +3,7 @@
     <div class="hackathon-in-progress-container">
       <div class="hackathon-title">
         <i class="xline xline-bottom"></i>
-        <p class="t3 c-org font-headline">EVENTS & HACKATHONS</p>
+        <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
         <p class="t2 c-wht font-headline">HACKATION IN PROGRESS</p>
       </div>
       <div class="row hackathon-progress-cards">
@@ -84,7 +84,7 @@ export default {
           pin: 'New York City',
           time: 'August 3-5',
           group: 'Open to all',
-          id: ''
+          id: '1'
         },
         {
           img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
@@ -92,7 +92,7 @@ export default {
           pin: 'New York City',
           time: 'August 3-5',
           group: 'Open to all',
-          id: ''
+          id: '3'
         },
         {
           img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
@@ -100,7 +100,7 @@ export default {
           pin: 'New York City',
           time: 'August 3-5',
           group: 'Open to all',
-          id: ''
+          id: '2'
         },
         {
           img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
@@ -108,7 +108,7 @@ export default {
           pin: 'New York City',
           time: 'August 3-5',
           group: 'Open to all',
-          id: ''
+          id: '1'
         }
       ],
       events: [
@@ -119,7 +119,7 @@ export default {
           date: 'Saturday, September 9th',
           time: '10:00 AM',
           pin: 'Galvanize NYC, New York',
-          id: ''
+          id: '1'
         },
         {
           img: `${this.baseUrl}/assets/images/temp/event-img.png`,
@@ -128,7 +128,7 @@ export default {
           date: 'Saturday, September 9th',
           time: '10:00 AM',
           pin: 'Galvanize NYC, New York',
-          id: ''
+          id: '2'
         },
         {
           img: `${this.baseUrl}/assets/images/temp/event-img.png`,
@@ -137,7 +137,7 @@ export default {
           date: 'Saturday, September 9th',
           time: '10:00 AM',
           pin: 'Galvanize NYC, New York',
-          id: ''
+          id: '3'
         }
       ]
     };

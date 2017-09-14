@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isReplayUploaded && !isBotUploaded" class="">
+    <div v-if="currentView == 'upload'">
       <div>
         <div class="page-header">
           <h1>PLAY A HALITE AI BOT</h1>
@@ -14,7 +14,7 @@
       <div class="row play-upload-section">
         <div class="col-sm-6">
           <div class="upload-container">
-            <Upload></Upload>
+            <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
             <p class="text-center">You can also submit a bot via Github.<br>
@@ -23,59 +23,16 @@
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
-            <visualizer-container :toggleUploadReplay="toggleUploadReplay"></visualizer-container>
+            <visualizer-container></visualizer-container>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="halite-uploaded-bot">
-      <div class="upload-state">
-        <h2>Your bot</h2>
-        <p class="upload-state-filename"><span class="icon-document"></span> Julia bot v5.hlt</p>
-        <div class="upload-state-options">
-          <div class="upload-state-option-item">
-            <span class="ha-checkbox ha-checkbox-checked"><span></span></span>
-            Upload as a new bot
-          </div>
-          <div class="upload-state-option-item">
-            <span class="ha-checkbox"><span></span></span>
-            Upgrade an existing bot
-          </div>
-        </div>
-        <div class="upload-state-select-bot">
-          <select name="" id="" class="form-control">
-            <option value="">Select a bot</option>
-            <option value="">xyz</option>
-            <option value="">abc</option>
-          </select>
-        </div>
-        <div class="upload-state-buttons">
-          <a href="#">Cancel</a>
-          <button class="btn-ha btn-ha-lg">Submit</button>
-        </div>
-      </div>
-      <p></p>
+    <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">
 
-      <div class="upload-state">
-        <img :src="`${baseUrl}/assets/images/icon-wait.svg`" alt="success" class="upload-state-icon">
-        <h2>bot submiited. currently compiling.</h2>
-        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
-        <div class="upload-state-buttons">
-          <span class="ha-text">10 minutes remaning</span>
-        </div>
-      </div>
-      <p></p>
-
-      <div class="upload-state">
-        <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
-        <h2>Success!</h2>
-        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
-        <div class="upload-state-buttons">
-          <button class="btn-ha btn-ha-clear btn-ha-lg">Watch Halite TV</button>
-          <button class="btn-ha btn-ha-lg">See your result</button>
-        </div>
-      </div>
+      <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"></bot-upload>
+    
     </div>
 
     <div id="halitetv-visualizer">
@@ -86,27 +43,38 @@
   import * as api from "../api";
   import VisualizerContainer from "./VisualizerContainer.vue";
   import Upload from "./Upload.vue";
+  import BotUpload from "./BotUpload.vue";
 
   export default {
     name: "uploader",
     props: ["baseUrl"],
     components: {
       "Upload": Upload,
+      "bot-upload": BotUpload,
       "visualizer-container": VisualizerContainer
     },
     data: function(){
       return {
-        isBotUploaded: false,
-        isReplayUploaded: false
+        currentView: 'upload',
+        botFile: {name: ""},
+        loggedIn: false,
+        user: null,
+        botsList: []
       }
     },
+    mounted: function(){
+      api.me().then((me) => {
+        if (me !== null) {
+          this.loggedIn = true;
+          this.user = me;
+          api.list_bots(me.user_id).then((bots) => {
+            this.botsList = bots;
+          });
+        }
+      });
+    },
     methods: {
-      toggleUploadBot: function(){
-        this.isBotUploaded = true;
-      },
-      toggleUploadReplay: function(){
-        this.isReplayUploaded = true;
-      }
+
     }
   }
 </script>

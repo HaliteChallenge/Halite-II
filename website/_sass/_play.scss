@@ -108,6 +108,15 @@
     letter-spacing: 0.5px;
   }
 
+  &-error{
+    color: $error;
+    text-align: center;
+    max-width: 387px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+  }
+
   // form
   &-select-bot{
     max-width: 260px;

@@ -62,7 +62,7 @@
 
   export default {
     name: 'visualizer',
-    props: ["isReplayUploaded", "toggleUploadReplay"],
+    props: [],
     components: {
       "halite-upload-zone": UploadZone,
     },
@@ -89,10 +89,10 @@
           }
         }).then((game) => {
           this.message = "Parsing replay, please wait…";
+          this.$parent.currentView = 'replay';
           showGame(game).then(() => {
             this.is_downloading = false;
             this.message = null;
-            this.toggleUploadReplay();
           }).catch((e) => {
             this.is_downloading = false;
             this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
@@ -110,7 +110,7 @@
           const inst = this;
           reader.onload = (e) => {
             inst.is_upload = false;
-            inst.toggleUploadReplay();
+            this.$parent.currentView = 'replay';
             showGame({
               game: null,
               replay: e.target.result,
