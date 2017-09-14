@@ -29,7 +29,7 @@
         <div class="game-replay-viewer"></div>
         <div class="game-replay-controller">
           <i class="xline xline-top"></i>
-          <i class="xline xline-bottom"></i> 
+          <i class="xline xline-bottom"></i>
           <div class="game-replay-btn-table">
             <div class="game-replay-btn-cell">
               <span class="replay-btn">
@@ -178,7 +178,7 @@
                   <i class="xline xline-top"></i>
                   <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
-                    <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
+                    <img :src="`https://github.com/${_player.name}.png`">
                   </div>
                   <div class="card-dashboard-info">
                     <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
@@ -374,7 +374,7 @@
             visualizer.frame = 0;
             visualizer.time = 0.0;
             this.frame = 0;
-            this.time = 0.0; 
+            this.time = 0.0;
           }
           visualizer.play();
         }
@@ -382,7 +382,7 @@
       this.pauseVideo = (e) => {
         if(visualizer) {
           visualizer.pause();
-        } 
+        }
       }
       this.toggleSpeed = (e) => {
         const speedList =  {
@@ -469,7 +469,7 @@
 
         try {
           if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
-            
+
           for (let _pIndex in this.stats.frames[0].players) {
             let playerP = [];
             let playerH = [];

@@ -117,8 +117,8 @@ api.me().then((me) => {
            render: (h) => h(UserProfileBar, {props: {baseUrl: _global.baseUrl}}),
        });
 
-       if (me.is_new_user === true && window.location.pathname !== "/associate") {
-           window.location.replace("/associate");
+       if (me.is_new_user === true && window.location.pathname !== "/create-account") {
+           window.location.replace("/create-account");
        }
    }
 });
