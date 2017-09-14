@@ -258,8 +258,6 @@
                          <div class="content">
                              <p class="t3 c-wht">ABOUT THE HALITE COMPETITION</p>
                              <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by Two Sigma in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
-                             <p class="t3 c-wht font-headline">ABOUT THE HALITE COMPETITION</p>
-                             <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by Two Sigma in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
                                  <div class="ha-button no-bg-button"><span>LEARN MORE</span></div>
