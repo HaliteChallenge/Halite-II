@@ -11,7 +11,6 @@ public class Collision {
      * @return true if the segment intersects, false otherwise
      */
     public static boolean segmentCircleIntersect(final Position start, final Position end, final Entity circle, final double fudge) {
-        // Derived with SymPy
         // Parameterize the segment as start + t * (end - start),
         // and substitute into the equation of a circle
         // Solve for t

@@ -21,13 +21,16 @@ public class MetadataParser {
         final double yPos = Double.parseDouble(metadata.pop());
         final short health = Short.parseShort(metadata.pop());
 
-        final Velocity velocity = new Velocity(Double.parseDouble(metadata.pop()), Double.parseDouble(metadata.pop()));
+        // Ignoring velocity(x,y) which is always (0,0) in current version.
+        metadata.pop();
+        metadata.pop();
+
         final Ship.DockingStatus dockingStatus = Ship.DockingStatus.values()[Short.parseShort(metadata.pop())];
         final long dockedPlanet = Long.parseLong(metadata.pop());
         final short dockingProgress = Short.parseShort(metadata.pop());
         final short weaponCooldown = Short.parseShort(metadata.pop());
 
-        return new Ship(owner, id, xPos, yPos, health, velocity, dockingStatus, dockedPlanet, dockingProgress, weaponCooldown);
+        return new Ship(owner, id, xPos, yPos, health, dockingStatus, dockedPlanet, dockingProgress, weaponCooldown);
     }
 
     public static Planet newPlanetFromMetadata(final LinkedList<String> metadata) {
@@ -56,7 +59,8 @@ public class MetadataParser {
             dockedShips.add(Long.parseLong(metadata.pop()));
         }
 
-        return new Planet(owner, id, xPos, yPos, health, radius, dockingSpots, currentProduction, remainingProduction, dockedShips);
+        return new Planet(owner, id, xPos, yPos, health, radius, dockingSpots,
+                          currentProduction, remainingProduction, dockedShips);
     }
 
     public static Short parsePlayerNum(final LinkedList<String> metadata) {
