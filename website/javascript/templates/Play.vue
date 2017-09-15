@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="play-container">
+    <div class="message-container" v-if="displayMessage">
+      <Message :message="message.content" :type="message.type"></Message>
+    </div>
     <div v-if="currentView == 'upload'">
       <div>
         <div class="page-header">
@@ -31,7 +34,9 @@
 
     <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">
 
-      <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"></bot-upload>
+      <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
+        :enableMessage="enableMessage"
+        :disableMessage="disableMessage"></bot-upload>
     
     </div>
 
@@ -44,6 +49,7 @@
   import VisualizerContainer from "./VisualizerContainer.vue";
   import Upload from "./Upload.vue";
   import BotUpload from "./BotUpload.vue";
+  import Message from "./Message.vue";
 
   export default {
     name: "uploader",
@@ -51,7 +57,8 @@
     components: {
       "Upload": Upload,
       "bot-upload": BotUpload,
-      "visualizer-container": VisualizerContainer
+      "visualizer-container": VisualizerContainer,
+      "Message": Message
     },
     data: function(){
       return {
@@ -59,7 +66,12 @@
         botFile: {name: ""},
         loggedIn: false,
         user: null,
-        botsList: []
+        botsList: [],
+        displayMessage: false,
+        message: {
+          type: "success",
+          content: ""
+        }
       }
     },
     mounted: function(){
@@ -74,7 +86,27 @@
       });
     },
     methods: {
-
+      enableMessage: function(type = 'success', content){
+        this.message.type = type;
+        this.message.content = content;
+        this.displayMessage = true;
+      },
+      disableMessage: function(){
+        this.displayMessage = false;
+      }
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  .play-container{
+    padding-top: 70px;
+    position: relative;
+  }
+  .message-container{
+    position: absolute;
+    top: 0;
+    left: -15px;
+    right: -15px;
+  }
+</style>

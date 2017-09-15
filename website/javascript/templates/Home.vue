@@ -11,8 +11,8 @@
                      <div class="ha-button"><span>PLAY NOW</span></div>
                  </div>
                  <div v-else class="me-in ha-button-container">
-                     <div class="ha-button no-bg-button"><span>CHECK YOUR STATS</span></div>
-                     <div class="ha-button"><span>SUBMIT A BOT</span></div>
+                     <a class="ha-button no-bg-button" href="/programming-competition-leaderboard"><span>CHECK YOUR STATS</span></a>
+                     <a class="ha-button" href="/play-programming-challenge"><span>SUBMIT A BOT</span></a>
                  </div>
              </div>
              <div class="col-md-12">
@@ -297,18 +297,10 @@
             };
         },
         mounted: function() {
-          let content = '';
-          document.write = function(s) {
-              content += s;
-          };
-          const callback = function() {
-          console.log('hi');
-          //document.getElementById("redditWidget").innerHTML = content;
-          };
-          this.createRedditWidget(callback);
+          this.createRedditWidget();
         },
         methods: {
-            createRedditWidget: function(callback) {
+            createRedditWidget: function() {
               let s = document.createElement('script'),
               content = '';
 
@@ -323,10 +315,6 @@
               };
 
               document.getElementsByTagName('head')[0].appendChild(s);
-              // let ckeditor = document.createElement('script');
-              // ckeditor.setAttribute('src', "https://www.reddit.com/domain/halite.io/hot/.embed?limit=5&t=all");
-              // ckeditor.setAttribute('onload', function(){console.log('hi')});
-              // document.body.appendChild(ckeditor);
             }
         },
     }

@@ -8,6 +8,7 @@ body{
   font-family: $font-body;
   background-color: transparent;
   color: #ECFFFB;
+  font-size: 1.6rem;
 
   > .body {
     margin-top: 61px;
@@ -231,5 +232,29 @@ input:focus{
   &:before{
     background-image: url("/assets/images/ha-left.svg");
     left: 0;
+  }
+}
+
+.hex-li{
+  display: flex;
+  align-items: center;
+  .hex-li-content{
+    
+  }
+  .hex-bullet{
+    display: inline-block;
+    flex: 0 0 71px;
+    width: 71px;
+    height: 84px;
+    line-height: 83px;
+    text-align: center;
+    font-family: $font-heading;
+    font-size: 36px;
+    color: $yellow;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.20);
+    background-image: url("/assets/images/hexagon.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-right: 10px;
   }
 }

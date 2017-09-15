@@ -1,0 +1,28 @@
+.table-leader{
+  > thead > tr > th, 
+  > tbody > tr > td{
+    padding: 15px 15px;
+    border-top: 1px solid #363347;
+    border-bottom: 1px solid #363347;
+  }
+  > thead > tr > th + th,
+  > tbody > tr > td + td{
+    border-left: 1px solid #363347;
+  }
+  > thead > tr > th{
+    background-color: #100f17;
+    color: $foreground;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  > tbody > tr > td{
+    background-color: #1c1a27;
+  }
+
+  > tbody > tr > td{
+    [class*="icon-tier-"]{
+      color: #E37222;
+      font-size: 24px;
+    }
+  }
+}

@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="col-md-6">
-          <img class="right" :src="hackathon.img" />
+          <img class="right img-responsive" :src="hackathon.img" />
         </div>
       </div>
     </section>
@@ -52,8 +52,68 @@
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="panel_join" aria-labelledby="panel_join">
-            You're welcome to start submitting bots now, but first you need to join the hackathon. Here are the steps to join:
+          <div class="panel-collapse collapse in" role="tabpanel" id="panel_join" aria-labelledby="panel_join">
+            <div class="hackathon-join-container">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <p>You're welcome to start submitting bots now, but first you need to join the hackathon. Here are the steps to join:</p>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">1</span>
+                      <span class="hex-li-content">Make sure you've verified that you go to Cornell by authenticating your email <a href="#">here</a>.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-1.png`" alt="how to join">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">2</span>
+                      <span class="hex-li-content">Get a hackathon code from whoever invited you</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-2.png`" alt="how to join">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">3</span>
+                      <span class="hex-li-content">Submit your code on your <a href="/user?me">user profile</a>.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-3.png`" alt="how to join">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">4</span>
+                      <span class="hex-li-content">Once you're all set, you'll see this hackathon on your <a href="/user?me">user profile</a> and you're ready to start <a href="/play-programming-challenge">submitting bots</a>!</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-4.png`" alt="how to join">
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -61,7 +121,9 @@
 
     <section class="hackathon-video"></section>
 
-    <section class="hackathon-leaderboard"></section>
+    <section class="hackathon-leaderboard">
+      <Leaderboard></Leaderboard>
+    </section>
 
   </section>
 </template>
@@ -69,6 +131,7 @@
 <script>
   import * as api from "../api";
   import HaliteBreadcrumb from './Breadcrumb.vue';
+  import Leaderboard from './Leaderboard.vue';
 
   const mockHackathon = {
     title: 'Cornell Virtual Halite Hackathon',
@@ -89,7 +152,8 @@
       }
     },
     components: {
-      HaliteBreadcrumb 
+      HaliteBreadcrumb,
+      Leaderboard
     },
     data: function() {
       return {
@@ -117,6 +181,7 @@
             this.hackathon = hackathon;
             return Promise.resolve();
           }, (xhr) => {
+            console.log(xhr);
             console.log('Cannot get hackathon info.')
           });
         } else {
@@ -124,9 +189,13 @@
         }
       }
 
-      getHackathonPromise().then((hackathon) => {
-        this.path.push({name: this.hackathon.title, link: 'javascript:;'});
-      })
+      api.me().then((me) => {
+        console.log(me);
+        getHackathonPromise().then((hackathon) => {
+          this.path.push({name: this.hackathon.title, link: 'javascript:;'});
+        });
+      });
+
       
     },
   }

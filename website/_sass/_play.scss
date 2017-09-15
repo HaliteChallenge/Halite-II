@@ -61,6 +61,9 @@
   border-radius: 5px;
   font-size: 16px;
   line-height: 1.5em;
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
   @media (min-width: $screen-sm-min){
     padding: 40px;
   }
