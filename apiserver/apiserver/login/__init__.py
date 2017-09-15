@@ -30,8 +30,12 @@ github = oauth.remote_app(
 
 @oauth_login.route("/github")
 def github_login_init():
-    return github.authorize(
-        callback=flask.url_for(".github_login_callback", _external=True))
+    url = urllib.parse.urlparse(config.API_URL)
+    base_url = url.scheme + "://" + url.netloc
+    full_url = urllib.parse.urljoin(
+        base_url,
+        flask.url_for(".github_login_callback"))
+    return github.authorize(callback=full_url)
 
 
 @oauth_login.route("/me")
