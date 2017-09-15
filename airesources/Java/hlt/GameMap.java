@@ -15,7 +15,7 @@ public class GameMap {
     private final Map<Long, Planet> planets;
     private List<Ship> ships;
 
-    public GameMap(final short width, final short height, final short playerId){
+    public GameMap(final short width, final short height, final short playerId) {
         this.width = width;
         this.height = height;
         this.playerId = playerId;
