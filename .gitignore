@@ -9,6 +9,7 @@
 
 # IntelliJ/CLion
 .idea/
+*.iml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
