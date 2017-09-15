@@ -17,10 +17,10 @@ title: Halite AI Challenge
 email: halite@halite.io
 description: > # this means to ignore newlines until "baseurl:"
   Halite is an artificial intelligence programming challenge.
-baseurl: ""
-url: "http://stg.halite.io/
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://35.185.45.87/" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: haliteAI
-github_username:  jekyll
+github_username:  haliteadmin
 
 permalink: /blog/:year/:month/:day/:title.html
 

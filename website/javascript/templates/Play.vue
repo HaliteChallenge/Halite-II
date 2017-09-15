@@ -20,8 +20,7 @@
             <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
-            <p class="text-center">You can also submit a bot via Github.<br>
-            To tell more about requirements for submitting a bot, check out <a href="#">our document</a></p>
+            <p class="text-center">You can also submit a bot via our <a href="https://github.com/twosigma/Halite-II/tree/master/tools/hlt_client">Halite Client Tool</a></p>
           </div>
         </div>
         <div class="col-sm-6">

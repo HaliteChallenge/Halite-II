@@ -2,7 +2,7 @@
     <div class="upload-bot">
         <halite-upload-zone v-if="loggedIn"
             title="Submit a bot"
-            description="Drop a .bot file here to upload"
+            description="Drop a .zip file here to upload"
             :icon="`${baseUrl}/assets/images/icon-submit.svg`"
             :message="error"
             :progressBar="is_uploading"
@@ -12,7 +12,7 @@
         <div v-else>
             <div class="panel panel-default upload-zone">
                 <div class="panel-body">
-                    <h2>Log In to upload bot</h2>
+                    <h2>Log in to upload bot</h2>
                 </div>
             </div>
         </div>

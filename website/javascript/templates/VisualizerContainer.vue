@@ -3,7 +3,7 @@
     <div v-if="is_upload">
       <halite-upload-zone
         title="Replay a File"
-        description="Drop a .zip file here to upload"
+        description="Drop a replay file here to upload"
         :icon="`${baseUrl}/assets/images/icon-replay.svg`"
         v-on:change="play_replay"
         :progressBar="is_downloading"
