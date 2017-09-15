@@ -10,7 +10,7 @@ parser.add_argument('type', metavar='T', type=str,help='Type of org')
 parser.add_argument('domain', metavar='D', type=str,help='Domain of the org')
 parser.add_argument('api-key', metavar='K', type=str,help='API Key')
 
-api_server_url_base = "http://35.190.3.178/v1/api/organization"
+api_server_url_base = "https://api.halite.io/v1/api/organization"
 email_endpoint = "/email_domain"
 
 def main(argv):
