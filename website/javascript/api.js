@@ -1,5 +1,5 @@
-export const API_SERVER_URL = "http://35.190.3.178/v1/api";
-export const LOGIN_SERVER_URL = "http://35.190.3.178/v1/login";
+export const API_SERVER_URL = "https://api.halite.io/v1/api";
+export const LOGIN_SERVER_URL = "https://api.halite.io/v1/login";
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
