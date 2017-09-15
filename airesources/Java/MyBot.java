@@ -1,46 +1,40 @@
-package halitejavabot;
+import hlt.*;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 
 public class MyBot {
+
     public static void main(String[] args) {
         Networking networking = new Networking();
         GameMap gameMap = networking.initialize("Caffeinated");
+        ArrayList<Move> moveList = new ArrayList<>();
 
-        Vector<Move> moves = new Vector<>();
+        for (;;) {
+            moveList.clear();
+            gameMap.updateMap(Networking.readAndSplitLine());
 
-        while (true) {
-            moves.clear();
-            gameMap.updateMap(Networking.parseInput());
-
-            for (Map.Entry<Long, Ship> shipEntry : gameMap.getMyPlayer().getShips().entrySet()) {
-                Ship ship = shipEntry.getValue();
+            for (Ship ship : gameMap.getMyPlayer().getShips().values()) {
 
                 if (ship.getDockingStatus() != Ship.DockingStatus.Undocked) {
                     continue;
                 }
 
-                for (Map.Entry<Long, Planet> planetEntry : gameMap.getPlanets().entrySet()) {
-                    Planet planet = planetEntry.getValue();
+                for (Planet planet : gameMap.getAllPlanets().values()) {
 
                     if (planet.getOwner() != null) {
                         continue;
                     }
-
-                    if (Movement.canDock(ship, planet)) {
-                        moves.add(new DockMove(ship, planet));
+                    if (ship.canDock(planet)) {
+                        moveList.add(new DockMove(ship, planet));
                     }
                     else {
-                        double orientation = Movement.orientTowards(ship, planet);
-                        moves.add(new ThrustMove(ship, gameMap.adjustForCollision(
-                                ship.position, orientation, (short) 2)));
+                        moveList.add(new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED / 2));
                     }
                     break;
                 }
             }
-
-            Networking.sendMoves(moves);
+            Networking.sendMoves(moveList);
         }
     }
 }

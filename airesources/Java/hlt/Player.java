@@ -1,13 +1,14 @@
-package halitejavabot;
+package hlt;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 public class Player {
-    private Map<Long, Ship> ships;
-    private short id;
 
-    public Player(short id){
+    private final Map<Long, Ship> ships;
+    private final short id;
+
+    public Player(final short id){
         this.id = id;
         ships = new TreeMap<>();
     }
@@ -16,7 +17,7 @@ public class Player {
         return ships;
     }
 
-    public Ship getShip(long entityId) {
+    public Ship getShip(final long entityId) {
         return ships.get(entityId);
     }
 
@@ -24,7 +25,7 @@ public class Player {
         return id;
     }
 
-    public void addShip(long shipId, Ship ship) {
+    public void addShip(final long shipId, final Ship ship) {
         ships.put(shipId, ship);
     }
 }

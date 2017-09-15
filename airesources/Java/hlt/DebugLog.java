@@ -1,11 +1,12 @@
-package halitejavabot;
+package hlt;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class DebugLog {
-    FileWriter file;
-    static DebugLog instance;
+
+    private final FileWriter file;
+    private static DebugLog instance;
 
     private DebugLog(FileWriter f) {
         file = f;
@@ -15,12 +16,13 @@ public class DebugLog {
         instance = new DebugLog(f);
     }
 
-    static void debug(String message) {
+    public static void addLog(String message) {
         try {
             instance.file.write(message);
             instance.file.write('\n');
             instance.file.flush();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
