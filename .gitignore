@@ -241,6 +241,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.so.[0-9]*
 
 # Distribution / packaging
 .Python
