@@ -1,7 +1,7 @@
 DockMove
 ========
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class DockMove extends Move
@@ -16,9 +16,9 @@ DockMove
 
 Methods
 -------
-getDestination
-^^^^^^^^^^^^^^
+getDestinationId
+^^^^^^^^^^^^^^^^
 
-.. java:method:: public EntityId getDestination()
+.. java:method:: public long getDestinationId()
    :outertype: DockMove
 

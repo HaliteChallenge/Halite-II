@@ -1,7 +1,7 @@
 Position
 ========
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class Position
@@ -22,6 +22,18 @@ equals
 .. java:method:: @Override public boolean equals(Object o)
    :outertype: Position
 
+getClosestPoint
+^^^^^^^^^^^^^^^
+
+.. java:method:: public Position getClosestPoint(Entity target)
+   :outertype: Position
+
+getDistanceTo
+^^^^^^^^^^^^^
+
+.. java:method:: public double getDistanceTo(Position target)
+   :outertype: Position
+
 getXPos
 ^^^^^^^
 
@@ -38,6 +50,12 @@ hashCode
 ^^^^^^^^
 
 .. java:method:: @Override public int hashCode()
+   :outertype: Position
+
+orientTowardsInDeg
+^^^^^^^^^^^^^^^^^^
+
+.. java:method:: public double orientTowardsInDeg(Position target)
    :outertype: Position
 
 toString

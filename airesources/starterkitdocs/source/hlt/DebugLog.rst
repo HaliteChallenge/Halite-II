@@ -5,31 +5,17 @@
 DebugLog
 ========
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class DebugLog
 
-Fields
-------
-file
-^^^^
-
-.. java:field::  FileWriter file
-   :outertype: DebugLog
-
-instance
-^^^^^^^^
-
-.. java:field:: static DebugLog instance
-   :outertype: DebugLog
-
 Methods
 -------
-debug
-^^^^^
+addLog
+^^^^^^
 
-.. java:method:: static void debug(String message)
+.. java:method:: public static void addLog(String message)
    :outertype: DebugLog
 
 initialize

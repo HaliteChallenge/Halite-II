@@ -1,19 +1,13 @@
 Constants
 =========
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class Constants
 
 Fields
 ------
-ADDITIONAL_PRODUCTIVITY
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:field:: public static final int ADDITIONAL_PRODUCTIVITY
-   :outertype: Constants
-
 BASE_PRODUCTIVITY
 ^^^^^^^^^^^^^^^^^
 
@@ -24,12 +18,6 @@ BASE_SHIP_HEALTH
 ^^^^^^^^^^^^^^^^
 
 .. java:field:: public static final short BASE_SHIP_HEALTH
-   :outertype: Constants
-
-DOCKED_SHIP_REGENERATION
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:field:: public static final short DOCKED_SHIP_REGENERATION
    :outertype: Constants
 
 DOCK_RADIUS
@@ -44,28 +32,28 @@ DOCK_TURNS
 .. java:field:: public static final int DOCK_TURNS
    :outertype: Constants
 
-DRAG
-^^^^
-
-.. java:field:: public static final double DRAG
-   :outertype: Constants
-
 EXPLOSION_RADIUS
 ^^^^^^^^^^^^^^^^
 
 .. java:field:: public static final double EXPLOSION_RADIUS
    :outertype: Constants
 
-EXTRA_PLANETS
-^^^^^^^^^^^^^
+FORECAST_FUDGE_FACTOR
+^^^^^^^^^^^^^^^^^^^^^
 
-.. java:field:: public static final int EXTRA_PLANETS
+.. java:field:: public static final double FORECAST_FUDGE_FACTOR
    :outertype: Constants
 
-MAX_ACCELERATION
-^^^^^^^^^^^^^^^^
+MAXIMUM_NUMBER_OF_PLAYERS
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:field:: public static final int MAX_ACCELERATION
+.. java:field:: public static final short MAXIMUM_NUMBER_OF_PLAYERS
+   :outertype: Constants
+
+MAX_CORRECTIONS
+^^^^^^^^^^^^^^^
+
+.. java:field:: public static final int MAX_CORRECTIONS
    :outertype: Constants
 
 MAX_SHIP_HEALTH
@@ -77,25 +65,7 @@ MAX_SHIP_HEALTH
 MAX_SPEED
 ^^^^^^^^^
 
-.. java:field:: public static final double MAX_SPEED
-   :outertype: Constants
-
-PLANETS_PER_PLAYER
-^^^^^^^^^^^^^^^^^^
-
-.. java:field:: public static final int PLANETS_PER_PLAYER
-   :outertype: Constants
-
-PRODUCTION_PER_SHIP
-^^^^^^^^^^^^^^^^^^^
-
-.. java:field:: public static final int PRODUCTION_PER_SHIP
-   :outertype: Constants
-
-RESOURCES_PER_RADIUS
-^^^^^^^^^^^^^^^^^^^^
-
-.. java:field:: public static final int RESOURCES_PER_RADIUS
+.. java:field:: public static final int MAX_SPEED
    :outertype: Constants
 
 SHIP_RADIUS

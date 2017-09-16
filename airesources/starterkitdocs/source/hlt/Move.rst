@@ -1,31 +1,17 @@
 Move
 ====
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class Move
-
-Fields
-------
-ship
-^^^^
-
-.. java:field:: protected Ship ship
-   :outertype: Move
-
-type
-^^^^
-
-.. java:field:: protected MoveType type
-   :outertype: Move
 
 Constructors
 ------------
 Move
 ^^^^
 
-.. java:constructor:: public Move()
+.. java:constructor:: public Move(MoveType type, Ship ship)
    :outertype: Move
 
 Methods

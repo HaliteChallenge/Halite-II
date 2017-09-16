@@ -1,7 +1,21 @@
+.. java:import:: java.util ArrayList
+
+.. java:import:: java.util List
+
+.. java:import:: java.util Map
+
+.. java:import:: java.util TreeMap
+
+.. java:import:: java.util Collections
+
+.. java:import:: java.util Collection
+
+.. java:import:: java.util LinkedList
+
 GameMap
 =======
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class GameMap
@@ -16,22 +30,22 @@ GameMap
 
 Methods
 -------
-adjustForCollision
-^^^^^^^^^^^^^^^^^^
+getAllPlanets
+^^^^^^^^^^^^^
 
-.. java:method:: public ThrustMove.Pair adjustForCollision(Position start, double angle, short thrust)
+.. java:method:: public Map<Long, Planet> getAllPlanets()
    :outertype: GameMap
 
-adjustForCollision
-^^^^^^^^^^^^^^^^^^
+getAllPlayers
+^^^^^^^^^^^^^
 
-.. java:method:: public ThrustMove.Pair adjustForCollision(Position start, double angle, short thrust, int tries)
+.. java:method:: public List<Player> getAllPlayers()
    :outertype: GameMap
 
-getClosestPoint
-^^^^^^^^^^^^^^^
+getAllShips
+^^^^^^^^^^^
 
-.. java:method:: public Position getClosestPoint(Position start, Position target, short radius)
+.. java:method:: public List<Ship> getAllShips()
    :outertype: GameMap
 
 getHeight
@@ -58,18 +72,6 @@ getPlanet
 .. java:method:: public Planet getPlanet(long entityId)
    :outertype: GameMap
 
-getPlanets
-^^^^^^^^^^
-
-.. java:method:: public Map<Long, Planet> getPlanets()
-   :outertype: GameMap
-
-getPlayers
-^^^^^^^^^^
-
-.. java:method:: public List<Player> getPlayers()
-   :outertype: GameMap
-
 getShip
 ^^^^^^^
 
@@ -82,21 +84,21 @@ getWidth
 .. java:method:: public short getWidth()
    :outertype: GameMap
 
-isPathable
-^^^^^^^^^^
+nearbyEntitiesByDistance
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public boolean isPathable(Position start, Position target)
+.. java:method:: public Map<Double, Entity> nearbyEntitiesByDistance(Entity entity)
    :outertype: GameMap
 
-positionDelta
-^^^^^^^^^^^^^
+objectsBetween
+^^^^^^^^^^^^^^
 
-.. java:method:: public Position positionDelta(Position originalPosition, Position deltaPosition)
+.. java:method:: public ArrayList<Entity> objectsBetween(Position start, Position target)
    :outertype: GameMap
 
 updateMap
 ^^^^^^^^^
 
-.. java:method::  GameMap updateMap(LinkedList<String> mapMetadata)
+.. java:method:: public GameMap updateMap(LinkedList<String> mapMetadata)
    :outertype: GameMap
 
