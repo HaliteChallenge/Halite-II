@@ -1,35 +1,27 @@
-halitejavabot
-=============
+hlt
+===
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
 
 .. toctree::
    :maxdepth: 1
 
-   Behavior
-   Behavior-BehaviorType
-   Behavior-State
-   BehaviorManager
    Collision
    Constants
    DebugLog
    DockMove
    Entity
-   Entity-Type
-   EntityId
    GameMap
+   MetadataParser
    Move
    Move-MoveType
-   Movement
-   MyBot
+   Navigation
    Networking
    Planet
    Player
    Position
    Ship
    Ship-DockingStatus
-   Ship-Velocity
    ThrustMove
-   ThrustMove-Pair
    UndockMove
 

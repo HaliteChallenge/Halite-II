@@ -1,9 +1,7 @@
-.. java:import:: java.util LinkedList
-
 Ship
 ====
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class Ship extends Entity
@@ -13,11 +11,17 @@ Constructors
 Ship
 ^^^^
 
-.. java:constructor:: public Ship(short owner, LinkedList<String> shipMetadata)
+.. java:constructor:: public Ship(short owner, long id, double xPos, double yPos, short health, DockingStatus dockingStatus, long dockedPlanet, short dockingProgress, short weaponCooldown)
    :outertype: Ship
 
 Methods
 -------
+canDock
+^^^^^^^
+
+.. java:method:: public boolean canDock(Planet planet)
+   :outertype: Ship
+
 getDockedPlanet
 ^^^^^^^^^^^^^^^
 
@@ -36,21 +40,9 @@ getDockingStatus
 .. java:method:: public DockingStatus getDockingStatus()
    :outertype: Ship
 
-getVelocity
-^^^^^^^^^^^
-
-.. java:method:: public Velocity getVelocity()
-   :outertype: Ship
-
 getWeaponCooldown
 ^^^^^^^^^^^^^^^^^
 
 .. java:method:: public short getWeaponCooldown()
-   :outertype: Ship
-
-parseShips
-^^^^^^^^^^
-
-.. java:method:: static LinkedList<Ship> parseShips(short owner, LinkedList<String> shipsMetadata)
    :outertype: Ship
 

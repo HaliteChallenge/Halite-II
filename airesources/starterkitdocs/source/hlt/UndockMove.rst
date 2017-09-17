@@ -1,7 +1,7 @@
 UndockMove
 ==========
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class UndockMove extends Move

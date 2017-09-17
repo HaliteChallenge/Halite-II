@@ -1,9 +1,7 @@
-.. java:import:: java.util LinkedList
-
 Ship.DockingStatus
 ==================
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public enum DockingStatus

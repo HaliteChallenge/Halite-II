@@ -5,7 +5,7 @@
 Player
 ======
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public class Player

@@ -1,7 +1,7 @@
 Move.MoveType
 =============
 
-.. java:package:: halitejavabot
+.. java:package:: hlt
    :noindex:
 
 .. java:type:: public enum MoveType
