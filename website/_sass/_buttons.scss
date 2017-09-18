@@ -54,6 +54,8 @@
   background-repeat: no-repeat;
   height: 38px;
   width: 200px;
+  line-height: 38px;
+  display: inline-block;
   text-align: center;
   font-family: 'Teko';
   color: #30242F;
@@ -63,13 +65,21 @@
   background-color: transparent;
   font-weight: 600;
   border: none;
+  &:hover{
+    color: #30242F;
+    text-decoration: none;
+  }
   &-lg{
     height: 55px;
+    line-height: 55px;
     width: 234px;
     font-size: 24px;
   }
   &-clear{
     background-image: url("/assets/images/button-clear.png");
     color: $yellow;
+    &:hover{
+      color: $yellow;
+    }
   }
 }

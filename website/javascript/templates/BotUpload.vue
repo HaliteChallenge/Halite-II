@@ -31,10 +31,10 @@
     <div class="upload-state" v-else>
         <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
         <h2>Success!</h2>
-        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
+        <p class="upload-state-desc">Your bot: {{botFile.name}} <br>New name: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
         <div class="upload-state-buttons">
-          <button class="btn-ha btn-ha-clear btn-ha-lg">Watch Halite TV</button>
-          <button class="btn-ha btn-ha-lg">See your result</button>
+          <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a>
+          <a class="btn-ha btn-ha-lg" href="/user?me">See your result</a>
         </div>
       </div>
   </div>
@@ -42,6 +42,7 @@
 
 <script>
   import * as api from "../api";
+  import _ from 'lodash';
 
   export default{
     name: "BotUpload",
@@ -69,7 +70,8 @@
         baseUrl: _global.baseUrl,
         selectedBot: null,
         uploadProgress: 0,
-        errorMessage: ""
+        errorMessage: "",
+        getStatusDelay: 3000,
       };
     },
     mounted: function(){
@@ -133,12 +135,30 @@
           console.log('success');
           this.enableMessage('success', "Your bot has been submitted");
           this.view = this.viewList.SUBMITTED;
+          this.checkBotStatus();
         }, (error) => {
           console.log('error');
           this.view = this.viewList.UPLOAD;
           this.enableMessage('error', error.message);
           this.errorMessage = error.message;
         });
+      },
+      checkBotStatus: function(){
+        const botId = this.botId;
+        let t = null;
+        const fetch = () => {
+          t = setTimeout(() => {
+            api.list_bots(this.user.user_id).then((bots) => {
+              const bot = _.find(bots, (i) => (i.bot_id === botId));
+              if (bot.compilation_status == 'Successful'){
+                this.view = this.viewList.SUCCESS;
+              } else {
+                fetch();
+              }
+            });
+          }, this.getStatusDelay);
+        }
+        fetch();
       }
     }
   }
