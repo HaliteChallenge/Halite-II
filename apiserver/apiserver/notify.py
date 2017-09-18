@@ -52,7 +52,7 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
     mail = sendgrid.helpers.mail.Mail()
 
     if not recipient.organization:
-        recipient.organization = "(no affiliation)"
+        recipient = recipient._replace(organization="(no affiliation)")
 
     mail.from_email = sendgrid.Email("halite@halite.io", "Halite Challenge")
     personalization = sendgrid.helpers.mail.Personalization()
