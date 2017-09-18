@@ -285,9 +285,23 @@
   import SelectedShip from "./SelectedShip.vue";
   import _ from "lodash";
 
-  libhaliteviz.setAssetRoot("/assets/js/");
+  // libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
 
+  // just for electron
+  if (window && window.process && window.process.type){
+      console.log("Running in electron");
+      libhaliteviz.setAssetRoot("assets/js/");
+  }
+  else{
+      console.log("Not running in electron");
+      libhaliteviz.setAssetRoot("/assets/js/");
+  }
+  const loadGame = (game) => {
+    const buffer = game.replay;
+    return libhaliteviz.parseReplay(buffer)
+  }
+  
   export default {
     name: 'haliteTV',
     props: ['game', 'replay', 'makeUserLink', 'getUserProfileImage'],
