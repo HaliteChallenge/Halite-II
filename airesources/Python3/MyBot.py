@@ -47,7 +47,9 @@ while True:
                 # with constant speed. Don't worry about pathfinding for now, as the command will do it for you.
                 # We run this navigate command each turn until we arrive to get the latest move.
                 # Here we move at half our maximum speed to better control the ships
-                navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=hlt.constants.MAX_SPEED/2)
+                # Angular step is used here such that we only try every 3rd degree to run faster. If we want 
+                # better granularity, we can set it to 1, but it should run slower.
+                navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=hlt.constants.MAX_SPEED/2, angular_step=3)
                 # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
                 # or we are trapped (or we reached our destination!), navigate_command will return null;
                 # don't fret though, we can run the command again the next turn)
