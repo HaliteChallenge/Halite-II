@@ -170,7 +170,8 @@ def update_compilation_status():
                     "version_number": bot["version_number"],
                     "detected_language": language,
                 },
-                config.GOODNEWS_ACCOMPLISHMENTS
+                config.GOODNEWS_ACCOMPLISHMENTS,
+                config.C_COMPLIATION_SUCCESS
             )
 
             return util.response_success()
@@ -185,6 +186,7 @@ def update_compilation_status():
                     "detected_language": language,
                     "errors": errors,
                 },
-                config.GAME_ERROR_MESSAGES
+                config.GAME_ERROR_MESSAGES,
+                config.C_COMPILATION_ERROR
             )
             return util.response_success()
