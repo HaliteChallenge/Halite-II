@@ -5,8 +5,19 @@
     }
   }
 
-  .page-description {
-    text-align: left;
-    padding: 0px;
+  .create-account-form{
+    .form-control{
+      max-width: 360px;
+    }
+  }
+
+  h2{
+    font-family: $font-heading;
+    font-size: 28px;
+    color: #63CECA;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 30px;
+    margin-bottom: 20px;
   }
 }

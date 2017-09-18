@@ -48,3 +48,25 @@
 .tab-pane{
   padding: 30px 0;
 }
+
+.list-ha{
+  padding-left: 0;
+  li{
+    display: block;
+    padding: 15px 0;
+    position: relative;
+    a{
+      padding: 5px 15px;
+      font-family: $font-heading;
+      font-size: 20px;
+      color: #858E92;
+      text-transform: uppercase;
+    }
+    &.active{
+      a{
+        background: rgba(255, 190, 0, 0.1);
+        color: $yellow;
+      }
+    }
+  }
+}
