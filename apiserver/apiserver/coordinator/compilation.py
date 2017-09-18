@@ -3,7 +3,7 @@ import datetime
 import flask
 import sqlalchemy
 
-from .. import badge_util, config, model, notify, util
+from .. import config, model, notify, util
 
 from .blueprint import coordinator_api
 
@@ -154,32 +154,6 @@ def update_compilation_status():
                     version_number=model.bots.c.version_number + 1,
                     games_played=0,
                 )
-            )
-
-            # Check if submission badges should be awarded
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_1_BADGE, 
-                submissions_count=1,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_10_BADGE, 
-                submissions_count=10,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_20_BADGE, 
-                submissions_count=20,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_50_BADGE, 
-                submissions_count=50,
-                version_number=bot["version_number"] + 1
             )
 
             bot = conn.execute(model.bots.select().where(

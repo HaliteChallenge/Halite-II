@@ -8,7 +8,7 @@ import arrow
 import flask
 import sqlalchemy
 
-from .. import badge_util, model, util
+from .. import model, util
 
 from . import util as api_util
 from .blueprint import web_api
@@ -50,7 +50,7 @@ hackathon_query = sqlalchemy.sql.select([
 
 
 @web_api.route("/hackathon", methods=["GET"])
-@api_util.requires_login(accept_key=True, admin=True, accept_local=True)
+@api_util.requires_login(accept_key=True, admin=True)
 def list_hackathons(*, user_id):
     result = []
     offset, limit = api_util.get_offset_limit()
@@ -126,9 +126,6 @@ def create_hackathon(*, user_id):
             verification_code=verification_code,
             organization_id=organization_id,
         )).inserted_primary_key[0]
-
-        # Add badges for first three places to db
-        badge_util.init_hackathon_badges(title, hackathon_id)
 
         return util.response_success({
             "hackathon_id": hackathon_id,
@@ -213,9 +210,6 @@ def update_hackathon(hackathon_id, *, user_id):
                 model.hackathons.c.id == hackathon_id
             ))
 
-            if values.get('title'):
-                badge_util.update_hackathon_badges(values.get('title'), hackathon_id)
-
         return util.response_success({
             "hackathon_id": hackathon_id,
             "updated_values": values,
@@ -224,10 +218,10 @@ def update_hackathon(hackathon_id, *, user_id):
 
 @web_api.route("/hackathon/<int:hackathon_id>/leaderboard", methods=["GET"])
 @util.cross_origin(methods=["GET"])
-@api_util.requires_login(accept_key=True, accept_local=True)
+@api_util.requires_login(accept_key=True)
 def get_hackathon_leaderboard(hackathon_id, *, user_id):
     with model.engine.connect() as conn:
-        if user_id and not can_view_hackathon(user_id, hackathon_id, conn):
+        if not can_view_hackathon(user_id, hackathon_id, conn):
             raise util.APIError(404)
 
         table = model.hackathon_ranked_bots_users_query(hackathon_id)
