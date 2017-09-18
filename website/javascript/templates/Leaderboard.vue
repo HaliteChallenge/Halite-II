@@ -54,7 +54,7 @@
             <tbody>
                 <tr v-for="player in leaderboard">
                     <td>{{ player.rank }}</td>
-                    <td><a :href="'user?user_id=' + player.user_id">{{ player.username }}</a></td>
+                    <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
                     <td>{{ Math.round(100 * player.score) / 100 }}</td>
                     <td>
                         <span :class="tierClass(player.tier)"></span>
