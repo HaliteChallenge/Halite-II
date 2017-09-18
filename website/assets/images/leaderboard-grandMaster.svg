@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>Page 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Hackathon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="04_Hackathon-Return" transform="translate(-74.000000, -2179.000000)" stroke="#63CECA" stroke-width="2">
+            <g id="6" transform="translate(35.000000, 1840.000000)">
+                <g id="Group-8" transform="translate(0.000000, 300.000000)">
+                    <g id="Group-6" transform="translate(40.000000, 36.000000)">
+                        <g id="Page-1" transform="translate(0.000000, 4.000000)">
+                            <path d="M7,0 L7,9 C7,13.419 10.581,17 15,17 C19.419,17 23,13.419 23,9 L23,0 L7,0 Z" id="Stroke-1"></path>
+                            <path d="M15,13 C12.794,13 11,11.205 11,9 L11,4" id="Stroke-3"></path>
+                            <path d="M15,22.5 L15,30" id="Stroke-5"></path>
+                            <path d="M6,30 L24,30" id="Stroke-7"></path>
+                            <path d="M26,2 L30,2 L30,4 C30,6.209 28.208,8 26,8" id="Stroke-9"></path>
+                            <path d="M4,2 L0,2 L0,4 C0,6.209 1.792,8 4,8" id="Stroke-11"></path>
+                            <path d="M12,20 C12,21.657 13.343,23 15,23 C16.657,23 18,21.657 18,20" id="Stroke-13"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

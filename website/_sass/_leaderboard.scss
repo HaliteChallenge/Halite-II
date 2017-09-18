@@ -1,0 +1,118 @@
+.leaderboard-container {
+    $o-color: #E37222;
+    $w-color: #FFFFFF;
+    $g-color: #9d9d9d;
+  
+    .c-org{
+      color: $o-color;
+    }
+    .c-wht{
+      color: $w-color;
+    }
+    .c-gry{
+      color: $g-color;
+    }
+    .c-yel{
+      color: $yellow;
+    }
+  
+    .d1{
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    .t1{
+      font-size: 6rem;
+      letter-spacing: 2px;
+    }
+    .t2{
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+    }
+    .t3{
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+    }
+    .t4{
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    .mgt-10{
+      margin-top: 10px;
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+
+        .filter-handler {
+            display: table;
+
+            .handler-item {
+                display: table-cell;
+                background-color: #000;
+                line-height: 38px;
+                padding: 0 10px;
+
+                .handler-item-img {
+                    vertical-align: baseline;
+                    cursor: pointer;
+                }
+                .handler-item-text {
+                    margin-left: 10px;
+                }
+            }
+        }
+    }
+
+    .leaderboard-filter-form {
+        .filter-group {
+            margin: 20px 0;
+        }
+
+        .form-control {
+            margin-right: 15px;
+        }
+
+        .ipt-username {
+            width: 370px;
+        }
+
+        .slt {
+            width: 220px;
+        }
+
+    }
+
+    .leaderboard-summary {
+        display: table;
+        width: 100%;
+        text-align: center;
+        background-color: #1C1A27;
+        padding: 20px 0;
+        margin-bottom: 5px;
+
+        .leaderboard-summary-item {
+            display: table-cell;
+
+            img {
+                display: inline-block;
+                vertical-align: top;
+                margin-top: 8px;
+            }
+
+            div {
+                display: inline-block;
+
+                p {
+                    text-align: left;
+                    margin: 0 0 0 10px;
+                }
+            }
+        }
+    }
+
+    .leaderboard-page {
+        margin: 30px 0 50px;
+    }
+}

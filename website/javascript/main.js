@@ -49,7 +49,7 @@ window.views = {
     Leaderboard: function () {
         new Vue({
             el: "#leaderboard-container",
-            render: (h) => h(Leaderboard),
+            render: (h) => h(Leaderboard, {props: {baseUrl: _global.baseUrl}}),
         });
     },
     Upload: function () {

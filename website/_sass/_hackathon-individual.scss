@@ -126,4 +126,20 @@
       max-width: 440px;
     }
   }
+
+  .hackathon-leaderboard {
+    position: relative;
+
+    .leaderboard-header {
+      text-align: center;
+      padding: 50px 0 30px;
+
+      .hackathon-title {
+        display: inline-block;
+        position: relative;
+        text-align: center;
+      }
+    }
+
+  }
 }

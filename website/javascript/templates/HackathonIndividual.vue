@@ -119,10 +119,18 @@
       </div>
     </section>
 
-    <section class="hackathon-video"></section>
+    <section class="hackathon-video">
+    </section>
 
     <section class="hackathon-leaderboard">
-      <Leaderboard></Leaderboard>
+      <i class="xline xline-top"></i>
+      <div class="leaderboard-header">
+        <div class="hackathon-title">
+          <i class="xline xline-bottom"></i>
+          <p class="t2 c-wht font-headline">CURRENT HACKATHON LEADERBOARD</p>
+        </div>
+      </div>
+      <Leaderboard :baseUrl="baseUrl"></Leaderboard>
     </section>
 
   </section>
@@ -182,7 +190,7 @@
             return Promise.resolve();
           }, (xhr) => {
             console.log(xhr);
-            console.log('Cannot get hackathon info.')
+            this.path.push({name: this.hackathon.title, link: 'javascript:;'});
           });
         } else {
           return Promise.resolve();
@@ -191,9 +199,9 @@
 
       api.me().then((me) => {
         console.log(me);
-        getHackathonPromise().then((hackathon) => {
+        getHackathonPromise().then(() => {
           this.path.push({name: this.hackathon.title, link: 'javascript:;'});
-        });
+        })
       });
 
       

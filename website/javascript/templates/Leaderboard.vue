@@ -1,13 +1,44 @@
 <template>
-    <div>
-        <form v-on:submit="update_filter">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Find username" v-model="username_filter" />
-                <span class="input-group-btn">
-                    <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button>
-                </span>
-            </div><!-- /input-group -->
+    <div class="leaderboard-container">
+        <form class="leaderboard-filter-form" v-on:submit="update_filter">
+            <div class="form-header">
+                <i class="xline xline-bottom"></i>
+                <p class="t2 c-wht font-headline">FILTER</p>
+                <div class="filter-handler">
+                    <div class="handler-item">
+                        <img class="handler-item-img" :src="`${baseUrl}/assets/images/simple-remove.svg`"/>
+                        <span class="handler-item-text">Clear all</span>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="input-group">
+                    <input type="text" class="form-control ipt-username" placeholder="Search a user name" v-model="username_filter" />
+                    <select class="form-control slt">
+                        <option value="" disabled selected>Tier</option>
+                    </select> 
+                    <select class="form-control slt">
+                        <option value="" disabled selected>Organization</option>
+                    </select> 
+                    <select class="form-control slt">
+                        <option value="" disabled selected>Country</option>
+                    </select> 
+                    <span class="input-group-btn">
+                        <!-- <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button> -->
+                        <button class="btn"><span>APPLY FILTER</span></button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
         </form>
+        <div class="leaderboard-summary">
+            <div class="leaderboard-summary-item" v-for="s in summary">
+                <img :src="s.img" />
+                <div>
+                    <p>{{s.number}}</p>
+                    <p>{{s.name}}</p>
+                </div>
+            </div>
+        </div>
         <table class="table table-leader">
             <thead>
                 <tr>
@@ -34,19 +65,58 @@
                 </tr>
             </tbody>
         </table>
+        <div class="leaderboard-page">
+            <HalitePagination :page="this.page" :lastPage="this.lastPage" :baseUrl="this.baseUrl"/>
+        </div>
+        </div>
     </div>
 </template>
 
 <script>
     import * as api from "../api";
+    import HalitePagination from './Pagination.vue';
     import {tierClass} from "../utils";
 
     export default {
         name: "leaderboard",
+        props: ['baseUrl'],
+        components: {
+            HalitePagination
+        },
         data: function() {
             return {
                 leaderboard: [],
                 username_filter: "",
+                page: 1,
+                limit: 5,
+                lastPage: 0,
+                summary: [
+                    {
+                        img: `${this.baseUrl}/assets/images/leaderboard-grandMaster.svg`,
+                        number: 23,
+                        name: 'GrandMaster'
+                    },
+                    {
+                        img: `${this.baseUrl}/assets/images/leaderboard-master.svg`,
+                        number: 23,
+                        name: 'Master'
+                    },
+                    {
+                        img: `${this.baseUrl}/assets/images/leaderboard-professional.svg`,
+                        number: 23,
+                        name: 'Professional'
+                    },
+                    {
+                        img: `${this.baseUrl}/assets/images/leaderboard-universityStudents.svg`,
+                        number: 23,
+                        name: 'University Students'
+                    },
+                    {
+                        img: `${this.baseUrl}/assets/images/leaderboard-highSchoolStudents.svg`,
+                        number: 23,
+                        name: 'High School Students'
+                    }
+                ]
             };
         },
         mounted: function() {
@@ -61,8 +131,14 @@
                 if (this.username_filter.length > 0) {
                     filters = "username,=," + this.username_filter;
                 }
-
-                api.leaderboard(filters).then((leaderboard) => {
+                if(this.lastPage <= 0) {
+                    api.leaderboard(filters).then(leaderboard => {
+                        if(leaderboard && leaderboard instanceof Array) {
+                            this.lastPage = Math.ceil(leaderboard.length / this.limit)
+                        }
+                    })
+                }
+                api.leaderboard(filters, null, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
                     this.leaderboard = leaderboard;
                 });
             }

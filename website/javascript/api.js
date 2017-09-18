@@ -159,12 +159,15 @@ export function get_replay(game_id, progress_callback) {
     });
 }
 
-export function leaderboard(filters, hackathon=null) {
+export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
     let url = `${API_SERVER_URL}/leaderboard`;
     let fields = {};
     if (hackathon) {
         url = `${API_SERVER_URL}/hackathon/${hackathon}/leaderboard`;
         fields.withCredentials = true;
+    }
+    if(offset !== null && limit !== null) {
+        url += `?offset=${offset}&limit=${limit}`
     }
     return $.get({
         url: url,
