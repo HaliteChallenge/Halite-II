@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 import os.path
 import glob
 import json
@@ -8,6 +9,9 @@ import shutil
 import subprocess
 import tempfile
 import traceback
+import logging
+import uuid
+import socket
 
 from time import sleep, gmtime, strftime
 
@@ -16,6 +20,8 @@ import backend
 import compiler
 import util
 
+# Log it real good
+LOG_FILENAME = "worker-log-{}.data".format(uuid.uuid4())
 
 # Where to create temporary directories
 TEMP_DIR = os.getcwd()
@@ -61,7 +67,7 @@ def give_ownership(top_dir, group, dir_perms):
 
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
-    print("Compiling a bot with userID %s\n" % str(user_id))
+    logging.debug("Compiling a bot with userID %s\n" % str(user_id))
 
     errors = []
 
@@ -106,12 +112,12 @@ def executeCompileTask(user_id, bot_id, backend):
             didCompile = False
 
         if didCompile:
-            print("Bot did compile\n")
+            logging.debug("Bot did compile\n")
             archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
             backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
         else:
-            print("Bot did not compile\n")
-            print("Bot errors %s\n" % str(errors))
+            logging.debug("Bot did not compile\n")
+            logging.debug("Bot errors %s\n" % str(errors))
 
         # Remove files as bot user (Python will clean up tempdir, but we don't
         # necessarily have permissions to clean up files)
@@ -175,14 +181,14 @@ def runGame(width, height, users):
             command.append("{} v{}".format(user["username"],
                                            user["version_number"]))
 
-        print("Run game command %s\n" % command)
-        print("Waiting for game output...\n")
+        logging.debug("Run game command %s\n" % command)
+        logging.debug("Waiting for game output...\n")
         lines = subprocess.Popen(
             command,
             stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
-        print("\n-----Here is game output: -----")
-        print("\n".join(lines))
-        print("--------------------------------\n")
+        logging.debug("\n-----Here is game output: -----")
+        logging.debug("\n".join(lines))
+        logging.debug("--------------------------------\n")
         # tempdir will automatically be cleaned up, but we need to do things
         # manually because the bot might have made files it owns
         for user_index, user in enumerate(users):
@@ -201,7 +207,7 @@ def runGame(width, height, users):
 def parseGameOutput(output, users):
     users = copy.deepcopy(users)
 
-    print(output)
+    logging.debug(output)
     result = json.loads(output)
 
     for player_tag, stats in result["stats"].items():
@@ -221,8 +227,8 @@ def parseGameOutput(output, users):
 
 def executeGameTask(width, height, users, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
-    print("Running game with width %d, height %d\n" % (width, height))
-    print("Users objects %s\n" % (str(users)))
+    logging.debug("Running game with width %d, height %d\n" % (width, height))
+    logging.debug("Users objects %s\n" % (str(users)))
 
     raw_output = '\n'.join(runGame(width, height, users))
     users, parsed_output = parseGameOutput(raw_output, users)
@@ -238,26 +244,34 @@ def executeGameTask(width, height, users, backend):
     # Make sure game processes exit
     subprocess.run(["pkill", "--signal", "9", "-f", "cgexec"])
 
+def _set_logging():
+    logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO)
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
+    logging.getLogger('requests').setLevel(logging.CRITICAL)
+    outLog = logging.StreamHandler(sys.stdout)
+    outLog.setLevel(logging.DEBUG)
+    outLog.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s'))
+    logging.getLogger().addHandler(outLog)
+
 if __name__ == "__main__":
-    print("Starting up worker...\n\n\n")
+    logging.info("Starting up worker at {}".format(socket.gethostname()))
     while True:
         try:
-            print("\n\n\nQuerying for new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
+            logging.debug("\n\n\nQuerying for new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
             task = backend.getTask()
             if "type" in task and (task["type"] == "compile" or task["type"] == "game"):
-                print("Got new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
-                print("Task object %s\n" % str(task))
+                logging.debug("Got new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
+                logging.debug("Task object %s\n" % str(task))
                 if task["type"] == "compile":
-                    print("Running a compilation task...\n")
+                    logging.debug("Running a compilation task...\n")
                     executeCompileTask(task["user"], task["bot"], backend)
                 else:
-                    print("Running a game task...\n")
+                    logging.debug("Running a game task...\n")
                     executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
             else:
-                print("No task available at time %s (GMT). Sleeping...\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
+                logging.debug("No task available at time %s (GMT). Sleeping...\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
         except Exception as e:
-            print("Error on get task %s\n" % str(e))
-            traceback.print_exc()
-            print("Sleeping...\n")
+            logging.exception("Error on get task %s\n" % str(e))
 
+		logging.debug("Sleeping...\n")
         sleep(random.randint(4, 10))
