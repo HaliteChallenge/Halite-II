@@ -40,7 +40,7 @@ def send_notification(recipient_email, recipient_name, subject, body,
     response = sg.client.mail.send.post(request_body=mail.get())
 
 
-def send_templated_notification(recipient, template_id, substitutions, group_id):
+def send_templated_notification(recipient, template_id, substitutions, group_id, category):
     """
     Send an email based on a template.
     :param Recipient recipient: The recipient of the email
@@ -67,6 +67,7 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
     mail.add_personalization(personalization)
     mail.template_id = template_id
     mail.asm = sendgrid.helpers.mail.ASM(group_id, [config.GOODNEWS_ACCOMPLISHMENTS, config.GAME_ERROR_MESSAGES, config.RESEARCH_EMAILS, config.NEWSLETTERS_ARTICLES])
+    mail.add_category(sendgrid.helpers.mail.Category(category))
     settings = sendgrid.helpers.mail.MailSettings()
     settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
     mail.mail_settings = settings
@@ -75,7 +76,7 @@ def send_templated_notification(recipient, template_id, substitutions, group_id)
     print(response.status_code)
 
 
-def send_templated_notification_simple(email, template_id, group_id):
+def send_templated_notification_simple(email, template_id, group_id, category):
     """
     Send an email based on a template.
     :param str email: The email recipient
@@ -92,6 +93,7 @@ def send_templated_notification_simple(email, template_id, group_id):
     mail.add_personalization(personalization)
     mail.template_id = template_id
     mail.asm = sendgrid.helpers.mail.ASM(group_id, [config.GOODNEWS_ACCOMPLISHMENTS, config.GAME_ERROR_MESSAGES, config.RESEARCH_EMAILS, config.NEWSLETTERS_ARTICLES])
+    mail.add_category(sendgrid.helpers.mail.Category(category))
     settings = sendgrid.helpers.mail.MailSettings()
     settings.sandbox_mode = sendgrid.helpers.mail.SandBoxMode(config.SENDGRID_SANDBOX_MODE)
     mail.mail_settings = settings

@@ -105,7 +105,8 @@ def send_verification_email(recipient, verification_code):
                 "verification_code": verification_code,
             }),
         },
-        config.GOODNEWS_ACCOMPLISHMENTS
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_EMAIL_VERIFICATION
     )
 
 
@@ -120,7 +121,8 @@ def send_confirmation_email(recipient):
         recipient,
         config.CONFIRMATION_TEMPLATE,
         {},
-        config.GOODNEWS_ACCOMPLISHMENTS
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_REGISTRATION_CONFIRMATION
     )
 
 
@@ -439,7 +441,8 @@ def add_subscriber(recipient):
     notify.send_templated_notification_simple(
         recipient,
         config.NEW_SUBSCRIBER_TEMPLATE,
-        config.GOODNEWS_ACCOMPLISHMENTS)
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_NEWSLETTER_SUBSCRIPTION)
     return util.response_success()
 
 @web_api.route("/api_key", methods=["POST"])
