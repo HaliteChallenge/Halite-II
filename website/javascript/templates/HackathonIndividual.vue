@@ -71,7 +71,12 @@
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-1.png`" alt="how to join">
+                  <!-- <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-1.png`" alt="how to join"> -->
+                  <div class="step-form">
+                    <p class="t2 c-wht font-headline">AUTHENTICATE YOUR EMAIL</p>
+                    <input type="text" class="form-control tall-ipt" placeholder="School Email" />
+                    <input type="text" class="form-control tall-ipt" placeholder="School Email (Confirm)" />
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -130,7 +135,7 @@
           <p class="t2 c-wht font-headline">CURRENT HACKATHON LEADERBOARD</p>
         </div>
       </div>
-      <Leaderboard :baseUrl="baseUrl"></Leaderboard>
+      <Leaderboard v-if="hackathon_id" :baseUrl="baseUrl" :hackathonId="hackathon_id"></Leaderboard>
     </section>
 
   </section>
@@ -166,7 +171,7 @@
     data: function() {
       return {
         hackathon_id: null,
-        hackathon: Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`}),
+        hackathon: {},
         path: [
           {
             name: 'Home',
@@ -186,10 +191,15 @@
       const getHackathonPromise = () => {
         if(this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
-            this.hackathon = hackathon;
+            this.hackathon = Object.assign(mockHackathon, {
+              title: hackathon.title,
+              description: hackathon.description,
+              img: `${this.baseUrl}/assets/images/temp/hackathon.png`
+            });
             return Promise.resolve();
           }, (xhr) => {
             console.log(xhr);
+            this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`});
             this.path.push({name: this.hackathon.title, link: 'javascript:;'});
           });
         } else {
@@ -198,7 +208,6 @@
       }
 
       api.me().then((me) => {
-        console.log(me);
         getHackathonPromise().then(() => {
           this.path.push({name: this.hackathon.title, link: 'javascript:;'});
         })

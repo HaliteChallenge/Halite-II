@@ -66,7 +66,12 @@
             </tbody>
         </table>
         <div class="leaderboard-page">
-            <HalitePagination :page="this.page" :lastPage="this.lastPage" :baseUrl="this.baseUrl"/>
+            <HalitePagination 
+                :page="this.page" 
+                :lastPage="this.lastPage" 
+                :baseUrl="this.baseUrl"
+                :changePage="this.changePage"
+            />
         </div>
         </div>
     </div>
@@ -79,7 +84,7 @@
 
     export default {
         name: "leaderboard",
-        props: ['baseUrl'],
+        props: ['baseUrl', 'hackathonId'],
         components: {
             HalitePagination
         },
@@ -88,7 +93,7 @@
                 leaderboard: [],
                 username_filter: "",
                 page: 1,
-                limit: 5,
+                limit: 12,
                 lastPage: 0,
                 summary: [
                     {
@@ -132,14 +137,24 @@
                     filters = "username,=," + this.username_filter;
                 }
                 if(this.lastPage <= 0) {
-                    api.leaderboard(filters).then(leaderboard => {
+                    api.leaderboard(filters, this.hackathonId).then(leaderboard => {
                         if(leaderboard && leaderboard instanceof Array) {
                             this.lastPage = Math.ceil(leaderboard.length / this.limit)
                         }
                     })
                 }
-                api.leaderboard(filters, null, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
+                api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
                     this.leaderboard = leaderboard;
+                });
+            },
+            changePage: function(page) {
+                let filters;
+                if (this.username_filter.length > 0) {
+                    filters = "username,=," + this.username_filter;
+                }
+                api.leaderboard(filters, this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
+                    this.leaderboard = leaderboard;
+                    this.page = page;
                 });
             }
         },

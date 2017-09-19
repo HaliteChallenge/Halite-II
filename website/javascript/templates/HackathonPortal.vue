@@ -1,10 +1,11 @@
 <template>
   <div class="hackathon-container">
-    <div class="hackathon-in-progress-container">
+    <div class="hackathon-in-progress-container" v-show="showHackathonInProgress">
+      <i class="xline xline-bottom"></i>
       <div class="hackathon-title">
         <i class="xline xline-bottom"></i>
         <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
-        <p class="t2 c-wht font-headline">HACKATION IN PROGRESS</p>
+        <p class="t2 c-wht font-headline">HACKATHON IN PROGRESS</p>
       </div>
       <div class="row hackathon-progress-cards">
         <div class="col-md-3" v-for="hackathon in hackathons" @click="jumpToHackathon(hackathon.id)">
@@ -31,8 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="hackathon-events-container">
-      <i class="xline xline-top"></i>
+    <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
         <i class="xline xline-bottom"></i>
         <p class="t2 c-wht font-headline">ALL EVENTS</p>
@@ -72,77 +72,66 @@
 <script>
 import * as api from "../api";
 
+const hackathonTemplate = {
+  pin: 'New York City',
+  time: 'August 3-5',
+  group: 'Open to all',
+};
+
+const eventTemplate = {
+  text: 'Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because…',
+  date: 'Saturday, September 9th',
+  time: '10:00 AM',
+  pin: 'Galvanize NYC, New York'
+}
+
 export default {
   name: "HackathonPortal",
   props: ['baseUrl'],
   data: function() {
     return {
-      hackathons: [
-        {
-          img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
-          title: 'Two Sigma Hackathon',
-          pin: 'New York City',
-          time: 'August 3-5',
-          group: 'Open to all',
-          id: '1'
-        },
-        {
-          img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
-          title: 'Two Sigma Hackathon',
-          pin: 'New York City',
-          time: 'August 3-5',
-          group: 'Open to all',
-          id: '3'
-        },
-        {
-          img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
-          title: 'Two Sigma Hackathon',
-          pin: 'New York City',
-          time: 'August 3-5',
-          group: 'Open to all',
-          id: '2'
-        },
-        {
-          img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
-          title: 'Two Sigma Hackathon',
-          pin: 'New York City',
-          time: 'August 3-5',
-          group: 'Open to all',
-          id: '1'
-        }
-      ],
-      events: [
-        {
-          img: `${this.baseUrl}/assets/images/temp/event-img.png`,
-          title: 'Two Sigma Hackathon',
-          text: 'Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because…',
-          date: 'Saturday, September 9th',
-          time: '10:00 AM',
-          pin: 'Galvanize NYC, New York',
-          id: '1'
-        },
-        {
-          img: `${this.baseUrl}/assets/images/temp/event-img.png`,
-          title: 'Two Sigma Hackathon',
-          text: 'Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because…',
-          date: 'Saturday, September 9th',
-          time: '10:00 AM',
-          pin: 'Galvanize NYC, New York',
-          id: '2'
-        },
-        {
-          img: `${this.baseUrl}/assets/images/temp/event-img.png`,
-          title: 'Two Sigma Hackathon',
-          text: 'Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because…',
-          date: 'Saturday, September 9th',
-          time: '10:00 AM',
-          pin: 'Galvanize NYC, New York',
-          id: '3'
-        }
-      ]
+      showHackathonInProgress: false,
+      showEvents: false,
+      hackathons: [],
+      events: []
     };
   },
   mounted: function() {
+    api.me().then(me => {
+      const userId = me.user_id;
+      if(userId) {
+        api.getUserHackathons(userId).then(hackathons => {
+          if(hackathons && hackathons instanceof Array) {
+            const wrapEvent = [];
+            hackathons.map(hackathon => {
+              const newEvent = Object.assign({}, eventTemplate, {
+                img: `${this.baseUrl}/assets/images/temp/event-img.png`, 
+                title: hackathon.title,
+                id: hackathon.hackathon_id
+              })
+              wrapEvent.push(newEvent);
+            });
+            this.events = wrapEvent;
+
+            if(hackathons.length >= 4) {
+              hackathons = hackathons.slice(0, 4); 
+            } 
+            const wrapHackathon = [];
+            hackathons.map(hackathon => {
+              const newHackathon = Object.assign({}, hackathonTemplate, {
+                img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
+                id: hackathon.hackathon_id,
+                title: hackathon.title
+              });
+              wrapHackathon.push(newHackathon);
+            })
+            this.hackathons = wrapHackathon;
+            this.showHackathonInProgress = true;
+          }
+          this.showEvents = true;
+        })
+      }
+    })
   },
   methods: {
     jumpToHackathon: function(id) {

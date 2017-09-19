@@ -125,6 +125,15 @@
     &-left-col{
       max-width: 440px;
     }
+
+    .step-form {
+      height: 286px;
+      background-color: #1C1A27;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   }
 
   .hackathon-leaderboard {
@@ -141,5 +150,9 @@
       }
     }
 
+  }
+
+  .tall-ipt {
+    height: 56px;
   }
 }

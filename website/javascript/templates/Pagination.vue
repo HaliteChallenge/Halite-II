@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="page-container">
-      <a href="javascript:;"><img :src="`${baseUrl}/assets/images/page-prev.svg`"/></a>
-      <a href="javascript:;">First page</a>
-      <a href="javascript:;" class="underline" v-for="i in pageRange">{{i}}</a>
-      <span>...</span>
-      <a href="javascript:;">Last page</a>
-      <a href="javascript:;"><img :src="`${baseUrl}/assets/images/page-next.svg`"/></a>
+      <a href="javascript:;" @click="updatePage(page - 1)"><img :src="`${baseUrl}/assets/images/page-prev.svg`"/></a>
+      <a href="javascript:;" @click="updatePage(1)">First page</a>
+      <a href="javascript:;" @click="updatePage(i)" :class="page === i? 'underline disabled': 'underline'" v-for="i in pageRange">{{i}}</a>
+      <span v-show="hasMore">...</span>
+      <a href="javascript:;" @click="updatePage(lastPage)">Last page</a>
+      <a href="javascript:;" @click="updatePage(page + 1)"><img :src="`${baseUrl}/assets/images/page-next.svg`"/></a>
     </div>
   </div>
 </template>
@@ -28,16 +28,40 @@
       baseUrl: {
         type: String,
         required: true
+      },
+      changePage: {
+        type: Function,
+        required: true
+      }
+    },
+    data: function() {
+      return {
+        hasMore: false
       }
     },
     computed: {
       pageRange: function () {
         if(this.lastPage <= 6) {
-          return _.range(1, this.lastPage + 1)
+          this.hasMore = false;
+          return _.range(1, this.lastPage + 1);
         } else {
-          // TODO not finish
-          return _.range(1, 7)
+          if(this.page <= 3) {
+            this.hasMore = true;
+            return _.range(1, 7);
+          } else if(this.page >= this.lastPage - 3) {
+            this.hasMore = false;
+            return _.range(this.lastPage - 5, this.lastPage + 1);
+          } else {
+            this.hasMore = true;
+            return _.range(this.page - 2, this.page + 4);
+          }
         }
+      }
+    },
+    methods: {
+      updatePage: function(page) {
+        if(page > this.lastPage || page === this.page) return;
+        this.changePage(page);
       }
     }
   }
@@ -51,11 +75,19 @@
     }
     a {
       margin-right: 10px;
+      color: inherit;
+
+      img {
+        height: 18px;
+      }
     }
   }
 
   .underline {
     text-decoration: underline;
-    cursor: pointer;
+  }
+  .disabled {
+    text-decoration: none;
+    cursor: text;
   }
 </style>
