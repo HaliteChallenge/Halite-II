@@ -4,20 +4,21 @@
         <div class="row">
             <div class="col-md-2">
                 <ul class="list-ha">
-                    <li class="active">
+                    <li>
                         <i class="xline xline-top"></i>
                         <i class="xline xline-bottom"></i>
-                        <a href="">Personal Info</a>
+                        <a href="#section_personal_info">Personal Info</a>
                     </li>
                     <li>
                         <i class="xline xline-top"></i>
                         <i class="xline xline-bottom"></i>
-                        <a href="">Account Info</a>
+                        <a href="#section_account_info">Account Info</a>
                     </li>
                 </ul>
             </div>
             <div class="col-md-8 col-xm-10">
                 <div class="page-header">
+                    <a id="section_personal_info"></a>
                     <h1>Create New Account</h1>
                     <p>Additional information are required to create your account.</p>
                 </div>
@@ -48,6 +49,9 @@
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
                         </div>
+                        <div class="form-group" v-if="organization != 'NONE'">
+                            <input type="email" class="form-control" id="work-email-confirm" placeholder="Work Email (Confirm)" v-model="email_confirm" />
+                        </div>
 
                         <div class="form-group">
                             <label for="org-name">Or, if you can't find your organization, share its name with us for approval</label>
@@ -67,7 +71,10 @@
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
-                            <input type="email" class="form-control" id="school-email" placeholder="School email" aria-describedby="school-email-help" v-model="email" />
+                            <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="work-email-confirm" placeholder="School Email (Confirm)" v-model="email_confirm" />
                         </div>
                     </div>
 
@@ -78,17 +85,11 @@
                                 <option v-for="org in only_high_schools" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
                             </select>
                         </div>
-
-                        <div class="form-group">
-                            <label v-if="organization != null" for="high-school-password">Great! Just enter your school password here:</label>
-                            <input v-if="organization != null" type="text" class="form-control" id="high-school-password" placeholder="School password" aria-describedby="high-school-password-help" />
-                            <span id="high-school-password-help" class="help-block">See your teacher if you don't know this</span>
-                        </div>
                     </div>
 
 
 
-                    <h2 class="form-heading">Account info</h2>
+                    <h2 id="section_account_info" class="form-heading">Account info</h2>
 
                     <!-- country -->
                     <div class="form-group">
@@ -107,6 +108,11 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label for="organization">If you are playing as part of a Hackathon, please enter your code here</label>
+                        <input type="text" class="form-control" v-model="hackathon_code" placeholder="Enter Hackathon password or code...">
+                    </div>
+
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
@@ -121,6 +127,7 @@
 
 <script>
     import * as api from "../api";
+    import {Alert} from "../utils";
 
     export default {
         name: "associate",
@@ -144,12 +151,14 @@
                 countries: countries,
                 data: iso3166.data,
                 email: "",
+                email_confirm: "",
                 country_code: "NONE",
                 country_region_code: "NONE",
                 level: "Professional",
                 organization: null,
                 organizations: [],
                 error: null,
+                hackathon_code: '',
             };
         },
         computed: {
@@ -175,7 +184,7 @@
             },
             only_high_schools: function() {
                 return this.organizations.filter((org) => org.type === "High School");
-            },
+            }
         },
         methods: {
             submit: function() {
@@ -202,9 +211,21 @@
                     request["email"] = this.email;
                 }
 
-                console.log(request);
+                // verify email
+                if (this.email == '' || this.email != this.email_confirm){
+                    this.error = "Email confirm doesn't match"
+                    return false;
+                }
+
                 api.register_me(request).then((success) => {
-                    window.location.replace("/user?me");
+                    if (this.hackathon_code != ""){
+                        api.registerHackathon(this.hackathon_code).then((success) => {
+                            console.log('register success');
+                            window.location.replace("/user?me");
+                        }, (error) => {
+                            this.error = error.responseJSON.message;
+                        });
+                    }
                 }, (error) => {
                     this.error = error.responseJSON.message;
                 });

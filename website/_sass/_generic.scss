@@ -70,6 +70,14 @@ a{
   }
 }
 
+body #message-placeholder .ha-alert{
+  position: fixed;
+  z-index: 999;
+  top: 61px;
+  left: 0;
+  width: 100%;
+}
+
 input:focus{
   outline: none;
   box-shadow: none;

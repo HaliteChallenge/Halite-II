@@ -61,11 +61,13 @@
       font-size: 20px;
       color: #858E92;
       text-transform: uppercase;
+      text-decoration: none;
     }
-    &.active{
+    &.active, &:hover{
       a{
         background: rgba(255, 190, 0, 0.1);
         color: $yellow;
+        text-decoration: none;
       }
     }
   }

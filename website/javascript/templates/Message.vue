@@ -1,6 +1,9 @@
 <template>
-  <div :class="`ha-alert ha-alert-${type}`">
-    <span class="ha-alert-type">{{`${type.toUpperCase()}:`}}</span>{{` ${message}`}}
+  <div :class="`ha-alert ha-alert-${type}`" v-if="show">
+    <div class="container">
+      <button class="close" @click="disable">&times;</button>
+      <span class="ha-alert-type">{{`${type.toUpperCase()}:`}}</span>{{` ${message}`}}
+    </div>
   </div>
 </template>
 
@@ -17,7 +20,16 @@
         default: "success",
       }
     },
-    computed: {
+    data: function(){
+      return {
+        show: true
+      }
+    },
+    methods: {
+      disable: function(){
+        console.log('hide message');
+        this.show = false;
+      }
     }
   }  
 </script>
@@ -37,11 +49,23 @@
 
     &-success{
       background-color: #2ecc71;
-      color: #262430
+      color: #262430;
+      .close{
+        color: #262430;
+      }
     }
     &-error{
       background-color: #FF2D55;
       color: #fff;
+      .close{
+        color: #fff;
+      }
+    }
+    button.close{
+      opacity: 0.8;
+      &:hover{
+        opacity: 1;
+      }
     }
   }
 </style>
