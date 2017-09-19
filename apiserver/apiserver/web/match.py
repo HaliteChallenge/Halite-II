@@ -93,21 +93,19 @@ def list_matches_helper(offset, limit, participant_clause,
             model.game_stats.c.planets_destroyed,
             model.game_stats.c.ships_produced,
             model.game_stats.c.ships_destroyed,
-        ]).select_from(model.games.join(
-            model.game_participants,
-            (model.games.c.id == model.game_participants.c.game_id) &
-            participant_clause,
-        ).outerjoin(
+        ]).select_from(model.games.outerjoin(
             model.game_stats,
             (model.games.c.id == model.game_stats.c.game_id)
         )).where(
-            where_clause
+            where_clause &
+            sqlalchemy.sql.exists(
+                model.game_participants.select(
+                    participant_clause &
+                    (model.game_participants.c.game_id == model.games.c.id)
+                )
+            )
         ).order_by(
             *order_clause
-        ).group_by(
-            # Get rid of duplicates when not filtering by a
-            # particular participant
-            model.games.c.id
         ).offset(offset).limit(limit).reduce_columns()
         matches = conn.execute(query)
 
