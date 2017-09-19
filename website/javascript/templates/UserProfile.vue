@@ -7,9 +7,13 @@
             <p>{{ user.level }} at {{ user.organization }}</p>
 
             <form v-if="is_my_page">
-                <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
-                <button class="btn btn-default" v-on:click="join_hackathon">Join Hackathon</button>
-                <span>{{ messages.hackathon }}</span>
+                <div class="form-inline-button">
+                    <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
+                    <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
+                </div>
+                <div>
+                    <p>{{ messages.hackathon }}</p>
+                </div>
             </form>
         </div>
         <div class="col-md-8">
@@ -81,13 +85,13 @@
                 <div class="btn-group" role="group" aria-label="Game Navigation">
                     <button
                         type="button"
-                        class="btn btn-default"
+                        class="btn"
                         :disabled="page === 0"
-                        v-on:click="prev_page">Prev</button>
+                        v-on:click="prev_page"><span>Prev</span></button>
                     <button
                         type="button"
-                        class="btn btn-default"
-                        v-on:click="next_page">Next</button>
+                        class="btn"
+                        v-on:click="next_page"><span>Next</span></button>
                 </div>
             </section>
         </div>
@@ -221,6 +225,11 @@
 </script>
 
 <style lang="scss" scoped>
+    .form-inline{
+        .btn-ha{
+            display: inline-block;
+        }
+    }
     .game-participant {
         img {
             height: 20px;

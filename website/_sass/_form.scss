@@ -31,3 +31,27 @@ select.form-control{
   color: #ECFFFB;
   letter-spacing: 0.5px;
 }
+
+.form-inline-button{
+  background-color: #000;
+  display: flex;
+  padding: 5px;
+  input{
+    color: #fff;
+    background-color: transparent;
+    border: 0;
+    flex: 1;
+  }
+  .btn{
+    border: 0;
+    color: #30242F;
+    font-weight: bold;
+    border-radius: 0;
+    text-transform: uppercase;
+    padding: 0 10px;
+    position: relative;
+    background-color: transparent;
+    font-size: 2rem;
+    font-family: "Teko";
+  }
+}
