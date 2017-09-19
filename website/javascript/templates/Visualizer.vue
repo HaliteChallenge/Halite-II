@@ -183,9 +183,10 @@
                   <div class="card-dashboard-info">
                     <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
                     <p class="card-dashboard-name">{{_player.name}}</p>
-                    <p class="card-dashboard-version-heading">Bot version:</p>
+                    <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
+                    <p v-else class="card-dashboard-version-heading">Local bot</p>
                   </div>
-                  <div class="card-dashboard-version">V{{_player.version}}</div>
+                  <div v-if="_player.version" class="card-dashboard-version">V{{_player.version}}</div>
                 </div>
               </div>
             </div>
@@ -301,7 +302,7 @@
     const buffer = game.replay;
     return libhaliteviz.parseReplay(buffer)
   }
-  
+
   export default {
     name: 'haliteTV',
     props: ['game', 'replay', 'makeUserLink', 'getUserProfileImage'],
@@ -511,16 +512,23 @@
 
         let ranks = this.replay.stats;
 
-        for(let id of Object.keys(this.replay.stats)){
+        for (let id of Object.keys(this.replay.stats)) {
           ranks[id].index = parseInt(id);
           ranks[id].botname = this.replay.player_names[id];
           ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
-          if (this.game){
-            const player = _.find(this.game.players, (player) => player.player_index == id )
-            ranks[id].tier = parseInt(player.rank)
-            ranks[id].version = player.version_number
-          } else {
-            ranks[id].version = ranks[id].botname.match(/v(\d+)$/, "$1")[1]
+          if (this.game) {
+            const player = _.find(this.game.players, (player) => player.player_index == id );
+            ranks[id].tier = parseInt(player.rank);
+            ranks[id].version = player.version_number;
+          }
+          else {
+            const version = ranks[id].botname.match(/v(\d+)$/, "$1");
+            if (version) {
+              ranks[id].version = version[1];
+            }
+            else {
+                ranks[id].version = null;
+            }
           }
         }
         return Object.values(ranks);
