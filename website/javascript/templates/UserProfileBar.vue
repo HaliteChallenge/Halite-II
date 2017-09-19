@@ -13,7 +13,7 @@
         </div>
         <ul class="nav navbar-nav navbar-right ">
             <li>
-                <a v-on:click.stop.prevent="show_submit"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
+                <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
         </ul>
         <div class="popup-container" v-on:click.stop.prevent="close_submit">
