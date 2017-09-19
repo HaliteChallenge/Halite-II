@@ -484,6 +484,8 @@ def update_user_timeout(conn, game_id, user):
             config.C_BOT_TIMED_OUT)
 
     elif hit_timeout_limit or hit_timeout_percent:
+        # For now, do not disable bots
+        return
         # Prevent the bot from playing more games until a new bot
         # is uploaded
         conn.execute(model.bots.update().values(
