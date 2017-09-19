@@ -41,7 +41,7 @@ PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
 ## List Python packages to preinstall.
-PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely"
+PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely flask"
 ## List Ruby gems to preinstall.
 RUBY_PACKAGES="bundler"
 

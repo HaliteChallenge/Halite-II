@@ -15,13 +15,27 @@ import socket
 
 from time import sleep, gmtime, strftime
 
+import datetime
+import threading
+from flask import Flask
+
 import archive
 import backend
 import compiler
 import util
 
+# Flask start
+app = Flask(__name__)
+
 # Log it real good
 LOG_FILENAME = "worker-log-{}.data".format(uuid.uuid4())
+
+# Used to ensure system is running (watchdog timer)
+TIME = datetime.datetime.now()
+TIME_THRESHOLD = 600000 # 10 mins in ms
+
+# Used by Watchdog timer to keep time
+LOCK = threading.Lock()
 
 # Where to create temporary directories
 TEMP_DIR = os.getcwd()
@@ -253,9 +267,31 @@ def _set_logging():
     outLog.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s'))
     logging.getLogger().addHandler(outLog)
 
+def set_time():
+    with LOCK:
+        TIME = datetime.datetime.now()
+        logging.info("Setting time to {}".format(TIME))
+
+def is_time_up_to_date():
+    with LOCK:
+        current_time = datetime.datetime.now()
+        logging.info("TIME DIFFERENCE: {}".format((current_time - TIME).total_seconds()))
+        if (current_time - TIME).total_seconds() > TIME_THRESHOLD:
+            return False
+        return True
+
+@app.route('/health_check')
+def health_check():
+    if is_time_up_to_date():
+        return 'Alive', 200
+    else:
+        return 'Dead', 503
+
 if __name__ == "__main__":
     logging.info("Starting up worker at {}".format(socket.gethostname()))
+    threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':5001, 'threaded':True}).start()
     while True:
+	set_time()
         try:
             logging.debug("\n\n\nQuerying for new task at time %s (GMT)\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
             task = backend.getTask()
@@ -273,5 +309,5 @@ if __name__ == "__main__":
         except Exception as e:
             logging.exception("Error on get task %s\n" % str(e))
 
-		logging.debug("Sleeping...\n")
+        logging.debug("Sleeping...\n")
         sleep(random.randint(4, 10))
