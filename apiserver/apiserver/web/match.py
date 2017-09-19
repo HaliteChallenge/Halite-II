@@ -100,12 +100,6 @@ def list_matches_helper(offset, limit, participant_clause,
         ).outerjoin(
             model.game_stats,
             (model.games.c.id == model.game_stats.c.game_id)
-        ).outerjoin(
-            model.game_bot_stats,
-            (model.games.c.id == model.game_bot_stats.c.game_id)
-        ).outerjoin(
-            model.game_view_stats,
-            (model.games.c.id == model.game_view_stats.c.game_id)
         )).where(
             where_clause
         ).order_by(
