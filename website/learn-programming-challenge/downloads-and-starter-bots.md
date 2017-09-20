@@ -52,12 +52,6 @@ __Linux users note:__ Your system must support GCC 4.9 or later (with correspond
     </tbody>
 </table>
 
-## Sample Bots with Additional Basic Strategies
-
-File includes examples in C++, Java, and Python3.
-
-[Download here]({{ site.baseurl }}/assets/downloads/sample_bots.zip)
-
 ## Standalone Visualizer
 
 Removed pending automated builds.
