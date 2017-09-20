@@ -14,24 +14,19 @@
             <div class="filter-group">
                 <div class="input-group">
                     <input type="text" class="form-control ipt-username" placeholder="Search a user name" v-model="username_filter" />
-                    <select class="form-control slt" v-model="tier_filter">
+                    <select class="form-control slt">
                         <option value="" disabled selected>Tier</option>
-                        <option value="Diamond">Diamond</option>
-                        <option value="Platinum">Platinum</option>
-                        <option value="Gold">Gold</option>
-                        <option value="Silver">Silver</option>
-                        <option value="Salt">Salt</option>
-                    </select>
+                    </select> 
                     <select class="form-control slt">
                         <option value="" disabled selected>Organization</option>
-                    </select>
+                    </select> 
                     <select class="form-control slt">
                         <option value="" disabled selected>Country</option>
-                    </select>
-                    <div>
+                    </select> 
+                    <span class="input-group-btn">
                         <!-- <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button> -->
                         <button class="btn"><span>APPLY FILTER</span></button>
-                    </div>
+                    </span>
                 </div><!-- /input-group -->
             </div>
         </form>
@@ -71,9 +66,9 @@
             </tbody>
         </table>
         <div class="leaderboard-page">
-            <HalitePagination
-                :page="this.page"
-                :lastPage="this.lastPage"
+            <HalitePagination 
+                :page="this.page" 
+                :lastPage="this.lastPage" 
                 :baseUrl="this.baseUrl"
                 :changePage="this.changePage"
             />
@@ -97,8 +92,6 @@
             return {
                 leaderboard: [],
                 username_filter: "",
-                tier_filter: "",
-                organization_filter: "",
                 page: 1,
                 limit: 12,
                 lastPage: 0,
@@ -139,13 +132,10 @@
             update_filter: function(e) {
                 if (e) e.preventDefault();
 
-                let filters = "";
+                let filters;
                 if (this.username_filter.length > 0) {
-                    filters += "username,=," + this.username_filter;
+                    filters = "username,=," + this.username_filter;
                 }
-                // if (this.tier_filter.length > 0) {
-                //     filters += "tier,=," + this.tier_filter;
-                // }
                 if(this.lastPage <= 0) {
                     api.leaderboard(filters, this.hackathonId).then(leaderboard => {
                         if(leaderboard && leaderboard instanceof Array) {
@@ -155,16 +145,6 @@
                 }
                 api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
                     this.leaderboard = leaderboard;
-                });
-            },
-            changePage: function(page) {
-                let filters;
-                if (this.username_filter.length > 0) {
-                    filters = "username,=," + this.username_filter;
-                }
-                api.leaderboard(filters, this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-                    this.leaderboard = leaderboard;
-                    this.page = page;
                 });
             },
             changePage: function(page) {

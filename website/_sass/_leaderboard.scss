@@ -74,20 +74,12 @@
             margin-right: 15px;
         }
 
-        .filter-group{
-            .input-group{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                > .form-control{
-                    min-width: 0;
-                    flex: 1;
-                }
-                > *{
-                    display: block;
-                    width: auto;
-                }
-            }
+        .ipt-username {
+            width: 370px;
+        }
+
+        .slt {
+            width: 220px;
         }
 
     }
