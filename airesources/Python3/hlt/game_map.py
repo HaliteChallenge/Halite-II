@@ -124,17 +124,20 @@ class Map:
                 return celestial_object
         return None
 
-    def obstacles_between(self, ship, target):
+    def obstacles_between(self, ship, target, ignore=()):
         """
         Check whether there is a straight-line path to the given point, without planetary obstacles in between.
 
         :param entity.Ship ship: Source entity
         :param entity.Entity target: Target entity
+        :param entity.Entity ignore: Which entity type to ignore
         :return: The list of obstacles between the ship and target
         :rtype: list[entity.Entity]
         """
         obstacles = []
-        for foreign_entity in self.all_planets() + self._all_ships():
+        entities = ([] if issubclass(entity.Planet, ignore) else self.all_planets()) \
+            + ([] if issubclass(entity.Ship, ignore) else self._all_ships())
+        for foreign_entity in entities:
             if foreign_entity == ship or foreign_entity == target:
                 continue
             if collision.intersect_segment_circle(ship, target, foreign_entity, fudge=ship.radius + 0.1):
