@@ -288,6 +288,7 @@ def health_check():
         return 'Dead', 503
 
 if __name__ == "__main__":
+    _set_logging()
     logging.info("Starting up worker at {}".format(socket.gethostname()))
     threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':5001, 'threaded':True}).start()
     while True:
