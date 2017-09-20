@@ -32,7 +32,7 @@ LOG_FILENAME = "worker-log-{}.data".format(uuid.uuid4())
 
 # Used to ensure system is running (watchdog timer)
 TIME = datetime.datetime.now()
-TIME_THRESHOLD = 600000 # 10 mins in ms
+TIME_THRESHOLD = 60 * 10 # 10 mins in s
 
 # Used by Watchdog timer to keep time
 LOCK = threading.Lock()
@@ -283,9 +283,9 @@ def is_time_up_to_date():
 @app.route('/health_check')
 def health_check():
     if is_time_up_to_date():
-        return 'Alive', 200
+        return "Alive", 200
     else:
-        return 'Dead', 503
+        return "Dead. Last alive at {}".format(TIME), 503
 
 if __name__ == "__main__":
     _set_logging()
