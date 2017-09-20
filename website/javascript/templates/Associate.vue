@@ -212,7 +212,7 @@
                 }
 
                 // verify email
-                if (this.email != this.email_confirm){
+                if (this.organization !== "NONE" && (this.email === '' || this.email != this.email_confirm)){
                     this.error = "Organizational emails match"
                     return false;
                 }
@@ -220,10 +220,12 @@
                 api.register_me(request).then((success) => {
                     if (this.hackathon_code != ""){
                         api.registerHackathon(this.hackathon_code).then((success) => {
-                            window.location.replace("/user?me");
+                            window.location.replace("/hackathon-and-events");
                         }, (error) => {
                             this.error = error.responseJSON.message;
                         });
+                    } else {
+                        window.location.replace("/play-programming-challenge");
                     }
                 }, (error) => {
                     this.error = error.responseJSON.message;
