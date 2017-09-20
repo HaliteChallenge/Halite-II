@@ -109,7 +109,7 @@ def github_login_callback():
 
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
-    return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/associate"))
+    return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/create-account"))
 
 
 @github.tokengetter
