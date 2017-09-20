@@ -268,12 +268,16 @@ def _set_logging():
     logging.getLogger().addHandler(outLog)
 
 def set_time():
+    global LOCK
     with LOCK:
+        global TIME
         TIME = datetime.datetime.now()
         logging.info("Setting time to {}".format(TIME))
 
 def is_time_up_to_date():
+    global LOCK
     with LOCK:
+        global TIME
         current_time = datetime.datetime.now()
         logging.info("TIME DIFFERENCE: {}".format((current_time - TIME).total_seconds()))
         if (current_time - TIME).total_seconds() > TIME_THRESHOLD:
