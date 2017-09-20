@@ -1,15 +1,7 @@
 <template>
     <form>
-        <div class="input-group">
-            <label for="user_id">User ID:</label>
-            <input id="user_id" type="text" class="form-control" placeholder="User ID" v-model="user_id" />
-        </div><!-- /input-group -->
-        <div class="input-group">
-            <label for="verification_code">Verification Code:</label>
-            <input id="verification_code" type="text" class="form-control" placeholder="Verification code" v-model="verification_code" />
-        </div><!-- /input-group -->
-        <button class="btn btn-primary" type="button" v-on:click="submit">Verify</button>
         <p class="text-danger">{{ error_message }}</p>
+        <p>{{ success_message }}</p>
     </form>
 </template>
 
@@ -23,23 +15,14 @@
                 verification_code: "",
                 user_id: "",
                 error_message: "",
+                success_message: "",
             };
         },
         mounted: function() {
             const params = new URLSearchParams(window.location.search);
 
-            if (params.has("user_id")) {
+            if (params.has("user_id") && params.has("verification_code")) {
                 this.user_id = params.get("user_id");
-            }
-            else {
-                api.me().then((me) => {
-                    if (me) {
-                        this.user_id = me.user_id;
-                    }
-                });
-            }
-
-            if (params.has("verification_code")) {
                 this.verification_code = params.get("verification_code");
                 this.submit();
             }
@@ -53,10 +36,15 @@
                             verification_code: this.verification_code,
                         },
                         error: (xhr) => {
-                            this.error_message = xhr.responseJSON.message;
+                            this.error_message = "Your email verification failed, please contact halite@halite.io: Error Details -" + xhr.responseJSON.message;
+                        },
+                        success: (xhr) => {
+                            this.success_message = "Your email has been verified successfully. You will be automatically redirected in a few seconds.";
                         },
                     }).then(() => {
-                        window.location.replace("/user?me");
+                         window.setTimeout(function(){
+                            window.location.replace("/user?me");
+                        }, 5000);
                     });
                 }
             }
