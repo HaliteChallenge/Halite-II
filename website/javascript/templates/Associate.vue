@@ -212,8 +212,8 @@
                 }
 
                 // verify email
-                if (this.email == '' || this.email != this.email_confirm){
-                    this.error = "Email confirm doesn't match"
+                if (this.email != this.email_confirm){
+                    this.error = "Organizational emails match"
                     return false;
                 }
 
