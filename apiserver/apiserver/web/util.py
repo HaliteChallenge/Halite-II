@@ -204,6 +204,9 @@ def get_sort_filter(fields, false_fields=()):
     order_clause = []
     manual_fields = []
 
+    # Clauses organized by field: clause
+    filter_clauses = {}
+
     for filter_param in flask.request.args.getlist("filter"):
         field, operation, value = parse_filter(filter_param)
 
@@ -230,6 +233,12 @@ def get_sort_filter(fields, false_fields=()):
         value = conversion(value)
 
         clause = operation(column, value)
+        if field in filter_clauses:
+            filter_clauses[field] |= clause
+        else:
+            filter_clauses[field] = clause
+
+    for clause in filter_clauses.values():
         where_clause &= clause
 
     for order_param in flask.request.args.getlist("order_by"):
