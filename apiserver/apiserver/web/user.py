@@ -101,7 +101,7 @@ def send_verification_email(recipient, verification_code):
         recipient,
         config.VERIFY_EMAIL_TEMPLATE,
         {
-            "verification_url": util.build_site_url("/verify_email", {
+            "verification_url": util.build_site_url("/verify-email", {
                 "verification_code": verification_code,
             }),
         },
