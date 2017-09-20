@@ -103,6 +103,7 @@ def send_verification_email(recipient, verification_code):
         {
             "verification_url": util.build_site_url("/verify-email", {
                 "verification_code": verification_code,
+                "user_id": recipient.user_id,
             }),
         },
         config.GOODNEWS_ACCOMPLISHMENTS,
