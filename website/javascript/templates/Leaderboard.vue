@@ -139,13 +139,14 @@
             update_filter: function(e) {
                 if (e) e.preventDefault();
 
-                let filters;
+                let filters = [];
                 if (this.username_filter.length > 0) {
-                    filters = "username,=," + this.username_filter;
+                    filters.push("username,=," + this.username_filter);
                 }
                 if (this.tier_filter.length > 0) {
-                    filters = "rank,=," + this.tier_filter;
+                    filters.push("rank,=," + this.tier_filter);
                 }
+                filters = filters.length ? filters : null;
                 if(this.lastPage <= 0) {
                     api.leaderboard(filters, this.hackathonId).then(leaderboard => {
                         if(leaderboard && leaderboard instanceof Array) {

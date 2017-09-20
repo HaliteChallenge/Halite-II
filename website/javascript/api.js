@@ -166,14 +166,19 @@ export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
         url = `${API_SERVER_URL}/hackathon/${hackathon}/leaderboard`;
         fields.withCredentials = true;
     }
+
+    const querystring = [];
     if(offset !== null && limit !== null) {
-        url += `?offset=${offset}&limit=${limit}`
+        querystring.push(`?offset=${offset}&limit=${limit}`);
+    }
+    if (filters && filters.length > 0) {
+        querystring.push(`filter=${filters.join('&filter=')}`);
+    }
+    if (querystring.length > 0) {
+      url += `?${querystring.join("&")}`;
     }
     return $.get({
         url: url,
-        data: {
-            filter: filters,
-        },
         xhrFields: fields,
     });
 }
