@@ -465,7 +465,7 @@ node_modules
 
 *.dSYM/
 
-website-drip/_site/*
+extensions/website-drip/_site/*
 musicgenerator/haliteamp/*
 airesources/startenv/*
 airesources/starterkits/docfx/*
