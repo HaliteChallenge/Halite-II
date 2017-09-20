@@ -19,6 +19,9 @@
     border-bottom: 1px solid #474951;
     li{
       display: inline-block;
+      @media (max-width: $screen-xs-max){
+        display: block;
+      }
       a{
         display: block;
         &:hover{
@@ -80,6 +83,9 @@
   .footer-social{
     text-align: center;
     margin-left: 80px;
+    @media (max-width: $screen-sm-max){
+      margin-left: 0;
+    }
     &-icons{
       .fa{
         font-size: 28px;

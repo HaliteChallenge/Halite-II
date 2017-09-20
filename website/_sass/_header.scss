@@ -3,6 +3,9 @@
   img{
     max-width: 100px;
     width: 100px;
+    @media (max-width: $screen-sm-max){
+      transform: translateY(5px);
+    }
   }
   @media (min-width: $screen-md-min){
     img{
@@ -11,7 +14,16 @@
     }
   }
 }
-
+#navbar{
+  @media (max-width: $screen-sm-max){
+    transform: translateY(9px);
+  }
+}
+.navbar-header{
+  @media (max-width: $screen-sm-max){
+    transform: translateY(5px);
+  }
+}
 .navbar-inverse{
   background-color: $gray-bg;
   color: $foreground;

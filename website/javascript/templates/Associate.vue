@@ -220,7 +220,6 @@
                 api.register_me(request).then((success) => {
                     if (this.hackathon_code != ""){
                         api.registerHackathon(this.hackathon_code).then((success) => {
-                            console.log('register success');
                             window.location.replace("/user?me");
                         }, (error) => {
                             this.error = error.responseJSON.message;

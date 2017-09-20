@@ -111,7 +111,7 @@ window.views = {
 api.me().then((me) => {
    if (me) {
        $(".not-logged-in").hide();
-
+       $(".navbar-signin").hide();
        new Vue({
            el: "#user-profile-bar-container",
            render: (h) => h(UserProfileBar, {props: {baseUrl: _global.baseUrl}}),

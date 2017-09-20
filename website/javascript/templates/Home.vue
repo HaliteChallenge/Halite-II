@@ -44,6 +44,9 @@
                 </div>
              </div>
              <div class="col-md-12 des">
+                 <div class="col-md-offset-2 col-md-4 bot-1">
+                     <img :src="`${baseUrl}/assets/images/temp/bot_2.png`"/>
+                 </div>
                  <div class="words col-md-offset-1 col-md-4">
                      <p class="t2 c-wht font-headline">MINING HALITE IN SPACE</p>
                      <div class="line-container"><i class="xline xline-top"></i></div>
@@ -54,7 +57,7 @@
                          <div class="ha-button no-bg-button"><span>READ THE CODEX</span></div>
                      </div>
                  </div>
-                 <div class="col-md-offset-2 col-md-4">
+                 <div class="col-md-offset-2 col-md-4 bot-2">
                      <img :src="`${baseUrl}/assets/images/temp/bot_2.png`"/>
                  </div>
              </div>
@@ -66,7 +69,7 @@
                  <p class="t5 c-gry">See what's happening right now behind the scenes. When you submit a bot, it compiles and then starts playing against all other bots. Thousands of games are played at a time. Check out a few!</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <div class="col-md-12">
-                     <div class="col-md-3">
+                     <div class="col-md-3 screen-shot">
                          <div class="img-container">
                              <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -80,7 +83,7 @@
                              </div>
                          </div>
                      </div>
-                     <div class="col-md-3">
+                     <div class="col-md-3 screen-shot">
                          <div class="img-container">
                              <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -94,7 +97,7 @@
                              </div>
                          </div>
                      </div>
-                     <div class="col-md-3">
+                     <div class="col-md-3 screen-shot">
                          <div class="img-container">
                              <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -108,7 +111,7 @@
                              </div>
                          </div>
                      </div>
-                     <div class="col-md-3">
+                     <div class="col-md-3 screen-shot">
                          <div class="img-container">
                              <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -135,12 +138,12 @@
                     <div class="scroll-arrow"></div>
                 </div>
             </div>
-             <div class="col-md-12 big-menu">
-                 <div class="col-md-4">
+             <div class="col-md-12 big-menu no-padding-xs">
+                 <div class="col-md-4 no-padding-xs">
                      <div class="menu-header">
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-1"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/forums.png`"/>
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
                      </div>
                      <div class="menu-body">
                          <div class="line-container"><i class="xline xline-top"></i></div>
@@ -156,11 +159,11 @@
                          </div>
                      </div>
                  </div>
-                 <div class="col-md-4">
+                 <div class="col-md-4 no-padding-xs">
                      <div class="menu-header">
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-1"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/events.png`"/>
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
                      </div>
                      <div class="menu-body">
                          <div class="line-container"><i class="xline xline-top"></i></div>
@@ -176,11 +179,11 @@
                          </div>
                      </div>
                  </div>
-                 <div class="col-md-4">
+                 <div class="col-md-4 no-padding-xs">
                      <div class="menu-header">
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-1"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/invite.png`"/>
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
                      </div>
                      <div class="menu-body">
                          <div class="line-container"><i class="xline xline-top"></i></div>
@@ -207,7 +210,7 @@
                  <div class="line-container"><i class="xline xline-top"></i></div>
                  <p class="t5 c-gry">Besides our forums, our community is very vocal. Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                  <div class="line-container"><i class="xline xline-top"></i></div>
-                 <div class="col-md-12 img-list">
+                 <div class="col-md-12 img-list no-padding-xs">
                      <div class="col-md-4">
                          <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
                             <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
@@ -224,12 +227,12 @@
                  </div>
                  <div class="clear"></div>
              </div>
-             <div class="col-md-12 big-menu">
+             <div class="col-md-12 big-menu no-padding-xs">
                  <div class="col-md-6">
                      <div class="menu-header">
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-1"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/career.png`"/>
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
                      </div>
                      <div class="menu-body">
                          <div class="line-container"><i class="xline xline-top"></i></div>
@@ -247,9 +250,9 @@
                  </div>
                  <div class="col-md-6">
                      <div class="menu-header">
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-1"><i class="xline xline-top"></i></div>
                          <img :src="`${baseUrl}/assets/images/temp/competition.png`"/>
-                         <div class="line-container"><i class="xline xline-top"></i></div>
+                         <div class="line-container line-2"><i class="xline xline-top"></i></div>
                      </div>
                      <div class="menu-body">
                          <div class="line-container"><i class="xline xline-top"></i></div>
