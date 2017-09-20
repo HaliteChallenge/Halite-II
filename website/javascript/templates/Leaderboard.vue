@@ -15,21 +15,12 @@
                 <div class="input-group">
                     <input type="text" class="form-control ipt-username" placeholder="Search a user name" v-model="username_filter" />
                     <select class="form-control slt" v-model="tier_filter">
-<<<<<<< HEAD
                         <option value="" selected>Tier</option>
                         <option value="1">Diamond</option>
                         <option value="2">Platinum</option>
                         <option value="3">Gold</option>
                         <option value="4">Silver</option>
                         <option value="5">Salt</option>
-=======
-                        <option value="" disabled selected>Tier</option>
-                        <option value="Diamond">Diamond</option>
-                        <option value="Platinum">Platinum</option>
-                        <option value="Gold">Gold</option>
-                        <option value="Silver">Silver</option>
-                        <option value="Salt">Salt</option>
->>>>>>> master
                     </select>
                     <select class="form-control slt">
                         <option value="" disabled selected>Organization</option>
@@ -153,11 +144,7 @@
                     filters = "username,=," + this.username_filter;
                 }
                 if (this.tier_filter.length > 0) {
-<<<<<<< HEAD
                     filters = "rank,=," + this.tier_filter;
-=======
-                    filters = "level,=," + this.tier_filter;
->>>>>>> master
                 }
                 if(this.lastPage <= 0) {
                     api.leaderboard(filters, this.hackathonId).then(leaderboard => {
