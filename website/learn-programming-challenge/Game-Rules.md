@@ -165,7 +165,7 @@ A.........
 .......C..
 ```
 
-If A moves as before, it will reach a point where it enters range of B and C simultaneously. Then both B and C will take 32 damage (half of A’s attack), but A will take 124 damage (the sum of B and C’s attacks).
+If A moves as before, it will reach a point where it enters range of B and C simultaneously. Then both B and C will take 32 damage (half of A’s attack), but A will take 128 damage (the sum of B and C’s attacks).
 
 
 
