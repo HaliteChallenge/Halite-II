@@ -1,7 +1,7 @@
 ---
 layout: doc_page
 title: The Halite Environment CLI
-toc: true
+toc: false
 description: The Halite environment is responsible for running games between bots and outputting appropriate data and files upon the end of a game.
 ---
 

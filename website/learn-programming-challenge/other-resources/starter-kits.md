@@ -1,7 +1,7 @@
 ---
 layout: doc_page
 title: Starter Kit Functionality
-toc: true
+toc: false
 ---
 
 Take advantage of the functionality your starter kits provide to make the most effective bots.

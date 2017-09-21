@@ -1,7 +1,7 @@
 ---
 layout: doc_page
 title: Learn How to Play in the Halite AI Programming Challenge
-toc: true
+toc: false
 menu: learn
 description: Welcome to the Halite II closed Two Sigma alpha competition! Learn how to quickly get started.
 ---

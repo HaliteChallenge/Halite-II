@@ -1,7 +1,7 @@
 ---
 layout: doc_page
 title: Submitting a Bot
-toc: true
+toc: false
 ---
 
 You submit a zip file containing your MyBot file and any other files needed to compile and run your MyBot file.

@@ -1,7 +1,7 @@
 ---
 layout: doc_page
 title: Best Practices
-toc: true
+toc: false
 description: In this guide, we will list a couple of simple, useful practices to follow when building your Halite bot.
 ---
 

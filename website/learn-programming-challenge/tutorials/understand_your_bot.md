@@ -2,7 +2,7 @@
 layout: doc_page
 title: Understand Your Bot
 sort_key: 000
-toc: true
+toc: false
 permalink: improve
 ---
 

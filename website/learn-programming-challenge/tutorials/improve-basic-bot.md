@@ -2,7 +2,7 @@
 layout: doc_page
 title: Improve the Basic Bot
 sort_key: 001
-toc: true
+toc: false
 discription: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
 permalink: improve
 ---
