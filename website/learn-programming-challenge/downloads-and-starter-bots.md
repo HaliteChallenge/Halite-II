@@ -15,7 +15,7 @@ Downloads include both the compiled Halite game environment and the starter kit 
 
 ## Download All Kits
 
-[Source code download]({{ site.baseurl }}/{{ site.data.downloads.source }})
+[Download]({{ site.baseurl }}/{{ site.data.downloads.source }})
 
 ## Game Environment version
 
