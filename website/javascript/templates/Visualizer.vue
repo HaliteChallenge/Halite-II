@@ -151,6 +151,9 @@
             <div v-else-if="selectedShip">
               <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
             </div>
+            <div v-else-if="selectedShip">
+              <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
+            </div>
             <div class="message-box" v-else>
               <p><span class="icon-info"></span></p>
               <p>Click on a ship, planet, or other map location to see properties</p>
@@ -201,10 +204,7 @@
                   Territory Gained
                 </h4>
                 <div class="post-game-graph">
-                  <!-- TODO: Real Graph -->
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}"/>
-                  <!-- <div class="game-graph-graph-container" /> -->
-                  <!--<img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">-->
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}"/>
                 </div>
               </div>
             </div>
@@ -220,9 +220,7 @@
                     rate of production
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-2.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -231,9 +229,7 @@
                     health
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-3.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.health" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -248,9 +244,7 @@
                     damage dealed
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
                     <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-4.png`"> -->
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -259,9 +253,7 @@
                     attack overtime
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-5.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -375,6 +367,8 @@
         this.selected.kind = kind;
         this.selected.id = args.id;
         this.selected.owner = args.owner;
+        console.log(kind);
+        console.log(args);
         visualizer.onUpdate();
         this.$forceUpdate();
       };
@@ -559,6 +553,9 @@
           }
         }
         return null;
+      },
+      selectedLocation: function(){
+
       }
     },
     methods: {

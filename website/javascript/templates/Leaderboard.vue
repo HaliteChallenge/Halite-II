@@ -22,8 +22,9 @@
                         <option value="4">Silver</option>
                         <option value="5">Salt</option>
                     </select>
-                    <select class="form-control slt">
-                        <option value="" disabled selected>Organization</option>
+                    <select class="form-control slt" v-model="organization_filter">
+                        <option value="" selected>Organization</option>
+                        <option v-for="org in organizations" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
                     </select>
                     <select class="form-control slt">
                         <option value="" disabled selected>Country</option>
@@ -94,6 +95,20 @@
             HalitePagination
         },
         data: function() {
+            // const countries = Object.entries(iso3166.data);
+            // countries.sort(function(country1, country2) {
+            //     const country1name = country1[1].name;
+            //     const country2name = country2[1].name;
+            //     if (country1name < country2name) {
+            //         return -1;
+            //     }
+            //     else if (country1name === country2name) {
+            //         return 0;
+            //     }
+            //     else {
+            //         return 1;
+            //     }
+            // });
             return {
                 leaderboard: [],
                 username_filter: "",
@@ -102,6 +117,7 @@
                 page: 1,
                 limit: 12,
                 lastPage: 0,
+                organizations: [],
                 summary: [
                     {
                         img: `${this.baseUrl}/assets/images/leaderboard-grandMaster.svg`,
@@ -132,6 +148,9 @@
             };
         },
         mounted: function() {
+            api.list_organizations().then((orgs) => {
+               this.organizations = orgs;
+            });
             this.update_filter();
         },
         methods: {
@@ -145,6 +164,9 @@
                 }
                 if (this.tier_filter.length > 0) {
                     filters.push("rank,=," + this.tier_filter);
+                }
+                if (this.organization_filter && this.organization_filter.toString().length > 0) {
+                    filters.push("organization_id,=," + this.organization_filter);
                 }
                 filters = filters.length ? filters : null;
                 if(this.lastPage <= 0) {

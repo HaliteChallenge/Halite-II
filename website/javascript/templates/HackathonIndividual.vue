@@ -20,7 +20,7 @@
         <p class="inline-block mg-left-tiny">{{hackathon.pin}}</p>
       </div>
       <div class="ha-button join-btn">
-        <span>JOIN NOW</span>
+        <a href="#join_now"><span>JOIN NOW</span></a>
       </div>
     </section>
 
@@ -30,8 +30,8 @@
         <div class="col-md-6">
           <p class="t1 c-wht font-headline">HACKATHON DESCRIPTION</p>
           <div class="hackathon-desc-text">
-            <i class="xline xline-top short-line"></i> 
-            <i class="xline xline-bottom short-line"></i> 
+            <i class="xline xline-top short-line"></i>
+            <i class="xline xline-bottom short-line"></i>
             <div v-html="hackathon.description"></div>
           </div>
         </div>
@@ -41,11 +41,12 @@
       </div>
     </section>
 
+    <a id="join_now" name="join_now"></a>
     <section class="hackathon-join">
       <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" href="#panel_join" aria-expanded="false" aria-controls="widget_player_details">
+            <a data-toggle="collapse" href="#panel_join" aria-expanded="true" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4 class="font-headline">HOW TO JOIN</h4>
               <span class="toggle-icon expand"></span>
@@ -181,7 +182,7 @@
             name: 'Hackathons',
             link: '/hackathon-and-events'
           }
-        ] 
+        ]
       }
     },
     mounted: function() {
@@ -213,7 +214,7 @@
         })
       });
 
-      
+
     },
   }
 </script>

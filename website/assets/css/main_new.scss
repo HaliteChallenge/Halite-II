@@ -13,10 +13,10 @@ $font-headline: "Teko";
 $screen-llg-min: 1400px;
 $error: #FF2D55;
 
-$player-1: #63CECA;
-$player-2: #FFBE00;
-$player-3: #E37222;
-$player-4: #FF00FF;
+$player-1: #E37222;
+$player-2: #BD00DB;
+$player-3: #63CECA;
+$player-4: #FFBE00;
 
 @import "bootstrap-sass-3.3.7/assets/stylesheets/bootstrap";
 
@@ -26,6 +26,7 @@ $player-4: #FF00FF;
 @import "_buttons.scss";
 @import "_form.scss";
 @import "_table.scss";
+@import "_nav.scss";
 @import "_tabs.scss";
 @import "_panels.scss";
 @import "_generic.scss";
@@ -40,4 +41,6 @@ $player-4: #FF00FF;
 @import "_hackathon-individual.scss";
 @import "_leaderboard.scss";
 @import "_play.scss";
-@import "_associate.scss"
+@import "_associate.scss";
+@import "_user-profile.scss";
+@import "_doc-page.scss";

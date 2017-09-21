@@ -7,6 +7,30 @@
   import Vue from "vue";
   import * as d3 from "d3";
 
+  function getDataPeriod(_data, _length, _index) {
+    if (!_data || !_length || (_data.length <= _length)) return _data
+    let _output = []
+    _data.forEach((item, i) => {
+      let min 
+      let max
+      const maxIndex = _data.length - 1
+      if((_index - _length / 2) < 0) {
+        min = 0
+        max = _length
+      } else if ((_index + _length / 2) > maxIndex) {
+        max = maxIndex
+        min = maxIndex - _length
+      } else {
+        max = _index + _length / 2
+        min = _index - _length / 2
+      }
+      if ((i >= min) && (i <= max)) {
+        _output.push(item)
+      }
+    })
+    return _output
+  }
+
   export default{
     name: 'PlayerLineChart',
 
@@ -19,7 +43,10 @@
         type: Number,
         required: true,
       },
-
+      maxLength: {
+        type: Number,
+        required: false,
+      },
     },
 
     data: function() {
@@ -29,6 +56,8 @@
         x: null,
       }
     },
+
+    
 
     watch: {
       chartData: function(chartData) {
@@ -42,7 +71,10 @@
         // g1 = svg.append('foreignObject').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')').append('svg'),
         g1 = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')'),
         g2 = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')'),
-        innerSvg = g1.append('foreignObject').append('svg');
+        innerSvg = g1.append('foreignObject').attr('height', height).attr('width', width).append('svg');
+
+        this.path1List = []
+        this.path2List = []
 
         this.innerSvg = innerSvg
 
@@ -53,6 +85,7 @@
 
         var y = d3.scaleLinear()
           .rangeRound([height, 0])
+        this.y = y
 
         var area = d3.area()
           .x(function(d) { return x(d.x) })
@@ -62,8 +95,10 @@
             .x(function(d) { return x(d.x) })
             .y(function(d) { return y(d.y) })    
 
+        this.area = area    
+        this.line = line    
 
-        let dataSet = chartData
+
 
         // let color = d3.scaleOrdinal(d3.schemeCategory20c)
 
@@ -71,9 +106,11 @@
         //     .interpolate(d3.interpolateHcl)
         //     .range([d3.rgb("red"), d3.rgb('#f5bc13')])
 
-        let color = (index) => ['#ff3bfb', '#f5c022', '#94e6e3', '#e78744'][index] || '#e78744'
+        let dataSet = chartData
 
-        x.domain(d3.extent(dataSet[0], function(d) { return d.x }))
+        let color = (index) => ['#E37222', '#BD00DB', '#63CECA', '#FFBE00', '#ECFFFB'][index] || '#ECFFFB'
+
+        x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, this.index), function(d) { return d.x }))
         let _dataSet = []
         dataSet.forEach(_data => {
           _dataSet = _dataSet.concat(_data)
@@ -101,27 +138,31 @@
             d.y = Number(d.y)
           })
 
-        let _color = color(index)
-        g2.append('path')
-          .datum(data)
-          .attr('stroke', _color)
-          .attr('fill', 'transparent')
-          .attr('stroke-linejoin', 'round')
-          .attr('stroke-dasharray', '1 10')
-          .attr('stroke-dashunits', 'pathLength')
-          .attr('stroke-linecap', 'round')
-          .attr('stroke-width', 2)
-          .attr('d', line)
+          let _color = color(index)
+          let path1 = g2.append('path')
+          path1.datum(getDataPeriod(data, this.maxLength, this.index))
+            .attr('stroke', _color)
+            .attr('fill', 'transparent')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-dasharray', '1 10')
+            .attr('stroke-dashunits', 'pathLength')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', 2)
+            .attr('d', line)
+
+          this.path1List.push(path1)
+            
+          let path2 = innerSvg.append('path')
+          path2.datum(getDataPeriod(data, this.maxLength, this.index))
+            .attr('fill', _color)
+            .attr('fill-opacity', .1)
+            .attr('stroke', _color)
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', 3)
+            .attr('d', area)
           
-        innerSvg.append('path')
-          .datum(data)
-          .attr('fill', _color)
-          .attr('fill-opacity', .1)
-          .attr('stroke', _color)
-          .attr('stroke-linejoin', 'round')
-          .attr('stroke-linecap', 'round')
-          .attr('stroke-width', 3)
-          .attr('d', area)
+          this.path2List.push(path2)
       })
 
 
@@ -154,7 +195,23 @@
         )
     },
     index: function(index) {
-      if (!this.innerSvg || !this.dragLine) return;
+      if (!this.path1List || !this.path2List || !this.path1List.length || !this.path2List.length || !this.innerSvg || !this.dragLine) return;
+
+      let dataSet = this.chartData
+      this.maxLength && console.log(index, getDataPeriod(dataSet[0], this.maxLength, index))
+      this.x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, index), function(d) { return d.x }))
+
+      dataSet.forEach((data, index) => {
+        data.forEach(d => {
+          d.x = d.x
+          d.y = Number(d.y)
+        })
+        let _peroidData = getDataPeriod(data, this.maxLength, this.index)
+        this.path1List[index] && this.path1List[index].datum(_peroidData).attr('d', this.line)
+        this.path2List[index] && this.path2List[index].datum(_peroidData).attr('d', this.area)
+        
+      })
+
       this.innerSvg
         .transition()  
         .ease(d3.easeLinear)

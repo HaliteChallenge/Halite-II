@@ -122,3 +122,18 @@ api.me().then((me) => {
        }
    }
 });
+
+// auto scroll to the anchor position
+(function(){
+    if (document.location.hash){
+        const hash = document.location.hash.slice(1);
+        const targetElement = document.getElementById(hash);
+        const top = targetElement.getBoundingClientRect().top - document.body.getBoundingClientRect().top;
+        // console.log(top);
+        setTimeout(function(){
+            window.scrollTo(0, 250);
+        },1000);
+    }
+    // event
+    
+})()

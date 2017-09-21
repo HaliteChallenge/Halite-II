@@ -6,12 +6,10 @@
                 <ul class="list-ha">
                     <li>
                         <i class="xline xline-top"></i>
-                        <i class="xline xline-bottom"></i>
                         <a href="#section_personal_info">Personal Info</a>
                     </li>
                     <li>
                         <i class="xline xline-top"></i>
-                        <i class="xline xline-bottom"></i>
                         <a href="#section_account_info">Account Info</a>
                     </li>
                 </ul>

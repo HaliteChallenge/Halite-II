@@ -1,10 +1,43 @@
 <template>
     <div class="row">
         <div class="col-md-4">
-            <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
-            <h1>{{ user.username }}</h1>
-
-            <p>{{ user.level }} at {{ user.organization }}</p>
+            <div class="user-profile">
+                <div class="user-profile-avatar">
+                    <i class="xline xline-top"></i>
+                    <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
+                </div>
+                <div class="user-profile-detail">
+                    <i class="xline xline-top"></i>
+                    <h1>{{ user.username }}</h1>
+                    <p>@julskast - USA</p>
+                </div>
+                <div class="user-profile-rank">
+                    <i class="xline xline-top"></i>
+                    <h2><span class="icon-tier-5"></span> rank 5, diamond tier</h2>
+                    <div class="user-profile-rank-stats">
+                        <div class="stats-item">
+                            <h3>Points</h3>
+                            <p>50.4</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Points</h3>
+                            <p>50.4</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Points</h3>
+                            <p>50.4</p>
+                        </div>
+                    </div>
+                    <p><a href="#">View on leaderboard</a></p>
+                </div>
+                <div class="user-profile-about">
+                    <i class="xline xline-top"></i>
+                    <h2>About</h2>
+                    <p>{{ user.level }} at {{ user.organization }}</p>
+                    <p>From New York, USA</p>
+                    <p>Bots in <a href="#">Python</a></p>
+                </div>
+            </div>
 
             <form v-if="is_my_page">
                 <div class="form-inline-button">

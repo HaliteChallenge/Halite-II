@@ -1,9 +1,10 @@
     <li class="{% if include.level.index.url == page.url %}active{% endif %} toc-group">
-        {{ include.level.name }}
-        <ul>
+        <i class="xline xline-top"></i>
+        <span>{{ include.level.name }}</span>
+        <ul class="sub-list-ha">
             {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">
-                <a href="{{ subpage.url }}">{% if subpage.short_title %}{{ subpage.short_title }}{% else %}{{ subpage.title }}{% endif %}</a>
+                <a href="{{ subpage.url }}"><span>{% if subpage.short_title %}{{ subpage.short_title }}{% else %}{{ subpage.title }}{% endif %}</span></a>
             </li>
             {% endfor %}
         {% for level in include.level.sublevels %}
