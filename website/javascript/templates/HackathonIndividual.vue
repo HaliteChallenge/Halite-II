@@ -192,6 +192,7 @@
       const getHackathonPromise = () => {
         if(this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
+            console.log(hackathon);
             this.hackathon = Object.assign(mockHackathon, {
               title: hackathon.title,
               description: hackathon.description,
