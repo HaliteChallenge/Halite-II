@@ -129,6 +129,9 @@ def main():
         if directory == "sample_bots":
             continue
 
+        if directory == "starterkitdocs":
+            continue
+
         language = directory
         generated_languages.append(language)
         print("Language:", language)

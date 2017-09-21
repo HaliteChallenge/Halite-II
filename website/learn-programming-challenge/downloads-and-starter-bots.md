@@ -4,21 +4,26 @@ title: Downloads and Starter Kits
 toc: false
 description: Download a Python AI bot, C++ AI bot, or Java AI bot as a quick and easy way to get started playing in the Halite AI competition.
 ---
-Download a Python, C++, or Java AI starter kit as a quick and easy way to get started playing in the Halite AI competition.
+Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
+
+
+We welcome the community to build new starter kits if there isnt one for their language of choice. Check out our [guide]() on how to build a new starter bot.
 
 ## About Your Starter Kit
 
-These downloads include both the Halite game environment (pre-compiled) as well as the starter kit for that language, unless no operating system is specified.
+Downloads include both the compiled Halite game environment and the starter kit for that language.
 
 ## Download All Kits
 
 [Source code download]({{ site.baseurl }}/{{ site.data.downloads.source }})
 
-__Current version:__ {{ site.data.downloads.version }}
+## Game Environment version
+
+__Version:__ {{ site.data.downloads.version }}
 
 ## Starter Kits by Language / Game Environment
 
-__Linux users note:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
+__Linux users:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
 
 <table class="table">
     <thead>
@@ -52,14 +57,8 @@ __Linux users note:__ Your system must support GCC 4.9 or later (with correspond
     </tbody>
 </table>
 
-## Standalone Visualizer
+## Halite Tools
 
-Removed pending automated builds.
+* [Halite Client](https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0): For uploading bots from your terminal
 
-<!--
-
-Only available for MacOS at the moment. (Sorry!)
-
-[MacOS DMG]({{ site.baseurl }}/assets/downloads/Standalone_MacOS.dmg)
-
--->
+* Offline Game Visualizer: TBD
