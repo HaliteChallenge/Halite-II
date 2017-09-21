@@ -128,6 +128,9 @@ def upload_game():
     # Update rankings
     update_rankings(users)
 
+    # Clean up old games
+    delete_old_games(users)
+
     return util.response_success()
 
 
@@ -510,3 +513,35 @@ def update_user_timeout(conn, game_id, user):
             },
             config.GAME_ERROR_MESSAGES,
             config.C_BOT_DISABLED)
+
+
+def delete_old_games(users):
+    """
+    If a user has more than 200 games, delete the oldest.
+    """
+    with model.engine.connect() as conn:
+        with conn.begin():
+            for user in users:
+                cutoff_time = conn.execute(sqlalchemy.sql.select([
+                    model.games.c.time_played
+                ]).where(
+                    sqlalchemy.sql.exists(
+                        model.game_participants.select().where(
+                            (model.game_participants.c.user_id == user["user_id"]) &
+                            (model.game_participants.c.game_id == model.games.c.id)))
+                ).order_by(model.games.c.time_played.desc()).limit(1).offset(200)).first()
+
+                if not cutoff_time:
+                    continue
+
+                cutoff_time = cutoff_time["time_played"]
+                # Delete all rows older than this in the various game tables
+                conn.execute(model.games.delete().where(
+                    sqlalchemy.sql.exists(
+                        model.game_participants.select().where(
+                            (model.game_participants.c.user_id == user["user_id"]) &
+                            (model.game_participants.c.game_id == model.games.c.id)
+                        )
+                    ) &
+                    (model.games.c.time_played <= cutoff_time)
+                ))

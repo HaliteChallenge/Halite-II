@@ -80,7 +80,7 @@ CREATE TABLE game_participant (
   rank INT UNSIGNED NOT NULL,
   player_index MEDIUMINT(8) UNSIGNED NOT NULL,
   timed_out BOOL NOT NULL,
-  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
   PRIMARY KEY (game_id, user_id, bot_id)
@@ -91,7 +91,7 @@ CREATE TABLE game_participant (
 CREATE TABLE game_view_stat (
   game_id INT UNSIGNED NOT NULL,
   views_total INT UNSIGNED NOT NULL,
-  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
   PRIMARY KEY (game_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -103,7 +103,7 @@ CREATE TABLE game_stat (
   planets_destroyed INT UNSIGNED NOT NULL,
   ships_produced INT UNSIGNED NOT NULL,
   ships_destroyed INT UNSIGNED NOT NULL,
-  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
   PRIMARY KEY (game_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -120,7 +120,7 @@ CREATE TABLE game_bot_stat (
   ships_relative_ratio FLOAT NOT NULL,
   planets_destroyed INT UNSIGNED NOT NULL,
   attacks_total INT UNSIGNED NOT NULL,
-  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES `user`(id),
   FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
   PRIMARY KEY (game_id, user_id, bot_id)
