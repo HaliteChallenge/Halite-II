@@ -73,6 +73,7 @@ header.navbar{
     min-height: 50px;
   }
   .not-logged-in{
+
     >li{
       padding: 0px 5px;
       >img {
@@ -84,16 +85,39 @@ header.navbar{
     }
   }
   .logged-in {
+    position: absolute;
+    top: 0;
+    right: 60px;
+    @media (min-width: $screen-md-min){
+      right: 20px;
+    }
     .navbar-right{
-      transform: translateY(-3px);
+      li a {
+        transform: translateY(-2px);
+        @media (max-width: $screen-sm-max){
+          transform: translateY(7px);
+        }
+      }
+    }
+    .submit-bot{
+      display: inline-block;
+      margin: 0;
+      height: 60px;
+      float: none !important;
+      @media (max-width: $screen-sm-max){
+        transform: translateY(-4px);
+      }
     }
     img {
       height: 34px;
     }
     .profile-container{
-      float: right;
       padding: 13px 0 0 10px;
       cursor: pointer;
+      display: inline-block;
+      @media (min-width: $screen-md-min){
+        transform: translateY(-26px);
+      }
       i{
         color: #FFF;
         margin-left: 3px;
@@ -101,8 +125,9 @@ header.navbar{
       ul{
         display: none;
         margin-top: 15px;
+        width: 135px;
         position: absolute;
-        transform: translateX(-75px);
+        transform: translateX(-85px);
         list-style: none;
         background-color: $gray-bg;
         border-radius: 4px;

@@ -1,5 +1,10 @@
 <template>
     <div class="logged-in">
+        <ul class="nav navbar-nav navbar-right submit-bot">
+            <li>
+                <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
+            </li>
+        </ul>
         <div class="profile-container">
             <a v-on:click.stop="slide_profile">
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
@@ -11,11 +16,6 @@
                 </ul>
             </a>
         </div>
-        <ul class="nav navbar-nav navbar-right ">
-            <li>
-                <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
-            </li>
-        </ul>
         <div class="popup-container" v-on:click.stop.prevent="close_submit">
             <div class="container">
                 <div class="row">
