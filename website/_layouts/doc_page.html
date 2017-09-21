@@ -14,18 +14,10 @@ layout: default
         {% capture toc %}{{ content | toc_only | strip }}{% endcapture %}
         {% if page.toc and toc contains 'li' %}
         <div class="col-md-6">
-            <div class="doc-content-header">
-                <div class="page-header">
-                    <h1>{{ page.title }}</h1>
-                </div>
-                <div class="doc-content-toc">
-                    {% if page.toc and toc contains 'li'  %}
-                        <h3 class="">Contents</h3>
-                        {{ toc }}
-                    {% endif %}
-                </div>
-            </div>
             <div class="doc-content-container">
+                <div class="page-header">
+                        <h1>{{ page.title }}</h1>
+                </div>
                 {{ content | inject_anchors }}
             </div>
         </div>
