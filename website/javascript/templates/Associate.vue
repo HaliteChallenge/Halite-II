@@ -212,7 +212,7 @@
                 }
 
                 // verify email
-                if (this.organization !== "NONE" && (this.email === '' || this.email != this.email_confirm)){
+                if (request["organization_id"] && (this.email === '' || this.email != this.email_confirm)){
                     this.error = "Organizational emails match"
                     return false;
                 }
