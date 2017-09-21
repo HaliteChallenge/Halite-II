@@ -26,8 +26,9 @@
                         <option value="" selected>Organization</option>
                         <option v-for="org in organizations" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
                     </select>
-                    <select class="form-control slt">
+                    <select class="form-control slt" aria-describedby="country-help" v-model="country_filter">
                         <option value="" disabled selected>Country</option>
+                        <option v-for="country in countries" :value="country[0]">{{ country[1].name }}</option>
                     </select>
                     <div>
                         <!-- <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button> -->
@@ -59,11 +60,11 @@
             </thead>
             <tbody>
                 <tr v-for="player in leaderboard">
-                    <td>{{ player.rank }}</td>
+                    <td>{{ player.rank || player.local_rank }}</td>
                     <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
                     <td>{{ Math.round(100 * player.score) / 100 }}</td>
                     <td>
-                        <span :class="tierClass(player.tier)"></span>
+                        <span :class="tierClass(player.tier || player.local_tier)"></span>
                     </td>
                     <td>{{ player.level }}</td>
                     <td>{{ player.organization }}</td>
@@ -95,27 +96,29 @@
             HalitePagination
         },
         data: function() {
-            // const countries = Object.entries(iso3166.data);
-            // countries.sort(function(country1, country2) {
-            //     const country1name = country1[1].name;
-            //     const country2name = country2[1].name;
-            //     if (country1name < country2name) {
-            //         return -1;
-            //     }
-            //     else if (country1name === country2name) {
-            //         return 0;
-            //     }
-            //     else {
-            //         return 1;
-            //     }
-            // });
+            const countries = Object.entries(iso3166.data);
+            countries.sort(function(country1, country2) {
+                const country1name = country1[1].name;
+                const country2name = country2[1].name;
+                if (country1name < country2name) {
+                    return -1;
+                }
+                else if (country1name === country2name) {
+                    return 0;
+                }
+                else {
+                    return 1;
+                }
+            });
             return {
+                countries: countries,
                 leaderboard: [],
                 username_filter: "",
                 tier_filter: "",
                 organization_filter: "",
+                country_filter: "",
                 page: 1,
-                limit: 12,
+                limit: 10,
                 lastPage: 0,
                 organizations: [],
                 summary: [
@@ -155,47 +158,43 @@
         },
         methods: {
             tierClass: tierClass,
-            update_filter: function(e) {
-                if (e) e.preventDefault();
-
+            build_filter: function() {
                 let filters = [];
                 if (this.username_filter.length > 0) {
                     filters.push("username,=," + this.username_filter);
                 }
                 if (this.tier_filter.length > 0) {
-                    filters.push("rank,=," + this.tier_filter);
+                    if (this.hackathonId) {
+                        filters.push("local_rank,=," + this.tier_filter);
+                    } else {
+                        filters.push("rank,=," + this.tier_filter);
+                    }
                 }
                 if (this.organization_filter && this.organization_filter.toString().length > 0) {
                     filters.push("organization_id,=," + this.organization_filter);
                 }
-                filters = filters.length ? filters : null;
+                // TODO: No country filter in API, wait for implementation
+                // if (this.country_filter.length > 0) {
+                //     filters.push("country,=," + this.country_filter);
+                // }
+                return filters.length ? filters : null;
+            },
+            update_filter: function(e) {
+                if (e) e.preventDefault();
+                const filters = this.build_filter();
                 if(this.lastPage <= 0) {
                     api.leaderboard(filters, this.hackathonId).then(leaderboard => {
                         if(leaderboard && leaderboard instanceof Array) {
                             this.lastPage = Math.ceil(leaderboard.length / this.limit)
                         }
-                    })
+                    });
                 }
                 api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
                     this.leaderboard = leaderboard;
                 });
             },
             changePage: function(page) {
-                let filters;
-                if (this.username_filter.length > 0) {
-                    filters = "username,=," + this.username_filter;
-                }
-                api.leaderboard(filters, this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-                    this.leaderboard = leaderboard;
-                    this.page = page;
-                });
-            },
-            changePage: function(page) {
-                let filters;
-                if (this.username_filter.length > 0) {
-                    filters = "username,=," + this.username_filter;
-                }
-                api.leaderboard(filters, this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
+                api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
                     this.leaderboard = leaderboard;
                     this.page = page;
                 });

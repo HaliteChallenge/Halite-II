@@ -169,7 +169,7 @@ export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
 
     const querystring = [];
     if(offset !== null && limit !== null) {
-        querystring.push(`?offset=${offset}&limit=${limit}`);
+        querystring.push(`offset=${offset}&limit=${limit}`);
     }
     if (filters && filters.length > 0) {
         querystring.push(`filter=${filters.join('&filter=')}`);
