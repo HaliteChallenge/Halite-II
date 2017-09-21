@@ -40,6 +40,8 @@ hackathon_query = sqlalchemy.sql.select([
     model.hackathons.c.end_date,
     model.hackathons.c.organization_id,
     model.organizations.c.organization_name,
+    model.hackathons.c.location,
+    model.hackathons.c.thumbnail,
 ]).select_from(
     model.hackathons.join(
         model.organizations,
@@ -70,6 +72,8 @@ def list_hackathons(*, user_id):
                 "end_date": hackathon["end_date"],
                 "organization_id": hackathon["organization_id"],
                 "organization_name": hackathon["organization_name"],
+                "location": hackathon["location"],
+                "thumbnail": hackathon["thumbnail"],
             }
 
             result.append(record)
@@ -87,6 +91,8 @@ def create_hackathon(*, user_id):
 
     title = hackathon_body["title"]
     description = hackathon_body["description"]
+    location = hackathon_body["location"]
+    thumbnail = hackathon_body["thumbnail"]
     start_date = arrow.get(hackathon_body["start_date"]).datetime
     end_date = arrow.get(hackathon_body["end_date"]).datetime
     organization_id = hackathon_body.get("organization_id", None)
@@ -125,6 +131,8 @@ def create_hackathon(*, user_id):
             end_date=end_date,
             verification_code=verification_code,
             organization_id=organization_id,
+            location=location,
+            thumbnail = thumbnail,
         )).inserted_primary_key[0]
 
         return util.response_success({
@@ -160,6 +168,8 @@ def get_hackathon(hackathon_id, *, user_id):
             "organization_id": hackathon["organization_id"],
             "organization_name": hackathon["organization_name"],
             "num_participants": hackathon_users,
+            "location": hackathon["location"],
+            "thumbnail": hackathon["thumbnail"],
         })
 
 
@@ -180,6 +190,12 @@ def update_hackathon(hackathon_id, *, user_id):
 
     if "organization_id" in hackathon_body:
         values["organization_id"] = int(hackathon_body["organization_id"])
+
+    if "location" in hackathon_body:
+        values["location"] = hackathon_body["location"]
+
+    if "thumbnail" in hackathon_body:
+        values["location"] = hackathon_body["thumbnail"]
 
     with model.engine.connect() as conn:
         hackathon = conn.execute(

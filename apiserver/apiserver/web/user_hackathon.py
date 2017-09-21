@@ -25,6 +25,9 @@ def get_user_hackathons(intended_user, *, user_id):
             model.hackathons.c.title,
             model.hackathons.c.start_date,
             model.hackathons.c.end_date,
+            model.hackathons.c.location,
+            model.hackathons.c.thumbnail,
+            model.hackathons.c.description,
         ]).select_from(
             model.hackathon_participants.join(
                 model.hackathons,
@@ -40,6 +43,12 @@ def get_user_hackathons(intended_user, *, user_id):
                 "title": hackathon["title"],
                 "status": api_util.hackathon_status(hackathon["start_date"],
                                                     hackathon["end_date"]),
+                
+                "start_date": hackathon["start_date"],
+                "end_date": hackathon["end_date"],
+                "location": hackathon["location"],
+                "thumbnail": hackathon["thumbnail"],
+                "description":hackathon["description"],
             })
 
     return flask.jsonify(record)

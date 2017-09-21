@@ -105,7 +105,8 @@ export default {
             const wrapEvent = [];
             hackathons.map(hackathon => {
               const newEvent = Object.assign({}, eventTemplate, {
-                img: `${this.baseUrl}/assets/images/temp/event-img.png`, 
+                img: hackathon.thumbnail, 
+                pin: hackathon.location,
                 title: hackathon.title,
                 id: hackathon.hackathon_id
               })
@@ -119,7 +120,8 @@ export default {
             const wrapHackathon = [];
             hackathons.map(hackathon => {
               const newHackathon = Object.assign({}, hackathonTemplate, {
-                img: `${this.baseUrl}/assets/images/temp/hackathon-image.png`,
+                img: hackathon.thumbnail,
+                pin: hackathon.location,
                 id: hackathon.hackathon_id,
                 title: hackathon.title
               });
