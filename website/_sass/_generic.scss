@@ -1,19 +1,15 @@
-
 html{
-  background-image: url();
+  background-image: url("/assets/images/site_bg.jpg");
   background-attachment: fixed;
   background-size: cover;
-  overflow-y: hidden;
 }
 
 body{
   font-family: $font-body;
   background-color: transparent;
   color: #ECFFFB;
-  overflow-y: scroll;
-  background: url("/assets/images/site_bg.jpg") no-repeat center fixed;
   font-size: 1.6rem;
-  background-size: cover;
+
   > .body {
     margin-top: 61px;
   }

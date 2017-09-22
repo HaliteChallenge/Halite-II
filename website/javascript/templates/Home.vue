@@ -219,7 +219,7 @@
                          </div>
                      </div>
                      <div class="col-md-4">
-                         <a class="twitter-timeline" data-height="400" href="https://twitter.com/HaliteAI"></a>
+                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
                      </div>
                      <div class="col-md-4">
                         <div id="redditWidget" class="reddit-widget"></div>
@@ -259,7 +259,7 @@
                          <div class="line-container line-2"><i class="xline xline-top"></i></div>
                          <div class="clear"></div>
                          <div class="content">
-                             <p class="t3 c-wht">ABOUT HALITE</p>
+                             <p class="t3 c-wht">ABOUT THE HALITE COMPETITION</p>
                              <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by Two Sigma in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                              <div class="clear"></div>
                              <div class="ha-button-container">
