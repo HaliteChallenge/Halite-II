@@ -5,7 +5,7 @@ Match API endpoints - list matches and get replays/error logs.
 import flask
 import sqlalchemy
 
-from .. import model, util
+from .. import model
 
 from .blueprint import web_api
 from . import util as api_util
@@ -38,9 +38,6 @@ def get_match_helper(match_id):
         ]).where(
             model.games.c.id == match_id
         )).first()
-
-        if not match:
-            return None
 
         result = {
             "map_width": match["map_width"],
@@ -170,7 +167,4 @@ def list_matches():
 
 @web_api.route("/match/<int:match_id>")
 def get_match(match_id):
-    match = get_match_helper(match_id)
-    if not match:
-        raise util.APIError(404, message="Match not found.")
-    return flask.jsonify(match)
+    return flask.jsonify(get_match_helper(match_id))
