@@ -49,6 +49,7 @@
   import Upload from "./Upload.vue";
   import BotUpload from "./BotUpload.vue";
   import Message from "./Message.vue";
+  import {Alert} from "../utils.js";
 
   export default {
     name: "uploader",
@@ -74,6 +75,14 @@
       }
     },
     mounted: function(){
+      // display a message when logged in successfully
+      const msg = this.$cookie.get('halite-message');
+      if ( msg ){
+        Alert.show(msg, 'success');
+        this.$cookie.delete('halite-message');
+      }
+
+      // logged in
       api.me().then((me) => {
         if (me !== null) {
           this.loggedIn = true;

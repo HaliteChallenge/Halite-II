@@ -60,16 +60,15 @@
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">1</span>
-                      <span class="hex-li-content">Make sure you've verified that you go to Cornell by authenticating your email <a href="#">here</a>.</span>
+                      <span class="hex-li-content">If you're participating in a school or company competition, make sure you've verified your organization email. <a href="/user?me">Edit your profile here</a>.</span>
                     </div>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <!-- <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-1.png`" alt="how to join"> -->
                   <div class="step-form">
                     <p class="t2 c-wht font-headline">AUTHENTICATE YOUR EMAIL</p>
-                    <input type="text" class="form-control tall-ipt" placeholder="School Email" />
-                    <input type="text" class="form-control tall-ipt" placeholder="School Email (Confirm)" />
+                    <div class="form-control tall-ipt">School Email</div>
+                    <div class="form-control tall-ipt">School Email (Confirm)</div>
                   </div>
                 </div>
               </div>
@@ -78,7 +77,7 @@
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">2</span>
-                      <span class="hex-li-content">Get a hackathon code from whoever invited you</span>
+                      <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email halite@halite.io for more information.</span>
                     </div>
                   </div>
                 </div>
@@ -91,25 +90,12 @@
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">3</span>
-                      <span class="hex-li-content">Submit your code on your <a href="/user?me">user profile</a>.</span>
+                      <span class="hex-li-content">Once you're all set, you'll see this hackathon on your user profile and you're ready to start submitting bots!</span>
                     </div>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-3.png`" alt="how to join">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="hackathon-join-left-col">
-                    <div class="hex-li">
-                      <span class="hex-bullet">4</span>
-                      <span class="hex-li-content">Once you're all set, you'll see this hackathon on your <a href="/user?me">user profile</a> and you're ready to start <a href="/play-programming-challenge">submitting bots</a>!</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-4.png`" alt="how to join">
+                  <a href="/play-programming-challenge"><img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-4.png`" alt="how to join"></a>
                 </div>
               </div>
             </div>

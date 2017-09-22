@@ -1,9 +1,7 @@
 <template>
   <div :class="`ha-alert ha-alert-${type}`" v-if="show">
-    <div class="container">
-      <button class="close" @click="disable">&times;</button>
-      <span class="ha-alert-type">{{`${type.toUpperCase()}:`}}</span>{{` ${message}`}}
-    </div>
+    <button class="close" @click="disable">&times;</button>
+    <span class="ha-alert-type">{{`${type.toUpperCase()}:`}}</span>{{` ${message}`}}
   </div>
 </template>
 
@@ -39,6 +37,9 @@
     text-align: center;
     font-size: 16px;
     line-height: 30px;
+    .close{
+      margin-right: 15px;
+    }
     &-type{
       font-family: Teko;
       text-transform: uppercase;
