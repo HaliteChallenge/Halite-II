@@ -241,7 +241,7 @@
                   <i class="dot-br"></i>
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-ship"></span>
-                    damage dealed
+                    damage dealt
                   </h4>
                   <div class="post-game-graph">
                     <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => {frame = index}" />
@@ -250,7 +250,7 @@
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
-                    attack overtime
+                    attack over time
                   </h4>
                   <div class="post-game-graph">
                     <PlayerLineChart :chart-data="chartData.attack" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
