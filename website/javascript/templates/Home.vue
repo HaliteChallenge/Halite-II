@@ -219,7 +219,7 @@
                          </div>
                      </div>
                      <div class="col-md-4">
-                         <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
+                         <a class="twitter-timeline" data-height="500" href="https://twitter.com/HaliteAI"></a>
                      </div>
                      <div class="col-md-4">
                         <div id="redditWidget" class="reddit-widget"></div>
