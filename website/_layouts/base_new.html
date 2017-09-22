@@ -49,97 +49,90 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
   <div id="message-placeholder"></div>
-
-  {% if page.no_header %}
-  {% else %}
-    <header class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <button class="btn btn-sm navbar-signin">
-            <span>
-              <i class="fa fa-github"></i>
-              Sign in
-            </span>
-          </button>
-          <a class="navbar-brand" href="{{ site.baseurl }}/">
-            <img alt="Halite" src="{{ site.baseurl }}/assets/images/full_logo.svg">
-          </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="{% if page.menu == 'learn' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'editor' %} active {% endif %}"><a href="{{ site.baseurl }}/editor"><span>Code</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'tv' %} active {% endif %}"><a href="{{ site.baseurl }}/halite-tv-coding-game-videos"><span>Halite TV</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Event &amp; Hackathons</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
-            </ul>
-          <ul class="nav navbar-nav navbar-right not-logged-in">
-            <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
-            <li><a href="{{ site.login_server_url }}/github">Sign In</a></li>
-          </ul>
-        </div>
-        <div id="user-profile-bar-container"></div>
-        <!--/.nav-collapse -->
+  <header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <button class="btn btn-sm navbar-signin">
+          <span>
+            <i class="fa fa-github"></i>
+            Sign in
+          </span>
+        </button>
+        <a class="navbar-brand" href="{{ site.baseurl }}/">
+          <img alt="Halite" src="{{ site.baseurl }}/assets/images/full_logo.svg">
+        </a>
       </div>
-    </header>
-  {% endif %}
+      <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+              <li class="{% if page.menu == 'learn' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'editor' %} active {% endif %}"><a href="{{ site.baseurl }}/editor"><span>Code</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'tv' %} active {% endif %}"><a href="{{ site.baseurl }}/halite-tv-coding-game-videos"><span>Halite TV</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Event &amp; Hackathons</span><i class="xline xline-bottom"></i></a></li>
+              <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
+          </ul>
+        <ul class="nav navbar-nav navbar-right not-logged-in">
+          <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
+          <li><a href="{{ site.login_server_url }}/github">Sign In</a></li>
+        </ul>
+      </div>
+      <div id="user-profile-bar-container"></div>
+      <!--/.nav-collapse -->
+    </div>
+  </header>
 
   <div class="body">
     {{ content }}
   </div>
-  
-  {% if page.no_header %}
-  {% else %}
-    <footer class="footer">
-      <nav class="navbar">
-        <div class="container-fluid">
-          <ul class="nav">
-            <li><a href="{{ site.baseurl }}/about">About</a></li>
-            <li><a href="{{ site.baseurl }}/about/contact">Contact</a></li>
-            <li><a href="{{ site.baseurl }}/about/terms-and-conditions">Terms and Conditions</a></li>
-            <li><a href="{{ site.baseurl }}/about/privacy">Privacy Policy</a></li>
-            <li><a href="http://status.halite.io">Status</a></li>
-          </ul>
-        </div>
-      </nav>
-      <div class="footer-below">
-        <div class="container-fluid">
-          <div class="footer-below-wrap">
-            <div class="footer-subscribe">
-              <p class="footer-subscribe-top">Subscribe to our newsletter</p>
-              <div class="footer-subscribe-field">
-                <input type="text">
-                <button class="btn"><span>SUBSCRIBE</span></button>
-              </div>
+
+  <footer class="footer">
+    <nav class="navbar">
+      <div class="container-fluid">
+        <ul class="nav">
+          <li><a href="{{ site.baseurl }}/about">About</a></li>
+          <li><a href="{{ site.baseurl }}/about/contact">Contact</a></li>
+          <li><a href="{{ site.baseurl }}/about/terms-and-conditions">Terms and Conditions</a></li>
+          <li><a href="{{ site.baseurl }}/about/privacy">Privacy Policy</a></li>
+          <li><a href="http://status.halite.io">Status</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="footer-below">
+      <div class="container-fluid">
+        <div class="footer-below-wrap">
+          <div class="footer-subscribe">
+            <p class="footer-subscribe-top">Subscribe to our newsletter</p>
+            <div class="footer-subscribe-field">
+              <input type="text">
+              <button class="btn"><span>SUBSCRIBE</span></button>
             </div>
-            <div class="footer-copy">
-              <img src="{{ site.baseurl }}/assets/images/full_logo.svg" class="footer-copy-logo" alt="">
-              <p> &copy; Halite by <a class="base-link" href="https://www.twosigma.com" target="_blank">Two Sigma</a>, 2017. All rights reserved.</p>
-            </div>
-            <div class="footer-social">
-              <p class="footer-social-top">
-                Follow us
-              </p>
-              <p class="footer-social-icons">
-                <a href="https://www.reddit.com/r/Halite/" target="_blank"><i class="fa fa-reddit-alien"></i></a>
-                <a href="https://www.facebook.com/haliteAI/" target="_blank"><i class="fa fa-facebook-official"></i></a>
-                <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank"><i class="fa fa-twitter"></i></a>
-                <a href="https://github.com/halitechallenge/Halite-II" target="_blank"><i class="fa fa-github"></i></a>
-              </p>
-            </div>
+          </div>
+          <div class="footer-copy">
+            <img src="{{ site.baseurl }}/assets/images/full_logo.svg" class="footer-copy-logo" alt="">
+            <p> &copy; Halite by <a class="base-link" href="https://www.twosigma.com" target="_blank">Two Sigma</a>, 2017. All rights reserved.</p>
+          </div>
+          <div class="footer-social">
+            <p class="footer-social-top">
+              Follow us
+            </p>
+            <p class="footer-social-icons">
+              <a href="https://www.reddit.com/r/Halite/" target="_blank"><i class="fa fa-reddit-alien"></i></a>
+              <a href="https://www.facebook.com/haliteAI/" target="_blank"><i class="fa fa-facebook-official"></i></a>
+              <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank"><i class="fa fa-twitter"></i></a>
+              <a href="https://github.com/halitechallenge/Halite-II" target="_blank"><i class="fa fa-github"></i></a>
+            </p>
           </div>
         </div>
       </div>
-    </footer>
-  {% endif %}
+    </div>
+  </footer>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
