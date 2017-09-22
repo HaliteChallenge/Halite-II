@@ -107,7 +107,7 @@
     <div class="footer-below">
       <div class="container-fluid">
         <div class="footer-below-wrap">
-          <div class="footer-subscribe">
+          <div class="footer-subscribe" id="subscribeFooter">
             <p class="footer-subscribe-top">Subscribe to our newsletter</p>
             <div class="footer-subscribe-field">
               <input type="text">
@@ -147,6 +147,13 @@
   <script>
     var _global = {}
     _global.baseUrl = '{{ site.baseurl }}';
+
+    if(window.localStorage["user_id"] != null)
+    {
+      console.log("logged in")
+      document.getElementById("subscribeFooter").style.visibility = "hidden"; 
+    }
+
   </script>
 
   {% if page.mount_view %}
