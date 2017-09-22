@@ -6,11 +6,15 @@ description: Details for hardware, compilation, game data, and GPU usage for the
 ---
 
 ## Hardware
-
 All compilation and games are run in Google Cloud Compute Engine instances with 1 vCPU and 2.5 GB memory.
 
-## Compilation
+## Compute and Memory per bot
+Bots are given 350 MB of RAM and equal amounts of CPU.
 
+## Halite Environment Version
+Games are always run using the most recent environment build.
+
+## Compilation
 Bot compilation is done using this [autocompile script][autocompile-script].
 
 To facilitate the installation of custom software, we allow users to include an install script. If a file named `install.sh` exists in your submission, it is run as a bash script under the root user in a sandbox with internet access and 10 minutes of runtime. Bots may only read and write to their current directory, so all files that you want to be available at runtime must be installed locally.
@@ -167,13 +171,7 @@ Clojure Packages:
 
 Both Python 3.5 and 3.6 are installed. To use 3.6, you will have to explicitly use a `run.sh` file to invoke `python3.6`.
 
-## Games
-
-Bots are given 350 MB of RAM and equal amounts of CPU.
-
-Games are always run using the most recent environment build.
-
-### GPU-Enabled Games
+## GPU-Enabled Games
 
 The following packages are available during __runtime__ (__not__ compile time) for GPU-enabled bots:
 
