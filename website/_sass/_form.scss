@@ -18,14 +18,10 @@
 
 select.form-control{
   -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   background-image: url("/assets/images/chevron-down.svg");
   background-position: calc(100% - 15px) center;
   background-repeat: no-repeat;
-}
-select.form-control::-ms-expand {
-    display: none;
 }
 
 .help-block{
