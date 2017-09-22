@@ -27,6 +27,11 @@ permalink: /blog/:year/:month/:day/:title.html
 api_server_url: "https://api.halite.io/v1/api"
 login_server_url: "https://api.halite.io/v1/login"
 
+breadcrumbs:
+  root:
+    hide: true  # show breadcrumbs on root/home page
+    image: true # Show image or title text
+
 # Build settings
 markdown: kramdown
 gems:

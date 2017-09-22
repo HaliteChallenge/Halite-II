@@ -222,6 +222,8 @@
       .event-img {
         height: 130px;
         width: 130px;
+        background-size: cover;
+        background-position: center;
       }
 
       .event-desc {
@@ -242,7 +244,7 @@
 
       .event-btn {
         height: 130px;
-        margin-right: 65px; 
+        margin-right: 65px;
         display: flex;
         align-items: center;
       }

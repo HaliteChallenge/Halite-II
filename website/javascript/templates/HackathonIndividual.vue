@@ -12,10 +12,6 @@
         <p class="inline-block mg-left-tiny">{{hackathon.date}}</p>
       </div>
       <div class="hackathon-info-text">
-        <img class="inline-block" :src="`${baseUrl}/assets/images/halite-time-white.svg`"/>
-        <p class="inline-block mg-left-tiny">{{hackathon.time}}</p>
-      </div>
-      <div class="hackathon-info-text">
         <img class="inline-block" :src="`${baseUrl}/assets/images/halite-pin-white.svg`"/>
         <p class="inline-block mg-left-tiny">{{hackathon.pin}}</p>
       </div>
@@ -27,16 +23,13 @@
     <section class="hackathon-desc">
       <i class="xline xline-top"></i>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <p class="t1 c-wht font-headline">HACKATHON DESCRIPTION</p>
           <div class="hackathon-desc-text">
             <i class="xline xline-top short-line"></i>
-            <i class="xline xline-bottom short-line"></i>
             <div v-html="hackathon.description"></div>
+            <i class="xline xline-bottom short-line"></i>
           </div>
-        </div>
-        <div class="col-md-6">
-          <img class="right img-responsive" :src="hackathon.img" />
         </div>
       </div>
     </section>
@@ -146,6 +139,7 @@
   import * as api from "../api";
   import HaliteBreadcrumb from './Breadcrumb.vue';
   import Leaderboard from './Leaderboard.vue';
+  import moment from 'moment';
 
   const mockHackathon = {
     title: 'Cornell Virtual Halite Hackathon',
@@ -193,9 +187,13 @@
         if(this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
             console.log(hackathon);
+            const beginDate = moment(hackathon.begin_date).format("MM-DD-YYYY");
+            const endDate = moment(hackathon.end_date).format("MM-DD-YYYY");
             this.hackathon = Object.assign(mockHackathon, {
               title: hackathon.title,
+              date: `${beginDate} to ${endDate}`,
               description: hackathon.description,
+              pin: hackathon.location,
               img: `${this.baseUrl}/assets/images/temp/hackathon.png`
             });
             return Promise.resolve();

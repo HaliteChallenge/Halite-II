@@ -5,26 +5,92 @@
       <div class="hackathon-title">
         <i class="xline xline-bottom"></i>
         <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
-        <p class="t2 c-wht font-headline">HACKATHON IN PROGRESS</p>
+        <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
       <div class="row hackathon-progress-cards">
-        <div class="col-md-3" v-for="hackathon in hackathons" @click="jumpToHackathon(hackathon.id)">
+        <div class="col-md-3" @click="jumpToHackathon(2)">
           <div class="hackathon-progress-card">
-            <img class="hackathon-card-img" :src="hackathon.img" alt="hackathon"/>
+            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
             <div class="hackathon-card-text">
-              <p class="t3 c-wht">{{hackathon.title}}</p>
+              <p class="t3 c-wht">Hackathon #1</p>
               <ul class="hackathon-info">
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">{{hackathon.pin}}</p>
+                  <p class="hackathon-card-item-text">New York</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">{{hackathon.time}}</p>
+                  <p class="hackathon-card-item-text">August 3-5</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">{{hackathon.group}}</p>
+                  <p class="hackathon-card-item-text">Open to all</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" @click="jumpToHackathon(2)">
+          <div class="hackathon-progress-card">
+            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
+            <div class="hackathon-card-text">
+              <p class="t3 c-wht">Hackathon #1</p>
+              <ul class="hackathon-info">
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
+                  <p class="hackathon-card-item-text">New York</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
+                  <p class="hackathon-card-item-text">August 3-5</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
+                  <p class="hackathon-card-item-text">Open to all</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" @click="jumpToHackathon(2)">
+          <div class="hackathon-progress-card">
+            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
+            <div class="hackathon-card-text">
+              <p class="t3 c-wht">Hackathon #2</p>
+              <ul class="hackathon-info">
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
+                  <p class="hackathon-card-item-text">New York</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
+                  <p class="hackathon-card-item-text">August 3-5</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
+                  <p class="hackathon-card-item-text">Open to all</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" @click="jumpToHackathon(2)">
+          <div class="hackathon-progress-card">
+            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
+            <div class="hackathon-card-text">
+              <p class="t3 c-wht">Hackathon #2</p>
+              <ul class="hackathon-info">
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
+                  <p class="hackathon-card-item-text">New York</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
+                  <p class="hackathon-card-item-text">August 3-5</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
+                  <p class="hackathon-card-item-text">Open to all</p>
                 </li>
               </ul>
             </div>
@@ -39,7 +105,7 @@
       </div>
       <div class="event-cards">
         <div class="event-card" v-for="event in events" @click="jumpToHackathon(event.id)">
-          <img class="event-img" :src="event.img"/>
+          <div class="event-img" :style="{'background-image':`url(${event.img})`}"></div>
           <div class="event-desc">
             <p class="t3 c-wht">{{event.title}}</p>
             <p>{{event.text}}</p>
@@ -105,7 +171,7 @@ export default {
             const wrapEvent = [];
             hackathons.map(hackathon => {
               const newEvent = Object.assign({}, eventTemplate, {
-                img: hackathon.thumbnail, 
+                img: hackathon.thumbnail,
                 pin: hackathon.location,
                 title: hackathon.title,
                 id: hackathon.hackathon_id
@@ -115,8 +181,8 @@ export default {
             this.events = wrapEvent;
 
             if(hackathons.length >= 4) {
-              hackathons = hackathons.slice(0, 4); 
-            } 
+              hackathons = hackathons.slice(0, 4);
+            }
             const wrapHackathon = [];
             hackathons.map(hackathon => {
               const newHackathon = Object.assign({}, hackathonTemplate, {

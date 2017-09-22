@@ -48,7 +48,7 @@
       font-family: $font-heading;
       font-size: 20px;
       line-height: 1.3em;
-      color: #858E92;
+      color: $foreground;
       text-transform: uppercase;
       text-decoration: none;
       > span{
@@ -86,18 +86,20 @@
       position: absolute;
       left: -20px;
       top: 7px;
-      color: #ECFFFB;
+      color: $foreground;
     }
     a{
       display: block;
-      opacity: 0.5;
       font-family: 'Teko';
       font-size: 20px;
-      color: #ECFFFB;
+      color: $foreground;
       letter-spacing: 1px;
       padding: 5px 0;
       text-transform: none;
       text-decoration: none;
+    }
+    &.active a, &.active:before{
+      color: $yellow;
     }
     &:hover{
       a, &:before{

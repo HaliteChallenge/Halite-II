@@ -1,0 +1,19 @@
+<nav class="breadcrumbs bootstrap hidden-sm-down" {% if (page.url == '/') and (site.breadcrumbs.root.hide) %}{{ 'style="display: none;"' }}{% endif %}>
+  <ul class="breadcrumb">
+    {% assign position = 0 %}
+    {% for crumbitem in breadcrumbs %}
+      {% assign position = position  | plus: 1 %}
+
+      {% if forloop.last %}
+        <li class="breadcrumb-item" property="itemListElement" typeof="ListItem"><span property="name">{{ crumbitem.title }}</span><meta property="position" content="{{ position }}" /></li>
+        {% continue %}
+      {% endif %}
+      {% if position > 1 %}
+        <li class="breadcrumb-item" property="itemListElement" typeof="ListItem">
+            <a property="item" typeof="WebPage" href="{{ crumbitem.url | prepend: site.baseurl }}"><span property="name">{{ crumbitem.title }}</span><meta property="position" content="{{ position }}" /></a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+  </ul>
+</nav>
