@@ -1,6 +1,5 @@
 <template>
     <div class="associate-container">
-
         <div class="row">
             <div class="col-md-2">
                 <ul class="list-ha">
@@ -10,6 +9,7 @@
                     </li>
                     <li>
                         <i class="xline xline-top"></i>
+                        <i class="xline xline-bottom"></i>
                         <a href="#section_account_info">Account Info</a>
                     </li>
                 </ul>
@@ -35,37 +35,16 @@
 
                     <div v-if="level === 'Professional'">
                         <div class="form-group">
-                            <label for="organization">Please choose your organization<span class="text-danger">*</span></label>
-                            <select class="form-control" id="organization" v-model="organization">
-                                <option value="NONE">(no affiliation)</option>
-                                <option v-for="org in organizations" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" v-if="organization != 'NONE'">
                             <label for="work-email">Please share your work email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
                         </div>
-                        <div class="form-group" v-if="organization != 'NONE'">
-                            <input type="email" class="form-control" id="work-email-confirm" placeholder="Work Email (Confirm)" v-model="email_confirm" />
-                        </div>
-
                         <div class="form-group">
-                            <label for="org-name">Or, if you can't find your organization, share its name with us for approval</label>
-                            <span id="org-name-help" class="help-block">This will be show on your profile and leaderboard</span>
-                            <input type="text" class="form-control" id="org-name" placeholder="Name" aria-describedby="org-name-help" />
+                            <input type="email" class="form-control" id="work-email-confirm" placeholder="Work Email (Confirm)" v-model="email_confirm" />
                         </div>
                     </div>
 
                     <div v-if="level === 'Undergraduate' || level === 'Graduate'">
-                        <div class="form-group">
-                            <label for="organization">Please choose your school<span class="text-danger">*</span></label>
-                            <select class="form-control" id="organization" v-model="organization">
-                                <option v-for="org in only_universities" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
-                            </select>
-                        </div>
-
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
@@ -78,14 +57,10 @@
 
                     <div v-if="level === 'High School'">
                         <div class="form-group">
-                            <label for="organization">Please choose your school<span class="text-danger">*</span></label>
-                            <select class="form-control" id="organization" v-model="organization">
-                                <option v-for="org in only_high_schools" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
-                            </select>
+                            <label for="organization">Please enter your school</label>
+                            <input type="text" class="form-control" placeholder="School Name" v-model="organization">
                         </div>
                     </div>
-
-
 
                     <h2 id="section_account_info" class="form-heading">Account info</h2>
 
@@ -176,12 +151,6 @@
                     }
                 });
                 return regions;
-            },
-            only_universities: function() {
-                return this.organizations.filter((org) => org.type === "University");
-            },
-            only_high_schools: function() {
-                return this.organizations.filter((org) => org.type === "High School");
             }
         },
         methods: {
@@ -215,36 +184,33 @@
                     return false;
                 }
 
-                api.register_me(request).then((success) => {
-                    if (this.hackathon_code != ""){
-                        api.registerHackathon(this.hackathon_code).then((success) => {
-                            window.location.replace("/hackathon-and-events");
-                        }, (error) => {
-                            this.error = error.responseJSON.message;
-                        });
-                    } else {
-                        window.location.replace("/play-programming-challenge");
-                    }
-                }, (error) => {
-                    this.error = error.responseJSON.message;
-                });
+                window.location.replace("/play-programming-challenge");
+                this.$cookie.set('halite-message', 'Success message');
+
+                // api.register_me(request).then((success) => {
+                //     if (this.hackathon_code != ""){
+                //         api.registerHackathon(this.hackathon_code).then((success) => {
+                //             window.location.replace("/hackathon-and-events");
+                //         }, (error) => {
+                //             this.error = error.responseJSON.message;
+                //         });
+                //     } else {
+                //         window.location.replace("/play-programming-challenge");
+                //     }
+                // }, (error) => {
+                //     this.error = error.responseJSON.message;
+                // });
             },
         },
         mounted: function() {
             api.me().then((me) => {
-               if (!me.is_new_user) {
+               if (me && !me.is_new_user) {
                    window.location.replace("/user?me");
                }
-            });
-            api.list_organizations().then((orgs) => {
-               this.organizations = orgs;
             });
         },
     }
 </script>
 
 <style lang="scss" scoped>
-    .associate-container{
-        padding-top: 50px;
-    }
 </style>

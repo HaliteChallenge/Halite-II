@@ -20,6 +20,7 @@ import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstra
 import * as api from "./api";
 
 Vue.use(require('vue-moment'));
+Vue.use(require('vue-cookie'));
 
 window.views = {
     ApiKey: function () {
