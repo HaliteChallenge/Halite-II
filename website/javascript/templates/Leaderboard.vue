@@ -37,13 +37,13 @@
                 </div><!-- /input-group -->
             </div>
         </form>
-        <div class="leaderboard-summary">
-            <div class="leaderboard-summary-item" v-for="s in summary">
-                <img :src="s.img" />
-                <div>
-                    <p>{{s.number}}</p>
-                    <p>{{s.name}}</p>
-                </div>
+        <div class="leaderboard-stats leaderboard-table-stats">
+            <div class="stat-item stat-item-sm" v-for="s in summary">
+              <div class="stat-item-icon"><span :class="`icon-${s.icon}`"></span></div>
+              <div class="stat-item-content">
+                <p class="stat-item-value">{{s.number}}</p>
+                <p class="stat-item-caption">{{s.name}}</p>
+              </div>
             </div>
         </div>
         <table class="table table-leader">
@@ -123,27 +123,27 @@
                 organizations: [],
                 summary: [
                     {
-                        img: `${this.baseUrl}/assets/images/leaderboard-grandMaster.svg`,
+                        icon: 'trophy',
                         number: 23,
                         name: 'GrandMaster'
                     },
                     {
-                        img: `${this.baseUrl}/assets/images/leaderboard-master.svg`,
+                        icon: 'crown',
                         number: 23,
                         name: 'Master'
                     },
                     {
-                        img: `${this.baseUrl}/assets/images/leaderboard-professional.svg`,
+                        icon: 'medal',
                         number: 23,
                         name: 'Professional'
                     },
                     {
-                        img: `${this.baseUrl}/assets/images/leaderboard-universityStudents.svg`,
+                        icon: 'hat',
                         number: 23,
                         name: 'University Students'
                     },
                     {
-                        img: `${this.baseUrl}/assets/images/leaderboard-highSchoolStudents.svg`,
+                        icon: 'bag',
                         number: 23,
                         name: 'High School Students'
                     }

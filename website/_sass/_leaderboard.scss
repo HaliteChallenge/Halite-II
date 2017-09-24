@@ -1,126 +1,209 @@
 .leaderboard-container {
-    $o-color: #E37222;
-    $w-color: #FFFFFF;
-    $g-color: #9d9d9d;
+  $o-color: #E37222;
+  $w-color: #FFFFFF;
+  $g-color: #9d9d9d;
   
-    .c-org{
-      color: $o-color;
-    }
-    .c-wht{
-      color: $w-color;
-    }
-    .c-gry{
-      color: $g-color;
-    }
-    .c-yel{
-      color: $yellow;
-    }
+  .c-org{
+    color: $o-color;
+  }
+  .c-wht{
+    color: $w-color;
+  }
+  .c-gry{
+    color: $g-color;
+  }
+  .c-yel{
+    color: $yellow;
+  }
   
-    .d1{
-      font-size: 1.4rem;
+  .d1{
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  .t1{
+    font-size: 6rem;
+    letter-spacing: 2px;
+  }
+  .t2{
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+  }
+  .t3{
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  .t4{
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  .mgt-10{
+    margin-top: 10px;
+  }
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+
+    .filter-handler {
+      display: table;
+
+      .handler-item {
+        display: table-cell;
+        background-color: #000;
+        line-height: 38px;
+        padding: 0 10px;
+
+        .handler-item-img {
+          vertical-align: baseline;
+          cursor: pointer;
+        }
+        .handler-item-text {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+
+  .leaderboard-filter-form {
+    .filter-group {
+      margin: 20px 0;
+    }
+
+    .form-control {
+      margin-right: 15px;
+    }
+
+    .filter-group{
+      .input-group{
+        @media (min-width: $screen-sm-min){
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          > .form-control{
+            min-width: 0;
+            flex: 1;
+          }
+        }
+        > *{
+          display: block;
+          margin-bottom: 10px;
+          @media (min-width: $screen-sm-min){
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+  }
+
+  .leaderboard-table-stats{
+    @media (min-width: $screen-sm-min){
+      display: flex;
+    }
+  }
+
+  .leaderboard-page {
+    margin: 30px 0 50px;
+  }
+}
+
+.leaderboard-summary{
+  margin-bottom: 50px;
+  @media (min-width: $screen-sm-min){
+    display: flex;
+    > div{
+      display: flex;
+      flex-flow: column;
+      > div{
+        flex: 1;
+      }
+    }
+  }
+}
+
+.leaderboard-stats, .leaderboard-explore{
+  background-color: #1c1a27;
+  padding: 20px;
+}
+.leaderboard-explore{
+  text-align: center;
+}
+
+.leaderboard-stats{
+  $header-color: $foreground;
+  $body-color: #C2D1D0;
+
+  .stat-item{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-bottom: 30px;
+    &:last-child{
+      margin-bottom: 0
+    }
+    @media (min-width: $screen-sm-min){
+      justify-content: center;
+      margin-bottom: 0;
+    }
+    &-icon{
+      margin-right: 15px;
+      font-size: 30px;
+      color: #63CECA;
+    }
+    &-content{
+      
+    }
+    &-value{
+      font-family: $font-heading;
+      font-size: 36px;
+      line-height: 1em;
+      color: #ECFFFB;
       letter-spacing: 1px;
+      margin-bottom: 0;
     }
-    .t1{
-      font-size: 6rem;
-      letter-spacing: 2px;
+    &-caption{
+      font-size: 14px;
+      line-height: 1em;
+      color: #C2D1D0;
+      letter-spacing: 0.5px;
+      margin-bottom: 0;
     }
-    .t2{
-      font-size: 2.5rem;
-      letter-spacing: 2px;
+    &-sm{
+      .stat-item-icon{
+        font-size: 30px;
+      }
+      .stat-item-value{
+        font-size: 24px;
+      }
+      .stat-item-caption{
+        font-size: 14px;
+      }
     }
-    .t3{
-      font-size: 1.5rem;
-      letter-spacing: 1px;
-    }
-    .t4{
-      font-size: 1.4rem;
-      letter-spacing: 1px;
-    }
-    .mgt-10{
-      margin-top: 10px;
-    }
+  }
+  &-row-1{
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #363347;
 
-    .form-header {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-
-        .filter-handler {
-            display: table;
-
-            .handler-item {
-                display: table-cell;
-                background-color: #000;
-                line-height: 38px;
-                padding: 0 10px;
-
-                .handler-item-img {
-                    vertical-align: baseline;
-                    cursor: pointer;
-                }
-                .handler-item-text {
-                    margin-left: 10px;
-                }
-            }
+    @media (min-width: $screen-sm-min){
+      display: flex;
+    }
+    .stat-item{
+      @media (min-width: $screen-sm-min){
+        border-right: 1px solid #363347;
+        &:last-child{
+          border-right: 0;
         }
+      }
     }
-
-    .leaderboard-filter-form {
-        .filter-group {
-            margin: 20px 0;
-        }
-
-        .form-control {
-            margin-right: 15px;
-        }
-
-        .filter-group{
-            .input-group{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                > .form-control{
-                    min-width: 0;
-                    flex: 1;
-                }
-                > *{
-                    display: block;
-                    width: auto;
-                }
-            }
-        }
-
+    .stat-item-icon{
+      font-size: 30px;
     }
-
-    .leaderboard-summary {
-        display: table;
-        width: 100%;
-        text-align: center;
-        background-color: #1C1A27;
-        padding: 20px 0;
-        margin-bottom: 5px;
-
-        .leaderboard-summary-item {
-            display: table-cell;
-
-            img {
-                display: inline-block;
-                vertical-align: top;
-                margin-top: 8px;
-            }
-
-            div {
-                display: inline-block;
-
-                p {
-                    text-align: left;
-                    margin: 0 0 0 10px;
-                }
-            }
-        }
+  }
+  &-row-2{
+    @media (min-width: $screen-sm-min){
+      display: flex;
     }
-
-    .leaderboard-page {
-        margin: 30px 0 50px;
-    }
+  }
 }

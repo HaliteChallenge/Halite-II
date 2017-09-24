@@ -3,7 +3,7 @@ import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
 import BotEditor from "./templates/BotEditor.vue";
 import HackathonLeaderboard from "./templates/HackathonLeaderboard.vue";
-import Leaderboard from "./templates/Leaderboard.vue";
+import LeaderboardContainer from "./templates/LeaderboardContainer.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
@@ -47,10 +47,10 @@ window.views = {
             render: (h) => h(HackathonLeaderboard),
         });
     },
-    Leaderboard: function () {
+    LeaderboardContainer: function () {
         new Vue({
             el: "#leaderboard-container",
-            render: (h) => h(Leaderboard, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(LeaderboardContainer, {props: {baseUrl: _global.baseUrl}}),
         });
     },
     Upload: function () {
