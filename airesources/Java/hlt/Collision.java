@@ -20,9 +20,9 @@ public class Collision {
         final double endX = end.getXPos();
         final double endY = end.getYPos();
         final double centerX = circle.getXPos();
-        final double centerY = circle.getXPos();
-        final double dx = startX - endX;
-        final double dy = startY - endY;
+        final double centerY = circle.getYPos();
+        final double dx = endX - startX;
+        final double dy = endY - startY;
 
         final double a = square(dx) + square(dy);
 
