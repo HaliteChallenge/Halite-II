@@ -24,25 +24,24 @@ public class Position {
         return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
     }
 
-    public double orientTowardsInDeg(final Position target) {
+    public int orientTowardsInDeg(final Position target) {
+        return Util.angleRadToDegClipped(orientTowardsInRad(target));
+    }
+
+    public double orientTowardsInRad(final Position target) {
         final double dx = target.getXPos() - xPos;
         final double dy = target.getYPos() - yPos;
 
-        double angle = Math.toDegrees(Math.atan2(dy, dx));
-        if (angle < 0) {
-            angle += 360;
-        }
-
-        return angle;
+        return Math.atan2(dy, dx) + 2 * Math.PI;
     }
 
     public Position getClosestPoint(final Entity target) {
         final int MIN_DISTANCE = 3;
         final double radius = target.getRadius() + MIN_DISTANCE;
-        final double angleDeg = target.orientTowardsInDeg(this);
+        final double angleRad = target.orientTowardsInRad(this);
 
-        final double dx = target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg));
-        final double dy = target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg));
+        final double dx = target.getXPos() + radius * Math.cos(angleRad);
+        final double dy = target.getYPos() + radius * Math.sin(angleRad);
 
         return new Position(dx, dy);
     }

@@ -13,27 +13,27 @@ public class Navigation {
     public ThrustMove navigateToDock(final GameMap gameMap, final int maxThrust) {
         final int maxCorrections = Constants.MAX_CORRECTIONS;
         final boolean avoidObstacles = true;
-        final int angularStep = 1;
+        final double angularStepRad = Math.PI/180;
         final Position targetPos = ship.getClosestPoint(target);
 
-        return navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStep);
+        return navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStepRad);
     }
 
     public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final int maxThrust,
-                                      final boolean avoidObstacles, final int maxCorrections, final int angularStep) {
+                                      final boolean avoidObstacles, final int maxCorrections, final double angularStepRad) {
         if (maxCorrections <= 0) {
             return null;
         }
 
         final double distance = ship.getDistanceTo(targetPos);
-        final double angleDeg = ship.orientTowardsInDeg(targetPos);
+        final double angleRad = ship.orientTowardsInRad(targetPos);
 
         if (avoidObstacles && !gameMap.objectsBetween(ship, targetPos).isEmpty()) {
-            final double newTargetDx = Math.cos(Math.toRadians(angleDeg + angularStep)) * distance;
-            final double newTargetDy = Math.sin(Math.toRadians(angleDeg + angularStep)) * distance;
+            final double newTargetDx = Math.cos(angleRad + angularStepRad) * distance;
+            final double newTargetDy = Math.sin(angleRad + angularStepRad) * distance;
             final Position newTarget = new Position(ship.getXPos() + newTargetDx, ship.getYPos() + newTargetDy);
 
-            return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections-1), angularStep);
+            return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections-1), angularStepRad);
         }
 
         final int thrust;
@@ -45,6 +45,8 @@ public class Navigation {
             thrust = maxThrust;
         }
 
-        return new ThrustMove(ship, (int)(angleDeg + 0.5), thrust);
+        final int angleDeg = Util.angleRadToDegClipped(angleRad);
+
+        return new ThrustMove(ship, angleDeg, thrust);
     }
 }
