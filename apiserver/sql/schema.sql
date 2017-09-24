@@ -54,7 +54,7 @@ CREATE TABLE bot (
   score FLOAT NOT NULL DEFAULT 0,
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) on delete cascade,
   PRIMARY KEY (user_id, id)
 );
 
@@ -141,8 +141,8 @@ CREATE TABLE bot_history (
   last_games_played BIGINT DEFAULT NULL,
   language VARCHAR(16) NOT NULL,
   when_retired DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
-  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, bot_id, version_number)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -153,7 +153,7 @@ CREATE TABLE user_notification (
   body varchar(2048) NOT NULL,
   mood ENUM('error', 'neutral', 'success') NOT NULL DEFAULT 'neutral',
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -176,8 +176,8 @@ CREATE TABLE `hackathon` (
 CREATE TABLE hackathon_participant (
   hackathon_id INT UNSIGNED NOT NULL,
   user_id INT UNSIGNED NOT NULL,
-  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
   PRIMARY KEY (hackathon_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -191,9 +191,9 @@ CREATE TABLE hackathon_snapshot (
   sigma FLOAT NOT NULL,
   version_number INT,
   language VARCHAR(16),
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
-  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id),
-  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id, bot_id) REFERENCES bot(user_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (hackathon_id) REFERENCES hackathon(id) ON DELETE CASCADE,
   PRIMARY KEY (hackathon_id, user_id, bot_id)
 );
 
@@ -209,8 +209,8 @@ CREATE TABLE user_badge (
   is_enabled BOOL NOT NULL DEFAULT TRUE,
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
-  FOREIGN KEY (badge_id) REFERENCES badge (id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  FOREIGN KEY (badge_id) REFERENCES badge (id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, badge_id)
 );
 
@@ -219,6 +219,6 @@ CREATE TABLE user_tier_history (
   tier VARCHAR(256) NOT NULL,
   last_in_tier DATETIME DEFAULT CURRENT_TIMESTAMP,
   total_time_in_tier INT UNSIGNED DEFAULT 0,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, tier)
 );

@@ -429,11 +429,19 @@ def update_user(intended_user_id, *, user_id):
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
 @web_util.requires_login(accept_key=True, admin=True)
-def delete_user(intended_user_id, *, admin_id):
-    # TODO: what happens to their games?
+def delete_user(intended_user_id, *, user_id):
     with model.engine.connect() as conn:
+        conn.execute(model.games.delete().where(
+            sqlalchemy.sql.exists(
+                model.game_participants.select().where(
+                    (model.game_participants.c.user_id == intended_user_id) &
+                    (model.game_participants.c.game_id == model.games.c.id)
+                )
+            )
+        ))
         conn.execute(model.users.delete().where(
             model.users.c.id == intended_user_id))
+    return util.response_success()
 
 @web_api.route("/user/addsubscriber/<string:recipient>", methods=["POST"])
 @util.cross_origin(methods=["POST"])
