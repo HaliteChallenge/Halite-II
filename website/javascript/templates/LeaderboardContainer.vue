@@ -71,7 +71,7 @@
         <div class="leaderboard-explore">
           <p><img src="/assets/images/sample-graph.svg" class="img-responsive" alt="graph"></p>
           <div>
-            <a href="#" class="btn-ha btn-ha-lg">Explore the data</a>
+            <a href="/stats" class="btn-ha btn-ha-lg">Explore the data</a>
           </div>
         </div>
       </div>
