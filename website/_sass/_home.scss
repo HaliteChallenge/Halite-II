@@ -53,17 +53,30 @@
   .pdr30{
     padding-right: 30px;
   }
+  .no-padding-xs{
+    @media (max-width: $screen-xs-max){
+      padding:0 !important;
+    }
+  }
   .notification{
     background-color: $yellow;
     margin-bottom: 30px;
+    font-size: 2.5rem;
     height: 60px;
     text-align: center;
     line-height: 60px;
     letter-spacing: 2px;
     color: $gray-bg;
     a{
-      text-decoration: underline;
+      color: #337ab7;
+      text-decoration: none;
       cursor: pointer;
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+    @media (max-width: $screen-sm-max){
+      display: none;
     }
   }
   .row>[class*="col"]{
@@ -80,6 +93,13 @@
     display: flex;
     .ha-button{
       flex: 1;
+    }
+    @media (max-width: $screen-xs-max){
+      width: auto;
+      display: block;
+      .ha-button{
+        display: block;
+      }
     }
   }
   .ha-button-container{
@@ -117,8 +137,27 @@
   }
   .des{
     text-align: left;
+    @media (max-width: $screen-xs-max){
+      text-align: center;
+    }
+    .bot-1{
+      display: none;
+      @media (max-width: $screen-xs-max){
+        display: block;
+      }
+    }
+    .bot-2{
+      display: block;
+      @media (max-width: $screen-xs-max){
+        display: none;
+      }
+    }
     img{
       width: 100%;
+      @media (max-width: $screen-xs-max){
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
     }
     .words{
       .ha-button-container{
@@ -132,6 +171,17 @@
             width:210px;
           }
         }
+        @media (max-width: $screen-xs-max){
+          margin-left: auto;
+          transform: translateX(0);
+        }
+      }
+      .line-container {
+        width: 35%;
+        margin-left: 0;
+        @media (max-width: $screen-xs-max){
+          margin-left: auto;
+        }
       }
     }
   }
@@ -144,6 +194,7 @@
   .big-menu{
     .reddit-widget{
       text-align: left;
+      height: 500px;
       .reddit-title{
         img{
           width: auto;
@@ -155,14 +206,27 @@
     }
     .img-list{
       padding:30px;
+      &>div{
+        @media (max-width: $screen-sm-max){
+          margin-bottom: 10px;
+        }
+      }
     }
     .line-container{
       width:10%;
+      @media (max-width: $screen-sm-max){
+        width:35%;
+      }
       margin-left: auto;
       margin-right: auto;
     }
     .ha-button-container{
       width:200px;
+    }
+    .screen-shot{
+      @media (max-width: $screen-xs-max){
+        margin-bottom: 20px;
+      }
     }
   }
   .img-des{
@@ -220,6 +284,23 @@
       transform: translateY(15px);
       margin-left: 8%;
       margin-right: 8%;
+      &.line-1{
+        @media (max-width: $screen-xs-max){
+          margin-left: 0;
+          margin-right: 0;
+          width: 36%;
+          left: 2px;
+          position: absolute;
+        }
+      }
+      &.line-2{
+        @media (max-width: $screen-xs-max){
+          position: absolute;
+          right: 2px;
+          width: 36%;
+          margin-right: 0;
+        }
+      }
     }
     img{
       max-width: 60px;
@@ -232,15 +313,25 @@
       margin-left: auto;
       margin-right: auto;
       transform: translateY(-20px);
+      @media (max-width: $screen-xs-max){
+        width: 85%;
+        margin-top: 35px;
+      }
     }
     .line-container{
       width: 160px;
+      @media (max-width: $screen-lg-min){
+        width: 150px;
+      }
       float: left;
       transform: translate(-60px, 45px) rotate(90deg);
       display: inline-block;
       &.line-2{
         float: right;
         transform: translate(42px, 45px) rotate(90deg);
+      }
+      @media (max-width: $screen-xs-max){
+        display: none;
       }
     }
   }

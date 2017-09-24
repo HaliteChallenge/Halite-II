@@ -109,4 +109,51 @@
   .right {
     float: right;
   }
+
+  .hackathon-join{
+    &-container{
+      > .row{
+        margin-top: 30px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        > [class*="col-"]{
+          flex: 1;
+        }
+      }
+    }
+    &-left-col{
+      max-width: 440px;
+    }
+
+    .step-form {
+      height: 286px;
+      background-color: #1C1A27;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  }
+
+  .hackathon-leaderboard {
+    position: relative;
+
+    .leaderboard-header {
+      text-align: center;
+      padding: 50px 0 30px;
+
+      .hackathon-title {
+        display: inline-block;
+        position: relative;
+        text-align: center;
+      }
+    }
+
+  }
+
+  .tall-ipt {
+    height: auto;
+    padding: 20px;
+  }
 }

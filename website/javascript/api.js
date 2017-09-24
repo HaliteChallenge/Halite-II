@@ -1,5 +1,5 @@
-export const API_SERVER_URL = "http://35.190.3.178/v1/api";
-export const LOGIN_SERVER_URL = "http://35.190.3.178/v1/login";
+export const API_SERVER_URL = "https://api.halite.io/v1/api";
+export const LOGIN_SERVER_URL = "https://api.halite.io/v1/login";
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
@@ -159,18 +159,26 @@ export function get_replay(game_id, progress_callback) {
     });
 }
 
-export function leaderboard(filters, hackathon=null) {
+export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
     let url = `${API_SERVER_URL}/leaderboard`;
     let fields = {};
     if (hackathon) {
         url = `${API_SERVER_URL}/hackathon/${hackathon}/leaderboard`;
         fields.withCredentials = true;
     }
+
+    const querystring = [];
+    if(offset !== null && limit !== null) {
+        querystring.push(`offset=${offset}&limit=${limit}`);
+    }
+    if (filters && filters.length > 0) {
+        querystring.push(`filter=${filters.join('&filter=')}`);
+    }
+    if (querystring.length > 0) {
+      url += `?${querystring.join("&")}`;
+    }
     return $.get({
         url: url,
-        data: {
-            filter: filters,
-        },
         xhrFields: fields,
     });
 }

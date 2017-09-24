@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div v-if="!isReplayUploaded && !isBotUploaded" class="">
+  <div class="play-container">
+    <div class="message-container" v-if="displayMessage">
+      <Message :message="message.content" :type="message.type"></Message>
+    </div>
+    <div v-if="currentView == 'upload'">
       <div>
         <div class="page-header">
           <h1>PLAY A HALITE AI BOT</h1>
@@ -14,68 +17,26 @@
       <div class="row play-upload-section">
         <div class="col-sm-6">
           <div class="upload-container">
-            <Upload></Upload>
+            <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
-            <p class="text-center">You can also submit a bot via Github.<br>
-            To tell more about requirements for submitting a bot, check out <a href="#">our document</a></p>
+            <p class="text-center">You can also submit a bot via our <a href="https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0">Halite Client Tool</a></p>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
-            <visualizer-container :toggleUploadReplay="toggleUploadReplay"></visualizer-container>
+            <visualizer-container></visualizer-container>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="halite-uploaded-bot">
-      <div class="upload-state">
-        <h2>Your bot</h2>
-        <p class="upload-state-filename"><span class="icon-document"></span> Julia bot v5.hlt</p>
-        <div class="upload-state-options">
-          <div class="upload-state-option-item">
-            <span class="ha-checkbox ha-checkbox-checked"><span></span></span>
-            Upload as a new bot
-          </div>
-          <div class="upload-state-option-item">
-            <span class="ha-checkbox"><span></span></span>
-            Upgrade an existing bot
-          </div>
-        </div>
-        <div class="upload-state-select-bot">
-          <select name="" id="" class="form-control">
-            <option value="">Select a bot</option>
-            <option value="">xyz</option>
-            <option value="">abc</option>
-          </select>
-        </div>
-        <div class="upload-state-buttons">
-          <a href="#">Cancel</a>
-          <button class="btn-ha btn-ha-lg">Submit</button>
-        </div>
-      </div>
-      <p></p>
+    <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">
 
-      <div class="upload-state">
-        <img :src="`${baseUrl}/assets/images/icon-wait.svg`" alt="success" class="upload-state-icon">
-        <h2>bot submiited. currently compiling.</h2>
-        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
-        <div class="upload-state-buttons">
-          <span class="ha-text">10 minutes remaning</span>
-        </div>
-      </div>
-      <p></p>
-
-      <div class="upload-state">
-        <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
-        <h2>Success!</h2>
-        <p class="upload-state-desc">Your bot: Julia bot v5 .file <br>New name: Julskast v5</p>
-        <div class="upload-state-buttons">
-          <button class="btn-ha btn-ha-clear btn-ha-lg">Watch Halite TV</button>
-          <button class="btn-ha btn-ha-lg">See your result</button>
-        </div>
-      </div>
+      <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
+        :enableMessage="enableMessage"
+        :disableMessage="disableMessage"></bot-upload>
+    
     </div>
 
     <div id="halitetv-visualizer">
@@ -86,27 +47,74 @@
   import * as api from "../api";
   import VisualizerContainer from "./VisualizerContainer.vue";
   import Upload from "./Upload.vue";
+  import BotUpload from "./BotUpload.vue";
+  import Message from "./Message.vue";
+  import {Alert} from "../utils.js";
 
   export default {
     name: "uploader",
     props: ["baseUrl"],
     components: {
       "Upload": Upload,
-      "visualizer-container": VisualizerContainer
+      "bot-upload": BotUpload,
+      "visualizer-container": VisualizerContainer,
+      "Message": Message
     },
     data: function(){
       return {
-        isBotUploaded: false,
-        isReplayUploaded: false
+        currentView: 'upload',
+        botFile: {name: ""},
+        loggedIn: false,
+        user: null,
+        botsList: [],
+        displayMessage: false,
+        message: {
+          type: "success",
+          content: ""
+        }
       }
     },
+    mounted: function(){
+      // display a message when logged in successfully
+      const msg = this.$cookie.get('halite-message');
+      if ( msg ){
+        Alert.show(msg, 'success');
+        this.$cookie.delete('halite-message');
+      }
+
+      // logged in
+      api.me().then((me) => {
+        if (me !== null) {
+          this.loggedIn = true;
+          this.user = me;
+          api.list_bots(me.user_id).then((bots) => {
+            this.botsList = bots;
+          });
+        }
+      });
+    },
     methods: {
-      toggleUploadBot: function(){
-        this.isBotUploaded = true;
+      enableMessage: function(type = 'success', content){
+        this.message.type = type;
+        this.message.content = content;
+        this.displayMessage = true;
       },
-      toggleUploadReplay: function(){
-        this.isReplayUploaded = true;
+      disableMessage: function(){
+        this.displayMessage = false;
       }
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  .play-container{
+    padding-top: 70px;
+    position: relative;
+  }
+  .message-container{
+    position: absolute;
+    top: 0;
+    left: -15px;
+    right: -15px;
+  }
+</style>

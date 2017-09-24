@@ -1,0 +1,61 @@
+.form-group{
+  margin-bottom: 20px;
+  label{
+    font-size: 18px;
+    color: #ECFFFB;
+    letter-spacing: 0.5px;
+  }
+}
+
+.form-control{
+  background-color: #000;
+  color: #fff;
+  border-radius: 0;
+  border: 0;
+  padding: 5px;
+  height: 45px;
+}
+
+select.form-control{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("/assets/images/chevron-down.svg");
+  background-position: calc(100% - 15px) center;
+  background-repeat: no-repeat;
+}
+select.form-control::-ms-expand {
+    display: none;
+}
+
+.help-block{
+  opacity: 0.8;
+  font-size: 16px;
+  font-style: italic;
+  color: #ECFFFB;
+  letter-spacing: 0.5px;
+}
+
+.form-inline-button{
+  background-color: #000;
+  display: flex;
+  padding: 5px;
+  input{
+    color: #fff;
+    background-color: transparent;
+    border: 0;
+    flex: 1;
+  }
+  .btn{
+    border: 0;
+    color: #30242F;
+    font-weight: bold;
+    border-radius: 0;
+    text-transform: uppercase;
+    padding: 0 10px;
+    position: relative;
+    background-color: transparent;
+    font-size: 2rem;
+    font-family: "Teko";
+  }
+}

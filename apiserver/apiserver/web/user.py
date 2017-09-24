@@ -101,11 +101,13 @@ def send_verification_email(recipient, verification_code):
         recipient,
         config.VERIFY_EMAIL_TEMPLATE,
         {
-            "verification_url": util.build_site_url("/verify_email", {
+            "verification_url": util.build_site_url("/verify-email", {
                 "verification_code": verification_code,
+                "user_id": recipient.user_id,
             }),
         },
-        config.GOODNEWS_ACCOMPLISHMENTS
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_EMAIL_VERIFICATION
     )
 
 
@@ -120,7 +122,8 @@ def send_confirmation_email(recipient):
         recipient,
         config.CONFIRMATION_TEMPLATE,
         {},
-        config.GOODNEWS_ACCOMPLISHMENTS
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_REGISTRATION_CONFIRMATION
     )
 
 
@@ -300,6 +303,39 @@ def get_user(intended_user, *, user_id):
 
         return flask.jsonify(user)
 
+# An endpoint for season 1 details, in the future at season 3 we need to make this more generic.
+@web_api.route("/user/<int:intended_user>/season1", methods=["GET"])
+@util.cross_origin(methods=["GET"])
+@web_util.requires_login(optional=True, accept_key=True)
+def get_user_season1(intended_user, *, user_id):
+    with model.engine.connect() as conn:
+        query = model.all_users.select(
+            model.all_users.c.user_id == intended_user)
+
+        row = conn.execute(query).first()
+        if not row:
+            raise util.APIError(404, message="No user found.")
+        
+        season_1_query = model.halite_1_users.select(
+            model.halite_1_users.c.username == row["username"])
+
+        season_1_row = conn.execute(season_1_query).first()
+        
+        if not season_1_row:
+            raise util.APIError(404, message="No user found for Halite Season 1.")
+
+        season_1_user = {
+            "username": season_1_row["username"],
+            "level": season_1_row["level"],
+            "organization": season_1_row["organization"],
+            "language": season_1_row["language"],
+            "mu": season_1_row["mu"],
+            "sigma": season_1_row["sigma"],
+            "num_submissions": int(season_1_row["numSubmissions"]),
+            "num_games": int(season_1_row["numGames"]),
+            "rank": int(season_1_row["rank"]) if season_1_row["rank"] is not None else None,}
+
+        return flask.jsonify(season_1_user)
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
 @util.cross_origin(methods=["POST"])
@@ -426,11 +462,19 @@ def update_user(intended_user_id, *, user_id):
 
 @web_api.route("/user/<int:intended_user_id>", methods=["DELETE"])
 @web_util.requires_login(accept_key=True, admin=True)
-def delete_user(intended_user_id, *, admin_id):
-    # TODO: what happens to their games?
+def delete_user(intended_user_id, *, user_id):
     with model.engine.connect() as conn:
+        conn.execute(model.games.delete().where(
+            sqlalchemy.sql.exists(
+                model.game_participants.select().where(
+                    (model.game_participants.c.user_id == intended_user_id) &
+                    (model.game_participants.c.game_id == model.games.c.id)
+                )
+            )
+        ))
         conn.execute(model.users.delete().where(
             model.users.c.id == intended_user_id))
+    return util.response_success()
 
 @web_api.route("/user/addsubscriber/<string:recipient>", methods=["POST"])
 @util.cross_origin(methods=["POST"])
@@ -439,7 +483,8 @@ def add_subscriber(recipient):
     notify.send_templated_notification_simple(
         recipient,
         config.NEW_SUBSCRIBER_TEMPLATE,
-        config.GOODNEWS_ACCOMPLISHMENTS)
+        config.GOODNEWS_ACCOMPLISHMENTS,
+        config.C_NEWSLETTER_SUBSCRIPTION)
     return util.response_success()
 
 @web_api.route("/api_key", methods=["POST"])

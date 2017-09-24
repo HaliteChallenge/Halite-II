@@ -39,6 +39,8 @@ def list_user_matches(intended_user):
 @util.cross_origin(methods=["GET"])
 def get_user_match(intended_user, match_id):
     result = match_api.get_match_helper(match_id)
+    if not result:
+        raise util.APIError(404, message="Match not found.")
     return flask.jsonify(result)
 
 

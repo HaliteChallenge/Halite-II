@@ -541,7 +541,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
                                         bool ignoreTimeout,
                                         hlt::PlayerMoveQueue& moves) {
 
-    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 1500;
+    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 2000;
 
     std::string response;
     nlohmann::json log_json;

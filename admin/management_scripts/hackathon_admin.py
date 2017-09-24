@@ -21,7 +21,7 @@ CONFIG_FILE = os.path.join(os.path.split(__file__)[0],
                            "./hackathon_config.json")
 CONFIG_CACHE = None
 DEFAULT_CONFIG = {
-    "api_endpoint": "http://35.190.3.178/v1/api/",
+    "api_endpoint": "https://api.halite.io/v1/api/",
 }
 
 

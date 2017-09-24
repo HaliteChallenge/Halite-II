@@ -10,9 +10,6 @@ import pycountry
 from .. import config, model, util
 
 
-_LOCAL = '127.0.0.1'
-_LOCAL_URL_ROOT = ('http://{}:5000/').format(_LOCAL)
-
 def validate_country(country_code, subdivision_code):
     try:
         country = pycountry.countries.get(alpha_3=country_code)
@@ -82,15 +79,8 @@ def validate_session_cookie(user_id):
         return user
 
 
-def validate_request_from_localhost():
-    """Check if a request is local - this way we can securely accept
-       api calls requiring admin permissions, without supplying a user"""
-    return (flask.request.remote_addr == _LOCAL and
-            flask.request.url_root == _LOCAL_URL_ROOT)
-
-
 def requires_login(accept_key=False, optional=False, admin=False,
-                   association=False, accept_local=False):
+                   association=False):
     """
     Indicates that an endpoint requires the user to be logged in.
 
@@ -106,9 +96,6 @@ def requires_login(accept_key=False, optional=False, admin=False,
         @functools.wraps(view)
         def decorated_view(*args, **kwargs):
             user = None
-            if accept_local and validate_request_from_localhost():
-                kwargs["user_id"] = None
-                return view(*args, **kwargs)
             if accept_key:
                 user = validate_api_key(
                     flask.request.headers.get(config.API_KEY_HEADER))
@@ -217,6 +204,9 @@ def get_sort_filter(fields, false_fields=()):
     order_clause = []
     manual_fields = []
 
+    # Clauses organized by field: clause
+    filter_clauses = {}
+
     for filter_param in flask.request.args.getlist("filter"):
         field, operation, value = parse_filter(filter_param)
 
@@ -243,6 +233,12 @@ def get_sort_filter(fields, false_fields=()):
         value = conversion(value)
 
         clause = operation(column, value)
+        if field in filter_clauses:
+            filter_clauses[field] |= clause
+        else:
+            filter_clauses[field] = clause
+
+    for clause in filter_clauses.values():
         where_clause &= clause
 
     for order_param in flask.request.args.getlist("order_by"):

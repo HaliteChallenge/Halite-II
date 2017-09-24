@@ -23,6 +23,7 @@ organizations = sqlalchemy.Table("organization", metadata, autoload=True)
 organization_email_domains = \
     sqlalchemy.Table("organization_email_domain", metadata, autoload=True)
 users = sqlalchemy.Table("user", metadata, autoload=True)
+halite_1_users = sqlalchemy.Table("halite_1_user", metadata, autoload=True)
 user_notifications = sqlalchemy.Table("user_notification", metadata, autoload=True)
 bots = sqlalchemy.Table("bot", metadata, autoload=True)
 bot_history = sqlalchemy.Table("bot_history", metadata, autoload=True)
@@ -34,9 +35,6 @@ game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True
 hackathons = sqlalchemy.Table("hackathon", metadata, autoload=True)
 hackathon_participants = sqlalchemy.Table("hackathon_participant", metadata, autoload=True)
 hackathon_snapshot = sqlalchemy.Table("hackathon_snapshot", metadata, autoload=True)
-badge = sqlalchemy.Table("badge", metadata, autoload=True)
-user_badge = sqlalchemy.Table("user_badge", metadata, autoload=True)
-user_tier_history = sqlalchemy.Table('user_tier_history', metadata, autoload=True)
 
 def ranked_bots_query(variable="rank", alias="ranked_bots"):
     """

@@ -3,7 +3,7 @@ import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
 import BotEditor from "./templates/BotEditor.vue";
 import HackathonLeaderboard from "./templates/HackathonLeaderboard.vue";
-import Leaderboard from "./templates/Leaderboard.vue";
+import LeaderboardContainer from "./templates/LeaderboardContainer.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
@@ -20,6 +20,7 @@ import _ from "../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstra
 import * as api from "./api";
 
 Vue.use(require('vue-moment'));
+Vue.use(require('vue-cookie'));
 
 window.views = {
     ApiKey: function () {
@@ -46,10 +47,10 @@ window.views = {
             render: (h) => h(HackathonLeaderboard),
         });
     },
-    Leaderboard: function () {
+    LeaderboardContainer: function () {
         new Vue({
             el: "#leaderboard-container",
-            render: (h) => h(Leaderboard),
+            render: (h) => h(LeaderboardContainer, {props: {baseUrl: _global.baseUrl}}),
         });
     },
     Upload: function () {
@@ -111,14 +112,29 @@ window.views = {
 api.me().then((me) => {
    if (me) {
        $(".not-logged-in").hide();
-
+       $(".navbar-signin").hide();
        new Vue({
            el: "#user-profile-bar-container",
            render: (h) => h(UserProfileBar, {props: {baseUrl: _global.baseUrl}}),
        });
 
-       if (me.is_new_user === true && window.location.pathname !== "/associate") {
-           window.location.replace("/associate");
+       if (me.is_new_user === true && window.location.pathname !== "/create-account") {
+           window.location.replace("/create-account");
        }
    }
 });
+
+// auto scroll to the anchor position
+(function(){
+    if (document.location.hash){
+        const hash = document.location.hash.slice(1);
+        const targetElement = document.getElementById(hash);
+        const top = targetElement.getBoundingClientRect().top - document.body.getBoundingClientRect().top;
+        // console.log(top);
+        setTimeout(function(){
+            window.scrollTo(0, 250);
+        },1000);
+    }
+    // event
+    
+})()

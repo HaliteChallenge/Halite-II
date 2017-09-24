@@ -10,8 +10,24 @@ Contact the Halite team with questions, suggestions, press requests or technical
 
 ## Two Sigma Internal (Employees Only)
 
-1. **HipChat:** [ts/halite2chat](ts/halite2chat)
-2. **Email:** <mailto:halite@halite.io>
+**HipChat:** [ts/halite2chat](ts/halite2chat)
+
+
+## Need Help Playing Halite?
+
+The Halite team is here to help if you have any questions. You can always email us at <mailto:halite@halite.io>. This includes technical support and press inquiries.
+
+To receive notifications about technical maintenance or issues, you can subscribe to our [status page](halite.statuspage.io) to get the lastest updates and incidents.
+
+## Legal Issues
+
+For questions related to legal concerns, please contact Two Sigma directly:
+
+Two Sigma Open Source, LLC
+Attn: Legal Halite Matters
+100 Avenue of the Americas
+16th Floor
+New York, NY 10013
 
 ## Need Help Playing Halite?
 

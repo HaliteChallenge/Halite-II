@@ -9,6 +9,7 @@
 
 # IntelliJ/CLion
 .idea/
+*.iml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -240,6 +241,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.so.[0-9]*
 
 # Distribution / packaging
 .Python
@@ -463,7 +465,7 @@ node_modules
 
 *.dSYM/
 
-website-drip/_site/*
+extensions/website-drip/_site/*
 musicgenerator/haliteamp/*
 airesources/startenv/*
 airesources/starterkits/docfx/*
@@ -491,3 +493,10 @@ yarn.lock
 environment/cmake_install.cmake
 environment/CMakeCache.txt
 environment/Makefile
+website-drip/_site/about/contact.html
+website-drip/_site/404.html
+website-drip/_site/feed.xml
+website-drip/_site/index.html
+website-drip/_site/about/privacy.html
+website-drip/_site/about/terms-and-conditions.html
+website-drip/_site/assets/css/main_new.css

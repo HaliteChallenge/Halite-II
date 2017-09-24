@@ -34,8 +34,10 @@
   "devDependencies": {
     "electron": "^1.6.11",
     "electron-builder": "^19.16.0",
+    "electron-packager": "^9.0.0",
     "file-loader": "^0.11.2",
     "ify-loader": "^1.0.4",
+    "jquery": "3.2.1",
     "node-sass": "^4.5.3",
     "scss-loader": "0.0.1",
     "vue-loader": "^13.0.1",
@@ -45,7 +47,9 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
-    "libhaliteviz": "file:../libhaliteviz",
+    "fs": "0.0.1-security",
+    "jquery": "3.2.1",
+    "libhaliteviz": "file:../../libhaliteviz",
     "vue": "^2.3.4"
   }
 }

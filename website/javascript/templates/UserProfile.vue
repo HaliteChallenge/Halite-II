@@ -1,20 +1,53 @@
 <template>
     <div class="row">
-        <div class="col-md-4">
-            <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
-            <h1>{{ user.username }}</h1>
+        <div class="col-md-3">
+            <div class="user-profile">
+                <div class="user-profile-avatar">
+                    <i class="xline xline-top"></i>
+                    <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
+                </div>
+                <div class="user-profile-detail">
+                    <i class="xline xline-top"></i>
+                    <h1>{{ user.username }}</h1>
+                    <p>@{{ user.username }}</p>
+                </div>
+                <div class="user-profile-rank">
+                    <i class="xline xline-top"></i>
+                    <h2><span class="icon-tier-5"></span> rank 5, diamond tier</h2>
+                    <div class="user-profile-rank-stats">
+                        <div class="stats-item">
+                            <h3>Points</h3>
+                            <p>{{ Math.round(user.score * 100) / 100 }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Bots</h3>
+                            <p>{{ user.num_submissions }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Games</h3>
+                            <p>{{ user.num_games }}</p>
+                        </div>
+                    </div>
+                    <p><a href="#">View on leaderboard</a></p>
+                </div>
+                <div class="user-profile-about">
+                    <i class="xline xline-top"></i>
+                    <h2>About</h2>
+                    <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
+                    <p>From New York, USA</p>
+                    <p>Bots in 
+                        <template v-for="(lang, index) in botLang">
+                            <span class="hl">{{lang}}</span><span v-if="(index+1) < botLang.length">,</span>
+                        </template>
+                    </p>
+                </div>
+            </div>
 
-            <p>{{ user.level }} at {{ user.organization }}</p>
-
-            <form v-if="is_my_page">
-                <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
-                <button class="btn btn-default" v-on:click="join_hackathon">Join Hackathon</button>
-                <span>{{ messages.hackathon }}</span>
-            </form>
+            
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <section>
-                <h2>Stats Summary</h2>
+                <!-- <h2>Stats Summary</h2>
                 <p v-if="user.tier"><b>{{ user.tier }}</b> player</p>
                 <p><b>Points:</b> {{ Math.round(user.score * 100) / 100 }}</p>
                 <p v-if="user.rank"><b>Rank:</b> {{ user.rank }}</p>
@@ -23,17 +56,21 @@
                 <p v-for="bot in bots">
                     Bot version {{ bot.version_number }} rank {{ bot.rank }} written in {{ bot.language }} with {{ bot.games_played }} games played
                     <span v-if="bot.compilation_status">(latest version compilation status: {{ bot.compilation_status }})</span>
-                </p>
+                </p> -->
             </section>
-            <section>
-                <h2>Game Feed</h2>
 
-                <template v-if="is_my_page">
+            <section class="profile-section">
+                <h2>
+                    <i class="xline xline-bottom"></i>
+                    Game Videos Feed
+                </h2>
+
+                <!-- <template v-if="is_my_page">
                     <input type="checkbox" v-bind:checked="only_timed_out" id="only-timed-out" v-on:change="toggle_filter" />
                     <label for="only-timed-out">Only show games where I timed out</label>
-                </template>
+                </template> -->
 
-                <table class="table">
+                <table class="table table-leader">
                     <thead>
                         <tr>
                             <th>Played On</th>
@@ -78,17 +115,56 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="btn-group" role="group" aria-label="Game Navigation">
+
+                <div class="btn-group text-center" role="group" aria-label="Game Navigation">
                     <button
                         type="button"
-                        class="btn btn-default"
+                        class="btn"
                         :disabled="page === 0"
-                        v-on:click="prev_page">Prev</button>
+                        v-on:click="prev_page"><span>Prev</span></button>
                     <button
                         type="button"
-                        class="btn btn-default"
-                        v-on:click="next_page">Next</button>
+                        class="btn"
+                        v-on:click="next_page"><span>Next</span></button>
                 </div>
+            </section>
+
+            <section class="profile-section profile-section-hackathon">
+                <h2>
+                    <i class="xline xline-bottom"></i>
+                    Your Hackathon
+                </h2>
+
+                <form v-if="is_my_page" class="profile-section-right-form">
+                    <div class="form-inline-button">
+                        <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
+                        <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
+                    </div>
+                    <div>
+                        <p>{{ messages.hackathon }}</p>
+                    </div>
+                </form>
+                <div v-if="hackathons.length > 0">
+                    <table class="table table-leader">
+                        <thead>
+                            <tr>
+                                <th>Hackathons</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="hackathon in hackathons">
+                                <td>{{hackathon.title}}</td>
+                                <td>{{hackathon.location}}</td>
+                                <td>{{hackathon.status}}</td>
+                                <td><a href="#">Leaderboard</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                    
             </section>
         </div>
     </div>
@@ -111,8 +187,10 @@
                 },
                 games: [],
                 bots: [],
+                hackathons: [],
                 profile_images: {},
                 page: 0,
+                limit: 10,
                 offset: 0,
                 only_timed_out: false,
                 is_my_page: false,
@@ -149,34 +227,56 @@
                     this.bots = bots;
                 });
                 this.fetch();
+                this.fetchHackathon();
             });
 
             api.me().then((me) => {
                 this.is_my_page = me && me.user_id === this.user.user_id;
             });
         },
+        computed: {
+            botLang: function(){
+                let lang = [];
+                if (this.bots.length > 0){
+                    for (let i = 0; i < this.bots.length; i++){
+                        if (lang.indexOf(this.bots[i].language) == -1){
+                            lang.push(this.bots[i].language);
+                        }
+                    }
+                }
+                return lang;
+            }
+        },
         methods: {
             fetch: function() {
-                let query = `order_by=desc,time_played&offset=${this.offset}`;
+                let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`;
                 if (this.only_timed_out) {
                     query += `&filter=timed_out,=,${this.user.user_id}`;
                 }
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
                 return $.get(url)
-                 .then((data) => {
-                     this.games = data;
-                     for (let game of data) {
-                         for (let participant of Object.keys(game.players)) {
-                             if (this.profile_images[participant]) continue;
-                             this.profile_images[participant] = "loading";
+                    .then((data) => {
+                        this.games = data;
+                        for (let game of data) {
+                            for (let participant of Object.keys(game.players)) {
+                                if (this.profile_images[participant]) continue;
+                                this.profile_images[participant] = "loading";
 
-                             api.get_user(participant).then((user) => {
-                                 this.profile_images[participant] = api.make_profile_image_url(user.username);
-                                 this.$forceUpdate();
-                             });
-                         }
-                     }
-                 });
+                                api.get_user(participant).then((user) => {
+                                this.profile_images[participant] = api.make_profile_image_url(user.username);
+                                this.$forceUpdate();
+                            });
+                        }
+                    }
+                });
+            },
+
+            fetchHackathon: function(){
+                api.getUserHackathons(this.user.user_id).then(hackathons => {
+                    if(hackathons && hackathons instanceof Array) {
+                        this.hackathons = hackathons;
+                    }
+                });
             },
 
             next_page: function() {
@@ -221,6 +321,11 @@
 </script>
 
 <style lang="scss" scoped>
+    .form-inline{
+        .btn-ha{
+            display: inline-block;
+        }
+    }
     .game-participant {
         img {
             height: 20px;

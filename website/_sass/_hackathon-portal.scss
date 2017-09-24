@@ -174,6 +174,7 @@
 
   .hackathon-in-progress-container {
     padding: 50px 0;
+    position: relative;
   }
 
   .hackathon-title {
@@ -183,6 +184,8 @@
 
   .hackathon-progress-cards {
     margin-top: 30px;
+    display: flex;
+    justify-content: center;
   }
 
   .hackathon-progress-card {
@@ -219,6 +222,8 @@
       .event-img {
         height: 130px;
         width: 130px;
+        background-size: cover;
+        background-position: center;
       }
 
       .event-desc {
@@ -239,7 +244,7 @@
 
       .event-btn {
         height: 130px;
-        margin-right: 65px; 
+        margin-right: 65px;
         display: flex;
         align-items: center;
       }

@@ -29,7 +29,7 @@
         <div class="game-replay-viewer"></div>
         <div class="game-replay-controller">
           <i class="xline xline-top"></i>
-          <i class="xline xline-bottom"></i> 
+          <i class="xline xline-bottom"></i>
           <div class="game-replay-btn-table">
             <div class="game-replay-btn-cell">
               <span class="replay-btn">
@@ -136,7 +136,7 @@
         </div>
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_map_properties">
-            <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="false" aria-controls="widget_map_properties">
+            <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="true" aria-controls="widget_map_properties">
               <i class="xline xline-top"></i>
               <h4>map object properties</h4>
               <span class="toggle-icon chevron"></span>
@@ -147,6 +147,9 @@
             <!-- DISPLAY MESSAGE BOX -->
             <div v-if="selectedPlanet">
               <SelectedPlanet :selected-planet="selectedPlanet" :players="players"></SelectedPlanet>
+            </div>
+            <div v-else-if="selectedShip">
+              <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
             </div>
             <div v-else-if="selectedShip">
               <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
@@ -178,14 +181,15 @@
                   <i class="xline xline-top"></i>
                   <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
-                    <img :src="`${ baseUrl }/assets/images/temp/avatar-1.jpg`">
+                    <img :src="`https://github.com/${_player.name}.png`">
                   </div>
                   <div class="card-dashboard-info">
                     <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
                     <p class="card-dashboard-name">{{_player.name}}</p>
-                    <p class="card-dashboard-version-heading">Bot version:</p>
+                    <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
+                    <p v-else class="card-dashboard-version-heading">Local bot</p>
                   </div>
-                  <div class="card-dashboard-version">V{{_player.version}}</div>
+                  <div v-if="_player.version" class="card-dashboard-version">V{{_player.version}}</div>
                 </div>
               </div>
             </div>
@@ -200,10 +204,7 @@
                   Territory Gained
                 </h4>
                 <div class="post-game-graph">
-                  <!-- TODO: Real Graph -->
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}"/>
-                  <!-- <div class="game-graph-graph-container" /> -->
-                  <!--<img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-1.png`">-->
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}"/>
                 </div>
               </div>
             </div>
@@ -219,9 +220,7 @@
                     rate of production
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-2.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -230,9 +229,7 @@
                     health
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-3.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.health" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -244,23 +241,19 @@
                   <i class="dot-br"></i>
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-ship"></span>
-                    damage dealed
+                    damage dealt
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
                     <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-4.png`"> -->
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
-                    attack overtime
+                    attack over time
                   </h4>
                   <div class="post-game-graph">
-                    <!-- TODO: Real Graph -->
-                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => {frame = index}" />
-                    <!-- <img class="post-game-graph-img img-responsive" :src="`${baseUrl}/assets/images/temp/graph-5.png`"> -->
+                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -285,8 +278,22 @@
   import SelectedShip from "./SelectedShip.vue";
   import _ from "lodash";
 
-  libhaliteviz.setAssetRoot("/assets/js/");
+  // libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
+
+  // just for electron
+  if (window && window.process && window.process.type){
+      console.log("Running in electron");
+      libhaliteviz.setAssetRoot("assets/js/");
+  }
+  else{
+      console.log("Not running in electron");
+      libhaliteviz.setAssetRoot("/assets/js/");
+  }
+  const loadGame = (game) => {
+    const buffer = game.replay;
+    return libhaliteviz.parseReplay(buffer)
+  }
 
   export default {
     name: 'haliteTV',
@@ -360,6 +367,8 @@
         this.selected.kind = kind;
         this.selected.id = args.id;
         this.selected.owner = args.owner;
+        console.log(kind);
+        console.log(args);
         visualizer.onUpdate();
         this.$forceUpdate();
       };
@@ -374,7 +383,7 @@
             visualizer.frame = 0;
             visualizer.time = 0.0;
             this.frame = 0;
-            this.time = 0.0; 
+            this.time = 0.0;
           }
           visualizer.play();
         }
@@ -382,7 +391,7 @@
       this.pauseVideo = (e) => {
         if(visualizer) {
           visualizer.pause();
-        } 
+        }
       }
       this.toggleSpeed = (e) => {
         const speedList =  {
@@ -469,7 +478,7 @@
 
         try {
           if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
-            
+
           for (let _pIndex in this.stats.frames[0].players) {
             let playerP = [];
             let playerH = [];
@@ -497,16 +506,23 @@
 
         let ranks = this.replay.stats;
 
-        for(let id of Object.keys(this.replay.stats)){
+        for (let id of Object.keys(this.replay.stats)) {
           ranks[id].index = parseInt(id);
           ranks[id].botname = this.replay.player_names[id];
           ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
-          if (this.game){
-            const player = _.find(this.game.players, (player) => player.player_index == id )
-            ranks[id].tier = parseInt(player.rank)
-            ranks[id].version = player.version_number
-          } else {
-            ranks[id].version = ranks[id].botname.match(/v(\d+)$/, "$1")[1]
+          if (this.game) {
+            const player = _.find(this.game.players, (player) => player.player_index == id );
+            ranks[id].tier = parseInt(player.rank);
+            ranks[id].version = player.version_number;
+          }
+          else {
+            const version = ranks[id].botname.match(/v(\d+)$/, "$1");
+            if (version) {
+              ranks[id].version = version[1];
+            }
+            else {
+                ranks[id].version = null;
+            }
           }
         }
         return Object.values(ranks);
@@ -537,6 +553,9 @@
           }
         }
         return null;
+      },
+      selectedLocation: function(){
+
       }
     },
     methods: {

@@ -5,7 +5,7 @@ Match API endpoints - list matches and get replays/error logs.
 import flask
 import sqlalchemy
 
-from .. import model
+from .. import model, util
 
 from .blueprint import web_api
 from . import util as api_util
@@ -38,6 +38,9 @@ def get_match_helper(match_id):
         ]).where(
             model.games.c.id == match_id
         )).first()
+
+        if not match:
+            return None
 
         result = {
             "map_width": match["map_width"],
@@ -93,27 +96,19 @@ def list_matches_helper(offset, limit, participant_clause,
             model.game_stats.c.planets_destroyed,
             model.game_stats.c.ships_produced,
             model.game_stats.c.ships_destroyed,
-        ]).select_from(model.games.join(
-            model.game_participants,
-            (model.games.c.id == model.game_participants.c.game_id) &
-            participant_clause,
-        ).outerjoin(
+        ]).select_from(model.games.outerjoin(
             model.game_stats,
             (model.games.c.id == model.game_stats.c.game_id)
-        ).outerjoin(
-            model.game_bot_stats,
-            (model.games.c.id == model.game_bot_stats.c.game_id)
-        ).outerjoin(
-            model.game_view_stats,
-            (model.games.c.id == model.game_view_stats.c.game_id)
         )).where(
-            where_clause
+            where_clause &
+            sqlalchemy.sql.exists(
+                model.game_participants.select(
+                    participant_clause &
+                    (model.game_participants.c.game_id == model.games.c.id)
+                )
+            )
         ).order_by(
             *order_clause
-        ).group_by(
-            # Get rid of duplicates when not filtering by a
-            # particular participant
-            model.games.c.id
         ).offset(offset).limit(limit).reduce_columns()
         matches = conn.execute(query)
 
@@ -175,4 +170,7 @@ def list_matches():
 
 @web_api.route("/match/<int:match_id>")
 def get_match(match_id):
-    return flask.jsonify(get_match_helper(match_id))
+    match = get_match_helper(match_id)
+    if not match:
+        raise util.APIError(404, message="Match not found.")
+    return flask.jsonify(match)

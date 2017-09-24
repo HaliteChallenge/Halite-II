@@ -25,6 +25,10 @@ def get_user_hackathons(intended_user, *, user_id):
             model.hackathons.c.title,
             model.hackathons.c.start_date,
             model.hackathons.c.end_date,
+            model.hackathons.c.location,
+            model.hackathons.c.thumbnail,
+            model.hackathons.c.description,
+            model.hackathons.c.is_open,
         ]).select_from(
             model.hackathon_participants.join(
                 model.hackathons,
@@ -40,6 +44,51 @@ def get_user_hackathons(intended_user, *, user_id):
                 "title": hackathon["title"],
                 "status": api_util.hackathon_status(hackathon["start_date"],
                                                     hackathon["end_date"]),
+                
+                "start_date": hackathon["start_date"],
+                "end_date": hackathon["end_date"],
+                "location": hackathon["location"],
+                "thumbnail": hackathon["thumbnail"],
+                "description":hackathon["description"],
+                "is_open":hackathon["is_open"],
+            })
+
+    return flask.jsonify(record)
+
+
+@web_api.route("/user/<int:intended_user>/allhackathons", methods=["GET"])
+@util.cross_origin(methods=["GET", "POST"])
+@api_util.requires_login(accept_key=True)
+def get_user_hackathons_all(intended_user, *, user_id):
+    
+    if user_id != intended_user:
+        raise api_util.user_mismatch_error()
+
+    record = []
+    with model.engine.connect() as conn:
+        hackathons = conn.execute(sqlalchemy.sql.select([
+            model.hackathons.c.id,
+            model.hackathons.c.title,
+            model.hackathons.c.start_date,
+            model.hackathons.c.end_date,
+            model.hackathons.c.location,
+            model.hackathons.c.thumbnail,
+            model.hackathons.c.description,
+        ]).where(
+            model.hackathons.c.is_open == 1
+        )).fetchall()
+
+        for hackathon in hackathons:
+            record.append({
+                "hackathon_id": hackathon["id"],
+                "title": hackathon["title"],
+                "status": api_util.hackathon_status(hackathon["start_date"],
+                                                    hackathon["end_date"]),       
+                "start_date": hackathon["start_date"],
+                "end_date": hackathon["end_date"],
+                "location": hackathon["location"],
+                "thumbnail": hackathon["thumbnail"],
+                "description":hackathon["description"],
             })
 
     return flask.jsonify(record)

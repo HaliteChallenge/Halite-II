@@ -3,7 +3,7 @@ import datetime
 import flask
 import sqlalchemy
 
-from .. import badge_util, config, model, notify, util
+from .. import config, model, notify, util
 
 from .blueprint import coordinator_api
 
@@ -156,32 +156,6 @@ def update_compilation_status():
                 )
             )
 
-            # Check if submission badges should be awarded
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_1_BADGE, 
-                submissions_count=1,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_10_BADGE, 
-                submissions_count=10,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_20_BADGE, 
-                submissions_count=20,
-                version_number=bot["version_number"] + 1
-            )
-            badge_util.add_successful_submission_badge(
-                user_id, 
-                config.SUBMISSION_50_BADGE, 
-                submissions_count=50,
-                version_number=bot["version_number"] + 1
-            )
-
             bot = conn.execute(model.bots.select().where(
                 (model.bots.c.user_id == user_id) &
                 (model.bots.c.id == bot_id)
@@ -196,7 +170,8 @@ def update_compilation_status():
                     "version_number": bot["version_number"],
                     "detected_language": language,
                 },
-                config.GOODNEWS_ACCOMPLISHMENTS
+                config.GOODNEWS_ACCOMPLISHMENTS,
+                config.C_COMPLIATION_SUCCESS
             )
 
             return util.response_success()
@@ -211,6 +186,7 @@ def update_compilation_status():
                     "detected_language": language,
                     "errors": errors,
                 },
-                config.GAME_ERROR_MESSAGES
+                config.GAME_ERROR_MESSAGES,
+                config.C_COMPILATION_ERROR
             )
             return util.response_success()

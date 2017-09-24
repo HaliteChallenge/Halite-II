@@ -12,56 +12,111 @@
         <p class="inline-block mg-left-tiny">{{hackathon.date}}</p>
       </div>
       <div class="hackathon-info-text">
-        <img class="inline-block" :src="`${baseUrl}/assets/images/halite-time-white.svg`"/>
-        <p class="inline-block mg-left-tiny">{{hackathon.time}}</p>
-      </div>
-      <div class="hackathon-info-text">
         <img class="inline-block" :src="`${baseUrl}/assets/images/halite-pin-white.svg`"/>
         <p class="inline-block mg-left-tiny">{{hackathon.pin}}</p>
       </div>
       <div class="ha-button join-btn">
-        <span>JOIN NOW</span>
+        <a href="#join_now"><span>JOIN NOW</span></a>
       </div>
     </section>
 
     <section class="hackathon-desc">
       <i class="xline xline-top"></i>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <p class="t1 c-wht font-headline">HACKATHON DESCRIPTION</p>
           <div class="hackathon-desc-text">
-            <i class="xline xline-top short-line"></i> 
-            <i class="xline xline-bottom short-line"></i> 
+            <i class="xline xline-top short-line"></i>
             <div v-html="hackathon.description"></div>
+            <i class="xline xline-bottom short-line"></i>
           </div>
-        </div>
-        <div class="col-md-6">
-          <img class="right" :src="hackathon.img" />
         </div>
       </div>
     </section>
 
+    <a id="join_now" name="join_now"></a>
     <section class="hackathon-join">
       <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" href="#panel_join" aria-expanded="false" aria-controls="widget_player_details">
+            <a data-toggle="collapse" href="#panel_join" aria-expanded="true" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4 class="font-headline">HOW TO JOIN</h4>
               <span class="toggle-icon expand"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="panel_join" aria-labelledby="panel_join">
-            You're welcome to start submitting bots now, but first you need to join the hackathon. Here are the steps to join:
+          <div class="panel-collapse collapse in" role="tabpanel" id="panel_join" aria-labelledby="panel_join">
+            <div class="hackathon-join-container">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <p>You're welcome to start submitting bots now, but first you need to join the hackathon. Here are the steps to join:</p>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">1</span>
+                      <span class="hex-li-content">If you're participating in a school or company competition, make sure you've verified your organization email. <a href="/user?me">Edit your profile here</a>.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="step-form">
+                    <p class="t2 c-wht font-headline">AUTHENTICATE YOUR EMAIL</p>
+                    <div class="form-control tall-ipt">School Email</div>
+                    <div class="form-control tall-ipt">School Email (Confirm)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">2</span>
+                      <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email halite@halite.io for more information.</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-2.png`" alt="how to join">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="hackathon-join-left-col">
+                    <div class="hex-li">
+                      <span class="hex-bullet">3</span>
+                      <span class="hex-li-content">Once you're all set, you'll see this hackathon on your user profile and you're ready to start submitting bots!</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <a href="/play-programming-challenge"><img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-4.png`" alt="how to join"></a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="hackathon-video"></section>
+    <section class="hackathon-video">
+    </section>
 
-    <section class="hackathon-leaderboard"></section>
+    <section class="hackathon-leaderboard">
+      <i class="xline xline-top"></i>
+      <div class="leaderboard-header">
+        <div class="hackathon-title">
+          <i class="xline xline-bottom"></i>
+          <p class="t2 c-wht font-headline">CURRENT HACKATHON LEADERBOARD</p>
+        </div>
+      </div>
+      <Leaderboard v-if="hackathon_id" :baseUrl="baseUrl" :hackathonId="hackathon_id"></Leaderboard>
+    </section>
 
   </section>
 </template>
@@ -69,6 +124,8 @@
 <script>
   import * as api from "../api";
   import HaliteBreadcrumb from './Breadcrumb.vue';
+  import Leaderboard from './Leaderboard.vue';
+  import moment from 'moment';
 
   const mockHackathon = {
     title: 'Cornell Virtual Halite Hackathon',
@@ -89,12 +146,13 @@
       }
     },
     components: {
-      HaliteBreadcrumb 
+      HaliteBreadcrumb,
+      Leaderboard
     },
     data: function() {
       return {
         hackathon_id: null,
-        hackathon: Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`}),
+        hackathon: {},
         path: [
           {
             name: 'Home',
@@ -104,7 +162,7 @@
             name: 'Hackathons',
             link: '/hackathon-and-events'
           }
-        ] 
+        ]
       }
     },
     mounted: function() {
@@ -114,20 +172,34 @@
       const getHackathonPromise = () => {
         if(this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
-            this.hackathon = hackathon;
+            console.log(hackathon);
+            const beginDate = moment(hackathon.begin_date).format("MM-DD-YYYY");
+            const endDate = moment(hackathon.end_date).format("MM-DD-YYYY");
+            this.hackathon = Object.assign(mockHackathon, {
+              title: hackathon.title,
+              date: `${beginDate} to ${endDate}`,
+              description: hackathon.description,
+              pin: hackathon.location,
+              img: `${this.baseUrl}/assets/images/temp/hackathon.png`
+            });
             return Promise.resolve();
           }, (xhr) => {
-            console.log('Cannot get hackathon info.')
+            console.log(xhr);
+            this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`});
+            this.path.push({name: this.hackathon.title, link: 'javascript:;'});
           });
         } else {
           return Promise.resolve();
         }
       }
 
-      getHackathonPromise().then((hackathon) => {
-        this.path.push({name: this.hackathon.title, link: 'javascript:;'});
-      })
-      
+      api.me().then((me) => {
+        getHackathonPromise().then(() => {
+          this.path.push({name: this.hackathon.title, link: 'javascript:;'});
+        })
+      });
+
+
     },
   }
 </script>
