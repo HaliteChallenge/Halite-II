@@ -10,7 +10,7 @@ public class Navigation {
         this.target = target;
     }
 
-    public ThrustMove navigateToDock(final GameMap gameMap, final int maxThrust) {
+    public ThrustMove navigateToDock(final GameMap gameMap, final double maxThrust) {
         final int maxCorrections = Constants.MAX_CORRECTIONS;
         final boolean avoidObstacles = true;
         final int angularStep = 1;
@@ -19,7 +19,7 @@ public class Navigation {
         return navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStep);
     }
 
-    public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final int maxThrust,
+    public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final double maxThrust,
                                       final boolean avoidObstacles, final int maxCorrections, final int angularStep) {
         if (maxCorrections <= 0) {
             return null;
@@ -36,14 +36,14 @@ public class Navigation {
             return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections - 1), angularStep);
         }
 
-        final int thrust;
+        final double thrust;
         if (distance < maxThrust) {
-            thrust = (int)(distance + 0.5);
+            thrust = distance;
         }
         else {
             thrust = maxThrust;
         }
 
-        return new ThrustMove(ship, (int)(angleDeg + 0.5), thrust);
+        return new ThrustMove(ship, (int)(angleDeg + 0.5), (int) (thrust + 0.5));
     }
 }

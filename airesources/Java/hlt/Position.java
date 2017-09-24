@@ -5,7 +5,7 @@ public class Position {
     private final double xPos;
     private final double yPos;
 
-    public Position(final double xPos, final double yPos){
+    public Position(final double xPos, final double yPos) {
         this.xPos = xPos;
         this.yPos = yPos;
     }
@@ -28,7 +28,12 @@ public class Position {
         final double dx = target.getXPos() - xPos;
         final double dy = target.getYPos() - yPos;
 
-        return Math.toDegrees(Math.atan2(dy, dx)) % 360;
+        double angle = Math.toDegrees(Math.atan2(dy, dx));
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        return angle;
     }
 
     public Position getClosestPoint(final Entity target) {
@@ -36,8 +41,8 @@ public class Position {
         final double radius = target.getRadius() + MIN_DISTANCE;
         final double angleDeg = target.orientTowardsInDeg(this);
 
-        final short dx = (short)(target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg)));
-        final short dy = (short)(target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg)));
+        final double dx = target.getXPos() + radius * Math.cos(Math.toRadians(angleDeg));
+        final double dy = target.getYPos() + radius * Math.sin(Math.toRadians(angleDeg));
 
         return new Position(dx, dy);
     }

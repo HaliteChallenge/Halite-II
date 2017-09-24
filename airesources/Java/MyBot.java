@@ -1,7 +1,6 @@
 import hlt.*;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class MyBot {
 
@@ -22,16 +21,19 @@ public class MyBot {
 
                 for (Planet planet : gameMap.getAllPlanets().values()) {
 
-                    if (planet.getOwner() != null) {
+                    if (planet.isOwned()) {
                         continue;
                     }
                     if (ship.canDock(planet)) {
                         moveList.add(new DockMove(ship, planet));
+                        break;
                     }
-                    else {
-                        moveList.add(new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED / 2));
+
+                    final ThrustMove newThrustMove = new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED/2);
+                    if (newThrustMove != null) {
+                        moveList.add(newThrustMove);
+                        break;
                     }
-                    break;
                 }
             }
             Networking.sendMoves(moveList);
