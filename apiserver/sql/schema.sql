@@ -160,18 +160,19 @@ CREATE TABLE user_notification (
 CREATE TABLE `hackathon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL,
-  `description` varchar(2048) NOT NULL,
+  `description` varchar(4096) NOT NULL,
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
   `verification_code` varchar(32) NOT NULL,
   `organization_id` int(11) DEFAULT NULL,
   `location` varchar(256) DEFAULT NULL,
   `thumbnail` varchar(512) DEFAULT NULL,
+  `is_open` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `verification_code` (`verification_code`),
   KEY `organization_id` (`organization_id`),
   CONSTRAINT `hackathon_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 CREATE TABLE hackathon_participant (
   hackathon_id INT UNSIGNED NOT NULL,
