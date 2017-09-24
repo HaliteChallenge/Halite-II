@@ -10,7 +10,7 @@ public class Navigation {
         this.target = target;
     }
 
-    public ThrustMove navigateToDock(final GameMap gameMap, final double maxThrust) {
+    public ThrustMove navigateToDock(final GameMap gameMap, final int maxThrust) {
         final int maxCorrections = Constants.MAX_CORRECTIONS;
         final boolean avoidObstacles = true;
         final int angularStep = 1;
@@ -19,7 +19,7 @@ public class Navigation {
         return navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStep);
     }
 
-    public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final double maxThrust,
+    public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final int maxThrust,
                                       final boolean avoidObstacles, final int maxCorrections, final int angularStep) {
         if (maxCorrections <= 0) {
             return null;
@@ -33,17 +33,18 @@ public class Navigation {
             final double newTargetDy = Math.sin(Math.toRadians(angleDeg + angularStep)) * distance;
             final Position newTarget = new Position(ship.getXPos() + newTargetDx, ship.getYPos() + newTargetDy);
 
-            return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections - 1), angularStep);
+            return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections-1), angularStep);
         }
 
-        final double thrust;
+        final int thrust;
         if (distance < maxThrust) {
-            thrust = distance;
+            // Do not round up, since overshooting might cause collision.
+            thrust = (int) distance;
         }
         else {
             thrust = maxThrust;
         }
 
-        return new ThrustMove(ship, (int)(angleDeg + 0.5), (int) (thrust + 0.5));
+        return new ThrustMove(ship, (int)(angleDeg + 0.5), thrust);
     }
 }
