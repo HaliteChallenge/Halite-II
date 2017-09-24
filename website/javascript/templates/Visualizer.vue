@@ -136,7 +136,7 @@
         </div>
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_map_properties">
-            <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="false" aria-controls="widget_map_properties">
+            <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="true" aria-controls="widget_map_properties">
               <i class="xline xline-top"></i>
               <h4>map object properties</h4>
               <span class="toggle-icon chevron"></span>

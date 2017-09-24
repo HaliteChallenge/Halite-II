@@ -3,4 +3,4 @@
 set -e
 
 make MyBot
-./halite -d "256 256" "./MyBot" "./MyBot"
+./halite -d "240 160" "./MyBot" "./MyBot"

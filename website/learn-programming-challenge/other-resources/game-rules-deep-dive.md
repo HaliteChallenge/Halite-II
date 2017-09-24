@@ -94,7 +94,7 @@ When a planet dies, it explodes, dealing damage to any ships or planets within 5
 ### Ship-Ship Combat & Collision
 Ships automatically fight each other when they come into close distances. (5 units from the center of the ship, represented on the board by the aura around the ship) When ships come into contact, they do 64 units of damage per turn to each other.
 
-Ships that try to occupy the same spot on the board will both explode. I.e. if the ships are moving at a high velocity towards each other, ships will start to fight but will collide before getting to zero strength. Ship collisions do no damage to any ships or planets other than the two ships themselves. (A very rare edge case is when two planets collide with each other at the same time that they collide with a planet. In this case, they would collide with the planet and destroy each other at the same time).
+Ships that try to occupy the same spot on the board will both explode. I.e. if the ships are moving at a high velocity towards each other, ships will start to fight but will collide before getting to zero strength. Ship collisions do no damage to any ships or planets other than the two ships themselves. (A very rare edge case is when two ships collide with each other at the same time that they collide with a planet. In this case, they would collide with the planet and destroy each other at the same time).
 
 If multiple enemy ships are within range simultaneously for a turn, the damage is evenly spread between all ships. (During processing, each ship accumulates damage in floating-point precision, which is then rounded down and applied at the end of each substep).  
 
