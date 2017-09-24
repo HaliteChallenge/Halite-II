@@ -4,26 +4,25 @@ import java.util.ArrayList;
 
 public class MyBot {
 
-    public static void main(String[] args) {
-        Networking networking = new Networking();
-        GameMap gameMap = networking.initialize("Caffeinated");
-        ArrayList<Move> moveList = new ArrayList<>();
+    public static void main(final String[] args) {
+        final Networking networking = new Networking();
+        final GameMap gameMap = networking.initialize("Tamagocchi");
+        final ArrayList<Move> moveList = new ArrayList<>();
 
         for (;;) {
             moveList.clear();
             gameMap.updateMap(Networking.readAndSplitLine());
 
-            for (Ship ship : gameMap.getMyPlayer().getShips().values()) {
-
+            for (final Ship ship : gameMap.getMyPlayer().getShips().values()) {
                 if (ship.getDockingStatus() != Ship.DockingStatus.Undocked) {
                     continue;
                 }
 
-                for (Planet planet : gameMap.getAllPlanets().values()) {
-
+                for (final Planet planet : gameMap.getAllPlanets().values()) {
                     if (planet.isOwned()) {
                         continue;
                     }
+
                     if (ship.canDock(planet)) {
                         moveList.add(new DockMove(ship, planet));
                         break;
@@ -32,8 +31,9 @@ public class MyBot {
                     final ThrustMove newThrustMove = new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED/2);
                     if (newThrustMove != null) {
                         moveList.add(newThrustMove);
-                        break;
                     }
+
+                    break;
                 }
             }
             Networking.sendMoves(moveList);
