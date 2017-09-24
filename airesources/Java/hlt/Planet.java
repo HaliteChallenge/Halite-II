@@ -4,7 +4,6 @@ import java.util.List;
 
 public class Planet extends Entity {
 
-    private final Short owner;
     private final short remainingProduction;
     private final short currentProduction;
     private final short dockingSpots;
@@ -20,7 +19,6 @@ public class Planet extends Entity {
         this.dockingSpots = dockingSpots;
         this.currentProduction = currentProduction;
         this.remainingProduction = remainingProduction;
-        this.owner = owner;
         this.dockedShips = dockedShips;
     }
 
@@ -45,6 +43,17 @@ public class Planet extends Entity {
     }
 
     public boolean isOwned() {
-        return owner != null;
+        return getOwner() != null;
+    }
+
+    @Override
+    public String toString() {
+        return "Planet[" +
+                super.toString() +
+                ", remainingProduction=" + remainingProduction +
+                ", currentProduction=" + currentProduction +
+                ", dockingSpots=" + dockingSpots +
+                ", dockedShips=" + dockedShips +
+                "]";
     }
 }

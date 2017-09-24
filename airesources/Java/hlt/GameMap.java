@@ -13,7 +13,7 @@ public class GameMap {
     private final short playerId;
     private final List<Player> players;
     private final Map<Long, Planet> planets;
-    private List<Ship> ships;
+    private List<Ship> allShips;
 
     public GameMap(final short width, final short height, final short playerId) {
         this.width = width;
@@ -21,6 +21,7 @@ public class GameMap {
         this.playerId = playerId;
         players = new ArrayList<>(Constants.MAXIMUM_NUMBER_OF_PLAYERS);
         planets = new TreeMap<>();
+        allShips = new LinkedList<>();
     }
 
     public short getHeight() {
@@ -56,14 +57,14 @@ public class GameMap {
     }
 
     public List<Ship> getAllShips(){
-        return Collections.unmodifiableList(ships);
+        return Collections.unmodifiableList(allShips);
     }
 
     public ArrayList<Entity> objectsBetween(Position start, Position target) {
         final ArrayList<Entity> entitiesFound = new ArrayList<>();
 
         addEntitiesBetween(entitiesFound, start, target, planets.values());
-        addEntitiesBetween(entitiesFound, start, target, ships);
+        addEntitiesBetween(entitiesFound, start, target, allShips);
 
         return entitiesFound;
     }
@@ -92,7 +93,7 @@ public class GameMap {
             entityByDistance.put(entity.getDistanceTo(planet), planet);
         }
 
-        for (final Ship ship : ships) {
+        for (final Ship ship : allShips) {
             if (ship.equals(entity)) {
                 continue;
             }
@@ -107,13 +108,16 @@ public class GameMap {
         final short numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
 
         players.clear();
+        planets.clear();
+        allShips.clear();
 
         // update players info
         for (short i = 0; i < numberOfPlayers; i++) {
             final short playerId = MetadataParser.parsePlayerId(mapMetadata);
 
             final Player currentPlayer = new Player(playerId);
-            ships = MetadataParser.getShipList(playerId, mapMetadata);
+            final List<Ship> ships = MetadataParser.getShipList(playerId, mapMetadata);
+            allShips.addAll(ships);
 
             for (final Ship ship : ships) {
                 currentPlayer.addShip(ship.getId(), ship);
@@ -127,6 +131,11 @@ public class GameMap {
             final Planet planet = MetadataParser.newPlanetFromMetadata(mapMetadata);
             planets.put(planet.getId(), planet);
         }
+
+        if (!mapMetadata.isEmpty()) {
+            throw new IllegalStateException("Failed to parse data from Halite game engine. Please contact maintainers.");
+        }
+
         return this;
     }
 }
