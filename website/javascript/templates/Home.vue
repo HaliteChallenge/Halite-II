@@ -225,14 +225,14 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12 img-list no-padding-xs">
                     <div class="col-md-4">
-                        <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true">
+                        <div class="fb-page" data-href="https://www.facebook.com/haliteAI/" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="true" data-show-facepile="true" data-height="500px">
                            <blockquote cite="https://www.facebook.com/haliteAI/" class="fb-xfbml-parse-ignore">
                                <a href="https://www.facebook.com/haliteAI/"></a>
                            </blockquote>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <a class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
+                        <a data-height="500px" class="twitter-timeline" href="https://twitter.com/HaliteAI"></a>
                     </div>
                     <div class="col-md-4">
                        <div id="redditWidget" class="reddit-widget"></div>
