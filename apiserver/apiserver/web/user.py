@@ -303,6 +303,39 @@ def get_user(intended_user, *, user_id):
 
         return flask.jsonify(user)
 
+# An endpoint for season 1 details, in the future at season 3 we need to make this more generic.
+@web_api.route("/user/<int:intended_user>/season1", methods=["GET"])
+@util.cross_origin(methods=["GET"])
+@web_util.requires_login(optional=True, accept_key=True)
+def get_user_season1(intended_user, *, user_id):
+    with model.engine.connect() as conn:
+        query = model.all_users.select(
+            model.all_users.c.user_id == intended_user)
+
+        row = conn.execute(query).first()
+        if not row:
+            raise util.APIError(404, message="No user found.")
+        
+        season_1_query = model.halite_1_users.select(
+            model.halite_1_users.c.username == row["username"])
+
+        season_1_row = conn.execute(season_1_query).first()
+        
+        if not season_1_row:
+            raise util.APIError(404, message="No user found for Halite Season 1.")
+
+        season_1_user = {
+            "username": season_1_row["username"],
+            "level": season_1_row["level"],
+            "organization": season_1_row["organization"],
+            "language": season_1_row["language"],
+            "mu": season_1_row["mu"],
+            "sigma": season_1_row["sigma"],
+            "num_submissions": int(season_1_row["numSubmissions"]),
+            "num_games": int(season_1_row["numGames"]),
+            "rank": int(season_1_row["rank"]) if season_1_row["rank"] is not None else None,}
+
+        return flask.jsonify(season_1_user)
 
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
 @util.cross_origin(methods=["POST"])
