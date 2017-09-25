@@ -325,6 +325,7 @@ def get_user_season1(intended_user, *, user_id):
             raise util.APIError(404, message="No user found for Halite Season 1.")
 
         season_1_user = {
+            "userID": season_1_row["userID"],
             "username": season_1_row["username"],
             "level": season_1_row["level"],
             "organization": season_1_row["organization"],
