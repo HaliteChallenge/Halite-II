@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% seo %}
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>{{ page.title }}&mdash;{{ site.title }}</title>
+  <!-- Google Analytics -->
+  <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-80656237-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+<!-- Hotjar Tracking Code for halite.io -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:633485,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+  <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <!-- Bootstrap -->
+  <link href="{{ site.baseurl }}/assets/css/main_new.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  {% if page.additional_css %}
+  {% for dep in page.additional_css %}
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/css/{{ dep }}.css"/>
+  {% endfor %}
+  {% endif %}
+</head>
+
+<body>
+  <div>
+    {{ content }}
+  </div>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  {% if page.additional_js %}
+  {% for dep in page.additional_js %}
+  <script src="{{ site.baseurl }}/assets/js/{{ dep }}.js"></script>
+  {% endfor %}
+  {% endif %}
+
+  <script src="{{ site.baseurl }}/assets/js/bundle.js"></script>
+</body>
+
+</html>
