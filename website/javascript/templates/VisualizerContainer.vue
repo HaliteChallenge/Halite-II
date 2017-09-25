@@ -117,6 +117,7 @@
           reader.onload = (e) => {
             inst.is_upload = false;
             this.$parent.currentView = 'replay';
+            window.location.hash = '/replay-bot'
             showGame({
               game: null,
               replay: e.target.result,
