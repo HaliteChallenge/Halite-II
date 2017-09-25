@@ -69,7 +69,11 @@ def make_archive(output, environment, base_path, included_files):
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
         if source is not None:
             # source is None <=> platform-agnostic archive
-            archive.write(source, target)
+            zinfo = zipfile.ZipInfo.from_file(source, target)
+            zinfo.compress_type = zipfile.ZIP_DEFLATED
+            zinfo.external_attr = 0o0100755 << 16
+            with open(source, 'rb') as source_file:
+                archive.writestr(zinfo, source_file.read())
 
         for file in included_files:
             target_path = os.path.relpath(file, base_path)
@@ -114,6 +118,13 @@ def main():
 
     environments = detect_environments(args.environment_dir)
     generated_languages = []
+
+    # Ensure output directories exists
+    for location in [SOURCE_FILE, DOWNLOAD_DATA]:
+        try:
+            os.makedirs(os.path.dirname(location))
+        except FileExistsError:
+            pass
 
     make_source_download()
 
