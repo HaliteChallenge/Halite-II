@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">THERE'S AN AMA ON REDDIT TODAY, <a>CLICK HERE</a> TO JOIN THE CONVERSATION.</div>
+        <div class="notification font-headline">Season 2 of Halite is now live, Finals begin on January 22nd, 2018</div>
 
         <div class="row">
             <div class="col-md-12">
@@ -167,7 +167,7 @@
                             <p class="t5 c-gry">From a Halite I user: "The Halite community and chat were pretty active, so I didn’t feel like I lacked people to talk to. That was a really strong point of the game, there was a community even if it wasn’t a local community.”</p>
                             <div class="clear"></div>
                             <div class="ha-button-container">
-                                <a href="https://forums.halite.io/" target="_blank" class="ha-button no-bg-button"><span>JOIN THE CONVERSATION</span></a>
+                                <a href="https://forums.halite.io/" target="_blank" class="ha-button no-bg-button"><span>Forums</span></a>
                             </div>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                             <p class="t5 c-gry">Two Sigma, the creator of the Halite competition, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above. </p>
                             <div class="clear"></div>
                             <div class="ha-button-container">
-                                <div class="ha-button no-bg-button"><span>EXPLORE CAREERS</span></div>
+                                <a href="/about"><div class="ha-button no-bg-button"><span>LEARN MORE</span></div></a>
                             </div>
                         </div>
                     </div>
@@ -276,7 +276,7 @@
                             <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by <a href="https://twosigma.com">Two Sigma</a> in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                             <div class="clear"></div>
                             <div class="ha-button-container">
-                                <a href="${baseUrl}/about"><div class="ha-button no-bg-button"><span>LEARN MORE</span></div></a>
+                                <a href="/about"><div class="ha-button no-bg-button"><span>LEARN MORE</span></div></a>
                             </div>
                         </div>
                     </div>

@@ -8,11 +8,13 @@
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
       <div class="row hackathon-progress-cards">
+        <!-- For new events just copy paste the below div and customize, 
+        you also need to modify the function to point to the righ link -->
         <div class="col-md-3" @click="jumpToHackathon(2)">
           <div class="hackathon-progress-card">
             <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
             <div class="hackathon-card-text">
-              <p class="t3 c-wht">Hackathon #1</p>
+              <p class="t3 c-wht">TBD</p>
               <ul class="hackathon-info">
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
@@ -20,77 +22,11 @@
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">August 3-5</p>
+                  <p class="hackathon-card-item-text">TBD</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">Open to all</p>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" @click="jumpToHackathon(2)">
-          <div class="hackathon-progress-card">
-            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
-            <div class="hackathon-card-text">
-              <p class="t3 c-wht">Hackathon #1</p>
-              <ul class="hackathon-info">
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">New York</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">August 3-5</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">Open to all</p>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" @click="jumpToHackathon(2)">
-          <div class="hackathon-progress-card">
-            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
-            <div class="hackathon-card-text">
-              <p class="t3 c-wht">Hackathon #2</p>
-              <ul class="hackathon-info">
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">New York</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">August 3-5</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">Open to all</p>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3" @click="jumpToHackathon(2)">
-          <div class="hackathon-progress-card">
-            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
-            <div class="hackathon-card-text">
-              <p class="t3 c-wht">Hackathon #2</p>
-              <ul class="hackathon-info">
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">New York</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">August 3-5</p>
-                </li>
-                <li>
-                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">Open to all</p>
+                  <p class="hackathon-card-item-text">TBD</p>
                 </li>
               </ul>
             </div>
