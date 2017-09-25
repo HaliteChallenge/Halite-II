@@ -27,9 +27,8 @@
                         <label for="country">Which of the following describes you best?<span class="text-danger">*</span></label>
                         <select class="form-control" id="level" v-model="level">
                             <option>Professional</option>
-                            <option value="Undergraduate">In university (undergraduate)</option>
-                            <option value="Graduate">In graduate school</option>
-                            <option value="High School">In high school</option>
+                            <option value="University">University</option>
+                            <option value="High School">High school</option>
                         </select>
                     </div>
 
@@ -44,7 +43,7 @@
                         </div>
                     </div>
 
-                    <div v-if="level === 'Undergraduate' || level === 'Graduate'">
+                    <div v-if="level === 'University'">
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>

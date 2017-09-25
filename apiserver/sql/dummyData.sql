@@ -15,8 +15,8 @@ VALUES (1000, 'cornell.edu'),
 
 INSERT INTO "user" (id, oauth_id, oauth_provider, username, email, player_level, is_active, organization_id)
 VALUES (1016, 0, 0, 'erdman',         'abc@gmail.com', 'Professional',  TRUE, 1000),
-       (1017, 1, 0, 'djma',           'abc@gmail.com', 'Undergraduate', TRUE, 1001),
-       (1018, 1, 0, 'lidavidm',       'abc@gmail.com', 'Graduate',      TRUE, 1000),
+       (1017, 1, 0, 'djma',           'abc@gmail.com', 'University', TRUE, 1001),
+       (1018, 1, 0, 'lidavidm',       'abc@gmail.com', 'University',      TRUE, 1000),
        (1019, 1, 0, 'mmauer',         'abc@gmail.com', 'High School',   TRUE, 1000),
        (1020, 1, 0, 'srastogi',       'abc@gmail.com', 'Professional',  TRUE, 1000),
        (1021, 1, 0, 'jclapauch',      'abc@gmail.com', 'Professional',  TRUE, 1002),

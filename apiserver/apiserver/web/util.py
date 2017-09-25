@@ -27,7 +27,7 @@ def validate_country(country_code, subdivision_code):
 
 
 def validate_user_level(level):
-    return level in ('High School', 'Undergraduate', 'Graduate',
+    return level in ('High School', 'University',
                      'Professional')
 
 

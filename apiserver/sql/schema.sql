@@ -25,7 +25,7 @@ CREATE TABLE `user` (
   is_active BOOL NOT NULL DEFAULT TRUE,
   on_email_list BOOL NOT NULL DEFAULT 1,
   is_email_good BOOL NOT NULL DEFAULT 0,
-  player_level ENUM('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional',
+  player_level ENUM('High School','University','Professional') NOT NULL DEFAULT 'Professional',
   organization_id INT,
   -- ISO-3166 3-letter country code
   country_code VARCHAR(3),
