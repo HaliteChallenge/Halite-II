@@ -316,10 +316,11 @@
           min: 0,
           max: 0,
           sliderStyle: {
-            backgroundColor: 'transparent',
+            backgroundColor: '#E6AB00',
             top: 0,
             width: "6px",
-            height: "6px"
+            height: "6px",
+            left: '4px'
           },
           processStyle: {
             backgroundColor: '#E6AB00'
@@ -426,9 +427,12 @@
         }
       }
       this.changeFrame = (event) => {
-        if (visualizer){
-          visualizer.scrub(this.frame, 0);
-        }
+        // waiting for the slider dot finish to move
+        setTimeout(() => {
+          if (visualizer){
+            visualizer.scrub(this.frame, 0);
+          }  
+        }, 200);
       }
     },
     computed: {

@@ -156,6 +156,11 @@
             });
             this.update_filter();
         },
+        watch: {
+            hackathonId: function(){
+                this.update_filter();
+            }
+        },
         methods: {
             tierClass: tierClass,
             build_filter: function() {

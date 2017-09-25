@@ -96,7 +96,7 @@
     }
 
   }
-
+  
   .leaderboard-table-stats{
     @media (min-width: $screen-sm-min){
       display: flex;
@@ -130,10 +130,16 @@
   text-align: center;
 }
 
+.leaderboard-nav-tabs{
+  max-width: 470px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+}
+
 .leaderboard-stats{
   $header-color: $foreground;
   $body-color: #C2D1D0;
-
   .stat-item{
     display: flex;
     align-items: center;
