@@ -164,7 +164,10 @@ export default {
   },
   mounted: function() {
     api.me().then(me => {
-      const userId = me.user_id;
+      let userId = null;
+      if (me !== null) {
+        userId = me.user_id;
+      }
       if(userId) {
         api.getUserHackathons(userId).then(hackathons => {
           if(hackathons && hackathons instanceof Array) {

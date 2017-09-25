@@ -136,14 +136,14 @@
         </div>
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_map_properties">
-            <a data-toggle="collapse" data-parent="#accordion" href="#widget_map_properties" aria-expanded="true" aria-controls="widget_map_properties">
+            <a data-toggle="collapse" @click.stop="toggleObjectPanel" data-parent="#accordion" :aria-expanded="showObjectPanel.toString()" aria-controls="widget_map_properties">
               <i class="xline xline-top"></i>
               <h4>map object properties</h4>
               <span class="toggle-icon chevron"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="widget_map_properties" aria-labelledby="heading_map_properties">
+          <div class="panel-collapse collapse" :class="{'in': showObjectPanel}" role="tabpanel" :aria-expanded="showObjectPanel.toString()" id="widget_map_properties" aria-labelledby="heading_map_properties">
             <!-- DISPLAY MESSAGE BOX -->
             <div v-if="selectedPlanet">
               <SelectedPlanet :selected-planet="selectedPlanet" :players="players"></SelectedPlanet>
@@ -304,6 +304,7 @@
         frame: 0,
         time: 0,
         playing: false,
+        showObjectPanel: false,
         speedIndex: 1,
         speedLabel: '1x',
         stats: null,
@@ -368,6 +369,7 @@
         this.selected.kind = kind;
         this.selected.id = args.id;
         this.selected.owner = args.owner;
+        this.showObjectPanel = true;
         console.log(kind);
         console.log(args);
         visualizer.onUpdate();
@@ -577,6 +579,9 @@
       nextFrame: function(){
       },
       changeFrame: function(event){
+      },
+      toggleObjectPanel: function(e) {
+        this.showObjectPanel = !this.showObjectPanel;
       }
     }
   }

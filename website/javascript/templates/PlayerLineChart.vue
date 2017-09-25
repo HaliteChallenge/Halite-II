@@ -198,7 +198,7 @@
       if (!this.path1List || !this.path2List || !this.path1List.length || !this.path2List.length || !this.innerSvg || !this.dragLine) return;
 
       let dataSet = this.chartData
-      this.maxLength && console.log(index, getDataPeriod(dataSet[0], this.maxLength, index))
+      // this.maxLength && console.log(index, getDataPeriod(dataSet[0], this.maxLength, index))
       this.x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, index), function(d) { return d.x }))
 
       dataSet.forEach((data, index) => {

@@ -25,6 +25,7 @@
   let visualizer = null;
 
   const showGame = (game) => {
+    window.location.hash = '/replay-bot'
     if (visualizer) {
       visualizer.getVisualizer().destroy();
     }
@@ -101,6 +102,11 @@
           this.message = `Could not download replay.`;
           this.is_downloading = false;
         });
+      }
+      window.onhashchange = function() {
+        if(!window.location.hash) {
+          window.location.reload()
+        }
       }
     },
     methods: {
