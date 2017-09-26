@@ -136,10 +136,10 @@
           };
           leaderboard.forEach(function(item){
             if (item.level == "Professional"){
-              classes.professional += 1;
-            } else if (item.level == "University Student"){
-              classes.university += 1;
-            } else if (item.level == "High School Student"){
+              classes.professional += 1;}
+              else if (item.level == "University"){
+              classes.university += 1; }
+              else if (item.level == "High School"){
               classes.high_school += 1;
             }
           });
