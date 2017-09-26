@@ -2,7 +2,7 @@ const path = require("path");
 
 // https://github.com/vuejs-templates/webpack-simple
 module.exports = {
-    entry: ['babel-polyfill', './javascript/main.js'],
+    entry: "./javascript/main.js",
     output: {
         path: path.resolve(__dirname, "assets/js/"),
         filename: "bundle.js",
