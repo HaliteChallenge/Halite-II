@@ -41,11 +41,11 @@ The entities in Halite II are ships and planets. The key mechanics are movement,
 ### Ships
 Each ship occupies a perfectly circular area with radius 0.5 units. Ships have:
 * Health, ranging from 0 to 255 integral points, and starting at 255 points.
-* Velocity, ranging from 0 to 15 integral units/turn in any direction. (The velocity is stored as two floating-point components, representing the x and y directions; the magnitude of the resulting velocity vector is scaled as to not exceed 15.)
+* Velocity, ranging from 0 to 7 integral units/turn in any direction. (The velocity is stored as two floating-point components, representing the x and y directions; the magnitude of the resulting velocity vector is scaled as to not exceed 7.)
 * A weapon, with a reach of 5 units in all directions, dealing 64 damage/turn.
 
 ### Movement
-A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 15). Bots must be given a thrust command every turn to continue to move (stateless).
+A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 7). Bots must be given a thrust command every turn to continue to move (stateless).
 
 Beyond basic thrust, the API provides some additional helper methods for pathfinding.
 1. obstacles_between: determines whether there are obstacles between two designated entities (ships/planets/positions).
