@@ -59,3 +59,62 @@ select.form-control::-ms-expand {
     font-family: "Teko";
   }
 }
+
+.multiselect{
+  .multiselect__select{
+    background-image: url(/assets/images/chevron-down.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 20px;
+    height: 10px;
+    right: 12px;
+    top: 20px;
+    &:before{
+      display: none;
+    }
+    // background-position: calc(100% - 15px) center;
+  }
+  .multiselect__tags{
+    background-color: transparent;
+    border: 0;
+  }
+}
+
+.v-select.dropdown{
+  background-color: #000;
+  color: #fff;
+  flex: 1;
+  min-width: 0;
+  min-height: 45px;
+  margin-right: 10px;
+  padding-top: 4px;
+  /** input **/
+  .form-control{
+    margin-right: 0 !important;
+    max-width: 120px !important;
+  }
+
+  /** dropdown **/
+  .dropdown-toggle{
+    border: 0 !important;
+    /** select tag **/
+    .selected-tag{
+      border: 0;
+      background-color: $yellow;
+      color: #30242F;
+    }
+  }
+
+  .dropdown-menu{
+    background-color: #000 !important;
+    li > a{
+      color: #fff;
+    }
+    .highlight > a{
+      background-color: rgba(255, 190, 0, 0.3);
+    }
+    li >a:hover{
+      background-color: rgba(255, 190, 0, 0.3);
+    }
+  }
+}
