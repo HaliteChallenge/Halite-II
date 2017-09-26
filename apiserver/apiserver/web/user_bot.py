@@ -176,9 +176,10 @@ def store_user_bot(user_id, intended_user, bot_id):
         update = model.bots.update() \
             .where(bot_where_clause) \
             .values(
-            compile_status=model.CompileStatus.UPLOADED.value,
-            update_time=sqlalchemy.sql.func.now(),
-        )
+                compile_status=model.CompileStatus.UPLOADED.value,
+                update_time=sqlalchemy.sql.func.now(),
+                timeout_sent=False,
+            )
         conn.execute(update)
 
     # TODO: Email the user

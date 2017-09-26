@@ -54,6 +54,7 @@ CREATE TABLE bot (
   score FLOAT NOT NULL DEFAULT 0,
   creation_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timeout_sent BOOL DEFAULT FALSE,
   FOREIGN KEY (user_id) REFERENCES `user`(id) on delete cascade,
   PRIMARY KEY (user_id, id)
 );

@@ -447,12 +447,19 @@ def update_user_timeout(conn, game_id, user):
         model.game_participants.c.timed_out
     )).first()[0]
 
-    total_count = conn.execute(sqlalchemy.sql.select([
+    bot = conn.execute(sqlalchemy.sql.select([
         model.bots.c.games_played,
-    ]).select_from(model.game_participants).where(
+        model.bots.c.timeout_sent,
+    ]).select_from(model.bots).where(
         (model.bots.c.user_id == user["user_id"]) &
         (model.bots.c.id == user["bot_id"])
-    )).first()["games_played"]
+    )).first()
+
+    if not bot:
+        return
+
+    total_count = bot["games_played"]
+    timeout_sent = bot["timeout_sent"]
 
     # Disable bots that error out too much
     hit_timeout_limit = timed_out_count > config.MAX_ERRORS_PER_BOT
@@ -467,7 +474,7 @@ def update_user_timeout(conn, game_id, user):
                                  user["organization_name"],
                                  user["player_level"],
                                  user["creation_time"])
-    if timed_out_count == 1:
+    if timed_out_count == 1 and not timeout_sent:
         notify.send_templated_notification(
             recipient,
             config.FIRST_TIMEOUT_TEMPLATE,
@@ -485,6 +492,11 @@ def update_user_timeout(conn, game_id, user):
             },
             config.GAME_ERROR_MESSAGES,
             config.C_BOT_TIMED_OUT)
+
+        conn.execute(model.bots.update().values(timeout_sent=True).where(
+            (model.bots.c.user_id == user["user_id"]) &
+            (model.bots.c.id == user["bot_id"])
+        ))
 
     elif hit_timeout_limit or hit_timeout_percent:
         # For now, do not disable bots
@@ -517,24 +529,16 @@ def update_user_timeout(conn, game_id, user):
 
 def delete_old_games(users):
     """
-    If a user has more than 200 games, delete the oldest.
+    Delete games older than 2 weeks for Salt-tier players.
     """
+    sqlfunc = sqlalchemy.sql.func
     with model.engine.connect() as conn:
         with conn.begin():
             for user in users:
-                cutoff_time = conn.execute(sqlalchemy.sql.select([
-                    model.games.c.time_played
-                ]).where(
-                    sqlalchemy.sql.exists(
-                        model.game_participants.select().where(
-                            (model.game_participants.c.user_id == user["user_id"]) &
-                            (model.game_participants.c.game_id == model.games.c.id)))
-                ).order_by(model.games.c.time_played.desc()).limit(1).offset(200)).first()
-
-                if not cutoff_time:
+                if user["tier"] != config.TIER_4_NAME:
                     continue
 
-                cutoff_time = cutoff_time["time_played"]
+                cutoff_time = sqlfunc.adddate(sqlfunc.now(), -14)
                 # Delete all rows older than this in the various game tables
                 conn.execute(model.games.delete().where(
                     sqlalchemy.sql.exists(
@@ -543,5 +547,5 @@ def delete_old_games(users):
                             (model.game_participants.c.game_id == model.games.c.id)
                         )
                     ) &
-                    (model.games.c.time_played <= cutoff_time)
+                    (model.games.c.time_played < cutoff_time)
                 ))

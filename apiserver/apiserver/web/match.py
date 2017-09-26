@@ -1,9 +1,12 @@
 """
 Match API endpoints - list matches and get replays/error logs.
 """
+import io
 
 import flask
 import sqlalchemy
+import google.cloud.exceptions as gcloud_exceptions
+import google.cloud.storage as gcloud_storage
 
 from .. import model, util
 
@@ -32,6 +35,7 @@ def get_match_helper(match_id):
 
         match = conn.execute(sqlalchemy.sql.select([
             model.games.c.replay_name,
+            model.games.c.replay_bucket,
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
@@ -46,6 +50,7 @@ def get_match_helper(match_id):
             "map_width": match["map_width"],
             "map_height": match["map_height"],
             "replay": match["replay_name"],
+            "replay_class": match["replay_bucket"],
             "time_played": match["time_played"],
             "players": {}
         }
@@ -89,6 +94,7 @@ def list_matches_helper(offset, limit, participant_clause,
         query = sqlalchemy.sql.select([
             model.games.c.id,
             model.games.c.replay_name,
+            model.games.c.replay_bucket,
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
@@ -122,6 +128,7 @@ def list_matches_helper(offset, limit, participant_clause,
                 "map_width": match["map_width"],
                 "map_height": match["map_height"],
                 "replay": match["replay_name"],
+                "replay_class": match["replay_bucket"],
                 "time_played": match["time_played"],
                 "turns_total": match["turns_total"],
                 "planets_destroyed": match["planets_destroyed"],
@@ -174,3 +181,28 @@ def get_match(match_id):
     if not match:
         raise util.APIError(404, message="Match not found.")
     return flask.jsonify(match)
+
+
+@web_api.route("/replay/class/<int:replay_bucket>/name/<replay_name>",
+               methods=["GET"])
+@util.cross_origin(methods=["GET"])
+def get_replay(replay_bucket, replay_name):
+    bucket = model.get_replay_bucket(replay_bucket)
+    blob = gcloud_storage.Blob(replay_name, bucket, chunk_size=262144)
+    buffer = io.BytesIO()
+
+    try:
+        blob.download_to_file(buffer)
+    except gcloud_exceptions.NotFound:
+        raise util.APIError(404, message="Replay not found.")
+
+    buffer.seek(0)
+    response = flask.make_response(flask.send_file(
+        buffer,
+        mimetype="application/x-halite-2-replay",
+        as_attachment=True,
+        attachment_filename="{}.{}.hlt".format(replay_name, replay_bucket)))
+
+    response.headers["Content-Length"] = str(buffer.getbuffer().nbytes)
+
+    return response

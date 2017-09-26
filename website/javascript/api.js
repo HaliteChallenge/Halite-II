@@ -149,13 +149,58 @@ export function get_replay(game_id, progress_callback) {
             }
         };
 
+        xhr.onerror = function() {
+            reject();
+        };
+
+        xhr.onreadystatechange = function(e) {
+            if (xhr.readyState === 4) {
+                if (xhr.status !== 200) {
+                    reject();
+                }
+            }
+        };
+
         xhr.send();
     });
     return Promise.all([game_data_promise, replay_promise]).then(([game, replay]) => {
         return {
             game: game,
             replay: replay,
-        }
+        };
+    });
+}
+
+export function get_expired_replay(replay_class, replay_name) {
+    return new Promise((resolve, reject) => {
+        const xhr = makeRequest();
+        xhr.withCredentials = true;
+        xhr.open("GET", `${API_SERVER_URL}/replay/class/${replay_class}/name/${replay_name}`, true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function(e) {
+            if (this.status === 200) {
+                const blob = this.response;
+                resolve(blob);
+            }
+            else {
+                reject();
+            }
+        };
+
+        xhr.onerror = function() {
+            reject();
+        };
+
+        xhr.onreadystatechange = function(e) {
+            if (xhr.readyState === 4) {
+                if (xhr.status !== 200) {
+                    reject();
+                }
+            }
+        };
+
+        xhr.send();
     });
 }
 

@@ -14,6 +14,8 @@ login_log = logging.getLogger("login")
 
 
 oauth_login = flask.Blueprint("github_login", __name__)
+oauth_logout = flask.Blueprint("oauth_logout", __name__)
+
 oauth = OAuth(app)
 github = oauth.remote_app(
     "github",
@@ -47,6 +49,13 @@ def me():
         })
     else:
         return flask.jsonify(None)
+
+
+@oauth_logout.route("/", methods=["POST"])
+@cross_origin(methods=["POST"], origins=config.CORS_ORIGINS, supports_credentials=True)
+def logout():
+    flask.session.clear()
+    return util.response_success()
 
 
 @oauth_login.route("/response/github")

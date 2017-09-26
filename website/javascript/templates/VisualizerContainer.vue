@@ -11,8 +11,13 @@
         :message="message">
       </halite-upload-zone>
     </div>
+    <div v-if="message" class="row">
+        <div class="col-md-12">
+            <p>{{message}}</p>
+        </div>
+    </div>
   </div>
-  
+
 </template>
 
 <script>
@@ -78,6 +83,18 @@
     },
     mounted: function(){
       const params = new URLSearchParams(window.location.search);
+      const setupGame = (game) => {
+        this.message = "Parsing replay, please wait…";
+        this.$parent.currentView = 'replay';
+        showGame(game).then(() => {
+          this.is_downloading = false;
+          this.message = null;
+        }).catch((e) => {
+          this.is_downloading = false;
+          this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
+        });
+      };
+
       if (params.has("game_id")) {
         const game_id = params.get("game_id");
         this.message = `Downloading game ${game_id}.`;
@@ -89,18 +106,29 @@
             this.progress = Math.floor(100 * progress);
           }
         }).then((game) => {
-          this.message = "Parsing replay, please wait…";
-          this.$parent.currentView = 'replay';
-          showGame(game).then(() => {
-            this.is_downloading = false;
-            this.message = null;
-          }).catch((e) => {
-            this.is_downloading = false;
-            this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
-          });
+          window.history.replaceState(null, "", `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`);
+          setupGame(game);
         }, () => {
-          this.message = `Could not download replay.`;
-          this.is_downloading = false;
+          console.log(params.has("replay_class") && params.has("replay_name"));
+          if (params.has("replay_class") && params.has("replay_name")) {
+            const replay_class = params.get("replay_class");
+            const replay_name = params.get("replay_name");
+            console.log("Getting expired replay");
+            api.get_expired_replay(replay_class, replay_name).then((replay) => {
+              this.$parent.currentView = 'replay';
+              setupGame({
+                game: null,
+                replay: replay,
+              });
+            }, () => {
+              this.message = `Could not find old replay.`;
+              this.is_downloading = false;
+            });
+          }
+          else {
+            this.message = `Could not download replay.`;
+            this.is_downloading = false;
+          }
         });
       }
       window.onhashchange = function() {
@@ -131,5 +159,5 @@
 </script>
 
 <style>
-  
+
 </style>

@@ -56,6 +56,9 @@ def get_match_replay(intended_user, match_id):
             model.games.c.id == match_id
         )).first()
 
+        if not match:
+            raise util.APIError(404, message="Match not found.")
+
         bucket = model.get_replay_bucket(match["replay_bucket"])
         blob = gcloud_storage.Blob(match["replay_name"], bucket,
                                    chunk_size=262144)

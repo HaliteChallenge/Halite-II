@@ -11,7 +11,7 @@
         </div>
       </td>
     </tr>
-    
+
     <tr class="play-stats">
       <td></td>
       <td class="player-stats-legend">
@@ -28,8 +28,7 @@
   import Vue from "vue";
   import * as api from "../api";
   import * as libhaliteviz from "../../../libhaliteviz";
-  libhaliteviz.setAssetRoot("/assets/js/");
-  const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
+
 
   export default {
     name: 'PlayerStatsPane',
