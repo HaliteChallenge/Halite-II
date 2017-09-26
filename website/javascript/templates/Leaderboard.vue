@@ -246,61 +246,58 @@
           this.leaderboard = leaderboard;
           this.page = page;
         });
+      },
+      watch: {
+          hackathonId: function(){
+              this.update_filter();
+          }
+      },
+      methods: {
+          tierClass: tierClass,
+          build_filter: function() {
+              let filters = [];
+              if (this.username_filter.length > 0) {
+                  filters.push("username,=," + this.username_filter);
+              }
+              if (this.tier_filter.length > 0) {
+                  if (this.hackathonId) {
+                      filters.push("local_rank,=," + this.tier_filter);
+                  } else {
+                      filters.push("rank,=," + this.tier_filter);
+                  }
+              }
+              if (this.organization_filter && this.organization_filter.toString().length > 0) {
+                  filters.push("organization_id,=," + this.organization_filter);
+              }
+              // TODO: No country filter in API, wait for implementation
+              // if (this.country_filter.length > 0) {
+              //     filters.push("country,=," + this.country_filter);
+              // }
+              return filters.length ? filters : null;
+          },
+          update_filter: function(e) {
+              if (e) e.preventDefault();
+              const filters = this.build_filter();
+              if(this.lastPage <= 0) {
+                  api.leaderboard(filters, this.hackathonId).then(leaderboard => {
+                      if(leaderboard && leaderboard instanceof Array) {
+                          this.lastPage = Math.ceil(leaderboard.length / this.limit)
+                      }
+                  });
+              }
+              api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
+                  this.leaderboard = leaderboard;
+              });
+          },
+          changePage: function(page) {
+              api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
+                  this.leaderboard = leaderboard;
+                  this.page = page;
+              });
+          }
       }
-    },
-  }
-            this.update_filter();
-        },
-        watch: {
-            hackathonId: function(){
-                this.update_filter();
-            }
-        },
-        methods: {
-            tierClass: tierClass,
-            build_filter: function() {
-                let filters = [];
-                if (this.username_filter.length > 0) {
-                    filters.push("username,=," + this.username_filter);
-                }
-                if (this.tier_filter.length > 0) {
-                    if (this.hackathonId) {
-                        filters.push("local_rank,=," + this.tier_filter);
-                    } else {
-                        filters.push("rank,=," + this.tier_filter);
-                    }
-                }
-                if (this.organization_filter && this.organization_filter.toString().length > 0) {
-                    filters.push("organization_id,=," + this.organization_filter);
-                }
-                // TODO: No country filter in API, wait for implementation
-                // if (this.country_filter.length > 0) {
-                //     filters.push("country,=," + this.country_filter);
-                // }
-                return filters.length ? filters : null;
-            },
-            update_filter: function(e) {
-                if (e) e.preventDefault();
-                const filters = this.build_filter();
-                if(this.lastPage <= 0) {
-                    api.leaderboard(filters, this.hackathonId).then(leaderboard => {
-                        if(leaderboard && leaderboard instanceof Array) {
-                            this.lastPage = Math.ceil(leaderboard.length / this.limit)
-                        }
-                    });
-                }
-                api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
-                    this.leaderboard = leaderboard;
-                });
-            },
-            changePage: function(page) {
-                api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-                    this.leaderboard = leaderboard;
-                    this.page = page;
-                });
-            }
-        },
     }
+  }
 </script>
 
 <style lang="scss" scoped>
