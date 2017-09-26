@@ -162,7 +162,7 @@ def update_compilation_status():
             )).first()
 
             notify.send_templated_notification(
-                notify.Recipient(user["id"], user["username"], user["email"],
+                notify.Recipient(user["id"], user["username"], user["github_email"],
                                  user["organization_name"], user["player_level"],
                                  user["creation_time"]),
                 config.COMPILATION_SUCCESS_TEMPLATE,
@@ -177,7 +177,7 @@ def update_compilation_status():
             return util.response_success()
         else:
             notify.send_templated_notification(
-                notify.Recipient(user["id"], user["username"], user["email"],
+                notify.Recipient(user["id"], user["username"], user["github_email"],
                                  user["organization_name"], user["player_level"],
                                  user["creation_time"]),
                 config.COMPILATION_FAILURE_TEMPLATE,
