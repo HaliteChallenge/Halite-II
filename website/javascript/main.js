@@ -21,7 +21,6 @@ import * as api from "./api";
 
 Vue.use(require('vue-moment'));
 Vue.use(require('vue-cookie'));
-Vue.use(require('element-ui'));
 
 window.views = {
     ApiKey: function () {

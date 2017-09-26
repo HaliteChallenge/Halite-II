@@ -304,7 +304,7 @@
         frame: 0,
         time: 0,
         playing: false,
-        showObjectPanel: true,
+        showObjectPanel: false,
         speedIndex: 1,
         speedLabel: '1x',
         stats: null,

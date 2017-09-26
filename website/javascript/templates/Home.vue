@@ -8,10 +8,10 @@
                 <p class="t1 c-wht font-headline">HALITE 2</p>
                 <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                 <div v-if="!me_in" class="not-me ha-button-container">
-                    <a class="ha-button" href="/play-programming-challenge"><span>PLAY NOW</span></a>
+                    <div class="ha-button"><span>PLAY NOW</span></div>
                 </div>
                 <div v-else class="me-in ha-button-container">
-                    <a class="ha-button no-bg-button" href="/user?me"><span>CHECK YOUR STATS</span></a>
+                    <a class="ha-button no-bg-button" href="/programming-competition-leaderboard"><span>CHECK YOUR STATS</span></a>
                     <a class="ha-button" href="/play-programming-challenge"><span>SUBMIT A BOT</span></a>
                 </div>
             </div>
@@ -208,9 +208,8 @@
                             <div class="clear"></div>
                             <div class="ha-input-container">
                                 <div class="input-field">
-                                    <input type="text" placeholder="Coming soon..." />
-                                    &nbsp; &nbsp;
-                                    <button class="btn"><span>INVITE</span></button>
+                                    <input type="text" placeholder="" readonly>
+                                    <button class="btn"><span>  INVITE  </span></button>
                                 </div>
                             </div>
                         </div>
@@ -257,7 +256,7 @@
                             <p class="t5 c-gry">Two Sigma, the creator of the Halite competition, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above. </p>
                             <div class="clear"></div>
                             <div class="ha-button-container">
-                                <a href="https://www.twosigma.com/careers" class="ha-button no-bg-button"><span>EXPLORE CAREERS</span></a>
+                                <a href="/about"><div class="ha-button no-bg-button"><span>LEARN MORE</span></div></a>
                             </div>
                         </div>
                     </div>
@@ -277,7 +276,7 @@
                             <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by <a href="https://twosigma.com">Two Sigma</a> in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
                             <div class="clear"></div>
                             <div class="ha-button-container">
-                                <a href="/about" class="ha-button no-bg-button"><span>LEARN MORE</span></a>
+                                <a href="/about"><div class="ha-button no-bg-button"><span>LEARN MORE</span></div></a>
                             </div>
                         </div>
                     </div>
@@ -288,7 +287,7 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
                     <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP ON GITHUB</span></a>
-                    <a href="/play-programming-challenge" v-else class="ha-button"><span>PLAY NOW</span></a>
+                    <a :href="`${baseUrl}/play`" v-else class="ha-button"><span>PLAY NOW</span></a>
                 </div>
             </div>
         </div>

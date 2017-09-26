@@ -13,13 +13,11 @@
   "license": "MIT",
   "dependencies": {
     "d3": "^4.10.2",
-    "element-ui": "^1.4.5",
     "libhaliteviz": "file:../libhaliteviz",
     "lodash": "^4.17.4",
     "vue": "^2.3.4",
     "vue-cookie": "^1.1.4",
     "vue-moment": "^2.0.2",
-    "vue-select": "^2.2.0",
     "vue-slider-component": "^2.3.9"
   },
   "devDependencies": {

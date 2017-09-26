@@ -340,6 +340,7 @@
     margin-right: 0;
     margin-top: 20px;
     .input-field{
+      background-color: #000;
       display: flex;
       padding: 5px;
       max-width: 320px;
@@ -347,25 +348,20 @@
       margin-right: auto;
       input{
         color: #fff;
-        background-color: #000;
+        background-color: transparent;
         border: 0;
-        padding: 0px 10px;
         flex: 1;
         &:-moz-placeholder {
-          color: #fff;
-          opacity:0.5;
+          color: #fff; opacity:1;
         }
         &::-moz-placeholder {
-          color: #fff;
-          opacity:0.5;
+          color: #fff;opacity:1;
         }
         &:-ms-input-placeholder{
-          color: #fff;
-          opacity:0.5;
+          color: #fff;opacity:1;
         }
         &::-webkit-input-placeholder{
-          color: #fff;
-          opacity:0.5;
+          color: #fff;opacity:1;
         }
       }
       button{
