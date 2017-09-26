@@ -66,7 +66,7 @@ def upload_game():
                 sqlalchemy.sql.select([
                     model.users.c.id.label("user_id"),
                     model.users.c.on_email_list,
-                    model.users.c.github_email,
+                    model.users.c.email,
                     model.users.c.player_level,
                     model.users.c.creation_time,
                     model.users.c.username,
@@ -463,7 +463,7 @@ def update_user_timeout(conn, game_id, user):
     )
 
     recipient = notify.Recipient(user["user_id"], user["username"],
-                                 user["github_email"],
+                                 user["email"],
                                  user["organization_name"],
                                  user["player_level"],
                                  user["creation_time"])

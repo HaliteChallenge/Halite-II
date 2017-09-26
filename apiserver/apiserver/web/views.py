@@ -52,7 +52,7 @@ def discourse_sso(*, user_id):
 
     raw_payload = {
         "nonce": nonce,
-        "email": user["github_email"],
+        "email": user["email"],
         "external_id": str(user_id),
         "username": user["username"],
     }
