@@ -58,6 +58,12 @@
       padding:0 !important;
     }
   }
+  .margin-15-xs{
+    @media (max-width: $screen-xs-max){
+      margin-left:-15px !important;
+      margin-right:-15px !important;
+    }
+  }
   .notification{
     background-color: $yellow;
     margin-bottom: 30px;
@@ -84,38 +90,67 @@
     >[class*="array"]{
       height: 100px;
     }
+    >div>[class*="col"]:not(:first-child){
+      @media (max-width: $screen-sm-max){
+        margin: 30px 0;
+      }
+    }
   }
-  .not-me{
-    width: 200px;
+  .table-display{
+    @media (min-width: $screen-md-min){
+      display: table;
+      >div{
+        display: table-cell;
+        float: none !important;
+      }
+    }
   }
   .me-in{
     width: 400px;
-    display: flex;
-    .ha-button{
-      flex: 1;
+    margin-left: auto;
+    margin-right: auto;
+    >br{
+      display: none;
+    }
+    .ha-button-container:not(.no-bg-button){
+      margin-left: 20px;
     }
     @media (max-width: $screen-xs-max){
       width: auto;
       display: block;
-      .ha-button{
+      >br{
         display: block;
+      }
+      .ha-button-container:not(.no-bg-button){
+        margin-top: 20px;
+        margin-left: 0;
       }
     }
   }
   .ha-button-container{
     margin-left: auto;
     margin-right: auto;
-    font-family: $font-headline;
+    font-family: "Teko";
     font-size: 2rem;
-  }
-  .ha-button{
     background-image: url(../images/register_bg.png);
-    background-size: contain;
+    background-size: 100% 40px;
     background-position: center;
     background-repeat: no-repeat;
-    margin-top: 25px;
     padding: 5px 20px;
     cursor: pointer;
+    display: inline-block;
+    height: auto;
+    >div{
+      position: relative;
+      display: block;
+      height: 30px;
+      line-height: 30px;
+      a{
+        padding: 15px 3px;
+      }
+    }
+  }
+  .ha-button{
     span{
       transform: translateY(2px);
       color: $dark-gray;
@@ -137,7 +172,7 @@
   }
   .des{
     text-align: left;
-    @media (max-width: $screen-xs-max){
+    @media (max-width: $screen-sm-max){
       text-align: center;
     }
     .bot-1{
@@ -154,17 +189,17 @@
     }
     img{
       width: 100%;
-      @media (max-width: $screen-xs-max){
+      @media (max-width: $screen-sm-max){
         margin-top: 20px;
         margin-bottom: 20px;
+        width: 80%;
       }
     }
     .words{
       .ha-button-container{
-        width:200px;
         margin-left: 0;
         text-align: center;
-        transform: translateX(-11px);
+        transform: translateX(-1px);
         &.wider{
           transform: translateX(-15px);
           div{
@@ -179,7 +214,7 @@
       .line-container {
         width: 35%;
         margin-left: 0;
-        @media (max-width: $screen-xs-max){
+        @media (max-width: $screen-sm-max){
           margin-left: auto;
         }
       }
@@ -201,6 +236,13 @@
         }
       }
     }
+    .play-bot{
+      @media (max-width: $screen-sm-max){
+        margin-bottom: 20px;
+        padding-left: 30px;
+        padding-right: 30px;
+      }
+    }
     img{
       width: 100%;
     }
@@ -219,9 +261,6 @@
       }
       margin-left: auto;
       margin-right: auto;
-    }
-    .ha-button-container{
-      width:200px;
     }
     .screen-shot{
       @media (max-width: $screen-xs-max){
@@ -309,13 +348,19 @@
   }
   .menu-body{
     .content{
-      width: 75%;
+      width: 90%;
       margin-left: auto;
       margin-right: auto;
-      transform: translateY(-20px);
+      margin-top:20px;
+    }
+    >.xline{
+      top: 70px;
+      bottom: 0;
+      height: auto;
+    }
+    .xline-left,.xline-right{
       @media (max-width: $screen-xs-max){
-        width: 85%;
-        margin-top: 35px;
+        display: none;
       }
     }
     .line-container{

@@ -25,6 +25,7 @@
   }
 }
 .navbar-inverse{
+  $g-color: #b9b8b8;
   background-color: $gray-bg;
   color: $foreground;
   .navbar-nav{
@@ -32,6 +33,7 @@
       position: relative;
       padding: 5px;
       min-height: 50px;
+      color: $g-color;
       text-transform: uppercase;
       @media (min-width: $screen-md-min){
         padding: 15px 3px;
@@ -69,6 +71,7 @@
 header.navbar{
   border-bottom: 1px solid $border;
   height: 61px;
+  opacity: 0.9;
   @media (min-width: $screen-md-min){
     min-height: 50px;
   }
@@ -93,9 +96,9 @@ header.navbar{
     }
     .navbar-right{
       li a {
-        transform: translateY(-2px);
+        transform: translateY(2px);
         @media (max-width: $screen-sm-max){
-          transform: translateY(7px);
+          transform: translateY(12px);
         }
       }
     }
@@ -103,9 +106,10 @@ header.navbar{
       display: inline-block;
       margin: 0;
       height: 60px;
+      background-size: 100% 40px;
       float: none !important;
       @media (max-width: $screen-sm-max){
-        transform: translateY(-4px);
+        transform: translateY(-10px);
       }
     }
     img {
@@ -168,6 +172,8 @@ header.navbar{
       color: $yellow;
       padding: 3px 2px;
       margin-right: 5px;
+      font-size: 14px;
+      transform: translateY(-2px);
     }
     .popup-container{
       display: none;

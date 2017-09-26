@@ -8,11 +8,22 @@
                 <p class="t1 c-wht font-headline">HALITE 2</p>
                 <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                 <div v-if="!me_in" class="not-me ha-button-container">
-                    <a class="ha-button" href="/play-programming-challenge"><span>PLAY NOW</span></a>
+                    <div>
+                        <a class="ha-button" href="/play-programming-challenge"><span>PLAY NOW</span></a>
+                    </div>
                 </div>
-                <div v-else class="me-in ha-button-container">
-                    <a class="ha-button no-bg-button" href="/user?me"><span>CHECK YOUR STATS</span></a>
-                    <a class="ha-button" href="/play-programming-challenge"><span>SUBMIT A BOT</span></a>
+                <div v-else class="me-in">
+                    <div class="ha-button-container no-bg-button">
+                        <div>
+                            <a class="ha-button" href="/user?me"><span>CHECK YOUR STATS</span></a>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="ha-button-container">
+                        <div>
+                            <a class="ha-button" href="/play-programming-challenge"><span>SUBMIT A BOT</span></a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-12">
@@ -31,8 +42,10 @@
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <p class="t5 c-gry">Halite is an artificial intelligence programming challenge, created by [Two Sigma](www.twosigma.com), where players build bots using the coding language of their choice to battle on a two-dimensional virtual board. The last bot standing or the bot with all the territory wins. Victory will require micromanaging of the movement of ships, optimizing a bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
-                    <div class="ha-button-container">
-                        <a class="ha-button no-bg-button" href=""><span>GET STARTED</span></a>
+                    <div class="ha-button-container no-bg-button">
+                        <div>
+                            <a class="ha-button" href=""><span>GET STARTED</span></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -53,14 +66,15 @@
                     <p class="t5 c-gry">This year's game is a space story.</p>
                     <p class="t5 c-gry">Bots control ships that colonize and mine planets in order to produce more ships and battle opponents. A game's victor will need optimal pathfinding to move efficiently from planet to planet, and will need to master evasive maneuvers, especially if a ship is docked to a planet that is about to explode.</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
-                    <div class="ha-button-container">
-                        <a class="ha-button no-bg-button" href=""><span>READ THE CODEX</span></a>
+                    <div class="ha-button-container no-bg-button">
+                        <div>
+                            <a class="ha-button" href=""><span>READ THE CODEX</span></a>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-offset-2 col-md-4 bot-2">
                     <img :src="`${baseUrl}/assets/images/temp/bot_2.png`"/>
                 </div>
-                <div class="line-container"><i class="xline xline-top"></i></div>
            </div>
             <div class="col-md-12 ha-line">
             </div>
@@ -71,7 +85,7 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
                     <a href="/play/?game_id=850849">
-                        <div class="col-md-3">
+                        <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -87,7 +101,7 @@
                         </div>
                     </a>
                     <a href="/play/?game_id=850858">
-                        <div class="col-md-3">
+                        <div class="col-md-3 play-bot">
                           <div class="img-container">
                               <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                               <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -103,7 +117,7 @@
                         </div>
                     </a>
                     <a href="/play/?game_id=851091">
-                        <div class="col-md-3">
+                        <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -119,7 +133,7 @@
                         </div>
                     </a>
                     <a href="/play/?game_id=851123">
-                        <div class="col-md-3">
+                        <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
@@ -152,65 +166,68 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <p class="t5 c-gry">It can be frustrating to play games like Halite on your own - you make some progress but then get stuck. Find friends to play with to make Halite even more fun.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <div class="col-md-4">
-                    <div class="menu-header">
-                        <div class="line-container line-1"><i class="xline xline-top"></i></div>
-                        <img :src="`${baseUrl}/assets/images/temp/forums.png`"/>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                    </div>
-                    <div class="menu-body">
-                        <div class="line-container"><i class="xline xline-top"></i></div>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                        <div class="clear"></div>
-                        <div class="content">
-                            <p class="t3 c-wht font-headline">JOIN THE FORUMS</p>
-                            <p class="t5 c-gry">From a Halite I user: "The Halite community and chat were pretty active, so I didn’t feel like I lacked people to talk to. That was a really strong point of the game, there was a community even if it wasn’t a local community.”</p>
-                            <div class="clear"></div>
-                            <div class="ha-button-container">
-                                <a href="https://forums.halite.io/" target="_blank" class="ha-button no-bg-button"><span>Forums</span></a>
+                <div class="table-display">
+                    <div class="col-md-4 no-padding-xs margin-15-xs">
+                        <div class="menu-header">
+                            <div class="line-container line-1"><i class="xline xline-top"></i></div>
+                            <img :src="`${baseUrl}/assets/images/temp/forums.png`"/>
+                            <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                        </div>
+                        <div class="menu-body">
+                            <i class="xline xline-left"></i>
+                            <i class="xline xline-right"></i>
+                            <div class="content">
+                                <p class="t3 c-wht font-headline">JOIN THE FORUMS</p>
+                                <p class="t5 c-gry">"I didn’t feel like I lacked people to talk to...There was a community even if it wasn’t a local community.” - Halite 1 Player</p>
+                                <div class="clear"></div>
+                                <div class="ha-button-container no-bg-button">
+                                    <div>
+                                        <a href="https://forums.halite.io/" target="_blank" class="ha-button"><span>JOIN NOW</span></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 no-padding-xs">
-                    <div class="menu-header">
-                        <div class="line-container line-1"><i class="xline xline-top"></i></div>
-                        <img :src="`${baseUrl}/assets/images/temp/events.png`"/>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                    </div>
-                    <div class="menu-body">
-                        <div class="line-container"><i class="xline xline-top"></i></div>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                        <div class="clear"></div>
-                        <div class="content">
-                            <p class="t3 c-wht font-headline">HACKATHONS &amp; EVENTS</p>
-                            <p class="t5 c-gry">Find out what events the Halite community is organizing.</p>
-                            <div class="clear"></div>
-                            <div class="ha-button-container">
-                                <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button no-bg-button"><span>LEARN MORE</span></a>
+                    <div class="col-md-4 no-padding-xs margin-15-xs">
+                        <div class="menu-header">
+                            <div class="line-container line-1"><i class="xline xline-top"></i></div>
+                            <img :src="`${baseUrl}/assets/images/temp/events.png`"/>
+                            <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                        </div>
+                        <div class="menu-body">
+                            <i class="xline xline-left"></i>
+                            <i class="xline xline-right"></i>
+                            <div class="content">
+                                <p class="t3 c-wht font-headline">HACKATHONS &amp; EVENTS</p>
+                                <p class="t5 c-gry">Find out what events the Halite community is organizing.</p>
+                                <div class="clear"></div>
+                                <div class="ha-button-container no-bg-button">
+                                    <div>
+                                        <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button"><span>LEARN MORE</span></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 no-padding-xs">
-                    <div class="menu-header">
-                        <div class="line-container line-1"><i class="xline xline-top"></i></div>
-                        <img :src="`${baseUrl}/assets/images/temp/invite.png`"/>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                    </div>
-                    <div class="menu-body">
-                        <div class="line-container"><i class="xline xline-top"></i></div>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                        <div class="clear"></div>
-                        <div class="content">
-                            <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
-                            <p class="t5 c-gry">Feature coming soon.</p>
-                            <div class="clear"></div>
-                            <div class="ha-input-container">
-                                <div class="input-field">
-                                    <input type="text" placeholder="Coming soon..." />
-                                    &nbsp; &nbsp;
-                                    <button class="btn"><span>INVITE</span></button>
+                    <div class="col-md-4 no-padding-xs margin-15-xs">
+                        <div class="menu-header">
+                            <div class="line-container line-1"><i class="xline xline-top"></i></div>
+                            <img :src="`${baseUrl}/assets/images/temp/invite.png`"/>
+                            <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                        </div>
+                        <div class="menu-body">
+                            <i class="xline xline-left"></i>
+                            <i class="xline xline-right"></i>
+                            <div class="content">
+                                <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
+                                <p class="t5 c-gry">Feature coming soon.</p>
+                                <div class="clear"></div>
+                                <div class="ha-input-container">
+                                    <div class="input-field">
+                                        <input type="text" placeholder="Coming soon..." />
+                                        &nbsp; &nbsp;
+                                        <button class="btn"><span>INVITE</span></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -242,42 +259,46 @@
                 <div class="clear"></div>
             </div>
             <div class="col-md-12 big-menu no-padding-xs">
-                <div class="col-md-6">
-                    <div class="menu-header">
-                        <div class="line-container line-1"><i class="xline xline-top"></i></div>
-                        <img :src="`${baseUrl}/assets/images/temp/career.png`"/>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                    </div>
-                    <div class="menu-body">
-                        <div class="line-container"><i class="xline xline-top"></i></div>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                        <div class="clear"></div>
-                        <div class="content">
-                            <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
-                            <p class="t5 c-gry">Two Sigma, the creator of the Halite competition, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above. </p>
-                            <div class="clear"></div>
-                            <div class="ha-button-container">
-                                <a href="https://www.twosigma.com/careers" class="ha-button no-bg-button"><span>EXPLORE CAREERS</span></a>
+                <div class="table-display">
+                    <div class="col-md-6">
+                        <div class="menu-header">
+                            <div class="line-container line-1"><i class="xline xline-top"></i></div>
+                            <img :src="`${baseUrl}/assets/images/temp/career.png`"/>
+                            <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                        </div>
+                        <div class="menu-body">
+                            <i class="xline xline-left"></i>
+                            <i class="xline xline-right"></i>
+                            <div class="content">
+                                <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
+                                <p class="t5 c-gry">Two Sigma, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above.</p>
+                                <div class="clear"></div>
+                                <div class="ha-button-container no-bg-button">
+                                    <div>
+                                        <a href="https://www.twosigma.com/careers" class="ha-button"><span>EXPLORE CAREERS</span></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="menu-header">
-                        <div class="line-container line-1"><i class="xline xline-top"></i></div>
-                        <img :src="`${baseUrl}/assets/images/temp/competition.png`"/>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                    </div>
-                    <div class="menu-body">
-                        <div class="line-container"><i class="xline xline-top"></i></div>
-                        <div class="line-container line-2"><i class="xline xline-top"></i></div>
-                        <div class="clear"></div>
-                        <div class="content">
-                            <p class="t3 c-wht">ABOUT THE COMPETITION</p>
-                            <p class="t5 c-gry">Halite is an AI programming competition running October 23 - January 26, created by <a href="https://twosigma.com">Two Sigma</a> in 2016. Two interns built the first iteration of Halite, and due it its success Halite II was built over the summer of 2017.</p>
-                            <div class="clear"></div>
-                            <div class="ha-button-container">
-                                <a href="/about" class="ha-button no-bg-button"><span>LEARN MORE</span></a>
+                    <div class="col-md-6">
+                        <div class="menu-header">
+                            <div class="line-container line-1"><i class="xline xline-top"></i></div>
+                            <img :src="`${baseUrl}/assets/images/temp/competition.png`"/>
+                            <div class="line-container line-2"><i class="xline xline-top"></i></div>
+                        </div>
+                        <div class="menu-body">
+                            <i class="xline xline-left"></i>
+                            <i class="xline xline-right"></i>
+                            <div class="content">
+                                <p class="t3 c-wht">ABOUT THE COMPETITION</p>
+                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 26, 2017. Created by two interns at <a href="https://twosigma.com">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
+                                <div class="clear"></div>
+                                <div class="ha-button-container no-bg-button">
+                                    <div>
+                                        <a href="/about" class="ha-button"><span>LEARN MORE</span></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -287,8 +308,10 @@
                 <p class="t2 c-wht">GET STARTED WITH HALITE</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
-                    <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP ON GITHUB</span></a>
-                    <a href="/play-programming-challenge" v-else class="ha-button"><span>PLAY NOW</span></a>
+                    <div>
+                        <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP ON GITHUB</span></a>
+                        <a href="/play-programming-challenge" v-else class="ha-button"><span>PLAY NOW</span></a>
+                    </div>
                 </div>
             </div>
         </div>

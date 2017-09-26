@@ -3,7 +3,7 @@
   a{
     color: $foreground;
     &.base-link{
-      color: #337AB7;
+      color: $yellow;
       text-decoration: underline;
     }
   }
@@ -55,12 +55,12 @@
       text-align: center;
     }
     &-field{
-      background-color: #000;
       display: flex;
       padding: 5px;
       input{
         color: #fff;
-        background-color: transparent;
+        background-color: #000;
+        margin-right: 10px;
         border: 0;
         flex: 1;
       }
