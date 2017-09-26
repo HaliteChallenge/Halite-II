@@ -78,6 +78,7 @@ def leaderboard():
                 "num_games": int(row["num_games"]),
                 "score": float(row["score"]),
                 "language": row["language"],
+                "country": row["country_code"],
                 "rank": int(row["rank"]) if row["rank"] is not None else None,
             }
 

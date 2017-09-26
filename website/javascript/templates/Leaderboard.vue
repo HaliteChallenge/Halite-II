@@ -32,40 +32,18 @@
             <!-- <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button> -->
             <button class="btn"><span>APPLY FILTER</span></button>
           </div>
-        </div><!-- /input-group -->
+        </div>
       </div>
     </form>
-    <div class="leaderboard-stats leaderboard-table-stats">
-      <div class="stat-item">
-        <div class="stat-item-icon"><span class="icon-medal"></span></div>
-        <div class="stat-item-content">
-        <p class="stat-item-value">{{classes.professional}}</p>
-        <p class="stat-item-caption">Professional</p>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-item-icon"><span class="icon-hat"></span></div>
-        <div class="stat-item-content">
-        <p class="stat-item-value">{{classes.university}}</p>
-        <p class="stat-item-caption">University Students</p>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-item-icon"><span class="icon-bag"></span></div>
-        <div class="stat-item-content">
-        <p class="stat-item-value">{{classes.high_school}}</p>
-        <p class="stat-item-caption">High School Students</p>
-        </div>
-      </div>
-    </div>
     <table class="table table-leader">
       <thead>
         <tr>
           <th>#</th>
-          <th>Username</th>
-          <th>Points</th>
+          <th>Player</th>
+          <th>Score</th>
           <th>Tier</th>
           <th>Academic Status</th>
+          <th>Country</th>
           <th>Organization</th>
           <th>Language</th>
         </tr>
@@ -79,6 +57,7 @@
             <span :class="tierClass(player.tier || player.local_tier)"></span>
           </td>
           <td>{{ player.level }}</td>
+          <td>{{ player.country }}</td>
           <td>{{ player.organization }}</td>
           <td>{{ player.language }}</td>
         </tr>
@@ -205,10 +184,11 @@
         if (this.organization_filter && this.organization_filter.toString().length > 0) {
           filters.push("organization_id,=," + this.organization_filter);
         }
-        // TODO: No country filter in API, wait for implementation
-        // if (this.country_filter.length > 0) {
-        //     filters.push("country,=," + this.country_filter);
-        // }
+
+        if (this.country_filter.length > 0) {
+          filters.push("country,=," + this.country_filter);
+        }
+
         return filters.length ? filters : null;
       },
       update_filter: function(e) {
@@ -217,25 +197,8 @@
         if(this.lastPage <= 0) {
           api.leaderboard(filters, this.hackathonId).then(leaderboard => {
             if(leaderboard && leaderboard instanceof Array) {
-              this.lastPage = Math.ceil(leaderboard.length / this.limit)
-            }
-            // classes
-            let classes = {
-              professional: 0,
-              university: 0,
-              high_school: 0
-            };
-            leaderboard.forEach(function(item){
-              if (item.level == "Professional"){
-                classes.professional += 1;
-              } else if (item.level == "University"){
-                classes.university += 1;
-              } else if (item.level == "High School"){
-                classes.high_school += 1;
-              }
-            });
-            this.classes = classes;
-          });
+              this.lastPage = Math.ceil(leaderboard.length / this.limit);
+            }});
         }
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
           this.leaderboard = leaderboard;
@@ -247,55 +210,6 @@
           this.page = page;
         });
       },
-      watch: {
-          hackathonId: function(){
-              this.update_filter();
-          }
-      },
-      methods: {
-          tierClass: tierClass,
-          build_filter: function() {
-              let filters = [];
-              if (this.username_filter.length > 0) {
-                  filters.push("username,=," + this.username_filter);
-              }
-              if (this.tier_filter.length > 0) {
-                  if (this.hackathonId) {
-                      filters.push("local_rank,=," + this.tier_filter);
-                  } else {
-                      filters.push("rank,=," + this.tier_filter);
-                  }
-              }
-              if (this.organization_filter && this.organization_filter.toString().length > 0) {
-                  filters.push("organization_id,=," + this.organization_filter);
-              }
-              // TODO: No country filter in API, wait for implementation
-              // if (this.country_filter.length > 0) {
-              //     filters.push("country,=," + this.country_filter);
-              // }
-              return filters.length ? filters : null;
-          },
-          update_filter: function(e) {
-              if (e) e.preventDefault();
-              const filters = this.build_filter();
-              if(this.lastPage <= 0) {
-                  api.leaderboard(filters, this.hackathonId).then(leaderboard => {
-                      if(leaderboard && leaderboard instanceof Array) {
-                          this.lastPage = Math.ceil(leaderboard.length / this.limit)
-                      }
-                  });
-              }
-              api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
-                  this.leaderboard = leaderboard;
-              });
-          },
-          changePage: function(page) {
-              api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-                  this.leaderboard = leaderboard;
-                  this.page = page;
-              });
-          }
-      }
     }
   }
 </script>
