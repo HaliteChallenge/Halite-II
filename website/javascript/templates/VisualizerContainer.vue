@@ -25,7 +25,6 @@
   let visualizer = null;
 
   const showGame = (game) => {
-    window.location.hash = '/replay-bot'
     if (visualizer) {
       visualizer.getVisualizer().destroy();
     }

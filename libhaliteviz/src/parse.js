@@ -1,4 +1,5 @@
 const parseWorker = require("worker-loader?inline!./parseWorker");
+import {TextDecoder} from 'text-encoding';
 
 export function parseReplay(buffer) {
     return new Promise((resolve, reject) => {
