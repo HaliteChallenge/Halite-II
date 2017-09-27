@@ -78,12 +78,16 @@ header.navbar{
   .not-logged-in{
 
     >li{
+      >a{
+        transform: translateY(1px);
+      }
       padding: 0px 5px;
       >img {
         height: 34px;
       }
       >a>i{
         margin-top: -2px;
+        transform: translateY(1px);
       }
     }
   }
@@ -96,9 +100,9 @@ header.navbar{
     }
     .navbar-right{
       li a {
-        transform: translateY(2px);
+        transform: translateY(1px);
         @media (max-width: $screen-sm-max){
-          transform: translateY(12px);
+          transform: translateY(11px);
         }
       }
     }
@@ -173,7 +177,7 @@ header.navbar{
       padding: 3px 2px;
       margin-right: 5px;
       font-size: 14px;
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
     .popup-container{
       display: none;
@@ -253,6 +257,10 @@ header.navbar{
     float: right;
     .fa{
       font-size: 1.2em;
+      transform: translateY(2px);
+    }
+    &:focus{
+      outline: none;
     }
     &:focus{
       outline: none;
