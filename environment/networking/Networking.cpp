@@ -576,7 +576,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             std::cout << err.what() << std::endl;
         }
 
-        player_logs_json[player_tag]["Error"]["Message"] = err.what();
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Got Exception (if any): " + std::string(err.what()) + "; Response received (if any): " + response;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (std::string s) {
