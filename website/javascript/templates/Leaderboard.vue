@@ -13,7 +13,6 @@
       </div>
       <div class="filter-group">
         <div class="input-group">
-          <!-- <input type="text" class="form-control ipt-username" placeholder="Search a user name" v-model="username_filter" /> -->
           <v-select
             multiple
             placeholder="Usernames"
@@ -38,16 +37,7 @@
             v-model="country_filter"
             :options="countries">
           </v-select>
-          <!-- <select class="form-control slt" v-model="organization_filter">
-            <option value="" selected>Organization</option>
-            <option v-for="org in organizations" :value="org.organization_id">{{ org.name }} ({{org.type}})</option>
-          </select> -->
-          <!-- <select class="form-control slt" aria-describedby="country-help" v-model="country_filter">
-            <option value="" disabled selected>Country</option>
-            <option v-for="country in countries" :value="country[0]">{{ country[1].name }}</option>
-          </select> -->
           <div>
-            <!-- <button class="btn btn-default searchbarbutton" type="button" v-on:click="update_filter"><i class="fa fa-search" aria-hidden="true"></i></button> -->
             <button class="btn"><span>APPLY FILTER</span></button>
           </div>
         </div>
@@ -108,20 +98,6 @@
     },
     data: function() {
       const countries = countries_data;
-      console.log(countries)
-      // countries.sort(function(country1, country2) {
-      //   const country1name = country1[1].name;
-      //   const country2name = country2[1].name;
-      //   if (country1name < country2name) {
-      //     return -1;
-      //   }
-      //   else if (country1name === country2name) {
-      //     return 0;
-      //   }
-      //   else {
-      //     return 1;
-      //   }
-      // });
       let country_options = [];
       countries.forEach((item) => {
         country_options.push({value: item['alpha-3'], label: item.name});
@@ -218,9 +194,7 @@
             filters.push("organization_id,=," + item.value);
           });
         }
-
         if (this.country_filter.length > 0) {
-          // filters.push("country_code,=,USA");
           this.country_filter.forEach(function(item){
             filters.push("country_code,=," + item.value);
           });
