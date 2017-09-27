@@ -22,7 +22,7 @@
             <div class="stat-item">
               <div class="stat-item-icon"><span class="icon-globe-2"></span></div>
               <div class="stat-item-content">
-                <p class="stat-item-value">121</p>
+                <p class="stat-item-value">{{metric.countries}}</p>
                 <p class="stat-item-caption">Countries</p>
               </div>
             </div>
@@ -62,24 +62,7 @@
         </div>
       </div>
     </div>
-    <div class="leaderboard-nav-tabs">
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" :class="{'active': isGlobalActive}">
-          <a @click="fetchGlobal" aria-controls="player_stats" role="tab" data-toggle="tab">
-            <i class="xline xline-top"></i>
-            <span>Global</span>
-            <i class="xline xline-bottom"></i>
-          </a>
-        </li>
-        <li role="presentation" :class="{'active': !isGlobalActive}">
-          <a @click="fetchHackathon" aria-controls="game_stats" role="tab" data-toggle="tab">
-            <i class="xline xline-top"></i>
-            <span>My Hackathon</span>
-            <i class="xline xline-bottom"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
+
     <Leaderboard :hackathonId="hackathonId" :baseUrl="baseUrl"></Leaderboard>
   </div>
 </template>
@@ -100,6 +83,11 @@
       return {
         hackathonId: null,
         isGlobalActive: true,
+        metric: {
+          professional: 20,
+          increment: 23,
+          countries: 0
+        },
         classes: {
           professional: 0,
           university: 0,
@@ -134,6 +122,8 @@
             university: 0,
             high_school: 0
           };
+          let countries = [];
+          let country_count = 0;
           leaderboard.forEach(function(item){
             if (item.level == "Professional"){
               classes.professional += 1;}
@@ -142,7 +132,13 @@
               else if (item.level == "High School"){
               classes.high_school += 1;
             }
+            if (item.country && countries.indexOf(item.country) === -1){
+              countries.push(item.country);
+              country_count++;
+            }
           });
+          console.log(countries);
+          this.metric.countries = country_count;
           this.classes = classes;
         });
       }
