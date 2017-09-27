@@ -56,6 +56,16 @@ __Linux users:__ Your system must support GCC 4.9 or later (with corresponding G
     </tbody>
 </table>
 
+## Download The Halite Source Code
+
+If you want to dig deeper into the inner workings of Halite, you can also [download the source code]({{ site.baseurl }}/{{ site.data.downloads.source }}) of the game itself. 
+
+__Current version:__ {{ site.data.downloads.version }}
+
+## Standalone Visualizer
+
+Removed pending automated builds.
+
 ## Halite Tools
 
 * [Halite Client](https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0): For uploading bots from your terminal
