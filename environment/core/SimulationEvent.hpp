@@ -15,7 +15,6 @@
  */
 constexpr auto EVENT_TIME_PRECISION = 10000;
 
-// TODO: document
 enum class SimulationEventType {
     Attack,
     Collision,
@@ -74,7 +73,6 @@ struct SimulationEvent {
 namespace std {
     template<> struct hash<SimulationEvent> {
         auto operator()(const SimulationEvent& ev) const -> std::size_t {
-            // TODO: this is a TERRIBLE hash function
             return std::hash<hlt::EntityId>{}(ev.id1) ^
                 std::hash<hlt::EntityId>{}(ev.id2) ^
                 static_cast<size_t>(ev.type);

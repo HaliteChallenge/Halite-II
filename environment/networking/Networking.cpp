@@ -290,7 +290,6 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
 
     fd_set set;
     FD_ZERO(&set); /* clear the set */
-    // TODO: remove this
     if (connection.read > FD_SETSIZE) assert(false);
     FD_SET(connection.read, &set); /* add our file descriptor to the set */
     char buffer;
@@ -547,7 +546,6 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
     nlohmann::json log_json;
     try {
         if (is_process_dead(player_tag)) {
-            // TODO: more debug output
             return -1;
         }
 

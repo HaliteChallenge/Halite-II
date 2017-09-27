@@ -33,7 +33,6 @@ namespace hlt {
                 record["type"] = "undock";
                 break;
             case hlt::MoveType::Error:
-                // TODO: wrap the move that could not be executed
                 assert(false);
         }
 

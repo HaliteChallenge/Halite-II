@@ -213,7 +213,6 @@ namespace mapgen {
         }
 
         while (extra_planets > 0 && total_attempts < MAX_TOTAL_ATTEMPTS) {
-            // TODO: can we make this composable?
             total_attempts++;
 
             const auto choice = std::uniform_int_distribution<>(1, 2)(rng);

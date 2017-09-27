@@ -323,11 +323,6 @@ auto Halite::process_production() -> void {
                         game_map.any_planet_collision(location.first, open_radius) ||
                         game_map.any_collision(location.first, open_radius, occupants);
 
-                    // const auto num_occupants = game_map.test(location.first, open_radius).size();
-
-                    // if (has_occupants && num_occupants == 0) assert(false);
-                    // if (!has_occupants && num_occupants > 0) assert(false);
-
                     if (distance < best_distance && !has_occupants) {
                         best_distance = distance;
                         best_location = location;
@@ -768,7 +763,6 @@ auto Halite::process_events() -> void {
 
         for (auto& pair : attackers) {
             full_frame_events.back().push_back(
-                // TODO: define a move constructor?
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
         }
 
