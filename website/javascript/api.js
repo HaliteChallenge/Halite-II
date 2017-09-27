@@ -1,5 +1,6 @@
 export const API_SERVER_URL = "https://api.halite.io/v1/api";
 export const LOGIN_SERVER_URL = "https://api.halite.io/v1/login";
+export const LOGOUT_SERVER_URL = "https://api.halite.io/v1/logout/";
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
@@ -55,6 +56,20 @@ export function get_user(user_id) {
         xhrFields: {
             withCredentials: true,
         },
+    });
+}
+
+export function logout() {
+    return $.post({
+        url: `${LOGOUT_SERVER_URL}`,
+        xhrFields: {
+            withCredentials: true,
+        },
+    }).then((res) => {
+        logged_in = false;
+        window.localStorage.removeItem("cache");
+        window.localStorage.removeItem("user_id");
+        window.localStorage.removeItem("username");
     });
 }
 

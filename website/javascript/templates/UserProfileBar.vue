@@ -74,7 +74,9 @@
                 $(currentTarget).stop().slideUp();
             },
             sign_out: function (e) {
-                window.location.replace("/");
+                api.logout().then((res)=>{
+                    window.location.replace("/");
+                });
             },
             show_submit: function () {
                 $(".popup-container").show();

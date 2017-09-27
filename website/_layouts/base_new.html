@@ -87,6 +87,14 @@
           </ul>
         </div>
         <div id="user-profile-bar-container"></div>
+        <div class="mobile-strict-container">
+          <div class="state">
+            <i class="close fa fa-window-close-o"></i>
+            <img src="{{ site.baseurl }}/assets/images/temp/mobile_disable.png">
+            <h2 class="font-headline">Sorry, Not Supported</h2>
+            <p class="upload-state-desc">Login is not supported on mobile devices.<br>Please go to a desktop to sign in or sign up.</p>
+          </div>
+        </div>
         <!--/.nav-collapse -->
       </div>
     </header>
@@ -160,7 +168,15 @@
     {
       document.getElementById("subscribeFooter").style.visibility = "hidden";
     }
-
+    var signinBtn = document.getElementsByClassName('navbar-signin')[0];
+    var mobileCon = document.getElementsByClassName('mobile-strict-container')[0];
+    var closeBtn = mobileCon.getElementsByClassName('close')[0];
+    signinBtn.addEventListener("click", function(e) {
+        mobileCon.style.visibility = "visible";
+    });
+    closeBtn.addEventListener("click", function(e) {
+        mobileCon.style.visibility = "hidden";
+    });
   </script>
 
   {% if page.mount_view %}

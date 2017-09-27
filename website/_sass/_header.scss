@@ -71,7 +71,7 @@
 header.navbar{
   border-bottom: 1px solid $border;
   height: 61px;
-  opacity: 0.9;
+  background-color: rgba(37, 36, 47, 0.9);
   @media (min-width: $screen-md-min){
     min-height: 50px;
   }
@@ -254,6 +254,9 @@ header.navbar{
     .fa{
       font-size: 1.2em;
     }
+    &:focus{
+      outline: none;
+    }
   }
 
   .navbar-toggle{
@@ -293,5 +296,28 @@ header.navbar{
         }
       }
     }
+  }
+}
+.mobile-strict-container{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1c1a27;
+  text-align: center;
+  min-width: 360px;
+  @media (min-width: $screen-sm-min){
+    min-width: 500px;
+  }
+  padding: 10px;
+  visibility: hidden;
+  img{
+    margin-top: 30px;
+    max-width:60px;
+  }
+  .close{
+    color: #d0cccc;
+    opacity: 1;
+    text-shadow: none;
   }
 }
