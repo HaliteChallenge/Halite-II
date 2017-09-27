@@ -213,7 +213,8 @@
             const instance = this;
             leaderboard.forEach(function(user){
               instance.users.push(user.username);
-            });
+            });         
+            instance.users.sort()
           });
         }
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
