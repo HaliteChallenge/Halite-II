@@ -20,7 +20,8 @@
     "vue-cookie": "^1.1.4",
     "vue-moment": "^2.0.2",
     "vue-select": "^2.2.0",
-    "vue-slider-component": "^2.3.9"
+    "vue-slider-component": "^2.3.9",
+    "i18n-iso-countries": "^2.0.0"
   },
   "devDependencies": {
     "babel-loader": "^7.1.1",

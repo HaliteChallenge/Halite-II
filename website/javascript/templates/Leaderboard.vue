@@ -65,7 +65,7 @@
             <span :class="tierClass(player.tier || player.local_tier)"></span>
           </td>
           <td>{{ player.level }}</td>
-          <td>{{ player.country }}</td>
+          <td>{{ getCountryName(player.country) }}</td>
           <td>{{ player.organization }}</td>
           <td>{{ player.language }}</td>
         </tr>
@@ -233,6 +233,10 @@
         this.organization_filter = [];
         this.tier_filter = [];
         this.update_filter();
+      },
+      getCountryName: function(name) {
+        var countries = require("i18n-iso-countries");
+        return countries.getName(name, "en");
       }
     }
   }
