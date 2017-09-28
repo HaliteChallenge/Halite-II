@@ -269,3 +269,44 @@ input:focus{
     margin-right: 10px;
   }
 }
+
+.ha-button-container{
+  margin-left: auto;
+  margin-right: auto;
+  font-family: "Teko";
+  font-size: 2rem;
+  background-image: url("/assets/images/register_bg.png");
+  background-size: 100% 40px;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 5px 20px;
+  cursor: pointer;
+  display: inline-block;
+  height: auto;
+  >div{
+    position: relative;
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    a{
+      padding: 15px 3px;
+    }
+  }
+}
+.ha-button{
+  span{
+    transform: translateY(2px);
+    color: $dark-gray;
+    line-height: 20px;
+    padding: 3px;
+    display: inline-block;
+    letter-spacing: 1px;
+  }
+}
+
+.no-bg-button{
+  background-image: url("/assets/images/button-clear.png");
+  span{
+    color: $yellow;
+  }
+}

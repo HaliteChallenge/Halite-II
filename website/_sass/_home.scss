@@ -127,45 +127,6 @@
       }
     }
   }
-  .ha-button-container{
-    margin-left: auto;
-    margin-right: auto;
-    font-family: "Teko";
-    font-size: 2rem;
-    background-image: url(../images/register_bg.png);
-    background-size: 100% 40px;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 5px 20px;
-    cursor: pointer;
-    display: inline-block;
-    height: auto;
-    >div{
-      position: relative;
-      display: block;
-      height: 30px;
-      line-height: 30px;
-      a{
-        padding: 15px 3px;
-      }
-    }
-  }
-  .ha-button{
-    span{
-      transform: translateY(2px);
-      color: $dark-gray;
-      line-height: 20px;
-      padding: 3px;
-      display: inline-block;
-      letter-spacing: 1px;
-    }
-  }
-  .no-bg-button{
-    background-image: url(../images/temp/btn_bg.png);
-    span{
-      color: $yellow;
-    }
-  }
   .ha-line{
     background-color: #889295;
     height: 1px;

@@ -11,7 +11,7 @@
                 <i class="fa fa-sort-down"></i>
                 <ul class="nav">
                     <li><a href="/user?me"><span>view profile</span><i class="line line-bottom"></i></a></li>
-                    <li><a href="/user?me"><span>edit profile</span><i class="line line-bottom"></i></a></li>
+                    <li><a href="/user/edit-user"><span>edit profile</span><i class="line line-bottom"></i></a></li>
                     <li><a v-on:click.stop.prevent="sign_out"><span>sign out</span><i class="line line-bottom"></i></a></li>
                 </ul>
             </a>

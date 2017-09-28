@@ -1,0 +1,90 @@
+.edit-user-container{
+  padding-top: 20px;
+  th{
+    background-color: #1c1a27 !important;
+    border-top: 1px solid #363347 !important;
+  }
+  td{
+    background-color: #000 !important;
+    &:nth-of-type(4), &:nth-of-type(5){
+      text-align: center;
+    }
+  }
+  a{
+      color: $yellow;
+    &.base{
+      text-decoration: underline;
+    }
+  }
+  input[type='checkbox'] {
+    display: none;
+  }
+  input[type='checkbox'] + label {
+    position: relative;
+    display: inline-block;
+    padding: 7px;
+    background-color: #000;
+    border-radius: 2px;
+    border: 1px solid #CACACA;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  input[type='checkbox'] + label:active, .input[type='checkbox'] + label:checked + label:active {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  input[type='checkbox']:checked + label {
+    background-color: #000;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border-color:$yellow;
+  }
+  input[type='checkbox']:checked + label:after {
+    content: '\2714';
+    position: absolute;
+    font-size: 12px;
+    top: 0px;
+    left: 2px;
+    color: $yellow;
+    font-weight: bold;
+  }
+  .relative-container{
+    position: relative;
+  }
+  .back-arrow{
+    color: $yellow;
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    .arrow{
+      transform: translateY(-1px);
+      margin-right: 10px;
+    }
+  }
+  .cancel-href{
+    margin-right:20px;
+  }
+  .ha-button{
+    text-transform: uppercase;
+  }
+  .fa-trash{
+    color:$error;
+    font-size: 1.8rem;
+    cursor: pointer;
+    &:hover{
+      font-size: 1.9rem;
+    }
+  }
+  .lock{
+    position: absolute;
+    left: 340px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #807f7f;
+  }
+  .line-container{
+    position: relative;
+    width: 100%;
+  }
+  .form-control[disabled]{
+    background-color: #000;
+  }
+}

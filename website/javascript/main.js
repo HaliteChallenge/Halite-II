@@ -8,6 +8,7 @@ import LeaderboardContainer from "./templates/LeaderboardContainer.vue";
 import Upload from "./templates/Upload.vue";
 import UserProfile from "./templates/UserProfile.vue";
 import UserProfileBar from "./templates/UserProfileBar.vue";
+import EditUserProfile from "./templates/EditUserProfile.vue";
 import VerifyEmail from "./templates/VerifyEmail.vue";
 import VisualizerContainer from "./templates/VisualizerContainer.vue";
 import Home from "./templates/Home.vue";
@@ -65,6 +66,12 @@ window.views = {
         new Vue({
             el: "#user-profile-container",
             render: (h) => h(UserProfile),
+        });
+    },
+    EditUserProfile: function () {
+        new Vue({
+            el: "#edit-user-profile-container",
+            render: (h) => h(EditUserProfile, {props: {baseUrl: _global.baseUrl}}),
         });
     },
     VerifyEmail: function () {
