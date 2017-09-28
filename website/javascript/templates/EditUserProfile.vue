@@ -12,11 +12,6 @@
                         <i class="xline xline-top"></i>
                         <a href="#section_account_info">Account Info</a>
                     </li>
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <i class="xline xline-bottom"></i>
-                        <a href="#section_email_preferences">Email Preferences</a>
-                    </li>
                 </ul>
             </div>
             <div class="col-md-8 col-xm-10">
@@ -90,50 +85,6 @@
                             label="label"
                             :options="regions">
                         </v-select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Name(optional)</label>
-                        <input type="text" class="form-control" placeholder="Enter your name">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Bio(optional)</label>
-                        <input type="text" class="form-control" placeholder="Your bio">
-                    </div>
-
-                    <div class="line-container"><i class="xline xline-top"></i></div>
-
-                    <h2 id="section_email_preferences" class="form-heading">email preferences</h2>
-                    <div class="form-group">
-                        <label for="email">Notifications go to your primary email.</label>
-                        <table class="table table-leader">
-                            <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Email Type</th>
-                                <th>Level</th>
-                                <th>Make primary</th>
-                                <th>Remove</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>julskast@msn.com</td>
-                                <td>Github</td>
-                                <td>Secondary</td>
-                                <td><input name="primary-email" type="checkbox" v-model='primary'><label></label></td>
-                                <td><i class="fa fa-trash"></i></td>
-                            </tr>
-                            <tr>
-                                <td>julskast@msn.com</td>
-                                <td>Github</td>
-                                <td>Primary</td>
-                                <td><input name="primary-email" type="checkbox"><label></label></td>
-                                <td><i class="fa fa-trash"></i></td>
-                            </tr>
-                            </tbody>
-                        </table>
                     </div>
 
                     <div class="form-group has-error" v-if="error">
