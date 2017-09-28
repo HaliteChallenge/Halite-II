@@ -113,13 +113,15 @@ def github_login_callback():
                 oauth_provider=1,
             )).inserted_primary_key
             flask.session["user_id"] = new_user_id[0]
+            return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/create-account"))
         else:
             flask.session["user_id"] = user["id"]
+            return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/play-programming-challenge"))
 
     if "redirectURL" in flask.request.args:
         return flask.redirect(flask.request.args["redirectURL"])
-    return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/create-account"))
 
+    return util.response_success()
 
 @github.tokengetter
 def github_tokengetter():
