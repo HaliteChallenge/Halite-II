@@ -153,6 +153,7 @@ def update_compilation_status():
                     language=language,
                     version_number=model.bots.c.version_number + 1,
                     games_played=0,
+                    sigma=8.333,
                 )
             )
 
