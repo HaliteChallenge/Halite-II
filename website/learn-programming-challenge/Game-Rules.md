@@ -24,9 +24,9 @@ Two or four players compete in a match.
 1. At the start of a game, all planets are neutral and players own none of them. The sizes and locations of planets also varies map to map
 2. Only one team can dock on a planet at a time. 
 3. Number of ships that can be docked to a planer is determined by the planets size.
-4. When a ship docks on a planet, the planet produces ships for the docked player
-5. Planets produce at a constant rate per ship with no limit to ship production
-6. Planets can be destroyed through collisions with ships
+4. When a ship docks on a planet, the planet produces ships for the docked player.
+5. Planets produce at a constant rate per ship with no limit to ship production.
+6. Planets can be destroyed through collisions with ships.
 
 ## Win conditions
 1. They are the sole survivor
