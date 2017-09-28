@@ -8,7 +8,7 @@
     overflow: hidden;
   }
   &-break-down{
-    
+
   }
   &-ship, &-territory{
     display: flex;
@@ -22,10 +22,12 @@
     margin-left: 2px;
     background-color: #171719;
     &-1{
-      background-color: #B8E986;
+      background-color: rgba(255,239,229,0.3);
+      border: solid #FFEFE5 1px;
     }
     &-2{
-      background-color: #FFC760;
+      background-color: rgba(111,177,207,0.3);
+      border: solid #6FB1CF 1px;
     }
   }
 
@@ -35,13 +37,15 @@
   &-legend-block{
     display: inline-block;
     width: 45px;
-    height: 7px;
+    height: 10px;
     margin-right: 10px;
     &-1{
-      background-color: #B8E986;
+      background-color: rgba(255,239,229,0.3);
+      border: solid #FFEFE5 1px;
     }
     &-2{
-      background-color: #FFC760;
+      background-color: rgba(111,177,207,0.3);
+      border: solid #6FB1CF 1px;
     }
   }
 }

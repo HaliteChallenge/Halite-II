@@ -38,9 +38,6 @@
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
                         </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" id="work-email-confirm" placeholder="Work Email (Confirm)" v-model="email_confirm" />
-                        </div>
                     </div>
 
                     <div v-if="level === 'University'">
@@ -48,9 +45,6 @@
                             <label for="school-email">Please share your school email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" id="work-email-confirm" placeholder="School Email (Confirm)" v-model="email_confirm" />
                         </div>
                     </div>
 
@@ -66,18 +60,30 @@
                     <!-- country -->
                     <div class="form-group">
                         <label for="country">Which country will you be playing from?</label>
-                        <select class="form-control" id="country" aria-describedby="country-help" v-model="country_code">
+                        <!-- <select class="form-control" id="country" aria-describedby="country-help" v-model="country_code">
                             <option value="NONE">(would prefer not to disclose)</option>
                             <option v-for="country in countries" :value="country[0]">{{ country[1].name }}</option>
-                        </select>
+                        </select> -->
+                        <v-select
+                            placeholder="(would prefer not to disclose)"
+                            label="label"
+                            v-model="country_code"
+                            :options="country_options">
+                        </v-select>
                     </div>
 
-                    <div class="form-group" v-if="country_code !== 'NONE'">
+                    <div class="form-group" v-if="country_code !== ''">
                         <label for="country">What is your state, province, or region?</label>
-                        <select class="form-control" id="country-region" aria-describedby="country-region-help" v-model="country_region_code">
+                        <!-- <select class="form-control" id="country-region" aria-describedby="country-region-help" v-model="country_region_code">
                             <option value="NONE">(would prefer not to disclose)</option>
                             <option v-for="region in regions" :value="region[0]">{{ region[1].name }}</option>
-                        </select>
+                        </select> -->
+                        <v-select
+                            placeholder="(would prefer not to disclose)"
+                            v-model="country_region_code"
+                            label="label"
+                            :options="regions">
+                        </v-select>
                     </div>
 
                     <div class="form-group">
@@ -99,15 +105,22 @@
 
 <script>
     import * as api from "../api";
-    import {Alert} from "../utils";
+    import vSelect from 'vue-select';
+    import {Alert, countries_data} from "../utils";
 
     export default {
         name: "associate",
+        components: {vSelect},
         data: function() {
             const countries = Object.entries(iso3166.data);
             countries.sort(function(country1, country2) {
                 const country1name = country1[1].name;
                 const country2name = country2[1].name;
+                const country1code = country1[0];
+                const country2code = country2[0];
+                if (country1code == 'US' && country2code != 'US') return -1;
+                if (country2code == 'US' && country1code != 'US') return 1;
+
                 if (country1name < country2name) {
                     return -1;
                 }
@@ -119,13 +132,30 @@
                 }
             });
 
+            const codes = {};
+            Object.entries(iso3166.codes).forEach((item) => {
+                codes[item[1]] = item[0];
+            });
+            const new_countries = countries.map((item) => {
+                return {
+                    label: item[1].name,
+                    value: codes[item[0]],
+                    code: item[0]
+                };
+            });
+            new_countries.unshift({
+                value: "NONE",
+                code: "NONE",
+                label: "(would prefer not to disclose)",
+            });
+
             return {
                 countries: countries,
+                country_options: new_countries,
                 data: iso3166.data,
                 email: "",
-                email_confirm: "",
-                country_code: "NONE",
-                country_region_code: "NONE",
+                country_code: "",
+                country_region_code: "",
                 level: "Professional",
                 organization: null,
                 organizations: [],
@@ -135,7 +165,10 @@
         },
         computed: {
             regions: function() {
-                const regions = Object.entries(iso3166.data[this.country_code].sub);
+                const regions = Object.entries(iso3166.data[this.country_code.code].sub);
+
+                const codes = [];
+
                 regions.sort(function(region1, region2) {
                     const name1 = region1[1].name;
                     const name2 = region2[1].name;
@@ -149,8 +182,23 @@
                         return 1;
                     }
                 });
-                return regions;
-            }
+
+                const new_regions = regions.map((item) => {
+                    return {
+                        label: item[1].name,
+                        value: item[0],
+                        type: item[1].type
+                    }
+                });
+
+                new_regions.unshift({
+                    value: "NONE",
+                    code: "NONE",
+                    label: "(would prefer not to disclose)",
+                });
+
+                return new_regions;
+            },
         },
         methods: {
             submit: function() {
@@ -159,7 +207,7 @@
                     "organization_id": this.organization === "NONE" ? null : this.organization,
                 };
 
-                if (this.country_code !== "NONE") {
+                if (this.country_code !== "") {
                     const codes = {};
 
                     // Build conversion table of 2-char country code to 3-char
@@ -167,9 +215,9 @@
                         codes[iso3166.codes[code3]] = code3;
                     }
 
-                    request["country_code"] = codes[this.country_code];
-                    if (this.country_region_code !== "NONE") {
-                        request["country_subdivision_code"] = this.country_region_code;
+                    request["country_code"] = this.country_code.value;
+                    if (this.country_region_code !== "") {
+                        request["country_subdivision_code"] = this.country_region_code.value;
                     }
                 }
 
@@ -178,8 +226,8 @@
                 }
 
                 // verify email
-                if (request["organization_id"] && (this.email === '' || this.email != this.email_confirm)){
-                    this.error = "Organizational emails match"
+                if (request["organization_id"] && (this.email === '')){
+                    this.error = "Email is required";
                     return false;
                 }
 

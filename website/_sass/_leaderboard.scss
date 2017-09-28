@@ -106,6 +106,12 @@
   .leaderboard-page {
     margin: 30px 0 50px;
   }
+
+  .v-select.dropdown{
+    .form-control{
+      max-width: 120px !important;
+    }
+  }
 }
 
 .leaderboard-summary{

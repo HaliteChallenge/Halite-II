@@ -270,7 +270,7 @@
                             <i class="xline xline-left"></i>
                             <i class="xline xline-right"></i>
                             <div class="content">
-                                <p class="t3 c-wht">CAREERS AT TWO SIGMA</p>
+                                <p class="t3 c-wht font-headline">CAREERS AT TWO SIGMA</p>
                                 <p class="t5 c-gry">Two Sigma, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
@@ -291,7 +291,7 @@
                             <i class="xline xline-left"></i>
                             <i class="xline xline-right"></i>
                             <div class="content">
-                                <p class="t3 c-wht">ABOUT THE COMPETITION</p>
+                                <p class="t3 c-wht font-headline">ABOUT THE COMPETITION</p>
                                 <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 26, 2017. Created by two interns at <a href="https://twosigma.com">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
@@ -305,7 +305,7 @@
                 </div>
             </div>
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">GET STARTED WITH HALITE</p>
+                <p class="t2 c-wht font-headline">GET STARTED WITH HALITE</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
                     <div>

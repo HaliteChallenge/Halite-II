@@ -11,7 +11,7 @@
     if (!_data || !_length || (_data.length <= _length)) return _data
     let _output = []
     _data.forEach((item, i) => {
-      let min 
+      let min
       let max
       const maxIndex = _data.length - 1
       if((_index - _length / 2) < 0) {
@@ -57,7 +57,7 @@
       }
     },
 
-    
+
 
     watch: {
       chartData: function(chartData) {
@@ -81,7 +81,7 @@
         var x = d3.scaleLinear()
           .rangeRound([0, width])
 
-        this.x = x  
+        this.x = x
 
         var y = d3.scaleLinear()
           .rangeRound([height, 0])
@@ -93,10 +93,10 @@
 
         var line = d3.area()
             .x(function(d) { return x(d.x) })
-            .y(function(d) { return y(d.y) })    
+            .y(function(d) { return y(d.y) })
 
-        this.area = area    
-        this.line = line    
+        this.area = area
+        this.line = line
 
 
 
@@ -107,8 +107,8 @@
         //     .range([d3.rgb("red"), d3.rgb('#f5bc13')])
 
         let dataSet = chartData
-
-        let color = (index) => ['#E37222', '#BD00DB', '#63CECA', '#FFBE00', '#ECFFFB'][index] || '#ECFFFB'
+        
+        let color = (index) => ['#BD00DB', '#63CECA', '#FFBE00', '#C5EC98', '#E37222', '#ECFFFB'][index % 6]
 
         x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, this.index), function(d) { return d.x }))
         let _dataSet = []
@@ -151,7 +151,7 @@
             .attr('d', line)
 
           this.path1List.push(path1)
-            
+
           let path2 = innerSvg.append('path')
           path2.datum(getDataPeriod(data, this.maxLength, this.index))
             .attr('fill', _color)
@@ -161,7 +161,7 @@
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 3)
             .attr('d', area)
-          
+
           this.path2List.push(path2)
       })
 
@@ -175,7 +175,7 @@
       this.dragLine = dragLine
 
       const self = this
-        
+
       dragLine.call(
           d3.drag()
             .on('start', function(){ return d3.select(this).raise() })
@@ -209,16 +209,16 @@
         let _peroidData = getDataPeriod(data, this.maxLength, this.index)
         this.path1List[index] && this.path1List[index].datum(_peroidData).attr('d', this.line)
         this.path2List[index] && this.path2List[index].datum(_peroidData).attr('d', this.area)
-        
+
       })
 
       this.innerSvg
-        .transition()  
+        .transition()
         .ease(d3.easeLinear)
         .attr('width', this.x(index))
 
       this.dragLine
-        .transition()  
+        .transition()
         .ease(d3.easeLinear)
         .attr('transform', `translate(${this.x(index)})`)
       },

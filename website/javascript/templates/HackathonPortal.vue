@@ -8,7 +8,7 @@
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
       <div class="row hackathon-progress-cards">
-        <!-- For new events just copy paste the below div and customize, 
+        <!-- For new events just copy paste the below div and customize,
         you also need to modify the function to point to the righ link -->
         <div class="col-md-3" @click="jumpToHackathon(2)">
           <div class="hackathon-progress-card">
@@ -92,7 +92,7 @@ export default {
   props: ['baseUrl'],
   data: function() {
     return {
-      showHackathonInProgress: false,
+      showHackathonInProgress: true,
       showEvents: false,
       hackathons: [],
       events: []

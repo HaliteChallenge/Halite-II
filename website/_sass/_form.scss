@@ -91,7 +91,6 @@ select.form-control::-ms-expand {
   /** input **/
   .form-control{
     margin-right: 0 !important;
-    max-width: 120px !important;
   }
 
   /** dropdown **/
@@ -109,6 +108,9 @@ select.form-control::-ms-expand {
     background-color: #000 !important;
     li > a{
       color: #fff;
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .highlight > a{
       background-color: rgba(255, 190, 0, 0.3);

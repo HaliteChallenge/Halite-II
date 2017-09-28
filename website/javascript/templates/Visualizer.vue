@@ -204,7 +204,7 @@
                   Territory Gained
                 </h4>
                 <div class="post-game-graph">
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}"/>
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}"/>
                 </div>
               </div>
             </div>
@@ -220,7 +220,7 @@
                     rate of production
                   </h4>
                   <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.production" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
+                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
                 <div class="dashboard-graph col-md-6">
@@ -229,7 +229,7 @@
                     health
                   </h4>
                   <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.health" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
+                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -253,7 +253,7 @@
                     attack over time
                   </h4>
                   <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" :max-length="20" @updateIndex="index => {frame = index}" />
+                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => {frame = index}" />
                   </div>
                 </div>
               </div>
@@ -433,7 +433,7 @@
         setTimeout(() => {
           if (visualizer){
             visualizer.scrub(this.frame, 0);
-          }  
+          }
         }, 200);
       }
     },
