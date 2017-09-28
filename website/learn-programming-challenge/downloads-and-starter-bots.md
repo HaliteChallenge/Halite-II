@@ -2,6 +2,7 @@
 layout: doc_page
 title: Downloads and Starter Kits
 toc: false
+sort_key: 001
 description: Download a Python AI bot, C++ AI bot, or Java AI bot as a quick and easy way to get started playing in the Halite AI competition.
 ---
 Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
@@ -12,15 +13,7 @@ We welcome the community to build new starter kits if there isn't one for their 
 
 Downloads include both the compiled Halite game environment and the starter kit for that language.
 
-## Download All Kits
-
-[Download]({{ site.baseurl }}/{{ site.data.downloads.source }})
-
-## Game Environment version
-
-__Version:__ {{ site.data.downloads.version }}
-
-## Starter Kits by Language / Game Environment
+## Starter Kits by Language or Just the Game Environment
 
 __Linux users:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
 
@@ -62,12 +55,12 @@ If you want to dig deeper into the inner workings of Halite, you can also [downl
 
 __Current version:__ {{ site.data.downloads.version }}
 
-## Standalone Visualizer
+<!-- ## Standalone Visualizer
 
-Removed pending automated builds.
+Removed pending automated builds.-->
 
 ## Halite Tools
 
 * [Halite Client](https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0): For uploading bots from your terminal
 
-* Offline Game Visualizer: TBD
+<!--* Offline Game Visualizer: TBD-->
