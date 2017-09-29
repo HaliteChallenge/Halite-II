@@ -575,7 +575,7 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-
+        std::replace(response.begin(), response.end(), '\n', ';');
         player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Got Exception (if any): " + std::string(err.what()) + "; Response received (if any): " + response;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
