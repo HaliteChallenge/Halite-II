@@ -239,10 +239,14 @@
                             this.error = error.responseJSON.message;
                         });
                     } else {
-                        window.location.replace("/play-programming-challenge");
+                        Alert.show('You have created account successfully', 'success');
+                        setTimeout(() => {
+                            window.location.replace("/play-programming-challenge");
+                        }, 2000);
                     }
                 }, (error) => {
-                    this.error = error.responseJSON.message;
+                    Alert.show(error.responseJSON.message, 'error');
+                    // this.error = error.responseJSON.message;
                 });
             },
         },

@@ -86,7 +86,6 @@
                             :options="regions">
                         </v-select>
                     </div>
-
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>

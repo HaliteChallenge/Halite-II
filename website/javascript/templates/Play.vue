@@ -75,13 +75,6 @@
       }
     },
     mounted: function(){
-      // display a message when logged in successfully
-      const msg = this.$cookie.get('halite-message');
-      if ( msg ){
-        Alert.show(msg, 'success');
-        this.$cookie.delete('halite-message');
-      }
-
       // logged in
       api.me().then((me) => {
         if (me !== null) {

@@ -6,7 +6,7 @@
         <p class="t2 c-wht font-headline">FILTER</p>
         <div class="filter-handler">
           <div class="handler-item" @click="clearFilter">
-            <img class="handler-item-img" :src="`${baseUrl}/assets/images/simple-remove.svg`"/>
+            <span class="icon-remove"></span>
             <span class="handler-item-text">Clear all</span>
           </div>
         </div>

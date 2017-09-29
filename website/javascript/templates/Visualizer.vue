@@ -167,14 +167,14 @@
     <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" href="#panel_post_game" aria-expanded="true" aria-controls="widget_player_details">
+            <a data-toggle="collapse" href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details" @click="initChart">
               <i class="xline xline-top"></i>
               <h4>post game dashboard</h4>
               <span class="toggle-icon expand"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
+          <div class="panel-collapse collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
               <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
                 <div class="card-dashboard active">
@@ -203,9 +203,7 @@
                   <span class="icon-globe"></span>
                   Territory Gained
                 </h4>
-                <div class="post-game-graph">
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}"/>
-                </div>
+                <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}"/>
               </div>
             </div>
             <div class="dashboard-graph-container bb ">
@@ -219,18 +217,14 @@
                     <span class="icon-ship"></span>
                     rate of production
                   </h4>
-                  <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.production" :index="frame" @updateIndex="index => {frame = index}" />
-                  </div>
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     health
                   </h4>
-                  <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.health" :index="frame" @updateIndex="index => {frame = index}" />
-                  </div>
+                  <PlayerLineChart :chart-data="chartData.health" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -243,18 +237,14 @@
                     <span class="icon-ship"></span>
                     damage dealt
                   </h4>
-                  <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.damage" :index="frame" @updateIndex="index => {frame = index}" />
-                  </div>
+                  <PlayerLineChart :chart-data="chartData.damage" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     attack over time
                   </h4>
-                  <div class="post-game-graph">
-                    <PlayerLineChart :chart-data="chartData.attack" :index="frame" @updateIndex="index => {frame = index}" />
-                  </div>
+                  <PlayerLineChart :chart-data="chartData.attack" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -308,6 +298,7 @@
         speedIndex: 1,
         speedLabel: '1x',
         stats: null,
+        showChart: false,
         selected: {
           kind: '',
           id: 0,
@@ -582,7 +573,12 @@
       },
       toggleObjectPanel: function(e) {
         this.showObjectPanel = !this.showObjectPanel;
+      },
+      initChart: function() {
+        if (this.showChart) return
+        setTimeout(() => this.showChart = true, 500)
       }
+      
     }
   }
 </script>

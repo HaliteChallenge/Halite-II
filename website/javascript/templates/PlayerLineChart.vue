@@ -47,6 +47,10 @@
         type: Number,
         required: false,
       },
+      showChart: {
+        type: Boolean,
+        required: true,
+      }
     },
 
     data: function() {
@@ -60,7 +64,9 @@
 
 
     watch: {
-      chartData: function(chartData) {
+      showChart: function(showChart) {
+        if (!showChart) return
+        const chartData = this.chartData
         if(!chartData || !chartData.length) return
 
         var svg = d3.select(this.$refs.mainSvg).attr('class', 'main-svg'),
@@ -129,7 +135,10 @@
             yAxis.select('.domain')
               .remove()
 
-        innerSvg.attr('width', 0)
+        this.initDragPositon = x(this.index)
+              
+
+        innerSvg.attr('width', this.initDragPositon)
           .attr('height', height)
 
         dataSet.forEach((data, index) => {
@@ -161,38 +170,40 @@
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 3)
             .attr('d', area)
-
           this.path2List.push(path2)
-      })
+        })
 
+        let dragLine = g1.append('path')
+          .attr('class', 'drag-line')
+          .attr('d', `M${this.initDragPositon},${y(0)}L${this.initDragPositon},0`)
+          .attr('stroke', '#a7b5b5')
+          .attr('stroke-width', 3)
 
-      let dragLine = g1.append('path')
-        .attr('class', 'drag-line')
-        .attr('d', `M${0},${y(0)}L${0},0`)
-        .attr('stroke', '#a7b5b5')
-        .attr('stroke-width', 3)
+        this.dragLine = dragLine
 
-      this.dragLine = dragLine
+        const self = this
 
-      const self = this
-
-      dragLine.call(
-          d3.drag()
-            .on('start', function(){ return d3.select(this).raise() })
-            .on('drag', function(){
-              let dx = d3.event.sourceEvent.clientX
-              let _x = dx - margin.left - svgPosition.left
-              let _base = 0
-              let _width = width
-              let _offset = _x < _base ? _base : _x > _width ? _width : _x
-              self.$emit('updateIndex', Math.round(x.invert(_offset)))
-              // innerSvg.attr('width', _offset)
-              // d3.select(this)
-              //   .attr('transform', () => {
-              //     return `translate(${_offset})`
-              //   })
-            })
-        )
+        // dragLine.call(
+        //     d3.drag()
+        //       .on('start', function(){ return d3.select(this).raise() })
+        //       .on('drag', function(){
+        //         let dx = d3.event.sourceEvent.clientX
+        //         let _x = dx - margin.left - svgPosition.left
+        //         let _base = 0
+        //         let _width = width
+        //         let _offset = _x < _base ? _base : _x > _width ? _width : _x
+        //         self.$emit('updateIndex', Math.round(x.invert(_offset)))
+        //       })
+        //   )
+        svg.on("click", function() {
+          var coords = d3.mouse(this)
+          let _x = coords[0] - margin.left
+          let _base = 0
+          let _width = width
+          let _offset = _x < _base ? _base : _x > _width ? _width : _x
+         
+          self.$emit('updateIndex', Math.round(x.invert(_offset)))
+        })
     },
     index: function(index) {
       if (!this.path1List || !this.path2List || !this.path1List.length || !this.path2List.length || !this.innerSvg || !this.dragLine) return;
@@ -220,7 +231,7 @@
       this.dragLine
         .transition()
         .ease(d3.easeLinear)
-        .attr('transform', `translate(${this.x(index)})`)
+        .attr('transform', `translate(${this.x(index) - this.initDragPositon})`)
       },
     }
   }

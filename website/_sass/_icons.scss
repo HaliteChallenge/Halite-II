@@ -24,6 +24,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-join:before {
+  content: "\e922";
+}
+.icon-remove:before {
+  content: "\e91f";
+}
+.icon-folder:before {
+  content: "\e920";
+}
+.icon-disk:before {
+  content: "\e921";
+}
 .icon-globe-2:before {
   content: "\e917";
 }
@@ -54,14 +66,14 @@
 .icon-pause:before {
   content: "\e913";
 }
-.icon-next:before {
-  content: "\e90f";
+.icon-prev:before {
+  content: "\e911";
 }
 .icon-play:before {
   content: "\e910";
 }
-.icon-prev:before {
-  content: "\e911";
+.icon-next:before {
+  content: "\e90f";
 }
 .icon-volumn:before {
   content: "\e912";

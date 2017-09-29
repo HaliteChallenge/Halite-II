@@ -44,7 +44,7 @@
           <div class="event-img" :style="{'background-image':`url(${event.img})`}"></div>
           <div class="event-desc">
             <p class="t3 c-wht">{{event.title}}</p>
-            <p>{{event.text}}</p>
+            <p v-html="event.text"></p>
           </div>
           <div class="event-attr">
             <ul class="hackathon-info">
@@ -63,7 +63,7 @@
               </ul>
           </div>
           <div class="event-btn">
-            <a href="javascript:;"><img :src="`${baseUrl}/assets/images/btn-join.svg`"/></a>
+            <a href="javascript:;"><span class="icon-join"></span> JOIN</a>
           </div>
         </div>
       </div>
@@ -73,6 +73,7 @@
 
 <script>
 import * as api from "../api";
+import moment from 'moment';
 
 const hackathonTemplate = {
   pin: 'New York City',
@@ -109,11 +110,17 @@ export default {
           if(hackathons && hackathons instanceof Array) {
             const wrapEvent = [];
             hackathons.map(hackathon => {
+              const date = moment(hackathon.start_date).format('dddd, MMMM Do');
+              const time = moment(hackathon.start_date).format('LT');
+
               const newEvent = Object.assign({}, eventTemplate, {
                 img: hackathon.thumbnail,
                 pin: hackathon.location,
                 title: hackathon.title,
-                id: hackathon.hackathon_id
+                text: hackathon.description,
+                id: hackathon.hackathon_id,
+                date: date,
+                time: time
               })
               wrapEvent.push(newEvent);
             });

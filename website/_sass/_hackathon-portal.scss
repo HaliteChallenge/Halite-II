@@ -247,6 +247,14 @@
         margin-right: 65px;
         display: flex;
         align-items: center;
+        font-family: teko;
+        font-size: 20px;
+        font-weight: bold;
+        [class*='icon-']{
+          font-size: 30px;
+          vertical-align: middle;
+          margin-right: 10px;
+        }
       }
     }
   }

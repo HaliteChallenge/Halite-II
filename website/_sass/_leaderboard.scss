@@ -78,11 +78,14 @@
       .input-group{
         @media (min-width: $screen-sm-min){
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
           > .form-control{
             min-width: 0;
             flex: 1;
+          }
+          .btn{
+            margin-top: 3px;
           }
         }
         > *{
@@ -108,8 +111,27 @@
   }
 
   .v-select.dropdown{
-    .form-control{
-      max-width: 120px !important;
+    // align-self: flex-start;
+    .selected-tag + .form-control{
+      max-width: 50px;
+    }
+    .dropdown-toggle{
+      max-height: 94px;
+      overflow: scroll;
+      .selected-tag{
+        max-width: 150px;
+        padding-right: 25px;
+        display: inline-block;
+        position: relative;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        .close{
+          position: absolute;
+          right: 6px;
+          top: 2px;
+        }
+      }
     }
   }
 }

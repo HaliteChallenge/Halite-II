@@ -237,3 +237,12 @@
     // color: $yellow;
   }
 }
+.dashboard-graph {
+  display: block;
+}
+.player-line-chart {
+  display: block;
+  &>svg {
+    display: block;
+  }
+}
