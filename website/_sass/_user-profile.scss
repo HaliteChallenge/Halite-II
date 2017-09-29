@@ -13,6 +13,16 @@
     text-align: center;
     margin-bottom: 15px;
   }
+  &-edit-link{
+    position: absolute;
+    top: 23px;
+    right: 0;
+    color: #FFBE00;
+    cursor: pointer;
+    &:hover{
+      font-size: 1.8rem;
+    }
+  }
   &-avatar{
     padding: 10px;
     position: relative;
@@ -28,6 +38,50 @@
       letter-spacing: 1px;
       font-family: $font-heading;
       text-transform: uppercase;
+    }
+    p{
+      margin-bottom: 0;
+    }
+  }
+  &-badge{
+    padding: 20px 0;
+    position: relative;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    &-page{
+      position: absolute;
+      top: 15px;
+      right: 0;
+      img{
+        height:18px;
+        margin-left:5px;
+        cursor: pointer;
+      }
+    }
+    &-content{
+      overflow: hidden;
+    }
+    &-list{
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+      white-space: nowrap;
+      li{
+        display: inline-block;
+        margin-right:20px;
+        img{
+          width: 45px;
+        }
+      }
+    }
+    &-button{
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      cursor: pointer;
+      img{
+        height:40px;
+      }
     }
   }
   &-rank{
@@ -78,6 +132,18 @@
   position: relative;
   padding-top: 20px;
   padding-bottom: 20px;
+  .table-leader > thead > tr > th {
+    background-color: #1c1a27;
+  }
+  .table-leader > tbody > tr > td {
+    background-color: #000;
+  }
+  a{
+    color: $yellow;
+    &:hover{
+      text-decoration: underline;
+    }
+  }
   h2{
     font-family: $font-heading;
     text-transform: uppercase;
@@ -100,6 +166,64 @@
       right: 0;
       top: 27px;
       width: 320px;
+    }
+  }
+  .ha-button-container{
+    text-transform: uppercase;
+    font-weight: bold;
+    .fa{
+      background: $dark-gray;
+      color: $yellow;
+      padding: 3px 2px;
+      margin-right: 5px;
+      font-size: 14px;
+    }
+  }
+  .section-empty{
+    text-align: center;
+    h2{
+      padding: 0;
+      margin-bottom: 20px;
+    }
+    p{
+      color: #C2D1D0;
+      margin-bottom: 30px;
+    }
+    [class*="icon"]{
+      color: $yellow;
+      max-width: 60px;
+      margin: 10px 0;
+    }
+  }
+  .history-section{
+    &-list{
+      background-color: #1c1a27;
+      padding: 20px;
+      margin-bottom:10px;
+      .icon-state{
+        width:30px;
+        transform: translateY(-15px);
+        margin-right: 20px;
+      }
+      a{
+        position: absolute;
+        right: 20px;
+      }
+      div{
+        display: inline-block;
+        position: relative;
+        .icon-xs-state{
+          margin-left: 10px;
+        }
+        h2{
+          margin: 0;
+          padding-bottom: 5px;
+        }
+        p{
+          color: #C2D1D0;
+          margin: 0;
+        }
+      }
     }
   }
 }

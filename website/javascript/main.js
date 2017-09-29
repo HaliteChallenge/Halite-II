@@ -65,7 +65,7 @@ window.views = {
     UserProfile: function () {
         new Vue({
             el: "#user-profile-container",
-            render: (h) => h(UserProfile),
+            render: (h) => h(UserProfile, {props: {baseUrl: _global.baseUrl}}),
         });
     },
     EditUserProfile: function () {
