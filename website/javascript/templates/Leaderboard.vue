@@ -164,6 +164,7 @@
         })
         this.organizations = organizations;
       });
+
       this.update_filter();
     },
     watch: {
@@ -226,6 +227,10 @@
           this.leaderboard = leaderboard;
           this.page = page;
         });
+      },
+      getCountryName: function(name) {
+        var countries = require("i18n-iso-countries");
+        return countries.getName(name, "en");
       },
       clearFilter: function(){
         this.username_filter = [];
