@@ -69,7 +69,7 @@ class Map:
         for foreign_entity in self._all_ships() + self.all_planets():
             if entity == foreign_entity:
                 continue
-            result.setdefault(entity.calculate_angle_between(foreign_entity), []).append(foreign_entity)
+            result.setdefault(entity.calculate_distance_between(foreign_entity), []).append(foreign_entity)
         return result
 
     def _link(self):
