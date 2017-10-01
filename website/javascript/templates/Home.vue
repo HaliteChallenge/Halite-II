@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Season 2 of Halite is now live, Finals begin on January 22nd, 2018</div>
+        <div class="notification font-headline">Internal Two Sigma Hackathon is now live, Finals begin on October 6th 22nd, 2018</div>
 
         <div class="row">
             <div class="col-md-12">
@@ -220,13 +220,14 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
-                                <p class="t5 c-gry">Feature coming soon.</p>
+                                <p class="t5 c-gry">Halite is collaborative, invite a friend to join in the fun</p>
                                 <div class="clear"></div>
                                 <div class="ha-input-container">
                                     <div class="input-field">
-                                        <input type="text" placeholder="Coming soon..." />
-                                        &nbsp; &nbsp;
-                                        <button class="btn"><span>INVITE</span></button>
+                                        <input id="intmpid" type="email" placeholder="newhaliteplayer@example.com"/>
+                                        <button class="btn" v-on:click="invite"><span>INVITE</span></button>
+                                        <div class="clear"></div>
+                                        <p id="invitestatus" class="t5 c-gry"></p>
                                     </div>
                                 </div>
                             </div>
@@ -340,6 +341,21 @@
          this.createRedditWidget();
        },
        methods: {
+           invite: function() {
+                if(!document.getElementById("intmpid").checkValidity())
+                {
+                    document.getElementById("invitestatus").style.color = "red"
+                    document.getElementById("invitestatus").textContent = "Invalid email.."
+                }
+                else
+                {
+                    let content = document.getElementById("intmpid").value
+                    api.invitefriend(content).then(status => {
+                        document.getElementById("invitestatus").style.color = "green"
+                        document.getElementById("invitestatus").textContent = "Invitation sent..."
+                    })
+                }
+           },
            createRedditWidget: function() {
              let s = document.createElement('script'),
              content = '';

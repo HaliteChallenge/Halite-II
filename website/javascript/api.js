@@ -287,3 +287,15 @@ export function getUserHackathons(userId) {
         }
     })
 }
+
+export function invitefriend(email) {
+    return $.post({
+        url: `${API_SERVER_URL}/invitation/user/` + email
+    });
+}
+
+export function subscribe(email) {
+    return $.post({
+        url: `${API_SERVER_URL}/user/addsubscriber/` + email
+    });
+}
