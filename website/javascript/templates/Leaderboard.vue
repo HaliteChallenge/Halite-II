@@ -54,6 +54,7 @@
           <th>Country</th>
           <th>Organization</th>
           <th>Language</th>
+          <th>Activity</th>
         </tr>
       </thead>
       <tbody>
@@ -68,6 +69,7 @@
           <td>{{ getCountryName(player.country) }}</td>
           <td>{{ player.organization }}</td>
           <td>{{ player.language }}</td>
+          <td>{{ player.update_time | moment("calendar") }}</td>
         </tr>
       </tbody>
     </table>
@@ -89,6 +91,7 @@
   import {tierClass, countries_data} from "../utils";
   import vSelect from 'vue-select';
   import _ from 'lodash';
+  import moment from 'moment';
 
   export default {
     name: "leaderboard",
