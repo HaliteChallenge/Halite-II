@@ -22,7 +22,7 @@ export class HaliteVisualizer {
         this.time = 0;
         this._playing = false;
 
-        this.timeStep = 0.03;
+        this.timeStep = 0.01;
         this.playSpeed = 2.0;
         this.scrubSpeed = 0.25;
         // Keyboard controls - map a key name to an action, or directly to
