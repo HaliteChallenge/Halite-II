@@ -54,7 +54,7 @@
           <th>Country</th>
           <th>Organization</th>
           <th>Language</th>
-          <th>Activity</th>
+          <th>Last Submission</th>
         </tr>
       </thead>
       <tbody>
