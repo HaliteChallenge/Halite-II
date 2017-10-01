@@ -44,7 +44,6 @@
           <div class="event-img" :style="{'background-image':`url(${event.img})`}"></div>
           <div class="event-desc">
             <p class="t3 c-wht">{{event.title}}</p>
-            <p v-html="event.text"></p>
           </div>
           <div class="event-attr">
             <ul class="hackathon-info">

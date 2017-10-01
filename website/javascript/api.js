@@ -281,7 +281,7 @@ export function getHackathon(id) {
 
 export function getUserHackathons(userId) {
     return $.get({
-        url: `${API_SERVER_URL}/user/${userId}/allhackathons`,
+        url: `${API_SERVER_URL}/user/${userId}/hackathon`,
         xhrFields: {
             withCredentials: true,
         }
