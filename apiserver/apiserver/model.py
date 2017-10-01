@@ -54,6 +54,7 @@ def ranked_bots_query(variable="rank", alias="ranked_bots"):
         bots.c.games_played,
         bots.c.version_number,
         bots.c.language,
+        bots.c.update_time,
     ]).select_from(bots).select_from(sqlalchemy.sql.select([
         sqlalchemy.sql.text("@{}:=0".format(variable))
     ]).alias("rn")).order_by(bots.c.score.desc()).alias(alias)
@@ -141,6 +142,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.mu,
     ranked_bots.c.score,
     ranked_bots.c.language,
+    ranked_bots.c.update_time,
     # Perform a no-op operation so we can label the column easily
     sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), sqlalchemy.Integer).label("rank"),
 ]).select_from(ranked_bots.join(
