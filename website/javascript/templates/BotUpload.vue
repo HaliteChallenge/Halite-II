@@ -43,6 +43,7 @@
 <script>
   import * as api from "../api";
   import _ from 'lodash';
+  import JSZip from 'JSZip';
 
   export default{
     name: "BotUpload",
@@ -127,21 +128,43 @@
       upload: function(){
         const user_id = this.user.user_id;
         const bot_id = this.botId;
+        let my_bot_present = false;
+        JSZip.loadAsync(this.botFile, () => {                          
+          }).then((zip) => {
+              zip.forEach(function (relativePath, zipEntry) { 
+                 if(zipEntry.name.startsWith("MyBot."))
+                 {
+                   my_bot_present = true;
+                 }
+              });
 
-        api.update_bot(user_id, bot_id, this.botFile, (progress) => {
-          console.log('uploading ', this.uploadProgress);
-          this.uploadProgress = Math.floor(progress * 100);
-        }).then(() => {
-          console.log('success');
-          this.enableMessage('success', "Your bot has been submitted");
-          this.view = this.viewList.SUBMITTED;
-          this.checkBotStatus();
-        }, (error) => {
-          console.log('error');
-          this.view = this.viewList.UPLOAD;
-          this.enableMessage('error', error.message);
-          this.errorMessage = error.message;
-        });
+              return my_bot_present;
+
+          }).then ((my_bot_present) => {
+            
+              if(!my_bot_present)
+              {
+                const error_message = "The zip archive does not contain a root MyBot.{ext} file. Please make sure that MyBot.{ext} is present in the root of the zip archive"
+                this.enableMessage('error', error_message);
+                this.errorMessage = error_message;
+                return;
+              }
+
+              api.update_bot(user_id, bot_id, this.botFile, (progress) => {
+                console.log('uploading ', this.uploadProgress);
+                this.uploadProgress = Math.floor(progress * 100);
+                }).then(() => {
+                  console.log('success');
+                  this.enableMessage('success', "Your bot has been submitted");
+                  this.view = this.viewList.SUBMITTED;
+                  this.checkBotStatus();
+                }, (error) => {
+                  console.log('error');
+                  this.view = this.viewList.UPLOAD;
+                  this.enableMessage('error', error.message);
+                  this.errorMessage = error.message;
+                });
+          });
       },
       checkBotStatus: function(){
         const botId = this.botId;
