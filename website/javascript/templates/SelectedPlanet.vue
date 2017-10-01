@@ -31,6 +31,7 @@
 </template>
 <script>
   import Vue from "vue";
+  import {isUndefined, isNull} from "lodash";
 
   export default {
     props: ['selectedPlanet', 'players'],
@@ -38,9 +39,10 @@
       info: function(){
         const base = this.selectedPlanet.base;
         const state = this.selectedPlanet.state;
+
         const info = {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
-          owner: !state.owner ? '' : this.players[state.owner].name,
+          owner: isUndefined(state.owner) || isNull(state.owner) ? '' : this.players[state.owner].name,
           planetId: base.id,
           dockingSpots: base.docking_spots,
           health: base.health

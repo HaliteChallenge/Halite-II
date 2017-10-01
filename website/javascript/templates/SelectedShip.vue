@@ -31,6 +31,7 @@
 </template>
 <script>
   import Vue from "vue";
+  import {isUndefined, isNull} from "lodash";
 
   export default {
     props: ['selectedShip', 'players'],
@@ -40,7 +41,7 @@
 
         return {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
-          owner: !base.owner ? '' : this.players[base.owner].name,
+          owner: isUndefined(base.owner) || isNull(base.owner) ? '' : this.players[base.owner].name,
           id: base.id,
           velocity: `(${base.vel_x}, ${base.vel_y})`,
           health: base.health

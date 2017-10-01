@@ -255,6 +255,10 @@
           vertical-align: middle;
           margin-right: 10px;
         }
+        a:hover{
+          color: $yellow;
+          text-decoration: none;
+        }
       }
     }
   }

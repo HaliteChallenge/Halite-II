@@ -1,5 +1,5 @@
 .doc-container{
-  
+
 }
 .doc-content-header{
   background-color: #fff;
@@ -8,7 +8,7 @@
   margin-bottom: 10px;
   h1{
     text-align: left;
-    font-weight: bold;  
+    font-weight: bold;
   }
   h3{
     opacity: 0.8;
@@ -27,7 +27,7 @@
     display: flex;
     flex-wrap: wrap;
     li{
-      display: block;  
+      display: block;
       width: 50%;
       padding-left: 20px;
       position: relative;
@@ -48,7 +48,7 @@
 .doc-content-container{
   background-color: #fff;
   padding: 20px;
-  color: #191822;
+  color: #1e1d28;
   code{
     background-color: #ac5544;
     color: #fff;
@@ -59,9 +59,16 @@
       color: #191822;
     }
   }
-  
+  a {
+    color: #2980B9;
+    &:hover {
+      color: #44a3e2;
+    }
+  }
+
   h2{
     font-size: 2.8rem;
+    font-weight: bold;
     font-family: 'Teko';
   }
 }

@@ -336,7 +336,6 @@
       vueSlider,
       PlayerStatsPane,
       PlayerDetailPane,
-      PlayerLineChart,
       SelectedPlanet,
       SelectedShip,
       SelectedPoint,
@@ -367,8 +366,6 @@
         this.selected.x = args.x;
         this.selected.y = args.y;
         this.showObjectPanel = true;
-        console.log(kind);
-        console.log(args);
         visualizer.onUpdate();
         this.$forceUpdate();
       };
@@ -456,7 +453,6 @@
             count[planet.owner].planets++;
           }
         }
-
         // total
         let total = {ships: 0, planets: 0};
         for (let item of Object.values(count)){
