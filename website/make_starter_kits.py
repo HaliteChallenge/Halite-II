@@ -199,7 +199,7 @@ def main():
         })
 
     output["languages"].append({
-        "language": "(all languages)",
+        "language": "All Languages",
         "files": panlanguage_kits,
     })
 

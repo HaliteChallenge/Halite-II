@@ -39,8 +39,8 @@ __Linux users:__ Your system must support GCC 4.9 or later (with corresponding G
         </tr>
         {% endfor %}
         <tr>
-            <td>(no language, only game environment)</td>
-            <td>empty zip…?</td>
+            <td>Only Game Environment</td>
+            <td>NA</td>
             {% for file in site.data.downloads.environments %}
             <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
             {% endfor %}
