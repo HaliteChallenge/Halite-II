@@ -226,7 +226,7 @@
                                     <div class="input-field">
                                         <input id="intmpid" type="email" placeholder="newhaliteplayer@example.com"/>
                                         <button class="btn" v-on:click="invite"><span>INVITE</span></button>
-                                        <div class="clear"></div>
+                                        <br/>
                                         <p id="invitestatus" class="t5 c-gry"></p>
                                     </div>
                                 </div>
