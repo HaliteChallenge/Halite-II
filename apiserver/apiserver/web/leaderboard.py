@@ -80,7 +80,6 @@ def leaderboard():
                 "language": row["language"],
                 "country": row["country_code"],
                 "rank": int(row["rank"]) if row["rank"] is not None else None,
-                "update_time": row["update_time"],
             }
 
             if total_users and row["rank"] is not None:

@@ -141,7 +141,6 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.mu,
     ranked_bots.c.score,
     ranked_bots.c.language,
-    ranked_bots.c.update_time,
     # Perform a no-op operation so we can label the column easily
     sqlalchemy.cast(sqlalchemy.sql.text("ranked_bots.bot_rank"), sqlalchemy.Integer).label("rank"),
 ]).select_from(ranked_bots.join(
