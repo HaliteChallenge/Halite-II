@@ -107,6 +107,13 @@
                         <dd>{{ selected_ship.health }}</dd>
                     </dl>
                 </div>
+                <div v-if="selected.kind === 'point'">
+                    <h3>Selected Coordinate</h3>
+                    <dl>
+                        <dt>Location</dt>
+                        <dd>({{ selected.x.toFixed(4) }}, {{ selected.y.toFixed(4) }})</dd>
+                    </dl>
+                </div>
             </div>
         </div>
     </div>
@@ -135,6 +142,8 @@
                  kind: null,
                  owner: null,
                  id: null,
+                 x: null,
+                 y: null,
              },
              stats: null,
              player_names: null,
@@ -157,6 +166,8 @@
              this.selected.kind = kind;
              this.selected.id = args.id;
              this.selected.owner = args.owner;
+             this.selected.x = args.x;
+             this.selected.y = args.y;
              visualizer.onUpdate();
              this.$forceUpdate();
          };

@@ -151,8 +151,8 @@
             <div v-else-if="selectedShip">
               <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
             </div>
-            <div v-else-if="selectedShip">
-              <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
+            <div v-else-if="selectedPoint">
+              <SelectedPoint :selected-point="selectedPoint"></SelectedPoint>
             </div>
             <div class="message-box" v-else>
               <p><span class="icon-info"></span></p>
@@ -266,6 +266,7 @@
   import PlayerLineChart from "./PlayerLineChart.vue";
   import SelectedPlanet from "./SelectedPlanet.vue";
   import SelectedShip from "./SelectedShip.vue";
+  import SelectedPoint from "./SelectedPoint.vue";
   import _ from "lodash";
 
   // libhaliteviz.setAssetRoot("/assets/js/");
@@ -302,7 +303,9 @@
         selected: {
           kind: '',
           id: 0,
-          owner: ''
+          owner: '',
+          x: 0,
+          y: 0,
         },
         sliderOptions: {
           min: 0,
@@ -336,6 +339,7 @@
       PlayerLineChart,
       SelectedPlanet,
       SelectedShip,
+      SelectedPoint,
     },
     mounted: function(){
       this.sliderOptions = Object.assign(this.sliderOptions, {
@@ -360,6 +364,8 @@
         this.selected.kind = kind;
         this.selected.id = args.id;
         this.selected.owner = args.owner;
+        this.selected.x = args.x;
+        this.selected.y = args.y;
         this.showObjectPanel = true;
         console.log(kind);
         console.log(args);
@@ -551,8 +557,11 @@
         }
         return null;
       },
-      selectedLocation: function(){
-
+      selectedPoint: function(){
+        if (this.selected.kind === "point") {
+          return this.selected;
+        }
+        return null;
       }
     },
     methods: {
@@ -578,7 +587,7 @@
         if (this.showChart) return
         setTimeout(() => this.showChart = true, 500)
       }
-      
+
     }
   }
 </script>

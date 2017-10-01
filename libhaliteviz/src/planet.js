@@ -63,7 +63,7 @@ export class Planet {
         this.core.rotation = Math.random() * 2 * Math.PI;
         this.core.interactive = true;
         this.core.buttonMode = true;
-        this.core.on("pointerdown", () => {
+        this.core.on("pointerdown", (e) => {
             // When clicked, notify the visualizer
             onSelect("planet", {
                 id: this.id,

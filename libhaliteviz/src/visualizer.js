@@ -65,6 +65,16 @@ export class HaliteVisualizer {
         this.starfield = PIXI.Sprite.from(
             assets.BACKGROUND_IMAGES[Math.floor(Math.random() * assets.BACKGROUND_IMAGES.length)]);
         this.starfield.width = replay.width * this.scale * assets.CELL_SIZE;
+        this.starfield.interactive = true;
+
+        this.starfield.on("pointerdown", (e) => {
+            const localCoords = e.data.global;
+            const relativeX = localCoords.x;
+            const relativeY = localCoords.y;
+            const coordX = (relativeX / assets.VISUALIZER_SIZE) * replay.width;
+            const coordY = (relativeY / assets.VISUALIZER_HEIGHT) * replay.height;
+            this.onSelect("point", { x: coordX, y: coordY });
+        });
 
         // Set up letterboxing in case replay aspect ratio does't match ours
         this.container.position.x = Math.max(0, (assets.VISUALIZER_SIZE - replay.width * this.scale * assets.CELL_SIZE) / 2);
