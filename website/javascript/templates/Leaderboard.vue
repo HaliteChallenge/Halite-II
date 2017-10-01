@@ -164,7 +164,6 @@
           organizations.push({value: item.organization_id, label: `${item.name} (${item.type})`});
         })
         this.organizations = organizations;
-
         this.build_filters_from_url();
         this.update_filter();
       });
@@ -182,40 +181,44 @@
       build_filters_from_url: function(){
         let params = {};
         // extract filter term to objects
-        window.location.search.slice(1).split('&').forEach((item) => {
-          let param = item.split('=');
-          params[param[0]] = param[1].split(',');
-        });
-        console.log(params);
-
-        // get username value
-        if (params.username && params.username.length > 0 ){
-          this.username_filter = params.username;
-        }
-
-        // get tier value
-        if (params.tier && params.tier.length > 0){
-          let selected = this.levels.filter((item) => {
-            return params.tier.indexOf(item.value + "") != -1;
-          })
-          this.tier_filter = selected;
-        }
-
-        // get organization
-        if (params.organization && params.organization.length > 0){
-          let selected = this.organizations.filter((item) => {
-            // return item.value == 16872;
-            return params.organization.indexOf(item.value + "") != -1; // convert to string
+        let urlparams = window.location.search.slice(1)
+        if(urlparams)
+        {
+          urlparams.split('&').forEach((item) => {
+            let param = item.split('=');
+            params[param[0]] = param[1].split(',');
           });
-          this.organization_filter = selected;
-        }
+          console.log(params);
 
-        // get country
-        if (params.country && params.country.length > 0){
-          let selected = this.countries.filter((item) => {
-            return params.country.indexOf(item.value + "") != -1; // convert to string
-          })
-          this.country_filter = selected;
+          // get username value
+          if (params.username && params.username.length > 0 ){
+            this.username_filter = params.username;
+          }
+
+          // get tier value
+          if (params.tier && params.tier.length > 0){
+            let selected = this.levels.filter((item) => {
+              return params.tier.indexOf(item.value + "") != -1;
+            })
+            this.tier_filter = selected;
+          }
+
+          // get organization
+          if (params.organization && params.organization.length > 0){
+            let selected = this.organizations.filter((item) => {
+              // return item.value == 16872;
+              return params.organization.indexOf(item.value + "") != -1; // convert to string
+            });
+            this.organization_filter = selected;
+          }
+
+          // get country
+          if (params.country && params.country.length > 0){
+            let selected = this.countries.filter((item) => {
+              return params.country.indexOf(item.value + "") != -1; // convert to string
+            })
+            this.country_filter = selected;
+          }
         }
       },
       build_filter: function() {
