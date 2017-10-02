@@ -55,10 +55,10 @@ BOT_COMMAND = "cgexec -g cpu,memory:{cgroup} sudo -Hiu {bot_user} bash -c 'cd {b
 
 
 COMPILE_ERROR_MESSAGE = """
-Your bot caused unexpected behavior in our servers. If you cannot figure out 
+Your bot caused unexpected behavior in our servers. If you cannot figure out
 why this happened, please email us at halite@halite.io. We can help.
 
-For our reference, here is the trace of the error: 
+For our reference, here is the trace of the error:
 """
 
 
@@ -77,6 +77,7 @@ def give_ownership(top_dir, group, dir_perms):
         os.chmod(dirpath, dir_perms)
         for filename in filenames:
             shutil.chown(os.path.join(dirpath, filename), group=group)
+            os.chmod(os.path.join(dirpath, filename), dir_perms)
 
 
 def executeCompileTask(user_id, bot_id, backend):

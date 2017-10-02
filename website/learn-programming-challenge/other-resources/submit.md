@@ -25,6 +25,8 @@ The following package managers are already installed on the server and can be us
 
 If your library isn't on a package manager that supports local installation and you can’t download it with `curl`, you are going to have to compile it on our game servers. Include the source of you library in your bot's zip file and put compilation instructions in the `install.sh` file.
 
+If you are using `pip`, then make sure to use the `--system` flag with the `--target` flag, due to how Debian/Ubuntu patch the `pip` packages (reference: [pip#3826](https://github.com/pypa/pip/issues/3826)).
+
 ## Preinstalled Libraries
 
 For convenience's sake, we include tensorflow, keras (using a tensorflow backend), numpy, scipy, scikit-learn, pillow, and h5py on our game servers. Just import these libraries from your python files like normal!
