@@ -25,14 +25,17 @@ rm -f main_new_min.css
 
 # js
 cd ../js
+echo "minifying bundle"
 uglifyjs --compress --mangle -- bundle.js > bundle.min.js
 cp bundle.min.js bundle.js
 rm -f bundle.min.js
 
+echo "minifying worker 1"
 uglifyjs --compress --mangle -- f49921291dbd28462a61.worker.js > f49921291dbd28462a61.worker.min.js
 cp f49921291dbd28462a61.worker.min.js f49921291dbd28462a61.worker.js
 rm -f f49921291dbd28462a61.worker.min.js
 
+echo "minifying worker 2"
 uglifyjs --compress --mangle -- 276d7a58ef9843d54ee0.worker.js > 276d7a58ef9843d54ee0.worker.min.js
 cp 276d7a58ef9843d54ee0.worker.min.js 276d7a58ef9843d54ee0.worker.js
 rm -f 276d7a58ef9843d54ee0.worker.min.js

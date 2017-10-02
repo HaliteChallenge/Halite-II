@@ -17,6 +17,10 @@
         <td>Planet ID:</td>
         <td>{{info.planetId}}</td>
       </tr>
+       <tr>
+        <td>Radius:</td>
+        <td>{{info.radius}}</td>
+      </tr>
       <tr>
         <td>Docking Spots:</td>
         <td>{{info.dockingSpots}}</td>
@@ -38,14 +42,16 @@
     computed: {
       info: function(){
         const base = this.selectedPlanet.base;
+        console.log(this.selectedPlanet.base)
         const state = this.selectedPlanet.state;
 
         const info = {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
-          owner: isUndefined(state.owner) || isNull(state.owner) ? '' : this.players[state.owner].name,
+          owner: isUndefined(state.owner) || isNull(state.owner) ? 'Unconquered' : this.players[state.owner].name,
           planetId: base.id,
           dockingSpots: base.docking_spots,
-          health: base.health
+          health: base.health,
+          radius: Math.round(base.r * 100) / 100
         };
 
         return info;
