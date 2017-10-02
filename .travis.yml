@@ -87,6 +87,7 @@ script:
   - cmake .
   - make -j2
   - cd ../website
+  - npm config set package-lock false
   - gem install bundler
   - bundle install --path=vendor/bundle
   - npm install

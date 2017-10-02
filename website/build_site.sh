@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+npm config set package-lock false
+
 sudo gem install bundler
 bundle install --path=vendor/bundle
 
