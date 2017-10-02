@@ -24,7 +24,7 @@
       <i class="xline xline-top"></i>
       <div class="row">
         <div class="col-md-12">
-          <p class="t1 c-wht font-headline">HACKATHON DESCRIPTION</p>
+          <p class="t1 c-wht font-headline">More Details</p>
           <div class="hackathon-desc-text">
             <i class="xline xline-top short-line"></i>
             <div v-html="hackathon.description"></div>

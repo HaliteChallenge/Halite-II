@@ -3,7 +3,6 @@
     <div class="hackathon-in-progress-container" v-show="showHackathonInProgress">
       <i class="xline xline-bottom"></i>
       <div class="hackathon-title">
-        <i class="xline xline-bottom"></i>
         <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
@@ -36,8 +35,9 @@
     </div>
     <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
+        <i class="xline xline-top"></i>
         <i class="xline xline-bottom"></i>
-        <p class="t2 c-wht font-headline">ALL EVENTS</p>
+        <p class="t2 c-wht font-headline">ALL HACKATHONS</p>
       </div>
       <div class="event-cards">
         <div class="event-card" v-for="event in events" @click="jumpToHackathon(event.id)">
