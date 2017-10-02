@@ -282,7 +282,7 @@
             const instance = this;
             leaderboard.forEach(function(user){
               instance.users.push(user.username);
-            });         
+            });
             instance.users.sort()
           });
         }

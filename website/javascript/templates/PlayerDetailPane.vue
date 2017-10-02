@@ -10,6 +10,7 @@
           <div class="card-player-stats"><span class="icon-ship"></span> Ships: {{player.ships}}</div>
           <div class="card-player-stats"><span class="icon-planet"></span> Planets Owned: {{player.planets}}</div>
           <div class="card-player-stats"><span class="icon-lightning"></span> Attacks: {{playerInfo ? playerInfo[index].totalDamages : ''}}</div>
+          <div class="card-player-stats"><span class="icon-ship"></span> Ships Produced: {{player.shipsProduced}}</div>
         </div>
       </div>
     </div>
@@ -44,5 +45,5 @@
   }
 </script>
 <style>
-  
+
 </style>

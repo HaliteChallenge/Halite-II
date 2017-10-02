@@ -434,18 +434,29 @@
     computed: {
       statistics: function(){
         let count = {};
+        if (!this.shipsProduced) {
+          this.shipsProduced = [];
+          for (let i = 0; i < this.replay.num_players; i++) {
+            this.shipsProduced[i] = 0;
+          }
+        }
+
         for (let i = 0; i < this.replay.num_players; i++) {
           count[i] = {
             ships: 0,
             planets: 0,
             shipsRate: 0,
-            planetsRate: 0
+            planetsRate: 0,
+            shipsProduced: this.shipsProduced[i]
           };
         }
 
         let frame = this.replay.frames[this.frame]
         for (let owner of Object.keys(frame.ships)) {
           count[owner].ships += Object.values(frame.ships[owner]).length;
+          if (count[owner].ships > this.shipsProduced[owner]) {
+            count[owner].shipsProduced = this.shipsProduced[owner] = count[owner].ships;
+          }
         }
 
         for (let planet of Object.values(frame.planets)) {
