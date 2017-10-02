@@ -204,6 +204,7 @@ def hackathon_ranked_bots_users_query(hackathon_id, *, alias="hackathon_ranked_b
         ranked_bots.c.mu,
         ranked_bots.c.score,
         ranked_bots.c.language,
+        ranked_bots.c.update_time,
         # Perform a no-op operation so we can label the column easily
         sqlalchemy.cast(sqlalchemy.sql.text("local_rank.local_rank"), sqlalchemy.Integer).label("local_rank"),
     ]).select_from(

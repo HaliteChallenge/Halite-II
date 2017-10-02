@@ -276,7 +276,8 @@ def get_hackathon_leaderboard(hackathon_id, *, user_id):
                 "version_number": int(row["num_submissions"]),
                 "score": float(row["score"]),
                 "language": row["language"],
-                "local_rank": int(row["local_rank"])
+                "local_rank": int(row["local_rank"]),
+                "update_time": row["update_time"]
                 if row["local_rank"] is not None else None,
             }
 
