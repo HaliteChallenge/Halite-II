@@ -71,7 +71,7 @@
 header.navbar{
   border-bottom: 1px solid $border;
   height: 61px;
-  background-color: rgba(37, 36, 47, 0.9);
+  background-color: rgb(37, 36, 47);
   @media (min-width: $screen-md-min){
     min-height: 50px;
   }
