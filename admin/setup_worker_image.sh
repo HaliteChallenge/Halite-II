@@ -36,12 +36,12 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy Cython"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
 ## List Python packages to preinstall.
-PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely flask"
+PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely flask cython pandas"
 ## List Ruby gems to preinstall.
 RUBY_PACKAGES="bundler"
 
