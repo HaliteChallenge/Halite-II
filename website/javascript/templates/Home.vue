@@ -4,8 +4,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <p class="d1 c-org font-headline">INTRODUCING</p>
-                <p class="t1 c-wht font-headline">HALITE 2</p>
+                <p class="t1 c-wht font-headline">HALITE II</p>
                 <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                 <div v-if="!me_in" class="not-me ha-button-container">
                     <div>
