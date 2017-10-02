@@ -69,7 +69,7 @@
           <td>{{ getCountryName(player.country) }}</td>
           <td>{{ player.organization }}</td>
           <td>{{ player.language }}</td>
-          <td>{{ player.update_time | moment("calendar") }}</td>
+          <td>{{ getFormattedDate(player.update_time)  }}</td>
         </tr>
       </tbody>
     </table>
@@ -310,6 +310,9 @@
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
         return countries.getName(name, "en");
+      },
+      getFormattedDate: function(date) {
+        return moment(date).startOf("day").fromNow()
       }
     }
   }
