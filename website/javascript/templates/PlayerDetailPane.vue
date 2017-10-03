@@ -7,10 +7,10 @@
           <span :class="'circle bg-player-' + (parseInt(index)+1)"></span>
         </h4>
         <div class="card-player-stats-list">
-          <div class="card-player-stats"><span class="icon-ship"></span> Ships: {{player.ships}}</div>
+          <div class="card-player-stats"><span class="icon-ship"></span> Current Ships: {{player.ships}}</div>
           <div class="card-player-stats"><span class="icon-planet"></span> Planets Owned: {{player.planets}}</div>
           <div class="card-player-stats"><span class="icon-lightning"></span> Attacks: {{playerInfo ? playerInfo[index].totalDamages : ''}}</div>
-          <div class="card-player-stats"><span class="icon-ships"></span> Ships Produced: {{player.shipsProduced}}</div>
+          <div class="card-player-stats"><span class="icon-ships"></span> Total Ships: {{player.shipsProduced}}</div>
         </div>
       </div>
     </div>

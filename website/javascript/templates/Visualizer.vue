@@ -5,7 +5,7 @@
       <div class="game-heading">
         <i class="xline xline-top"></i>
         <i class="xline xline-bottom"></i>
-        <p class="game-heading-date" v-if="game">{{game.time_played | moment("MM/DD/YY - HH:mm:ss")}}</p>
+        <p class="game-heading-date" v-if="game">{{game.time_played | moment("MMM Do, YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
           <div class="short">
             <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
