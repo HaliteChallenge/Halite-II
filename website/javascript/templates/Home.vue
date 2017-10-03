@@ -238,9 +238,9 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht font-headline">JOIN THE CONVERSATION</p>
+                <p class="t2 c-wht font-headline">WHAT THE COMMUNITY HAS TO SAY</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Besides our forums, our community is very vocal. Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
+                <p class="t5 c-gry">Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12 img-list no-padding-xs">
                     <div class="col-md-4">
