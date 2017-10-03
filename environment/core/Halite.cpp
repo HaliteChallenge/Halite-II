@@ -1070,7 +1070,10 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     // Output gamefile. First try the replays folder; if that fails, just use the straight filename.
     std::stringstream filename_buf;
     filename_buf << "replay-" << put_time();
-    filename_buf << id << ".hlt";
+    filename_buf << "-" << seed;
+    filename_buf << "-" << game_map.map_width;
+    filename_buf << "-" << game_map.map_height;
+    filename_buf << "-" << id << ".hlt";
     auto filename = filename_buf.str();
 
     if (enable_replay) {
