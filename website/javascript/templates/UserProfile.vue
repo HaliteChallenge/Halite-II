@@ -166,8 +166,8 @@
                             <tr v-for="hackathon in hackathons">
                                 <td>{{hackathon.title}}</td>
                                 <td>{{hackathon.location}}</td>
-                                <td>{{hackathon.status}}</td>
-                                <td><a href="#">View Leaderboard</a></td>
+                                <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
+                                <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">View Hackathon</a></td>
                             </tr>
                         </tbody>
                     </table>
