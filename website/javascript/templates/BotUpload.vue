@@ -43,7 +43,7 @@
 <script>
   import * as api from "../api";
   import _ from 'lodash';
-  import JSZip from 'JSZip';
+  import JSZip from 'jszip';
 
   export default{
     name: "BotUpload",

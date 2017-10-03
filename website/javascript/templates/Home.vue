@@ -223,7 +223,7 @@
                                 <div class="clear"></div>
                                 <div class="ha-input-container">
                                     <div class="input-field">
-                                        <input id="intmpid" type="email" placeholder="newhaliteplayer@example.com"/>
+                                        <input id="intmpid" type="email" placeholder="Your friend's email..."/>
                                         <button class="btn" v-on:click="invite"><span>INVITE</span></button>
                                         <br/>
                                         <p id="invitestatus" class="t5 c-gry"></p>
