@@ -78,9 +78,9 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">WATCH GAMES ON HALITE TV</p>
+                <p class="t2 c-wht">WATCH STAFF PICKS</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">See what's happening right now. Thanks to our game engine, thousands of games are played at a time. Check out a few!</p>
+                <p class="t5 c-gry">Thanks to our game engine, thousands of games are played at a time. Check out a few!</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
                     <a href="/play/?game_id=850849">
@@ -153,6 +153,7 @@
                     <div class="ha-button no-bg-button"><span>SEE ALL VIDEOS</span></div>
                 </div>-->
             </div>
+            <div class="clear"></div>
             <div class="col-md-12">
                <div class="arrows-icon">
                    <div class="scroll-arrow"></div>
@@ -163,7 +164,7 @@
             <div class="col-md-12 big-menu">
                 <p class="t2 c-wht">PLAY WITH FRIENDS</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">It can be frustrating to play games like Halite on your own - you make some progress but then get stuck. Find friends to play with to make Halite even more fun.</p>
+                <p class="t5 c-gry">Halite is fun and collaborative, play with friends to progress further.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="table-display">
                     <div class="col-md-4 no-padding-xs margin-15-xs">
@@ -177,7 +178,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">JOIN THE FORUMS</p>
-                                <p class="t5 c-gry">"I didn’t feel like I lacked people to talk to...There was a community even if it wasn’t a local community.” - Halite 1 Player</p>
+                                <p class="t5 c-gry">"The Halite community and chat were pretty active...That was a really strong point of the game” - Halite 1 Player</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
@@ -219,7 +220,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
-                                <p class="t5 c-gry">Halite is collaborative, invite a friend to join in the fun</p>
+                                <p class="t5 c-gry">Invite a friend to join in the fun</p>
                                 <div class="clear"></div>
                                 <div class="ha-input-container">
                                     <div class="input-field">
@@ -309,7 +310,7 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
                     <div>
-                        <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP ON GITHUB</span></a>
+                        <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></a>
                         <a href="/play-programming-challenge" v-else class="ha-button"><span>PLAY NOW</span></a>
                     </div>
                 </div>
