@@ -8,24 +8,15 @@
                 </div>
                 <div class="user-profile-detail">
                     <i class="xline xline-top"></i>
-                    <h1>{{ user.username }}</h1>
-                    <p>@{{ user.username }}</p>
+                    <a :href="'https://github.com/' + user.username">{{ user.username }}</a>
                     <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
-                </div>
-                <div class="user-profile-badge">
-                    <i class="xline xline-top"></i>
-                    <h2>Badges</h2>
-                    <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
-                    <div class="user-profile-badge-content">
-                        <ul class="user-profile-badge-list">
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
-                        </ul>
-                    </div>
-                    <a class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
+                    <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
+                    <p>From New York, USA</p>
+                    <p>Bots in 
+                        <template v-for="(lang, index) in botLang">
+                            <span class="hl">{{lang}}</span><span v-if="(index+1) < botLang.length">,</span>
+                        </template>
+                    </p>
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
@@ -46,20 +37,22 @@
                     </div>
                     <p><a href="#">View on leaderboard</a></p>
                 </div>
-                <div class="user-profile-about">
+                <div class="user-profile-badge">
                     <i class="xline xline-top"></i>
-                    <h2>About</h2>
-                    <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
-                    <p>From New York, USA</p>
-                    <p>Bots in 
-                        <template v-for="(lang, index) in botLang">
-                            <span class="hl">{{lang}}</span><span v-if="(index+1) < botLang.length">,</span>
-                        </template>
-                    </p>
+                    <h2>Badges</h2>
+                    <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
+                    <div class="user-profile-badge-content">
+                        <ul class="user-profile-badge-list">
+                            <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
+                            <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
+                            <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
+                            <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
+                            <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
+                        </ul>
+                    </div>
+                    <a class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
                 </div>
-            </div>
-
-            
+            </div>          
         </div>
         <div class="col-md-6">
             <section>
@@ -74,71 +67,6 @@
                     <span v-if="bot.compilation_status">(latest version compilation status: {{ bot.compilation_status }})</span>
                 </p> -->
             </section>
-
-            <section class="profile-section history-section">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Recent History
-                </h2>
-                <form v-if="is_my_page" class="profile-section-right-form">
-                    <select class="form-control">
-                        <option>All</option>
-                    </select>
-                </form>
-                <div class="section-empty">
-                    <img :src="`${baseUrl}/assets/images/temp/history.png`" class="icon-"></img>
-                    <h2>It's quiet here</h2>
-                    <p>You haven't submit any bot yet. Let's do it and <br /> view your recent history here</p>
-                    <div v-if="is_my_page" class="ha-button-container">
-                        <div>
-                            <a  :href="`${baseUrl}/play-programming-challenge`" class="ha-button"><i class="fa fa-arrow-up"></i><span>Submit a bot</span></a>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="false" class="history-section-content">
-                    <div class="history-section-list">
-                        <img class="icon-state" :src="`${baseUrl}/assets/images/temp/done.png`">
-                        <div>
-                            <h2>Bot submitted successfully<img class="icon-xs-state" :src="`${baseUrl}/assets/images/temp/world.png`"></h2>
-                            <p>Your bot {{ user.username }} v3 has been successfully submitted</p>
-                        </div>
-                        <a href="#">See video</a>
-                    </div>
-                    <div class="history-section-list">
-                        <img class="icon-state" :src="`${baseUrl}/assets/images/temp/alert.png`">
-                        <div>
-                            <h2>Error. Compiling error<img class="icon-xs-state fa fa-lock"></h2>
-                            <p>Error code:#00032. Your bot is not ready for submission</p>
-                        </div>
-                        <a href="#">Learn more</a>
-                    </div>
-                    <div class="history-section-list">
-                        <img class="icon-state" :src="`${baseUrl}/assets/images/temp/badge_4.png`">
-                        <div>
-                            <h2>Badge earned<img class="icon-xs-state" :src="`${baseUrl}/assets/images/temp/world.png`"></h2>
-                            <p>10 win in a row</p>
-                        </div>
-                        <a href="#">Share badge</a>
-                    </div>
-                    <div class="history-section-list">
-                        <img class="icon-state" :src="`${baseUrl}/assets/images/temp/done.png`">
-                        <div>
-                            <h2>Email verified<img class="icon-xs-state" :src="`${baseUrl}/assets/images/temp/world.png`"></h2>
-                            <p>You can now start uploading bots</p>
-                        </div>
-                        <a href="#">Submit a bot</a>
-                    </div>
-                    <div class="history-section-list">
-                        <img class="icon-state" :src="`${baseUrl}/assets/images/temp/done.png`">
-                        <div>
-                            <h2>User registered<img class="icon-xs-state" :src="`${baseUrl}/assets/images/temp/world.png`"></h2>
-                            <p>Welcome to Halite 2</p>
-                        </div>
-                        <a href="#">Submit a bot</a>
-                    </div>
-                </div>
-            </section>
-
             <section class="profile-section">
                 <h2>
                     <i class="xline xline-bottom"></i>
@@ -150,10 +78,6 @@
                     <h2>Nothing to show</h2>
                     <p>Complete your first game and view replays<br/>here</p>
                 </div>
-                <!-- <template v-if="is_my_page">
-                    <input type="checkbox" v-bind:checked="only_timed_out" id="only-timed-out" v-on:change="toggle_filter" />
-                    <label for="only-timed-out">Only show games where I timed out</label>
-                </template> -->
 
                 <table class="table table-leader" v-if="games.length">
                     <thead>
@@ -214,7 +138,7 @@
                 </div>
             </section>
 
-            <section class="profile-section profile-section-hackathon">
+            <section v-if="is_my_page" class="profile-section profile-section-hackathon">
                 <h2>
                     <i class="xline xline-bottom"></i>
                     Your Hackathons

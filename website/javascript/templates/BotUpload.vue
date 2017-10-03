@@ -128,7 +128,7 @@
           });
       },
       checkBotStatus: function(){
-        const botId = this.botId;
+        const botId = 0;
         let t = null;
         const fetch = () => {
           t = setTimeout(() => {

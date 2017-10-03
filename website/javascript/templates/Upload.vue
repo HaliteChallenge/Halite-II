@@ -43,34 +43,7 @@
                 console.log(files);
                 if (files.length > 0) {
                     this.$parent.botFile = files[0];
-                    this.$parent.currentView = 'botUpload';
-                    // let user_id;
-                    // this.error = null;
-
-                    // const has_bot_promise = api.me().then((user) => {
-                    //     user_id = user.user_id;
-                    //     return api.list_bots(user.user_id);
-                    // }).then((bots) => {
-                    //     if (bots.length > 0) {
-                    //         return bots[0].bot_id;
-                    //     }
-                    //     return null;
-                    // });
-
-                    // has_bot_promise
-                    //     .then((bot_id) => {
-                    //         return api.update_bot(user_id, bot_id, files[0], (progress) => {
-                    //             this.is_uploading = true;
-                    //             this.progress = Math.floor(progress * 100);
-                    //         });
-                    //     })
-                    //     .then(() => {
-                    //         this.error = "Successfully uploaded!";
-                    //         this.is_uploading = false;
-                    //     }, (error) => {
-                    //         this.error = error.message;
-                    //         this.is_uploading = false;
-                    //     });
+                    this.$parent.currentView = 'botUpload';ZZZZ
                 }
             }
         },
