@@ -55,18 +55,6 @@
             </div>          
         </div>
         <div class="col-md-6">
-            <section>
-                <!-- <h2>Stats Summary</h2>
-                <p v-if="user.tier"><b>{{ user.tier }}</b> player</p>
-                <p><b>Points:</b> {{ Math.round(user.score * 100) / 100 }}</p>
-                <p v-if="user.rank"><b>Rank:</b> {{ user.rank }}</p>
-                <p><b>Games Played:</b>  {{ user.num_games }}</p>
-                <p><b>Submissions:</b>  {{ user.num_submissions }}</p>
-                <p v-for="bot in bots">
-                    Bot version {{ bot.version_number }} rank {{ bot.rank }} written in {{ bot.language }} with {{ bot.games_played }} games played
-                    <span v-if="bot.compilation_status">(latest version compilation status: {{ bot.compilation_status }})</span>
-                </p> -->
-            </section>
             <section class="profile-section">
                 <h2>
                     <i class="xline xline-bottom"></i>
