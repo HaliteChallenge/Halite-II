@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-ships:before {
+  content: "\e923";
+}
 .icon-join:before {
   content: "\e922";
 }

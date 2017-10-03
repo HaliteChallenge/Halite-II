@@ -6,17 +6,17 @@
         <div class="leaderboard-stats">
           <div class="leaderboard-stats-row-1">
             <div class="stat-item">
-              <div class="stat-item-icon"><span class="icon-pie-chart"></span></div>
+              <div class="stat-item-icon"><span class="icon-bar-chart"></span></div>
               <div class="stat-item-content">
-                <p class="stat-item-value">20%</p>
-                <p class="stat-item-caption">Professional</p>
+                <p class="stat-item-value">{{metric.players}}</p>
+                <p class="stat-item-caption">Players</p>
               </div>
             </div>
             <div class="stat-item">
-              <div class="stat-item-icon"><span class="icon-bar-chart"></span></div>
+              <div class="stat-item-icon"><span class="icon-pie-chart"></span></div>
               <div class="stat-item-content">
-                <p class="stat-item-value">20%</p>
-                <p class="stat-item-caption">Professional</p>
+                <p class="stat-item-value">{{metric.organizations}}</p>
+                <p class="stat-item-caption">Organizations</p>
               </div>
             </div>
             <div class="stat-item">
@@ -84,9 +84,9 @@
         hackathonId: null,
         isGlobalActive: true,
         metric: {
-          professional: 20,
-          increment: 23,
-          countries: 0
+          organizations: 20,
+          countries: 0,
+          players: 0
         },
         classes: {
           professional: 0,
@@ -113,10 +113,6 @@
       },
       fetchData: function(){
         api.leaderboard([], this.hackathonId).then(leaderboard => {
-          console.log(leaderboard);
-          if(leaderboard && leaderboard instanceof Array) {
-            this.lastPage = Math.ceil(leaderboard.length / this.limit)
-          }
           let classes = {
             professional: 0,
             university: 0,
@@ -124,6 +120,9 @@
           };
           let countries = [];
           let country_count = 0;
+          let org_count = 0;
+          let org_ids = [];
+
           leaderboard.forEach(function(item){
             if (item.level == "Professional"){
               classes.professional += 1;}
@@ -136,9 +135,15 @@
               countries.push(item.country);
               country_count++;
             }
+            if (item.organization_id && org_ids.indexOf(item.organization_id) === -1){
+              org_ids.push(item.organization_id);
+              org_count++;
+            }
           });
-          console.log(countries);
+
+          this.metric.organizations = org_count;
           this.metric.countries = country_count;
+          this.metric.players = leaderboard.length;
           this.classes = classes;
         });
       }

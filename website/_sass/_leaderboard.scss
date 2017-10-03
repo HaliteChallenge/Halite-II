@@ -46,12 +46,25 @@
     position: relative;
 
     .filter-handler {
-      display: table;
-
+      line-height: 38px;
+      margin-bottom: 10px;
+      > *{
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+      .v-select{
+        display: inline-block;
+        vertical-align: middle;
+        min-width: 250px;
+      }
+      .form-group{
+        margin-bottom: 0;
+      }
       .handler-item {
-        display: table-cell;
+        display: inline-block;
         background-color: #000;
-        line-height: 38px;
+        
         padding: 0 10px;
 
         .handler-item-img {
@@ -60,6 +73,15 @@
         }
         .handler-item-text {
           margin-left: 10px;
+        }
+      }
+      > a{
+        vertical-align: middle;
+        color: $foreground;
+        cursor: pointer;
+        &:hover{
+          text-decoration: none;
+          color: $yellow;
         }
       }
     }

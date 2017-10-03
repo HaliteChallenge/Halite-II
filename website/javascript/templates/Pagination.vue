@@ -60,6 +60,7 @@
     },
     methods: {
       updatePage: function(page) {
+        console.log(this.page);
         if(page > this.lastPage || page === this.page) return;
         this.changePage(page);
       }
@@ -75,19 +76,22 @@
     }
     a {
       margin-right: 10px;
-      color: inherit;
-
+      color: #6E757C;
       img {
         height: 18px;
       }
+      &.underline {
+        text-decoration: underline;
+        color: #6E757C;
+      }
+      &.disabled {
+        text-decoration: none;
+        color: #ECFFFB;
+        cursor: text;
+      }
     }
+
   }
 
-  .underline {
-    text-decoration: underline;
-  }
-  .disabled {
-    text-decoration: none;
-    cursor: text;
-  }
+  
 </style>
