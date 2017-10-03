@@ -139,7 +139,7 @@
     }
     .dropdown-toggle{
       max-height: 94px;
-      overflow: scroll;
+      overflow-y: auto;
       .selected-tag{
         max-width: 150px;
         padding-right: 25px;
