@@ -3,21 +3,6 @@
     <div class="upload-state" v-if="view == viewList.UPLOAD">
       <h2>Your bot</h2>
       <p class="upload-state-filename"><span class="icon-document"></span> {{botFile.name}}</p>
-      <div class="upload-state-options">
-        <div class="upload-state-option-item" @click="updateUploadType(true)">
-          <span :class="{'ha-checkbox': true, 'ha-checkbox-checked': newUpload}"><span></span></span>
-          Upload as a new bot
-        </div>
-        <div class="upload-state-option-item" v-if="hasBots" @click="updateUploadType(false)">
-          <span :class="{'ha-checkbox': true, 'ha-checkbox-checked': !newUpload}"><span></span></span>
-          Upgrade an existing bot
-        </div>
-      </div>
-      <div class="upload-state-select-bot" v-if="hasBots">
-        <select name="" id="" class="form-control" @change="changeBot($event.target.value)">
-          <option :value="bot.bot_id" :key="bot.bot_id" v-for="bot in botsList">{{`${user.username} v${bot.version_number}`}}</option>
-        </select>
-      </div>
       <div class="upload-state-buttons">
         <a @click="cancel">Cancel</a>
         <button class="btn-ha btn-ha-lg" @click="upload">Submit</button>
@@ -67,7 +52,6 @@
           SUCCESS: 'SUCCESS'
         },
         view: 'UPLOAD',
-        newUpload: true,
         baseUrl: _global.baseUrl,
         selectedBot: null,
         uploadProgress: 0,
@@ -84,41 +68,19 @@
       },
       bot: {
         get: function(){
-          if (!this.newUpload){
-            if ( this.selectedBot !== null ){
+            if (this.selectedBot !== null ){
               return this.selectedBot;
             } else if (this.hasBots) {
-              return this.botsList[0];
+             return this.botsList[0];
             }
+            
             return null;
           }
-          return null;
-        }
-      },
-      botId: {
-        get: function(){
-          let bot_id = null
-          const selectedBot = this.bot;
-
-          if (!this.newUpload){
-            bot_id = selectedBot != null ? selectedBot.bot_id : null;
-          }
-
-          return bot_id;
-        }
       }
     },
     methods: {
-      updateUploadType: function(type){
-        this.newUpload = type;
-      },
       cancel: function(){
         this.$parent.currentView = 'upload';
-      },
-      changeBot: function(value){
-        const selectedBot = _.find( this.botsList, (bot) => (bot.bot_id = parseInt(value)) );
-        console.log(selectedBot);
-        this.selectedBot = selectedBot ? selectedBot.bot_id : null;
       },
       changeView: function(view){
         if (this.viewList[view]){
@@ -127,7 +89,6 @@
       },
       upload: function(){
         const user_id = this.user.user_id;
-        const bot_id = this.botId;
         let my_bot_present = false;
         JSZip.loadAsync(this.botFile, () => {                          
           }).then((zip) => {
@@ -150,7 +111,7 @@
                 return;
               }
 
-              api.update_bot(user_id, bot_id, this.botFile, (progress) => {
+              api.update_bot(user_id, 0, this.botFile, (progress) => {
                 console.log('uploading ', this.uploadProgress);
                 this.uploadProgress = Math.floor(progress * 100);
                 }).then(() => {

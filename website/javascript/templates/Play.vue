@@ -8,11 +8,6 @@
         <div class="page-header">
           <h1>PLAY A HALITE AI BOT</h1>
         </div>
-        <div class="line-container line-container-sm"><i class="xline xline-top"></i></div>
-          <div class="page-description page-description-sm">
-            <p>You can either submit a bot to have it start playing games, or you can preview a bot by uploading a replay file that was generated offline.</p>
-          </div>
-        <div class="line-container line-container-sm"><i class="xline xline-top"></i></div>
       </div>
       <div class="row play-upload-section">
         <div class="col-sm-6">
