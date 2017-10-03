@@ -18,7 +18,7 @@
         <h2>Success!</h2>
         <p class="upload-state-desc">Your bot: {{botFile.name}} <br>New name: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
         <div class="upload-state-buttons">
-          <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a>
+          <!-- <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a> -->
           <a class="btn-ha btn-ha-lg" href="/user?me">See your result</a>
         </div>
       </div>
