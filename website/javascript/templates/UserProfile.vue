@@ -20,7 +20,7 @@
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
-                    <h2><span class="icon-tier-5"></span> rank 5, diamond tier</h2>
+                    <h2><span :class="'icon-tier-' + 4"></span> rank {{ user.rank }}, diamond tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Points</h3>
@@ -50,7 +50,7 @@
                             <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
                         </ul>
                     </div>
-                    <a class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
+                    <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
                 </div>
             </div>          
         </div>
