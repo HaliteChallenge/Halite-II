@@ -60,13 +60,15 @@
                     <div class="line-container"><i class="xline xline-top"></i></div>
 
                     <h2 id="section_account_info" class="form-heading">Account info</h2>
+
                     <div class="form-group">
-                        <label for="country">Username(as show On Github)</label>
+                        <label for="country">Username (as show On Github)</label>
                         <div class="relative-container">
-                            <input type="text" class="form-control" placeholder="Julskast" disabled>
+                            <input type="text" class="form-control" placeholder="Enter your username" disabled>
                             <i class="fa fa-lock lock"></i>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label for="country">Which country will you be playing from?<span class="text-danger">*</span></label>
                         <v-select
@@ -86,6 +88,56 @@
                             :options="regions">
                         </v-select>
                     </div>
+
+                    <div class="form-group">
+                        <label for="country">Name (Optional)</label>
+                        <div class="relative-container">
+                            <input type="text" class="form-control" placeholder="Enter your name">
+                            <i class="fa fa-lock lock"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Bio (Optional)</label>
+                        <div class="relative-container">
+                            <input type="text" class="form-control" placeholder="Julskast" disabled>
+                            <i class="fa fa-lock lock"></i>
+                        </div>
+                    </div>
+
+                    <div class="line-container"><i class="xline xline-top"></i></div>
+
+                    <h2 id="section_account_info" class="form-heading">Email Preference</h2>
+
+                    <p>Notifications go to your primary email</p>
+                    <table class="table table-leader">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Email Type</th>
+                                <th>level</th>
+                                <th>Make Primary</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>julskast@msn.com</td>
+                                <td>Github</td>
+                                <td>Secondary</td>
+                                <td><input type="checkbox" name="" id=""></td>
+                                <td><a href="#" class="text-danger"><span class="icon-delete"></span></a></td>
+                            </tr>
+                            <tr>
+                                <td>julskast@msn.com</td>
+                                <td>Github</td>
+                                <td>Secondary</td>
+                                <td><input type="checkbox" name="" id=""></td>
+                                <td><a href="#" class="text-danger"><span class="icon-delete"></span></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>

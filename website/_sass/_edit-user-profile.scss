@@ -1,15 +1,15 @@
 .edit-user-container{
   padding-top: 20px;
-  th{
-    background-color: #1c1a27 !important;
-    border-top: 1px solid #363347 !important;
-  }
-  td{
-    background-color: #000 !important;
-    &:nth-of-type(4), &:nth-of-type(5){
-      text-align: center;
-    }
-  }
+  // th{
+  //   background-color: #1c1a27 !important;
+  //   border-top: 1px solid #363347 !important;
+  // }
+  // td{
+  //   background-color: #000 !important;
+  //   &:nth-of-type(4), &:nth-of-type(5){
+  //     text-align: center;
+  //   }
+  // }
   a{
       color: $yellow;
     &.base{
@@ -83,6 +83,8 @@
   .line-container{
     position: relative;
     width: 100%;
+    margin-top: 30px;
+    padding-bottom: 30px;
   }
   .form-control[disabled]{
     background-color: #000;
