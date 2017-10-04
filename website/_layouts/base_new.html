@@ -25,6 +25,15 @@
         r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
         a.appendChild(r);
     })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+
+function handleOutboundLinkClicks(category, action, label) {
+  ga('send', 'event', {
+    eventCategory: category,
+    eventAction: action,
+    eventLabel: label
+  });
+}
+
 </script>
 
 
@@ -100,7 +109,7 @@
                 <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Events</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
+                <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-forum','spotlight');return true;" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
             </ul>
           <ul class="nav navbar-nav navbar-right not-logged-in">
             <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
@@ -136,8 +145,8 @@
             <li><a href="{{ site.baseurl }}/about/terms-and-conditions">Terms and Conditions</a></li>
             <li><a href="{{ site.baseurl }}/about/privacy">Privacy Policy</a></li>
             <li><a href="/about/frequently-asked-questions">FAQ</a></li>
-            <li><a href="https://2016.halite.io" target="_blank">Halite I</a></li>
-            <li><a href="https://status.halite.io" target="_blank">Status</a></li>
+            <li><a href="https://2016.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-halite1','footer');return true;" target="_blank">Halite I</a></li>
+            <li><a href="https://status.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-status','footer');return true;" target="_blank">Status</a></li>
           </ul>
         </div>
       </nav>
@@ -162,10 +171,10 @@
                 Follow us
               </p>
               <p class="footer-social-icons">
-                <a href="https://www.reddit.com/r/Halite/" target="_blank"><i class="fa fa-reddit-alien"></i></a>
-                <a href="https://www.facebook.com/haliteAI/" target="_blank"><i class="fa fa-facebook-official"></i></a>
-                <a href="https://twitter.com/intent/follow?screen_name=haliteai" target="_blank"><i class="fa fa-twitter"></i></a>
-                <a href="https://github.com/halitechallenge/Halite-II" target="_blank"><i class="fa fa-github"></i></a>
+                <a href="https://www.reddit.com/r/Halite/" onclick="javascript:handleOutboundLinkClicks('follow', 'follow-reddit','footer');return true;" target="_blank"><i class="fa fa-reddit-alien"></i></a>
+                <a href="https://www.facebook.com/haliteAI/" onclick="javascript:handleOutboundLinkClicks('follow', 'follow-facebook','footer');return true;" target="_blank"><i class="fa fa-facebook-official"></i></a>
+                <a href="https://twitter.com/intent/follow?screen_name=haliteai" onclick="javascript:handleOutboundLinkClicks('follow', 'follow-twitter','footer');return true;" target="_blank"><i class="fa fa-twitter"></i></a>
+                <a href="https://github.com/halitechallenge/Halite-II" onclick="javascript:handleOutboundLinkClicks('follow', 'follow-github','footer');return true;" target="_blank"><i class="fa fa-github"></i></a>
               </p>
             </div>
           </div>
