@@ -1,8 +1,11 @@
 <template>
     <div class="associate-container edit-user-container">
+        <div>
+            <a href="/user?me" class="back-arrow"><img class="arrow" :src="`${baseUrl}/assets/images/temp/back_arrow.png`"/><span>Back to your profile</span></a>
+        </div>
         <div class="row">
-            <div class="col-md-2">
-                <a href="/user?me" class="back-arrow"><img class="arrow" :src="`${baseUrl}/assets/images/temp/back_arrow.png`"/><span>Back to your profile</span></a>
+            <div class="col-md-3">
+                
                 <ul class="list-ha">
                     <li>
                         <i class="xline xline-top"></i>
@@ -14,7 +17,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-md-8 col-xm-10">
+            <div class="col-md-6 col-xm-10">
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Edit your profile</h1>
@@ -24,34 +27,12 @@
                     <div class="form-group">
                         <label for="country">Which of the following describes you best?<span class="text-danger">*</span></label>
                         <select class="form-control" id="level" v-model="level">
-                            <option>Professional</option>
+                            <option value="Professional">Professional</option>
                             <option value="University">University</option>
                             <option value="High School">High school</option>
                         </select>
                     </div>
 
-                    <div v-if="level === 'Professional'">
-                        <div class="form-group">
-                            <label for="work-email">Please share your work email</label>
-                            <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
-                            <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
-                        </div>
-                    </div>
-
-                    <div v-if="level === 'University'">
-                        <div class="form-group">
-                            <label for="school-email">Please share your school email</label>
-                            <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
-                            <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
-                        </div>
-                    </div>
-
-                    <div v-if="level === 'High School'">
-                        <div class="form-group">
-                            <label for="organization">Please enter your school</label>
-                            <input type="text" class="form-control" placeholder="School Name" v-model="organization">
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label for="organization">If you are playing as part of a Hackathon, please enter your code here</label>
                         <input type="text" class="form-control" v-model="hackathon_code" placeholder="Enter Hackathon password or code...">
@@ -64,7 +45,7 @@
                     <div class="form-group">
                         <label for="country">Username (as show On Github)</label>
                         <div class="relative-container">
-                            <input type="text" class="form-control" placeholder="Enter your username" disabled>
+                            <input type="text" class="form-control" placeholder="Enter your username" v-model="username" disabled>
                             <i class="fa fa-lock lock"></i>
                         </div>
                     </div>
@@ -74,79 +55,27 @@
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             label="label"
-                            v-model="country_code"
+                            :on-change="change_country"
+                            v-model="selected_country"
                             :options="country_options">
                         </v-select>
                     </div>
 
-                    <div class="form-group" v-if="country_code !== ''">
+                    <div class="form-group" v-if="selected_country">
                         <label for="country">State/province<span class="text-danger">*</span></label>
                         <v-select
                             placeholder="(would prefer not to disclose)"
-                            v-model="country_region_code"
+                            v-model="selected_region"
                             label="label"
                             :options="regions">
                         </v-select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="country">Name (Optional)</label>
-                        <div class="relative-container">
-                            <input type="text" class="form-control" placeholder="Enter your name">
-                            <i class="fa fa-lock lock"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="country">Bio (Optional)</label>
-                        <div class="relative-container">
-                            <input type="text" class="form-control" placeholder="Julskast" disabled>
-                            <i class="fa fa-lock lock"></i>
-                        </div>
-                    </div>
-
-                    <div class="line-container"><i class="xline xline-top"></i></div>
-
-                    <h2 id="section_account_info" class="form-heading">Email Preference</h2>
-
-                    <p>Notifications go to your primary email</p>
-                    <table class="table table-leader">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Email Type</th>
-                                <th>level</th>
-                                <th>Make Primary</th>
-                                <th>Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>julskast@msn.com</td>
-                                <td>Github</td>
-                                <td>Secondary</td>
-                                <td><input type="checkbox" name="" id=""></td>
-                                <td><a href="#" class="text-danger"><span class="icon-delete"></span></a></td>
-                            </tr>
-                            <tr>
-                                <td>julskast@msn.com</td>
-                                <td>Github</td>
-                                <td>Secondary</td>
-                                <td><input type="checkbox" name="" id=""></td>
-                                <td><a href="#" class="text-danger"><span class="icon-delete"></span></a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
                     <a class="cancel-href base" href="#" target="_self">Cancel</a>
-                    <div class="ha-button-container">
-                        <div>
-                            <a href="#" class="ha-button"><span>Update Profile</span></a>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn-ha">Update Profile</button>
                 </form>
             </div>
         </div>
@@ -164,6 +93,23 @@
         components: {vSelect},
         props: ['baseUrl'],
         data: function() {
+            return {
+                countries: [],
+                country_options: [],
+                data: iso3166.data,
+                username: '',
+                selected_country: null,
+                selected_region: null,
+                level: "Professional",
+                organization: null,
+                organizations: [],
+                error: null,
+                hackathon_code: '',
+                primary:true,
+                user: null,
+            };
+        },
+        mounted: function(){
             const countries = Object.entries(iso3166.data);
             countries.sort(function(country1, country2) {
                 const country1name = country1[1].name;
@@ -188,6 +134,7 @@
             Object.entries(iso3166.codes).forEach((item) => {
                 codes[item[1]] = item[0];
             });
+
             const new_countries = countries.map((item) => {
                 return {
                     label: item[1].name,
@@ -200,25 +147,31 @@
                 code: "NONE",
                 label: "(would prefer not to disclose)",
             });
+            this.countries = countries;
+            this.country_options = new_countries;
 
-            return {
-                countries: countries,
-                country_options: new_countries,
-                data: iso3166.data,
-                email: "",
-                country_code: "",
-                country_region_code: "",
-                level: "Professional",
-                organization: null,
-                organizations: [],
-                error: null,
-                hackathon_code: '',
-                primary:true,
-            };
+            // get current user 
+            api.me().then((me) => {
+                console.log(me);
+                // initialize the data
+                this.user = me;
+                this.level = me.level;
+                this.username = me.username
+                // country
+                this.selected_country = this.country_options.find((item) =>{
+                    return item.value == me.country_code;
+                });
+                this.selected_region  = this.regions.find((item) =>{
+                    return item.value = me.country_subdivision_code;
+                });
+                console.log(this.selected_country)
+            })
         },
         computed: {
             regions: function() {
-                const regions = Object.entries(iso3166.data[this.country_code.code].sub);
+                if (!this.selected_country) return [];
+
+                const regions = Object.entries(iso3166.data[this.selected_country.code].sub);
 
                 const codes = [];
 
@@ -252,10 +205,29 @@
 
                 return new_regions;
             },
+            country_code: function(){
+                return this.selected_country ? this.selected_country.value : null;
+            },
+            country_region_code: function(){
+                return this.selected_region ? this.selected_region.value : null;  
+            }
         },
         methods: {
-            submit: function() {
+            // reset selected region when change the country
+            change_country: function(value){
+                this.selected_country = value;
+                this.selected_region = null;
+            },
+            get_country: function(){
+                const selected_country =  this.country_options.find((item) => {
+                    return item.value == this.country_code.value;
+                });
+                return selected_country;
+            },
+            submit: function(e) {
+
                 let request = {
+                    "user_id": this.user.user_id,
                     "level": this.level,
                     "organization_id": this.organization === "NONE" ? null : this.organization,
                 };
@@ -268,9 +240,9 @@
                         codes[iso3166.codes[code3]] = code3;
                     }
 
-                    request["country_code"] = this.country_code.value;
+                    request["country_code"] = this.country_code;
                     if (this.country_region_code !== "") {
-                        request["country_subdivision_code"] = this.country_region_code.value;
+                        request["country_subdivision_code"] = this.country_region_code;
                     }
                 }
 
@@ -279,14 +251,22 @@
                 }
 
                 // verify email
-                if (request["organization_id"] && (this.email === '')){
+                if (this.email === ''){
                     this.error = "Email is required";
                     return false;
                 }
+
+                // send request
+                api.register_me(request).then(() => {
+                    Alert.show('You have update profile successfully', 'success');
+                    console.log('updating user profile successfully');
+                }, (error) => {
+                    Alert.show(error.responseJSON.message, 'error');
+                    // this.error = error.responseJSON.message;
+                });
+
             },
-        },
-        mounted: function() {
-        },
+        }
     }
 </script>
 
