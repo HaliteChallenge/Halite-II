@@ -80,6 +80,13 @@ def give_ownership(top_dir, group, dir_perms):
             os.chmod(os.path.join(dirpath, filename), dir_perms)
 
 
+def rm_as_user(user, directory):
+    """Remove a directory tree as the specified user."""
+    subprocess.call(["sudo", "-H", "-u", user, "-s", "rm", "-rf", directory],
+                    stderr=subprocess.PIPE,
+                    stdout=subprocess.PIPE)
+
+
 def executeCompileTask(user_id, bot_id, backend):
     """Downloads and compiles a bot. Posts the compiled bot files to the manager."""
     logging.debug("Compiling a bot with userID %s\n" % str(user_id))
@@ -126,23 +133,22 @@ def executeCompileTask(user_id, bot_id, backend):
             errors = [COMPILE_ERROR_MESSAGE + traceback.format_exc()] + errors
             didCompile = False
 
-        if didCompile:
-            logging.debug("Bot did compile\n")
-            archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
-            backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
-        else:
-            logging.debug("Bot did not compile\n")
-            logging.debug("Bot errors %s\n" % str(errors))
+        try:
+            if didCompile:
+                logging.debug("Bot did compile\n")
+                archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
+                backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
+            else:
+                logging.debug("Bot did not compile\n")
+                logging.debug("Bot errors %s\n" % str(errors))
 
-        # Remove files as bot user (Python will clean up tempdir, but we don't
-        # necessarily have permissions to clean up files)
-        # TODO: factor this out into helper function, don't hardcode username
-        subprocess.call(["sudo", "-H", "-u", "bot_compilation", "-s", "rm", "-rf", temp_dir],
-                        stderr=subprocess.PIPE,
-                        stdout=subprocess.PIPE)
 
-        backend.compileResult(user_id, bot_id, didCompile, language,
-                              errors=(None if didCompile else "\n".join(errors)))
+            backend.compileResult(user_id, bot_id, didCompile, language,
+                                  errors=(None if didCompile else "\n".join(errors)))
+        finally:
+            # Remove files as bot user (Python will clean up tempdir, but we don't
+            # necessarily have permissions to clean up files)
+            rm_as_user("bot_compilation", temp_dir)
 
 
 def runGame(width, height, users):
@@ -208,9 +214,7 @@ def runGame(width, height, users):
         # manually because the bot might have made files it owns
         for user_index, user in enumerate(users):
             bot_user = "bot_{}".format(user_index)
-            subprocess.call(["sudo", "-H", "-u", bot_user, "-s", "rm", "-rf", temp_dir],
-                            stderr=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
+            rm_as_user(bot_user, temp_dir)
 
             # The processes won't necessarily be automatically cleaned up, so
             # let's do it ourselves
