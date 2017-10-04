@@ -41,8 +41,8 @@ auto test_aabb_circle(
 
 CollisionMap::CollisionMap(const hlt::Map& game_map,
                            const std::function<double(const hlt::Ship&)> radius_func) {
-    width = static_cast<int>(std::ceil(game_map.map_width / CELL_SIZE));
-    height = static_cast<int>(std::ceil(game_map.map_height / CELL_SIZE));
+    width = static_cast<int>(std::ceil(static_cast<double>(game_map.map_width) / CELL_SIZE));
+    height = static_cast<int>(std::ceil(static_cast<double>(game_map.map_height) / CELL_SIZE));
 
     std::vector<std::vector<hlt::EntityId>> row(height, std::vector<hlt::EntityId>());
     cells.resize(width, row);
