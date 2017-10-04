@@ -15,12 +15,10 @@
 #include <vector>
 
 #include "Constants.hpp"
-#include "Globals.hpp"
 #include "Log.hpp"
 #include "Entity.hpp"
 #include "Map.hpp"
 #include "Move.hpp"
-#include "Behavior.hpp"
 
 namespace hlt {
     static auto get_string() -> std::string {
@@ -97,11 +95,12 @@ namespace hlt {
     }
 
     static auto parse_map(std::string& input) -> Map {
-        auto map = Map(map_width, map_height);
-        std::stringstream iss(input);
-
-        int num_players;
+        int map_width, map_height, num_players;
+        std::stringstream iss(get_string());
+        iss >> map_width >> map_height;
         iss >> num_players;
+
+        auto map = Map(map_width, map_height);
 
         // Meaningless loop indices, used as bookkeeping
         for (auto i = 0; i < num_players; i++) {
@@ -172,12 +171,9 @@ namespace hlt {
      */
     static auto initialize(std::string bot_name) -> std::pair<PlayerId, Map> {
         std::cout.sync_with_stdio(false);
-        my_tag = static_cast<PlayerId>(std::stoi(get_string()));
+        auto my_tag = static_cast<PlayerId>(std::stoi(get_string()));
 
         Log::open(std::to_string(static_cast<int>(my_tag)) + bot_name + ".log");
-
-        std::stringstream iss(get_string());
-        iss >> map_width >> map_height;
 
         auto initial_map = get_map();
 
