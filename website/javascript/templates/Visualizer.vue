@@ -47,9 +47,9 @@
               <span class="replay-btn">
                 <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
               </span>
-              <span class="replay-btn">
+              <!-- <span class="replay-btn">
                 <span class="icon-volumn"></span>
-              </span>
+              </span> -->
               <i class="xline xline-right" style="right: 0; top: 35%"></i>
             </div>
             <div class="game-replay-progress">
