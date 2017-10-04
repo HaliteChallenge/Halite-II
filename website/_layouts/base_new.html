@@ -40,10 +40,12 @@ function handleOutboundLinkClicks(category, action, label) {
 <script>
   function check()
   {
+    handleOutboundLinkClicks('subscribe','click-to-subscribe','footer')
     if(!document.getElementById("tmpid").checkValidity())
     {
       document.getElementById("status").style.color = "red"
       document.getElementById("status").textContent = "Invalid email.."
+      handleOutboundLinkClicks('subscribe-error','click-to-subscribe','footer')
     }
     else
     {
@@ -54,6 +56,7 @@ function handleOutboundLinkClicks(category, action, label) {
       xhr.send()
       document.getElementById("status").style.color = "green"
       document.getElementById("status").textContent = "You are subscribed to Halite II updates"
+      handleOutboundLinkClicks('subscribe-success','click-to-subscribe','footer')
     }
   }
 </script>
@@ -112,8 +115,8 @@ function handleOutboundLinkClicks(category, action, label) {
                 <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-forum','spotlight');return true;" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
             </ul>
           <ul class="nav navbar-nav navbar-right not-logged-in">
-            <li><a href="{{ site.login_server_url }}/github"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
-            <li><a href="{{ site.login_server_url }}/github">Sign In</a></li>
+            <li><a href="{{ site.login_server_url }}/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
+            <li><a href="{{ site.login_server_url }}/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;">Sign In</a></li>
           </ul>
         </div>
         <div id="user-profile-bar-container"></div>
@@ -164,7 +167,7 @@ function handleOutboundLinkClicks(category, action, label) {
             </div>
             <div class="footer-copy">
               <img src="{{ site.baseurl }}/assets/images/full_logo.svg" class="footer-copy-logo" alt="">
-              <p> &copy; Halite by <a class="base-link" href="https://www.twosigma.com" target="_blank">Two Sigma</a>, 2017. All rights reserved.</p>
+              <p> &copy; Halite by <a class="base-link" href="https://www.twosigma.com" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-ts','footer');return true;" target="_blank">Two Sigma</a>, 2017. All rights reserved.</p>
             </div>
             <div class="footer-social">
               <p class="footer-social-top">

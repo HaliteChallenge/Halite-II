@@ -276,7 +276,7 @@
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
-                                        <a href="https://www.twosigma.com/careers" class="ha-button"><span>EXPLORE CAREERS</span></a>
+                                        <a v-on:click="gaData('click-external', 'click-tscareers','spotlight')" href="https://www.twosigma.com/careers" class="ha-button"><span>EXPLORE CAREERS</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +321,7 @@
 
 <script>
    import * as api from "../api";
+   import * as utils from "../utils";
 
    export default {
        name: "home",
@@ -342,10 +343,12 @@
        },
        methods: {
            invite: function() {
+                gaData('invite','click-to-invite', 'home')
                 if(!document.getElementById("intmpid").checkValidity())
                 {
                     document.getElementById("invitestatus").style.color = "red"
                     document.getElementById("invitestatus").textContent = "Invalid email.."
+                    gaData('invite-error','click-to-invite', 'home')
                 }
                 else
                 {
@@ -353,6 +356,7 @@
                     api.invitefriend(content).then(status => {
                         document.getElementById("invitestatus").style.color = "green"
                         document.getElementById("invitestatus").textContent = "Invitation sent..."
+                        gaData('invite-success','click-to-invite', 'home')
                     })
                 }
            },
@@ -371,6 +375,9 @@
              };
 
              document.getElementsByTagName('head')[0].appendChild(s);
+           },
+           gaData: function(category, action, label) {
+             utils.gaEvent(category, action, label);
            }
        },
    }

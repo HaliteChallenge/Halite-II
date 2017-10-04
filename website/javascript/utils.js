@@ -11,6 +11,14 @@ export function tierClass(tier){
   }
 }
 
+export function gaEvent(category, action, label) {
+  ga('send', 'event', {
+    eventCategory: category,
+    eventAction: action,
+    eventLabel: label
+  });
+}
+
 export const Alert = {
   show: function(message = "there is an error", type = 'error'){
     let outerContainer = document.getElementById('message-placeholder');
