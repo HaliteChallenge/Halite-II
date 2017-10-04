@@ -44,7 +44,7 @@
                 console.log(files);
                 if (files.length > 0) {
                     this.$parent.botFile = files[0];
-                    this.$parent.currentView = 'botUpload';ZZZZ
+                    this.$parent.currentView = 'botUpload';
                 }
             }
         },
