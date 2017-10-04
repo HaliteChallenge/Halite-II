@@ -8,11 +8,11 @@
                 </div>
                 <div class="user-profile-detail">
                     <i class="xline xline-top"></i>
-                    <a :href="'https://github.com/' + user.username">{{ user.username }}</a>
+                    <a class="user-name" :href="'https://github.com/' + user.username">{{ user.username }}</a>
                     <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
                     <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
                     <p>From New York, USA</p>
-                    <p>Bots in 
+                    <p>Bots in
                         <template v-for="(lang, index) in botLang">
                             <span class="hl">{{lang}}</span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
@@ -52,7 +52,7 @@
                     </div>
                     <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
                 </div>
-            </div>          
+            </div>
         </div>
         <div class="col-md-6">
             <section class="profile-section">
@@ -85,14 +85,14 @@
                                 </time>
                             </td>
                             <td>
-                                <a v-for="player in Object.keys(game.players)"
-                                   :href="'/user?user_id=' + player"
+                                <a v-for="player in game.playerSorted"
+                                   :href="'/user?user_id=' + player.id"
                                    class="game-participant"
-                                   v-bind:class="{ 'timed-out': game.players[player].timed_out }"
-                                   :title="game.players[player].timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
-                                    <img :alt="player" :src="profile_images[player]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                   v-bind:class="{ 'timed-out': player.timed_out }"
+                                   :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
+                                    <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
                                     <span class="rank">
-                                        {{ game.players[player].rank }}
+                                        {{ player.rank }}
                                     </span>
                                 </a>
                             </td>
@@ -291,19 +291,22 @@
                     query += `&filter=timed_out,=,${this.user.user_id}`;
                 }
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
-                return $.get(url)
-                    .then((data) => {
-                        this.games = data;
-                        for (let game of data) {
-                            for (let participant of Object.keys(game.players)) {
-                                if (this.profile_images[participant]) continue;
-                                this.profile_images[participant] = "loading";
+                return $.get(url).then((data) => {
+                    this.games = data;
+                    for (let game of data) {
+                        for (let participant of Object.keys(game.players)) {
+                            game.players[participant].id = participant;
+                            if (this.profile_images[participant]) continue;
+                            this.profile_images[participant] = "loading";
 
-                                api.get_user(participant).then((user) => {
+                            api.get_user(participant).then((user) => {
                                 this.profile_images[participant] = api.make_profile_image_url(user.username);
                                 this.$forceUpdate();
                             });
                         }
+                        const players = Object.values(game.players).sort((r1, r2) => {return r2.rank - r1.rank;});
+                        game.playerSorted = players;
+                        console.log(players);
                     }
                 });
             },
