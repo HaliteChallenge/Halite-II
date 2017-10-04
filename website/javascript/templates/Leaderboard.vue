@@ -140,7 +140,7 @@
         organization_filter: "",
         country_filter: "",
         page: 1,
-        limit: 10,
+        limit: 70,
         lastPage: 0,
         organizations: [],
         classes: {

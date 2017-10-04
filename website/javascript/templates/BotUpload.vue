@@ -3,7 +3,7 @@
     <div class="upload-state" v-if="view == viewList.UPLOAD">
       <h2>Bot File</h2>
       <p class="upload-state-desc"><span class="icon-document"></span> {{botFile.name}}</p>
-      <p class="upload-state-filename">New Bot Version: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
+      <p class="upload-state-filename">New Bot Version: {{`${user.username} v${bot === null ? 1 : parseInt(bot.version_number) + 1}`}}</p>
       <div class="upload-state-buttons">
         <a @click="cancel">CANCEL</a>
         <button class="btn-ha" @click="upload">SUBMIT YOUR BOT</button>
@@ -12,12 +12,12 @@
     <div class="upload-state" v-else-if="view == viewList.SUBMITTED">
       <img :src="`${baseUrl}/assets/images/icon-wait.svg`" alt="success" class="upload-state-icon">
       <h2>bot submitted. currently compiling.</h2>
-      <p class="upload-state-desc">Your bot: {{botFile.name}} <br>New name: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
+      <p class="upload-state-desc">Your bot: {{botFile.name}} <br>New name: {{`${user.username} v${bot === null ? 1 : parseInt(bot.version_number) + 1}`}}</p>
     </div>
     <div class="upload-state" v-else>
         <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
         <h2>Success!</h2>
-        <p class="upload-state-desc">New Bot Version: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
+        <p class="upload-state-desc">New Bot Version: {{`${user.username} v${bot === null ? 1 : parseInt(bot.version_number) + 1}`}}</p>
         <div class="upload-state-buttons">
           <!-- <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a> -->
           <a class="btn-ha btn-ha-lg" href="/user?me">See your result</a>
@@ -73,6 +73,8 @@
               return this.selectedBot;
             } else if (this.hasBots) {
              return this.botsList[0];
+            }else{
+              
             }
             
             return null;
@@ -112,7 +114,14 @@
                 return;
               }
 
-              api.update_bot(user_id, 0, this.botFile, (progress) => {
+              let bot_id = 0;
+              console.log(this.hasBots);
+              if(!this.hasBots)
+              {
+                bot_id = null;
+              }
+
+              api.update_bot(user_id, bot_id, this.botFile, (progress) => {
                 console.log('uploading ', this.uploadProgress);
                 this.uploadProgress = Math.floor(progress * 100);
                 }).then(() => {
@@ -121,7 +130,7 @@
                   this.view = this.viewList.SUBMITTED;
                   this.checkBotStatus();
                 }, (error) => {
-                  console.log('error');
+                  console.log(error);
                   this.view = this.viewList.UPLOAD;
                   this.enableMessage('error', error.message);
                   this.errorMessage = error.message;
