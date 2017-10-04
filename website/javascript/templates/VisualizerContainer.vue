@@ -4,6 +4,7 @@
       <halite-upload-zone
         title="Replay a File"
         description="Drop a replay file here to upload"
+        buttonText = "Select a replay file"
         :icon="`${baseUrl}/assets/images/icon-replay.svg`"
         v-on:change="play_replay"
         :progressBar="is_downloading"

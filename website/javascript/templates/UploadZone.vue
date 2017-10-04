@@ -9,7 +9,7 @@
             <p class="upload-zone-desc">{{description}}</p>
 
             <div class="upload-zone-btn text-center">
-                <button class="btn-ha btn-ha-lg"><span>Select File</span></button>
+                <button class="btn-ha btn-ha-lg"><span>{{ buttonText }}</span></button>
             </div>
 
             <p class="hidden" v-if="message">{{ message }}</p>
@@ -29,7 +29,7 @@
 <script>
     export default {
         name: "halite-upload-zone",
-        props: ["title", "message", "icon", "description", "progress", "progressBar"],
+        props: ["title", "message", "icon", "description", "progress", "progressBar","buttonText"],
         data: function() {
             return {
                 drag_over: false,
