@@ -6,7 +6,7 @@
       <p class="upload-state-filename">New Bot Version: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
       <div class="upload-state-buttons">
         <a @click="cancel">CANCEL</a>
-        <button class="btn-ha btn-ha-lg" @click="upload">SUBMIT YOUR BOT</button>
+        <button class="btn-ha" @click="upload">SUBMIT YOUR BOT</button>
       </div>
     </div>
     <div class="upload-state" v-else-if="view == viewList.SUBMITTED">
@@ -17,7 +17,7 @@
     <div class="upload-state" v-else>
         <img :src="`${baseUrl}/assets/images/icon-success.svg`" alt="success" class="upload-state-icon">
         <h2>Success!</h2>
-        <p class="upload-state-desc">Your bot: {{botFile.name}} <br>New name: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
+        <p class="upload-state-desc">New Bot Version: {{`${user.username} v${parseInt(bot.version_number) + 1}`}}</p>
         <div class="upload-state-buttons">
           <!-- <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a> -->
           <a class="btn-ha btn-ha-lg" href="/user?me">See your result</a>
@@ -106,7 +106,7 @@
             
               if(!my_bot_present)
               {
-                const error_message = "The zip archive does not contain a root MyBot.{ext} file. Please make sure that MyBot.{ext} is present in the root of the zip archive"
+                const error_message = "The zip archive does not contain a root MyBot.{ext} file. MyBot.{ext} is required to be present in the root of the zip file."
                 this.enableMessage('error', error_message);
                 this.errorMessage = error_message;
                 return;
@@ -117,7 +117,7 @@
                 this.uploadProgress = Math.floor(progress * 100);
                 }).then(() => {
                   console.log('success');
-                  this.enableMessage('success', "Your bot has been submitted");
+                  this.enableMessage('success', "Your bot has been submitted and will start playing games in the next 15 mins.");
                   this.view = this.viewList.SUBMITTED;
                   this.checkBotStatus();
                 }, (error) => {

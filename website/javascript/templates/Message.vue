@@ -41,10 +41,8 @@
       margin-right: 15px;
     }
     &-type{
-      font-family: Teko;
       text-transform: uppercase;
       vertical-align: center;
-      font-size: 24px;
       line-height: 30px;
     }
 
