@@ -12,10 +12,14 @@ to log anything use the logging module.
 """
 # Let's start by importing the Halite Starter Kit so we can interface with the Halite engine
 import hlt
+# Then let's import the logging module so we can print out information
+import logging
 
 # GAME START
 # Here we define the bot's name as Settler and initialize the game, including communication with the Halite engine.
 game = hlt.Game("Settler")
+# Then we print our start message to the logs
+logging.info("Starting my Settler bot!")
 
 while True:
     # TURN START

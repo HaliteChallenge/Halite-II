@@ -29,7 +29,7 @@
   }
   &-detail{
     padding: 20px 0;
-    position: relative; 
+    position: relative;
     opacity: 0.8;
     font-size: 16px;
     letter-spacing: 0.5px;
@@ -129,10 +129,32 @@
   }
 }
 
+.user-profile-avatar {
+  text-align: center;
+
+  img {
+    max-width: 229px;
+    max-height: 230px;
+    display: inline;
+  }
+}
+
+.user-profile-detail {
+  .user-name {
+    font-size: 150%;
+  }
+}
+
 .profile-section{
   position: relative;
   padding-top: 20px;
   padding-bottom: 20px;
+  .btn-group {
+    display: block;
+    button {
+      float: none;
+    }
+  }
   .table-leader > thead > tr > th {
     background-color: #1c1a27;
   }
