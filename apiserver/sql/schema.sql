@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE `badge` (
   `id` mediumint(8) unsigned NOT NULL,
   `name` varchar(256) NOT NULL,
@@ -242,3 +244,5 @@ CREATE TABLE `user_tier_history` (
   PRIMARY KEY (`user_id`,`tier`),
   CONSTRAINT `user_tier_history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET FOREIGN_KEY_CHECKS = 1;
