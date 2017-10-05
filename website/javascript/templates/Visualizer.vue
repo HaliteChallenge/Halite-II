@@ -275,11 +275,9 @@
 
   // just for electron
   if (window && window.process && window.process.type){
-      console.log("Running in electron");
       libhaliteviz.setAssetRoot("assets/js/");
   }
   else{
-      console.log("Not running in electron");
       libhaliteviz.setAssetRoot("/assets/js/");
   }
   const loadGame = (game) => {

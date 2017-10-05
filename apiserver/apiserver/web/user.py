@@ -34,7 +34,7 @@ def make_user_record(row, *, logged_in, total_users=None):
     else:
         user["tier"] = None
 
-    if row["email"] is None and logged_in:
+    if row.get("personal_email") is None and logged_in:
         # User is new user, indicate this when they are logged in
         user["is_new_user"] = True
 
@@ -315,12 +315,12 @@ def get_user_season1(intended_user, *, user_id):
         row = conn.execute(query).first()
         if not row:
             raise util.APIError(404, message="No user found.")
-        
+
         season_1_query = model.halite_1_users.select(
             model.halite_1_users.c.username == row["username"])
 
         season_1_row = conn.execute(season_1_query).first()
-        
+
         if not season_1_row:
             raise util.APIError(404, message="No user found for Halite Season 1.")
 
