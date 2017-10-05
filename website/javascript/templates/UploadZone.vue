@@ -51,26 +51,27 @@
     .upload-zone {
         position: relative;
 
-    h2 {
-        text-align: center;
-        font-weight: 300;
-    }
+        h2 {
+            text-align: center;
+            font-weight: 300;
+        }
 
-    input {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-        opacity: 0;
-    }
+        input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
 
-    &.dragging {
-         background: blue;
-         color: white;
-     }
+        &.dragging {
+            // background: blue;
+            // color: white;
+            // border-color: $yellow;
+        }
     }
 </style>

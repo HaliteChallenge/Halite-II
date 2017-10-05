@@ -4,7 +4,7 @@
       <div class="panel-heading" role="tab" id="heading_player_details">
         <a data-toggle="collapse" href="#panel_filter" aria-expanded="true" aria-controls="panel_filter">
           <i class="xline xline-top"></i>
-          <h4>FILTERS</h4>
+          <h4>Filters</h4>
           <span class="toggle-icon expand"></span>
           <i class="xline xline-bottom"></i>
         </a>
