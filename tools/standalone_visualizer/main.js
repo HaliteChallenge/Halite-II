@@ -28,7 +28,7 @@ function createWindow() {
 electron.app.on("ready", createWindow);
 electron.app.on("window-all-closed", function() {
     if (process.platform !== "darwin") {
-        app.quit();
+        electron.app.quit();
     }
 });
 electron.app.on("activate", function() {
