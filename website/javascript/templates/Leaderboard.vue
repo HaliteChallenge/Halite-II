@@ -4,16 +4,14 @@
       <div class="panel-heading" role="tab" id="heading_player_details">
         <a data-toggle="collapse" href="#panel_filter" aria-expanded="true" aria-controls="panel_filter">
           <i class="xline xline-top"></i>
-          <h4>Filter</h4>
+          <h4>FILTERS</h4>
           <span class="toggle-icon expand"></span>
           <i class="xline xline-bottom"></i>
         </a>
       </div>
       <div class="panel-collapse collapse in" role="tabpanel" id="panel_filter" aria-labelledby="panel_filter">
         <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
-          <div class="form-header">
-            <!-- <i class="xline xline-bottom"></i> -->
-            
+          <div class="form-header">>           
             <div class="filter-handler" v-if="filter_handle_view==='normal'">
               <div class="handler-item" @click="openSaveFilter">
                 <span class="icon-disk"></span>
@@ -459,10 +457,6 @@
       changePage: function(page) {
         this.page = page;
         this.update_filter();
-        // api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-        //   this.leaderboard = leaderboard;
-        //   this.page = page;
-        // });
       },
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
