@@ -115,17 +115,16 @@ export class Ship {
 
         this.halo.alpha = health_factor;
 
-        let vel_x = record.vel_x;
-        let vel_y = record.vel_y;
+        let vel_x = 0;
+        let vel_y = 0;
 
         // Draw the exhaust trail based on the thrust command issued this turn
         this.exhaust.visible = false;
         if (this.visualizer.frame < this.visualizer.replay.frames.length - 1) {
             let moves = this.visualizer.replay.moves[this.visualizer.frame];
             let move = moves[record.owner][0][record.id];
-            if (move && move.type === "thrust") {
-                // Adds the command to the ship velocity, though without
-                // drag/inertia, this is entirely pointless
+            if (move && move.type === "thrust" && record.docking.status === "undocked") {
+                // Adds the command to the ship velocity
                 let angle = move.angle * Math.PI / 180;
                 vel_x += move.magnitude * Math.cos(angle);
                 vel_y += move.magnitude * Math.sin(angle);
