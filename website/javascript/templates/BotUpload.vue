@@ -30,6 +30,7 @@
   import * as api from "../api";
   import _ from 'lodash';
   import JSZip from 'jszip';
+  import * as utils from "../utils";
 
   export default{
     name: "BotUpload",
@@ -83,6 +84,7 @@
     },
     methods: {
       cancel: function(){
+        this.gaData('play', 'click-cancel-submit','play-submit-flow');
         this.$parent.currentView = 'upload';
       },
       changeView: function(view){
@@ -93,6 +95,7 @@
       upload: function(){
         const user_id = this.user.user_id;
         let my_bot_present = false;
+        this.gaData('play', 'click-confirm-bot','play-submit-flow');
         JSZip.loadAsync(this.botFile, () => {                          
           }).then((zip) => {
               zip.forEach(function (relativePath, zipEntry) { 
@@ -108,6 +111,7 @@
             
               if(!my_bot_present)
               {
+                this.gaData('play', 'submit-error-zip','play-submit-flow');
                 const error_message = "The zip archive does not contain a root MyBot.{ext} file. MyBot.{ext} is required to be present in the root of the zip file."
                 this.enableMessage('error', error_message);
                 this.errorMessage = error_message;
@@ -125,12 +129,12 @@
                 console.log('uploading ', this.uploadProgress);
                 this.uploadProgress = Math.floor(progress * 100);
                 }).then(() => {
-                  console.log('success');
+                  this.gaData('play', 'submit-success','play-submit-flow');
                   this.enableMessage('success', "Your bot has been submitted and will start playing games in the next 15 mins.");
                   this.view = this.viewList.SUBMITTED;
                   this.checkBotStatus();
                 }, (error) => {
-                  console.log(error);
+                  this.gaData('play', 'submit-error','play-submit-flow');
                   this.view = this.viewList.UPLOAD;
                   this.enableMessage('error', error.message);
                   this.errorMessage = error.message;
@@ -146,6 +150,7 @@
               const bot = _.find(bots, (i) => (i.bot_id === botId));
               if (bot.compilation_status == 'Successful'){
                 this.view = this.viewList.SUCCESS;
+                this.gaData('play', 'complilation-success','play-submit-flow')
               } else {
                 fetch();
               }
@@ -153,7 +158,10 @@
           }, this.getStatusDelay);
         }
         fetch();
-      }
+      },
+      gaData: function(category, action, label) {
+        utils.gaEvent(category, action, label);
+      },
     }
   }
 </script>

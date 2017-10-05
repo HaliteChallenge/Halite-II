@@ -1,7 +1,13 @@
 .table-leader{
   > thead > tr > th, 
   > tbody > tr > td{
-    padding: 15px 15px;
+    padding: 8px 15px;
+    vertical-align: top;
+    border-top: 0;
+    border-bottom: 0;
+  }
+  > thead > tr,
+  > tbody > tr{
     border-top: 1px solid #363347;
     border-bottom: 1px solid #363347;
   }
@@ -23,6 +29,19 @@
     [class*="icon-tier-"]{
       color: #E37222;
       font-size: 24px;
+    }
+  }
+
+  > tbody > tr:hover{
+    td {
+      border-top: 1px solid $yellow;
+      border-bottom: 1px solid $yellow;
+    }
+    td:first-child{
+      border-left: 1px solid $yellow;
+    }
+    td:last-child{
+      border-right: 1px solid $yellow;
     }
   }
 }

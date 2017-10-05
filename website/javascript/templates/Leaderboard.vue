@@ -1,83 +1,101 @@
 <template>
   <div class="leaderboard-container">
-    <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
-      <div class="form-header">
-        <i class="xline xline-bottom"></i>
-        <p class="t2 c-wht font-headline">FILTER</p>
-        <div class="filter-handler" v-if="filter_handle_view==='normal'">
-          <div class="handler-item" @click="openSaveFilter">
-            <span class="icon-disk"></span>
-            <span class="handler-item-text">Save Filter</span>
-          </div>
-          <div class="handler-item" @click="openViewFilter">
-            <span class="icon-folder"></span>
-            <span class="handler-item-text">View Filters</span>
-          </div>
-          <div class="handler-item" @click="clearFilter">
-            <span class="icon-remove"></span>
-            <span class="handler-item-text">Clear all</span>
-          </div>
-        </div>
-        <div class="filter-handler" v-if="filter_handle_view==='save'">
-          <label>Enter filter name</label>
-          <div class="form-group">
-            <input type="text" v-model="filter_name" placeholder="Enter name" class="form-control">
-          </div>
-          <button class="btn btn-sm" @click="saveFilter"><span>Save</span></button>
-          <a @click="resetFilterView"><span class="icon-remove"></span></a>
-        </div>
-        <div class="filter-handler" v-if="filter_handle_view==='view'">
-          <v-select
-            placeholder="Select filter"
-            label="name"
-            v-model="selected_filter"
-            :options="saved_filters">
-          </v-select>
-          <button class="btn btn-sm" @click="viewFilter"><span>View</span></button>
-          <a @click="resetFilterView"><span class="icon-remove"></span></a>
-        </div>
+    <div class="panel panel-stats">
+      <div class="panel-heading" role="tab" id="heading_player_details">
+        <a data-toggle="collapse" href="#panel_filter" aria-expanded="true" aria-controls="panel_filter">
+          <i class="xline xline-top"></i>
+          <h4>FILTERS</h4>
+          <span class="toggle-icon expand"></span>
+          <i class="xline xline-bottom"></i>
+        </a>
       </div>
-      <div class="filter-group">
-        <div class="input-group">
-          <v-select
-            multiple
-            placeholder="Usernames"
-            v-model="username_filter"
-            :options="users">
-          </v-select>
-          <v-select
-            multiple
-            placeholder="Tier"
-            v-model="tier_filter"
-            :options="levels">
-          </v-select>
-          <v-select
-            multiple
-            placeholder="Organization"
-            v-model="organization_filter"
-            :options="organizations">
-          </v-select>
-          <v-select
-            multiple
-            placeholder="Countries"
-            v-model="country_filter"
-            :options="countries">
-          </v-select>
-          <div>
-            <button class="btn"><span>APPLY FILTER</span></button>
+      <div class="panel-collapse collapse in" role="tabpanel" id="panel_filter" aria-labelledby="panel_filter">
+        <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
+          <div class="form-header">>           
+            <div class="filter-handler" v-if="filter_handle_view==='normal'">
+              <div class="handler-item" @click="openSaveFilter">
+                <span class="icon-disk"></span>
+                <span class="handler-item-text">Save Filter</span>
+              </div>
+              <div class="handler-item" @click="openViewFilter">
+                <span class="icon-folder"></span>
+                <span class="handler-item-text">View Filters</span>
+              </div>
+              <div class="handler-item" @click="clearFilter">
+                <span class="icon-remove"></span>
+                <span class="handler-item-text">Clear all</span>
+              </div>
+            </div>
+            <div class="filter-handler" v-if="filter_handle_view==='save'">
+              <label>Enter filter name</label>
+              <div class="form-group">
+                <input type="text" v-model="filter_name" placeholder="Enter name" class="form-control">
+              </div>
+              <button class="btn btn-sm" @click="saveFilter"><span>Save</span></button>
+              <a @click="resetFilterView"><span class="icon-remove"></span></a>
+            </div>
+            <div class="filter-handler" v-if="filter_handle_view==='view'">
+              <v-select
+                placeholder="Select filter"
+                label="name"
+                v-model="selected_filter"
+                :options="saved_filters">
+              </v-select>
+              <button class="btn btn-sm" @click="viewFilter"><span>View</span></button>
+              <a @click="resetFilterView"><span class="icon-remove"></span></a>
+            </div>
           </div>
-        </div>
+          <div class="filter-group">
+            <div class="input-group">
+              <v-select
+                multiple
+                placeholder="Usernames"
+                v-model="username_filter"
+                :options="filter_options.usernames_options">
+              </v-select>
+              <v-select
+                multiple
+                placeholder="Tier"
+                v-model="tier_filter"
+                :options="levels">
+              </v-select>
+              <v-select
+                multiple
+                placeholder="Organization"
+                v-model="organization_filter"
+                :options="filter_options.org_options">
+              </v-select>
+              <v-select
+                multiple
+                placeholder="Countries"
+                v-model="country_filter"
+                :options="filter_options.country_options">
+              </v-select>
+              <v-select
+                multiple
+                placeholder="Language"
+                v-model="language_filter"
+                :options="filter_options.language_options">
+              </v-select>
+              <div>
+                <button class="btn"><span>APPLY FILTER</span></button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
+
+    
     <table class="table table-leader">
       <thead>
         <tr>
-          <th>#</th>
+          <th class="text-center">Rank</th>
           <th>Player</th>
           <th>Score</th>
-          <th>Tier</th>
+          <th class="text-center">Tier</th>
           <th>Academic Status</th>
-          <th>Country</th>
+          <th class="text-center">Country</th>
           <th>Organization</th>
           <th>Language</th>
           <th>Last Submission</th>
@@ -85,14 +103,19 @@
       </thead>
       <tbody>
         <tr v-for="player in leaderboard">
-          <td>{{ player.rank || player.local_rank }}</td>
-          <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
-          <td>{{ Math.round(100 * player.score) / 100 }}</td>
+          <td class="text-center">{{ player.rank || player.local_rank }}</td>
           <td>
+            <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
+              <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
+              {{ player.username }}
+            </a>
+          </td>
+          <td>{{ Math.round(100 * player.score) / 100 }}</td>
+          <td class="text-center">
             <span :class="tierClass(player.tier || player.local_tier)"></span>
           </td>
           <td>{{ player.level }}</td>
-          <td>{{ getCountryName(player.country) }}</td>
+          <td class="text-center">{{ getCountryName(player.country) }}</td>
           <td>{{ player.organization }}</td>
           <td>{{ player.language }}</td>
           <td>{{ getFormattedDate(player.update_time)  }}</td>
@@ -133,14 +156,16 @@
         country_options.push({value: item['alpha-3'], label: item.name});
       });
       return {
+        contry_data: countries_data,
         countries: country_options,
         leaderboard: [],
         username_filter: "",
         tier_filter: "",
         organization_filter: "",
         country_filter: "",
+        language_filter: "",
         page: 1,
-        limit: 70,
+        limit: 25,
         lastPage: 0,
         organizations: [],
         classes: {
@@ -150,6 +175,7 @@
         },
         filter_handle_view: 'normal',
         users: [],
+        all_leaderboards: [],
         summary: [
           {
             icon: 'medal',
@@ -190,26 +216,8 @@
       };
     },
     mounted: function() {
-      api.list_organizations().then((orgs) => {
-        let organizations = [];
-        orgs.forEach((item) => {
-          organizations.push({value: item.organization_id, label: `${item.name} (${item.type})`});
-        })
-        this.organizations = organizations;
-
-        this.build_filters_from_url();
-        this.update_filter(true);
-      }, () => {
-        // update filter even though getting organization is failed
-        this.build_filters_from_url();
-        this.update_filter(true);
-      });
-
-      // this.build_filters_from_url();
-      // this.update_filter();
-
-      // get saved filter
-      // this.saved_filters = localStorage.saved_filters;
+      // start setup filter list
+      this.calculate_filters();
     },
     watch: {
       hackathonId: function(){
@@ -221,6 +229,61 @@
         let saved_filters = JSON.parse(localStorage.saved_filters);
 
         return saved_filters || [];
+      },
+
+      // getting the filter options
+      filter_options: function(){
+        let filters = {
+          language_options: [],
+          country_options: [],
+          org_options: [],
+          usernames_options: []
+        };
+
+        let language_options = [];
+        let country_codes = [];
+        let organization_ids = [];
+        let org_options = [];
+        let username_options = [];
+
+        this.all_leaderboards.forEach((user) => {
+          if (user.language && language_options.indexOf(user.language) == -1){
+            language_options.push(user.language);
+          }
+          if (user.country && country_codes.indexOf(user.country) == -1){
+            country_codes.push(user.country);
+          }
+          if (user.organization_id && organization_ids.indexOf(user.organization_id) == -1){
+            organization_ids.push(user.organization_id);
+            org_options.push({
+              label: user.organization,
+              value: user.organization_id
+            });
+          }
+          username_options.push(user.username);
+        })
+
+        // filter countries
+        // const country_options = [];
+        const country_options = countries_data.filter((country) => {
+          if (country_codes.indexOf(country['alpha-3']) !== -1){
+            console.log(country['alpha-3']);
+          }
+          return country_codes.indexOf(country['alpha-3']) != -1;
+        }).map((country) => {
+          return {
+            label: country.name,
+            value: country['alpha-3']
+          }
+        })
+
+        filters.language_options = language_options;
+        filters.country_codes = country_codes;
+        filters.country_options = country_options;
+        filters.org_options = org_options;
+        filters.usernames_options = username_options;
+
+        return filters;
       }
     },
     methods: {
@@ -236,7 +299,6 @@
           let param = item.split('=');
           params[param[0]] = param[1].split(',');
         });
-        console.log(params);
 
         // get username value
         if (params.username && params.username.length > 0 ){
@@ -253,7 +315,7 @@
 
         // get organization
         if (params.organization && params.organization.length > 0){
-          let selected = this.organizations.filter((item) => {
+          let selected = this.filter_options.org_options.filter((item) => {
             // return item.value == 16872;
             return params.organization.indexOf(item.value + "") != -1; // convert to string
           });
@@ -262,10 +324,17 @@
 
         // get country
         if (params.country && params.country.length > 0){
-          let selected = this.countries.filter((item) => {
+          let selected = this.filter_options.country_options.filter((item) => {
             return params.country.indexOf(item.value + "") != -1; // convert to string
           })
           this.country_filter = selected;
+        }
+
+        if (params.language && params.language.length > 0){
+          let selected = this.filter_options.language_options.filter((item) => {
+            return params.language.indexOf(item + "") != -1; // convert to string
+          })
+          this.language_filter = selected;
         }
 
         // page
@@ -276,6 +345,7 @@
       build_filter: function() {
         let filters = [];
         let params = {};
+        // adding the username filter
         if (this.username_filter.length > 0) {
           params['username'] = [];
           this.username_filter.forEach(function(item){
@@ -283,6 +353,8 @@
             params['username'].push(item);
           });
         }
+
+        // adding the tier filter
         if (this.tier_filter.length > 0) {
           let key = "rank";
           if (this.hackathonId) {
@@ -294,6 +366,8 @@
             params['tier'].push(item.value);
           });
         }
+
+        // adding the organization filter
         if (this.organization_filter && this.organization_filter.length > 0) {
           params['organization'] = [];
           this.organization_filter.forEach(function(item){
@@ -301,11 +375,21 @@
             params['organization'].push(item.value);
           });
         }
+
+        // adding the country filter
         if (this.country_filter.length > 0) {
           params['country'] = [];
           this.country_filter.forEach(function(item){
             filters.push("country_code,=," + item.value);
             params['country'].push(item.value);
+          });
+        }
+
+        if (this.language_filter.length > 0){
+          params['language'] = [];
+          this.language_filter.forEach((item) => {
+            filters.push("language,=," + item)
+            params['language'].push(item);
           });
         }
 
@@ -320,41 +404,59 @@
             query_string.push(key + '=' + items.join());
           });
           window.history.replaceState(null, null, "?" + query_string.join('&'));
+        } else {
+          window.history.replaceState(null, null, window.location.pathname);
         }
 
         return filters.length ? filters : null;
       },
+
       on_update_filter: function(e) {
         if (e) e.preventDefault();
         this.page = 1; // reset page number when reset filter
         this.update_filter(true); // apply filter
       },
+
+      // calculate filter list rendered in the filter bar
+      calculate_filters: function(){
+        // calculating filter list items doesn't need to apply any filter in the request
+        // limit should be set to a big number in order to get all the items to calculate
+        api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
+          const instance = this;
+          leaderboard.forEach(function(user){
+            instance.users.push(user.username);
+          });
+          instance.users.sort();
+
+          // save the users
+          this.all_leaderboards = leaderboard;
+
+          // apply filter. Firstly, setup filter items matched with the url, 
+          // Then apply searching items matched with the filter
+          this.build_filters_from_url();
+          this.update_filter(true);
+
+        });
+      },
+
       update_filter: function(updatePageNumber = false){
         const filters = this.build_filter();
 
         if(updatePageNumber) {
-          api.leaderboard(filters, this.hackathonId).then(leaderboard => {
+          api.leaderboard(filters, this.hackathonId, 0, 999999).then(leaderboard => {
             if(leaderboard && leaderboard instanceof Array) {
               this.lastPage = Math.ceil(leaderboard.length / this.limit);
             }
-            const instance = this;
-            leaderboard.forEach(function(user){
-              instance.users.push(user.username);
-            });
-            instance.users.sort()
           });
         }
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
           this.leaderboard = leaderboard;
         });
       },
+
       changePage: function(page) {
         this.page = page;
         this.update_filter();
-        // api.leaderboard(this.build_filter(), this.hackathonId, (page - 1) * this.limit, this.limit).then((leaderboard) => {
-        //   this.leaderboard = leaderboard;
-        //   this.page = page;
-        // });
       },
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");

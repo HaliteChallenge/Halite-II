@@ -27,6 +27,7 @@
 </template>
 
 <script>
+
     export default {
         name: "halite-upload-zone",
         props: ["title", "message", "icon", "description", "progress", "progressBar","buttonText"],
@@ -41,7 +42,7 @@
                 this.$emit("change",
                     Array.prototype.slice.call(event.target.files));
                 event.target.value = null;
-            },
+            }
         },
     }
 </script>
