@@ -206,6 +206,6 @@ namespace std {
                     (id._player_id & 0xFF));
         }
     };
-};
+}
 
 #endif //ENVIRONMENT_ENTITY_H
