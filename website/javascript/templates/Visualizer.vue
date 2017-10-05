@@ -167,7 +167,7 @@
     <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details" @click="initChart">
+            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-postgame-dashboard','gameplay')"  href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details" @click="initChart">
               <i class="xline xline-top"></i>
               <h4>post game dashboard</h4>
               <span class="toggle-icon expand"></span>
@@ -441,7 +441,7 @@
           }
         }, 200);
 
-        this.gaData('visualizer', 'click-frame','gameplay')
+        this.gaData('visualizer', 'click-slider','gameplay')
       }
     },
     computed: {
