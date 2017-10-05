@@ -259,6 +259,7 @@
   import Vue from "vue";
   import * as api from "../api";
   import * as libhaliteviz from "../../../libhaliteviz";
+  import * as utils from "../utils";
   import moment from 'vue-moment';
   import vueSlider from 'vue-slider-component';
   import PlayerStatsPane from "./PlayerStatsPane.vue";
@@ -368,6 +369,7 @@
         this.showObjectPanel = true;
         visualizer.onUpdate();
         this.$forceUpdate();
+        this.gaData('visualizer', 'click-map-objects','gameplay')
       };
       visualizer.attach('.game-replay-viewer');
       // play the replay
@@ -383,12 +385,15 @@
             this.time = 0.0;
           }
           visualizer.play();
+          this.gaData('visualizer', 'click-play','gameplay')
         }
       }
       this.pauseVideo = (e) => {
         if(visualizer) {
           visualizer.pause();
         }
+
+        this.gaData('visualizer', 'click-pause','gameplay')
       }
       this.toggleSpeed = (e) => {
         const speedList =  {
@@ -411,16 +416,22 @@
         if(visualizer) {
           visualizer.playSpeed = value;
         }
+
+        this.gaData('visualizer', 'click-speed','gameplay')
       }
       this.prevFrame = () =>{
         if (visualizer && this.frame > 0){
           visualizer.scrub(this.frame + -1, 0);
         }
+
+        this.gaData('visualizer', 'click-back','gameplay')
       }
       this.nextFrame = () => {
         if (visualizer && this.frame < this.replay.num_frames - 1){
           visualizer.scrub(this.frame + 1, 0);
         }
+
+        this.gaData('visualizer', 'click-forward','gameplay')
       }
       this.changeFrame = (event) => {
         // waiting for the slider dot finish to move
@@ -429,6 +440,8 @@
             visualizer.scrub(this.frame, 0);
           }
         }, 200);
+
+        this.gaData('visualizer', 'click-frame','gameplay')
       }
     },
     computed: {
@@ -593,7 +606,10 @@
       initChart: function() {
         if (this.showChart) return
         setTimeout(() => this.showChart = true, 500)
-      }
+      },
+      gaData: function(category, action, label) {
+        utils.gaEvent(category, action, label);
+      },
 
     }
   }
