@@ -51,7 +51,7 @@ function handleOutboundLinkClicks(category, action, label) {
     {
       let content = document.getElementById("tmpid").value
       const xhr = new XMLHttpRequest()
-      var url = "https://api.halite.io/v1/api/user/addsubscriber/" + content
+      var url = "{{ site.api_server_url }}/user/addsubscriber/" + content
       xhr.open("POST", url, true)
       xhr.send()
       document.getElementById("status").style.color = "green"
@@ -59,6 +59,9 @@ function handleOutboundLinkClicks(category, action, label) {
       handleOutboundLinkClicks('subscribe-success','click-to-subscribe','footer')
     }
   }
+  var api_server_url = "{{ site.api_server_url }}";
+  var login_server_url = "{{ site.login_server_url }}";
+  var logout_server_url = "{{ site.logout_server_url }}";
 </script>
 
   <script async src='https://www.google-analytics.com/analytics.js'></script>
