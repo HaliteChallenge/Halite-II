@@ -149,7 +149,7 @@ auto Replay::output(std::string filename) -> void {
     auto data_size = data.size();
     auto bin_data = reinterpret_cast<const unsigned char*>(data.data());
 
-    // Use miniz to further compress replay file
+    // Use zstd to further compress replay file
     auto compressed_length = ZSTD_compressBound(data_size);
     auto compressed_data = reinterpret_cast<uint8_t*>(std::malloc(compressed_length));
     auto result = ZSTD_compress(compressed_data, compressed_length,
