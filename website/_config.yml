@@ -26,7 +26,6 @@ permalink: /blog/:year/:month/:day/:title.html
 
 api_server_url: "https://api.halite.io/v1/api"
 login_server_url: "https://api.halite.io/v1/login"
-logout_server_url: "https://api.halite.io/v1/logout/"
 
 breadcrumbs:
   root:
