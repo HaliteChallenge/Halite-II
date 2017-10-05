@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(environment)
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -I ./ -g -O2 -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I ./ -g -O2 -Wall -Wno-sign-compare -Wno-unused-function -pedantic")
 
 include_directories(${CMAKE_SOURCE_DIR}/core)
 include_directories(${CMAKE_SOURCE_DIR}/core/mapgen)
-include_directories(${CMAKE_SOURCE_DIR}/miniz)
 include_directories(${CMAKE_SOURCE_DIR}/networking)
 include_directories(${CMAKE_SOURCE_DIR}/tclap)
 include_directories(${CMAKE_SOURCE_DIR}/zstd-1.3.0/lib)

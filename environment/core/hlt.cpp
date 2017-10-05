@@ -73,6 +73,8 @@ namespace hlt {
                 return entity_id.entity_index() < planets.size() && planets[entity_id.entity_index()].is_alive();
             case EntityType::ShipEntity:
                 return ships.at(entity_id.player_id()).count(entity_id.entity_index()) > 0;
+            default:
+                throw std::string("Unknown entity id type");
         }
     }
 
@@ -105,6 +107,8 @@ namespace hlt {
                 return get_planet(entity_id);
             case EntityType::ShipEntity:
                 return get_ship(entity_id);
+            default:
+                throw std::string("Unknown entity id type");
         }
     }
 
