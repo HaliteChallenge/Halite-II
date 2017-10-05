@@ -67,7 +67,7 @@
   background-color: transparent;
   font-weight: 600;
   border: none;
-  &:hover{
+  &:hover, &:focus{
     color: #30242F;
     text-decoration: none;
   }
