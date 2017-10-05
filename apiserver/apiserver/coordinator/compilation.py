@@ -68,7 +68,7 @@ def update_compilation_status():
         user = conn.execute(sqlalchemy.sql.select([
             model.users.c.id,
             model.users.c.username,
-            model.users.c.email,
+            model.users.c.github_email.label("email"),
             model.users.c.github_email,
             model.users.c.is_active,
             model.users.c.on_email_list,

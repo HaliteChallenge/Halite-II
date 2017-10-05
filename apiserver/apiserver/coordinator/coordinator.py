@@ -66,7 +66,7 @@ def upload_game():
                 sqlalchemy.sql.select([
                     model.users.c.id.label("user_id"),
                     model.users.c.on_email_list,
-                    model.users.c.email,
+                    model.users.c.github_email.label("email"),
                     model.users.c.player_level,
                     model.users.c.creation_time,
                     model.users.c.username,
