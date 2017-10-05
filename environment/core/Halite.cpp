@@ -895,20 +895,20 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
             continue;
         }
 
-        auto &player_ships = game_map.ships.at(player_id);
-        auto &planets = game_map.planets;
+        const auto &player_ships = game_map.ships.at(player_id);
+        const auto &planets = game_map.planets;
 
         nlohmann::json ships_json;
         nlohmann::json commands_json;
         nlohmann::json planets_json;
 
-        for (auto &ship : player_ships) {
+        for (const auto &ship : player_ships) {
             ships_json += ship.second.output_json(player_id, ship.first);
         }
 
         unsigned short planet_count = 0;
 
-        for (auto &planet : planets) {
+        for (const auto &planet : planets) {
             if (planet.owned && planet.owner == player_id && planet.is_alive()) {
                 planet_count++;
             }
@@ -916,20 +916,19 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 
         for (hlt::EntityIndex planet_idx = 0;
             planet_idx < planets.size(); planet_idx++) {
-            auto planet = planets[planet_idx];
+            const auto &planet = planets[planet_idx];
             if (planet.owned && planet.owner == player_id && planet.is_alive()) {
                 planets_json += planet.output_json(planet_idx);
             }
         }
 
         for (int move_no = 0; move_no < hlt::MAX_QUEUED_MOVES; move_no++) {
-            for (auto &pair : player_ships) {
+            for (const auto &pair : player_ships) {
                 const auto ship_idx = pair.first;
-                auto &ship = pair.second;
                 if (player_moves[player_id][move_no].count(ship_idx) == 0){
                     continue;
                 }
-                auto move = player_moves[player_id][move_no][ship_idx];
+                const auto &move = player_moves[player_id][move_no][ship_idx];
                 commands_json += move.output_json(player_id, move_no);
             }
         }

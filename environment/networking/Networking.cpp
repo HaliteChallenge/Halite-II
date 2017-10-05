@@ -309,7 +309,11 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
             select(connection.read + 1, &set, NULL, NULL, &timeout);
 
         if (selectionResult > 0) {
-            read(connection.read, &buffer, 1);
+            const size_t bytes_read = read(connection.read, &buffer, 1);
+            if (bytes_read != 1) {
+                throw BotInputError(player_tag, newString, std::string(
+                    "Panic: select() was positive but read() for 1 byte did not return 1."), 0);
+            }
 
             if (buffer == '\n') break;
             else newString += buffer;
@@ -665,7 +669,10 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
         int selectionResult =
             select(connection.read + 1, &set, NULL, NULL, &timeout);
         if (selectionResult > 0) {
-            read(connection.read, &buffer, 1);
+            const size_t bytes_read = read(connection.read, &buffer, 1);
+            if (bytes_read != 1) {
+                break;
+            }
             newString += buffer;
         } else break;
     }
