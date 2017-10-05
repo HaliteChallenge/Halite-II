@@ -73,14 +73,14 @@
       <div class="game-stats-widget">
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="active">
-            <a href="#player_stats" aria-controls="player_stats" role="tab" data-toggle="tab">
+            <a href="#player_stats" v-on:click="gaData('visualizer','click-player-stats','gameplay')" aria-controls="player_stats" role="tab" data-toggle="tab">
               <i class="xline xline-top"></i>
               <span>Player stats</span>
               <i class="xline xline-bottom"></i>
             </a>
           </li>
           <li role="presentation">
-            <a href="#game_stats" aria-controls="game_stats" role="tab" data-toggle="tab">
+            <a href="#game_stats" v-on:click="gaData('visualizer','click-game-stats','gameplay')" aria-controls="game_stats" role="tab" data-toggle="tab">
               <i class="xline xline-top"></i>
               <span>Game/Map Stats</span>
               <i class="xline xline-bottom"></i>
@@ -123,7 +123,7 @@
       <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" data-parent="#accordion" href="#widget_player_details" aria-expanded="false" aria-controls="widget_player_details">
+            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-player-details','gameplay')" data-parent="#accordion" href="#widget_player_details" aria-expanded="false" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4>player details</h4>
               <span class="toggle-icon chevron"></span>
@@ -136,7 +136,7 @@
         </div>
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_map_properties">
-            <a data-toggle="collapse" @click.stop="toggleObjectPanel" data-parent="#accordion" :aria-expanded="showObjectPanel.toString()" aria-controls="widget_map_properties">
+            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-object-properties','gameplay')" @click.stop="toggleObjectPanel" data-parent="#accordion" :aria-expanded="showObjectPanel.toString()" aria-controls="widget_map_properties">
               <i class="xline xline-top"></i>
               <h4>map object properties</h4>
               <span class="toggle-icon chevron"></span>
