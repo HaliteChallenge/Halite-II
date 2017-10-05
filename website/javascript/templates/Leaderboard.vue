@@ -167,7 +167,7 @@
         country_filter: "",
         language_filter: "",
         page: 1,
-        limit: 10,
+        limit: 25,
         lastPage: 0,
         organizations: [],
         classes: {

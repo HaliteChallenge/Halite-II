@@ -4,7 +4,7 @@
       <div class="panel-heading" role="tab" id="heading_player_details">
         <a data-toggle="collapse" href="#panel_metric" aria-expanded="true" aria-controls="panel_metric">
           <i class="xline xline-top"></i>
-          <h4>Summary</h4>
+          <h4>LEADERBOARD STATISTICS</h4>
           <span class="toggle-icon expand"></span>
           <i class="xline xline-bottom"></i>
         </a>
