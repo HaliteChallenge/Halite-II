@@ -79,6 +79,9 @@
   border: 5px dashed #413f4a;
   border-radius: 4px;
   margin-bottom: 0;
+  &.dragging{
+    border-color: $yellow;
+  }
 }
 .panel.upload-zone h2{
   font-family: "Teko";

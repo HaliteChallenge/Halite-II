@@ -29,8 +29,7 @@
     <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">
 
       <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
-        :enableMessage="enableMessage"
-        :disableMessage="disableMessage"></bot-upload>
+      :showMessage="showMessage"></bot-upload>
     
     </div>
 
@@ -82,14 +81,9 @@
       });
     },
     methods: {
-      enableMessage: function(type = 'success', content){
-        this.message.type = type;
-        this.message.content = content;
-        this.displayMessage = true;
+      showMessage: function(type = 'success', content){
+        Alert.show(content, type)
       },
-      disableMessage: function(){
-        this.displayMessage = false;
-      }
     }
   }
 </script>
