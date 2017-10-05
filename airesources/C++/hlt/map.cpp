@@ -22,8 +22,6 @@ namespace hlt {
             start.pos_x*center.pos_x + end.pos_x*center.pos_x +
             std::pow(start.pos_y, 2) - start.pos_y*end.pos_y -
             start.pos_y*center.pos_y + end.pos_y*center.pos_y);
-        const auto c = std::pow(start.pos_x - center.pos_x, 2) +
-            std::pow(start.pos_y - center.pos_y, 2);
 
         if (a == 0.0) {
             // Start and end are the same point
@@ -76,6 +74,8 @@ namespace hlt {
                 return entity_id.entity_index() < planets.size() && planets[entity_id.entity_index()].is_alive();
             case EntityType::ShipEntity:
                 return ships.at(entity_id.player_id()).count(entity_id.entity_index()) > 0;
+            default:
+                throw std::string("Unknown entity id type");
         }
     }
 
@@ -108,6 +108,8 @@ namespace hlt {
                 return get_planet(entity_id);
             case EntityType::ShipEntity:
                 return get_ship(entity_id);
+            default:
+                throw std::string("Unknown entity id type");
         }
     }
 
