@@ -3,7 +3,7 @@
 //
 
 #include <cassert>
-#include "Entity.hpp"
+#include "entity.hpp"
 
 namespace hlt {
     auto Location::distance(const Location &other) const -> double {

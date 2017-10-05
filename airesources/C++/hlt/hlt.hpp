@@ -14,11 +14,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Constants.hpp"
-#include "Log.hpp"
-#include "Entity.hpp"
-#include "Map.hpp"
-#include "Move.hpp"
+#include "constants.hpp"
+#include "log.hpp"
+#include "entity.hpp"
+#include "map.hpp"
+#include "move.hpp"
 
 namespace hlt {
     static auto get_string() -> std::string {

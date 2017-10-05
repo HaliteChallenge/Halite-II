@@ -1,4 +1,4 @@
-CXXFLAGS += -std=c++11 -I ./ -g
+CXXFLAGS += -std=c++11 -I ./ -g -Werror
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:%.cpp=%.o)
 TARGET=MyBot

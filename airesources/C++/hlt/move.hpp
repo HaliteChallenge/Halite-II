@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-#include "Entity.hpp"
+#include "entity.hpp"
 
 namespace hlt {
     enum class MoveType {

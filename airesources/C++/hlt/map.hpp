@@ -18,10 +18,10 @@
 #include <array>
 #include <unordered_map>
 
-#include "Constants.hpp"
-#include "Log.hpp"
-#include "Entity.hpp"
-#include "Move.hpp"
+#include "constants.hpp"
+#include "log.hpp"
+#include "entity.hpp"
+#include "move.hpp"
 
 namespace hlt {
     template<typename T>
