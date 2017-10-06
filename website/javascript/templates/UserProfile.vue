@@ -7,7 +7,6 @@
                     <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
                 </div>
                 <div class="user-profile-detail">
-                    <i class="xline xline-top"></i>
                     <a class="user-name" :href="'https://github.com/' + user.username">{{ user.username }}</a>
                     <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
                     <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
@@ -37,7 +36,7 @@
                     </div>
                     <p><a href="#">View on leaderboard</a></p>
                 </div>
-                <div class="user-profile-badge">
+                <!-- <div class="user-profile-badge">
                     <i class="xline xline-top"></i>
                     <h2>Badges</h2>
                     <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
@@ -51,7 +50,7 @@
                         </ul>
                     </div>
                     <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="col-md-6">
