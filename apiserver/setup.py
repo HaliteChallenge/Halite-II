@@ -9,5 +9,6 @@ setup(
         "flask",
         "google-api-python-client",
         "sqlalchemy",
+        "alembic",
     ],
 )
