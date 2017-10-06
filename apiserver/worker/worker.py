@@ -296,7 +296,7 @@ def health_check():
     else:
         return "Dead. Last alive at {}".format(TIME), 503
 
-if __name__ == "__main__":
+def main():
     _set_logging()
     logging.info("Starting up worker at {}".format(socket.gethostname()))
     threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':5001, 'threaded':True}).start()
@@ -321,3 +321,7 @@ if __name__ == "__main__":
 
         logging.debug("Sleeping...\n")
         sleep(random.randint(4, 10))
+
+
+if __name__ == "__main__":
+    main()
