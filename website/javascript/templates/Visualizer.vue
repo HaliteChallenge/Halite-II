@@ -445,10 +445,26 @@
     computed: {
       statistics: function(){
         let count = {};
+
         if (!this.shipsProduced) {
+
           this.shipsProduced = [];
-          for (let i = 0; i < this.replay.num_players; i++) {
-            this.shipsProduced[i] = 0;
+          for (let frame of this.replay.frames) {
+            let thisFrame = { 0: 3, 1: 3, 2: 3, 3: 3 };
+            if (this.shipsProduced.length > 0) {
+              thisFrame[0] = this.shipsProduced[this.shipsProduced.length - 1][0];
+              thisFrame[1] = this.shipsProduced[this.shipsProduced.length - 1][1];
+              thisFrame[2] = this.shipsProduced[this.shipsProduced.length - 1][2];
+              thisFrame[3] = this.shipsProduced[this.shipsProduced.length - 1][3];
+            }
+            if (frame.events) {
+              for (let event of frame.events) {
+                if (event.event === "spawned") {
+                  thisFrame[event.entity.owner]++;
+                }
+              }
+            }
+            this.shipsProduced.push(thisFrame);
           }
         }
 
@@ -458,16 +474,13 @@
             planets: 0,
             shipsRate: 0,
             planetsRate: 0,
-            shipsProduced: this.shipsProduced[i]
+            shipsProduced: this.shipsProduced[this.frame][i],
           };
         }
 
         let frame = this.replay.frames[this.frame]
         for (let owner of Object.keys(frame.ships)) {
           count[owner].ships += Object.values(frame.ships[owner]).length;
-          if (count[owner].ships > this.shipsProduced[owner]) {
-            count[owner].shipsProduced = this.shipsProduced[owner] = count[owner].ships;
-          }
         }
 
         for (let planet of Object.values(frame.planets)) {
