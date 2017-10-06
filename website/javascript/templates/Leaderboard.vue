@@ -11,7 +11,7 @@
       </div>
       <div class="panel-collapse collapse in" role="tabpanel" id="panel_filter" aria-labelledby="panel_filter">
         <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
-          <div class="form-header">>           
+          <div class="form-header">>
             <div class="filter-handler" v-if="filter_handle_view==='normal'">
               <div class="handler-item" @click="openSaveFilter">
                 <span class="icon-disk"></span>
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    
+
     <table class="table table-leader">
       <thead>
         <tr>
@@ -431,7 +431,7 @@
           // save the users
           this.all_leaderboards = leaderboard;
 
-          // apply filter. Firstly, setup filter items matched with the url, 
+          // apply filter. Firstly, setup filter items matched with the url,
           // Then apply searching items matched with the filter
           this.build_filters_from_url();
           this.update_filter(true);
@@ -489,7 +489,7 @@
             username: this.username_filter,
             tier: this.tier_filter,
             organization: this.organization_filter,
-            country: this.country_filter  
+            country: this.country_filter
           }
         });
         localStorage.saved_filters = JSON.stringify(saved_filters);

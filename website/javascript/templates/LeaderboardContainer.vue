@@ -73,7 +73,7 @@
         </div>
       </div>
     </div>
-    
+
 
     <Leaderboard :hackathonId="hackathonId" :baseUrl="baseUrl"></Leaderboard>
   </div>
@@ -119,7 +119,7 @@
             const hackathonId = hackathons[0].hackathon_id;
             this.hackathonId = hackathonId;
             this.isGlobalActive = false;
-            this.fetchData();    
+            this.fetchData();
           })
         });
       },
