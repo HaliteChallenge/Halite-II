@@ -141,6 +141,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     ranked_bots.c.games_played.label("num_games"),
     ranked_bots.c.version_number.label("num_submissions"),
     ranked_bots.c.mu,
+    ranked_bots.c.sigma,
     ranked_bots.c.score,
     ranked_bots.c.language,
     ranked_bots.c.update_time,
