@@ -73,6 +73,7 @@
                             <th>Opponents</th>
                             <th>Map Size</th>
                             <th>Watch</th>
+                            <th>Won</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,6 +108,9 @@
                                    class="text-danger">
                                     Download error log
                                 </a>
+                            </td>
+                            <td class="winner">
+                              {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
                             </td>
                         </tr>
                     </tbody>
@@ -303,7 +307,7 @@
                                 this.$forceUpdate();
                             });
                         }
-                        
+
                         const players = Object.values(game.players).sort((r1, r2) => {
                           if (r1.id.toString() === this.user.user_id.toString())
                             return -1;
@@ -311,9 +315,8 @@
                             return 1;
                           return r2.rank - r1.rank;
                         });
-                        
+
                         game.playerSorted = players;
-                        console.log(players);
                     }
                 });
             },
@@ -356,7 +359,6 @@
                 event.preventDefault();
 
                 const code = this.$refs.hackathon_signup_code.value;
-                console.log(code);
                 api.registerHackathon(code).then(() => {
                     this.messages.hackathon = "Successfully registered!";
                 }, (error) => {

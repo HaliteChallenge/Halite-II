@@ -155,11 +155,16 @@
       float: none;
     }
   }
-  .table-leader > thead > tr > th {
-    background-color: #1c1a27;
-  }
-  .table-leader > tbody > tr > td {
-    background-color: #000;
+  .table-leader {
+    thead > tr > th {
+      background-color: #1c1a27;
+    }
+    tbody > tr > td {
+      background-color: #000;
+    }
+    .winner {
+      color: #0DA63C;
+    }
   }
   a{
     color: $yellow;
