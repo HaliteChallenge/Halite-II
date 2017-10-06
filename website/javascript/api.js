@@ -1,6 +1,6 @@
-export const API_SERVER_URL = "https://api.halite.io/v1/api";
-export const LOGIN_SERVER_URL = "https://api.halite.io/v1/login";
-export const LOGOUT_SERVER_URL = "https://api.halite.io/v1/logout/";
+export const API_SERVER_URL = api_server_url;
+export const LOGIN_SERVER_URL = login_server_url;
+export const LOGOUT_SERVER_URL = logout_server_url;
 
 // TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
