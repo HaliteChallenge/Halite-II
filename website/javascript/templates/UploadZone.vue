@@ -67,11 +67,5 @@
             cursor: pointer;
             opacity: 0;
         }
-
-        &.dragging {
-            // background: blue;
-            // color: white;
-            // border-color: $yellow;
-        }
     }
 </style>

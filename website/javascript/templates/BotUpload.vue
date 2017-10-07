@@ -118,14 +118,12 @@
               }
 
               let bot_id = 0;
-              console.log(this.hasBots);
               if(!this.hasBots)
               {
                 bot_id = null;
               }
 
               api.update_bot(user_id, bot_id, this.botFile, (progress) => {
-                console.log('uploading ', this.uploadProgress);
                 this.uploadProgress = Math.floor(progress * 100);
                 }).then(() => {
                   this.showMessage('success', "Your bot has been submitted and will start playing games in the next 15 mins.");
@@ -133,7 +131,6 @@
                   this.view = this.viewList.SUBMITTED;
                   this.checkBotStatus();
                 }, (error) => {
-                  this.gaData('play', 'submit-error','play-submit-flow');
                   this.view = this.viewList.UPLOAD;
                   this.showMessage('error', error.message);
                   this.errorMessage = error.message;

@@ -54,6 +54,27 @@
   }
 }
 
+.play-container{
+  #halitetv-more-upload{
+    @media (min-width: $screen-sm-min){
+      width: 83%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h2{
+      margin-top: 40px;
+      font-family: $font-heading;
+      text-transform: uppercase;
+      font-size: 24px;
+      letter-spacing: 1px;
+    }
+  }
+}
+.play-container .upload-zone{
+  min-height: 320px;
+}
+
+
 .upload-state{
   text-align: center;
   padding: 20px;

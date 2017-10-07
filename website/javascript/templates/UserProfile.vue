@@ -19,7 +19,7 @@
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
-                    <h2><span :class="'icon-tier-' + 4"></span> rank {{ user.rank }}, diamond tier</h2>
+                    <h2><span :class="'icon-tier-' + 4"></span> rank {{ user.rank }}, {{ user.tier }} tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Points</h3>
@@ -151,9 +151,6 @@
                         <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
                         <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
                     </div>
-                    <div>
-                        <p>{{ messages.hackathon }}</p>
-                    </div>
                 </form>
                 <div v-if="hackathons.length > 0">
                     <table class="table table-leader">
@@ -211,6 +208,7 @@
 
 <script>
     import * as api from "../api";
+    import {Alert} from "../utils.js";
 
     export default {
         name: "UserProfile",
@@ -324,7 +322,9 @@
             fetchHackathon: function(){
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
-                        this.hackathons = hackathons;
+                        this.hackathons = hackathons.filter((h) => {
+                            return h.participant == true;
+                        });
                     }
                 });
             },
@@ -360,9 +360,9 @@
 
                 const code = this.$refs.hackathon_signup_code.value;
                 api.registerHackathon(code).then(() => {
-                    this.messages.hackathon = "Successfully registered!";
+                    Alert.show("Successfully registered!")
                 }, (error) => {
-                    this.messages.hackathon = `Error: ${error.message || error.responseJSON.message}`;
+                    Alert.show(`Error: ${error.message || error.responseJSON.message}`)
                 });
             },
             prev_badge: ()=>{
