@@ -1,10 +1,9 @@
 <template>
   <div class="leaderboard-container">
     <div class="panel panel-stats">
-      
+      <p class="t2 c-wht">{{ name }}</p>
     </div>
 
-    
     <table class="table table-leader">
       <thead>
         <tr>
@@ -74,6 +73,7 @@
         country_options.push({value: item['alpha-3'], label: item.name});
       });
       return {
+        name: "",
         contry_data: countries_data,
         countries: country_options,
         leaderboard: [],
@@ -134,23 +134,9 @@
       };
     },
     mounted: function() {
-      // start setup filter list
       this.calculate_filters();
-
-      // determine if the filter should be collapsed or not
-      this.setupCollapseFilter();
-    },
-    watch: {
-      hackathonId: function(){
-        this.update_filter(true);
-      }
     },
     computed:{
-      saved_filters: function(){
-        let saved_filters = JSON.parse(localStorage.saved_filters);
-
-        return saved_filters || [];
-      },
 
       // getting the filter options
       filter_options: function(){
@@ -205,23 +191,6 @@
         filters.usernames_options = username_options;
 
         return filters;
-      }
-    },
-    watch: {
-      username_filter: function(){
-        this.on_update_filter();
-      },
-      tier_filter: function(){
-        this.on_update_filter();
-      },
-      organization_filter: function(){
-        this.on_update_filter();
-      },
-      country_filter: function(){
-        this.on_update_filter();
-      },
-      lang_filter: function(){
-        this.on_update_filter();
       }
     },
     methods: {
@@ -354,32 +323,7 @@
         return filters.length ? filters : null;
       },
 
-      toggleFilter: function() {
-        setTimeout(() => {
-          const collapsed = !$('#panel_filter').hasClass('in');
-          this.$cookie.set('leaderboard_filter_collapsed', collapsed ? 1 : 0);
-        }, 500);
-      },
-
-      setupCollapseFilter: function(){
-        const collapse = this.$cookie.get('leaderboard_filter_collapsed');
-        if (collapse == 1){
-          $('#panel_filter').removeClass('in');
-          $('#toggle_filter').attr('aria-expanded', 'false');
-        }
-      },
-
-      on_update_filter: function(e) {
-        if (e && e.preventDefault) e.preventDefault();
-
-        this.page = 1; // reset page number when reset filter
-        this.update_filter(true); // apply filter
-      },
-
-      // calculate filter list rendered in the filter bar
       calculate_filters: function(){
-        // calculating filter list items doesn't need to apply any filter in the request
-        // limit should be set to a big number in order to get all the items to calculate
         api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
           const instance = this;
           leaderboard.forEach(function(user, index){
@@ -387,28 +331,8 @@
           });
           instance.users.sort();
 
-          // save the users
           this.all_leaderboards = leaderboard;
-
-          // apply filter. Firstly, setup filter items matched with the url,
-          // Then apply searching items matched with the filter
           this.build_filters_from_url();
-
-          // Find pagination of the goto user
-          if (this.show_user) {
-            let gotoIndex = -1;
-            for (let i=0; i<leaderboard.length; i++){
-              const user = leaderboard[i];
-              if (user.user_id.toString() === this.show_user.toString()){
-                gotoIndex = i;
-                break;
-              }
-            }
-            if (gotoIndex > -1) {
-              this.page = Math.ceil(gotoIndex / this.limit);
-            }
-          }
-
           this.update_filter(true);
         });
       },
@@ -435,49 +359,6 @@
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
         return countries.getName(name, "en");
-      },
-      clearFilter: function(){
-        this.username_filter = [];
-        this.country_filter = [];
-        this.organization_filter = [];
-        this.tier_filter = [];
-        this.update_filter();
-      },
-      openSaveFilter: function(){
-        this.filter_handle_view = 'save';
-      },
-      openViewFilter: function(){
-        this.filter_handle_view = 'view';
-      },
-      resetFilterView: function(){
-        this.filter_handle_view = 'normal';
-      },
-      saveFilter: function(){
-        let saved_filters = [];
-        if (localStorage.saved_filters && localStorage.saved_filters.length > 0){
-          saved_filters = JSON.parse(localStorage.saved_filters);
-        }
-        saved_filters.push({
-          name: this.filter_name,
-          filter: {
-            username: this.username_filter,
-            tier: this.tier_filter,
-            organization: this.organization_filter,
-            country: this.country_filter
-          }
-        });
-        localStorage.saved_filters = JSON.stringify(saved_filters);
-        this.filter_handle_view = 'normal';
-      },
-      viewFilter: function(){
-        const filter = this.selected_filter.filter;
-        this.username_filter = filter.username || [];
-        this.tier_filter = filter.tier || [];
-        this.organization_filter = filter.organization || [];
-        this.country_filter = filter.country || [];
-        this.update_filter(true);
-
-        this.filter_handle_view = 'normal';
       },
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
