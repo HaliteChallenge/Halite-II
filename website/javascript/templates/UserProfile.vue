@@ -55,7 +55,7 @@
                 </div> -->
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
             <section class="profile-section">
                 <h2>
                     <i class="xline xline-bottom"></i>
