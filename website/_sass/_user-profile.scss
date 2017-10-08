@@ -156,6 +156,11 @@
       float: none;
     }
   }
+
+  .game-participant{
+    white-space: nowrap;
+  }
+
   .table-leader {
     thead > tr > th {
       background-color: #1c1a27;
@@ -254,5 +259,26 @@
         }
       }
     }
+  }
+}
+
+.table-sticky-container{
+  position: relative;
+  .table-sticky{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    tr{
+      border-bottom: 0;
+    }
+  }
+  .table-scrollable-content{
+    overflow-y: auto;
+    max-height: 500px;
+  }
+
+  .table{
+    margin: 0;
   }
 }

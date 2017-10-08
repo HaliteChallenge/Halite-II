@@ -2,7 +2,7 @@
   <div>
     <div class="panel panel-stats">
       <div class="panel-heading" role="tab" id="heading_player_details">
-        <a data-toggle="collapse" href="#panel_metric" aria-expanded="true" aria-controls="panel_metric">
+        <a data-toggle="collapse" id="toggle_metric" href="#panel_metric" @click="toggleStats" aria-expanded="true" aria-controls="panel_metric">
           <i class="xline xline-top"></i>
           <h4>LEADERBOARD STATISTICS</h4>
           <span class="toggle-icon expand"></span>
@@ -90,6 +90,9 @@
     components: {Leaderboard},
     mounted: function(){
       this.fetchData();
+
+      // determine whether the collapseable summary panel should be collapsed
+      this.setupCollapseStats();
     },
     data: function(){
       return {
@@ -108,6 +111,21 @@
       }
     },
     methods: {
+      toggleStats: function() {
+        setTimeout(() => {
+          const collapsed = !$('#panel_metric').hasClass('in');
+          this.$cookie.set('leaderboard_stats_collapsed', collapsed ? 1 : 0);
+        }, 500);
+      },
+
+      setupCollapseStats: function(){
+        const collapse = this.$cookie.get('leaderboard_stats_collapsed')
+        if (collapse == 1){
+          $('#panel_metric').removeClass('in');
+          $('#toggle_metric').attr('aria-expanded', 'false');
+        }
+      },
+
       fetchGlobal: function(){
         this.hackathonId = null;
         this.isGlobalActive = true;

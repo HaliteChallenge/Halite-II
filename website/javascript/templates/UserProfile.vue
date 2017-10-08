@@ -9,17 +9,19 @@
                 <div class="user-profile-detail">
                     <a class="user-name" :href="'https://github.com/' + user.username">{{ user.username }}</a>
                     <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
-                    <p>{{ user.level }} <span v-if="user.organization">at {{ user.organization }}</span></p>
-                    <p>From New York, USA</p>
-                    <p>Bots in
+                    <p>{{ user.level }} <span v-if="user.organization">at <a  :href="`/programming-competition-leaderboard?organization=${user.organization_id}`">{{ user.organization }}</a></span></p>
+                    <p v-if="user.location">
+                      From <a :href="`/programming-competition-leaderboard?country=${user.country_code}`">{{user.location}}</a>
+                    </p>
+                    <p v-if="botLang.length > 0">Bots in
                         <template v-for="(lang, index) in botLang">
-                            <span class="hl">{{lang}}</span><span v-if="(index+1) < botLang.length">,</span>
+                            <span class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
-                    <h2><span :class="'icon-tier-' + 4"></span> rank {{ user.rank }}, {{ user.tier }} tier</h2>
+                    <h2><span :class="tierClass(user.tier || 'Salt')"></span> {{ user.rank ? `rank ${user.rank}` : "No Rank" }}, {{ user.tier || "Salt" }} tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Points</h3>
@@ -34,7 +36,7 @@
                             <p>{{ user.num_games }}</p>
                         </div>
                     </div>
-                    <p><a href="#">View on leaderboard</a></p>
+                    <p><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
                 </div>
                 <!-- <div class="user-profile-badge">
                     <i class="xline xline-top"></i>
@@ -65,68 +67,70 @@
                     <h2>Nothing to show</h2>
                     <p>Complete your first game and view replays<br/>here</p>
                 </div>
+                <div v-if="games.length">
+                    <table class="table table-leader">
+                        <thead>
+                            <tr>
+                                <th>Played On</th>
+                                <th>Opponents</th>
+                                <th>Map Size</th>
+                                <th>Watch</th>
+                                <th>Won</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="game in games">
+                                <td>
+                                    <time :datetime="game.time_played"
+                                          :title="game.time_played">
+                                        {{ game.time_played | moment("calendar") }}
+                                    </time>
+                                </td>
+                                <td>
+                                    <a v-for="player in game.playerSorted"
+                                       :href="'/user?user_id=' + player.id"
+                                       class="game-participant"
+                                       v-bind:class="{ 'timed-out': player.timed_out }"
+                                       :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
+                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                        <span class="rank">
+                                            {{ player.rank }}
+                                        </span>
+                                    </a>
+                                </td>
+                                <td>{{ game.map_width }}x{{ game.map_height }}</td>
+                                <td>
+                                    <a :href="'/play?game_id=' + game.game_id">
+                                        {{ game.game_id }}
+                                    </a>
 
-                <table class="table table-leader" v-if="games.length">
-                    <thead>
-                        <tr>
-                            <th>Played On</th>
-                            <th>Opponents</th>
-                            <th>Map Size</th>
-                            <th>Watch</th>
-                            <th>Won</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="game in games">
-                            <td>
-                                <time :datetime="game.time_played"
-                                      :title="game.time_played">
-                                    {{ game.time_played | moment("calendar") }}
-                                </time>
-                            </td>
-                            <td>
-                                <a v-for="player in game.playerSorted"
-                                   :href="'/user?user_id=' + player.id"
-                                   class="game-participant"
-                                   v-bind:class="{ 'timed-out': player.timed_out }"
-                                   :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
-                                    <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                    <span class="rank">
-                                        {{ player.rank }}
-                                    </span>
-                                </a>
-                            </td>
-                            <td>{{ game.map_width }}x{{ game.map_height }}</td>
-                            <td>
-                                <a :href="'/play?game_id=' + game.game_id">
-                                    {{ game.game_id }}
-                                </a>
+                                    <a v-if="game.players[user.user_id].timed_out && is_my_page"
+                                       target="_blank"
+                                       :href="error_log_link(game.game_id)"
+                                       class="text-danger">
+                                        Download error log
+                                    </a>
+                                </td>
+                                <td class="winner">
+                                  {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                                <a v-if="game.players[user.user_id].timed_out && is_my_page"
-                                   target="_blank"
-                                   :href="error_log_link(game.game_id)"
-                                   class="text-danger">
-                                    Download error log
-                                </a>
-                            </td>
-                            <td class="winner">
-                              {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div v-if="games.length" class="btn-group text-center" role="group" aria-label="Game Navigation">
-                    <button
-                        type="button"
-                        class="btn"
-                        :disabled="page === 0"
-                        v-on:click="prev_page"><span>Prev</span></button>
-                    <button
-                        type="button"
-                        class="btn"
-                        v-on:click="next_page"><span>Next</span></button>
+                    <div class="btn-group text-center" role="group" aria-label="Game Navigation">
+                        <button
+                            type="button"
+                            class="btn"
+                            :disabled="page === 0"
+                            v-on:click="prev_page"><span>Prev</span></button>
+                        <button
+                            type="button"
+                            class="btn"
+                            v-on:click="next_page"><span>Next</span></button>
+                    </div>
                 </div>
+
             </section>
 
             <section v-if="is_my_page" class="profile-section profile-section-hackathon">
@@ -153,24 +157,38 @@
                     </div>
                 </form>
                 <div v-if="hackathons.length > 0">
-                    <table class="table table-leader">
-                        <thead>
-                            <tr>
-                                <th>Hackathons</th>
-                                <th>Location</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="hackathon in hackathons">
-                                <td>{{hackathon.title}}</td>
-                                <td>{{hackathon.location}}</td>
-                                <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
-                                <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">View Hackathon</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-sticky-container">
+                        <table class="table table-leader table-sticky">
+                            <thead>
+                                <tr>
+                                    <th>Hackathons</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="table-scrollable-content">
+                            <table class="table table-leader">
+                                <thead>
+                                    <tr>
+                                        <th>Hackathons</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="hackathon in hackathons">
+                                        <td>{{hackathon.title}}</td>
+                                        <td>{{hackathon.location}}</td>
+                                        <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
+                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">View Hackathon</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
             <section v-if="is_my_page" class="profile-section profile-section-error">
@@ -179,26 +197,45 @@
                     Your Errors
                 </h2>
                 <div>
-                    <table class="table table-leader">
-                        <thead>
-                        <tr>
-                            <th>Error</th>
-                            <th>Descriptions</th>
-                            <th>Date</th>
-                            <th>Note</th>
-                            <th>Game File</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>#21252</td>
-                            <td>Compiling Error</td>
-                            <td>15:23 07/21/2017</td>
-                            <td><a href="#">View Log</a></td>
-                            <td><a href="#">Download</a></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-sticky-container">
+                        <table class="table table-leader table-sticky">
+                            <thead>
+                                <tr>
+                                    <th>Error</th>
+                                    <th>Descriptions</th>
+                                    <th>Date</th>
+                                    <th>Note</th>
+                                    <th>Game File</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="table-scrollable-content">
+                            <table class="table table-leader">
+                                <thead>
+                                    <tr>
+                                        <th>Error</th>
+                                        <th>Descriptions</th>
+                                        <th>Date</th>
+                                        <th>Note</th>
+                                        <th>Game File</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="game in error_games">
+                                        <td>{{game.game_id}}</td>
+                                        <td>Time out</td>
+                                        <td><time :datetime="game.time_played"
+                                                  :title="game.time_played">
+                                                {{ game.time_played | moment("calendar") }}
+                                            </time></td>
+                                        <td><a :href="error_log_link(game.game_id)" target="_blank">View Log</a></td>
+                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
 
             </section>
@@ -208,13 +245,19 @@
 
 <script>
     import * as api from "../api";
+<<<<<<< HEAD
+    import {Alert, tierClass} from "../utils.js";
+
+=======
     import {Alert} from "../utils.js";
+>>>>>>> master
 
     export default {
         name: "UserProfile",
         props: ['baseUrl'],
         data: function() {
             return {
+                tierClass: tierClass,
                 user: {
                     "level": "",
                     "username": "",
@@ -225,6 +268,7 @@
                 },
                 games: [],
                 bots: [],
+                error_games: [],
                 hackathons: [],
                 profile_images: {},
                 page: 0,
@@ -255,6 +299,7 @@
                     return;
                 }
                 this.user = user;
+                this.user.location = this.getLocation();
 
                 if (params.has("me")) {
                     window.history.replaceState(
@@ -266,11 +311,13 @@
                 });
                 this.fetch();
                 this.fetchHackathon();
+                this.fetchErrorGames();
             });
 
             api.me().then((me) => {
                 this.is_my_page = me && me.user_id === this.user.user_id;
             });
+
         },
         computed: {
             botLang: function(){
@@ -286,6 +333,21 @@
             }
         },
         methods: {
+            setupStickyTable: function(){
+                //sticky table
+                // console.log($(this.$el));
+                // console.log($(this.$el).find('.table-sticky-container'));
+                setTimeout(() => {
+                    const el = $(this.$el).find('.table-sticky-container').each(function(){
+                        const heading = $(this).find('.table-sticky th');
+                        const body = $(this).find('.table:not(.table-sticky) th');
+                        heading.each(function(index){
+                            $(this).width($(body[index]).width());
+                        });
+                    });
+                }, 500);
+
+            },
             fetch: function() {
                 let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`;
                 if (this.only_timed_out) {
@@ -319,6 +381,25 @@
                 });
             },
 
+            getLocation: function() {
+              const user = this.user;
+              let state = '', country = '';
+              const countries = require("i18n-iso-countries");
+
+              if (user.country_code) {
+                const countryAlpha2 = countries.alpha3ToAlpha2(user.country_code);
+                const countryData = iso3166.data[countryAlpha2];
+                let stateData;
+                if (countryData && user.country_subdivision_code) {
+                  stateData = countryData.sub[user.country_subdivision_code]
+                }
+                state = stateData ? stateData.name : '';
+                country = countryData ? countryData.name : '';
+              }
+              const location = `${state ? state + ', ' : ''}${country}`;
+              return location ? location : '';
+            },
+
             fetchHackathon: function(){
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
@@ -327,6 +408,15 @@
                         });
                     }
                 });
+            },
+
+            fetchErrorGames: function(){
+                let query = `order_by=desc,time_played&offset=0&limit=50&filter=timed_out,=,${this.user.user_id}`;
+                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
+                return $.get(url).then((data) => {
+                    this.error_games = data;
+                    this.setupStickyTable();
+                })
             },
 
             next_page: function() {
@@ -353,6 +443,10 @@
 
             error_log_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
+            },
+
+            replay_link: function(game_id) {
+                return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`;
             },
 
             join_hackathon: function(event) {

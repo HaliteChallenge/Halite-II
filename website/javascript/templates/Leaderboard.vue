@@ -2,7 +2,7 @@
   <div class="leaderboard-container">
     <div class="panel panel-stats">
       <div class="panel-heading" role="tab" id="heading_player_details">
-        <a data-toggle="collapse" href="#panel_filter" aria-expanded="true" aria-controls="panel_filter">
+        <a data-toggle="collapse" id="toggle_filter" href="#panel_filter" @click="toggleFilter" aria-expanded="true" aria-controls="panel_filter">
           <i class="xline xline-top"></i>
           <h4>Filters</h4>
           <span class="toggle-icon expand"></span>
@@ -77,16 +77,16 @@
                 v-model="language_filter"
                 :options="filter_options.language_options">
               </v-select>
-              <div>
+              <!-- <div>
                 <button class="btn"><span>APPLY FILTER</span></button>
-              </div>
+              </div> -->
             </div>
           </div>
         </form>
       </div>
     </div>
 
-
+    
     <table class="table table-leader">
       <thead>
         <tr>
@@ -218,6 +218,9 @@
     mounted: function() {
       // start setup filter list
       this.calculate_filters();
+
+      // determine if the filter should be collapsed or not
+      this.setupCollapseFilter();
     },
     watch: {
       hackathonId: function(){
@@ -286,6 +289,23 @@
         return filters;
       }
     },
+    watch: {
+      username_filter: function(){
+        this.on_update_filter();
+      },
+      tier_filter: function(){
+        this.on_update_filter();
+      },
+      organization_filter: function(){
+        this.on_update_filter();
+      },
+      country_filter: function(){
+        this.on_update_filter();
+      },
+      lang_filter: function(){
+        this.on_update_filter();
+      }
+    },
     methods: {
       tierClass: tierClass,
       build_filters_from_url: function(){
@@ -299,6 +319,11 @@
           let param = item.split('=');
           params[param[0]] = param[1].split(',');
         });
+
+        // get jump user ID value
+        if (params.show_user && params.show_user.length > 0){
+          this.show_user = params.show_user;
+        }
 
         // get username value
         if (params.username && params.username.length > 0 ){
@@ -411,8 +436,24 @@
         return filters.length ? filters : null;
       },
 
+      toggleFilter: function() {
+        setTimeout(() => {
+          const collapsed = !$('#panel_filter').hasClass('in');
+          this.$cookie.set('leaderboard_filter_collapsed', collapsed ? 1 : 0);
+        }, 500);
+      },
+
+      setupCollapseFilter: function(){
+        const collapse = this.$cookie.get('leaderboard_filter_collapsed');
+        if (collapse == 1){
+          $('#panel_filter').removeClass('in');
+          $('#toggle_filter').attr('aria-expanded', 'false');
+        }
+      },
+
       on_update_filter: function(e) {
-        if (e) e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
+
         this.page = 1; // reset page number when reset filter
         this.update_filter(true); // apply filter
       },
@@ -423,7 +464,7 @@
         // limit should be set to a big number in order to get all the items to calculate
         api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
           const instance = this;
-          leaderboard.forEach(function(user){
+          leaderboard.forEach(function(user, index){
             instance.users.push(user.username);
           });
           instance.users.sort();
@@ -434,8 +475,23 @@
           // apply filter. Firstly, setup filter items matched with the url,
           // Then apply searching items matched with the filter
           this.build_filters_from_url();
-          this.update_filter(true);
 
+          // Find pagination of the goto user
+          if (this.show_user) {
+            let gotoIndex = -1;
+            for (let i=0; i<leaderboard.length; i++){
+              const user = leaderboard[i];
+              if (user.user_id.toString() === this.show_user.toString()){
+                gotoIndex = i;
+                break;
+              }
+            }
+            if (gotoIndex > -1) {
+              this.page = Math.ceil(gotoIndex / this.limit);
+            }
+          }
+
+          this.update_filter(true);
         });
       },
 

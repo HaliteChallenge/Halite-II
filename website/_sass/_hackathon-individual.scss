@@ -113,7 +113,7 @@
   .hackathon-join{
     &-container{
       > .row{
-        margin-top: 30px;
+        margin-top: 0;
         margin-bottom: 30px;
         display: flex;
         align-items: center;
@@ -122,10 +122,17 @@
         }
       }
     }
-    &-left-col{
-      max-width: 440px;
+    .ha-button-container{
+      text-transform: uppercase;
+      font-weight: bold;
+      .fa{
+        background: $dark-gray;
+        color: $yellow;
+        padding: 3px 2px;
+        margin-right: 5px;
+        font-size: 14px;
+      }
     }
-
     .step-form {
       height: 286px;
       background-color: #1C1A27;

@@ -1,7 +1,7 @@
 <template>
   <div class="hackathon-container">
     <div class="hackathon-in-progress-container" v-show="showHackathonInProgress">
-      <i class="xline xline-bottom"></i>
+      <i v-show="showEvents" class="xline xline-bottom"></i>
       <div class="hackathon-title">
         <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
@@ -32,6 +32,7 @@
           </div>
         </div>
       </div>
+      <p v-if="!showEvents"><a :href="loginServerUrl">Sign in</a> to see all your hackathons or find new ones to join.</p>
     </div>
     <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
@@ -95,7 +96,8 @@ export default {
       showHackathonInProgress: true,
       showEvents: false,
       hackathons: [],
-      events: []
+      events: [],
+      loginServerUrl:`${api.LOGIN_SERVER_URL}/github`,
     };
   },
   mounted: function() {

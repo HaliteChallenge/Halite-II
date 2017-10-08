@@ -11,6 +11,12 @@
     border-radius: 0;
     margin-bottom: 0;
     height: auto;
+    a{
+      &:focus{
+        background-color: inherit;
+        outline: none;
+      }
+    }
   }
   .nav{
     text-align: center;
@@ -35,7 +41,9 @@
     padding-top: 20px;
     padding-bottom: 20px;
     .footer-below-wrap{
+      transform: translateY(5px);
       @media (min-width: $screen-md-min){
+        transform: translateY(11px);
         display: flex;
         justify-content: space-between;
       }
@@ -60,7 +68,7 @@
       input{
         color: #fff;
         background-color: #000;
-        margin-right: 10px;
+        padding:0 10px;
         border: 0;
         flex: 1;
       }
@@ -82,7 +90,7 @@
 
   .footer-social{
     text-align: center;
-    margin-left: 80px;
+    margin-left: 118px;
     @media (max-width: $screen-sm-max){
       margin-left: 0;
     }

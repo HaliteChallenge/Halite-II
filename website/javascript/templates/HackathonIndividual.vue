@@ -8,7 +8,6 @@
     <section class="hackathon-info">
       <p class="t2 c-org font-headline">{{hackathon.title}}</p>
       <div class="hackathon-info-text mg-top-normal">
-        <img class="inline-block" :src="`${baseUrl}/assets/images/halite-date-white.svg`"/>
         <p class="inline-block mg-left-tiny">{{hackathon.date}}</p>
       </div>
       <div class="hackathon-info-text">
@@ -49,14 +48,14 @@
           <div class="panel-collapse collapse in" role="tabpanel" id="panel_join" aria-labelledby="panel_join">
             <div class="hackathon-join-container">
               <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                   <div class="hackathon-join-left-col">
                     <p>You're welcome to start submitting bots now, but first you need to join the hackathon. Here are the steps to join:</p>
                   </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">1</span>
@@ -64,16 +63,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="step-form">
-                    <p class="t2 c-wht font-headline">AUTHENTICATE YOUR EMAIL</p>
-                    <div class="form-control tall-ipt">School Email</div>
-                    <div class="form-control tall-ipt">School Email (Confirm)</div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">2</span>
@@ -81,12 +71,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-2.png`" alt="how to join">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <div class="hackathon-join-left-col">
                     <div class="hex-li">
                       <span class="hex-bullet">3</span>
@@ -94,8 +79,12 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <a href="/play-programming-challenge"><img class="img-responsive" :src="`${baseUrl}/assets/images/hackathon/join-figure-4.png`" alt="how to join"></a>
+              </div>
+              <div class="row">
+                <div class="ha-button-container">
+                  <div>
+                    <a class="ha-button" href="/play-programming-challenge"><i class="fa fa-arrow-up"></i><span>SUBMIT A BOT</span></a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -112,7 +101,7 @@
       <div class="leaderboard-header">
         <div class="hackathon-title">
           <i class="xline xline-bottom"></i>
-          <p class="t2 c-wht font-headline">CURRENT HACKATHON LEADERBOARD</p>
+          <p class="t2 c-wht font-headline">{{hackathon.title}}</p>
         </div>
       </div>
       <Leaderboard v-if="hackathon_id" :baseUrl="baseUrl" :hackathonId="hackathon_id"></Leaderboard>
