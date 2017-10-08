@@ -7,7 +7,7 @@
                     <img class="img-responsive" :src="'https://github.com/' + user.username + '.png'" :alt="user.username" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'">
                 </div>
                 <div class="user-profile-detail">
-                    <a class="user-name" :href="'https://github.com/' + user.username">{{ user.username }}</a>
+                    <a class="user-name" target="_blank" :href="'https://github.com/' + user.username">{{ user.username }}</a>
                     <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
                     <p>{{ user.level }} <span v-if="user.organization">at <a  :href="`/programming-competition-leaderboard?organization=${user.organization_id}`">{{ user.organization }}</a></span></p>
                     <p v-if="user.location">
