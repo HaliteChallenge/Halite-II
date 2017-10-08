@@ -231,18 +231,14 @@
   }
   .img-des{
     border: 1px solid #757577;
-    text-align: left;
-    padding: 10px;
+    text-align: Center;
+    padding: 20px;
     position: relative;
     >img{
       max-width:25px;
       margin-right: 5px;
     }
     .i-label{
-      position: absolute;
-      top: 14px;
-      left: 46px;
-      right: 10px;
       display: inline-block;
       white-space: nowrap;
       text-overflow: ellipsis;

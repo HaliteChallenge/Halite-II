@@ -15,6 +15,7 @@ import Home from "./templates/Home.vue";
 import HackathonPortal from "./templates/HackathonPortal.vue";
 import HackathonIndividual from './templates/HackathonIndividual.vue';
 import Leagues from './templates/Leagues.vue';
+import LeagueBoard from './templates/LeagueBoard.vue';
 import Play from "./templates/Play.vue";
 
 // Include bootstrap.js - do not remove
@@ -121,6 +122,12 @@ window.views = {
         new Vue({
             el: "#leagues-container",
             render: (h) => h(Leagues, {props: {baseUrl: _global.baseUrl}}),
+        });
+    },
+    LeagueBoard: function(){
+        new Vue({
+            el: "#leaderboard-container",
+            render: (h) => h(LeagueBoard, {props: {baseUrl: _global.baseUrl}}),
         });
     }
 };

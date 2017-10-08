@@ -2,10 +2,10 @@
     <div class="leagues-container">
         <div class="row">
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">Language Leagues</p>
+                <p class="t2 c-wht">Countries</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
-                    <a href="/play/?game_id=850849">
+                    <a href="/halite-league-board?country=USA">
                         <div class="col-md-2 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
@@ -13,58 +13,22 @@
                                 </div>                   
                             </div>
                              <div class="img-des">                   
-                                <span class="t4 c-wht i-label">Top 20 Python Bots</span>
+                                <span class="t5 c-wht i-label">Top 20 USA Bots</span>
                             </div>
                         </div>
                     </a>
-                    <a href="/play/?game_id=850858">
-                        <div class="col-md-3 play-bot">
-                          <div class="img-container">
-                              <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
-                              <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
-                          </div>
-                          <div class="img-des">
-                              <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                              <span class="t4 c-wht i-label">Gogokefakefa vs. ...</span>
-                              <div class="i-des">
-                                  <span class="t5 c-gry">09/22/17 - 12:45:49</span>
-                                  <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                              </div>
-                          </div>
-                        </div>
-                    </a>
-                    <a href="/play/?game_id=851091">
-                        <div class="col-md-3 play-bot">
-                            <div class="img-container">
-                                <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
-                                <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
-                            </div>
+                     <a href="/halite-league-board?country=GBR">
+                        <div class="col-md-2 play-bot">   
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_3.png`"/>
-                                <span class="t4 c-wht i-label">PIOTRZIELINSKI DEFEATS J-CLAP</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:56:13</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <div class="img-container">
+                                    <img :src="`${baseUrl}/assets/images/leagues/python.png`"/>
+                                </div>                   
+                            </div>
+                             <div class="img-des">                   
+                                <span class="t5 c-wht i-label">Top 20 UK Bots</span>
                             </div>
                         </div>
-                    </a>
-                    <a href="/play/?game_id=851123">
-                        <div class="col-md-3 play-bot">
-                            <div class="img-container">
-                                <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
-                                <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
-                            </div>
-                            <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                                <span class="t4 c-wht i-label">LIDAVIDM DEFEATS 3</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:57:30</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+                    </a>        
                 </div>
                 <div class="clear"></div>
                 <div class="line-container"><i class="xline xline-bottom"></i></div>
