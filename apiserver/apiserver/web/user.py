@@ -34,7 +34,7 @@ def make_user_record(row, *, logged_in, total_users=None):
     else:
         user["tier"] = None
 
-    if row.get("personal_email") is None and logged_in:
+    if "personal_email" in row and row["personal_email"] is None and logged_in:
         # User is new user, indicate this when they are logged in
         user["is_new_user"] = True
 
