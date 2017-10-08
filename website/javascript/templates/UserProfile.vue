@@ -245,12 +245,7 @@
 
 <script>
     import * as api from "../api";
-<<<<<<< HEAD
     import {Alert, tierClass} from "../utils.js";
-
-=======
-    import {Alert} from "../utils.js";
->>>>>>> master
 
     export default {
         name: "UserProfile",
