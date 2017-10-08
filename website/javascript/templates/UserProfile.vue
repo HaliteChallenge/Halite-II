@@ -261,8 +261,8 @@
                                                   :title="game.time_played">
                                                 {{ game.time_played | moment("calendar") }}
                                             </time></td>
-                                        <td><a :href="error_log_link(game.game_id)" target="_blank">View Log</a></td>
-                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download</a></td>
+                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
+                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download Game</a></td>
                                     </tr>
                                 </tbody>
                             </table>
