@@ -1,9 +1,8 @@
 <template>
   <div class="leaderboard-container">
-    <div class="panel panel-stats">
-      <p class="t2 c-wht">{{ leaguename }}</p>
+    <div class="page-header">
+      <h1>{{ getLeagueName(leaguename) }}</h1>
     </div>
-
     <table class="table table-leader">
       <thead>
         <tr>
@@ -208,7 +207,6 @@
           params[param[0]] = param[1].split(',');
         });
 
-        // get jump user ID value
         if (params.leaguename){
           this.leaguename = params.leaguename.slice(0);
         }
@@ -265,10 +263,10 @@
         let filters = [];
         let params = {};
 
+        console.log(this.leaguename);
         // adding the username filter
-        if (this.leaguename > 0) {
+        if (this.leaguename) {
           params.leaguename = [];
-          filters.push("leaguename,=," + this.leaguename);
           params['leaguename'].push(this.leaguename);
         }
 
@@ -324,6 +322,7 @@
           params['page'] = [this.page];
         }
 
+        console.log(params)
         // build params
         if (filters.length > 0 ){
           let query_string = [];
@@ -335,6 +334,7 @@
           window.history.replaceState(null, null, window.location.pathname);
         }
 
+        console.log(filters)
         return filters.length ? filters : null;
       },
 
@@ -379,6 +379,10 @@
 
       getFormattedDate: function(date) {
         return moment(date).startOf("day").fromNow()
+      },
+
+      getLeagueName: function(name) {
+        return this.leaguename[0].split('-').join(' ');
       }
     }
   }

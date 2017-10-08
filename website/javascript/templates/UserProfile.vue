@@ -278,8 +278,6 @@
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
     import Vue from "vue";
-
-    Vue.use(AsyncComputed)
     
     export default {
         name: "UserProfile",
