@@ -103,13 +103,6 @@
                                     <a :href="'/play?game_id=' + game.game_id">
                                         {{ game.game_id }}
                                     </a>
-
-                                    <a v-if="game.players[user.user_id].timed_out && is_my_page"
-                                       target="_blank"
-                                       :href="error_log_link(game.game_id)"
-                                       class="text-danger">
-                                        Download error log
-                                    </a>
                                 </td>
                                 <td class="winner">
                                   {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
