@@ -125,7 +125,47 @@
                 </div>
 
             </section>
+            <section v-if="is_my_page" class="profile-section">
+                <h2>
+                    <i class="xline xline-bottom"></i>
+                    Your Nemeses
+                </h2>
 
+                <div v-if="!nemesisList.length" class="section-empty">
+                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                    <h2>You have not met your nemeses yet</h2>
+                    <p>Submit your first bot to uncover your nemeses<br/>here</p>
+                </div>
+
+                <table class="table table-leader" v-if="nemesisList.length">
+                    <thead>
+                        <tr>
+                            <th>Nemesis</th>
+                            <th>Win %</th>
+                            <th>Loss %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="nemesis in nemesisList">
+                            <td>
+                                <a :href="'/user?user_id=' + nemesis.id"
+                                   class="game-participant">
+                                    <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                    <span class="rank">
+                                        {{nemesis.id}}
+                                    </span>
+                                </a>
+                            </td>
+                            <td>
+                                {{nemesis.wins}}
+                            </td>
+                             <td>
+                                {{nemesis.losses}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
             <section v-if="is_my_page" class="profile-section profile-section-hackathon">
                 <h2>
                     <i class="xline xline-bottom"></i>
@@ -194,10 +234,10 @@
                         <table class="table table-leader table-sticky">
                             <thead>
                                 <tr>
-                                    <th>Error</th>
-                                    <th>Descriptions</th>
+                                    <th>Id</th>
+                                    <th>Reason</th>
                                     <th>Date</th>
-                                    <th>Note</th>
+                                    <th>Log</th>
                                     <th>Game File</th>
                                 </tr>
                             </thead>
@@ -228,9 +268,7 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
-
             </section>
         </div>
     </div>
@@ -239,7 +277,11 @@
 <script>
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
+    import AsyncComputed from 'vue-async-computed'
+    import Vue from "vue";
 
+    Vue.use(AsyncComputed)
+    
     export default {
         name: "UserProfile",
         props: ['baseUrl'],
@@ -255,6 +297,7 @@
                     "user_id": "",
                 },
                 games: [],
+                nemesisList: [],
                 bots: [],
                 error_games: [],
                 hackathons: [],
@@ -262,6 +305,7 @@
                 page: 0,
                 limit: 10,
                 offset: 0,
+                nemesisLimit: 10,
                 only_timed_out: false,
                 is_my_page: false,
                 messages: {
@@ -300,6 +344,7 @@
                 this.fetch();
                 this.fetchHackathon();
                 this.fetchErrorGames();
+                this.nemesis();
             });
 
             api.me().then((me) => {
@@ -368,7 +413,6 @@
                     }
                 });
             },
-
             getLocation: function() {
               const user = this.user;
               let state = '', country = '';
@@ -387,17 +431,73 @@
               const location = `${state ? state + ', ' : ''}${country}`;
               return location ? location : '';
             },
+            nemesis: function() {
+                let query = `order_by=desc,time_played&offset=0&limit=200`;
+                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
+                return $.get(url).then((data) => {
+                    var nemesisMap = new Map()
+                    for (let game of data) {
+                        if(game.players[this.user.user_id].rank === 1){
+                            for (let participant of Object.keys(game.players)) {
+                                if(participant == this.user.user_id){
+                                    continue;
+                                }
 
+                                let playerData = nemesisMap.get(participant);
+                                if(playerData){
+                                    playerData.losses++;
+                                }
+                                else{
+                                    let obj = {wins: 0, losses:1}
+                                    nemesisMap.set(participant,obj);
+                                }
+                            }}
+                        else{
+                            for (let participant of Object.keys(game.players)) {
+                                if(participant == this.user.user_id){
+                                    continue;
+                                }
+
+                                if(game.players[participant].rank === 1){ 
+                                    let playerData = nemesisMap.get(participant);
+                                    if(playerData){
+                                        playerData.wins++;
+                                    }
+                                    else{
+                                        let obj = {wins: 1, losses:0}
+                                        nemesisMap.set(participant,obj);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    for (var [key, value] of nemesisMap) {
+                        let totalGames = value.wins + value.losses;
+                        let winRatio = value.wins/totalGames;
+                        let lossRatio = value.losses/totalGames;
+                        var obj = {id:key, wins:Math.round(winRatio*100), losses:Math.round(lossRatio*100)};
+                        this.nemesisList.push(obj);
+                        api.get_user(key).then((user) => {
+                                this.profile_images[key] = api.make_profile_image_url(user.username);
+                                this.$forceUpdate();
+                        });
+                    }
+
+                    this.nemesisList.sort(function(a,b) { return b.losses - a.losses});
+                    this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit);
+                });
+            },
             fetchHackathon: function(){
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
                         this.hackathons = hackathons.filter((h) => {
+                            console.log(h);
                             return h.participant == true;
                         });
                     }
                 });
             },
-
             fetchErrorGames: function(){
                 let query = `order_by=desc,time_played&offset=0&limit=50&filter=timed_out,=,${this.user.user_id}`;
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
@@ -406,7 +506,6 @@
                     this.setupStickyTable();
                 })
             },
-
             next_page: function() {
                 this.offset += 10;
                 this.fetch().then(() => {
