@@ -1,7 +1,7 @@
 <template>
   <div class="leaderboard-container">
     <div class="panel panel-stats">
-      <p class="t2 c-wht">{{ name }}</p>
+      <p class="t2 c-wht">{{ leaguename }}</p>
     </div>
 
     <table class="table table-leader">
@@ -73,7 +73,7 @@
         country_options.push({value: item['alpha-3'], label: item.name});
       });
       return {
-        name: "",
+        leaguename: "",
         contry_data: countries_data,
         countries: country_options,
         leaderboard: [],
@@ -195,6 +195,7 @@
     },
     methods: {
       tierClass: tierClass,
+
       build_filters_from_url: function(){
         let params = {};
         if (!window.location.search.slice(1)){
@@ -206,6 +207,11 @@
           let param = item.split('=');
           params[param[0]] = param[1].split(',');
         });
+
+        // get jump user ID value
+        if (params.leaguename){
+          this.leaguename = params.leaguename.slice(0);
+        }
 
         // get jump user ID value
         if (params.show_user && params.show_user.length > 0){
@@ -254,9 +260,18 @@
           this.page = parseInt(params.page[0]);
         }
       },
+
       build_filter: function() {
         let filters = [];
         let params = {};
+
+        // adding the username filter
+        if (this.leaguename > 0) {
+          params.leaguename = [];
+          filters.push("leaguename,=," + this.leaguename);
+          params['leaguename'].push(this.leaguename);
+        }
+
         // adding the username filter
         if (this.username_filter.length > 0) {
           params['username'] = [];
@@ -356,14 +371,12 @@
         this.page = page;
         this.update_filter();
       },
+
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
         return countries.getName(name, "en");
       },
-      getCountryName: function(name) {
-        var countries = require("i18n-iso-countries");
-        return countries.getName(name, "en");
-      },
+
       getFormattedDate: function(date) {
         return moment(date).startOf("day").fromNow()
       }

@@ -237,7 +237,7 @@
                                     <th>Id</th>
                                     <th>Reason</th>
                                     <th>Date</th>
-                                    <th>Log</th>
+                                    <th>Log File</th>
                                     <th>Game File</th>
                                 </tr>
                             </thead>
@@ -246,10 +246,10 @@
                             <table class="table table-leader">
                                 <thead>
                                     <tr>
-                                        <th>Error</th>
-                                        <th>Descriptions</th>
+                                        <th>Id</th>
+                                        <th>Reason</th>
                                         <th>Date</th>
-                                        <th>Note</th>
+                                        <th>Log File</th>
                                         <th>Game File</th>
                                     </tr>
                                 </thead>
@@ -277,7 +277,6 @@
 <script>
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
-    import AsyncComputed from 'vue-async-computed'
     import Vue from "vue";
 
     Vue.use(AsyncComputed)
