@@ -232,7 +232,7 @@
   .img-des{
     border: 1px solid #757577;
     text-align: Center;
-    padding: 20px;
+    padding: 10px;
     position: relative;
     >img{
       max-width:25px;
@@ -258,19 +258,7 @@
   }
   .img-container{
     position: relative;
-    .img-btn{
-      cursor: pointer;
-      width: 16%;
-      max-width: 52px;
-      min-width: 30px;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      &:hover{
-        width: 17%;
-      }
-    }
+    margin: 10px;
   }
   .menu-header{
     margin-top: 10px;
@@ -414,4 +402,8 @@
       }
     }
   }
+}
+
+.breadcrumb-top{
+  margin-top: 20px;
 }

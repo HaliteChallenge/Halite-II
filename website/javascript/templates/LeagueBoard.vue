@@ -1,5 +1,8 @@
 <template>
   <div class="leaderboard-container">
+    <section class="hackathon-breadcrumb breadcrumb-top">
+      <HaliteBreadcrumb :path="path" :baseUrl="baseUrl" />
+    </section>
     <div class="page-header">
       <h1>{{ getLeagueName(leaguename) }}</h1>
     </div>
@@ -53,16 +56,19 @@
 <script>
   import * as api from "../api";
   import HalitePagination from './Pagination.vue';
+  import HaliteBreadcrumb from './Breadcrumb.vue';
   import {tierClass, countries_data} from "../utils";
   import vSelect from 'vue-select';
   import _ from 'lodash';
   import moment from 'moment';
+
 
   export default {
     name: "leagueboard",
     props: ['baseUrl'],
     components: {
       HalitePagination,
+      HaliteBreadcrumb,
       vSelect
     },
     data: function() {
@@ -72,6 +78,16 @@
         country_options.push({value: item['alpha-3'], label: item.name});
       });
       return {
+        path: [
+          {
+            name: 'Home',
+            link: '/'
+          },
+          {
+            name: 'Leagues',
+            link: '/halite-leagues'
+          }
+        ],
         leaguename: "",
         contry_data: countries_data,
         countries: country_options,
@@ -382,7 +398,11 @@
       },
 
       getLeagueName: function(name) {
-        return this.leaguename[0].split('-').join(' ');
+        if(this.leaguename.length > 0){
+          return this.leaguename[0].split('-').join(' ');
+        }
+
+        return "";
       }
     }
   }
