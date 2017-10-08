@@ -50,6 +50,7 @@ def ranked_bots_query(variable="rank", alias="ranked_bots"):
         bots.c.user_id,
         bots.c.id.label("bot_id"),
         bots.c.mu,
+        bots.c.sigma,
         bots.c.score,
         bots.c.games_played,
         bots.c.version_number,
