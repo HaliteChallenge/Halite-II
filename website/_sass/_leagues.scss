@@ -1,0 +1,421 @@
+.leagues-container{
+  $o-color: #E37222;
+  $w-color: #FFFFFF;
+  $g-color: #d0cccc;
+
+  padding-top: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  .c-org{
+    color: $o-color;
+  }
+  .c-wht{
+    color: $w-color;
+  }
+  .c-gry{
+    color: $g-color;
+  }
+  .c-yel{
+    color: $yellow;
+  }
+
+  .d1{
+    font-size: 2.3rem;
+    letter-spacing: 1px;
+  }
+  .t1{
+    font-size: 10rem;
+    letter-spacing: 6px;
+    margin-bottom: 0;
+  }
+  .t2{
+    font-size: 3.5rem;
+    letter-spacing: 4px;
+  }
+  .t3{
+    font-size: 3rem;
+    letter-spacing: 2px;
+  }
+  .t4{
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  .t5{
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  .mgt-10{
+    margin-top: 10px;
+  }
+  .pdl30{
+    padding-left: 30px;
+  }
+  .pdr30{
+    padding-right: 30px;
+  }
+  .no-padding-xs{
+    @media (max-width: $screen-xs-max){
+      padding:0 !important;
+    }
+  }
+  .margin-15-xs{
+    @media (max-width: $screen-xs-max){
+      margin-left:-15px !important;
+      margin-right:-15px !important;
+    }
+  }
+  .notification{
+    background-color: $yellow;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    letter-spacing: 2px;
+    color: $gray-bg;
+    a{
+      color: #337ab7;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+    @media (max-width: $screen-sm-max){
+      display: none;
+    }
+  }
+  .row>[class*="col"]{
+    margin: 20px 0;
+    >[class*="array"]{
+      height: 100px;
+    }
+    >div>[class*="col"]:not(:first-child){
+      @media (max-width: $screen-sm-max){
+        margin: 30px 0;
+      }
+    }
+  }
+  .table-display{
+    @media (min-width: $screen-md-min){
+      display: table;
+      >div{
+        display: table-cell;
+        float: none !important;
+      }
+    }
+  }
+  .me-in{
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    >br{
+      display: none;
+    }
+    .ha-button-container:not(.no-bg-button){
+      margin-left: 20px;
+    }
+    @media (max-width: $screen-xs-max){
+      width: auto;
+      display: block;
+      >br{
+        display: block;
+      }
+      .ha-button-container:not(.no-bg-button){
+        margin-top: 20px;
+        margin-left: 0;
+      }
+    }
+  }
+  .ha-line{
+    background-color: #889295;
+    height: 1px;
+  }
+  .des{
+    text-align: left;
+    @media (max-width: $screen-sm-max){
+      text-align: center;
+    }
+    .bot-1{
+      display: none;
+      @media (max-width: $screen-xs-max){
+        display: block;
+      }
+    }
+    .bot-2{
+      display: block;
+      @media (max-width: $screen-xs-max){
+        display: none;
+      }
+    }
+    img{
+      width: 100%;
+      @media (max-width: $screen-sm-max){
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 80%;
+      }
+    }
+    .words{
+      .ha-button-container{
+        margin-left: 0;
+        text-align: center;
+        transform: translateX(-1px);
+        &.wider{
+          transform: translateX(-15px);
+          div{
+            width:210px;
+          }
+        }
+        @media (max-width: $screen-xs-max){
+          margin-left: auto;
+          transform: translateX(0);
+        }
+      }
+      .line-container {
+        width: 35%;
+        margin-left: 0;
+        @media (max-width: $screen-sm-max){
+          margin-left: auto;
+        }
+      }
+    }
+  }
+  .line-container{
+    width:25%;
+    position: relative;
+    margin-top: 20px;
+    padding-bottom: 20px;
+  }
+  .big-menu{
+    .reddit-widget{
+      text-align: left;
+      height: 500px;
+      .reddit-title{
+        img{
+          width: auto;
+        }
+      }
+    }
+    .play-bot{
+      @media (max-width: $screen-sm-max){
+        margin-bottom: 20px;
+        padding-left: 30px;
+        padding-right: 30px;
+      }
+    }
+    img{
+      width: 100%;
+    }
+    .img-list{
+      padding:30px;
+      &>div{
+        @media (max-width: $screen-sm-max){
+          margin-bottom: 10px;
+        }
+      }
+    }
+    .line-container{
+      width:10%;
+      @media (max-width: $screen-sm-max){
+        width:35%;
+      }
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .screen-shot{
+      @media (max-width: $screen-xs-max){
+        margin-bottom: 20px;
+      }
+    }
+  }
+  .img-des{
+    border: 1px solid #757577;
+    text-align: left;
+    padding: 10px;
+    position: relative;
+    >img{
+      max-width:25px;
+      margin-right: 5px;
+    }
+    .i-label{
+      position: absolute;
+      top: 14px;
+      left: 46px;
+      right: 10px;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .i-des{
+      margin: 15px 0 10px;
+    }
+    .right-btn{
+      float: right;
+      max-width:17px;
+      cursor: pointer;
+    }
+  }
+  .clear{
+    clear: both;
+  }
+  .img-container{
+    position: relative;
+    .img-btn{
+      cursor: pointer;
+      width: 16%;
+      max-width: 52px;
+      min-width: 30px;
+      transform: translate(-50%, -50%);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      &:hover{
+        width: 17%;
+      }
+    }
+  }
+  .menu-header{
+    margin-top: 10px;
+    .line-container{
+      display: inline-block;
+      width: 25%;
+      transform: translateY(15px);
+      margin-left: 8%;
+      margin-right: 8%;
+      &.line-1{
+        @media (max-width: $screen-xs-max){
+          margin-left: 0;
+          margin-right: 0;
+          width: 36%;
+          left: 2px;
+          position: absolute;
+        }
+      }
+      &.line-2{
+        @media (max-width: $screen-xs-max){
+          position: absolute;
+          right: 2px;
+          width: 36%;
+          margin-right: 0;
+        }
+      }
+    }
+    img{
+      max-width: 60px;
+      width: 14%;
+    }
+  }
+  .menu-body{
+    .content{
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top:20px;
+    }
+    >.xline{
+      top: 70px;
+      bottom: 0;
+      height: auto;
+    }
+    .xline-left,.xline-right{
+      @media (max-width: $screen-xs-max){
+        display: none;
+      }
+    }
+    .line-container{
+      width: 160px;
+      @media (max-width: $screen-lg-min){
+        width: 150px;
+      }
+      float: left;
+      transform: translate(-60px, 45px) rotate(90deg);
+      display: inline-block;
+      &.line-2{
+        float: right;
+        transform: translate(42px, 45px) rotate(90deg);
+      }
+      @media (max-width: $screen-xs-max){
+        display: none;
+      }
+    }
+  }
+  .ha-input-container{
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 20px;
+    .input-field{
+      display: flex;
+      padding: 5px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+      input{
+        color: #fff;
+        background-color: #000;
+        border: 0;
+        padding: 0px 10px;
+        flex: 1;
+        &:-moz-placeholder {
+          color: #fff;
+          opacity:0.5;
+        }
+        &::-moz-placeholder {
+          color: #fff;
+          opacity:0.5;
+        }
+        &:-ms-input-placeholder{
+          color: #fff;
+          opacity:0.5;
+        }
+        &::-webkit-input-placeholder{
+          color: #fff;
+          opacity:0.5;
+        }
+      }
+      button{
+        letter-spacing: 2px;
+      }
+    }
+  }
+
+  @keyframes arrow
+  {
+    0% {opacity:0}
+    40% {opacity:1}
+    80% {opacity:0}
+    100% {opacity:0}
+  }
+
+  .arrows-icon{
+    $animation-delay: 0.5s;
+    $arrow-size: 12px;
+
+    .scroll-arrow {
+      margin-left: auto;
+      margin-right: auto;
+      width: $arrow-size;
+      height: $arrow-size;
+      transform: rotate(45deg);
+      border-right: 2px solid white;
+      border-bottom: 2px solid white;
+      animation: arrow 2s infinite;;
+      // animation-direction: alternate;
+      // &:nth-child(1){
+      //   animation-delay: -1s;
+      // }
+      // &:nth-child(2){
+      //   animation-delay: -0.5s;
+      // }
+      // &:nth-child(3){
+      //   animation-delay: 0s;
+      // }
+      @for $i from 1 through 3 {
+        &:nth-child(#{$i}) {
+          animation-delay: -$animation-delay*(3-$i);
+        }
+      }
+    }
+  }
+}
