@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: static_page
 title: Privacy Policy
 permalink: /about/privacy
 description: Halite and Two Sigma take your privacy seriously. Read our privacy policy to learn how we treat personal information.

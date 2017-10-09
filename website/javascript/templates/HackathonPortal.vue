@@ -1,9 +1,12 @@
 <template>
   <div class="hackathon-container">
     <div class="hackathon-in-progress-container" v-show="showHackathonInProgress">
+      <div class="page-header">
+        <h1>EVENTS &amp; HACKATHONS</h1>
+        <i class="xline xline-bottom"></i>
+      </div>
       <i v-show="showEvents" class="xline xline-bottom"></i>
       <div class="hackathon-title">
-        <p class="t3 c-org font-headline">EVENTS &amp; HACKATHONS</p>
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
       <div class="row hackathon-progress-cards">

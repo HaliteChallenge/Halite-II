@@ -5,8 +5,12 @@
       <HaliteBreadcrumb :path="path" :baseUrl="baseUrl" />
     </section>
 
+    <div class="page-header">
+      <h1>{{hackathon.title}}</h1>
+      <i class="xline xline-bottom"></i>
+    </div>
+
     <section class="hackathon-info">
-      <p class="t2 c-org font-headline">{{hackathon.title}}</p>
       <div class="hackathon-info-text mg-top-normal">
         <p class="inline-block mg-left-tiny">{{hackathon.date}}</p>
       </div>
@@ -143,10 +147,6 @@
         hackathon_id: null,
         hackathon: {},
         path: [
-          {
-            name: 'Home',
-            link: '/'
-          },
           {
             name: 'Hackathons',
             link: '/hackathon-and-events'

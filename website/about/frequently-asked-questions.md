@@ -1,9 +1,9 @@
 ---
-layout: doc_page
+layout: static_page
 title: Frequently Asked Questions
 short_title: FAQ
 permalink: /about/frequently-asked-questions
-toc: true
+toc: false
 description: Answers to frequent questions about the Halite AI programming challenge.
 ---
 

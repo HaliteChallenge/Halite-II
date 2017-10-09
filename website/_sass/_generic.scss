@@ -22,6 +22,10 @@ a{
   color: #FFBE00; 
 }
 
+h1, h2, h3{
+  font-family: $font-heading;
+}
+
 .nav{
   font-family: $font-headline;
   font-size: 2rem;
@@ -41,12 +45,18 @@ a{
 .page-header {
   margin-top: 0;
   border-bottom: 0;
+  position: relative;
   h1{
     font-family: "Teko";
     font-size: 3.6rem;
     letter-spacing: 2px;
     text-align: center;
     text-transform: uppercase;
+  }
+  .xline{
+    max-width: 150px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 

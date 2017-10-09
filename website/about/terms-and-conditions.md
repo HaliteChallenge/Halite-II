@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: static_page
 title: Terms and Conditions
 permalink: /about/terms-and-conditions
 description: Read about Halite's terms and conditions and contact us if you have any questions.

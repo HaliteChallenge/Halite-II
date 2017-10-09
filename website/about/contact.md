@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: static_page
 title: Contact Us
 permalink: /about/contact
 toc: false
