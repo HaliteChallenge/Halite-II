@@ -90,7 +90,7 @@
           </td>
           <td>{{ Math.round(100 * player.score) / 100 }}</td>
           <td class="text-center">
-            <span :class="tierClass(player.tier || player.local_tier)"></span>
+            <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
           </td>
           <td>{{ player.level }}</td>
           <td class="text-center">{{ getCountryName(player.country) }}</td>
@@ -115,6 +115,7 @@
 <script>
   import * as api from "../api";
   import HalitePagination from './Pagination.vue';
+  import TierPopover from './TierPopover.vue';
   import {tierClass, countries_data} from "../utils";
   import vSelect from 'vue-select';
   import _ from 'lodash';
@@ -125,7 +126,8 @@
     props: ['baseUrl', 'hackathonId'],
     components: {
       HalitePagination,
-      vSelect
+      vSelect,
+      TierPopover
     },
     data: function() {
       const countries = countries_data;

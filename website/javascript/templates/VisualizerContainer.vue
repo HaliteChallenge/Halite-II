@@ -113,6 +113,7 @@
           if (params.has("replay_class") && params.has("replay_name")) {
             const replay_class = params.get("replay_class");
             const replay_name = params.get("replay_name");
+            this.$parent.replayFile = replay_name;
             console.log("Getting expired replay");
             api.get_expired_replay(replay_class, replay_name).then((replay) => {
               this.$parent.currentView = 'replay';
@@ -145,7 +146,8 @@
           reader.onload = (e) => {
             inst.is_upload = false;
             this.$parent.currentView = 'replay';
-            window.location.hash = '/replay-bot'
+            window.location.hash = '/replay-bot';
+            this.$parent.replayFile = files[0].name;
             showGame({
               game: null,
               replay: e.target.result,
