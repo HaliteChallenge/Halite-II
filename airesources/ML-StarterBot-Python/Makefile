@@ -52,5 +52,5 @@ compare: bin/compare.sh MyBotShortTraining.py MyBot.py model_short_training mode
 	bin/compare.sh MyBotShortTraining.py MyBot.py
 
 submission: 
-	zip -r submission.zip MyBot.py hlt/ tsmlstarterbot/ models/
+	zip -r submission.zip MyBot.py LANGUAGE hlt/ tsmlstarterbot/ models/
 
