@@ -125,50 +125,65 @@
                 </div>
 
             </section>
-            <section v-if="is_my_page" class="profile-section">
+            <section class="profile-section">
                 <h2>
                     <i class="xline xline-bottom"></i>
-                    Your Nemeses
+                    Nemeses
                 </h2>
 
                 <div v-if="!nemesisList.length" class="section-empty">
                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                    <h2>You have not met your nemeses yet</h2>
+                    <h2>No nemeses yet</h2>
                     <p>Submit your first bot to uncover your nemeses<br/>here</p>
                 </div>
-
-                <table class="table table-leader" v-if="nemesisList.length">
-                    <thead>
-                        <tr>
-                            <th>Nemesis</th>
-                            <th>Games</th>
-                            <th>Win %</th>
-                            <th>Loss %</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="nemesis in nemesisList">
-                            <td>
-                                <a :href="'/user?user_id=' + nemesis.id"
-                                   class="game-participant">
-                                    <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                    <span class="rank">
-                                        {{nemesis.id}}
-                                    </span>
-                                </a>
-                            </td>
-                             <td>
-                                {{nemesis.total}}
-                            </td>
-                            <td>
-                                {{nemesis.wins}}
-                            </td>
-                             <td>
-                                {{nemesis.losses}}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div v-if="nemesisList.length > 0">
+                    <div class="table-sticky-container">
+                        <table class="table table-leader table-sticky">
+                            <thead>
+                                <tr>
+                                    <th>Nemesis</th>
+                                    <th>Games</th>
+                                    <th>Win %</th>
+                                    <th>Loss %</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="table-scrollable-content">
+                            <table class="table table-leader">
+                                <thead>
+                                    <tr>
+                                       <th>Nemesis</th>
+                                        <th>Games</th>
+                                        <th>Win %</th>
+                                        <th>Loss %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr v-for="nemesis in nemesisList">
+                                        <td>
+                                            <a :href="'/user?user_id=' + nemesis.id"
+                                            class="game-participant">
+                                                <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                <span class="rank">
+                                                    {{nemesis.id}}
+                                                </span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{nemesis.total}}
+                                        </td>
+                                        <td>
+                                            {{nemesis.wins}}
+                                        </td>
+                                        <td>
+                                            {{nemesis.losses}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </section>
             <section v-if="is_my_page" class="profile-section profile-section-hackathon">
                 <h2>
@@ -306,7 +321,7 @@
                 page: 0,
                 limit: 10,
                 offset: 0,
-                nemesisLimit: 10,
+                nemesisLimit: 30,
                 nemesisGameCount: 200,
                 nemesisGameThreshold: 10,
                 only_timed_out: false,
@@ -370,9 +385,6 @@
         },
         methods: {
             setupStickyTable: function(){
-                //sticky table
-                // console.log($(this.$el));
-                // console.log($(this.$el).find('.table-sticky-container'));
                 setTimeout(() => {
                     const el = $(this.$el).find('.table-sticky-container').each(function(){
                         const heading = $(this).find('.table-sticky th');
@@ -491,6 +503,8 @@
 
                     this.nemesisList.sort(function(a,b) { return b.losses - a.losses});
                     this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit);
+                    console.log(this.nemesisList.length);
+                    this.setupStickyTable();
                 });
             },
             fetchHackathon: function(){
