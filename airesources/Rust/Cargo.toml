@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["Paul Butler <paul.butler@twosigma.com>"]
 
 [dependencies]
+
+[[bin]]
+name = "MyBot"
+path = "src/main.rs"

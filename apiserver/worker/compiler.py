@@ -325,7 +325,7 @@ comp_args = {
         ["python3", "-c", PYTHON_EXT_COMPILER],
     ],
     "Rust": [
-        ["cargo", "build", "--release", "-q"],
+        ["cargo", "rustc", "--release", "-q", "--", "-Awarnings"],
     ],
     "Scala": [
         ["scalac"],
