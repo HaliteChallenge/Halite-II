@@ -8,9 +8,6 @@ NUM_BOTS=4
 sudo groupadd bots
 sudo useradd -m worker -U -G bots -s /bin/bash
 
-# Don't just grant random people sudo access.
-sudo rm /etc/sudoers.d/google_sudoers
-
 ## Add necessary repositories for Node.js.
 # https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
@@ -36,7 +33,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy Cython"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
@@ -53,25 +50,27 @@ sudo python3.6 -m pip install ${PYTHON_PACKAGES}
 
 sudo gem install ${RUBY_PACKAGES}
 
-## Install Rustup, making sure the worker user can access it.
-sudo -iu worker sh -c 'curl https://sh.rustup.rs -sSf > rustup.sh; sh rustup.sh -y'
+## Install Rustup, making sure the compilation user can access it.
+## None of the other users will have access!
+sudo -iu bot_compilation sh -c 'curl https://sh.rustup.rs -sSf > rustup.sh; sh rustup.sh -y'
+sudo -iu bot_compilation rustup toolchain install nightly beta
 
 ## Install Leiningen/Clojure, also for the worker user.
 sudo sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
 sudo chmod a+x /usr/bin/lein
-sudo -iu worker lein
+sudo -iu bot_compilation lein
 
 # Miniconda
-sudo -iu worker sh -c 'curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -sSf > miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda'
+sudo -iu bot_compilation sh -c 'curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -sSf > miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda'
 
 # Groovy
-curl -s get.sdkman.io | sudo -iu worker bash
-cat <<EOF | sudo -iu worker tee -a /home/worker/.profile
+curl -s get.sdkman.io | sudo -iu bot_compilation bash
+cat <<EOF | sudo -iu bot_compilation tee -a /home/bot_compilation/.profile
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/worker/.sdkman"
-[[ -s "/home/worker/.sdkman/bin/sdkman-init.sh" ]] && source "/home/worker/.sdkman/bin/sdkman-init.sh"
+[[ -s "/home/worker/.sdkman/bin/sdkman-init.sh" ]] && source "/home/bot_compilation/.sdkman/bin/sdkman-init.sh"
 EOF
-sudo -iu worker sdk install groovy
+sudo -iu bot_compilation sdk install groovy
 
 ## Create four cgroups to isolate bots.
 sudo touch /etc/cgconfig.conf
@@ -167,19 +166,22 @@ for package in ${RUBY_PACKAGES}; do
 done
 
 echo "Rust Packages"
-sudo -iu worker bash << EOF
+sudo -iu bot_compilation bash << EOF
 rustc -V
 cargo -V
 rustup -V
 EOF
 
 echo "Clojure Packages"
-sudo -iu worker bash << EOF
+sudo -iu bot_compilation bash << EOF
 lein version
 EOF
 
 echo "Groovy Packages"
-sudo -iu worker sdk current | grep groovy
+sudo -iu bot_compilation sdk current | grep groovy
 
 echo "Miniconda"
-sudo -iu worker bash -c 'source ~/miniconda/bin/activate; conda -V'
+sudo -iu bot_compilation bash -c 'source ~/miniconda/bin/activate; conda -V'
+
+# Don't just grant random people sudo access.
+sudo rm /etc/sudoers.d/google_sudoers

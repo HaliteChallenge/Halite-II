@@ -1,5 +1,6 @@
 import Vue from "vue";
 import 'url-search-params-polyfill';
+import 'element-ui/lib/theme-default/index.css';
 import ApiKey from "./templates/ApiKey.vue";
 import Associate from "./templates/Associate.vue";
 import BotEditor from "./templates/BotEditor.vue";

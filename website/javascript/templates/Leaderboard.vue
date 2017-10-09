@@ -13,37 +13,11 @@
         <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
           <div class="form-header">
             <div class="filter-handler" v-if="filter_handle_view==='normal'">
-              <!-- <div class="handler-item" @click="openSaveFilter">
-                <span class="icon-disk"></span>
-                <span class="handler-item-text">Save Filter</span>
-              </div>
-              <div class="handler-item" @click="openViewFilter">
-                <span class="icon-folder"></span>
-                <span class="handler-item-text">View Filters</span>
-              </div> -->
               <div class="handler-item" @click="clearFilter">
                 <span class="icon-remove"></span>
                 <span class="handler-item-text">Clear all</span>
               </div>
             </div>
-            <!-- <div class="filter-handler" v-if="filter_handle_view==='save'">
-              <label>Enter filter name</label>
-              <div class="form-group">
-                <input type="text" v-model="filter_name" placeholder="Enter name" class="form-control">
-              </div>
-              <button class="btn btn-sm" @click="saveFilter"><span>Save</span></button>
-              <a @click="resetFilterView"><span class="icon-remove"></span></a>
-            </div>
-            <div class="filter-handler" v-if="filter_handle_view==='view'">
-              <v-select
-                placeholder="Select filter"
-                label="name"
-                v-model="selected_filter"
-                :options="saved_filters">
-              </v-select>
-              <button class="btn btn-sm" @click="viewFilter"><span>View</span></button>
-              <a @click="resetFilterView"><span class="icon-remove"></span></a>
-            </div> -->
           </div>
           <div class="filter-group">
             <div class="input-group">
@@ -57,6 +31,12 @@
                 multiple
                 placeholder="Tier"
                 v-model="tier_filter"
+                :options="tiers">
+              </v-select>
+               <v-select
+                multiple
+                placeholder="Level"
+                v-model="level_filter"
                 :options="levels">
               </v-select>
               <v-select
@@ -85,8 +65,6 @@
         </form>
       </div>
     </div>
-
-    
     <table class="table table-leader">
       <thead>
         <tr>
@@ -112,7 +90,7 @@
           </td>
           <td>{{ Math.round(100 * player.score) / 100 }}</td>
           <td class="text-center">
-            <span :class="tierClass(player.tier || player.local_tier)"></span>
+            <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
           </td>
           <td>{{ player.level }}</td>
           <td class="text-center">{{ getCountryName(player.country) }}</td>
@@ -137,6 +115,7 @@
 <script>
   import * as api from "../api";
   import HalitePagination from './Pagination.vue';
+  import TierPopover from './TierPopover.vue';
   import {tierClass, countries_data} from "../utils";
   import vSelect from 'vue-select';
   import _ from 'lodash';
@@ -147,7 +126,8 @@
     props: ['baseUrl', 'hackathonId'],
     components: {
       HalitePagination,
-      vSelect
+      vSelect,
+      TierPopover
     },
     data: function() {
       const countries = countries_data;
@@ -164,6 +144,7 @@
         organization_filter: "",
         country_filter: "",
         language_filter: "",
+        level_filter: "",
         page: 1,
         limit: 25,
         lastPage: 0,
@@ -194,6 +175,20 @@
           }
         ],
         levels: [
+          {
+            value: 'Professional',
+            label: 'Professional'
+          },
+          {
+            value: 'University',
+            label: 'University'
+          },
+          {
+            value: 'High School',
+            label: 'High School'
+          }
+        ],
+        tiers: [
           {
             label: "Diamond",
             value: 1
@@ -240,7 +235,7 @@
           language_options: [],
           country_options: [],
           org_options: [],
-          usernames_options: []
+          usernames_options: [],
         };
 
         let language_options = [];
@@ -296,13 +291,16 @@
       tier_filter: function(){
         this.on_update_filter();
       },
+      level_filter: function(){
+        this.on_update_filter();
+      },
       organization_filter: function(){
         this.on_update_filter();
       },
       country_filter: function(){
         this.on_update_filter();
       },
-      lang_filter: function(){
+      language_filter: function(){
         this.on_update_filter();
       }
     },
@@ -330,9 +328,17 @@
           this.username_filter = params.username;
         }
 
+        // get level value
+        if (params.level && params.level.length > 0){
+          let selected = this.levels.filter((item) => {
+            return params.level.indexOf(item.value + "") != -1;
+          })
+          this.level_filter = selected;
+        }
+
         // get tier value
         if (params.tier && params.tier.length > 0){
-          let selected = this.levels.filter((item) => {
+          let selected = this.tiers.filter((item) => {
             return params.tier.indexOf(item.value + "") != -1;
           })
           this.tier_filter = selected;
@@ -370,12 +376,22 @@
       build_filter: function() {
         let filters = [];
         let params = {};
+
         // adding the username filter
         if (this.username_filter.length > 0) {
           params['username'] = [];
           this.username_filter.forEach(function(item){
             filters.push("username,=," + item);
             params['username'].push(item);
+          });
+        }
+
+         // adding the level filter
+        if (this.level_filter.length > 0) {
+          params['level'] = [];
+          this.level_filter.forEach(function(item){
+            filters.push("level,=," + item.value);
+            params['level'].push(item.value);
           });
         }
 
@@ -524,42 +540,6 @@
         this.organization_filter = [];
         this.tier_filter = [];
         this.update_filter();
-      },
-      openSaveFilter: function(){
-        this.filter_handle_view = 'save';
-      },
-      openViewFilter: function(){
-        this.filter_handle_view = 'view';
-      },
-      resetFilterView: function(){
-        this.filter_handle_view = 'normal';
-      },
-      saveFilter: function(){
-        let saved_filters = [];
-        if (localStorage.saved_filters && localStorage.saved_filters.length > 0){
-          saved_filters = JSON.parse(localStorage.saved_filters);
-        }
-        saved_filters.push({
-          name: this.filter_name,
-          filter: {
-            username: this.username_filter,
-            tier: this.tier_filter,
-            organization: this.organization_filter,
-            country: this.country_filter
-          }
-        });
-        localStorage.saved_filters = JSON.stringify(saved_filters);
-        this.filter_handle_view = 'normal';
-      },
-      viewFilter: function(){
-        const filter = this.selected_filter.filter;
-        this.username_filter = filter.username || [];
-        this.tier_filter = filter.tier || [];
-        this.organization_filter = filter.organization || [];
-        this.country_filter = filter.country || [];
-        this.update_filter(true);
-
-        this.filter_handle_view = 'normal';
       },
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");

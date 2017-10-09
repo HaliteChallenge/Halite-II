@@ -98,7 +98,7 @@
         JSZip.loadAsync(this.botFile, () => {                          
           }).then((zip) => {
               zip.forEach(function (relativePath, zipEntry) { 
-                 if(zipEntry.name.startsWith("MyBot."))
+                 if(zipEntry.name.toLowerCase().startsWith("mybot.") || zipEntry.name.toLowerCase().startsWith("cargo.toml"))
                  {
                    my_bot_present = true;
                  }
@@ -111,8 +111,8 @@
               if(!my_bot_present)
               {
                 this.gaData('play', 'submit-error-zip','play-submit-flow');
-                const error_message = "The zip archive does not contain a root MyBot.{ext} file. MyBot.{ext} is required to be present in the root of the zip file."
-                this.enableMessage('error', error_message);
+                const error_message = "The zip archive does not contain a root mybot.{ext} file. mybot.{ext} is required to be present in the root of the zip file."
+                this.showMessage('error', error_message);
                 this.errorMessage = error_message;
                 return;
               }

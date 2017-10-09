@@ -8,16 +8,16 @@
         <p class="game-heading-date" v-if="game">{{game.time_played | moment("MMM Do, YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
           <div class="short">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[0].tier"/>{{sortedPlayers[0].name}}</span>
             <span class="action">defeats</span>
-            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[1].tier"></span>{{sortedPlayers[1].name}}</span>
+            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[1].tier"/>{{sortedPlayers[1].name}}</span>
             <span class="action" v-if="sortedPlayers.length > 2">+{{sortedPlayers.length - 2}}</span>
           </div>
           <div class="long">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><span :class="'icon-tier-' + sortedPlayers[0].tier"></span>{{sortedPlayers[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[0].tier"/>{{sortedPlayers[0].name}}</span>
             <span class="action">defeats</span>
             <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
-              <span :class="'icon-tier-' + player.tier"></span>
+              <TierPopover :tier="'icon-tier-' + player.tier"/>
               {{player.name}}
             </span>
           </div>
@@ -268,6 +268,7 @@
   import SelectedPlanet from "./SelectedPlanet.vue";
   import SelectedShip from "./SelectedShip.vue";
   import SelectedPoint from "./SelectedPoint.vue";
+  import TierPopover from './TierPopover.vue';
   import _ from "lodash";
 
   // libhaliteviz.setAssetRoot("/assets/js/");
@@ -338,6 +339,7 @@
       SelectedPlanet,
       SelectedShip,
       SelectedPoint,
+      TierPopover
     },
     mounted: function(){
       this.sliderOptions = Object.assign(this.sliderOptions, {
@@ -615,10 +617,12 @@
         this.showObjectPanel = !this.showObjectPanel;
       },
       initChart: function() {
+        console.log('initChart')
         if (this.showChart) return
         setTimeout(() => this.showChart = true, 500)
       },
       gaData: function(category, action, label) {
+        console.log('gaData')
         utils.gaEvent(category, action, label);
       },
 

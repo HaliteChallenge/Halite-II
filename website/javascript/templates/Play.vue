@@ -3,7 +3,18 @@
     <div class="message-container" v-if="displayMessage">
       <Message :message="message.content" :type="message.type"></Message>
     </div>
-    <div v-if="currentView == 'upload'">
+
+    <div class="row" id="replay-filename" v-if="currentView=='replay'">
+      <div class="col-sm-8 replay-header">
+        <div class="replay-breadcrumb">
+          <HaliteBreadcrumb :path="path" :baseUrl="baseUrl" />
+        </div>
+        <div class="filename"><span style="color: #858E92;">Replaying file: </span>{{replayFile}}</div>
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+
+    <div class="play-body" v-if="currentView == 'upload'">
       <div>
         <div class="page-header">
           <h1>PLAY A HALITE AI BOT</h1>
@@ -57,6 +68,7 @@
 <script>
   import * as api from "../api";
   import Vue from 'vue';
+  import HaliteBreadcrumb from './Breadcrumb.vue';
   import VisualizerContainer from "./VisualizerContainer.vue";
   import * as libhaliteviz from "../../../libhaliteviz";
   import Upload from "./Upload.vue";
@@ -112,11 +124,13 @@
       "bot-upload": BotUpload,
       "visualizer-container": VisualizerContainer,
       "Message": Message,
-      "halite-upload-zone": UploadZone
+      "halite-upload-zone": UploadZone,
+      HaliteBreadcrumb
     },
     data: function(){
       return {
         currentView: 'upload',
+        replayFile: '',
         botFile: {name: ""},
         loggedIn: false,
         user: null,
@@ -128,7 +142,17 @@
         },
         is_downloading: false,
         uploadProgress: null,
-        uploadMessage: null
+        uploadMessage: null,
+        path: [
+          {
+            name: '',
+            link: 'javascript:;'
+          },
+          {
+            name: 'Back',
+            link: '/play-programming-challenge'
+          }
+        ]
       }
     },
     mounted: function(){
@@ -168,9 +192,27 @@
 </script>
 
 <style lang="scss" scoped>
-  .play-container{
-    padding-top: 70px;
+  #replay-filename {
+    height: 70px;
     position: relative;
+
+    .replay-header {
+      margin-top: 35px;
+    }
+
+    .replay-breadcrumb {
+      position: absolute;
+    }
+
+    .filename {
+      text-align: center;
+    }
+  }
+  .play-container{
+    position: relative;
+  }
+  .play-body {
+    margin-top: 90px;
   }
   .message-container{
     position: absolute;

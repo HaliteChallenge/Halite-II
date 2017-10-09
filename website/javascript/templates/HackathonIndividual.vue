@@ -88,6 +88,7 @@
                 </div>
               </div>
             </div>
+            <i class="xline xline-bottom"></i>
           </div>
         </div>
       </div>
@@ -97,7 +98,6 @@
     </section>
 
     <section class="hackathon-leaderboard">
-      <i class="xline xline-top"></i>
       <div class="leaderboard-header">
         <div class="hackathon-title">
           <i class="xline xline-bottom"></i>
@@ -162,8 +162,9 @@
         if(this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
             console.log(hackathon);
-            const beginDate = moment(hackathon.begin_date).format("MM-DD-YYYY");
-            const endDate = moment(hackathon.end_date).format("MM-DD-YYYY");
+            const beginDate = moment(hackathon.start_date).format("MMM Do, YYYY: HH:MM");
+            const endDate = moment(hackathon.end_date).format("MMM Do, YYYY: HH:MM");
+            console.log(`${beginDate} to ${endDate}`);
             this.hackathon = Object.assign(mockHackathon, {
               title: hackathon.title,
               date: `${beginDate} to ${endDate}`,
@@ -171,17 +172,20 @@
               pin: hackathon.location,
               img: `${this.baseUrl}/assets/images/temp/hackathon.png`
             });
+            let title = _.chain(hackathon.title).toLower().split(' ').join('-').value();
+            window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
             return Promise.resolve();
           }, (xhr) => {
             console.log(xhr);
             this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`});
+            let title = _.chain(this.hackathon.title).toLower().split(' ').join('-').value();
+            window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
             this.path.push({name: this.hackathon.title, link: 'javascript:;'});
           });
         } else {
           return Promise.resolve();
         }
       }
-
       api.me().then((me) => {
         getHackathonPromise().then(() => {
           this.path.push({name: this.hackathon.title, link: 'javascript:;'});

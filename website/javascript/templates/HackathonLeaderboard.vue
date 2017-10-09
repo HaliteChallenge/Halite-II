@@ -22,7 +22,7 @@
         <table class="table">
             <thead>
             <tr>
-                <th>#</th>
+                <th>Hackathon Rank</th>
                 <th>Username</th>
                 <th>Organization</th>
                 <th>Level</th>

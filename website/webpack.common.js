@@ -42,6 +42,10 @@ module.exports = {
                     }
                 }
             },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
+            },
             // Work around pixi-extra-filter's use of glslify (which is
             // browserify-dependent) to load shaders
             {
@@ -53,7 +57,7 @@ module.exports = {
                 loader: "ify-loader",
             },
             {
-                test: /\.png$/,
+                test: /\.(png|ttf|woff)$/,
                 loader: "file-loader",
             },
         ],
