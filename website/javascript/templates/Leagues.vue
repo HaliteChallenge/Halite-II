@@ -5,7 +5,7 @@
                 <p class="t2 c-wht">Levels</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
-                    <a href="/halite-league-board?leaguename=top-10-bots-USA&country=USA">
+                    <a href="/halite-league-board?leaguename=Top-20-Professionals&level=Professional">
                         <div class="col-md-3 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
@@ -17,7 +17,7 @@
                             </div>
                         </div>
                     </a>
-                     <a href="/halite-league-board?leaguename=top-10-bots-USA&country=USA">
+                     <a href="/halite-league-board?leaguename=Top-20-University&level=University">
                         <div class="col-md-3 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     </a>   
-                     <a href="/halite-league-board?leaguename=top-10-bots-USA&country=USA">
+                     <a href="/halite-league-board?leaguename=Top-20-High-School&level=High School">
                         <div class="col-md-3 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
@@ -87,7 +87,7 @@
                 <p class="t2 c-wht">Languages</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
-                    <a href="/halite-league-board?leaguename=top-10-bots-USA&country=USA">
+                    <a href="/halite-league-board?leaguename=top-20-bots-Python&language=Python">
                         <div class="col-md-3 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
@@ -99,7 +99,7 @@
                             </div>
                         </div>
                     </a>
-                     <a href="/halite-league-board?leaguename=top-10-bots-USA&country=USA">
+                     <a href="/halite-league-board?leaguename=top-20-bots-Java|JAR&language=Java&language=JAR">
                         <div class="col-md-3 play-bot">   
                             <div class="img-des">
                                 <div class="img-container">
