@@ -28,4 +28,4 @@ set(SOURCE_FILES "${SOURCE_FILES}" main.cpp)
 
 add_executable(halite ${SOURCE_FILES})
 
-TARGET_LINK_LIBRARIES(halite pthread)
+target_link_libraries(halite pthread -static)
