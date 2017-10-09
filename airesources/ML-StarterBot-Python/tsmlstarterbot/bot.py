@@ -165,16 +165,6 @@ class Bot:
         """
         Given list of pairs (ship, planet) produce instructions for every ship to go to its respective planet.
         """
-        all_target_planets = set([planet for ship, planet in ships_to_planets_assignment])
-        enemy_ships_count = {}
-        for planet in all_target_planets:
-            enemy_ships_count[planet] = 0
-            for player in game_map.all_players():
-                if player != game_map.get_me():
-                    for s in player.all_ships():
-                        if s.calculate_distance_between(planet) <= planet.radius + 3:
-                            enemy_ships_count[planet] += 1
-
         command_queue = []
         # Send ships to their planets.
         for ship, planet in ships_to_planets_assignment:
