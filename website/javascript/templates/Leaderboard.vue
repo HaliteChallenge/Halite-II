@@ -80,7 +80,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="player in leaderboard">
+        <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
           <td class="text-center">{{ player.rank || player.local_rank }}</td>
           <td>
             <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
@@ -100,7 +100,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="leaderboard-page">
+    <div class="leaderboard-page" v-if="isDefaultLimit">
       <HalitePagination
         :page="this.page"
         :lastPage="this.lastPage"
@@ -120,6 +120,8 @@
   import vSelect from 'vue-select';
   import _ from 'lodash';
   import moment from 'moment';
+
+  const DEFAULT_LIMIT = 25;
 
   export default {
     name: "leaderboard",
@@ -146,7 +148,7 @@
         language_filter: "",
         level_filter: "",
         page: 1,
-        limit: 25,
+        limit: DEFAULT_LIMIT,
         lastPage: 0,
         organizations: [],
         classes: {
@@ -157,6 +159,7 @@
         filter_handle_view: 'normal',
         users: [],
         all_leaderboards: [],
+        params: [],
         summary: [
           {
             icon: 'medal',
@@ -282,6 +285,11 @@
         filters.usernames_options = username_options;
 
         return filters;
+      },
+
+      // return if limit is set default value
+      isDefaultLimit: function(){
+        return this.limit == DEFAULT_LIMIT;
       }
     },
     watch: {
@@ -361,6 +369,7 @@
           this.country_filter = selected;
         }
 
+        // get country
         if (params.language && params.language.length > 0){
           let selected = this.filter_options.language_options.filter((item) => {
             return params.language.indexOf(item + "") != -1; // convert to string
@@ -368,11 +377,17 @@
           this.language_filter = selected;
         }
 
+        // get page limit
+        if (params.limit && params.limit.length > 0){
+          this.limit = params.limit;
+        }
+
         // page
         if (params.page){
           this.page = parseInt(params.page[0]);
         }
       },
+
       build_filter: function() {
         let filters = [];
         let params = {};
@@ -438,16 +453,14 @@
           params['page'] = [this.page];
         }
 
-        // build params
-        if (filters.length > 0 ){
-          let query_string = [];
-          _.forEach(params, function(items, key){
-            query_string.push(key + '=' + items.join());
-          });
-          window.history.replaceState(null, null, "?" + query_string.join('&'));
-        } else {
-          window.history.replaceState(null, null, window.location.pathname);
+        if (this.limit != DEFAULT_LIMIT){
+          params['limit'] = [this.limit];
         }
+
+        this.params = params;
+
+        // build params in url
+        this.build_params();
 
         return filters.length ? filters : null;
       },
@@ -457,6 +470,21 @@
           const collapsed = !$('#panel_filter').hasClass('in');
           this.$cookie.set('leaderboard_filter_collapsed', collapsed ? 1 : 0);
         }, 500);
+      },
+
+      build_params: function(){
+        const params = this.params;
+
+        // build params
+        if ( Object.entries(params).length >0 ){
+          let query_string = [];
+          _.forEach(params, function(items, key){
+            query_string.push(key + '=' + items.join());
+          });
+          window.history.replaceState(null, null, "?" + query_string.join('&'));
+        } else {
+          window.history.replaceState(null, null, window.location.pathname);
+        }
       },
 
       setupCollapseFilter: function(){
@@ -521,8 +549,19 @@
             }
           });
         }
+
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
           this.leaderboard = leaderboard;
+
+          // scroll to user 
+          if (this.show_user){
+            setTimeout(() => {
+              const id = $(`#user-row-${this.show_user}`);
+              const offset = 60; // the header height
+              $('body, html').scrollTop(id.offset().top - offset);
+              this.show_user = null;
+            }, 1000);
+          }
         });
       },
 

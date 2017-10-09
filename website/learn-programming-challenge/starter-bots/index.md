@@ -1,7 +1,6 @@
 ---
 layout: doc_page
 title: Starter bots overview
-breadcrumb: Learn
 toc: false
 menu: learn
 description: Documentation for some of the key starter kits in Halite II

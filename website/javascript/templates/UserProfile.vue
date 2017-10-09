@@ -75,6 +75,7 @@
                                 <th>Opponents</th>
                                 <th>Map Size</th>
                                 <th>Watch</th>
+                                <th>Turns</th>
                                 <th>Won</th>
                             </tr>
                         </thead>
@@ -103,6 +104,9 @@
                                     <a :href="'/play?game_id=' + game.game_id">
                                         {{ game.game_id }}
                                     </a>
+                                </td>
+                                <td >
+                                  {{ game.turns_total }}
                                 </td>
                                 <td class="winner">
                                   {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
@@ -368,7 +372,6 @@
             api.me().then((me) => {
                 this.is_my_page = me && me.user_id === this.user.user_id;
             });
-
         },
         computed: {
             botLang: function(){
@@ -385,7 +388,7 @@
         },
         methods: {
             setupStickyTable: function(){
-                setTimeout(() => {
+                const calcCol = () => {
                     const el = $(this.$el).find('.table-sticky-container').each(function(){
                         const heading = $(this).find('.table-sticky th');
                         const body = $(this).find('.table:not(.table-sticky) th');
@@ -393,8 +396,14 @@
                             $(this).width($(body[index]).width());
                         });
                     });
+                }
+                setTimeout(() => {
+                    calcCol();
                 }, 500);
-
+                $(window).on('resize', () => {
+                    console.log('resize');
+                    calcCol();
+                });
             },
             fetch: function() {
                 let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`;
@@ -525,6 +534,7 @@
                     this.setupStickyTable();
                 })
             },
+
             next_page: function() {
                 this.offset += 10;
                 this.fetch().then(() => {
