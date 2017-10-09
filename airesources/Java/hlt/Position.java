@@ -36,8 +36,7 @@ public class Position {
     }
 
     public Position getClosestPoint(final Entity target) {
-        final int MIN_DISTANCE = 3;
-        final double radius = target.getRadius() + MIN_DISTANCE;
+        final double radius = target.getRadius() + Constants.MIN_DISTANCE;
         final double angleRad = target.orientTowardsInRad(this);
 
         final double dx = target.getXPos() + radius * Math.cos(angleRad);

@@ -3,8 +3,6 @@ package hlt;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 public class Networking {
 
@@ -71,12 +69,12 @@ public class Networking {
         }
     }
 
-    public static LinkedList<String> readAndSplitLine() {
-        return new LinkedList<>(Arrays.asList(readLine().trim().split(" ")));
+    public static Metadata readLineIntoMetadata() {
+        return new Metadata(readLine().trim().split(" "));
     }
     
     public GameMap initialize(final String botName) {
-        final short myId = Short.parseShort(readLine());
+        final int myId = Integer.parseInt(readLine());
         try {
             DebugLog.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
         }
@@ -84,15 +82,15 @@ public class Networking {
             e.printStackTrace();
         }
 
-        final LinkedList<String> inputStringMapSize = readAndSplitLine();
-        final short width = Short.parseShort(inputStringMapSize.pop());
-        final short height = Short.parseShort(inputStringMapSize.pop());
-        GameMap gameMap = new GameMap(width, height, myId);
+        final Metadata inputStringMapSize = readLineIntoMetadata();
+        final int width = Integer.parseInt(inputStringMapSize.pop());
+        final int height = Integer.parseInt(inputStringMapSize.pop());
+        final GameMap gameMap = new GameMap(width, height, myId);
 
         // Associate bot name
         System.out.println(botName);
 
-        final LinkedList<String> inputStringMetadata = readAndSplitLine();
+        final Metadata inputStringMetadata = readLineIntoMetadata();
         gameMap.updateMap(inputStringMetadata);
 
         return gameMap;

@@ -9,55 +9,59 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class GameMap {
-    private final short width, height;
-    private final short playerId;
+    private final int width, height;
+    private final int playerId;
     private final List<Player> players;
-    private final Map<Long, Planet> planets;
-    private List<Ship> allShips;
+    private final List<Player> playersUnmodifiable;
+    private final Map<Integer, Planet> planets;
+    private final List<Ship> allShips;
+    private final List<Ship> allShipsUnmodifiable;
 
-    public GameMap(final short width, final short height, final short playerId) {
+    public GameMap(final int width, final int height, final int playerId) {
         this.width = width;
         this.height = height;
         this.playerId = playerId;
         players = new ArrayList<>(Constants.MAXIMUM_NUMBER_OF_PLAYERS);
+        playersUnmodifiable = Collections.unmodifiableList(players);
         planets = new TreeMap<>();
-        allShips = new LinkedList<>();
+        allShips = new ArrayList<>();
+        allShipsUnmodifiable = Collections.unmodifiableList(allShips);
     }
 
-    public short getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public short getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public short getMyPlayerId() {
+    public int getMyPlayerId() {
         return playerId;
     }
 
     public List<Player> getAllPlayers() {
-        return Collections.unmodifiableList(players);
+        return playersUnmodifiable;
     }
 
     public Player getMyPlayer() {
         return getAllPlayers().get(getMyPlayerId());
     }
 
-    public Ship getShip(final short playerId, final long entityId) throws IndexOutOfBoundsException {
+    public Ship getShip(final int playerId, final int entityId) throws IndexOutOfBoundsException {
         return players.get(playerId).getShip(entityId);
     }
 
-    public Planet getPlanet(final long entityId) {
+    public Planet getPlanet(final int entityId) {
         return planets.get(entityId);
     }
 
-    public Map<Long, Planet> getAllPlanets() {
+    public Map<Integer, Planet> getAllPlanets() {
         return planets;
     }
 
-    public List<Ship> getAllShips(){
-        return Collections.unmodifiableList(allShips);
+    public List<Ship> getAllShips() {
+        return allShipsUnmodifiable;
     }
 
     public ArrayList<Entity> objectsBetween(Position start, Position target) {
@@ -103,17 +107,17 @@ public class GameMap {
         return entityByDistance;
     }
 
-    public GameMap updateMap(final LinkedList<String> mapMetadata) {
+    public GameMap updateMap(final Metadata mapMetadata) {
         DebugLog.addLog("--- NEW TURN ---");
-        final short numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
+        final int numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
 
         players.clear();
         planets.clear();
         allShips.clear();
 
         // update players info
-        for (short i = 0; i < numberOfPlayers; i++) {
-            final short playerId = MetadataParser.parsePlayerId(mapMetadata);
+        for (int i = 0; i < numberOfPlayers; ++i) {
+            final int playerId = MetadataParser.parsePlayerId(mapMetadata);
 
             final Player currentPlayer = new Player(playerId);
             final List<Ship> ships = MetadataParser.getShipList(playerId, mapMetadata);
@@ -125,9 +129,9 @@ public class GameMap {
             players.add(currentPlayer);
         }
 
-        final long numberOfPlanets = Long.parseLong(mapMetadata.pop());
+        final int numberOfPlanets = Integer.parseInt(mapMetadata.pop());
 
-        for (long i = 0; i < numberOfPlanets; i++) {
+        for (int i = 0; i < numberOfPlanets; ++i) {
             final Planet planet = MetadataParser.newPlanetFromMetadata(mapMetadata);
             planets.put(planet.getId(), planet);
         }

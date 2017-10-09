@@ -14,6 +14,9 @@ public class Constants {
     public static final int WEAPON_DAMAGE = 48;
     public static final double EXPLOSION_RADIUS = 5;
 
+    // for Position.getClosestPoint()
+    public static final int MIN_DISTANCE = 3;
+
     // Distance from the edge of the planet at which ships can try to dock
     public static final double DOCK_RADIUS = 4;
 

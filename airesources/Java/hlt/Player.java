@@ -5,27 +5,27 @@ import java.util.TreeMap;
 
 public class Player {
 
-    private final Map<Long, Ship> ships;
-    private final short id;
+    private final Map<Integer, Ship> ships;
+    private final int id;
 
-    public Player(final short id){
+    public Player(final int id) {
         this.id = id;
         ships = new TreeMap<>();
     }
 
-    public Map<Long, Ship> getShips() {
+    public Map<Integer, Ship> getShips() {
         return ships;
     }
 
-    public Ship getShip(final long entityId) {
+    public Ship getShip(final int entityId) {
         return ships.get(entityId);
     }
 
-    public short getId() {
+    public int getId() {
         return id;
     }
 
-    public void addShip(final long shipId, final Ship ship) {
+    public void addShip(final int shipId, final Ship ship) {
         ships.put(shipId, ship);
     }
 }

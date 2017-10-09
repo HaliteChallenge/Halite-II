@@ -2,12 +2,12 @@ package hlt;
 
 public class Entity extends Position {
 
-    private final Short owner;
-    private final long id;
-    private final short health;
+    private final int owner;
+    private final int id;
+    private final int health;
     private final double radius;
 
-    public Entity(final Short owner, final long id, final double xPos, final double yPos, final short health, final double radius) {
+    public Entity(final int owner, final int id, final double xPos, final double yPos, final int health, final double radius) {
         super(xPos, yPos);
         this.owner = owner;
         this.id = id;
@@ -15,15 +15,15 @@ public class Entity extends Position {
         this.radius = radius;
     }
 
-    public Short getOwner() {
+    public int getOwner() {
         return owner;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public short getHealth() {
+    public int getHealth() {
         return health;
     }
 
