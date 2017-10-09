@@ -4,15 +4,14 @@ import java.util.List;
 
 public class Planet extends Entity {
 
-    private final short remainingProduction;
-    private final short currentProduction;
-    private final short dockingSpots;
-    private final List<Long> dockedShips;
+    private final int remainingProduction;
+    private final int currentProduction;
+    private final int dockingSpots;
+    private final List<Integer> dockedShips;
 
-    public Planet(final Short owner, final long id, final double xPos, final double yPos,
-                  final short health, final double radius, final short dockingSpots,
-                  final short currentProduction, final short remainingProduction,
-                  final List<Long> dockedShips) {
+    public Planet(final int owner, final int id, final double xPos, final double yPos, final int health,
+                  final double radius, final int dockingSpots, final int currentProduction,
+                  final int remainingProduction, final List<Integer> dockedShips) {
 
         super(owner, id, xPos, yPos, health, radius);
 
@@ -22,19 +21,19 @@ public class Planet extends Entity {
         this.dockedShips = dockedShips;
     }
 
-    public short getRemainingProduction() {
+    public int getRemainingProduction() {
         return remainingProduction;
     }
 
-    public short getCurrentProduction() {
+    public int getCurrentProduction() {
         return currentProduction;
     }
 
-    public short getDockingSpots() {
+    public int getDockingSpots() {
         return dockingSpots;
     }
 
-    public List<Long> getDockedShips() {
+    public List<Integer> getDockedShips() {
         return dockedShips;
     }
 
@@ -43,7 +42,7 @@ public class Planet extends Entity {
     }
 
     public boolean isOwned() {
-        return getOwner() != null;
+        return getOwner() != -1;
     }
 
     @Override

@@ -5,13 +5,13 @@ public class Ship extends Entity {
     public enum DockingStatus { Undocked, Docking, Docked, Undocking }
 
     private final DockingStatus dockingStatus;
-    private final long dockedPlanet;
-    private final short dockingProgress;
-    private final short weaponCooldown;
+    private final int dockedPlanet;
+    private final int dockingProgress;
+    private final int weaponCooldown;
 
-    public Ship(final short owner, final long id, final double xPos, final double yPos,
-                final short health, final DockingStatus dockingStatus, final long dockedPlanet,
-                final short dockingProgress, final short weaponCooldown) {
+    public Ship(final int owner, final int id, final double xPos, final double yPos,
+                final int health, final DockingStatus dockingStatus, final int dockedPlanet,
+                final int dockingProgress, final int weaponCooldown) {
 
         super(owner, id, xPos, yPos, health, Constants.SHIP_RADIUS);
 
@@ -21,7 +21,7 @@ public class Ship extends Entity {
         this.weaponCooldown = weaponCooldown;
     }
 
-    public short getWeaponCooldown() {
+    public int getWeaponCooldown() {
         return weaponCooldown;
     }
 
@@ -29,11 +29,11 @@ public class Ship extends Entity {
         return dockingStatus;
     }
 
-    public short getDockingProgress() {
+    public int getDockingProgress() {
         return dockingProgress;
     }
 
-    public long getDockedPlanet() {
+    public int getDockedPlanet() {
         return dockedPlanet;
     }
 
