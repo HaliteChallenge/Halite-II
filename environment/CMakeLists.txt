@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.8)
+# versions before 3.4 always link with -rdynamic on linux, which breaks static linkage with clang
+cmake_minimum_required(VERSION 3.4)
 project(environment)
 set(CMAKE_CXX_STANDARD 11)
 
