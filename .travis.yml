@@ -86,7 +86,26 @@ script:
   - cd environment/
   - cmake .
   - make -j2
-  - cd ../website
+
+# build C++ bot
+  - cd ../airesources/C++
+  - cmake .
+  - make -j2
+
+# build Java bot
+  - cd ../Java
+  - javac MyBot.java
+  
+# compile Python script
+  - cd ../Python3
+  - python -m py_compile MyBot.py
+
+# compile mlstarterbot script
+  - cd ../ML-StarterBot-Python
+  - python -m py_compile MyBot.py
+
+# build website
+  - cd ../../website
   - npm config set package-lock false
   - gem install bundler
   - bundle install --path=vendor/bundle
@@ -96,4 +115,3 @@ script:
   - cd ../website
   - npm run build
   - bundle exec jekyll build
-# build website
