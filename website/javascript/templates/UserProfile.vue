@@ -75,8 +75,8 @@
                                 <th>Opponents</th>
                                 <th>Map Size</th>
                                 <th>Watch</th>
-                                <th>Won</th>
                                 <th>Turns</th>
+                                <th>Won</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -105,11 +105,11 @@
                                         {{ game.game_id }}
                                     </a>
                                 </td>
-                                <td class="winner">
-                                  {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
-                                </td>
                                 <td >
                                   {{ game.turns_total }}
+                                </td>
+                                <td class="winner">
+                                  {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
                                 </td>
                             </tr>
                         </tbody>
