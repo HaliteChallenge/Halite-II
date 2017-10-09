@@ -2,7 +2,7 @@ package hlt;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Networking {
 
@@ -10,7 +10,7 @@ public class Networking {
     private static final char DOCK_KEY = 'd';
     private static final char THRUST_KEY = 't';
 
-    public static void sendMoves(final ArrayList<Move> moves) {
+    public static void sendMoves(final Iterable<Move> moves) {
         final StringBuilder moveString = new StringBuilder();
 
         for (final Move move : moves) {
