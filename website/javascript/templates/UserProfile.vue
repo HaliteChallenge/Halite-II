@@ -141,6 +141,7 @@
                     <thead>
                         <tr>
                             <th>Nemesis</th>
+                            <th>Games</th>
                             <th>Win %</th>
                             <th>Loss %</th>
                         </tr>
@@ -155,6 +156,9 @@
                                         {{nemesis.id}}
                                     </span>
                                 </a>
+                            </td>
+                             <td>
+                                {{nemesis.total}}
                             </td>
                             <td>
                                 {{nemesis.wins}}
@@ -303,6 +307,8 @@
                 limit: 10,
                 offset: 0,
                 nemesisLimit: 10,
+                nemesisGameCount: 200,
+                nemesisGameThreshold: 10,
                 only_timed_out: false,
                 is_my_page: false,
                 messages: {
@@ -429,7 +435,7 @@
               return location ? location : '';
             },
             nemesis: function() {
-                let query = `order_by=desc,time_played&offset=0&limit=200`;
+                let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`;
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
                 return $.get(url).then((data) => {
                     var nemesisMap = new Map()
@@ -473,8 +479,10 @@
                         let totalGames = value.wins + value.losses;
                         let winRatio = value.wins/totalGames;
                         let lossRatio = value.losses/totalGames;
-                        var obj = {id:key, wins:Math.round(winRatio*100), losses:Math.round(lossRatio*100)};
-                        this.nemesisList.push(obj);
+                        if(totalGames >= this.nemesisGameThreshold){
+                            var obj = {id:key, wins:Math.round(winRatio*100), losses:Math.round(lossRatio*100), total:totalGames};
+                            this.nemesisList.push(obj);
+                        }
                         api.get_user(key).then((user) => {
                                 this.profile_images[key] = api.make_profile_image_url(user.username);
                                 this.$forceUpdate();
