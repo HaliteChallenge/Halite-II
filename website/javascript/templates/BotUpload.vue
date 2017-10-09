@@ -112,7 +112,7 @@
               {
                 this.gaData('play', 'submit-error-zip','play-submit-flow');
                 const error_message = "The zip archive does not contain a root MyBot.{ext} file. MyBot.{ext} is required to be present in the root of the zip file."
-                this.enableMessage('error', error_message);
+                this.showMessage('error', error_message);
                 this.errorMessage = error_message;
                 return;
               }
