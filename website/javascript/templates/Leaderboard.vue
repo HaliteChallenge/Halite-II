@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    
+
     <table class="table table-leader">
       <thead>
         <tr>
@@ -302,7 +302,7 @@
       country_filter: function(){
         this.on_update_filter();
       },
-      lang_filter: function(){
+      language_filter: function(){
         this.on_update_filter();
       }
     },

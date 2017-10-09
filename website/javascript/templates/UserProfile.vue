@@ -15,7 +15,7 @@
                     </p>
                     <p v-if="botLang.length > 0">Bots in
                         <template v-for="(lang, index) in botLang">
-                            <span class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
+                            <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
                 </div>
@@ -278,7 +278,7 @@
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
     import Vue from "vue";
-    
+
     export default {
         name: "UserProfile",
         props: ['baseUrl'],
@@ -455,7 +455,7 @@
                                     continue;
                                 }
 
-                                if(game.players[participant].rank === 1){ 
+                                if(game.players[participant].rank === 1){
                                     let playerData = nemesisMap.get(participant);
                                     if(playerData){
                                         playerData.wins++;
