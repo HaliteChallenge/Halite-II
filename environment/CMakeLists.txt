@@ -4,6 +4,11 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I ./ -g -O2 -Wall -Wno-sign-compare -Wno-unused-function -pedantic")
 
+# versions of cmake before 3.4 always link with -rdynamic on linux, which breaks static linkage with clang
+# unfortunately travis right now only has cmake 3.2, so have to do this workaround for now
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
 include_directories(${CMAKE_SOURCE_DIR}/core)
 include_directories(${CMAKE_SOURCE_DIR}/core/mapgen)
 include_directories(${CMAKE_SOURCE_DIR}/networking)
@@ -28,4 +33,4 @@ set(SOURCE_FILES "${SOURCE_FILES}" main.cpp)
 
 add_executable(halite ${SOURCE_FILES})
 
-TARGET_LINK_LIBRARIES(halite pthread)
+target_link_libraries(halite pthread -static)
