@@ -25,7 +25,7 @@ Constructors
 GameMap
 ^^^^^^^
 
-.. java:constructor:: public GameMap(short width, short height, short playerId)
+.. java:constructor:: public GameMap(int width, int height, int playerId)
    :outertype: GameMap
 
 Methods
@@ -33,7 +33,7 @@ Methods
 getAllPlanets
 ^^^^^^^^^^^^^
 
-.. java:method:: public Map<Long, Planet> getAllPlanets()
+.. java:method:: public Map<Integer, Planet> getAllPlanets()
    :outertype: GameMap
 
 getAllPlayers
@@ -51,7 +51,7 @@ getAllShips
 getHeight
 ^^^^^^^^^
 
-.. java:method:: public short getHeight()
+.. java:method:: public int getHeight()
    :outertype: GameMap
 
 getMyPlayer
@@ -63,25 +63,25 @@ getMyPlayer
 getMyPlayerId
 ^^^^^^^^^^^^^
 
-.. java:method:: public short getMyPlayerId()
+.. java:method:: public int getMyPlayerId()
    :outertype: GameMap
 
 getPlanet
 ^^^^^^^^^
 
-.. java:method:: public Planet getPlanet(long entityId)
+.. java:method:: public Planet getPlanet(int entityId)
    :outertype: GameMap
 
 getShip
 ^^^^^^^
 
-.. java:method:: public Ship getShip(short playerId, long entityId) throws IndexOutOfBoundsException
+.. java:method:: public Ship getShip(int playerId, int entityId) throws IndexOutOfBoundsException
    :outertype: GameMap
 
 getWidth
 ^^^^^^^^
 
-.. java:method:: public short getWidth()
+.. java:method:: public int getWidth()
    :outertype: GameMap
 
 nearbyEntitiesByDistance
@@ -99,6 +99,6 @@ objectsBetween
 updateMap
 ^^^^^^^^^
 
-.. java:method:: public GameMap updateMap(LinkedList<String> mapMetadata)
+.. java:method:: public GameMap updateMap(Metadata mapMetadata)
    :outertype: GameMap
 

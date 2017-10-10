@@ -13,7 +13,7 @@ Constructors
 Planet
 ^^^^^^
 
-.. java:constructor:: public Planet(Short owner, long id, double xPos, double yPos, short health, double radius, short dockingSpots, short currentProduction, short remainingProduction, List<Long> dockedShips)
+.. java:constructor:: public Planet(int owner, int id, double xPos, double yPos, int health, double radius, int dockingSpots, int currentProduction, int remainingProduction, List<Integer> dockedShips)
    :outertype: Planet
 
 Methods
@@ -21,25 +21,25 @@ Methods
 getCurrentProduction
 ^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public short getCurrentProduction()
+.. java:method:: public int getCurrentProduction()
    :outertype: Planet
 
 getDockedShips
 ^^^^^^^^^^^^^^
 
-.. java:method:: public List<Long> getDockedShips()
+.. java:method:: public List<Integer> getDockedShips()
    :outertype: Planet
 
 getDockingSpots
 ^^^^^^^^^^^^^^^
 
-.. java:method:: public short getDockingSpots()
+.. java:method:: public int getDockingSpots()
    :outertype: Planet
 
 getRemainingProduction
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public short getRemainingProduction()
+.. java:method:: public int getRemainingProduction()
    :outertype: Planet
 
 isFull
@@ -52,5 +52,11 @@ isOwned
 ^^^^^^^
 
 .. java:method:: public boolean isOwned()
+   :outertype: Planet
+
+toString
+^^^^^^^^
+
+.. java:method:: @Override public String toString()
    :outertype: Planet
 

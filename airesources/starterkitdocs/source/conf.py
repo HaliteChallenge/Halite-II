@@ -22,6 +22,7 @@ import sys
 import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath('../../Python3'))
+sys.path.insert(0, os.path.abspath('../../ML-StarterBot-Python/tsmlstarterbot'))
 
 print(sys.path[0])
 
@@ -52,12 +53,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'javasphinx',
-    'sphinx_csharp.csharp',
-    'autoapi.extension']
+    'javasphinx']
 
-autoapi_type = 'dotnet'
-autoapi_dirs = ['../../CSharp/']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

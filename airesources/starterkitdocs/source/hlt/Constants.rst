@@ -68,6 +68,12 @@ MAX_SPEED
 .. java:field:: public static final int MAX_SPEED
    :outertype: Constants
 
+MIN_DISTANCE
+^^^^^^^^^^^^
+
+.. java:field:: public static final int MIN_DISTANCE
+   :outertype: Constants
+
 SHIP_RADIUS
 ^^^^^^^^^^^
 

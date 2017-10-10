@@ -55,7 +55,13 @@ hashCode
 orientTowardsInDeg
 ^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public double orientTowardsInDeg(Position target)
+.. java:method:: public int orientTowardsInDeg(Position target)
+   :outertype: Position
+
+orientTowardsInRad
+^^^^^^^^^^^^^^^^^^
+
+.. java:method:: public double orientTowardsInRad(Position target)
    :outertype: Position
 
 toString
