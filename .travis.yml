@@ -94,9 +94,9 @@ script:
   - make -j2
 
 # build scala bot
-  - sudo apt-get install scala
-  - cd ../Scala
-  - scalac MyBot.scala hlt/*
+#  - sudo apt-get install scala
+# - cd ../Scala
+#  - scalac MyBot.scala hlt/*
 
 
 # build Rust bot
