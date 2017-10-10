@@ -62,6 +62,7 @@ function handleOutboundLinkClicks(category, action, label) {
   var api_server_url = "{{ site.api_server_url }}";
   var login_server_url = "{{ site.login_server_url }}";
   var logout_server_url = "{{ site.logout_server_url }}";
+  var is_learn_section = window.location.pathname.startsWith('/learn-programming-challenge');
 </script>
 
   <script async src='https://www.google-analytics.com/analytics.js'></script>
@@ -110,7 +111,7 @@ function handleOutboundLinkClicks(category, action, label) {
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="{% if page.menu == 'learn' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
+                <li class="{% if page.menu == 'learn' or page.dir contains '/learn-programming-challenge' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'leagues' %} active {% endif %}"><a href="{{ site.baseurl }}/halite-leagues"><span>Leagues</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
