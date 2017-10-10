@@ -3,7 +3,7 @@
         <table class="table table-leader">
             <thead>
             <tr>
-                <th>Hackathon Rank</th>
+                <th class="text-center">Hackathon Rank</th>
                 <th>Player</th>
                 <th>Score</th>
                 <th class="text-center">Tier</th>

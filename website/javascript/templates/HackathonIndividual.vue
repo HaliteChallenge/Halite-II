@@ -118,7 +118,7 @@
             <div class="leaderboard-header">
                 <div class="hackathon-title">
                     <i class="xline xline-bottom"></i>
-                    <p class="t2 c-wht font-headline">{{hackathon.title}}</p>
+                    <p class="t2 c-wht font-headline">{{hackathon.title}} Leaderboard</p>
                 </div>
             </div>
             <Leaderboard v-if="hackathon_id" :baseUrl="baseUrl" :hackathonId="hackathon_id"></Leaderboard>
