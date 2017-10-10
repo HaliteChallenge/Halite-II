@@ -2,7 +2,7 @@
 layout: default
 title: Halite TV | Watch Coding Game Videos
 full_width: true
-menu: tv
+menu: play
 mount_view: Visualizer
 permalink: /halite-tv-coding-game-videos
 description: Watch videos from the Halite AI Programming Challenge, including featured videos and games with top players.

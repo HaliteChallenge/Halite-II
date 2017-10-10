@@ -1,7 +1,9 @@
 <template>
   <table class="player-stats-table">
     <tr class="player-stats" v-for="(player, index) in statistics">
-      <td :class="'player-stats-name color-' + (parseInt(index) + 1)">{{player_names[index].split(" ")[0]}}:</td>
+      <td :class="'player-stats-name color-' + (parseInt(index) + 1)">
+        <a class="player-name-anchor" :href="`/user/?user_id=${(players[index] || {}).id}`">{{(players[index] || {}).name}}</a>:
+      </td>
       <td class="player-stats-break-down">
         <div class="player-stats-ship">
           <div v-for="i in 20" v-bind:class="{'bar': true, 'bar-1': isActive(i, player.shipsRate)}"></div>
@@ -32,12 +34,7 @@
 
   export default {
     name: 'PlayerStatsPane',
-    props: ['replay', 'statistics'],
-    data: function(){
-      return {
-        player_names: this.replay.player_names
-      };
-    },
+    props: ['players', 'statistics'],
     mounted: function(){
       console.log(this.statistics)
     },

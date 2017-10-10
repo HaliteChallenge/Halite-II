@@ -2,7 +2,7 @@
 layout: default
 title: Play
 full_width: true
-menu: tv
+menu: play
 mount_view: HaliteTV
 ---
 

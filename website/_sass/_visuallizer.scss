@@ -247,3 +247,11 @@
     display: block;
   }
 }
+
+.player-name-anchor {
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}

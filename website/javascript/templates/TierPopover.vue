@@ -12,12 +12,13 @@
         <p class="header-text">{{badge}} tier</p>
         <span class="close-btn icon-remove" @click="show = false" />
       </div>
-      <p class="tier-won">Won 145 games</p>
-      <p class="tier-percetage"><i>5% of players achieved this badge</i></p>
+      <p class="tier-percetage"><i>{{percentage}}% of players achieved this badge</i></p>
       <div class="tier-more-btn">
-        <button class="btn">
-          <span>LEARN MORE ABOUT TIERS</span>
-        </button>
+        <a href="/learn-programming-challenge/contest-rules#ranking">
+          <button class="btn">
+            <span>LEARN MORE ABOUT TIERS</span>
+          </button>
+        </a>
       </div>
     </div>
   </el-popover>
@@ -27,6 +28,7 @@
   import Vue from 'vue';
   import {Popover} from 'element-ui';
   const badges = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Salt'];
+  const percentages = ['0.2', '0.2', '0.4', '0.8', '98.4']
 
   export default {
     name: 'TierPopover',
@@ -39,12 +41,14 @@
       const badge = badges[index - 1];
       this.index = index;
       this.badge = badge;
+      this.percentage = percentages[index - 1];
     },
     data: function() {
       return {
         show: false,
         index: '',
-        badge: ''
+        badge: '',
+        percentage: ''
       }
     }
   }
