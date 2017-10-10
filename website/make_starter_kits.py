@@ -58,8 +58,6 @@ def scan_directory(full_path):
             if ext.lower() in INCLUDED_EXTENSIONS or filename in INCLUDED_FILES:
                 included_files.append(os.path.join(containing_dir, filename))
 
-    # TODO: also get sample bots and READMEs
-
     return included_files
 
 
