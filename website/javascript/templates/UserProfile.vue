@@ -301,6 +301,7 @@
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
     import Vue from "vue";
+    import * as utils from "../utils";
 
     export default {
         name: "UserProfile",
@@ -567,12 +568,14 @@
 
             join_hackathon: function(event) {
                 event.preventDefault();
-
                 const code = this.$refs.hackathon_signup_code.value;
+                gaData('hackathon','click-submit-hackathon-code','hackathon-flow');
                 api.registerHackathon(code).then(() => {
                     Alert.show("Successfully registered!", 'success');
+                    gaData('hackathon','hackathon-code-success','hackathon-flow');
                 }, (error) => {
                     Alert.show(`Error: ${error.message || error.responseJSON.message}`);
+                    gaData('hackathon','hackathon-code-error','hackathon-flow');
                 });
             },
             prev_badge: ()=>{
@@ -606,6 +609,9 @@
                     aniVal = 0;
                 }
                 $(list).animate({marginLeft:'+='+aniVal+'px'});
+            },
+            gaData: function(category, action, label) {
+                utils.gaEvent(category, action, label);
             },
         },
     }

@@ -77,6 +77,7 @@
 <script>
 import * as api from "../api";
 import moment from 'moment';
+import * as utils from "../utils";
 
 const hackathonTemplate = {
   pin: 'New York City',
@@ -153,8 +154,12 @@ export default {
   },
   methods: {
     jumpToHackathon: function(id) {
+      gaData('hackathon', 'click-to-join', 'hackathon-flow');
       window.location.href = `hackathon-individual/?hackathon_id=${id}`
-    }
+    },
+    gaData: function(category, action, label) {
+      utils.gaEvent(category, action, label);
+    },
   },
 }
 </script>
