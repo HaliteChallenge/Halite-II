@@ -100,7 +100,6 @@
                 organization: null,
                 organizations: [],
                 error: null,
-                hackathon_code: '',
                 primary:true,
                 user: null,
             };
