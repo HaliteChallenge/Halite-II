@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 dist: trusty
 language: cpp
 
@@ -82,6 +82,9 @@ before_install:
     - eval "${MATRIX_EVAL}"
 
 script:
+
+
+
 # build game environment
   - cd environment/
   - cmake .
@@ -91,6 +94,11 @@ script:
   - cd ../airesources/C++
   - cmake .
   - make -j2
+
+# build Rust bot
+  - cd ../Rust
+  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
+  - cargo rustc --release -q -- -Awarnings
 
 # build Java bot
   - cd ../Java
