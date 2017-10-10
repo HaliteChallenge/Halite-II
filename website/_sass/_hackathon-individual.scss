@@ -56,7 +56,11 @@
       letter-spacing: 1px;
     }
   }
-
+  .panel-heading{
+    >a{
+      cursor: pointer;
+    }
+  }
   .hackathon-info {
     text-align: center;
     margin: 50px 0;
