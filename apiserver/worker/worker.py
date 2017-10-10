@@ -163,7 +163,6 @@ def runGame(width, height, users):
 
         # Make sure bots have access to the temp dir as a whole
         # Otherwise, Python can't import modules from the bot dir
-        # TODO: is it possible to limit permissions more?
         # Based on strace, Python lstat()s the full dir path to the dir it's
         # in, and fails when it tries to lstat the temp dir, which this
         # fixes
