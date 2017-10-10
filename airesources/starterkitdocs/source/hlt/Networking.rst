@@ -2,11 +2,7 @@
 
 .. java:import:: java.io IOException
 
-.. java:import:: java.util ArrayList
-
 .. java:import:: java.util Arrays
-
-.. java:import:: java.util LinkedList
 
 Networking
 ==========
@@ -24,15 +20,15 @@ initialize
 .. java:method:: public GameMap initialize(String botName)
    :outertype: Networking
 
-readAndSplitLine
-^^^^^^^^^^^^^^^^
+readLineIntoMetadata
+^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public static LinkedList<String> readAndSplitLine()
+.. java:method:: public static Metadata readLineIntoMetadata()
    :outertype: Networking
 
 sendMoves
 ^^^^^^^^^
 
-.. java:method:: public static void sendMoves(ArrayList<Move> moves)
+.. java:method:: public static void sendMoves(Iterable<Move> moves)
    :outertype: Networking
 

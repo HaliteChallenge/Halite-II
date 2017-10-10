@@ -12,6 +12,7 @@ hlt
    DockMove
    Entity
    GameMap
+   Metadata
    MetadataParser
    Move
    Move-MoveType
@@ -24,4 +25,5 @@ hlt
    Ship-DockingStatus
    ThrustMove
    UndockMove
+   Util
 

@@ -23,3 +23,6 @@ Get Mono:
 
 Generate the docs:
 1. javasphinx-apidoc -f -o source/ --title='Java Starter Kit' ../Java/hlt
+
+Running the Server
+1. gunicorn -w 1 'sphinxserver:app(home="build/")' -b 127.0.0.1:8080

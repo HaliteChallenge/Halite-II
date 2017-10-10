@@ -11,7 +11,7 @@ Constructors
 Ship
 ^^^^
 
-.. java:constructor:: public Ship(short owner, long id, double xPos, double yPos, short health, DockingStatus dockingStatus, long dockedPlanet, short dockingProgress, short weaponCooldown)
+.. java:constructor:: public Ship(int owner, int id, double xPos, double yPos, int health, DockingStatus dockingStatus, int dockedPlanet, int dockingProgress, int weaponCooldown)
    :outertype: Ship
 
 Methods
@@ -25,13 +25,13 @@ canDock
 getDockedPlanet
 ^^^^^^^^^^^^^^^
 
-.. java:method:: public long getDockedPlanet()
+.. java:method:: public int getDockedPlanet()
    :outertype: Ship
 
 getDockingProgress
 ^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public short getDockingProgress()
+.. java:method:: public int getDockingProgress()
    :outertype: Ship
 
 getDockingStatus
@@ -43,6 +43,12 @@ getDockingStatus
 getWeaponCooldown
 ^^^^^^^^^^^^^^^^^
 
-.. java:method:: public short getWeaponCooldown()
+.. java:method:: public int getWeaponCooldown()
+   :outertype: Ship
+
+toString
+^^^^^^^^
+
+.. java:method:: @Override public String toString()
    :outertype: Ship
 

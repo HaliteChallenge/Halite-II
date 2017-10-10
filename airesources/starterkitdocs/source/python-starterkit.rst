@@ -30,3 +30,9 @@ constants
 
 .. automodule:: hlt.constants
    :members:
+
+constants
+=========================
+
+.. automodule:: hlt.constants
+   :members:

@@ -15,7 +15,7 @@ Constructors
 Player
 ^^^^^^
 
-.. java:constructor:: public Player(short id)
+.. java:constructor:: public Player(int id)
    :outertype: Player
 
 Methods
@@ -23,24 +23,24 @@ Methods
 addShip
 ^^^^^^^
 
-.. java:method:: public void addShip(long shipId, Ship ship)
+.. java:method:: public void addShip(int shipId, Ship ship)
    :outertype: Player
 
 getId
 ^^^^^
 
-.. java:method:: public short getId()
+.. java:method:: public int getId()
    :outertype: Player
 
 getShip
 ^^^^^^^
 
-.. java:method:: public Ship getShip(long entityId)
+.. java:method:: public Ship getShip(int entityId)
    :outertype: Player
 
 getShips
 ^^^^^^^^
 
-.. java:method:: public Map<Long, Ship> getShips()
+.. java:method:: public Map<Integer, Ship> getShips()
    :outertype: Player
 

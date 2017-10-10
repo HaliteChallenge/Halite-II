@@ -25,6 +25,6 @@ navigateToDock
 navigateTowards
 ^^^^^^^^^^^^^^^
 
-.. java:method:: public ThrustMove navigateTowards(GameMap gameMap, Position targetPos, int maxThrust, boolean avoidObstacles, int maxCorrections, int angularStep)
+.. java:method:: public ThrustMove navigateTowards(GameMap gameMap, Position targetPos, int maxThrust, boolean avoidObstacles, int maxCorrections, double angularStepRad)
    :outertype: Navigation
 
