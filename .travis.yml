@@ -83,8 +83,6 @@ before_install:
 
 script:
 
-
-
 # build game environment
   - cd environment/
   - cmake .
@@ -94,6 +92,19 @@ script:
   - cd ../airesources/C++
   - cmake .
   - make -j2
+
+# build scala bot
+  - wget www.scala-lang.org/files/archive/scala-2.10.4.deb
+  - dpkg -i scala-2.10.4.deb
+  - apt-get update -y
+  - apt-get install -y scala
+  - wget https://bintray.com/artifact/download/sbt/debian/sbt-0.13.6.deb
+  - dpkg -i sbt-0.13.6.deb
+  - apt-get update -y
+  - apt-get install -y sbt
+  - cd ../airesources/Scala
+  - scalac MyBot.scala hlt/*
+
 
 # build Rust bot
   - cd ../Rust
