@@ -11,6 +11,21 @@ from .. import model, util
 from . import util as api_util
 from .blueprint import web_api
 
+_COUNT_KEY = 'count'
+_LOADERBOARD_ALIAS = 'full_leaderboard'
+
+
+def _count_leaderboard_query(where_clause):
+    """
+    Considering the desired clause, return the number of distinct users in leaderboard
+    :param where_clause: Clause to filter by
+    :return: Number of distinct users
+    """
+    full_leaderboard = model.ranked_bots_users.select().where(where_clause).reduce_columns().alias(_LOADERBOARD_ALIAS)
+    return sqlalchemy.sql.select([
+        sqlalchemy.sql.func.count(sqlalchemy.distinct(full_leaderboard.c.user_id))
+    ]).select_from(full_leaderboard).where(full_leaderboard.c.num_games > 0)
+
 
 @web_api.route("/leaderboard")
 @util.cross_origin(methods=["GET"])
@@ -36,7 +51,10 @@ def leaderboard():
         order_clause = [model.ranked_bots_users.c.rank]
 
     with model.engine.connect() as conn:
-        total_users = conn.execute(model.total_ranked_users).first()[0]
+        if _COUNT_KEY in flask.request.args:
+            return str(api_util.get_value(conn.execute(_count_leaderboard_query(where_clause))))
+
+        total_users = api_util.get_value(conn.execute(model.total_ranked_users))
 
         tier_filter = None
         tier_thresholds = util.tier_thresholds(total_users)
