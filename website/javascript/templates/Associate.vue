@@ -241,14 +241,14 @@
                         });
                     } else {
                         Alert.show('You have created account successfully', 'success');
-                         gaData('account','new-account-success','account-flow')
+                        this.gaData('account','new-account-success','account-flow')
                         setTimeout(() => {
                             window.location.replace("/play-programming-challenge");
                         }, 2000);
                     }
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');
-                    gaData('account','new-account-error','account-flow');
+                    this.gaData('account','new-account-error','account-flow');
                 });
             },
             gaData: function(category, action, label) {
@@ -261,7 +261,7 @@
                    window.location.replace("/user?me");
                }
                else{
-                    gaData('account','click-submit-new-account','account-flow');
+                    this.gaData('account','click-submit-new-account','account-flow');
                }             
             });
         },

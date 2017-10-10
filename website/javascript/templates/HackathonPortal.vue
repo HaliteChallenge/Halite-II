@@ -154,7 +154,7 @@ export default {
   },
   methods: {
     jumpToHackathon: function(id) {
-      gaData('hackathon', 'click-to-join', 'hackathon-flow');
+      this.gaData('hackathon', 'click-to-join', 'hackathon-flow');
       window.location.href = `hackathon-individual/?hackathon_id=${id}`
     },
     gaData: function(category, action, label) {

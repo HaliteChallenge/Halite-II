@@ -74,8 +74,11 @@
                 let currentTarget = e ? e.currentTarget : $(".profile-container ul");
                 $(currentTarget).stop().slideUp();
             },
+            gaData: function(category, action, label) {
+                utils.gaEvent(category, action, label);
+            },
             sign_out: function (e) {
-                gaData('account', 'click-sign-out', 'account-flow');
+                this.gaData('account', 'click-sign-out', 'account-flow');
                 api.logout().then((res)=>{
                     window.location.replace("/");
                 });
@@ -87,9 +90,6 @@
                 $(".popup-container").hide();
             },
             select_file: function () {
-            },
-            gaData: function(category, action, label) {
-                utils.gaEvent(category, action, label);
             },
         },
     }

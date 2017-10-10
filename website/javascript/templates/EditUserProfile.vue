@@ -260,10 +260,10 @@
                 // send request
                 api.register_me(request).then(() => {
                     Alert.show('You have update profile successfully', 'success');
-                    gaData("account", "edit-profile-success", "edit-profile-flow");
+                    this.gaData("account", "edit-profile-success", "edit-profile-flow");
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');
-                    gaData("account", "edit-profile-error", "edit-profile-flow")
+                    this.gaData("account", "edit-profile-error", "edit-profile-flow")
                 });
 
             },
