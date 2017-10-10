@@ -191,8 +191,6 @@ def store_game_results(game_output, replay_key, bucket_class, users):
     :param users: The list of user objects for this game.
     :return game_id: ID of the record in game table
     """
-    # TODO: the original code deletes games if there are over 600k in the
-    # database. Is that really a concern for us?
 
     # Store game results in database
     with model.engine.connect() as conn:

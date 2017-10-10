@@ -278,3 +278,13 @@ def hackathon_status(start_date, end_date):
     elif start_date > datetime.datetime.now():
         status = "upcoming"
     return status
+
+
+def get_value(query):
+    """
+    Returns the single value item from an executed query
+    :param query: The query executed
+    :return: The value within
+    """
+    return query.first[0]
+

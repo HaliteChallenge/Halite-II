@@ -28,7 +28,5 @@ do
     rm "$i.hlt"
 done
 
-#TODO: create a zip file here
-
 echo "downloaded games to $1/"
 

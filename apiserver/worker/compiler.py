@@ -449,7 +449,6 @@ languages = (
         [BOT],
         [([""], ExternalCompiler(comp_args["Lisp"][0]))]
     ),
-    # TODO: how to differentiate Lua5.2 and LuaJIT?
     Language("Lua/LuaJIT", BOT +".lua", "MyBot.lua",
         "luajit MyBot.lua",
         [],

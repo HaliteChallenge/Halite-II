@@ -182,8 +182,6 @@ def store_user_bot(user_id, intended_user, bot_id):
             )
         conn.execute(update)
 
-    # TODO: Email the user
-
     return util.response_success()
 
 
@@ -196,7 +194,6 @@ def delete_user_bot(intended_user, bot_id, *, user_id):
             message="Cannot delete bot for another user.")
 
     with model.engine.connect() as conn:
-        # TODO: move bot to BotHistory
         conn.execute(model.bots.delete().where(
             (model.bots.c.user_id == user_id) &
             (model.bots.c.id == bot_id)

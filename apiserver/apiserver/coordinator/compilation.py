@@ -51,7 +51,7 @@ def serve_compilation_task(conn):
     return None
 
 
-# TODO: these aren't RESTful URLs, but it's what the worker expects
+# these aren't RESTful URLs, but it's what the worker expects
 @coordinator_api.route("/compile", methods=["POST"])
 def update_compilation_status():
     """Update the compilation status of a bot."""
