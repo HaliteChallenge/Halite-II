@@ -248,7 +248,7 @@
                     }
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');
-                    gaData('account','new-account-error','account-flow')
+                    gaData('account','new-account-error','account-flow');
                 });
             },
             gaData: function(category, action, label) {
@@ -261,7 +261,7 @@
                    window.location.replace("/user?me");
                }
                else{
-                    gaData('account','click-submit-new-account','account-flow')
+                    gaData('account','click-submit-new-account','account-flow');
                }             
             });
         },

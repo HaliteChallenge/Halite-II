@@ -41,3 +41,10 @@ echo "minifying worker 2"
 uglifyjs --compress --mangle -- 276d7a58ef9843d54ee0.worker.js > 276d7a58ef9843d54ee0.worker.min.js
 cp 276d7a58ef9843d54ee0.worker.min.js 276d7a58ef9843d54ee0.worker.js
 rm -f 276d7a58ef9843d54ee0.worker.min.js
+
+
+echo "minifying worker 3"
+uglifyjs --compress --mangle -- 682e10449e59829608e0.worker.js > 682e10449e59829608e0.worker.min.js
+cp 682e10449e59829608e0.worker.min.js 682e10449e59829608e0.worker.js
+rm -f 682e10449e59829608e0.worker.min.js
+
