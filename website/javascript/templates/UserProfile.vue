@@ -569,13 +569,13 @@
             join_hackathon: function(event) {
                 event.preventDefault();
                 const code = this.$refs.hackathon_signup_code.value;
-                gaData('hackathon','click-submit-hackathon-code','hackathon-flow');
+                this.gaData('hackathon','click-submit-hackathon-code','hackathon-flow');
                 api.registerHackathon(code).then(() => {
                     Alert.show("Successfully registered!", 'success');
-                    gaData('hackathon','hackathon-code-success','hackathon-flow');
+                    this.gaData('hackathon','hackathon-code-success','hackathon-flow');
                 }, (error) => {
                     Alert.show(`Error: ${error.message || error.responseJSON.message}`);
-                    gaData('hackathon','hackathon-code-error','hackathon-flow');
+                    this.gaData('hackathon','hackathon-code-error','hackathon-flow');
                 });
             },
             prev_badge: ()=>{

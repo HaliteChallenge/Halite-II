@@ -33,17 +33,12 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="organization">If you are playing as part of a Hackathon, please enter your code here</label>
-                        <input type="text" class="form-control" v-model="hackathon_code" placeholder="Enter Hackathon password or code...">
-                    </div>
-
                     <div class="line-container"><i class="xline xline-top"></i></div>
 
                     <h2 id="section_account_info" class="form-heading">Account info</h2>
 
                     <div class="form-group">
-                        <label for="country">Username (as show On Github)</label>
+                        <label for="country">Username (As shown On Github)</label>
                         <div class="relative-container">
                             <input type="text" class="form-control" placeholder="Enter your username" v-model="username" disabled>
                             <i class="fa fa-lock lock"></i>
