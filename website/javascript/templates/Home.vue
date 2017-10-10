@@ -43,7 +43,7 @@
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
-                            <a class="ha-button" href=""><span>GET STARTED</span></a>
+                            <a class="ha-button" href="/learn-programming-challenge"><span>GET STARTED</span></a>
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">WATCH STAFF PICKS</p>
+                <p class="t2 c-wht">STAFF PICKS</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <p class="t5 c-gry">Thanks to our game engine, thousands of games are played at a time. Check out a few!</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>

@@ -6,6 +6,10 @@
   padding-top: 20px;
   margin-bottom: 20px;
   text-align: center;
+
+  .banner {
+    font-family: Helvetica;
+  }
   .c-org{
     color: $o-color;
   }
@@ -22,11 +26,13 @@
   .d1{
     font-size: 2.3rem;
     letter-spacing: 1px;
+    margin: 20px 0px;
   }
   .t1{
     font-size: 10rem;
     letter-spacing: 6px;
     margin-bottom: 0;
+    line-height: 0.7em;
   }
   .t2{
     font-size: 3.5rem;
@@ -67,12 +73,13 @@
   .notification{
     background-color: $yellow;
     margin-bottom: 30px;
-    font-size: 2.5rem;
+    font-size: 1.7rem;
     height: 60px;
     text-align: center;
     line-height: 60px;
     letter-spacing: 2px;
     color: $gray-bg;
+    font-family: Helvetica !important;
     a{
       color: #337ab7;
       text-decoration: none;

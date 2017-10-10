@@ -1,22 +1,49 @@
 .doc-container{
-
+  // .list-nav{
+  //   > li > a, > li > span{
+  //     color: #858E92;
+  //   } 
+  //   .sub-list-ha{
+  //     > li > a{
+  //       color: #858E92;
+  //     }
+  //     > li:before{
+  //       color: #858E92;
+  //     }
+  //   }
+  // }
 }
 .doc-content-header{
   background-color: #fff;
   padding: 10px;
   color: #191822;
   margin-bottom: 10px;
+  h1, h2, h3, h4 ,h5, h6{
+    font-family: $font-heading;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #1E1D28;
+  }
   h1{
     text-align: left;
-    font-weight: 600;
-    font-size: 36pt;
+    font-size: 36px;
+  }
+  h2{
+    font-size: 32px;
   }
   h3{
-    opacity: 0.8;
-    font-size: 28pt;
-    color: #251824;
-    margin-top: 0;
-    font-weight: 600;
+    font-size: 28px;
+  }
+  h4{
+    font-size: 24px;
+  }
+  h5{
+    font-size: 20px;
+  }
+  h6{
+    font-size: 18px
   }
 
   .page-header{

@@ -229,7 +229,7 @@
                   <i class="dot-br"></i>
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-ship"></span>
-                    rate of production
+                    Total Production
                   </h4>
                   <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
