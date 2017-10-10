@@ -61,12 +61,12 @@
       }
     },
 
-
-
-    watch: {
-      showChart: function(showChart) {
+    methods: {
+      initChart: function(option) {
+        let { showChart, chartData } = option || {}
+        showChart = (showChart !== undefined ? showChart : this.showChart)
         if (!showChart) return
-        const chartData = this.chartData
+        chartData = (chartData !== undefined ? chartData : this.chartData)
         if(!chartData || !chartData.length) return
 
         var svg = d3.select(this.$refs.mainSvg).attr('class', 'main-svg'),
@@ -204,34 +204,47 @@
          
           self.$emit('updateIndex', Math.round(x.invert(_offset)))
         })
+      }
     },
-    index: function(index) {
-      if (!this.path1List || !this.path2List || !this.path1List.length || !this.path2List.length || !this.innerSvg || !this.dragLine) return;
 
-      let dataSet = this.chartData
-      // this.maxLength && console.log(index, getDataPeriod(dataSet[0], this.maxLength, index))
-      this.x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, index), function(d) { return d.x }))
+    mounted: function() {
+      this.initChart()
+    },
 
-      dataSet.forEach((data, index) => {
-        data.forEach(d => {
-          d.x = d.x
-          d.y = Number(d.y)
+    watch: {
+      showChart: function(showChart) {
+        this.initChart({showChart})
+      },
+      chartData: function(chartData) {
+        this.initChart({chartData})
+      },
+      index: function(index) {
+        if (!this.path1List || !this.path2List || !this.path1List.length || !this.path2List.length || !this.innerSvg || !this.dragLine) return;
+
+        let dataSet = this.chartData
+        // this.maxLength && console.log(index, getDataPeriod(dataSet[0], this.maxLength, index))
+        this.x.domain(d3.extent(getDataPeriod(dataSet[0], this.maxLength, index), function(d) { return d.x }))
+
+        dataSet.forEach((data, index) => {
+          data.forEach(d => {
+            d.x = d.x
+            d.y = Number(d.y)
+          })
+          let _peroidData = getDataPeriod(data, this.maxLength, this.index)
+          this.path1List[index] && this.path1List[index].datum(_peroidData).attr('d', this.line)
+          this.path2List[index] && this.path2List[index].datum(_peroidData).attr('d', this.area)
+
         })
-        let _peroidData = getDataPeriod(data, this.maxLength, this.index)
-        this.path1List[index] && this.path1List[index].datum(_peroidData).attr('d', this.line)
-        this.path2List[index] && this.path2List[index].datum(_peroidData).attr('d', this.area)
 
-      })
+        this.innerSvg
+          .transition()
+          .ease(d3.easeLinear)
+          .attr('width', this.x(index))
 
-      this.innerSvg
-        .transition()
-        .ease(d3.easeLinear)
-        .attr('width', this.x(index))
-
-      this.dragLine
-        .transition()
-        .ease(d3.easeLinear)
-        .attr('transform', `translate(${this.x(index) - this.initDragPositon})`)
+        this.dragLine
+          .transition()
+          .ease(d3.easeLinear)
+          .attr('transform', `translate(${this.x(index) - this.initDragPositon})`)
       },
     }
   }

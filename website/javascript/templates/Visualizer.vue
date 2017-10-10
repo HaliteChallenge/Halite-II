@@ -8,17 +8,26 @@
         <p class="game-heading-date" v-if="game">{{game.time_played | moment("MMM Do, YY - HH:mm:ss")}}</p>
         <div class="game-heading-players">
           <div class="short">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[0].tier"/>{{sortedPlayers[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
+              <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
+              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+            </span>
             <span class="action">defeats</span>
-            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[1].tier"/>{{sortedPlayers[1].name}}</span>
+            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length">
+              <TierPopover :tier="tierClass(sortedPlayers[1].tier)"/>
+              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[1].id}`">{{sortedPlayers[1].name}}</a>
+            </span>
             <span class="action" v-if="sortedPlayers.length > 2">+{{sortedPlayers.length - 2}}</span>
           </div>
           <div class="long">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length"><TierPopover :tier="'icon-tier-' + sortedPlayers[0].tier"/>{{sortedPlayers[0].name}}</span>
+            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
+              <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
+              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+            </span>
             <span class="action">defeats</span>
             <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
-              <TierPopover :tier="'icon-tier-' + player.tier"/>
-              {{player.name}}
+              <TierPopover :tier="tierClass(player.tier)"/>
+              <a class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</a>
             </span>
           </div>
         </div>
@@ -38,10 +47,10 @@
               <span class="replay-btn">
                 <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
               </span>
-              <span v-if="!playing" class="replay-btn">
+              <span v-if="!playing" class="replay-btn" style="text-align: center">
                 <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
               </span>
-              <span v-if="playing" class="replay-btn">
+              <span v-if="playing" class="replay-btn" style="text-align: center">
                 <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
               </span>
               <span class="replay-btn">
@@ -91,7 +100,7 @@
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="player_stats">
             <div id="player_stats_pane">
-              <PlayerStatsPane :replay="replay" :statistics="statistics"></PlayerStatsPane>
+              <PlayerStatsPane :players="players" :statistics="statistics"></PlayerStatsPane>
             </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="game_stats">
@@ -123,14 +132,14 @@
       <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-player-details','gameplay')" data-parent="#accordion" href="#widget_player_details" aria-expanded="false" aria-controls="widget_player_details">
+            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-player-details','gameplay')" @click.stop="togglePlayerPanel" data-parent="#accordion" :aria-expanded="showPlayerDetailPanel.toString()" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4>player details</h4>
               <span class="toggle-icon chevron"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="widget_player_details" aria-labelledby="heading_player_details">
+          <div class="panel-collapse collapse" :class="{'in': showPlayerDetailPanel}" role="tabpanel" :aria-expanded="showPlayerDetailPanel.toString()" id="widget_player_details" aria-labelledby="heading_player_details">
             <PlayerDetailPane :replay="replay" :statistics="statistics" :stats="stats" :frame="frame"></PlayerDetailPane>
           </div>
         </div>
@@ -167,14 +176,14 @@
     <div class="panel-group" aria-multiselectable="true">
         <div class="panel panel-stats">
           <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-postgame-dashboard','gameplay')"  href="#panel_post_game" aria-expanded="false" aria-controls="widget_player_details" @click="initChart">
+            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-postgame-dashboard','gameplay')"  @click.stop="toggleChartPanel" data-parent="#accordion" :aria-expanded="showChartPanel.toString()" aria-controls="widget_player_details">
               <i class="xline xline-top"></i>
               <h4>post game dashboard</h4>
               <span class="toggle-icon expand"></span>
               <i class="xline xline-bottom"></i>
             </a>
           </div>
-          <div class="panel-collapse collapse" role="tabpanel" id="panel_post_game" aria-labelledby="panel_post_game">
+          <div class="panel-collapse collapse" :class="{'in': showChartPanel}" role="tabpanel" :aria-expanded="showChartPanel.toString()" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
               <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
                 <div class="card-dashboard active">
@@ -184,8 +193,13 @@
                     <img :src="`https://github.com/${_player.name}.png`">
                   </div>
                   <div class="card-dashboard-info">
-                    <span class="dot bg-1" :class="`bg-${_pIndex + 1}`"></span>
-                    <p class="card-dashboard-name">{{_player.name}}</p>
+                    <span style="display: block;" :class="`player color-${_pIndex + 1}`">
+                      <TierPopover :tier="tierClass(_player.tier)"/>
+                      RANK {{_player.rank}}
+                    </span>
+                    <p class="card-dashboard-name">
+                      <a class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                    </p>
                     <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
                     <p v-else class="card-dashboard-version-heading">Local bot</p>
                   </div>
@@ -203,7 +217,7 @@
                   <span class="icon-globe"></span>
                   Territory Gained
                 </h4>
-                <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}"/>
+                <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
               </div>
             </div>
             <div class="dashboard-graph-container bb ">
@@ -217,14 +231,14 @@
                     <span class="icon-ship"></span>
                     rate of production
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     health
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.health" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -237,14 +251,14 @@
                     <span class="icon-ship"></span>
                     damage dealt
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.damage" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     attack over time
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.attack" :index="frame" :showChart="showChart" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -269,7 +283,17 @@
   import SelectedShip from "./SelectedShip.vue";
   import SelectedPoint from "./SelectedPoint.vue";
   import TierPopover from './TierPopover.vue';
+  import {tierClass} from "../utils";
   import _ from "lodash";
+
+  const speedList =  {
+    1: '&frac12x',
+    2: '1x',
+    4: '2x',
+    6: '3x',
+    8: '4x',
+    10: '5x',
+  };
 
   // libhaliteviz.setAssetRoot("/assets/js/");
   const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
@@ -295,11 +319,13 @@
         frame: 0,
         time: 0,
         playing: false,
-        showObjectPanel: true,
-        speedIndex: 1,
-        speedLabel: '1x',
+        showObjectPanel: sessionStorage.getItem('halite-showMapObjectPanel') === 'false'? false : true,
+        showPlayerDetailPanel: sessionStorage.getItem('halite-showPlayerDetailPanel') === 'true'? true : false,
+        showChartPanel: sessionStorage.getItem('halite-showChartPanel') === 'true'? true : false,
+        speedIndex: 3,
+        speedLabel: '3x',
         stats: null,
-        showChart: false,
+        // showChart: false,
         selected: {
           kind: '',
           id: 0,
@@ -328,7 +354,9 @@
           piecewiseStyle: {
             backgroundColor: '#23242b'
           }
-        }
+        },
+        players: [],
+        sortedPlayers: []
       }
     },
     components: {
@@ -342,12 +370,24 @@
       TierPopover
     },
     mounted: function(){
+      this.getSortedPlayers();
       this.sliderOptions = Object.assign(this.sliderOptions, {
         max: this.replay.num_frames - 1,
         value: this.frame
       });
 
       const visualizer = new HaliteVisualizer(this.replay);
+      const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed');
+      if(storedSpeedIndex) {
+        const speedIndex = parseInt(storedSpeedIndex);
+        this.speedIndex = speedIndex;
+        const value = Object.keys(speedList)[speedIndex];
+        const label = speedList[value];
+        this.speedLabel = label;
+        visualizer.playSpeed = value;
+      } else {
+        visualizer.playSpeed = 6;
+      }
       this.stats = visualizer.stats;
 
       visualizer.onUpdate = () => {
@@ -396,15 +436,6 @@
         this.gaData('visualizer', 'click-pause','gameplay')
       }
       this.toggleSpeed = (e) => {
-        const speedList =  {
-          1: '&frac12x',
-          2: '1x',
-          4: '2x',
-          6: '3x',
-          8: '4x',
-          10: '5x',
-        };
-
         // set speed
         this.speedIndex++;
         if (this.speedIndex >= Object.keys(speedList).length ) this.speedIndex = 0;
@@ -418,6 +449,8 @@
         }
 
         this.gaData('visualizer', 'click-speed','gameplay')
+
+        sessionStorage.setItem('halite-replaySpeed', this.speedIndex);
       }
       this.prevFrame = () =>{
         if (visualizer && this.frame > 0){
@@ -514,7 +547,7 @@
 
         try {
           if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
-
+          console.log('this.stats.frames', this.stats.frames)
           for (let _pIndex in this.stats.frames[0].players) {
             let playerP = [];
             let playerH = [];
@@ -536,35 +569,6 @@
           console.error(e)
           return output
         }
-      },
-      players: function(){
-        if (!this.replay) return [];
-
-        let ranks = this.replay.stats;
-
-        for (let id of Object.keys(this.replay.stats)) {
-          ranks[id].index = parseInt(id);
-          ranks[id].botname = this.replay.player_names[id];
-          ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
-          if (this.game) {
-            const player = _.find(this.game.players, (player) => player.player_index == id );
-            ranks[id].tier = parseInt(player.rank);
-            ranks[id].version = player.version_number;
-          }
-          else {
-            const version = ranks[id].botname.match(/v(\d+)$/, "$1");
-            if (version) {
-              ranks[id].version = version[1];
-            }
-            else {
-                ranks[id].version = null;
-            }
-          }
-        }
-        return Object.values(ranks);
-      },
-      sortedPlayers: function(){
-        return _.sortBy(this.players, ['rank']);
       },
       selectedPlanet: function(){
         if (this.selected.kind === "planet") {
@@ -598,6 +602,46 @@
       }
     },
     methods: {
+      tierClass: tierClass,
+      getPlayers: async function(){
+        if (!this.replay) return [];
+
+        let ranks = this.replay.stats;
+
+        for (let id of Object.keys(this.replay.stats)) {
+          ranks[id].index = parseInt(id);
+          ranks[id].botname = this.replay.player_names[id];
+          ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
+          if (this.game) {
+            let player = {};
+            Object.getOwnPropertyNames(this.game.players).map(userId => {
+              if(this.game.players[userId].player_index == id) {
+                player = this.game.players[userId];
+                player.id = userId;
+              }
+            })
+            ranks[id].version = player.version_number;
+            ranks[id].id = player.id;
+            const user = await api.get_user(player.id)
+            ranks[id].tier = user.tier;
+          }
+          else {
+            const version = ranks[id].botname.match(/v(\d+)$/, "$1");
+            if (version) {
+              ranks[id].version = version[1];
+            }
+            else {
+                ranks[id].version = null;
+            }
+          }
+        }
+        return Object.values(ranks);
+      },
+      getSortedPlayers: async function(){
+        const players = await this.getPlayers();
+        this.players = players;
+        this.sortedPlayers =  _.sortBy(players, ['rank']);
+      },
       getPlayerName: function(botname){
         return botname.replace(/\sv\d+$/, '');
       },
@@ -615,6 +659,16 @@
       },
       toggleObjectPanel: function(e) {
         this.showObjectPanel = !this.showObjectPanel;
+        sessionStorage.setItem('halite-showMapObjectPanel', this.showObjectPanel.toString());
+      },
+      togglePlayerPanel: function(e) {
+        this.showPlayerDetailPanel = !this.showPlayerDetailPanel;
+        sessionStorage.setItem('halite-showPlayerDetailPanel', this.showPlayerDetailPanel.toString());
+      },
+      toggleChartPanel: function(e) {
+        this.showChartPanel = !this.showChartPanel;
+        sessionStorage.setItem('halite-showChartPanel', this.showChartPanel.toString());
+        this.initChart();
       },
       initChart: function() {
         console.log('initChart')
