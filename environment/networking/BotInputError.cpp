@@ -9,7 +9,7 @@ BotInputError::BotInputError(
     const std::string& input,
     const std::string& explanation,
     std::string::difference_type location)
-    : player(player), input(input), explanation(explanation), location(location) {
+{
     message += "ERROR: Bot #";
     message += std::to_string((int) player);
     message += ": ";

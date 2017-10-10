@@ -11,11 +11,6 @@
 
 class BotInputError : std::exception {
 private:
-    hlt::PlayerId player;
-    std::string input;
-    std::string explanation;
-    std::string::difference_type location;
-
     std::string message;
 public:
     explicit BotInputError(
