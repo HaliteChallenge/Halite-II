@@ -1,8 +1,8 @@
 ---
 layout: static_page
-title: What is the Halite AI Programming Challenge?
+title: About Us
 permalink: /about/
-toc: true
+toc: false
 description: Halite is an Artificial Intelligence programming game run by Two Sigma where players build smart bots that battle on a virtual two-dimensional board.
 ---
 
@@ -16,7 +16,7 @@ The 2017-2018 season runs October- January, with participants able to join up un
 
 > The general who wins the battle makes many calculations in his temple before the battle is fought
 >
-> --<cite>Sun Tzu</cite>
+> <cite>-- Sun Tzu</cite>
 
 ## HALITE HISTORY
 [Halite I](2016.halite.io) was conceived of and developed by Benjamin Spector and Michael Truell in 2016. Two Sigma, having had a history of playful programming challenges for its mathematical and software-oriented teams (e.g., see the Robotic Air Hockey Competition) retained Ben and Michael as 2016 summer interns to develop Halite, run an internal Halite Challenge, and ultimately open Halite up to human and non-human coding enthusiasts worldwide. Halite I was a great success, developing a flourishing community of bot builders from around the globe, representing 35+ universities and 20+ organizations.
@@ -44,6 +44,12 @@ To help productize and orchestrate the public launch, Two Sigma reached out to C
 Many have contributed to Halite since Ben and Michael’s invention; in addition to the Halite II core team (David Li, Jaques Clapauch, Harikrishna Menon, and Julia Kastner), they include Camille Fournier,  Alfred Spector, Matt Adereth, Trammel Hudson, Emily Malloy, Arnaud Sahuguet, Serguei Narojnyi, Xinyun Wu, Barbara Zhan, Georgi Georgiev, Jason Zhang, Nick Vrilo, Tuan Anh Hoang-Vu, and Scott Rich. And, no doubt, much credit should also be provided to users who are sending questions and comments to the forums.
 
 ##May the best bot win!
+
+<div class="ha-button-container btn-center">
+    <div>
+        <a class="ha-button" href="/"><span>GET STARTED</span></a>
+    </div>
+</div>
 
 [halite-i]: http://halite.io
 [story]: {{ site.baseurl }}/learn/the-halite-codex

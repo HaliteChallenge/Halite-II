@@ -73,4 +73,36 @@
     font-weight: bold;
     font-family: 'Teko';
   }
+
+	.btn-center{
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+  blockquote{
+    margin-left: -20px;
+    margin-right: -20px;
+    background-image: url("/assets/images/quotebg.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    color: #fff;
+    border-left: 0;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    
+    font-family: $font-heading;
+    color: $yellow;
+    font-size: 4rem;
+    line-height: 1.2em;
+    letter-spacing: 1px;
+    cite{
+      font-family: $font-body;
+      color: $foreground;
+      font-size: 1.8rem;
+      font-style: normal;
+    }
+  }
 }

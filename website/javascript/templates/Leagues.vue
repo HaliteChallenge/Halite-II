@@ -1,9 +1,11 @@
 <template>
     <div class="leagues-container">
-         <div class="row">
+        <div class="row">
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">Levels</p>
-                <div class="line-container"><i class="xline xline-top"></i></div>
+                <div class="page-header">
+                    <h1>Levels</h1>
+                    <i class="xline xline-bottom"></i>
+                </div>
                 <div class="col-md-12">
                     <a href="/halite-league-board?leaguename=Top-20-Professionals&level=Professional">
                         <div class="col-md-3 play-bot">   
@@ -49,8 +51,10 @@
         </div>
         <div class="row">
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">Countries</p>
-                <div class="line-container"><i class="xline xline-top"></i></div>
+                <div class="page-header">
+                    <h2 class="h1">Countries</h2>
+                    <i class="xline xline-bottom"></i>
+                </div>
                 <div class="col-md-12 center-block">
                     <a href="/halite-league-board?leaguename=top-20-bots-USA&country=USA">
                         <div class="col-md-3 play-bot">   
@@ -84,8 +88,10 @@
         </div>
          <div class="row">
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">Languages</p>
-                <div class="line-container"><i class="xline xline-top"></i></div>
+                <div class="page-header">
+                    <h2 class="h1">Languages</h2>
+                    <i class="xline xline-bottom"></i>
+                </div>
                 <div class="col-md-12">
                     <a href="/halite-league-board?leaguename=top-20-bots-Python&language=Python">
                         <div class="col-md-3 play-bot">   

@@ -18,6 +18,7 @@
       <div>
         <div class="page-header">
           <h1>PLAY A HALITE AI BOT</h1>
+          <i class="xline xline-bottom"></i>
         </div>
       </div>
       <div class="row play-upload-section">

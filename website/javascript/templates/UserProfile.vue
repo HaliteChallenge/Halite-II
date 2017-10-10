@@ -570,9 +570,9 @@
 
                 const code = this.$refs.hackathon_signup_code.value;
                 api.registerHackathon(code).then(() => {
-                    Alert.show("Successfully registered!")
+                    Alert.show("Successfully registered!", 'success');
                 }, (error) => {
-                    Alert.show(`Error: ${error.message || error.responseJSON.message}`)
+                    Alert.show(`Error: ${error.message || error.responseJSON.message}`);
                 });
             },
             prev_badge: ()=>{

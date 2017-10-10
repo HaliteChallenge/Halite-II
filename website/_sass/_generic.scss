@@ -43,10 +43,10 @@ h1, h2, h3{
 }
 
 .page-header {
-  margin-top: 0;
+  margin-top: 60px;
   border-bottom: 0;
   position: relative;
-  h1{
+  h1, .h1{
     font-family: "Teko";
     font-size: 3.6rem;
     letter-spacing: 2px;
