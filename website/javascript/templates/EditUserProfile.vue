@@ -87,6 +87,7 @@
     import * as api from "../api";
     import vSelect from 'vue-select';
     import {Alert, countries_data} from "../utils";
+    import * as utils from "../utils";
 
     export default {
         name: "EditUserProfile",
@@ -259,12 +260,15 @@
                 // send request
                 api.register_me(request).then(() => {
                     Alert.show('You have update profile successfully', 'success');
-                    console.log('updating user profile successfully');
+                    gaData("account", "edit-profile-success", "edit-profile-flow");
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');
-                    // this.error = error.responseJSON.message;
+                    gaData("account", "edit-profile-error", "edit-profile-flow")
                 });
 
+            },
+            gaData: function(category, action, label) {
+                utils.gaEvent(category, action, label);
             },
         }
     }

@@ -10,8 +10,8 @@
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
                 <i class="fa fa-sort-down"></i>
                 <ul class="nav">
-                    <li><a href="/user?me"><span>view profile</span><i class="line line-bottom"></i></a></li>
-                    <li><a href="/user/edit-user"><span>edit profile</span><i class="line line-bottom"></i></a></li>
+                    <li><a v-on:click="gaData('account','click-view-profile','account-flow')" href="/user?me"><span>view profile</span><i class="line line-bottom"></i></a></li>
+                    <li><a v-on:click="gaData('account','click-edit-profile','account-flow')"href="/user/edit-user"><span>edit profile</span><i class="line line-bottom"></i></a></li>
                     <li><a v-on:click.stop.prevent="sign_out"><span>sign out</span><i class="line line-bottom"></i></a></li>
                 </ul>
             </a>
@@ -36,6 +36,7 @@
 
 <script>
     import * as api from "../api";
+    import * as utils from "../utils";
 
     export default {
         name: "user-profile-bar",
@@ -74,6 +75,7 @@
                 $(currentTarget).stop().slideUp();
             },
             sign_out: function (e) {
+                gaData('account', 'click-sign-out', 'account-flow');
                 api.logout().then((res)=>{
                     window.location.replace("/");
                 });
@@ -85,7 +87,10 @@
                 $(".popup-container").hide();
             },
             select_file: function () {
-            }
+            },
+            gaData: function(category, action, label) {
+                utils.gaEvent(category, action, label);
+            },
         },
     }
 </script>
