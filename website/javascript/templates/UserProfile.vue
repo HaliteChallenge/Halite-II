@@ -573,6 +573,7 @@
                 api.registerHackathon(code).then(() => {
                     Alert.show("Successfully registered!", 'success');
                     this.gaData('hackathon','hackathon-code-success','hackathon-flow');
+                    this.fetchHackathon();
                 }, (error) => {
                     Alert.show(`Error: ${error.message || error.responseJSON.message}`);
                     this.gaData('hackathon','hackathon-code-error','hackathon-flow');
