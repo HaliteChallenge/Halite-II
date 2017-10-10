@@ -27,6 +27,7 @@
   import * as libhaliteviz from "../../../libhaliteviz";
   import UploadZone from "./UploadZone.vue";
   import Visualizer from "./Visualizer.vue";
+  import * as utils from "../utils";
 
   let visualizer = null;
 
@@ -140,6 +141,7 @@
     },
     methods: {
       play_replay: function(files) {
+        this.gaData('play','select-replay-file','replay-flow')
         if (files.length > 0) {
           const reader = new FileReader();
           const inst = this;
@@ -155,7 +157,10 @@
           };
           reader.readAsArrayBuffer(files[0]);
         }
-      }
+      },
+      gaData: function(category, action, label) {
+        utils.gaEvent(category, action, label);
+      },
     }
   }
 </script>
