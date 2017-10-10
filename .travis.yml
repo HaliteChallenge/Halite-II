@@ -95,7 +95,7 @@ script:
 
 # build scala bot
   - sudo apt-get install scala
-  - cd ../Rust
+  - cd ../Scala
   - scalac MyBot.scala hlt/*
 
 
