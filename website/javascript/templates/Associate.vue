@@ -107,6 +107,7 @@
     import * as api from "../api";
     import vSelect from 'vue-select';
     import {Alert, countries_data} from "../utils";
+    import * as utils from "../utils";
 
     export default {
         name: "associate",
@@ -240,14 +241,18 @@
                         });
                     } else {
                         Alert.show('You have created account successfully', 'success');
+                         gaData('account','new-account-success','account-flow')
                         setTimeout(() => {
                             window.location.replace("/play-programming-challenge");
                         }, 2000);
                     }
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');
-                    // this.error = error.responseJSON.message;
+                    gaData('account','new-account-error','account-flow')
                 });
+            },
+            gaData: function(category, action, label) {
+                utils.gaEvent(category, action, label);
             },
         },
         mounted: function() {
@@ -255,6 +260,9 @@
                if (me && !me.is_new_user) {
                    window.location.replace("/user?me");
                }
+               else{
+                    gaData('account','click-submit-new-account','account-flow')
+               }             
             });
         },
     }
