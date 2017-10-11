@@ -14,6 +14,7 @@ export class KeyboardControls {
         this.el = el;
 
         this._onKeyUp = (e) => {
+            if (document.activeElement.tagName == "INPUT") return;
             if (typeof this.keyBindings[e.code] !== "undefined") {
                 const event = this.keyBindings[e.code];
                 if (typeof event === "function") {
@@ -30,6 +31,7 @@ export class KeyboardControls {
         };
 
         this._onKeyDown = (e) => {
+            if (document.activeElement.tagName == "INPUT") return;
             if (typeof this.keyBindings[e.code] !== "undefined") {
                 const event = this.keyBindings[e.code];
                 if (typeof event !== "function") {
@@ -54,7 +56,7 @@ export class KeyboardControls {
     }
 
     handleKeys(dt) {
-        dt *= this.visualizer.timeStep * this.visualizer.scrubSpeed;
+        dt *= this.visualizer.timeStep * this.visualizer.scrubSpeed * 50;
 
         if (this.keyState["scrubBackwards"]) {
             this.visualizer.pause();

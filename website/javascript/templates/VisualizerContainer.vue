@@ -14,7 +14,7 @@
     </div>
     <div v-if="message" class="row">
         <div class="col-md-12">
-            <p>{{message}}</p>
+            <p class="visuallizer-loading-message">{{message}}</p>
         </div>
     </div>
   </div>

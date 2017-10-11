@@ -8,6 +8,11 @@
   }
 }
 
+.visuallizer-loading-message {
+  text-align: center;
+  padding: 20px 0px;
+}
+
 .game-heading{
   text-align: center;
   padding-top: 15px;
@@ -218,6 +223,20 @@
   }
   &-full{
 
+  }
+}
+
+.game-stats-widget{
+  .nav-tabs{
+    > li > a {
+      padding-top: 14px;
+      padding-bottom: 14px;
+      span{
+        padding-top: 7px;
+        padding-bottom: 5px;
+        line-height: 1em;
+      }
+    }
   }
 }
 

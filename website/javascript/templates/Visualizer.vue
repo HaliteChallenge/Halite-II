@@ -10,7 +10,8 @@
           <div class="short">
             <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
               <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
-              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+              <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+              <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
             </span>
             <span class="action">defeats</span>
             <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length">
@@ -22,12 +23,14 @@
           <div class="long">
             <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
               <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
-              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+              <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+              <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
             </span>
             <span class="action">defeats</span>
             <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
               <TierPopover :tier="tierClass(player.tier)"/>
-              <a class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</a>
+              <a v-if="player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</a>
+              <span v-if="!player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</span>
             </span>
           </div>
         </div>
@@ -100,7 +103,7 @@
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="player_stats">
             <div id="player_stats_pane">
-              <PlayerStatsPane :players="players" :statistics="statistics"></PlayerStatsPane>
+              <PlayerStatsPane :players="players" :statistics="statistics" :userlink="userlink"></PlayerStatsPane>
             </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="game_stats">
@@ -198,7 +201,8 @@
                       RANK {{_player.rank}}
                     </span>
                     <p class="card-dashboard-name">
-                      <a class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                      <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                      <span v-if="!_player.id" class="player-name-anchor">{{_player.name}}</span>
                     </p>
                     <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
                     <p v-else class="card-dashboard-version-heading">Local bot</p>
@@ -229,9 +233,9 @@
                   <i class="dot-br"></i>
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-ship"></span>
-                    Total Production
+                    Ships
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
@@ -543,22 +547,26 @@
           health: [],
           damage: [],
           attack: [],
+          ship: []
         };
 
         try {
           if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
-          console.log('this.stats.frames', this.stats.frames)
           for (let _pIndex in this.stats.frames[0].players) {
             let playerP = [];
+            let playerS = [];
             let playerH = [];
             let playerD = [];
             let playerA = [];
             this.stats.frames.forEach((_frame, _fIndex) => {
-              playerP.push({x: _fIndex, y: _frame.players[_pIndex].currentProductions});
+              const lastProd = _fIndex > 0 ? playerP[_fIndex-1].y : 0;
+              playerP.push({x: _fIndex, y: _frame.players[_pIndex].currentProductions + lastProd});
+              playerS.push({x: _fIndex, y: _frame.players[_pIndex].totalShips});
               playerH.push({x: _fIndex, y: _frame.players[_pIndex].totalHealths});
               playerD.push({x: _fIndex, y: _frame.players[_pIndex].totalDamages});
               playerA.push({x: _fIndex, y: _frame.players[_pIndex].totalAttacks});
             });
+            output.ship.push(playerS);
             output.production.push(playerP);
             output.health.push(playerH);
             output.damage.push(playerD);
@@ -602,6 +610,13 @@
       }
     },
     methods: {
+      userlink: function(user_id){
+        if (user_id){
+          return `/user/?user_id=${user_id}`;
+        } else {
+          return '';
+        }
+      },
       tierClass: tierClass,
       getPlayers: async function(){
         if (!this.replay) return [];
