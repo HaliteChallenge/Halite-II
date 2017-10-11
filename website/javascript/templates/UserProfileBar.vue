@@ -1,11 +1,11 @@
 <template>
     <div class="logged-in">
-        <ul class="nav navbar-nav navbar-right submit-bot">
+        <ul id="submitbutton" class="nav navbar-nav navbar-right submit-bot container-empty">
             <li>
                 <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
         </ul>
-        <div class="profile-container">
+        <div id="profile" class="profile-container container-empty">
             <a v-on:click.stop="slide_profile">
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
                 <i class="fa fa-sort-down"></i>
@@ -15,21 +15,6 @@
                     <li><a v-on:click.stop.prevent="sign_out"><span>sign out</span><i class="line line-bottom"></i></a></li>
                 </ul>
             </a>
-        </div>
-        <div class="popup-container" v-on:click.stop.prevent="close_submit">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-offset-2 col-md-8 popup-pane" v-on:click.stop>
-                        <i class="fa fa-window-close-o" v-on:click.stop.prevent="close_submit"></i>
-                        <div class="content">
-                            <img class="icon" :src="`${baseUrl}/assets/images/temp/submit-bot.png`"/>
-                            <p class="p1">SUBMIT A BOT</p>
-                            <p class="p2">Drop a .bot file here to upload</p>
-                            <div v-on:click="select_file" class="button"><span>SELECT FILE</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -58,6 +43,8 @@
             api.me().then((user) => {
                 this.username = user.username;
                 this.profile_image = api.make_profile_image_url(this.username);
+                $('profile').addClass('container-loaded');
+                $('submitbutton').addClass('container-loaded');
             });
             document.addEventListener('click', (e) => {
                 if (!this.$el.contains(e.target)) {
@@ -82,14 +69,6 @@
                 api.logout().then((res)=>{
                     window.location.replace("/");
                 });
-            },
-            show_submit: function () {
-                $(".popup-container").show();
-            },
-            close_submit: function () {
-                $(".popup-container").hide();
-            },
-            select_file: function () {
             },
         },
     }

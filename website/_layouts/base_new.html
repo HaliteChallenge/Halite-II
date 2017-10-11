@@ -118,7 +118,7 @@ function handleOutboundLinkClicks(category, action, label) {
                 <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Events</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-forum','spotlight');return true;" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
             </ul>
-          <ul class="nav navbar-nav navbar-right not-logged-in">
+          <ul class="nav navbar-nav navbar-right not-logged-in container-empty">
             <li><a href="{{ site.login_server_url }}/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;"><i class="fa fa-github"></i>&nbsp;&nbsp;Sign Up</a></li>
             <li><a href="{{ site.login_server_url }}/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;">Sign In</a></li>
           </ul>
@@ -137,13 +137,13 @@ function handleOutboundLinkClicks(category, action, label) {
     </header>
   {% endif %}
 
-  <div class="body">
+  <div class="body container-empty">
     {{ content }}
   </div>
 
   {% if page.no_header %}
   {% else %}
-    <footer class="footer">
+    <footer class="footer container-empty">
       <nav class="navbar">
         <div class="container-fluid">
           <ul class="nav">
@@ -217,6 +217,13 @@ function handleOutboundLinkClicks(category, action, label) {
     closeBtn.addEventListener("click", function(e) {
         mobileCon.style.visibility = "hidden";
     });
+
+    $(document).ready(function() {     
+      setTimeout(function() {
+          $('.container-empty').addClass('container-loaded');
+      }, 250);
+  });
+
   </script>
 
   {% if page.mount_view %}
