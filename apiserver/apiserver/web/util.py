@@ -286,5 +286,5 @@ def get_value(query):
     :param query: The query executed
     :return: The value within
     """
-    return query.first[0]
+    return query.first()[0]
 
