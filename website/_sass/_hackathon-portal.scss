@@ -218,61 +218,10 @@
   .hackathon-events-container {
     padding-top: 50px;
     position: relative;
+  }
 
-    .event-cards {
-      margin-top: 50px;
-      height: 500px;
-      overflow: auto;
-    }
-
-    .event-card {
-      background-color: #1C1A27;
-      height: 130px;
-      display: flex;
-      margin-bottom: 20px;
-      cursor: pointer;
-
-      .event-img {
-        height: 130px;
-        width: 130px;
-        background-size: cover;
-        background-position: center;
-      }
-
-      .event-desc {
-        flex: 1;
-        display: flex;
-        text-align: left;
-        flex-direction: column;
-        justify-content: center;
-        padding-left: 15px;
-      }
-
-      .event-attr {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding-left: 20px;
-      }
-
-      .event-btn {
-        height: 130px;
-        margin-right: 65px;
-        display: flex;
-        align-items: center;
-        font-family: teko;
-        font-size: 20px;
-        font-weight: bold;
-        [class*='icon-']{
-          font-size: 30px;
-          vertical-align: middle;
-          margin-right: 10px;
-        }
-        a:hover{
-          color: $yellow-hover;
-          text-decoration: none;
-        }
-      }
-    }
+  .hackathon-table {
+    text-align: left;
+    margin-top: 20px;
   }
 }
