@@ -67,7 +67,7 @@
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
-                            <a class="ha-button" href=""><span>READ THE CODEX</span></a>
+                            <a class="ha-button" href="/learn-programming-challenge/the-halite-codex"><span>READ THE CODEX</span></a>
                         </div>
                     </div>
                 </div>
