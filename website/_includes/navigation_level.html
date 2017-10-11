@@ -2,7 +2,7 @@
         <i class="xline xline-top"></i>
         <span><span>{{ include.level.name }}</span></span>
         <ul class="sub-list-ha">
-            {% for subpage in include.level.pages | sort: 'sort_key' %}
+            {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">
                 <a href="{{ subpage.url }}"><span>{% if subpage.short_title %}{{ subpage.short_title }}{% else %}{{ subpage.title }}{% endif %}</span></a>
             </li>

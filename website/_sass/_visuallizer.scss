@@ -199,6 +199,45 @@
   }
 }
 
+.game-replay-share{
+  position: relative;
+  .popup-container{
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%);
+    z-index: 99;
+  }
+  .popup-share{
+    text-align: left;
+    padding: 10px;
+    background-color: #1c1927;
+    color: $foreground-2;
+    a{
+      color: $foreground-2;
+    }
+    label, .form-inline-button, .share-socials{
+      margin-bottom: 5px;
+    }
+    label{
+      font-size: 0.9em;
+      display: block;
+    }
+    .share-socials{
+      font-size: 1.5em;
+    }
+    .hr{
+      height: 1px;
+      background-color: $foreground-2;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    .btn{
+      color: #30242F;
+    }
+  }
+}
+
 .card-dashboard-list{
   margin-bottom: 30px;
 }

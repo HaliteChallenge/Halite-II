@@ -2,7 +2,6 @@
 layout: doc_page
 title: The Halite Codex
 toc: false
-sort_key: 2
 description: Background on the Halite game story from the Halatian general and lead scientist.
 
 ---

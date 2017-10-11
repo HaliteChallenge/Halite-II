@@ -72,7 +72,25 @@
               </div>
             </div>
             <div class="game-replay-share">
-              <button class="btn">
+              <div class="popup-container" v-show="sharePopup">
+                <div class="popup-share">
+                  <label>Share as a link</label>
+                  <div class="form-inline-button">
+                    <input type="text" placeholder="Hackathon signup code"> 
+                    <button class="btn">
+                      <span>Join Hackathon</span>
+                    </button>
+                  </div>
+                  <div class="share-socials">
+                    <a href="#"><i class="fa fa-facebook-official"></i></a>
+                    <a href="#"><i class="fa fa-twitter"></i></a>
+                  </div>
+                  <div class="hr"></div>
+                  <label>Share as a video</label>
+                  <a href="#" class="btn btn-block"><span>Create Video</span></a>
+                </div>
+              </div>
+              <button class="btn" @click="toggleShare">
                 <span>SHARE</span>
               </button>
             </div>
@@ -329,6 +347,7 @@
         speedIndex: 3,
         speedLabel: '3x',
         stats: null,
+        sharePopup: false,
         // showChart: false,
         selected: {
           kind: '',
@@ -694,7 +713,9 @@
         console.log('gaData')
         utils.gaEvent(category, action, label);
       },
-
+      toggleShare: function(){
+        this.sharePopup = !this.sharePopup;
+      }
     }
   }
 </script>

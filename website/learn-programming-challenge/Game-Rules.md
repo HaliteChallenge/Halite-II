@@ -2,7 +2,6 @@
 layout: doc_page
 title: Game Rules
 toc: false
-sort_key: 4
 description: Learn the rules of the game to win the Halite AI Programming Challenge.
 ---
 
