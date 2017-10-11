@@ -9,11 +9,11 @@
                 <ul class="list-ha">
                     <li>
                         <i class="xline xline-top"></i>
-                        <a href="#section_personal_info">Personal Info</a>
+                        <a href="#section_personal_info"><span>Personal Info</span></a>
                     </li>
                     <li>
                         <i class="xline xline-top"></i>
-                        <a href="#section_account_info">Account Info</a>
+                        <a href="#section_account_info"><span>Account Info</span></a>
                     </li>
                 </ul>
             </div>

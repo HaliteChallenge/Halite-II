@@ -11,8 +11,11 @@
   //   }
   // }
   a{
-      color: $yellow;
-    &.base{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
       text-decoration: underline;
     }
   }

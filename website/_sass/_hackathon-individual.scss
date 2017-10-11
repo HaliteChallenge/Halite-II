@@ -61,6 +61,15 @@
       cursor: pointer;
     }
   }
+  a{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
   .hackathon-info {
     text-align: center;
     margin: 10px 0;

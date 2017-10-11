@@ -5,6 +5,17 @@
     &.base-link{
       color: $yellow;
       text-decoration: none;
+      cursor: pointer;
+      &:hover{
+        color: $yellow-hover;
+        text-decoration: underline;
+      }
+    }
+  }
+  .footer-hidden{
+    visibility:hidden;
+    @media (max-width: $screen-sm-max){
+      display: none;
     }
   }
   .navbar{

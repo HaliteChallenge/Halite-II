@@ -77,8 +77,8 @@
            </div>
             <div class="col-md-12 ha-line">
             </div>
-            <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">STAFF PICKS</p>
+            <div class="col-md-12 big-menu watch-section">
+                <p class="t2 c-wht">WATCH STAFF PICKS</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <p class="t5 c-gry">Thanks to our game engine, thousands of games are played at a time. Check out a few!</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
@@ -154,7 +154,7 @@
                 </div>-->
             </div>
             <div class="clear"></div>
-            <div class="col-md-12">
+            <div class="col-md-12 watch-section-arrow">
                <div class="arrows-icon">
                    <div class="scroll-arrow"></div>
                    <div class="scroll-arrow"></div>
@@ -201,7 +201,7 @@
                                 <p class="t3 c-wht font-headline">HACKATHONS &amp; EVENTS</p>
                                 <p class="t5 c-gry">Find out what events the Halite community is organizing.</p>
                                 <div class="clear"></div>
-                                <div class="ha-button-container no-bg-button">
+                                <div class="ha-button-container no-bg-button btn-bottom">
                                     <div>
                                         <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button"><span>LEARN MORE</span></a>
                                     </div>
@@ -222,7 +222,7 @@
                                 <p class="t3 c-wht font-headline">INVITE A FRIEND</p>
                                 <p class="t5 c-gry">Invite a friend to join in the fun</p>
                                 <div class="clear"></div>
-                                <div class="ha-input-container">
+                                <div class="ha-input-container btn-bottom btn-bottom-width">
                                     <div class="input-field">
                                         <input id="intmpid" type="email" placeholder="Your friend's email..."/>
                                         <button class="btn" v-on:click="invite"><span>INVITE</span></button>
@@ -310,7 +310,7 @@
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
                     <div>
-                        <a href="" v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></a>
+                        <a :href="loginServerUrl" @click.stop.prevent="signup" v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></a>
                         <a href="/play-programming-challenge" v-else class="ha-button"><span>PLAY NOW</span></a>
                     </div>
                 </div>
@@ -335,7 +335,8 @@
                };
            }
            return {
-               me_in
+               me_in,
+               loginServerUrl:`${api.LOGIN_SERVER_URL}/github`,
            };
        },
        mounted: function() {
@@ -358,6 +359,14 @@
                         document.getElementById("invitestatus").textContent = "Invitation sent..."
                         gaData('invite-success','click-to-invite', 'home')
                     })
+                }
+           },
+           signup: ()=>{
+                let docWidth = $(document).width();
+                if(docWidth <= 768){
+                    $('.mobile-strict-container').css('visibility', 'visible');
+                }else{
+                    window.location.replace(`${api.LOGIN_SERVER_URL}/github`);
                 }
            },
            createRedditWidget: function() {

@@ -70,6 +70,18 @@
       margin-right:-15px !important;
     }
   }
+  a{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
+  .ha-button-container{
+    margin-top: 10px;
+  }
   .notification{
     background-color: $yellow;
     margin-bottom: 30px;
@@ -81,10 +93,11 @@
     color: $gray-bg;
     font-family: Helvetica !important;
     a{
-      color: #337ab7;
+      color: $blue;
       text-decoration: none;
       cursor: pointer;
       &:hover{
+        color: $blue-hover;
         text-decoration: underline;
       }
     }
@@ -119,8 +132,11 @@
     >br{
       display: none;
     }
-    .ha-button-container:not(.no-bg-button){
-      margin-left: 20px;
+    .ha-button-container{
+      margin-top: 0;
+      &:not(.no-bg-button){
+        margin-left: 20px;
+      }
     }
     @media (max-width: $screen-xs-max){
       width: auto;
@@ -138,20 +154,45 @@
     background-color: #889295;
     height: 1px;
   }
+  .btn-bottom{
+    @media (min-width: $screen-md-min) {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      &-width {
+        transform: none;
+        margin-left: -148px !important;
+      }
+    }
+  }
   .des{
     text-align: left;
+    @media (min-width: $screen-md-min){
+      display: table;
+      >div{
+        display: table-cell;
+        float: none !important;
+        vertical-align: middle;
+        padding-left: 9%;
+        padding-right: 9%;
+      }
+    }
     @media (max-width: $screen-sm-max){
       text-align: center;
     }
     .bot-1{
       display: none;
-      @media (max-width: $screen-xs-max){
+      @media (max-width: $screen-sm-max){
         display: block;
       }
     }
     .bot-2{
       display: block;
-      @media (max-width: $screen-xs-max){
+      @media (min-width: $screen-md-min){
+        display: table-cell;
+      }
+      @media (max-width: $screen-sm-max){
         display: none;
       }
     }
@@ -233,6 +274,14 @@
     .screen-shot{
       @media (max-width: $screen-xs-max){
         margin-bottom: 20px;
+      }
+    }
+  }
+  .watch-section{
+    @media (max-width: $screen-sm-max){
+      display: none;
+      &-arrow{
+        display: none;
       }
     }
   }
