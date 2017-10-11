@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Internal Two Sigma Hackathon is now live, Finals begin on October 6th 22nd, 2018</div>
+        <div class="notification font-headline">Halite II launches on October 23rd, Finals begin on January 22nd, 2018</div>
 
         <div class="row">
             <div class="col-md-12">
