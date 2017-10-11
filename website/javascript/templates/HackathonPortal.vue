@@ -35,7 +35,6 @@
           </div>
         </div>
       </div>
-      <p v-if="!showEvents"><a :href="loginServerUrl">Sign in</a> to see all your hackathons or find new ones to join.</p>
     </div>
     <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
@@ -112,7 +111,21 @@ export default {
       }
       if(userId) {
         api.getUserHackathons(userId).then(hackathons => {
-          if(hackathons && hackathons instanceof Array) {
+         this.populateHackathons(hackathons);
+        })
+      }
+      else
+      {
+         api.getHackathons().then(hackathons => {
+         this.populateHackathons(hackathons);
+        })
+      }
+    })
+  },
+  methods: {
+    populateHackathons: function(hackathons)
+    {
+      if(hackathons && hackathons instanceof Array) {
             const wrapEvent = [];
             hackathons.map(hackathon => {
               const date = moment(hackathon.start_date).format('dddd, MMMM Do');
@@ -129,8 +142,8 @@ export default {
               })
               wrapEvent.push(newEvent);
             });
-            this.events = wrapEvent;
 
+            this.events = wrapEvent;
             if(hackathons.length >= 4) {
               hackathons = hackathons.slice(0, 4);
             }
@@ -148,11 +161,7 @@ export default {
             this.showHackathonInProgress = true;
           }
           this.showEvents = true;
-        })
-      }
-    })
-  },
-  methods: {
+    },
     jumpToHackathon: function(id) {
       this.gaData('hackathon', 'click-to-join', 'hackathon-flow');
       window.location.href = `hackathon-individual/?hackathon_id=${id}`

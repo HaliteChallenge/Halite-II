@@ -52,8 +52,8 @@ hackathon_query = sqlalchemy.sql.select([
 
 
 @web_api.route("/hackathon", methods=["GET"])
-@api_util.requires_login(accept_key=True, admin=True)
-def list_hackathons(*, user_id):
+@util.cross_origin(methods=["GET", "POST"])
+def list_hackathons():
     result = []
     offset, limit = api_util.get_offset_limit()
 
@@ -82,6 +82,7 @@ def list_hackathons(*, user_id):
 
 
 @web_api.route("/hackathon", methods=["POST"])
+@util.cross_origin(methods=["GET", "POST"])
 @api_util.requires_login(accept_key=True, admin=True)
 def create_hackathon(*, user_id):
     # Accept JSON if possible; fall back to form-encoded data
@@ -143,14 +144,12 @@ def create_hackathon(*, user_id):
 
 @web_api.route("/hackathon/<int:hackathon_id>", methods=["GET"])
 @util.cross_origin(methods=["GET", "PUT"])
-@api_util.requires_login(accept_key=True)
-def get_hackathon(hackathon_id, *, user_id):
+def get_hackathon(hackathon_id):
     with model.engine.connect() as conn:
         hackathon = conn.execute(hackathon_query.where(
             model.hackathons.c.id == hackathon_id)).first()
 
-        if (not hackathon or
-                not can_view_hackathon(user_id, hackathon["id"], conn)):
+        if not hackathon:
             raise util.APIError(404)
 
         hackathon_users = conn.execute(
@@ -232,13 +231,10 @@ def update_hackathon(hackathon_id, *, user_id):
         })
 
 
-@web_api.route("/hackathon/<int:hackathon_id>/leaderboard", methods=["GET"])
+@web_api.route("/hackathon/<int:hackathon_id>/leaderboard")
 @util.cross_origin(methods=["GET"])
-@api_util.requires_login(accept_key=True)
-def get_hackathon_leaderboard(hackathon_id, *, user_id):
+def get_hackathon_leaderboard(hackathon_id):
     with model.engine.connect() as conn:
-        if not can_view_hackathon(user_id, hackathon_id, conn):
-            raise util.APIError(404)
 
         table = model.hackathon_ranked_bots_users_query(hackathon_id)
 

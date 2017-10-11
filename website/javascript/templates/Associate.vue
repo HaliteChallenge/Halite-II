@@ -9,8 +9,12 @@
                     </li>
                     <li>
                         <i class="xline xline-top"></i>
-                        <i class="xline xline-bottom"></i>
                         <a href="#section_account_info">Account Info</a>
+                    </li>
+                     <li>
+                        <i class="xline xline-top"></i>
+                        <i class="xline xline-bottom"></i>
+                        <a href="#section_account_info">Hackathon Signup</a>
                     </li>
                 </ul>
             </div>

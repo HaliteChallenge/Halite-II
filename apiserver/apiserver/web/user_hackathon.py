@@ -13,11 +13,7 @@ from .blueprint import web_api
 
 @web_api.route("/user/<int:intended_user>/hackathon", methods=["GET"])
 @util.cross_origin(methods=["GET", "POST"])
-@api_util.requires_login(accept_key=True)
-def get_user_hackathons(intended_user, *, user_id):
-    if user_id != intended_user:
-        raise api_util.user_mismatch_error()
-
+def get_user_hackathons(intended_user):
     record = []
     with model.engine.connect() as conn:
         hackathons = conn.execute(sqlalchemy.sql.select([

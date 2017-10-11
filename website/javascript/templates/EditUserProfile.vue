@@ -4,8 +4,7 @@
             <a href="/user?me" class="back-arrow"><img class="arrow" :src="`${baseUrl}/assets/images/temp/back_arrow.png`"/><span>Back to your profile</span></a>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                
+            <div class="col-md-3">        
                 <ul class="list-ha">
                     <li>
                         <i class="xline xline-top"></i>
@@ -14,6 +13,11 @@
                     <li>
                         <i class="xline xline-top"></i>
                         <a href="#section_account_info"><span>Account Info</span></a>
+                    </li>
+                    <li>
+                        <i class="xline xline-top"></i>
+                        <i class="xline xline-bottom"></i>
+                        <a href="#section_account_info">Hackathon Signup</a>
                     </li>
                 </ul>
             </div>
