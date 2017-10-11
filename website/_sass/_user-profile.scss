@@ -13,11 +13,19 @@
     text-align: center;
     margin-bottom: 15px;
   }
+  a{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
   &-edit-link{
     position: absolute;
     top: 23px;
     right: 0;
-    color: #FFBE00;
     cursor: pointer;
     &:hover{
       font-size: 1.8rem;
@@ -174,7 +182,10 @@
   }
   a{
     color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
     &:hover{
+      color: $yellow-hover;
       text-decoration: underline;
     }
   }

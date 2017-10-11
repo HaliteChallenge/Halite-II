@@ -76,7 +76,7 @@ header.navbar{
     min-height: 50px;
   }
   .not-logged-in{
-
+    background-size: 200px 40px !important;
     >li{
       >a{
         transform: translateY(1px);
@@ -110,7 +110,7 @@ header.navbar{
       display: inline-block;
       margin: 0;
       height: 60px;
-      background-size: 100% 40px;
+      background-size: 160px 40px;
       float: none !important;
       @media (max-width: $screen-sm-max){
         transform: translateY(-10px);

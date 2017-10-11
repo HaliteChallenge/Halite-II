@@ -205,7 +205,7 @@ function handleOutboundLinkClicks(category, action, label) {
 
     if(window.localStorage["user_id"] != null)
     {
-      document.getElementById("subscribeFooter").style.visibility = "hidden";
+      document.getElementById("subscribeFooter").className += ' '+'footer-hidden';
     }
     var signinBtn = document.getElementsByClassName('navbar-signin')[0];
     var mobileCon = document.getElementsByClassName('mobile-strict-container')[0];

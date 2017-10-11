@@ -55,6 +55,15 @@
 }
 
 .play-container{
+  a{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
   #halitetv-more-upload{
     @media (min-width: $screen-sm-min){
       width: 83%;

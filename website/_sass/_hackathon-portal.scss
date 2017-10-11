@@ -153,6 +153,15 @@
     clear: both;
   }
 
+  a{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
 
   .hackathon-info {
     padding-left: 0;
@@ -258,7 +267,7 @@
           margin-right: 10px;
         }
         a:hover{
-          color: $yellow;
+          color: $yellow-hover;
           text-decoration: none;
         }
       }
