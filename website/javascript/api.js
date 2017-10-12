@@ -290,6 +290,15 @@ export function getUserHackathons(userId) {
     });
 }
 
+export function getUserHistory(userId) {
+    return $.get({
+        url: `${API_SERVER_URL}/user/${userId}/history`,
+        xhrFields: {
+            withCredentials: true,
+        }
+    });
+}
+
 export function invitefriend(email) {
     return $.post({
         url: `${API_SERVER_URL}/invitation/user/` + email

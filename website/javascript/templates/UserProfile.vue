@@ -36,6 +36,7 @@
                             <p>{{ user.num_games }}</p>
                         </div>
                     </div>
+                    <h2 v-if="highestRank"> Highest Rank: {{highestRank}}</h2>
                     <p><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
                 </div>
                 <!-- <div class="user-profile-badge">
@@ -134,7 +135,6 @@
                     <i class="xline xline-bottom"></i>
                     Nemeses
                 </h2>
-
                 <div v-if="!nemesisList.length" class="section-empty">
                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
                     <h2>No nemeses yet</h2>
@@ -182,6 +182,110 @@
                                         <td>
                                             {{nemesis.losses}}
                                         </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="profile-section">
+                <h2>
+                    <i class="xline xline-bottom"></i>
+                    History
+                </h2>
+                <div v-if="!userHistory.length" class="section-empty">
+                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                    <h2>No history</h2>
+                    <p>Submit your first bot to see your history<br/>here</p>
+                </div>
+                <div v-if="userHistory.length > 0">
+                    <div class="table-sticky-container">
+                        <table class="table table-leader table-sticky">
+                            <thead>
+                                <tr>
+                                    <th>Bot Version</th>
+                                    <th>Score</th>
+                                    <th>Rank</th>
+                                    <th>Games</th>
+                                    <th>Retired On</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="table-scrollable-content">
+                            <table class="table table-leader">
+                                <thead>
+                                    <tr>
+                                        <th>Bot Version</th>
+                                        <th>Score</th>
+                                        <th>Rank</th>
+                                        <th>Games</th>
+                                        <th>Retired On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr v-for="historyItem in userHistory">
+                                        <td>
+                                            {{historyItem.bot_version}}
+                                        </td>
+                                        <td>
+                                            {{ Math.round(100 * historyItem.last_score) / 100 }}
+                                        </td>
+                                        <td>
+                                            {{historyItem.last_rank}}
+                                        </td>
+                                         <td>
+                                            {{historyItem.last_games_played}}
+                                        </td>
+                                        <td>
+                                            {{getFormattedDate(historyItem.when_retired)}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section v-if="is_my_page" class="profile-section profile-section-error">
+                <h2>
+                    <i class="xline xline-bottom"></i>
+                    Your Errors
+                </h2>
+                <div>
+                    <div class="table-sticky-container">
+                        <table class="table table-leader table-sticky">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Reason</th>
+                                    <th>Date</th>
+                                    <th>Log File</th>
+                                    <th>Game File</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="table-scrollable-content">
+                            <table class="table table-leader">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Reason</th>
+                                        <th>Date</th>
+                                        <th>Log File</th>
+                                        <th>Game File</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="game in error_games">
+                                        <td>{{game.game_id}}</td>
+                                        <td>Time out</td>
+                                        <td><time :datetime="game.time_played"
+                                                  :title="game.time_played">
+                                                {{ game.time_played | moment("calendar") }}
+                                            </time></td>
+                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
+                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download Game</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -247,52 +351,6 @@
                     </div>
                 </div>
             </section>
-            <section v-if="is_my_page" class="profile-section profile-section-error">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Your Errors
-                </h2>
-                <div>
-                    <div class="table-sticky-container">
-                        <table class="table table-leader table-sticky">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Reason</th>
-                                    <th>Date</th>
-                                    <th>Log File</th>
-                                    <th>Game File</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="table-scrollable-content">
-                            <table class="table table-leader">
-                                <thead>
-                                    <tr>
-                                        <th>Id</th>
-                                        <th>Reason</th>
-                                        <th>Date</th>
-                                        <th>Log File</th>
-                                        <th>Game File</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="game in error_games">
-                                        <td>{{game.game_id}}</td>
-                                        <td>Time out</td>
-                                        <td><time :datetime="game.time_played"
-                                                  :title="game.time_played">
-                                                {{ game.time_played | moment("calendar") }}
-                                            </time></td>
-                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download Game</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     </div>
 </template>
@@ -301,7 +359,8 @@
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
     import Vue from "vue";
-    import * as utils from "../utils";
+    import * as utils from "../utils";  
+    import moment from 'moment';
 
     export default {
         name: "UserProfile",
@@ -322,6 +381,7 @@
                 bots: [],
                 error_games: [],
                 hackathons: [],
+                userHistory: [],
                 profile_images: {},
                 page: 0,
                 limit: 10,
@@ -331,6 +391,7 @@
                 nemesisGameThreshold: 10,
                 only_timed_out: false,
                 is_my_page: false,
+                highestRank: null,
                 messages: {
                     hackathon: "",
                 },
@@ -367,7 +428,8 @@
                 this.fetch();
                 this.fetchHackathon();
                 this.fetchErrorGames();
-                this.nemesis();
+                this.fetchnemesis();
+                this.fetchhistory();
             });
 
             api.me().then((me) => {
@@ -456,7 +518,7 @@
               const location = `${state ? state + ', ' : ''}${country}`;
               return location ? location : '';
             },
-            nemesis: function() {
+            fetchnemesis: function() {
                 let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`;
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
                 return $.get(url).then((data) => {
@@ -521,9 +583,17 @@
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
                         this.hackathons = hackathons.filter((h) => {
-                            console.log(h);
                             return h.participant == true;
                         });
+                    }
+                });
+            },
+            fetchhistory: function(){
+                api.getUserHistory(this.user.user_id).then(history => {
+                    if(history && history instanceof Array) {
+                        history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
+                        this.userHistory = history;
+                        this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);
                     }
                 });
             },
@@ -533,23 +603,20 @@
                 return $.get(url).then((data) => {
                     this.error_games = data;
                     this.setupStickyTable();
-                })
+                });
             },
-
             next_page: function() {
                 this.offset += 10;
                 this.fetch().then(() => {
                     this.page += 1;
                 });
             },
-
             prev_page: function() {
                 this.offset -= 10;
                 this.fetch().then(() => {
                     this.page -= 1;
                 });
             },
-
             toggle_filter: function() {
                 this.only_timed_out = !this.only_timed_out;
                 this.offset = 0;
@@ -557,15 +624,12 @@
                     this.page = 0;
                 });
             },
-
             error_log_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
             },
-
             replay_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`;
             },
-
             join_hackathon: function(event) {
                 event.preventDefault();
                 const code = this.$refs.hackathon_signup_code.value;
@@ -610,6 +674,9 @@
                     aniVal = 0;
                 }
                 $(list).animate({marginLeft:'+='+aniVal+'px'});
+            },
+            getFormattedDate: function(date) {
+                return moment(date).format("MMM Do, YYYY - HH:MM");
             },
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
