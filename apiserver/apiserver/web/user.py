@@ -519,3 +519,31 @@ def reset_api_key(intended_user=None, *, user_id):
         return util.response_success({
             "api_key": "{}:{}".format(user_id, api_key),
         }, status_code=201)
+
+@web_api.route("/user/<int:intended_user_id>/history", methods=["GET"])
+@util.cross_origin(methods=["GET"])
+def get_rank_history(intended_user_id):
+    result = []
+    with model.engine.connect() as conn:
+        history = conn.execute(sqlalchemy.sql.select([
+                model.bot_history.c.version_number,
+                model.bot_history.c.last_rank,
+                model.bot_history.c.last_score,
+                model.bot_history.c.last_num_players,
+                model.bot_history.c.last_games_played,
+                model.bot_history.c.when_retired
+            ]).select_from(model.bot_history).where(model.bot_history.c.user_id == intended_user_id))
+        
+        for row in history.fetchall():
+            history_item = {
+                "bot_version": int(row["version_number"]),
+                "last_rank": int(row["last_rank"]),
+                "last_score": float(row["last_score"]),
+                "last_num_players": int(row["last_num_players"]),
+                "last_games_played": int(row["last_games_played"]),
+                "when_retired": row["when_retired"],
+            }
+
+            result.append(history_item)
+
+    return flask.jsonify(result)
