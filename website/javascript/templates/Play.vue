@@ -218,7 +218,7 @@
     position: relative;
   }
   .play-body {
-    margin-top: 90px;
+    margin-top: 0px;
   }
   .message-container{
     position: absolute;
