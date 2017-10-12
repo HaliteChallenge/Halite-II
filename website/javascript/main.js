@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 import Vue from "vue";
 import 'url-search-params-polyfill';
 import 'element-ui/lib/theme-default/index.css';
@@ -56,7 +58,7 @@ window.views = {
     LeaderboardContainer: function () {
         new Vue({
             el: "#leaderboard-container",
-            render: (h) => h(LeaderboardContainer, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(LeaderboardContainer, { props: { baseUrl: _global.baseUrl } }),
         });
     },
     Upload: function () {
@@ -68,13 +70,13 @@ window.views = {
     UserProfile: function () {
         new Vue({
             el: "#user-profile-container",
-            render: (h) => h(UserProfile, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(UserProfile, { props: { baseUrl: _global.baseUrl } }),
         });
     },
     EditUserProfile: function () {
         new Vue({
             el: "#edit-user-profile-container",
-            render: (h) => h(EditUserProfile, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(EditUserProfile, { props: { baseUrl: _global.baseUrl } }),
         });
     },
     VerifyEmail: function () {
@@ -89,76 +91,76 @@ window.views = {
             render: (h) => h(VisualizerContainer),
         });
     },
-    HaliteTV: function() {
+    HaliteTV: function () {
         new Vue({
             el: "#halitetv-container",
-            render: (h) => h(VisualizerContainer, {props: {baseUrl: _global.baseUrl}})
+            render: (h) => h(VisualizerContainer, { props: { baseUrl: _global.baseUrl } })
         });
     },
     Home: function () {
         new Vue({
             el: "#home-container",
-            render: (h) => h(Home, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(Home, { props: { baseUrl: _global.baseUrl } }),
         });
     },
     HackathonPortal: function () {
         new Vue({
             el: "#hackathon-container",
-            render: (h) => h(HackathonPortal, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(HackathonPortal, { props: { baseUrl: _global.baseUrl } }),
         });
     },
-    HackathonIndividual: function() {
+    HackathonIndividual: function () {
         new Vue({
             el: '#hackathon-container',
-            render: (h) => h(HackathonIndividual, {props: {baseUrl: _global.baseUrl}})
+            render: (h) => h(HackathonIndividual, { props: { baseUrl: _global.baseUrl } })
         });
     },
-    Play: function(){
+    Play: function () {
         new Vue({
             el: "#play-container",
-            render: (h) => h(Play, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(Play, { props: { baseUrl: _global.baseUrl } }),
         });
     },
-    Leagues: function(){
+    Leagues: function () {
         new Vue({
             el: "#leagues-container",
-            render: (h) => h(Leagues, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(Leagues, { props: { baseUrl: _global.baseUrl } }),
         });
     },
-    LeagueBoard: function(){
+    LeagueBoard: function () {
         new Vue({
             el: "#leaderboard-container",
-            render: (h) => h(LeagueBoard, {props: {baseUrl: _global.baseUrl}}),
+            render: (h) => h(LeagueBoard, { props: { baseUrl: _global.baseUrl } }),
         });
     }
 };
 
 api.me().then((me) => {
-   if (me) {
-       $(".not-logged-in").hide();
-       $(".navbar-signin").hide();
-       new Vue({
-           el: "#user-profile-bar-container",
-           render: (h) => h(UserProfileBar, {props: {baseUrl: _global.baseUrl}}),
-       });
+    if (me) {
+        $(".not-logged-in").hide();
+        $(".navbar-signin").hide();
+        new Vue({
+            el: "#user-profile-bar-container",
+            render: (h) => h(UserProfileBar, { props: { baseUrl: _global.baseUrl } }),
+        });
 
-       if (me.is_new_user === true && window.location.pathname !== "/create-account") {
-           window.location.replace("/create-account");
-       }
-   }
+        if (me.is_new_user === true && window.location.pathname !== "/create-account") {
+            window.location.replace("/create-account");
+        }
+    }
 });
 
 // auto scroll to the anchor position
-(function(){
-    if (document.location.hash){
+(function () {
+    if (document.location.hash) {
         const hash = document.location.hash.slice(1);
         const targetElement = document.getElementById(hash);
         const top = targetElement.getBoundingClientRect().top - document.body.getBoundingClientRect().top;
         // console.log(top);
-        setTimeout(function(){
+        setTimeout(function () {
             window.scrollTo(0, 250);
-        },1000);
+        }, 1000);
     }
     // event
-    
-})()
+
+})();

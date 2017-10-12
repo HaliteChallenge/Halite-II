@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 export const API_SERVER_URL = api_server_url;
 export const LOGIN_SERVER_URL = login_server_url;
 export const LOGOUT_SERVER_URL = logout_server_url;
@@ -11,7 +13,7 @@ export function me_cached() {
         return {
             user_id: cached_me["user_id"],
             username: cached_me["username"],
-        }
+        };
     }
     else if (window.localStorage["cache"]) {
         return {
@@ -93,12 +95,12 @@ export function update_bot(user_id, bot_id, file, progress_callback) {
     const endpoint = bot_id === null ? "bot" : `bot/${bot_id}`;
 
     const xhr = makeRequest();
-    xhr.upload.addEventListener("progress", function(e) {
+    xhr.upload.addEventListener("progress", function (e) {
         if (e.lengthComputable) {
             progress_callback(e.loaded / e.total);
         }
     }, false);
-    xhr.upload.addEventListener("load", function(e) {
+    xhr.upload.addEventListener("load", function (e) {
         progress_callback(1);
     }, false);
     xhr.withCredentials = true;
@@ -111,7 +113,7 @@ export function update_bot(user_id, bot_id, file, progress_callback) {
     xhr.send(form_data);
 
     return new Promise((resolve, reject) => {
-       xhr.onload = function(e) {
+        xhr.onload = function (e) {
             if (this.status === 200) {
                 resolve();
             }
@@ -119,7 +121,7 @@ export function update_bot(user_id, bot_id, file, progress_callback) {
                 const response = JSON.parse(e.target.responseText);
                 reject(response);
             }
-       };
+        };
     });
 }
 
@@ -149,12 +151,12 @@ export function get_replay(game_id, progress_callback) {
         xhr.responseType = "arraybuffer";
 
         if (progress_callback) {
-            xhr.onprogress = function(e) {
+            xhr.onprogress = function (e) {
                 progress_callback(e.loaded, e.total);
             };
         }
 
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             if (this.status === 200) {
                 const blob = this.response;
                 resolve(blob);
@@ -164,11 +166,11 @@ export function get_replay(game_id, progress_callback) {
             }
         };
 
-        xhr.onerror = function() {
+        xhr.onerror = function () {
             reject();
         };
 
-        xhr.onreadystatechange = function(e) {
+        xhr.onreadystatechange = function (e) {
             if (xhr.readyState === 4) {
                 if (xhr.status !== 200) {
                     reject();
@@ -193,7 +195,7 @@ export function get_expired_replay(replay_class, replay_name) {
         xhr.open("GET", `${API_SERVER_URL}/replay/class/${replay_class}/name/${replay_name}`, true);
         xhr.responseType = "arraybuffer";
 
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             if (this.status === 200) {
                 const blob = this.response;
                 resolve(blob);
@@ -203,11 +205,11 @@ export function get_expired_replay(replay_class, replay_name) {
             }
         };
 
-        xhr.onerror = function() {
+        xhr.onerror = function () {
             reject();
         };
 
-        xhr.onreadystatechange = function(e) {
+        xhr.onreadystatechange = function (e) {
             if (xhr.readyState === 4) {
                 if (xhr.status !== 200) {
                     reject();
@@ -219,7 +221,7 @@ export function get_expired_replay(replay_class, replay_name) {
     });
 }
 
-export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
+export function leaderboard(filters, hackathon = null, offset = null, limit = null) {
     let url = `${API_SERVER_URL}/leaderboard`;
     let fields = {};
     if (hackathon) {
@@ -228,14 +230,14 @@ export function leaderboard(filters, hackathon=null, offset=null, limit=null) {
     }
 
     const querystring = [];
-    if(offset !== null && limit !== null) {
+    if (offset !== null && limit !== null) {
         querystring.push(`offset=${offset}&limit=${limit}`);
     }
     if (filters && filters.length > 0) {
         querystring.push(`filter=${filters.join('&filter=')}`);
     }
     if (querystring.length > 0) {
-      url += `?${querystring.join("&")}`;
+        url += `?${querystring.join("&")}`;
     }
     return $.get({
         url: url,
@@ -285,7 +287,7 @@ export function getUserHackathons(userId) {
         xhrFields: {
             withCredentials: true,
         }
-    })
+    });
 }
 
 export function invitefriend(email) {
