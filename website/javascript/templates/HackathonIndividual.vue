@@ -61,7 +61,7 @@
                          :aria-expanded="joinExpanded.toString()" id="widget_join_details"
                          aria-labelledby="heading_join_details">
                         <div class="hackathon-join-container">
-                            <div class="row">
+                            <div class="row hackathon-join-des">
                                 <div class="col-sm-12">
                                     <div class="hackathon-join-left-col">
                                         <p>You're welcome to start submitting bots now, but first you need to join the
@@ -69,7 +69,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row hackathon-join-hex">
                                 <div class="col-sm-4">
                                     <div class="hackathon-join-left-col">
                                         <div class="hex-li">
@@ -156,11 +156,17 @@
       Leaderboard
     },
     data: function () {
+      let detailExpanded = true;
+      let joinExpanded = true;
+      if($(window).width() < 768){
+        detailExpanded = false;
+        joinExpanded = false;
+      }
       return {
         hackathon_id: null,
         isInHackathon: false,
-        detailExpanded: true,
-        joinExpanded: true,
+        detailExpanded,
+        joinExpanded,
         hackathon: {},
         path: [
           {
@@ -189,10 +195,15 @@
             });
             this.isInHackathon = true;
             if (this.isInHackathon) {
-              let detailExpanded = window.sessionStorage['detailExpanded'] === 'true' ? true : false;
-              let joinExpanded = window.sessionStorage['joinExpanded'] === 'true' ? true : false;
-              this.detailExpanded = false || detailExpanded;
-              this.joinExpanded = false || joinExpanded;
+              if($(window).width() < 768){
+                this.detailExpanded = false;
+                this.joinExpanded = false;
+              }else{
+                let detailExpanded = window.sessionStorage['detailExpanded'] === 'true' ? true : false;
+                let joinExpanded = window.sessionStorage['joinExpanded'] === 'true' ? true : false;
+                this.detailExpanded = false || detailExpanded;
+                this.joinExpanded = false || joinExpanded;
+              }
             }
             let title = _.chain(hackathon.title).toLower().split(' ').join('-').value();
             window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);

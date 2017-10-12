@@ -71,7 +71,9 @@ h1, h2, h3{
 }
 
 .learnpage-content{
-  margin-left: 30px;
+  @media (min-width: $screen-md-min) {
+    margin-left: 30px;
+  }
 }
 
 .page-description{

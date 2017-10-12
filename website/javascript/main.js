@@ -161,6 +161,4 @@ api.me().then((me) => {
             window.scrollTo(0, 250);
         }, 1000);
     }
-    // event
-
 })();

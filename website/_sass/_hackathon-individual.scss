@@ -135,6 +135,19 @@
         }
       }
     }
+    &-des{
+      @media (max-width: $screen-xs-max){
+        margin-bottom: 0 !important;
+      }
+    }
+    &-hex{
+      @media (max-width: $screen-xs-max){
+        display: block !important;
+        > [class*="col-"]{
+          margin: 20px 0;
+        }
+      }
+    }
     .panel-collapse{
       position: relative;
     }
