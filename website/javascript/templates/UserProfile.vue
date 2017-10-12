@@ -74,10 +74,9 @@
                         <thead>
                             <tr>
                                 <th>Watch</th>
-                                <th>Opponents</th>
-                                <th>Map Size</th>
-                                <th>Turns</th>
-                                <th>Won</th>
+                                <th style="padding-left: 40px;">Result</th>
+                                <th class="text-center" >Map Size</th>
+                                <th class="text-center">Turns</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,6 +87,9 @@
                                     </a>
                                 </td>
                                 <td>
+                                    <div class="info-icon-trophy">
+                                        <span v-if="game.players[user.user_id].rank === 1" class="icon-trophy"></span>
+                                    </div>
                                     <a v-for="player in game.playerSorted"
                                        :href="'/user?user_id=' + player.id"
                                        class="game-participant"
@@ -99,12 +101,9 @@
                                         </span>
                                     </a>
                                 </td>
-                                <td>{{ game.map_width }}x{{ game.map_height }}</td>                        
-                                <td >
+                                <td class="text-center">{{ game.map_width }}x{{ game.map_height }}</td>                        
+                                <td class="text-center">
                                   {{ game.turns_total }}
-                                </td>
-                                <td class="winner">
-                                  {{ game.players[user.user_id].rank === 1 ? 'Won' : '' }}
                                 </td>
                             </tr>
                         </tbody>
@@ -141,9 +140,9 @@
                             <thead>
                                 <tr>
                                     <th>Nemesis</th>
-                                    <th>Games</th>
-                                    <th>Win %</th>
-                                    <th>Loss %</th>
+                                    <th class="text-center">Games</th>
+                                    <th class="text-center">Win %</th>
+                                    <th class="text-center">Loss %</th>
                                 </tr>
                             </thead>
                         </table>
@@ -151,10 +150,10 @@
                             <table class="table table-leader">
                                 <thead>
                                     <tr>
-                                       <th>Nemesis</th>
-                                        <th>Games</th>
-                                        <th>Win %</th>
-                                        <th>Loss %</th>
+                                        <th>Nemesis</th>
+                                        <th class="text-center">Games</th>
+                                        <th class="text-center">Win %</th>
+                                        <th class="text-center">Loss %</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -168,13 +167,13 @@
                                                 </span>
                                             </a>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{nemesis.total}}
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{nemesis.wins}}
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{nemesis.losses}}
                                         </td>
                                     </tr>
@@ -201,9 +200,9 @@
                             <thead>
                                 <tr>
                                     <th>Bot Version</th>
-                                    <th>Score</th>
-                                    <th>Rank</th>
-                                    <th>Games</th>
+                                    <th class="text-center">Score</th>
+                                    <th class="text-center">Rank</th>
+                                    <th class="text-center">Games</th>
                                     <th>Retired On</th>
                                 </tr>
                             </thead>
@@ -213,9 +212,9 @@
                                 <thead>
                                     <tr>
                                         <th>Bot Version</th>
-                                        <th>Score</th>
-                                        <th>Rank</th>
-                                        <th>Games</th>
+                                        <th class="text-center">Score</th>
+                                        <th class="text-center">Rank</th>
+                                        <th class="text-center">Games</th>
                                         <th>Retired On</th>
                                     </tr>
                                 </thead>
@@ -224,13 +223,13 @@
                                         <td>
                                             {{historyItem.bot_version}}
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{ Math.round(100 * historyItem.last_score) / 100 }}
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             {{historyItem.last_rank}}
                                         </td>
-                                         <td>
+                                         <td class="text-center">
                                             {{historyItem.last_games_played}}
                                         </td>
                                         <td>
@@ -255,7 +254,6 @@
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Reason</th>
                                     <th>Date</th>
                                     <th>Log File</th>
                                     <th>Game File</th>
@@ -267,7 +265,6 @@
                                 <thead>
                                     <tr>
                                         <th>Id</th>
-                                        <th>Reason</th>
                                         <th>Date</th>
                                         <th>Log File</th>
                                         <th>Game File</th>
@@ -276,11 +273,11 @@
                                 <tbody>
                                     <tr v-for="game in error_games">
                                         <td>{{game.game_id}}</td>
-                                        <td>Time out</td>
                                         <td><time :datetime="game.time_played"
                                                   :title="game.time_played">
-                                                {{ game.time_played | moment("calendar") }}
-                                            </time></td>
+                                                {{ getFormattedDateForGames(game.time_played)}}
+                                            </time>
+                                        </td>
                                         <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
                                         <td><a :href="replay_link(game.game_id)" target="_blank">Download Game</a></td>
                                     </tr>
@@ -680,7 +677,7 @@
             getFormattedDate: function(date) {
                 var date = moment(date);
                 if(date.isValid()){
-                    return moment(date).format("MMM Do, YYYY - HH:MM");
+                    return moment(date).format("MM/DD, YY - HH:MM");
                 }
                 else{
                     return "Still playing";
