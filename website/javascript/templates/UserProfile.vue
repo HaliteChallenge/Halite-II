@@ -594,6 +594,10 @@
                         history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
                         this.userHistory = history;
                         this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);
+                        this.userHistory.unshift({bot_version:"Current("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
+                        if(this.highestRank > this.user.rank){
+                            this.highestRank = this.user.rank;
+                        }
                     }
                 });
             },
@@ -676,7 +680,13 @@
                 $(list).animate({marginLeft:'+='+aniVal+'px'});
             },
             getFormattedDate: function(date) {
-                return moment(date).format("MMM Do, YYYY - HH:MM");
+                var date = moment(date);
+                if(date.isValid()){
+                    return moment(date).format("MMM Do, YYYY - HH:MM");
+                }
+                else{
+                    return "Still playing";
+                }
             },
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
