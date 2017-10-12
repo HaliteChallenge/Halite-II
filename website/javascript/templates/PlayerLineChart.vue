@@ -50,6 +50,10 @@
       showChart: {
         type: Boolean,
         required: true,
+      },
+      selectedPlayers: {
+        type: Object,
+        required: true
       }
     },
 
@@ -63,11 +67,15 @@
 
     methods: {
       initChart: function(option) {
-        let { showChart, chartData } = option || {}
+        let { showChart, chartData, selectedPlayers } = option || {}
         showChart = (showChart !== undefined ? showChart : this.showChart)
         if (!showChart) return
+
         chartData = (chartData !== undefined ? chartData : this.chartData)
         if(!chartData || !chartData.length) return
+
+        selectedPlayers = (selectedPlayers !== undefined ? selectedPlayers : this.selectedPlayers)
+        if (!selectedPlayers || !Object.entries(selectedPlayers).length) return;
 
         var svg = d3.select(this.$refs.mainSvg).attr('class', 'main-svg'),
         svgPosition = svg.node().getBoundingClientRect(),
@@ -76,7 +84,7 @@
         height = +svgPosition.height - margin.top - margin.bottom,
         // g1 = svg.append('foreignObject').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')').append('svg'),
         g1 = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')'),
-        g2 = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')'),
+        g2 = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')').attr('class', 'group-2'),
         innerSvg = g1.append('foreignObject').attr('height', height).attr('width', width).append('svg');
 
         this.path1List = []
@@ -103,8 +111,6 @@
 
         this.area = area
         this.line = line
-
-
 
         // let color = d3.scaleOrdinal(d3.schemeCategory20c)
 
@@ -136,41 +142,45 @@
               .remove()
 
         this.initDragPositon = x(this.index)
-              
 
         innerSvg.attr('width', this.initDragPositon)
           .attr('height', height)
 
         dataSet.forEach((data, index) => {
-          data.forEach(d => {
-            d.x = d.x
-            d.y = Number(d.y)
-          })
+          // if (selectedPlayers[index]){
+            data.forEach(d => {
+              d.x = d.x
+              d.y = Number(d.y)
+            })
 
-          let _color = color(index)
-          let path1 = g2.append('path')
-          path1.datum(getDataPeriod(data, this.maxLength, this.index))
-            .attr('stroke', _color)
-            .attr('fill', 'transparent')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-dasharray', '1 10')
-            .attr('stroke-dashunits', 'pathLength')
-            .attr('stroke-linecap', 'round')
-            .attr('stroke-width', 2)
-            .attr('d', line)
+            let _color = color(index)
+            let path1 = g2.append('path')
+            path1.datum(getDataPeriod(data, this.maxLength, this.index))
+              .attr('stroke', _color)
+              .attr('fill', 'transparent')
+              .attr('stroke-linejoin', 'round')
+              .attr('stroke-dasharray', '1 10')
+              .attr('stroke-dashunits', 'pathLength')
+              .attr('stroke-linecap', 'round')
+              .attr('stroke-width', 2)
+              .attr('d', line)
+              .attr('class', 'line-chart')
 
-          this.path1List.push(path1)
+            this.path1List.push(path1)
 
-          let path2 = innerSvg.append('path')
-          path2.datum(getDataPeriod(data, this.maxLength, this.index))
-            .attr('fill', _color)
-            .attr('fill-opacity', .1)
-            .attr('stroke', _color)
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-linecap', 'round')
-            .attr('stroke-width', 3)
-            .attr('d', area)
-          this.path2List.push(path2)
+            let path2 = innerSvg.append('path')
+            path2.datum(getDataPeriod(data, this.maxLength, this.index))
+              .attr('fill', _color)
+              .attr('fill-opacity', .1)
+              .attr('stroke', _color)
+              .attr('stroke-linejoin', 'round')
+              .attr('stroke-linecap', 'round')
+              .attr('stroke-width', 3)
+              .attr('d', area)
+            this.path2List.push(path2) 
+          // } else {
+          //   console.log('skip index ' + index);
+          // }
         })
 
         let dragLine = g1.append('path')
@@ -204,7 +214,20 @@
          
           self.$emit('updateIndex', Math.round(x.invert(_offset)))
         })
-      }
+      },
+      refreshGraph: function(){
+        const path1List = this.path1List;
+        const path2List = this.path2List;
+        Object.values(this.selectedPlayers).forEach((item, index) => {
+          if (item){
+            path1List[index].attr('stroke-opacity', 1);
+            path2List[index].attr('stroke-opacity', 1).attr('fill-opacity', 0.1);
+          } else {
+            path1List[index].attr('stroke-opacity', 0);
+            path2List[index].attr('stroke-opacity', 0).attr('fill-opacity', 0);
+          }
+        })
+      },
     },
 
     mounted: function() {
@@ -212,6 +235,9 @@
     },
 
     watch: {
+      selectedPlayers: function(selectedPlayers){
+        this.initChart({selectedPlayers});
+      },
       showChart: function(showChart) {
         this.initChart({showChart})
       },

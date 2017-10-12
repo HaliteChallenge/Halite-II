@@ -2,7 +2,7 @@
   // .list-nav{
   //   > li > a, > li > span{
   //     color: #858E92;
-  //   } 
+  //   }
   //   .sub-list-ha{
   //     > li > a{
   //       color: #858E92;
@@ -12,12 +12,7 @@
   //     }
   //   }
   // }
-}
-.doc-content-header{
-  background-color: #fff;
-  padding: 10px;
-  color: #191822;
-  margin-bottom: 10px;
+
   h1, h2, h3, h4 ,h5, h6{
     font-family: $font-heading;
     letter-spacing: 2px;
@@ -29,9 +24,11 @@
   h1{
     text-align: left;
     font-size: 36px;
+    text-transform: uppercase;
   }
   h2{
     font-size: 32px;
+    text-transform: uppercase;
   }
   h3{
     font-size: 28px;
@@ -43,8 +40,15 @@
     font-size: 20px;
   }
   h6{
-    font-size: 18px
+    font-size: 18px;
   }
+}
+
+.doc-content-header{
+  background-color: #fff;
+  padding: 10px;
+  color: #191822;
+  margin-bottom: 10px;
 
   .page-header{
     margin-bottom: 0;
@@ -95,12 +99,6 @@
     }
   }
 
-  h2{
-    font-size: 32pt;
-    font-weight: bold;
-    font-family: 'Teko';
-  }
-
   .btn-center{
     margin-left: 50%;
     transform: translateX(-50%);
@@ -119,7 +117,7 @@
     border-left: 0;
     padding-top: 40px;
     padding-bottom: 40px;
-    
+
     font-family: $font-heading;
     color: $yellow;
     font-size: 4rem;

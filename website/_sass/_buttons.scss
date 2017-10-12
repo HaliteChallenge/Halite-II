@@ -9,6 +9,9 @@
   background-color: transparent;
   font-size: 2rem;
   font-family: $font-headline;
+  &:active{
+    outline: none;
+  }
   >span{
     background-color: $yellow;
     display: block;

@@ -72,22 +72,27 @@
               </div>
             </div>
             <div class="game-replay-share">
+              <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
               <div class="popup-container" v-show="sharePopup">
                 <div class="popup-share">
                   <label>Share as a link</label>
                   <div class="form-inline-button">
-                    <input type="text" placeholder="Hackathon signup code"> 
-                    <button class="btn">
-                      <span>Join Hackathon</span>
+                    <input ref="shareInput" type="text" :value="shareLink"> 
+                    <button class="btn" @click="copyToClipboard">
+                      <span>Copy</span>
                     </button>
                   </div>
                   <div class="share-socials">
-                    <a href="#"><i class="fa fa-facebook-official"></i></a>
-                    <a href="#"><i class="fa fa-twitter"></i></a>
+                    <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+   target="_blank"><i class="fa fa-facebook-official"></i></a>
+                    <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+   target="_blank"><i class="fa fa-twitter"></i></a>
+                    <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+   target="_blank"><i class="fa fa-linkedin"></i></a>
                   </div>
-                  <div class="hr"></div>
+                  <!-- <div class="hr"></div>
                   <label>Share as a video</label>
-                  <a href="#" class="btn btn-block"><span>Create Video</span></a>
+                  <a href="#" class="btn btn-block"><span>Create Video</span></a> -->
                 </div>
               </div>
               <button class="btn" @click="toggleShare">
@@ -207,7 +212,7 @@
           <div class="panel-collapse collapse" :class="{'in': showChartPanel}" role="tabpanel" :aria-expanded="showChartPanel.toString()" id="panel_post_game" aria-labelledby="panel_post_game">
             <div class="card-dashboard-list row">
               <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
-                <div class="card-dashboard active">
+                <div :class="{'card-dashboard': true, 'active': selectedPlayers[_pIndex]}" @click="toggleSelectedPlayer(_pIndex)">
                   <i class="xline xline-top"></i>
                   <i class="xline xline-bottom"></i>
                   <div class="card-dashboard-thumb">
@@ -239,7 +244,7 @@
                   <span class="icon-globe"></span>
                   Territory Gained
                 </h4>
-                <PlayerLineChart :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
+                <PlayerLineChart ref="chart1" :selected-players="selectedPlayers" :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
               </div>
             </div>
             <div class="dashboard-graph-container bb ">
@@ -253,14 +258,14 @@
                     <span class="icon-ship"></span>
                     Ships
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     health
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -273,14 +278,14 @@
                     <span class="icon-ship"></span>
                     damage dealt
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     attack over time
                   </h4>
-                  <PlayerLineChart :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -379,7 +384,8 @@
           }
         },
         players: [],
-        sortedPlayers: []
+        sortedPlayers: [],
+        selectedPlayers: {}
       }
     },
     components: {
@@ -626,6 +632,13 @@
           return this.selected;
         }
         return null;
+      },
+      shareLink: function(){
+        // const game_id = this.game.game_id;
+        // const replay_class = this.game.game.replay_class;
+        // const replay = this.game.game.replay;
+        return window.location.href;
+        // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       }
     },
     methods: {
@@ -675,6 +688,12 @@
         const players = await this.getPlayers();
         this.players = players;
         this.sortedPlayers =  _.sortBy(players, ['rank']);
+
+        const selectedPlayers = {};
+        this.players.forEach(function(item, index){
+          selectedPlayers[index] = true;
+        });
+        this.selectedPlayers = selectedPlayers;
       },
       getPlayerName: function(botname){
         return botname.replace(/\sv\d+$/, '');
@@ -715,6 +734,32 @@
       },
       toggleShare: function(){
         this.sharePopup = !this.sharePopup;
+      },
+      shareSocial: function(social){
+        switch (social){
+          case 'facebook':
+            return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href);
+          break;
+          case 'twitter':
+            return 'https://twitter.com/home?status=' + encodeURIComponent(window.location.href);
+          break;
+          case 'linkedin': 
+            return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
+          break;
+        }
+      },
+      /**
+       * @param  {e} event
+       * @return {void}
+       */
+      copyToClipboard: function(e){
+        if (e) e.preventDefault();
+        this.$refs.shareInput.select();
+        document.execCommand('copy');
+      },
+      toggleSelectedPlayer: function(id){
+        this.selectedPlayers[id] = !this.selectedPlayers[id];
+        this.$refs.chart1.refreshGraph();
       }
     }
   }
