@@ -49,6 +49,9 @@ export function prepareAll(renderer, prepare) {
     // Right thing is prepare.add, but that does't seem to work.
     // Possibly related to https://github.com/pixijs/pixi.js/issues/3829
     // Workaround: https://stackoverflow.com/a/42762277
+
+    if (!renderer.bindTexture) return;
+
     Object.keys(SHIP_EXPLOSION_SHEET.data.frames)
         .forEach((frame) => renderer.bindTexture(PIXI.Texture.from(frame).baseTexture));
 
