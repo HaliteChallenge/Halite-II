@@ -37,4 +37,6 @@ set(SOURCE_FILES "${SOURCE_FILES}" main.cpp)
 
 add_executable(halite ${SOURCE_FILES})
 
-target_link_libraries(halite pthread -static)
+# On Linux, make sure to link using the whole-archive option
+# See: https://stackoverflow.com/questions/35116327
+target_link_libraries(halite -Wl,--whole-archive pthread -Wl,--no-whole-archive -static)
