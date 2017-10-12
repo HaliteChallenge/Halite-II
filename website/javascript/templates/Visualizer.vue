@@ -258,14 +258,14 @@
                     <span class="icon-ship"></span>
                     Ships
                   </h4>
-                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart ref="chart2" :selected-players="selectedPlayers" :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     health
                   </h4>
-                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart ref="chart3" :selected-players="selectedPlayers" :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -278,14 +278,14 @@
                     <span class="icon-ship"></span>
                     damage dealt
                   </h4>
-                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart ref="chart4" :selected-players="selectedPlayers" :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
                 <div class="dashboard-graph col-md-6">
                   <h4 class="dashboard-graph-heading">
                     <span class="icon-health"></span>
                     attack over time
                   </h4>
-                  <PlayerLineChart :selected-players="selectedPlayers" :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  <PlayerLineChart ref="chart5" :selected-players="selectedPlayers" :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
                 </div>
               </div>
             </div>
@@ -385,7 +385,7 @@
         },
         players: [],
         sortedPlayers: [],
-        selectedPlayers: {}
+        selectedPlayers: []
       }
     },
     components: {
@@ -689,7 +689,7 @@
         this.players = players;
         this.sortedPlayers =  _.sortBy(players, ['rank']);
 
-        const selectedPlayers = {};
+        const selectedPlayers = [];
         this.players.forEach(function(item, index){
           selectedPlayers[index] = true;
         });
@@ -760,6 +760,9 @@
       toggleSelectedPlayer: function(id){
         this.selectedPlayers[id] = !this.selectedPlayers[id];
         this.$refs.chart1.refreshGraph();
+        this.$refs.chart2.refreshGraph();
+        this.$refs.chart3.refreshGraph();
+        this.$refs.chart4.refreshGraph();
       }
     }
   }
