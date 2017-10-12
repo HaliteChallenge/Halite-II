@@ -256,7 +256,7 @@
                                     <th>Id</th>
                                     <th>Date</th>
                                     <th>Log File</th>
-                                    <th>Game File</th>
+                                    <th>Game</th>
                                 </tr>
                             </thead>
                         </table>
@@ -267,7 +267,7 @@
                                         <th>Id</th>
                                         <th>Date</th>
                                         <th>Log File</th>
-                                        <th>Game File</th>
+                                        <th>Game</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -279,7 +279,7 @@
                                             </time>
                                         </td>
                                         <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                        <td><a :href="replay_link(game.game_id)" target="_blank">Download Game</a></td>
+                                        <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -316,10 +316,9 @@
                         <table class="table table-leader table-sticky">
                             <thead>
                                 <tr>
-                                    <th>Hackathons</th>
+                                    <th>Hackathon</th>
                                     <th>Location</th>
                                     <th>Status</th>
-                                    <th></th>
                                 </tr>
                             </thead>
                         </table>
@@ -327,18 +326,16 @@
                             <table class="table table-leader">
                                 <thead>
                                     <tr>
-                                        <th>Hackathons</th>
+                                        <th>Hackathon</th>
                                         <th>Location</th>
                                         <th>Status</th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="hackathon in hackathons">
-                                        <td>{{hackathon.title}}</td>
+                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
                                         <td>{{hackathon.location}}</td>
                                         <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
-                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">View Hackathon</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -626,8 +623,11 @@
             error_log_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
             },
-            replay_link: function(game_id) {
+            replay_download_link: function(game_id) {
                 return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`;
+            },
+            replay_link: function(game_id) {
+                return `/play/?game_id=${game_id}`;
             },
             join_hackathon: function(event) {
                 event.preventDefault();
