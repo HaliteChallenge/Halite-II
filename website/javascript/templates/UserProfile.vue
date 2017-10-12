@@ -61,6 +61,7 @@
                 <h2>
                     <i class="xline xline-bottom"></i>
                     Game Videos Feed
+                    <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
                 </h2>
 
                 <div v-if="!games.length" class="section-empty">
@@ -72,21 +73,19 @@
                     <table class="table table-leader">
                         <thead>
                             <tr>
-                                <th>Played On</th>
+                                <th>Watch</th>
                                 <th>Opponents</th>
                                 <th>Map Size</th>
-                                <th>Watch</th>
                                 <th>Turns</th>
                                 <th>Won</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="game in games">
-                                <td>
-                                    <time :datetime="game.time_played"
-                                          :title="game.time_played">
-                                        {{ game.time_played | moment("calendar") }}
-                                    </time>
+                                 <td>
+                                    <a :href="'/play?game_id=' + game.game_id">
+                                        {{getFormattedDateForGames(game.time_played)}}
+                                    </a>
                                 </td>
                                 <td>
                                     <a v-for="player in game.playerSorted"
@@ -100,12 +99,7 @@
                                         </span>
                                     </a>
                                 </td>
-                                <td>{{ game.map_width }}x{{ game.map_height }}</td>
-                                <td>
-                                    <a :href="'/play?game_id=' + game.game_id">
-                                        {{ game.game_id }}
-                                    </a>
-                                </td>
+                                <td>{{ game.map_width }}x{{ game.map_height }}</td>                        
                                 <td >
                                   {{ game.turns_total }}
                                 </td>
@@ -134,6 +128,7 @@
                 <h2>
                     <i class="xline xline-bottom"></i>
                     Nemeses
+                    <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                 </h2>
                 <div v-if="!nemesisList.length" class="section-empty">
                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
@@ -193,6 +188,7 @@
                 <h2>
                     <i class="xline xline-bottom"></i>
                     History
+                    <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
                 </h2>
                 <div v-if="!userHistory.length" class="section-empty">
                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
@@ -251,6 +247,7 @@
                 <h2>
                     <i class="xline xline-bottom"></i>
                     Your Errors
+                    <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
                 </h2>
                 <div>
                     <div class="table-sticky-container">
@@ -297,6 +294,7 @@
                 <h2>
                     <i class="xline xline-bottom"></i>
                     Your Hackathons
+                     <span title="All the hackathons in which you are as participant" class="info-icon icon-info pull-right"></span>
                 </h2>
 
                 <div v-if="!hackathons.length" class="section-empty">
@@ -686,6 +684,15 @@
                 }
                 else{
                     return "Still playing";
+                }
+            },
+            getFormattedDateForGames: function(date) {
+                var date = moment(date);
+                if(date.isValid()){
+                    return moment(date).format("MM/DD, YY - HH:MM");
+                }
+                else{
+                    return null;
                 }
             },
             gaData: function(category, action, label) {
