@@ -217,12 +217,25 @@ function handleOutboundLinkClicks(category, action, label) {
         mobileCon.style.visibility = "hidden";
     });
 
-    $(document).ready(function() {     
+    var minHeightFn = function () {
+      var docHeight = window.innerHeight;
+      var headerHeight = document.getElementsByTagName('header')[0].offsetHeight;
+      var footerHeight = document.getElementsByTagName('footer')[0].offsetHeight;
+      var body = document.getElementsByClassName('body')[0];
+      var minHeight = docHeight - footerHeight - headerHeight;
+      body.style.minHeight = minHeight + 'px';
+    };
+
+    $(document).ready(function() {
+      minHeightFn();
       setTimeout(function() {
           $('.container-empty').addClass('container-loaded');
       }, 250);
-  });
+    });
 
+    $(window).on('resize', () => {
+      minHeightFn();
+    });
   </script>
 
   {% if page.mount_view %}
