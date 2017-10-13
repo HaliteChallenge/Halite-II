@@ -40,7 +40,7 @@ def get_user_hackathons(intended_user):
                 "title": hackathon["title"],
                 "status": api_util.hackathon_status(hackathon["start_date"],
                                                     hackathon["end_date"]),
-                
+
                 "start_date": hackathon["start_date"],
                 "end_date": hackathon["end_date"],
                 "location": hackathon["location"],
@@ -70,7 +70,7 @@ def get_user_hackathons(intended_user):
                     "title": hackathon["title"],
                     "status": api_util.hackathon_status(hackathon["start_date"],
                                                         hackathon["end_date"]),
-                    
+
                     "start_date": hackathon["start_date"],
                     "end_date": hackathon["end_date"],
                     "location": hackathon["location"],
@@ -79,7 +79,7 @@ def get_user_hackathons(intended_user):
                     "is_open":hackathon["is_open"],
                     "participant": False,
                 })
-    
+
     return flask.jsonify(record)
 
 
@@ -118,6 +118,8 @@ def associate_user_hackathon(intended_user, *, user_id):
                 message="Sorry, this hackathon has already ended."
             )
 
+        message = None
+
         if hackathon["organization_id"] is not None:
             user = conn.execute(model.users.select().where(
                 model.users.c.id == user_id
@@ -128,6 +130,10 @@ def associate_user_hackathon(intended_user, *, user_id):
                     message="Sorry, this hackathon is only open to members "
                             "of a certain organization. "
                 )
+
+            if not user["is_email_good"]:
+                message = "Hackathon signup pending, please verify your email first."
+
 
         already_exists = conn.execute(
             model.hackathon_participants.select(
@@ -148,4 +154,8 @@ def associate_user_hackathon(intended_user, *, user_id):
             )
         )
 
+    if message:
+        return util.response_success({
+            "message": message,
+        })
     return util.response_success()

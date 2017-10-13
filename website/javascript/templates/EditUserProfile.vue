@@ -5,7 +5,7 @@
         </div>
         <div class="row">
             <div class="col-md-3">
-                
+
                 <ul class="list-ha">
                     <li>
                         <i class="xline xline-top"></i>
@@ -14,6 +14,10 @@
                     <li>
                         <i class="xline xline-top"></i>
                         <a href="#section_account_info"><span>Account Info</span></a>
+                    </li>
+                    <li>
+                        <i class="xline xline-top"></i>
+                        <a href="#section_hackathons"><span>Hackathons</span></a>
                     </li>
                 </ul>
             </div>
@@ -25,12 +29,26 @@
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
                     <div class="form-group">
-                        <label for="country">Which of the following describes you best?<span class="text-danger">*</span></label>
+                        <label for="level">Which of the following describes you best?<span class="text-danger">*</span></label>
                         <select class="form-control" id="level" v-model="level">
                             <option value="Professional">Professional</option>
                             <option value="University">University</option>
                             <option value="High School">High school</option>
                         </select>
+                    </div>
+
+                    <div class="form-group" v-if="level != 'High School'">
+                        <label for="personal-email">Personal Email</label>
+                        <input class="form-control" type="email" id="personal-email" v-model="email" />
+                        <p>This is used to affiliate you with an
+                        organization (based on the email domain). You
+                        will be asked to verify your email first.</p>
+                    </div>
+                    <div class="form-group" v-else>
+                        <p>Please email us your high school name at
+                            <a href="mailto:halite@halite.io">halite@halite.io</a>
+                        to be associated with that high school on the
+                        leaderboard.</p>
                     </div>
 
                     <div class="line-container"><i class="xline xline-top"></i></div>
@@ -71,6 +89,15 @@
                     </div>
                     <a class="cancel-href base" href="#" target="_self">Cancel</a>
                     <button type="submit" class="btn-ha">Update Profile</button>
+
+                    <div class="line-container"><i class="xline xline-top"></i></div>
+
+                    <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
+                    <div class="form-group">
+                        <label for="hackathon">Join a Hackathon</label>
+                        <input type="text" class="form-control" placeholder="Enter hackathon code" v-model="hackathon_code">
+                    </div>
+                    <button type="button" class="btn-ha" v-on:click="join_hackathon">Join Hackathon</button>
                 </form>
             </div>
         </div>
@@ -99,9 +126,11 @@
                 level: "Professional",
                 organization: null,
                 organizations: [],
+                email: '',
                 error: null,
                 primary:true,
                 user: null,
+                hackathon_code: null,
             };
         },
         mounted: function(){
@@ -145,13 +174,13 @@
             this.countries = countries;
             this.country_options = new_countries;
 
-            // get current user 
+            // get current user
             api.me().then((me) => {
                 console.log(me);
                 // initialize the data
                 this.user = me;
                 this.level = me.level;
-                this.username = me.username
+                this.username = me.username;
                 // country
                 this.selected_country = this.country_options.find((item) =>{
                     return item.value == me.country_code;
@@ -204,7 +233,7 @@
                 return this.selected_country ? this.selected_country.value : null;
             },
             country_region_code: function(){
-                return this.selected_region ? this.selected_region.value : null;  
+                return this.selected_region ? this.selected_region.value : null;
             }
         },
         methods: {
@@ -222,7 +251,6 @@
             submit: function(e) {
 
                 let request = {
-                    "user_id": this.user.user_id,
                     "level": this.level,
                     "organization_id": this.organization === "NONE" ? null : this.organization,
                 };
@@ -245,24 +273,47 @@
                     request["email"] = this.email;
                 }
 
-                // verify email
-                if (this.email === ''){
-                    this.error = "Email is required";
-                    return false;
-                }
-
                 // send request
-                api.register_me(request).then(() => {
-                    Alert.show('You have update profile successfully', 'success');
+                api.update_me(this.user.user_id, request).then(() => {
+                    Alert.show('You have updated your profile successfully', 'success');
                     this.gaData("account", "edit-profile-success", "edit-profile-flow");
                 }, (error) => {
-                    Alert.show(error.responseJSON.message, 'error');
+                    const errorMessage = error.responseJSON ?
+                                         error.responseJSON.message :
+                                         "Sorry, we couldn't update your profile. Please try again later.";
+                    Alert.show(errorMessage, 'error');
                     this.gaData("account", "edit-profile-error", "edit-profile-flow")
                 });
 
             },
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
+            },
+
+            join_hackathon: function() {
+                if (this.hackathon_code) {
+                    api.registerHackathon(this.hackathon_code).then((response) => {
+                        let message = "You've signed up for the hackathon!";
+                        if (response.responseJSON && response.responseJSON.message) {
+                            message = response.responseJSON.message;
+                        }
+                        Alert.show(message, 'success');
+                    }, (err) => {
+                        let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later.";
+                        if (err.message) {
+                            message = err.message;
+                        }
+                        if (err.responseJSON) {
+                            message = err.responseJSON.message;
+                        }
+
+                        Alert.show(message, "error");
+                    })
+                    this.hackathon_code = null;
+                }
+                else {
+                    Alert.show("Please enter the code to join the hackathon.", 'error');
+                }
             },
         }
     }

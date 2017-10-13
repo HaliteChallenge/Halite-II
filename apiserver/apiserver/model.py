@@ -188,6 +188,10 @@ def hackathon_total_ranked_users_query(hackathon_id):
             hackathon_participants,
             (bots.c.user_id == hackathon_participants.c.user_id) &
             (hackathon_participants.c.hackathon_id == hackathon_id)
+        ).join(
+            users,
+            (bots.c.user_id == users.c.id) &
+            (users.c.is_email_good == True)
         )
     ).where(bots.c.games_played > 0)
 
@@ -215,7 +219,9 @@ def hackathon_ranked_bots_users_query(hackathon_id, *, alias="hackathon_ranked_b
     ]).select_from(
         ranked_bots.join(
             users,
-            ranked_bots.c.user_id == users.c.id,
+            (ranked_bots.c.user_id == users.c.id) &
+            # Only include verified users
+            (users.c.is_email_good == True),
         ).join(
             local_rank,
             (local_rank.c.user_id == ranked_bots.c.user_id) &

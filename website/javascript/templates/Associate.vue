@@ -56,6 +56,9 @@
                         <div class="form-group">
                             <label for="organization">Please enter your school</label>
                             <input type="text" class="form-control" placeholder="School Name" v-model="organization">
+                            <p>If your school is not listed, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+
+                            <p>To verify your affiliation with the selected school, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </div>
 
@@ -266,7 +269,7 @@
                }
                else{
                     this.gaData('account','click-submit-new-account','account-flow');
-               }             
+               }
             });
         },
     }

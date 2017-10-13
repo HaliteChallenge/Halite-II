@@ -129,6 +129,30 @@ def send_confirmation_email(recipient):
     )
 
 
+def guess_affiliation(email):
+    with model.engine.connect() as conn:
+        if "@" not in email:
+            return None, None
+        domain = email.split("@")[1].strip().lower()
+
+        organization = conn.execute(sqlalchemy.sql.select([
+            model.organizations.c.id,
+            model.organizations.c.organization_name,
+        ]).select_from(model.organizations).where(
+            sqlalchemy.sql.exists(
+                model.organization_email_domains.select().where(
+                    (model.organization_email_domains.c.organization_id == model.organizations.c.id) &
+                    (model.organization_email_domains.c.domain == domain)
+                )
+            )
+        )).first()
+
+        if organization:
+            return organization["id"], organization["organization_name"]
+
+        return None, None
+
+
 @web_api.route("/user")
 @util.cross_origin(methods=["GET", "POST"])
 def list_users():
@@ -192,6 +216,7 @@ def create_user(*, user_id):
     level = body.get("level", user_data["player_level"])
     provided_code = body.get("verification_code", None)
     verification_code = uuid.uuid4().hex
+    message = []
 
     # Values to insert into the database
     values = {}
@@ -219,10 +244,15 @@ def create_user(*, user_id):
         values["country_code"] = country_code
         values["country_subdivision_code"] = subdivision_code
 
+    if org_id is None and email:
+        # Guess an affiliation
+        org_id, org_name = guess_affiliation(email)
+        if org_id:
+            message.append("You've been added to the {} organization automatically.".format(org_name))
+
     # Figure out the situation with their email/organization
     if org_id is None and email is None:
-        # Just use their Github email. Don't bother guessing an affiliation
-        # (we can do that client-side)
+        # Just use their Github email.
         values.update({
             "email": model.users.c.github_email,
             "is_email_good": 1,
@@ -266,14 +296,14 @@ def create_user(*, user_id):
                              user_data["creation_time"]),
             verification_code)
 
-        message = "Please check your email for a verification code."
+        message.append("Please check your email for a verification code.")
     else:
         values.update({
             "email": model.users.c.github_email,
             "is_email_good": 1,
             "organization_id": org_id,
         })
-        message = "You've been added to the organization automatically!"
+        message.append("You've been added to the organization automatically!")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
@@ -281,12 +311,12 @@ def create_user(*, user_id):
         ).values(**values))
 
     return util.response_success({
-        "message": message,
+        "message": "\n".join(message),
     }, status_code=201)
 
 
 @web_api.route("/user/<int:intended_user>", methods=["GET"])
-@util.cross_origin(methods=["GET"])
+@util.cross_origin(methods=["GET", "PUT"])
 @web_util.requires_login(optional=True, accept_key=True)
 def get_user(intended_user, *, user_id):
     with model.engine.connect() as conn:
@@ -340,6 +370,7 @@ def get_user_season1(intended_user, *, user_id):
 
         return flask.jsonify(season_1_user)
 
+
 @web_api.route("/user/<int:user_id>/verify", methods=["POST"])
 @util.cross_origin(methods=["POST"])
 def verify_user_email(user_id):
@@ -375,7 +406,41 @@ def verify_user_email(user_id):
         raise util.APIError(400, message="Invalid verification code.")
 
 
+@web_api.route("/user/<int:user_id>/verify/resend", methods=["POST"])
+@util.cross_origin(methods=["POST"])
+@web_util.requires_login()
+def resend_user_verification_email(user_id):
+    with model.engine.connect() as conn:
+        row = conn.execute(
+            model.users.select(model.users.c.id == user_id)
+        ).first()
+
+        if not row:
+            raise util.APIError(404, message="No user found.")
+
+        if row["is_email_good"]:
+            return util.response_success({
+                "message": "Email already verified.",
+            })
+
+        if not row["verification_code"]:
+            raise util.APIError(
+                400,
+                message="Please finish setting up your account first.")
+
+        send_verification_email(
+            notify.Recipient(user_id, row["username"], row["email"],
+                             None, row["player_level"],
+                             row["creation_time"]),
+            row["verification_code"])
+
+        return util.response_success({
+            "message": "Verification code resent.",
+        })
+
+
 @web_api.route("/user/<int:intended_user_id>", methods=["PUT"])
+@util.cross_origin(methods=["GET", "PUT"])
 @web_util.requires_login(accept_key=False)
 def update_user(intended_user_id, *, user_id):
     if user_id != intended_user_id:
@@ -392,6 +457,7 @@ def update_user(intended_user_id, *, user_id):
     }
 
     update = {}
+    message = []
 
     for key in fields:
         if key not in columns:
@@ -417,7 +483,7 @@ def update_user(intended_user_id, *, user_id):
             raise util.APIError(
                 400, message="Invalid country/country subdivision code.")
 
-    if "organization_id" in update:
+    if update.get("organization_id") is not None:
         # Associate the user with the organization
         if "email" not in update:
             raise util.APIError(
@@ -432,16 +498,26 @@ def update_user(intended_user_id, *, user_id):
     if "email" in update:
         update["verification_code"] = uuid.uuid4().hex
 
+        if update.get("organization_id") is None:
+            org_id, org_name = guess_affiliation(update["email"])
+            if org_id:
+                message.append("You've been added to the {} organization automatically.".format(org_name))
+        else:
+            message.append("Please check your inbox for a verification email.")
+
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
             model.users.c.id == user_id
         ).values(**update))
 
-        user_data = conn.execute(model.users.select(
-            model.users.c.id == intended_user_id).join(
-            model.organizations,
-            model.users.c.organization_id == model.organizations.c.id,
-            isouter=True
+        user_data = conn.execute(sqlalchemy.sql.select(["*"]).select_from(
+            model.users.join(
+                model.organizations,
+                model.users.c.organization_id == model.organizations.c.id,
+                isouter=True
+            )
+        ).where(
+            model.users.c.id == intended_user_id
         )).first()
 
         if "email" in update:
@@ -460,6 +536,10 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["player_level"],
                                  user_data["creation_time"]))
 
+    if message:
+        return util.response_success({
+            "message": "\n".join(message),
+        })
     return util.response_success()
 
 
