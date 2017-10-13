@@ -1,31 +1,33 @@
 <template>
     <div>
-        <table class="table table-leader">
-            <thead>
-            <tr>
-                <th class="text-center">Hackathon Rank</th>
-                <th>Player</th>
-                <th>Score</th>
-                <th class="text-center">Tier</th>
-                <th>Organization</th>
-                <th>Language</th>
-                <th>Last Submission</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="player in leaderboard">
-                <td class="text-center">{{ player.rank || player.local_rank }}</td>
-                <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
-                <td>{{ Math.round(100 * player.score) / 100 }}</td>
-                <td class="text-center">
-                    <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
-                </td>
-                <td>{{ player.organization }}</td>
-                <td>{{ player.language }}</td>
-                <td>{{ getFormattedDate(player.update_time) }}</td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table table-leader">
+                <thead>
+                <tr>
+                    <th class="text-center">Hackathon Rank</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                    <th class="text-center">Tier</th>
+                    <th>Organization</th>
+                    <th>Language</th>
+                    <th>Last Submission</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="player in leaderboard">
+                    <td class="text-center">{{ player.rank || player.local_rank }}</td>
+                    <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
+                    <td>{{ Math.round(100 * player.score) / 100 }}</td>
+                    <td class="text-center">
+                        <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
+                    </td>
+                    <td>{{ player.organization }}</td>
+                    <td>{{ player.language }}</td>
+                    <td>{{ getFormattedDate(player.update_time) }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="leaderboard-page">
             <HalitePagination
                     :page="this.page"
