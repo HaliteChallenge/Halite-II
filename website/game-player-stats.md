@@ -1,9 +1,11 @@
 ---
 layout: base_stats
-title: Stats
 no_header: true
 no_footer: true
-description: Halite Stats
+title: Halite Game and Player Stats
+image: assets/images/sample-graph.svg
+content: website
+description: Fun Halite AI Programming Challenge Statistics| Games played per minute, Player actions and more...
 ---
 
 <div class="intrinsic-container intrinsic-container-16x9">

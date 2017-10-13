@@ -66,15 +66,13 @@
             <div class="leaderboard-explore">
               <p><img src="/assets/images/sample-graph.svg" class="img-responsive" alt="graph"></p>
               <div>
-                <a href="/stats" class="btn-ha btn-ha-lg" target="_blank">More Stats</a>
+                <a href="/game-player-stats" class="btn-ha btn-ha-lg" target="_blank">More Stats</a>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
     <Leaderboard :hackathonId="hackathonId" :baseUrl="baseUrl"></Leaderboard>
   </div>
 </template>

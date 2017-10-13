@@ -6,7 +6,10 @@ menu: play
 mount_views: ["Play"]
 additional_js: ["gif", "RecordRTC.min"]
 permalink: /play-programming-challenge
-description: Submit a bot to the Halite AI programming challenge or visualize a replay of a game file created online.
+title: Submit your bot or watch replays
+image: assets/images/temp/bot_2.png
+content: website
+description: Upload your bots to compete or upload replays to watch and analyze games.
 ---
 
 <div id="play-container"></div>
