@@ -8,7 +8,6 @@
                 </div>
                 <div class="user-profile-detail">
                     <a class="user-name" target="_blank" :href="'https://github.com/' + user.username">{{ user.username }}</a>
-                    <a v-if="is_my_page" href="/user/edit-user"><i class="fa fa-pencil user-profile-edit-link"></i></a>
                     <p>{{ user.level }} <span v-if="user.organization">at <a  :href="`/programming-competition-leaderboard?organization=${user.organization_id}`">{{ user.organization }}</a></span></p>
                     <p v-if="user.location">
                       From <a :href="`/programming-competition-leaderboard?country=${user.country_code}`">{{user.location}}</a>
@@ -57,292 +56,332 @@
             </div>
         </div>
         <div class="col-md-7">
-            <section class="profile-section">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Game Videos Feed
-                    <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
-                </h2>
+            <div class="user-widget tab-container">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#games"  aria-controls="games" role="tab" data-toggle="tab">
+                        <i class="xline xline-top"></i>
+                        <span>Games & Logs</span>
+                        <i class="xline xline-bottom"></i>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#analysis"  aria-controls="analysis" role="tab" data-toggle="tab">
+                        <i class="xline xline-top"></i>
+                        <span>Analysis</span>
+                        <i class="xline xline-bottom"></i>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#hackathons"  aria-controls="hackathons" role="tab" data-toggle="tab">
+                        <i class="xline xline-top"></i>
+                        <span>Hackathons</span>
+                        <i class="xline xline-bottom"></i>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="games">
+                        <div id="games_pane">
+                            <section class="profile-section">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    Game Videos Feed
+                                    <span title="Games played by your bot, replay files are kept forever, but games data might be deleted every 2 weeks" class="info-icon icon-info pull-right"></span>
+                                </h2>
 
-                <div v-if="!games.length" class="section-empty">
-                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                    <h2>Nothing to show</h2>
-                    <p>Complete your first game and view replays<br/>here</p>
-                </div>
-                <div v-if="games.length">
-                    <table class="table table-leader">
-                        <thead>
-                            <tr>
-                                <th>Watch</th>
-                                <th style="padding-left: 40px;">Result</th>
-                                <th class="text-center" >Map Size</th>
-                                <th class="text-center">Turns</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="game in games">
-                                 <td>
-                                    <a :href="'/play?game_id=' + game.game_id">
-                                        {{getFormattedDateForGames(game.time_played)}}
-                                    </a>
-                                </td>
-                                <td>
-                                    <div class="info-icon-trophy">
-                                        <span v-if="game.players[user.user_id].rank === 1" class="icon-trophy"></span>
+                                <div v-if="!games.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <h2>Nothing to show</h2>
+                                    <p>Complete your first game and view replays<br/>here</p>
+                                </div>
+                                <div v-if="games.length">
+                                    <table class="table table-leader">
+                                        <thead>
+                                            <tr>
+                                                <th>Watch</th>
+                                                <th style="padding-left: 40px;">Result</th>
+                                                <th class="text-center hidden-xs" >Map Size</th>
+                                                <th class="text-center hidden-xs">Turns</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="game in games">
+                                                <td>
+                                                    <a :href="'/play?game_id=' + game.game_id">
+                                                        {{getFormattedDateForGames(game.time_played)}}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <div class="info-icon-trophy">
+                                                        <span v-if="game.players[user.user_id].rank === 1" class="icon-trophy"></span>
+                                                    </div>
+                                                    <a v-for="player in game.playerSorted"
+                                                    :href="'/user?user_id=' + player.id"
+                                                    class="game-participant"
+                                                    v-bind:class="{ 'timed-out': player.timed_out }"
+                                                    :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
+                                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                        <span class="rank">
+                                                            {{ player.rank }}
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td class="text-center hidden-xs">{{ game.map_width }}x{{ game.map_height }}</td>                        
+                                                <td class="text-center hidden-xs">
+                                                {{ game.turns_total }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="btn-group text-center" role="group" aria-label="Game Navigation">
+                                        <button
+                                            type="button"
+                                            class="btn"
+                                            :disabled="page === 0"
+                                            v-on:click="prev_page"><span>Prev</span></button>
+                                        <button
+                                            type="button"
+                                            class="btn"
+                                            v-on:click="next_page"><span>Next</span></button>
                                     </div>
-                                    <a v-for="player in game.playerSorted"
-                                       :href="'/user?user_id=' + player.id"
-                                       class="game-participant"
-                                       v-bind:class="{ 'timed-out': player.timed_out }"
-                                       :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
-                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                        <span class="rank">
-                                            {{ player.rank }}
-                                        </span>
-                                    </a>
-                                </td>
-                                <td class="text-center">{{ game.map_width }}x{{ game.map_height }}</td>                        
-                                <td class="text-center">
-                                  {{ game.turns_total }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
 
-                    <div class="btn-group text-center" role="group" aria-label="Game Navigation">
-                        <button
-                            type="button"
-                            class="btn"
-                            :disabled="page === 0"
-                            v-on:click="prev_page"><span>Prev</span></button>
-                        <button
-                            type="button"
-                            class="btn"
-                            v-on:click="next_page"><span>Next</span></button>
+                            </section>
+                            <section v-if="is_my_page" class="profile-section profile-section-error">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    Your Errors
+                                    <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
+                                </h2>
+                                <div>
+                                    <div class="table-sticky-container">
+                                        <table class="table table-leader table-sticky">
+                                            <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th class="hidden-xs">Date</th>
+                                                    <th>Log File</th>
+                                                    <th>Game</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <div class="table-scrollable-content">
+                                            <table class="table table-leader">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Id</th>
+                                                        <th class="hidden-xs">Date</th>
+                                                        <th>Log File</th>
+                                                        <th>Game</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="game in error_games">
+                                                        <td>{{game.game_id}}</td>
+                                                        <td class="hidden-xs"><time :datetime="game.time_played"
+                                                                :title="game.time_played">
+                                                                {{ getFormattedDateForGames(game.time_played)}}
+                                                            </time>
+                                                        </td>
+                                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
+                                                        <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
                     </div>
-                </div>
+                    <div role="tabpanel" class="tab-pane" id="analysis">
+                        <div id="map_stats_pane">
+                            <section class="profile-section">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    Nemeses
+                                    <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                </h2>
+                                <div v-if="!nemesisList.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <h2>No nemeses yet</h2>
+                                    <p>Submit your first bot to uncover your nemeses<br/>here</p>
+                                </div>
+                                <div v-if="nemesisList.length > 0">
+                                    <div class="table-sticky-container">
+                                        <table class="table table-leader table-sticky">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nemesis</th>
+                                                    <th class="text-center hidden-xs">Games</th>
+                                                    <th class="text-center">Win %</th>
+                                                    <th class="text-center">Loss %</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <div class="table-scrollable-content">
+                                            <table class="table table-leader">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nemesis</th>
+                                                        <th class="text-center hidden-xs">Games</th>
+                                                        <th class="text-center">Win %</th>
+                                                        <th class="text-center">Loss %</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="nemesis in nemesisList">
+                                                        <td>
+                                                            <a :href="'/user?user_id=' + nemesis.id"
+                                                            class="game-participant">
+                                                                <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                                <span class="rank">
+                                                                    {{nemesis.id}}
+                                                                </span>
+                                                            </a>
+                                                        </td>
+                                                        <td class="text-center hidden-xs">
+                                                            {{nemesis.total}}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{nemesis.wins}}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{nemesis.losses}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="profile-section">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    History
+                                    <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
+                                </h2>
+                                <div v-if="!userHistory.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <h2>No history</h2>
+                                    <p>Submit your first bot to see your history<br/>here</p>
+                                </div>
+                                <div v-if="userHistory.length > 0">
+                                    <div class="table-sticky-container">
+                                        <table class="table table-leader table-sticky">
+                                            <thead>
+                                                <tr>
+                                                    <th>Bot Version</th>
+                                                    <th class="text-center">Score</th>
+                                                    <th class="text-center">Rank</th>
+                                                    <th class="text-center hidden-xs">Games</th>
+                                                    <th class="hidden-xs">Retired On</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <div class="table-scrollable-content">
+                                            <table class="table table-leader">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Bot Version</th>
+                                                        <th class="text-center">Score</th>
+                                                        <th class="text-center">Rank</th>
+                                                        <th class="text-center hidden-xs">Games</th>
+                                                        <th class="hidden-xs">Retired On</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="historyItem in userHistory">
+                                                        <td>
+                                                            {{historyItem.bot_version}}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{ Math.round(100 * historyItem.last_score) / 100 }}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{historyItem.last_rank}}
+                                                        </td>
+                                                        <td class="text-center hidden-xs">
+                                                            {{historyItem.last_games_played}}
+                                                        </td>
+                                                        <td class="hidden-xs">
+                                                            {{getFormattedDate(historyItem.when_retired)}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="hackathons">
+                        <div id="map_stats_pane">
+                            <section v-if="is_my_page" class="profile-section profile-section-hackathon">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    Your Hackathons
+                                    <span title="All the hackathons in which you are as participant" class="info-icon icon-info pull-right"></span>
+                                </h2>
 
-            </section>
-            <section class="profile-section">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Nemeses
-                    <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
-                </h2>
-                <div v-if="!nemesisList.length" class="section-empty">
-                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                    <h2>No nemeses yet</h2>
-                    <p>Submit your first bot to uncover your nemeses<br/>here</p>
-                </div>
-                <div v-if="nemesisList.length > 0">
-                    <div class="table-sticky-container">
-                        <table class="table table-leader table-sticky">
-                            <thead>
-                                <tr>
-                                    <th>Nemesis</th>
-                                    <th class="text-center">Games</th>
-                                    <th class="text-center">Win %</th>
-                                    <th class="text-center">Loss %</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="table-scrollable-content">
-                            <table class="table table-leader">
-                                <thead>
-                                    <tr>
-                                        <th>Nemesis</th>
-                                        <th class="text-center">Games</th>
-                                        <th class="text-center">Win %</th>
-                                        <th class="text-center">Loss %</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                     <tr v-for="nemesis in nemesisList">
-                                        <td>
-                                            <a :href="'/user?user_id=' + nemesis.id"
-                                            class="game-participant">
-                                                <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                                <span class="rank">
-                                                    {{nemesis.id}}
-                                                </span>
-                                            </a>
-                                        </td>
-                                        <td class="text-center">
-                                            {{nemesis.total}}
-                                        </td>
-                                        <td class="text-center">
-                                            {{nemesis.wins}}
-                                        </td>
-                                        <td class="text-center">
-                                            {{nemesis.losses}}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="profile-section">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    History
-                    <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
-                </h2>
-                <div v-if="!userHistory.length" class="section-empty">
-                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                    <h2>No history</h2>
-                    <p>Submit your first bot to see your history<br/>here</p>
-                </div>
-                <div v-if="userHistory.length > 0">
-                    <div class="table-sticky-container">
-                        <table class="table table-leader table-sticky">
-                            <thead>
-                                <tr>
-                                    <th>Bot Version</th>
-                                    <th class="text-center">Score</th>
-                                    <th class="text-center">Rank</th>
-                                    <th class="text-center">Games</th>
-                                    <th>Retired On</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="table-scrollable-content">
-                            <table class="table table-leader">
-                                <thead>
-                                    <tr>
-                                        <th>Bot Version</th>
-                                        <th class="text-center">Score</th>
-                                        <th class="text-center">Rank</th>
-                                        <th class="text-center">Games</th>
-                                        <th>Retired On</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                     <tr v-for="historyItem in userHistory">
-                                        <td>
-                                            {{historyItem.bot_version}}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ Math.round(100 * historyItem.last_score) / 100 }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{historyItem.last_rank}}
-                                        </td>
-                                         <td class="text-center">
-                                            {{historyItem.last_games_played}}
-                                        </td>
-                                        <td>
-                                            {{getFormattedDate(historyItem.when_retired)}}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section v-if="is_my_page" class="profile-section profile-section-error">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Your Errors
-                    <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
-                </h2>
-                <div>
-                    <div class="table-sticky-container">
-                        <table class="table table-leader table-sticky">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Date</th>
-                                    <th>Log File</th>
-                                    <th>Game</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="table-scrollable-content">
-                            <table class="table table-leader">
-                                <thead>
-                                    <tr>
-                                        <th>Id</th>
-                                        <th>Date</th>
-                                        <th>Log File</th>
-                                        <th>Game</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="game in error_games">
-                                        <td>{{game.game_id}}</td>
-                                        <td><time :datetime="game.time_played"
-                                                  :title="game.time_played">
-                                                {{ getFormattedDateForGames(game.time_played)}}
-                                            </time>
-                                        </td>
-                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                        <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section v-if="is_my_page" class="profile-section profile-section-hackathon">
-                <h2>
-                    <i class="xline xline-bottom"></i>
-                    Your Hackathons
-                     <span title="All the hackathons in which you are as participant" class="info-icon icon-info pull-right"></span>
-                </h2>
+                                <div v-if="!hackathons.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
+                                    <h2>Your haven't join any event</h2>
+                                    <p>Start joining a Hackathon by adding code to<br/>your profile</p>
+                                    <div v-if="is_my_page" class="ha-button-container">
+                                        <div>
+                                            <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button"><span>Join a Hackathon</span></a>
+                                        </div>
+                                    </div>
+                                </div>
 
-                <div v-if="!hackathons.length" class="section-empty">
-                    <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                    <h2>Your haven't join any event</h2>
-                    <p>Start joining a Hackathon by adding code to<br/>your profile</p>
-                    <div v-if="is_my_page" class="ha-button-container">
-                        <div>
-                            <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button"><span>Join a Hackathon</span></a>
+                                <form v-if="is_my_page" class="profile-section-right-form">
+                                    <div class="form-inline-button">
+                                        <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
+                                        <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
+                                    </div>
+                                </form>
+                                <div v-if="hackathons.length > 0">
+                                    <div class="table-sticky-container">
+                                        <table class="table table-leader table-sticky">
+                                            <thead>
+                                                <tr>
+                                                    <th>Hackathon</th>
+                                                    <th>Location</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <div class="table-scrollable-content">
+                                            <table class="table table-leader">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Hackathon</th>
+                                                        <th>Location</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="hackathon in hackathons">
+                                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
+                                                        <td>{{hackathon.location}}</td>
+                                                        <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </div>
-
-                <form v-if="is_my_page" class="profile-section-right-form">
-                    <div class="form-inline-button">
-                        <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
-                        <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
-                    </div>
-                </form>
-                <div v-if="hackathons.length > 0">
-                    <div class="table-sticky-container">
-                        <table class="table table-leader table-sticky">
-                            <thead>
-                                <tr>
-                                    <th>Hackathon</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="table-scrollable-content">
-                            <table class="table table-leader">
-                                <thead>
-                                    <tr>
-                                        <th>Hackathon</th>
-                                        <th>Location</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="hackathon in hackathons">
-                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
-                                        <td>{{hackathon.location}}</td>
-                                        <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
     </div>
 </template>
