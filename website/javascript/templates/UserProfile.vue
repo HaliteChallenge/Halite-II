@@ -612,7 +612,7 @@
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
                         this.hackathons = hackathons.filter((h) => {
-                            return true;// h.participant == true;
+                            return h.participant == true;
                         });
                     }
                 });
