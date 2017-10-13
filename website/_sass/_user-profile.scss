@@ -205,6 +205,17 @@
 
   &-hackathon{
     .form-inline-button{
+      background-color: transparent;
+      input {
+        flex: 1;
+        color: #fff;
+        background-color: #000;
+        border: 0;
+        padding: 0 10px;
+      }
+      .btn{
+        letter-spacing: 1px;
+      }
       @media (max-width: $screen-sm-max){
         margin-bottom: 10px;    
       }
@@ -215,7 +226,7 @@
       position: absolute;
       right: 0;
       top: 27px;
-      width: 330px;
+      width: 356px;
     }
   }
   .ha-button-container{

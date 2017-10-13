@@ -359,3 +359,9 @@ input:focus{
 .container-loaded {
   opacity: 1;
 }
+
+.table-container{
+  @media (max-width: $screen-sm-min){
+    overflow-x: auto;
+  }
+}

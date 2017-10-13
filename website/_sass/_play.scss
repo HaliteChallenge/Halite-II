@@ -55,6 +55,23 @@
 }
 
 .play-container{
+  .mobile-strict-section{
+    text-align: center;
+    margin: 30px 0;
+    display: none;
+    img{
+      margin-top: 20px;
+      max-width:60px;
+    }
+    @media (max-width: $screen-xs-max){
+      display: block;
+    }
+  }
+  .play-upload-section{
+    @media (max-width: $screen-xs-max){
+      display: none;
+    }
+  }
   a{
     color: $yellow;
     text-decoration: none;

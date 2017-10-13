@@ -36,6 +36,11 @@
           </div>
         </div>
       </div>
+      <div class="mobile-strict-section">
+        <img :src="`${baseUrl}/assets/images/temp/mobile_disable.png`">
+        <h2 class="font-headline">Sorry, Not Supported</h2>
+        <p>You must play Halite on a desktop device.<br>This page is not supported on mobile.</p>
+      </div>
     </div>
 
     <div id="halite-uploaded-bot" v-if="currentView=='botUpload'">

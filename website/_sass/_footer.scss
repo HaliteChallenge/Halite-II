@@ -84,7 +84,7 @@
         flex: 1;
       }
       .btn{
-
+        letter-spacing: 1px;
       }
     }
   }
@@ -101,7 +101,7 @@
 
   .footer-social{
     text-align: center;
-    margin-left: 118px;
+    margin-left: 127px;
     @media (max-width: $screen-sm-max){
       margin-left: 0;
     }

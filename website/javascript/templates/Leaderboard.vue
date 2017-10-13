@@ -66,8 +66,9 @@
       </div>
     </div>
     <div v-if="leaderboard.length > 0">
-      <table class="table table-leader">
-        <thead>
+      <div class="table-container">
+        <table class="table table-leader">
+          <thead>
           <tr>
             <th class="text-center">Rank</th>
             <th>Player</th>
@@ -79,8 +80,8 @@
             <th>Language</th>
             <th>Last Submission</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
             <td class="text-center">{{ player.rank || player.local_rank }}</td>
             <td>
@@ -99,8 +100,9 @@
             <td>{{ player.language }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
           </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
       <div class="leaderboard-page" v-if="isDefaultLimit">
         <HalitePagination
           :page="this.page"
