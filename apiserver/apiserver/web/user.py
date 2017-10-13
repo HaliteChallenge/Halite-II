@@ -26,6 +26,8 @@ def make_user_record(row, *, logged_in, total_users=None):
         "num_submissions": int(row["num_submissions"]),
         "num_games": int(row["num_games"]),
         "score": float(row["score"]),
+        "mu": float(row["mu"]),
+        "sigma": float(row["sigma"]),
         "rank": int(row["rank"]) if row["rank"] is not None else None,
     }
 

@@ -94,7 +94,7 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li role="presentation">
+                    <li v-if="hackathons.length" role="presentation">
                         <a href="#hackathons"  aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>
@@ -220,6 +220,32 @@
                     </div>
                     <div role="tabpanel" class="tab-pane" id="analysis">
                         <div id="map_stats_pane">
+                            <section class="profile-section">
+                                <h2>
+                                    <i class="xline xline-bottom"></i>
+                                    Score Analysis
+                                    <span title="Rank is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
+                                </h2>
+                                <div v-if="!user.mu" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <h2>No score analysis</h2>
+                                    <p>Submit your first bot to get your score<br/>here</p>
+                                </div>
+                                <div v-if="user.mu" class="user-profile-rank-stats">
+                                    <div class="stats-item">
+                                        <h3>Score</h3>
+                                        <p>{{ Math.round(user.score * 100) / 100 }}</p>
+                                    </div>
+                                    <div class="stats-item">
+                                        <h3>&mu;</h3>
+                                        <p>{{ Math.round(user.mu * 100) / 100 }}</p>
+                                    </div>
+                                    <div class="stats-item">
+                                        <h3>&sigma;</h3>
+                                        <p>{{ Math.round(user.sigma * 100) / 100 }}</p>
+                                    </div>
+                                </div>
+                            </section>
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>

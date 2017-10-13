@@ -116,6 +116,8 @@ all_users = sqlalchemy.sql.select([
     _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
     _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),
     _func.coalesce(_func.max(ranked_bots.c.score), 0).label("score"),
+    _func.coalesce(_func.max(ranked_bots.c.sigma), 0).label("sigma"),
+    _func.coalesce(_func.max(ranked_bots.c.mu), 0).label("mu"),
     _func.coalesce(_func.min(sqlalchemy.sql.text("ranked_bots.bot_rank"))).label("rank"),
 ]).select_from(users.join(
     ranked_bots,
