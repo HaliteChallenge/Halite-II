@@ -52,7 +52,7 @@
         required: true,
       },
       selectedPlayers: {
-        type: Array,
+        type: Object,
         required: true
       }
     },

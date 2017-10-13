@@ -32,7 +32,7 @@
   let visualizer = null;
 
   const showGame = (game) => {
-    if (visualizer && visualizer.getVisualizer ) {
+    if (visualizer) {
       visualizer.getVisualizer().destroy();
     }
 
@@ -138,20 +138,6 @@
           window.location.reload()
         }
       }
-
-      // handle whole page drag and drop
-      const ins = this;
-      $('body').attr('draggable', 'true');
-      $('body').on('drop dragdrop',function(e){
-        e.preventDefault();
-        ins.play_replay(e.originalEvent.dataTransfer.files);
-      });
-      $('body').on('dragenter',function(event){
-          event.preventDefault();
-      })
-      $('body').on('dragover',function(event){
-          event.preventDefault();
-      });
     },
     methods: {
       play_replay: function(files) {

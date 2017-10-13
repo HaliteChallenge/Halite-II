@@ -1,5 +1,4 @@
 .table-leader{
-  width: 100%;
   > thead > tr > th,
   > tbody > tr > td{
     padding: 8px 15px;
@@ -49,28 +48,6 @@
     }
     td:last-child{
       border-right: 1px solid $yellow;
-    }
-  }
-
-  .hide-mobile{
-    @media (max-width: $screen-sm-max){
-      display: none;
-    }
-  }
-  .hackathon-name{
-    @media (max-width: $screen-sm-max){
-      span{
-        display: block;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;  
-        width: 200px;
-      }
-    }
-    @media (max-width: $screen-xs-max){
-      span{
-        width: 100px;
-      }
     }
   }
 }

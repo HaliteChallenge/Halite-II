@@ -65,55 +65,49 @@
         </form>
       </div>
     </div>
-    <div v-if="leaderboard.length > 0">
-      <table class="table table-leader">
-        <thead>
-          <tr>
-            <th class="text-center">Rank</th>
-            <th>Player</th>
-            <th>Score</th>
-            <th class="text-center">Tier</th>
-            <th>Academic Status</th>
-            <th class="text-center">Country</th>
-            <th>Organization</th>
-            <th>Language</th>
-            <th>Last Submission</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
-            <td class="text-center">{{ player.rank || player.local_rank }}</td>
-            <td>
-              <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
-                <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
-                {{ player.username }}
-              </a>
-            </td>
-            <td>{{ Math.round(100 * player.score) / 100 }}</td>
-            <td class="text-center">
-              <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
-            </td>
-            <td>{{ player.level }}</td>
-            <td class="text-center">{{ getCountryName(player.country) }}</td>
-            <td>{{ player.organization }}</td>
-            <td>{{ player.language }}</td>
-            <td>{{ getFormattedDate(player.update_time)  }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="leaderboard-page" v-if="isDefaultLimit">
-        <HalitePagination
-          :page="this.page"
-          :lastPage="this.lastPage"
-          :baseUrl="this.baseUrl"
-          :changePage="this.changePage"
-        />
-      </div>
+    <table class="table table-leader">
+      <thead>
+        <tr>
+          <th class="text-center">Rank</th>
+          <th>Player</th>
+          <th>Score</th>
+          <th class="text-center">Tier</th>
+          <th>Academic Status</th>
+          <th class="text-center">Country</th>
+          <th>Organization</th>
+          <th>Language</th>
+          <th>Last Submission</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
+          <td class="text-center">{{ player.rank || player.local_rank }}</td>
+          <td>
+            <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
+              <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
+              {{ player.username }}
+            </a>
+          </td>
+          <td>{{ Math.round(100 * player.score) / 100 }}</td>
+          <td class="text-center">
+            <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
+          </td>
+          <td>{{ player.level }}</td>
+          <td class="text-center">{{ getCountryName(player.country) }}</td>
+          <td>{{ player.organization }}</td>
+          <td>{{ player.language }}</td>
+          <td>{{ getFormattedDate(player.update_time)  }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="leaderboard-page" v-if="isDefaultLimit">
+      <HalitePagination
+        :page="this.page"
+        :lastPage="this.lastPage"
+        :baseUrl="this.baseUrl"
+        :changePage="this.changePage"
+      />
     </div>
-    <div v-else class="zero-state-pane">
-      <img src="/assets/images/leaderboard-zero-icon.png" alt="" />
-      <div class="zero-state-title">NOTHING TO SHOW</div>
-      <div>Please try adjusting or removing your selection criteria.</div>
     </div>
   </div>
 </template>
@@ -559,7 +553,7 @@
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
           this.leaderboard = leaderboard;
 
-          // scroll to user
+          // scroll to user 
           if (this.show_user){
             setTimeout(() => {
               const id = $(`#user-row-${this.show_user}`);
