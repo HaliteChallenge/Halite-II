@@ -95,7 +95,9 @@
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
             </td>
             <td>{{ player.level }}</td>
-            <td class="text-center">{{ getCountryName(player.country) }}</td>
+            <td class="text-center">
+              <img v-if="getCountry(player.country)" :title="`${getCountryName(player.country)}`" :src="`${getCountry(player.country)}`" class="country-img">
+            </td>
             <td>{{ player.organization }}</td>
             <td>{{ player.language }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
@@ -579,6 +581,7 @@
       },
       getCountryName: function(name) {
         var countries = require("i18n-iso-countries");
+
         return countries.getName(name, "en");
       },
       clearFilter: function(){
@@ -588,9 +591,19 @@
         this.tier_filter = [];
         this.update_filter();
       },
+      getCountry: function(name) {
+        
+        if(name)
+        {
+          var countries = require("i18n-iso-countries");
+          return "/assets/images/countries/" + countries.getAlpha2Code(countries.getName(name, "en"), 'en').toLowerCase()  +".png" ;
+        }
+
+        return null;
+      },
       getCountryName: function(name) {
-        var countries = require("i18n-iso-countries");
-        return countries.getName(name, "en");
+          var countries = require("i18n-iso-countries");
+          return countries.getName(name, "en");
       },
       getFormattedDate: function(date) {
         return moment(date).startOf("day").fromNow()
