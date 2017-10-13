@@ -35,9 +35,30 @@
                             <p>{{ user.num_games }}</p>
                         </div>
                     </div>
-                    <h2 v-if="highestRank"> Highest Rank: {{highestRank}}</h2>
-                    <p><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                    <h2 v-if="highestRank"> Highest Rank Acheived: {{highestRank}}</h2>
                 </div>
+              </div>
+                <div class="game-replay-share text-center">
+                    <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
+                    <div class="popup-container" v-show="sharePopup">
+                    <div class="popup-share">
+                        <label>Share as a link</label>
+                        <div class="form-inline-button">
+                            <input ref="shareInput" type="text" :value="shareLink"> 
+                            <button class="btn" @click="copyToClipboard">
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                        <div class="share-socials">
+                            <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-facebook-official"></i></a>
+                            <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
+                            <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" @click="toggleShare">
+                <span>SHARE</span>
+                </button>
                 <!-- <div class="user-profile-badge">
                     <i class="xline xline-top"></i>
                     <h2>Badges</h2>
@@ -53,6 +74,7 @@
                     </div>
                     <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
                 </div> -->
+                 <p style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
             </div>
         </div>
         <div class="col-md-7">
@@ -421,6 +443,7 @@
                 only_timed_out: false,
                 is_my_page: false,
                 highestRank: null,
+                sharePopup: false,
                 messages: {
                     hackathon: "",
                 },
@@ -476,6 +499,10 @@
                     }
                 }
                 return lang;
+            },
+            shareLink: function(){
+                console.log(window.location.href);
+                return window.location.href;
             },
         },
         methods: {
@@ -604,7 +631,6 @@
 
                     this.nemesisList.sort(function(a,b) { return b.losses - a.losses});
                     this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit);
-                    console.log(this.nemesisList.length);
                     this.setupStickyTable();
                 });
             },
@@ -732,18 +758,33 @@
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
             },
-            displayDay: function(date){
-                const date1 = moment(date);
-                const date2 = moment();
-                const diff = date1.diff(date2, 'days');
-                if (diff == 0){
-                    return 'Today';
-                } else if (diff == 1){
-                    return 'Yesterday';
-                } else {
-                    return `${diff} days ago`;
+            toggleShare: function(){
+                this.sharePopup = !this.sharePopup;
+            },
+            shareSocial: function(social){
+                let text = "Halite II Player - " + this.user.username + " Rank: " + this.user.rank + " Tier: " + this.user.tier + " ";
+                let tags = "haliteplayerstats";
+                switch (social){
+                case 'facebook':
+                    return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href);
+                break;
+                case 'twitter':
+                    return 'https://twitter.com/intent/tweet?text=' + text + "&url=" + encodeURIComponent(window.location.href) + "&hashtags=" + tags + "&via=haliteAI";
+                break;
+                case 'linkedin': 
+                    return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
+                break;
                 }
-            }
+            },
+            /**
+             * @param  {e} event
+             * @return {void}
+             */
+            copyToClipboard: function(e){
+                if (e) e.preventDefault();
+                this.$refs.shareInput.select();
+                document.execCommand('copy');
+            },
         },
     }
 </script>

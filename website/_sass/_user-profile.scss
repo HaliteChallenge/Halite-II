@@ -37,7 +37,7 @@
     position: relative;
   }
   &-detail{
-    padding: 20px 0;
+    padding: 10px 0;
     position: relative;
     opacity: 0.8;
     font-size: 16px;
@@ -95,7 +95,7 @@
     }
   }
   &-rank{
-    padding: 20px 0;
+    padding: 20px 10px 10px 20px;
     position: relative;
     text-align: center;
     span[class*="icon"]{
