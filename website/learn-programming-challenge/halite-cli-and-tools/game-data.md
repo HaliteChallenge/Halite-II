@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Game Data
+title: Downloading Game Data
 toc: false
 ---
 
