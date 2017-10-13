@@ -135,7 +135,6 @@
                                             </tr>
                                         </tbody>
                                     </table>
-
                                     <div class="btn-group text-center" role="group" aria-label="Game Navigation">
                                         <button
                                             type="button"
@@ -339,7 +338,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <form v-if="is_my_page" class="profile-section-right-form">
                                     <div class="form-inline-button">
                                         <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
@@ -390,7 +388,7 @@
     import * as api from "../api";
     import {Alert, tierClass} from "../utils.js";
     import Vue from "vue";
-    import * as utils from "../utils";  
+    import * as utils from "../utils";
     import moment from 'moment';
 
     export default {
@@ -478,7 +476,7 @@
                     }
                 }
                 return lang;
-            }
+            },
         },
         methods: {
             setupStickyTable: function(){
@@ -734,6 +732,18 @@
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
             },
+            displayDay: function(date){
+                const date1 = moment(date);
+                const date2 = moment();
+                const diff = date1.diff(date2, 'days');
+                if (diff == 0){
+                    return 'Today';
+                } else if (diff == 1){
+                    return 'Yesterday';
+                } else {
+                    return `${diff} days ago`;
+                }
+            }
         },
     }
 </script>
