@@ -201,6 +201,9 @@
 
 .game-replay-share{
   position: relative;
+  .btn{
+    letter-spacing: 2px;
+  }
   .popup-container{
     position: absolute;
     bottom: 100%;
@@ -219,13 +222,20 @@
   }
   .popup-share{
     text-align: left;
-    padding: 10px;
+    padding: 15px 25px 15px 15px;
     background-color: #1c1927;
     color: $foreground-2;
     a{
       color: $foreground-2;
     }
-    label, .form-inline-button, .share-socials{
+    .form-inline-button {
+      padding: 0px 0px 0px 10px;
+
+      input[type=text] {
+        padding-right: 15px;
+      }
+    }
+    label, .form-inline-button{
       margin-bottom: 5px;
     }
     label{
@@ -242,6 +252,7 @@
       margin-bottom: 5px;
     }
     .btn{
+      margin-right: -10px;
       color: #30242F;
     }
   }
