@@ -736,12 +736,14 @@
         this.sharePopup = !this.sharePopup;
       },
       shareSocial: function(social){
+        let text = "Halite Game Replay - ";
+        let tags = "halitegame";
         switch (social){
           case 'facebook':
             return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href);
           break;
           case 'twitter':
-            return 'https://twitter.com/home?status=' + encodeURIComponent(window.location.href);
+            return 'https://twitter.com/intent/tweet?text=' + text + "&url=" + encodeURIComponent(window.location.href) + "&hashtags=" + tags + "&via=haliteAI";
           break;
           case 'linkedin': 
             return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
