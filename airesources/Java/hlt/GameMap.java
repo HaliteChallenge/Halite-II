@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Collections;
 import java.util.Collection;
-import java.util.LinkedList;
 
 public class GameMap {
     private final int width, height;
@@ -16,6 +15,10 @@ public class GameMap {
     private final Map<Integer, Planet> planets;
     private final List<Ship> allShips;
     private final List<Ship> allShipsUnmodifiable;
+
+    // used only during parsing to reduce memory allocations
+    private final List<Ship> currentShips = new ArrayList<>();
+    private final List<Integer> dockedShips = new ArrayList<>();
 
     public GameMap(final int width, final int height, final int playerId) {
         this.width = width;
@@ -117,14 +120,16 @@ public class GameMap {
 
         // update players info
         for (int i = 0; i < numberOfPlayers; ++i) {
+            currentShips.clear();
+            final Map<Integer, Ship> currentPlayerShips = new TreeMap<>();
             final int playerId = MetadataParser.parsePlayerId(mapMetadata);
 
-            final Player currentPlayer = new Player(playerId);
-            final List<Ship> ships = MetadataParser.getShipList(playerId, mapMetadata);
-            allShips.addAll(ships);
+            final Player currentPlayer = new Player(playerId, currentPlayerShips);
+            MetadataParser.populateShipList(currentShips, playerId, mapMetadata);
+            allShips.addAll(currentShips);
 
-            for (final Ship ship : ships) {
-                currentPlayer.addShip(ship.getId(), ship);
+            for (final Ship ship : currentShips) {
+                currentPlayerShips.put(ship.getId(), ship);
             }
             players.add(currentPlayer);
         }
@@ -132,7 +137,8 @@ public class GameMap {
         final int numberOfPlanets = Integer.parseInt(mapMetadata.pop());
 
         for (int i = 0; i < numberOfPlanets; ++i) {
-            final Planet planet = MetadataParser.newPlanetFromMetadata(mapMetadata);
+            dockedShips.clear();
+            final Planet planet = MetadataParser.newPlanetFromMetadata(dockedShips, mapMetadata);
             planets.put(planet.getId(), planet);
         }
 

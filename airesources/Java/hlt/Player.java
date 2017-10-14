@@ -1,5 +1,6 @@
 package hlt;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,9 +9,9 @@ public class Player {
     private final Map<Integer, Ship> ships;
     private final int id;
 
-    public Player(final int id) {
+    public Player(final int id, Map<Integer, Ship> ships) {
         this.id = id;
-        ships = new TreeMap<>();
+        this.ships = Collections.unmodifiableMap(ships);
     }
 
     public Map<Integer, Ship> getShips() {
@@ -23,9 +24,5 @@ public class Player {
 
     public int getId() {
         return id;
-    }
-
-    public void addShip(final int shipId, final Ship ship) {
-        ships.put(shipId, ship);
     }
 }
