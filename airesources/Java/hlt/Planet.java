@@ -1,5 +1,6 @@
 package hlt;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Planet extends Entity {
@@ -18,7 +19,7 @@ public class Planet extends Entity {
         this.dockingSpots = dockingSpots;
         this.currentProduction = currentProduction;
         this.remainingProduction = remainingProduction;
-        this.dockedShips = dockedShips;
+        this.dockedShips = Collections.unmodifiableList(dockedShips);
     }
 
     public int getRemainingProduction() {

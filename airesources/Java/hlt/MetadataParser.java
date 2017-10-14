@@ -7,14 +7,12 @@ import java.util.List;
 
 public class MetadataParser {
 
-    public static List<Ship> getShipList(final int owner, final Metadata shipsMetadata) {
+    public static void populateShipList(final List<Ship> shipsOutput, final int owner, final Metadata shipsMetadata) {
         final long numberOfShips = Long.parseLong(shipsMetadata.pop());
-        ArrayList<Ship> ships = new ArrayList<>();
 
         for(int i = 0; i < numberOfShips; ++i) {
-            ships.add(newShipFromMetadata(owner, shipsMetadata));
+            shipsOutput.add(newShipFromMetadata(owner, shipsMetadata));
         }
-        return ships;
     }
 
     private static Ship newShipFromMetadata(final int owner, final Metadata metadata) {
@@ -35,7 +33,7 @@ public class MetadataParser {
         return new Ship(owner, id, xPos, yPos, health, dockingStatus, dockedPlanet, dockingProgress, weaponCooldown);
     }
 
-    public static Planet newPlanetFromMetadata(final Metadata metadata) {
+    public static Planet newPlanetFromMetadata(final List<Integer> dockedShips, final Metadata metadata) {
         final int id = Integer.parseInt(metadata.pop());
         final double xPos = Double.parseDouble(metadata.pop());
         final double yPos = Double.parseDouble(metadata.pop());
@@ -56,7 +54,6 @@ public class MetadataParser {
         }
 
         final int dockedShipCount = Integer.parseInt(metadata.pop());
-        final ArrayList<Integer> dockedShips = new ArrayList<>(dockedShipCount);
         for (int i = 0; i < dockedShipCount; ++i) {
             dockedShips.add(Integer.parseInt(metadata.pop()));
         }
