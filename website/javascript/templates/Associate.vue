@@ -14,7 +14,7 @@
                      <li>
                         <i class="xline xline-top"></i>
                         <i class="xline xline-bottom"></i>
-                        <a href="#section_account_info">Hackathon Signup</a>
+                        <a href="#section_hackathons">Hackathons</a>
                     </li>
                 </ul>
             </div>
@@ -92,6 +92,8 @@
                             :options="regions">
                         </v-select>
                     </div>
+
+                    <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
 
                     <div class="form-group">
                         <label for="organization">If you are playing as part of a Hackathon, please enter your code here</label>

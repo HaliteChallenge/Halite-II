@@ -44,7 +44,7 @@
                     }).then(() => {
                          window.setTimeout(function(){
                             window.location.replace("/play-programming-challenge");
-                        }, 3000);
+                        }, 5000);
                     });
                 }
             }
