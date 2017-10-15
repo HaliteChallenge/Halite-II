@@ -39,7 +39,7 @@
                 <div class="words col-md-offset-2 col-md-4">
                    <p class="t2 c-wht font-headline">WHAT IS HALITE?</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
-                    <p class="t5 c-gry">Halite is an artificial intelligence programming challenge, created by [Two Sigma](www.twosigma.com), where players build bots using the coding language of their choice to battle on a two-dimensional virtual board. The last bot standing or the bot with all the territory wins. Victory will require micromanaging of the movement of ships, optimizing a bot’s combat ability, and braving a branching factor billions of times higher than that of Go.</p>
+                    <p class="t5 c-gry">Halite is an open source artificial intelligence programming challenge, created by <a href="https://www.twosigma.com" target="_blank">Two Sigma</a>, where players build bots using the coding language of their choice to battle on a two-dimensional virtual board.</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
@@ -63,7 +63,7 @@
                     <p class="t2 c-wht font-headline">MINING HALITE IN SPACE</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <p class="t5 c-gry">This year's game is a space story.</p>
-                    <p class="t5 c-gry">Bots control ships that colonize and mine planets in order to produce more ships and battle opponents. A game's victor will need optimal pathfinding to move efficiently from planet to planet, and will need to master evasive maneuvers, especially if a ship is docked to a planet that is about to explode.</p>
+                    <p class="t5 c-gry">Your mission is to extract Halite. Bots control ships that colonize and mine planets producing more ships to defeat opponents. To acheive victory, you will need optimal pathfinding and swarm control to move efficiently from planet to planet and destroy enemy ships.</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
@@ -78,9 +78,9 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 big-menu watch-section">
-                <p class="t2 c-wht">WATCH STAFF PICKS</p>
+                <p class="t2 c-wht">WATCH TOP GAMES</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Thanks to our game engine, thousands of games are played at a time. Check out a few!</p>
+                <p class="t5 c-gry">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
                     <a href="/play/?game_id=850849">
