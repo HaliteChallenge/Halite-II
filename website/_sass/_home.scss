@@ -81,6 +81,9 @@
   }
   .ha-button-container{
     margin-top: 10px;
+    > div a{
+      padding-top: 0;
+    }
   }
   .notification{
     background-color: $yellow;
@@ -403,15 +406,17 @@
     margin-top: 20px;
     .input-field{
       display: flex;
-      padding: 5px;
       max-width: 320px;
       margin-left: auto;
       margin-right: auto;
+      background-color: #000;
+      padding-left: 10px;
       input{
         color: #fff;
-        background-color: #000;
         border: 0;
-        padding: 0px 10px;
+        padding: 0px;
+        margin-right: 10px;
+        background-color: transparent;
         flex: 1;
         &:-moz-placeholder {
           color: #fff;
@@ -432,6 +437,7 @@
       }
       button{
         letter-spacing: 1px;
+        margin-right: -10px;
       }
     }
   }

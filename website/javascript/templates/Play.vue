@@ -1,9 +1,5 @@
 <template>
   <div class="play-container">
-    <div class="message-container" v-if="displayMessage">
-      <Message :message="message.content" :type="message.type"></Message>
-    </div>
-
     <div class="row" id="replay-filename" v-if="currentView=='replay'">
       <div class="col-sm-8 replay-header">
         <div class="replay-breadcrumb">
@@ -23,7 +19,7 @@
       </div>
       <div class="row play-upload-section">
         <div class="col-sm-6">
-          <div class="upload-container">
+          <div class="upload-container" id="bot-upload-container">
             <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
@@ -32,7 +28,16 @@
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
-            <visualizer-container></visualizer-container>
+            <halite-upload-zone
+              title="Replay a File"
+              description="Drop a replay file here to upload"
+              buttonText = "Select File"
+              :icon="`${baseUrl}/assets/images/icon-replay.svg`"
+              v-on:change="play_replay"
+              :progressBar="is_downloading"
+              :progress="uploadProgress"
+              :message="uploadMessage">
+            </halite-upload-zone>
           </div>
         </div>
       </div>
@@ -49,10 +54,17 @@
       :showMessage="showMessage"></bot-upload>
     
     </div>
+    
+    <div v-if="message" class="row">
+      <div class="col-md-12">
+        <p class="visuallizer-loading-message">{{message}}</p>
+      </div>
+    </div>
 
     <div id="halitetv-visualizer">
 
     </div>
+
     <div id="halitetv-more-upload" v-if="currentView=='replay'">
       <h2>Replay Another Bot</h2>
       <div class="upload-container">
@@ -88,7 +100,7 @@
   // showing game 
   let visualizer = null;
   const showGame = (game) => {
-    if (visualizer) {
+    if (visualizer && visualizer.getVisualizer) {
       visualizer.getVisualizer().destroy();
     }
 
@@ -130,7 +142,6 @@
       "Upload": Upload,
       "bot-upload": BotUpload,
       "visualizer-container": VisualizerContainer,
-      "Message": Message,
       "halite-upload-zone": UploadZone,
       HaliteBreadcrumb
     },
@@ -143,18 +154,11 @@
         user: null,
         botsList: [],
         displayMessage: false,
-        message: {
-          type: "success",
-          content: ""
-        },
+        message: "",
         is_downloading: false,
         uploadProgress: null,
         uploadMessage: null,
         path: [
-          {
-            name: '',
-            link: 'javascript:;'
-          },
           {
             name: 'Back',
             link: '/play-programming-challenge'
@@ -174,18 +178,33 @@
         }
       });
       
+      
       // handle whole page drag and drop
       const ins = this;
       $('body').attr('draggable', 'true');
       $('body').on('drop dragdrop',function(e){
-        e.preventDefault();
-        ins.play_replay(e.originalEvent.dataTransfer.files);
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+
+        // verify if the dropzone is not the bot uploader zone
+        if (!container || !container.contains(e.target)){
+          e.preventDefault();
+          ins.play_replay(e.originalEvent.dataTransfer.files);
+        }
       });
-      $('body').on('dragenter',function(event){
+      $('body').on('dragenter',function(e){
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+        if (!container || !container.contains(e.target)){
           event.preventDefault();
+        }
       })
-      $('body').on('dragover',function(event){
+      $('body').on('dragover',function(e){
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+        if (!container || !container.contains(e.target)){
           event.preventDefault();
+        }
       });
     },
     methods: {
@@ -199,11 +218,17 @@
           const inst = this;
           reader.onload = (e) => {
             inst.is_upload = false;
-            this.$parent.currentView = 'replay';
+            inst.currentView = 'replay';
+            inst.replayFile = files[0].name;
             window.location.hash = '/replay-bot'
+            inst.message = "Parsing replay, please wait…";
             showGame({
               game: null,
               replay: e.target.result,
+            }).then(() => {
+              this.message = null;
+            }).catch(() => {
+              this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
             });
           };
           reader.readAsArrayBuffer(files[0]);

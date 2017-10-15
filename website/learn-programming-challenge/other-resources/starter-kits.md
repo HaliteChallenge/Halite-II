@@ -2,6 +2,7 @@
 layout: doc_page
 title: Starter Kit Functionality
 toc: false
+sort_key: 5
 permalink: starter-kit-functionality
 ---
 

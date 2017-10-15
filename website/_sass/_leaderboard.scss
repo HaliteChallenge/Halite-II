@@ -128,6 +128,7 @@
 
     .filter-group{
       .input-group{
+        display: block;
         @media (min-width: $screen-sm-min){
           display: flex;
           align-items: flex-start;

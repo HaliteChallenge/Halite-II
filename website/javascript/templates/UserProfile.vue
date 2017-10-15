@@ -44,7 +44,7 @@
                     <div class="popup-share">
                         <label>Share as a link</label>
                         <div class="form-inline-button">
-                            <input ref="shareInput" type="text" :value="shareLink"> 
+                            <input ref="shareInput" type="text" :value="shareLink">
                             <button class="btn" @click="copyToClipboard">
                                 <span>Copy</span>
                             </button>
@@ -81,21 +81,21 @@
             <div class="user-widget tab-container">
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active">
-                        <a href="#games"  aria-controls="games" role="tab" data-toggle="tab">
+                        <a href="#games" @click="refreshStickyTable" aria-controls="games" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Games & Logs</span>
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
                     <li role="presentation">
-                        <a href="#analysis"  aria-controls="analysis" role="tab" data-toggle="tab">
+                        <a href="#analysis" @click="refreshStickyTable" aria-controls="analysis" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Analysis</span>
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
                     <li v-if="hackathons.length" role="presentation">
-                        <a href="#hackathons"  aria-controls="hackathons" role="tab" data-toggle="tab">
+                        <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>
                         <i class="xline xline-bottom"></i>
@@ -150,7 +150,7 @@
                                                         </span>
                                                     </a>
                                                 </td>
-                                                <td class="text-center hidden-xs">{{ game.map_width }}x{{ game.map_height }}</td>                        
+                                                <td class="text-center hidden-xs">{{ game.map_width }}x{{ game.map_height }}</td>
                                                 <td class="text-center hidden-xs">
                                                 {{ game.turns_total }}
                                                 </td>
@@ -286,7 +286,7 @@
                                                             class="game-participant">
                                                                 <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
                                                                 <span class="rank">
-                                                                    {{nemesis.id}}
+                                                                    {{usernames[nemesis.id]}}
                                                                 </span>
                                                             </a>
                                                         </td>
@@ -460,6 +460,7 @@
                 hackathons: [],
                 userHistory: [],
                 profile_images: {},
+                usernames: {},
                 page: 0,
                 limit: 10,
                 offset: 0,
@@ -513,6 +514,9 @@
             api.me().then((me) => {
                 this.is_my_page = me && me.user_id === this.user.user_id;
             });
+
+            // sticky tables
+            this.setupStickyTable()
         },
         computed: {
             botLang: function(){
@@ -533,8 +537,14 @@
         },
         methods: {
             setupStickyTable: function(){
+                $(window).on('resize', () => {
+                    calcCol();
+                });
+            },
+            refreshStickyTable: function(){
+                console.log('setup table sticky');
                 const calcCol = () => {
-                    const el = $(this.$el).find('.table-sticky-container').each(function(){
+                    const el = $(this.$el).find('.table-sticky-container:visible').each(function(){
                         const heading = $(this).find('.table-sticky th');
                         const body = $(this).find('.table:not(.table-sticky) th');
                         heading.each(function(index){
@@ -545,10 +555,6 @@
                 setTimeout(() => {
                     calcCol();
                 }, 500);
-                $(window).on('resize', () => {
-                    console.log('resize');
-                    calcCol();
-                });
             },
             fetch: function() {
                 let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`;
@@ -566,6 +572,7 @@
 
                             api.get_user(participant).then((user) => {
                                 this.profile_images[participant] = api.make_profile_image_url(user.username);
+                                this.usernames[participant] = user.username;
                                 this.$forceUpdate();
                             });
                         }
@@ -640,24 +647,29 @@
                             }
                         }
                     }
-
                     for (var [key, value] of nemesisMap) {
                         let totalGames = value.wins + value.losses;
                         let winRatio = value.wins/totalGames;
                         let lossRatio = value.losses/totalGames;
                         if(totalGames >= this.nemesisGameThreshold){
-                            var obj = {id:key, wins:Math.round(winRatio*100), losses:Math.round(lossRatio*100), total:totalGames};
+                            var obj = {
+                                id:key,
+                                wins:Math.round(winRatio*100),
+                                losses:Math.round(lossRatio*100),
+                                total:totalGames
+                            };
                             this.nemesisList.push(obj);
                         }
                         api.get_user(key).then((user) => {
-                                this.profile_images[key] = api.make_profile_image_url(user.username);
-                                this.$forceUpdate();
+                            this.profile_images[key] = api.make_profile_image_url(user.username);
+                            this.usernames[key] = user.username;
+                            this.$forceUpdate();
                         });
                     }
 
                     this.nemesisList.sort(function(a,b) { return b.losses - a.losses});
                     this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit);
-                    this.setupStickyTable();
+                    this.refreshStickyTable();
                 });
             },
             fetchHackathon: function(){
@@ -687,7 +699,7 @@
                 const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
                 return $.get(url).then((data) => {
                     this.error_games = data;
-                    this.setupStickyTable();
+                    this.refreshStickyTable();
                 });
             },
             next_page: function() {
@@ -797,7 +809,7 @@
                 case 'twitter':
                     return 'https://twitter.com/intent/tweet?text=' + text + "&url=" + encodeURIComponent(window.location.href) + "&hashtags=" + tags + "&via=haliteAI";
                 break;
-                case 'linkedin': 
+                case 'linkedin':
                     return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
                 break;
                 }

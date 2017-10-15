@@ -118,7 +118,7 @@
 
       setupCollapseStats: function(){
         const collapse = this.$cookie.get('leaderboard_stats_collapsed')
-        if (collapse == 1){
+        if (collapse == 1 || $(window).width() < 768){
           $('#panel_metric').removeClass('in');
           $('#toggle_metric').attr('aria-expanded', 'false');
         }

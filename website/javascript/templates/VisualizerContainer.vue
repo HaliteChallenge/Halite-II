@@ -143,14 +143,28 @@
       const ins = this;
       $('body').attr('draggable', 'true');
       $('body').on('drop dragdrop',function(e){
-        e.preventDefault();
-        ins.play_replay(e.originalEvent.dataTransfer.files);
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+
+        // verify if the dropzone is not the bot uploader zone
+        if (!container || !container.contains(e.target)){
+          e.preventDefault();
+          ins.play_replay(e.originalEvent.dataTransfer.files);
+        }
       });
-      $('body').on('dragenter',function(event){
+      $('body').on('dragenter',function(e){
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+        if (!container || !container.contains(e.target)){
           event.preventDefault();
+        }
       })
-      $('body').on('dragover',function(event){
+      $('body').on('dragover',function(e){
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container');
+        if (!container || !container.contains(e.target)){
           event.preventDefault();
+        }
       });
     },
     methods: {
@@ -164,9 +178,14 @@
             this.$parent.currentView = 'replay';
             window.location.hash = '/replay-bot';
             this.$parent.replayFile = files[0].name;
+            this.message = "Parsing replay, please wait…";
             showGame({
               game: null,
               replay: e.target.result,
+            }).then(() => {
+              this.message = null;
+            }).catch(() => {
+              this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
             });
           };
           reader.readAsArrayBuffer(files[0]);
