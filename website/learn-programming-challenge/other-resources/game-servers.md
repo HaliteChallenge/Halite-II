@@ -2,6 +2,7 @@
 layout: doc_page
 title: Game Servers
 toc: false
+sort_key: 3
 description: Details for hardware, compilation, game data, and GPU usage for the Halite AI Programming Challenge.
 ---
 

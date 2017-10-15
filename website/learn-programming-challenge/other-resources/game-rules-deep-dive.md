@@ -2,6 +2,7 @@
 layout: doc_page
 title: Game Rules Deep Dive
 toc: false
+sort_key: 1
 description: Learn the details of the rules of the game to win the Halite AI Programming Challenge.
 ---
 

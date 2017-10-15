@@ -1,6 +1,6 @@
 .btn{
   border: 0;
-  color: #30242F;
+  color: #30242F !important;
   font-weight: bold;
   border-radius: 0;
   text-transform: uppercase;
@@ -11,6 +11,7 @@
   font-family: $font-headline;
   &:active{
     outline: none;
+    box-shadow: none;
   }
   >span{
     background-color: $yellow;
@@ -63,7 +64,7 @@
   display: inline-block;
   text-align: center;
   font-family: 'Teko';
-  color: #30242F;
+  color: #30242F !important;
   letter-spacing: 1px;
   font-size: 18px;
   text-transform: uppercase;
@@ -71,8 +72,9 @@
   font-weight: 600;
   border: none;
   &:hover, &:focus{
-    color: #30242F;
-    text-decoration: none;
+    color: #30242F !important;
+    text-decoration: none !important;
+    box-shadow: none;
   }
   &-lg{
     height: 55px;
