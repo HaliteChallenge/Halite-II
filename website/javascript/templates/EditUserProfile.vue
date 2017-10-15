@@ -4,28 +4,17 @@
             <a href="/user?me" class="back-arrow"><img class="arrow" :src="`${baseUrl}/assets/images/temp/back_arrow.png`"/><span>Back to your profile</span></a>
         </div>
         <div class="row">
-            <div class="col-md-3">
-
-                <ul class="list-ha">
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <a href="#section_personal_info"><span>Personal Info</span></a>
-                    </li>
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <a href="#section_account_info"><span>Account Info</span></a>
-                    </li>
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <a href="#section_hackathons"><span>Hackathons</span></a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-6 col-xm-10">
+            <div class="col-md-6 col-xm-10 col-md-offset-3 col-xm-offset-1">
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Edit your profile</h1>
                 </div>
+
+                <h2 class="form-heading">Resend Verification Mail</h2>
+                <p>If you cant find our account verification mail, resend a verification mail to your mail now.</p>
+                </br>
+                <button class="btn-ha">Resend Verfication</button>
+
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
                     <div class="form-group">
@@ -38,11 +27,12 @@
                     </div>
 
                     <div class="form-group" v-if="level != 'High School'">
-                        <label for="personal-email">Personal Email</label>
+                        <label for="personal-email">Work or University Email</label>
                         <input class="form-control" type="email" id="personal-email" v-model="email" />
                         <p>This is used to affiliate you with an
                         organization (based on the email domain). You
                         will be asked to verify your email first.</p>
+                         <button class="btn-ha"> Profile</button>
                     </div>
                     <div class="form-group" v-else>
                         <p>Please email us your high school name at
@@ -64,7 +54,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="country">Which country will you be playing from?<span class="text-danger">*</span></label>
+                        <label for="country">Which country will you be playing from?</label>
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             label="label"
@@ -75,7 +65,7 @@
                     </div>
 
                     <div class="form-group" v-if="selected_country">
-                        <label for="country">State/province<span class="text-danger">*</span></label>
+                        <label for="country">State, Province, or Region</label>
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             v-model="selected_region"
@@ -84,24 +74,26 @@
                         </v-select>
                     </div>
 
-                    <div class="form-group has-error" v-if="error">
-                        <span id="error-help" class="help-block">{{ error }}</span>
-                    </div>
-                    <a class="cancel-href base" href="#" target="_self">Cancel</a>
-                    <button type="submit" class="btn-ha">Update Profile</button>
 
                     <div class="line-container"><i class="xline xline-top"></i></div>
+
+        
 
                     <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
                     <div class="form-group">
                         <label for="hackathon">Join a Hackathon</label>
                         <input type="text" class="form-control" placeholder="Enter hackathon code" v-model="hackathon_code">
                     </div>
-                    <button type="button" class="btn-ha" v-on:click="join_hackathon">Join Hackathon</button>
+
+                    <div class="form-group has-error" v-if="error">
+                        <span id="error-help" class="help-block">{{ error }}</span>
+                    </div>
+                    <a class="cancel-href base" href="#" target="_self">Cancel</a>
+                    <button type="submit" class="btn-ha">Update Profile</button>
+
                 </form>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -185,10 +177,12 @@
                 this.selected_country = this.country_options.find((item) =>{
                     return item.value == me.country_code;
                 });
+
                 this.selected_region  = this.regions.find((item) =>{
                     return item.value = me.country_subdivision_code;
                 });
-                console.log(this.selected_country)
+
+                console.log(this.regions)
             })
         },
         computed: {
@@ -283,37 +277,34 @@
                                          "Sorry, we couldn't update your profile. Please try again later.";
                     Alert.show(errorMessage, 'error');
                     this.gaData("account", "edit-profile-error", "edit-profile-flow")
-                });
+                }).then(()=> {
+                    if (this.hackathon_code) {
+                        api.registerHackathon(this.hackathon_code).then((response) => {
+                            let message = "You've signed up for the hackathon!";
+                            if (response.responseJSON && response.responseJSON.message) {
+                                message = response.responseJSON.message;
+                            }
+                            Alert.show(message, 'success');
+                        }, (err) => {
+                            let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later.";
+                            if (err.message) {
+                                message = err.message;
+                            }
+                            if (err.responseJSON) {
+                                message = err.responseJSON.message;
+                            }
 
+                            Alert.show(message, "error");
+                        });
+                    this.hackathon_code = null;
+                    }
+                    else {
+                        Alert.show("Please enter the code to join the hackathon.", 'error');
+                    }
+                });
             },
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
-            },
-
-            join_hackathon: function() {
-                if (this.hackathon_code) {
-                    api.registerHackathon(this.hackathon_code).then((response) => {
-                        let message = "You've signed up for the hackathon!";
-                        if (response.responseJSON && response.responseJSON.message) {
-                            message = response.responseJSON.message;
-                        }
-                        Alert.show(message, 'success');
-                    }, (err) => {
-                        let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later.";
-                        if (err.message) {
-                            message = err.message;
-                        }
-                        if (err.responseJSON) {
-                            message = err.responseJSON.message;
-                        }
-
-                        Alert.show(message, "error");
-                    })
-                    this.hackathon_code = null;
-                }
-                else {
-                    Alert.show("Please enter the code to join the hackathon.", 'error');
-                }
             },
         }
     }
