@@ -154,6 +154,12 @@
                 organizations: [],
                 error: null,
                 hackathon_code: '',
+                account_success: "Your account has been successfully created. You'll be redirected in a few seconds.",
+                verify_sent: "We've sent a verification email to the address you provided.",
+                hackathon_add: "You've also been successfully added to a Halite hackathon",
+                account_error: "Error: Sorry, something went wrong. Please fix any form fields with issues or you can submit a bot now and edit your profile later to fix remaining issues.",
+                sucess_message: '',
+                error_string: '',
             };
         },
         computed: {
@@ -225,18 +231,25 @@
                 }
 
                 api.register_me(request).then((success) => {
+                    if(request["organization_id"]){
+                        this.sucess_message =  this.verify_sent + "\n" + this.account_success;
+                    }
+                    else{
+                        this.sucess_message = this.account_success;
+                    }
                     if (this.hackathon_code != ""){
                         api.registerHackathon(this.hackathon_code).then((success) => {
-                            window.location.replace("/hackathon-and-events");
+                            this.sucess_message +=  "\n"+ this.hackathon_add;
+                            Alert.show(this.sucess_message, 'success');
                         }, (error) => {
                             this.error = error.responseJSON.message;
                         });
                     } else {
-                        Alert.show('You have created account successfully', 'success');
+                        Alert.show(this.sucess_message, 'success');
                         this.gaData('account','new-account-success','account-flow')
                         setTimeout(() => {
                             window.location.replace("/learn-programming-challenge");
-                        }, 2000);
+                        }, 3000);
                     }
                 }, (error) => {
                     Alert.show(error.responseJSON.message, 'error');

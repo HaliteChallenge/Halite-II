@@ -283,7 +283,6 @@
 
                 console.log(request);
 
-                // send request
                 api.update_me(this.user.user_id, request).then(() => {
                     Alert.show('You have updated your profile successfully', 'success');
                     this.gaData("account", "edit-profile-success", "edit-profile-flow");
@@ -313,9 +312,6 @@
                             Alert.show(message, "error");
                         });
                     this.hackathon_code = null;
-                    }
-                    else {
-                        Alert.show("Please enter the code to join the hackathon.", 'error');
                     }
                 });
             },
