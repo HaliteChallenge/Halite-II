@@ -502,6 +502,7 @@ def update_user(intended_user_id, *, user_id):
             org_id, org_name = guess_affiliation(update["email"])
             if org_id:
                 message.append("You've been added to the {} organization automatically.".format(org_name))
+                update["organization_id"] = org_id
         else:
             message.append("Please check your inbox for a verification email.")
 

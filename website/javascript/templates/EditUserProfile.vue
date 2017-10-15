@@ -17,29 +17,40 @@
 
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
-                    <div class="form-group">
-                        <label for="level">Which of the following describes you best?<span class="text-danger">*</span></label>
-                        <select class="form-control" id="level" v-model="level">
-                            <option value="Professional">Professional</option>
-                            <option value="University">University</option>
-                            <option value="High School">High school</option>
-                        </select>
-                    </div>
+                    <p v-if="user && user.organization_id">You are currently affiliated with {{ user.organization }}.</p>
+                    <p v-else>You are not currently affiliated with any organization.</p>
+                    <button
+                        type="button"
+                        class="btn-ha"
+                        v-if="!edit_email"
+                        v-on:click="edit_email = true"
+                    >Edit email/affiliation</button>
 
-                    <div class="form-group" v-if="level != 'High School'">
-                        <label for="personal-email">Work or University Email</label>
-                        <input class="form-control" type="email" id="personal-email" v-model="email" />
-                        <p>This is used to affiliate you with an
-                        organization (based on the email domain). You
-                        will be asked to verify your email first.</p>
-                         <button class="btn-ha"> Profile</button>
-                    </div>
-                    <div class="form-group" v-else>
-                        <p>Please email us your high school name at
-                            <a href="mailto:halite@halite.io">halite@halite.io</a>
-                        to be associated with that high school on the
-                        leaderboard.</p>
-                    </div>
+                    <template v-if="edit_email">
+                        <div class="form-group">
+                            <label for="level">Which of the following describes you best?<span class="text-danger">*</span></label>
+                            <select class="form-control" id="level" v-model="level">
+                                <option value="Professional">Professional</option>
+                                <option value="University">University</option>
+                                <option value="High School">High school</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" v-if="level != 'High School'">
+                            <label for="personal-email">Work or University Email</label>
+                            <input class="form-control" type="email" id="personal-email" v-model="email" />
+                            <p>This is used to affiliate you with an
+                                organization (based on the email domain). You
+                                will be asked to verify your email first.</p>
+                            <button class="btn-ha"> Profile</button>
+                        </div>
+                        <div class="form-group" v-else>
+                            <p>Please email us your high school name at
+                                <a href="mailto:halite@halite.io">halite@halite.io</a>
+                                to be associated with that high school on the
+                                leaderboard.</p>
+                        </div>
+                    </template>
 
                     <div class="line-container"><i class="xline xline-top"></i></div>
 
@@ -65,7 +76,7 @@
                     </div>
 
                     <div class="form-group" v-if="selected_country">
-                        <label for="country">State, Province, or Region</label>
+                        <label for="region">State, Province, or Region</label>
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             v-model="selected_region"
@@ -77,7 +88,7 @@
 
                     <div class="line-container"><i class="xline xline-top"></i></div>
 
-        
+
 
                     <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
                     <div class="form-group">
@@ -123,6 +134,7 @@
                 primary:true,
                 user: null,
                 hackathon_code: null,
+                edit_email: false,
             };
         },
         mounted: function(){
@@ -179,7 +191,7 @@
                 });
 
                 this.selected_region  = this.regions.find((item) =>{
-                    return item.value = me.country_subdivision_code;
+                    return item.value == me.country_subdivision_code;
                 });
 
                 console.log(this.regions)
@@ -233,8 +245,10 @@
         methods: {
             // reset selected region when change the country
             change_country: function(value){
-                this.selected_country = value;
-                this.selected_region = null;
+                if (this.selected_country !== value) {
+                    this.selected_country = value;
+                    this.selected_region = null;
+                }
             },
             get_country: function(){
                 const selected_country =  this.country_options.find((item) => {
@@ -266,6 +280,8 @@
                 if (this.level !== "High School" && this.email) {
                     request["email"] = this.email;
                 }
+
+                console.log(request);
 
                 // send request
                 api.update_me(this.user.user_id, request).then(() => {
