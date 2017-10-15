@@ -25,6 +25,10 @@ TrueSkill gives every user a μ (calculated player skill) and σ (the probabilit
 
 If you submit a second bot, we do not reset your score to zero (as we did in Halite I), and you will start from the rank of your last bot. But this doesn’t mean your rank is safe forever! If your second bot is worse than your first, your rank will fall as your new bot plays others, and of course if your second bot is better, your rank will improve.
 
+### Why don't we reset ranks for new bot submissions?
+
+In Halite 1, submitting a new version of a bot would reset that bot's rank. In Halite 2, we decided against this. Since we wanted to provide GPU resources, but limit them to certain top bots, resetting ranks would effectively mean that no bot would ever be able to take advantage of the GPU---since submitting a GPU-enabled bot would reset its rank and deny it access. Furthermore, for top players, this caused some volatility towards the end, as submitting a new bot would mean re-climbing the leaderboard.
+
 ## TIERS
 We assign you a tier based on your current rank.  Tiers are by percentile: the top 1/512 players are considered Platinum; the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Salt. You will move from tier to tier as your rank changes.
 
@@ -32,9 +36,9 @@ We assign you a tier based on your current rank.  Tiers are by percentile: the t
 At midnight on January 22nd, we will close submissions and let the final bots play each other for the last week of January. We will announce final winners on January 29th based on the final scores at that point in time and will freeze scores. We may also decide that Salt level bots (or any other bot) will stop playing earlier than 29th if we need the bandwidth to play more games for top bots in the last few days. Stay tuned for updates.
 
 ## OTHER AWARDS AND BADGES
-Other than the top bots, we will award badges to players with achievements playing the game. These range from submitting your first or second bot to being the top player from your country or language. Read the full description of [badges and accomplishments - coming soon]().
+Other than the top bots, we may award badges to players with achievements playing the game. These range from submitting your first or second bot to being the top player from your country or language. Stay tuned to see these features.
 
-Prizes for this contest are bragging rights and some awesome Halite sweatshirts for top bots. In addition, Two Sigma will waive first round interviews for all users ranked Gold and above at the end of the contest. [Learn more here - coming soon](). And we’ll be announcing the results of the competition with a link to the top players’ Github profiles and/or blogs (please do blog!).
+Prizes for this contest are bragging rights and some awesome Halite trophies and sweatshirts for top bots. In addition, Two Sigma will waive first round interviews for all users ranked Gold and above at the end of the contest. [Learn more here - coming soon](). And we’ll be announcing the results of the competition with a link to the top players’ Github profiles and/or blogs (please do blog!).
 
 ## HACKATHONS
 Throughout the competition, Two Sigma and its partners will be hosting hackathons for players to compete against smaller pools. Some examples include a High School hackathon in NYC in November and a hackathon at [Two Sigma Ventures](https://www.twosigmaventures.com/). If you’d be interested in hosting your own hackathon or use Halite in the classroom, contact our team at <mailto:halite@halite.io> or read our [hackathon tutorial - coming soon]() .
