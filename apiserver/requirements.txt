@@ -25,7 +25,6 @@ MarkupSafe==1.0
 oauth2client==4.1.1
 oauthlib==2.0.2
 passlib==1.7.1
-pkg-resources==0.0.0
 protobuf==3.3.0
 pyasn1==0.2.3
 pyasn1-modules==0.0.9
@@ -41,6 +40,7 @@ rsa==3.4.2
 sendgrid==4.2.0
 six==1.10.0
 SQLAlchemy==1.1.11
+tld==0.7.9
 trueskill==0.4.4
 uritemplate==3.0.0
 urllib3==1.21.1

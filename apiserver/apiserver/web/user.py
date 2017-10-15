@@ -6,11 +6,16 @@ import uuid
 
 import flask
 import sqlalchemy
+import tld
 
 from .. import config, model, notify, util
 
 from . import util as web_util
 from .blueprint import web_api
+
+
+tld.update_tld_names()
+
 
 def make_user_record(row, *, logged_in, total_users=None):
     """Given a database result row, create the JSON user object."""
@@ -64,6 +69,10 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
         if "@" not in email_to_verify:
             raise util.APIError(400, message="Email invalid.")
         domain = email_to_verify.split("@")[1].strip().lower()
+        # Only use the TLD to search
+        domain_tld = tld.get_tld(domain, fail_silently=True, fix_protocol=True)
+        if domain_tld:
+            domain = domain_tld
         count = conn.execute(sqlalchemy.sql.select([
             sqlalchemy.sql.func.count()
         ]).select_from(model.organization_email_domains).where(
@@ -83,9 +92,6 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
                 raise verification_error
             else:
                 raise email_error
-        elif can_verify_by_code:
-            if not code_correct:
-                raise verification_error
 
     # Otherwise, no verification method defined, or passed verification
 
@@ -134,6 +140,9 @@ def guess_affiliation(email):
         if "@" not in email:
             return None, None
         domain = email.split("@")[1].strip().lower()
+        domain_tld = tld.get_tld(domain, fail_silently=True, fix_protocol=True)
+        if domain_tld:
+            domain = domain_tld
 
         organization = conn.execute(sqlalchemy.sql.select([
             model.organizations.c.id,
