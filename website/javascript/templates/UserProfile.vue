@@ -74,7 +74,7 @@
                     </div>
                     <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
                 </div> -->
-                 <p style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                 <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
             </div>
         </div>
         <div class="col-md-7">
@@ -94,7 +94,7 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li v-if="hackathons.length" role="presentation">
+                    <li role="presentation">
                         <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>
@@ -115,8 +115,8 @@
 
                                 <div v-if="!games.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                                    <h2>Nothing to show</h2>
-                                    <p>Complete your first game and view replays<br/>here</p>
+                                    <h2>No games played yet</h2>
+                                    <p v-if="is_my_page">Complete your first game and view replays<br/>here</p>
                                 </div>
                                 <div v-if="games.length">
                                     <table class="table table-leader">
@@ -178,7 +178,7 @@
                                     <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                  <div v-if="!error_games.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No errors yet</h2>
                                 </div>
                                 <div>
@@ -231,9 +231,9 @@
                                     <span title="Rank is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!user.mu" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No score analysis</h2>
-                                    <p>Submit your first bot to get your score<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to get your score<br/>here</p>
                                 </div>
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
@@ -257,9 +257,9 @@
                                     <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!nemesisList.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No nemesis yet</h2>
-                                    <p>Submit your first bot to uncover your nemesis<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis<br/>here</p>
                                 </div>
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
@@ -317,9 +317,9 @@
                                     <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!userHistory.length" class="section-empty">
-                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No history</h2>
-                                    <p>Submit your first bot to see your history<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to see your history<br/>here</p>
                                 </div>
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
@@ -373,29 +373,23 @@
                     </div>
                     <div role="tabpanel" class="tab-pane" id="hackathons">
                         <div id="map_stats_pane">
-                            <section v-if="is_my_page" class="profile-section profile-section-hackathon">
+                            <section class="profile-section profile-section-hackathon">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
-                                    Your Hackathons
+                                    Hackathons
                                     <span title="All the hackathons in which you are as participant" class="info-icon icon-info pull-right"></span>
                                 </h2>
 
                                 <div v-if="!hackathons.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                                    <h2>Your haven't join any event</h2>
-                                    <p>Start joining a Hackathon by adding code to<br/>your profile</p>
+                                    <h2>No Hackathons yet</h2>
+                                    <p v-if="is_my_page">If you have a Hackthon code, add it to your <br/>your profile</p>
                                     <div v-if="is_my_page" class="ha-button-container">
                                         <div>
-                                            <a :href="`${baseUrl}/hackathon-and-events`" class="ha-button"><span>Join a Hackathon</span></a>
+                                            <a :href="`${baseUrl}/user/edit-user`" class="ha-button"><span>Add your Hackathon code</span></a>
                                         </div>
                                     </div>
                                 </div>
-                                <form v-if="is_my_page" class="profile-section-right-form">
-                                    <div class="form-inline-button">
-                                        <input type="text" placeholder="Hackathon signup code" ref="hackathon_signup_code">
-                                        <button class="btn" v-on:click="join_hackathon"><span>Join Hackathon</span></button>
-                                    </div>
-                                </form>
                                 <div v-if="hackathons.length > 0">
                                     <div class="table-sticky-container">
                                         <table class="table table-leader table-sticky">
@@ -676,11 +670,13 @@
                     if(history && history instanceof Array) {
                         history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
                         this.userHistory = history;
+                        if(this.user.num_submissions > 0){
+                            this.userHistory.unshift({bot_version:"Current("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
+                        }
                         if(history.length <= 0){
                             return;
                         }
-                        this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);
-                        this.userHistory.unshift({bot_version:"Current("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
+                        this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);                      
                         if(this.highestRank > this.user.rank){
                             this.highestRank = this.user.rank;
                         }

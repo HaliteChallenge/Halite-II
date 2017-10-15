@@ -1,28 +1,11 @@
 <template>
     <div class="associate-container">
         <div class="row">
-            <div class="col-md-2">
-                <ul class="list-ha">
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <a href="#section_personal_info">Personal Info</a>
-                    </li>
-                    <li>
-                        <i class="xline xline-top"></i>
-                        <a href="#section_account_info">Account Info</a>
-                    </li>
-                     <li>
-                        <i class="xline xline-top"></i>
-                        <i class="xline xline-bottom"></i>
-                        <a href="#section_hackathons">Hackathons</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-8 col-xm-10">
+            <div class="col-md-6 col-xm-10">
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Create New Account</h1>
-                    <p>Additional information are required to create your account.</p>
+                    <p>Additional information is required to complete your account.</p>
                 </div>
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">

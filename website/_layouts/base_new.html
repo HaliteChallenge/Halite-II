@@ -44,7 +44,7 @@ function handleOutboundLinkClicks(category, action, label) {
     if(!document.getElementById("tmpid").checkValidity())
     {
       document.getElementById("status").style.color = "red"
-      document.getElementById("status").textContent = "Invalid email.."
+      document.getElementById("status").textContent = "Please enter a valid email."
       handleOutboundLinkClicks('subscribe-error','click-to-subscribe','footer')
     }
     else
@@ -114,7 +114,7 @@ function handleOutboundLinkClicks(category, action, label) {
                 <li class="{% if page.menu == 'learn' or page.dir contains '/learn-programming-challenge' %} active {% endif %}"><a href="{{ site.baseurl }}/learn-programming-challenge"><span>Learn</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'play' %} active {% endif %}"><a href="{{ site.baseurl }}/play-programming-challenge"><span>Play</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'leaderboard' %} active {% endif %}"><a href="{{ site.baseurl }}/programming-competition-leaderboard"><span>Leaderboard</span><i class="xline xline-bottom"></i></a></li>
-                <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Events</span><i class="xline xline-bottom"></i></a></li>
+                <li class="{% if page.menu == 'events' %} active {% endif %}"><a href="{{ site.baseurl }}/hackathon-and-events"><span>Events & Hackathons</span><i class="xline xline-bottom"></i></a></li>
                 <li class="{% if page.menu == 'forums' %} active {% endif %}"><a href="https://forums.halite.io" onclick="javascript:handleOutboundLinkClicks('click-external', 'click-forum','spotlight');return true;" target="_blank"><span>Forums</span><i class="xline xline-bottom"></i></a></li>
             </ul>
           <ul class="nav navbar-nav navbar-right not-logged-in container-empty">

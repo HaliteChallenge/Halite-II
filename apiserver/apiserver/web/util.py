@@ -105,12 +105,6 @@ def requires_login(accept_key=False, optional=False, admin=False,
                     flask.session.get(config.SESSION_COOKIE))
 
             if user:
-                if association and not (user["is_email_good"] and
-                                        user["is_active"]):
-                    raise util.APIError(
-                        403,
-                        message="Please verify your email first.")
-
                 if admin and user["is_admin"]:
                     kwargs["user_id"] = user["user_id"]
                 elif admin:
