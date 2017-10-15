@@ -1,7 +1,7 @@
 <template>
     <div class="associate-container">
         <div class="row">
-            <div class="col-md-6 col-xm-10">
+            <div class="col-md-6 col-xm-10 col-md-offset-3 col-xm-offset-1">
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Create New Account</h1>

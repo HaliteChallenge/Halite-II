@@ -18,14 +18,13 @@
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
                     <p v-if="user && user.organization_id">You are currently affiliated with {{ user.organization }}.</p>
-                    <p v-else>You are not currently affiliated with any organization.</p>
+                    <p v-else>You are not currently affiliated with an organization.</p>
+                    </br>
                     <button
                         type="button"
                         class="btn-ha"
                         v-if="!edit_email"
-                        v-on:click="edit_email = true"
-                    >Edit email/affiliation</button>
-
+                        v-on:click="edit_email = true">Edit Affiliation</button>
                     <template v-if="edit_email">
                         <div class="form-group">
                             <label for="level">Which of the following describes you best?<span class="text-danger">*</span></label>
@@ -39,16 +38,10 @@
                         <div class="form-group" v-if="level != 'High School'">
                             <label for="personal-email">Work or University Email</label>
                             <input class="form-control" type="email" id="personal-email" v-model="email" />
-                            <p>This is used to affiliate you with an
-                                organization (based on the email domain). You
-                                will be asked to verify your email first.</p>
-                            <button class="btn-ha"> Profile</button>
+                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile.</p>
                         </div>
                         <div class="form-group" v-else>
-                            <p>Please email us your high school name at
-                                <a href="mailto:halite@halite.io">halite@halite.io</a>
-                                to be associated with that high school on the
-                                leaderboard.</p>
+                            <p>Please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
                         </div>
                     </template>
 
