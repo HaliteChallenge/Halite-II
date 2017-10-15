@@ -230,34 +230,35 @@
                     return false;
                 }
 
-                api.register_me(request).then((success) => {
-                    if(request["organization_id"]){
-                        this.sucess_message =  this.verify_sent + "\n" + this.account_success;
-                    }
-                    else{
-                        this.sucess_message = this.account_success;
-                    }
-                    if (this.hackathon_code != ""){
-                        api.registerHackathon(this.hackathon_code).then((success) => {
-                            this.sucess_message +=  "\n"+ this.hackathon_add;
-                            Alert.show(this.sucess_message, 'success');
-                            setTimeout(() => {
-                            window.location.replace("/learn-programming-challenge");
-                             }, 3000);
-                        }, (error) => {
-                            this.error = error.responseJSON.message;
-                        });
-                    } else {
+                const register = () => {
+                    api.register_me(request).then((success) => {
+                        if(request["organization_id"]){
+                            this.sucess_message =  this.verify_sent + "\n" + this.account_success;
+                        }
+                        else{
+                            this.sucess_message = this.account_success;
+                        }
                         Alert.show(this.sucess_message, 'success');
                         this.gaData('account','new-account-success','account-flow')
                         setTimeout(() => {
                             window.location.replace("/learn-programming-challenge");
                         }, 3000);
-                    }
-                }, (error) => {
-                    Alert.show(error.responseJSON.message, 'error');
-                    this.gaData('account','new-account-error','account-flow');
-                });
+                    }, (error) => {
+                        Alert.show(error.responseJSON.message, 'error');
+                        this.gaData('account','new-account-error','account-flow');
+                    });
+                };
+
+                if (this.hackathonCode != "") {
+                    api.registerHackathon(this.hackathon_code).then((success) => {
+                        register();
+                    }, (error) => {
+                        this.error = error.responseJSON.message;
+                    });
+                }
+                else {
+                    register();
+                }
             },
             gaData: function(category, action, label) {
                 utils.gaEvent(category, action, label);
