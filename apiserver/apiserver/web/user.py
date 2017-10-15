@@ -528,13 +528,6 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["player_level"],
                                  user_data["creation_time"]),
                 update["verification_code"])
-        else:
-            send_confirmation_email(
-                notify.Recipient(user_id, user_data["username"],
-                                 user_data["email"],
-                                 user_data["organization_name"],
-                                 user_data["player_level"],
-                                 user_data["creation_time"]))
 
     if message:
         return util.response_success({
@@ -615,7 +608,7 @@ def get_rank_history(intended_user_id):
                 model.bot_history.c.last_games_played,
                 model.bot_history.c.when_retired
             ]).select_from(model.bot_history).where(model.bot_history.c.user_id == intended_user_id))
-        
+
         for row in history.fetchall():
             history_item = {
                 "bot_version": int(row["version_number"]),
