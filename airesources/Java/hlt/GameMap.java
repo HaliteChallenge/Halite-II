@@ -18,7 +18,6 @@ public class GameMap {
 
     // used only during parsing to reduce memory allocations
     private final List<Ship> currentShips = new ArrayList<>();
-    private final List<Integer> dockedShips = new ArrayList<>();
 
     public GameMap(final int width, final int height, final int playerId) {
         this.width = width;
@@ -137,7 +136,7 @@ public class GameMap {
         final int numberOfPlanets = Integer.parseInt(mapMetadata.pop());
 
         for (int i = 0; i < numberOfPlanets; ++i) {
-            dockedShips.clear();
+            final List<Integer> dockedShips = new ArrayList<>();
             final Planet planet = MetadataParser.newPlanetFromMetadata(dockedShips, mapMetadata);
             planets.put(planet.getId(), planet);
         }
