@@ -284,6 +284,7 @@ def create_user(*, user_id):
                            provided_code)
 
     # Set the email verification code (if necessary).
+    organization_name = None
     if email:
         values.update({
             "email": email,
@@ -293,7 +294,6 @@ def create_user(*, user_id):
             "player_level": level,
         })
 
-        organization_name = None
         if org_id:
             with model.engine.connect() as conn:
                 organization_data = conn.execute(model.organizations.select(
@@ -321,6 +321,11 @@ def create_user(*, user_id):
         conn.execute(model.users.update().where(
             model.users.c.id == user_id
         ).values(**values))
+
+    send_confirmation_email(
+        notify.Recipient(user_id, user_data["username"], user_data["github_email"],
+                         organization_name, level,
+                         user_data["creation_time"]))
 
     return util.response_success({
         "message": "\n".join(message),

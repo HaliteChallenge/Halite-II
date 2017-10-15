@@ -249,7 +249,7 @@
                     });
                 };
 
-                if (this.hackathonCode != "") {
+                if (this.hackathonCode) {
                     api.registerHackathon(this.hackathon_code).then((success) => {
                         register();
                     }, (error) => {
