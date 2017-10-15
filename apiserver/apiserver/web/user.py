@@ -219,7 +219,9 @@ def create_user(*, user_id):
     message = []
 
     # Values to insert into the database
-    values = {}
+    values = {
+        "player_level": level,
+    }
 
     # Perform validation on given values
     if "level" in body and not web_util.validate_user_level(body["level"]):
@@ -279,6 +281,7 @@ def create_user(*, user_id):
             "is_email_good": 0,
             "verification_code": verification_code,
             "organization_id": org_id,
+            "player_level": level,
         })
 
         organization_name = None
@@ -463,15 +466,17 @@ def update_user(intended_user_id, *, user_id):
         if key not in columns:
             raise util.APIError(400, message="Cannot update '{}'".format(key))
 
-        update[columns[key]] = fields[key]
+        if fields[key]:
+            # Don't overwrite values with None/null
+            update[columns[key]] = fields[key]
 
     # Validate new player level
-    if ("player_level" in update and
+    if (update.get("player_level") and
             not web_util.validate_user_level(update["player_level"])):
         raise util.APIError(400, message="Invalid player level.")
 
     # Validate new country/region, if provided
-    if "country_code" in update or "country_subdivision_code" in update:
+    if update.get("country_code") or update.get("country_subdivision_code"):
         with model.engine.connect() as conn:
             user = conn.execute(
                 model.users.select(model.users.c.id == user_id)).first()
@@ -492,10 +497,10 @@ def update_user(intended_user_id, *, user_id):
         verify_affiliation(update["organization_id"], update["email"],
                            update.get("organization_verification_code"))
 
-    if "organization_verification_code" in update:
+    if update.get("organization_verification_code"):
         del update["organization_verification_code"]
 
-    if "email" in update:
+    if update.get("email"):
         update["verification_code"] = uuid.uuid4().hex
 
         if update.get("organization_id") is None:
