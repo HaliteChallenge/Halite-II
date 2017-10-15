@@ -241,6 +241,9 @@
                         api.registerHackathon(this.hackathon_code).then((success) => {
                             this.sucess_message +=  "\n"+ this.hackathon_add;
                             Alert.show(this.sucess_message, 'success');
+                            setTimeout(() => {
+                            window.location.replace("/learn-programming-challenge");
+                             }, 3000);
                         }, (error) => {
                             this.error = error.responseJSON.message;
                         });
