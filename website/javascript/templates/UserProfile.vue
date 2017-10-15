@@ -177,6 +177,10 @@
                                     Your Errors
                                     <span title="Download the replay files and error logs (last 30) for games where your bot errored or timed out." class="info-icon icon-info pull-right"></span>
                                 </h2>
+                                 <div v-if="!error_games.length" class="section-empty">
+                                    <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
+                                    <h2>No errors yet</h2>
+                                </div>
                                 <div>
                                     <div class="table-sticky-container">
                                         <table class="table table-leader table-sticky">
@@ -662,7 +666,7 @@
                 api.getUserHackathons(this.user.user_id).then(hackathons => {
                     if(hackathons && hackathons instanceof Array) {
                         this.hackathons = hackathons.filter((h) => {
-                            return true;// h.participant == true;
+                            return h.participant == true;
                         });
                     }
                 });
