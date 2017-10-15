@@ -252,7 +252,7 @@
                         Alert.show('You have created account successfully', 'success');
                         this.gaData('account','new-account-success','account-flow')
                         setTimeout(() => {
-                            window.location.replace("/play-programming-challenge");
+                            window.location.replace("/learn-programming-challenge");
                         }, 2000);
                     }
                 }, (error) => {
