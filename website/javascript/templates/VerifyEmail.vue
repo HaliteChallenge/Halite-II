@@ -43,7 +43,7 @@
                         },
                     }).then(() => {
                          window.setTimeout(function(){
-                            window.location.replace("/play-programming-challenge");
+                            window.location.replace("/user/?me");
                         }, 5000);
                     });
                 }
