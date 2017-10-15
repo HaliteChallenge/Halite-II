@@ -249,13 +249,13 @@
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
-                                    Nemeses
+                                    Nemesis
                                     <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!nemesisList.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
-                                    <h2>No nemeses yet</h2>
-                                    <p>Submit your first bot to uncover your nemeses<br/>here</p>
+                                    <h2>No nemesis yet</h2>
+                                    <p>Submit your first bot to uncover your nemesis<br/>here</p>
                                 </div>
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
@@ -613,37 +613,22 @@
                 return $.get(url).then((data) => {
                     var nemesisMap = new Map()
                     for (let game of data) {
-                        if(game.players[this.user.user_id].rank === 1){
-                            for (let participant of Object.keys(game.players)) {
-                                if(participant == this.user.user_id){
-                                    continue;
-                                }
+                        let user_player = game.players[this.user.user_id];
+                        for (let participant of Object.keys(game.players)) {
+                            if(participant == this.user.user_id){
+                                continue;
+                            }
 
-                                let playerData = nemesisMap.get(participant);
-                                if(playerData){
-                                    playerData.losses++;
-                                }
-                                else{
-                                    let obj = {wins: 0, losses:1}
-                                    nemesisMap.set(participant,obj);
-                                }
-                            }}
-                        else{
-                            for (let participant of Object.keys(game.players)) {
-                                if(participant == this.user.user_id){
-                                    continue;
-                                }
+                            let playerData = nemesisMap.get(participant);
+                            if(typeof playerData === 'undefined') {
+                                playerData = {wins: 0, losses:0};
+                                nemesisMap.set(participant, playerData);
+                            }
 
-                                if(game.players[participant].rank === 1){
-                                    let playerData = nemesisMap.get(participant);
-                                    if(playerData){
-                                        playerData.wins++;
-                                    }
-                                    else{
-                                        let obj = {wins: 1, losses:0}
-                                        nemesisMap.set(participant,obj);
-                                    }
-                                }
+                            if(user_player.rank < game.players[participant].rank){
+                                playerData.wins++;
+                            } else {
+                                playerData.losses++;
                             }
                         }
                     }
