@@ -113,7 +113,7 @@ def github_login_callback():
                 oauth_provider=1,
             )).inserted_primary_key
             flask.session["user_id"] = new_user_id[0]
-            return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/create-account"))
+            return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/learn-programming-challenge"))
         else:
             flask.session["user_id"] = user["id"]
             return flask.redirect(urllib.parse.urljoin(config.SITE_URL, "/play-programming-challenge"))
