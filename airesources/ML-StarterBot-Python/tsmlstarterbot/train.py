@@ -67,6 +67,7 @@ def main():
     parser.add_argument("--games_limit", type=int, help="Train on up to games_limit games", default=1000)
     parser.add_argument("--seed", type=int, help="Random seed to make the training deterministic")
     parser.add_argument("--bot_to_imitate", help="Name of the bot whose strategy we want to learn")
+    parser.add_argument("--dump_features_location", help="Location of hdf file where the features should be stored")
 
     args = parser.parse_args()
 
@@ -80,7 +81,7 @@ def main():
     else:
         raw_data = fetch_data_dir(args.data, args.games_limit)
 
-    data_input, data_output = parse(raw_data, args.bot_to_imitate)
+    data_input, data_output = parse(raw_data, args.bot_to_imitate, args.dump_features_location)
     data_size = len(data_input)
     training_input, training_output = data_input[:int(0.85 * data_size)], data_output[:int(0.85 * data_size)]
     validation_input, validation_output = data_input[int(0.85 * data_size):], data_output[int(0.85 * data_size):]

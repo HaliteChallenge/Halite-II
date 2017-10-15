@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from tsmlstarterbot.common import *
 
@@ -23,7 +24,7 @@ def angle_dist(a1, a2):
 
 def find_target_planet(bot_id, current_frame, planets, move):
     """
-    Find a planet to which the ship try to made a move to. We infer it by looking at the angle that the ship moved
+    Find a planet which the ship tried to go to. We try to find it by looking at the angle that the ship moved
     with and the angle between the ship and the planet.
     :param bot_id: id of our bot
     :param current_frame: current frame
@@ -36,7 +37,7 @@ def find_target_planet(bot_id, current_frame, planets, move):
         # If the move was to dock, we know the planet we wanted to move towards
         return move['planet_id']
     if move['type'] != 'thrust':
-        # If the move was not "thrust" (i.e. it was "undock"), we cannot find the planet
+        # If the move was not "thrust" (i.e. it was "undock"), there is no angle to analyze
         return -1
 
     ship_angle = move['angle']
@@ -54,6 +55,7 @@ def find_target_planet(bot_id, current_frame, planets, move):
         planet_x = planet_data['x']
         planet_y = planet_data['y']
         a = angle(planet_x - ship_x, planet_y - ship_y)
+        # We try to find the planet with minimal angle distance
         if optimal_planet == -1 or angle_dist(ship_angle, a) < angle_dist(ship_angle, optimal_angle):
             optimal_planet = planet_id
             optimal_angle = a
@@ -63,7 +65,9 @@ def find_target_planet(bot_id, current_frame, planets, move):
 
 def format_data_for_training(data):
     """
-    Convert from parsed data to numpy arrays ready to feed to network.
+    Create numpy array with planet features ready to feed to the neural net.
+    :param data: parsed features
+    :return: numpy array of shape (number of frames, PLANET_MAX_NUM, PER_PLANET_FEATURES)
     """
     training_input = []
     training_output = []
@@ -93,7 +97,36 @@ def format_data_for_training(data):
     return np.array(training_input), np.array(training_output)
 
 
-def parse(all_games_json_data, bot_to_imitate=None):
+def serialize_data(data, dump_features_location):
+    """
+    Serialize all the features into .h5 file.
+
+    :param data: data to serialize
+    :param dump_features_location: path to .h5 file where the features should be saved
+    """
+    training_data_for_pandas = {
+        (game_id, frame_id, planet_id): planet_features
+        for game_id, frame in enumerate(data)
+        for frame_id, planets in enumerate(frame)
+        for planet_id, planet_features in planets[0].items()}
+
+    training_data_to_store = pd.DataFrame.from_dict(training_data_for_pandas, orient="index")
+    training_data_to_store.columns = FEATURE_NAMES
+    index_names = ["game", "frame", "planet"]
+    training_data_to_store.index = pd.MultiIndex.from_tuples(training_data_to_store.index, names=index_names)
+    training_data_to_store.to_hdf(dump_features_location, "training_data")
+
+
+def parse(all_games_json_data, bot_to_imitate=None, dump_features_location=None):
+    """
+    Parse the games to compute features. This method computes PER_PLANET_FEATURES features for each planet in each frame
+    in each game the bot we're imitating played.
+
+    :param all_games_json_data: list of json dictionaries describing games
+    :param bot_to_imitate: name of the bot to imitate or None if we want to imitate the bot who won the most games
+    :param dump_features_location: location where to serialize the features
+    :return: data ready for training
+    """
     print("Parsing data...")
 
     parsed_games = 0
@@ -111,7 +144,7 @@ def parse(all_games_json_data, bot_to_imitate=None):
             players_games_count[p] += 1
 
         bot_to_imitate = max(players_games_count, key=players_games_count.get)
-    print("Bot to imitate: {}".format(bot_to_imitate))
+    print("Bot to imitate: {}.".format(bot_to_imitate))
 
     for json_data in all_games_json_data:
 
@@ -120,17 +153,18 @@ def parse(all_games_json_data, bot_to_imitate=None):
         width = json_data['width']
         height = json_data['height']
 
-        max_rounds = max_number_of_rounds(width, height)
-
         # For each game see if bot_to_imitate played in it
         if bot_to_imitate not in set(json_data['player_names']):
             continue
-        # We train on all the games of the bot regardless if it won or not.
+        # We train on all the games of the bot regardless whether it won or not.
         bot_to_imitate_id = str(json_data['player_names'].index(bot_to_imitate))
 
         parsed_games = parsed_games + 1
+        game_training_data = []
+
         # Ignore the last frame, no decision to be made there
         for idx in range(len(frames) - 1):
+
             current_moves = moves[idx]
             current_frame = frames[idx]
 
@@ -163,7 +197,7 @@ def parse(all_games_json_data, bot_to_imitate=None):
             if all_moving_ships == 0:
                 continue
 
-            # compute what % of the ships should be sent to given planet
+            # Compute what % of the ships should be sent to given planet
             for planet_id, allocated_ships in allocations.items():
                 allocations[planet_id] = allocated_ships / all_moving_ships
 
@@ -180,13 +214,11 @@ def parse(all_games_json_data, bot_to_imitate=None):
                 enemy_minimal_distance = 10000
 
                 owned_by_winner = 1 if planet_data['owner'] == bot_to_imitate_id else -1
-                owner_id = 0
+                ownership = 0
                 if planet_data['owner'] == bot_to_imitate_id:
-                    owner_id = 1
+                    ownership = 1
                 elif planet_data['owner'] is not None:
-                    owner_id = -1
-
-                point_in_time = idx / max_rounds
+                    ownership = -1
 
                 average_distance = 0
                 my_ships_health = 0
@@ -208,8 +240,9 @@ def parse(all_games_json_data, bot_to_imitate=None):
                 average_distance = average_distance / my_ships_health
 
                 is_active = 1.0 if planet_base_data['docking_spots'] > len(
-                    planet_data['docked_ships']) or owner_id != 1 else 0.0
+                    planet_data['docked_ships']) or ownership != 1 else 0.0
 
+                # Features of the planet are inserted into the vector in the order described by FEATURE_NAMES
                 planet_features[str(planet_id)] = [
                     planet_data['health'],
                     planet_base_data['docking_spots'] - len(planet_data['docked_ships']),
@@ -218,17 +251,22 @@ def parse(all_games_json_data, bot_to_imitate=None):
                     gravity,
                     winner_minimal_distance,
                     enemy_minimal_distance,
-                    owner_id,
-                    point_in_time,
+                    ownership,
                     distance_from_center,
                     average_distance,
                     is_active]
 
-            training_data.append((planet_features, allocations))
+            game_training_data.append((planet_features, allocations))
+        training_data.append(game_training_data)
 
     if parsed_games == 0:
-        raise Exception("Didn't find any matching games. a Try different bot.")
+        raise Exception("Didn't find any matching games. Try different bot.")
 
-    print("Data parsed, parsed {} games, total frames: {}".format(parsed_games, len(training_data)))
+    if dump_features_location is not None:
+        serialize_data(training_data, dump_features_location)
 
-    return format_data_for_training(training_data)
+    flat_training_data = [item for sublist in training_data for item in sublist]
+
+    print("Data parsed, parsed {} games, total frames: {}".format(parsed_games, len(flat_training_data)))
+
+    return format_data_for_training(flat_training_data)

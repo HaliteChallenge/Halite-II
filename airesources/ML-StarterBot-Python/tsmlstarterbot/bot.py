@@ -2,8 +2,6 @@ import heapq
 import os
 import time
 
-import numpy as np
-
 import hlt
 from tsmlstarterbot.common import *
 from tsmlstarterbot.neural_net import NeuralNet
@@ -16,44 +14,49 @@ class Bot:
         self._name = name
 
     def play(self):
-        # Load the model before calling hlt.Game since after that you have limited time to respond
+        """
+        Play a game using stdin/stdout.
+        """
+
+        # Load the model before calling hlt.Game since after that you have limited time to respond.
         nn = NeuralNet(cached_model=self._model_location)
+
+        # Initialize the game.
         game = hlt.Game(self._name)
 
-        current_round = 0
-
         while True:
+            # Update the game map.
             game_map = game.update_map()
             start_time = time.time()
 
-            # Produce features for each planet
-            features = self.produce_features(game_map, current_round)
+            # Produce features for each planet.
+            features = self.produce_features(game_map)
 
             # Find predictions which planets we should send ships to.
-            # (create minibatch of size 1 for the network)
-            predictions = nn.predict(np.array([features]))[0]
+            predictions = nn.predict(features)
 
-            # Use simple greedy algorithm to assign closest ships to each planet
+            # Use simple greedy algorithm to assign closest ships to each planet according to predictions.
             ships_to_planets_assignment = self.produce_ships_to_planets_assignment(game_map, predictions)
 
-            # Produce halite instruction for each ship
+            # Produce halite instruction for each ship.
             instructions = self.produce_instructions(game_map, ships_to_planets_assignment, start_time)
 
-            # Send the command
+            # Send the command.
             game.send_command_queue(instructions)
-            current_round = current_round + 1
 
-    def produce_features(self, game_map, current_round):
+    def produce_features(self, game_map):
         """
-        For each planet produce a set of features that we will feed to the neural net.
+        For each planet produce a set of features that we will feed to the neural net. We always return an array
+        with PLANET_MAX_NUM rows - if planet is not present in the game, we set all featurse to 0.
+
         :param game_map: game map
-        :param current_round: current round index
-        :return: 2-dimensional array where i-th row represents set of features of the i-th planet
+        :return: 2-D array where i-th row represents set of features of the i-th planet
         """
         feature_matrix = [[0 for _ in range(PER_PLANET_FEATURES)] for _ in range(PLANET_MAX_NUM)]
 
         for planet in game_map.all_planets():
 
+            # Compute "ownership" feature - 0 if planet is not occupied, 1 if occupied by us, -1 if occupied by enemy.
             if planet.owner == game_map.get_me():
                 ownership = 1
             elif planet.owner is None:
@@ -88,7 +91,6 @@ class Bot:
             remaining_docking_spots = planet.num_docking_spots - len(planet.all_docked_ships())
             signed_current_production = planet.current_production * ownership
 
-            current_time_in_the_game = current_round / max_number_of_rounds(game_map.width, game_map.height)
             is_active = remaining_docking_spots > 0 or ownership != 1
 
             feature_matrix[planet.id] = [
@@ -100,7 +102,6 @@ class Bot:
                 my_best_distance,
                 enemy_best_distance,
                 ownership,
-                current_time_in_the_game,
                 distance_from_center,
                 health_weighted_ship_distance,
                 is_active
@@ -110,7 +111,10 @@ class Bot:
 
     def produce_ships_to_planets_assignment(self, game_map, predictions):
         """
-        Given the predictions from the neural net, assign closest ships for each planet
+        Given the predictions from the neural net, create assignment (undocked ship -> planet) deciding which
+        planet each ship should go to. Note that we already know how many ships is going to each planet
+        (from the neural net), we just don't know which ones.
+
         :param game_map: game map
         :param predictions: probability distribution describing where the ships should be sent
         :return: list of pairs (ship, planet)
@@ -130,8 +134,8 @@ class Bot:
 
         # Create heaps for greedy ship assignment.
         for planet in game_map.all_planets():
-            # We insert negative prediction as a key, since we want max heap here.
-            heapq.heappush(planet_heap, (-predictions[planet.id], planet.id))
+            # We insert negative number of ships as a key, since we want max heap here.
+            heapq.heappush(planet_heap, (-predictions[planet.id] * number_of_ships_to_assign, planet.id))
             h = []
             for ship in undocked_ships:
                 d = ship.calculate_distance_between(planet)
@@ -140,14 +144,13 @@ class Bot:
 
         # Create greedy assignment
         already_assigned_ships = set()
-        ship_value = 1 / number_of_ships_to_assign
 
         while number_of_ships_to_assign > len(already_assigned_ships):
             # Remove the best planet from the heap and put it back in with adjustment.
             # (Account for the fact the distribution values are stored as negative numbers on the heap.)
-            current_p, best_planet_id = heapq.heappop(planet_heap)
-            current_p = -(-current_p - ship_value)
-            heapq.heappush(planet_heap, (current_p, best_planet_id))
+            ships_to_send, best_planet_id = heapq.heappop(planet_heap)
+            ships_to_send = -(-ships_to_send - 1)
+            heapq.heappush(planet_heap, (ships_to_send, best_planet_id))
 
             # Find the closest unused ship to the best planet.
             _, best_ship_id = heapq.heappop(ship_heaps[best_planet_id])
@@ -164,9 +167,16 @@ class Bot:
     def produce_instructions(self, game_map, ships_to_planets_assignment, round_start_time):
         """
         Given list of pairs (ship, planet) produce instructions for every ship to go to its respective planet.
+        If the planet belongs to the enemy, we go to the weakest docked ship.
+        If it's ours or is unoccupied, we try to dock.
+
+        :param game_map: game map
+        :param ships_to_planets_assignment: list of tuples (ship, planet)
+        :param round_start_time: time (in seconds) between the Epoch and the start of this round
+        :return: list of instructions to send to the Halite engine
         """
         command_queue = []
-        # Send ships to their planets.
+        # Send each ship to its planet
         for ship, planet in ships_to_planets_assignment:
             speed = hlt.constants.MAX_SPEED
 
@@ -190,8 +200,17 @@ class Bot:
         return command_queue
 
     def navigate(self, game_map, start_of_round, ship, destination, speed):
-        # "navigate" method is Halite API is inefficient so we don't use it if we already spent more than 1.2 second of
-        # our 2 second budget
+        """
+        Send a ship to its destination. Because "navigate" method in Halite API is expensive, we use that method only if
+        we haven't used too much time yet.
+
+        :param game_map: game map
+        :param start_of_round: time (in seconds) between the Epoch and the start of this round
+        :param ship: ship we want to send
+        :param destination: destination to which we want to send the ship to
+        :param speed: speed with which we would like to send the ship to its destination
+        :return:
+        """
         current_time = time.time()
         have_time = current_time - start_of_round < 1.2
         navigate_command = None
