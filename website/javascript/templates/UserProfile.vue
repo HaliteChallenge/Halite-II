@@ -182,7 +182,7 @@
                                     <h2>No errors yet</h2>
                                 </div>
                                 <div>
-                                    <div class="table-sticky-container">
+                                    <div v-if="error_games.length > 0" class="table-sticky-container">
                                         <table class="table table-leader table-sticky">
                                             <thead>
                                                 <tr>
@@ -676,6 +676,9 @@
                     if(history && history instanceof Array) {
                         history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
                         this.userHistory = history;
+                        if(history.length <= 0){
+                            return;
+                        }
                         this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);
                         this.userHistory.unshift({bot_version:"Current("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
                         if(this.highestRank > this.user.rank){
