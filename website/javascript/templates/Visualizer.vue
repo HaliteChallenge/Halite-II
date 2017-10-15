@@ -138,7 +138,7 @@
                     <td>{{`${replay.width}x${replay.height}`}}</td>
                   </tr>
                   <tr>
-                    <th>Map Paremeters:</th>
+                    <th>Map Parameters:</th>
                     <td>{{replay.map_generator}}</td>
                   </tr>
                   <tr>
