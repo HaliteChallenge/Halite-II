@@ -438,6 +438,7 @@
     import Vue from "vue";
     import * as utils from "../utils";
     import moment from 'moment';
+    import dateformat from 'dateformat'
 
     export default {
         name: "UserProfile",
@@ -761,18 +762,20 @@
                 $(list).animate({marginLeft:'+='+aniVal+'px'});
             },
             getFormattedDate: function(date) {
-                var date = moment(date);
-                if(date.isValid()){
-                    return moment(date).format("MM/DD, YY - HH:MM");
+                var cdate = moment(date);
+                if(cdate.isValid()){
+                    var dateFormat = require('dateformat');
+                    return dateFormat(date, "mm/dd, yy - HH:MM");
                 }
                 else{
                     return "Still playing";
                 }
             },
             getFormattedDateForGames: function(date) {
-                var date = moment(date);
-                if(date.isValid()){
-                    return moment(date).format("MM/DD, YY - HH:MM");
+                var cdate = moment(date);
+                if(cdate.isValid()){
+                    var dateFormat = require('dateformat');
+                    return dateFormat(date, "mm/dd, yy - HH:MM");
                 }
                 else{
                     return null;
