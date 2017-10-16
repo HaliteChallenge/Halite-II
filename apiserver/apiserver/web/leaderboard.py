@@ -12,7 +12,7 @@ from . import util as api_util
 from .blueprint import web_api
 
 _COUNT_KEY = 'count'
-_LOADERBOARD_ALIAS = 'full_leaderboard'
+_LEADERBOARD_ALIAS = 'full_leaderboard'
 
 
 def _count_leaderboard_query(where_clause):
@@ -21,10 +21,10 @@ def _count_leaderboard_query(where_clause):
     :param where_clause: Clause to filter by
     :return: Number of distinct users
     """
-    full_leaderboard = model.ranked_bots_users.select().where(where_clause).reduce_columns().alias(_LOADERBOARD_ALIAS)
+    full_leaderboard = model.ranked_bots_users.select().where(where_clause).reduce_columns().alias(_LEADERBOARD_ALIAS)
     return sqlalchemy.sql.select([
         sqlalchemy.sql.func.count(sqlalchemy.distinct(full_leaderboard.c.user_id))
-    ]).select_from(full_leaderboard).where(full_leaderboard.c.num_games > 0)
+    ]).select_from(full_leaderboard)
 
 
 @web_api.route("/leaderboard")
