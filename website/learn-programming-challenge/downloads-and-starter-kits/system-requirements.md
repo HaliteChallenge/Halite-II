@@ -3,7 +3,7 @@ layout: doc_page
 title: System Requirements
 toc: false
 description: System requirements to play Halite
-sort_key: 6
+sort_key: 1
 ---
 These are the browsers and operating systems we have tested Halite on, and we will continue to support these during the competition. If you run into any issues with Halite that are due to incompatibilities with your operating system or browser, do let us know at [halite@halite.io](mailto:halite@halite.io). 
 
@@ -14,7 +14,7 @@ While we cant promise supporting a large cross section of browsers and operating
 These are the operating systems that we have tested on, but are **not hard minimum requirements**. We expect the Halite executable to work on some older versions of the these operating systems as well. 
 
  - Mac OSX 10.12.6
- - Ubuntu 17.04
+ - Ubuntu 17.04 - Other distributions should work with GCC 4.9 or later (with corresponding GLIBC)
  - Windows (TODO)
 
 ## Browsers

@@ -2,20 +2,18 @@
 layout: doc_page
 title: Downloads and Starter Kits
 toc: false
-description: Download a Python AI bot, C++ AI bot, or Java AI bot as a quick and easy way to get started playing in the Halite AI competition.
-sort_key: 0
+description: Halite engine and language specific starter kit downloads
 ---
+
 Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
 
-We welcome the community to build new starter kits if there isn't one for their language of choice. Check out our [guide(TBD)]() on how to build a new starter bot.
-
-## About Your Starter Kit
+We welcome our community to build new starter kits, if there isn't one for their preferred language. Check out our [guide](creating-a-new-starter-kit) on how to build a new starter bot.
 
 Downloads include both the compiled Halite game environment and the starter kit for that language.
 
-## Starter Kits by Language or Just the Game Environment
+## Downloads
 
-__Linux users:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
+System requirements are available [here](system-requirements).
 
 <div class="table-container">
     <table class="table">
@@ -26,6 +24,7 @@ __Linux users:__ Your system must support GCC 4.9 or later (with corresponding G
             </tr>
             <tr>
                 <th>Language</th>
+                <td>Version</td>
                 {% for platform in site.data.downloads.platforms %}
                 <td>{{ platform }}</td>
                 {% endfor %}
@@ -35,6 +34,7 @@ __Linux users:__ Your system must support GCC 4.9 or later (with corresponding G
             {% for language in site.data.downloads.languages %}
             <tr>
                 <td>{{ language.language }}</td>
+                <td>{{ language.version }}</td>
                 {% for file in language.files %}
                 <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
                 {% endfor %}
@@ -51,18 +51,13 @@ __Linux users:__ Your system must support GCC 4.9 or later (with corresponding G
     </table>
 </div>
 
-## Download The Halite Source Code
-
-If you want to dig deeper into the inner workings of Halite, you can also [download the source code]({{ site.baseurl }}/{{ site.data.downloads.source }}) of the game itself. 
+## Source Code
 
 __Current version:__ {{ site.data.downloads.version }}
 
-<!-- ## Standalone Visualizer
-
-Removed pending automated builds.-->
+[Download the source code]({{ site.baseurl }}/{{ site.data.downloads.source }}) or visit our [GitHub repository](https://github.com/HaliteChallenge/Halite-II). 
 
 ## Halite Tools
 
-* [Halite Client](https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0): For uploading bots from your terminal
-
-<!--* Offline Game Visualizer: TBD-->
+* [Halite Client](): Upload bots, download game data and run regression tests against your bots.
+* [Halite Offline Visualizer](): View Halite games offline.

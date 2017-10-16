@@ -23,11 +23,16 @@ PLATFORM_AGNOSTIC = "None"
 # Names of generated downloads
 # Standard language + platform
 OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{language}_{platform}.zip"
+
 # Platform only
 ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
+
 # All languages + platform
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
+
+versions =  {"Python3" : "0.9.0", "C++" : "0.9.0", "Java" : "0.9.0", "CSharp" : "0.7.0" ,"JavaScript": "0.7.0",
+"ML-StarterBot-Python":"0.9.0", "Rust" : "0.9.0", "Scala" : "0.9.0" }
 
 
 def detect_environments(directory):
@@ -135,9 +140,6 @@ def main():
         if not os.path.isdir(full_path):
             continue
 
-        if directory == "sample_bots":
-            continue
-
         if directory == "starterkitdocs":
             continue
 
@@ -194,6 +196,7 @@ def main():
         output["languages"].append({
             "language": language,
             "files": language_kits,
+            "version": versions[language]
         })
 
     output["languages"].append({

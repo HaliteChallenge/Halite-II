@@ -1,10 +1,9 @@
 ---
 layout: doc_page
-title: Improve the Basic Bot
+title: Creating a new starter kit
 toc: false
 discription: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
-permalink: improve
-sort_key: 10
+sort_key: 2
 ---
 
 In this tutorial, we’ll add a couple heuristics to the basic bot. This will hopefully help you understand Halite II better and set you on your way to dominating the universe.

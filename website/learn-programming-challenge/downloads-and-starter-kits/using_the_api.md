@@ -1,9 +1,9 @@
 ---
 layout: doc_page
-title: System Requirements
+title: Using the API
 toc: false
 description: System requirements to play Halite
-sort_key: 8
+sort_key: 6
 ---
 
 In this tutorial, we’ll go over the basic universal API for Halite. All starter kits should contain equal capabilities which enable optimal interfacing with the Halite Game, so whether you're a Python Guru or a C++ beginner, this document should help you equally. Examples in this document will reference the python nomenclature however, but all names should be very similar if not equal across all languages.
