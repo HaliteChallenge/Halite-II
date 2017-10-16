@@ -74,7 +74,7 @@
             <th>Player</th>
             <th>Rating</th>
             <th class="text-center">Tier</th>
-            <th>Academic Status</th>
+            <th>Level</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
             <th>Language</th>
