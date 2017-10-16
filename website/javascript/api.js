@@ -114,7 +114,7 @@ export function update_bot(user_id, bot_id, file, progress_callback) {
 
     return new Promise((resolve, reject) => {
         xhr.onload = function (e) {
-            if (this.status === 200) {
+            if (this.status === 200 || this.status == 201) {
                 resolve();
             }
             else {
