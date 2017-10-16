@@ -94,7 +94,7 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li role="presentation">
+                    <li v-if="hackathons.length" role="presentation">
                         <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>

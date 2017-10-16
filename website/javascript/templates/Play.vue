@@ -1,5 +1,12 @@
 <template>
   <div class="play-container">
+
+    <div v-if="message" class="row">
+      <div class="col-md-12">
+        <p class="visuallizer-loading-message">{{message}}</p>
+      </div>
+    </div>
+
     <div class="row" id="replay-filename" v-if="currentView=='replay'">
       <div class="col-sm-8 replay-header">
         <div class="replay-breadcrumb">
@@ -55,12 +62,6 @@
     
     </div>
     
-    <div v-if="message" class="row">
-      <div class="col-md-12">
-        <p class="visuallizer-loading-message">{{message}}</p>
-      </div>
-    </div>
-
     <div id="halitetv-visualizer">
 
     </div>

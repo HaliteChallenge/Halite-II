@@ -137,7 +137,7 @@
 
   export default {
     name: "leaderboard",
-    props: ['baseUrl', 'hackathonId'],
+    props: ['baseUrl', 'hackathonId', 'lbFromContainer'],
     components: {
       HalitePagination,
       vSelect,
@@ -518,7 +518,8 @@
       calculate_filters: function(){
         // calculating filter list items doesn't need to apply any filter in the request
         // limit should be set to a big number in order to get all the items to calculate
-        api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
+
+        const handleLeaderboard = leaderboard => {
           const instance = this;
           leaderboard.forEach(function(user, index){
             instance.users.push(user.username);
@@ -548,23 +549,37 @@
           }
 
           this.update_filter(true);
-        });
+        }
+
+        let leaderboard;
+        if(this.lbFromContainer) {
+          leaderboard = this.lbFromContainer;
+          handleLeaderboard(leaderboard);
+        } else {
+          api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
+            handleLeaderboard(leaderboard);
+          });
+        }
       },
 
       update_filter: function(updatePageNumber = false){
         const filters = this.build_filter();
 
         if(updatePageNumber) {
-          api.leaderboard(filters, this.hackathonId, 0, 999999).then(leaderboard => {
-            if(leaderboard && leaderboard instanceof Array) {
-              this.lastPage = Math.ceil(leaderboard.length / this.limit);
-            }
-          });
+          if(this.all_leaderboards) {
+            this.lastPage = Math.ceil(this.all_leaderboards.length / this.limit);
+          } else {
+            api.leaderboard(filters, this.hackathonId, 0, 999999).then(leaderboard => {
+              if(leaderboard && leaderboard instanceof Array) {
+                this.lastPage = Math.ceil(leaderboard.length / this.limit);
+              }
+            });
+          }
+          
         }
 
-        api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
+        const handleLeaderboard = leaderboard => {
           this.leaderboard = leaderboard;
-
           // scroll to user
           if (this.show_user){
             setTimeout(() => {
@@ -574,7 +589,15 @@
               this.show_user = null;
             }, 1000);
           }
-        });
+        }
+
+        if(this.all_leaderboards) {
+          handleLeaderboard(this.all_leaderboards.slice((this.page - 1) * this.limit, this.page * this.limit));
+        } else {
+          api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
+            handleLeaderboard(leaderboard);
+          });
+        }
       },
 
       changePage: function(page) {

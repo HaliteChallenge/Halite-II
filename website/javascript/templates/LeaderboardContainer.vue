@@ -73,7 +73,7 @@
         </div>
       </div>
     </div>
-    <Leaderboard :hackathonId="hackathonId" :baseUrl="baseUrl"></Leaderboard>
+    <Leaderboard v-if="leaderboard" :lbFromContainer="leaderboard" :hackathonId="hackathonId" :baseUrl="baseUrl"></Leaderboard>
   </div>
 </template>
 <script>
@@ -106,6 +106,7 @@
           university: 0,
           high_school: 0
         },
+        leaderboard: null
       }
     },
     methods: {
@@ -141,6 +142,7 @@
       },
       fetchData: function(){
         api.leaderboard([], this.hackathonId, 0, 999999).then(leaderboard => {
+          this.leaderboard = leaderboard
           let classes = {
             professional: 0,
             university: 0,
