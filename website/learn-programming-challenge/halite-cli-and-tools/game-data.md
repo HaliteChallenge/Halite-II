@@ -2,6 +2,7 @@
 layout: doc_page
 title: Game Download Tool
 toc: false
+sort_key: 3
 ---
 
 ## Game Files
@@ -17,7 +18,7 @@ There are 2 buckets where you can download these files. We are not planning to d
 
 Our deep learning team has provided an easy to use script to download games from the top tier bucket for a given day. The script should work on Mac and Linux OS'es. If you need a windows version, we are looking for a community [contribution](https://github.com/HaliteChallenge/Halite-II) on this front.
 
-[Halite Games Download Tool](https://storage.cloud.google.com/halite-assets/game_data.zip)
+[Download: Halite Games Download Tool](https://storage.cloud.google.com/halite-assets/game_download.zip)
 
 ### Prerequisites
 
