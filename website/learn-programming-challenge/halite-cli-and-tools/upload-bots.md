@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Uploading Bots
+title: Upload Bot Tool
 toc: false
 ---
 
