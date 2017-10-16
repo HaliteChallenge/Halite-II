@@ -2,7 +2,7 @@
 layout: doc_page
 title: Hackathons
 toc: false
-sort_key: 4
+sort_key: 2
 description: Best practices for doing Halite Hackathons and troubleshooting information.
 ---
 

@@ -1,9 +1,9 @@
 ---
 layout: doc_page
 title: Understand Your Bot
-sort_key: 000
 toc: false
 permalink: improve
+sort_key: 7
 ---
 
 In this tutorial, we’ll go through the code that powers our basic starter bots. This will hopefully help you understand Halite II and get you started battling other bots.

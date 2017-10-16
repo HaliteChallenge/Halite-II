@@ -1,17 +1,17 @@
 ---
 layout: doc_page
 title: Improve the Basic Bot
-sort_key: 001
 toc: false
 discription: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
 permalink: improve
+sort_key: 1
 ---
 
 In this tutorial, we’ll add a couple heuristics to the basic bot. This will hopefully help you understand Halite II better and set you on your way to dominating the universe.
 
 ## Prerequisites for Tutorial
 
-Make sure you have read our [basic instructions]({{ site.baseurl }}/learn-programming-challenge/) and followed the steps to download your bot. Also, make sure you [understand the basic bot structure]({% link learn-programming-challenge/tutorials/understand_your_bot.md %})
+Make sure you have read our [basic instructions]({{ site.baseurl }}/learn-programming-challenge/) and followed the steps to download your bot. Also, make sure you [understand the basic bot structure](understand_your_bot.md)
 Now open the `MyBot.py` file in your favorite editor and let’s get started!
 
 ## Improving the bot

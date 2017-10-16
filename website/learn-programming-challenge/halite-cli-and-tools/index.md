@@ -5,6 +5,7 @@ breadcrumb: Halite CLI, Tools and API
 toc: false
 menu: learn
 description: Advanced Halite tools for uploading bots, downloading games, offline visualization and more.
+sort_key: 0
 ---
 
 Some awesome toys and APIs for you to be super productive while playing Halite.

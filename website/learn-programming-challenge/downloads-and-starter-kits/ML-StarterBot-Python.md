@@ -3,6 +3,7 @@ layout: doc_page
 title: ML starter bot in Python
 toc: false
 description: An ML Starter bot from Two Sigma's Deep Learning Team
+sort_key: 2
 ---
 
 ## What does this bot do?

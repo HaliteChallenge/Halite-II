@@ -2,7 +2,7 @@
 layout: doc_page
 title: Submitting a Bot
 toc: false
-sort_key: 6
+sort_key: 5
 ---
 
 You submit a zip file containing your MyBot file and any other files needed to compile and run your MyBot file.

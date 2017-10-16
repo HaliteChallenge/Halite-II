@@ -2,8 +2,8 @@
 layout: doc_page
 title: Starter Kit Functionality
 toc: false
-sort_key: 5
 permalink: starter-kit-functionality
+sort_key: 3
 ---
 
 Take advantage of the functionality your starter kits provide to make the most effective bots.

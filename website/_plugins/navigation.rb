@@ -21,11 +21,11 @@ module Jekyll
       immediate_dirs = immediate_subpages.map { |p| p.dir }
       immediate_dirs.uniq!
       
-      root, remainder = this_level.partition {|page| page.name == "index.md" and page.dir == full_dir }
-
+      root, remainder = this_level.partition {|page| page.name == "index.md" and page.dir == full_dir } 
       remainder = remainder.sort_by do |page|
         if page.data.key?("sort_key")
           page.data["sort_key"]
+          puts page.data["sort_key"]
         else
           page.data["title"]
         end

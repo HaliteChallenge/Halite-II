@@ -3,6 +3,7 @@ layout: doc_page
 title: Downloads and Starter Kits
 toc: false
 description: Download a Python AI bot, C++ AI bot, or Java AI bot as a quick and easy way to get started playing in the Halite AI competition.
+sort_key: 0
 ---
 Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
 

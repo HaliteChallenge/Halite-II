@@ -3,6 +3,7 @@ layout: doc_page
 title: Contest Rules
 toc: false
 description: Learn the rules of the game to win the Halite AI Programming Challenge.
+sort_key: 0
 ---
 
 The 2017-2018 season of Halite II will run from October 2017 through January 2018. 
