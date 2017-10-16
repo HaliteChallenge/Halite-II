@@ -30,13 +30,13 @@ Due to the success of Halite I, Two Sigma decided to create a new iteration of H
 
 Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating systemused for chess.
 
-Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rank was reset. For Halite II, player scores will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md).
+Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was reset. For Halite II, player ratings will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md).
 
 Tiers are based on the percentile rank. The top 1/512 players are considered Platinum;the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Bronze.
 
 ### How are the winners decided?
 
-Winners are simply the highest ranked players on the leaderboard at the end of the competition. Last submissions are due January 22nd, and bots will run through the following week to get significant games played to compute scores. So, submit early and often!
+Winners are simply the highest ranked players on the leaderboard at the end of the competition. Last submissions are due January 22nd, and bots will run through the following week to get significant games played to compute ratings. So, submit early and often!
 
 ### Is there a prize for the winners?
 

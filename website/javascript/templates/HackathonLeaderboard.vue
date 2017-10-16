@@ -6,7 +6,7 @@
                 <tr>
                     <th class="text-center">Hackathon Rank</th>
                     <th>Player</th>
-                    <th>Score</th>
+                    <th>Rating</th>
                     <th class="text-center">Tier</th>
                     <th>Organization</th>
                     <th>Language</th>

@@ -23,7 +23,7 @@
                     <h2><span :class="tierClass(user.tier || 'Bronze')"></span> {{ user.rank ? `rank ${user.rank}` : "No Rank" }}, {{ user.tier || "Bronze" }} tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
-                            <h3>Points</h3>
+                            <h3>Rating</h3>
                             <p>{{ Math.round(user.score * 100) / 100 }}</p>
                         </div>
                         <div class="stats-item">
@@ -227,17 +227,17 @@
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
-                                    Score Analysis
-                                    <span title="Rank is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
+                                    Rating Analysis
+                                    <span title="Rating is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!user.mu" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No score analysis</h2>
-                                    <p v-if="is_my_page">Submit your first bot to get your score<br/>here</p>
+                                    <h2>No rating analysis</h2>
+                                    <p v-if="is_my_page">Submit your first bot to get your rating.<br/>here</p>
                                 </div>
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
-                                        <h3>Score</h3>
+                                        <h3>Rating</h3>
                                         <p>{{ Math.round(user.score * 100) / 100 }}</p>
                                     </div>
                                     <div class="stats-item">
@@ -314,7 +314,7 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     History
-                                    <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
+                                    <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!userHistory.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
@@ -327,7 +327,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Bot Version</th>
-                                                    <th class="text-center">Score</th>
+                                                    <th class="text-center">Rating</th>
                                                     <th class="text-center">Rank</th>
                                                     <th class="text-center hidden-xs">Games</th>
                                                     <th class="hidden-xs">Retired On</th>
@@ -339,7 +339,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Bot Version</th>
-                                                        <th class="text-center">Score</th>
+                                                        <th class="text-center">Rating</th>
                                                         <th class="text-center">Rank</th>
                                                         <th class="text-center hidden-xs">Games</th>
                                                         <th class="hidden-xs">Retired On</th>
