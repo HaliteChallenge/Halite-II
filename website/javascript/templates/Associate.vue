@@ -5,7 +5,8 @@
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Create New Account</h1>
-                    <p>Additional information is required to complete your account.</p>
+                    <p class="text-center">Additional information is required to complete your account.</p>
+                    <i class="xline xline-bottom"></i>
                 </div>
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">

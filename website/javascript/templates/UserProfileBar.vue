@@ -1,6 +1,6 @@
 <template>
     <div class="logged-in">
-        <ul id="submitbutton" class="nav navbar-nav navbar-right submit-bot container-empty">
+        <ul id="submitbutton" v-if="!isMobile" class="nav navbar-nav navbar-right submit-bot container-empty hidden-xs hidden-sm">
             <li>
                 <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
@@ -28,17 +28,20 @@ export default {
       props: ['baseUrl'],
       data: function () {
         const me = api.me_cached()
+        const isMobile = window.mobileAndTabletcheck()
         if (me) {
           return {
             username: me.username,
-            profile_image: api.make_profile_image_url(me.username)
+            profile_image: api.make_profile_image_url(me.username),
+            isMobile: isMobile
           }
-    }
+        }
         return {
           username: '',
-          profile_image: null
+          profile_image: null,
+          isMobile: isMobile
         }
-  },
+      },
       mounted: function () {
         api.me().then((user) => {
           this.username = user.username

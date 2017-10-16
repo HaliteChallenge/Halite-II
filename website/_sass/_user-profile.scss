@@ -142,9 +142,13 @@
   text-align: center;
 
   img {
-    max-width: 229px;
-    max-height: 230px;
     display: inline;
+    max-width: 160px;
+    max-height: 161px;
+    @media (min-width: $screen-md-min){
+      max-width: 229px;
+      max-height: 230px;
+    }
   }
 }
 

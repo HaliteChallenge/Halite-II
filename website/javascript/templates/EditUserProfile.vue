@@ -8,6 +8,7 @@
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Edit your profile</h1>
+                    <i class="xline xline-bottom"></i>
                 </div>
 
                 <h2 class="form-heading">Resend Verification Mail</h2>

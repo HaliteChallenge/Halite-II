@@ -474,7 +474,7 @@ import dateformat from 'dateformat'
             hackathon: ''
           }
         }
-  },
+      },
       mounted: function () {
         const params = new URLSearchParams(window.location.search)
         let source
@@ -507,9 +507,11 @@ import dateformat from 'dateformat'
           this.fetchErrorGames()
           this.fetchnemesis()
           this.fetchhistory()
+        }, (e) => {
+          window.location.replace(`${this.baseUrl}/404`);
         })
 
-    api.me().then((me) => {
+        api.me().then((me) => {
           this.is_my_page = me && me.user_id === this.user.user_id
         })
 
@@ -639,9 +641,9 @@ import dateformat from 'dateformat'
                 }
                 this.nemesisList.push(obj)
               }
-              api.get_user(key).then((user) => {
-                this.profile_images[key] = api.make_profile_image_url(user.username)
-                this.usernames[key] = user.username
+              api.get_user(parseInt(key)).then((user) => {
+                this.profile_images[user.user_id] = api.make_profile_image_url(user.username)
+                this.usernames[user.user_id] = user.username
                 this.$forceUpdate()
               })
             }
