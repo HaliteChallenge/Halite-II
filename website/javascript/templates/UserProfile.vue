@@ -671,7 +671,7 @@
                         history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
                         this.userHistory = history;
                         if(this.user.num_submissions > 0){
-                            this.userHistory.unshift({bot_version:"Current("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
+                            this.userHistory.unshift({bot_version:"Current ("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
                         }
                         if(history.length <= 0){
                             return;
