@@ -23,7 +23,16 @@ You need to have the appropriate Halite executable for your operating system ava
 
 #### Python
 
-
 #### Bash
 
-`./game_download yyyymmdd`: You need to specify the date for which you want to download these games and the script will create a folder in your current directory and download and decompress all the files.
+- `Positional Parameter $1` - Command snippet to start bot 1
+- `Positional Parameter $2` - Command snippet to start bot 2
+- `Positional Parameter $3` - Path to Halite executable
+- `Positional Parameter $4` - Map Size
+
+**Python Example:** 
+<pre>
+  <code class="apache hljs">
+    ./compare.sh "python3 ../bv1/MyBot.py"  "python3 ../bv2/MyBot.py" "../halite" "240 160"
+  </code>
+</pre>

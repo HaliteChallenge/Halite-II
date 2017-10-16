@@ -8,7 +8,7 @@ sort_key: 1
 
 The Halite environment is responsible for running games between bots and outputting appropriate data and files upon the end of a game. The downloadable version is the same version used on the servers.
 
-It may be passed a number of flags, including:
+## Usage
 
 - `-d`: allows the automatic input of the dimensions of the map. The following argument is expected to be a string containing the width and height (space-separated).
 - `-t`: disables timeouts for the duration of the game.

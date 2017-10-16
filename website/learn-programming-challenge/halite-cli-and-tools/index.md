@@ -7,9 +7,11 @@ menu: learn
 description: Advanced Halite tools for uploading bots, downloading games, offline visualization and more.
 ---
 
-Some awesome toys for you to be super productive while playing Halite
+Some awesome toys and APIs for you to be super productive while playing Halite.
 
-* [login]: {{ site.login_server_url }}/github
-* [downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots
-* [contact]: {{ site.baseurl }}/about/contact-us
-* [play]: {{ site.baseurl }}/play-programming-challenge
+* [Halite CI](): Halite executable that is responsible for running games.
+* [Upload Bots Tool](): Upload your bots from the terminal instead of the website.
+* [Compare Bots Tools](): Compare win/loss ration multiple versions of your bots.
+* [Game Data Download Tool](): Download games played on our servers.
+* [Offline Visualizer](): View game replays offline.
+* [Halite API](): Use the Halite API to build and publish your own Halite tools and visualizations.

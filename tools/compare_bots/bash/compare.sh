@@ -11,13 +11,11 @@ echo "Replays will be saved in ./comparison directory"
 mkdir -p comparison/
 cd comparison
 
-# We point here to the halite binary. If you are not doing this on OS X, please go to Halite website to download
-# a build
-HALITE_BINARY=../bin/halite
 
 for x in $(seq 1 $GAMES); do
 # run a game
-game_output=$($HALITE_BINARY -d "240 160" -t "python3 ../$1" "python3 ../$2" | grep "rank #1")
+game_output=$($3 -d "$4" -t "$1" "$2" | grep "rank #1")
+echo game_output
 if [[ $game_output == *"Player #0"* ]]; then
     PLAYER1_WINS=$((PLAYER1_WINS + 1))
 fi

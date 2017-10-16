@@ -84,15 +84,10 @@
   background-color: #fff;
   padding: 20px;
   color: #1e1d28;
-  code{
-    background-color: #ac5544;
-    color: #fff;
-  }
   pre{
-    code{
-      background-color: transparent;
-      color: #191822;
-    }
+    padding: 0px;
+    background: transparent;
+    border: 0px;
   }
   a {
     color: #2980B9;
