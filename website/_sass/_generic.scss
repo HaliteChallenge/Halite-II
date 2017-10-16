@@ -2,6 +2,9 @@ html{
   background-image: url("/assets/images/site_bg.jpg");
   background-attachment: fixed;
   background-size: cover;
+  @media (max-width: $screen-sm-min){
+    background-size: auto;
+  }
 }
 
 body{
