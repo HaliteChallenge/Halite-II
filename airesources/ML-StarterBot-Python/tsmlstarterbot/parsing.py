@@ -26,7 +26,7 @@ def find_target_planet(bot_id, current_frame, planets, move):
     """
     Find a planet which the ship tried to go to. We try to find it by looking at the angle that the ship moved
     with and the angle between the ship and the planet.
-    :param bot_id: id of our bot
+    :param bot_id: id of bot to imitate
     :param current_frame: current frame
     :param planets: planets data
     :param move: current move to analyze
@@ -210,12 +210,11 @@ def parse(all_games_json_data, bot_to_imitate=None, dump_features_location=None)
 
                 gravity = 0
                 planet_base_data = json_data['planets'][planet_id]
-                winner_minimal_distance = 10000
-                enemy_minimal_distance = 10000
+                closest_friendly_ship_distance = 10000
+                closest_enemy_ship_distance = 10000
 
-                owned_by_winner = 1 if planet_data['owner'] == bot_to_imitate_id else -1
                 ownership = 0
-                if planet_data['owner'] == bot_to_imitate_id:
+                if str(planet_data['owner']) == bot_to_imitate_id:
                     ownership = 1
                 elif planet_data['owner'] is not None:
                     ownership = -1
@@ -225,16 +224,16 @@ def parse(all_games_json_data, bot_to_imitate=None, dump_features_location=None)
 
                 for player_id, ships in current_frame['ships'].items():
                     for ship_id, ship_data in ships.items():
-                        is_winner = 1 if player_id == bot_to_imitate_id else -1
+                        is_bot_to_imitate = 1 if player_id == bot_to_imitate_id else -1
                         dist2 = distance2(planet_base_data['x'], planet_base_data['y'], ship_data['x'], ship_data['y'])
                         dist = math.sqrt(dist2)
-                        gravity = gravity + is_winner * ship_data['health'] / dist2
-                        if is_winner == 1:
-                            winner_minimal_distance = min(winner_minimal_distance, dist)
+                        gravity = gravity + is_bot_to_imitate * ship_data['health'] / dist2
+                        if is_bot_to_imitate == 1:
+                            closest_friendly_ship_distance = min(closest_friendly_ship_distance, dist)
                             average_distance = average_distance + dist * ship_data['health']
                             my_ships_health = my_ships_health + ship_data['health']
                         else:
-                            enemy_minimal_distance = min(enemy_minimal_distance, dist)
+                            closest_enemy_ship_distance = min(closest_enemy_ship_distance, dist)
 
                 distance_from_center = distance(planet_base_data['x'], planet_base_data['y'], width / 2, height / 2)
                 average_distance = average_distance / my_ships_health
@@ -242,15 +241,17 @@ def parse(all_games_json_data, bot_to_imitate=None, dump_features_location=None)
                 is_active = 1.0 if planet_base_data['docking_spots'] > len(
                     planet_data['docked_ships']) or ownership != 1 else 0.0
 
+                signed_current_production = planet_data['current_production'] * ownership
+
                 # Features of the planet are inserted into the vector in the order described by FEATURE_NAMES
                 planet_features[str(planet_id)] = [
                     planet_data['health'],
                     planet_base_data['docking_spots'] - len(planet_data['docked_ships']),
                     planet_data['remaining_production'],
-                    planet_data['current_production'] * owned_by_winner,
+                    signed_current_production,
                     gravity,
-                    winner_minimal_distance,
-                    enemy_minimal_distance,
+                    closest_friendly_ship_distance,
+                    closest_enemy_ship_distance,
                     ownership,
                     distance_from_center,
                     average_distance,
