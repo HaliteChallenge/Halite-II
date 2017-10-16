@@ -5,17 +5,40 @@ toc: false
 description: System requirements to play Halite
 sort_key: 6
 ---
-These are the browsers, operating systems and libraries we have tested Halite on, and we will continue to support these during the competition. If you run into any issues with Halite that are due to incomptabilities with your system, do let us know as [halite@halite.io](mailto:halite@halite.io)
+These are the browsers and operating systems we have tested Halite on, and we will continue to support these during the competition. If you run into any issues with Halite that are due to incompatibilities with your operating system or browser, do let us know at [halite@halite.io](mailto:halite@halite.io). 
 
-## Operating Systems
+While we cant promise supporting a large cross section of browsers and operating systems, we will consider each request carefully.
 
-* Mac OSX 10.10+
+## Halite Game Engine
+
+These are the operating systems that we have tested on, but are **not hard minimum requirements**. We expect the Halite executable to work on some older versions of the these operating systems as well. 
+
+ - Mac OSX 10.12.6
+ - Ubuntu 17.04
+ - Windows (TODO)
 
 ## Browsers
 
-Chrome 55+
+While we haven't tested browser support completely on Linux, we believe using the supported version of Chrome (55+) or Firefox (53+) will enable you to use the Halite web experience on linux desktops.
 
-
-
-## Cookies
+<div class="table-container">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Mac OSX 10.10 +</td>
+                <td>Chrome 55+</td>
+                <td>Safari 11+</td>
+                <td>Firefox 53+</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Windows 10 +</td>
+                <td>Chrome 55+</td>
+                <td>NA</td>
+                <td>Firefox 53+</td>
+                <td>Edge 15+</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 

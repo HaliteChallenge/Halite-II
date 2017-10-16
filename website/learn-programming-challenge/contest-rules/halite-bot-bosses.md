@@ -8,6 +8,8 @@ sort_key: 1
 
 While our matchmaking does not gaurantee that you will play against these bots, these bots are a good indication of how your strategies compare to some of the bots that we think falls into difficulty levels.
 
+
+
 ## Policy Bosses
 These bots are based on strategies derived from micro-managing pieces and some cost function optimizations.
 

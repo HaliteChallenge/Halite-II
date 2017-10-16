@@ -25,7 +25,6 @@ module Jekyll
       remainder = remainder.sort_by do |page|
         if page.data.key?("sort_key")
           page.data["sort_key"]
-          puts page.data["sort_key"]
         else
           page.data["title"]
         end
