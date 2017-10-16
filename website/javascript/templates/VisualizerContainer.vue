@@ -22,27 +22,27 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import * as api from "../api";
-  import * as libhaliteviz from "../../../libhaliteviz";
-  import UploadZone from "./UploadZone.vue";
-  import Visualizer from "./Visualizer.vue";
-  import * as utils from "../utils";
+  import Vue from 'vue'
+import * as api from '../api'
+import * as libhaliteviz from '../../../libhaliteviz'
+import UploadZone from './UploadZone.vue'
+import Visualizer from './Visualizer.vue'
+import * as utils from '../utils'
 
-  let visualizer = null;
+let visualizer = null
 
-  const showGame = (game) => {
-    if (visualizer && visualizer.getVisualizer ) {
-      visualizer.getVisualizer().destroy();
-    }
+const showGame = (game) => {
+    if (visualizer && visualizer.getVisualizer) {
+      visualizer.getVisualizer().destroy()
+  }
 
-    const buffer = game.replay;
-    return libhaliteviz.parseReplay(buffer).then((replay) => {
-      let outerContainer = document.getElementById("halitetv-visualizer");
-      outerContainer.innerHTML = "";
+    const buffer = game.replay
+  return libhaliteviz.parseReplay(buffer).then((replay) => {
+      let outerContainer = document.getElementById('halitetv-visualizer')
+      outerContainer.innerHTML = ''
 
-      let container = document.createElement("div");
-      document.getElementById("halitetv-visualizer").appendChild(container);
+      let container = document.createElement('div')
+      document.getElementById('halitetv-visualizer').appendChild(container)
 
       new Vue({
         el: container,
@@ -50,30 +50,30 @@
           props: {
             replay: Object.freeze(replay),
             game: game.game,
-            makeUserLink: function(user_id) {
-              return `/user?user_id=${user_id}`;
+            makeUserLink: function (user_id) {
+              return `/user?user_id=${user_id}`
             },
-            getUserProfileImage: function(user_id) {
+            getUserProfileImage: function (user_id) {
               return api.get_user(user_id).then((user) => {
-                return api.make_profile_image_url(user.username);
-              });
-            },
+                return api.make_profile_image_url(user.username)
+              })
+            }
           }
         }),
-        mounted: function() {
-          visualizer = this.$children[0];
-        },
-      });
-    });
-  }
+        mounted: function () {
+          visualizer = this.$children[0]
+        }
+      })
+  })
+}
 
   export default {
     name: 'visualizer',
     props: [],
     components: {
-      "halite-upload-zone": UploadZone,
+      'halite-upload-zone': UploadZone
     },
-    data: function() {
+    data: function () {
       return {
         is_downloading: false,
         progress: 0,
@@ -82,116 +82,115 @@
         baseUrl: _global.baseUrl
       }
     },
-    mounted: function(){
-      const params = new URLSearchParams(window.location.search);
+    mounted: function () {
+      const params = new URLSearchParams(window.location.search)
       const setupGame = (game) => {
-        this.message = "Parsing replay, please wait…";
-        this.$parent.currentView = 'replay';
+        this.message = 'Parsing replay, please wait…'
+        this.$parent.currentView = 'replay'
         showGame(game).then(() => {
-          this.is_downloading = false;
-          this.message = null;
+          this.is_downloading = false
+          this.message = null
         }).catch((e) => {
-          this.is_downloading = false;
-          this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
-        });
-      };
+          this.is_downloading = false
+          this.message = 'There was an error parsing the replay. Please let us know at halite@halite.io.'
+        })
+      }
 
-      if (params.has("game_id")) {
-        const game_id = params.get("game_id");
-        this.message = `Downloading game ${game_id}.`;
-        this.is_upload = false;
+      if (params.has('game_id')) {
+        const game_id = params.get('game_id')
+        this.message = `Downloading game ${game_id}.`
+        this.is_upload = false
         api.get_replay(game_id, (loaded, total) => {
           if (total !== 0) {
-            const progress = loaded / total;
-            this.is_downloading = true;
-            this.progress = Math.floor(100 * progress);
+            const progress = loaded / total
+            this.is_downloading = true
+            this.progress = Math.floor(100 * progress)
           }
         }).then((game) => {
-          window.history.replaceState(null, "", `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`);
-          setupGame(game);
+          window.history.replaceState(null, '', `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`)
+          setupGame(game)
         }, () => {
-          if (params.has("replay_class") && params.has("replay_name")) {
-            const replay_class = params.get("replay_class");
-            const replay_name = params.get("replay_name");
-            this.$parent.replayFile = replay_name;
+          if (params.has('replay_class') && params.has('replay_name')) {
+            const replay_class = params.get('replay_class')
+            const replay_name = params.get('replay_name')
+            this.$parent.replayFile = replay_name
             api.get_expired_replay(replay_class, replay_name).then((replay) => {
-              this.$parent.currentView = 'replay';
+              this.$parent.currentView = 'replay'
               setupGame({
                 game: null,
-                replay: replay,
-              });
+                replay: replay
+              })
             }, () => {
-              this.message = `Could not find old replay.`;
-              this.is_downloading = false;
-            });
+              this.message = `Could not find old replay.`
+              this.is_downloading = false
+            })
+          } else {
+            this.message = `Could not download replay.`
+            this.is_downloading = false
           }
-          else {
-            this.message = `Could not download replay.`;
-            this.is_downloading = false;
-          }
-        });
+        })
       }
-      window.onhashchange = function() {
-        if(!window.location.hash) {
+      window.onhashchange = function () {
+        if (!window.location.hash) {
           window.location.reload()
         }
       }
 
       // handle whole page drag and drop
-      const ins = this;
-      $('body').attr('draggable', 'true');
-      $('body').on('drop dragdrop',function(e){
+      const ins = this
+      $('body').attr('draggable', 'true')
+      $('body').on('drop dragdrop', function (e) {
         // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
+        const container = document.getElementById('bot-upload-container')
 
         // verify if the dropzone is not the bot uploader zone
-        if (!container || !container.contains(e.target)){
-          e.preventDefault();
-          ins.play_replay(e.originalEvent.dataTransfer.files);
-        }
-      });
-      $('body').on('dragenter',function(e){
-        // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
-        if (!container || !container.contains(e.target)){
-          event.preventDefault();
+        if (!container || !container.contains(e.target)) {
+          e.preventDefault()
+          ins.play_replay(e.originalEvent.dataTransfer.files)
         }
       })
-      $('body').on('dragover',function(e){
+      $('body').on('dragenter', function (e) {
         // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
-        if (!container || !container.contains(e.target)){
-          event.preventDefault();
+        const container = document.getElementById('bot-upload-container')
+        if (!container || !container.contains(e.target)) {
+          event.preventDefault()
         }
-      });
-    },
+      })
+      $('body').on('dragover', function (e) {
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container')
+        if (!container || !container.contains(e.target)) {
+          event.preventDefault()
+        }
+      })
+  },
     methods: {
-      play_replay: function(files) {
-        this.gaData('play','select-replay-file','replay-flow')
+      play_replay: function (files) {
+        this.gaData('play', 'select-replay-file', 'replay-flow')
         if (files.length > 0) {
-          const reader = new FileReader();
-          const inst = this;
+          const reader = new FileReader()
+          const inst = this
           reader.onload = (e) => {
-            inst.is_upload = false;
-            this.$parent.currentView = 'replay';
-            window.location.hash = '/replay-bot';
-            this.$parent.replayFile = files[0].name;
-            this.message = "Parsing replay, please wait…";
+            inst.is_upload = false
+            this.$parent.currentView = 'replay'
+            window.location.hash = '/replay-bot'
+            this.$parent.replayFile = files[0].name
+            this.message = 'Parsing replay, please wait…'
             showGame({
               game: null,
-              replay: e.target.result,
+              replay: e.target.result
             }).then(() => {
-              this.message = null;
+              this.message = null
             }).catch(() => {
-              this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
-            });
-          };
-          reader.readAsArrayBuffer(files[0]);
+              this.message = 'There was an error parsing the replay. Please let us know at halite@halite.io.'
+            })
+          }
+          reader.readAsArrayBuffer(files[0])
         }
       },
-      gaData: function(category, action, label) {
-        utils.gaEvent(category, action, label);
-      },
+      gaData: function (category, action, label) {
+        utils.gaEvent(category, action, label)
+      }
     }
   }
 </script>

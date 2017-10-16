@@ -12,9 +12,9 @@
 </template>
 
 <script>
-  import _ from 'lodash';
+  import _ from 'lodash'
 
-  export default {
+export default {
     name: 'HalitePagination',
     props: {
       page: {
@@ -34,34 +34,34 @@
         required: true
       }
     },
-    data: function() {
+    data: function () {
       return {
         hasMore: false
       }
     },
     computed: {
       pageRange: function () {
-        if(this.lastPage <= 6) {
-          this.hasMore = false;
-          return _.range(1, this.lastPage + 1);
+        if (this.lastPage <= 6) {
+          this.hasMore = false
+          return _.range(1, this.lastPage + 1)
         } else {
-          if(this.page <= 3) {
-            this.hasMore = true;
-            return _.range(1, 7);
-          } else if(this.page >= this.lastPage - 3) {
-            this.hasMore = false;
-            return _.range(this.lastPage - 5, this.lastPage + 1);
+          if (this.page <= 3) {
+            this.hasMore = true
+            return _.range(1, 7)
+          } else if (this.page >= this.lastPage - 3) {
+            this.hasMore = false
+            return _.range(this.lastPage - 5, this.lastPage + 1)
           } else {
-            this.hasMore = true;
-            return _.range(this.page - 2, this.page + 4);
+            this.hasMore = true
+            return _.range(this.page - 2, this.page + 4)
           }
         }
       }
     },
     methods: {
-      updatePage: function(page) {
-        if(page > this.lastPage || page === this.page) return;
-        this.changePage(page);
+      updatePage: function (page) {
+        if (page > this.lastPage || page === this.page) return
+        this.changePage(page)
       }
     }
   }

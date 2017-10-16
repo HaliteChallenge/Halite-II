@@ -431,388 +431,383 @@
 </template>
 
 <script>
-    import * as api from "../api";
-    import {Alert, tierClass} from "../utils.js";
-    import Vue from "vue";
-    import * as utils from "../utils";
-    import moment from 'moment';
-    import dateformat from 'dateformat'
+    import * as api from '../api'
+import {Alert, tierClass} from '../utils.js'
+import Vue from 'vue'
+import * as utils from '../utils'
+import moment from 'moment'
+import dateformat from 'dateformat'
 
     export default {
-        name: "UserProfile",
-        props: ['baseUrl'],
-        data: function() {
-            return {
-                tierClass: tierClass,
-                user: {
-                    "level": "",
-                    "username": "",
-                    "organization": "",
-                    "points": "",
-                    "num_games": "",
-                    "user_id": "",
-                },
-                games: [],
-                nemesisList: [],
-                bots: [],
-                error_games: [],
-                hackathons: [],
-                userHistory: [],
-                profile_images: {},
-                usernames: {},
-                page: 0,
-                limit: 10,
-                offset: 0,
-                nemesisLimit: 30,
-                nemesisGameCount: 200,
-                nemesisGameThreshold: 10,
-                only_timed_out: false,
-                is_my_page: false,
-                highestRank: null,
-                sharePopup: false,
-                messages: {
-                    hackathon: "",
-                },
-            };
-        },
-        mounted: function() {
-            const params = new URLSearchParams(window.location.search);
-            let source;
+      name: 'UserProfile',
+      props: ['baseUrl'],
+      data: function () {
+        return {
+          tierClass: tierClass,
+          user: {
+            'level': '',
+            'username': '',
+            'organization': '',
+            'points': '',
+            'num_games': '',
+            'user_id': ''
+          },
+          games: [],
+          nemesisList: [],
+          bots: [],
+          error_games: [],
+          hackathons: [],
+          userHistory: [],
+          profile_images: {},
+          usernames: {},
+          page: 0,
+          limit: 10,
+          offset: 0,
+          nemesisLimit: 30,
+          nemesisGameCount: 200,
+          nemesisGameThreshold: 10,
+          only_timed_out: false,
+          is_my_page: false,
+          highestRank: null,
+          sharePopup: false,
+          messages: {
+            hackathon: ''
+          }
+        }
+  },
+      mounted: function () {
+        const params = new URLSearchParams(window.location.search)
+        let source
 
-            if (params.has("me")) {
-                source = api.me();
-            }
-            else {
-                const user_id = params.get("user_id");
-                source = api.get_user(user_id);
-            }
+        if (params.has('me')) {
+          source = api.me()
+        } else {
+          const user_id = params.get('user_id')
+          source = api.get_user(user_id)
+        }
 
-            source.then((user) => {
-                if (user === null) {
-                    window.location.replace(`${api.LOGIN_SERVER_URL}/github`);
-                    return;
-                }
-                this.user = user;
-                this.user.location = this.getLocation();
+        source.then((user) => {
+          if (user === null) {
+            window.location.replace(`${api.LOGIN_SERVER_URL}/github`)
+            return
+          }
+          this.user = user
+          this.user.location = this.getLocation()
 
-                if (params.has("me")) {
-                    window.history.replaceState(
-                        {}, "",
-                        `${window.location.origin}${window.location.pathname}?user_id=${user.user_id}`);
-                }
-                api.list_bots(user.user_id).then((bots) => {
-                    this.bots = bots;
-                });
-                this.fetch();
-                this.fetchHackathon();
-                this.fetchErrorGames();
-                this.fetchnemesis();
-                this.fetchhistory();
-            });
+          if (params.has('me')) {
+            window.history.replaceState(
+              {}, '',
+              `${window.location.origin}${window.location.pathname}?user_id=${user.user_id}`)
+          }
+          api.list_bots(user.user_id).then((bots) => {
+            this.bots = bots
+          })
+          this.fetch()
+          this.fetchHackathon()
+          this.fetchErrorGames()
+          this.fetchnemesis()
+          this.fetchhistory()
+        })
 
-            api.me().then((me) => {
-                this.is_my_page = me && me.user_id === this.user.user_id;
-            });
+    api.me().then((me) => {
+          this.is_my_page = me && me.user_id === this.user.user_id
+        })
 
-            // sticky tables
-            this.setupStickyTable()
-        },
-        computed: {
-            botLang: function(){
-                let lang = [];
-                if (this.bots.length > 0){
-                    for (let i = 0; i < this.bots.length; i++){
-                        if (lang.indexOf(this.bots[i].language) == -1){
-                            lang.push(this.bots[i].language);
-                        }
-                    }
-                }
-                return lang;
-            },
-            shareLink: function(){
-                return window.location.href;
-            },
-        },
-        methods: {
-            setupStickyTable: function(){
-                $(window).on('resize', () => {
-                    calcCol();
-                });
-            },
-            refreshStickyTable: function(){
-                const calcCol = () => {
-                    const el = $(this.$el).find('.table-sticky-container:visible').each(function(){
-                        const heading = $(this).find('.table-sticky th');
-                        const body = $(this).find('.table:not(.table-sticky) th');
-                        heading.each(function(index){
-                            $(this).width($(body[index]).width());
-                        });
-                    });
-                }
-                setTimeout(() => {
-                    calcCol();
-                }, 500);
-            },
-            fetch: function() {
-                let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`;
-                if (this.only_timed_out) {
-                    query += `&filter=timed_out,=,${this.user.user_id}`;
-                }
-                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
-                return $.get(url).then((data) => {
-                    this.games = data;
-                    for (let game of data) {
-                        for (let participant of Object.keys(game.players)) {
-                            game.players[participant].id = participant;
-                            if (this.profile_images[participant]) continue;
-                            this.profile_images[participant] = "loading";
-
-                            api.get_user(participant).then((user) => {
-                                this.profile_images[participant] = api.make_profile_image_url(user.username);
-                                this.usernames[participant] = user.username;
-                                this.$forceUpdate();
-                            });
-                        }
-
-                        const players = Object.values(game.players).sort((r1, r2) => {
-                          if (r1.id.toString() === this.user.user_id.toString())
-                            return -1;
-                          if (r2.id.toString() === this.user.user_id.toString())
-                            return 1;
-                          return r2.rank - r1.rank;
-                        });
-
-                        game.playerSorted = players;
-                    }
-                });
-            },
-            getLocation: function() {
-              const user = this.user;
-              let state = '', country = '';
-              const countries = require("i18n-iso-countries");
-
-              if (user.country_code) {
-                const countryAlpha2 = countries.alpha3ToAlpha2(user.country_code);
-                const countryData = iso3166.data[countryAlpha2];
-                let stateData;
-                if (countryData && user.country_subdivision_code) {
-                  stateData = countryData.sub[user.country_subdivision_code]
-                }
-                state = stateData ? stateData.name : '';
-                country = countryData ? countryData.name : '';
+    // sticky tables
+    this.setupStickyTable()
+      },
+      computed: {
+        botLang: function () {
+          let lang = []
+          if (this.bots.length > 0) {
+            for (let i = 0; i < this.bots.length; i++) {
+              if (lang.indexOf(this.bots[i].language) == -1) {
+                lang.push(this.bots[i].language)
               }
-              const location = `${state ? state + ', ' : ''}${country}`;
-              return location ? location : '';
-            },
-            fetchnemesis: function() {
-                let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`;
-                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
-                return $.get(url).then((data) => {
-                    var nemesisMap = new Map()
-                    for (let game of data) {
-                        let user_player = game.players[this.user.user_id];
-                        for (let participant of Object.keys(game.players)) {
-                            if(participant == this.user.user_id){
-                                continue;
-                            }
+            }
+          }
+          return lang
+        },
+        shareLink: function () {
+          return window.location.href
+        }
+      },
+      methods: {
+        setupStickyTable: function () {
+          $(window).on('resize', () => {
+            calcCol()
+          })
+    },
+        refreshStickyTable: function () {
+          const calcCol = () => {
+            const el = $(this.$el).find('.table-sticky-container:visible').each(function () {
+              const heading = $(this).find('.table-sticky th')
+              const body = $(this).find('.table:not(.table-sticky) th')
+              heading.each(function (index) {
+                $(this).width($(body[index]).width())
+              })
+            })
+          }
+          setTimeout(() => {
+            calcCol()
+          }, 500)
+        },
+        fetch: function () {
+          let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`
+          if (this.only_timed_out) {
+            query += `&filter=timed_out,=,${this.user.user_id}`
+          }
+          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
+          return $.get(url).then((data) => {
+            this.games = data
+            for (let game of data) {
+              for (let participant of Object.keys(game.players)) {
+                game.players[participant].id = participant
+                if (this.profile_images[participant]) continue
+                this.profile_images[participant] = 'loading'
 
-                            let playerData = nemesisMap.get(participant);
-                            if(typeof playerData === 'undefined') {
-                                playerData = {wins: 0, losses:0};
-                                nemesisMap.set(participant, playerData);
-                            }
+                api.get_user(participant).then((user) => {
+                  this.profile_images[participant] = api.make_profile_image_url(user.username)
+                  this.usernames[participant] = user.username
+                  this.$forceUpdate()
+                })
+              }
 
-                            if(user_player.rank < game.players[participant].rank){
-                                playerData.wins++;
-                            } else {
-                                playerData.losses++;
-                            }
-                        }
-                    }
-                    for (var [key, value] of nemesisMap) {
-                        let totalGames = value.wins + value.losses;
-                        let winRatio = value.wins/totalGames;
-                        let lossRatio = value.losses/totalGames;
-                        if(totalGames >= this.nemesisGameThreshold){
-                            var obj = {
-                                id:key,
-                                wins:Math.round(winRatio*100),
-                                losses:Math.round(lossRatio*100),
-                                total:totalGames
-                            };
-                            this.nemesisList.push(obj);
-                        }
-                        api.get_user(key).then((user) => {
-                            this.profile_images[key] = api.make_profile_image_url(user.username);
-                            this.usernames[key] = user.username;
-                            this.$forceUpdate();
-                        });
-                    }
+              const players = Object.values(game.players).sort((r1, r2) => {
+                if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
+                if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
+                return r2.rank - r1.rank
+              })
 
-                    this.nemesisList.sort(function(a,b) { return b.losses - a.losses});
-                    this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit);
-                    this.refreshStickyTable();
-                });
-            },
-            fetchHackathon: function(){
-                api.getUserHackathons(this.user.user_id).then(hackathons => {
-                    if(hackathons && hackathons instanceof Array) {
-                        this.hackathons = hackathons.filter((h) => {
-                            return h.participant == true;
-                        });
-                    }
-                });
-            },
-            fetchhistory: function(){
-                api.getUserHistory(this.user.user_id).then(history => {
-                    if(history && history instanceof Array) {
-                        history.sort(function(a,b) { return parseInt(b.bot_version) - parseInt(a.bot_version)});;
-                        this.userHistory = history;
-                        if(this.user.num_submissions > 0){
-                            this.userHistory.unshift({bot_version:"Current ("+ this.user.num_submissions+")", last_score: this.user.score, last_rank:this.user.rank, last_games_played: this.user.num_games, when_retired: "Still playing" })
-                        }
-                        if(history.length <= 0){
-                            return;
-                        }
-                        this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank);                      
-                        if(this.highestRank > this.user.rank){
-                            this.highestRank = this.user.rank;
-                        }
-                    }
-                });
-            },
-            fetchErrorGames: function(){
-                let query = `order_by=desc,time_played&offset=0&limit=50&filter=timed_out,=,${this.user.user_id}`;
-                const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`;
-                return $.get(url).then((data) => {
-                    this.error_games = data;
-                    this.refreshStickyTable();
-                });
-            },
-            next_page: function() {
-                this.offset += 10;
-                this.fetch().then(() => {
-                    this.page += 1;
-                });
-            },
-            prev_page: function() {
-                this.offset -= 10;
-                this.fetch().then(() => {
-                    this.page -= 1;
-                });
-            },
-            toggle_filter: function() {
-                this.only_timed_out = !this.only_timed_out;
-                this.offset = 0;
-                this.fetch().then(() => {
-                    this.page = 0;
-                });
-            },
-            error_log_link: function(game_id) {
-                return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`;
-            },
-            replay_download_link: function(game_id) {
-                return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`;
-            },
-            replay_link: function(game_id) {
-                return `/play/?game_id=${game_id}`;
-            },
-            join_hackathon: function(event) {
-                event.preventDefault();
-                const code = this.$refs.hackathon_signup_code.value;
-                this.gaData('hackathon','click-submit-hackathon-code','hackathon-flow');
-                api.registerHackathon(code).then(() => {
-                    Alert.show("Successfully registered!", 'success');
-                    this.gaData('hackathon','hackathon-code-success','hackathon-flow');
-                    this.fetchHackathon();
-                }, (error) => {
-                    Alert.show(`Error: ${error.message || error.responseJSON.message}`);
-                    this.gaData('hackathon','hackathon-code-error','hackathon-flow');
-                });
-            },
-            prev_badge: ()=>{
-                let content = $(".user-profile-badge-content");
-                let list = $(".user-profile-badge-list");
-                let contentWidth = $(content).width();
-                let listWidth = $(list).children("li").outerWidth(true) * $(list).children("li").length;
-                let marginLeft = parseInt($(list).css('marginLeft'));
-                let interval = 20;
-                let aniVal = 0;
-                let cal = listWidth + marginLeft - contentWidth;
-                if(cal > interval){
-                    aniVal = interval;
-                }else if(0 < cal <= interval){
-                    aniVal = cal;
-                }else{
-                    aniVal = 0;
+              game.playerSorted = players
+            }
+          })
+        },
+        getLocation: function () {
+          const user = this.user
+          let state = '', country = ''
+          const countries = require('i18n-iso-countries')
+
+          if (user.country_code) {
+            const countryAlpha2 = countries.alpha3ToAlpha2(user.country_code)
+            const countryData = iso3166.data[countryAlpha2]
+            let stateData
+            if (countryData && user.country_subdivision_code) {
+              stateData = countryData.sub[user.country_subdivision_code]
+            }
+            state = stateData ? stateData.name : ''
+            country = countryData ? countryData.name : ''
+          }
+          const location = `${state ? state + ', ' : ''}${country}`
+          return location || ''
+    },
+        fetchnemesis: function () {
+          let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`
+          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
+          return $.get(url).then((data) => {
+            var nemesisMap = new Map()
+            for (let game of data) {
+              let user_player = game.players[this.user.user_id]
+              for (let participant of Object.keys(game.players)) {
+                if (participant == this.user.user_id) {
+                  continue
                 }
-                $(list).animate({marginLeft:'-='+aniVal+'px'});
-            },
-            next_badge: ()=>{
-                let list = $(".user-profile-badge-list");
-                let marginLeft = Math.abs(parseInt($(list).css('marginLeft')));
-                let interval = 20;
-                let aniVal = 0;
-                if(marginLeft > interval){
-                    aniVal = interval;
-                }else if(0 < marginLeft <= interval){
-                    aniVal = marginLeft;
-                }else{
-                    aniVal = 0;
+
+                let playerData = nemesisMap.get(participant)
+                if (typeof playerData === 'undefined') {
+                  playerData = {wins: 0, losses: 0}
+                  nemesisMap.set(participant, playerData)
                 }
-                $(list).animate({marginLeft:'+='+aniVal+'px'});
-            },
-            getFormattedDate: function(date) {
-                var cdate = moment(date);
-                if(cdate.isValid()){
-                    var dateFormat = require('dateformat');
-                    return dateFormat(date, "mm/dd, yy - HH:MM");
+
+                if (user_player.rank < game.players[participant].rank) {
+                  playerData.wins++
+                } else {
+                  playerData.losses++
                 }
-                else{
-                    return "Still playing";
+              }
+            }
+            for (var [key, value] of nemesisMap) {
+              let totalGames = value.wins + value.losses
+              let winRatio = value.wins / totalGames
+              let lossRatio = value.losses / totalGames
+              if (totalGames >= this.nemesisGameThreshold) {
+                var obj = {
+                  id: key,
+                  wins: Math.round(winRatio * 100),
+                  losses: Math.round(lossRatio * 100),
+                  total: totalGames
                 }
-            },
-            getFormattedDateForGames: function(date) {
-                var cdate = moment(date);
-                if(cdate.isValid()){
-                    var dateFormat = require('dateformat');
-                    return dateFormat(date, "mm/dd, yy - HH:MM");
-                }
-                else{
-                    return null;
-                }
-            },
-            gaData: function(category, action, label) {
-                utils.gaEvent(category, action, label);
-            },
-            toggleShare: function(){
-                this.sharePopup = !this.sharePopup;
-            },
-            shareSocial: function(social){
-                let text = "Halite II Player - " + this.user.username + " Rank: " + this.user.rank + " Tier: " + this.user.tier + " ";
-                let tags = "haliteplayerstats";
-                switch (social){
-                case 'facebook':
-                    return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href);
-                break;
-                case 'twitter':
-                    return 'https://twitter.com/intent/tweet?text=' + text + "&url=" + encodeURIComponent(window.location.href) + "&hashtags=" + tags + "&via=haliteAI";
-                break;
-                case 'linkedin':
-                    return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
-                break;
-                }
-            },
-            /**
+                this.nemesisList.push(obj)
+              }
+              api.get_user(key).then((user) => {
+                this.profile_images[key] = api.make_profile_image_url(user.username)
+                this.usernames[key] = user.username
+                this.$forceUpdate()
+              })
+            }
+
+            this.nemesisList.sort(function (a, b) { return b.losses - a.losses })
+            this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit)
+            this.refreshStickyTable()
+          })
+    },
+        fetchHackathon: function () {
+          api.getUserHackathons(this.user.user_id).then(hackathons => {
+            if (hackathons && hackathons instanceof Array) {
+              this.hackathons = hackathons.filter((h) => {
+                return h.participant == true
+              })
+            }
+          })
+        },
+        fetchhistory: function () {
+          api.getUserHistory(this.user.user_id).then(history => {
+            if (history && history instanceof Array) {
+              history.sort(function (a, b) { return parseInt(b.bot_version) - parseInt(a.bot_version) })
+              this.userHistory = history
+              if (this.user.num_submissions > 0) {
+                this.userHistory.unshift({bot_version: 'Current (' + this.user.num_submissions + ')', last_score: this.user.score, last_rank: this.user.rank, last_games_played: this.user.num_games, when_retired: 'Still playing' })
+              }
+              if (history.length <= 0) {
+                return
+              }
+              this.highestRank = history.reduce((min, p) => p.last_rank < min ? p.last_rank : min, history[0].last_rank)
+              if (this.highestRank > this.user.rank) {
+                this.highestRank = this.user.rank
+              }
+            }
+          })
+        },
+        fetchErrorGames: function () {
+          let query = `order_by=desc,time_played&offset=0&limit=50&filter=timed_out,=,${this.user.user_id}`
+          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
+          return $.get(url).then((data) => {
+            this.error_games = data
+            this.refreshStickyTable()
+          })
+    },
+        next_page: function () {
+          this.offset += 10
+          this.fetch().then(() => {
+            this.page += 1
+          })
+    },
+        prev_page: function () {
+          this.offset -= 10
+          this.fetch().then(() => {
+            this.page -= 1
+          })
+    },
+        toggle_filter: function () {
+          this.only_timed_out = !this.only_timed_out
+          this.offset = 0
+          this.fetch().then(() => {
+            this.page = 0
+          })
+    },
+        error_log_link: function (game_id) {
+          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`
+        },
+        replay_download_link: function (game_id) {
+          return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`
+        },
+        replay_link: function (game_id) {
+          return `/play/?game_id=${game_id}`
+        },
+        join_hackathon: function (event) {
+          event.preventDefault()
+          const code = this.$refs.hackathon_signup_code.value
+          this.gaData('hackathon', 'click-submit-hackathon-code', 'hackathon-flow')
+          api.registerHackathon(code).then(() => {
+            Alert.show('Successfully registered!', 'success')
+            this.gaData('hackathon', 'hackathon-code-success', 'hackathon-flow')
+            this.fetchHackathon()
+          }, (error) => {
+            Alert.show(`Error: ${error.message || error.responseJSON.message}`)
+            this.gaData('hackathon', 'hackathon-code-error', 'hackathon-flow')
+          })
+    },
+        prev_badge: () => {
+          let content = $('.user-profile-badge-content')
+          let list = $('.user-profile-badge-list')
+          let contentWidth = $(content).width()
+          let listWidth = $(list).children('li').outerWidth(true) * $(list).children('li').length
+          let marginLeft = parseInt($(list).css('marginLeft'))
+          let interval = 20
+          let aniVal = 0
+          let cal = listWidth + marginLeft - contentWidth
+          if (cal > interval) {
+            aniVal = interval
+          } else if (cal > 0 <= interval) {
+            aniVal = cal
+          } else {
+            aniVal = 0
+          }
+          $(list).animate({marginLeft: '-=' + aniVal + 'px'})
+        },
+        next_badge: () => {
+          let list = $('.user-profile-badge-list')
+          let marginLeft = Math.abs(parseInt($(list).css('marginLeft')))
+          let interval = 20
+          let aniVal = 0
+          if (marginLeft > interval) {
+            aniVal = interval
+          } else if (marginLeft > 0 <= interval) {
+            aniVal = marginLeft
+          } else {
+            aniVal = 0
+          }
+          $(list).animate({marginLeft: '+=' + aniVal + 'px'})
+        },
+        getFormattedDate: function (date) {
+          var cdate = moment(date)
+          if (cdate.isValid()) {
+            var dateFormat = require('dateformat')
+            return dateFormat(date, 'mm/dd, yy - HH:MM')
+          } else {
+            return 'Still playing'
+          }
+        },
+        getFormattedDateForGames: function (date) {
+          var cdate = moment(date)
+          if (cdate.isValid()) {
+            var dateFormat = require('dateformat')
+            return dateFormat(date, 'mm/dd, yy - HH:MM')
+          } else {
+            return null
+          }
+        },
+        gaData: function (category, action, label) {
+          utils.gaEvent(category, action, label)
+        },
+        toggleShare: function () {
+          this.sharePopup = !this.sharePopup
+        },
+        shareSocial: function (social) {
+          let text = 'Halite II Player - ' + this.user.username + ' Rank: ' + this.user.rank + ' Tier: ' + this.user.tier + ' '
+          let tags = 'haliteplayerstats'
+          switch (social) {
+            case 'facebook':
+              return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href)
+              break
+            case 'twitter':
+              return 'https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(window.location.href) + '&hashtags=' + tags + '&via=haliteAI'
+              break
+            case 'linkedin':
+              return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
+              break
+          }
+        },
+        /**
              * @param  {e} event
              * @return {void}
              */
-            copyToClipboard: function(e){
-                if (e) e.preventDefault();
-                this.$refs.shareInput.select();
-                document.execCommand('copy');
-            },
-        },
+        copyToClipboard: function (e) {
+          if (e) e.preventDefault()
+          this.$refs.shareInput.select()
+          document.execCommand('copy')
+        }
+      }
     }
 </script>
 

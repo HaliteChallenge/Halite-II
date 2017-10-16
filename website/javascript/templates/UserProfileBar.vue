@@ -20,57 +20,57 @@
 </template>
 
 <script>
-    import * as api from "../api";
-    import * as utils from "../utils";
+    import * as api from '../api'
+import * as utils from '../utils'
 
-    export default {
-        name: "user-profile-bar",
-        props: ['baseUrl'],
-        data: function() {
-            const me = api.me_cached();
-            if (me) {
-                return {
-                    username: me.username,
-                    profile_image: api.make_profile_image_url(me.username),
-                };
-            }
-            return {
-                username: "",
-                profile_image: null,
-            };
+export default {
+      name: 'user-profile-bar',
+      props: ['baseUrl'],
+      data: function () {
+        const me = api.me_cached()
+        if (me) {
+          return {
+            username: me.username,
+            profile_image: api.make_profile_image_url(me.username)
+          }
+    }
+        return {
+          username: '',
+          profile_image: null
+        }
+  },
+      mounted: function () {
+        api.me().then((user) => {
+          this.username = user.username
+          this.profile_image = api.make_profile_image_url(this.username)
+          $('profile').addClass('container-loaded')
+          $('submitbutton').addClass('container-loaded')
+        })
+    document.addEventListener('click', (e) => {
+          if (!this.$el.contains(e.target)) {
+            this.leave_profile()
+          }
+        })
+      },
+      methods: {
+        slide_profile: function (e) {
+          const currentTarget = e.currentTarget
+          $(currentTarget).find('ul').slideToggle()
         },
-        mounted: function() {
-            api.me().then((user) => {
-                this.username = user.username;
-                this.profile_image = api.make_profile_image_url(this.username);
-                $('profile').addClass('container-loaded');
-                $('submitbutton').addClass('container-loaded');
-            });
-            document.addEventListener('click', (e) => {
-                if (!this.$el.contains(e.target)) {
-                    this.leave_profile();
-                }
-            })
+        leave_profile: function (e) {
+          let currentTarget = e ? e.currentTarget : $('.profile-container ul')
+          $(currentTarget).stop().slideUp()
         },
-        methods: {
-            slide_profile: function (e) {
-                const currentTarget = e.currentTarget;
-                $(currentTarget).find("ul").slideToggle();
-            },
-            leave_profile: function (e) {
-                let currentTarget = e ? e.currentTarget : $(".profile-container ul");
-                $(currentTarget).stop().slideUp();
-            },
-            gaData: function(category, action, label) {
-                utils.gaEvent(category, action, label);
-            },
-            sign_out: function (e) {
-                this.gaData('account', 'click-sign-out', 'account-flow');
-                api.logout().then((res)=>{
-                    window.location.replace("/");
-                });
-            },
+        gaData: function (category, action, label) {
+          utils.gaEvent(category, action, label)
         },
+        sign_out: function (e) {
+          this.gaData('account', 'click-sign-out', 'account-flow')
+          api.logout().then((res) => {
+            window.location.replace('/')
+          })
+        }
+      }
     }
 </script>
 

@@ -30,14 +30,14 @@
 </div>
 </template>
 <script>
-  import Vue from "vue";
-  import {isUndefined, isNull} from "lodash";
+  import Vue from 'vue'
+import {isUndefined, isNull} from 'lodash'
 
-  export default {
+export default {
     props: ['selectedShip', 'players'],
     computed: {
-      info: function(){
-        const base = this.selectedShip;
+      info: function () {
+        const base = this.selectedShip
 
         return {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
@@ -45,7 +45,7 @@
           id: base.id,
           velocity: `(${base.vel_x}, ${base.vel_y})`,
           health: base.health
-        };
+        }
       }
     }
   }

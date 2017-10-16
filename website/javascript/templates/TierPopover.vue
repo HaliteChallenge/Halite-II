@@ -25,10 +25,10 @@
 </template>
 
 <script>
-  import Vue from 'vue';
-  import {Popover} from 'element-ui';
-  const badges = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Salt'];
-  const percentages = ['0.2', '0.2', '0.4', '0.8', '98.4']
+  import Vue from 'vue'
+import {Popover} from 'element-ui'
+const badges = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Salt']
+const percentages = ['0.2', '0.2', '0.4', '0.8', '98.4']
 
   export default {
     name: 'TierPopover',
@@ -36,14 +36,14 @@
     components: {
       'el-popover': Popover
     },
-    mounted: function() {
-      const index = parseInt(this.tier.split('-')[2]);
-      const badge = badges[index - 1];
-      this.index = index;
-      this.badge = badge;
-      this.percentage = percentages[index - 1];
-    },
-    data: function() {
+    mounted: function () {
+      const index = parseInt(this.tier.split('-')[2])
+      const badge = badges[index - 1]
+      this.index = index
+      this.badge = badge
+      this.percentage = percentages[index - 1]
+  },
+    data: function () {
       return {
         show: false,
         index: '',

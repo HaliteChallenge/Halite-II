@@ -96,184 +96,177 @@
 </template>
 
 <script>
-    import * as api from "../api";
-    import vSelect from 'vue-select';
-    import {Alert, countries_data} from "../utils";
-    import * as utils from "../utils";
+    import * as api from '../api'
+import vSelect from 'vue-select'
+import {Alert, countries_data} from '../utils'
+import * as utils from '../utils'
 
-    export default {
-        name: "associate",
-        components: {vSelect},
-        data: function() {
-            const countries = Object.entries(iso3166.data);
-            countries.sort(function(country1, country2) {
-                const country1name = country1[1].name;
-                const country2name = country2[1].name;
-                const country1code = country1[0];
-                const country2code = country2[0];
-                if (country1code == 'US' && country2code != 'US') return -1;
-                if (country2code == 'US' && country1code != 'US') return 1;
+export default {
+      name: 'associate',
+      components: {vSelect},
+      data: function () {
+        const countries = Object.entries(iso3166.data)
+        countries.sort(function (country1, country2) {
+          const country1name = country1[1].name
+          const country2name = country2[1].name
+          const country1code = country1[0]
+          const country2code = country2[0]
+          if (country1code == 'US' && country2code != 'US') return -1
+          if (country2code == 'US' && country1code != 'US') return 1
 
-                if (country1name < country2name) {
-                    return -1;
-                }
-                else if (country1name === country2name) {
-                    return 0;
-                }
-                else {
-                    return 1;
-                }
-            });
+          if (country1name < country2name) {
+            return -1
+          } else if (country1name === country2name) {
+            return 0
+          } else {
+            return 1
+          }
+        })
 
-            const codes = {};
-            Object.entries(iso3166.codes).forEach((item) => {
-                codes[item[1]] = item[0];
-            });
-            const new_countries = countries.map((item) => {
-                return {
-                    label: item[1].name,
-                    value: codes[item[0]],
-                    code: item[0]
-                };
-            });
-            new_countries.unshift({
-                value: "NONE",
-                code: "NONE",
-                label: "(would prefer not to disclose)",
-            });
+        const codes = {}
+        Object.entries(iso3166.codes).forEach((item) => {
+          codes[item[1]] = item[0]
+        })
+    const new_countries = countries.map((item) => {
+          return {
+            label: item[1].name,
+            value: codes[item[0]],
+            code: item[0]
+          }
+    })
+        new_countries.unshift({
+          value: 'NONE',
+          code: 'NONE',
+          label: '(would prefer not to disclose)'
+        })
 
+        return {
+          countries: countries,
+          country_options: new_countries,
+          data: iso3166.data,
+          email: '',
+          country_code: '',
+          country_region_code: '',
+          level: 'Professional',
+          organization: null,
+          organizations: [],
+          error: null,
+          hackathon_code: '',
+          account_success: "Your account has been successfully created. You'll be redirected in a few seconds.",
+          verify_sent: "We've sent a verification email to the address you provided.",
+          hackathon_add: "You've also been successfully added to a Halite hackathon",
+          account_error: 'Error: Sorry, something went wrong. Please fix any form fields with issues or you can submit a bot now and edit your profile later to fix remaining issues.',
+          sucess_message: '',
+          error_string: ''
+        }
+  },
+      computed: {
+        regions: function () {
+          const regions = Object.entries(iso3166.data[this.country_code.code].sub)
+
+          const codes = []
+
+          regions.sort(function (region1, region2) {
+            const name1 = region1[1].name
+            const name2 = region2[1].name
+            if (name1 < name2) {
+              return -1
+            } else if (name1 === name2) {
+              return 0
+            } else {
+              return 1
+            }
+          })
+
+          const new_regions = regions.map((item) => {
             return {
-                countries: countries,
-                country_options: new_countries,
-                data: iso3166.data,
-                email: "",
-                country_code: "",
-                country_region_code: "",
-                level: "Professional",
-                organization: null,
-                organizations: [],
-                error: null,
-                hackathon_code: '',
-                account_success: "Your account has been successfully created. You'll be redirected in a few seconds.",
-                verify_sent: "We've sent a verification email to the address you provided.",
-                hackathon_add: "You've also been successfully added to a Halite hackathon",
-                account_error: "Error: Sorry, something went wrong. Please fix any form fields with issues or you can submit a bot now and edit your profile later to fix remaining issues.",
-                sucess_message: '',
-                error_string: '',
-            };
+              label: item[1].name,
+              value: item[0],
+              type: item[1].type
+            }
+          })
+
+          new_regions.unshift({
+            value: 'NONE',
+            code: 'NONE',
+            label: '(would prefer not to disclose)'
+          })
+
+          return new_regions
+        }
+      },
+      methods: {
+        submit: function () {
+          let request = {
+            'level': this.level,
+            'organization_id': this.organization === 'NONE' ? null : this.organization
+          }
+
+          if (this.country_code !== '') {
+            const codes = {}
+
+            // Build conversion table of 2-char country code to 3-char
+            for (let code3 of Object.keys(iso3166.codes)) {
+              codes[iso3166.codes[code3]] = code3
+            }
+
+            request['country_code'] = this.country_code.value
+            if (this.country_region_code !== '') {
+              request['country_subdivision_code'] = this.country_region_code.value
+            }
+          }
+
+          if (this.level !== 'High School' && this.email) {
+            request['email'] = this.email
+          }
+
+          // verify email
+          if (request['organization_id'] && (this.email === '')) {
+            this.error = 'Email is required'
+            return false
+          }
+
+          const register = () => {
+            api.register_me(request).then((success) => {
+              if (request['organization_id']) {
+                this.sucess_message = this.verify_sent + '\n' + this.account_success
+              } else {
+                this.sucess_message = this.account_success
+              }
+              Alert.show(this.sucess_message, 'success')
+              this.gaData('account', 'new-account-success', 'account-flow')
+              setTimeout(() => {
+                window.location.replace('/learn-programming-challenge')
+              }, 3000)
+            }, (error) => {
+              Alert.show(error.responseJSON.message, 'error')
+              this.gaData('account', 'new-account-error', 'account-flow')
+            })
+          }
+
+          if (this.hackathonCode) {
+            api.registerHackathon(this.hackathon_code).then((success) => {
+              register()
+            }, (error) => {
+              this.error = error.responseJSON.message
+            })
+          } else {
+            register()
+          }
         },
-        computed: {
-            regions: function() {
-                const regions = Object.entries(iso3166.data[this.country_code.code].sub);
-
-                const codes = [];
-
-                regions.sort(function(region1, region2) {
-                    const name1 = region1[1].name;
-                    const name2 = region2[1].name;
-                    if (name1 < name2) {
-                        return -1;
-                    }
-                    else if (name1 === name2) {
-                        return 0;
-                    }
-                    else {
-                        return 1;
-                    }
-                });
-
-                const new_regions = regions.map((item) => {
-                    return {
-                        label: item[1].name,
-                        value: item[0],
-                        type: item[1].type
-                    }
-                });
-
-                new_regions.unshift({
-                    value: "NONE",
-                    code: "NONE",
-                    label: "(would prefer not to disclose)",
-                });
-
-                return new_regions;
-            },
-        },
-        methods: {
-            submit: function() {
-                let request = {
-                    "level": this.level,
-                    "organization_id": this.organization === "NONE" ? null : this.organization,
-                };
-
-                if (this.country_code !== "") {
-                    const codes = {};
-
-                    // Build conversion table of 2-char country code to 3-char
-                    for (let code3 of Object.keys(iso3166.codes)) {
-                        codes[iso3166.codes[code3]] = code3;
-                    }
-
-                    request["country_code"] = this.country_code.value;
-                    if (this.country_region_code !== "") {
-                        request["country_subdivision_code"] = this.country_region_code.value;
-                    }
-                }
-
-                if (this.level !== "High School" && this.email) {
-                    request["email"] = this.email;
-                }
-
-                // verify email
-                if (request["organization_id"] && (this.email === '')){
-                    this.error = "Email is required";
-                    return false;
-                }
-
-                const register = () => {
-                    api.register_me(request).then((success) => {
-                        if(request["organization_id"]){
-                            this.sucess_message =  this.verify_sent + "\n" + this.account_success;
-                        }
-                        else{
-                            this.sucess_message = this.account_success;
-                        }
-                        Alert.show(this.sucess_message, 'success');
-                        this.gaData('account','new-account-success','account-flow')
-                        setTimeout(() => {
-                            window.location.replace("/learn-programming-challenge");
-                        }, 3000);
-                    }, (error) => {
-                        Alert.show(error.responseJSON.message, 'error');
-                        this.gaData('account','new-account-error','account-flow');
-                    });
-                };
-
-                if (this.hackathonCode) {
-                    api.registerHackathon(this.hackathon_code).then((success) => {
-                        register();
-                    }, (error) => {
-                        this.error = error.responseJSON.message;
-                    });
-                }
-                else {
-                    register();
-                }
-            },
-            gaData: function(category, action, label) {
-                utils.gaEvent(category, action, label);
-            },
-        },
-        mounted: function() {
-            api.me().then((me) => {
-               if (me && !me.is_new_user) {
-                   window.location.replace("/user?me");
-               }
-               else{
-                    this.gaData('account','click-submit-new-account','account-flow');
-               }
-            });
-        },
+        gaData: function (category, action, label) {
+          utils.gaEvent(category, action, label)
+        }
+      },
+      mounted: function () {
+        api.me().then((me) => {
+          if (me && !me.is_new_user) {
+            window.location.replace('/user?me')
+          } else {
+            this.gaData('account', 'click-submit-new-account', 'account-flow')
+          }
+        })
+    }
     }
 </script>
 

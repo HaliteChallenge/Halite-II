@@ -7,28 +7,28 @@
 
 <script>
   export default{
-    name: "home",
+    name: 'home',
     props: {
-      "message": {
+      'message': {
         type: String,
-        default: "",
+        default: ''
       },
-      "type": {
+      'type': {
         type: String,
-        default: "success",
+        default: 'success'
       }
     },
-    data: function(){
+    data: function () {
       return {
         show: true
       }
     },
     methods: {
-      disable: function(){
-        this.show = false;
+      disable: function () {
+        this.show = false
       }
     }
-  }  
+  }
 </script>
 <style lang="scss" scoped>
   .ha-alert{

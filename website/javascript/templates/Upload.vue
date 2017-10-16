@@ -21,31 +21,31 @@
 </template>
 
 <script>
-    import * as api from "../api";
-    import UploadZone from "./UploadZone.vue";
+    import * as api from '../api'
+import UploadZone from './UploadZone.vue'
 
-    export default {
-        name: "uploader",
-        components: {
-            "halite-upload-zone": UploadZone,
-        },
-        props: ["loggedIn"],
-        data: function() {
-            return {
-                error: null,
-                is_uploading: false,
-                progress: 0,
-                baseUrl: _global.baseUrl
-            };
-        },
-        methods: {
-            upload_bot: function(files) {
-                if (files.length > 0) {
-                    this.$parent.botFile = files[0];
-                    this.$parent.currentView = 'botUpload';
-                }
-            }
-        },
+export default {
+      name: 'uploader',
+      components: {
+        'halite-upload-zone': UploadZone
+      },
+      props: ['loggedIn'],
+      data: function () {
+        return {
+          error: null,
+          is_uploading: false,
+          progress: 0,
+          baseUrl: _global.baseUrl
+        }
+  },
+      methods: {
+        upload_bot: function (files) {
+          if (files.length > 0) {
+            this.$parent.botFile = files[0]
+            this.$parent.currentView = 'botUpload'
+          }
+        }
+      }
     }
 </script>
 

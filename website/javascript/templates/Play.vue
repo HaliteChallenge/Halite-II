@@ -85,33 +85,33 @@
   </div>
 </template>
 <script>
-  import * as api from "../api";
-  import Vue from 'vue';
-  import HaliteBreadcrumb from './Breadcrumb.vue';
-  import VisualizerContainer from "./VisualizerContainer.vue";
-  import * as libhaliteviz from "../../../libhaliteviz";
-  import Upload from "./Upload.vue";
-  import BotUpload from "./BotUpload.vue";
-  import Message from "./Message.vue";
-  import {Alert} from "../utils.js";
-  import UploadZone from "./UploadZone.vue";
-  import Visualizer from "./Visualizer.vue";
-  import * as utils from "../utils";
-  
-  // showing game 
-  let visualizer = null;
-  const showGame = (game) => {
+  import * as api from '../api'
+import Vue from 'vue'
+import HaliteBreadcrumb from './Breadcrumb.vue'
+import VisualizerContainer from './VisualizerContainer.vue'
+import * as libhaliteviz from '../../../libhaliteviz'
+import Upload from './Upload.vue'
+import BotUpload from './BotUpload.vue'
+import Message from './Message.vue'
+import {Alert} from '../utils.js'
+import UploadZone from './UploadZone.vue'
+import Visualizer from './Visualizer.vue'
+import * as utils from '../utils'
+
+// showing game 
+let visualizer = null
+const showGame = (game) => {
     if (visualizer && visualizer.getVisualizer) {
-      visualizer.getVisualizer().destroy();
-    }
+      visualizer.getVisualizer().destroy()
+  }
 
-    const buffer = game.replay;
-    return libhaliteviz.parseReplay(buffer).then((replay) => {
-      let outerContainer = document.getElementById("halitetv-visualizer");
-      outerContainer.innerHTML = "";
+    const buffer = game.replay
+  return libhaliteviz.parseReplay(buffer).then((replay) => {
+      let outerContainer = document.getElementById('halitetv-visualizer')
+      outerContainer.innerHTML = ''
 
-      let container = document.createElement("div");
-      document.getElementById("halitetv-visualizer").appendChild(container);
+      let container = document.createElement('div')
+      document.getElementById('halitetv-visualizer').appendChild(container)
 
       new Vue({
         el: container,
@@ -119,43 +119,43 @@
           props: {
             replay: Object.freeze(replay),
             game: game.game,
-            makeUserLink: function(user_id) {
-              return `/user?user_id=${user_id}`;
+            makeUserLink: function (user_id) {
+              return `/user?user_id=${user_id}`
             },
-            getUserProfileImage: function(user_id) {
+            getUserProfileImage: function (user_id) {
               return api.get_user(user_id).then((user) => {
-                return api.make_profile_image_url(user.username);
-              });
-            },
+                return api.make_profile_image_url(user.username)
+              })
+            }
           }
         }),
-        mounted: function() {
-          visualizer = this.$children[0];
-        },
-      });
-    });
-  }
+        mounted: function () {
+          visualizer = this.$children[0]
+        }
+      })
+  })
+}
 
   export default {
-    name: "uploader",
-    props: ["baseUrl"],
+    name: 'uploader',
+    props: ['baseUrl'],
     components: {
-      "Upload": Upload,
-      "bot-upload": BotUpload,
-      "visualizer-container": VisualizerContainer,
-      "halite-upload-zone": UploadZone,
+      'Upload': Upload,
+      'bot-upload': BotUpload,
+      'visualizer-container': VisualizerContainer,
+      'halite-upload-zone': UploadZone,
       HaliteBreadcrumb
     },
-    data: function(){
+    data: function () {
       return {
         currentView: 'upload',
         replayFile: '',
-        botFile: {name: ""},
+        botFile: {name: ''},
         loggedIn: false,
         user: null,
         botsList: [],
         displayMessage: false,
-        message: "",
+        message: '',
         is_downloading: false,
         uploadProgress: null,
         uploadMessage: null,
@@ -167,77 +167,76 @@
         ]
       }
     },
-    mounted: function(){
+    mounted: function () {
       // logged in
       api.me().then((me) => {
         if (me !== null) {
-          this.loggedIn = true;
-          this.user = me;
+          this.loggedIn = true
+          this.user = me
           api.list_bots(me.user_id).then((bots) => {
-            this.botsList = bots;
-          });
-        }
-      });
-      
-      
-      // handle whole page drag and drop
-      const ins = this;
-      $('body').attr('draggable', 'true');
-      $('body').on('drop dragdrop',function(e){
-        // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
-
-        // verify if the dropzone is not the bot uploader zone
-        if (!container || !container.contains(e.target)){
-          e.preventDefault();
-          ins.play_replay(e.originalEvent.dataTransfer.files);
-        }
-      });
-      $('body').on('dragenter',function(e){
-        // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
-        if (!container || !container.contains(e.target)){
-          event.preventDefault();
+            this.botsList = bots
+          })
         }
       })
-      $('body').on('dragover',function(e){
+  
+      // handle whole page drag and drop
+      const ins = this
+      $('body').attr('draggable', 'true')
+      $('body').on('drop dragdrop', function (e) {
         // get the bot uploader container
-        const container = document.getElementById('bot-upload-container');
-        if (!container || !container.contains(e.target)){
-          event.preventDefault();
+        const container = document.getElementById('bot-upload-container')
+
+        // verify if the dropzone is not the bot uploader zone
+        if (!container || !container.contains(e.target)) {
+          e.preventDefault()
+          ins.play_replay(e.originalEvent.dataTransfer.files)
         }
-      });
-    },
+      })
+      $('body').on('dragenter', function (e) {
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container')
+        if (!container || !container.contains(e.target)) {
+          event.preventDefault()
+        }
+      })
+      $('body').on('dragover', function (e) {
+        // get the bot uploader container
+        const container = document.getElementById('bot-upload-container')
+        if (!container || !container.contains(e.target)) {
+          event.preventDefault()
+        }
+      })
+  },
     methods: {
-      showMessage: function(type = 'success', content){
+      showMessage: function (type = 'success', content) {
         Alert.show(content, type)
       },
-      play_replay: function(files) {
-        this.gaData('play','select-replay-file-another','replay-flow')
+      play_replay: function (files) {
+        this.gaData('play', 'select-replay-file-another', 'replay-flow')
         if (files.length > 0) {
-          const reader = new FileReader();
-          const inst = this;
+          const reader = new FileReader()
+          const inst = this
           reader.onload = (e) => {
-            inst.is_upload = false;
-            inst.currentView = 'replay';
-            inst.replayFile = files[0].name;
+            inst.is_upload = false
+            inst.currentView = 'replay'
+            inst.replayFile = files[0].name
             window.location.hash = '/replay-bot'
-            inst.message = "Parsing replay, please wait…";
+            inst.message = 'Parsing replay, please wait…'
             showGame({
               game: null,
-              replay: e.target.result,
+              replay: e.target.result
             }).then(() => {
-              this.message = null;
+              this.message = null
             }).catch(() => {
-              this.message = "There was an error parsing the replay. Please let us know at halite@halite.io.";
-            });
-          };
-          reader.readAsArrayBuffer(files[0]);
+              this.message = 'There was an error parsing the replay. Please let us know at halite@halite.io.'
+            })
+          }
+          reader.readAsArrayBuffer(files[0])
         }
       },
-      gaData: function(category, action, label) {
-        utils.gaEvent(category, action, label);
-      },
+      gaData: function (category, action, label) {
+        utils.gaEvent(category, action, label)
+      }
     }
   }
 </script>

@@ -14,18 +14,18 @@
     </div>
 </template>
 <script>
- import Vue from "vue";
+ import Vue from 'vue'
 
- export default {
-     props: ['selectedPoint'],
-     computed: {
-         info: function(){
-             const info = {
-                 location: `${this.selectedPoint.x.toFixed(4)}, ${this.selectedPoint.y.toFixed(4)}`,
-             };
+export default {
+   props: ['selectedPoint'],
+   computed: {
+     info: function () {
+       const info = {
+         location: `${this.selectedPoint.x.toFixed(4)}, ${this.selectedPoint.y.toFixed(4)}`
+       }
 
-             return info;
-         }
+       return info
      }
+   }
  }
 </script>

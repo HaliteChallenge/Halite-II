@@ -21,26 +21,26 @@
 </template>
 
 <script>
-    import * as api from "../api";
+    import * as api from '../api'
 
-    export default {
-        name: "ApiKey",
-        data: function() {
-            return {
-                api_key: "",
-            };
-        },
-        methods: {
-            fetch: function(e) {
-                e.preventDefault();
-                api.reset_api_key().then((data) => {
-                    this.api_key = data.api_key;
-                }, (e) => {
-                    console.error(e);
-                    this.api_key = "Error: could not reset API key.";
-                });
-            },
-        },
+export default {
+      name: 'ApiKey',
+      data: function () {
+        return {
+          api_key: ''
+        }
+  },
+      methods: {
+        fetch: function (e) {
+          e.preventDefault()
+          api.reset_api_key().then((data) => {
+            this.api_key = data.api_key
+          }, (e) => {
+            console.error(e)
+            this.api_key = 'Error: could not reset API key.'
+          })
+        }
+      }
     }
 </script>
 

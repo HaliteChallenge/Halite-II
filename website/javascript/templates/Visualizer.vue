@@ -297,58 +297,57 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import * as api from "../api";
-  import * as libhaliteviz from "../../../libhaliteviz";
-  import * as utils from "../utils";
-  import moment from 'vue-moment';
-  import vueSlider from 'vue-slider-component';
-  import PlayerStatsPane from "./PlayerStatsPane.vue";
-  import PlayerDetailPane from "./PlayerDetailPane.vue";
-  import PlayerLineChart from "./PlayerLineChart.vue";
-  import SelectedPlanet from "./SelectedPlanet.vue";
-  import SelectedShip from "./SelectedShip.vue";
-  import SelectedPoint from "./SelectedPoint.vue";
-  import TierPopover from './TierPopover.vue';
-  import {tierClass} from "../utils";
-  import _ from "lodash";
+  import Vue from 'vue'
+import * as api from '../api'
+import * as libhaliteviz from '../../../libhaliteviz'
+import * as utils from '../utils'
+import moment from 'vue-moment'
+import vueSlider from 'vue-slider-component'
+import PlayerStatsPane from './PlayerStatsPane.vue'
+import PlayerDetailPane from './PlayerDetailPane.vue'
+import PlayerLineChart from './PlayerLineChart.vue'
+import SelectedPlanet from './SelectedPlanet.vue'
+import SelectedShip from './SelectedShip.vue'
+import SelectedPoint from './SelectedPoint.vue'
+import TierPopover from './TierPopover.vue'
+import {tierClass} from '../utils'
+import _ from 'lodash'
 
-  const speedList =  {
+const speedList = {
     1: '&frac12x',
     2: '1x',
     4: '2x',
     6: '3x',
     8: '4x',
-    10: '5x',
-  };
-
-  // libhaliteviz.setAssetRoot("/assets/js/");
-  const HaliteVisualizer = libhaliteviz.HaliteVisualizer;
-
-  // just for electron
-  if (window && window.process && window.process.type){
-      libhaliteviz.setAssetRoot("assets/js/");
+    10: '5x'
   }
-  else{
-      libhaliteviz.setAssetRoot("/assets/js/");
-  }
+
+// libhaliteviz.setAssetRoot("/assets/js/");
+const HaliteVisualizer = libhaliteviz.HaliteVisualizer
+
+// just for electron
+if (window && window.process && window.process.type) {
+    libhaliteviz.setAssetRoot('assets/js/')
+} else {
+    libhaliteviz.setAssetRoot('/assets/js/')
+}
   const loadGame = (game) => {
-    const buffer = game.replay;
-    return libhaliteviz.parseReplay(buffer)
+    const buffer = game.replay
+  return libhaliteviz.parseReplay(buffer)
   }
 
   export default {
     name: 'haliteTV',
     props: ['game', 'replay', 'makeUserLink', 'getUserProfileImage'],
-    data: function(){
+    data: function () {
       return {
         baseUrl: '',
         frame: 0,
         time: 0,
         playing: false,
-        showObjectPanel: sessionStorage.getItem('halite-showMapObjectPanel') === 'false'? false : true,
-        showPlayerDetailPanel: sessionStorage.getItem('halite-showPlayerDetailPanel') === 'true'? true : false,
-        showChartPanel: sessionStorage.getItem('halite-showChartPanel') === 'true'? true : false,
+        showObjectPanel: sessionStorage.getItem('halite-showMapObjectPanel') !== 'false',
+        showPlayerDetailPanel: sessionStorage.getItem('halite-showPlayerDetailPanel') === 'true',
+        showChartPanel: sessionStorage.getItem('halite-showChartPanel') === 'true',
         speedIndex: 3,
         speedLabel: '3x',
         stats: null,
@@ -359,7 +358,7 @@
           id: 0,
           owner: '',
           x: 0,
-          y: 0,
+          y: 0
         },
         sliderOptions: {
           min: 0,
@@ -367,8 +366,8 @@
           sliderStyle: {
             backgroundColor: '#E6AB00',
             top: 0,
-            width: "6px",
-            height: "6px",
+            width: '6px',
+            height: '6px',
             left: '4px'
           },
           processStyle: {
@@ -398,137 +397,136 @@
       SelectedPoint,
       TierPopover
     },
-    mounted: function(){
-      this.getSortedPlayers();
+    mounted: function () {
+      this.getSortedPlayers()
       this.sliderOptions = Object.assign(this.sliderOptions, {
         max: this.replay.num_frames - 1,
         value: this.frame
-      });
+      })
 
-      const visualizer = new HaliteVisualizer(this.replay);
-      const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed');
-      if(storedSpeedIndex) {
-        const speedIndex = parseInt(storedSpeedIndex);
-        this.speedIndex = speedIndex;
-        const value = Object.keys(speedList)[speedIndex];
-        const label = speedList[value];
-        this.speedLabel = label;
-        visualizer.playSpeed = value;
+      const visualizer = new HaliteVisualizer(this.replay)
+      const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
+      if (storedSpeedIndex) {
+        const speedIndex = parseInt(storedSpeedIndex)
+        this.speedIndex = speedIndex
+        const value = Object.keys(speedList)[speedIndex]
+        const label = speedList[value]
+        this.speedLabel = label
+        visualizer.playSpeed = value
       } else {
-        visualizer.playSpeed = 6;
+        visualizer.playSpeed = 6
       }
-      this.stats = visualizer.stats;
+      this.stats = visualizer.stats
 
       visualizer.onUpdate = () => {
-        this.frame = visualizer.frame;
-        this.time = visualizer.time;
-      };
+        this.frame = visualizer.frame
+        this.time = visualizer.time
+      }
       visualizer.onPlay = () => {
-        this.playing = true;
-      };
+        this.playing = true
+      }
       visualizer.onPause = () => {
-        this.playing = false;
-      };
+        this.playing = false
+      }
       visualizer.onSelect = (kind, args) => {
-        this.selected.kind = kind;
-        this.selected.id = args.id;
-        this.selected.owner = args.owner;
-        this.selected.x = args.x;
-        this.selected.y = args.y;
-        this.showObjectPanel = true;
-        visualizer.onUpdate();
-        this.$forceUpdate();
-        this.gaData('visualizer', 'click-map-objects','gameplay')
-      };
-      visualizer.attach('.game-replay-viewer');
+        this.selected.kind = kind
+        this.selected.id = args.id
+        this.selected.owner = args.owner
+        this.selected.x = args.x
+        this.selected.y = args.y
+        this.showObjectPanel = true
+        visualizer.onUpdate()
+        this.$forceUpdate()
+        this.gaData('visualizer', 'click-map-objects', 'gameplay')
+      }
+      visualizer.attach('.game-replay-viewer')
       // play the replay
-      visualizer.play();
+      visualizer.play()
 
       // action
       this.playVideo = (e) => {
-        if(visualizer) {
-          if(this.frame >= this.replay.num_frames - 1) {
-            visualizer.frame = 0;
-            visualizer.time = 0.0;
-            this.frame = 0;
-            this.time = 0.0;
+        if (visualizer) {
+          if (this.frame >= this.replay.num_frames - 1) {
+            visualizer.frame = 0
+            visualizer.time = 0.0
+            this.frame = 0
+            this.time = 0.0
           }
-          visualizer.play();
-          this.gaData('visualizer', 'click-play','gameplay')
+          visualizer.play()
+          this.gaData('visualizer', 'click-play', 'gameplay')
         }
       }
       this.pauseVideo = (e) => {
-        if(visualizer) {
-          visualizer.pause();
+        if (visualizer) {
+          visualizer.pause()
         }
 
-        this.gaData('visualizer', 'click-pause','gameplay')
+        this.gaData('visualizer', 'click-pause', 'gameplay')
       }
       this.toggleSpeed = (e) => {
         // set speed
-        this.speedIndex++;
-        if (this.speedIndex >= Object.keys(speedList).length ) this.speedIndex = 0;
+        this.speedIndex++
+        if (this.speedIndex >= Object.keys(speedList).length) this.speedIndex = 0
 
-        const value = Object.keys(speedList)[this.speedIndex];
-        const label = speedList[value];
-        this.speedLabel = label;
+        const value = Object.keys(speedList)[this.speedIndex]
+        const label = speedList[value]
+        this.speedLabel = label
 
-        if(visualizer) {
-          visualizer.playSpeed = value;
+        if (visualizer) {
+          visualizer.playSpeed = value
         }
 
-        this.gaData('visualizer', 'click-speed','gameplay')
+        this.gaData('visualizer', 'click-speed', 'gameplay')
 
-        sessionStorage.setItem('halite-replaySpeed', this.speedIndex);
+        sessionStorage.setItem('halite-replaySpeed', this.speedIndex)
       }
-      this.prevFrame = () =>{
-        if (visualizer && this.frame > 0){
-          visualizer.scrub(this.frame + -1, 0);
+      this.prevFrame = () => {
+        if (visualizer && this.frame > 0) {
+          visualizer.scrub(this.frame + -1, 0)
         }
 
-        this.gaData('visualizer', 'click-back','gameplay')
+        this.gaData('visualizer', 'click-back', 'gameplay')
       }
       this.nextFrame = () => {
-        if (visualizer && this.frame < this.replay.num_frames - 1){
-          visualizer.scrub(this.frame + 1, 0);
+        if (visualizer && this.frame < this.replay.num_frames - 1) {
+          visualizer.scrub(this.frame + 1, 0)
         }
 
-        this.gaData('visualizer', 'click-forward','gameplay')
+        this.gaData('visualizer', 'click-forward', 'gameplay')
       }
       this.changeFrame = (event) => {
         // waiting for the slider dot finish to move
         setTimeout(() => {
-          if (visualizer){
-            visualizer.scrub(this.frame, 0);
+          if (visualizer) {
+            visualizer.scrub(this.frame, 0)
           }
-        }, 200);
+        }, 200)
 
-        this.gaData('visualizer', 'click-slider','gameplay')
+        this.gaData('visualizer', 'click-slider', 'gameplay')
       }
     },
     computed: {
-      statistics: function(){
-        let count = {};
+      statistics: function () {
+        let count = {}
 
         if (!this.shipsProduced) {
-
-          this.shipsProduced = [];
+          this.shipsProduced = []
           for (let frame of this.replay.frames) {
-            let thisFrame = { 0: 3, 1: 3, 2: 3, 3: 3 };
+            let thisFrame = { 0: 3, 1: 3, 2: 3, 3: 3 }
             if (this.shipsProduced.length > 0) {
-              thisFrame[0] = this.shipsProduced[this.shipsProduced.length - 1][0];
-              thisFrame[1] = this.shipsProduced[this.shipsProduced.length - 1][1];
-              thisFrame[2] = this.shipsProduced[this.shipsProduced.length - 1][2];
-              thisFrame[3] = this.shipsProduced[this.shipsProduced.length - 1][3];
+              thisFrame[0] = this.shipsProduced[this.shipsProduced.length - 1][0]
+              thisFrame[1] = this.shipsProduced[this.shipsProduced.length - 1][1]
+              thisFrame[2] = this.shipsProduced[this.shipsProduced.length - 1][2]
+              thisFrame[3] = this.shipsProduced[this.shipsProduced.length - 1][3]
             }
             if (frame.events) {
               for (let event of frame.events) {
-                if (event.event === "spawned") {
-                  thisFrame[event.entity.owner]++;
+                if (event.event === 'spawned') {
+                  thisFrame[event.entity.owner]++
                 }
               }
             }
-            this.shipsProduced.push(thisFrame);
+            this.shipsProduced.push(thisFrame)
           }
         }
 
@@ -538,231 +536,229 @@
             planets: 0,
             shipsRate: 0,
             planetsRate: 0,
-            shipsProduced: this.shipsProduced[this.frame][i],
-          };
+            shipsProduced: this.shipsProduced[this.frame][i]
+          }
         }
 
         let frame = this.replay.frames[this.frame]
         for (let owner of Object.keys(frame.ships)) {
-          count[owner].ships += Object.values(frame.ships[owner]).length;
+          count[owner].ships += Object.values(frame.ships[owner]).length
         }
 
         for (let planet of Object.values(frame.planets)) {
           if (planet.owner !== null) {
-            count[planet.owner].planets++;
+            count[planet.owner].planets++
           }
         }
         // total
-        let total = {ships: 0, planets: 0};
-        for (let item of Object.values(count)){
-          total.ships += item.ships;
-          total.planets += item.planets;
+        let total = {ships: 0, planets: 0}
+        for (let item of Object.values(count)) {
+          total.ships += item.ships
+          total.planets += item.planets
         }
 
-        for (let owner in Object.keys(count)){
-          count[owner].shipsRate = total.ships == 0 ? 0 : count[owner].ships/total.ships;
-          count[owner].planetsRate = total.planets == 0 ? 0 : count[owner].planets/total.planets;
+        for (let owner in Object.keys(count)) {
+          count[owner].shipsRate = total.ships == 0 ? 0 : count[owner].ships / total.ships
+          count[owner].planetsRate = total.planets == 0 ? 0 : count[owner].planets / total.planets
         }
 
-        return count;
+        return count
       },
-      chartData: function(){
+      chartData: function () {
         let output = {
           production: [],
           health: [],
           damage: [],
           attack: [],
           ship: []
-        };
+        }
 
         try {
           if (!this.stats || !this.stats.frames || !this.stats.frames.length || !this.stats.frames[0].players) return output
           for (let _pIndex in this.stats.frames[0].players) {
-            let playerP = [];
-            let playerS = [];
-            let playerH = [];
-            let playerD = [];
-            let playerA = [];
+            let playerP = []
+            let playerS = []
+            let playerH = []
+            let playerD = []
+            let playerA = []
             this.stats.frames.forEach((_frame, _fIndex) => {
-              const lastProd = _fIndex > 0 ? playerP[_fIndex-1].y : 0;
-              playerP.push({x: _fIndex, y: _frame.players[_pIndex].currentProductions + lastProd});
-              playerS.push({x: _fIndex, y: _frame.players[_pIndex].totalShips});
-              playerH.push({x: _fIndex, y: _frame.players[_pIndex].totalHealths});
-              playerD.push({x: _fIndex, y: _frame.players[_pIndex].totalDamages});
-              playerA.push({x: _fIndex, y: _frame.players[_pIndex].totalAttacks});
-            });
-            output.ship.push(playerS);
-            output.production.push(playerP);
-            output.health.push(playerH);
-            output.damage.push(playerD);
-            output.attack.push(playerA);
+              const lastProd = _fIndex > 0 ? playerP[_fIndex - 1].y : 0
+              playerP.push({x: _fIndex, y: _frame.players[_pIndex].currentProductions + lastProd})
+              playerS.push({x: _fIndex, y: _frame.players[_pIndex].totalShips})
+              playerH.push({x: _fIndex, y: _frame.players[_pIndex].totalHealths})
+              playerD.push({x: _fIndex, y: _frame.players[_pIndex].totalDamages})
+              playerA.push({x: _fIndex, y: _frame.players[_pIndex].totalAttacks})
+            })
+            output.ship.push(playerS)
+            output.production.push(playerP)
+            output.health.push(playerH)
+            output.damage.push(playerD)
+            output.attack.push(playerA)
           }
-          return output;
-        } catch(e) {
+          return output
+        } catch (e) {
           console.error(e)
           return output
         }
       },
-      selectedPlanet: function(){
-        if (this.selected.kind === "planet") {
-          let frame = this.replay.frames[this.frame];
-          let state = frame.planets[this.selected.id];
+      selectedPlanet: function () {
+        if (this.selected.kind === 'planet') {
+          let frame = this.replay.frames[this.frame]
+          let state = frame.planets[this.selected.id]
           if (state) {
             return {
               base: this.replay.planets[this.selected.id],
               state: state
-            };
+            }
           }
         }
-        return null;
+        return null
       },
-      selectedShip: function(){
-        if (this.selected.kind === "ship") {
-          let frame = this.replay.frames[this.frame];
-          let state = frame.ships[this.selected.owner][this.selected.id];
+      selectedShip: function () {
+        if (this.selected.kind === 'ship') {
+          let frame = this.replay.frames[this.frame]
+          let state = frame.ships[this.selected.owner][this.selected.id]
 
           if (state) {
-            return state;
+            return state
           }
         }
-        return null;
+        return null
       },
-      selectedPoint: function(){
-        if (this.selected.kind === "point") {
-          return this.selected;
+      selectedPoint: function () {
+        if (this.selected.kind === 'point') {
+          return this.selected
         }
-        return null;
+        return null
       },
-      shareLink: function(){
+      shareLink: function () {
         // const game_id = this.game.game_id;
         // const replay_class = this.game.game.replay_class;
         // const replay = this.game.game.replay;
-        return window.location.href;
-        // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
+        return window.location.href
+      // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       }
     },
     methods: {
-      userlink: function(user_id){
-        if (user_id){
-          return `/user/?user_id=${user_id}`;
+      userlink: function (user_id) {
+        if (user_id) {
+          return `/user/?user_id=${user_id}`
         } else {
-          return '';
+          return ''
         }
       },
       tierClass: tierClass,
-      getPlayers: async function(){
-        if (!this.replay) return [];
+      getPlayers: async function () {
+        if (!this.replay) return []
 
-        let ranks = this.replay.stats;
+        let ranks = this.replay.stats
 
         for (let id of Object.keys(this.replay.stats)) {
-          ranks[id].index = parseInt(id);
-          ranks[id].botname = this.replay.player_names[id];
-          ranks[id].name = this.getPlayerName(this.replay.player_names[id]);
+          ranks[id].index = parseInt(id)
+          ranks[id].botname = this.replay.player_names[id]
+          ranks[id].name = this.getPlayerName(this.replay.player_names[id])
           if (this.game) {
-            let player = {};
+            let player = {}
             Object.getOwnPropertyNames(this.game.players).map(userId => {
-              if(this.game.players[userId].player_index == id) {
-                player = this.game.players[userId];
-                player.id = userId;
+              if (this.game.players[userId].player_index == id) {
+                player = this.game.players[userId]
+                player.id = userId
               }
             })
-            ranks[id].version = player.version_number;
-            ranks[id].id = player.id;
+            ranks[id].version = player.version_number
+            ranks[id].id = player.id
             const user = await api.get_user(player.id)
-            ranks[id].tier = user.tier;
-          }
-          else {
-            const version = ranks[id].botname.match(/v(\d+)$/, "$1");
+            ranks[id].tier = user.tier
+          } else {
+            const version = ranks[id].botname.match(/v(\d+)$/, '$1')
             if (version) {
-              ranks[id].version = version[1];
-            }
-            else {
-                ranks[id].version = null;
+              ranks[id].version = version[1]
+            } else {
+              ranks[id].version = null
             }
           }
         }
-        return Object.values(ranks);
+        return Object.values(ranks)
       },
-      getSortedPlayers: async function(){
-        const players = await this.getPlayers();
-        this.players = players;
-        this.sortedPlayers =  _.sortBy(players, ['rank']);
+      getSortedPlayers: async function () {
+        const players = await this.getPlayers()
+        this.players = players
+        this.sortedPlayers = _.sortBy(players, ['rank'])
 
-        const selectedPlayers = [];
-        this.players.forEach(function(item, index){
-          selectedPlayers[index] = true;
-        });
-        this.selectedPlayers = selectedPlayers;
+        const selectedPlayers = []
+        this.players.forEach(function (item, index) {
+          selectedPlayers[index] = true
+        })
+        this.selectedPlayers = selectedPlayers
       },
-      getPlayerName: function(botname){
-        return botname.replace(/\sv\d+$/, '');
+      getPlayerName: function (botname) {
+        return botname.replace(/\sv\d+$/, '')
       },
-      playVideo: function(event) {
+      playVideo: function (event) {
       },
-      pauseVideo: function(event){
+      pauseVideo: function (event) {
       },
-      toggleSpeed: function(event) {
+      toggleSpeed: function (event) {
       },
-      prevFrame: function(){
+      prevFrame: function () {
       },
-      nextFrame: function(){
+      nextFrame: function () {
       },
-      changeFrame: function(event){
+      changeFrame: function (event) {
       },
-      toggleObjectPanel: function(e) {
-        this.showObjectPanel = !this.showObjectPanel;
-        sessionStorage.setItem('halite-showMapObjectPanel', this.showObjectPanel.toString());
+      toggleObjectPanel: function (e) {
+        this.showObjectPanel = !this.showObjectPanel
+        sessionStorage.setItem('halite-showMapObjectPanel', this.showObjectPanel.toString())
       },
-      togglePlayerPanel: function(e) {
-        this.showPlayerDetailPanel = !this.showPlayerDetailPanel;
-        sessionStorage.setItem('halite-showPlayerDetailPanel', this.showPlayerDetailPanel.toString());
+      togglePlayerPanel: function (e) {
+        this.showPlayerDetailPanel = !this.showPlayerDetailPanel
+        sessionStorage.setItem('halite-showPlayerDetailPanel', this.showPlayerDetailPanel.toString())
       },
-      toggleChartPanel: function(e) {
-        this.showChartPanel = !this.showChartPanel;
-        sessionStorage.setItem('halite-showChartPanel', this.showChartPanel.toString());
-        this.initChart();
+      toggleChartPanel: function (e) {
+        this.showChartPanel = !this.showChartPanel
+        sessionStorage.setItem('halite-showChartPanel', this.showChartPanel.toString())
+        this.initChart()
       },
-      initChart: function() {
+      initChart: function () {
         if (this.showChart) return
         setTimeout(() => this.showChart = true, 500)
       },
-      gaData: function(category, action, label) {
-        utils.gaEvent(category, action, label);
+      gaData: function (category, action, label) {
+        utils.gaEvent(category, action, label)
       },
-      toggleShare: function(){
-        this.sharePopup = !this.sharePopup;
+      toggleShare: function () {
+        this.sharePopup = !this.sharePopup
       },
-      shareSocial: function(social){
-        let text = "Halite Game Replay - ";
-        let tags = "halitegame";
-        switch (social){
+      shareSocial: function (social) {
+        let text = 'Halite Game Replay - '
+        let tags = 'halitegame'
+        switch (social) {
           case 'facebook':
-            return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href);
-          break;
+            return 'https://www.facebook.com/sharer.php?u=' + encodeURIComponent(window.location.href)
+            break
           case 'twitter':
-            return 'https://twitter.com/intent/tweet?text=' + text + "&url=" + encodeURIComponent(window.location.href) + "&hashtags=" + tags + "&via=haliteAI";
-          break;
-          case 'linkedin': 
-            return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`;
-          break;
+            return 'https://twitter.com/intent/tweet?text=' + text + '&url=' + encodeURIComponent(window.location.href) + '&hashtags=' + tags + '&via=haliteAI'
+            break
+          case 'linkedin':
+            return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
+            break
         }
       },
       /**
        * @param  {e} event
        * @return {void}
        */
-      copyToClipboard: function(e){
-        if (e) e.preventDefault();
-        this.$refs.shareInput.select();
-        document.execCommand('copy');
+      copyToClipboard: function (e) {
+        if (e) e.preventDefault()
+        this.$refs.shareInput.select()
+        document.execCommand('copy')
       },
-      toggleSelectedPlayer: function(id){
-        this.selectedPlayers[id] = !this.selectedPlayers[id];
-        this.$refs.chart1.refreshGraph();
-        this.$refs.chart2.refreshGraph();
-        this.$refs.chart3.refreshGraph();
-        this.$refs.chart4.refreshGraph();
+      toggleSelectedPlayer: function (id) {
+        this.selectedPlayers[id] = !this.selectedPlayers[id]
+        this.$refs.chart1.refreshGraph()
+        this.$refs.chart2.refreshGraph()
+        this.$refs.chart3.refreshGraph()
+        this.$refs.chart4.refreshGraph()
       }
     }
   }

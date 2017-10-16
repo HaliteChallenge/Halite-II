@@ -127,31 +127,31 @@
 </template>
 
 <script>
-   import * as api from "../api";
-   import * as utils from "../utils";
+   import * as api from '../api'
+import * as utils from '../utils'
 
-   export default {
-       name: "leagues",
-       props: ['baseUrl'],
-       data: function() {
-           const me = api.me_cached();
-           let me_in = false;
-           if (me) {
-               return {
-                   me_in: true,
-               };
-           }
-           return {
-               me_in
-           };
-       },
-       mounted: function() {
-       },
-       methods: {
-           gaData: function(category, action, label) {
-             utils.gaEvent(category, action, label);
-           }
-       },
+export default {
+     name: 'leagues',
+     props: ['baseUrl'],
+     data: function () {
+       const me = api.me_cached()
+       let me_in = false
+       if (me) {
+         return {
+           me_in: true
+         }
+       }
+       return {
+         me_in
+       }
+  },
+     mounted: function () {
+     },
+     methods: {
+       gaData: function (category, action, label) {
+         utils.gaEvent(category, action, label)
+       }
+     }
    }
 </script>
 

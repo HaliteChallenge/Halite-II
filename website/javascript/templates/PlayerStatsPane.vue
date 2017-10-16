@@ -32,23 +32,21 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import * as api from "../api";
-  import * as libhaliteviz from "../../../libhaliteviz";
+  import Vue from 'vue'
+import * as api from '../api'
+import * as libhaliteviz from '../../../libhaliteviz'
 
-
-  export default {
+export default {
     name: 'PlayerStatsPane',
     props: ['players', 'statistics'],
-    mounted: function(){
+    mounted: function () {
     },
     methods: {
-      isActive: function(i, rate){
-        return i <= rate * 20 ? true : false;
+      isActive: function (i, rate) {
+        return i <= rate * 20
       }
     }
   }
-
 </script>
 
 <style>

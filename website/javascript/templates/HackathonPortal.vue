@@ -72,15 +72,15 @@
 </template>
 
 <script>
-import * as api from "../api";
-import moment from 'moment';
-import * as utils from "../utils";
+import * as api from '../api'
+import moment from 'moment'
+import * as utils from '../utils'
 
 const hackathonTemplate = {
   pin: 'New York City',
   time: 'August 3-5',
-  group: 'Open to all',
-};
+  group: 'Open to all'
+}
 
 const eventTemplate = {
   text: 'Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because…',
@@ -90,60 +90,57 @@ const eventTemplate = {
 }
 
 export default {
-  name: "HackathonPortal",
+  name: 'HackathonPortal',
   props: ['baseUrl'],
-  data: function() {
+  data: function () {
     return {
       showEvents: false,
-      events: [],
-    };
+      events: []
+    }
   },
-  mounted: function() {
+  mounted: function () {
     api.me().then(me => {
-      let userId = null;
+      let userId = null
       if (me !== null) {
-        userId = me.user_id;
+        userId = me.user_id
       }
-      if(userId) {
+      if (userId) {
         api.getUserHackathons(userId).then(hackathons => {
-         this.populateHackathons(hackathons);
+          this.populateHackathons(hackathons)
         })
-      }
-      else
-      {
-         api.getHackathons().then(hackathons => {
-         this.populateHackathons(hackathons);
+      } else {
+        api.getHackathons().then(hackathons => {
+          this.populateHackathons(hackathons)
         })
       }
     })
   },
   methods: {
-    populateHackathons: function(hackathons)
-    {
-      if(hackathons && hackathons instanceof Array) {
-            const wrapEvent = [];
-            hackathons.map(hackathon => {
-              const newEvent = Object.assign({}, eventTemplate, {
-                img: hackathon.thumbnail,
-                pin: hackathon.location,
-                title: hackathon.title,
-                text: hackathon.description,
-                id: hackathon.hackathon_id,
-                status: hackathon.status,
-                start_date: moment(hackathon.start_date).format('MMMM Do'),
-                end_date: moment(hackathon.end_date).format('MMMM Do')
-              })
-              wrapEvent.push(newEvent);
-            });
+    populateHackathons: function (hackathons) {
+      if (hackathons && hackathons instanceof Array) {
+        const wrapEvent = []
+        hackathons.map(hackathon => {
+          const newEvent = Object.assign({}, eventTemplate, {
+            img: hackathon.thumbnail,
+            pin: hackathon.location,
+            title: hackathon.title,
+            text: hackathon.description,
+            id: hackathon.hackathon_id,
+            status: hackathon.status,
+            start_date: moment(hackathon.start_date).format('MMMM Do'),
+            end_date: moment(hackathon.end_date).format('MMMM Do')
+          })
+          wrapEvent.push(newEvent)
+        })
 
-            this.events = wrapEvent;
-          }
-          this.showEvents = true;
+        this.events = wrapEvent
+      }
+      this.showEvents = true
     },
-    gaData: function(category, action, label) {
-      utils.gaEvent(category, action, label);
-    },
-  },
+    gaData: function (category, action, label) {
+      utils.gaEvent(category, action, label)
+    }
+  }
 }
 </script>
 

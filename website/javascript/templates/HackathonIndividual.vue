@@ -128,12 +128,12 @@
 </template>
 
 <script>
-  import * as api from "../api";
-  import HaliteBreadcrumb from './Breadcrumb.vue';
-  import Leaderboard from './HackathonLeaderboard.vue';
-  import moment from 'moment';
+  import * as api from '../api'
+import HaliteBreadcrumb from './Breadcrumb.vue'
+import Leaderboard from './HackathonLeaderboard.vue'
+import moment from 'moment'
 
-  const mockHackathon = {
+const mockHackathon = {
     title: 'Cornell Virtual Halite Hackathon',
     date: 'November 1 - 2017',
     time: 'Hack night: November 12, 6-9 PM',
@@ -141,9 +141,9 @@
     description: `<p>Welcome to the Cornell Virtual Halite Hackathon and On-Campus Hack Night! You\'ve found this page because you\'ve been chosen - someone believes you\'d be game to practice some programming, build AI bots, and conquer the universe.</p>
     <p>This is one of our 29 campus hackathons across the US and beyond. Any student whose bots beat our challenge bots are automatically qualified for an interview with Two Sigma - you can learn about Two Sigma Careers here. The top two or three participants of this hackathon, assuming they beat our qualifier bots, will be invited to New York City for a one-day multi-school bot-building tournament. You can read more about our intern recruiting here.</p>
     <p>For you folks at Cornell, we're going to be hosting a three-hour hack night to really get things going. November 12, 6-9pm. This is a great chance to really dive into how to play Halite, meet some folks from Two Sigma, and ramp up your game.</p> `
-  };
+  }
 
-  export default {
+export default {
     name: 'HackathonIndividual',
     props: {
       baseUrl: {
@@ -156,11 +156,11 @@
       Leaderboard
     },
     data: function () {
-      let detailExpanded = true;
-      let joinExpanded = true;
-      if($(window).width() < 768){
-        detailExpanded = false;
-        joinExpanded = false;
+      let detailExpanded = true
+      let joinExpanded = true
+      if ($(window).width() < 768) {
+        detailExpanded = false
+        joinExpanded = false
       }
       return {
         hackathon_id: null,
@@ -177,62 +177,60 @@
       }
     },
     mounted: function () {
-      const params = new URLSearchParams(window.location.search);
-      this.hackathon_id = params.get("hackathon_id");
+      const params = new URLSearchParams(window.location.search)
+      this.hackathon_id = params.get('hackathon_id')
 
       const getHackathonPromise = () => {
         if (this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
-            const beginDate = moment(hackathon.start_date).format("MMM Do, YYYY: HH:MM");
-            const endDate = moment(hackathon.end_date).format("MMM Do, YYYY: HH:MM");
+            const beginDate = moment(hackathon.start_date).format('MMM Do, YYYY: HH:MM')
+            const endDate = moment(hackathon.end_date).format('MMM Do, YYYY: HH:MM')
             this.hackathon = Object.assign(mockHackathon, {
               title: hackathon.title,
               date: `${beginDate} to ${endDate}`,
               description: hackathon.description,
               pin: hackathon.location,
               img: `${this.baseUrl}/assets/images/temp/hackathon.png`
-            });
-            this.isInHackathon = true;
+            })
+            this.isInHackathon = true
             if (this.isInHackathon) {
-              if($(window).width() < 768){
-                this.detailExpanded = false;
-                this.joinExpanded = false;
-              }else{
-                let detailExpanded = window.sessionStorage['detailExpanded'] === 'true' ? true : false;
-                let joinExpanded = window.sessionStorage['joinExpanded'] === 'true' ? true : false;
-                this.detailExpanded = false || detailExpanded;
-                this.joinExpanded = false || joinExpanded;
+              if ($(window).width() < 768) {
+                this.detailExpanded = false
+                this.joinExpanded = false
+              } else {
+                let detailExpanded = window.sessionStorage['detailExpanded'] === 'true'
+                let joinExpanded = window.sessionStorage['joinExpanded'] === 'true'
+                this.detailExpanded = false || detailExpanded
+                this.joinExpanded = false || joinExpanded
               }
             }
-            let title = _.chain(hackathon.title).toLower().split(' ').join('-').value();
-            window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
-            return Promise.resolve();
+            let title = _.chain(hackathon.title).toLower().split(' ').join('-').value()
+            window.history.replaceState(null, '', `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`)
+            return Promise.resolve()
           }, (xhr) => {
-            this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`});
-            let title = _.chain(this.hackathon.title).toLower().split(' ').join('-').value();
-            window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
-            this.path.push({name: this.hackathon.title, link: 'javascript:;'});
-          });
+            this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`})
+            let title = _.chain(this.hackathon.title).toLower().split(' ').join('-').value()
+            window.history.replaceState(null, '', `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`)
+            this.path.push({name: this.hackathon.title, link: 'javascript:;'})
+          })
         } else {
-          return Promise.resolve();
+          return Promise.resolve()
         }
       }
       api.me().then((me) => {
         getHackathonPromise().then(() => {
-          this.path.push({name: this.hackathon.title, link: 'javascript:;'});
+          this.path.push({name: this.hackathon.title, link: 'javascript:;'})
         })
-      });
-
-
-    },
+      })
+  },
     methods: {
       toggleObjectPanel: function (item) {
-        this[item] = !this[item];
+        this[item] = !this[item]
         if (this.isInHackathon) {
-          window.sessionStorage[item] = this[item].toString();
+          window.sessionStorage[item] = this[item].toString()
         }
-      },
-    },
+      }
+    }
   }
 </script>
 

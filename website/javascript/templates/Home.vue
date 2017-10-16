@@ -321,75 +321,72 @@
 </template>
 
 <script>
-   import * as api from "../api";
-   import * as utils from "../utils";
+   import * as api from '../api'
+import * as utils from '../utils'
 
-   export default {
-       name: "home",
-       props: ['baseUrl'],
-       data: function() {
-           const me = api.me_cached();
-           let me_in = false;
-           if (me) {
-               return {
-                   me_in: true,
-               };
-           }
-           return {
-               me_in,
-               loginServerUrl:`${api.LOGIN_SERVER_URL}/github`,
-           };
+export default {
+     name: 'home',
+     props: ['baseUrl'],
+     data: function () {
+       const me = api.me_cached()
+       let me_in = false
+       if (me) {
+         return {
+           me_in: true
+         }
+       }
+       return {
+         me_in,
+         loginServerUrl: `${api.LOGIN_SERVER_URL}/github`
+       }
+  },
+     mounted: function () {
+       this.createRedditWidget()
+     },
+     methods: {
+       invite: function () {
+         gaData('invite', 'click-to-invite', 'home')
+         if (!document.getElementById('intmpid').checkValidity()) {
+           document.getElementById('invitestatus').style.color = 'red'
+           document.getElementById('invitestatus').textContent = 'Invalid email..'
+           gaData('invite-error', 'click-to-invite', 'home')
+         } else {
+           let content = document.getElementById('intmpid').value
+           api.invitefriend(content).then(status => {
+             document.getElementById('invitestatus').style.color = 'green'
+             document.getElementById('invitestatus').textContent = 'Invitation sent...'
+             gaData('invite-success', 'click-to-invite', 'home')
+           })
+         }
        },
-       mounted: function() {
-         this.createRedditWidget();
+       signup: () => {
+         let docWidth = $(document).width()
+         if (docWidth <= 768) {
+           $('.mobile-strict-container').css('visibility', 'visible')
+         } else {
+           window.location.replace(`${api.LOGIN_SERVER_URL}/github`)
+         }
        },
-       methods: {
-           invite: function() {
-                gaData('invite','click-to-invite', 'home')
-                if(!document.getElementById("intmpid").checkValidity())
-                {
-                    document.getElementById("invitestatus").style.color = "red"
-                    document.getElementById("invitestatus").textContent = "Invalid email.."
-                    gaData('invite-error','click-to-invite', 'home')
-                }
-                else
-                {
-                    let content = document.getElementById("intmpid").value
-                    api.invitefriend(content).then(status => {
-                        document.getElementById("invitestatus").style.color = "green"
-                        document.getElementById("invitestatus").textContent = "Invitation sent..."
-                        gaData('invite-success','click-to-invite', 'home')
-                    })
-                }
-           },
-           signup: ()=>{
-                let docWidth = $(document).width();
-                if(docWidth <= 768){
-                    $('.mobile-strict-container').css('visibility', 'visible');
-                }else{
-                    window.location.replace(`${api.LOGIN_SERVER_URL}/github`);
-                }
-           },
-           createRedditWidget: function() {
-             let s = document.createElement('script'),
-             content = '';
+       createRedditWidget: function () {
+         let s = document.createElement('script'),
+           content = ''
 
-             s.src = 'https://www.reddit.com/domain/halite.io/hot/.embed?limit=5&t=all';
+         s.src = 'https://www.reddit.com/domain/halite.io/hot/.embed?limit=5&t=all'
 
-             document.write = function(s) {
-                 content += s;
-             };
+         document.write = function (s) {
+           content += s
+         }
 
-             s.onload = function(){
-                 document.getElementById('redditWidget').innerHTML = content;
-             };
+         s.onload = function () {
+           document.getElementById('redditWidget').innerHTML = content
+         }
 
-             document.getElementsByTagName('head')[0].appendChild(s);
-           },
-           gaData: function(category, action, label) {
-             utils.gaEvent(category, action, label);
-           }
+         document.getElementsByTagName('head')[0].appendChild(s)
        },
+       gaData: function (category, action, label) {
+         utils.gaEvent(category, action, label)
+       }
+     }
    }
 </script>
 

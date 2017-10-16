@@ -27,23 +27,22 @@
 </template>
 
 <script>
-
     export default {
-        name: "halite-upload-zone",
-        props: ["title", "message", "icon", "description", "progress", "progressBar","buttonText"],
-        data: function() {
-            return {
-                drag_over: false,
-            };
-        },
-        methods: {
-            on_changed: function(event) {
-                this.drag_over = false;
-                this.$emit("change",
-                    Array.prototype.slice.call(event.target.files));
-                event.target.value = null;
-            }
-        },
+      name: 'halite-upload-zone',
+      props: ['title', 'message', 'icon', 'description', 'progress', 'progressBar', 'buttonText'],
+      data: function () {
+        return {
+          drag_over: false
+        }
+  },
+      methods: {
+        on_changed: function (event) {
+          this.drag_over = false
+          this.$emit('change',
+            Array.prototype.slice.call(event.target.files))
+          event.target.value = null
+        }
+      }
     }
 </script>
 

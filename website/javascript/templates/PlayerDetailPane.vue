@@ -18,28 +18,28 @@
 </template>
 
 <script>
-  import Vue from "vue";
+  import Vue from 'vue'
 
-  export default{
+export default{
     name: 'PlayerDetailPane',
     props: ['replay', 'frame', 'stats', 'statistics'],
-    data: function(){
-      return{
+    data: function () {
+      return {
         player_names: this.replay.player_names
       }
     },
-    mounted: function(){
+    mounted: function () {
     },
     computed: {
-      playerInfo: function(){
-        if (!this.stats) return null;
+      playerInfo: function () {
+        if (!this.stats) return null
 
-        return this.stats.frames[this.frame].players;
+        return this.stats.frames[this.frame].players
       }
     },
     methods: {
-      numberSep: function(number) {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      numberSep: function (number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       }
     }
   }

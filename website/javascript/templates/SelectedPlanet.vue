@@ -34,15 +34,15 @@
 </div>
 </template>
 <script>
-  import Vue from "vue";
-  import {isUndefined, isNull} from "lodash";
+  import Vue from 'vue'
+import {isUndefined, isNull} from 'lodash'
 
-  export default {
+export default {
     props: ['selectedPlanet', 'players'],
     computed: {
-      info: function(){
-        const base = this.selectedPlanet.base;
-        const state = this.selectedPlanet.state;
+      info: function () {
+        const base = this.selectedPlanet.base
+        const state = this.selectedPlanet.state
 
         const info = {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
@@ -51,9 +51,9 @@
           dockingSpots: base.docking_spots,
           health: state.health,
           radius: Math.round(base.r * 100) / 100
-        };
+        }
 
-        return info;
+        return info
       }
     }
   }
