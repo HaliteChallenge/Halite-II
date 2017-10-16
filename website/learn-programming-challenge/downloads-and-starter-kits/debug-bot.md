@@ -1,7 +1,9 @@
 ---
 layout: doc_page
 title: Debug your bot
-toc: false
+description: Overview of how to debug common issues with bots including compilation and timeout failures.
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 4
 ---
 The are primarily 3 different kinds of issues you will run into after your bot submission.

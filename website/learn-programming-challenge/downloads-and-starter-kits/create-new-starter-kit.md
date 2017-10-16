@@ -2,94 +2,51 @@
 layout: doc_page
 title: Create a new starter kit
 toc: false
-description: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
+description: Overview of how to create a starter kit for Halite
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 5
 ---
 
-In this tutorial, we’ll add a couple heuristics to the basic bot. This will hopefully help you understand Halite II better and set you on your way to dominating the universe.
+## API Design
 
-## Prerequisites for Tutorial
+Please try to generally adhere to the API used in [Python3 starter kit](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3). This is as follows:
 
-Make sure you have read our [basic instructions]({{ site.baseurl }}/learn-programming-challenge/) and followed the steps to download your bot. Also, make sure you [understand the basic bot structure](understand_your_bot.md)
-Now open the `MyBot.py` file in your favorite editor and let’s get started!
+- game([Name of bot]): Initializes the game
+- game.update_map(): Get latest map per turn
+- game.all_ships(): All ships
+- game.all_planets(): All planets
+- game.[me].all_planets(): Get all planets for the player
+- game.[me].all_ships(): Get all planets for the player
+- planet entity: All properties of a planet
+- ship entity: All properties of a ship
+- ship.navigate(): Given a planet, ship or location navigate to that location avoiding collisions (best effort)
+- game.send_command_queue(): Send commands to the game engine
 
-## Improving the bot
+Of course, if changes to this API will make the starter package fit more nicely into your language, feel free to make them. A Java API will not translate directly into Lisp nicely.
 
-### Go to the closest planets first
+## Networking Overview
+Bots communicate with the environment via stdin and stdout using series of space separated integers. There are two stages of communication - initialization and turn formats, and these are detailed below.
 
-We can sort the planets by distance before iterating over them. The faster we can get to a planet and dock, the faster we'll get new ships to command.
+### Initialization
+At the beginning of the game, bot is sent the following, with each item newline-terminated:
 
-```python
-planets = game_map.planets.values()
-sort_key = lambda planet: hlt.distance(ship, planet)
-for planet in sorted(planets, key=sort_key):
-```
+- A single integer representing their own tag within the game.
+- Two integers representing the WIDTH and HEIGHT of the map.
+- The initial game map.
+- Every bot is expected to respond with a string representing their name (newline-terminated) within 30 seconds.
 
-### Skip a planet if no resources left
+### Turn
+Every turn, every bot is sent the the present game map (newline-terminated). Every bot is expected to respond with a set of moves (newline-terminated) within 2 seconds.
 
-While we can win by trying to own every planet on the map, it's easier if we don't waste any ships docking to planets without resources unless we're specifically going for that strategy.
+### Game map format
 
-```python
-if planet.owned or planet.remaining_production == 0:
-    continue
-```
+### Move command format
 
-### Undock ships that are docked to planets with no more resources
+### Dock command format
 
-Similarly, if a ship is just hanging out at an empty planet, we might as well undock it and use it.
+### Submitting your new starter kit
 
-```python
-if ship.docked == "docked" and game_map.planets[ship.planet].remaining_production == 0:
-    command_queue.append(hlt.undock(ship))
-    continue
-```
+Fork our [repo](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3), place your starter package in the `airesources/` folder, and send us a pull request! If we accept your PR, your starter package will be added to the site.
 
-### Fly Faster
-
-When using `move_to`, instead of hardcoding a thrust, we can specify that the thrust is equal to the drag force, which is the fastest we can move without having to deal with inertia.
-
-```python
-command_queue.append(hlt.move_to(ship, angle, hlt.GameConstants.DRAG))
-```
-
-Remember, drag is applied at the end of the turn, so if you accelerate by less than or equal to the drag force, then at the end of the turn, drag will take over, and you won't have any momentum carry over into next turn.
-
-### Use warp!
-
-Warp lets us move far more quickly, allowing us to be more offensive and caputure territory more quickly. In Python, it also performs collision avoidance (this feature coming to other starter kits soon).
-
-To use warp, there's a bit of setup needed. First off, it takes over control of the ship for you while the ship is warping---so before issuing commands to any ship, make sure it's not warping!
-
-```python
-if hlt.is_warping(ship):
-    continue
-```
-
-Next, make sure to update the warps each turn. Before issuing your commands, just call the update function, which returns a list of commands to issue to warping ships. Extend your command list with this list so that the commands make it to your ships.
-
-```python
-command_queue.extend(hlt.update_warps())
-hlt.send_command_queue(command_queue)
-```
-
-Finally, make sure to actually use warp! `warp` takes a target coordinate, not an angle and thrust. We'll use the `closest_point_to` helper function, which returns the coordinates that are 1) at a given distance from a target and 2) closest to the given source.
-
-```python
-# Find the coordinates which are DOCK_RADIUS units away
-# from the planet surface and as close to possible to
-# the ship.
-target_x, target_y = hlt.closest_point_to(
-    ship, planet, r=hlt.GameConstants.DOCK_RADIUS)
-```
-
-Then, if the ship is far away from the planet, we warp to the target coordinates instead.
-
-```python
-if hlt.can_dock(ship, planet):
-    command_queue.append(hlt.dock(ship, planet))
-elif distance > 10:
-    hlt.warp(ship, target_x, target_y)
-else:
-    command_queue.append(hlt.move_to(ship, angle, 1))
-```
-
+Note: please include the runGame.sh and runGame.bat scripts, you can look at the Python stater kit for inspiration.

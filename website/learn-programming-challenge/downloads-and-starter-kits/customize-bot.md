@@ -1,7 +1,9 @@
 ---
 layout: doc_page
 title: Customize your bot
-toc: false
+description: Overview of how to customize your bot submission with dependencies, language names and more.
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 3
 ---
 
