@@ -30,7 +30,7 @@ If you submit a second bot, we do not reset your score to zero (as we did in Hal
 In Halite 1, submitting a new version of a bot would reset that bot's rank. In Halite 2, we decided against this. Since we wanted to provide GPU resources, but limit them to certain top bots, resetting ranks would effectively mean that no bot would ever be able to take advantage of the GPU---since submitting a GPU-enabled bot would reset its rank and deny it access. Furthermore, for top players, this caused some volatility towards the end, as submitting a new bot would mean re-climbing the leaderboard.
 
 ## TIERS
-We assign you a tier based on your current rank.  Tiers are by percentile: the top 1/512 players are considered Platinum; the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Salt. You will move from tier to tier as your rank changes.
+We assign you a tier based on your current rank.  Tiers are by percentile: the top 1/512 players are considered Diamond; the next 1/256 are considered Platinum, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Salt. You will move from tier to tier as your rank changes.
 
 ## FINALS
 At midnight on January 22nd, we will close submissions and let the final bots play each other for the last week of January. We will announce final winners on January 29th based on the final scores at that point in time and will freeze scores. We may also decide that Salt level bots (or any other bot) will stop playing earlier than 29th if we need the bandwidth to play more games for top bots in the last few days. Stay tuned for updates.
