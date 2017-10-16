@@ -142,9 +142,8 @@
                                                     <a v-for="player in game.playerSorted"
                                                     :href="'/user?user_id=' + player.id"
                                                     class="game-participant"
-                                                    v-bind:class="{ 'timed-out': player.timed_out }"
-                                                    :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
-                                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                    :title="usernames[player.id] + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
+                                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
                                                         <span class="rank">
                                                             {{ player.rank }}
                                                         </span>
