@@ -1,8 +1,9 @@
 ---
 layout: doc_page
 title: System Requirements
-toc: false
 description: System requirements to play Halite
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 1
 ---
 These are the browsers and operating systems we have tested Halite on, and we will continue to support these during the competition. If you run into any issues with Halite that are due to incompatibilities with your operating system or browser, do let us know at [halite@halite.io](mailto:halite@halite.io). 

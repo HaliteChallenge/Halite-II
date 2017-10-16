@@ -1,11 +1,11 @@
 ---
 layout: doc_page
-title: Submitting a Bot
+title: Customize your bot
 toc: false
 sort_key: 3
 ---
 
-You submit a zip file containing your MyBot file and any other files needed to compile and run your MyBot file.
+## Customize your bot
 
 ## Installing Dependencies
 
@@ -21,6 +21,7 @@ The following package managers are already installed on the server and can be us
 - `python3.6 -m pip` (Python 3.6)
 - `virtualenv`
 - `npm`
+- `cargo`
 
 `curl` and `wget` are also available and can be used to download additional runtimes, tools, and environments.
 
@@ -30,13 +31,13 @@ If you are using `pip`, then make sure to use the `--system` flag with the `--ta
 
 ## Preinstalled Libraries
 
-For convenience's sake, we include tensorflow, keras (using a tensorflow backend), numpy, scipy, scikit-learn, pillow, and h5py on our game servers. Just import these libraries from your python files like normal!
+For convenience's sake, we include tensorflow, keras (using a tensorflow backend), numpy, scipy, scikit-learn, pillow and h5py on our game servers. Just import these libraries from your python files like normal.
 
 ## Compilation
 
 Bot compilation is done using [this autocompile script][autocompiler]. Many languages will be properly autodetected and compiled if needed without the need for an install.sh script.
 
-Your main file must be called MyBot. Your language is recognized using the file extension of your MyBot file. The appropriate file extensions for each language are:
+Your main file must be called `MyBot.*` Your language is recognized using the file extension of your MyBot file. The appropriate file extensions for each language are:
 
 - Java - .java
 - Python - .py
@@ -62,7 +63,7 @@ If you are using a language that is generic or that does not have first class su
 
 For JVM languages, you can submit a jar file inside of your zip file instead of source files. The jar will be executed java -jar MyBot.jar so you need to define a Main-Class header in the manifest.
 
-## Running
+## Custom run script
 
 You may supply a run.sh script to control how your bot is run. Many languages will be properly autodetected and run without the need for an install.sh script. You should only include a custom run.sh script if you have a real need for one.
 
@@ -70,12 +71,4 @@ You may supply a run.sh script to control how your bot is run. Many languages wi
 
 You could use a run.sh file to use a custom runtime such as PyPy instead of the default Python 3.
 
-## Understanding Game Logs
 
-<!-- TODO: this needs to be rewritten -->
-
-When your bot times out or errors on our game servers, we save and display a log file with debugging information including the time your bot took each turn, its output each turn, and its final output from stdout and stderr.
-
-To find these log files, visit your homepage. Just click the download log button to grab your error log for a game.
-
-[autocompiler]: https://github.com/HaliteChallenge/Halite/blob/master/worker/compiler.py
