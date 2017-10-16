@@ -1,6 +1,6 @@
     <li class="{% if include.level.index.url == page.url %}active{% endif %} toc-group">
         <i class="xline xline-top"></i>
-        <span><span>{{ include.level.name }}</span></span>
+        <a href="{{ include.level.index.url }}"><span>{{ include.level.name }}</span></a>
         <ul class="sub-list-ha">
             {% for subpage in include.level.pages %}
             <li class="{% if subpage.url == page.url %}active{% endif %}">

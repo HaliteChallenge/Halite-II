@@ -16,37 +16,39 @@ Downloads include both the compiled Halite game environment and the starter kit 
 
 __Linux users:__ Your system must support GCC 4.9 or later (with corresponding GLIBC).
 
-<table class="table">
-    <thead>
-        <tr>
-            <td></td>
-            <th colspan="{{ site.data.downloads.platforms | size }}" class="text-center">Operating System</th>
-        </tr>
-        <tr>
-            <th>Language</th>
-            {% for platform in site.data.downloads.platforms %}
-            <td>{{ platform }}</td>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <td></td>
+                <th colspan="{{ site.data.downloads.platforms | size }}" class="text-center">Operating System</th>
+            </tr>
+            <tr>
+                <th>Language</th>
+                {% for platform in site.data.downloads.platforms %}
+                <td>{{ platform }}</td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for language in site.data.downloads.languages %}
+            <tr>
+                <td>{{ language.language }}</td>
+                {% for file in language.files %}
+                <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for language in site.data.downloads.languages %}
-        <tr>
-            <td>{{ language.language }}</td>
-            {% for file in language.files %}
-            <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-        <tr>
-            <td>Only Game Environment</td>
-            <td>NA</td>
-            {% for file in site.data.downloads.environments %}
-            <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
-            {% endfor %}
-        </tr>
-    </tbody>
-</table>
+            <tr>
+                <td>Only Game Environment</td>
+                <td>NA</td>
+                {% for file in site.data.downloads.environments %}
+                <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 ## Download The Halite Source Code
 

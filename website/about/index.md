@@ -47,7 +47,7 @@ Many have contributed to Halite since Ben and Michael’s invention; in addition
 
 <div class="ha-button-container btn-center">
     <div>
-        <a class="ha-button" href="/"><span>GET STARTED</span></a>
+        <a class="ha-button" href="/learn-programming-challenge"><span>GET STARTED</span></a>
     </div>
 </div>
 

@@ -188,6 +188,17 @@
       }
     }
   }
+
+  .leaderboard-table {
+    > tbody > tr > td {
+      vertical-align: middle;
+    }
+  }
+
+  .tier-td > span {
+    display: block;
+    height: 24px;
+  }
 }
 
 .leaderboard-summary{

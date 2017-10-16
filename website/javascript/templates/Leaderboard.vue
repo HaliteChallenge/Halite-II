@@ -67,7 +67,7 @@
     </div>
     <div v-if="leaderboard.length > 0">
       <div class="table-container">
-        <table class="table table-leader">
+        <table class="table table-leader leaderboard-table">
           <thead>
           <tr>
             <th class="text-center">Rank</th>
@@ -91,7 +91,7 @@
               </a>
             </td>
             <td>{{ Math.round(100 * player.score) / 100 }}</td>
-            <td class="text-center">
+            <td class="text-center tier-td">
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
             </td>
             <td>{{ player.level }}</td>
@@ -125,7 +125,8 @@
 </template>
 
 <script>
-  import * as api from '../api'
+
+import * as api from '../api'
 import HalitePagination from './Pagination.vue'
 import TierPopover from './TierPopover.vue'
 import {tierClass, countries_data} from '../utils'
@@ -523,6 +524,7 @@ export default {
           leaderboard.forEach(function (user, index) {
             instance.users.push(user.username)
           })
+          
           instance.users.sort()
 
           // save the users
@@ -546,38 +548,39 @@ export default {
               this.page = Math.ceil(gotoIndex / this.limit)
             }
           }
-
-          this.update_filter(true)
+          
+          this.update_filter(true, true);
         }
 
-        let leaderboard
-        if (this.lbFromContainer) {
-          leaderboard = this.lbFromContainer
-          handleLeaderboard(leaderboard)
+        let leaderboard;
+        if(this.lbFromContainer) {
+          leaderboard = this.lbFromContainer;
+          handleLeaderboard(leaderboard);
         } else {
           api.leaderboard([], this.hackathonId, 0, 99999).then(leaderboard => {
-            handleLeaderboard(leaderboard)
-          })
+            handleLeaderboard(leaderboard);
+          });
         }
       },
 
-      update_filter: function (updatePageNumber = false) {
-        const filters = this.build_filter()
+      update_filter: function(updatePageNumber = false, defaultFilter = false){
+        const filters = this.build_filter();
 
-        if (updatePageNumber) {
-          if (this.all_leaderboards) {
-            this.lastPage = Math.ceil(this.all_leaderboards.length / this.limit)
+        if(updatePageNumber) {
+          if(this.all_leaderboards && defaultFilter) {
+            this.lastPage = Math.ceil(this.all_leaderboards.length / this.limit);
           } else {
             api.leaderboard(filters, this.hackathonId, 0, 999999).then(leaderboard => {
-              if (leaderboard && leaderboard instanceof Array) {
-                this.lastPage = Math.ceil(leaderboard.length / this.limit)
+              if(leaderboard && leaderboard instanceof Array) {
+                this.lastPage = Math.ceil(leaderboard.length / this.limit);
               }
-            })
+            });
           }
+          
         }
 
         const handleLeaderboard = leaderboard => {
-          this.leaderboard = leaderboard
+          this.leaderboard = leaderboard;
           // scroll to user
           if (this.show_user) {
             setTimeout(() => {
@@ -588,13 +591,13 @@ export default {
             }, 1000)
           }
         }
-
-        if (this.all_leaderboards) {
-          handleLeaderboard(this.all_leaderboards.slice((this.page - 1) * this.limit, this.page * this.limit))
+        
+        if(this.all_leaderboards && defaultFilter) {
+          handleLeaderboard(this.all_leaderboards.slice((this.page - 1) * this.limit, this.page * this.limit));
         } else {
           api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
-            handleLeaderboard(leaderboard)
-          })
+            handleLeaderboard(leaderboard);
+          });
         }
       },
 

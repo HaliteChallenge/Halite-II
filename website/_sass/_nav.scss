@@ -84,16 +84,16 @@
       content: "\25CF";
       position: absolute;
       left: -20px;
-      top: 7px;
+      top: 1px;
       color: $foreground;
     }
     a{
       display: block;
-      font-size: 14px;
+      font-size: 13px;
       color: $foreground;
       letter-spacing: 1px;
       padding: 5px 0;
-      text-transform: none;
+      text-transform: uppercase;
       text-decoration: none;
     }
     &.active a, &.active:before{

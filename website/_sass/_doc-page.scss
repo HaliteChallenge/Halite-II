@@ -100,7 +100,9 @@
       color: #44a3e2;
     }
   }
-
+  h2{
+    text-transform: uppercase;
+  }
   .btn-center{
     margin-left: 50%;
     transform: translateX(-50%);
@@ -131,5 +133,10 @@
       font-size: 1.8rem;
       font-style: normal;
     }
+  }
+}
+.static-container{
+  img{
+    max-width: 100%;
   }
 }
