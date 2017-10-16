@@ -4,7 +4,7 @@ import Message from './templates/Message.vue'
 import Vue from 'vue'
 
 export function tierClass (tier) {
-  const lvl = { 'Salt': 5, 'Silver': 4, 'Gold': 3, 'Platinum': 2, 'Diamond': 1 }
+  const lvl = { 'Bronze': 5, 'Silver': 4, 'Gold': 3, 'Platinum': 2, 'Diamond': 1 }
   if (tier in lvl) {
     return 'icon-tier-' + lvl[tier]
   } else {

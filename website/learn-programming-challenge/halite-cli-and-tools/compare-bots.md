@@ -33,6 +33,6 @@ You need to have the appropriate Halite executable for your operating system ava
 **Python Example:** 
 <pre>
   <code class="apache hljs">
-    ./compare.sh "python3 ../bv1/MyBot.py"  "python3 ../bv2/MyBot.py" "../halite" "240 160"
+    ./compare_bots.sh "python3 ../v1/MyBot.py"  "python3 ../v2/MyBot.py" "../halite" "240 160"
   </code>
 </pre>

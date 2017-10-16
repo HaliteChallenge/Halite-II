@@ -105,7 +105,7 @@ TIER_2_NAME = "Gold"
 TIER_2_PERCENT = 1/128
 TIER_3_NAME = "Silver"
 TIER_3_PERCENT = 1/64
-TIER_4_NAME = "Salt"
+TIER_4_NAME = "Bronze"
 # What tier a player must be in to be eligible for GPUs
 GPU_TIER_NAME = TIER_2_NAME
 

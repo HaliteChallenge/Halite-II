@@ -527,7 +527,7 @@ def update_user_timeout(conn, game_id, user):
 
 def delete_old_games(users):
     """
-    Delete games older than 2 weeks for Salt-tier players.
+    Delete games older than 2 weeks for Bronze-tier players.
     """
     sqlfunc = sqlalchemy.sql.func
     with model.engine.connect() as conn:

@@ -20,7 +20,7 @@
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
-                    <h2><span :class="tierClass(user.tier || 'Salt')"></span> {{ user.rank ? `rank ${user.rank}` : "No Rank" }}, {{ user.tier || "Salt" }} tier</h2>
+                    <h2><span :class="tierClass(user.tier || 'Bronze')"></span> {{ user.rank ? `rank ${user.rank}` : "No Rank" }}, {{ user.tier || "Bronze" }} tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Points</h3>

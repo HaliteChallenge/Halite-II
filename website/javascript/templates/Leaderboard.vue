@@ -218,7 +218,7 @@ export default {
             label: 'Silver',
             value: 4
           }, {
-            label: 'Salt',
+            label: 'Bronze',
             value: 5
           }
         ],
