@@ -1,7 +1,6 @@
 ---
 layout: doc_page
 title: Create a new starter kit
-toc: false
 description: Overview of how to create a starter kit for Halite
 image: assets/images/temp/bot_1.png
 content: website

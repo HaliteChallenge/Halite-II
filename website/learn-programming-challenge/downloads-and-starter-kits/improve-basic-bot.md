@@ -2,6 +2,8 @@
 layout: doc_page
 title: Improve your basic bot
 description: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 6
 ---
 
