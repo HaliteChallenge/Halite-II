@@ -4,53 +4,51 @@ title: Learn How to Get Started with Halite
 breadcrumb: Learn
 toc: false
 menu: learn
-description: Welcome to the Halite II competition! Learn how to quickly get started downloading, building, and submitting and AI bot.
+description: Welcome to the Halite II competition! Learn how to quickly get started downloading, building, and submitting an AI bot.
 ---
 
-Welcome to the Halite II competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. We’ll walk you through a few first steps, but there are many more documents for you to explore as you get better and better at building Halite bots.
+Welcome to the Halite II competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. Let's get you set up!
 
-## 1) LOG IN
+## Getting started
+
+### 1) LOG IN
     
-The very first thing you need to do is [log in via Github][login] and fill out a bit more information for us to be able to make you a profile.
+First, you need to [log in via Github][login] and create a user profile.
 
-__Beta users:__ You can register using your personal GitHub email but please make sure to associate your Two Sigma email so we can add you to the Hackathon.
+### 2) WATCH A FEW GAMES
 
-## 2) WATCH A FEW GAMES
+Get a feel for how to play. Here's one of our favorites:
 
-Watch a few games to get a feel for how to play. You can go to the leaderboard, click on a user, and watch thier games.
+<img src="/assets/images/gifs/Oct-16-2017%2015-23-13%20intro.gif" alt="First Halite game video">
 
-You might also want to [browse the game rules], but it helps to watch some videos first.    
+[Watch the whole game here.][David game]
 
+To find more games, check out some user profiles, where you'll find recently played games.
 
-## 3) DOWNLOAD A BOT
+You might also want to [browse the game rules][game rules], but it helps to watch some videos first.  
 
-Now it's time to [download the game environment and starter kit][downloads] for your platform and language of choice. Choose your prefered language:
-    
-- Python
-- Java
-- C++
-    
-Don’t see your language yet? [Let us know][contact]. We'll have documents on how to make your own bot in the language of you choice in the near future. If you cant wait for our write-up, we would highly recommend that you take a look at the Python/Java Starter kit to get an idea of how to implement a starter kit.
+### 3) DOWNLOAD A BOT
+
+Now it's time to [download the game environment and starter kit][downloads] for your platform and language of choice. 
     
 The game environment and starter kit are bundled together, so you should be all set.
 
-## 4) VISUALIZE
+### 4) SUMBIT THE STARTER BOT
 
-Try running the bot with the provided `run_game.sh` or `run_game.bat` file. This will compile the bot and play it against itself automatically. When the game ends, it will produce a replay file (*.hlt) in the bot directory. Drag it to the [online visualizer][play] to see how the game went.
+A great way to get going with the game is to just go ahead and [submit][play] the starter bot you downloaded and then going to your [user profile][profile] to see how you've done.
 
-Make sure you have the tools you need to see if your bot is working as expected. You can also [upload a replay file][play] to see a game you played locally on your browser. 
-    
-## 5) PLAY
-When you're ready, having hopefully tweaked a few variables in the starter bot, you should [submit your bot][play]. You can learn more about [submission rules][submit] in our documentation. 
-
-Once the bot is done, you can see your results on on your user profile and/or you can [replay a file][play] and you’ll show up on the [leaderboard][leaderboard].
+We've created a lot of other documents for you to learn how to play Halite. If you've made it through all these steps, a great next resouce is our guide to [improving the basic bot][improve bot].
  
-May the best bot win!
+### May the best bot win!
 
 
 [login]: {{ site.login_server_url }}/github
-[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots
+[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits
 [contact]: {{ site.baseurl }}/about/contact-us
 [play]: {{ site.baseurl }}/play-programming-challenge
-[submit]: {{ site.baseurl }}/learn-programming-challenge/other-resources/submit
+[submit]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits/submit
 [leaderboard]: {{ site.baseurl }}/programming-competition-leaderboard
+[game rules]: {{ site.baseurl }}/learn-programming-challenge/game-rules
+[profile]: /user/?me
+[improve bot]: /learn-programming-competition/downloads-and-starter-kits/improve-basic-bot
+[david game]: /play/?game_id=1658857&replay_class=0&replay_name=replay-20171016-183304%2B0000--998929535-240-160-1508178764
