@@ -4,7 +4,6 @@ export const API_SERVER_URL = api_server_url;
 export const LOGIN_SERVER_URL = login_server_url;
 export const LOGOUT_SERVER_URL = logout_server_url;
 
-// TODO: also cache login in local cookie so we don't have to do so many round trips
 let cached_me = null;
 let logged_in = null;
 
@@ -43,7 +42,6 @@ export function me() {
         logged_in = true;
         return get_user(me.user_id).then((user) => {
             cached_me = user;
-            // TODO: invalidate this cache every so often
             window.localStorage["cache"] = Date.now();
             window.localStorage["user_id"] = user.user_id;
             window.localStorage["username"] = user.username;
