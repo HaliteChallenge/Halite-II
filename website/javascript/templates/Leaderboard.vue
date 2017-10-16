@@ -95,7 +95,7 @@
               <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
             </td>
             <td>{{ player.level }}</td>
-            <td class="text-center country-img-td">
+            <td class="text-center">
               <div>
                 <img v-if="getCountry(player.country)" :title="`${getCountryName(player.country)}`" :src="`${getCountry(player.country)}`" class="country-img">
               </div>
