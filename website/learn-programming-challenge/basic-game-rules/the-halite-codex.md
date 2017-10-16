@@ -4,7 +4,6 @@ title: The Halite Codex
 toc: false
 description: Background on the Halite game story from the Halatian general and lead scientist.
 sort_key: 3
-
 ---
  
 When last we met, Halite was fought in the trenches of a battlefield. The fearsome battle, fraught with peril, had left the planet desolate. All the Halite had been mined, and no clear winner had emerged. No faction wished to yield, knowing that he who controls the Halite controls all. Since then the people of the Halite have evolved beyond simple on-ground battlefields and are vying for true control of the universe. The war rages on, but whom of the Halatians shall prevail?
