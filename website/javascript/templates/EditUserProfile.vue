@@ -173,7 +173,6 @@
 
             // get current user
             api.me().then((me) => {
-                console.log(me);
                 // initialize the data
                 this.user = me;
                 this.level = me.level;
@@ -186,8 +185,6 @@
                 this.selected_region  = this.regions.find((item) =>{
                     return item.value == me.country_subdivision_code;
                 });
-
-                console.log(this.regions)
             })
         },
         computed: {
@@ -273,8 +270,6 @@
                 if (this.level !== "High School" && this.email) {
                     request["email"] = this.email;
                 }
-
-                console.log(request);
 
                 api.update_me(this.user.user_id, request).then(() => {
                     Alert.show('You have updated your profile successfully', 'success');

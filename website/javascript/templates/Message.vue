@@ -25,7 +25,6 @@
     },
     methods: {
       disable: function(){
-        console.log('hide message');
         this.show = false;
       }
     }

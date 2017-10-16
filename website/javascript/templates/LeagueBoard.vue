@@ -189,7 +189,6 @@
         // const country_options = [];
         const country_options = countries_data.filter((country) => {
           if (country_codes.indexOf(country['alpha-3']) !== -1){
-            console.log(country['alpha-3']);
           }
           return country_codes.indexOf(country['alpha-3']) != -1;
         }).map((country) => {
@@ -279,7 +278,6 @@
         let filters = [];
         let params = {};
 
-        console.log(this.leaguename);
         // adding the username filter
         if (this.leaguename) {
           params.leaguename = [];
@@ -338,7 +336,6 @@
           params['page'] = [this.page];
         }
 
-        console.log(params)
         // build params
         if (filters.length > 0 ){
           let query_string = [];
@@ -349,8 +346,7 @@
         } else {
           window.history.replaceState(null, null, window.location.pathname);
         }
-
-        console.log(filters)
+        
         return filters.length ? filters : null;
       },
 

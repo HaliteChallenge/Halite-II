@@ -724,12 +724,10 @@
         this.initChart();
       },
       initChart: function() {
-        console.log('initChart')
         if (this.showChart) return
         setTimeout(() => this.showChart = true, 500)
       },
       gaData: function(category, action, label) {
-        console.log('gaData')
         utils.gaEvent(category, action, label);
       },
       toggleShare: function(){

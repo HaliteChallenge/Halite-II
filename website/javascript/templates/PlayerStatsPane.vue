@@ -41,7 +41,6 @@
     name: 'PlayerStatsPane',
     props: ['players', 'statistics'],
     mounted: function(){
-      console.log(this.statistics)
     },
     methods: {
       isActive: function(i, rate){

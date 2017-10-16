@@ -530,7 +530,6 @@
                 return lang;
             },
             shareLink: function(){
-                console.log(window.location.href);
                 return window.location.href;
             },
         },
@@ -541,7 +540,6 @@
                 });
             },
             refreshStickyTable: function(){
-                console.log('setup table sticky');
                 const calcCol = () => {
                     const el = $(this.$el).find('.table-sticky-container:visible').each(function(){
                         const heading = $(this).find('.table-sticky th');

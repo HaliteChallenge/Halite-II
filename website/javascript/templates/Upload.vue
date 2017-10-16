@@ -40,8 +40,6 @@
         },
         methods: {
             upload_bot: function(files) {
-                console.log('update files');
-                console.log(files);
                 if (files.length > 0) {
                     this.$parent.botFile = files[0];
                     this.$parent.currentView = 'botUpload';

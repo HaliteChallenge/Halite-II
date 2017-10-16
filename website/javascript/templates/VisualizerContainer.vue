@@ -110,12 +110,10 @@
           window.history.replaceState(null, "", `?game_id=${game_id}&replay_class=${game.game.replay_class}&replay_name=${encodeURIComponent(game.game.replay)}`);
           setupGame(game);
         }, () => {
-          console.log(params.has("replay_class") && params.has("replay_name"));
           if (params.has("replay_class") && params.has("replay_name")) {
             const replay_class = params.get("replay_class");
             const replay_name = params.get("replay_name");
             this.$parent.replayFile = replay_name;
-            console.log("Getting expired replay");
             api.get_expired_replay(replay_class, replay_name).then((replay) => {
               this.$parent.currentView = 'replay';
               setupGame({

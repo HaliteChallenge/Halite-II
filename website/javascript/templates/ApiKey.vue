@@ -30,12 +30,10 @@
                 api_key: "",
             };
         },
-        // TODO: add api method to check login and redirect if appropriate
         methods: {
             fetch: function(e) {
                 e.preventDefault();
                 api.reset_api_key().then((data) => {
-                    console.log(data);
                     this.api_key = data.api_key;
                 }, (e) => {
                     console.error(e);

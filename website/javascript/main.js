@@ -156,7 +156,6 @@ api.me().then((me) => {
         const hash = document.location.hash.slice(1);
         const targetElement = document.getElementById(hash);
         const top = targetElement.getBoundingClientRect().top - document.body.getBoundingClientRect().top;
-        // console.log(top);
         setTimeout(function () {
             window.scrollTo(0, 250);
         }, 1000);

@@ -60,7 +60,6 @@
     },
     methods: {
       updatePage: function(page) {
-        console.log(this.page);
         if(page > this.lastPage || page === this.page) return;
         this.changePage(page);
       }

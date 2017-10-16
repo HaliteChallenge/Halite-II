@@ -280,7 +280,6 @@
         // const country_options = [];
         const country_options = countries_data.filter((country) => {
           if (country_codes.indexOf(country['alpha-3']) !== -1){
-            console.log(country['alpha-3']);
           }
           return country_codes.indexOf(country['alpha-3']) != -1;
         }).map((country) => {

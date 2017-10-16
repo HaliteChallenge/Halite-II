@@ -183,7 +183,6 @@
       const getHackathonPromise = () => {
         if (this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
-            console.log(hackathon);
             const beginDate = moment(hackathon.start_date).format("MMM Do, YYYY: HH:MM");
             const endDate = moment(hackathon.end_date).format("MMM Do, YYYY: HH:MM");
             this.hackathon = Object.assign(mockHackathon, {
@@ -209,7 +208,6 @@
             window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
             return Promise.resolve();
           }, (xhr) => {
-            console.log(xhr);
             this.hackathon = Object.assign(mockHackathon, {img: `${this.baseUrl}/assets/images/temp/hackathon.png`});
             let title = _.chain(this.hackathon.title).toLower().split(' ').join('-').value();
             window.history.replaceState(null, "", `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`);
