@@ -38,7 +38,7 @@
                     <div class="panel-collapse collapse" :class="{'in': detailExpanded}" role="tabpanel"
                          :aria-expanded="detailExpanded.toString()" id="widget_more_details"
                          aria-labelledby="heading_more_details">
-                        <div v-html="hackathon.description"></div>
+                        <div v-html="hackathon.description" style="padding: 30px;"></div>
                     </div>
                 </div>
             </div>
