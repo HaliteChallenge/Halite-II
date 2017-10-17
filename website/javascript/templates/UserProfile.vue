@@ -564,14 +564,9 @@ import dateformat from 'dateformat'
             for (let game of data) {
               for (let participant of Object.keys(game.players)) {
                 game.players[participant].id = participant
-                if (this.profile_images[participant]) continue
-                this.profile_images[participant] = 'loading'
-
-                api.get_user(participant).then((user) => {
-                  this.profile_images[participant] = api.make_profile_image_url(user.username)
-                  this.usernames[participant] = user.username
-                  this.$forceUpdate()
-                })
+                this.profile_images[participant] = api.make_profile_image_url(participant.username)
+                this.usernames[participant] = participant.username
+                console.log(participant);
               }
 
               const players = Object.values(game.players).sort((r1, r2) => {
@@ -614,6 +609,9 @@ import dateformat from 'dateformat'
                   continue
                 }
 
+                this.profile_images[participant] = api.make_profile_image_url(participant.username)
+                this.usernames[participant] = participant.username
+
                 let playerData = nemesisMap.get(participant)
                 if (typeof playerData === 'undefined') {
                   playerData = {wins: 0, losses: 0}
@@ -640,11 +638,6 @@ import dateformat from 'dateformat'
                 }
                 this.nemesisList.push(obj)
               }
-              api.get_user(parseInt(key)).then((user) => {
-                this.profile_images[user.user_id] = api.make_profile_image_url(user.username)
-                this.usernames[user.user_id] = user.username
-                this.$forceUpdate()
-              })
             }
 
             this.nemesisList.sort(function (a, b) { return b.losses - a.losses })
