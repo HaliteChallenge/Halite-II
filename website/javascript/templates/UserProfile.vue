@@ -563,10 +563,10 @@ import dateformat from 'dateformat'
             this.games = data
             for (let game of data) {
               for (let participant of Object.keys(game.players)) {
+                let username = game.players[participant].username
                 game.players[participant].id = participant
-                this.profile_images[participant] = api.make_profile_image_url(participant.username)
-                this.usernames[participant] = participant.username
-                console.log(participant);
+                this.profile_images[participant] = api.make_profile_image_url(username)
+                this.usernames[participant] = username
               }
 
               const players = Object.values(game.players).sort((r1, r2) => {
@@ -609,8 +609,9 @@ import dateformat from 'dateformat'
                   continue
                 }
 
-                this.profile_images[participant] = api.make_profile_image_url(participant.username)
-                this.usernames[participant] = participant.username
+                let username = game.players[participant].username
+                this.profile_images[participant] = api.make_profile_image_url(username)
+                this.usernames[participant] = username
 
                 let playerData = nemesisMap.get(participant)
                 if (typeof playerData === 'undefined') {
