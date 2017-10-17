@@ -14,7 +14,7 @@
                 <h2 class="form-heading">Resend Verification Mail</h2>
                 <p>If you cant find our account verification mail, resend a verification mail to your mail now.</p>
                 </br>
-                <button class="btn-ha">Resend Verfication</button>
+                <button class="btn-ha" v-on:click="resend_verification_email">Resend Verfication</button>
 
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
@@ -301,7 +301,29 @@ export default {
         },
         gaData: function (category, action, label) {
           utils.gaEvent(category, action, label)
-        }
+        },
+        resend_verification_email: function() {
+          api.resend_verification_email(this.user.user_id).then((response) => {
+            let message = "Verification email resent!"
+            if (response && response.message) {
+              message = response.message;
+            }
+            else if (response && response.responseJSON && response.responseJSON.messasge) {
+              message = response.responseJSON.message;
+            }
+            Alert.show(message, "success");
+          }, (response) => {
+            let message = "Sorry, we couldn't resend the verification email. Please try again later.";
+            if (response && response.message) {
+              message = response.message;
+            }
+            else if (response && response.responseJSON && response.responseJSON.message) {
+              message = response.responseJSON.message;
+            }
+
+            Alert.show(message, "error");
+          });
+        },
       }
     }
 </script>

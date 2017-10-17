@@ -149,6 +149,16 @@ export function update_me (user_id, data) {
   })
 }
 
+export function resend_verification_email(user_id) {
+    return $.ajax({
+        url: `${API_SERVER_URL}/user/${user_id}/verify/resend`,
+        method: "POST",
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
+}
+
 export function get_replay (game_id, progress_callback) {
   let game_data_promise = Promise.resolve($.get(`${API_SERVER_URL}/user/0/match/${game_id}`))
   let replay_promise = new Promise((resolve, reject) => {

@@ -516,6 +516,7 @@ def update_user(intended_user_id, *, user_id):
 
     if update.get("email"):
         update["verification_code"] = uuid.uuid4().hex
+        update["is_email_good"] = False
 
         if update.get("organization_id") is None:
             org_id, org_name = guess_affiliation(update["email"])
