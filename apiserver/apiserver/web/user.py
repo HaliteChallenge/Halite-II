@@ -260,6 +260,8 @@ def create_user(*, user_id):
         org_id, org_name = guess_affiliation(email)
         if org_id:
             message.append("You've been added to the {} organization automatically.".format(org_name))
+        else:
+            message.append("Could not determine an organization. Reach out to us at halite@halite.io to add your organization.")
 
     # Figure out the situation with their email/organization
     if org_id is None and email is None:
@@ -315,7 +317,8 @@ def create_user(*, user_id):
             "is_email_good": 1,
             "organization_id": org_id,
         })
-        message.append("You've been added to the organization automatically!")
+        if org_id:
+            message.append("You've been added to the organization automatically!")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
@@ -523,6 +526,11 @@ def update_user(intended_user_id, *, user_id):
             if org_id:
                 message.append("You've been added to the {} organization automatically.".format(org_name))
                 update["organization_id"] = org_id
+            else:
+                update["organization_id"] = None
+                message.append("This email doesn't seem to be part of an organization."
+                               " Reach out to us at halite@halite.io if you'd like us"
+                               " to add your organization.")
         else:
             message.append("Please check your inbox for a verification email.")
 

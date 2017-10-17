@@ -39,7 +39,7 @@
                         <div class="form-group" v-if="level != 'High School'">
                             <label for="personal-email">Work or University Email</label>
                             <input class="form-control" type="email" id="personal-email" v-model="email" />
-                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile.</p>
+                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                         <div class="form-group" v-else>
                             <p>Please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
@@ -267,8 +267,10 @@ export default {
             request['email'] = this.email
           }
 
-          api.update_me(this.user.user_id, request).then(() => {
-            Alert.show('You have updated your profile successfully', 'success')
+          api.update_me(this.user.user_id, request).then((response) => {
+            let message = 'You have updated your profile successfully.';
+            if (response.message) message += ' ' + response.message;
+            Alert.show(message, 'success')
             this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
           }, (error) => {
             const errorMessage = error.responseJSON
