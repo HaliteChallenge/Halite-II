@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Meet Your Fleet
+title: Units
 toc: false
 description: Reference guide for unit properties of Halite
 image: assets/images/temp/bot_1.png
@@ -27,7 +27,7 @@ The basic unit of your fleet; a [nimble ship](the-halite-codex) built by deposit
 
 ### Properties
 
- <table class="table">
+ <table class="table table-leader" style="color:white;">
     <thead>
         <tr>
             <th>Property</th>
@@ -67,7 +67,7 @@ The basic unit of your fleet; a [nimble ship](the-halite-codex) built by deposit
 </table>
 
 ### Commands
-<table class="table">
+<table class="table table-leader" style="color:white;">
     <thead>
         <tr>
             <th>Command</th>
@@ -110,40 +110,60 @@ The basic unit of your fleet; a [nimble ship](the-halite-codex) built by deposit
 
 ## Planet
 
+The basic unit that generates Halite ships, you can conquer planets, fight other plays for control of planets and dock to generate more ships from the Halite. Resources are essentially infinite for all planets, the larger the planet the more ships that can dock to it and corresponding generate more ships per turn.
+
 <div class="static-container text-center">
     <img style="width: 50%;height: auto;" src="/assets/images//tutorial-images/planet-production.gif">
 </div>
 
 ### Properties
 
-<table class="table">
-<thead>
-    <tr>
-        <th>Property</th>
-        <th>Description</th>
-        <th>Default</th>
-        <th>Max</th>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td>Health</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Radius</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Resources</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</tbody>
+<table class="table table-leader" style="color:white;">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Description</th>
+            <th>Default</th>
+            <th>Max</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Health</td>
+            <td>Varies from planet to planet, function of radius</td>
+            <td>Random</td>
+            <td>Random</td>
+        </tr>
+        <tr>
+            <td>Radius</td>
+            <td>Varies from planet to planet</td>
+            <td>Random</td>
+            <td>Random</td>
+        </tr>
+        <tr>
+            <td>Dock Radius</td>
+            <td>The distance from the planet edge a ship can dock</td>
+            <td>4 units</td>
+            <td>4 units</td>
+        </tr>
+        <tr>
+            <td>Explosion Radius</td>
+            <td>On planet destruction, ships are damaged if they are within this radius</td>
+            <td>10 units</td>
+            <td>10 units</td>
+        </tr>
+        <tr>
+            <td>Production</td>
+            <td>On planet destruction, ships are damaged if they are within this radius</td>
+            <td>1 ship/6 turns</td>
+            <td>(1 ship/6 turns) * number of ships</td>
+        </tr>
+        <tr>
+            <td>Spawn Radius</td>
+            <td>Distance from the planet edge where ships are spawned</td>
+            <td>2 units</td>
+            <td>2 units</td>
+        </tr>
+    </tbody>
 </table>
 
