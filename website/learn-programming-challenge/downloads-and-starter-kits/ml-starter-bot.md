@@ -37,6 +37,10 @@ The model is trained on historical data. We look at a particular bot (usually th
 
 ### Training
 
+ - Download the ML bot starter kit for your operating system from [here](/learn-programming-challenge/downloads-and-starter-kits/)
+ - Unzip the archive and go to the root folder of the starter kit
+ - Create a python 3 virtual environment and start it
+ - Install the required python packages using `pip install` from the requirements.txt
  - Go to to the root folder of the bot and run `make`.
 
 The bot needs a zip file with the games in json format to train on. We packed about 1000 games and made them available online for your convenience. After you run `make`, the script will download the games and will train the model on 1000 games, serializing it to models/ directory. 
