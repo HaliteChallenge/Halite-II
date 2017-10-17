@@ -101,12 +101,12 @@ function handleOutboundLinkClicks(category, action, label) {
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <button class="btn btn-sm navbar-signin">
+          <a class="btn btn-sm navbar-signin" href="{{ site.login_server_url }}/github" onclick="javascript:handleOutboundLinkClicks('account', 'click-to-sign-up','navigation');return true;">
             <span>
               <i class="fa fa-github"></i>
               Sign in
             </span>
-          </button>
+          </a>
           <a class="navbar-brand" href="{{ site.baseurl }}/">
             <img alt="Halite" src="{{ site.baseurl }}/assets/images/full_logo.svg">
           </a>
@@ -209,15 +209,16 @@ function handleOutboundLinkClicks(category, action, label) {
     {
       document.getElementById("subscribeFooter").className += ' '+'footer-hidden';
     }
-    var signinBtn = document.getElementsByClassName('navbar-signin')[0];
-    var mobileCon = document.getElementsByClassName('mobile-strict-container')[0];
-    var closeBtn = mobileCon.getElementsByClassName('close')[0];
-    signinBtn.addEventListener("click", function(e) {
-        mobileCon.style.visibility = "visible";
-    });
-    closeBtn.addEventListener("click", function(e) {
-        mobileCon.style.visibility = "hidden";
-    });
+    
+    // var signinBtn = document.getElementsByClassName('navbar-signin')[0];
+    // var mobileCon = document.getElementsByClassName('mobile-strict-container')[0];
+    // var closeBtn = mobileCon.getElementsByClassName('close')[0];
+    // signinBtn.addEventListener("click", function(e) {
+    //     mobileCon.style.visibility = "visible";
+    // });
+    // closeBtn.addEventListener("click", function(e) {
+    //     mobileCon.style.visibility = "hidden";
+    // });
 
     var minHeightFn = function () {
       var docHeight = window.innerHeight;

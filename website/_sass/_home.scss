@@ -400,6 +400,11 @@
       }
     }
   }
+  .section-des{
+    @media (min-width: $screen-md-min){
+      padding: 0 30px;
+    }
+  }
   .ha-input-container{
     margin-left: 0;
     margin-right: 0;

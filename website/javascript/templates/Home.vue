@@ -80,7 +80,7 @@
             <div class="col-md-12 big-menu watch-section">
                 <p class="t2 c-wht">WATCH TOP GAMES</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
+                <p class="t5 c-gry section-des">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
                     <a href="/play/?game_id=850849">
@@ -240,7 +240,7 @@
             <div class="col-md-12 big-menu">
                 <p class="t2 c-wht font-headline">WHAT THE COMMUNITY HAS TO SAY</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
+                <p class="t5 c-gry section-des">Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12 img-list no-padding-xs">
                     <div class="col-md-4">
