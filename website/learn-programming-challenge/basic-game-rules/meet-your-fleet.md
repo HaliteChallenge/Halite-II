@@ -12,9 +12,18 @@ sort_key: 0
 
 Space is a 2D grid, where grid cells (not grid points) are identified by an X and Y coordinate. The top-left cell is cell (0, 0), with positive X extending towards the right and positive Y extending toward the bottom. All distances are Euclidean `sqrt(dx^2 + dy^2)`. Note that this makes the coordinate system left-handed!
 
+<div class="static-container text-center">
+    <img style="width: 60%;height: auto;" src="/assets/images//tutorial-images/map.png">
+</div>
+
 ## Ship
 
 The basic unit of your fleet; a [nimble ship](the-halite-codex) built by depositing layers of pure Halite You start with three, but you'll want to make more.
+
+<div class="static-container text-center">
+    <img style="width: 40%;height: auto;" src="/assets/images//tutorial-images/ship-movement.gif">
+    <img style="width: 40%;height: auto;" src="/assets/images//tutorial-images/ship-combat.gif">
+</div>
 
 ### Properties
 
@@ -101,8 +110,8 @@ The basic unit of your fleet; a [nimble ship](the-halite-codex) built by deposit
 
 ## Planet
 
-<div class="static-container">
-    <img style="width: 50%;height: auto;" src="/assets/images//tutorial-images/final-composite.png">
+<div class="static-container text-center">
+    <img style="width: 50%;height: auto;" src="/assets/images//tutorial-images/planet-production.gif">
 </div>
 
 ### Properties
