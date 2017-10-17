@@ -57,6 +57,8 @@ export function prepareAll(renderer, prepare) {
 
     Object.keys(PLANET_EXPLOSION_SHEET.data.frames)
         .forEach((frame) => renderer.bindTexture(PIXI.Texture.from(frame).baseTexture));
+
+    BACKGROUND_IMAGES.forEach((image) => renderer.bindTexture(PIXI.Texture.from(image)));
 }
 
 export function setAssetRoot(path) {

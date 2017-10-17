@@ -441,8 +441,8 @@ if (window && window.process && window.process.type) {
         this.gaData('visualizer', 'click-map-objects', 'gameplay')
       }
       visualizer.attach('.game-replay-viewer')
-      // play the replay
-      visualizer.play()
+      // play the replay - delay a bit to make sure assets load/are rendered
+      window.setTimeout(function() { visualizer.play() }, 500);
 
       // action
       this.playVideo = (e) => {

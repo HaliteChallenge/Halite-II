@@ -42,7 +42,7 @@ export class HaliteVisualizer {
             assets.VISUALIZER_SIZE,
             assets.VISUALIZER_HEIGHT,
             {
-                backgroundColor: 0x15223F,
+                backgroundColor: 0x000000,
             }
         );
         // Seems to help with pixelation when downscaling
@@ -152,6 +152,8 @@ export class HaliteVisualizer {
 
         this._onKeyUp = null;
         this._onKeyDown = null;
+
+        this.application.render();
     }
 
     /**
@@ -292,6 +294,7 @@ export class HaliteVisualizer {
         this.keyboardControls.attach(document.body);
 
         this.update();
+        this.application.render();
 
         this.application.ticker.add((dt) => {
             if (this.isPlaying()) {
@@ -309,6 +312,7 @@ export class HaliteVisualizer {
 
     play() {
         if (this._playing) return;
+        this.application.render();
         this.application.start();
 
         this._playing = true;
