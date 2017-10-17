@@ -263,3 +263,34 @@ CREATE TABLE hackathon_snapshot (
 CREATE INDEX user_id ON hackathon_snapshot (user_id, bot_id);
 
 INSERT INTO alembic_version (version_num) VALUES ('7f0054256cf5');
+
+-- Running upgrade 7f0054256cf5 -> 33de9025cc63
+
+ALTER TABLE game_stat DROP FOREIGN KEY game_stat_ibfk_1;
+
+ALTER TABLE game_view_stat DROP FOREIGN KEY game_view_stat_ibfk_1;
+
+ALTER TABLE game_bot_stat DROP FOREIGN KEY game_bot_stat_ibfk_1;
+
+ALTER TABLE game_participant DROP FOREIGN KEY game_participant_ibfk_4;
+
+ALTER TABLE game MODIFY id INTEGER(9) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE game_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_view_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_bot_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_participant MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_stat ADD CONSTRAINT game_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_view_stat ADD CONSTRAINT game_view_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_bot_stat ADD CONSTRAINT game_bot_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_participant ADD CONSTRAINT game_participant_ibfk_4 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+UPDATE alembic_version SET version_num='33de9025cc63' WHERE alembic_version.version_num = '7f0054256cf5';
+
