@@ -15,6 +15,8 @@ If you are using a language that is generic or that does not have first class su
 
 This is especially useful when you are uploading a Jar file for JVM languages or writing ML bots, and you want to specifically call out a language like `Kotlin` or in the case of ML use `ML` in lieu of language. 
 
+[Example Bot](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/ML-StarterBot-Python)
+
 ## Installing Dependencies
 
 Instead of packaging up your dependencies inside your zip file, you may include a bash file named `install.sh` that will be run before your bot is compiled.
