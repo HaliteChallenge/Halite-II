@@ -93,7 +93,7 @@
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
-                    <a class="cancel-href base" href="#" target="_self">Cancel</a>
+                    <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
                     <button type="submit" class="btn-ha">Update Profile</button>
                     <br>
                     <br>

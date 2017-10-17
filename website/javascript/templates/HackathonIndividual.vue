@@ -83,7 +83,7 @@
                                     <div class="hackathon-join-left-col">
                                         <div class="hex-li">
                                             <span class="hex-bullet">2</span>
-                                            <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email halite@halite.io for more information.</span>
+                                            <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email <a href="mailto:halite@halite.io">halite@halite.io</a> for more information.</span>
                                         </div>
                                     </div>
                                 </div>

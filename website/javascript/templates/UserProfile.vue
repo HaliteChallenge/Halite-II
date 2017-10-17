@@ -116,7 +116,7 @@
                                 <div v-if="!games.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
                                     <h2>No games played yet</h2>
-                                    <p v-if="is_my_page">Complete your first game and view replays<br/>here</p>
+                                    <p v-if="is_my_page">Complete your first game and view replays. <br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="games.length">
                                     <table class="table table-leader">
@@ -232,7 +232,7 @@
                                 <div v-if="!user.mu" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No rating analysis</h2>
-                                    <p v-if="is_my_page">Submit your first bot to get your rating.<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to get your rating. <br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
@@ -258,7 +258,7 @@
                                 <div v-if="!nemesisList.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No nemesis yet</h2>
-                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis. <br/><a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
@@ -318,7 +318,7 @@
                                 <div v-if="!userHistory.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No history</h2>
-                                    <p v-if="is_my_page">Submit your first bot to see your history<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to see your history.<br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
