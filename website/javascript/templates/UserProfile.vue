@@ -572,7 +572,7 @@ import dateformat from 'dateformat'
               const players = Object.values(game.players).sort((r1, r2) => {
                 if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
                 if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
-                return r2.rank - r1.rank
+                return r1.rank - r2.rank
               })
 
               game.playerSorted = players
