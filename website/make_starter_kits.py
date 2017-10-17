@@ -63,6 +63,7 @@ def scan_directory(full_path):
             if ext.lower() in INCLUDED_EXTENSIONS or filename in INCLUDED_FILES:
                 included_files.append(os.path.join(containing_dir, filename))
 
+    included_files.append(os.path.join(STARTER_KIT_DIR, "README.MD"))
     return included_files
 
 
