@@ -220,14 +220,16 @@ function handleOutboundLinkClicks(category, action, label) {
 
   <script src="{{ site.baseurl }}/assets/js/bundle.js"></script>
 
+<!-- Twitter universal website tag code -->
 <script>
-  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
-  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-  // Insert Twitter Pixel ID and Standard Event data below
-  twq('init','nyaxy');
-  twq('track','PageView');
+!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+},s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+// Insert Twitter Pixel ID and Standard Event data below
+twq('init','nyaxy');
+twq('track','PageView');
 </script>
+<!-- End Twitter universal website tag code -->
 
   <script>
     var _global = {}
@@ -237,16 +239,6 @@ function handleOutboundLinkClicks(category, action, label) {
     {
       document.getElementById("subscribeFooter").className += ' '+'footer-hidden';
     }
-    
-    // var signinBtn = document.getElementsByClassName('navbar-signin')[0];
-    // var mobileCon = document.getElementsByClassName('mobile-strict-container')[0];
-    // var closeBtn = mobileCon.getElementsByClassName('close')[0];
-    // signinBtn.addEventListener("click", function(e) {
-    //     mobileCon.style.visibility = "visible";
-    // });
-    // closeBtn.addEventListener("click", function(e) {
-    //     mobileCon.style.visibility = "hidden";
-    // });
 
     var minHeightFn = function () {
       var docHeight = window.innerHeight;
