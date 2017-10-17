@@ -21,10 +21,6 @@ Bot compilation is done using this [autocompile script][autocompile-script].
 
 For more details on customizing your bot, see our guide [here](downloads-and-starter-kits/customize-bot).
 
-The following compilers/interpreters are used:
-
-TODO
-
 Both Python 3.5 and 3.6 are installed. To use 3.6, you will have to explicitly use a `run.sh` file to invoke `python3.6`.
 
 ## GPU-Enabled Games
