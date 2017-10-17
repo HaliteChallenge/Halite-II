@@ -501,7 +501,7 @@ export default {
 
       setupCollapseFilter: function () {
         const collapse = this.$cookie.get('leaderboard_filter_collapsed')
-        if (collapse == 1 || $(window).width() < 768) {
+        if (collapse == 1 || window.mobileAndTabletcheck()) {
           $('#panel_filter').removeClass('in')
           $('#toggle_filter').attr('aria-expanded', 'false')
         }

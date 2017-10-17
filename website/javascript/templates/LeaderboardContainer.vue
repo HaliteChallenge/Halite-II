@@ -120,7 +120,7 @@ export default {
 
       setupCollapseStats: function () {
         const collapse = this.$cookie.get('leaderboard_stats_collapsed')
-        if (collapse == 1 || $(window).width() < 768) {
+        if (collapse == 1 || window.mobileAndTabletcheck()) {
           $('#panel_metric').removeClass('in')
           $('#toggle_metric').attr('aria-expanded', 'false')
         }

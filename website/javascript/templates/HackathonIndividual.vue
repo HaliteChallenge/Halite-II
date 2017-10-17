@@ -158,7 +158,7 @@ export default {
     data: function () {
       let detailExpanded = true
       let joinExpanded = true
-      if ($(window).width() < 768) {
+      if (window.mobileAndTabletcheck()) {
         detailExpanded = false
         joinExpanded = false
       }
@@ -194,7 +194,7 @@ export default {
             })
             this.isInHackathon = true
             if (this.isInHackathon) {
-              if ($(window).width() < 768) {
+              if (window.mobileAndTabletcheck()) {
                 this.detailExpanded = false
                 this.joinExpanded = false
               } else {
