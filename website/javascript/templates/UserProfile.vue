@@ -253,7 +253,7 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     Nemesis
-                                    <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!nemesisList.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
