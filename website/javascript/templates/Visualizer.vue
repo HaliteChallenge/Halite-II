@@ -62,7 +62,7 @@
               <!-- <span class="replay-btn">
                 <span class="icon-volumn"></span>
               </span> -->
-              <i class="xline xline-right" style="right: 0; top: 35%"></i>
+              <i class="xline xline-right" style="right: 0; top: 0; height: 100%"></i>
             </div>
             <div class="game-replay-progress">
               <div class="game-replay-progress-inner">
@@ -363,6 +363,7 @@ if (window && window.process && window.process.type) {
         sliderOptions: {
           min: 0,
           max: 0,
+          speed: 1.5,
           sliderStyle: {
             backgroundColor: '#E6AB00',
             top: 0,

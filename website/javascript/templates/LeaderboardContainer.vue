@@ -62,7 +62,7 @@
             </div>
           </div>
 
-          <div class="col-md-3">
+          <div v-if="!isMobile" class="col-md-3">
             <div class="leaderboard-explore">
               <p><img src="/assets/images/sample-graph.svg" class="img-responsive" alt="graph"></p>
               <div>
@@ -106,7 +106,8 @@ export default {
           university: 0,
           high_school: 0
         },
-        leaderboard: null
+        leaderboard: null,
+        isMobile: window.mobileAndTabletcheck()
       }
     },
     methods: {

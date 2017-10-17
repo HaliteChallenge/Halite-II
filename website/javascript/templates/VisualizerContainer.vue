@@ -13,8 +13,9 @@
       </halite-upload-zone>
     </div>
     <div v-if="message" class="row">
-        <div class="col-md-12">
-            <p class="visuallizer-loading-message">{{message}}</p>
+        <div class="col-md-12 status-message">
+            <img class="loading-img" :src="`${baseUrl}/assets/images/loading-icon.gif`"/>
+            <p class="visuallizer-loading-message message-top">{{message}}</p>
         </div>
     </div>
   </div>

@@ -84,7 +84,7 @@
           <tbody>
           <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
             <td class="text-center">{{ player.rank || player.local_rank }}</td>
-            <td>
+            <td class="nowrap">
               <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
                 <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
                 {{ player.username }}
@@ -548,7 +548,6 @@ export default {
               this.page = Math.ceil(gotoIndex / this.limit)
             }
           }
-          
           this.update_filter(true, true);
         }
 
@@ -591,7 +590,6 @@ export default {
             }, 1000)
           }
         }
-        
         if(this.all_leaderboards && defaultFilter) {
           handleLeaderboard(this.all_leaderboards.slice((this.page - 1) * this.limit, this.page * this.limit));
         } else {

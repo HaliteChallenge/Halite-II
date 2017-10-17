@@ -368,3 +368,13 @@ input:focus{
     overflow-x: auto;
   }
 }
+
+.status-message {
+  text-align: center;
+  .loading-img {
+    width: 150px;
+  }
+  .message-top {
+    margin-top: -30px;
+  }
+}

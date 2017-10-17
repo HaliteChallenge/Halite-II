@@ -1,12 +1,6 @@
 <template>
   <div class="play-container">
 
-    <div v-if="message" class="row">
-      <div class="col-md-12">
-        <p class="visuallizer-loading-message">{{message}}</p>
-      </div>
-    </div>
-
     <div class="row" id="replay-filename" v-if="currentView=='replay'">
       <div class="col-sm-8 replay-header">
         <div class="replay-breadcrumb">
@@ -60,6 +54,13 @@
       <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
       :showMessage="showMessage"></bot-upload>
     
+    </div>
+
+    <div v-if="message" class="row">
+        <div class="col-md-12 status-message">
+            <img class="loading-img" :src="`${baseUrl}/assets/images/loading-icon.gif`"/>
+            <p class="visuallizer-loading-message message-top">{{message}}</p>
+        </div>
     </div>
     
     <div id="halitetv-visualizer">
