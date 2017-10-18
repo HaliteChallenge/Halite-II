@@ -5,7 +5,11 @@ import os
 import sys
 import json
 import argparse
-import requests
+
+import upload_bot
+import download_game
+import compare_bots
+
 from json.decoder import JSONDecodeError
 
 """client.py: Client for interacting with the Halite II servers."""
@@ -17,19 +21,26 @@ __date__ = "August 1, 2017"
 __email__ = "halite@halite.io"
 __license__ = "MIT"
 __status__ = "Production"
-__version__ = "1.0"
+__version__ = "1.5"
 
+URI_HALITE_API = 'http://api.halite.io/v1/api'
+URI_API_CREATE_BOT = URI_HALITE_API + "/user/{}/bot"
+URI_API_EXISTING_BOT = URI_HALITE_API + "/user/{}/bot/{}"
+URI_HALITE_WEB_PAGE = 'http://35.185.45.87'  # TODO change to cname (halite.io)
+URI_WEB_API_KEY = "{}/user/api_key".format(URI_HALITE_WEB_PAGE)
 
-_URI_HALITE_API = 'http://35.190.3.178/v1/api'  # TODO change to cname (api.haliete.io)
-_URI_API_CREATE_BOT = _URI_HALITE_API + "/user/{}/bot"
-_URI_API_EXISTING_BOT = _URI_HALITE_API + "/user/{}/bot/{}"
-_URI_HALITE_WEB_PAGE = 'http://35.185.45.87'
-_URI_WEB_API_KEY = "{}/user/api_key".format(_URI_HALITE_WEB_PAGE)
+SUCCESS = 200
+FIRST_BOT_ID = 0
+BOT_FILE_KEY = 'botFile'
+API_KEY_HEADER = 'X-API-KEY'
 
-_SUCCESS = 200
-_FIRST_BOT_ID = 0
-_BOT_FILE_KEY = 'botFile'
-_API_KEY_HEADER = 'X-API-KEY'
+AUTH_MODE = 'auth'
+GYM_MODE = 'gym'
+REPLAY_MODE = 'replay'
+BOT_MODE = 'bot'
+MODES = str({AUTH_MODE, GYM_MODE, REPLAY_MODE, BOT_MODE})
+REPLAY_MODE_DATE = 'date'
+REPLAY_MODE_USER = 'user'
 
 
 class Config:
@@ -53,7 +64,6 @@ class Config:
         self.api_key = auth[self._api_key_key]
         self.user_id = auth[self._user_key]
 
-
     @staticmethod
     def _get_config_folder_path():
         """
@@ -70,12 +80,13 @@ class Config:
         """
         return "{}/auth".format(Config._get_config_folder_path())
 
-    def _auth_exists(self):
+    @staticmethod
+    def auth_exists():
         """
         Whether tha auth file has been created already
         :return: True if exists, False otherwise
         """
-        return os.path.isfile(self._auth_file)
+        return os.path.isfile(Config._get_auth_file_path())
 
     def _write_auth(self, data):
         """
@@ -92,7 +103,7 @@ class Config:
         to first authenticate.
         :return: The JSON object with the auth information
         """
-        if not self._auth_exists():
+        if not self.auth_exists():
             raise ValueError("CLI not authenticated. Please run `client.py --auth` first.")
         with open(self._auth_file) as file:
             config_contents = file.read()
@@ -116,6 +127,12 @@ class Config:
         config_result[Config._user_key] = api_key.split(Config._key_delimiter)[Config._user_position]
         return config_result
 
+    def __str__(self):
+        return "* id:\t\t{}{}* api_key:\t{}".format(self.user_id, os.linesep, self.api_key)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 def _parse_arguments():
     """
@@ -123,39 +140,54 @@ def _parse_arguments():
     :return: parsed arguments if any. Prints help otherwise
     """
     parser = argparse.ArgumentParser(description="Halite 2.0 CLI")
-    parser.add_argument('-a', '--auth', action='store_true',
-                        help="Authorize the client to make requests on your behalf")
-    parser.add_argument('-b', '--bot-path', dest='bot_path', action='store', type=str,
-                        help="The path wherein your bot zip lives.")
+    # .Modes
+    subparser = parser.add_subparsers(dest='mode', metavar=MODES)
+    # .Modes.Auth
+    auth_parser = subparser.add_parser(AUTH_MODE, help='Authorize client to make requests on your behalf')
+    auth_parser.add_argument('-m', '--metadata', action='store_true', help="Print auth metadata")
+    # .Modes.Bot
+    bot_parser = subparser.add_parser('bot', help='Actions associated with a bot')
+    bot_parser.add_argument('-b', '--bot-path', dest='bot_path', action='store', type=str, required=True,
+                            help="The path wherein your bot zip lives.")
+    # .Modes.Gym
+    bot_parser = subparser.add_parser('gym', help='Train your Bot(s)!')
+    bot_parser.add_argument('-r', '--run-command', dest='run_commands', action='append', type=str, required=True,
+                            help="The command to run a specific bot. You may pass either 2 or 4 of these arguments")
+    bot_parser.add_argument('-b', '--binary', dest='halite_binary', action='store', type=str, required=True,
+                            help="The halite executable/binary path, used to run the games")
+
+    bot_parser.add_argument('-W', '--width', dest='map_width', action='store', type=int, default=240,
+                            help="The map width the simulations will run in")
+    bot_parser.add_argument('-H', '--height', dest='map_height', action='store', type=int, default=160,
+                            help="The map height the simulations will run in")
+    bot_parser.add_argument('-i', '--iterations', dest='iterations', action='store', type=int,  default=100,
+                            help="Number of games to be run")
+    # .Modes.Replay
+    replay_parser = subparser.add_parser('replay', help='Actions associated with replay files')
+    # .Modes.Replay.Modes
+    replay_subparser = replay_parser.add_subparsers(dest='replay_mode', metavar='{date, user}')
+    # .Modes.Replay.Modes.User
+    replay_user_parser = replay_subparser.add_parser(REPLAY_MODE_USER, help='Retrieve replays based on a specified user')
+    replay_user_parser.add_argument('-i', '--id', action='store', dest='user_id',
+                                    help="Fetch recent replay files apposite a user. "
+                                         "Enter a user id to fetch that specific"
+                                         "user's files; leave blank to fetch yours")
+    replay_user_parser.add_argument('-l', '--limit', action='store', dest='limit', type=int, default=250,
+                                    help='Number of replays to fetch')
+    replay_user_parser.add_argument('-d', '--destination', dest='destination', action='store', type=str, required=True,
+                                    help="In which folder to store all resulting replay files.")
+    # .Modes.Replay.Modes.Date
+    replay_regex_parser = replay_subparser.add_parser(REPLAY_MODE_DATE, help='Retrieve replays based on regex')
+    replay_regex_parser.add_argument('-t', '--date', action='store', type=str, dest='date', required=True,
+                                     help="Fetch replay files matching the specified date. To fetch a day's files user"
+                                          "the YYYYMMDD format.")
+    replay_regex_parser.add_argument('-a', '--all', action='store_true', default=False,
+                                     help="Whether to retrieve all files. Omit for only Gold and higher.")
+    replay_regex_parser.add_argument('-d', '--destination', dest='destination', action='store', type=str, required=True,
+                                     help="In which folder to store all resulting replay files.")
     if len(sys.argv) < 2:
         parser.print_help()
     return parser.parse_args()
-
-
-def _bot_exists(user_id):
-    """
-    Whether a bot has been previously uploaded. Assumes that a user only has bot 0
-    :param user_id: The id of the user making the request
-    :return: True if created, False otherwise
-    """
-    return requests.get(_URI_API_EXISTING_BOT.format(user_id, _FIRST_BOT_ID)).status_code == _SUCCESS
-
-
-def _upload_bot(user_id, api_key, bot_path):
-    """
-    Uploads the bot to the Halite servers. If the bot exists, simply update using PUT. Otherwise create it with
-    POST. NOTE: Assuming only bot is bot 0
-    :param user_id: The ID of the user making the request
-    :param api_key: The API key provided by the server (acquired in the auth phase)
-    :param bot_path: The path wherein the bot is found (expected file)
-    :return: The result of the request to the server
-    """
-    files = {_BOT_FILE_KEY: open(bot_path, 'rb')}
-    headers = {_API_KEY_HEADER: api_key}
-    if _bot_exists(user_id):
-        return requests.put(_URI_API_EXISTING_BOT.format(user_id, _FIRST_BOT_ID), files=files, headers=headers)
-    else:
-        return requests.post(_URI_API_CREATE_BOT.format(user_id), files=files, headers=headers)
 
 
 def authorize():
@@ -163,25 +195,9 @@ def authorize():
     Create the config for the user. This will ask the user to visit a webpage and paste the api key encountered.
     :return: Nothing
     """
-    api_key = input("Please go to {} to obtain an api_key, and paste here: ".format(_URI_WEB_API_KEY))
+    api_key = input("Please go to {} to obtain an api_key, and paste here: ".format(URI_WEB_API_KEY))
     Config(api_key)
     print("Successfully set up user account")
-
-
-def upload(bot_path):
-    """
-    Uploads the bot placed under bot_path. May only be called once Config is properly initialized.
-    :param bot_path: The path wherein the bot is located
-    :return: Nothing
-    """
-    config = Config()
-    if not bot_path or not os.path.isfile(bot_path):
-        raise ValueError("Bot path is not valid or does not exist. Try again.")
-    print("Uploading bot...")
-    result = _upload_bot(config.user_id, config.api_key, bot_path)
-    if result.status_code != _SUCCESS:
-        raise IOError("Unable to upload bot: {}".format(result.text))
-    print("Successfully uploaded bot")
 
 
 def main():
@@ -192,13 +208,26 @@ def main():
     """
     try:
         args = _parse_arguments()
-        if args.auth:
-            authorize()
-        elif args.bot_path:
-            upload(args.bot_path)
-    except (ValueError, IOError) as err:
-        print(err)
+        if args.mode == AUTH_MODE:
+            if not (args.metadata and Config.auth_exists()):
+                authorize()
+            if args.metadata:
+                print(Config())
+        elif args.mode == BOT_MODE:
+            upload_bot.upload(args.bot_path)
+        elif args.mode == REPLAY_MODE:
+            download_game.download(args.replay_mode, args.destination,
+                                   getattr(args, 'date', None), getattr(args, 'all', None),
+                                   Config().user_id if Config.auth_exists() else None, getattr(args, 'user_id', None),
+                                   getattr(args, 'limit', None))
+        elif args.mode == GYM_MODE:
+            compare_bots.play_games(args.halite_binary,
+                                    args.map_width, args.map_height,
+                                    args.run_commands, args.iterations)
+    except (IndexError, TypeError, ValueError, IOError, FileNotFoundError) as err:
+        sys.stderr.write(str(err) + os.linesep)
         exit(-1)
+
 
 if __name__ == "__main__":
     main()
