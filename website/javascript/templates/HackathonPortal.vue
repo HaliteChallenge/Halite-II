@@ -76,6 +76,7 @@
 import * as api from '../api'
 import moment from 'moment'
 import * as utils from '../utils'
+import _ from 'lodash'
 
 const hackathonTemplate = {
   pin: 'New York City',
@@ -135,7 +136,9 @@ export default {
           wrapEvent.push(newEvent)
         })
 
-        this.events = wrapEvent
+        // wrapEvent = 
+
+        this.events = _.orderBy(wrapEvent, ['status', 'title'], ['asc', 'asc'])
       }
       this.showEvents = true
     },
