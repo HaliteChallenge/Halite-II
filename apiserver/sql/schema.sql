@@ -48,7 +48,6 @@ CREATE TABLE halite_1_user (
     `githubEmail` VARCHAR(64), 
     `verificationCode` VARCHAR(64), 
     `isEmailGood` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', 
-    `is_gpu_enabled` tinyint(1) NOT NULL DEFAULT '0',
     level ENUM('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional', 
     PRIMARY KEY (`userID`)
 )DEFAULT CHARSET=latin1 AUTO_INCREMENT=5350 ENGINE=InnoDB;
@@ -125,6 +124,7 @@ CREATE TABLE user (
     update_time DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     api_key_hash VARCHAR(255), 
     is_admin TINYINT(1) DEFAULT '0', 
+    `is_gpu_enabled` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (id), 
     CONSTRAINT user_ibfk_1 FOREIGN KEY(organization_id) REFERENCES organization (id)
 )DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000 ENGINE=InnoDB;
