@@ -36,19 +36,20 @@
                             :options="gpu_states">
                         </v-select>
                     </div>
+         
+
+                    <div class="line-container"><i class="xline xline-top"></i></div>
+
+                    <h2 class="form-heading">Email Settings</h2>
+                    <form v-on:submit.prevent="submit" class="create-account-form">
+                        <div class="form-group">
+                                To manage your email preferences, click the relevant link at the bottom of any Halite email.
+                        </div>
+                    </form>  
+
+                    <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
+                    <button type="submit" class="btn-ha">Save Settings</button>
                 </form>
-
-                <div class="line-container"><i class="xline xline-top"></i></div>
-
-                <h2 class="form-heading">Email Settings</h2>
-                <form v-on:submit.prevent="submit" class="create-account-form">
-                    <div class="form-group">
-                            To manage your email preferences, click the relevant link at the bottom of any Halite email.
-                    </div>
-                </form>  
-
-                <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
-                <button type="submit" class="btn-ha">Save Settings</button>
             </div>
         </div>
     </div>
@@ -98,7 +99,6 @@ export default {
       },
       methods: {
         submit: function (e) {
-
            let request = {
             'is_gpu_enabled': this.selected_gpu_state,
           }
