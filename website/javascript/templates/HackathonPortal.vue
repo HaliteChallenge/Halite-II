@@ -42,31 +42,33 @@
         <i class="xline xline-bottom"></i>
         <p class="t2 c-wht font-headline">ALL HACKATHONS</p>
       </div>
-      <table class="table table-leader hackathon-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="event in events">
-            <td>
-              <a class="leaderboard-name" :href="'/hackathon-individual?hackathon_id=' + event.id">
-                <img width="30" height="30" :src="`${event.img}`" alt="">
-                {{event.title}}
-              </a>
-            </td>
-            <td>{{event.pin}}</td>
-            <td>{{event.status.charAt(0).toUpperCase() + event.status.slice(1)}}</td>
-            <td>{{event.start_date}}</td>
-            <td>{{event.end_date}}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-container">
+        <table class="table table-leader hackathon-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="event in events">
+              <td>
+                <a class="leaderboard-name" :href="'/hackathon-individual?hackathon_id=' + event.id">
+                  <img width="30" height="30" :src="`${event.img}`" alt="">
+                  {{event.title}}
+                </a>
+              </td>
+              <td>{{event.pin}}</td>
+              <td>{{event.status.charAt(0).toUpperCase() + event.status.slice(1)}}</td>
+              <td>{{event.start_date}}</td>
+              <td>{{event.end_date}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -95,7 +97,8 @@ export default {
   data: function () {
     return {
       showEvents: false,
-      events: []
+      events: [],
+      sort: {}
     }
   },
   mounted: function () {

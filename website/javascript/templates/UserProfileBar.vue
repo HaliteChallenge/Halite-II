@@ -1,11 +1,11 @@
 <template>
     <div class="logged-in">
-        <ul id="submitbutton" v-if="!isMobile" class="nav navbar-nav navbar-right submit-bot container-empty hidden-xs hidden-sm">
+        <ul id="submitbutton" v-if="!isMobile" class="nav navbar-nav navbar-right submit-bot hidden-xs hidden-sm">
             <li>
                 <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
         </ul>
-        <div id="profile" class="profile-container container-empty">
+        <div id="profile" class="profile-container">
             <a v-on:click.stop="slide_profile">
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
                 <i class="fa fa-sort-down"></i>

@@ -82,7 +82,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
+          <tr :id="`user-row-${player.user_id}`" :key="player.user_id" v-for="player in leaderboard">
             <td class="text-center">{{ player.rank || player.local_rank }}</td>
             <td class="nowrap">
               <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
@@ -587,6 +587,9 @@ export default {
               const offset = 60 // the header height
               $('body, html').scrollTop(id.offset().top - offset)
               this.show_user = null
+
+              // hight light
+              id.addClass('hl');
             }, 1000)
           }
         }
