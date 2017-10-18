@@ -306,11 +306,18 @@ def create_user(*, user_id):
                 if organization_data:
                     organization_name = organization_data["organization_name"]
 
-        send_verification_email(
-            notify.Recipient(user_id, user_data["username"], email,
-                             organization_name, level,
-                             user_data["creation_time"]),
-            verification_code)
+            send_verification_email(
+                notify.Recipient(user_id, user_data["username"], email,
+                                 organization_name, level,
+                                 user_data["creation_time"]),
+                verification_code)
+        else:
+            # Do not send verification email if we don't recognize it
+            # as part of an organization
+            values.update({
+                "is_email_good": 1,
+                "verification_code": None,
+            })
 
         message.append("Please check your email for a verification code.")
     else:
@@ -524,6 +531,7 @@ def update_user(intended_user_id, *, user_id):
         update["is_email_good"] = False
 
         if update.get("organization_id") is None:
+            # Try and guess an affiliation
             org_id, org_name = guess_affiliation(update["email"])
             if org_id:
                 message.append("You've been added to the {} organization automatically.".format(org_name))
@@ -533,6 +541,14 @@ def update_user(intended_user_id, *, user_id):
                 message.append("This email doesn't seem to be part of an organization."
                                " Reach out to us at halite@halite.io if you'd like us"
                                " to add your organization.")
+
+        if update.get("organization_id") is None:
+            # Do not send verification email if we don't recognize it
+            # as part of an organization
+            update.update({
+                "is_email_good": 1,
+                "verification_code": None,
+            })
         else:
             message.append("Please check your inbox for a verification email.")
 
@@ -551,7 +567,7 @@ def update_user(intended_user_id, *, user_id):
             model.users.c.id == intended_user_id
         )).first()
 
-        if "email" in update:
+        if "email" in update and update.get("organization_id"):
             send_verification_email(
                 notify.Recipient(user_id, user_data["username"],
                                  user_data["email"],
