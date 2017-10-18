@@ -483,6 +483,7 @@ def update_user(intended_user_id, *, user_id):
         "organization_id": "organization_id",
         "email": "email",
         "verification_code": "organization_verification_code",
+        "is_gpu_enabled":"is_gpu_enabled"
     }
 
     update = {}

@@ -20,7 +20,7 @@
         <p class="upload-state-desc">New Bot Version: {{`${user.username} v${bot === null ? 1 : parseInt(bot.version_number) + 1}`}}</p>
         <div class="upload-state-buttons">
           <!-- <a class="btn-ha btn-ha-clear btn-ha-lg" href="/halite-tv-coding-game-videos">Watch Halite TV</a> -->
-          <a class="btn-ha btn-ha-lg" href="/user?me">See your result</a>
+          <a class="btn-ha btn-ha-lg" href="/user?me">See your results</a>
         </div>
       </div>
   </div>

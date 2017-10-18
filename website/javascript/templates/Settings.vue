@@ -24,10 +24,12 @@
                     <button class="btn-ha btn-ha-md" style="margin-top:20px;" v-on:click="fetchApiKey">Generate API Key</button>
                 </form>
 
+                 <div class="line-container"><i class="xline xline-top"></i></div>
+
                 <h2 class="form-heading">Bot Settings</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
                     <div class="form-group">
-                        <label for="hackathon">Enable GPUs for you bot</label>
+                      <label for="gpusettings">Enable GPUs for your current bot</label>
                        <v-select
                             label="label"
                             v-model="selected_gpu_state"
@@ -35,6 +37,16 @@
                         </v-select>
                     </div>
                 </form>
+
+                <div class="line-container"><i class="xline xline-top"></i></div>
+
+                <h2 class="form-heading">Email Settings</h2>
+                <form v-on:submit.prevent="submit" class="create-account-form">
+                    <div class="form-group">
+                            To manage your email preferences, click the relevant link at the bottom of any Halite email.
+                    </div>
+                </form>  
+
                 <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
                 <button type="submit" class="btn-ha">Save Settings</button>
             </div>
@@ -64,8 +76,8 @@ export default {
   },
       mounted: function () {
 
-        this.gpu_states.push("Yes");
-        this.gpu_states.push("No");
+        this.gpu_states.push( {label: "Yes",value: 1});
+        this.gpu_states.push( {label: "No",value: 0});
 
         api.me().then((me) => {
           this.user = me
@@ -74,50 +86,34 @@ export default {
 
           if(this.user.is_gpu_enabled){
             this.selected_gpu_state = this.gpu_states.find((item) => {
-              return item.value == "Yes"
+              return item.value == 1
             });
           }
           else{
-             this.selected_gpu_state = this.gpu_states.find((item) => {
-              return item.value == "No"
+              this.selected_gpu_state = this.gpu_states.find((item) => {
+              return item.value == 0
             });
           }
         });
       },
       methods: {
         submit: function (e) {
+
+           let request = {
+            'is_gpu_enabled': this.selected_gpu_state,
+          }
+
           api.update_me(this.user.user_id, request).then((response) => {
-            let message = 'You have updated your profile successfully.';
+            let message = 'Your settings have been saved successfully.';
             if (response.message) message += ' ' + response.message;
             Alert.show(message, 'success', true)
-            this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
+            this.gaData('account', 'edit-settings-success', 'edit-settings-flow')
           }, (error) => {
             const errorMessage = error.responseJSON
               ? error.responseJSON.message
-              : "Sorry, we couldn't update your profile. Please try again later."
+              : "Sorry, we couldn't update your settings. Please try again later."
             Alert.show(errorMessage, 'error')
-            this.gaData('account', 'edit-profile-error', 'edit-profile-flow')
-          }).then(() => {
-            if (this.hackathon_code) {
-              api.registerHackathon(this.hackathon_code).then((response) => {
-                let message = "You've signed up for the hackathon!"
-                if (response.responseJSON && response.responseJSON.message) {
-                  message = response.responseJSON.message
-                }
-                Alert.show(message, 'success', true)
-              }, (err) => {
-                let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
-                if (err.message) {
-                  message = err.message
-                }
-                if (err.responseJSON) {
-                  message = err.responseJSON.message
-                }
-
-                Alert.show(message, 'error')
-              })
-              this.hackathon_code = null
-            }
+            this.gaData('account', 'edit-settings-error', 'edit-settings-flow')
           })
         },
         gaData: function (category, action, label) {
