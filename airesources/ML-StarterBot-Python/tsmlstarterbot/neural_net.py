@@ -1,47 +1,30 @@
-import math
 import os
 import tensorflow as tf
 import numpy as np
 
 from tsmlstarterbot.common import PLANET_MAX_NUM, PER_PLANET_FEATURES
 
-# Silence any tensorflow output
+# We don't want tensorflow to produce any warnings in the standard output, since the bot communicates
+# with the game engine through stdout/stdin.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '99'
 tf.logging.set_verbosity(tf.logging.ERROR)
 
 
-# Normalize each column of the input.
-def normalize_columns(x):
-    m = np.expand_dims(x.mean(axis=1), axis=1)
-    s = np.expand_dims(x.std(axis=1), axis=1)
-    return (x - m) / (s + 1e-6)
+# Normalize planet features within each frame.
+def normalize_input(input_data):
+
+    # Assert the shape is what we expect
+    shape = input_data.shape
+    assert len(shape) == 3 and shape[1] == PLANET_MAX_NUM and shape[2] == PER_PLANET_FEATURES
+
+    m = np.expand_dims(input_data.mean(axis=1), axis=1)
+    s = np.expand_dims(input_data.std(axis=1), axis=1)
+    return (input_data - m) / (s + 1e-6)
 
 
 class NeuralNet(object):
     FIRST_LAYER_SIZE = 12
     SECOND_LAYER_SIZE = 6
-
-    def _add_layer(self, input_layer, input_size, output_size, use_bias=True, activation=tf.nn.relu):
-        """
-        Adds one layer with weights and biases.
-
-        :param input_layer
-        :param input_size: size of the input
-        :param output_size: size of the output
-        :param use_bias: whether to use bias or not
-        :param activation: activation function for the layer
-        :return: fully connected layer activation(Wx + b)
-        """
-
-        # These weights are shared among all the planets
-        shared_weights = tf.Variable(
-            tf.random_normal([input_size, output_size], stddev=1.0 / math.sqrt(input_size + output_size)))
-        # Add bias if requested
-        bias = tf.Variable(tf.zeros(shape=output_size)) if use_bias else tf.constant(0, dtype=tf.float32)
-
-        layer = tf.add(tf.matmul(input_layer, shared_weights), bias)
-
-        return activation(layer)
 
     def __init__(self, cached_model=None, seed=None):
         self._graph = tf.Graph()
@@ -59,26 +42,21 @@ class NeuralNet(object):
             self._target_distribution = tf.placeholder(dtype=tf.float32, name="target_distribution",
                                                        shape=(None, PLANET_MAX_NUM))
 
-            # Combine all the planets from all the frames together in one big vector, so it's easier to share
+            # Combine all the planets from all the frames together, so it's easier to share
             # the weights and biases between them in the network.
             flattened_frames = tf.reshape(self._features, [-1, PER_PLANET_FEATURES])
 
-            first_layer = self._add_layer(flattened_frames, PER_PLANET_FEATURES, self.FIRST_LAYER_SIZE)
-            second_layer = self._add_layer(first_layer, self.FIRST_LAYER_SIZE, self.SECOND_LAYER_SIZE)
+            first_layer = tf.contrib.layers.fully_connected(flattened_frames, self.FIRST_LAYER_SIZE)
+            second_layer = tf.contrib.layers.fully_connected(first_layer, self.SECOND_LAYER_SIZE)
 
-            third_layer = self._add_layer(second_layer, self.SECOND_LAYER_SIZE, 1,
-                                          use_bias=False, activation=lambda x: x)
+            third_layer = tf.contrib.layers.fully_connected(second_layer, 1, activation_fn=None)
 
             # Group the planets back in frames.
             logits = tf.reshape(third_layer, [-1, PLANET_MAX_NUM])
 
             self._prediction_normalized = tf.nn.softmax(logits)
 
-            self._loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-                logits=logits, labels=self._target_distribution))
-            self._entropy = tf.reduce_mean(-tf.reduce_sum(
-                self._target_distribution * tf.log(tf.clip_by_value(self._target_distribution, 1e-10, 1.0)),
-                reduction_indices=[1]))
+            self._loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=self._target_distribution))
 
             self._optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(self._loss)
             self._saver = tf.train.Saver()
@@ -97,7 +75,7 @@ class NeuralNet(object):
         :return: training loss on the input data
         """
         loss, _ = self._session.run([self._loss, self._optimizer],
-                                    feed_dict={self._features: normalize_columns(input_data),
+                                    feed_dict={self._features: normalize_input(input_data),
                                                self._target_distribution: expected_output_data})
         return loss
 
@@ -110,7 +88,7 @@ class NeuralNet(object):
         that should be sent to each planet
         """
         return self._session.run(self._prediction_normalized,
-                                 feed_dict={self._features: normalize_columns(np.array([input_data]))})[0]
+                                 feed_dict={self._features: normalize_input(np.array([input_data]))})[0]
 
     def compute_loss(self, input_data, expected_output_data):
         """
@@ -121,16 +99,8 @@ class NeuralNet(object):
         :return: training loss on the input data
         """
         return self._session.run(self._loss,
-                                 feed_dict={self._features: normalize_columns(input_data),
+                                 feed_dict={self._features: normalize_input(input_data),
                                             self._target_distribution: expected_output_data})
-
-    def compute_entropy(self, target_distribution):
-        """
-        Compute entropy of the target distribution.
-        :param target_distribution: numpy array of shape (number of frames, PLANET_MAX_NUM)
-        :return: entropy of the target distribution
-        """
-        return self._session.run(self._entropy, feed_dict={self._target_distribution: target_distribution})
 
     def save(self, path):
         """

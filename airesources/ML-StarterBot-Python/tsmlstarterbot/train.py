@@ -93,7 +93,6 @@ def main():
     permutation = np.random.permutation(training_data_size)
     training_input, training_output = training_input[permutation], training_output[permutation]
 
-    print("Validation set entropy: {}".format(nn.compute_entropy(validation_output)))
     print("Initial, cross validation loss: {}".format(nn.compute_loss(validation_input, validation_output)))
 
     curves = []
