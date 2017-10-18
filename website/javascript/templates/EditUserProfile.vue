@@ -8,12 +8,13 @@
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Edit your profile</h1>
+                    <i class="xline xline-bottom"></i>
                 </div>
 
-                <h2 class="form-heading">Resend Verification Mail</h2>
-                <p>If you cant find our account verification mail, resend a verification mail to your mail now.</p>
+                <h2 v-if="!user.is_email_good" class="form-heading">Resend Verification Mail</h2>
+                <p v-if="!user.is_email_good">If you cant find our account verification mail, resend a verification mail to your mail now.</p>
                 </br>
-                <button class="btn-ha">Resend Verfication</button>
+                <button v-if="!user.is_email_good" class="btn-ha" v-on:click="resend_verification_email">Resend Verfication</button>
 
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
@@ -38,7 +39,7 @@
                         <div class="form-group" v-if="level != 'High School'">
                             <label for="personal-email">Work or University Email</label>
                             <input class="form-control" type="email" id="personal-email" v-model="email" />
-                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile.</p>
+                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                         <div class="form-group" v-else>
                             <p>Please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
@@ -92,9 +93,8 @@
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
-                    <a class="cancel-href base" href="#" target="_self">Cancel</a>
+                    <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
                     <button type="submit" class="btn-ha">Update Profile</button>
-
                 </form>
             </div>
         </div>
@@ -266,8 +266,10 @@ export default {
             request['email'] = this.email
           }
 
-          api.update_me(this.user.user_id, request).then(() => {
-            Alert.show('You have updated your profile successfully', 'success')
+          api.update_me(this.user.user_id, request).then((response) => {
+            let message = 'You have updated your profile successfully.';
+            if (response.message) message += ' ' + response.message;
+            Alert.show(message, 'success', true)
             this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
           }, (error) => {
             const errorMessage = error.responseJSON
@@ -282,7 +284,7 @@ export default {
                 if (response.responseJSON && response.responseJSON.message) {
                   message = response.responseJSON.message
                 }
-                Alert.show(message, 'success')
+                Alert.show(message, 'success', true)
               }, (err) => {
                 let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
                 if (err.message) {
@@ -300,7 +302,29 @@ export default {
         },
         gaData: function (category, action, label) {
           utils.gaEvent(category, action, label)
-        }
+        },
+        resend_verification_email: function() {
+          api.resend_verification_email(this.user.user_id).then((response) => {
+            let message = "Verification code has been resent."
+            if (response && response.message) {
+              message = response.message;
+            }
+            else if (response && response.responseJSON && response.responseJSON.messasge) {
+              message = response.responseJSON.message;
+            }
+            Alert.show(message, "success", true);
+          }, (response) => {
+            let message = "Sorry, we couldn't resend the verification email. Please try again later.";
+            if (response && response.message) {
+              message = response.message;
+            }
+            else if (response && response.responseJSON && response.responseJSON.message) {
+              message = response.responseJSON.message;
+            }
+
+            Alert.show(message, "error");
+          });
+        },
       }
     }
 </script>

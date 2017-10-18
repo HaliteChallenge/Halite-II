@@ -14,7 +14,7 @@ ENVIRONMENT_DIR_HELP = "Directory containing precompiled Halite environment " \
                        "executables, each named after their platform. "
 VERSION_HELP = "The version string to embed in the downloads page."
 IGNORED_EXTENSIONS = [".exe", ".class", ".pyc", ".obj"]
-INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp", ".cs", ".csproj"]
+INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp", ".cs", ".csproj", ".scala", ".js", ".sh", ".bat", ".toml", ".rs", ]
 INCLUDED_FILES = ["Makefile", "README"]
 STARTER_KIT_DIR = "../airesources"
 DOWNLOAD_DATA = "_data/downloads.json"
@@ -23,11 +23,16 @@ PLATFORM_AGNOSTIC = "None"
 # Names of generated downloads
 # Standard language + platform
 OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{language}_{platform}.zip"
+
 # Platform only
 ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
+
 # All languages + platform
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
+
+versions =  {"Python3" : "0.9.0", "C++" : "0.9.0", "Java" : "0.9.0", "CSharp" : "0.7.0" ,"JavaScript": "0.7.0",
+"ML-StarterBot-Python":"0.9.0", "Rust" : "0.9.0", "Scala" : "0.9.0" }
 
 
 def detect_environments(directory):
@@ -58,6 +63,7 @@ def scan_directory(full_path):
             if ext.lower() in INCLUDED_EXTENSIONS or filename in INCLUDED_FILES:
                 included_files.append(os.path.join(containing_dir, filename))
 
+    included_files.append(os.path.join(STARTER_KIT_DIR, "README.MD"))
     return included_files
 
 
@@ -135,9 +141,6 @@ def main():
         if not os.path.isdir(full_path):
             continue
 
-        if directory == "sample_bots":
-            continue
-
         if directory == "starterkitdocs":
             continue
 
@@ -194,6 +197,7 @@ def main():
         output["languages"].append({
             "language": language,
             "files": language_kits,
+            "version": versions[language]
         })
 
     output["languages"].append({

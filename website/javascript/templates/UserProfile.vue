@@ -23,7 +23,7 @@
                     <h2><span :class="tierClass(user.tier || 'Bronze')"></span> {{ user.rank ? `rank ${user.rank}` : "No Rank" }}, {{ user.tier || "Bronze" }} tier</h2>
                     <div class="user-profile-rank-stats">
                         <div class="stats-item">
-                            <h3>Points</h3>
+                            <h3>Rating</h3>
                             <p>{{ Math.round(user.score * 100) / 100 }}</p>
                         </div>
                         <div class="stats-item">
@@ -56,25 +56,46 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn" @click="toggleShare">
-                <span>SHARE</span>
-                </button>
-                <!-- <div class="user-profile-badge">
+                <div>
+                    <button class="btn" @click="toggleShare">
+                        <span>SHARE</span>
+                    </button>
+                    <!-- <div class="user-profile-badge">
+                        <i class="xline xline-top"></i>
+                        <h2>Badges</h2>
+                        <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
+                        <div class="user-profile-badge-content">
+                            <ul class="user-profile-badge-list">
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
+                            </ul>
+                        </div>
+                        <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
+                    </div> -->
+                    <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                </div>
+                <div class="stats-1-section">
                     <i class="xline xline-top"></i>
-                    <h2>Badges</h2>
-                    <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
-                    <div class="user-profile-badge-content">
-                        <ul class="user-profile-badge-list">
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
-                        </ul>
+                    <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>             
+                    <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
+                        <div class="stats-item">
+                            <h3>Rank</h3>
+                            <p>{{ season1stats.rank }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Bots</h3>
+                            <p>{{season1stats.num_submissions }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Games</h3>
+                            <p>{{ season1stats.num_games }}</p>
+                        </div>
                     </div>
-                    <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
-                </div> -->
-                 <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                </div>
+                <a v-if="season1stats && season1stats.num_submissions > 0" class="user-name" target="_blank" :href="'https://2016.halite.io/user.php?userID=' + season1stats.userID">View Halite 1 Profile</a>
             </div>
         </div>
         <div class="col-md-7">
@@ -94,7 +115,7 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li v-if="hackathons.length" role="presentation">
+                    <li role="presentation">
                         <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>
@@ -116,7 +137,7 @@
                                 <div v-if="!games.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/game_video.png`" class="icon-"></img>
                                     <h2>No games played yet</h2>
-                                    <p v-if="is_my_page">Complete your first game and view replays<br/>here</p>
+                                    <p v-if="is_my_page">Complete your first game and view replays. <br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="games.length">
                                     <table class="table table-leader">
@@ -142,9 +163,8 @@
                                                     <a v-for="player in game.playerSorted"
                                                     :href="'/user?user_id=' + player.id"
                                                     class="game-participant"
-                                                    v-bind:class="{ 'timed-out': player.timed_out }"
-                                                    :title="player.timed_out ? 'This player timed out or errored in this game. See the log for details.' : ''">
-                                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                    :title="usernames[player.id] + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
+                                                        <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
                                                         <span class="rank">
                                                             {{ player.rank }}
                                                         </span>
@@ -227,17 +247,17 @@
                             <section class="profile-section">
                                 <h2>
                                     <i class="xline xline-bottom"></i>
-                                    Score Analysis
-                                    <span title="Rank is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
+                                    Rating Analysis
+                                    <span title="Rating is calculated as mu - 3 * sigma;" class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!user.mu" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
-                                    <h2>No score analysis</h2>
-                                    <p v-if="is_my_page">Submit your first bot to get your score<br/>here</p>
+                                    <h2>No rating analysis</h2>
+                                    <p v-if="is_my_page">Submit your first bot to get your rating. <br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="user.mu" class="user-profile-rank-stats">
                                     <div class="stats-item">
-                                        <h3>Score</h3>
+                                        <h3>Rating</h3>
                                         <p>{{ Math.round(user.score * 100) / 100 }}</p>
                                     </div>
                                     <div class="stats-item">
@@ -254,12 +274,12 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     Nemesis
-                                    <span title="Players you most often loose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
+                                    <span title="Players you most often lose/win (minimum 10 games played) against, based on analysis of the last 200 games." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!nemesisList.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No nemesis yet</h2>
-                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to uncover your nemesis. <br/><a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
@@ -314,12 +334,12 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     History
-                                    <span title="Rank/Score history of your bots, the rank/score is the last score or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
+                                    <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!userHistory.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
                                     <h2>No history</h2>
-                                    <p v-if="is_my_page">Submit your first bot to see your history<br/>here</p>
+                                    <p v-if="is_my_page">Submit your first bot to see your history.<br/> <a href="/play-programming-challenge">Play here</a></p>
                                 </div>
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
@@ -327,7 +347,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Bot Version</th>
-                                                    <th class="text-center">Score</th>
+                                                    <th class="text-center">Rating</th>
                                                     <th class="text-center">Rank</th>
                                                     <th class="text-center hidden-xs">Games</th>
                                                     <th class="hidden-xs">Retired On</th>
@@ -339,7 +359,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Bot Version</th>
-                                                        <th class="text-center">Score</th>
+                                                        <th class="text-center">Rating</th>
                                                         <th class="text-center">Rank</th>
                                                         <th class="text-center hidden-xs">Games</th>
                                                         <th class="hidden-xs">Retired On</th>
@@ -382,7 +402,7 @@
 
                                 <div v-if="!hackathons.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                                    <h2>No Hackathons yet</h2>
+                                    <h2>No part of any Hackathons yet</h2>
                                     <p v-if="is_my_page">If you have a Hackthon code, add it to your <br/>your profile</p>
                                     <div v-if="is_my_page" class="ha-button-container">
                                         <div>
@@ -470,11 +490,12 @@ import dateformat from 'dateformat'
           is_my_page: false,
           highestRank: null,
           sharePopup: false,
+          season1stats: null,
           messages: {
             hackathon: ''
           }
         }
-  },
+      },
       mounted: function () {
         const params = new URLSearchParams(window.location.search)
         let source
@@ -507,9 +528,13 @@ import dateformat from 'dateformat'
           this.fetchErrorGames()
           this.fetchnemesis()
           this.fetchhistory()
+          this.fetchHalite1Stats()
+
+        }, (e) => {
+          window.location.replace(`${this.baseUrl}/404`);
         })
 
-    api.me().then((me) => {
+        api.me().then((me) => {
           this.is_my_page = me && me.user_id === this.user.user_id
         })
 
@@ -562,21 +587,16 @@ import dateformat from 'dateformat'
             this.games = data
             for (let game of data) {
               for (let participant of Object.keys(game.players)) {
+                let username = game.players[participant].username
                 game.players[participant].id = participant
-                if (this.profile_images[participant]) continue
-                this.profile_images[participant] = 'loading'
-
-                api.get_user(participant).then((user) => {
-                  this.profile_images[participant] = api.make_profile_image_url(user.username)
-                  this.usernames[participant] = user.username
-                  this.$forceUpdate()
-                })
+                this.profile_images[participant] = api.make_profile_image_url(username)
+                this.usernames[participant] = username
               }
 
               const players = Object.values(game.players).sort((r1, r2) => {
                 if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
                 if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
-                return r2.rank - r1.rank
+                return r1.rank - r2.rank
               })
 
               game.playerSorted = players
@@ -600,7 +620,7 @@ import dateformat from 'dateformat'
           }
           const location = `${state ? state + ', ' : ''}${country}`
           return location || ''
-    },
+        },
         fetchnemesis: function () {
           let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`
           const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
@@ -612,6 +632,10 @@ import dateformat from 'dateformat'
                 if (participant == this.user.user_id) {
                   continue
                 }
+
+                let username = game.players[participant].username
+                this.profile_images[participant] = api.make_profile_image_url(username)
+                this.usernames[participant] = username
 
                 let playerData = nemesisMap.get(participant)
                 if (typeof playerData === 'undefined') {
@@ -639,18 +663,19 @@ import dateformat from 'dateformat'
                 }
                 this.nemesisList.push(obj)
               }
-              api.get_user(key).then((user) => {
-                this.profile_images[key] = api.make_profile_image_url(user.username)
-                this.usernames[key] = user.username
-                this.$forceUpdate()
-              })
             }
 
             this.nemesisList.sort(function (a, b) { return b.losses - a.losses })
             this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit)
             this.refreshStickyTable()
           })
-    },
+        },
+        fetchHalite1Stats: function () {
+          api.get_season1_stats(this.user.user_id).then(userDetails => {
+            this.season1stats = userDetails;
+            console.log(this.season1stats);
+          })
+        },
         fetchHackathon: function () {
           api.getUserHackathons(this.user.user_id).then(hackathons => {
             if (hackathons && hackathons instanceof Array) {

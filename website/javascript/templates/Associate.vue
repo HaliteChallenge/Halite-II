@@ -5,7 +5,8 @@
                 <div class="page-header">
                     <a id="section_personal_info"></a>
                     <h1>Create New Account</h1>
-                    <p>Additional information is required to complete your account.</p>
+                    <p class="text-center">Additional information is required to complete your account.</p>
+                    <i class="xline xline-bottom"></i>
                 </div>
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
@@ -24,6 +25,7 @@
                             <label for="work-email">Please share your work email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
+                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </div>
 
@@ -32,6 +34,7 @@
                             <label for="school-email">Please share your school email</label>
                             <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
+                            <p>This is used to affiliate you with a university (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </div>
 
@@ -156,7 +159,7 @@ export default {
           verify_sent: "We've sent a verification email to the address you provided.",
           hackathon_add: "You've also been successfully added to a Halite hackathon",
           account_error: 'Error: Sorry, something went wrong. Please fix any form fields with issues or you can submit a bot now and edit your profile later to fix remaining issues.',
-          sucess_message: '',
+          success_message: '',
           error_string: ''
         }
   },
@@ -229,11 +232,13 @@ export default {
           const register = () => {
             api.register_me(request).then((success) => {
               if (request['organization_id']) {
-                this.sucess_message = this.verify_sent + '\n' + this.account_success
+                this.success_message = this.verify_sent + '\n' + this.account_success
               } else {
-                this.sucess_message = this.account_success
+                this.success_message = this.account_success
               }
-              Alert.show(this.sucess_message, 'success')
+              if (success.message) this.success_message += success.message;
+
+              Alert.show(this.success_message, 'success')
               this.gaData('account', 'new-account-success', 'account-flow')
               setTimeout(() => {
                 window.location.replace('/learn-programming-challenge')

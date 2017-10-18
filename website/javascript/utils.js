@@ -21,7 +21,7 @@ export function gaEvent (category, action, label) {
 }
 
 export const Alert = {
-  show: function (message = 'there is an error', type = 'error') {
+  show: function (message = 'there is an error', type = 'error', auto_hide = 'false') {
     let outerContainer = document.getElementById('message-placeholder')
     outerContainer.innerHTML = ''
     let container = document.createElement('div')
@@ -36,7 +36,16 @@ export const Alert = {
         }
       })
     })
+
+    if(auto_hide)
+    {
+     setTimeout(function() {
+        let outerContainer = document.getElementById('message-placeholder')
+        outerContainer.innerHTML = ''
+      }, 5000);
+    }
   },
+
   hide: function () {
     let outerContainer = document.getElementById('message-placeholder')
     outerContainer.innerHTML = ''

@@ -3,9 +3,7 @@ import math
 # Max number of planets.
 PLANET_MAX_NUM = 28
 
-# Number of initial features per planet we compute for each planet.
-PER_PLANET_FEATURES = 11
-
+# These are the features we compute per planet
 FEATURE_NAMES = [
     "health",
     "available_docking_spots",
@@ -19,6 +17,8 @@ FEATURE_NAMES = [
     "weighted_average_distance_from_friendly_ships",
     "is_active"]
 
+# Number of initial features per planet we have
+PER_PLANET_FEATURES = len(FEATURE_NAMES)
 
 def distance2(x1, y1, x2, y2):
     return (x1 - x2) ** 2 + (y1 - y2) ** 2

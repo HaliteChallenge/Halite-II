@@ -4,6 +4,7 @@ import os.path
 import zipfile
 
 import numpy as np
+import pandas as pd
 from tsmlstarterbot.parsing import parse
 
 from tsmlstarterbot.neural_net import NeuralNet
@@ -92,8 +93,9 @@ def main():
     permutation = np.random.permutation(training_data_size)
     training_input, training_output = training_input[permutation], training_output[permutation]
 
-    print("Validation set entropy: {}".format(nn.compute_entropy(validation_output)))
     print("Initial, cross validation loss: {}".format(nn.compute_loss(validation_input, validation_output)))
+
+    curves = []
 
     for s in range(args.steps):
         start = (s * args.minibatch_size) % training_data_size
@@ -102,6 +104,10 @@ def main():
         if s % 25 == 0 or s == args.steps - 1:
             validation_loss = nn.compute_loss(validation_input, validation_output)
             print("Step: {}, cross validation loss: {}, training_loss: {}".format(s, validation_loss, training_loss))
+            curves.append((s, training_loss, validation_loss))
+
+    cf = pd.DataFrame(curves, columns=['step', 'training_loss', 'cv_loss'])
+    fig = cf.plot(x='step', y=['training_loss', 'cv_loss']).get_figure()
 
     # Save the trained model, so it can be used by the bot
     current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -110,6 +116,8 @@ def main():
     nn.save(model_path)
     print("Model serialized")
 
+    curve_path = os.path.join(current_directory, os.path.pardir, "models", args.model_name + "_training_plot.png")
+    fig.savefig(curve_path)
 
 if __name__ == "__main__":
     main()

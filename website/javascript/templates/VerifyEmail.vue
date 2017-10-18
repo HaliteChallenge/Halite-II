@@ -1,7 +1,7 @@
 <template>
     <form>
-        <p class="text-danger">{{ error_message }}</p>
-        <p>{{ success_message }}</p>
+        <p class="text-danger" style="text-align: center; padding-left: 40px;padding-right: 40px;">{{ error_message }}</p>
+        <p style="text-align: center;"> {{ success_message }} </p>
     </form>
 </template>
 
@@ -39,12 +39,12 @@ export default {
                 this.error_message = 'Your email verification failed, please contact halite@halite.io: Error Details -' + xhr.responseJSON.message
               },
               success: (xhr) => {
-                this.success_message = 'Your email has been verified successfully. You will be automatically redirected in a few seconds.'
+                this.success_message = 'Your email has been verified successfully. If you signed up for a hackathon that requires a verified email, you will now appear on the hackathon leaderboard. \n Sit tight, you’ll be automatically redirected in a few seconds.'
               }
             }).then(() => {
               window.setTimeout(function () {
                 window.location.replace('/user/?me')
-              }, 5000)
+              }, 10000)
             })
           }
         }

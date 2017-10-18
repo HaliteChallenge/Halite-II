@@ -80,7 +80,7 @@
             <div class="col-md-12 big-menu watch-section">
                 <p class="t2 c-wht">WATCH TOP GAMES</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
+                <p class="t5 c-gry section-des">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
                     <a href="/play/?game_id=850849">
@@ -90,12 +90,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_1.png`"/>
-                                <span class="t4 c-wht i-label">Brianvanleeuwen vs. ...</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:45:25</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">Juliak vs Erdman</span>
                             </div>
                         </div>
                     </a>
@@ -106,12 +101,7 @@
                               <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                           </div>
                           <div class="img-des">
-                              <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                              <span class="t4 c-wht i-label">Gogokefakefa vs. ...</span>
-                              <div class="i-des">
-                                  <span class="t5 c-gry">09/22/17 - 12:45:49</span>
-                                  <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                              </div>
+                              <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
                           </div>
                         </div>
                     </a>
@@ -122,12 +112,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_3.png`"/>
-                                <span class="t4 c-wht i-label">PIOTRZIELINSKI DEFEATS J-CLAP</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:56:13</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">CarlosWatt... vs Erdman, +2</span>
                             </div>
                         </div>
                     </a>
@@ -138,12 +123,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                                <span class="t4 c-wht i-label">LIDAVIDM DEFEATS 3</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:57:30</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
                             </div>
                         </div>
                     </a>
@@ -240,7 +220,7 @@
             <div class="col-md-12 big-menu">
                 <p class="t2 c-wht font-headline">WHAT THE COMMUNITY HAS TO SAY</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
-                <p class="t5 c-gry">Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
+                <p class="t5 c-gry section-des">Find out what players are say and sharing and stay tuned for the latest news and events from Two Sigma, the Halite team, and our broader community.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12 img-list no-padding-xs">
                     <div class="col-md-4">
@@ -305,12 +285,24 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-12 ha-line">
+            </div>
+            <div class="col-md-12 col-sm-12 sponsor-section">
+                <p class="t2 c-wht font-headline">OUR SUPPORTING PARTNERS</p>
+                <div class="col-md-6 col-sm-6 left">
+                    <span class="t3 c-wht font-headline left-label">CORNELL<br/>TECH</span>
+                    <span class="left-des font-headline"><span class="c-gry">HOME OF THE</span><span class="c-wht"> JACOBS<br/>TECHNION-CORNELL<br/>INSTITUTE</span></span>
+                </div>
+                <div class="col-md-6 col-sm-6 right">
+                    <span class="t2 c-wht font-headline">Google</span>
+                </div>
+            </div>
             <div class="col-md-12 big-menu">
                 <p class="t2 c-wht font-headline">GET STARTED WITH HALITE</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="ha-button-container">
                     <div>
-                        <a :href="loginServerUrl" @click.stop.prevent="signup" v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></a>
+                        <a :href="loginServerUrl" v-if="!me_in" class="ha-button"><span>SIGN UP WITH GITHUB</span></a>
                         <a href="/play-programming-challenge" v-if="me_in" class="ha-button hidden-sm hidden-xs"><span>PLAY NOW</span></a>
                         <a href="/learn-programming-challenge" v-if="me_in" class="ha-button visible-sm visible-xs"><span>GET STARTED AND LEARN</span></a>
                     </div>
@@ -357,14 +349,6 @@ export default {
              document.getElementById('invitestatus').textContent = 'Invitation sent...'
              gaData('invite-success', 'click-to-invite', 'home')
            })
-         }
-       },
-       signup: () => {
-         let docWidth = $(document).width()
-         if (docWidth <= 768) {
-           $('.mobile-strict-container').css('visibility', 'visible')
-         } else {
-           window.location.replace(`${api.LOGIN_SERVER_URL}/github`)
          }
        },
        createRedditWidget: function () {

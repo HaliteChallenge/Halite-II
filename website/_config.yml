@@ -21,6 +21,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://35.185.45.87/" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: haliteAI
 github_username:  haliteadmin
+markdown: kramdown
 
 permalink: /blog/:year/:month/:day/:title.html
 

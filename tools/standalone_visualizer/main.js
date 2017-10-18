@@ -9,8 +9,11 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new electron.BrowserWindow({
-        width: 1000,
+        width: 1280,
         height: 960,
+        autoHideMenuBar: true,
+        show: false,
+        icon: path.join(__dirname, 'assets/icons/png/64x64.png')
     });
 
     mainWindow.loadURL(url.format({
@@ -22,6 +25,10 @@ function createWindow() {
     mainWindow.on("closed", function() {
         // Close the window by letting JS GC it
         mainWindow = null;
+    });
+
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
     });
 }
 

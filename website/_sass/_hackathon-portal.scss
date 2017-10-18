@@ -217,6 +217,9 @@
     padding-top: 50px;
     position: relative;
   }
+  .table-container{
+    overflow-x: auto;
+  }
 
   .hackathon-table {
     text-align: left;

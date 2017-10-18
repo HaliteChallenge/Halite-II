@@ -38,7 +38,25 @@ module.exports = {
                 options: {
                     loaders: {
                         'scss': 'vue-style-loader!css-loader!sass-loader',
-                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+                        'js': {
+                            loader: 'babel-loader',
+                            options: {
+                                presets: [
+                                    ['env', {
+                                        targets: {
+                                            browsers: ["last 2 versions", "safari >= 7"]
+                                        }
+                                    }],
+                                ],
+                                env: {
+                                    "production": {
+                                        // TODO: figure out why we can't enable babili here
+                                        // "presets": ["babili"]
+                                    }
+                                },
+                            }
+                        }
                     }
                 }
             },

@@ -38,7 +38,7 @@
                     <div class="panel-collapse collapse" :class="{'in': detailExpanded}" role="tabpanel"
                          :aria-expanded="detailExpanded.toString()" id="widget_more_details"
                          aria-labelledby="heading_more_details">
-                        <div v-html="hackathon.description"></div>
+                        <div v-html="hackathon.description" style="padding: 30px;"></div>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                                     <div class="hackathon-join-left-col">
                                         <div class="hex-li">
                                             <span class="hex-bullet">2</span>
-                                            <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email halite@halite.io for more information.</span>
+                                            <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email <a href="mailto:halite@halite.io">halite@halite.io</a> for more information.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@ export default {
     data: function () {
       let detailExpanded = true
       let joinExpanded = true
-      if ($(window).width() < 768) {
+      if (window.mobileAndTabletcheck()) {
         detailExpanded = false
         joinExpanded = false
       }
@@ -194,7 +194,7 @@ export default {
             })
             this.isInHackathon = true
             if (this.isInHackathon) {
-              if ($(window).width() < 768) {
+              if (window.mobileAndTabletcheck()) {
                 this.detailExpanded = false
                 this.joinExpanded = false
               } else {

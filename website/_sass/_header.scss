@@ -17,11 +17,25 @@
 #navbar{
   @media (max-width: $screen-sm-max){
     transform: translateY(9px);
+    background: #25242f;
   }
 }
 .navbar-header{
   @media (max-width: $screen-sm-max){
     transform: translateY(5px);
+  }
+}
+#navbar{
+  .navbar-nav{
+    @media (max-width: $screen-sm-max){
+      margin-top: 0;
+      margin-bottom: 0;
+      li a{
+        text-align: center;
+        border-bottom: 1px solid $border;
+        line-height: 40px;
+      }
+    }
   }
 }
 .navbar-inverse{
@@ -123,9 +137,7 @@ header.navbar{
       padding: 13px 0 0 10px;
       cursor: pointer;
       display: inline-block;
-      @media (min-width: $screen-md-min){
-        transform: translateY(-26px);
-      }
+      vertical-align: top;
       i{
         color: #FFF;
         margin-left: 3px;

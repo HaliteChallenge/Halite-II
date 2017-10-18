@@ -2,7 +2,7 @@
 layout: doc_page
 title: Upload Bot Tool
 toc: false
-sort_key: 2
+sort_key: 9
 ---
 
 ## Uploading bots from the terminal

@@ -124,6 +124,7 @@ CREATE TABLE user (
     update_time DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     api_key_hash VARCHAR(255), 
     is_admin TINYINT(1) DEFAULT '0', 
+    `is_gpu_enabled` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (id), 
     CONSTRAINT user_ibfk_1 FOREIGN KEY(organization_id) REFERENCES organization (id)
 )DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000 ENGINE=InnoDB;
@@ -263,3 +264,40 @@ CREATE TABLE hackathon_snapshot (
 CREATE INDEX user_id ON hackathon_snapshot (user_id, bot_id);
 
 INSERT INTO alembic_version (version_num) VALUES ('7f0054256cf5');
+
+-- Running upgrade 7f0054256cf5 -> 33de9025cc63
+
+ALTER TABLE game_stat DROP FOREIGN KEY game_stat_ibfk_1;
+
+ALTER TABLE game_view_stat DROP FOREIGN KEY game_view_stat_ibfk_1;
+
+ALTER TABLE game_bot_stat DROP FOREIGN KEY game_bot_stat_ibfk_1;
+
+ALTER TABLE game_participant DROP FOREIGN KEY game_participant_ibfk_4;
+
+ALTER TABLE game MODIFY id INTEGER(9) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE game_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_view_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_bot_stat MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_participant MODIFY game_id INTEGER(9) UNSIGNED NOT NULL;
+
+ALTER TABLE game_stat ADD CONSTRAINT game_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_view_stat ADD CONSTRAINT game_view_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_bot_stat ADD CONSTRAINT game_bot_stat_ibfk_1 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+ALTER TABLE game_participant ADD CONSTRAINT game_participant_ibfk_4 FOREIGN KEY(game_id) REFERENCES game (id) ON DELETE CASCADE;
+
+UPDATE alembic_version SET version_num='33de9025cc63' WHERE alembic_version.version_num = '7f0054256cf5';
+
+-- Running upgrade 33de9025cc63 -> e7920cc5568a
+
+ALTER TABLE user ADD COLUMN is_gpu_enabled TINYINT(1) NOT NULL DEFAULT '0';
+
+UPDATE alembic_version SET version_num='e7920cc5568a' WHERE alembic_version.version_num = '33de9025cc63';
+

@@ -1,17 +1,18 @@
 <template>
     <div class="logged-in">
-        <ul id="submitbutton" class="nav navbar-nav navbar-right submit-bot container-empty">
+        <ul id="submitbutton" v-if="!isMobile" class="nav navbar-nav navbar-right submit-bot hidden-xs hidden-sm">
             <li>
                 <a href="/play-programming-challenge"><i class="fa fa-arrow-up"></i>Submit a Bot</a>
             </li>
         </ul>
-        <div id="profile" class="profile-container container-empty">
+        <div id="profile" class="profile-container">
             <a v-on:click.stop="slide_profile">
                 <img :src="profile_image + '?size=40'" :title="username + '\'s Profile'" :alt="username + '\'s profile image'" />
                 <i class="fa fa-sort-down"></i>
                 <ul class="nav">
                     <li><a v-on:click="gaData('account','click-view-profile','account-flow')" href="/user?me"><span>view profile</span><i class="line line-bottom"></i></a></li>
                     <li><a v-on:click="gaData('account','click-edit-profile','account-flow')"href="/user/edit-user"><span>edit profile</span><i class="line line-bottom"></i></a></li>
+                     <li><a v-on:click="gaData('account','click-edit-settings','account-flow')"href="/user/settings"><span>settings</span><i class="line line-bottom"></i></a></li>
                     <li><a v-on:click.stop.prevent="sign_out"><span>sign out</span><i class="line line-bottom"></i></a></li>
                 </ul>
             </a>
@@ -28,17 +29,20 @@ export default {
       props: ['baseUrl'],
       data: function () {
         const me = api.me_cached()
+        const isMobile = window.mobileAndTabletcheck()
         if (me) {
           return {
             username: me.username,
-            profile_image: api.make_profile_image_url(me.username)
+            profile_image: api.make_profile_image_url(me.username),
+            isMobile: isMobile
           }
-    }
+        }
         return {
           username: '',
-          profile_image: null
+          profile_image: null,
+          isMobile: isMobile
         }
-  },
+      },
       mounted: function () {
         api.me().then((user) => {
           this.username = user.username

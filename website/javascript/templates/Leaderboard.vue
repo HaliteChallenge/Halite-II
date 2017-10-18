@@ -72,9 +72,9 @@
           <tr>
             <th class="text-center">Rank</th>
             <th>Player</th>
-            <th>Score</th>
+            <th>Rating</th>
             <th class="text-center">Tier</th>
-            <th>Academic Status</th>
+            <th>Level</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
             <th>Language</th>
@@ -82,9 +82,9 @@
           </tr>
           </thead>
           <tbody>
-          <tr :id="`user-row-${player.user_id}`" v-for="player in leaderboard">
+          <tr :id="`user-row-${player.user_id}`" :key="player.user_id" v-for="player in leaderboard">
             <td class="text-center">{{ player.rank || player.local_rank }}</td>
-            <td>
+            <td class="nowrap">
               <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
                 <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
                 {{ player.username }}
@@ -501,7 +501,7 @@ export default {
 
       setupCollapseFilter: function () {
         const collapse = this.$cookie.get('leaderboard_filter_collapsed')
-        if (collapse == 1 || $(window).width() < 768) {
+        if (collapse == 1 || window.mobileAndTabletcheck()) {
           $('#panel_filter').removeClass('in')
           $('#toggle_filter').attr('aria-expanded', 'false')
         }
@@ -548,7 +548,6 @@ export default {
               this.page = Math.ceil(gotoIndex / this.limit)
             }
           }
-          
           this.update_filter(true, true);
         }
 
@@ -588,10 +587,12 @@ export default {
               const offset = 60 // the header height
               $('body, html').scrollTop(id.offset().top - offset)
               this.show_user = null
+
+              // hight light
+              id.addClass('hl');
             }, 1000)
           }
         }
-        
         if(this.all_leaderboards && defaultFilter) {
           handleLeaderboard(this.all_leaderboards.slice((this.page - 1) * this.limit, this.page * this.limit));
         } else {

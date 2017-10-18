@@ -148,13 +148,13 @@
     }
 
     .game-replay-btn-table {
-      display: table;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       height: 100%;
       width: 100%;
 
       .game-replay-btn-cell {
-        display: table-cell;
-        vertical-align: middle;
         position: relative;
         width: 200px;
 
@@ -174,8 +174,7 @@
     }
 
     .game-replay-progress {
-      display: table-cell;
-      vertical-align: middle;
+      flex: 1;
       padding-left: 20px;
       padding-right: 20px;
     }
@@ -191,8 +190,6 @@
     }
 
     .game-replay-share {
-      display: table-cell;
-      vertical-align: middle;
       text-align: right;
       width: 100px;
     }

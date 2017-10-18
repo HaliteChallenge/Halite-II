@@ -11,7 +11,7 @@
         <tr>
           <th class="text-center">Rank</th>
           <th>Player</th>
-          <th>Score</th>
+          <th>Rating</th>
           <th class="text-center">Tier</th>
           <th>Academic Status</th>
           <th class="text-center">Country</th>

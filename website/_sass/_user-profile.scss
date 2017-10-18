@@ -142,9 +142,13 @@
   text-align: center;
 
   img {
-    max-width: 229px;
-    max-height: 230px;
     display: inline;
+    max-width: 160px;
+    max-height: 161px;
+    @media (min-width: $screen-md-min){
+      max-width: 229px;
+      max-height: 230px;
+    }
   }
 }
 
@@ -152,6 +156,16 @@
   .user-name {
     font-size: 35px;
     font-family: $font-heading;
+  }
+}
+
+.stats-1-section{
+  position: relative;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-top: 30px;
+  h3{
+    margin-top: 0;
   }
 }
 
@@ -168,6 +182,12 @@
 
   .game-participant{
     white-space: nowrap;
+  }
+
+  .timed-out{
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: red;
   }
 
   .table-leader {

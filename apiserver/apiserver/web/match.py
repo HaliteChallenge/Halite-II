@@ -119,9 +119,14 @@ def list_matches_helper(offset, limit, participant_clause,
         matches = conn.execute(query)
 
         for match in matches.fetchall():
-            participants = conn.execute(model.game_participants.select(
-                model.game_participants.c.game_id == match["id"]
-            ))
+            participants = conn.execute(
+                model.game_participants.join(
+                    model.users,
+                    model.game_participants.c.user_id == model.users.c.id
+                ).select(
+                    model.game_participants.c.game_id == match["id"]
+                )
+            )
 
             match = {
                 "game_id": match["id"],
@@ -139,6 +144,7 @@ def list_matches_helper(offset, limit, participant_clause,
 
             for participant in participants:
                 match["players"][participant["user_id"]] = {
+                    "username": participant["username"],
                     "bot_id": participant["bot_id"],
                     "version_number": participant["version_number"],
                     "player_index": participant["player_index"],

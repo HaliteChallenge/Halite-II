@@ -1,14 +1,16 @@
 {
-  "name": "halite_standalone",
+  "name": "halite_visualizer",
   "version": "1.0.0",
-  "description": "",
+  "description": "The standalone visualizer for Halite II.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack -w",
     "build": "webpack",
     "start": "electron .",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder",
+    "package-mac": "electron-packager . \"Halite II Visualizer\" --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . \"Halite II Visualizer\" --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Halite II Visualizer\"",    
+    "package-linux": "electron-packager . \"Halite II Visualizer\" --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/icon.png --prune=true --out=release-builds"
   },
   "build": {
     "appId": "halite2.standalone",
@@ -21,10 +23,6 @@
     ],
     "linux": {
       "target": [
-        "snap",
-        "deb",
-        "rpm",
-        "pacman",
         "tar.gz"
       ]
     }
@@ -32,6 +30,7 @@
   "author": "David Li <David.M.Li@TwoSigma.com>",
   "license": "MIT",
   "devDependencies": {
+    "copy-webpack-plugin": "^4.1.1",
     "electron": "^1.6.11",
     "electron-builder": "^19.16.0",
     "electron-packager": "^9.0.0",
@@ -46,10 +45,12 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "css-loader": "^0.28.7",
     "font-awesome": "^4.7.0",
     "fs": "0.0.1-security",
     "jquery": "3.2.1",
     "libhaliteviz": "file:../../libhaliteviz",
+    "sass-loader": "^6.0.6",
     "vue": "^2.3.4"
   }
 }

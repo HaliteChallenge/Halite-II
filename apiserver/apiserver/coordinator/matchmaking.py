@@ -115,18 +115,19 @@ def serve_game_task(conn, has_gpu=False):
         })
 
 
-def find_recent_seed_player(conn, ranked_users, rank_limit, restrictions=False):
+def find_idle_seed_player(conn, ranked_users, rank_limit, restrictions=False):
     """
-    Find a seed player that has played in a recent game.
+    Find a seed player that hasn't played recently.
     :param conn:
     :param rank_limit:
     :param restrictions: If True, additionally restrict number of games
     played by the bot, and sort randomly.
     :return:
     """
-    # Find the users in the most recent games, and pick a seed player
-    # from those. Ported from Halite 1 PHP backend (which seems to have
-    # been derived from aichallenge/Ants).
+    # Get all users last time to play a game, and pick a seed player
+    # from those that haven't played for the longest. Newly submitted bots
+    # having never played get picked first. Initially ported from Halite 1
+    # PHP backend (which was partially derived from aichallenge/Ants).
 
     sqlfunc = sqlalchemy.sql.func
 
@@ -134,30 +135,35 @@ def find_recent_seed_player(conn, ranked_users, rank_limit, restrictions=False):
     user_id = model.game_participants.c.user_id
     bot_id = model.game_participants.c.bot_id
 
-    recent_gamers = sqlalchemy.sql.select([
+    gamers_last_play = sqlalchemy.sql.select([
         max_time,
-        user_id,
-        bot_id,
+        ranked_users.c.user_id,
+        model.ranked_bots_users.c.bot_id,
         ranked_users.c.username,
         ranked_users.c.rank.label("player_rank"),
         model.ranked_bots_users.c.num_submissions.label("version_number"),
         model.ranked_bots_users.c.mu,
-        model.ranked_bots_users.c.rank,
+        # The database isn't smart enough to know that there is only one rank
+        # value for a given (user_id, bot_id).
+        sqlfunc.any_value(model.ranked_bots_users.c.rank).label('rank'),
     ]).select_from(
-        model.game_participants.join(
-            model.games,
-            model.games.c.id == model.game_participants.c.game_id,
-            ).join(
+        ranked_users.join(
             model.ranked_bots_users,
-            (model.ranked_bots_users.c.user_id ==
-             model.game_participants.c.user_id) &
-            (model.ranked_bots_users.c.bot_id == model.game_participants.c.bot_id)
+            (model.ranked_bots_users.c.user_id
+             == ranked_users.c.user_id)
+            & rank_limit
         ).join(
-            ranked_users,
-            (model.ranked_bots_users.c.user_id == ranked_users.c.user_id) &
-            rank_limit
+            model.game_participants.join(
+                model.games,
+                model.games.c.id == model.game_participants.c.game_id
+            ),
+            (ranked_users.c.user_id == model.game_participants.c.user_id)
+            & (model.ranked_bots_users.c.bot_id
+               == model.game_participants.c.bot_id),
+            isouter=True
         )
-    ).group_by(user_id, bot_id, model.ranked_bots_users.c.rank).reduce_columns().alias("temptable")
+    ).group_by(ranked_users.c.user_id, model.ranked_bots_users.c.bot_id
+    ).reduce_columns().alias("temptable")
 
     # Of those users, select ones with under 400 games, preferring
     # ones in older games, and get their data
@@ -168,20 +174,20 @@ def find_recent_seed_player(conn, ranked_users, rank_limit, restrictions=False):
         bot_restrictions &= outer_bots.c.games_played < 400
 
     potential_players = sqlalchemy.sql.select([
-        recent_gamers.c.user_id,
-        recent_gamers.c.bot_id,
-        recent_gamers.c.username,
-        recent_gamers.c.version_number,
-        recent_gamers.c.mu,
-        recent_gamers.c.rank,
-        recent_gamers.c.player_rank,
+        gamers_last_play.c.user_id,
+        gamers_last_play.c.bot_id,
+        gamers_last_play.c.username,
+        gamers_last_play.c.version_number,
+        gamers_last_play.c.mu,
+        gamers_last_play.c.rank,
+        gamers_last_play.c.player_rank,
     ]).select_from(
-        recent_gamers.join(
+        gamers_last_play.join(
             outer_bots,
-            (outer_bots.c.user_id == recent_gamers.c.user_id) &
-            (outer_bots.c.id == recent_gamers.c.bot_id))) \
+            (outer_bots.c.user_id == gamers_last_play.c.user_id) &
+            (outer_bots.c.id == gamers_last_play.c.bot_id))) \
         .where(bot_restrictions) \
-        .order_by(recent_gamers.c.max_time.asc()) \
+        .order_by(gamers_last_play.c.max_time.asc()) \
         .limit(15).alias("orderedtable")
 
     if restrictions:
@@ -248,7 +254,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
         elif 0.25 < rand_value <= 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
                          " from recent game with under 400 games played")
-            result = find_recent_seed_player(conn, ranked_users, rank_limit,
+            result = find_idle_seed_player(conn, ranked_users, rank_limit,
                                              restrictions=True)
             if result:
                 return result
@@ -258,7 +264,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
         # games the user can have played, and we do not sort randomly.
         logging.info("Matchmaking: seed player: looking for random bot"
                      " from recent game")
-        result = find_recent_seed_player(conn, ranked_users, rank_limit,
+        result = find_idle_seed_player(conn, ranked_users, rank_limit,
                                          restrictions=False)
         if result:
             return result

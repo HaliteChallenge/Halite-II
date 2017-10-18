@@ -9,5 +9,6 @@ setup(name='hlt_client',
       packages=['hlt_client'],
 	  install_requires=[
 		  'requests',
+          'zstd',
 	  ],
       zip_safe=False)

@@ -69,6 +69,8 @@ def tier_thresholds(total_users):
         num_players += math.ceil(percentage * total_users)
         result[tier] = num_players
 
+    result[config.TIER_4_NAME] = total_users
+
     return result
 
 

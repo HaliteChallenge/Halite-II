@@ -239,7 +239,8 @@ def get_hackathon_leaderboard(hackathon_id):
         table = model.hackathon_ranked_bots_users_query(hackathon_id)
 
         result = []
-        offset, limit = api_util.get_offset_limit()
+        offset, limit = api_util.get_offset_limit(default_limit=250,
+                                                  max_limit=5000)
 
         where_clause, order_clause, _ = api_util.get_sort_filter({
             "user_id": table.c.user_id,

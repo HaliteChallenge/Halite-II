@@ -120,11 +120,21 @@ export function update_bot (user_id, bot_id, file, progress_callback) {
   })
 }
 
-export function list_organizations () {
+export function list_organizations (user_id) {
   return $.get({
-    url: `${API_SERVER_URL}/organization`
+    url: `${API_SERVER_URL}/user/${user_id}/season1`
   })
 }
+
+export function get_season1_stats (userId) {
+  return $.get({
+    url: `${API_SERVER_URL}/user/${userId}/season1`,
+    xhrFields: {
+      withCredentials: true
+    }
+  })
+}
+
 
 export function register_me (data) {
   return $.post({
@@ -147,6 +157,16 @@ export function update_me (user_id, data) {
       withCredentials: true
     }
   })
+}
+
+export function resend_verification_email(user_id) {
+    return $.ajax({
+        url: `${API_SERVER_URL}/user/${user_id}/verify/resend`,
+        method: "POST",
+        xhrFields: {
+            withCredentials: true,
+        },
+    });
 }
 
 export function get_replay (game_id, progress_callback) {
