@@ -12,5 +12,5 @@ Before submitting a bot, make sure you adhere to our guidelines, or the upload o
 ## Uploading your bot
 
 * Website: You can use the [play page](https://halite.io/learn-programming-challenge/play-programming-challenge) in the Halite website to submit your bot.
-* Halite Client: If you a command line experience, you can use the [Halite Client tool]((https://halite.io/learn-programming-challenge/halite-cli-and-tools/upload-bots) to upload your bot.
+* Halite Client: If you a command line experience, you can use the [Halite Client tool](https://halite.io/learn-programming-challenge/halite-cli-and-tools/upload-bots) to upload your bot.
 
