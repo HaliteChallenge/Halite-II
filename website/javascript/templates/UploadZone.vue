@@ -1,6 +1,7 @@
 <template>
     <div class="panel panel-default upload-zone"
          @dragenter="drag_over = true"
+         @dragover="drag_over = true"
          @dragleave="drag_over = false"
          v-bind:class="{ dragging: drag_over }">
         <div class="panel-body">
