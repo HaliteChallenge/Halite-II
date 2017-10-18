@@ -56,25 +56,43 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn" @click="toggleShare">
-                <span>SHARE</span>
-                </button>
-                <!-- <div class="user-profile-badge">
-                    <i class="xline xline-top"></i>
-                    <h2>Badges</h2>
-                    <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
-                    <div class="user-profile-badge-content">
-                        <ul class="user-profile-badge-list">
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
-                            <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
-                        </ul>
+                <div>
+                    <button class="btn" @click="toggleShare">
+                        <span>SHARE</span>
+                    </button>
+                    <!-- <div class="user-profile-badge">
+                        <i class="xline xline-top"></i>
+                        <h2>Badges</h2>
+                        <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
+                        <div class="user-profile-badge-content">
+                            <ul class="user-profile-badge-list">
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
+                                <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
+                            </ul>
+                        </div>
+                        <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
+                    </div> -->
+                    <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                </div>
+                <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>             
+                <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
+                    <div class="stats-item">
+                        <h3>Rank</h3>
+                        <p>{{ season1stats.rank }}</p>
                     </div>
-                    <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
-                </div> -->
-                 <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                    <div class="stats-item">
+                        <h3>Bots</h3>
+                        <p>{{season1stats.num_submissions }}</p>
+                    </div>
+                    <div class="stats-item">
+                        <h3>Games</h3>
+                        <p>{{ season1stats.num_games }}</p>
+                    </div>
+                </div>
+                <a v-if="season1stats && season1stats.num_submissions > 0" class="user-name" target="_blank" :href="'https://2016.halite.io/user.php?userID=' + season1stats.userID">View Halite 1 Profile</a>
             </div>
         </div>
         <div class="col-md-7">
@@ -469,6 +487,7 @@ import dateformat from 'dateformat'
           is_my_page: false,
           highestRank: null,
           sharePopup: false,
+          season1stats: null,
           messages: {
             hackathon: ''
           }
@@ -506,6 +525,8 @@ import dateformat from 'dateformat'
           this.fetchErrorGames()
           this.fetchnemesis()
           this.fetchhistory()
+          this.fetchHalite1Stats()
+
         }, (e) => {
           window.location.replace(`${this.baseUrl}/404`);
         })
@@ -596,7 +617,7 @@ import dateformat from 'dateformat'
           }
           const location = `${state ? state + ', ' : ''}${country}`
           return location || ''
-    },
+        },
         fetchnemesis: function () {
           let query = `order_by=desc,time_played&offset=0&limit=${this.nemesisGameCount}`
           const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
@@ -645,7 +666,13 @@ import dateformat from 'dateformat'
             this.nemesisList = this.nemesisList.slice(1, this.nemesisLimit)
             this.refreshStickyTable()
           })
-    },
+        },
+        fetchHalite1Stats: function () {
+          api.get_season1_stats(this.user.user_id).then(userDetails => {
+            this.season1stats = userDetails;
+            console.log(this.season1stats);
+          })
+        },
         fetchHackathon: function () {
           api.getUserHackathons(this.user.user_id).then(hackathons => {
             if (hackathons && hackathons instanceof Array) {
