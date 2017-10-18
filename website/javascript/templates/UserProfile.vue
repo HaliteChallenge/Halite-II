@@ -788,7 +788,7 @@ import dateformat from 'dateformat'
           var cdate = moment(date)
           if (cdate.isValid()) {
             var dateFormat = require('dateformat')
-            return dateFormat(date, 'mm/dd, yy - HH:MM')
+            return dateFormat(date, 'dd/mm/yy HH:MM')
           } else {
             return 'Still playing'
           }
@@ -797,7 +797,7 @@ import dateformat from 'dateformat'
           var cdate = moment(date)
           if (cdate.isValid()) {
             var dateFormat = require('dateformat')
-            return dateFormat(date, 'mm/dd, yy - HH:MM')
+            return dateFormat(date, 'dd/mm/yy HH:MM')
           } else {
             return null
           }
