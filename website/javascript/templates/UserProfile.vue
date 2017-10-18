@@ -77,19 +77,22 @@
                     </div> -->
                     <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
                 </div>
-                <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>             
-                <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
-                    <div class="stats-item">
-                        <h3>Rank</h3>
-                        <p>{{ season1stats.rank }}</p>
-                    </div>
-                    <div class="stats-item">
-                        <h3>Bots</h3>
-                        <p>{{season1stats.num_submissions }}</p>
-                    </div>
-                    <div class="stats-item">
-                        <h3>Games</h3>
-                        <p>{{ season1stats.num_games }}</p>
+                <div class="stats-1-section">
+                    <i class="xline xline-top"></i>
+                    <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>             
+                    <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
+                        <div class="stats-item">
+                            <h3>Rank</h3>
+                            <p>{{ season1stats.rank }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Bots</h3>
+                            <p>{{season1stats.num_submissions }}</p>
+                        </div>
+                        <div class="stats-item">
+                            <h3>Games</h3>
+                            <p>{{ season1stats.num_games }}</p>
+                        </div>
                     </div>
                 </div>
                 <a v-if="season1stats && season1stats.num_submissions > 0" class="user-name" target="_blank" :href="'https://2016.halite.io/user.php?userID=' + season1stats.userID">View Halite 1 Profile</a>
