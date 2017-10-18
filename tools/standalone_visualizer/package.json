@@ -1,5 +1,5 @@
 {
-  "name": "halite_standalone",
+  "name": "halite_visualizer",
   "version": "1.0.0",
   "description": "The standalone visualizer for Halite II.",
   "main": "main.js",
@@ -7,7 +7,10 @@
     "watch": "webpack -w",
     "build": "webpack",
     "start": "electron .",
-    "pack": "electron-builder"
+    "pack": "electron-builder",
+    "package-mac": "electron-packager . \"Halite II Visualizer\" --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . \"Halite II Visualizer\" --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Halite II Visualizer\"",    
+    "package-linux": "electron-packager . \"Halite II Visualizer\" --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/icon.png --prune=true --out=release-builds"
   },
   "build": {
     "appId": "halite2.standalone",

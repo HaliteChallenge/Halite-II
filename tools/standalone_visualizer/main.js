@@ -13,6 +13,7 @@ function createWindow() {
         height: 960,
         autoHideMenuBar: true,
         show: false,
+        icon: path.join(__dirname, 'assets/icons/png/64x64.png')
     });
 
     mainWindow.loadURL(url.format({
