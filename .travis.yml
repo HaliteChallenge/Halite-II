@@ -127,3 +127,12 @@ script:
   - cd ../website
   - npm run build
   - bundle exec jekyll build
+
+# build standalone visualizer
+  - cd ../tools/standalone_visualizer
+  - npm install
+  - cd ../../website
+  - bundle exec jekyll build
+  - cd ../tools/standalone_visualizer
+  - npm run build
+  - npm run package-linux
