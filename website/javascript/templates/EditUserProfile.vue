@@ -275,7 +275,7 @@ export default {
           api.update_me(this.user.user_id, request).then((response) => {
             let message = 'You have updated your profile successfully.';
             if (response.message) message += ' ' + response.message;
-            Alert.show(message, 'success')
+            Alert.show(message, 'success', true)
             this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
           }, (error) => {
             const errorMessage = error.responseJSON
@@ -290,7 +290,7 @@ export default {
                 if (response.responseJSON && response.responseJSON.message) {
                   message = response.responseJSON.message
                 }
-                Alert.show(message, 'success')
+                Alert.show(message, 'success', true)
               }, (err) => {
                 let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
                 if (err.message) {
@@ -311,14 +311,14 @@ export default {
         },
         resend_verification_email: function() {
           api.resend_verification_email(this.user.user_id).then((response) => {
-            let message = "Verification email resent!"
+            let message = "Verification code has been resent."
             if (response && response.message) {
               message = response.message;
             }
             else if (response && response.responseJSON && response.responseJSON.messasge) {
               message = response.responseJSON.message;
             }
-            Alert.show(message, "success");
+            Alert.show(message, "success", true);
           }, (response) => {
             let message = "Sorry, we couldn't resend the verification email. Please try again later.";
             if (response && response.message) {
