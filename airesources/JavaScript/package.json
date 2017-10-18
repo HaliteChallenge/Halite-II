@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "mocha": "^4.0.1",
+    "should": "^13.1.2"
+  }
+}
