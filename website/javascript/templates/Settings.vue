@@ -100,7 +100,7 @@ export default {
       methods: {
         submit: function (e) {
            let request = {
-            'is_gpu_enabled': this.selected_gpu_state,
+            'is_gpu_enabled': this.selected_gpu_state.value,
           }
 
           api.update_me(this.user.user_id, request).then((response) => {
