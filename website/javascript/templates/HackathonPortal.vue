@@ -57,7 +57,6 @@
             <tr v-for="event in events">
               <td>
                 <a class="leaderboard-name" :href="'/hackathon-individual?hackathon_id=' + event.id">
-                  <img width="30" height="30" :src="`${event.img}`" alt="">
                   {{event.title}}
                 </a>
               </td>

@@ -94,7 +94,7 @@
                         <i class="xline xline-bottom"></i>
                         </a>
                     </li>
-                    <li v-if="hackathons.length" role="presentation">
+                    <li role="presentation">
                         <a href="#hackathons" @click="refreshStickyTable" aria-controls="hackathons" role="tab" data-toggle="tab">
                         <i class="xline xline-top"></i>
                         <span>Hackathons</span>
@@ -381,7 +381,7 @@
 
                                 <div v-if="!hackathons.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                                    <h2>No Hackathons yet</h2>
+                                    <h2>No part of any Hackathons yet</h2>
                                     <p v-if="is_my_page">If you have a Hackthon code, add it to your <br/>your profile</p>
                                     <div v-if="is_my_page" class="ha-button-container">
                                         <div>
