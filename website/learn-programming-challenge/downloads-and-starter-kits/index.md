@@ -10,11 +10,10 @@ Download a language specific starter kit as a quick and easy way to get started 
 
 We welcome our community to build new starter kits, if there isn't one for their preferred language. Check out our [guide](creating-a-new-starter-kit) on how to build a new starter bot.
 
-Downloads include both the compiled Halite game environment and the starter kit for that language.
+## System Requirements
+System requirements are detailed [here](system-requirements).
 
-## Downloads
-
-System requirements are available [here](system-requirements).
+## Starter kits Download
 
 <div class="table-container">
     <table class="table">
@@ -43,6 +42,7 @@ System requirements are available [here](system-requirements).
             {% endfor %}
             <tr>
                 <td>Only Game Environment</td>
+                <td>{{ site.data.downloads.version }}</td>
                 <td>NA</td>
                 {% for file in site.data.downloads.environments %}
                 <td><a href="{{ site.baseurl }}/{{ file }}">Download</a></td>
@@ -52,13 +52,45 @@ System requirements are available [here](system-requirements).
     </table>
 </div>
 
-## Source Code
+## Halite Tools and Source Download
 
-__Current version:__ {{ site.data.downloads.version }}
-
-[Download the source code]({{ site.baseurl }}/{{ site.data.downloads.source }}) or visit our [GitHub repository](https://github.com/HaliteChallenge/Halite-II). 
-
-## Halite Tools
-
-* [Halite Client](): Upload bots, download game data and run regression tests against your bots.
-* [Halite Offline Visualizer](): View Halite games offline.
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tool</th>
+                <td>Version</td>
+                <td>All Platforms</td>
+                <td>MacOS</td>
+                <td>Linux</td>
+                <td>Windows</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Halite Client Tool</td>
+                <td>0.9.0-Beta</td>
+                <td><a href="https://storage.cloud.google.com/halite-assets/HaliteClient.zip">Download</a></td>
+                <td>NA</td>
+                <td>NA</td>
+                <td>NA</td>
+            </tr>
+            <tr>
+                <td>Halite Visualizer</td>
+                <td>0.9.0-Beta</td>
+                <td>NA</td>
+                <td><a href="https://storage.cloud.google.com/halite-assets/visualizer/Halite%20II%20Visualizer-mac.zip">Download</a></td>
+                <td>NA</td>
+                <td>NA</td>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td>NA</td>
+                <td><a href="{{ site.baseurl }}/{{ site.data.downloads.source }}">Download</a></td>
+                <td>NA</td>
+                <td>NA</td>
+                <td>NA</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

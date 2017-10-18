@@ -83,47 +83,47 @@
                 <p class="t5 c-gry section-des">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <div class="col-md-12">
-                    <a href="/play/?game_id=850849">
+                    <a href="/play/?game_id=1626842&replay_class=1&replay_name=replay-20171015-182606%2B0000--97108346-336-224-1508091963">
                         <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <span class="t4 c-wht i-label">Juliak vs Erdman</span>
+                                <span class="t4 c-wht i-label">Daewook defeats Shummie</span>
                             </div>
                         </div>
                     </a>
-                    <a href="/play/?game_id=850858">
+                    <a href="/play/?game_id=1626934&replay_class=0&replay_name=replay-20171015-183002%2B0000--308196515-336-224-1508092174">
                         <div class="col-md-3 play-bot">
                           <div class="img-container">
                               <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                               <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                           </div>
                           <div class="img-des">
-                              <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
+                              <span class="t4 c-wht i-label">Mellendo defeats 3</span>
                           </div>
                         </div>
                     </a>
-                    <a href="/play/?game_id=851091">
+                    <a href="/play/?game_id=1627081&replay_class=0&replay_name=replay-20171015-183733%2B0000--766145029-312-208-1508092632">
                         <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <span class="t4 c-wht i-label">CarlosWatt... vs Erdman, +2</span>
+                                <span class="t4 c-wht i-label">PLBertrand defeats 3</span>
                             </div>
                         </div>
                     </a>
-                    <a href="/play/?game_id=851123">
+                    <a href="/play/?game_id=1626887&replay_class=0&replay_name=replay-20171015-182753%2B0000--45079826-264-176-1508091911">
                         <div class="col-md-3 play-bot">
                             <div class="img-container">
                                 <img :src="`${baseUrl}/assets/images/temp/watch.png`"/>
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
+                                <span class="t4 c-wht i-label">Dexgroves defeats 3</span>
                             </div>
                         </div>
                     </a>
