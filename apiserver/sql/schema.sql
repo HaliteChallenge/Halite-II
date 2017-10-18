@@ -295,3 +295,9 @@ ALTER TABLE game_participant ADD CONSTRAINT game_participant_ibfk_4 FOREIGN KEY(
 
 UPDATE alembic_version SET version_num='33de9025cc63' WHERE alembic_version.version_num = '7f0054256cf5';
 
+-- Running upgrade 33de9025cc63 -> e7920cc5568a
+
+ALTER TABLE user ADD COLUMN is_gpu_enabled TINYINT(1) NOT NULL DEFAULT '0';
+
+UPDATE alembic_version SET version_num='e7920cc5568a' WHERE alembic_version.version_num = '33de9025cc63';
+
