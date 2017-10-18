@@ -1,20 +1,15 @@
 <template>
     <div class="row">
-        <div class="col-md-8">
-            <div class="page-header">
-                <h1>Reset &amp; Retrieve My API Key</h1>
-            </div>
+        <div class="col-md-6 col-xm-10 col-md-offset-3 col-xm-offset-1">
             <p>
-                Retrieve your API key for command-line tools, like a command-line bot uploader.
+                Your API key is used in Halite Client tools for authentication
             </p>
             <p>
-                <strong>Note:</strong> you may only reset and generate a new API key. Once you close this page, you will not be able to retrieve that key again&mdash;you will have to generate a new one.
+                <strong>Note: </strong>Once you close this page, you will not be able to retrieve that key again. You will need to generate a new one.
             </p>
             <form>
-                <button class="btn btn-primary" v-on:click="fetch">
-                    Reset and Retrieve API Key
-                </button>
-                <input type="text" readonly :value="api_key" />
+                <input style="margin-top:20px; max-width: 400px" type="text" readonly :value="api_key"/>
+                <button class="btn-ha btn-ha-md" style="margin-top:20px;" v-on:click="fetch">Generate API Key</button>
             </form>
         </div>
     </div>
