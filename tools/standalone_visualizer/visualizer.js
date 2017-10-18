@@ -1,7 +1,10 @@
 import Vue from "vue";
-import Visualizer from "../../website/javascript/templates/Visualizer.vue";
+import Play from "./Standalone.vue";
+
+// Stub out Google Analytics
+window.ga = function() {};
 
 new Vue({
     el: "#visualizer-container",
-    render: (h) => h(Visualizer),
+    render: (h) => h(Play),
 });
