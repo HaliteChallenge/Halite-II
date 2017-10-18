@@ -90,12 +90,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_1.png`"/>
-                                <span class="t4 c-wht i-label">Brianvanleeuwen vs. ...</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:45:25</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">Juliak vs Erdman</span>
                             </div>
                         </div>
                     </a>
@@ -106,12 +101,7 @@
                               <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                           </div>
                           <div class="img-des">
-                              <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                              <span class="t4 c-wht i-label">Gogokefakefa vs. ...</span>
-                              <div class="i-des">
-                                  <span class="t5 c-gry">09/22/17 - 12:45:49</span>
-                                  <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                              </div>
+                              <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
                           </div>
                         </div>
                     </a>
@@ -122,12 +112,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_3.png`"/>
-                                <span class="t4 c-wht i-label">PIOTRZIELINSKI DEFEATS J-CLAP</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:56:13</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">CarlosWatt... vs Erdman, +2</span>
                             </div>
                         </div>
                     </a>
@@ -138,12 +123,7 @@
                                 <img class="img-btn" :src="`${baseUrl}/assets/images/temp/play_btn.png`"/>
                             </div>
                             <div class="img-des">
-                                <img :src="`${baseUrl}/assets/images/temp/icon_play_2.png`"/>
-                                <span class="t4 c-wht i-label">LIDAVIDM DEFEATS 3</span>
-                                <div class="i-des">
-                                    <span class="t5 c-gry">09/22/17 - 12:57:30</span>
-                                    <!--<img class="right-btn" :src="`${baseUrl}/assets/images/temp/share.png`"/>-->
-                                </div>
+                                <span class="t4 c-wht i-label">Harikmenon vs Erdman, +2</span>
                             </div>
                         </div>
                     </a>
@@ -303,6 +283,18 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-md-12 ha-line">
+            </div>
+            <div class="col-md-12 col-sm-12 sponsor-section">
+                <p class="t2 c-wht font-headline">OUR SPONSORS</p>
+                <div class="col-md-6 col-sm-6 left">
+                    <span class="t3 c-wht font-headline left-label">CORNELL<br/>TECH</span>
+                    <span class="left-des font-headline"><span class="c-gry">HOME OF THE</span><span class="c-wht"> JACOBS<br/>TECHNION-CORNELL<br/>INSTITUTE</span></span>
+                </div>
+                <div class="col-md-6 col-sm-6 right">
+                    <span class="t2 c-wht font-headline">Google</span>
                 </div>
             </div>
             <div class="col-md-12 big-menu">

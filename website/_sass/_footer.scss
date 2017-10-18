@@ -77,11 +77,18 @@
       display: flex;
       background-color: #000;
       padding-left: 10px;
+      @media (max-width: $screen-sm-max){
+        margin-right: 10px;
+      }
       input{
         color: #fff;
         background-color: transparent;
         border: 0;
         flex: 1;
+        @media (max-width: $screen-sm-max){
+          width: 100%;
+          flex: auto;
+        }
         margin-right: 10px;
       }
       .btn{

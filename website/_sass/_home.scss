@@ -165,7 +165,7 @@
       bottom: 0;
       &-width {
         transform: none;
-        margin-left: -148px !important;
+        margin-left: -140px !important;
       }
     }
   }
@@ -290,18 +290,17 @@
   }
   .img-des{
     border: 1px solid #757577;
-    text-align: left;
+    text-align: center;
     padding: 10px;
     position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     >img{
       max-width:25px;
       margin-right: 5px;
     }
     .i-label{
-      position: absolute;
-      top: 14px;
-      left: 46px;
-      right: 10px;
       display: inline-block;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -416,6 +415,9 @@
       margin-right: auto;
       background-color: #000;
       padding-left: 10px;
+      @media (max-width: 355px){
+        margin-right: 10px;
+      }
       input{
         color: #fff;
         border: 0;
@@ -454,7 +456,45 @@
     80% {opacity:0}
     100% {opacity:0}
   }
-
+  .sponsor-section{
+    margin-bottom: 40px !important;
+    .left{
+      text-align: right;
+      padding-right: 50px;
+      @media (max-width: $screen-xs-max){
+        text-align: center;
+        padding-right: 0;
+        margin-top: 20px;
+      }
+      &-label{
+        text-align: right;
+        display: inline-block;
+        border-right: 1px solid;
+        padding-right: 8px;
+        line-height: 30px;
+      }
+      &-des{
+        text-align: left;
+        display: inline-block;
+        font-size: 17px;
+        line-height: 17px;
+        margin-left: 7px;
+        letter-spacing: 1px;
+      }
+    }
+    .right{
+      text-align: left;
+      padding-left: 120px;
+      @media (max-width: $screen-xs-max){
+        text-align: center;
+        padding-left: 0;
+        margin-top: 20px;
+      }
+      >span{
+        letter-spacing: 2px;
+      }
+    }
+  }
   .arrows-icon{
     $animation-delay: 0.5s;
     $arrow-size: 12px;
