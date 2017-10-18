@@ -288,7 +288,7 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 col-sm-12 sponsor-section">
-                <p class="t2 c-wht font-headline">OUR SPONSORS</p>
+                <p class="t2 c-wht font-headline">OUR PARTNERS</p>
                 <div class="col-md-6 col-sm-6 left">
                     <span class="t3 c-wht font-headline left-label">CORNELL<br/>TECH</span>
                     <span class="left-des font-headline"><span class="c-gry">HOME OF THE</span><span class="c-wht"> JACOBS<br/>TECHNION-CORNELL<br/>INSTITUTE</span></span>
