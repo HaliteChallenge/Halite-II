@@ -48,6 +48,7 @@ CREATE TABLE halite_1_user (
     `githubEmail` VARCHAR(64), 
     `verificationCode` VARCHAR(64), 
     `isEmailGood` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', 
+    `is_gpu_enabled` tinyint(1) NOT NULL DEFAULT '0',
     level ENUM('High School','Undergraduate','Graduate','Professional') NOT NULL DEFAULT 'Professional', 
     PRIMARY KEY (`userID`)
 )DEFAULT CHARSET=latin1 AUTO_INCREMENT=5350 ENGINE=InnoDB;

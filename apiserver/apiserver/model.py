@@ -112,6 +112,8 @@ all_users = sqlalchemy.sql.select([
     users.c.country_subdivision_code,
     users.c.github_email.label("email"),
     users.c.email.label("personal_email"),
+    users.c.is_email_good,
+    users.c.is_gpu_enabled,
     _func.coalesce(_func.count(), 0).label("num_bots"),
     _func.coalesce(_func.sum(ranked_bots.c.games_played), 0).label("num_games"),
     _func.coalesce(_func.sum(ranked_bots.c.version_number), 0).label("num_submissions"),

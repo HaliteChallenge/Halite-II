@@ -34,6 +34,8 @@ def make_user_record(row, *, logged_in, total_users=None):
         "mu": float(row["mu"]),
         "sigma": float(row["sigma"]),
         "rank": int(row["rank"]) if row["rank"] is not None else None,
+        "is_email_good":row["is_email_good"],
+        "is_gpu_enabled": row["is_gpu_enabled"]
     }
 
     if total_users and row["rank"] is not None:

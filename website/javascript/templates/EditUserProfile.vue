@@ -11,10 +11,10 @@
                     <i class="xline xline-bottom"></i>
                 </div>
 
-                <h2 class="form-heading">Resend Verification Mail</h2>
-                <p>If you cant find our account verification mail, resend a verification mail to your mail now.</p>
+                <h2 v-if="!user.is_email_good" class="form-heading">Resend Verification Mail</h2>
+                <p v-if="!user.is_email_good">If you cant find our account verification mail, resend a verification mail to your mail now.</p>
                 </br>
-                <button class="btn-ha" v-on:click="resend_verification_email">Resend Verfication</button>
+                <button v-if="!user.is_email_good" class="btn-ha" v-on:click="resend_verification_email">Resend Verfication</button>
 
                 <h2 class="form-heading">personal info</h2>
                 <form v-on:submit.prevent="submit" class="create-account-form">
