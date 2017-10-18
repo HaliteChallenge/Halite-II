@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import 'url-search-params-polyfill'
 import 'element-ui/lib/theme-default/index.css'
-import ApiKey from './templates/ApiKey.vue'
 import Associate from './templates/Associate.vue'
 import BotEditor from './templates/BotEditor.vue'
 import HackathonLeaderboard from './templates/HackathonLeaderboard.vue'
@@ -20,6 +19,7 @@ import HackathonIndividual from './templates/HackathonIndividual.vue'
 import Leagues from './templates/Leagues.vue'
 import LeagueBoard from './templates/LeagueBoard.vue'
 import Play from './templates/Play.vue'
+import Settings from './templates/Settings.vue'
 
 // Include bootstrap.js - do not remove
 import _ from '../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap'
@@ -31,12 +31,6 @@ Vue.use(require('vue-cookie'))
 Vue.use(require('element-ui'))
 
 window.views = {
-  ApiKey: function () {
-    new Vue({
-      el: '#api-key-container',
-      render: (h) => h(ApiKey)
-    })
-  },
   Associate: function () {
     new Vue({
       el: '#associate-container',
@@ -131,6 +125,12 @@ window.views = {
     new Vue({
       el: '#leaderboard-container',
       render: (h) => h(LeagueBoard, { props: { baseUrl: _global.baseUrl } })
+    })
+  },
+  Settings: function () {
+    new Vue({
+      el: '#settings-container',
+      render: (h) => h(Settings, { props: { baseUrl: _global.baseUrl } })
     })
   }
 }
