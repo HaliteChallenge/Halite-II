@@ -2,6 +2,8 @@ const MapParser = require('./MapParser');
 const Ship = require('./Ship');
 const Planet = require('./Planet');
 
+const Geometry = require('./Geometry');
+
 class Map {
     constructor({width, height, myPlayerId}) {
         this._width = width;
@@ -45,6 +47,26 @@ class Map {
         return this._planets;
     }
 
+    shipsBetween(ship, target) {
+        return this._obstaclesBetween(this.allShips, ship, target);
+    }
+
+    enemyShipsBetween(ship, target) {
+        return this._obstaclesBetween(this.enemyShips, ship, target);
+    }
+
+    planetsBetween(ship, target) {
+        return this._obstaclesBetween(this.planets, ship, target);
+    }
+
+    obstaclesBetween(ship, target) {
+        const result = [];
+        result.concat(this.shipsBetween(ship, target));
+        result.concat(this.planetsBetween(ship, target));
+
+        return result;
+    }
+
     update(line) {
         this._parser = new MapParser(line);
 
@@ -61,6 +83,11 @@ class Map {
         if (remainingTokens.length !== 0) {
             throw new Error('detected unprocessed remaining tokens: ' + remainingTokens);
         }
+    }
+
+    _obstaclesBetween(obstaclesList, ship, target) {
+        return obstaclesList.filter(o => o !== ship && o !== target)
+            .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.1))
     }
 
     _updatePlayers() {

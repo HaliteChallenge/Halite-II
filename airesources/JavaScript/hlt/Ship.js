@@ -35,6 +35,10 @@ class Ship {
         return this._params.yPos;
     }
 
+    get radius() {
+        return 0.5;
+    }
+
     get health() {
         return this._params.health;
     }
