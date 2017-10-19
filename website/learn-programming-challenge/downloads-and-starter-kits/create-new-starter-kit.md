@@ -1,15 +1,17 @@
 ---
 layout: doc_page
 title: Create a new starter kit
-description: Overview of how to create a starter kit for Halite
+description: Learn how to create an AI starter kit in a new programming language for the Halite Challenge
 image: assets/images/temp/bot_1.png
 content: website
 sort_key: 5
 ---
+Thank you for your interest in creating a new Halite starter kit! We've put together everything you should need to know to create a Halite bot in a new programming language, but if you have any questions feel free to reach out via our [Discord Chat][Discord]{:target="_blank"} or email us at <halite@halite.io>.
+
 
 ## API Design
 
-Please try to generally adhere to the API used in [Python3 starter kit](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3). This is as follows:
+Please try to generally adhere to the API used in [Python3 starter kit](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3){:target="_blank"}. This is as follows:
 
 - game([Name of bot]): Initializes the game
 - game.update_map(): Get latest map per turn
@@ -46,6 +48,8 @@ Every turn, every bot is sent the the present game map (newline-terminated). Eve
 
 ### Submitting your new starter kit
 
-Fork our [repo](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3), place your starter package in the `airesources/` folder, and send us a pull request! If we accept your PR, your starter package will be added to the site.
+Fork our [repo](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/Python3){:target="_blank"}, place your starter package in the `airesources/` folder, and send us a pull request! If we accept your PR, your starter package will be added to the site.
 
 Note: please include the runGame.sh and runGame.bat scripts, you can look at the Python stater kit for inspiration.
+
+[Discord]:

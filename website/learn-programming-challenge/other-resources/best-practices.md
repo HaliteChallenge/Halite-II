@@ -18,7 +18,7 @@ The starter kits have limited functionality to do this already, and may even pri
 ## Test new vs old before upload
 Before submitting a new bot to the online leaderboard, we recommend running some games against the version of your bot that is currently on the leaderboard. If your new bot consistently wins, then put it up!
 
-Check out [our tool](/halite-cli-and-tools/compare-bots) that makes it easier for you to do regression testing.
+Check out [our tool](/halite-cli-and-tools/compare-bots){:target="_blank"} that makes it easier for you to do regression testing.
 
 ## Debug timeout issues by disabling timeout locally
 When debugging latency issues with your bot, it can be helpful to disable game environment timeouts. To do so, append the -t flag to your environment command, like so:
@@ -31,7 +31,7 @@ You can replay games with the exact same map, which is useful when trying to deb
     ./halite -d "30 30" -s 42 "python3 MyBot.py" "python3 RandomBot.py" -t
 
 ## Debugging with an IDE
-There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found [here on the forums][debugger-method]. 
+There is a community contributed method for running a Halite bot from a custom debugger locally. More on this can be found [here on the forums][debugger-method]{:target="_blank"}. 
 __Warning: this method has not been tested with Halite II. Use at your own risk.__ 
 
 [debugger-method]: http://2016.forums.halite.io/t/running-your-halite-bot-from-a-debugger/70

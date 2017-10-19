@@ -17,12 +17,12 @@ Halite (the tournament) is an online programming competition where human coders 
 
 ### Where does the game come from? Who invented it?
 
-Halite I was created by Benjamin Spector and Michael Truell during a summer internship at [Two Sigma] (www.twosigma.com) in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by Benjamin Spector, Michael Truell, David Li, Jaques Clapauch, Julia Kastner, and Harikrishna Menon in 2017 at Two Sigma.
+Halite I was created by Benjamin Spector and Michael Truell during a summer internship at [Two Sigma] (www.twosigma.com){:target="_blank"} in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by Benjamin Spector, Michael Truell, David Li, Jaques Clapauch, Julia Kastner, and Harikrishna Menon in 2017 at Two Sigma.
 
 ### Why did you invent it?
 
 Halite’s creators heard about the Ants AI Challenge a few years too late :-(
-They couldn’t find any other competitions quite like it, so they decided to create one. Halite I was born as an internal competition within [Two Sigma] (www.twosigma.com)
+They couldn’t find any other competitions quite like it, so they decided to create one. Halite I was born as an internal competition within [Two Sigma] (www.twosigma.com){:target="_blank"}.
 
 Due to the success of Halite I, Two Sigma decided to create a new iteration of Halite I and re-host the game with new rules, challenges, and a brand new website.
 
@@ -30,7 +30,7 @@ Due to the success of Halite I, Two Sigma decided to create a new iteration of H
 
 Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating systemused for chess.
 
-Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was reset. For Halite II, player ratings will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md).
+Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was reset. For Halite II, player ratings will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md){:target="_blank"}.
 
 Tiers are based on the percentile rank. The top 1/512 players are considered Platinum;the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Bronze.
 
@@ -40,7 +40,7 @@ Winners are simply the highest ranked players on the leaderboard at the end of t
 
 ### Is there a prize for the winners?
 
-Pride! Bragging rights! Appreciation from the TS team! We are also introducing a number of badges and awards this year, [learn more here](https://docs.google.com/spreadsheets/d/162pBdYhbw60fX_rYpuknCs056rRM3dsFICglwfzRn_E/edit?usp=sharing).
+Pride! Bragging rights! Appreciation from the TS team! We are also introducing a number of badges and awards this year, [learn more here](https://docs.google.com/spreadsheets/d/162pBdYhbw60fX_rYpuknCs056rRM3dsFICglwfzRn_E/edit?usp=sharing){:target="_blank"}.
 
 ### What information do you store about me?
 

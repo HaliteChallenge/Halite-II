@@ -21,7 +21,7 @@ Get a feel for how to play. Here's one of our favorites:
 
 <img src="/assets/images/gifs/Oct-16-2017%2015-23-13%20intro.gif" alt="First Halite game video">
 
-[Watch the whole game here.][David game]
+[Watch the whole game here.][david game]
 
 To find more games, check out some user profiles, where you'll find recently played games.
 

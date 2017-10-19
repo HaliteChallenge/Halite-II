@@ -25,3 +25,5 @@ You need to have the appropriate Halite executable for your operating system ava
 
 
 #### Bash
+
+[Halite Client](https://www.dropbox.com/s/ifn743v9a785x6h/hlt_client.zip?dl=0): For uploading bots from your terminal

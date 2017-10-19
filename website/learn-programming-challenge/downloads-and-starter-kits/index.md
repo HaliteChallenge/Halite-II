@@ -8,7 +8,7 @@ content: website
 
 Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
 
-We welcome our community to build new starter kits, if there isn't one for their preferred language. Check out our [guide](creating-a-new-starter-kit) on how to build a new starter bot.
+We welcome our community to build new starter kits, if there isn't one for their preferred language. Check out our [guide](create-new-starter-kit) on how to build a new starter bot.
 
 ## System Requirements
 System requirements are detailed [here](system-requirements).

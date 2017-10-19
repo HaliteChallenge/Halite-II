@@ -17,7 +17,7 @@ Bots are given 350 MB of RAM and equal amounts of CPU.
 Games are always run using the most recent environment build.
 
 ## Compilation
-Bot compilation is done using this [autocompile script][autocompile-script].
+Bot compilation is done using this [autocompile script][autocompile-script]{:target="_blank"}.
 
 For more details on customizing your bot, see our guide [here](downloads-and-starter-kits/customize-bot).
 

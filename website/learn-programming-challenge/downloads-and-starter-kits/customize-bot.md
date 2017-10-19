@@ -15,7 +15,7 @@ If you are using a language that is generic or that does not have first class su
 
 This is especially useful when you are uploading a Jar file for JVM languages or writing ML bots, and you want to specifically call out a language like `Kotlin` or in the case of ML use `ML` in lieu of language. 
 
-[Example Bot](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/ML-StarterBot-Python)
+[Example Bot](https://github.com/HaliteChallenge/Halite-II/tree/master/airesources/ML-StarterBot-Python){:target="_blank"}
 
 ## Installing Dependencies
 
@@ -39,7 +39,7 @@ If your library isn't on a package manager that supports local installation and 
 
 **Note:**
 
-If you are using `pip`, then make sure to use the `--system` flag with the `--target` flag, due to how Debian/Ubuntu patch the `pip` packages (reference: [pip#3826](https://github.com/pypa/pip/issues/3826)).
+If you are using `pip`, then make sure to use the `--system` flag with the `--target` flag, due to how Debian/Ubuntu patch the `pip` packages (reference: [pip#3826](https://github.com/pypa/pip/issues/3826){:target="_blank"}).
 
 ## Preinstalled Libraries
 
@@ -47,7 +47,7 @@ For convenience's sake, we include `tensorflow`, `keras (using a tensorflow back
 
 ## Compilation
 
-Bot compilation is done using [this autocompile script](https://github.com/HaliteChallenge/Halite-II/blob/master/apiserver/worker/compiler.py). Many languages will be properly auto-detected and compiled if needed without the need for an install.sh script.
+Bot compilation is done using [this autocompile script](https://github.com/HaliteChallenge/Halite-II/blob/master/apiserver/worker/compiler.py){:target="_blank"}. Many languages will be properly auto-detected and compiled if needed without the need for an install.sh script.
 
 Your main file must be called `MyBot.*` Your language is recognized using the file extension of your MyBot file. The appropriate file extensions for each language are:
 
@@ -65,7 +65,7 @@ Your main file must be called `MyBot.*` Your language is recognized using the fi
 - Clojure - .clj
 - C - .c
 
-See the [Game Server Reference](/other-resources/game-servers) for details about compiler and runtime versions.
+See the [Game Server Reference](/other-resources/game-servers){:target="_blank"} for details about compiler and runtime versions.
 
 ## JVM Languages
 

@@ -5,7 +5,7 @@ toc: false
 sort_key: 2
 description: Find out how to join a Halite hackathon or start one of your own, through these detailed instructions
 ---
-Throughout the competition, <a href=“https://www.twosigma.com” target=“_blank”>Two Sigma</a>, the creator of Halite, and its partners will be hosting hackathons for players to compete against smaller pools of players. Some examples include a High School hackathon in NYC in November and a public Hack Night at Cornell Tech.
+Throughout the competition, [Two Sigma](https://www.twosigma.com){:target="_blank"}, the creator of Halite, and its partners will be hosting hackathons for players to compete against smaller pools of players. Some examples include a High School hackathon in NYC in November and a public Hack Night at Cornell Tech.
 
 ## Join a hackathon
 

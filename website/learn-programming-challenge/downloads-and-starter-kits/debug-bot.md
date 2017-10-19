@@ -38,7 +38,7 @@ Another class of failures is errors during game execution.
 
 * **Incorrect commands:** The most common reason for this is are custom functions that you might have written to send moves to the Game engine. These commands might be formatted incorrectly or contain characters that are not allowed by the game engine.
 
-* **Out of memory**: Bots have a specific memory limit and if they exceed this limit, they are killed. To read more about resource limits for bots, see our guide [here](/other-resources/game-servers).
+* **Out of memory**: Bots have a specific memory limit and if they exceed this limit, they are killed. To read more about resource limits for bots, see our guide [here](learn-programming-language/other-resources/game-servers).
 
 The easiest way to debug these issues is to look into the game logs. More information about game logs is available in the below section.
 

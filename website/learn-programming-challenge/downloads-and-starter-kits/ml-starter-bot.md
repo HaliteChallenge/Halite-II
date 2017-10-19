@@ -23,7 +23,7 @@ It uses a neural network to try to answer the question: __Given the current situ
 Given the percentage for each planet, we perform a simple greedy assignment to decide which ship goes where. If a planet belongs to an enemy, we go to its weakest docked ship. If not, we try to dock.
 
 ## Why did we choose this approach
-In our model we don’t have to worry about different number of ships, different board sizes or symmetry. The network is equivariant to permutation (see [neural_network_test.py](https://github.com/HaliteChallenge/Halite-II/blob/master/airesources/ML-StarterBot-Python/tsmlstarterbot/neural_net.py)), which means the results depend solely on the features of the planets and not on the order they are presented to the network. This makes training much easier.
+In our model we don’t have to worry about different number of ships, different board sizes or symmetry. The network is equivariant to permutation (see [neural_network_test.py](https://github.com/HaliteChallenge/Halite-II/blob/master/airesources/ML-StarterBot-Python/tsmlstarterbot/neural_net.py){:target="_blank"}), which means the results depend solely on the features of the planets and not on the order they are presented to the network. This makes training much easier.
 
 The model is trained on historical data. We look at a particular bot (usually the one that was winning a lot), and train the network to mimic its behavior. 
 
@@ -58,4 +58,4 @@ You can also use our Halite Client Tool to [download replays](/learn-programming
 - A separate model for 4 players game
 - Introduce state to the bot (take previous decisions into account)
 
-You can read more about parameter sharing and equivariant networks [here](http://www.deeplearningbook.org/contents/convnets.html). 
+You can read more about parameter sharing and equivariant networks [here](http://www.deeplearningbook.org/contents/convnets.html){:target="_blank"}. 
