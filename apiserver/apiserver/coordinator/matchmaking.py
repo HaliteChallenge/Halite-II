@@ -30,14 +30,24 @@ def serve_game_task(conn, has_gpu=False):
     total_players = conn.execute(model.total_ranked_users).first()[0]
     thresholds = util.tier_thresholds(total_players)
     ranked_users = model.ranked_users_query()
-    if has_gpu or config.COMPETITION_FINALS_PAIRING:
+    if config.COMPETITION_FINALS_PAIRING:
         rank_limit = (ranked_users.c.rank <=
-                      thresholds[config.GPU_TIER_NAME])
+                      thresholds[config.FINALS_TIER_NAME])
     else:
-        rank_limit = (ranked_users.c.rank >
-                      thresholds[config.GPU_TIER_NAME])
+        rank_limit = sqlalchemy.sql.expression.true()
 
-    seed_player = find_seed_player(conn, ranked_users, rank_limit)
+    if has_gpu:
+        seed_filter = (rank_limit
+                      & (model.ranked_bots_users.c.is_gpu_enabled == True))
+    else:
+        seed_filter = (rank_limit
+                      & (model.ranked_bots_users.c.is_gpu_enabled == False))
+
+    seed_player = find_seed_player(conn, ranked_users, seed_filter)
+    if not seed_player and has_gpu:
+        # If there isn't a gpu enabled seed, check for any seed to keep the
+        # gpu worker busy
+        seed_player = find_seed_player(conn, ranked_users, rank_limit)
     if not seed_player:
         return
 
@@ -51,6 +61,10 @@ def serve_game_task(conn, has_gpu=False):
             seed_player.user_id, seed_player.mu, mu_rank_limit))
 
     # Find closely matched players
+    player_filter = sqlalchemy.sql.expression.true()
+    if not has_gpu:
+        # if this isn't a gpu enabled worker filter out gpu only bots
+        player_filter = (model.ranked_bots_users.c.is_gpu_enabled == False)
     sqlfunc = sqlalchemy.sql.func
     close_players = sqlalchemy.sql.select([
         model.ranked_bots_users.c.user_id,
@@ -73,7 +87,8 @@ def serve_game_task(conn, has_gpu=False):
         (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         (~((model.bots.c.user_id == seed_player["user_id"]) &
            (model.bots.c.id == seed_player["bot_id"]))) &
-        rank_limit
+        rank_limit &
+        player_filter
     ).order_by(
         sqlalchemy.func.abs(model.bots.c.mu - seed_player["mu"])
     ).limit(mu_rank_limit).alias("muranktable")
@@ -115,11 +130,11 @@ def serve_game_task(conn, has_gpu=False):
         })
 
 
-def find_idle_seed_player(conn, ranked_users, rank_limit, restrictions=False):
+def find_idle_seed_player(conn, ranked_users, seed_filter, restrictions=False):
     """
     Find a seed player that hasn't played recently.
     :param conn:
-    :param rank_limit:
+    :param seed_filter: SQL expression to limit which players can be used.
     :param restrictions: If True, additionally restrict number of games
     played by the bot, and sort randomly.
     :return:
@@ -151,7 +166,7 @@ def find_idle_seed_player(conn, ranked_users, rank_limit, restrictions=False):
             model.ranked_bots_users,
             (model.ranked_bots_users.c.user_id
              == ranked_users.c.user_id)
-            & rank_limit
+            & seed_filter
         ).join(
             model.game_participants.join(
                 model.games,
@@ -199,11 +214,11 @@ def find_idle_seed_player(conn, ranked_users, rank_limit, restrictions=False):
     return conn.execute(query).first()
 
 
-def find_newbie_seed_player(conn, ranked_users, rank_limit):
+def find_newbie_seed_player(conn, ranked_users, seed_filter):
     """
     Find a seed player that has not played that many games.
     :param conn:
-    :param rank_limit:
+    :param seed_filter: SQL expression to limit which players can be used.
     :return:
     """
     sqlfunc = sqlalchemy.sql.func
@@ -228,18 +243,18 @@ def find_newbie_seed_player(conn, ranked_users, rank_limit):
     ).where(
         (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
         (model.bots.c.games_played < 400) &
-        rank_limit
+        seed_filter
     ).order_by(ordering).limit(1).reduce_columns()
 
     return conn.execute(query).first()
 
 
-def find_seed_player(conn, ranked_users, rank_limit):
+def find_seed_player(conn, ranked_users, seed_filter):
     """
     Find a seed player for a game.
     :param conn: A database connection.
     :param rank_users: The table clause to base player ranks on.
-    :param rank_limit: A WHERE clause to restrict player ranks.
+    :param seed_filter: A WHERE clause to restrict player ranks.
     :return: A seed player, or None.
     """
     if not config.COMPETITION_FINALS_PAIRING:
@@ -248,13 +263,13 @@ def find_seed_player(conn, ranked_users, rank_limit):
         if rand_value > 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
                          " with under 400 games played")
-            result = find_newbie_seed_player(conn, ranked_users, rank_limit)
+            result = find_newbie_seed_player(conn, ranked_users, seed_filter)
             if result:
                 return result
         elif 0.25 < rand_value <= 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
                          " from recent game with under 400 games played")
-            result = find_idle_seed_player(conn, ranked_users, rank_limit,
+            result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                              restrictions=True)
             if result:
                 return result
@@ -264,7 +279,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
         # games the user can have played, and we do not sort randomly.
         logging.info("Matchmaking: seed player: looking for random bot"
                      " from recent game")
-        result = find_idle_seed_player(conn, ranked_users, rank_limit,
+        result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                          restrictions=False)
         if result:
             return result
@@ -272,8 +287,6 @@ def find_seed_player(conn, ranked_users, rank_limit):
         # For finals: take 15 players with least games played, and select one
         total_players = conn.execute(model.total_ranked_users).first()[0]
         thresholds = util.tier_thresholds(total_players)
-        rank_limit = (model.ranked_bots_users.c.rank <=
-                      thresholds[config.FINALS_TIER_NAME])
 
         least_played = sqlalchemy.sql.select([
             model.ranked_bots_users.c.user_id,
@@ -287,7 +300,7 @@ def find_seed_player(conn, ranked_users, rank_limit):
             model.ranked_bots_users.join(
                 ranked_users,
                 (model.ranked_bots_users.c.user_id == ranked_users.c.user_id) &
-                rank_limit
+                seed_filter
             )
         ).where(
             model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value

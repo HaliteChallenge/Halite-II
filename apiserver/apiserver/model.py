@@ -142,6 +142,7 @@ ranked_bots_users = sqlalchemy.sql.select([
     users.c.country_code,
     users.c.country_subdivision_code,
     users.c.github_email.label("email"),
+    users.c.is_gpu_enabled,
     ranked_bots.c.bot_id,
     ranked_bots.c.games_played.label("num_games"),
     ranked_bots.c.version_number.label("num_submissions"),
