@@ -5,7 +5,10 @@ breadcrumb: Learn
 toc: false
 menu: learn
 description: Welcome to the Halite II competition! Learn how to quickly get started downloading, building, and submitting an AI bot.
+mount_view: Onboarding
 ---
+
+<div id="onboarding-container"></div>
 
 Welcome to the Halite II competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. Let's get you set up!
 
