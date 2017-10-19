@@ -86,15 +86,14 @@
       .handler-item {
         display: inline-block;
         background-color: #000;
-
-        padding: 0 10px;
+        padding: 0 15px;
 
         .handler-item-img {
           vertical-align: baseline;
-          cursor: pointer;
+          font-size: 90%;
         }
         .handler-item-text {
-          margin-left: 10px;
+          margin-left: 5px;
         }
       }
       > a{
@@ -186,6 +185,10 @@
           top: 2px;
         }
       }
+    }
+
+    &:last-of-type{
+      margin-right: 0px;
     }
   }
 

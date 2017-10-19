@@ -51,6 +51,7 @@
     }
     .short{
       display: flex;
+      justify-content: center;
       @media (min-width: $screen-sm-min){
         display: none;
       }
@@ -138,8 +139,10 @@
 
   .game-replay-controller {
     position: relative;
-    height: 60px;
     width: 100%;
+    @media (min-width: $screen-sm-min){
+      height: 60px;
+    }
     .xline{
       background-color: #474951;
       &:after, &:before{
@@ -153,10 +156,21 @@
       align-items: center;
       height: 100%;
       width: 100%;
+      flex-wrap: wrap;
+      @media (min-width: $screen-sm-min){
+        flex-wrap: nowrap;
+      }
 
       .game-replay-btn-cell {
         position: relative;
-        width: 200px;
+        width: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        @media (min-width: $screen-sm-min){
+          width: 200px;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
 
         .replay-btn {
           margin-right: 25px;

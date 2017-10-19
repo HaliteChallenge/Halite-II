@@ -1,336 +1,336 @@
 <template>
   <div class="visuallizer-container">
-  <div class="row">
-    <div class="col-md-8">
-      <div class="game-heading">
-        <i class="xline xline-top"></i>
-        <i class="xline xline-bottom"></i>
-        <p class="game-heading-date" v-if="game">{{game.time_played | moment("MMM Do, YY - HH:mm:ss")}}</p>
-        <div class="game-heading-players">
-          <div class="short">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
-              <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
-              <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
-              <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
-            </span>
-            <span class="action">defeats</span>
-            <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length">
-              <TierPopover :tier="tierClass(sortedPlayers[1].tier)"/>
-              <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[1].id}`">{{sortedPlayers[1].name}}</a>
-            </span>
-            <span class="action" v-if="sortedPlayers.length > 2">+{{sortedPlayers.length - 2}}</span>
-          </div>
-          <div class="long">
-            <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
-              <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
-              <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
-              <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
-            </span>
-            <span class="action">defeats</span>
-            <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
-              <TierPopover :tier="tierClass(player.tier)"/>
-              <a v-if="player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</a>
-              <span v-if="!player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</span>
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="game-replay">
-        <i class="xline xline-left"></i>
-        <i class="xline xline-right"></i>
-        <div class="game-replay-viewer"></div>
-        <div class="game-replay-controller">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="game-heading">
           <i class="xline xline-top"></i>
           <i class="xline xline-bottom"></i>
-          <div class="game-replay-btn-table">
-            <div class="game-replay-btn-cell">
-              <span class="replay-btn">
-                <a href="javascript:;" @click="toggleSpeed"><span v-html="speedLabel"></span></a>
+          <p class="game-heading-date" v-if="game">{{game.time_played | moment("MMM Do, YY - HH:mm:ss")}}</p>
+          <div class="game-heading-players">
+            <div class="short">
+              <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
+                <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
+                <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+                <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
               </span>
-              <span class="replay-btn">
-                <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
+              <span class="action">defeats</span>
+              <span :class="`player color-${sortedPlayers[1].index + 1}`" v-if="sortedPlayers.length">
+                <TierPopover :tier="tierClass(sortedPlayers[1].tier)"/>
+                <a class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[1].id}`">{{sortedPlayers[1].name}}</a>
               </span>
-              <span v-if="!playing" class="replay-btn" style="text-align: center">
-                <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
-              </span>
-              <span v-if="playing" class="replay-btn" style="text-align: center">
-                <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
-              </span>
-              <span class="replay-btn">
-                <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
-              </span>
-              <!-- <span class="replay-btn">
-                <span class="icon-volumn"></span>
-              </span> -->
-              <i class="xline xline-right" style="right: 0; top: 0; height: 100%"></i>
+              <span class="action" v-if="sortedPlayers.length > 2">+{{sortedPlayers.length - 2}}</span>
             </div>
-            <div class="game-replay-progress">
-              <div class="game-replay-progress-inner">
-                <div>0</div>
-                <div class="game-replay-progress-bar"><vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
-                <div>{{sliderOptions.max}}</div>
+            <div class="long">
+              <span :class="`player color-${sortedPlayers[0].index + 1}`" v-if="sortedPlayers.length">
+                <TierPopover :tier="tierClass(sortedPlayers[0].tier)"/>
+                <a v-if="sortedPlayers[0].id" class="player-name-anchor" :href="`/user/?user_id=${sortedPlayers[0].id}`">{{sortedPlayers[0].name}}</a>
+                <span v-if="!sortedPlayers[0].id" class="player-name-anchor">{{sortedPlayers[0].name}}</span>
+              </span>
+              <span class="action">defeats</span>
+              <span :class="`player color-${player.index + 1}`" v-for="(player, index) in sortedPlayers" v-if="index > 0" :key="index">
+                <TierPopover :tier="tierClass(player.tier)"/>
+                <a v-if="player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</a>
+                <span v-if="!player.id" class="player-name-anchor" :href="`/user/?user_id=${player.id}`">{{player.name}}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="game-replay">
+          <i class="xline xline-left"></i>
+          <i class="xline xline-right"></i>
+          <div class="game-replay-viewer"></div>
+          <div class="game-replay-controller">
+            <i class="xline xline-top"></i>
+            <i class="xline xline-bottom"></i>
+            <div class="game-replay-btn-table">
+              <div class="game-replay-btn-cell">
+                <span class="replay-btn">
+                  <a href="javascript:;" @click="toggleSpeed"><span v-html="speedLabel"></span></a>
+                </span>
+                <span class="replay-btn">
+                  <a href="javascript:;" @click="prevFrame"><span class="icon-prev"></span></a>
+                </span>
+                <span v-if="!playing" class="replay-btn" style="text-align: center">
+                  <a href="javascript:;" @click="playVideo"><span class="icon-play"></span></a>
+                </span>
+                <span v-if="playing" class="replay-btn" style="text-align: center">
+                  <a href="javascript:;" @click="pauseVideo"><span class="icon-pause"></span></a>
+                </span>
+                <span class="replay-btn">
+                  <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
+                </span>
+                <!-- <span class="replay-btn">
+                  <span class="icon-volumn"></span>
+                </span> -->
+                <i class="xline xline-right" style="right: 0; top: 0; height: 100%"></i>
               </div>
-            </div>
-            <div class="game-replay-share">
-              <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
-              <div class="popup-container" v-show="sharePopup">
-                <div class="popup-share">
-                  <label>Share as a link</label>
-                  <div class="form-inline-button">
-                    <input ref="shareInput" type="text" :value="shareLink"> 
-                    <button class="btn" @click="copyToClipboard">
-                      <span>Copy</span>
-                    </button>
-                  </div>
-                  <div class="share-socials">
-                    <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-   target="_blank"><i class="fa fa-facebook-official"></i></a>
-                    <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-   target="_blank"><i class="fa fa-twitter"></i></a>
-                    <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-   target="_blank"><i class="fa fa-linkedin"></i></a>
-                  </div>
-                  <!-- <div class="hr"></div>
-                  <label>Share as a video</label>
-                  <a href="#" class="btn btn-block"><span>Create Video</span></a> -->
+              <div class="game-replay-progress">
+                <div class="game-replay-progress-inner">
+                  <div>0</div>
+                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
+                  <div>{{sliderOptions.max}}</div>
                 </div>
               </div>
-              <button class="btn" @click="toggleShare">
-                <span>SHARE</span>
-              </button>
+              <div class="game-replay-share">
+                <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
+                <div class="popup-container" v-show="sharePopup">
+                  <div class="popup-share">
+                    <label>Share as a link</label>
+                    <div class="form-inline-button">
+                      <input ref="shareInput" type="text" :value="shareLink"> 
+                      <button class="btn" @click="copyToClipboard">
+                        <span>Copy</span>
+                      </button>
+                    </div>
+                    <div class="share-socials">
+                      <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+     target="_blank"><i class="fa fa-facebook-official"></i></a>
+                      <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+     target="_blank"><i class="fa fa-twitter"></i></a>
+                      <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+     target="_blank"><i class="fa fa-linkedin"></i></a>
+                    </div>
+                    <!-- <div class="hr"></div>
+                    <label>Share as a video</label>
+                    <a href="#" class="btn btn-block"><span>Create Video</span></a> -->
+                  </div>
+                </div>
+                <button class="btn" @click="toggleShare">
+                  <span>SHARE</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
+        </div>
+      </div>
+      <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
+        <div class="game-stats-widget">
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+              <a href="#player_stats" v-on:click="gaData('visualizer','click-player-stats','gameplay')" aria-controls="player_stats" role="tab" data-toggle="tab">
+                <i class="xline xline-top"></i>
+                <span>Player stats</span>
+                <i class="xline xline-bottom"></i>
+              </a>
+            </li>
+            <li role="presentation">
+              <a href="#game_stats" v-on:click="gaData('visualizer','click-game-stats','gameplay')" aria-controls="game_stats" role="tab" data-toggle="tab">
+                <i class="xline xline-top"></i>
+                <span>Game/Map Stats</span>
+                <i class="xline xline-bottom"></i>
+              </a>
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="player_stats">
+              <div id="player_stats_pane">
+                <PlayerStatsPane :players="players" :statistics="statistics" :userlink="userlink"></PlayerStatsPane>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="game_stats">
+              <div id="map_stats_pane">
+                <table class="map-stats-props">
+                  <tbody>
+                    <tr>
+                      <th>Map Size:</th>
+                      <td>{{`${replay.width}x${replay.height}`}}</td>
+                    </tr>
+                    <tr>
+                      <th>Map Parameters:</th>
+                      <td>{{replay.map_generator}}</td>
+                    </tr>
+                    <tr>
+                      <th>Seed:</th>
+                      <td>{{replay.seed}}</td>
+                    </tr>
+                    <tr>
+                      <th>Replay Version:</th>
+                      <td>{{replay.version}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-        <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
+        <div class="panel-group" aria-multiselectable="true">
+          <div class="panel panel-stats">
+            <div class="panel-heading" role="tab" id="heading_player_details">
+              <a data-toggle="collapse" v-on:click="gaData('visualizer','click-player-details','gameplay')" @click.stop="togglePlayerPanel" data-parent="#accordion" :aria-expanded="showPlayerDetailPanel.toString()" aria-controls="widget_player_details">
+                <i class="xline xline-top"></i>
+                <h4>player details</h4>
+                <span class="toggle-icon chevron"></span>
+                <i class="xline xline-bottom"></i>
+              </a>
+            </div>
+            <div class="panel-collapse collapse" :class="{'in': showPlayerDetailPanel}" role="tabpanel" :aria-expanded="showPlayerDetailPanel.toString()" id="widget_player_details" aria-labelledby="heading_player_details">
+              <PlayerDetailPane :replay="replay" :statistics="statistics" :stats="stats" :frame="frame"></PlayerDetailPane>
+            </div>
+          </div>
+          <div class="panel panel-stats">
+            <div class="panel-heading" role="tab" id="heading_map_properties">
+              <a data-toggle="collapse" v-on:click="gaData('visualizer','click-object-properties','gameplay')" @click.stop="toggleObjectPanel" data-parent="#accordion" :aria-expanded="showObjectPanel.toString()" aria-controls="widget_map_properties">
+                <i class="xline xline-top"></i>
+                <h4>map object properties</h4>
+                <span class="toggle-icon chevron"></span>
+                <i class="xline xline-bottom"></i>
+              </a>
+            </div>
+            <div class="panel-collapse collapse" :class="{'in': showObjectPanel}" role="tabpanel" :aria-expanded="showObjectPanel.toString()" id="widget_map_properties" aria-labelledby="heading_map_properties">
+              <!-- DISPLAY MESSAGE BOX -->
+              <div v-if="selectedPlanet">
+                <SelectedPlanet :selected-planet="selectedPlanet" :players="players"></SelectedPlanet>
+              </div>
+              <div v-else-if="selectedShip">
+                <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
+              </div>
+              <div v-else-if="selectedPoint">
+                <SelectedPoint :selected-point="selectedPoint"></SelectedPoint>
+              </div>
+              <div class="message-box" v-else>
+                <p><span class="icon-info"></span></p>
+                <p>Click on a ship, planet, or other map location to see properties</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-md-4 sidebar">
-      <div class="game-stats-widget">
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active">
-            <a href="#player_stats" v-on:click="gaData('visualizer','click-player-stats','gameplay')" aria-controls="player_stats" role="tab" data-toggle="tab">
-              <i class="xline xline-top"></i>
-              <span>Player stats</span>
-              <i class="xline xline-bottom"></i>
-            </a>
-          </li>
-          <li role="presentation">
-            <a href="#game_stats" v-on:click="gaData('visualizer','click-game-stats','gameplay')" aria-controls="game_stats" role="tab" data-toggle="tab">
-              <i class="xline xline-top"></i>
-              <span>Game/Map Stats</span>
-              <i class="xline xline-bottom"></i>
-            </a>
-          </li>
-        </ul>
-        <!-- Tab panes -->
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="player_stats">
-            <div id="player_stats_pane">
-              <PlayerStatsPane :players="players" :statistics="statistics" :userlink="userlink"></PlayerStatsPane>
-            </div>
-          </div>
-          <div role="tabpanel" class="tab-pane" id="game_stats">
-            <div id="map_stats_pane">
-              <table class="map-stats-props">
-                <tbody>
-                  <tr>
-                    <th>Map Size:</th>
-                    <td>{{`${replay.width}x${replay.height}`}}</td>
-                  </tr>
-                  <tr>
-                    <th>Map Parameters:</th>
-                    <td>{{replay.map_generator}}</td>
-                  </tr>
-                  <tr>
-                    <th>Seed:</th>
-                    <td>{{replay.seed}}</td>
-                  </tr>
-                  <tr>
-                    <th>Replay Version:</th>
-                    <td>{{replay.version}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="post-game-dashboard hidden-xs hidden-sm" v-if="!isMobile">
       <div class="panel-group" aria-multiselectable="true">
-        <div class="panel panel-stats">
-          <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-player-details','gameplay')" @click.stop="togglePlayerPanel" data-parent="#accordion" :aria-expanded="showPlayerDetailPanel.toString()" aria-controls="widget_player_details">
-              <i class="xline xline-top"></i>
-              <h4>player details</h4>
-              <span class="toggle-icon chevron"></span>
-              <i class="xline xline-bottom"></i>
-            </a>
-          </div>
-          <div class="panel-collapse collapse" :class="{'in': showPlayerDetailPanel}" role="tabpanel" :aria-expanded="showPlayerDetailPanel.toString()" id="widget_player_details" aria-labelledby="heading_player_details">
-            <PlayerDetailPane :replay="replay" :statistics="statistics" :stats="stats" :frame="frame"></PlayerDetailPane>
+          <div class="panel panel-stats">
+            <div class="panel-heading" role="tab" id="heading_player_details">
+              <a data-toggle="collapse" v-on:click="gaData('visualizer','click-postgame-dashboard','gameplay')"  @click.stop="toggleChartPanel" data-parent="#accordion" :aria-expanded="showChartPanel.toString()" aria-controls="widget_player_details">
+                <i class="xline xline-top"></i>
+                <h4>post game dashboard</h4>
+                <span class="toggle-icon expand"></span>
+                <i class="xline xline-bottom"></i>
+              </a>
+            </div>
+            <div class="panel-collapse collapse" :class="{'in': showChartPanel}" role="tabpanel" :aria-expanded="showChartPanel.toString()" id="panel_post_game" aria-labelledby="panel_post_game">
+              <div class="card-dashboard-list row">
+                <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
+                  <div :class="{'card-dashboard': true, 'active': selectedPlayers[_pIndex]}" @click="toggleSelectedPlayer(_pIndex)">
+                    <i class="xline xline-top"></i>
+                    <i class="xline xline-bottom"></i>
+                    <div class="card-dashboard-thumb">
+                      <img :src="`https://github.com/${_player.name}.png`">
+                    </div>
+                    <div class="card-dashboard-info">
+                      <span style="display: block;" :class="`player color-${_pIndex + 1}`">
+                        <TierPopover :tier="tierClass(_player.tier)"/>
+                        RANK {{_player.rank}}
+                      </span>
+                      <p class="card-dashboard-name">
+                        <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                        <span v-if="!_player.id" class="player-name-anchor">{{_player.name}}</span>
+                      </p>
+                      <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
+                      <p v-else class="card-dashboard-version-heading">Local bot</p>
+                    </div>
+                    <div v-if="_player.version" class="card-dashboard-version">V{{_player.version}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dashboard-graph-container bt bb">
+                <i class="dot-tl"></i>
+                <i class="dot-tr"></i>
+                <i class="dot-bl"></i>
+                <i class="dot-br"></i>
+                <div class="dashboard-graph dashboard-graph-full">
+                  <h4 class="dashboard-graph-heading">
+                    <span class="icon-globe"></span>
+                    Territory Gained
+                  </h4>
+                  <PlayerLineChart ref="chart1" :selected-players="selectedPlayers" :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
+                </div>
+              </div>
+              <div class="dashboard-graph-container bb ">
+                <i class="dot-bl"></i>
+                <i class="dot-br"></i>
+                <div class="row">
+                  <div class="dashboard-graph br col-md-6">
+                    <i class="dot-tr"></i>
+                    <i class="dot-br"></i>
+                    <h4 class="dashboard-graph-heading">
+                      <span class="icon-ship"></span>
+                      Ships
+                    </h4>
+                    <PlayerLineChart ref="chart2" :selected-players="selectedPlayers" :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  </div>
+                  <div class="dashboard-graph col-md-6">
+                    <h4 class="dashboard-graph-heading">
+                      <span class="icon-health"></span>
+                      health
+                    </h4>
+                    <PlayerLineChart ref="chart3" :selected-players="selectedPlayers" :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  </div>
+                </div>
+              </div>
+              <div class="dashboard-graph-container">
+                <div class="row">
+                  <div class="dashboard-graph br col-md-6">
+                    <i class="dot-tr"></i>
+                    <i class="dot-br"></i>
+                    <h4 class="dashboard-graph-heading">
+                      <span class="icon-ship"></span>
+                      damage dealt
+                    </h4>
+                    <PlayerLineChart ref="chart4" :selected-players="selectedPlayers" :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  </div>
+                  <div class="dashboard-graph col-md-6">
+                    <h4 class="dashboard-graph-heading">
+                      <span class="icon-health"></span>
+                      attack over time
+                    </h4>
+                    <PlayerLineChart ref="chart5" :selected-players="selectedPlayers" :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="panel panel-stats">
-          <div class="panel-heading" role="tab" id="heading_map_properties">
-            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-object-properties','gameplay')" @click.stop="toggleObjectPanel" data-parent="#accordion" :aria-expanded="showObjectPanel.toString()" aria-controls="widget_map_properties">
-              <i class="xline xline-top"></i>
-              <h4>map object properties</h4>
-              <span class="toggle-icon chevron"></span>
-              <i class="xline xline-bottom"></i>
-            </a>
-          </div>
-          <div class="panel-collapse collapse" :class="{'in': showObjectPanel}" role="tabpanel" :aria-expanded="showObjectPanel.toString()" id="widget_map_properties" aria-labelledby="heading_map_properties">
-            <!-- DISPLAY MESSAGE BOX -->
-            <div v-if="selectedPlanet">
-              <SelectedPlanet :selected-planet="selectedPlanet" :players="players"></SelectedPlanet>
-            </div>
-            <div v-else-if="selectedShip">
-              <SelectedShip :selected-ship="selectedShip" :players="players"></SelectedShip>
-            </div>
-            <div v-else-if="selectedPoint">
-              <SelectedPoint :selected-point="selectedPoint"></SelectedPoint>
-            </div>
-            <div class="message-box" v-else>
-              <p><span class="icon-info"></span></p>
-              <p>Click on a ship, planet, or other map location to see properties</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
-  <div class="post-game-dashboard">
-    <div class="panel-group" aria-multiselectable="true">
-        <div class="panel panel-stats">
-          <div class="panel-heading" role="tab" id="heading_player_details">
-            <a data-toggle="collapse" v-on:click="gaData('visualizer','click-postgame-dashboard','gameplay')"  @click.stop="toggleChartPanel" data-parent="#accordion" :aria-expanded="showChartPanel.toString()" aria-controls="widget_player_details">
-              <i class="xline xline-top"></i>
-              <h4>post game dashboard</h4>
-              <span class="toggle-icon expand"></span>
-              <i class="xline xline-bottom"></i>
-            </a>
-          </div>
-          <div class="panel-collapse collapse" :class="{'in': showChartPanel}" role="tabpanel" :aria-expanded="showChartPanel.toString()" id="panel_post_game" aria-labelledby="panel_post_game">
-            <div class="card-dashboard-list row">
-              <div class="col-md-3" v-for="(_player, _pIndex) in (players) || []">
-                <div :class="{'card-dashboard': true, 'active': selectedPlayers[_pIndex]}" @click="toggleSelectedPlayer(_pIndex)">
-                  <i class="xline xline-top"></i>
-                  <i class="xline xline-bottom"></i>
-                  <div class="card-dashboard-thumb">
-                    <img :src="`https://github.com/${_player.name}.png`">
-                  </div>
-                  <div class="card-dashboard-info">
-                    <span style="display: block;" :class="`player color-${_pIndex + 1}`">
-                      <TierPopover :tier="tierClass(_player.tier)"/>
-                      RANK {{_player.rank}}
-                    </span>
-                    <p class="card-dashboard-name">
-                      <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
-                      <span v-if="!_player.id" class="player-name-anchor">{{_player.name}}</span>
-                    </p>
-                    <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
-                    <p v-else class="card-dashboard-version-heading">Local bot</p>
-                  </div>
-                  <div v-if="_player.version" class="card-dashboard-version">V{{_player.version}}</div>
-                </div>
-              </div>
-            </div>
-            <div class="dashboard-graph-container bt bb">
-              <i class="dot-tl"></i>
-              <i class="dot-tr"></i>
-              <i class="dot-bl"></i>
-              <i class="dot-br"></i>
-              <div class="dashboard-graph dashboard-graph-full">
-                <h4 class="dashboard-graph-heading">
-                  <span class="icon-globe"></span>
-                  Territory Gained
-                </h4>
-                <PlayerLineChart ref="chart1" :selected-players="selectedPlayers" :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
-              </div>
-            </div>
-            <div class="dashboard-graph-container bb ">
-              <i class="dot-bl"></i>
-              <i class="dot-br"></i>
-              <div class="row">
-                <div class="dashboard-graph br col-md-6">
-                  <i class="dot-tr"></i>
-                  <i class="dot-br"></i>
-                  <h4 class="dashboard-graph-heading">
-                    <span class="icon-ship"></span>
-                    Ships
-                  </h4>
-                  <PlayerLineChart ref="chart2" :selected-players="selectedPlayers" :chart-data="chartData.ship" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
-                </div>
-                <div class="dashboard-graph col-md-6">
-                  <h4 class="dashboard-graph-heading">
-                    <span class="icon-health"></span>
-                    health
-                  </h4>
-                  <PlayerLineChart ref="chart3" :selected-players="selectedPlayers" :chart-data="chartData.health" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
-                </div>
-              </div>
-            </div>
-            <div class="dashboard-graph-container">
-              <div class="row">
-                <div class="dashboard-graph br col-md-6">
-                  <i class="dot-tr"></i>
-                  <i class="dot-br"></i>
-                  <h4 class="dashboard-graph-heading">
-                    <span class="icon-ship"></span>
-                    damage dealt
-                  </h4>
-                  <PlayerLineChart ref="chart4" :selected-players="selectedPlayers" :chart-data="chartData.damage" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
-                </div>
-                <div class="dashboard-graph col-md-6">
-                  <h4 class="dashboard-graph-heading">
-                    <span class="icon-health"></span>
-                    attack over time
-                  </h4>
-                  <PlayerLineChart ref="chart5" :selected-players="selectedPlayers" :chart-data="chartData.attack" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-  </div>
-</div>
 </template>
 
 <script>
   import Vue from 'vue'
-import * as api from '../api'
-import * as libhaliteviz from '../../../libhaliteviz'
-import * as utils from '../utils'
-import moment from 'vue-moment'
-import vueSlider from 'vue-slider-component'
-import PlayerStatsPane from './PlayerStatsPane.vue'
-import PlayerDetailPane from './PlayerDetailPane.vue'
-import PlayerLineChart from './PlayerLineChart.vue'
-import SelectedPlanet from './SelectedPlanet.vue'
-import SelectedShip from './SelectedShip.vue'
-import SelectedPoint from './SelectedPoint.vue'
-import TierPopover from './TierPopover.vue'
-import {tierClass} from '../utils'
-import _ from 'lodash'
+  import * as api from '../api'
+  import * as libhaliteviz from '../../../libhaliteviz'
+  import * as utils from '../utils'
+  import moment from 'vue-moment'
+  import vueSlider from 'vue-slider-component'
+  import PlayerStatsPane from './PlayerStatsPane.vue'
+  import PlayerDetailPane from './PlayerDetailPane.vue'
+  import PlayerLineChart from './PlayerLineChart.vue'
+  import SelectedPlanet from './SelectedPlanet.vue'
+  import SelectedShip from './SelectedShip.vue'
+  import SelectedPoint from './SelectedPoint.vue'
+  import TierPopover from './TierPopover.vue'
+  import {tierClass} from '../utils'
+  import _ from 'lodash'
 
-const speedList = {
-    1: '&frac12x',
-    2: '1x',
-    4: '2x',
-    6: '3x',
-    8: '4x',
-    10: '5x'
+  const speedList = {
+      1: '&frac12x',
+      2: '1x',
+      4: '2x',
+      6: '3x',
+      8: '4x',
+      10: '5x'
+    }
+
+  // libhaliteviz.setAssetRoot("/assets/js/");
+  const HaliteVisualizer = libhaliteviz.HaliteVisualizer
+
+  // just for electron
+  if (window && window.process && window.process.type) {
+      libhaliteviz.setAssetRoot('assets/js/')
+  } else {
+      libhaliteviz.setAssetRoot('/assets/js/')
   }
-
-// libhaliteviz.setAssetRoot("/assets/js/");
-const HaliteVisualizer = libhaliteviz.HaliteVisualizer
-
-// just for electron
-if (window && window.process && window.process.type) {
-    libhaliteviz.setAssetRoot('assets/js/')
-} else {
-    libhaliteviz.setAssetRoot('/assets/js/')
-}
   const loadGame = (game) => {
     const buffer = game.replay
   return libhaliteviz.parseReplay(buffer)
@@ -352,6 +352,7 @@ if (window && window.process && window.process.type) {
         speedLabel: '3x',
         stats: null,
         sharePopup: false,
+        isMobile: window.mobileAndTabletcheck(),
         // showChart: false,
         selected: {
           kind: '',

@@ -67,7 +67,7 @@
 
     </div>
 
-    <div id="halitetv-more-upload" v-if="currentView=='replay'">
+    <div id="halitetv-more-upload" v-if="currentView=='replay' && !message">
       <h2>Replay Another Bot</h2>
       <div class="upload-container">
         <halite-upload-zone
@@ -87,32 +87,32 @@
 </template>
 <script>
   import * as api from '../api'
-import Vue from 'vue'
-import HaliteBreadcrumb from './Breadcrumb.vue'
-import VisualizerContainer from './VisualizerContainer.vue'
-import * as libhaliteviz from '../../../libhaliteviz'
-import Upload from './Upload.vue'
-import BotUpload from './BotUpload.vue'
-import Message from './Message.vue'
-import {Alert} from '../utils.js'
-import UploadZone from './UploadZone.vue'
-import Visualizer from './Visualizer.vue'
-import * as utils from '../utils'
+  import Vue from 'vue'
+  import HaliteBreadcrumb from './Breadcrumb.vue'
+  import VisualizerContainer from './VisualizerContainer.vue'
+  import * as libhaliteviz from '../../../libhaliteviz'
+  import Upload from './Upload.vue'
+  import BotUpload from './BotUpload.vue'
+  import Message from './Message.vue'
+  import {Alert} from '../utils.js'
+  import UploadZone from './UploadZone.vue'
+  import Visualizer from './Visualizer.vue'
+  import * as utils from '../utils'
 
-// showing game 
-let visualizer = null
-const showGame = (game) => {
+  // showing game 
+  let visualizer = null
+  const showGame = (game) => {
     if (visualizer && visualizer.getVisualizer) {
       visualizer.getVisualizer().destroy()
-  }
+    }
 
     const buffer = game.replay
-  return libhaliteviz.parseReplay(buffer).then((replay) => {
+    return libhaliteviz.parseReplay(buffer).then((replay) => {
       let outerContainer = document.getElementById('halitetv-visualizer')
       outerContainer.innerHTML = ''
 
       let container = document.createElement('div')
-      document.getElementById('halitetv-visualizer').appendChild(container)
+      outerContainer.appendChild(container)
 
       new Vue({
         el: container,
@@ -182,30 +182,32 @@ const showGame = (game) => {
   
       // handle whole page drag and drop
       const ins = this
-      $('body').on('drop dragdrop', function (e) {
+      $('body').on('drop dragdrop', (e) => {
         // get the bot uploader container
         const container = document.getElementById('bot-upload-container')
 
         // verify if the dropzone is not the bot uploader zone
         if (!container || !container.contains(e.target)) {
           e.preventDefault()
+          let outerContainer = document.getElementById('halitetv-visualizer')
+          outerContainer.innerHTML = ''
           ins.play_replay(e.originalEvent.dataTransfer.files)
         }
       })
-      $('body').on('dragenter', function (e) {
+      $('body').on('dragenter', (e) => {
         // get the bot uploader container
         const container = document.getElementById('bot-upload-container')
         if (!container || !container.contains(e.target)) {
           event.preventDefault()
         }
       })
-      $('body').on('dragover', function (e) {
+      $('body').on('dragover', (e) => {
         // get the bot uploader container
         const container = document.getElementById('bot-upload-container')
         if (!container || !container.contains(e.target)) {
           event.preventDefault()
         }
-      })
+      });
   },
     methods: {
       showMessage: function (type = 'success', content) {

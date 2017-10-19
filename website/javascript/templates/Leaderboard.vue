@@ -13,10 +13,10 @@
         <form class="leaderboard-filter-form" v-on:submit="on_update_filter">
           <div class="form-header">
             <div class="filter-handler" v-if="filter_handle_view==='normal'">
-              <div class="handler-item" @click="clearFilter">
-                <span class="icon-remove"></span>
+              <a href="#" class="handler-item" @click="clearFilter">
+                <span class="handler-item-img icon-remove"></span>
                 <span class="handler-item-text">Clear all</span>
-              </div>
+              </a>
             </div>
           </div>
           <div class="filter-group">
@@ -524,7 +524,7 @@ export default {
           leaderboard.forEach(function (user, index) {
             instance.users.push(user.username)
           })
-          
+
           instance.users.sort()
 
           // save the users
@@ -575,7 +575,7 @@ export default {
               }
             });
           }
-          
+
         }
 
         const handleLeaderboard = leaderboard => {
