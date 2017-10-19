@@ -182,7 +182,6 @@ const showGame = (game) => {
   
       // handle whole page drag and drop
       const ins = this
-      $('body').attr('draggable', 'true')
       $('body').on('drop dragdrop', function (e) {
         // get the bot uploader container
         const container = document.getElementById('bot-upload-container')

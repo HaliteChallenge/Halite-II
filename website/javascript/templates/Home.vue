@@ -78,7 +78,7 @@
             <div class="col-md-12 ha-line">
             </div>
             <div class="col-md-12 big-menu watch-section">
-                <p class="t2 c-wht">WATCH TOP GAMES</p>
+                <p class="t2 c-wht font-headline">WATCH TOP GAMES</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <p class="t5 c-gry section-des">Check out some top games from Halite players to learn more about rules and strategy. Our team has selected some fun 2-player and 4-player games just for you.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
@@ -142,7 +142,7 @@
                </div>
            </div>
             <div class="col-md-12 big-menu">
-                <p class="t2 c-wht">PLAY WITH FRIENDS</p>
+                <p class="t2 c-wht font-headline">PLAY WITH FRIENDS</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
                 <p class="t5 c-gry">Halite is fun and collaborative, play with friends to progress further.</p>
                 <div class="line-container"><i class="xline xline-top"></i></div>
@@ -290,11 +290,10 @@
             <div class="col-md-12 col-sm-12 sponsor-section">
                 <p class="t2 c-wht font-headline">OUR SUPPORTING PARTNERS</p>
                 <div class="col-md-6 col-sm-6 left">
-                    <span class="t3 c-wht font-headline left-label">CORNELL<br/>TECH</span>
-                    <span class="left-des font-headline"><span class="c-gry">HOME OF THE</span><span class="c-wht"> JACOBS<br/>TECHNION-CORNELL<br/>INSTITUTE</span></span>
+                    <img class="logo" :src="`${baseUrl}/assets/images/temp/logo_corneltech.png`"/>
                 </div>
                 <div class="col-md-6 col-sm-6 right">
-                    <span class="t2 c-wht font-headline">Google</span>
+                    <img class="logo" :src="`${baseUrl}/assets/images/temp/logo_google.png`"/>
                 </div>
             </div>
             <div class="col-md-12 big-menu">
