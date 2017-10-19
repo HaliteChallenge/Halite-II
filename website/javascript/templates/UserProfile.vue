@@ -17,6 +17,16 @@
                             <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
+                    <div v-if="is_my_page && bots && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
+                        <p class="warning">
+                            Your bot is disabled   <span title="Due to excessive timeouts or errors, you bot has been disabled, look at the game logs to debug the issue or try submitting it again." class="info-icon icon-info"></span>
+                        </p>
+                    </div>
+                     <div v-if="is_my_page && bots && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
+                        <p class="warning">
+                            Your bot failed to compile   <span title="Look at the compilation failure mail to debug the issue or try submitting it again." class="info-icon icon-info"></span>
+                        </p>
+                    </div>
                 </div>
                 <div class="user-profile-rank">
                     <i class="xline xline-top"></i>
@@ -452,11 +462,11 @@
 
 <script>
     import * as api from '../api'
-import {Alert, tierClass} from '../utils.js'
-import Vue from 'vue'
-import * as utils from '../utils'
-import moment from 'moment'
-import dateformat from 'dateformat'
+    import {Alert, tierClass} from '../utils.js'
+    import Vue from 'vue'
+    import * as utils from '../utils'
+    import moment from 'moment'
+    import dateformat from 'dateformat'
 
     export default {
       name: 'UserProfile',
@@ -562,7 +572,7 @@ import dateformat from 'dateformat'
           $(window).on('resize', () => {
             calcCol()
           })
-    },
+        },
         refreshStickyTable: function () {
           const calcCol = () => {
             const el = $(this.$el).find('.table-sticky-container:visible').each(function () {
@@ -710,26 +720,26 @@ import dateformat from 'dateformat'
             this.error_games = data
             this.refreshStickyTable()
           })
-    },
+        },
         next_page: function () {
           this.offset += 10
           this.fetch().then(() => {
             this.page += 1
           })
-    },
+        },
         prev_page: function () {
           this.offset -= 10
           this.fetch().then(() => {
             this.page -= 1
           })
-    },
+        },
         toggle_filter: function () {
           this.only_timed_out = !this.only_timed_out
           this.offset = 0
           this.fetch().then(() => {
             this.page = 0
           })
-    },
+        },
         error_log_link: function (game_id) {
           return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/error_log`
         },
@@ -739,19 +749,6 @@ import dateformat from 'dateformat'
         replay_link: function (game_id) {
           return `/play/?game_id=${game_id}`
         },
-        join_hackathon: function (event) {
-          event.preventDefault()
-          const code = this.$refs.hackathon_signup_code.value
-          this.gaData('hackathon', 'click-submit-hackathon-code', 'hackathon-flow')
-          api.registerHackathon(code).then(() => {
-            Alert.show('Successfully registered!', 'success')
-            this.gaData('hackathon', 'hackathon-code-success', 'hackathon-flow')
-            this.fetchHackathon()
-          }, (error) => {
-            Alert.show(`Error: ${error.message || error.responseJSON.message}`)
-            this.gaData('hackathon', 'hackathon-code-error', 'hackathon-flow')
-          })
-    },
         prev_badge: () => {
           let content = $('.user-profile-badge-content')
           let list = $('.user-profile-badge-list')
