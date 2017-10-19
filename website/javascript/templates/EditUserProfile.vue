@@ -42,7 +42,12 @@
                             <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                         <div class="form-group" v-else>
-                            <p>Please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
+                          <v-select
+                            placeholder="Select School"
+                            v-model="selected_highSchool"
+                            :options="highSchools">
+                          </v-select>
+                          <p style="margin-top: 10px">If you dont see your High School listed, please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
                         </div>
                     </template>
 
@@ -119,9 +124,10 @@ export default {
           username: '',
           selected_country: null,
           selected_region: null,
+          selected_highSchool: null,
           level: 'Professional',
           organization: null,
-          organizations: [],
+          highSchools: [],
           email: '',
           error: null,
           primary: true,
@@ -154,13 +160,14 @@ export default {
           codes[item[1]] = item[0]
         })
 
-    const new_countries = countries.map((item) => {
-          return {
-            label: item[1].name,
-            value: codes[item[0]],
-            code: item[0]
-          }
-    })
+        const new_countries = countries.map((item) => {
+              return {
+                label: item[1].name,
+                value: codes[item[0]],
+                code: item[0]
+              }
+        })
+
         new_countries.unshift({
           value: 'NONE',
           code: 'NONE',
@@ -168,6 +175,21 @@ export default {
         })
         this.countries = countries
         this.country_options = new_countries
+
+        api.list_organizations().then((orgs)=>
+        {
+            let schools = []
+            if(orgs && orgs instanceof Array)
+            {
+                schools = orgs.filter((item) => {
+                return item.type === 'High School'
+              })
+            }
+
+            for (var i = 0; i < schools.length; i++) {
+                this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
+              }
+        })
 
         // get current user
         api.me().then((me) => {
@@ -183,7 +205,7 @@ export default {
           this.selected_region = this.regions.find((item) => {
             return item.value == me.country_subdivision_code
           })
-    })
+        })
       },
       computed: {
         regions: function () {
@@ -245,7 +267,12 @@ export default {
         submit: function (e) {
           let request = {
             'level': this.level,
-            'organization_id': this.organization === 'NONE' ? null : this.organization
+            'organization_id': this === 'NONE' ? null : this.organization
+          }
+
+          if(this.level === 'High School')
+          {
+            request['organization_id'] = this.selected_highSchool.id
           }
 
           if (this.country_code !== '') {
@@ -265,6 +292,8 @@ export default {
           if (this.level !== 'High School' && this.email) {
             request['email'] = this.email
           }
+
+          console.log(request);
 
           api.update_me(this.user.user_id, request).then((response) => {
             let message = 'You have updated your profile successfully.';

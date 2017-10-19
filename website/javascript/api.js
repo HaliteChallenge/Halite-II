@@ -122,7 +122,7 @@ export function update_bot (user_id, bot_id, file, progress_callback) {
 
 export function list_organizations (user_id) {
   return $.get({
-    url: `${API_SERVER_URL}/user/${user_id}/season1`
+    url: `${API_SERVER_URL}/organization`
   })
 }
 
