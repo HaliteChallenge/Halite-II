@@ -20,6 +20,7 @@ import Leagues from './templates/Leagues.vue'
 import LeagueBoard from './templates/LeagueBoard.vue'
 import Play from './templates/Play.vue'
 import Settings from './templates/Settings.vue'
+import View404 from './templates/404.vue'
 
 // Include bootstrap.js - do not remove
 import _ from '../vendor_assets/bootstrap-sass-3.3.7/assets/javascripts/bootstrap'
@@ -131,6 +132,12 @@ window.views = {
     new Vue({
       el: '#settings-container',
       render: (h) => h(Settings, { props: { baseUrl: _global.baseUrl } })
+    })
+  },
+  View404: function () {
+    new Vue({
+      el: '#view404-container',
+      render: (h) => h(View404, { props: { baseUrl: _global.baseUrl } })
     })
   }
 }

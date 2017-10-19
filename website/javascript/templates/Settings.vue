@@ -86,7 +86,7 @@ export default {
           this.username = me.username
 
           if(this.user.is_gpu_enabled){
-            this.selected_gpu_state = this.gpu_states.find((item) => {
+            this.selected_gpu_state = this.gpu_states.ldsifind((item) => {
               return item.value == 1
             });
           }
