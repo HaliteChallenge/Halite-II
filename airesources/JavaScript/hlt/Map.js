@@ -1,14 +1,23 @@
-const MapParser = require('./MapParser');
 const Ship = require('./Ship');
 const Planet = require('./Planet');
 
 const Geometry = require('./Geometry');
 
 class Map {
-    constructor({width, height, myPlayerId}) {
+    constructor({myPlayerId, width, height}) {
+        this._myPlayerId = myPlayerId;
         this._width = width;
         this._height = height;
-        this._myPlayerId = myPlayerId;
+
+        this._playerIds = [];
+        this._planets = [];
+        this._ships = [];
+        this._eneymyShips = [];
+        this._shipsByPlayerId = {};
+    }
+
+    get myPlayerId() {
+        return this._myPlayerId;
     }
 
     get width() {
@@ -19,8 +28,24 @@ class Map {
         return this._height;
     }
 
-    get myPlayerId() {
-        return this._myPlayerId;
+    addPlayerId(playerId) {
+        this._playerIds.push(playerId);
+    }
+
+    addPlayerShips(playerId, shipsParams) {
+        const existingShips = this._shipsByPlayerId[playerId] || [];
+        const newShips = shipsParams.map(p => new Ship(playerId, p));
+
+        this._shipsByPlayerId[playerId] = existingShips.concat(newShips);
+        if (playerId !== this.myPlayerId) {
+            this._eneymyShips = this._eneymyShips.concat(newShips);
+        }
+
+        this._ships = this._ships.concat(newShips);
+    }
+
+    addPlanets(planetParams) {
+        this._planets = this._planets.concat(planetParams.map(p => new Planet(p)));
     }
 
     get numberOfPlayers() {
@@ -60,68 +85,12 @@ class Map {
     }
 
     obstaclesBetween(ship, target) {
-        const result = [];
-        result.concat(this.shipsBetween(ship, target));
-        result.concat(this.planetsBetween(ship, target));
-
-        return result;
-    }
-
-    update(line) {
-        this._parser = new MapParser(line);
-
-        this._playerIds = [];
-        this._planets = [];
-        this._ships = [];
-        this._eneymyShips = [];
-        this._shipsByPlayerId = {};
-
-        this._updatePlayers();
-        this._updatePlanets();
-
-        const remainingTokens = this._parser.remainingTokens();
-        if (remainingTokens.length !== 0) {
-            throw new Error('detected unprocessed remaining tokens: ' + remainingTokens);
-        }
+        return this.shipsBetween(ship, target).concat(this.planetsBetween(ship, target));
     }
 
     _obstaclesBetween(obstaclesList, ship, target) {
         return obstaclesList.filter(o => o !== ship && o !== target)
             .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.1))
-    }
-
-    _updatePlayers() {
-        const numberOfPlayers = this._parser.nextInt();
-        for (let playerIdx = 0; playerIdx < numberOfPlayers; playerIdx++) {
-            const playerId = this._parser.nextInt();
-
-            this._playerIds.push(playerId);
-            this._updateShips(playerId);
-        }
-    }
-
-    _updateShips(playerId) {
-        const playerShips = [];
-        this._shipsByPlayerId[playerId] = playerShips;
-
-        const numberOfShips = this._parser.nextInt();
-        for (let shipIdx = 0; shipIdx < numberOfShips; shipIdx++) {
-            const ship = new Ship(playerId, this._parser.nextShipParams());
-
-            this._ships.push(ship);
-            playerShips.push(ship);
-
-            if (playerId !== this.myPlayerId) {
-                this.enemyShips.push(ship);
-            }
-        }
-    }
-
-    _updatePlanets() {
-        const numberOfPlanets = this._parser.nextInt();
-        for (let planetIdx = 0; planetIdx < numberOfPlanets; planetIdx++) {
-            this._planets.push(new Planet(this._parser.nextPlanetParams()));
-        }
     }
 }
 

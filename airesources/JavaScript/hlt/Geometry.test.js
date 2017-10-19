@@ -1,5 +1,6 @@
+require('should');
+
 const Geometry = require('./Geometry');
-const should = require('should');
 
 describe('Geometry', () => {
     it('distance between two points', () => {
