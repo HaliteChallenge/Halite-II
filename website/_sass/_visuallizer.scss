@@ -330,3 +330,13 @@
     text-decoration: underline;
   }
 }
+
+
+// slider component
+.vue-slider-component .vue-slider-dot{
+
+}
+.vue-slider-component.vue-slider-horizontal .vue-slider-dot{
+  left: 4px;
+  transform: translateX(-8px);
+}
