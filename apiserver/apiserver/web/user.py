@@ -483,7 +483,7 @@ def update_user(intended_user_id, *, user_id):
         "organization_id": "organization_id",
         "email": "email",
         "verification_code": "organization_verification_code",
-        "is_gpu_enabled":"is_gpu_enabled"
+        "is_gpu_enabled": "is_gpu_enabled",
     }
 
     update = {}
@@ -493,7 +493,7 @@ def update_user(intended_user_id, *, user_id):
         if key not in columns:
             raise util.APIError(400, message="Cannot update '{}'".format(key))
 
-        if fields[key]:
+        if fields[key] is not None:
             # Don't overwrite values with None/null
             update[columns[key]] = fields[key]
 

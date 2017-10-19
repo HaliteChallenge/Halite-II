@@ -36,7 +36,7 @@
                             :options="gpu_states">
                         </v-select>
                     </div>
-         
+
 
                     <div class="line-container"><i class="xline xline-top"></i></div>
 
@@ -45,7 +45,7 @@
                         <div class="form-group">
                                 To manage your email preferences, click the relevant link at the bottom of any Halite email.
                         </div>
-                    </form>  
+                    </form>
 
                     <a class="cancel-href base" href="/user/?me" target="_self">Cancel</a>
                     <button type="submit" class="btn-ha">Save Settings</button>
