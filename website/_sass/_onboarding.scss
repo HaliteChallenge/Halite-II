@@ -1,0 +1,133 @@
+.onboarding-container{
+  $font-color1: #191822;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(19,19,27,0.6);
+  z-index: 1031;
+  color: $foreground;
+  a{
+    cursor: pointer;
+  }
+  >.row{
+    margin-top: 61px;
+  }
+  .tip-info{
+    color: #BC6215;
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+  .close-btn{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: 1px solid;
+    cursor: pointer;
+  }
+  [class^="step-section-"]{
+    position: relative;
+    padding:20px;
+    background-color: #1C1A27;
+    border-radius: 5px;
+    text-align: center;
+  }
+  .video{
+    height: 150px;
+    margin: 20px 0;
+  }
+  .ha-button span{
+    width: 100px;
+    font-weight: bold;
+  }
+  a.link-in-dark{
+    color: $yellow;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+      color: $yellow-hover;
+      text-decoration: underline;
+    }
+  }
+  .section-content{
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+    >h2{
+      margin:10px 0;
+    }
+  }
+  .download-section{
+    display: flex;
+    margin: 30px 0;
+    select{
+      flex: 1;
+      width:140px;
+      margin: 0 10px;
+    }
+    &-link{
+      flex: 1;
+      line-height: 45px;
+      max-width: 160px;
+      padding: 0 7px;
+      >a{
+        margin-right:10px;
+      }
+      img{
+        cursor: pointer;
+        transform: translateY(-2px);
+      }
+    }
+  }
+  .step{
+    &-rank{
+      color: $yellow;
+    }
+    &-margin{
+      margin: 20px 0;
+    }
+    &-sub-header{
+      text-align: left;
+      position: relative;
+      padding: 12px 10px;
+      margin-top: 10px;
+      border-top: 1px solid #979797;
+      select{
+        position: absolute;
+        right:10px;
+        width: 200px;
+        height: 35px;
+        top: 5px;
+      }
+    }
+    &-title{
+      color: $yellow;
+      text-transform: uppercase;
+    }
+    &-flex{
+      display: flex;
+      background-color: #FFFFFF;
+      >div{
+        color: $font-color1;
+        font-size: 13px;
+        padding: 20px;
+        flex: 1;
+        text-align: left;
+      }
+    }
+    &-language{
+      background-color: #353341;
+    }
+    &-language-space{
+      background-color: #FFFFFF;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    &-bottom{
+      >a{
+        margin-right:20px;
+      }
+    }
+  }
+}

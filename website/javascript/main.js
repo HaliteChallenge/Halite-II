@@ -18,6 +18,7 @@ import HackathonPortal from './templates/HackathonPortal.vue'
 import HackathonIndividual from './templates/HackathonIndividual.vue'
 import Leagues from './templates/Leagues.vue'
 import LeagueBoard from './templates/LeagueBoard.vue'
+import Onboarding from './templates/Onboarding.vue'
 import Play from './templates/Play.vue'
 import Settings from './templates/Settings.vue'
 import View404 from './templates/404.vue'
@@ -126,6 +127,12 @@ window.views = {
     new Vue({
       el: '#leaderboard-container',
       render: (h) => h(LeagueBoard, { props: { baseUrl: _global.baseUrl } })
+    })
+  },
+  Onboarding: function () {
+    new Vue({
+      el: '#onboarding-container',
+      render: (h) => h(Onboarding, { props: { baseUrl: _global.baseUrl } })
     })
   },
   Settings: function () {

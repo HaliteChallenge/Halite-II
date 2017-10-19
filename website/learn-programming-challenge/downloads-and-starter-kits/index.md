@@ -4,6 +4,7 @@ title: Downloads and Starter Kits
 description: Halite engine and language specific starter kit downloads
 image: assets/images/temp/bot_1.png
 content: website
+mount_view: Onboarding
 ---
 
 Download a language specific starter kit as a quick and easy way to get started playing in the Halite AI competition. 
@@ -54,6 +55,7 @@ System requirements are detailed [here](system-requirements).
 
 ## Halite Tools and Source Download
 
+<div id="onboarding-container"></div>
 <div class="table-container">
     <table class="table">
         <thead>
