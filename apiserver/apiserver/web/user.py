@@ -59,6 +59,9 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
     :param provided_code: A verification code for the org, if provided.
     :return: Nothing (raises util.APIError if user cannot affiliate)
     """
+    email_error = util.APIError(400, message="Invalid email for organization.")
+    verification_error = util.APIError(400, message="Invalid verification code.")
+
     with model.engine.connect() as conn:
         org = conn.execute(model.organizations.select().where(
             model.organizations.c.id == org_id
@@ -66,6 +69,13 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
 
         if org is None:
             raise util.APIError(404, message="Organization does not exist.")
+
+        if org["kind"] == "High School":
+            # Don't require validation for high schools - we manually check
+            return
+
+        if not email:
+            raise email_error
 
         # Verify the email against the org
         if "@" not in email_to_verify:
@@ -83,10 +93,6 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
         )).first()[0]
 
         can_verify_by_code = org["verification_code"] is not None
-        email_error = util.APIError(
-            400, message="Invalid email for organization.")
-        verification_error = util.APIError(
-            400, message="Invalid verification code.")
         code_correct = org["verification_code"] == provided_code
 
         if count == 0:
@@ -289,6 +295,7 @@ def create_user(*, user_id):
 
     # Set the email verification code (if necessary).
     organization_name = None
+    organization_is_high_school = False
     if email:
         values.update({
             "email": email,
@@ -305,12 +312,18 @@ def create_user(*, user_id):
                 )).first()
                 if organization_data:
                     organization_name = organization_data["organization_name"]
+                    organization_is_high_school = organization_data["kind"] == "High School"
 
-            send_verification_email(
-                notify.Recipient(user_id, user_data["username"], email,
-                                 organization_name, level,
-                                 user_data["creation_time"]),
-                verification_code)
+            if organization_is_high_school and level == "High School":
+                values.update({
+                    "is_email_good": 1,
+                })
+            else:
+                send_verification_email(
+                    notify.Recipient(user_id, user_data["username"], email,
+                                     organization_name, level,
+                                     user_data["creation_time"]),
+                    verification_code)
         else:
             # Do not send verification email if we don't recognize it
             # as part of an organization
@@ -502,14 +515,21 @@ def update_user(intended_user_id, *, user_id):
             not web_util.validate_user_level(update["player_level"])):
         raise util.APIError(400, message="Invalid player level.")
 
+    with model.engine.connect() as conn:
+        old_user = conn.execute(
+            model.users.select(model.users.c.id == user_id)).first()
+        if update.get("organization_id") is not None:
+            org_data = conn.execute(
+                model.organizations.select(model.organizations.c.id == update["organization_id"])
+            ).first()
+        else:
+            org_data = None
+
     # Validate new country/region, if provided
     if update.get("country_code") or update.get("country_subdivision_code"):
-        with model.engine.connect() as conn:
-            user = conn.execute(
-                model.users.select(model.users.c.id == user_id)).first()
-        country_code = update.get("country_code", user["country_code"])
+        country_code = update.get("country_code", old_user["country_code"])
         subdivision_code = update.get("country_subdivision_code",
-                                      user["country_subdivision_code"])
+                                      old_user["country_subdivision_code"])
 
         if not web_util.validate_country(country_code, subdivision_code):
             raise util.APIError(
@@ -517,11 +537,16 @@ def update_user(intended_user_id, *, user_id):
 
     if update.get("organization_id") is not None:
         # Associate the user with the organization
-        if "email" not in update:
+        current_level = update.get("player_level", old_user["player_level"])
+
+        # Only require email for non-high-school
+        if ("email" not in update and
+            current_level != "High School" and
+            org_data and org_data["kind"] == "High School"):
             raise util.APIError(
                 400, message="Provide email to associate with organization."
             )
-        verify_affiliation(update["organization_id"], update["email"],
+        verify_affiliation(update["organization_id"], update.get("email"),
                            update.get("organization_verification_code"))
 
     if update.get("organization_verification_code"):
