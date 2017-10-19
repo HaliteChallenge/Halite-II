@@ -36,12 +36,14 @@ def serve_game_task(conn, has_gpu=False):
     else:
         rank_limit = sqlalchemy.sql.expression.true()
 
-    if has_gpu:
-        seed_filter = (rank_limit
-                      & (model.ranked_bots_users.c.is_gpu_enabled == True))
-    else:
-        seed_filter = (rank_limit
-                      & (model.ranked_bots_users.c.is_gpu_enabled == False))
+    seed_filter = rank_limit
+    if config.ENFORCE_GPU_SEEDING:
+        if has_gpu:
+            seed_filter = (rank_limit
+                          & (model.ranked_bots_users.c.is_gpu_enabled == True))
+        else:
+            seed_filter = (rank_limit
+                          & (model.ranked_bots_users.c.is_gpu_enabled == False))
 
     seed_player = find_seed_player(conn, ranked_users, seed_filter)
     if not seed_player and has_gpu:

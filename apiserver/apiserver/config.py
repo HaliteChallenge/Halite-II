@@ -116,3 +116,6 @@ TIER_0_STAY_BADGE = "A"
 TIER_1_STAY_BADGE = "B"
 TIER_2_STAY_BADGE = "C"
 TIER_3_STAY_BADGE = "D"
+
+# Whether GPU workers should preferentially seed is_gpu_enabled players.
+ENFORCE_GPU_SEEDING = False
