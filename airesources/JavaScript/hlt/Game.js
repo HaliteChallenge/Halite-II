@@ -1,16 +1,32 @@
 const Networking = require('./Networking');
-const Map = require('./Map');
+const MapParser = require('./MapParser');
+
+let mapParser = null;
 
 class Game {
     static start(botName, frameAction) {
-        const map = new Map({width: 100, height: 100, myPlayerId: 1}); // TODO read from output
+        Networking.writeLine(botName);
 
-        Networking.initialize(botName, (readLine) => {
-            map.update(readLine);
-            const moves = frameAction(map);
-            console.log(moves);
+        Networking.readLine(line => {
+            mapParser = new MapParser(extractGameMeta(line));
+
+            Networking.forEachReadLine(line => {
+                const map = mapParser.parse(line);
+                const moves = frameAction(map);
+                Networking.sendMoves(moves);
+            })
         });
     }
 }
+
+function extractGameMeta(line) {
+    const tokens = line.trim().split(' ');
+    return {
+        myPlayerId: parseInt(tokens[0]),
+        width: parseInt(tokens[1]),
+        height: parseInt(tokens[2])
+    }
+}
+
 
 module.exports = Game;

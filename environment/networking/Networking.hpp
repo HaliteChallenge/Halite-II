@@ -86,6 +86,7 @@ private:
     void send_string(hlt::PlayerId player_tag, std::string& sendString);
     std::string get_string(hlt::PlayerId player_tag,
                            unsigned int timeout_millis);
+    std::string read_trailing_input(hlt::PlayerId player_tag, long max_lines=20);
 };
 
 #endif

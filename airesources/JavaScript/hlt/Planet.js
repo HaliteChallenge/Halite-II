@@ -23,12 +23,12 @@ class Planet {
         return this._params.yPos;
     }
 
-    get health() {
-        return this._params.health;
-    }
-
     get radius() {
         return this._params.radius;
+    }
+
+    get health() {
+        return this._params.health;
     }
 
     get dockingSpots() {
