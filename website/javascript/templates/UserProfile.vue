@@ -380,7 +380,7 @@
                                                             {{historyItem.last_games_played}}
                                                         </td>
                                                         <td class="hidden-xs">
-                                                            {{getFormattedDate(historyItem.when_retired)}}
+                                                            {{getFormattedDateForGames(historyItem.when_retired, "Still Playing")}}
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -784,22 +784,13 @@ import dateformat from 'dateformat'
           }
           $(list).animate({marginLeft: '+=' + aniVal + 'px'})
         },
-        getFormattedDate: function (date) {
+        getFormattedDateForGames: function (date, return_value_not_valid) {
           var cdate = moment(date)
           if (cdate.isValid()) {
             var dateFormat = require('dateformat')
             return dateFormat(date, 'dd/mm/yy HH:MM')
           } else {
-            return 'Still playing'
-          }
-        },
-        getFormattedDateForGames: function (date) {
-          var cdate = moment(date)
-          if (cdate.isValid()) {
-            var dateFormat = require('dateformat')
-            return dateFormat(date, 'dd/mm/yy HH:MM')
-          } else {
-            return null
+            return return_value_not_valid
           }
         },
         gaData: function (category, action, label) {

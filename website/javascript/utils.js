@@ -21,7 +21,7 @@ export function gaEvent (category, action, label) {
 }
 
 export const Alert = {
-  show: function (message = 'there is an error', type = 'error', auto_hide = 'false') {
+  show: function (message = 'there is an error', type = 'error', auto_hide = false) {
     let outerContainer = document.getElementById('message-placeholder')
     outerContainer.innerHTML = ''
     let container = document.createElement('div')
