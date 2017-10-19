@@ -333,6 +333,19 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
     return newString;
 }
 
+std::string Networking::read_trailing_input(hlt::PlayerId player_tag, long max_lines) {
+    std::string error_string = "";
+    for(int line = 0; line < max_lines; line++) {
+        try{
+            error_string += get_string(player_tag, 0);
+        } catch(BotInputError exc) {
+            break;
+        }
+    }
+    return error_string;
+}
+
+
 void Networking::launch_bot(std::string command) {
 #ifdef _WIN32
 
@@ -579,8 +592,8 @@ int Networking::handle_frame_networking(hlt::PlayerId player_tag,
             std::lock_guard<std::mutex> guard(coutMutex);
             std::cout << err.what() << std::endl;
         }
-        std::replace(response.begin(), response.end(), '\n', ';');
-        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Got Exception (if any): " + std::string(err.what()) + "; Response received (if any): " + response;
+        std::string error_string = response + read_trailing_input(player_tag);
+        player_logs_json[player_tag]["Error"]["Message"] = "ERRORED! Got Exception (if any): " + std::string(err.what()) + "; Response received (if any): " + error_string;
         player_logs_json[player_tag]["Error"]["Turn"] = turnNumber;
     }
     catch (std::string s) {
