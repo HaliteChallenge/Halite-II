@@ -146,6 +146,10 @@
         // verify if the dropzone is not the bot uploader zone
         if (!container || !container.contains(e.target)) {
           e.preventDefault()
+          // clear the current game 
+          let outerContainer = document.getElementById('halitetv-visualizer')
+          outerContainer.innerHTML = ''
+          // play the upload replay
           ins.play_replay(e.originalEvent.dataTransfer.files)
         }
       })
