@@ -96,9 +96,34 @@ group ${CGROUP} {
         memory {
                 memory.limit_in_bytes=$((350*1024*1024));
         }
+        devices {
+                devices.allow="a *:* rwm";
+        }
 }
 EOF
 done
+
+## cgconfig doesn't let us set multiple denied devices, so we need a
+## sudo-executable script that fixes this for us
+cat <<EOF | sudo tee -a /home/worker/fix_cgroups.sh
+#!/bin/sh
+echo "c 195:1 rwm" > /sys/fs/cgroup/devices/bot_0/devices.deny
+echo "c 195:2 rwm" > /sys/fs/cgroup/devices/bot_0/devices.deny
+echo "c 195:3 rwm" > /sys/fs/cgroup/devices/bot_0/devices.deny
+
+echo "c 195:0 rwm" > /sys/fs/cgroup/devices/bot_1/devices.deny
+echo "c 195:2 rwm" > /sys/fs/cgroup/devices/bot_1/devices.deny
+echo "c 195:3 rwm" > /sys/fs/cgroup/devices/bot_1/devices.deny
+
+echo "c 195:0 rwm" > /sys/fs/cgroup/devices/bot_2/devices.deny
+echo "c 195:1 rwm" > /sys/fs/cgroup/devices/bot_2/devices.deny
+echo "c 195:3 rwm" > /sys/fs/cgroup/devices/bot_2/devices.deny
+
+echo "c 195:0 rwm" > /sys/fs/cgroup/devices/bot_3/devices.deny
+echo "c 195:1 rwm" > /sys/fs/cgroup/devices/bot_3/devices.deny
+echo "c 195:2 rwm" > /sys/fs/cgroup/devices/bot_3/devices.deny
+EOF
+sudo chmod 544 /home/worker/fix_cgroups.sh
 
 ## Create a user to be used by compilation. This user will have limited Internet access.
 sudo useradd -m bot_compilation -G bots
@@ -107,6 +132,8 @@ sudo useradd -m bot_compilation -G bots
 sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DROP
 ## Grant sudo access to the worker as this user.
 sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: ALL\" > /etc/sudoers.d/worker_bot_compilation"
+## Grant sudo access to the cgroup fixer script as root.
+sudo sh -c "echo \"worker ALL=(root) NOPASSWD: /home/worker/fix_cgroups.sh\" > /etc/sudoers.d/worker_bot_compilation"
 sudo chmod 0400 /etc/sudoers.d/worker_bot_compilation
 
 ## Create four users to isolate bots.

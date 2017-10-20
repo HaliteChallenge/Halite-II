@@ -5,8 +5,8 @@ echo "This script should be run after the base worker image setup script."
 echo "Installing CUDA and cudnn."
 
 curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.61-1_amd64.deb
-wget -O libcudnn.deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64/libcudnn5_5.1.10-1%2Bcuda8.0_amd64.deb
-wget -O libcudnn-dev.deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64/libcudnn5-dev_5.1.10-1%2Bcuda8.0_amd64.deb
+wget -O libcudnn.deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64/libcudnn6_6.0.21-1+cuda8.0_amd64.deb
+wget -O libcudnn-dev.deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64/libcudnn6-dev_6.0.21-1+cuda8.0_amd64.deb
 
 sudo dpkg -i ./cuda-repo-ubuntu1604_8.0.61-1_amd64.deb
 sudo apt-get update
