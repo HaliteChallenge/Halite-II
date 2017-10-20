@@ -139,6 +139,29 @@ export default {
        return {
          step: 1,
          show: true,
+         sliderOptions: {
+           min: 0,
+           max: 0,
+           speed: 1.5,
+           sliderStyle: {
+             backgroundColor: '#E6AB00',
+             top: 0,
+             width: '6px',
+             height: '6px',
+             left: '4px'
+           },
+           processStyle: {
+             backgroundColor: '#E6AB00'
+           },
+           tooltipStyle: {
+             backgroundColor: '#E6AB00',
+             border: '1px solid #E6AB00',
+             color: '#30242F'
+           },
+           piecewiseStyle: {
+             backgroundColor: '#23242b'
+           }
+         }
        }
      },
       watch: {
@@ -149,7 +172,7 @@ export default {
           }, 200);
         },
       },
-     mounted: function () {
+      mounted: function () {
        this.maxSectionHeight = ()=>{
          const winHeight = $(window).height();
          const sectionHeight = $('.section-content').prop('scrollHeight');
