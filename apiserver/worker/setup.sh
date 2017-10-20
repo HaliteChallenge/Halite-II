@@ -18,5 +18,10 @@ cp ../../environment/halite .
 # Grab configuration values
 python3 grab_config.py
 
+# Fix up cgroups
+if [ -f /home/worker/fix_cgroups.sh ]; then
+   sudo /home/worker/fix_cgroups.sh
+fi
+
 # Start the worker
 screen -S worker -d -m /bin/bash -c "python3 worker.py"
