@@ -95,7 +95,7 @@ def associate_user_hackathon(intended_user, *, user_id):
     if not verification_code:
         raise util.APIError(
             400,
-            message="Please provide the verification code."
+            message="Please provide a hackathon code."
         )
 
     with model.engine.connect() as conn:
@@ -105,8 +105,8 @@ def associate_user_hackathon(intended_user, *, user_id):
         if not hackathon:
             raise util.APIError(
                 404,
-                message="Hackathon does not exist. Please check the "
-                        "verification code. "
+                message="This hackathon does not exist. Please check the "
+                        "hackathon code. "
             )
 
         status = api_util.hackathon_status(hackathon["start_date"],
@@ -115,7 +115,7 @@ def associate_user_hackathon(intended_user, *, user_id):
         if status == "closed":
             raise util.APIError(
                 400,
-                message="Sorry, this hackathon has already ended."
+                message="Sorry, this hackathon has already closed."
             )
 
         message = None
@@ -135,7 +135,7 @@ def associate_user_hackathon(intended_user, *, user_id):
                 )
 
             if not user["is_email_good"]:
-                message = "Hackathon signup pending, please verify your email first."
+                message = "To finish signing up for your hackathon, please verify your email."
 
 
         already_exists = conn.execute(
@@ -147,7 +147,7 @@ def associate_user_hackathon(intended_user, *, user_id):
 
         if already_exists:
             return util.response_success({
-                "message": "You're already signed up for this hackathon!"
+                "message": "You're already signed up for this hackathon"
             })
 
         conn.execute(
