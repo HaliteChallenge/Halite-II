@@ -60,10 +60,39 @@ At the beginning of the game, bot is sent the following, with each item newline-
 Every turn, every bot is sent the the present game map (newline-terminated). Every bot is expected to respond with a set of moves (newline-terminated) within 2 seconds.
 
 ### Game map format
+The map tokens are divided by specified "containers." Each container represents a item and apposite subitems ordered as follows:
+
+#### Player
+Note that items here are space delimited.
+1. Number of players: "[(integer) number of players]"
+2-5 (this may be between 1 and 4 items). Single player object containing the player's id, and the player's ships (this object is exponded on the next section): "[(integer) player id] [(ship) ships]"
+
+#### Ship
+The ships as extracted from player objects, and represented as follows:
+1. Number of ships: "[(integer) number of ships]"
+2-32767 (this may be between 0 and 32767 items). Single ship object containing the ship's id, x coordinate, y coordinate, health, x velocity (deprecated), y velocity (deprecated), docking status, docked planet, docking progress, and weapon cooldown: [(integer) ship id], [(floating point) x], [(floating point) y], [(integer) health], [(floating point) vel x=0], [(floating point) vel y=0], [(enum/integer) docked status], [(integer) docked_planet id], [(integer) docking progress], [(integer) cooldown] 
+
+#### Planet
+The planet object is extracted following the complete player objects:
+1. Number of planets: "[(integer) number of planets]"
+2-32767 (this may be between 1 and 32767 items). Singple planet object containing planet id, x coordinate, y coordinate, health, radius, number of docking spots, current production, remaining production (deprecated), health, whether the planet is owned, planet owner, number of docked ships, and the ids of those ships: [(integer) planet id], [(floating point) x], [(floating point) y], [(integer) health], [(floating point) radius], [(integer) docking], [(integer) current], [(integer) remaining], [(integer) is owned], [(integer) owner id], [(integer) number of docked ships] [(integer) id of ship 0] ... [(integer) id of ship x]
 
 ### Move command format
+The move command, like all other commands, is comma separated and each command is distinct due to line delimiting. It is formatted as follows:
+
+"t [(integer) ship id] [(integer) speed] [(integer) angle]"
+
+Wherein the speed signifies the distance traversed in one turn and the angle is a number between 0 and 259 (inclusive) represented in degrees.
 
 ### Dock command format
+The dock command, like all other commands, is comma separated and each command is distinct due to line delimiting. It is formatted as follows:
+
+"d [(integer) ship id] [(integer) planet id]"
+
+### Undock command format
+The undock command is exactly equal to the dock command with a u replacing the d, and the fact that no planet id is necessary:
+
+"u [(integer) ship id]"
 
 ### Submitting your new starter kit
 
