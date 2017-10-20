@@ -322,7 +322,7 @@ comp_args = {
         ["fpc", "-Mdelphi", "-Si", "-O3", "-Xs", "-v0", "-o" + BOT],
     ],
     "Python": [
-        ["python3", "-c", PYTHON_EXT_COMPILER],
+        ["python3.6", "-c", PYTHON_EXT_COMPILER],
     ],
     "Rust": [
         ["cargo", "rustc", "--release", "-q", "--", "-Awarnings"],
@@ -487,7 +487,7 @@ languages = (
         [(["*.php"], ChmodCompiler("PHP"))]
     ),
     Language("Python", BOT +".py", "MyBot.py",
-        "python3 MyBot.py",
+        "python3.6 MyBot.py",
         ["*.pyc"],
         [(["*.py"], ChmodCompiler("Python")),
         (["setup_exts"], ErrorFilterCompiler(comp_args["Python"][0], separate=True, filter_stderr='-Wstrict-prototypes'))]
