@@ -178,21 +178,6 @@ export default {
         this.countries = countries
         this.country_options = new_countries
 
-        api.list_organizations().then((orgs)=>
-        {
-            let schools = []
-            if(orgs && orgs instanceof Array)
-            {
-                schools = orgs.filter((item) => {
-                return item.type === 'High School'
-              })
-            }
-
-            for (var i = 0; i < schools.length; i++) {
-                this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
-              }
-        })
-
         // get current user
         api.me().then((me) => {
           // initialize the data
@@ -207,6 +192,25 @@ export default {
           this.selected_region = this.regions.find((item) => {
             return item.value == me.country_subdivision_code
           })
+        })
+
+        api.list_organizations().then((orgs)=>
+        {
+            let schools = []
+            if(orgs && orgs instanceof Array)
+            {
+                schools = orgs.filter((item) => {
+                return item.type === 'High School'
+              })
+            }
+
+            for (var i = 0; i < schools.length; i++) {
+                this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
+              }
+
+            this.selected_highSchool = this.highSchools.find((item) => {
+              return item.id == this.user.organization_id
+            })
         })
       },
       computed: {
@@ -274,6 +278,7 @@ export default {
 
           if(this.level === 'High School')
           {
+
             request['organization_id'] = this.selected_highSchool.id
           }
 
@@ -295,11 +300,11 @@ export default {
             request['email'] = this.email
           }
 
-          console.log(request);
-
+          this.hackathon_error_message = ''
           api.update_me(this.user.user_id, request).then((response) => {
             let message = 'You have updated your profile successfully.';
-            if (response.message) message += ' ' + response.message;
+            if (response.message) 
+              message += ' ' + response.message;
             Alert.show(message, 'success', true)
             this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
           }, (error) => {
@@ -311,11 +316,10 @@ export default {
           }).then(() => {
             if (this.hackathon_code) {
               api.registerHackathon(this.hackathon_code).then((response) => {
-                let message = "You've signed up for the hackathon!"
+                let message = "You've signed up for the hackathon, Check your user profile to see your Hackathons"
                 if (response.responseJSON && response.responseJSON.message) {
                   message = response.responseJSON.message
                 }
-                this.hackathon_error_message = ''
                 Alert.show(message, 'success', true)
               }, (err) => {
                 this.hackathon_error_message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
@@ -325,7 +329,6 @@ export default {
                 if (err.responseJSON) {
                   this.hackathon_error_message = err.responseJSON.message
                 }
-
                 Alert.show(this.hackathon_error_message, 'error')
               })
               this.hackathon_code = null

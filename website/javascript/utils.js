@@ -42,7 +42,7 @@ export const Alert = {
      setTimeout(function() {
         let outerContainer = document.getElementById('message-placeholder')
         outerContainer.innerHTML = ''
-      }, 30000);
+      }, 45000);
     }
   },
 

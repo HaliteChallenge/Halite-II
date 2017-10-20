@@ -564,19 +564,11 @@ def update_user(intended_user_id, *, user_id):
                 update["organization_id"] = org_id
             else:
                 update["organization_id"] = None
-                message.append("This email doesn't seem to be part of an organization."
-                               " Reach out to us at halite@halite.io if you'd like us"
-                               " to add your organization.")
+                message.append("This email belongs to an organization not known to Halite."
+                               " Halite Team will review your affiliation after you verify your email,"
+                               " and contact you if we need more information.")
 
-        if update.get("organization_id") is None:
-            # Do not send verification email if we don't recognize it
-            # as part of an organization
-            update.update({
-                "is_email_good": 1,
-                "verification_code": None,
-            })
-        else:
-            message.append("Please check your inbox for a verification email.")
+        message.append("Please check your inbox for a verification email.")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
