@@ -68,7 +68,7 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
         )).first()
 
         if org is None:
-            raise util.APIError(404, message="Organization does not exist.")
+            raise util.APIError(404, message="This organization does not exist.")
 
         if org["kind"] == "High School":
             # Don't require validation for high schools - we manually check
@@ -226,7 +226,7 @@ def create_user(*, user_id):
             raise util.APIError(400, message="User needs to verify email.")
 
         if user_data["is_email_good"] == 1:
-            raise util.APIError(400, message="User already validated.")
+            raise util.APIError(400, message="You have already successfully confirmed your membership with this organization.")
 
     org_id = body.get("organization_id")
     email = body.get("email")
@@ -269,7 +269,7 @@ def create_user(*, user_id):
         if org_id:
             message.append("You've been added to the {} organization.".format(org_name))
         else:
-            message.append("Could not determine an organization. Reach out to us at halite@halite.io to add your organization.")
+            message.append("We could not recognize this organization. Reach out to us at halite@halite.io for help.")
 
     # Figure out the situation with their email/organization
     if org_id is None and email is None:
@@ -564,11 +564,10 @@ def update_user(intended_user_id, *, user_id):
                 update["organization_id"] = org_id
             else:
                 update["organization_id"] = None
-                message.append("This email belongs to an organization not known to Halite."
-                               " Halite Team will review your affiliation after you verify your email,"
-                               " and contact you if we need more information.")
+                message.append("We are setting up the association with the organization."
+                               " Please verify your email, and we will contact you for more information if needed.")
 
-        message.append("Please check your inbox for a verification email.")
+        message.append("Please check your inbox for your verification email.")
 
     with model.engine.connect() as conn:
         conn.execute(model.users.update().where(
