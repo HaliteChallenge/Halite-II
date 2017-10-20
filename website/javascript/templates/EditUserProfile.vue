@@ -93,6 +93,7 @@
                     <div class="form-group">
                         <label for="hackathon">Join a Hackathon</label>
                         <input type="text" class="form-control" placeholder="Enter hackathon code" v-model="hackathon_code">
+                         <p style="margin-top: 20px;color: red;">{{hackathon_error_message}}</p>
                     </div>
 
                     <div class="form-group has-error" v-if="error">
@@ -133,7 +134,8 @@ export default {
           primary: true,
           user: null,
           hackathon_code: null,
-          edit_email: false
+          edit_email: false,
+          hackathon_error_message: ''
         }
   },
       mounted: function () {
@@ -313,17 +315,18 @@ export default {
                 if (response.responseJSON && response.responseJSON.message) {
                   message = response.responseJSON.message
                 }
+                this.hackathon_error_message = ''
                 Alert.show(message, 'success', true)
               }, (err) => {
-                let message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
+                this.hackathon_error_message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
                 if (err.message) {
-                  message = err.message
+                  this.hackathon_error_message = err.message
                 }
                 if (err.responseJSON) {
-                  message = err.responseJSON.message
+                  this.hackathon_error_message = err.responseJSON.message
                 }
 
-                Alert.show(message, 'error')
+                Alert.show(this.hackathon_error_message, 'error')
               })
               this.hackathon_code = null
             }
