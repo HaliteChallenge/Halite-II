@@ -17,11 +17,11 @@ These are the operating systems that we have tested on, but are **not hard minim
 
  - Mac OSX 10.12.6
  - Ubuntu 17.04 - Other distributions should work with GCC 4.9 or later (with corresponding GLIBC)
- - Windows (TODO)
+ - Windows 10
 
 ## Browsers
 
-While we haven't tested browser support completely on Linux, we believe using the supported version of Chrome (55+) or Firefox (53+) will enable you to use the Halite web experience on linux desktops.
+While we haven't tested browser support on multiple Linux distributions, supported versions of Chrome (55+) or Firefox (53+) should work.
 
 <div class="table-container">
     <table class="table">
@@ -39,6 +39,13 @@ While we haven't tested browser support completely on Linux, we believe using th
                 <td>NA</td>
                 <td>Firefox 53+</td>
                 <td>Edge 15+</td>
+            </tr>
+             <tr>
+                <td>Linux (Debian 7)</td>
+                <td>Chrome 55+</td>
+                <td>NA</td>
+                <td>Firefox 53+</td>
+                <td>NA</td>
             </tr>
         </tbody>
     </table>
