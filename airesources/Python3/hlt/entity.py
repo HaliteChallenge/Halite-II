@@ -274,7 +274,7 @@ class Ship(Entity):
         will avoid obstacles on the way, with up to max_corrections corrections. Note that each correction accounts
         for angular_step degrees difference, meaning that the algorithm will naively try max_correction degrees before giving
         up (and returning None). The navigation will only consist of up to one command; call this method again
-        in teh next turn to continue navigating to the position.
+        in the next turn to continue navigating to the position.
 
         :param Entity target: The entity to which you will navigate
         :param game_map.Map game_map: The map of the game, from which obstacles will be extracted
