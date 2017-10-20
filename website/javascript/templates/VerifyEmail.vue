@@ -43,7 +43,7 @@ export default {
               }
             }).then(() => {
               window.setTimeout(function () {
-                window.location.replace('/user/?me')
+                window.location.replace('/user/?user_id='+this.user_id)
               }, 10000)
             })
           }
