@@ -2,13 +2,6 @@
     <div class="editorArea">
         <div v-if="editorViewer">
             <span class="optGroup">
-                Editor Theme:
-                <select v-model="selected_theme" v-on:change="reset_theme">
-                    <option>Dark</option>
-                    <option>Light</option>
-                </select>
-            </span>
-            <span class="optGroup">
                 Bot Language:
                 <select v-model="selected_language" v-on:change="reset_language">
                     <option v-for="(_, lang) in all_bot_languages"

@@ -43,9 +43,7 @@
                                 <option>Java</option><option>Python</option>
                             </select>
                         </div>
-                        <div class="step-language-space">
-                            <img :src="`${baseUrl}/assets/images/temp/code.png`"/>
-                        </div>
+                        <bot-editor></bot-editor>
                     </div>
                     <div class="step-bottom">
                         <a class="link-in-dark" @click="step = 1">Back</a>
@@ -94,6 +92,7 @@ import * as api from '../api'
 import * as utils from '../utils'
 import * as libhaliteviz from '../../../libhaliteviz'
 import Visualizer from './Visualizer.vue'
+import BotEditor from './BotEditor.vue'
 import _ from 'lodash'
 
 let visualizer = null
@@ -135,6 +134,9 @@ const showGame = (game) => {
 export default {
      name: 'onboarding',
      props: ['baseUrl'],
+    components: {
+      'bot-editor': BotEditor
+    },
      data: function () {
        return {
          step: 1,

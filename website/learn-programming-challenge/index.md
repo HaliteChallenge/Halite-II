@@ -6,6 +6,8 @@ toc: false
 menu: learn
 description: Welcome to the Halite II competition! Learn how to quickly get started downloading, building, and submitting an AI bot.
 mount_view: Onboarding
+additional_js: ["FileSaver.min", "jszip.min", "jszip-utils.min", "editorBuild/code_edit/built-codeEdit.min"]
+additional_css: ["built-codeEdit", "dark-codeEdit"]
 ---
 
 <div id="onboarding-container"></div>
