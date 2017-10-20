@@ -124,11 +124,14 @@ def associate_user_hackathon(intended_user, *, user_id):
             user = conn.execute(model.users.select().where(
                 model.users.c.id == user_id
             )).first()
+            organization = conn.execute(model.organizations.select().where(
+                model.organizations.c.id == hackathon["organization_id"] 
+            )).first()
             if hackathon["organization_id"] != user["organization_id"]:
                 raise util.APIError(
                     400,
                     message="Sorry, this hackathon is only open to members "
-                            "of a certain organization. "
+                            "of " + organization["organization_name"]
                 )
 
             if not user["is_email_good"]:

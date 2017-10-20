@@ -593,6 +593,14 @@ def update_user(intended_user_id, *, user_id):
                                  user_data["player_level"],
                                  user_data["creation_time"]),
                 update["verification_code"])
+        elif "email" in update:
+            send_verification_email(
+                notify.Recipient(user_id, user_data["username"],
+                                 user_data["email"],
+                                 "unknown",
+                                 user_data["player_level"],
+                                 user_data["creation_time"]),
+                update["verification_code"])
 
     if message:
         return util.response_success({

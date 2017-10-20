@@ -22,10 +22,10 @@
 
                     <div v-if="level === 'Professional'">
                         <div class="form-group">
-                            <label for="work-email">Please share your work email</label>
-                            <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
+                            <label for="work-email">Please share your work email</label>                 
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
-                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+                            <p class="help-block"><p class="help-block">We’ll use your email domain to affiliate you with your company, but we won’t share your email publicly.</p>
+                            <p>If we can’t find your organization (based on your email domain) or you have any questions, contact us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </div>
 
@@ -90,7 +90,7 @@
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
 
-                    <button type="submit" class="btn-ha btn-ha-lg">Submit</button>
+                    <button type="submit" class="btn-ha btn-ha-md">Submit</button>
                 </form>
             </div>
         </div>

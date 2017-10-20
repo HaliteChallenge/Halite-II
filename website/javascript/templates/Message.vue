@@ -59,6 +59,13 @@
         color: #fff;
       }
     }
+    &-warning{
+      background-color: #FFBE00;
+      color: #fff;
+      .close{
+        color: #fff;
+      }
+    }
     button.close{
       opacity: 0.8;
       &:hover{
