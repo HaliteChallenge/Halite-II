@@ -39,7 +39,7 @@
                         <div class="form-group" v-if="level != 'High School'">
                             <label for="personal-email">Work or University Email</label>
                             <input class="form-control" type="email" id="personal-email" v-model="email" />
-                            <p>This is used to affiliate you with an organization (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+                            <p style="margin-top: 10px">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                         <div class="form-group" v-else>
                           <v-select
@@ -47,7 +47,7 @@
                             v-model="selected_highSchool"
                             :options="highSchools">
                           </v-select>
-                          <p style="margin-top: 10px">If you dont see your High School listed, please email us your high school name at <a href="mailto:halite@halite.io">halite@halite.io</a> to be associated with that high school on the leaderboard.</p>
+                          <p style="margin-top: 10px">If your school is not listed, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </template>
 
@@ -56,7 +56,7 @@
                     <h2 id="section_account_info" class="form-heading">Account info</h2>
 
                     <div class="form-group">
-                        <label for="country">Username (As shown On Github)</label>
+                        <label for="country">Your GitHub username</label>
                         <div class="relative-container">
                             <input type="text" class="form-control" placeholder="Enter your username" v-model="username" disabled>
                             <i class="fa fa-lock lock"></i>
