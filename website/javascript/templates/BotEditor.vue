@@ -317,7 +317,7 @@ function saveCode (ctx) {
         text-align: left;
         margin: 15px 0px;
         position: relative;
-        height: 30em;
+        height: 25em;
     }
     .editorArea {
         margin: 0px 15px;

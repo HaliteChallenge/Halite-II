@@ -9,9 +9,9 @@
                     <p class="step-des">
                         If you added a company or school email, make sure you<br/>check your email to complete verfication. Now, before you get<br/>started, check out a game video.
                     </p>
-                    <div id="halitetv-visualizer" class="video">
-
-                    </div>
+                    <div class="text-center">
+                       <video width="600" height="600" src="/assets/images/tutorial-images/game.mp4" controls></video>
+                    </div>        
                     <div class="ha-button-container step-bottom">
                         <div>
                             <a @click="step = 2;" class="ha-button"><span>NEXT</span></a>
