@@ -78,7 +78,7 @@ class GameMap {
      * @returns {[Ship]}
      */
     playerShips(playerId) {
-        return this._shipsByPlayerId[playerId];
+        return this._shipsByPlayerId[playerId] || [];
     }
 
     /**

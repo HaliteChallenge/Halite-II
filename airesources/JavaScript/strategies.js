@@ -4,9 +4,7 @@
  * @returns {Array}
  */
 function myStrategy(gameMap) {
-    const moves = [];
-    moves.push(gameMap.myShips[0].thrust(10, 50));
-
+    const moves = gameMap.myShips.map(s => s.thrust(1, 0));
     return moves;
 }
 
