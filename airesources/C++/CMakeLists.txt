@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
-project(MyBot)
-set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I ./ -g -O2 -Wall -Wno-unused-function -Werror -pedantic")
+project(MyBot)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -Wall -Wno-unused-function -pedantic")
 
 include_directories(${CMAKE_SOURCE_DIR}/hlt)
 
