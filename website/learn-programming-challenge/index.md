@@ -9,6 +9,9 @@ mount_view: Onboarding
 additional_js: ["FileSaver.min", "jszip.min", "jszip-utils.min", "editorBuild/code_edit/built-codeEdit.min"]
 additional_css: ["built-codeEdit", "dark-codeEdit"]
 ---
+<script>
+  var site_downloads = {{ site.data.downloads | jsonify }};
+</script>
 
 <div id="onboarding-container"></div>
 
@@ -17,7 +20,7 @@ Welcome to the Halite II competition!  If you’re here, that means you’re exc
 ## Getting started
 
 ### 1) LOG IN
-    
+
 First, you need to [log in via Github][login] and create a user profile.
 
 ### 2) WATCH A FEW GAMES
@@ -34,8 +37,8 @@ You might also want to [browse the game rules][game rules], but it helps to watc
 
 ### 3) DOWNLOAD A BOT
 
-Now it's time to [download the game environment and starter kit][downloads] for your platform and language of choice. 
-    
+Now it's time to [download the game environment and starter kit][downloads] for your platform and language of choice.
+
 The game environment and starter kit are bundled together, so you should be all set.
 
 ### 4) SUMBIT THE STARTER BOT
@@ -43,7 +46,7 @@ The game environment and starter kit are bundled together, so you should be all 
 A great way to get going with the game is to just go ahead and [submit][play] the starter bot you downloaded and then going to your [user profile][profile] to see how you've done.
 
 We've created a lot of other documents for you to learn how to play Halite. If you've made it through all these steps, a great next resouce is our guide to [improving the basic bot][improve bot].
- 
+
 ### May the best bot win!
 
 

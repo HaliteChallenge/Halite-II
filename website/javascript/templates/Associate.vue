@@ -22,7 +22,7 @@
 
                     <div v-if="level === 'Professional'">
                         <div class="form-group">
-                            <label for="work-email">Please share your work email</label>                 
+                            <label for="work-email">Please share your work email</label>
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
                             <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
@@ -225,12 +225,12 @@ export default {
           //this.hackathon_error_message = ''
           api.register_me(request).then((response) => {
             let message = 'You have updated your profile successfully. You will be redirected automatically in a few seconds';
-            if (response.message) 
+            if (response.message)
               message += ' ' + response.message;
             Alert.show(message, 'success', true)
             this.gaData('account', 'new-account-success', 'account-flow')
             setTimeout(() => {
-            window.location.replace('/learn-programming-challenge')
+            window.location.replace('/learn-programming-challenge/?new=1')
             }, 3000)
           }, (error) => {
             const errorMessage = error.responseJSON

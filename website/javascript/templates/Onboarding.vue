@@ -10,7 +10,7 @@
 						If you added a company or school email, make sure you<br/>check your email to complete verfication. Now, before you get<br/>started, check out a game video.
 					</p>
 					<div class="text-center">
-					   <video width="600" height="400" src="/assets/images/tutorial-images/Game.mp4" controls></video>
+					   <video width="600" height="400" src="https://storage.cloud.google.com/halite-content/Game.mp4" controls></video>
 					</div>
 					<div class="ha-button-container step-bottom">
 						<div>
@@ -65,23 +65,10 @@
 					</p>
 					<div class="download-section">
 						<select class="form-control" v-model="language" placeholder="Select a language">
-							<option value="C++">C++</option>
-							<option value="CSharp">CSharp</option>
-							<option value="Go">Go</option>
-							<option value="Java">Java</option>
-							<option value="JavaScript">JavaScript</option>
-							<option value="ML-StarterBot-Python">ML-StarterBot-Python</option>
-							<option value="Python3">Python3</option>
-							<option value="Rust">Rust</option>
-							<option value="Scala">Scala</option>
-							<option value="all">All Languages</option>
-							<option value="">Only Game Environment</option>
+							<option v-for="(language, i) in site_downloads.languages" :value="i">{{ language.language }}</option>
 						</select>
 						<select class="form-control" v-model="platform" placeholder="Select a platform">
-							<option value="None">None</option>
-							<option value="Linux-x64">Linux-x64</option>
-							<option value="MacOS">MacOS</option>
-							<option value="Windows">Windows</option>
+							<option v-for="(platform, i) in site_downloads.platforms" :value="i">{{ platform }}</option>
 						</select>
 						<div class="download-section-link"><a @click="downloadCode" class="link-in-dark">Download Code</a><img :src="`${baseUrl}/assets/images/temp/download.png`"/></div>
 					</div>
@@ -111,7 +98,7 @@ import _ from 'lodash'
 let visualizer = null
 const showGame = (game) => {
   if (visualizer && visualizer.getVisualizer) {
-	visualizer.getVisualizer().destroy()
+		visualizer.getVisualizer().destroy()
   }
 
   const buffer = game.replay
@@ -139,7 +126,7 @@ const showGame = (game) => {
 		}
 	  }),
 	  mounted: function () {
-		visualizer = this.$children[0];
+			visualizer = this.$children[0];
 	  }
 	})
   })
@@ -153,9 +140,10 @@ export default {
   data: function () {
 		return {
 			step: 1,
-			isShown: true,
-			code_language: 'Python3',
-			code_platform: 'None',
+			isShown: false,
+			site_downloads: site_downloads,
+			code_language: 0,
+			code_platform: 0,
 			sliderOptions: {
 				min: 0,
 				max: 0,
@@ -211,9 +199,6 @@ export default {
 					return this.code_language;
 				},
 				set: function(value){
-					console.log(value)
-					// this.$refs.botEditor.selected_language = value
-					// this.$refs.botEditor.reset_language()
 					this.code_language = value
 				}
 			},
@@ -222,28 +207,28 @@ export default {
 					return this.code_platform;
 				},
 				set: function(value){
-					console.log(value)
 					this.code_platform = value
 				}
 			},
 	  },
 	  mounted: function () {
 	   this.maxSectionHeight = ()=>{
-		 const winHeight = $(window).height();
-		 const sectionHeight = $('.section-content').prop('scrollHeight');
-		 const headerHeight = 61;
-		 const marginTop = 40;
-		 const marginBottom = 10;
-		 let maxHeight = winHeight - headerHeight - marginTop - marginBottom;
-		 let overflow = 'auto';
-		 if(maxHeight > sectionHeight){
-		   overflow =  'hidden';
-		 }
-		 $('.section-content').css({'overflow':overflow, 'max-height': maxHeight + 'px'});
+			 const winHeight = $(window).height();
+			 const sectionHeight = $('.section-content').prop('scrollHeight');
+			 const headerHeight = 61;
+			 const marginTop = 40;
+			 const marginBottom = 10;
+			 let maxHeight = winHeight - headerHeight - marginTop - marginBottom;
+			 let overflow = 'auto';
+			 if(maxHeight > sectionHeight){
+			   overflow =  'hidden';
+			 }
+			 $('.section-content').css({'overflow':overflow, 'max-height': maxHeight + 'px'});
 	   };
 	   $(window).on('resize', _.throttle(this.maxSectionHeight, 150));
 	   this.maxSectionHeight();
-	   this.show = true;
+		 // Show popup only when new=1 in querystring
+	   this.show = (document.location.search.toLowerCase().replace('?', '').split('&').includes('new=1'));
 	 },
 	 methods: {
 	  play_replay: function (files) {
@@ -281,12 +266,9 @@ export default {
 	  },
 	  downloadCode: function(){
 	  	//this.$refs.botEditor.download_bot();
-			const language = this.code_language ? `${this.code_language}_` : '';
-			if (this.code_language === '' && this.code_platform === 'None') {
-				alert("This starter kit is not available");
-				return;
-			}
-			window.location.href = `/assets/downloads/Halite2_${language}${this.code_platform}.zip`;
+			let url = site_downloads.languages[this.code_language].files[this.code_platform];
+			if (!url.startsWith('/')) url = `/${url}`;
+			window.location.href = url;
 	  },
 	  closePopup: function(){
 	  	this.show = false;
