@@ -15,18 +15,3 @@ There are 2 buckets where you can download these files. We are not planning to d
 * **Other tier games (silver and Bronze):** [gs://halite-2-replays](https://storage.cloud.google.com/halite-2-replays//)
 
 ## Tools
-
-Our deep learning team has provided an easy to use script to download games from the top tier bucket for a given day. The script should work on Mac and Linux OS'es. If you need a windows version, we are looking for a community [contribution](https://github.com/HaliteChallenge/Halite-II){:target="_blank"}on this front.
-
-[Download: Halite Games Download Tool](https://storage.cloud.google.com/halite-assets/game_download.zip)
-
-### Prerequisites
-
-We [zstd](http://facebook.github.io/zstd/){:target="_blank"} to compress our replay files so you need to have these zstd tools in your path for the script to work.
-
-* Download the [latest release](https://github.com/facebook/zstd/releases){:target="_blank"} of zstd
-* Unzip and run `make install` on the root folder
-
-### Usage
-
-`./game_download yyyymmdd`: You need to specify the date for which you want to download these games and the script will create a folder in your current directory and download and decompress all the files.

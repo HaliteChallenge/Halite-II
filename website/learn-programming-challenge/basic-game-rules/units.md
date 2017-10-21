@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Units
+title: Unit Reference
 toc: false
 description: Reference guide for unit properties of Halite
 image: assets/images/temp/bot_1.png
