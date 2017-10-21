@@ -24,27 +24,27 @@
                         <div class="form-group">
                             <label for="work-email">Please share your work email</label>                 
                             <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
-                            <p class="help-block"><p class="help-block">We’ll use your email domain to affiliate you with your company, but we won’t share your email publicly.</p>
-                            <p>If we can’t find your organization (based on your email domain) or you have any questions, contact us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+                            <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>
 
                     <div v-if="level === 'University'">
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
-                            <p class="help-block">We won’t share it publicly, plus you can see how you score against your coworkers</p>
                             <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
-                            <p>This is used to affiliate you with a university (based on the email domain). You will need to verify your association before it shows up on your profile. If you are not added to your organization, or it does not exist, let us know at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+                            <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>
 
                     <div v-if="level === 'High School'">
                         <div class="form-group">
-                            <label for="organization">Please enter your school</label>
-                            <input type="text" class="form-control" placeholder="School Name" v-model="organization">
-                            <p>If your school is not listed, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
-
-                            <p>To verify your affiliation with the selected school, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
+                            <label for="organization">Please select your school</label>
+                            <v-select
+                              placeholder="Select School"
+                              v-model="selected_highSchool"
+                              :options="highSchools">
+                            </v-select>
+                            <p style="margin-top: 10px;">If your school is not listed, please email us at <a href="mailto:halite@halite.io">halite@halite.io</a>.</p>
                         </div>
                     </div>
 
@@ -53,10 +53,6 @@
                     <!-- country -->
                     <div class="form-group">
                         <label for="country">Which country will you be playing from?</label>
-                        <!-- <select class="form-control" id="country" aria-describedby="country-help" v-model="country_code">
-                            <option value="NONE">(would prefer not to disclose)</option>
-                            <option v-for="country in countries" :value="country[0]">{{ country[1].name }}</option>
-                        </select> -->
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             label="label"
@@ -67,10 +63,6 @@
 
                     <div class="form-group" v-if="country_code !== ''">
                         <label for="country">What is your state, province, or region?</label>
-                        <!-- <select class="form-control" id="country-region" aria-describedby="country-region-help" v-model="country_region_code">
-                            <option value="NONE">(would prefer not to disclose)</option>
-                            <option v-for="region in regions" :value="region[0]">{{ region[1].name }}</option>
-                        </select> -->
                         <v-select
                             placeholder="(would prefer not to disclose)"
                             v-model="country_region_code"
@@ -79,17 +71,14 @@
                         </v-select>
                     </div>
 
-                    <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
-
+                    <!-- <h2 id="section_hackathons" class="form-heading">Hackathons</h2>
                     <div class="form-group">
                         <label for="organization">If you are playing as part of a Hackathon, please enter your code here</label>
                         <input type="text" class="form-control" v-model="hackathon_code" placeholder="Enter Hackathon password or code...">
-                    </div>
-
+                    </div> -->
                     <div class="form-group has-error" v-if="error">
                         <span id="error-help" class="help-block">{{ error }}</span>
                     </div>
-
                     <button type="submit" class="btn-ha btn-ha-md">Submit</button>
                 </form>
             </div>
@@ -130,7 +119,8 @@ export default {
         Object.entries(iso3166.codes).forEach((item) => {
           codes[item[1]] = item[0]
         })
-    const new_countries = countries.map((item) => {
+
+        const new_countries = countries.map((item) => {
           return {
             label: item[1].name,
             value: codes[item[0]],
@@ -153,14 +143,13 @@ export default {
           level: 'Professional',
           organization: null,
           organizations: [],
+          highSchools: [],
+          selected_highSchool: null,
           error: null,
           hackathon_code: '',
-          account_success: "Your account has been successfully created. You'll be redirected in a few seconds.",
-          verify_sent: "We've sent a verification email to the address you provided.",
-          hackathon_add: "You've also been successfully added to a Halite hackathon",
-          account_error: 'Error: Sorry, something went wrong. Please fix any form fields with issues or you can submit a bot now and edit your profile later to fix remaining issues.',
           success_message: '',
-          error_string: ''
+          error_string: '',
+          hackathon_error_message: ''
         }
   },
       computed: {
@@ -229,35 +218,27 @@ export default {
             return false
           }
 
-          const register = () => {
-            api.register_me(request).then((success) => {
-              if (request['organization_id']) {
-                this.success_message = this.verify_sent + '\n' + this.account_success
-              } else {
-                this.success_message = this.account_success
-              }
-              if (success.message) this.success_message += success.message;
-
-              Alert.show(this.success_message, 'success')
-              this.gaData('account', 'new-account-success', 'account-flow')
-              setTimeout(() => {
-                window.location.replace('/learn-programming-challenge')
-              }, 3000)
-            }, (error) => {
-              Alert.show(error.responseJSON.message, 'error')
-              this.gaData('account', 'new-account-error', 'account-flow')
-            })
+          if(this.level === 'High School'){
+          request['organization_id'] = this.selected_highSchool.id
           }
 
-          if (this.hackathonCode) {
-            api.registerHackathon(this.hackathon_code).then((success) => {
-              register()
-            }, (error) => {
-              this.error = error.responseJSON.message
-            })
-          } else {
-            register()
-          }
+          //this.hackathon_error_message = ''
+          api.register_me(request).then((response) => {
+            let message = 'You have updated your profile successfully. You will be redirected automatically in a few seconds';
+            if (response.message) 
+              message += ' ' + response.message;
+            Alert.show(message, 'success', true)
+            this.gaData('account', 'new-account-success', 'account-flow')
+            setTimeout(() => {
+            window.location.replace('/learn-programming-challenge')
+            }, 3000)
+          }, (error) => {
+            const errorMessage = error.responseJSON
+              ? error.responseJSON.message
+              : "Sorry, we couldn't update your profile. Please try again later."
+            Alert.show(errorMessage, 'error')
+            this.gaData('account', 'new-account-error', 'account-flow')
+          })
         },
         gaData: function (category, action, label) {
           utils.gaEvent(category, action, label)
@@ -271,8 +252,23 @@ export default {
             this.gaData('account', 'click-submit-new-account', 'account-flow')
           }
         })
-    }
-    }
+
+      api.list_organizations().then((orgs)=>
+      {
+          let schools = []
+          if(orgs && orgs instanceof Array)
+          {
+              schools = orgs.filter((item) => {
+              return item.type === 'High School'
+            })
+          }
+
+          for (var i = 0; i < schools.length; i++) {
+              this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
+            }
+      })
+    },
+  }
 </script>
 
 <style lang="scss" scoped>

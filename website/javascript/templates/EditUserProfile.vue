@@ -138,230 +138,228 @@ export default {
           hackathon_error_message: ''
         }
   },
-      mounted: function () {
-        const countries = Object.entries(iso3166.data)
-        countries.sort(function (country1, country2) {
-          const country1name = country1[1].name
-          const country2name = country2[1].name
-          const country1code = country1[0]
-          const country2code = country2[0]
-          if (country1code == 'US' && country2code != 'US') return -1
-          if (country2code == 'US' && country1code != 'US') return 1
+    mounted: function () {
+      const countries = Object.entries(iso3166.data)
+      countries.sort(function (country1, country2) {
+        const country1name = country1[1].name
+        const country2name = country2[1].name
+        const country1code = country1[0]
+        const country2code = country2[0]
+        if (country1code == 'US' && country2code != 'US') return -1
+        if (country2code == 'US' && country1code != 'US') return 1
 
-          if (country1name < country2name) {
+        if (country1name < country2name) {
+          return -1
+        } else if (country1name === country2name) {
+          return 0
+        } else {
+          return 1
+        }
+      })
+
+      const codes = {}
+      Object.entries(iso3166.codes).forEach((item) => {
+        codes[item[1]] = item[0]
+      })
+
+      const new_countries = countries.map((item) => {
+            return {
+              label: item[1].name,
+              value: codes[item[0]],
+              code: item[0]
+            }
+      })
+
+      new_countries.unshift({
+        value: 'NONE',
+        code: 'NONE',
+        label: '(would prefer not to disclose)'
+      })
+      this.countries = countries
+      this.country_options = new_countries
+
+      // get current user
+      api.me().then((me) => {
+        // initialize the data
+        this.user = me
+        this.level = me.level
+        this.username = me.username
+        // country
+        this.selected_country = this.country_options.find((item) => {
+          return item.value == me.country_code
+        })
+
+        this.selected_region = this.regions.find((item) => {
+          return item.value == me.country_subdivision_code
+        })
+      })
+
+      api.list_organizations().then((orgs)=>
+      {
+          let schools = []
+          if(orgs && orgs instanceof Array)
+          {
+              schools = orgs.filter((item) => {
+              return item.type === 'High School'
+            })
+          }
+
+          for (var i = 0; i < schools.length; i++) {
+              this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
+            }
+
+          this.selected_highSchool = this.highSchools.find((item) => {
+            return item.id == this.user.organization_id
+          })
+      })
+    },
+    computed: {
+      regions: function () {
+        if (!this.selected_country) return []
+
+        const regions = Object.entries(iso3166.data[this.selected_country.code].sub)
+
+        const codes = []
+
+        regions.sort(function (region1, region2) {
+          const name1 = region1[1].name
+          const name2 = region2[1].name
+          if (name1 < name2) {
             return -1
-          } else if (country1name === country2name) {
+          } else if (name1 === name2) {
             return 0
           } else {
             return 1
           }
         })
 
-        const codes = {}
-        Object.entries(iso3166.codes).forEach((item) => {
-          codes[item[1]] = item[0]
+        const new_regions = regions.map((item) => {
+          return {
+            label: item[1].name,
+            value: item[0],
+            type: item[1].type
+          }
         })
 
-        const new_countries = countries.map((item) => {
-              return {
-                label: item[1].name,
-                value: codes[item[0]],
-                code: item[0]
-              }
-        })
-
-        new_countries.unshift({
+        new_regions.unshift({
           value: 'NONE',
           code: 'NONE',
           label: '(would prefer not to disclose)'
         })
-        this.countries = countries
-        this.country_options = new_countries
 
-        // get current user
-        api.me().then((me) => {
-          // initialize the data
-          this.user = me
-          this.level = me.level
-          this.username = me.username
-          // country
-          this.selected_country = this.country_options.find((item) => {
-            return item.value == me.country_code
-          })
-
-          this.selected_region = this.regions.find((item) => {
-            return item.value == me.country_subdivision_code
-          })
-        })
-
-        api.list_organizations().then((orgs)=>
-        {
-            let schools = []
-            if(orgs && orgs instanceof Array)
-            {
-                schools = orgs.filter((item) => {
-                return item.type === 'High School'
-              })
-            }
-
-            for (var i = 0; i < schools.length; i++) {
-                this.highSchools.push({label: schools[i].name, id: schools[i].organization_id})
-              }
-
-            this.selected_highSchool = this.highSchools.find((item) => {
-              return item.id == this.user.organization_id
-            })
-        })
+        return new_regions
       },
-      computed: {
-        regions: function () {
-          if (!this.selected_country) return []
-
-          const regions = Object.entries(iso3166.data[this.selected_country.code].sub)
-
-          const codes = []
-
-          regions.sort(function (region1, region2) {
-            const name1 = region1[1].name
-            const name2 = region2[1].name
-            if (name1 < name2) {
-              return -1
-            } else if (name1 === name2) {
-              return 0
-            } else {
-              return 1
-            }
-          })
-
-          const new_regions = regions.map((item) => {
-            return {
-              label: item[1].name,
-              value: item[0],
-              type: item[1].type
-            }
-          })
-
-          new_regions.unshift({
-            value: 'NONE',
-            code: 'NONE',
-            label: '(would prefer not to disclose)'
-          })
-
-          return new_regions
-        },
-        country_code: function () {
-          return this.selected_country ? this.selected_country.value : null
-        },
-        country_region_code: function () {
-          return this.selected_region ? this.selected_region.value : null
+      country_code: function () {
+        return this.selected_country ? this.selected_country.value : null
+      },
+      country_region_code: function () {
+        return this.selected_region ? this.selected_region.value : null
+      }
+    },
+    methods: {
+      // reset selected region when change the country
+      change_country: function (value) {
+        if (this.selected_country !== value) {
+          this.selected_country = value
+          this.selected_region = null
         }
       },
-      methods: {
-        // reset selected region when change the country
-        change_country: function (value) {
-          if (this.selected_country !== value) {
-            this.selected_country = value
-            this.selected_region = null
-          }
-        },
-        get_country: function () {
-          const selected_country = this.country_options.find((item) => {
-            return item.value == this.country_code.value
-          })
-          return selected_country
-        },
-        submit: function (e) {
-          let request = {
-            'level': this.level,
-            'organization_id': this === 'NONE' ? null : this.organization
-          }
+      get_country: function () {
+        const selected_country = this.country_options.find((item) => {
+          return item.value == this.country_code.value
+        })
+        return selected_country
+      },
+      submit: function (e) {
+        let request = {
+          'level': this.level,
+          'organization_id': this === 'NONE' ? null : this.organization
+        }
 
-          if(this.level === 'High School')
-          {
+        if(this.level === 'High School'){
+          request['organization_id'] = this.selected_highSchool.id
+        }
 
-            request['organization_id'] = this.selected_highSchool.id
+        if (this.country_code !== '') {
+          const codes = {}
+
+          // Build conversion table of 2-char country code to 3-char
+          for (let code3 of Object.keys(iso3166.codes)) {
+            codes[iso3166.codes[code3]] = code3
           }
 
-          if (this.country_code !== '') {
-            const codes = {}
+          request['country_code'] = this.country_code
+          if (this.country_region_code !== '') {
+            request['country_subdivision_code'] = this.country_region_code
+          }
+        }
 
-            // Build conversion table of 2-char country code to 3-char
-            for (let code3 of Object.keys(iso3166.codes)) {
-              codes[iso3166.codes[code3]] = code3
-            }
+        if (this.level !== 'High School' && this.email) {
+          request['email'] = this.email
+        }
 
-            request['country_code'] = this.country_code
-            if (this.country_region_code !== '') {
-              request['country_subdivision_code'] = this.country_region_code
-            }
+        this.hackathon_error_message = ''
+        api.update_me(this.user.user_id, request).then((response) => {
+          let message = 'You have updated your profile successfully.';
+          if (response.message) 
+            message += ' ' + response.message;
+          Alert.show(message, 'success', true)
+          this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
+        }, (error) => {
+          const errorMessage = error.responseJSON
+            ? error.responseJSON.message
+            : "Sorry, we couldn't update your profile. Please try again later."
+          Alert.show(errorMessage, 'error')
+          this.gaData('account', 'edit-profile-error', 'edit-profile-flow')
+        }).then(() => {
+          if (this.hackathon_code) {
+            api.registerHackathon(this.hackathon_code).then((response) => {
+              let message = "You've signed up for the hackathon, Check your user profile to see your Hackathons"
+              if (response.responseJSON && response.responseJSON.message) {
+                message = response.responseJSON.message
+              }
+              Alert.show(message, 'success', true)
+            }, (err) => {
+              this.hackathon_error_message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
+              if (err.message) {
+                this.hackathon_error_message = err.message
+              }
+              if (err.responseJSON) {
+                this.hackathon_error_message = err.responseJSON.message
+              }
+              Alert.show(this.hackathon_error_message, 'error')
+            })
+            this.hackathon_code = null
+          }
+        })
+      },
+      gaData: function (category, action, label) {
+        utils.gaEvent(category, action, label)
+      },
+      resend_verification_email: function() {
+        api.resend_verification_email(this.user.user_id).then((response) => {
+          let message = "Verification code has been resent."
+          if (response && response.message) {
+            message = response.message;
+          }
+          else if (response && response.responseJSON && response.responseJSON.messasge) {
+            message = response.responseJSON.message;
+          }
+          Alert.show(message, "success", true);
+        }, (response) => {
+          let message = "Sorry, we couldn't resend the verification email. Please try again later.";
+          if (response && response.message) {
+            message = response.message;
+          }
+          else if (response && response.responseJSON && response.responseJSON.message) {
+            message = response.responseJSON.message;
           }
 
-          if (this.level !== 'High School' && this.email) {
-            request['email'] = this.email
-          }
-
-          this.hackathon_error_message = ''
-          api.update_me(this.user.user_id, request).then((response) => {
-            let message = 'You have updated your profile successfully.';
-            if (response.message) 
-              message += ' ' + response.message;
-            Alert.show(message, 'success', true)
-            this.gaData('account', 'edit-profile-success', 'edit-profile-flow')
-          }, (error) => {
-            const errorMessage = error.responseJSON
-              ? error.responseJSON.message
-              : "Sorry, we couldn't update your profile. Please try again later."
-            Alert.show(errorMessage, 'error')
-            this.gaData('account', 'edit-profile-error', 'edit-profile-flow')
-          }).then(() => {
-            if (this.hackathon_code) {
-              api.registerHackathon(this.hackathon_code).then((response) => {
-                let message = "You've signed up for the hackathon, Check your user profile to see your Hackathons"
-                if (response.responseJSON && response.responseJSON.message) {
-                  message = response.responseJSON.message
-                }
-                Alert.show(message, 'success', true)
-              }, (err) => {
-                this.hackathon_error_message = "Sorry, we couldn't sign you up for the hackathon. Please try again later."
-                if (err.message) {
-                  this.hackathon_error_message = err.message
-                }
-                if (err.responseJSON) {
-                  this.hackathon_error_message = err.responseJSON.message
-                }
-                Alert.show(this.hackathon_error_message, 'error')
-              })
-              this.hackathon_code = null
-            }
-          })
-        },
-        gaData: function (category, action, label) {
-          utils.gaEvent(category, action, label)
-        },
-        resend_verification_email: function() {
-          api.resend_verification_email(this.user.user_id).then((response) => {
-            let message = "Verification code has been resent."
-            if (response && response.message) {
-              message = response.message;
-            }
-            else if (response && response.responseJSON && response.responseJSON.messasge) {
-              message = response.responseJSON.message;
-            }
-            Alert.show(message, "success", true);
-          }, (response) => {
-            let message = "Sorry, we couldn't resend the verification email. Please try again later.";
-            if (response && response.message) {
-              message = response.message;
-            }
-            else if (response && response.responseJSON && response.responseJSON.message) {
-              message = response.responseJSON.message;
-            }
-
-            Alert.show(message, "error");
-          });
-        },
-      }
+          Alert.show(message, "error");
+        });
+      },
     }
+  }
 </script>
 
 <style lang="scss" scoped>
