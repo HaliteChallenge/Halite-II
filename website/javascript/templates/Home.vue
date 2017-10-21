@@ -289,13 +289,13 @@
             </div>
             <div class="col-md-6 col-sm-6 sponsor-section text-center">
                 <p class="t2 c-wht font-headline">LAUNCH PARTNER</p>
-                <div class="text-center col-md-6 col-sm-6">
+                <div class="text-center">
                     <img class="logo center-block" :src="`${baseUrl}/assets/images/temp/logo_corneltech.png`"/>
                 </div>
             </div>
             <div class="col-md-6 col-sm-6 sponsor-section text-center">
                 <p class="t2 c-wht font-headline">SUPPORT FROM</p>
-                <div class="text-center col-md-6 col-sm-6">
+                <div class="text-center">
                     <img class="logo center-block" :src="`${baseUrl}/assets/images/logo_cloud_reverse.png`"/>
                 </div>
             </div>

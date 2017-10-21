@@ -506,6 +506,9 @@
 
         this.gaData('visualizer', 'click-slider', 'gameplay')
       }
+
+      // disable text select on safari
+      document.onselectstart = function(){ return false; };
     },
     computed: {
       statistics: function () {
