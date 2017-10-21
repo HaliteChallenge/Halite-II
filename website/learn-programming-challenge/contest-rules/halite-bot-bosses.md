@@ -12,8 +12,7 @@ While our matchmaking does not guarantee that you will play against these bots, 
 As the game evolves, we expect some of these bots to drop their existing ranks fast. Check out where they are in the [leaderboard](/programming-competition-leaderboard?username=tsadmiral,tscaptain,tscommander,tscommander-ml) now.
 
 
-## Policy Bosses
-These bots are based on strategies derived from micro-managing pieces and some cost function optimizations.
+## Halite Bosses
 
 <div>
     <table class="table table-leader" style="color:white;">
