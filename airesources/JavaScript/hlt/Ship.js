@@ -1,31 +1,39 @@
 const Geometry = require('./Geometry');
 
-const dockingStatus = {
-    UNDOCKED: 0,
-    DOCKING: 1,
-    DOCKED: 2,
-    UNDOCKING: 3
-};
+const constants = require('./Constants');
 
-const DOCK_RADIUS = 4;
-const SHIP_RADIUS = 0.5;
+class Ship extends Entity {
+    static dockingStatus = {
+        UNDOCKED: 0,
+        DOCKING: 1,
+        DOCKED: 2,
+        UNDOCKING: 3
+    };
 
-class Ship {
     constructor(ownerId, params) {
+        super(params);
         this._ownerId = ownerId;
         this._params = params
     }
 
     isDocked() {
-        return this.dockingStatus === dockingStatus.DOCKED;
+        return this.dockingStatus === this.dockingStatus.DOCKED;
+    }
+
+    isDocking() {
+        return this.dockingStatus === this.dockingStatus.DOCKING;
+    }
+
+    isUndocking() {
+        return this.dockingStatus === this.dockingStatus.UNDOCKING;
+    }
+
+    isUndocked() {
+        return this.dockingStatus === this.dockingStatus.UNDOCKED;
     }
 
     canDock(planet) {
-        return Geometry.distance(this, planet) <= planet.radius + DOCK_RADIUS;
-    }
-
-    get id() {
-        return this._params.id;
+        return Geometry.distance(this, planet) <= planet.radius + constants.DOCK_RADIUS;
     }
 
     get ownerId() {
@@ -36,20 +44,8 @@ class Ship {
         return this._params.dockingStatus;
     }
 
-    get x() {
-        return this._params.xPos;
-    }
-
-    get y() {
-        return this._params.yPos;
-    }
-
     get radius() {
-        return SHIP_RADIUS;
-    }
-
-    get health() {
-        return this._params.health;
+        return constants.SHIP_RADIUS;
     }
 
     get dockedPlanetId() {

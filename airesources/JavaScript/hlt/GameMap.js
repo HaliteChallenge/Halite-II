@@ -12,6 +12,7 @@ class GameMap {
         this._playerIds = [];
         this._planets = [];
         this._ships = [];
+        this._shipById = {};
         this._eneymyShips = [];
         this._shipsByPlayerId = {};
     }
@@ -32,9 +33,21 @@ class GameMap {
         this._playerIds.push(playerId);
     }
 
+    /**
+     * add ships to a specified player. only call this method explicitly to setup a game state for your unit tests.
+     * engine will call this method on your behalf during a real game.
+     * @param {number} playerId player id
+     * @param {object[]} shipsParams ship params
+     * @see strategies.test.js
+     */
     addPlayerShips(playerId, shipsParams) {
+        const withDefaults = {
+            health: 255,
+            dockingStatus: Ship.dockingStatus.UNDOCKED,
+            ...shipsParams};
+
         const existingShips = this._shipsByPlayerId[playerId] || [];
-        const newShips = shipsParams.map(p => new Ship(playerId, p));
+        const newShips = withDefaults.map(p => new Ship(playerId, p));
 
         this._shipsByPlayerId[playerId] = existingShips.concat(newShips);
         if (playerId !== this.myPlayerId) {
@@ -42,23 +55,34 @@ class GameMap {
         }
 
         this._ships = this._ships.concat(newShips);
+        newShips.forEach(s => this._shipById[s.id] = s);
     }
 
+    /**
+     * add planets. only call this method explicitly to setup a game state for your unit tests.
+     * engine will call this method on your behalf during a real game.
+     * @param {object[]} planetParams planet params
+     * @see strategies.test.js
+     */
     addPlanets(planetParams) {
-        this._planets = this._planets.concat(planetParams.map(p => new Planet(p)));
+        this._planets = this._planets.concat(planetParams.map(p => new Planet(this, p)));
     }
 
     get numberOfPlayers() {
         return this._playerIds.length
     }
 
+    /**
+     * list of all ships
+     * @returns {Ship[]}
+     */
     get allShips() {
         return this._ships;
     }
 
     /**
      * list of ships that belong to you
-     * @returns {[Ship]}
+     * @returns {Ship[]}
      */
     get myShips() {
         return this.playerShips(this.myPlayerId);
@@ -66,7 +90,7 @@ class GameMap {
 
     /**
      * list of ships that belong to your enemy(ies)
-     * @returns {[Ship]}
+     * @returns {Ship[]}
      */
     get enemyShips() {
         return this._eneymyShips;
@@ -75,36 +99,84 @@ class GameMap {
     /**
      * list of ships that belong to a specified player id
      * @param playerId id of a player
-     * @returns {[Ship]}
+     * @returns {Ship[]}
      */
     playerShips(playerId) {
         return this._shipsByPlayerId[playerId] || [];
     }
 
     /**
+     * return ship instance by id
+     * @param shipId ship id
+     * @returns {Ship}
+     */
+    shipById(shipId) {
+        return this._shipById[shipId];
+    }
+
+    /**
+     * return ships instances by ids
+     * @param [shipIds] ship ids
+     * @returns {Ship[]}
+     */
+    shipsById(shipIds) {
+        return shipsIds.map(id => this.shipById(id));
+    }
+
+    /**
      * list of planets
-     * @returns {[Planet]}
+     * @returns {Planet[]}
      */
     get planets() {
         return this._planets;
     }
 
+    /**
+     * ships between specified ship and a target. excludes ship and target
+     * @param {Ship} ship
+     * @param {object} target
+     * @returns {Ship[]}
+     */
     shipsBetween(ship, target) {
         return this._obstaclesBetween(this.allShips, ship, target);
     }
 
+    /**
+     * your ships between specified ship and a target. excludes ship and target
+     * @param {Ship} ship
+     * @param {Entity} target
+     * @returns {Ship[]}
+     */
     myShipsBetween(ship, target) {
         return this._obstaclesBetween(this.myShips, ship, target);
     }
 
+    /**
+     * enemy ships between specified ship and a target. excludes ship and target
+     * @param {Ship} ship
+     * @param {Entity} target
+     * @returns {Ship[]}
+     */
     enemyShipsBetween(ship, target) {
         return this._obstaclesBetween(this.enemyShips, ship, target);
     }
 
+    /**
+     * planets between specified ship and a target. excludes ship and target
+     * @param {Ship} ship
+     * @param {Entity} target
+     * @returns {Planet[]}
+     */
     planetsBetween(ship, target) {
         return this._obstaclesBetween(this.planets, ship, target);
     }
 
+    /**
+     * planets and ships between specified ship and a target. excludes ship and target
+     * @param {Ship} ship
+     * @param {Entity} target
+     * @returns {Entity[]}
+     */
     obstaclesBetween(ship, target) {
         return this.shipsBetween(ship, target).concat(this.planetsBetween(ship, target));
     }
@@ -112,6 +184,12 @@ class GameMap {
     _obstaclesBetween(obstaclesList, ship, target) {
         return obstaclesList.filter(o => o !== ship && o !== target)
             .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.1))
+    }
+
+    _shipsByIdFromIds(ids) {
+        const shipsById = {};
+        ids.forEach(id => shipsById[id] = this._shipById[id]);
+        return shipsById;
     }
 }
 
