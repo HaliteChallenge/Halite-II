@@ -1,5 +1,3 @@
 package hlt
 
-class DockMove(override val ship: Ship, val planet: Planet) extends Move(Move.Dock, ship) {
-  def getDestinationId: Long = planet.getId
-}
+class DockMove(override val ship: Ship, val planet: Planet) extends Move(Move.Dock, ship)

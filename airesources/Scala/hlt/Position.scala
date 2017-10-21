@@ -11,7 +11,7 @@ class Position(val xPos: Double, val yPos: Double) {
 
   def getClosestPoint(target: Entity): Position = {
     val MIN_DISTANCE = 3
-    val radius = target.getRadius + MIN_DISTANCE
+    val radius = target.radius + MIN_DISTANCE
     val angleRad = target.orientTowardsInRad(this)
     val dx = target.getXPos + radius * Math.cos(angleRad)
     val dy = target.getYPos + radius * Math.sin(angleRad)
