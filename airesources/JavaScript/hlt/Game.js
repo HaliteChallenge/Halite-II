@@ -1,18 +1,23 @@
 const Networking = require('./Networking');
-const MapParser = require('./MapParser');
+const GameMapParser = require('./GameMapParser');
 
 let mapParser = null;
 
 class Game {
-    static start(botName, frameAction) {
+    /**
+     * starts a game with a specified bot name and a strategy
+     * @param botName bot name
+     * @param {function} strategy function with game map as a parameter that returns a list of moves to take
+     */
+    static start(botName, strategy) {
         Networking.writeLine(botName);
 
         Networking.readLine(line => {
-            mapParser = new MapParser(extractGameMeta(line));
+            mapParser = new GameMapParser(extractGameMeta(line));
 
             Networking.forEachReadLine(line => {
                 const map = mapParser.parse(line);
-                const moves = frameAction(map);
+                const moves = strategy(map);
                 Networking.sendMoves(moves);
             })
         });

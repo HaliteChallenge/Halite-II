@@ -3,7 +3,7 @@ const Planet = require('./Planet');
 
 const Geometry = require('./Geometry');
 
-class Map {
+class GameMap {
     constructor({myPlayerId, width, height}) {
         this._myPlayerId = myPlayerId;
         this._width = width;
@@ -56,24 +56,45 @@ class Map {
         return this._ships;
     }
 
+    /**
+     * list of ships that belong to you
+     * @returns {[Ship]}
+     */
     get myShips() {
         return this.playerShips(this.myPlayerId);
     }
 
+    /**
+     * list of ships that belong to your enemy(ies)
+     * @returns {[Ship]}
+     */
     get enemyShips() {
         return this._eneymyShips;
     }
 
+    /**
+     * list of ships that belong to a specified player id
+     * @param playerId id of a player
+     * @returns {[Ship]}
+     */
     playerShips(playerId) {
         return this._shipsByPlayerId[playerId];
     }
 
+    /**
+     * list of planets
+     * @returns {[Planet]}
+     */
     get planets() {
         return this._planets;
     }
 
     shipsBetween(ship, target) {
         return this._obstaclesBetween(this.allShips, ship, target);
+    }
+
+    myShipsBetween(ship, target) {
+        return this._obstaclesBetween(this.myShips, ship, target);
     }
 
     enemyShipsBetween(ship, target) {
@@ -94,4 +115,4 @@ class Map {
     }
 }
 
-module.exports = Map;
+module.exports = GameMap;

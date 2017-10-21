@@ -1,9 +1,7 @@
 const Game = require('./hlt/Game');
-const Moves = require('./hlt/Moves');
+const {myStrategy} = require('./strategies');
 
-Game.start('JsBot', (map) => {
-    const moves = [];
-    moves.push(Moves.dock(1, 2));
-
-    return moves;
-});
+// start a game with a bot named 'JsBot'
+// and a strategy myStrategy defined in strategies.js
+// it is defined a separate file so you can unit test it in strategies.test.js
+Game.start('JsBot', myStrategy);

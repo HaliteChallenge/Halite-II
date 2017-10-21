@@ -1,6 +1,6 @@
-const Map = require('./Map');
+const GameMap = require('./GameMap');
 
-class MapParser {
+class GameMapParser {
     constructor({myPlayerId, width, height}) {
         this._myPlayerId = myPlayerId;
         this._width = width;
@@ -11,7 +11,7 @@ class MapParser {
         this._tokens = line.trim().split(' ');
         this._currentIdx = 0;
 
-        this.map = new Map({myPlayerId: this._myPlayerId,
+        this.map = new GameMap({myPlayerId: this._myPlayerId,
             width: this._width,
             height: this._height});
 
@@ -128,4 +128,4 @@ function forEachRange(end, actionFunc) {
     }
 }
 
-module.exports = MapParser;
+module.exports = GameMapParser;

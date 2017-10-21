@@ -1,9 +1,14 @@
+const Geometry = require('./Geometry');
+
 const dockingStatus = {
     UNDOCKED: 0,
     DOCKING: 1,
     DOCKED: 2,
     UNDOCKING: 3
 };
+
+const DOCK_RADIUS = 4;
+const SHIP_RADIUS = 0.5;
 
 class Ship {
     constructor(ownerId, params) {
@@ -13,6 +18,10 @@ class Ship {
 
     isDocked() {
         return this.dockingStatus === dockingStatus.DOCKED;
+    }
+
+    canDock(planet) {
+        return Geometry.distance(this, planet) <= planet.radius + DOCK_RADIUS;
     }
 
     get id() {
@@ -36,7 +45,7 @@ class Ship {
     }
 
     get radius() {
-        return 0.5;
+        return SHIP_RADIUS;
     }
 
     get health() {
@@ -53,6 +62,18 @@ class Ship {
 
     get weaponCooldown() {
         return this._params.weaponCooldown;
+    }
+
+    dock(planet) {
+        return `d ${this.id} ${planet.id}`;
+    }
+
+    unDock() {
+        return `u ${this.id}`;
+    }
+
+    thrust(magnitude, angle) {
+        return `t ${this.id} ${magnitude} ${angle}`;
     }
 
     toString() {
