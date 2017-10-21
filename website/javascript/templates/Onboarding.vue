@@ -10,8 +10,8 @@
 						If you added a company or school email, make sure you<br/>check your email to complete verfication. Now, before you get<br/>started, check out a game video.
 					</p>
 					<div class="text-center">
-					   <video width="600" height="400" src="/assets/images/tutorial-images/game.mp4" controls></video>
-					</div>        
+					   <video width="600" height="400" src="/assets/images/tutorial-images/Game.mp4" controls></video>
+					</div>
 					<div class="ha-button-container step-bottom">
 						<div>
 							<a @click="step = 2;" class="ha-button"><span>NEXT</span></a>
@@ -32,7 +32,7 @@
 							- If you want to make one edit to the bot, you can change the navigate speed to 7!
 						</div>
 						<div>
-							- We also support Scala, Rust, and other languages. <a href="#">Download a starter kit.</a>
+							- We also support Scala, Rust, and other languages. <a @click="downloadCode">Download a starter kit.</a>
 							<p class="tip-info"><i class="fa fa-info-circle"></i>This bot doesn't save locally.</p>
 						</div>
 					</div>
@@ -64,13 +64,26 @@
 						Now that you’ve submitted your first bot you’re<br/>ready to really start playing.
 					</p>
 					<div class="download-section">
-						<select class="form-control" placeholder="Select a language">
-							<option>Java</option><option>Python</option>
+						<select class="form-control" v-model="language" placeholder="Select a language">
+							<option value="C++">C++</option>
+							<option value="CSharp">CSharp</option>
+							<option value="Go">Go</option>
+							<option value="Java">Java</option>
+							<option value="JavaScript">JavaScript</option>
+							<option value="ML-StarterBot-Python">ML-StarterBot-Python</option>
+							<option value="Python3">Python3</option>
+							<option value="Rust">Rust</option>
+							<option value="Scala">Scala</option>
+							<option value="all">All Languages</option>
+							<option value="">Only Game Environment</option>
 						</select>
-						<select class="form-control" placeholder="Select a platform">
-							<option>Mac</option><option>Linux</option>
+						<select class="form-control" v-model="platform" placeholder="Select a platform">
+							<option value="None">None</option>
+							<option value="Linux-x64">Linux-x64</option>
+							<option value="MacOS">MacOS</option>
+							<option value="Windows">Windows</option>
 						</select>
-						<div class="download-section-link"><a href="#" class="link-in-dark">Download Code</a><img :src="`${baseUrl}/assets/images/temp/download.png`"/></div>
+						<div class="download-section-link"><a @click="downloadCode" class="link-in-dark">Download Code</a><img :src="`${baseUrl}/assets/images/temp/download.png`"/></div>
 					</div>
 					<p class="step-margin">Check out your <a class="link-in-dark" href="/user?me">user profile</a> to see your bot's game</p>
 					<div class="step-bottom">
@@ -141,6 +154,8 @@ export default {
 		return {
 			step: 1,
 			isShown: true,
+			code_language: 'Python3',
+			code_platform: 'None',
 			sliderOptions: {
 				min: 0,
 				max: 0,
@@ -183,14 +198,32 @@ export default {
 					return this.isShown;
 				},
 				set: function(value) {
-					console.log('setter');
-					console.log(value);
 					this.isShown = value;
 					if (value) {
 						$('body').addClass('noscroll');
 					} else {
 						$('body').removeClass('noscroll');
 					}
+				}
+			},
+			language: {
+				get: function(){
+					return this.code_language;
+				},
+				set: function(value){
+					console.log(value)
+					// this.$refs.botEditor.selected_language = value
+					// this.$refs.botEditor.reset_language()
+					this.code_language = value
+				}
+			},
+			platform: {
+				get: function(){
+					return this.code_platform;
+				},
+				set: function(value){
+					console.log(value)
+					this.code_platform = value
 				}
 			},
 	  },
@@ -240,7 +273,20 @@ export default {
 		 	utils.gaEvent(category, action, label)
 	  },
 	  submitCode: function(){
-			this.step = 3;
+			this.$refs.botEditor.upload_bot().then(() => {
+				this.step = 3;
+			}).catch((message) => {
+				alert('Upload Failed: ' + message)
+			});
+	  },
+	  downloadCode: function(){
+	  	//this.$refs.botEditor.download_bot();
+			const language = this.code_language ? `${this.code_language}_` : '';
+			if (this.code_language === '' && this.code_platform === 'None') {
+				alert("This starter kit is not available");
+				return;
+			}
+			window.location.href = `/assets/downloads/Halite2_${language}${this.code_platform}.zip`;
 	  },
 	  closePopup: function(){
 	  	this.show = false;

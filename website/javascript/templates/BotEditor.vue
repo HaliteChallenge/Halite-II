@@ -17,14 +17,14 @@
                 <span id = "progressMessageDiv">Loading language tooling plugins...</span>
             </div>
         </div>
-        <div class="bot-code-controls" v-if="editorViewer">
+        <!-- <div class="bot-code-controls" v-if="editorViewer">
             <button v-on:click="download_bot">Download Bot Code</button>
             <span v-if="logged_in">
                 <button v-on:click="upload_bot">Upload my bot!</button>
                 <span v-if="status_message">{{ status_message }}</span>
             </span>
             <span v-else>Log In to upload bot</span>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -55,7 +55,7 @@ const botLanguagePacks = {
 var logVerbose = false
 const BOT_LANG_KEY = 'bot_language'
 const THEME_KEY = 'editor_theme'
-const DARK_THEME = 'Dark'
+const DARK_THEME = 'Light'
 const RESET_MSG = 'Are you sure you want to reset your bot code to the default sample code?\n(All changes will be lost!)'
 
 function saveCode (ctx) {
@@ -196,7 +196,6 @@ export default {
     get_default_code_promise: function () {
       logInfo('Loading default bot code...')
       const fileName = this.bot_info().fileName
-      console.log(filename);
       return this.get_starter_zip().then((starterZip) => {
         logInfo('Got starter zip. Getting sample bot file: ' + fileName)
         return starterZip.file(fileName).async('text')
@@ -232,7 +231,7 @@ export default {
         return zip.file(this.bot_info().fileName, this.get_editor_code())
           .generateAsync({type: 'blob'})
       })
-},
+    },
     reload_code: function (use_default = false) {
       const codePromise = use_default ? this.get_default_code_promise() : this.get_code_promise()
       return codePromise.then((contents) => {
@@ -252,7 +251,7 @@ export default {
       return this.reload_code().then(() => {
         saveCode(this) // save code for new language's bot
       })
-},
+    },
     reset_theme: function () {
       const editorElement = jQuery('.textview')
       const darkThemeClass = 'editorTheme'
@@ -264,6 +263,7 @@ export default {
       return true
     },
     upload_bot: function () {
+      console.log('... starting upload')
       return new Promise ((resolve, reject) => {
         this.get_user_zip_promise().then((blob) => {
           const botFile = new File([blob], this.bot_info().zipName)
@@ -287,9 +287,11 @@ export default {
               this.status_message = `Uploading... (${p}%)`
             })
           }).then(() => {
+            console.log('upload successully')
             this.status_message = 'Successfully uploaded!'
             resolve();
           }, (err) => {
+            console.log('error: ' + err.message)
             this.status_message = err.message
             reject(err.message);
           })
