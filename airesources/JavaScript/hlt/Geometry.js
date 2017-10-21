@@ -14,8 +14,8 @@ class Geometry {
 
     /**
      * angle in rad between two points
-     * @param start object with {x, y} properties
-     * @param end object with {x, y} properties
+     * @param {object} start object with {x, y} properties
+     * @param {object} end object with {x, y} properties
      * @returns {number} radian between 0 and 2*PI
      */
     static angleInRad(start, end) {
@@ -24,6 +24,16 @@ class Geometry {
 
         const atan = Math.atan2(dy, dx);
         return atan >= 0 ? atan : (atan + 2 * Math.PI);
+    }
+
+    /**
+     * angle in degree between two points
+     * @param {object} start object with {x, y} properties
+     * @param {object} end object with {x, y} properties
+     * @returns {number} angle between 0 and 360
+     */
+    static angleInDegree(start, end) {
+        return this.angleInRad(start, end) * 180.0 / Math.PI;
     }
 
     /**

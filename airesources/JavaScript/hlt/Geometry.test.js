@@ -21,6 +21,19 @@ describe('Geometry', () => {
         }
     });
 
+    it('angle in degree between two points should be between 0 and 2Pi', () => {
+        expectDegree(0, {x: 0, y: 0}, {x: 130, y: 0});
+        expectDegree(90, {x: 0, y: 0}, {x: 0, y: 10});
+        expectDegree(180, {x: 0, y: 0}, {x: -100, y: 0});
+        expectDegree(270, {x: 0, y: 0}, {x: 0, y: -100});
+        expectDegree(359.99, {x: 0, y: 0}, {x: 100000, y: -1});
+
+        function expectDegree(expected, start, end) {
+            const angleInRad = Geometry.angleInDegree(start, end);
+            angleInRad.should.be.approximately(expected, 0.01);
+        }
+    });
+
     it('line intersects circle', () => {
         Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 0}, {x: 50, y: -1, radius: 1}).should.be.true();
         Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 0, y: 100}, {x: 50, y: 50, radius: 1}).should.be.false();
