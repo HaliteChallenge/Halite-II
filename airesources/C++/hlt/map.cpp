@@ -183,7 +183,7 @@ namespace hlt {
         return true;
     }
 
-    auto Map::forecast_collision(const Location& start, const Location& target) -> bool {
+    bool Map::forecast_collision(const Location& start, const Location& target) const {
         if (!within_bounds(target) || !pathable(start, target, 0.6)) {
             return true;
         }
@@ -205,9 +205,12 @@ namespace hlt {
         return false;
     }
 
-    auto Map::adjust_for_collision(
-        const Location& start, double angle, unsigned short thrust,
-        int tries) -> std::pair<double, unsigned short> {
+    std::pair<double, unsigned short> Map::adjust_for_collision(
+        const Location& start,
+        double angle,
+        unsigned short thrust,
+        int tries) const
+    {
         while (tries > 0) {
             const auto target = Location{
                 start.pos_x + thrust * std::cos(angle),

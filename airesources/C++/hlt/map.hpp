@@ -80,7 +80,7 @@ namespace hlt {
          * useful for sub-inertial speeds. Does not account for the movements
          * of other ships.
          */
-        auto forecast_collision(const Location& start, const Location& target) -> bool;
+        bool forecast_collision(const Location& start, const Location& target) const;
 
         /**
          * Try to avoid forecasted collisions (as predicted by
@@ -96,9 +96,9 @@ namespace hlt {
          * @param tries
          * @return
          */
-        auto adjust_for_collision(
+        std::pair<double, unsigned short> adjust_for_collision(
             const Location& start, double angle, unsigned short thrust,
-            int tries=25) -> std::pair<double, unsigned short>;
+            int tries=25) const;
 
         /**
          * Find the closest point at the minimum given distance (radius) to the

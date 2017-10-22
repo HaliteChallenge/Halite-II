@@ -1,7 +1,7 @@
-#ifndef HALITE_HLT_H
-#define HALITE_HLT_H
+#pragma once
 
 #ifdef _WIN32
+//TODO add via add_definitions in cmake instead
 #define _USE_MATH_DEFINES
 #endif
 
@@ -27,9 +27,10 @@ namespace hlt {
         return result;
     }
 
-    static auto send_string(std::string text) -> void {
+    static bool send_string(const std::string& text) {
         // std::endl used to flush
         std::cout << text << std::endl;
+        return !std::cout.bad();
     }
 
     static auto parse_ship(std::istream& iss)
@@ -139,7 +140,7 @@ namespace hlt {
      * Send all queued moves to the game engine.
      * @param moves
      */
-    static auto send_moves(std::vector<Move>& moves) -> void {
+    static bool send_moves(const std::vector<Move>& moves) {
         std::ostringstream oss;
         for (const auto& move : moves) {
             switch (move.type) {
@@ -160,7 +161,7 @@ namespace hlt {
             }
         }
         Log::log(oss.str());
-        send_string(oss.str());
+        return send_string(oss.str());
     }
 
     /**
@@ -182,5 +183,3 @@ namespace hlt {
         return std::make_pair(my_tag, initial_map);
     }
 }
-
-#endif //HALITE_HLT_H

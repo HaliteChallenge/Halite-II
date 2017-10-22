@@ -1,17 +1,15 @@
 #include "hlt/hlt.hpp"
 
 int main() {
-    hlt::PlayerId my_tag;
-
-    auto setup = hlt::initialize("Settler of C++");
-    my_tag = setup.first;
+    const auto setup = hlt::initialize("IvanTheTerrible");
+    const hlt::PlayerId my_tag = setup.first;
 
     auto moves = std::vector<hlt::Move>();
     while (true) {
-        auto game_map = hlt::get_map();
+        const auto game_map = hlt::get_map();
         moves.clear();
 
-        for (const auto& ship_pair : game_map.ships[my_tag]) {
+        for (const auto& ship_pair : game_map.ships.at(my_tag)) {
             const auto ship_id = ship_pair.first;
             const auto& ship = ship_pair.second;
 
@@ -42,6 +40,9 @@ int main() {
             }
         }
 
-        hlt::send_moves(moves);
+        if (!hlt::send_moves(moves)) {
+            hlt::Log::log("send_moves failed; exiting");
+            break;
+        }
     }
 }
