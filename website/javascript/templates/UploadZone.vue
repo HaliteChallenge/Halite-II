@@ -15,7 +15,7 @@
 
             <p class="hidden" v-if="message">{{ message }}</p>
             <input class="form-control" type="file" v-on:change="on_changed" />
-            
+
             <div class="progress hidden" v-if="progressBar">
                 <div class="progress-bar progress-bar-striped active" role="progressbar"
                      :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"
