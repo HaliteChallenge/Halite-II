@@ -74,7 +74,7 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
             # Don't require validation for high schools - we manually check
             return
 
-        if not email:
+        if not email_to_verify:
             raise email_error
 
         # Verify the email against the org

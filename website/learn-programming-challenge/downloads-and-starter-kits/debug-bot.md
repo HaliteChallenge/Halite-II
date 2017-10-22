@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Debug your bot
+title: Debug your Bot
 description: Overview of how to debug common issues with bots including compilation and timeout failures.
 image: assets/images/temp/bot_1.png
 content: website

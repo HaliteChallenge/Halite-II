@@ -40,11 +40,10 @@ export default {
               },
               success: (xhr) => {
                 this.success_message = 'Your email has been verified successfully. If you signed up for a hackathon that requires a verified email, you will now appear on the hackathon leaderboard. \n Sit tight, you’ll be automatically redirected in a few seconds.'
+                window.setTimeout(function (user_id) {
+                  window.location.replace('/user/?user_id='+user_id)
+                }, 10000, this.user_id)
               }
-            }).then(() => {
-              window.setTimeout(function () {
-                window.location.replace('/user/?user_id='+this.user_id)
-              }, 10000)
             })
           }
         }

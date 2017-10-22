@@ -12,15 +12,35 @@
       <div class="row hackathon-progress-cards">
         <!-- For new events just copy paste the below div and customize,
         you also need to modify the function to point to the righ link -->
-        <div class="col-md-3" @click="jumpToHackathon(2)">
+        <div class="col-md-3" @click="openHackathon(1)">
           <div class="hackathon-progress-card">
-            <img class="hackathon-card-img" src="https://storage.googleapis.com/halite-2-hackathon-thumbnails/hackathon-image.png" alt="hackathon"/>
+            <img class="hackathon-card-img" src="/assets/images/dalton.jpg" alt="New York High School Hackathon"/>
             <div class="hackathon-card-text">
-              <p class="t3 c-wht">TBD</p>
+              <p class="t3 c-wht">NYC High School Hackathon</p>
               <ul class="hackathon-info">
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">New York</p>
+                  <p class="hackathon-card-item-text">The Dalton School</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
+                  <p class="hackathon-card-item-text">10:30 a.m</p>
+                </li>
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
+                  <p class="hackathon-card-item-text">November 11, 2017</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- <div class="hackathon-progress-card">
+            <img class="hackathon-card-img" src="/assets/images/cornell-tech.jpg" alt="New York High School Hackathon"/>
+            <div class="hackathon-card-text">
+              <p class="t3 c-wht">NYC Cornell Tech Hackathon</p>
+              <ul class="hackathon-info">
+                <li>
+                  <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
+                  <p class="hackathon-card-item-text">The Bridge @ Cornell Tech</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
@@ -32,7 +52,7 @@
                 </li>
               </ul>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -139,7 +159,14 @@ export default {
     },
     gaData: function (category, action, label) {
       utils.gaEvent(category, action, label)
-    }
+    },
+    openHackathon: function(id) {
+        if(id === 1)
+        {
+          var win = window.open("https://www.eventbrite.com/e/halite-nyc-high-school-hackathon-tickets-39020543496", '_blank');
+          win.focus();
+        }
+    },
   }
 }
 </script>

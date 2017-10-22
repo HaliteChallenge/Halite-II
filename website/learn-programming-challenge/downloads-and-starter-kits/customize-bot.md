@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Customize your bot
+title: Customize your Bot Submission
 description: Overview of how to customize your bot submission with dependencies, language names and more.
 image: assets/images/temp/bot_1.png
 content: website
@@ -27,7 +27,6 @@ It will be run with internet access and write access to only its current directo
 
 The following package managers are already installed on the server and can be used to install dependencies locally:
 
-- `pip3` (Python 3.5)
 - `python3.6 -m pip` (Python 3.6)
 - `virtualenv`
 - `npm`
@@ -39,7 +38,11 @@ If your library isn't on a package manager that supports local installation and 
 
 **Note:**
 
-If you are using `pip`, then make sure to use the `--system` flag with the `--target` flag, due to how Debian/Ubuntu patch the `pip` packages (reference: [pip#3826](https://github.com/pypa/pip/issues/3826){:target="_blank"}).
+If you are using `pip`, then make sure to use the `--system` flag with the `--target` flag, due to how Debian/Ubuntu patch the `pip` packages (reference: [pip#3826](https://github.com/pypa/pip/issues/3826){:target="_blank"}). For example:
+
+```
+python3.6 -m pip install --system --target . numpy
+```
 
 ## Preinstalled Libraries
 

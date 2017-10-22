@@ -23,11 +23,9 @@ And not that anything serious will go wrong (fingers crossed), but to receive no
 
 For questions related to anything non-game related like legal issues, you can contact our parent company, [Two Sigma](https://www.twosigma.com){:target="_blank"}.
 
-Two Sigma Open Source, LLC
-Attn: Halite
-100 Avenue of the Americas
-16th Floor
-New York, NY 10013
+**Two Sigma Open Source, LLC, Attn: Halite**
+<br>100 Avenue of the Americas, 16th Floor
+<br>New York, NY 10013
 
 
 ## Halite Logos

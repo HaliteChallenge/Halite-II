@@ -65,7 +65,7 @@ def nukeglob(pattern):
         try:
             os.unlink(path)
         except OSError as e:
-            if e.errno != errno.ENOENT and e.errno != EACCES:
+            if e.errno != errno.ENOENT and e.errno != errno.EACCES:
                 raise
 
 

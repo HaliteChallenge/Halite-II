@@ -17,12 +17,12 @@ Halite (the tournament) is an online programming competition where human coders 
 
 ### Where does the game come from? Who invented it?
 
-Halite I was created by Benjamin Spector and Michael Truell during a summer internship at [Two Sigma] (www.twosigma.com){:target="_blank"} in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by Benjamin Spector, Michael Truell, David Li, Jaques Clapauch, Julia Kastner, and Harikrishna Menon in 2017 at Two Sigma.
+Halite I was created by Benjamin Spector and Michael Truell during a summer internship at [Two Sigma](https://www.twosigma.com){:target="_blank"} in 2016. The game format is inspired by the 2011 Ants AI Challenge sponsored by Google. Halite II was created by Benjamin Spector, Michael Truell, David Li, Jaques Clapauch, Julia Kastner, and Harikrishna Menon in 2017 at Two Sigma.
 
 ### Why did you invent it?
 
 Halite’s creators heard about the Ants AI Challenge a few years too late :-(
-They couldn’t find any other competitions quite like it, so they decided to create one. Halite I was born as an internal competition within [Two Sigma] (www.twosigma.com){:target="_blank"}.
+They couldn’t find any other competitions quite like it, so they decided to create one. Halite I was born as an internal competition within [Two Sigma](https://www.twosigma.com){:target="_blank"}.
 
 Due to the success of Halite I, Two Sigma decided to create a new iteration of Halite I and re-host the game with new rules, challenges, and a brand new website.
 
@@ -40,11 +40,11 @@ Winners are simply the highest ranked players on the leaderboard at the end of t
 
 ### Is there a prize for the winners?
 
-Pride! Bragging rights! Appreciation from the TS team!
+Pride! Bragging rights! Appreciation from the TS team! 
 
 ### What information do you store about me?
 
-We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth as well as any information you provide in your user profile. You can learn more in our [privacy policy][/about/privacy].
+We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth as well as any information you provide in your user profile. You can learn more in our [privacy policy][privacy].
 
 ### How do you determine my organization?
 
@@ -77,4 +77,4 @@ We recommend you suppress this output. Most frameworks allow you to change the v
 
 [privacy]: {{ site.baseurl }}/about/privacy-policy
 [learn]: {{ site.baseurl }}/learn-programming-challenge
-[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots
+[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits

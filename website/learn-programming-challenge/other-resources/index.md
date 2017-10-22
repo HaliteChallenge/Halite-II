@@ -8,3 +8,7 @@ sort_key: 0
 ---
 
 The Halite team and community have provided additional resources to make it easy to dive into the Halite AI Programming Challenge.
+
+- [Design Principles Underlying Halite II](design-principles-underlying-halite-ii)
+- [Game Servers](game-servers)
+- [Best Practices](best-practices)

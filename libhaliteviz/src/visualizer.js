@@ -42,7 +42,7 @@ export class HaliteVisualizer {
             assets.VISUALIZER_SIZE,
             assets.VISUALIZER_HEIGHT,
             {
-                backgroundColor: 0x000000,
+                backgroundColor: 0x222222,
             }
         );
         // Seems to help with pixelation when downscaling
