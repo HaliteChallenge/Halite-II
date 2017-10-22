@@ -7,7 +7,7 @@ sort_key: 4
 
 ## Why Compare?
 
-Halite players often compare multiple versions of their bots against each other to make sure that each subsequent bot submission is better than the previous one. While you dont have access to other players bots in your environment, its important to do some regression testing against your own test and/or previous bot versions to make sure that you have not introduced issues that might drop you in your rankings.
+Halite players often compare multiple versions of their bots against each other to make sure that each subsequent bot submission is better than the previous one. While you don't have access to other players bots in your environment, its important to do some regression testing against your own test and/or previous bot versions to make sure that you have not introduced issues that might drop you in your rankings.
 
 ## Tools
 

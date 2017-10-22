@@ -8,7 +8,7 @@ sort_key: 0
 Here is a quick overview of the rules of Halite II. If you want to get into the nitty-gritty, check out our [Game Rules Deep Dive][Deep Dive].
 
 ## Map at Game Start
-Halite II is played on 2D map, which is set up as a continous Cartesian plane (think of it has having x/y axes). The map is like a virtual game board, and does not wrap, meaning that game pieces can fall off the edges of the board, they don't appear on the opposite side like an old school arcade game.
+Halite II is played on 2D map, which is set up as a continuos Cartesian plane (think of it has having x/y axes). The map is like a virtual game board, and does not wrap, meaning that game pieces can fall off the edges of the board, they don't appear on the opposite side like an old school arcade game.
 
 <img src="" alt="Halite Game Board at Start of Game">
 
@@ -34,7 +34,7 @@ The circle around the ship is its aura, which is uses to measure the offensive/d
 
 <img src="" alt="Halite ships in battle">
 
-Ships collide when they try to occoupy the same location on the map:
+Ships collide when they try to occupy the same location on the map:
 
 <img src="" alt="Halite ships explode">
 

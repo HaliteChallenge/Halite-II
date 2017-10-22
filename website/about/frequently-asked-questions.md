@@ -28,7 +28,7 @@ Due to the success of Halite I, Two Sigma decided to create a new iteration of H
 
 ### How are rankings computed?
 
-Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating systemused for chess.
+Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating system used for chess.
 
 Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was reset. For Halite II, player ratings will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md){:target="_blank"}.
 

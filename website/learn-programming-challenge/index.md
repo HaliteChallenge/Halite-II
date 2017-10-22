@@ -41,11 +41,11 @@ Now it's time to [download the game environment and starter kit][downloads] for 
 
 The game environment and starter kit are bundled together, so you should be all set.
 
-### 4) SUMBIT THE STARTER BOT
+### 4) SUBMIT THE STARTER BOT
 
 A great way to get going with the game is to just go ahead and [submit][play] the starter bot you downloaded and then going to your [user profile][profile] to see how you've done.
 
-We've created a lot of other documents for you to learn how to play Halite. If you've made it through all these steps, a great next resouce is our guide to [improving the basic bot][improve bot].
+We've created a lot of other documents for you to learn how to play Halite. If you've made it through all these steps, a great next resource is our guide to [improving the basic bot][improve bot].
 
 ### May the best bot win!
 
