@@ -75,7 +75,7 @@
                                         <div class="hex-li">
                                             <span class="hex-bullet">1</span>
                                             <span class="hex-li-content">If you're participating in a school or company competition, make sure you've verified your organization email. <a
-                                                    href="/user?me">Edit your profile here</a>.</span>
+                                                    href="/user/edit-user">Edit your profile here</a>.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -83,7 +83,7 @@
                                     <div class="hackathon-join-left-col">
                                         <div class="hex-li">
                                             <span class="hex-bullet">2</span>
-                                            <span class="hex-li-content">Add your hackathon code to <a href="/user?me">your profile</a>. If you don't have a code, email <a href="mailto:halite@halite.io">halite@halite.io</a> for more information.</span>
+                                            <span class="hex-li-content">Add your hackathon code to <a href="/user/edit-user">your profile</a>. If you don't have a code, email <a href="mailto:halite@halite.io">halite@halite.io</a> for more information.</span>
                                         </div>
                                     </div>
                                 </div>
