@@ -26,8 +26,8 @@ __version__ = "1.5"
 URI_HALITE_API = 'http://api.halite.io/v1/api'
 URI_API_CREATE_BOT = URI_HALITE_API + "/user/{}/bot"
 URI_API_EXISTING_BOT = URI_HALITE_API + "/user/{}/bot/{}"
-URI_HALITE_WEB_PAGE = 'http://35.185.45.87'  # TODO change to cname (halite.io)
-URI_WEB_API_KEY = "{}/user/api_key".format(URI_HALITE_WEB_PAGE)
+URI_HALITE_WEB_PAGE = 'http://halite.io'
+URI_WEB_API_KEY = "{}/user/settings".format(URI_HALITE_WEB_PAGE)
 
 SUCCESS = 200
 FIRST_BOT_ID = 0
