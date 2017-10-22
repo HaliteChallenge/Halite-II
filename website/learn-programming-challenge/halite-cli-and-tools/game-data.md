@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Game Download Tool
+title: Game Data
 toc: false
 sort_key: 3
 ---

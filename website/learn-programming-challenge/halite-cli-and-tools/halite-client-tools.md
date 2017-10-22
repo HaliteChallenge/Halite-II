@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Upload Bot Tool
+title: Halite Client Tools
 toc: false
 sort_key: 9
 ---
