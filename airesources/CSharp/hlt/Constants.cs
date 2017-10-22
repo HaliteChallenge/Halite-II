@@ -13,13 +13,13 @@ public class Constants {
     // Damage dealt to enemy ships per turn by a ship
     public const double WeaponDamage = 64;
     // Radius in which explosions affect other entities
-    public const double ExplosionRadius = 10;
+    public const double ExplosionRadius = 10.0;
     // Additional Radius from the planet edge at which the ship can dock to the planet
-    public const double DockRadius = 4;
+    public const double DockRadius = 4.0;
     // Number of turns it takes to dock the ship once the docking command is issued
     public const int TurnsToDock = 5;
     // Number of turns it takes a single docked ship to produce another ship. This grows linearly with the number of ships
     public const int BaseProductivity = 6;
     // Radius from the planets edge where new ships will be spawned
-    public const int SpawnRadius = 2;
+    public const double SpawnRadius = 2.0;
 }

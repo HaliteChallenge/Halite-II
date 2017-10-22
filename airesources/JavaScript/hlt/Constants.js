@@ -14,13 +14,13 @@ module.exports = {
     // Weapon damage
     WEAPON_DAMAGE: 64,
     // Radius in which explosions affect other entities
-    EXPLOSION_RADIUS: 10,
+    EXPLOSION_RADIUS: 10.0,
     // Distance from the edge of the planet at which ships can try to dock
-    DOCK_RADIUS: 4,
+    DOCK_RADIUS: 4.0,
     // Number of turns it takes to dock a ship
     DOCK_TURNS: 5,
     // Number of turns it takes to create a ship per docked ship
     BASE_PRODUCTIVITY: 6,
     // Distance from the planets edge at which new ships are created
-    SPAWN_RADIUS: 2
+    SPAWN_RADIUS: 2.0
 };
