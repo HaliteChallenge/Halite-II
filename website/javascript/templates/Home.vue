@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Halite II launches on October 23rd, Finals begin on January 22nd, 2018</div>
+        <div class="notification font-headline">Welcome to the 2017-2018 season of Halite, running until January 22nd, 2018</div>
 
         <div class="row">
             <div class="col-md-12">
@@ -67,7 +67,7 @@
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
-                            <a class="ha-button" href="/learn-programming-challenge/the-halite-codex"><span>READ THE CODEX</span></a>
+                            <a class="ha-button" href="/learn-programming-challenge/basic-game-rules/the-halite-codex"><span>READ THE CODEX</span></a>
                         </div>
                     </div>
                 </div>
@@ -207,8 +207,8 @@
                                         <input id="intmpid" type="email" placeholder="Your friend's email..."/>
                                         <button class="btn" v-on:click="invite"><span>INVITE</span></button>
                                         <br/>
-                                        <p id="invitestatus" class="t5 c-gry"></p>
                                     </div>
+                                    <p id="invitestatus" class="t5 c-gry"></p>
                                 </div>
                             </div>
                         </div>
@@ -256,7 +256,7 @@
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
-                                        <a v-on:click="gaData('click-external', 'click-tscareers','spotlight')" href="https://www.twosigma.com/careers" class="ha-button"><span>EXPLORE CAREERS</span></a>
+                                        <a v-on:click="gaData('click-external', 'click-tscareers','spotlight')" href="https://www.twosigma.com/careers" class="ha-button" target="_blank"><span>EXPLORE CAREERS</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -273,7 +273,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">ABOUT THE COMPETITION</p>
-                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 26, 2017. Created by two interns at <a href="https://twosigma.com">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
+                                <p class="t5 c-gry">Halite is an AI programming challenge running October 23 - January 26, 2017. Created by two interns at <a href="https://twosigma.com" target="_blank">Two Sigma</a> in 2016, the first iteration of Halite was such a success that Halite II was built the summer of 2017.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>
@@ -290,13 +290,17 @@
             <div class="col-md-6 col-sm-6 sponsor-section text-center">
                 <p class="t2 c-wht font-headline">LAUNCH PARTNER</p>
                 <div class="text-center">
-                    <img class="logo center-block" :src="`${baseUrl}/assets/images/temp/logo_corneltech.png`"/>
+                    <a href="https://tech.cornell.edu/" target="_blank">
+                        <img class="logo center-block" :src="`${baseUrl}/assets/images/temp/logo_corneltech.png`"/>
+                    </a>
                 </div>
             </div>
             <div class="col-md-6 col-sm-6 sponsor-section text-center">
                 <p class="t2 c-wht font-headline">SUPPORT FROM</p>
                 <div class="text-center">
-                    <img class="logo center-block" :src="`${baseUrl}/assets/images/logo_cloud_reverse.png`"/>
+                     <a href="https://cloud.google.com/" target="_blank">
+                        <img class="logo center-block" :src="`${baseUrl}/assets/images/logo_cloud_reverse.png`"/>
+                    </a>
                 </div>
             </div>
             <div class="col-md-12 big-menu">
@@ -339,17 +343,17 @@ export default {
      },
      methods: {
        invite: function () {
-         gaData('invite', 'click-to-invite', 'home')
+         this.gaData('invite', 'click-to-invite', 'home')
          if (!document.getElementById('intmpid').checkValidity()) {
            document.getElementById('invitestatus').style.color = 'red'
            document.getElementById('invitestatus').textContent = 'Invalid email..'
-           gaData('invite-error', 'click-to-invite', 'home')
+           this.gaData('invite-error', 'click-to-invite', 'home')
          } else {
            let content = document.getElementById('intmpid').value
            api.invitefriend(content).then(status => {
              document.getElementById('invitestatus').style.color = 'green'
              document.getElementById('invitestatus').textContent = 'Invitation sent...'
-             gaData('invite-success', 'click-to-invite', 'home')
+             this.gaData('invite-success', 'click-to-invite', 'home')
            })
          }
        },
