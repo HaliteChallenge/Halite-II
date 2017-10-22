@@ -16,12 +16,17 @@ from . import util as api_util
 
 
 @web_api.route("/login/discourse_sso")
-@api_util.requires_login(accept_key=False)
-def discourse_sso(*, user_id):
+def discourse_sso():
     """
     Implements an SSO endpoint for Discourse forums, as described at
     https://meta.discourse.org/t/official-single-sign-on-for-discourse/13045
     """
+    user = api_util.validate_session_cookie(flask.session.get(config.SESSION_COOKIE))
+    user_id = None
+    if user:
+        user_id = user["user_id"]
+    else:
+        return flask.redirect("https://api.halite.io/v1/login/github")
 
     sso_payload = flask.request.args.get("sso")
     sso_signature = flask.request.args.get("sig")
