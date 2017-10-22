@@ -1,59 +1,44 @@
-//
-// Created by David Li on 7/17/17.
-//
-
-#ifndef ENVIRONMENT_CONSTANTS_HPP
-#define ENVIRONMENT_CONSTANTS_HPP
+#pragma once
 
 namespace hlt {
-    constexpr auto MAX_PLAYERS = 4;
-    constexpr auto MAX_QUEUED_MOVES = 1;
+    namespace constants {
+        /** Games will not have more players than this */
+        constexpr int MAX_PLAYERS = 4;
 
-    /**
-     * Gameplay constants that may be tweaked (though they should be at their
-     * default values in a tournament setting).
-     */
-    struct GameConstants {
-        int SHIPS_PER_PLAYER = 3;
-        int PLANETS_PER_PLAYER = 6;
-        unsigned int EXTRA_PLANETS = 4;
-        unsigned int MAX_TURNS = 300;
+        /** Max number of units of distance a ship can travel in a turn */
+        constexpr int MAX_SPEED = 7;
 
-        double DRAG = 7.0;
-        double MAX_SPEED = 7.0;
-        double MAX_ACCELERATION = 7.0;
+        /** Radius of a ship */
+        constexpr double SHIP_RADIUS = 0.5;
 
-        double SHIP_RADIUS = 0.5;
+        /** Starting health of ship, also its max */
+        constexpr int MAX_SHIP_HEALTH = 255;
 
-        unsigned short MAX_SHIP_HEALTH = 255;
-        unsigned short BASE_SHIP_HEALTH = 255;
-        unsigned short DOCKED_SHIP_REGENERATION = 0;
+        /** Starting health of ship, also its max */
+        constexpr int BASE_SHIP_HEALTH = 255;
 
-        unsigned int WEAPON_COOLDOWN = 1;
-        double WEAPON_RADIUS = 5.0;
-        int WEAPON_DAMAGE = 64;
-        double EXPLOSION_RADIUS = 10.0;
+        /** Weapon cooldown period */
+        constexpr int WEAPON_COOLDOWN = 1;
 
-        double DOCK_RADIUS = 4;
-        unsigned int DOCK_TURNS = 5;
-        int RESOURCES_PER_RADIUS = 144;
-        bool INFINITE_RESOURCES = true;
-        int PRODUCTION_PER_SHIP = 72;
-        unsigned int BASE_PRODUCTIVITY = 6;
-        unsigned int ADDITIONAL_PRODUCTIVITY = 6;
+        /** Weapon damage radius */
+        constexpr double WEAPON_RADIUS = 5.0;
 
-        int SPAWN_RADIUS = 2;
+        /** Weapon damage */
+        constexpr int WEAPON_DAMAGE = 64;
 
-        static auto get_mut() -> GameConstants& {
-            // Guaranteed initialized only once by C++11
-            static GameConstants instance;
-            return instance;
-        }
+        /** Radius in which explosions affect other entities */
+        constexpr double EXPLOSION_RADIUS = 10.0;
 
-        static auto get() -> const GameConstants& {
-            return get_mut();
-        }
-    };
+        /** Distance from the edge of the planet at which ships can try to dock */
+        constexpr double DOCK_RADIUS = 4.0;
+
+        /** Number of turns it takes to dock a ship */
+        constexpr unsigned int DOCK_TURNS = 5;
+
+        /** Number of turns it takes to create a ship per docked ship */
+        constexpr int BASE_PRODUCTIVITY = 6;
+
+        /** Distance from the planets edge at which new ships are created */
+        constexpr int SPAWN_RADIUS = 2;
+    }
 }
-
-#endif //ENVIRONMENT_CONSTANTS_HPP

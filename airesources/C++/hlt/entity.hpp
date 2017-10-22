@@ -81,8 +81,7 @@ namespace hlt {
         }
 
         auto heal(unsigned short points) -> void {
-            health = std::min(GameConstants::get().MAX_SHIP_HEALTH,
-                              static_cast<unsigned short>(health + points));
+            health = std::min(constants::MAX_SHIP_HEALTH, health + points);
         }
 
         /**
@@ -152,7 +151,7 @@ namespace hlt {
          */
         auto can_dock(const Planet& planet) const -> bool {
             return this->location.distance(planet.location) <=
-                GameConstants::get().DOCK_RADIUS + planet.radius + radius;
+                constants::DOCK_RADIUS + planet.radius + radius;
         }
     };
 

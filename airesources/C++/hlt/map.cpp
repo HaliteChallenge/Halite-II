@@ -150,7 +150,7 @@ namespace hlt {
             }
         }
 
-        for (hlt::PlayerId player_id = 0; player_id < MAX_PLAYERS; player_id++) {
+        for (hlt::PlayerId player_id = 0; player_id < constants::MAX_PLAYERS; player_id++) {
             const auto& player_ships = ships[player_id];
 
             for (const auto& ship_pair : player_ships) {

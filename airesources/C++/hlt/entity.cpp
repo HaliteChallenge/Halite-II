@@ -43,7 +43,7 @@ namespace hlt {
         double new_vel_x = vel_x + magnitude * std::cos(angle);
         double new_vel_y = vel_y + magnitude * std::sin(angle);
 
-        const auto max_speed = GameConstants::get().MAX_SPEED;
+        const auto max_speed = constants::MAX_SPEED;
         if (this->magnitude() > max_speed) {
             double scale = max_speed / this->magnitude();
             new_vel_x *= scale;
@@ -132,10 +132,10 @@ namespace hlt {
     }
 
     auto Ship::revive(const Location& loc) -> void {
-        health = GameConstants::get().BASE_SHIP_HEALTH;
+        health = constants::BASE_SHIP_HEALTH;
         location = loc;
         weapon_cooldown = 0;
-        radius = GameConstants::get().SHIP_RADIUS;
+        radius = constants::SHIP_RADIUS;
         velocity = { 0, 0 };
         docking_status = DockingStatus::Undocked;
         docking_progress = 0;

@@ -50,7 +50,7 @@ namespace hlt {
         iss >> ship.docking_progress;
         iss >> ship.weapon_cooldown;
 
-        ship.radius = GameConstants::get().SHIP_RADIUS;
+        ship.radius = constants::SHIP_RADIUS;
 
         return std::make_pair(ship_id, ship);
     }
