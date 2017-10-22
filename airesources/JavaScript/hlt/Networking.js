@@ -6,24 +6,31 @@ const rl = readline.createInterface({
 });
 
 class Networking {
-    static write(message) {
-        process.stdout.write(message);
-    }
-
     static writeLine(line) {
         console.log(line);
     }
 
     static sendMoves(moves) {
-        moves.forEach(m => Networking.write(m));
-        // Networking.writeLine(moves.join('\n'));
-        Networking.writeLine('\n');
+        Networking.writeLine(moves.join(' ') + '\n');
     }
 
-    static readLine(onLineCallback) {
-        rl.question('', (line) => {
-            onLineCallback(line)
-        });
+    static readNLines(n, onLines) {
+        const lines = [];
+
+        readLine();
+
+        function readLine() {
+            rl.question('', onLine);
+        }
+
+        function onLine(line) {
+            lines.push(line);
+            if (lines.length === n) {
+                onLines(lines);
+            } else {
+                readLine();
+            }
+        }
     }
 
     static forEachReadLine(onLineCallback) {

@@ -23,7 +23,7 @@ function myStrategy(gameMap) {
 
             // If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
             if (ship.canDock(firstAvailablePlanet)) {
-                moves.push(ship.dock(planet));
+                moves.push(ship.dock(firstAvailablePlanet));
             } else {
                 /*
                  If we can't dock, we approach the planet with constant speed.
@@ -36,12 +36,13 @@ function myStrategy(gameMap) {
                  wish to turn that option off.
                  */
 
-                const pointCloseToPlanet = ship.pointApproaching(firstAvailablePlanet, 3);
+                const pointCloseToPlanet = ship.pointApproaching(firstAvailablePlanet, firstAvailablePlanet.radius + 3);
 
                 const thrustMove = ship.navigate({
-                    target: {id: firstAvailablePlanet.id, x: pointCloseToPlanet.x, y: pointCloseToPlanet.y},
+                    target: pointCloseToPlanet,
                     speed: constants.MAX_SPEED / 2,
-                    avoidObstacles: true, ignoreShips: true
+                    avoidObstacles: false,
+                    ignoreShips: true
                 });
 
                 moves.push(thrustMove);
