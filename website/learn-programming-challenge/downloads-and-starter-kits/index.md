@@ -68,7 +68,7 @@ System requirements are detailed [here](system-requirements).
             <tr>
                 <td>Halite Client Tool</td>
                 <td>0.9.0-Beta</td>
-                <td><a href="https://storage.cloud.google.com/halite-assets/HaliteClient.zip">Download</a></td>
+                <td><a href="https://storage.cloud.google.com/halite-content/HaliteClient.zip">Download</a></td>
                 <td>NA</td>
                 <td>NA</td>
                 <td>NA</td>
@@ -77,7 +77,7 @@ System requirements are detailed [here](system-requirements).
                 <td>Halite Visualizer</td>
                 <td>0.9.0-Beta</td>
                 <td>NA</td>
-                <td><a href="https://storage.cloud.google.com/halite-assets/visualizer/Halite%20II%20Visualizer-mac.zip">Download</a></td>
+                <td><a href="https://storage.cloud.google.com/halite-content/Halite%20II%20Visualizer-macos.zip">Download</a></td>
                 <td><a href="https://github.com/HaliteChallenge/Halite-II/blob/master/tools/standalone_visualizer/README.md">Instructions</a></td>
                 <td><a href="https://github.com/HaliteChallenge/Halite-II/blob/master/tools/standalone_visualizer/README.md">Instructions</a></td>
             </tr>

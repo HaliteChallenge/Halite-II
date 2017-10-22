@@ -1,5 +1,5 @@
 const Game = require('./hlt/Game');
-const {myStrategy} = require('./strategies');
+const {myStrategy} = require('./strategies/strategies');
 
 // start a game with a bot named 'JsBot'
 // and a strategy myStrategy defined in strategies.js

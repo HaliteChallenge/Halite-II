@@ -14,28 +14,42 @@ object Networking {
   def sendMoves(moves: Iterable[Move]): Unit = {
     val moveString = new StringBuilder
     for (move <- moves) {
-      move.getType match {
+      move.moveType match {
         case Undock =>
-          moveString.append(UNDOCK_KEY).append(" ").append(move.getShip.getId).append(" ")
+          moveString.append(UNDOCK_KEY).append(" ").append(move.ship.id).append(" ")
         case Dock =>
-          moveString.append(DOCK_KEY).append(" ").append(move.getShip.getId).append(" ").append(move.asInstanceOf[DockMove].getDestinationId).append(" ")
+          moveString
+            .append(DOCK_KEY)
+            .append(" ")
+            .append(move.ship.id)
+            .append(" ")
+            .append(move.asInstanceOf[DockMove].planet.id)
+            .append(" ")
         case Thrust =>
-          moveString.append(THRUST_KEY).append(" ").append(move.getShip.getId).append(" ").append(move.asInstanceOf[ThrustMove].getThrust).append(" ").append(move.asInstanceOf[ThrustMove].getAngle).append(" ")
+          moveString
+            .append(THRUST_KEY)
+            .append(" ")
+            .append(move.ship.id)
+            .append(" ")
+            .append(move.asInstanceOf[ThrustMove].getThrust)
+            .append(" ")
+            .append(move.asInstanceOf[ThrustMove].getAngle)
+            .append(" ")
         case Noop =>
       }
     }
     println(moveString)
   }
 
-  def readAndSplitLine = readLine.trim.split(" ").iterator
+  def readAndSplitLine: Iterator[String] = readLine.trim.split(" ").iterator
 
   private def readLine: String = {
     StdIn.readLine()
   }
 }
 
-class Networking {
-  def initialize(botName: String): (Short, Short, Short) = {
+class Networking(botName: String) {
+  var (width, height, myId) = {
     val myId = Networking.readLine.toShort
     try DebugLog.initialize(new FileWriter(s"$myId - $botName.log"))
     catch {
@@ -49,4 +63,6 @@ class Networking {
     println(botName)
     (width, height, myId)
   }
+
+  def nextGameMap(): GameMap = new GameMap(width, height, myId, Networking.readAndSplitLine)
 }

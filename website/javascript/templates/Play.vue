@@ -24,7 +24,7 @@
             <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
-            <p class="text-center">You can also submit a bot via our <a href="https://storage.googleapis.com/halite-assets/hlt_client.zip">Halite Client Tool</a></p>
+            <p class="text-center">You can also submit a bot via our <a href="https://storage.cloud.google.com/halite-content/HaliteClient.zip">Halite Client Tool</a></p>
           </div>
         </div>
         <div class="col-sm-6">
@@ -53,7 +53,7 @@
 
       <bot-upload :user="user" :bot-file="botFile" :bots-list="botsList"  v-if="currentView='botUpload'"
       :showMessage="showMessage"></bot-upload>
-    
+
     </div>
 
     <div v-if="message" class="row">
@@ -62,12 +62,11 @@
             <p class="visuallizer-loading-message message-top">{{message}}</p>
         </div>
     </div>
-    
-    <div id="halitetv-visualizer">
 
+    <div id="halitetv-visualizer">
     </div>
 
-    <div id="halitetv-more-upload" v-if="currentView=='replay' && !message">
+    <div id="halitetv-more-upload" :style="currentView=='replay' && !message ? `` : `display:none`">
       <h2>Replay Another Bot</h2>
       <div class="upload-container">
         <halite-upload-zone
@@ -99,7 +98,7 @@
   import Visualizer from './Visualizer.vue'
   import * as utils from '../utils'
 
-  // showing game 
+  // showing game
   let visualizer = null
   const showGame = (game) => {
     if (visualizer && visualizer.getVisualizer) {
@@ -131,6 +130,7 @@
           }
         }),
         mounted: function () {
+          window.scrollTo(0, 0);
           visualizer = this.$children[0]
         }
       })
@@ -179,7 +179,7 @@
           })
         }
       })
-  
+
       // handle whole page drag and drop
       const ins = this
       $('body').on('drop dragdrop', (e) => {

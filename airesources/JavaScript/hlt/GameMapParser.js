@@ -7,6 +7,11 @@ class GameMapParser {
         this._height = height;
     }
 
+    /**
+     * creates a game map instance from an encoded line
+     * @param line line from the halite communication
+     * @return {GameMap}
+     */
     parse(line) {
         this._tokens = line.trim().split(' ');
         this._currentIdx = 0;
@@ -54,8 +59,8 @@ class GameMapParser {
     _nextShipParams() {
         return {
             id: this._nextInt(),
-            xPos: this._nextFloat(),
-            yPos: this._nextFloat(),
+            x: this._nextFloat(),
+            y: this._nextFloat(),
             health: this._nextInt(),
             velocityX: this._nextFloat(),
             velocityY: this._nextFloat(),
@@ -69,8 +74,8 @@ class GameMapParser {
     _nextPlanetParams() {
         return {
             id: this._nextInt(),
-            xPos: this._nextFloat(),
-            yPos: this._nextFloat(),
+            x: this._nextFloat(),
+            y: this._nextFloat(),
             health: this._nextInt(),
             radius: this._nextFloat(),
             dockingSpots: this._nextInt(),

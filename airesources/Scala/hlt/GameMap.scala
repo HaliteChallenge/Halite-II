@@ -1,14 +1,21 @@
 package hlt
 
 object GameMap {
-  private def addEntitiesBetween(start: Position, target: Position, entitiesToCheck: Iterable[Entity]): Iterable[Entity] = {
+  private def addEntitiesBetween(start: Position,
+                                 target: Position,
+                                 entitiesToCheck: Iterable[Entity]): Iterable[Entity] = {
     entitiesToCheck
-      .filter(_ != start).filter(_ != target)
-      .filter(entity => Collision.segmentCircleIntersect(start, target, entity, Constants.FORECAST_FUDGE_FACTOR))
+      .filter(_ != start)
+      .filter(_ != target)
+      .filter(entity =>
+        Collision.segmentCircleIntersect(start, target, entity, Constants.FORECAST_FUDGE_FACTOR))
   }
 }
 
-class GameMap(val width: Short, val height: Short, val playerId: Short, val metadataIterator: Iterator[String]) {
+class GameMap(val width: Short,
+              val height: Short,
+              val playerId: Short,
+              val metadataIterator: Iterator[String]) {
   DebugLog.addLog("--- NEW TURN ---")
   var players: Seq[Player] = {
     val numberOfPlayers = MetadataParser.parsePlayerNum(metadataIterator)
@@ -17,36 +24,39 @@ class GameMap(val width: Short, val height: Short, val playerId: Short, val meta
     def getPlayerFromMetadata: Player = {
       val playerId = MetadataParser.parsePlayerId(metadataIterator)
       val ships = MetadataParser.getShipList(Some(playerId), metadataIterator)
-      new Player(playerId, ships.map(ships => ships.getId -> ships).toMap)
+      new Player(playerId, ships.map(ships => ships.id -> ships).toMap)
     }
 
     for (counter <- 1 to numberOfPlayers) yield getPlayerFromMetadata
   }
   DebugLog.addLog("Players: " + players)
 
-  var planets = {
+  var planets: Map[Long, Planet] = {
     val numberOfPlanets = metadataIterator.next.toLong
-    (for (counter <- 1 to numberOfPlanets.toInt) yield MetadataParser.newPlanetFromMetadata(metadataIterator)).map(planet => planet.getId -> planet).toMap
+    (for (counter <- 1 to numberOfPlanets.toInt)
+      yield MetadataParser.newPlanetFromMetadata(metadataIterator))
+      .map(planet => planet.id -> planet)
+      .toMap
   }
   DebugLog.addLog("Planets: " + planets)
 
-  if (!metadataIterator.isEmpty) throw new IllegalStateException("Failed to parse data from Halite game engine. Please contact maintainers.")
+  if (!metadataIterator.isEmpty) {
+    throw new IllegalStateException(
+      "Failed to parse data from Halite game engine. Please contact maintainers.")
+  }
 
   var allShips: Seq[Ship] = {
     def getShipsFromPlayers(players: Seq[Player], shipAccum: Seq[Ship]): Seq[Ship] = {
-      if (players.isEmpty)
+      if (players.isEmpty) {
         shipAccum
-      else
+      } else {
         getShipsFromPlayers(players.tail, players.head.getShips.values.toSeq ++ shipAccum)
+      }
     }
 
     getShipsFromPlayers(players, Seq.empty)
   }
   DebugLog.addLog("All ships: " + allShips)
-
-  def getHeight: Short = height
-
-  def getWidth: Short = width
 
   def getAllPlayers: Seq[Player] = players
 
@@ -55,7 +65,8 @@ class GameMap(val width: Short, val height: Short, val playerId: Short, val meta
   def getMyPlayerId: Short = playerId
 
   @throws[IndexOutOfBoundsException]
-  def getShip(playerId: Short, entityId: Long): Option[Ship] = players(playerId).getShip(entityId)
+  def getShip(playerId: Short, entityId: Long): Option[Ship] =
+    players(playerId).getShip(entityId)
 
   def getPlanet(entityId: Long): Planet = planets(entityId)
 
@@ -64,7 +75,8 @@ class GameMap(val width: Short, val height: Short, val playerId: Short, val meta
   def getAllShips: Seq[Ship] = allShips
 
   def objectsBetween(start: Position, target: Position): Iterable[Entity] = {
-    GameMap.addEntitiesBetween(start, target, planets.values) ++ GameMap.addEntitiesBetween(start, target, allShips)
+    GameMap.addEntitiesBetween(start, target, planets.values) ++ GameMap
+      .addEntitiesBetween(start, target, allShips)
   }
 
   def nearbyEntitiesByDistance(entity: Entity): Map[Double, Entity] = {
@@ -73,9 +85,9 @@ class GameMap(val width: Short, val height: Short, val playerId: Short, val meta
       .map(planet => entity.getDistanceTo(planet) -> planet)
       .toMap[Double, Entity]
       ++
-      allShips
-        .filter(_ != entity)
-        .map(planet => entity.getDistanceTo(planet) -> planet)
-        .toMap[Double, Entity])
+        allShips
+          .filter(_ != entity)
+          .map(planet => entity.getDistanceTo(planet) -> planet)
+          .toMap[Double, Entity])
   }
 }

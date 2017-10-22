@@ -94,10 +94,15 @@ group ${CGROUP} {
                 cpu.shares="1024";
         }
         memory {
-                memory.limit_in_bytes=$((350*1024*1024));
+                memory.limit_in_bytes="1G";
         }
         devices {
                 devices.allow="a *:* rwm";
+        }
+        cpuset {
+               cpuset.cpu_exclusive=1;
+               cpuset.cpus=${i};
+               cpuset.mems=0;
         }
 }
 EOF
@@ -133,7 +138,7 @@ sudo iptables -A OUTPUT -d 10.0.0.0/8 -m owner --uid-owner bot_compilation -j DR
 ## Grant sudo access to the worker as this user.
 sudo sh -c "echo \"worker ALL=(bot_compilation) NOPASSWD: ALL\" > /etc/sudoers.d/worker_bot_compilation"
 ## Grant sudo access to the cgroup fixer script as root.
-sudo sh -c "echo \"worker ALL=(root) NOPASSWD: /home/worker/fix_cgroups.sh\" > /etc/sudoers.d/worker_bot_compilation"
+sudo sh -c "echo \"worker ALL=(root) NOPASSWD: /home/worker/fix_cgroups.sh\" >> /etc/sudoers.d/worker_bot_compilation"
 sudo chmod 0400 /etc/sudoers.d/worker_bot_compilation
 
 ## Create four users to isolate bots.

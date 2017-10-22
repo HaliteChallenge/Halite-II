@@ -89,7 +89,7 @@
                 </div>
                 <div class="stats-1-section">
                     <i class="xline xline-top"></i>
-                    <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>             
+                    <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>
                     <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Rank</h3>
@@ -412,7 +412,7 @@
 
                                 <div v-if="!hackathons.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/temp/event.png`" class="icon-"></img>
-                                    <h2>No part of any Hackathons yet</h2>
+                                    <h2>Not part of any Hackathons yet</h2>
                                     <p v-if="is_my_page">If you have a Hackthon code, add it to your <br/>your profile</p>
                                     <div v-if="is_my_page" class="ha-button-container">
                                         <div>

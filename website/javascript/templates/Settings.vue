@@ -20,7 +20,7 @@
                      Note: Once you close this page, you will not be able to retrieve that key again. You will need to generate a new one.
                 </p>
                 <form>
-                    <input style="color: black; max-width: 400px" type="text" class="form-control" readonly :value="api_key"/>
+                    <input v-if="api_key" style="color: black; max-width: 400px" type="text" class="form-control" readonly :value="api_key"/>
                     <button class="btn-ha btn-ha-md" style="margin-top:20px;" v-on:click="fetchApiKey">Generate API Key</button>
                 </form>
 
@@ -72,7 +72,7 @@ export default {
           gpu_states: [],
           error: null,
           user: null,
-          api_key: ''
+          api_key: null,
         }
   },
       mounted: function () {

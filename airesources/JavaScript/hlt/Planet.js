@@ -1,34 +1,38 @@
-class Planet {
-    constructor(params) {
+const Entity = require('./Entity');
+
+class Planet extends Entity {
+    /**
+     * @param {GameMap} gameMap map this planet belongs to
+     * @param {object} params planet information
+     */
+    constructor(gameMap, params) {
+        super(params);
         this._params = params;
+        this._gameMap = gameMap;
     }
 
-    get owned() {
-        return this.ownerId !== null
+    /**
+     * Determines if the planet has an owner.
+     * @returns {boolean} true if planet is owned
+     */
+    isOwned() {
+        return !!this.ownerId;
+    }
+
+    /**
+     * Determines if the planet is free.
+     * @returns {boolean} true if planet is free
+     */
+    isFree() {
+        return !this.ownerId;
     }
 
     get ownerId() {
         return this._params.ownerId;
     }
 
-    get id() {
-        return this._params.id;
-    }
-
-    get x() {
-        return this._params.xPos;
-    }
-
-    get y() {
-        return this._params.yPos;
-    }
-
-    get radius() {
-        return this._params.radius;
-    }
-
-    get health() {
-        return this._params.health;
+    get owner() {
+        return this._gameMap.shipById(this.ownerId);
     }
 
     get dockingSpots() {
@@ -43,8 +47,20 @@ class Planet {
         return this._params.remainingProduction;
     }
 
+    /**
+     * docked ship ids
+     * @returns {number[]}
+     */
     get dockedShipIds() {
         return this._params.dockedShipIds;
+    }
+
+    /**
+     * docked ships instances
+     * @returns {Ship[]}
+     */
+    get dockedShips() {
+        return this._gameMap.shipsById(this.dockedShipIds);
     }
 
     toString() {

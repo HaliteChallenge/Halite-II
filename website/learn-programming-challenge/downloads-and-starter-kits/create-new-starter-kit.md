@@ -26,7 +26,7 @@ Please try to generally adhere to the API used in [Python3 starter kit](https://
 - map.obstacles_between([ship object], [target entity object], [object types to ignore]): Return a list of all entity objects between the ship and selected target
 - A player object, with the following variables: id
 - player.get_ship([ship id]): Returns the ship object aposite the ship id, which the player posesses
-- player.all_ships(): Return a list of all (living) ships the player posesses
+- player.all_ships(): Return a list of all (living) ships the player possesses
 - entity object, with the following variables: x, y, radius, health, player, id
 - entity.calculate_distance_between([target object]): Calculate the distance between the entity and the target object
 - entity.calculate_angle_between([target object]): Calculate the angle between the entity and the target object
@@ -65,7 +65,7 @@ The map tokens are divided by specified "containers." Each container represents 
 #### Player
 Note that items here are space delimited.
 1. Number of players: "[(integer) number of players]"
-2-5 (this may be between 1 and 4 items). Single player object containing the player's id, and the player's ships (this object is exponded on the next section): "[(integer) player id] [(ship) ships]"
+2-5 (this may be between 1 and 4 items). Single player object containing the player's id, and the player's ships (this object is expanded on the next section): "[(integer) player id] [(ship) ships]"
 
 #### Ship
 The ships as extracted from player objects, and represented as follows:

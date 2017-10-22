@@ -57,4 +57,4 @@ It can be hard to get started with Halite II - there are rules to learn, setup t
 [login]: {{ site.login_server_url }}/github
 [edit profile]: /user/edit-user
 [game example]: /play/?game_id=1656492
-[improve bot]: /learn-programming-competition/downloads-and-starter-kits/improve-basic-bot
+[improve bot]: /learn-programming-challenge/downloads-and-starter-kits/improve-basic-bot

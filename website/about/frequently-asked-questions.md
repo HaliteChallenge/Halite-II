@@ -28,9 +28,9 @@ Due to the success of Halite I, Two Sigma decided to create a new iteration of H
 
 ### How are rankings computed?
 
-Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating systemused for chess.
+Rankings are based on the outcome of organized games where bots play against each other. A good analogy is the Elo rating system used for chess.
 
-Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was reset. For Halite II, player ratings will only be reset when a user adds a new bot, not when a user replaces an existing bot. [Learn more](https://github.com/twosigma/Halite-II/blob/master/admin/docs/Ranking.md){:target="_blank"}.
+Bot rankings are computed using a Bayesian algorithm variant of the Glicko system, specifically using the TrueSkill Python library with some adjustments. The game coordinator picks groups of 2 or 4 bots to compete against each other at a time, and uses TrueSkill to update the bot ranking based on the match outcome. In Halite I, when a player submitted a bot, their rating was completely reset, for Halite II, we only reduce the rating by a constant factor and not to zero.
 
 Tiers are based on the percentile rank. The top 1/512 players are considered Platinum;the next 1/256 are considered Diamond, then the next 1/128 are Gold, 1/64 are Silver, and the rest are Bronze.
 
@@ -40,11 +40,11 @@ Winners are simply the highest ranked players on the leaderboard at the end of t
 
 ### Is there a prize for the winners?
 
-Pride! Bragging rights! Appreciation from the TS team! We are also introducing a number of badges and awards this year, [learn more here](https://docs.google.com/spreadsheets/d/162pBdYhbw60fX_rYpuknCs056rRM3dsFICglwfzRn_E/edit?usp=sharing){:target="_blank"}.
+Pride! Bragging rights! Appreciation from the TS team!
 
 ### What information do you store about me?
 
-We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth as well as any information you provide in your user profile. You can learn more in our [privacy policy][privacy].
+We store the email, username, and unique identifier that Github provides when you login to the halite.io website via Github OAuth as well as any information you provide in your user profile. You can learn more in our [privacy policy][/about/privacy].
 
 ### How do you determine my organization?
 
@@ -75,6 +75,6 @@ Halite reads commands from your bot's stdout and stderr, so anything else writte
 
 We recommend you suppress this output. Most frameworks allow you to change the verbosity, or change where output is redirected to. In some cases (e.g. Keras), you may need to monkeypatch stderr/stdout temporarily to another location when importing/using them.
 
-[privacy]: {{ site.baseurl }}/privacy-policy
+[privacy]: {{ site.baseurl }}/about/privacy-policy
 [learn]: {{ site.baseurl }}/learn-programming-challenge
 [downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots

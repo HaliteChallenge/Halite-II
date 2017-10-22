@@ -482,7 +482,7 @@ int Networking::handle_init_networking(hlt::PlayerId player_tag,
                                        const hlt::Map& m,
                                        bool ignoreTimeout,
                                        std::string* playerName) {
-    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 30000;
+    const int ALLOTTED_MILLIS = ignoreTimeout ? 2147483647 : 60000;
 
     std::string response;
     nlohmann::json init_log_json;

@@ -8,7 +8,7 @@ content: website
 ---
 
 ## Hardware
-All compilation and games are run in Google Cloud Compute Engine instances with 1 vCPU and 2.5 GB memory.
+All compilation and games are run in Google Cloud Compute Engine instances with 4 vCPU and 6 GB memory. The GPU workers have an additional 4 NVIDIA Tesla K80 GPUS in addition to the base specs.
 
 ## Compute and Memory per bot
 Bots are given 350 MB of RAM and equal amounts of CPU.
@@ -19,9 +19,46 @@ Games are always run using the most recent environment build.
 ## Compilation
 Bot compilation is done using this [autocompile script][autocompile-script]{:target="_blank"}.
 
-For more details on customizing your bot, see our guide [here](downloads-and-starter-kits/customize-bot).
+For more details on customizing your bot, see our guide [here](/learn-programming-challenge/downloads-and-starter-kits/customize-bot).
 
-Both Python 3.5 and 3.6 are installed. To use 3.6, you will have to explicitly use a `run.sh` file to invoke `python3.6`.
+## Languages Installed
+The following languages are preinstalled on the game servers:
+
+- Ada
+- CoffeeScript
+- C
+- C++
+- Clojure
+- Dart
+- DMD
+- Erlang
+- Go
+- Groovy
+- Haskell (GHC)
+- Java 8
+- Julia
+- Ocaml
+- Pascal
+- Php
+- Ruby
+- SBCL
+- Scala
+- Tcl 8.5
+- MIT Scheme
+- Mono (.NET)
+- Node-js
+- Python 3.6
+- Racket
+- Rust
+- Octave
+- Lua 5.2
+
+## Libraries
+The following libraries and packages are also preinstalled:
+
+Python: Numpy, Scipy, Scikit-learn, Pillow, H5py, Tensorflow, Keras, Theano, Shapely, Cython, Pandas
+
+Ruby: Bundler
 
 ## GPU-Enabled Games
 
@@ -29,9 +66,6 @@ The following packages are available during __runtime__ (__not__ compile time) f
 
 - cuda	8.0.61-1
 - libcupti-dev:amd64	8.0.44-3
-
-Python 3.5 Packages:
-- tensorflow-gpu 1.2.1
 
 Python 3.6 Packages:
 - tensorflow-gpu 1.2.1

@@ -140,6 +140,7 @@
   .game-replay-controller {
     position: relative;
     width: 100%;
+    @extend .noselect;
     @media (min-width: $screen-sm-min){
       height: 60px;
     }
@@ -166,6 +167,7 @@
         width: 100%;
         padding-top: 10px;
         padding-bottom: 10px;
+
         @media (min-width: $screen-sm-min){
           width: 200px;
           padding-top: 0;
@@ -347,8 +349,13 @@
 
 
 // slider component
+.vue-slider-component{
+  cursor: pointer !important;
+  * {
+    cursor: pointer !important;
+  }
+}
 .vue-slider-component .vue-slider-dot{
-
 }
 .vue-slider-component.vue-slider-horizontal .vue-slider-dot{
   left: 4px;

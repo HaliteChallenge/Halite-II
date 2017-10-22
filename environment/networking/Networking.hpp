@@ -34,7 +34,7 @@ extern bool quiet_output;
  */
 constexpr auto SERIALIZATION_PRECISION = 4;
 
-constexpr auto INIT_TIME_LIMIT = std::chrono::seconds{30};
+constexpr auto INIT_TIME_LIMIT = std::chrono::seconds{60};
 constexpr auto FRAME_TIME_LIMIT = std::chrono::milliseconds{2000};
 constexpr auto UNLIMITED_TIME = std::chrono::hours{24};
 // Well, close enough to unlimited anyways.

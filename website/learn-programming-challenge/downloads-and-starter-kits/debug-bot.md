@@ -12,7 +12,7 @@ The are primarily 3 different kinds of issues you will run into after your bot s
 
 If you bot fails compilation, you will get an email to that effect. The most common issues that cause compilation failures are given below.
 
-1. **Incorrect bot archive structure:** If you dont adhere to the guidelines specified in our [submit a bot guide](submit-bot) guide, your bot will fail to compile and you will get an email to that effect. Once you fix up your bot submission structure, this issue should resolve automatically.
+1. **Incorrect bot archive structure:** If you don't adhere to the guidelines specified in our [submit a bot guide](submit-bot) guide, your bot will fail to compile and you will get an email to that effect. Once you fix up your bot submission structure, this issue should resolve automatically.
 
 2. **Infrastructure Issues:** If you are submitting a bot in a unsupported language or trying to use a library/dependency that is not pre-installed on our servers, you will have to either add a custom `install.sh` and `run.sh` script to add these dependencies, and start your bot with a custom runtime. You can also reach out to the [Halite Team](mailto:halite@halite.io) to add first class support for your bot. To read more about customizing a bot, checkout out our guide [here](customize-bot).
 
@@ -38,7 +38,7 @@ Another class of failures is errors during game execution.
 
 * **Incorrect commands:** The most common reason for this is are custom functions that you might have written to send moves to the Game engine. These commands might be formatted incorrectly or contain characters that are not allowed by the game engine.
 
-* **Out of memory**: Bots have a specific memory limit and if they exceed this limit, they are killed. To read more about resource limits for bots, see our guide [here](learn-programming-language/other-resources/game-servers).
+* **Out of memory**: Bots have a specific memory limit and if they exceed this limit, they are killed. To read more about resource limits for bots, see our guide [here](/learn-programming-challenge/other-resources/game-servers).
 
 The easiest way to debug these issues is to look into the game logs. More information about game logs is available in the below section.
 

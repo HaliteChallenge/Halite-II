@@ -1,52 +1,56 @@
 ---
 layout: doc_page
 title: Bot Bosses
-toc: false
 description: Some Two Sigma bots to beat as you progress in the competition
+image: assets/images/temp/bot_1.png
+content: website
 sort_key: 1
 ---
 
-While our matchmaking does not gaurantee that you will play against these bots, these bots are a good indication of how your strategies compare to some of the bots that we think falls into difficulty levels.
+While our matchmaking does not guarantee that you will play against these bots, these bots are a good indication of how your strategies compare how we think about difficulty levels.
+
+As the game evolves, we expect some of these bots to drop their existing ranks fast. Check out where they are in the [leaderboard](/programming-competition-leaderboard?username=tsadmiral,tscaptain,tscommander,tscommander-ml) now.
 
 
+## Halite Bosses
 
-## Policy Bosses
-These bots are based on strategies derived from micro-managing pieces and some cost function optimizations.
-
-### tsadmiral
-
-**Level:** `Advanced`
-
-An advanced bot that was ranked top 3 in our short internal hackathon. Advanced micro-management of with an emphaiss on decision making.
-
-[See profile](/user/?user_id=1157)
-
-### tscommander
-
-**Level:** `Intermediate`
-
-A simple optimization of the strategy in the standard settler bots in the starter kits. This bot beats settlers easily.
-
-[See profile](/user/?user_id=1156)
-
-### tscaptain 
-
-**Level:** `Beginner`
-
-A more advanced bot that was ranked highly in our short internal hackathon. Significant micro-management of ships with a evolved cost function.
-
-[See profile](/user/?user_id=1157)
-
-
-## Machine Learning Bots
-ML bots written by the deep learning team at Two Sigma in our short internal hackathon.
-
-### tscommander-ml
-
-**Level:** `Beginner`
-
-A simple optimization of the strategy in the standard settler bots in the starter kits. This bot beats settlers easily.
-
-[See profile](/user/?user_id=1154)
+<div>
+    <table class="table table-leader" style="color:white;">
+        <thead>
+            <tr>
+                <th>Boss</th>
+                <th>Difficulty</th>
+                <th>Description</th>
+                <th>Profile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Admiral</td>
+                <td>Advanced</td>
+                <td>An advanced bot that was ranked top 3 in our short internal hackathon. Advanced micro-management of with an emphasis on decision making.</td>
+                <td><a href="/user/?user_id=1157">tsadmiral</a></td>
+            </tr>
+            <tr>
+                <td>Captain</td>
+                <td>Advanced</td>
+                <td>An intermediate bot that was ranked in the top 10 in our internal hackathon with significantly better micro-management of ships and path finding.</td>
+                <td><a href="/user/?user_id=1155">tscaptain</a></td>
+            </tr>
+            <tr>
+                <td>Commander</td>
+                <td>Beginner</td>
+                <td>A simple optimization of the strategy in the standard settler bots in the starter kits. This bot beats settlers easily.</td>
+                <td><a href="/user/?user_id=1156">tscommander</a></td>
+            </tr>
+            <tr>
+                <td>ML-Commander</td>
+                <td>Beginner</td>
+                <td>ML starter bot written by the Two Sigma team trained against some of the bots in our internal hackathon.</td>
+                <td><a href="/user/?user_id=1205">tscommander-ml</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 

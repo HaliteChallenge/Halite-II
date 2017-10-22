@@ -30,7 +30,7 @@ while True:
     command_queue = []
     # For every ship that I control
     for ship in game_map.get_me().all_ships():
-        # If the ship is undocked
+        # If the ship is docked
         if ship.docking_status != ship.DockingStatus.UNDOCKED:
             # Skip this ship
             continue

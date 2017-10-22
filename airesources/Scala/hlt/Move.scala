@@ -2,7 +2,7 @@ package hlt
 
 object Move {
 
-  def Values: List[MoveType] = List(Noop, Thrust, Dock, Undock)
+  def values: List[MoveType] = List(Noop, Thrust, Dock, Undock)
 
   sealed trait MoveType
 
@@ -16,8 +16,4 @@ object Move {
 
 }
 
-class Move(val `type`: Move.MoveType, val ship: Ship) {
-  def getType: Move.MoveType = `type`
-
-  def getShip: Ship = ship
-}
+class Move(val moveType: Move.MoveType, val ship: Ship)
