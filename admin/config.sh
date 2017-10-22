@@ -5,7 +5,7 @@ GCLOUD_ZONE="us-east1-b"
 GCLOUD_GPU_ZONE="us-east1-c"
 
 WEBSITE_MACHINE_TYPE="n1-standard-2"
-MACHINE_TYPE="custom-1-2560"
+MACHINE_TYPE="custom-4-6144"
 GPU_MACHINE_TYPE=${MACHINE_TYPE}
 IMAGE="halite-worker"
 GPU_IMAGE="halite-gpu-worker"

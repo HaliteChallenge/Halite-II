@@ -11,8 +11,7 @@ In this tutorial, we’ll add a couple heuristics to the basic bot. This will ho
 
 ## Prerequisites for this Tutorial
 
-Make sure you have read our [basic instructions]({{ site.baseurl }}/learn-programming-challenge/) and followed the steps to download your bot. Also, make sure you [understand the basic bot structure](understand_your_bot.md)
-Now open the `MyBot.py` file in your favorite editor and let’s get started!
+Make sure you have read our [basic instructions]({{ site.baseurl }}/learn-programming-challenge/) and followed the steps to download your bot. Now open the `MyBot.py` file in your favorite editor and let’s get started!
 
 ## Tips for beginners
 

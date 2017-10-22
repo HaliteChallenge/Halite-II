@@ -94,10 +94,15 @@ group ${CGROUP} {
                 cpu.shares="1024";
         }
         memory {
-                memory.limit_in_bytes=$((350*1024*1024));
+                memory.limit_in_bytes="1G";
         }
         devices {
                 devices.allow="a *:* rwm";
+        }
+        cpuset {
+               cpuset.cpu_exclusive=1;
+               cpuset.cpus=${i};
+               cpuset.mems=0;
         }
 }
 EOF

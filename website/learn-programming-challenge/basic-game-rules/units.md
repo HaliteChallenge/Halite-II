@@ -21,8 +21,8 @@ Space is a 2D grid, where grid cells (not grid points) are identified by an X an
 The basic unit of your fleet; a [nimble ship](the-halite-codex) built by depositing layers of pure Halite You start with three, but you'll want to make more.
 
 <div class="static-container text-center">
-    <img style="width: 40%;height: auto;" src="/assets/images//tutorial-images/ship-movement.gif">
-    <img style="width: 40%;height: auto;" src="/assets/images//tutorial-images/ship-combat.gif">
+    <img style="width: 40%;height: auto;" src="https://storage.cloud.google.com/halite-content/ship-movement.gif">
+    <img style="width: 40%;height: auto;" src="https://storage.cloud.google.com/halite-content/ship-combat.gif">
 </div>
 
 ### Properties
@@ -113,7 +113,7 @@ The basic unit of your fleet; a [nimble ship](the-halite-codex) built by deposit
 The basic unit that generates Halite ships, you can conquer planets, fight other plays for control of planets and dock to generate more ships from the Halite. Resources are essentially infinite for all planets, the larger the planet the more ships that can dock to it and corresponding generate more ships per turn.
 
 <div class="static-container text-center">
-    <img style="width: 50%;height: auto;" src="/assets/images//tutorial-images/planet-production.gif">
+    <img style="width: 50%;height: auto;" src="https://storage.cloud.google.com/halite-content/planet-production.gif">
 </div>
 
 ### Properties

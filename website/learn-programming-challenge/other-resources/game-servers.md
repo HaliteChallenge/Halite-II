@@ -8,7 +8,7 @@ content: website
 ---
 
 ## Hardware
-All compilation and games are run in Google Cloud Compute Engine instances with 1 vCPU and 2.5 GB memory.
+All compilation and games are run in Google Cloud Compute Engine instances with 4 vCPU and 6 GB memory. The GPU workers have an additional 4 NVIDIA Tesla K80 GPUS in addition to the base specs.
 
 ## Compute and Memory per bot
 Bots are given 350 MB of RAM and equal amounts of CPU.
@@ -19,7 +19,7 @@ Games are always run using the most recent environment build.
 ## Compilation
 Bot compilation is done using this [autocompile script][autocompile-script]{:target="_blank"}.
 
-For more details on customizing your bot, see our guide [here](downloads-and-starter-kits/customize-bot).
+For more details on customizing your bot, see our guide [here](/learn-programming-challenge/downloads-and-starter-kits/customize-bot).
 
 ## Languages Installed
 The following languages are preinstalled on the game servers:

@@ -14,7 +14,7 @@ This bot is playing under [tscaptain-ml](/user/?user_id=1154) in the global lead
 Download the bot [here](/learn-programming-challenge/downloads-and-starter-kits/)
 
 <div class="static-container text-center">
-    <img style="width: 60%;height: auto;" src="/assets/images//tutorial-images/mlbotpreview.gif">
+    <img style="width: 60%;height: auto;" src="https://storage.cloud.google.com/halite-content/mlbotpreview.gif">
 </div>
 
 ## Bot Strategy

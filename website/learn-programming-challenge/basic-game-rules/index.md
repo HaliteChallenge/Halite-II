@@ -5,7 +5,7 @@ toc: false
 description: Get an introduction to the rules of the game to win the Halite AI Programming Challenge.
 sort_key: 0
 ---
-Here is a quick overview of the rules of Halite II. If you want to get into the nitty-gritty, check out our [Game Rules Deep Dive][Deep Dive].
+Here is a quick overview of the rules of Halite II. If you want to get into the nitty-gritty, check out our [Game Rules Deep Dive][game-rules-deep-dive].
 
 ## Map at Game Start
 Halite II is played on 2D map, which is set up as a continuos Cartesian plane (think of it has having x/y axes). The map is like a virtual game board, and does not wrap, meaning that game pieces can fall off the edges of the board, they don't appear on the opposite side like an old school arcade game.

@@ -56,7 +56,7 @@ We've created a lot of other documents for you to learn how to play Halite. If y
 [play]: {{ site.baseurl }}/play-programming-challenge
 [submit]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits/submit
 [leaderboard]: {{ site.baseurl }}/programming-competition-leaderboard
-[game rules]: {{ site.baseurl }}/learn-programming-challenge/game-rules
+[game rules]: {{ site.baseurl }}/learn-programming-challenge/basic-game-rules
 [profile]: /user/?me
-[improve bot]: /learn-programming-competition/downloads-and-starter-kits/improve-basic-bot
+[improve bot]: /learn-programming-challenge/downloads-and-starter-kits/improve-basic-bot
 [david game]: /play/?game_id=1658857&replay_class=0&replay_name=replay-20171016-183304%2B0000--998929535-240-160-1508178764
