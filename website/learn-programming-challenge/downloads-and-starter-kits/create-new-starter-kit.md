@@ -60,7 +60,7 @@ Of course, if changes to this API will make the starter package fit more nicely 
 Bots communicate with the environment via stdin and stdout using series of space separated integers. There are two stages of communication - initialization and turn formats, and these are detailed below.
 
 ### Initialization
-At the beginning of the game, bot is sent the following, with each item newline-terminated:
+At the beginning of the game, bot is sent the following, finalized with a newline termination:
 
 - A single integer representing their own tag within the game.
 - Two integers representing the WIDTH and HEIGHT of the map.
@@ -89,14 +89,14 @@ The planet object is extracted following the complete player objects:
 2-32767 (this may be between 1 and 32767 items). Singple planet object containing planet id, x coordinate, y coordinate, health, radius, number of docking spots, current production, remaining production (deprecated), health, whether the planet is owned, planet owner, number of docked ships, and the ids of those ships: [(integer) planet id], [(floating point) x], [(floating point) y], [(integer) health], [(floating point) radius], [(integer) docking], [(integer) current], [(integer) remaining], [(integer) is owned], [(integer) owner id], [(integer) number of docked ships] [(integer) id of ship 0] ... [(integer) id of ship x]
 
 ### Move command format
-The move command, like all other commands, is comma separated and each command is distinct due to line delimiting. It is formatted as follows:
+The move command, like all other commands, is space separated and each turn's command is distinct due to line delimiting. It is formatted as follows:
 
 "t [(integer) ship id] [(integer) speed] [(integer) angle]"
 
 Wherein the speed signifies the distance traversed in one turn and the angle is a number between 0 and 259 (inclusive) represented in degrees.
 
 ### Dock command format
-The dock command, like all other commands, is comma separated and each command is distinct due to line delimiting. It is formatted as follows:
+The dock command, like all other commands, is space separated and each turn's command is distinct due to line delimiting. It is formatted as follows:
 
 "d [(integer) ship id] [(integer) planet id]"
 
