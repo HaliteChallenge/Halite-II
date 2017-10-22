@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Customize your bot
+title: Customize your Bot Submission
 description: Overview of how to customize your bot submission with dependencies, language names and more.
 image: assets/images/temp/bot_1.png
 content: website
