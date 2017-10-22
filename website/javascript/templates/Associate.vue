@@ -230,7 +230,7 @@ export default {
             Alert.show(message, 'success', true)
             this.gaData('account', 'new-account-success', 'account-flow')
             setTimeout(() => {
-            window.location.replace('/learn-programming-challenge/?new=1')
+            window.location.replace('/learn-programming-challenge')
             }, 3000)
           }, (error) => {
             const errorMessage = error.responseJSON
