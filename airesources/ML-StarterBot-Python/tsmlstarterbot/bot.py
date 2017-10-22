@@ -1,4 +1,5 @@
 import heapq
+import numpy as np
 import os
 import time
 
@@ -6,20 +7,22 @@ import hlt
 from tsmlstarterbot.common import *
 from tsmlstarterbot.neural_net import NeuralNet
 
-
 class Bot:
     def __init__(self, location, name):
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        self._model_location = os.path.join(current_directory, os.path.pardir, "models", location)
+        model_location = os.path.join(current_directory, os.path.pardir, "models", location)
         self._name = name
+        self._neural_net = NeuralNet(cached_model=model_location)
+
+        # Run prediction on random data to make sure that code path is executed at least once before the game starts
+        random_input_data = np.random.rand(PLANET_MAX_NUM, PER_PLANET_FEATURES)
+        predictions = self._neural_net.predict(random_input_data)
+        assert len(predictions) == PLANET_MAX_NUM
 
     def play(self):
         """
         Play a game using stdin/stdout.
         """
-
-        # Load the model before calling hlt.Game since after that you have limited time to respond.
-        nn = NeuralNet(cached_model=self._model_location)
 
         # Initialize the game.
         game = hlt.Game(self._name)
@@ -33,7 +36,7 @@ class Bot:
             features = self.produce_features(game_map)
 
             # Find predictions which planets we should send ships to.
-            predictions = nn.predict(features)
+            predictions = self._neural_net.predict(features)
 
             # Use simple greedy algorithm to assign closest ships to each planet according to predictions.
             ships_to_planets_assignment = self.produce_ships_to_planets_assignment(game_map, predictions)
