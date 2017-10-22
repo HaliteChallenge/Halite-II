@@ -38,7 +38,13 @@ Halite I was especially successful because of its robust forum community. Any pl
 To help productize and orchestrate the public launch, Two Sigma reached out to [Cornell Tech](https://tech.cornell.edu/){:target="_blank"}, a leader in graduate tech education. With a shared interest in encouraging programming, entrepreneurship, and growth of the thriving New York tech scene, the two partners initiated the public Halite competition in November 2016. Cornell Tech is providing ongoing game support and community management, and by working closely with the online gaming community, it will empower players to collaborate, learn and have fun. Additional partners have since joined the efforts to make programming more fun. This year, as part of [Product Studio](https://tech.cornell.edu/studio/curriculum/product-studio){:target="_blank"}, a group of Cornell Tech masters students are building "Halite for Kids", a version of Halite that can be taught in middle schools.
 
 ## OUR TEAM
-Many have contributed to Halite since Ben and Michael’s invention; in addition to the Halite II core team (David Li, Jaques Clapauch, Harikrishna Menon, and Julia Kastner), they include Camille Fournier,  Alfred Spector, Matt Adereth, Trammel Hudson, Emily Malloy, Arnaud Sahuguet, Serguei Narojnyi, Xinyun Wu, Barbara Zhan, Georgi Georgiev, Jason Zhang, Nick Vrilo, Tuan Anh Hoang-Vu, and Scott Rich. And, no doubt, much credit should also be provided to users who are sending questions and comments to the forums.
+Many have contributed to Halite since Ben and Michael’s invention; in addition to the Halite II core team (David Li, Jaques Clapauch, Harikrishna Menon, and Julia Kastner), there were many other major contributors to Halite II.
+
+### Two Sigma Contributors:
+Camille Fournier, Alfred Spector, Serguei Narojnyi, Xinyun Wu, Barbara Zhan, Georgi Georgiev, Jason Zhang, Nick Vrilo, Tuan Anh Hoang-Vu, Scott Rich, Paul Butler, Scott Lynch, Nick Golubyev, and many more who gave feedback during our internal competition.
+
+### External and Community Contributors:
+Special thanks to Arnaud Sahuguet, Janzert, Erik Wickerman, Raymond Shumm, Nick Malaguti, Mike Chase and Arjun Viswanathan, as well as to all the users who provided questions and comments to the forums and other conversations with the Halite Team.
 
 ## May the best bot win!
 
