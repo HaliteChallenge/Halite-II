@@ -6,7 +6,7 @@ public class Constants {
     // Implementation-independent language-agnostic constants
 
     /** Games will not have more players than this */
-    public static final int MAXIMUM_NUMBER_OF_PLAYERS = 4;
+    public static final int MAX_PLAYERS = 4;
 
     /** Max number of units of distance a ship can travel in a turn */
     public static final int MAX_SPEED = 7;

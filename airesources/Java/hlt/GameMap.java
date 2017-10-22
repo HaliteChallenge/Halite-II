@@ -23,7 +23,7 @@ public class GameMap {
         this.width = width;
         this.height = height;
         this.playerId = playerId;
-        players = new ArrayList<>(Constants.MAXIMUM_NUMBER_OF_PLAYERS);
+        players = new ArrayList<>(Constants.MAX_PLAYERS);
         playersUnmodifiable = Collections.unmodifiableList(players);
         planets = new TreeMap<>();
         allShips = new ArrayList<>();
