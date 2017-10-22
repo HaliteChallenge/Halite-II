@@ -11,8 +11,8 @@ public class Constants {
     public static final int MAX_CORRECTIONS = 90;
     public static final int WEAPON_COOLDOWN = 1;
     public static final double WEAPON_RADIUS = 5.0;
-    public static final int WEAPON_DAMAGE = 48;
-    public static final double EXPLOSION_RADIUS = 5;
+    public static final int WEAPON_DAMAGE = 64;
+    public static final double EXPLOSION_RADIUS = 10;
 
     // for Position.getClosestPoint()
     public static final int MIN_DISTANCE = 3;
@@ -24,7 +24,7 @@ public class Constants {
     public static final int DOCK_TURNS = 5;
 
     // Number of turns it takes to create a ship per docked ship.
-    public static final int BASE_PRODUCTIVITY = 8;
+    public static final int BASE_PRODUCTIVITY = 6;
 
     // Distance from the planets edge at which new ships are created
     public static final int SPAWN_RADIUS = 2;
