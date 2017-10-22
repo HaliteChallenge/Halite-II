@@ -224,7 +224,7 @@ export default {
 
           //this.hackathon_error_message = ''
           api.register_me(request).then((response) => {
-            let message = 'You have updated your profile successfully. You will be redirected automatically in a few seconds';
+            let message = 'You have updated your profile successfully. You will be redirected automatically in a few seconds.';
             if (response.message)
               message += ' ' + response.message;
             Alert.show(message, 'success', true)

@@ -14,7 +14,7 @@ pub const WEAPON_RADIUS: f64 = 5.0;
 // Weapon damage
 pub const WEAPON_DAMAGE: i32 = 64;
 // Radius in which explosions affect other entities
-pub const EXPLOSION_RADIUS: i32 = 10;
+pub const EXPLOSION_RADIUS: f64 = 10.0;
 // Distance from the edge of the planet at which ships can try to dock
 pub const DOCK_RADIUS: f64 = 4.0;
 // Number of turns it takes to dock a ship
@@ -22,4 +22,4 @@ pub const DOCK_TURNS: i32 = 5;
 // Number of turns it takes to create a ship per docked ship
 pub const BASE_PRODUCTIVITY: i32 = 6;
 // Distance from the planets edge at which new ships are created
-pub const SPAWN_RADIUS: i32 = 2;
+pub const SPAWN_RADIUS: f64 = 2.0;

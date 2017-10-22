@@ -35,12 +35,12 @@ class Entity {
     }
 
     /**
-     * the angle between this object and the target in degrees
+     * the angle in degrees between this object and the target in degrees
      * @param {Entity} target target
-     * @return {number} angle
+     * @return {number} angle in degrees
      */
-    angleBetween(target) {
-        return Geometry.angleInRad(this, target);
+    angleBetweenInDegree(target) {
+        return Geometry.angleInDegree(this, target);
     }
 }
 

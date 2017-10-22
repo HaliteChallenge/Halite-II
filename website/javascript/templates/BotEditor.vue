@@ -17,14 +17,6 @@
                 <span id = "progressMessageDiv">Loading language tooling plugins...</span>
             </div>
         </div>
-        <!-- <div class="bot-code-controls" v-if="editorViewer">
-            <button v-on:click="download_bot">Download Bot Code</button>
-            <span v-if="logged_in">
-                <button v-on:click="upload_bot">Upload my bot!</button>
-                <span v-if="status_message">{{ status_message }}</span>
-            </span>
-            <span v-else>Log In to upload bot</span>
-        </div> -->
     </div>
 </template>
 

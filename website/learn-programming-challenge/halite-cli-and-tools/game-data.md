@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Game Download Tool
+title: Game Data
 toc: false
 sort_key: 3
 ---
@@ -15,3 +15,5 @@ There are 2 buckets where you can download these files. We are not planning to d
 * **Other tier games (silver and Bronze):** [gs://halite-2-replays](https://storage.cloud.google.com/halite-2-replays//)
 
 ## Tools
+
+In order to expedite your learning process, we provide you a very useful CLI to help you get started. With it you can automatically download bots as desired. You can find it [here](halite-client-tools.md).

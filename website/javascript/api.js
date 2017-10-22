@@ -315,6 +315,14 @@ export function getUserHackathons (userId) {
   })
 }
 
+export function getHackathons () {
+  return $.get({
+    url: `${API_SERVER_URL}/hackathon`,
+    xhrFields: {
+    }
+  })
+}
+
 export function getUserHistory (userId) {
   return $.get({
     url: `${API_SERVER_URL}/user/${userId}/history`,

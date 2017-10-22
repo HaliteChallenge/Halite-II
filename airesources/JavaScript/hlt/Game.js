@@ -1,3 +1,5 @@
+const Log = require('./Log');
+
 const Networking = require('./Networking');
 const GameMapParser = require('./GameMapParser');
 
@@ -12,24 +14,42 @@ class Game {
     static start(botName, strategy) {
         Networking.writeLine(botName);
 
-        Networking.readLine(line => {
-            mapParser = new GameMapParser(extractGameMeta(line));
+        let turnNumber = 1;
+        Networking.readNLines(2, lines => {
+            const parsedGameMeta = parseGameMeta(lines);
+
+            Log.init(botName + parsedGameMeta.myPlayerId + '.log');
+
+            Log.log('game meta:');
+            lines.forEach(line => Log.log(line));
+            Log.log(JSON.stringify(parsedGameMeta));
+
+            mapParser = new GameMapParser(parsedGameMeta);
 
             Networking.forEachReadLine(line => {
+                Log.log(`turn #${turnNumber}, map:`);
+                Log.log(line);
+
                 const map = mapParser.parse(line);
                 const moves = strategy(map);
+
                 Networking.sendMoves(moves.filter(m => m !== null));
+                Log.log('moves:');
+                Log.log(moves.join(' '));
+
+                turnNumber++;
             })
         });
     }
 }
 
-function extractGameMeta(line) {
-    const tokens = line.trim().split(' ');
+function parseGameMeta(lines) {
+    const playerId = parseInt(lines[0]);
+    const widthHeight = lines[1].trim().split(' ');
     return {
-        myPlayerId: parseInt(tokens[0]),
-        width: parseInt(tokens[1]),
-        height: parseInt(tokens[2])
+        myPlayerId: playerId,
+        width: parseInt(widthHeight[0]),
+        height: parseInt(widthHeight[1])
     }
 }
 

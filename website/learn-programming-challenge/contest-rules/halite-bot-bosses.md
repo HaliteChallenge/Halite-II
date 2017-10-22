@@ -14,8 +14,8 @@ As the game evolves, we expect some of these bots to drop their existing ranks f
 
 ## Halite Bosses
 
-<div>
-    <table class="table table-leader" style="color:white;">
+<div class="table-container">
+    <table class="table">
         <thead>
             <tr>
                 <th>Boss</th>

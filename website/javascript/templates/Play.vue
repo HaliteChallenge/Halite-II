@@ -24,7 +24,7 @@
             <Upload :logged-in="loggedIn"></Upload>
           </div>
           <div class="upload-note">
-            <p class="text-center">You can also submit a bot via our <a href="https://storage.cloud.google.com/halite-content/HaliteClient.zip">Halite Client Tool</a></p>
+            <p class="text-center">You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
           </div>
         </div>
         <div class="col-sm-6">

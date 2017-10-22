@@ -89,7 +89,6 @@ class Ship extends Entity {
         return `t ${this.id} ${magnitude | 0} ${angle | 0}`;
     }
 
-
     /**
      * Move a ship to a specific target position (Entity). It is recommended to place the position
      * itself here, else navigate will crash into the target. If avoidObstacles is set to true (default)
@@ -118,9 +117,8 @@ class Ship extends Entity {
                     ignorePlanets ? this._gameMap.shipsBetween(this, target) : [];
 
             if (obstacles.length) {
-                const newTarget = {id: target.id, ...Geometry.rotateEnd(this, target, angularStep)};
                 return this.navigate({
-                    target: newTarget,
+                    target: Geometry.rotateEnd(this, target, angularStep),
                     speed: speed,
                     avoidObstacles,
                     maxCorrections: maxCorrections - 1,
@@ -129,10 +127,10 @@ class Ship extends Entity {
         }
 
         const distance = this.distanceBetween(target);
-        const angle = this.angleBetween(target);
+        const angleDegree = this.angleBetweenInDegree(target);
 
         const newSpeed = distance >= speed ? speed : distance;
-        return this.thrust(newSpeed, angle);
+        return this.thrust(newSpeed, angleDegree);
     }
 
     toString() {

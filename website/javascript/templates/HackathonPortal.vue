@@ -107,15 +107,10 @@ export default {
       if (me !== null) {
         userId = me.user_id
       }
-      if (userId) {
-        api.getUserHackathons(userId).then(hackathons => {
+    })
+
+    api.getHackathons().then(hackathons => {
           this.populateHackathons(hackathons)
-        })
-      } else {
-        api.getHackathons().then(hackathons => {
-          this.populateHackathons(hackathons)
-        })
-      }
     })
   },
   methods: {
@@ -136,10 +131,10 @@ export default {
           wrapEvent.push(newEvent)
         })
 
-        // wrapEvent = 
 
         this.events = _.orderBy(wrapEvent, ['status', 'title'], ['asc', 'asc'])
       }
+
       this.showEvents = true
     },
     gaData: function (category, action, label) {

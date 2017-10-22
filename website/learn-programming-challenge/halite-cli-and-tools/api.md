@@ -1,6 +1,6 @@
 ---
 layout: doc_page
-title: Halite API
+title: Halite Rest API
 toc: false
 sort_key: 5
 ---
