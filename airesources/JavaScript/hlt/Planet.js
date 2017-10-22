@@ -16,7 +16,8 @@ class Planet extends Entity {
      * @returns {boolean} true if planet is owned
      */
     isOwned() {
-        return !!this.ownerId;
+        return this.ownerId !== null &&
+            typeof this.ownerId !== 'undefined';
     }
 
     /**
@@ -24,7 +25,8 @@ class Planet extends Entity {
      * @returns {boolean} true if planet is free
      */
     isFree() {
-        return !this.ownerId;
+        return this.ownerId === null ||
+            typeof this.ownerId === 'undefined';
     }
 
     get ownerId() {
