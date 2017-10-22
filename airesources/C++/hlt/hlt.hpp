@@ -1,10 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-//TODO add via add_definitions in cmake instead
-#define _USE_MATH_DEFINES
-#endif
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>

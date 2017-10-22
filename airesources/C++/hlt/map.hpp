@@ -1,10 +1,6 @@
 #ifndef HLT_H
 #define HLT_H
 
-#ifdef _WIN32
-#define _USE_MATH_DEFINES
-#endif
-
 #include <list>
 #include <cmath>
 #include <vector>
