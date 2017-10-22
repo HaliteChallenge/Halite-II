@@ -11,14 +11,14 @@ WEAPON_COOLDOWN = 1
 #: Weapon damage radius
 WEAPON_RADIUS = 5.0
 #: Weapon damage
-WEAPON_DAMAGE = 48
+WEAPON_DAMAGE = 64
 #: Radius in which explosions affect other entities
-EXPLOSION_RADIUS = 5
+EXPLOSION_RADIUS = 10
 #: Distance from the edge of the planet at which ships can try to dock
 DOCK_RADIUS = 4
 #: Number of turns it takes to dock a ship
 DOCK_TURNS = 5
 #: Number of turns it takes to create a ship per docked ship
-BASE_PRODUCTIVITY = 8
+BASE_PRODUCTIVITY = 6
 #: Distance from the planets edge at which new ships are created
 SPAWN_RADIUS = 2
