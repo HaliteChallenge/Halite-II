@@ -1,3 +1,5 @@
+const Geometry = require('./Geometry');
+
 class Entity {
     constructor(params) {
         this._params = params;
@@ -8,11 +10,11 @@ class Entity {
     }
 
     get x() {
-        return this._params.xPos;
+        return this._params.x;
     }
 
     get y() {
-        return this._params.yPos;
+        return this._params.y;
     }
 
     get radius() {
@@ -22,4 +24,24 @@ class Entity {
     get health() {
         return this._params.health;
     }
+
+    /**
+     * calculates the distance between this object and the target
+     * @param {Entity} target target
+     * @return {number} distance
+     */
+    distanceBetween(target) {
+        return Geometry.distance(this, target);
+    }
+
+    /**
+     * the angle between this object and the target in degrees
+     * @param {Entity} target target
+     * @return {number} angle
+     */
+    angleBetween(target) {
+        return Geometry.angleInRad(this, target);
+    }
 }
+
+module.exports = Entity;

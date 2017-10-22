@@ -1,7 +1,8 @@
 const Ship = require('./Ship');
 const Planet = require('./Planet');
-
 const Geometry = require('./Geometry');
+
+const constants = require('./Constants');
 
 class GameMap {
     constructor({myPlayerId, width, height}) {
@@ -41,13 +42,8 @@ class GameMap {
      * @see strategies.test.js
      */
     addPlayerShips(playerId, shipsParams) {
-        const withDefaults = {
-            health: 255,
-            dockingStatus: Ship.dockingStatus.UNDOCKED,
-            ...shipsParams};
-
         const existingShips = this._shipsByPlayerId[playerId] || [];
-        const newShips = withDefaults.map(p => new Ship(playerId, p));
+        const newShips = shipsParams.map(p => new Ship(this, playerId, p));
 
         this._shipsByPlayerId[playerId] = existingShips.concat(newShips);
         if (playerId !== this.myPlayerId) {
@@ -182,7 +178,7 @@ class GameMap {
     }
 
     _obstaclesBetween(obstaclesList, ship, target) {
-        return obstaclesList.filter(o => o !== ship && o !== target)
+        return obstaclesList.filter(o => o.id !== ship.id && o.id !== target.id)
             .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.1))
     }
 

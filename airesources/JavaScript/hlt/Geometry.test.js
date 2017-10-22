@@ -34,6 +34,32 @@ describe('Geometry', () => {
         }
     });
 
+    it('new position by rotation', () => {
+        rotateAndValidateEnd({x: 10, y: 10}, {x: 30, y: 30}, 0, {x: 30, y: 30});
+        rotateAndValidateEnd({x: 30, y: 30}, {x: 10, y: 10}, 0, {x: 10, y: 10});
+        rotateAndValidateEnd({x: 10, y: 10}, {x: 30, y: 30}, 1, {x: 29.64, y: 30.34});
+        rotateAndValidateEnd({x: 10, y: 10}, {x: 30, y: 30}, -1, {x: 30.34, y: 29.64});
+
+        function rotateAndValidateEnd(start, end, angleRotation, expected) {
+            const newEnd = Geometry.rotateEnd(start, end, angleRotation);
+            newEnd.x.should.be.approximately(expected.x, 0.01);
+            newEnd.y.should.be.approximately(expected.y, 0.01);
+        }
+    });
+
+    it('new position by reducing', () => {
+        reduceAndValidateEnd({x: 10, y: 10}, {x: 30, y: 30}, 0, {x: 30, y: 30});
+        reduceAndValidateEnd({x: 30, y: 30}, {x: 10, y: 10}, 0, {x: 10, y: 10});
+        reduceAndValidateEnd({x: 10, y: 10}, {x: 30, y: 30}, 3, {x: 27.88, y: 27.88});
+        reduceAndValidateEnd({x: 30, y: 30}, {x: 10, y: 10}, 3, {x: 12.12, y: 12.12});
+
+        function reduceAndValidateEnd(start, end, delta, expected) {
+            const newEnd = Geometry.reduceEnd(start, end, delta);
+            newEnd.x.should.be.approximately(expected.x, 0.01);
+            newEnd.y.should.be.approximately(expected.y, 0.01);
+        }
+    });
+
     it('line intersects circle', () => {
         Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 0}, {x: 50, y: -1, radius: 1}).should.be.true();
         Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 0, y: 100}, {x: 50, y: 50, radius: 1}).should.be.false();

@@ -18,7 +18,7 @@ class Game {
             Networking.forEachReadLine(line => {
                 const map = mapParser.parse(line);
                 const moves = strategy(map);
-                Networking.sendMoves(moves);
+                Networking.sendMoves(moves.filter(m => m !== null));
             })
         });
     }

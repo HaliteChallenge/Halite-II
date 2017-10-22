@@ -1,3 +1,5 @@
+const Entity = require('./Entity');
+
 class Planet extends Entity {
     /**
      * @param {GameMap} gameMap map this planet belongs to
@@ -14,7 +16,7 @@ class Planet extends Entity {
      * @returns {boolean} true if planet is owned
      */
     isOwned() {
-        return this.ownerId !== null
+        return !!this.ownerId;
     }
 
     /**
@@ -22,7 +24,7 @@ class Planet extends Entity {
      * @returns {boolean} true if planet is free
      */
     isFree() {
-        return this.ownerId === null
+        return !this.ownerId;
     }
 
     get ownerId() {

@@ -6,12 +6,18 @@ const rl = readline.createInterface({
 });
 
 class Networking {
+    static write(message) {
+        process.stdout.write(message);
+    }
+
     static writeLine(line) {
-        console.log(line)
+        console.log(line);
     }
 
     static sendMoves(moves) {
-        Networking.writeLine(moves.join(' '));
+        moves.forEach(m => Networking.write(m));
+        // Networking.writeLine(moves.join('\n'));
+        Networking.writeLine('\n');
     }
 
     static readLine(onLineCallback) {
