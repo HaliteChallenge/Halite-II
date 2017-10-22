@@ -34,9 +34,9 @@ Turns are calculated using the following order of steps:
 
 These steps may be referred to as ‘substeps’. There is no minimum time for a step, but times are rounded to four decimal places.
  
-This calculation is most relevant to battles and other events that happen simultaneously. See relevant sections below for more details how these calculations impact [battles], [docking], and [collision].
+This calculation is most relevant to battles and other events that happen simultaneously. See relevant sections below for more details how these calculations impact [battles](#ship-planet-collision), [docking](#docking-and-mining), and [collision](#ship-planet-collision).
 
-## Entities & Game Mechanics
+## Entities and Game Mechanics
 The entities in Halite II are ships and planets. The key mechanics are movement, docking/mining, collision and combat.
 
 ### Ships
@@ -56,7 +56,7 @@ Beyond basic thrust, the API provides some additional helper methods for pathfin
 5. closest_point_to: returns a point near a given entity closest to the source entity
 6. navigate: given a position, will navigate a user towards a given location using other pathfinding methods. Navigate is a stateless method, you must continue to call it each turn until you arrive at your destination, and can always choose not to call it, being able to easily change directions between turns. If avoid_obstacles is set to True (default) will avoid obstacles on the way, with up to max_corrections corrections
 
-See [API documentation] for full details and tutorials for examples in practice. In order be successful at Halite II, players will need sophisticated pathfinding algorithms, but new players are encouraged to try out our navigate helper function as an easier starting point.
+See [API documentation](learn-programming-challenge/halite-cli-and-tools/api) for full details and tutorials for examples in practice. In order be successful at Halite II, players will need sophisticated pathfinding algorithms, but new players are encouraged to try out our navigate helper function as an easier starting point.
 
 ### Planets
 Each planet occupies a perfectly circular area. Planets have:
@@ -67,7 +67,7 @@ Each planet occupies a perfectly circular area. Planets have:
 * A list of docked ships
 * No velocity, no weapons
 
-### Docking/Mining
+### Docking and Mining
 To take control of a planet, a player must dock a ship to the planet. Only one team can dock on a planet at a time.
 
 **Docking:** Once a ship moves within 4 units of a planet (ie. 4 + radius distance from center of planet), it can be commanded to dock, which will cause the ship to begin the docking process. The planet must be unoccupied or owned by player currently intending to dock. The ship must also be stationary. If the ship is too far away or not stationary or the planet is occupied, the dock command does nothing.
@@ -90,7 +90,7 @@ Ships can do combat with planets by crashing into them (occupying locations on t
 
 Like ships, planets also have health points. Planets start with a number of health points proportional to their radius: 255 points per unit of radius (thus, a radius 3 planet has 765 health). A ship can damage or destroy a planet by colliding with it; the planet takes 1 point of damage for each point of health the ship had. Since ships have up to 255 health, this means a planet can absorb one collision with a full-health ship per unit of radius it has. For instance, a radius 3 planet will explode if 3 full-health ships collide with it.
 
-When a planet dies, it explodes, dealing damage to any ships or planets within 5 units of the planet surface. The damage scales linearly with distance from the surface, beginning at 255 damage when adjacent to the planet and ending at 51 damage if 5 units away.
+When a planet dies, it explodes, dealing damage to any ships or planets within 10 units of the planet surface. The damage scales linearly with distance from the surface, beginning at 255 damage when adjacent to the planet and ending at 51 damage if 5 units away.
 
 ### Ship-Ship Combat & Collision
 Ships automatically fight each other when they come into close distances. (5 units from the center of the ship, represented on the board by the aura around the ship) When ships come into contact, they do 64 units of damage per turn to each other.

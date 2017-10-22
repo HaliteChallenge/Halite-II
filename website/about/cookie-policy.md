@@ -32,6 +32,6 @@ We use cookies on our Site to personalize your experience on the Site and to mak
 We may also work with third-party service providers who may set cookies on our Site. These third-party service providers help us track and analyze your use of our Site and to optimize our Site and improve your experience. These third-party service providers are responsible for the cookies they set on our Site. If you want further information please go to the website for the relevant third-party service provider. For additional information regarding Google Analytics, please visit: [analytics.google.com](https://analytics.google.com){:target="_blank"}. 
 
 ## How to control cookies? 
-You can control and/or delete cookies as you wish, for details see https://aboutcookies.org. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed. If you do this however, you may have to manually adjust some preferences every time you visit our Site and functionalities may not work.
+You can control and/or delete cookies as you wish, for details see [https://aboutcookies.org](https://aboutcookies.org){:target="_blank"}. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed. If you do this however, you may have to manually adjust some preferences every time you visit our Site and functionalities may not work.
 
 

@@ -63,4 +63,7 @@ Planets can be destroyed through ship collisions. Boom.
     - If still a tie, then we check to see which team has done the most battle damage (destroying ships with other ships through attacks or collision).
     - If still a tie, a random winner will be chosen, but this outcome has a very low probability of occurring given the other winning conditions.
 
+## Note on game rules changes
+The Two Sigma and Halite team reserves the right to make changes on game rules during the course of the game. We promise we won't do this without a very good reason that improves the competition and the fun of the game, and we will try to make any changes as backwards compatible as possible.
+
 [Deep Dive]: /learn-programming-challenge/game-rules/game-rules-deep-dive
