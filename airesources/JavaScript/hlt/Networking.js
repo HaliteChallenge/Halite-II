@@ -7,11 +7,11 @@ const rl = readline.createInterface({
 
 class Networking {
     static writeLine(line) {
-        console.log(line);
+        process.stdout.write(line + '\n');
     }
 
     static sendMoves(moves) {
-        Networking.writeLine(moves.join(' ') + '\n');
+        Networking.writeLine(moves.join(' '));
     }
 
     static readNLines(n, onLines) {
