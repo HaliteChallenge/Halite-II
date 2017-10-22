@@ -93,7 +93,7 @@ The move command, like all other commands, is space separated and each turn's co
 
 "t [(integer) ship id] [(integer) speed] [(integer) angle]"
 
-Wherein the speed signifies the distance traversed in one turn and the angle is a number between 0 and 259 (inclusive) represented in degrees.
+Wherein the speed signifies the distance traversed in one turn and the angle is a number between 0 and 359 (inclusive) represented in degrees.
 
 ### Dock command format
 The dock command, like all other commands, is space separated and each turn's command is distinct due to line delimiting. It is formatted as follows:
