@@ -3,6 +3,10 @@ from . import login
 from . import web
 
 import flask_oauthlib.client
+from flask_compress import Compress
+
+compress = Compress()
+compress.init_app(app)
 
 
 setup_logging("api_server.log", app.logger)
