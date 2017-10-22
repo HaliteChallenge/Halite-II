@@ -11,7 +11,7 @@ content: website
 All compilation and games are run in Google Cloud Compute Engine instances with 4 vCPU and 6 GB memory. The GPU workers have an additional 4 NVIDIA Tesla K80 GPUS in addition to the base specs.
 
 ## Compute and Memory per bot
-Bots are given 350 MB of RAM and equal amounts of CPU.
+Bots are given 1GB of RAM and is pinned to a CPU. For GPU bots, each bot on a GPU worker has access to one NVIDIA Tesla K80 GPU.
 
 ## Halite Environment Version
 Games are always run using the most recent environment build.
