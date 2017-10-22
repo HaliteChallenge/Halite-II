@@ -121,7 +121,7 @@ export default{
           api.update_bot(user_id, bot_id, this.botFile, (progress) => {
             this.uploadProgress = Math.floor(progress * 100)
           }).then(() => {
-            this.showMessage('success', 'Your bot has been submitted and will start playing games in the next 15 mins.')
+            this.showMessage('success', 'Your bot has been submitted and will start playing games within the next 15 mins.')
             this.gaData('play', 'submit-success', 'play-submit-flow')
             this.view = this.viewList.SUBMITTED
             this.checkBotStatus()
