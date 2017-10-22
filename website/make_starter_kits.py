@@ -144,6 +144,9 @@ def main():
         if directory == "starterkitdocs":
             continue
 
+        if directory == "CSharp":
+            continue
+
         language = directory
         generated_languages.append(language)
         print("Language:", language)
