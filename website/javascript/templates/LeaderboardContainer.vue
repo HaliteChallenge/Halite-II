@@ -66,7 +66,7 @@
             <div class="leaderboard-explore">
               <p><img src="/assets/images/sample-graph.svg" class="img-responsive" alt="graph"></p>
               <div>
-                <a href="/game-player-stats" class="btn-ha btn-ha-lg" target="_blank">More Stats</a>
+                <a href="http://stats.halite.io:3000/public/dashboard/545ebc3c-4cdb-4940-acf1-e4d1332defac" class="btn-ha btn-ha-lg" target="_blank">More Stats</a>
               </div>
             </div>
           </div>
