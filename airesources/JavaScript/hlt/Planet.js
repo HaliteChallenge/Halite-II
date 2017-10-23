@@ -21,6 +21,22 @@ class Planet extends Entity {
     }
 
     /**
+     * Determines if the planet owner is you.
+     * @returns {boolean} true if planet is owned by you
+     */
+    isOwnedByMe() {
+        return this.ownerId === this._gameMap.myPlayerId;
+    }
+
+    /**
+     * Determines if the planet owner is not you.
+     * @returns {boolean} true if planet is owned by you
+     */
+    isOwnedByEnemy() {
+        return this.isOwned() && this.ownerId !== this._gameMap.myPlayerId;
+    }
+
+    /**
      * Determines if the planet is free.
      * @returns {boolean} true if planet is free
      */
@@ -33,12 +49,20 @@ class Planet extends Entity {
         return this._params.ownerId;
     }
 
-    get owner() {
-        return this._gameMap.shipById(this.ownerId);
-    }
-
+    /**
+     * number of docking spots in this planet
+     * @return {number} number of docking spots in this planet
+     */
     get dockingSpots() {
         return this._params.dockingSpots;
+    }
+
+    /**
+     * determines if there is docking spot available
+     * @return {boolean} true if there is a docking spot
+     */
+    hasDockingSpot() {
+        return this.numberOfDockedShips < this._params.dockingSpots;
     }
 
     get currentProduction() {
@@ -55,6 +79,14 @@ class Planet extends Entity {
      */
     get dockedShipIds() {
         return this._params.dockedShipIds;
+    }
+
+    /**
+     * number of docked ships
+     * @returns {number}
+     */
+    get numberOfDockedShips() {
+        return this._params.dockedShipIds.length;
     }
 
     /**
