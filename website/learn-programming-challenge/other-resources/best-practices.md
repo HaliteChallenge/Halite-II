@@ -18,7 +18,7 @@ The starter kits have limited functionality to do this already, and may even pri
 ## Test new vs old before upload
 Before submitting a new bot to the online leaderboard, we recommend running some games against the version of your bot that is currently on the leaderboard. If your new bot consistently wins, then put it up!
 
-Check out [our tool](/halite-cli-and-tools/compare-bots){:target="_blank"} that makes it easier for you to do regression testing.
+Check out [our tool](/learn-programming-challenge/halite-cli-and-tools/halite-client-tools) that makes it easier for you to do regression testing.
 
 ## Debug timeout issues by disabling timeout locally
 When debugging latency issues with your bot, it can be helpful to disable game environment timeouts. To do so, append the -t flag to your environment command, like so:
