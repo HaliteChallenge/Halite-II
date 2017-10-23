@@ -75,6 +75,6 @@ Halite reads commands from your bot's stdout and stderr, so anything else writte
 
 We recommend you suppress this output. Most frameworks allow you to change the verbosity, or change where output is redirected to. In some cases (e.g. Keras), you may need to monkeypatch stderr/stdout temporarily to another location when importing/using them.
 
-[privacy]: {{ site.baseurl }}/about/privacy-policy
+[privacy]: {{ site.baseurl }}/about/privacy
 [learn]: {{ site.baseurl }}/learn-programming-challenge
 [downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits

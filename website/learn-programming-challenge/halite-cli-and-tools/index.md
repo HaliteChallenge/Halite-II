@@ -14,4 +14,4 @@ Some awesome toys and APIs for you to be super productive while playing Halite.
 * [Upload Bots Tool](halite-client-tools): Upload your bots from the terminal instead of the website.
 * [Compare Bots Tools](halite-client-tools): Compare win/loss ration multiple versions of your bots.
 * [Game Data Download Tool](game-data): Download games played on our servers.
-* [Offline Visualizer](offline-visualizer): View game replays offline.
+* [Offline Visualizer](/learn-programming-challenge/downloads-and-starter-kits): View game replays offline.
