@@ -2,6 +2,9 @@
 
 namespace hlt {
     namespace constants {
+        ////////////////////////////////////////////////////////////////////////
+        // Implementation-independent language-agnostic constants
+
         /** Games will not have more players than this */
         constexpr int MAX_PLAYERS = 4;
 
@@ -40,5 +43,10 @@ namespace hlt {
 
         /** Distance from the planets edge at which new ships are created */
         constexpr int SPAWN_RADIUS = 2;
+
+        ////////////////////////////////////////////////////////////////////////
+        // Implementation-specific constants
+
+        constexpr int MAX_NAVIGATION_CORRECTIONS = 90;
     }
 }
