@@ -3,8 +3,8 @@ package hlt;
 public class Util {
 
     public static int angleRadToDegClipped(final double angleRad) {
-        final int degUnclipped = (int)(Math.toDegrees(angleRad) + 0.5);
+        final long degUnclipped = Math.round(Math.toDegrees(angleRad));
         // Make sure return value is in [0, 360) as required by game engine.
-        return ((degUnclipped % 360) + 360) % 360;
+        return (int) (((degUnclipped % 360L) + 360L) % 360L);
     }
 }

@@ -10,7 +10,7 @@ public class Navigation {
     {
         final int maxCorrections = Constants.MAX_NAVIGATION_CORRECTIONS;
         final boolean avoidObstacles = true;
-        final double angularStepRad = Math.PI/180;
+        final double angularStepRad = Math.PI/180.0;
         final Position targetPos = ship.getClosestPoint(dockTarget);
 
         return navigateShipTowardsTarget(gameMap, ship, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStepRad);
