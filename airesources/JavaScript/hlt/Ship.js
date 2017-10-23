@@ -46,7 +46,7 @@ class Ship extends Entity {
      */
     canDock(planet) {
         return (Geometry.distance(this, planet) <= planet.radius + constants.DOCK_RADIUS) &&
-            (planet.numberOfDockedShips < planet.dockingSpots) &&
+            (planet.hasDockingSpot()) &&
             (planet.isFree() || planet.ownerId === this.ownerId);
     }
 
