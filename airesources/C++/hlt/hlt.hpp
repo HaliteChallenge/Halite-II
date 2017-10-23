@@ -13,7 +13,7 @@ namespace hlt {
         const int map_height;
     };
 
-    /** Initialize our bot with the given name, getting back some metadata. */
+    /// Initialize our bot with the given name, getting back some metadata.
     static Metadata initialize(const std::string& bot_name) {
         std::cout.sync_with_stdio(false);
 

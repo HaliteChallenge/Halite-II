@@ -1,9 +1,4 @@
-//
-// Created by David Li on 7/19/17.
-//
-
-#ifndef AIRESOURCES_MOVE_HPP
-#define AIRESOURCES_MOVE_HPP
+#pragma once
 
 #include <cmath>
 
@@ -11,17 +6,12 @@
 
 namespace hlt {
     enum class MoveType {
-        //! Noop is not user-specifiable - instead it's the default command,
-        //! used to mean that no command was issued
         Noop = 0,
         Thrust,
         Dock,
         Undock,
     };
 
-    /**
-     * Represents a command that may be issued to a ship.
-     */
     struct Move {
         MoveType type;
         EntityIndex ship_id;
@@ -31,7 +21,7 @@ namespace hlt {
             EntityIndex dock_to;
         } move;
 
-        static auto dock(EntityIndex ship_id, EntityIndex dock_to) -> Move {
+        static Move dock(EntityIndex ship_id, EntityIndex dock_to) {
             Move move;
             move.type = MoveType::Dock;
             move.ship_id = ship_id;
@@ -40,14 +30,14 @@ namespace hlt {
             return move;
         }
 
-        static auto undock(EntityIndex ship_id) -> Move {
+        static Move undock(EntityIndex ship_id) {
             Move move;
             move.type = MoveType::Undock;
             return move;
         }
 
-        static auto thrust(EntityIndex ship_id, double angle,
-                           unsigned short thrust) -> Move {
+        static Move thrust(EntityIndex ship_id, double angle,
+                           unsigned short thrust) {
             Move move;
             move.type = MoveType::Thrust;
             move.ship_id = ship_id;
@@ -60,11 +50,10 @@ namespace hlt {
             return move;
         }
 
-        static auto thrust(EntityIndex ship_id,
-                           std::pair<double, unsigned short> direction) -> Move {
+        static Move thrust(EntityIndex ship_id,
+                           std::pair<double, unsigned short> direction)
+        {
             return thrust(ship_id, direction.first, direction.second);
         }
     };
 }
-
-#endif //AIRESOURCES_MOVE_HPP

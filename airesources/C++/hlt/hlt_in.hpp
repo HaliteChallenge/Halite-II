@@ -18,8 +18,12 @@ namespace hlt {
             iss >> ship.location.pos_x;
             iss >> ship.location.pos_y;
             iss >> ship.health;
-            iss >> ship.velocity.vel_x;
-            iss >> ship.velocity.vel_y;
+
+            // No longer in the game, but still part of protocol.
+            int vel_x_deprecated, vel_y_deprecated;
+            iss >> vel_x_deprecated;
+            iss >> vel_y_deprecated;
+
             int docking_status;
             iss >> docking_status;
             ship.docking_status = static_cast<DockingStatus>(docking_status);
@@ -116,7 +120,7 @@ namespace hlt {
             return map;
         }
 
-        static Map get_map(const int map_width, const int map_height) {
+        static const Map get_map(const int map_width, const int map_height) {
             Log::log("--- NEW TURN ---");
             const auto input = get_string();
             Log::log("input size: " + std::to_string(input.size()));

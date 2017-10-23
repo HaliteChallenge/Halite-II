@@ -1,9 +1,4 @@
-//
-// Created by David Li on 6/5/17.
-//
-
 #include "map.hpp"
-#include "log.hpp"
 
 namespace hlt {
     auto intersect_segment_circle(

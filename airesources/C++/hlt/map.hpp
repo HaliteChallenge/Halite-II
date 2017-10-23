@@ -1,5 +1,4 @@
-#ifndef HLT_H
-#define HLT_H
+#pragma once
 
 #include <list>
 #include <cmath>
@@ -10,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 #include <array>
 #include <unordered_map>
 
@@ -18,11 +17,11 @@
 #include "log.hpp"
 #include "entity.hpp"
 #include "move.hpp"
+#include "planet.hpp"
+#include "ship.hpp"
+#include "entity_id.hpp"
 
 namespace hlt {
-    template<typename T>
-    using entity_map = std::unordered_map<EntityIndex, T>;
-
     class Map {
     public:
         std::unordered_map<PlayerId, entity_map<Ship>> ships;
@@ -115,5 +114,3 @@ namespace hlt {
         }
     };
 }
-
-#endif

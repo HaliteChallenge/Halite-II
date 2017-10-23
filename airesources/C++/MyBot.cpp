@@ -5,10 +5,10 @@ int main() {
     const hlt::PlayerId player_id = metadata.player_id;
 
     auto moves = std::vector<hlt::Move>();
-    while (true) {
-        const auto game_map = hlt::in::get_map(metadata.map_width, metadata.map_height);
-        hlt::Log::log("got map");
+    for (;;) {
         moves.clear();
+        const hlt::Map game_map = hlt::in::get_map(metadata.map_width, metadata.map_height);
+        hlt::Log::log("got map");
 
         hlt::Log::log("ships size: " + std::to_string(game_map.ships.size()));
         for (const auto& ships : game_map.ships) {
@@ -38,14 +38,14 @@ int main() {
 
                 if (ship.can_dock(planet)) {
                     moves.push_back(hlt::Move::dock(ship_id, planet_id));
+                    break;
                 }
-                else {
-                    const auto angle = ship.angle_to(planet);
-                    moves.push_back(hlt::Move::thrust(
-                        ship_id,
-                        game_map.adjust_for_collision(ship.location, angle, 2)
-                    ));
-                }
+
+                const auto angle = ship.angle_to(planet);
+                moves.push_back(hlt::Move::thrust(
+                    ship_id,
+                    game_map.adjust_for_collision(ship.location, angle, 2)
+                ));
 
                 break;
             }

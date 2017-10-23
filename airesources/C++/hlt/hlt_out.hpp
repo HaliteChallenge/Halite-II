@@ -14,7 +14,7 @@ namespace hlt {
             return !std::cout.bad();
         }
 
-        /** Send all queued moves to the game engine. */
+        /// Send all queued moves to the game engine.
         static bool send_moves(const std::vector<Move>& moves) {
             std::ostringstream oss;
             for (const auto& move : moves) {
