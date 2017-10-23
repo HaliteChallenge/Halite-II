@@ -2,7 +2,7 @@
 layout: doc_page
 title: Downloads and Starter Kits
 description: Halite engine and language specific starter kit downloads
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 

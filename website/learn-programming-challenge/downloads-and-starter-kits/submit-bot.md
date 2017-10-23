@@ -2,7 +2,7 @@
 layout: doc_page
 title: Submit your bot
 description: Overview of guidelines and best practices on how to submit bots
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 2
 ---

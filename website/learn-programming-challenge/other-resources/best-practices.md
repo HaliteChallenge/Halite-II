@@ -4,7 +4,7 @@ title: Best Practices
 toc: false
 sort_key: 3
 description: In this guide, we will list a couple of simple, useful practices to follow when building your Halite bot.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 

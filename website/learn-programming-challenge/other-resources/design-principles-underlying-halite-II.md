@@ -4,7 +4,7 @@ title: Design Principles Underlying Halite II
 toc: false
 sort_key: 1
 description: This is a paper written by Benjamin Spector and Michael Truell and the Halite II Team about the concepts used in the design of the Halite II game.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 

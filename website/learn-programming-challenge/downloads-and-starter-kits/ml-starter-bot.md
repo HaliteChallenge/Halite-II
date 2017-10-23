@@ -2,7 +2,7 @@
 layout: doc_page
 title: ML starter bot
 description: An ML starter bot from the Two Sigma Team
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 7
 ---

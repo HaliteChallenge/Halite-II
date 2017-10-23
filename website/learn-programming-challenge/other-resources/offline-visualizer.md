@@ -2,7 +2,7 @@
 layout: doc_page
 title: Offline Visualizer
 description: The Halite team and community have provided an offline visualizer tool for you to use to play your games offline.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 4
 ---
