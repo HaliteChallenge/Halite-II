@@ -128,10 +128,11 @@
 </template>
 
 <script>
-  import * as api from '../api'
+import * as api from '../api'
 import HaliteBreadcrumb from './Breadcrumb.vue'
 import Leaderboard from './HackathonLeaderboard.vue'
 import moment from 'moment'
+import _ from 'lodash'
 
 const mockHackathon = {
     title: 'Cornell Virtual Halite Hackathon',
@@ -192,18 +193,6 @@ export default {
               pin: hackathon.location,
               img: `${this.baseUrl}/assets/images/temp/hackathon.png`
             })
-            this.isInHackathon = true
-            if (this.isInHackathon) {
-              if (window.mobileAndTabletcheck()) {
-                this.detailExpanded = false
-                this.joinExpanded = false
-              } else {
-                let detailExpanded = window.sessionStorage['detailExpanded'] === 'true'
-                let joinExpanded = window.sessionStorage['joinExpanded'] === 'true'
-                this.detailExpanded = false || detailExpanded
-                this.joinExpanded = false || joinExpanded
-              }
-            }
             let title = _.chain(hackathon.title).toLower().split(' ').join('-').value()
             window.history.replaceState(null, '', `?hackathon_id=${this.hackathon_id}&name=${encodeURIComponent(title)}`)
             return Promise.resolve()
@@ -217,10 +206,38 @@ export default {
           return Promise.resolve()
         }
       }
+      const isJoinHackathon = (userId) => {
+        if(this.hackathon_id){
+          return api.getUserHackathons(userId).then((hackathons)=>{
+            let isIn = _.findIndex(hackathons, (item) => { return item.hackathon_id == this.hackathon_id && item.participant === true })
+            if(isIn !== -1){
+              this.isInHackathon = true
+            }else{
+              this.isInHackathon = false
+            }
+            this.detailExpanded = this.isInHackathon ? false : true
+            this.joinExpanded = this.isInHackathon ? false : true
+          },(xhr) => {
+          })
+        }else {
+          return Promise.resolve()
+        }
+      }
       api.me().then((me) => {
         getHackathonPromise().then(() => {
           this.path.push({name: this.hackathon.title, link: 'javascript:;'})
         })
+        let userId = null
+        if (me !== null) {
+          userId = me.user_id
+        }
+        if (userId) {
+          let detailExpanded = window.sessionStorage['detailExpanded'] === 'true'
+          let joinExpanded = window.sessionStorage['joinExpanded'] === 'true'
+          this.detailExpanded = false || detailExpanded
+          this.joinExpanded = false || joinExpanded
+          isJoinHackathon(userId)
+        }
       })
   },
     methods: {
