@@ -7,8 +7,8 @@ public class MyBot {
     public static void main(final String[] args) {
         final Networking networking = new Networking();
         final GameMap gameMap = networking.initialize("Tamagocchi");
-        final ArrayList<Move> moveList = new ArrayList<>();
 
+        final ArrayList<Move> moveList = new ArrayList<>();
         for (;;) {
             moveList.clear();
             gameMap.updateMap(Networking.readLineIntoMetadata());
@@ -28,7 +28,7 @@ public class MyBot {
                         break;
                     }
 
-                    final ThrustMove newThrustMove = new Navigation(ship, planet).navigateToDock(gameMap, Constants.MAX_SPEED/2);
+                    final ThrustMove newThrustMove = Navigation.navigateShipToDock(gameMap, ship, planet, Constants.MAX_SPEED/2);
                     if (newThrustMove != null) {
                         moveList.add(newThrustMove);
                     }
