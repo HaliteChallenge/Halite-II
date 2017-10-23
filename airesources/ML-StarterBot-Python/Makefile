@@ -4,7 +4,7 @@
 FILE=replays-20170930-sample.zip
 
 # Halite binary address - please change here if you're not using MacOS
-HALITE_BINARY_ADDRESS=http://35.185.45.87/assets/downloads/Halite2_MacOS.zip
+HALITE_BINARY_ADDRESS=https://halite.io/assets/downloads/Halite2_MacOS.zip
 
 # There is nothing special about this seed (other that it's the 1 milionth prime) .
 SEED=15485863

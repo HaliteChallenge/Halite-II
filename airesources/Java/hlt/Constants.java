@@ -48,7 +48,7 @@ public class Constants {
     // Implementation-specific constants
 
     public static final double FORECAST_FUDGE_FACTOR = SHIP_RADIUS + 0.1;
-    public static final int MAX_CORRECTIONS = 90;
+    public static final int MAX_NAVIGATION_CORRECTIONS = 90;
 
     /** Used in Position.getClosestPoint() */
     public static final int MIN_DISTANCE = 3;

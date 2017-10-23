@@ -39,8 +39,15 @@ class Ship extends Entity {
         return this.dockingStatus === dockingStatus.UNDOCKED;
     }
 
+    /**
+     * determines if a planet can be docked
+     * @param {Planet} planet
+     * @return {boolean|number}
+     */
     canDock(planet) {
-        return Geometry.distance(this, planet) <= planet.radius + constants.DOCK_RADIUS;
+        return (Geometry.distance(this, planet) <= planet.radius + constants.DOCK_RADIUS) &&
+            (planet.hasDockingSpot()) &&
+            (planet.isFree() || planet.ownerId === this.ownerId);
     }
 
     get ownerId() {
@@ -69,9 +76,9 @@ class Ship extends Entity {
 
     /**
      * return {x, y} point that is <delta> distance before target
-     * @param {Entity} target
+     * @param {{x, y}|Entity} target
      * @param {number} delta
-     * @return {{x, y}|*} new point
+     * @return {{x, y}} new point
      */
     pointApproaching(target, delta) {
         return Geometry.reduceEnd(this, target, delta);
@@ -97,6 +104,7 @@ class Ship extends Entity {
      * up (and returning null). The navigation will only consist of up to one command; call this method again
      * in the next turn to continue navigating to the position.
      * @param {Entity} target the entity to which you will navigate
+     * @param {number} keepDistanceToTarget distance to maintain to the target
      * @param {number} speed the (max) speed to navigate. if the obstacle is nearer, will adjust accordingly.
      * @param {boolean} avoidObstacles whether to avoid the obstacles in the way (simple pathfinding).
      * @param {number} maxCorrections the maximum number of degrees to deviate per turn while trying to pathfind. if exceeded returns null.
@@ -104,7 +112,7 @@ class Ship extends Entity {
      * @param {boolean} ignoreShips whether to ignore ships in calculations (this will make your movement faster, but more precarious)
      * @param {boolean} ignorePlanets whether to ignore planets in calculations (useful if you want to crash onto planets)
      */
-    navigate({target, speed, avoidObstacles = true, maxCorrections = 90, angularStep = 1,
+    navigate({target, keepDistanceToTarget = 0, speed, avoidObstacles = true, maxCorrections = 90, angularStep = 1,
              ignoreShips = false, ignorePlanets = false}) {
         if (maxCorrections <= 0) {
             return null
@@ -119,6 +127,7 @@ class Ship extends Entity {
             if (obstacles.length) {
                 return this.navigate({
                     target: Geometry.rotateEnd(this, target, angularStep),
+                    keepDistanceToTarget,
                     speed: speed,
                     avoidObstacles,
                     maxCorrections: maxCorrections - 1,
@@ -126,8 +135,9 @@ class Ship extends Entity {
             }
         }
 
-        const distance = this.distanceBetween(target);
-        const angleDegree = this.angleBetweenInDegree(target);
+        const closeToTarget = Geometry.reduceEnd(this, target, keepDistanceToTarget);
+        const distance = this.distanceBetween(closeToTarget);
+        const angleDegree = this.angleBetweenInDegree(closeToTarget);
 
         const newSpeed = distance >= speed ? speed : distance;
         return this.thrust(newSpeed, angleDegree);

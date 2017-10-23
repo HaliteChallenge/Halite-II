@@ -90,7 +90,7 @@ class GameMapParser {
         const numberOfShips = this._nextInt();
         const shipIds = [];
         for (let shipIdx = 0; shipIdx < numberOfShips; shipIdx++) {
-            shipIdx.push(this._nextInt());
+            shipIds.push(this._nextInt());
         }
 
         return shipIds;
