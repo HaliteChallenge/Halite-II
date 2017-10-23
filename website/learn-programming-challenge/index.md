@@ -27,7 +27,11 @@ First, you need to [log in via Github][login] and create a user profile.
 
 Get a feel for how to play. Here's one of our favorites:
 
-<img src="/assets/images/gifs/Oct-16-2017%2015-23-13%20intro.gif" alt="First Halite game video">
+<div class="static-container text-center">
+  <img style="width: 80%;height: auto;" src="/assets/images/gifs/Oct-16-2017%2015-23-13%20intro.gif" alt="First Halite game video">
+</div>
+<br/>
+<br/>
 
 [Watch the whole game here.][david game]
 
