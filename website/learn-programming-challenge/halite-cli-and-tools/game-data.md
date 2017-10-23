@@ -11,8 +11,8 @@ All game replays played by our workers are available for download. You can use t
 
 There are 2 buckets where you can download these files. We are not planning to delete the replay files of gold games at this time, but we might choose to add a retention policy to the the halite-2-replays bucket.
 
-* **Top tier games (gold and above):** [gs://halite-2-gold-replays/](https://storage.cloud.google.com/halite-2-gold-replays//)
-* **Other tier games (silver and Bronze):** [gs://halite-2-replays](https://storage.cloud.google.com/halite-2-replays//)
+* **Top tier games (gold and above):** [gs://halite-2-gold-replays/](https://storage.cloud.google.com/halite-2-gold-replays/)
+* **Other tier games (silver and Bronze):** [gs://halite-2-replays](https://storage.cloud.google.com/halite-2-replays/)
 
 ## Tools
 

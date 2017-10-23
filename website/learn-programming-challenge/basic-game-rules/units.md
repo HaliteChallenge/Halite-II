@@ -148,15 +148,15 @@ The basic unit that generates Halite ships, you can conquer planets, fight other
         </tr>
         <tr>
             <td>Explosion Radius</td>
-            <td>On planet destruction, ships are damaged if they are within this radius</td>
+            <td>On planet destruction, ships are destroyed if they are within this radius</td>
             <td>10 units</td>
             <td>10 units</td>
         </tr>
         <tr>
             <td>Production</td>
-            <td>On planet destruction, ships are damaged if they are within this radius</td>
+            <td>Rate at which ships can be mined from a planet</td>
             <td>1 ship/6 turns</td>
-            <td>(1 ship/6 turns) * number of ships</td>
+            <td>Per docked ship - (1 ship/6 turns)</td>
         </tr>
         <tr>
             <td>Spawn Radius</td>

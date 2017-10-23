@@ -15,4 +15,3 @@ Some awesome toys and APIs for you to be super productive while playing Halite.
 * [Compare Bots Tools](halite-client-tools): Compare win/loss ration multiple versions of your bots.
 * [Game Data Download Tool](game-data): Download games played on our servers.
 * [Offline Visualizer](offline-visualizer): View game replays offline.
-* [Halite REST API](api): Use the Halite API to build and publish your own Halite tools and visualizations.

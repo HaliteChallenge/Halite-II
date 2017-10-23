@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="table-container">
+        <div class="table-container" v-if="leaderboard.length > 0">
             <table class="table table-leader">
                 <thead>
                 <tr>
@@ -28,13 +28,18 @@
                 </tbody>
             </table>
         </div>
-        <div class="leaderboard-page">
+        <div class="leaderboard-page" v-if="leaderboard.length > 0">
             <HalitePagination
                     :page="this.page"
                     :lastPage="this.lastPage"
                     :baseUrl="this.baseUrl"
                     :changePage="this.changePage"
             />
+        </div>
+        <div v-if="leaderboard.length === 0" class="zero-state-pane">
+            <img src="/assets/images/leaderboard-zero-icon.png" alt="" />
+            <div class="zero-state-title">NOTHING TO SHOW</div>
+            <div>Please try another hackathon.</div>
         </div>
     </div>
 </template>

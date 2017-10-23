@@ -218,7 +218,7 @@ export default {
             return false
           }
 
-          if(this.level === 'High School'){
+          if(this.level === 'High School' && this.selected_highSchool){
           request['organization_id'] = this.selected_highSchool.id
           }
 
