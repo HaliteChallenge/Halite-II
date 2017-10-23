@@ -181,7 +181,7 @@ func (ship Ship) Dock(planet Planet) string {
 }
 
 func (ship Ship) Undock() string {
-	return fmt.Sprintf("u %s %s", strconv.Itoa(ship.Id))
+	return fmt.Sprintf("u %s", strconv.Itoa(ship.Id))
 }
 
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
