@@ -4,7 +4,7 @@ const Geometry = require('./Geometry');
 
 describe('Geometry', () => {
     it('distance between two points', () => {
-        const distance = Geometry.distance({x: 10, y: 10}, {x: 40, y: -20});
+        const distance = Geometry.distance({x: 10, y: 10}, {x: 40, y: 40});
         distance.should.be.approximately(42.4264, 0.0001);
     });
 
@@ -24,9 +24,9 @@ describe('Geometry', () => {
     it('angle in degree between two points should be between 0 and 2Pi', () => {
         expectDegree(0, {x: 0, y: 0}, {x: 130, y: 0});
         expectDegree(90, {x: 0, y: 0}, {x: 0, y: 10});
-        expectDegree(180, {x: 0, y: 0}, {x: -100, y: 0});
-        expectDegree(270, {x: 0, y: 0}, {x: 0, y: -100});
-        expectDegree(359.99, {x: 0, y: 0}, {x: 100000, y: -1});
+        expectDegree(180, {x: 100, y: 0}, {x: 10, y: 0});
+        expectDegree(270, {x: 0, y: 100}, {x: 0, y: 10});
+        expectDegree(359.99, {x: 0, y: 1}, {x: 100000, y: 0});
 
         function expectDegree(expected, start, end) {
             const angleInRad = Geometry.angleInDegree(start, end);
@@ -61,9 +61,9 @@ describe('Geometry', () => {
     });
 
     it('line intersects circle', () => {
-        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 0}, {x: 50, y: -1, radius: 1}).should.be.true();
-        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 0, y: 100}, {x: 50, y: 50, radius: 1}).should.be.false();
-        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 100}, {x: 50, y: 50, radius: 1}).should.be.true();
+        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 0}, {x: 50, y: -1, radius: 1}, 0.5).should.be.true();
+        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 0, y: 100}, {x: 50, y: 50, radius: 1}, 0.5).should.be.false();
+        Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: 100, y: 100}, {x: 50, y: 50, radius: 1}, 0.5).should.be.true();
         Geometry.intersectSegmentCircle({x: 0, y: 0}, {x: -100, y: -100}, {x: -40, y: -20, radius: 1}, 14).should.be.true();
     });
 });

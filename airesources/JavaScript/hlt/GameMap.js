@@ -179,7 +179,7 @@ class GameMap {
 
     _obstaclesBetween(obstaclesList, ship, target) {
         return obstaclesList.filter(o => o.id !== ship.id && o.id !== target.id)
-            .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.1))
+            .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.2))
     }
 
     _shipsByIdFromIds(ids) {

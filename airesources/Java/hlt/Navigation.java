@@ -2,25 +2,29 @@ package hlt;
 
 public class Navigation {
 
-    private Ship ship;
-    private Entity target;
-
-    public Navigation(final Ship ship, final Entity target) {
-        this.ship = ship;
-        this.target = target;
-    }
-
-    public ThrustMove navigateToDock(final GameMap gameMap, final int maxThrust) {
-        final int maxCorrections = Constants.MAX_CORRECTIONS;
+    public static ThrustMove navigateShipToDock(
+            final GameMap gameMap,
+            final Ship ship,
+            final Entity dockTarget,
+            final int maxThrust)
+    {
+        final int maxCorrections = Constants.MAX_NAVIGATION_CORRECTIONS;
         final boolean avoidObstacles = true;
-        final double angularStepRad = Math.PI/180;
-        final Position targetPos = ship.getClosestPoint(target);
+        final double angularStepRad = Math.PI/180.0;
+        final Position targetPos = ship.getClosestPoint(dockTarget);
 
-        return navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStepRad);
+        return navigateShipTowardsTarget(gameMap, ship, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStepRad);
     }
 
-    public ThrustMove navigateTowards(final GameMap gameMap, final Position targetPos, final int maxThrust,
-                                      final boolean avoidObstacles, final int maxCorrections, final double angularStepRad) {
+    public static ThrustMove navigateShipTowardsTarget(
+            final GameMap gameMap,
+            final Ship ship,
+            final Position targetPos,
+            final int maxThrust,
+            final boolean avoidObstacles,
+            final int maxCorrections,
+            final double angularStepRad)
+    {
         if (maxCorrections <= 0) {
             return null;
         }
@@ -33,7 +37,7 @@ public class Navigation {
             final double newTargetDy = Math.sin(angleRad + angularStepRad) * distance;
             final Position newTarget = new Position(ship.getXPos() + newTargetDx, ship.getYPos() + newTargetDy);
 
-            return navigateTowards(gameMap, newTarget, maxThrust, true, (maxCorrections-1), angularStepRad);
+            return navigateShipTowardsTarget(gameMap, ship, newTarget, maxThrust, true, (maxCorrections-1), angularStepRad);
         }
 
         final int thrust;
