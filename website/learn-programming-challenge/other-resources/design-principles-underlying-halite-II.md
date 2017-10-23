@@ -83,7 +83,7 @@ If even after this rule there is still a tie, a random winner will be chosen, bu
 
 *Figure 1: This figure shows a mature, four-player game with many ships docked on planets. Ships are triangles. The colored circles are planets and have assumed the color of the docked ship(s). One or more brackets on the planets indicate ship(s) are docked.*
 
-Even more detailed rules are available in the [Halite II Detailed Rules](/learn-programming-challenge/other-resources/game-rules-deep-dive).
+Even more detailed rules are available in the [Halite II Detailed Rules](/learn-programming-challenge/basic-game-rules/game-rules-deep-dive).
 
 ### 3.2 Influence of EPCoF
 
