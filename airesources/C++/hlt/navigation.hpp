@@ -6,8 +6,8 @@
 
 namespace hlt {
 /*    static possibly<Move> navigate_ship_towards_target(
-            const Map &gameMap,
-            const Ship &ship,
+            const Map& gameMap,
+            const Ship& ship,
             const Location &targetPos,
             const int maxThrust,
             const bool avoidObstacles,
@@ -24,7 +24,7 @@ namespace hlt {
         if (avoidObstacles && !gameMap.objects_between(ship, targetPos).isEmpty()) {
             const double newTargetDx = cos(angleRad + angularStepRad) * distance;
             const double newTargetDy = sin(angleRad + angularStepRad) * distance;
-            const Location newTarget = new Position(ship.getXPos() + newTargetDx, ship.getYPos() + newTargetDy);
+            const Location newTarget = { ship.location.pos_x + newTargetDx, ship.location.pos_y + newTargetDy };
 
             return navigate_ship_towards_target(gameMap, ship, newTarget, maxThrust, true, (maxCorrections - 1),
                                                 angularStepRad);
@@ -42,9 +42,9 @@ namespace hlt {
         const int angleDeg = angle_rad_to_deg_clipped(angleRad);
 
         return Move::thrust(ship, angleDeg, thrust);
-    }
+    }*/
 
-    static possibly<Move> navigate_ship_to_dock(
+    /*static possibly<Move> navigate_ship_to_dock(
             const Map& map,
             const Ship& ship,
             const Entity& dock_target,

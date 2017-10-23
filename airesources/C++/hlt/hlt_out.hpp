@@ -26,12 +26,12 @@ namespace hlt {
                         break;
                     case MoveType::Dock:
                         oss << "d " << move.ship_id << " "
-                            << move.move.dock_to << " ";
+                            << move.dock_to << " ";
                         break;
                     case MoveType::Thrust:
                         oss << "t " << move.ship_id << " "
-                            << move.move.thrust.thrust << " "
-                            << move.move.thrust.angle << " ";
+                            << move.move_thrust << " "
+                            << move.move_angle_deg << " ";
                         break;
                 }
             }

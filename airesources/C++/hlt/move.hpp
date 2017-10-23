@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "entity.hpp"
+#include "util.hpp"
 
 namespace hlt {
     enum class MoveType {
@@ -13,46 +14,25 @@ namespace hlt {
     };
 
     struct Move {
-        MoveType type;
-        EntityIndex ship_id;
-
-        union {
-            struct { unsigned short thrust; unsigned short angle; } thrust;
-            EntityIndex dock_to;
-        } move;
+        const MoveType type;
+        const EntityIndex ship_id;
+        const int move_thrust;
+        const int move_angle_deg;
+        const EntityIndex dock_to;
 
         static Move dock(EntityIndex ship_id, EntityIndex dock_to) {
-            Move move;
-            move.type = MoveType::Dock;
-            move.ship_id = ship_id;
-            move.move.dock_to = dock_to;
-
-            return move;
+            return { MoveType::Dock, ship_id, -1, -1, dock_to };
         }
 
-        static Move undock(EntityIndex ship_id) {
-            Move move;
-            move.type = MoveType::Undock;
-            return move;
+        static Move undock(const EntityIndex ship_id) {
+            return { MoveType::Undock, ship_id, -1, -1, 0 };
         }
 
-        static Move thrust(EntityIndex ship_id, double angle,
-                           unsigned short thrust) {
-            Move move;
-            move.type = MoveType::Thrust;
-            move.ship_id = ship_id;
-            move.move.thrust.thrust = thrust;
-            auto angle_deg = static_cast<int>(angle * 180 / M_PI) % 360;
-            if (angle_deg < 0) angle_deg += 360;
-            move.move.thrust.angle =
-                static_cast<unsigned short>(angle_deg);
-
-            return move;
+        static Move thrust(const EntityIndex ship_id, const double angle_rad, const int thrust) {
+            return { MoveType::Thrust, ship_id, thrust, angle_rad_to_deg_clipped(angle_rad), 0 };
         }
 
-        static Move thrust(EntityIndex ship_id,
-                           std::pair<double, unsigned short> direction)
-        {
+        static Move thrust(const EntityIndex ship_id, const std::pair<double, int>& direction) {
             return thrust(ship_id, direction.first, direction.second);
         }
     };

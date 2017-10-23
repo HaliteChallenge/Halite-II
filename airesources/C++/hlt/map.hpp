@@ -26,20 +26,20 @@ namespace hlt {
     public:
         std::unordered_map<PlayerId, entity_map<Ship>> ships;
         entity_map<Planet> planets;
-        unsigned short map_width, map_height;
+        int map_width, map_height;
 
         Map();
         Map(const Map& other_map);
-        Map(unsigned short width, unsigned short height);
+        Map(int width, int height);
 
-        auto is_valid(EntityId entity_id) -> bool;
-        auto within_bounds(const Location& location) const -> bool;
-        auto get_ship(PlayerId player, EntityIndex entity) -> Ship&;
-        auto get_ship(PlayerId player, EntityIndex entity) const -> const Ship&;
-        auto get_ship(EntityId entity_id) -> Ship&;
-        auto get_planet(EntityId entity_id) -> Planet&;
-        auto get_entity(EntityId entity_id) -> Entity&;
-        auto get_distance(Location l1, Location l2) const -> double;
+        bool is_valid(EntityId entity_id);
+        bool within_bounds(const Location& location) const;
+        Ship& get_ship(PlayerId player, EntityIndex entity);
+        const Ship& get_ship(PlayerId player, EntityIndex entity) const;
+        Ship& get_ship(EntityId entity_id);
+        Planet& get_planet(EntityId entity_id);
+        Entity& get_entity(EntityId entity_id);
+        double get_distance(Location l1, Location l2) const;
         /**
          * Create a location with an offset applied, checking if the location
          * is within bounds. If not, the second member of the pair will be
@@ -49,9 +49,9 @@ namespace hlt {
          * @param dy
          * @return
          */
-        auto location_with_delta(const Location& location, double dx, double dy) -> possibly<Location>;
+        possibly<Location> location_with_delta(const Location& location, double dx, double dy);
 
-        auto test(const Location& location, double radius) -> std::vector<EntityId>;
+        std::vector<EntityId> test(const Location& location, double radius);
 
         constexpr static auto FORECAST_STEPS = 64;
         constexpr static auto FORECAST_DELTA = 1.0 / FORECAST_STEPS;
@@ -65,7 +65,7 @@ namespace hlt {
          * @param fudge How much distance to leave between planets and the path
          * @return
          */
-        auto pathable(const Location& start, const Location& target, double fudge) const -> bool;
+        bool pathable(const Location& start, const Location& target, double fudge) const;
 
         /**
          * Check if a collision might occur if a ship at the given location
@@ -103,9 +103,7 @@ namespace hlt {
          * @param radius
          * @return
          */
-        auto closest_point(const Location& start, const Location& target,
-                           double radius)
-        -> std::pair<Location, bool> {
+        std::pair<Location, bool> closest_point(const Location& start, const Location& target, double radius) {
             auto angle = start.angle_to(target) + M_PI;
             auto dx = radius * std::cos(angle);
             auto dy = radius * std::sin(angle);

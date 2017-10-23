@@ -51,7 +51,7 @@ namespace hlt {
         planets = other_map.planets;
     }
 
-    Map::Map(unsigned short width, unsigned short height) : Map() {
+    Map::Map(const int width, const int height) : Map() {
         map_width = width;
         map_height = height;
     }
