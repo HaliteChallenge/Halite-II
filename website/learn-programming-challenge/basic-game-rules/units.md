@@ -3,7 +3,7 @@ layout: doc_page
 title: Unit Reference
 toc: false
 description: Reference guide for unit properties of Halite
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 0
 ---

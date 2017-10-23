@@ -52,4 +52,4 @@ Throughout the competition, Two Sigma and its partners will be hosting hackathon
 One of the most wonderful aspects of Halite I, according to last years’ players, was our open and collaborative community on [the forums](https://forums.halite.io)and on our [Discord channel](https://discordapp.com/invite/EqW8DCB){:target="_blank"}. Please share ideas, tips, and even code for all to share. We only ask that you be courteous to your fellow players, and not share so many tricks or code that earlier players feel their effort was wasted. This is of course a gray line, so feel free to err on the side of over-sharing, and the Halite staff will help with moderation in the forums. We reserve the ability to remove any content we feel goes too far. So share, share, share and leave the tricky decisions to us.
 
 [login]: {{ site.login_server_url }}/github
-[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-bots
+[downloads]: {{ site.baseurl }}/learn-programming-challenge/downloads-and-starter-kits

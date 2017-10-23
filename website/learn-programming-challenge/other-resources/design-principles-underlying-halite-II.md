@@ -4,7 +4,7 @@ title: Design Principles Underlying Halite II
 toc: false
 sort_key: 1
 description: This is a paper written by Benjamin Spector and Michael Truell and the Halite II Team about the concepts used in the design of the Halite II game.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 
@@ -56,7 +56,7 @@ Halite II started with the above framework as well as the goal of leveraging muc
 ### 3.1 The Halite II Game
 
 
-Halite II is a turn-based strategy game in which two or four players participate. The rules which are described in [Halite II Rules](https://2017.halite.io/learn-programming-challenge/Game-Rules) and summarized below:
+Halite II is a turn-based strategy game in which two or four players participate. The rules which are described in [Halite II Rules](https://2017.halite.io/learn-programming-challenge/basic-game-rules/) and summarized below:
 
 Each player initially has a fleet of three ships. Players can move ships around a board using three commands:
 
@@ -83,7 +83,7 @@ If even after this rule there is still a tie, a random winner will be chosen, bu
 
 *Figure 1: This figure shows a mature, four-player game with many ships docked on planets. Ships are triangles. The colored circles are planets and have assumed the color of the docked ship(s). One or more brackets on the planets indicate ship(s) are docked.*
 
-Even more detailed rules are available in the [Halite II Detailed Rules](learn-programming-challenge/other-resources/game-rules-deep-dive).
+Even more detailed rules are available in the [Halite II Detailed Rules](/learn-programming-challenge/basic-game-rules/game-rules-deep-dive).
 
 ### 3.2 Influence of EPCoF
 

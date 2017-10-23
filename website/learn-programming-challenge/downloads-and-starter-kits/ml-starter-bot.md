@@ -2,7 +2,7 @@
 layout: doc_page
 title: ML starter bot
 description: An ML starter bot from the Two Sigma Team
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 7
 ---
@@ -45,7 +45,7 @@ The model is trained on historical data. We look at a particular bot (usually th
 
 The bot needs a zip file with the games in json format to train on. We packed about 1000 games and made them available online for your convenience. After you run `make`, the script will download the games and will train the model on 1000 games, serializing it to models/ directory. 
 
-You can also use our Halite Client Tool to [download replays](/learn-programming-challenge/halite-cli-and-tools/game-data) and run [regression tests](/learn-programming-challenge/halite-cli-and-tools/compare-bots).
+You can also use our Halite Client Tool to [download replays](/learn-programming-challenge/halite-cli-and-tools/game-data) and run [regression tests](/learn-programming-challenge/halite-cli-and-tools/halite-client-tools).
 
 ### Submission
 

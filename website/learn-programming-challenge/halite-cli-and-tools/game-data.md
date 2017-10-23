@@ -16,4 +16,4 @@ There are 2 buckets where you can download these files. We are not planning to d
 
 ## Tools
 
-In order to expedite your learning process, we provide you a very useful CLI to help you get started. With it you can automatically download bots as desired. You can find it [here](halite-client-tools.md).
+In order to expedite your learning process, we provide you a very useful CLI to help you get started. With it you can automatically download bots as desired. You can find it [here](halite-client-tools).

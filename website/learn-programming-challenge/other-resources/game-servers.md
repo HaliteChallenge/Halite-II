@@ -3,7 +3,7 @@ layout: doc_page
 title: Game Servers
 sort_key: 2
 description: Details for hardware, compilation, game data, and GPU usage for the Halite AI Programming Challenge.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 

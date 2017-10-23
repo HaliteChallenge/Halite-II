@@ -2,7 +2,7 @@
 layout: doc_page
 title: Create a new starter kit
 description: Learn how to create an AI starter kit in a new programming language for the Halite Challenge
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 5
 ---

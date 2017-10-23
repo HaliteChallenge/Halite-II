@@ -2,7 +2,7 @@
 layout: doc_page
 title: Customize your Bot Submission
 description: Overview of how to customize your bot submission with dependencies, language names and more.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 3
 ---
@@ -68,7 +68,7 @@ Your main file must be called `MyBot.*` Your language is recognized using the fi
 - Clojure - .clj
 - C - .c
 
-See the [Game Server Reference](/other-resources/game-servers){:target="_blank"} for details about compiler and runtime versions.
+See the [Game Server Reference](/learn-programming-challenge/other-resources/game-servers){:target="_blank"} for details about compiler and runtime versions.
 
 ## JVM Languages
 
