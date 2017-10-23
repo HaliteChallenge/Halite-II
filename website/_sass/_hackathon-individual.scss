@@ -196,4 +196,19 @@
     height: auto;
     padding: 20px;
   }
+
+  .zero-state-pane{
+    text-align: center;
+    font-size: 0.9em;
+
+    img{
+      width: 50px;
+    }
+
+    .zero-state-title{
+      font-size: 1.1em;
+      font-weight: bold;
+      margin: 20px 0px 10px 0px;
+    }
+  }
 }
