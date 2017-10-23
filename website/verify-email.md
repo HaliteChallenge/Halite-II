@@ -6,7 +6,7 @@ mount_view: VerifyEmail
 title: Email Verification
 image: assets/images/temp/bot_1.png
 content: website
-description: Verify your organizational affiliation
+description: Halite 404
 ---
 
 <div id="verify-email-container"></div>
