@@ -12,7 +12,7 @@ namespace hlt {
             return result;
         }
 
-        static std::pair<EntityId, Ship> parse_ship(std::stringstream& iss) {
+        static std::pair<EntityId, Ship> parse_ship(std::stringstream& iss, const PlayerId owner_id) {
             Ship ship;
 
             iss >> ship.entity_id;
@@ -33,6 +33,7 @@ namespace hlt {
             iss >> ship.docking_progress;
             iss >> ship.weapon_cooldown;
 
+            ship.owner_id = owner_id;
             ship.radius = constants::SHIP_RADIUS;
 
             return std::make_pair(ship.entity_id, ship);
@@ -56,19 +57,19 @@ namespace hlt {
                 planet.owned = true;
                 int owner;
                 iss >> owner;
-                planet.owner = static_cast<PlayerId>(owner);
+                planet.owner_id = static_cast<PlayerId>(owner);
             } else {
                 planet.owned = false;
                 int false_owner;
                 iss >> false_owner;
-                planet.owner = -1;
+                planet.owner_id = -1;
             }
 
-            int num_docked_ships;
+            unsigned int num_docked_ships;
             iss >> num_docked_ships;
 
             planet.docked_ships.reserve(num_docked_ships);
-            for (auto i = 0; i < num_docked_ships; ++i) {
+            for (unsigned int i = 0; i < num_docked_ships; ++i) {
                 EntityId ship_id;
                 iss >> ship_id;
                 planet.docked_ships.push_back(ship_id);
@@ -95,28 +96,34 @@ namespace hlt {
 
                 player_id = static_cast<PlayerId>(player_id_int);
 
-                int num_ships;
+                unsigned int num_ships;
                 iss >> num_ships;
 //                Log::log("mp4.2 num_ships: " + std::to_string(num_ships));
 
-                map.ships[player_id] = {};
-                for (auto j = 0; j < num_ships; ++j) {
-                    const auto& ship_pair = parse_ship(iss);
-                    map.ships[player_id].insert(ship_pair);
+                std::vector<Ship>& ship_vec = map.ships[player_id];
+                entity_map<unsigned int>& ship_map = map.ship_map[player_id];
+
+                ship_vec.reserve(num_ships);
+                for (unsigned int j = 0; j < num_ships; ++j) {
+                    const auto& ship_pair = parse_ship(iss, player_id);
+                    ship_vec.push_back(ship_pair.second);
+                    ship_map[ship_pair.first] = j;
                 }
             }
 
-            int num_planets;
+            unsigned int num_planets;
             iss >> num_planets;
 
 //            Log::log("mp5.1 - num_planets: " + std::to_string(num_planets));
 
-            for (auto i = 0; i < num_planets; i++) {
+            map.planets.reserve(num_planets);
+            for (unsigned int i = 0; i < num_planets; ++i) {
                 const auto& planet_pair = parse_planet(iss);
-                map.planets[planet_pair.first] = planet_pair.second;
+                map.planets.push_back(planet_pair.second);
+                map.planet_map[planet_pair.first] = i;
             }
 
-//            Log::log("mp6");
+//            Log::log("mp6: " + std::to_string(map.planets.size()));
 
             return map;
         }

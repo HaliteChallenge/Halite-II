@@ -9,19 +9,11 @@ int main() {
     for (;;) {
         moves.clear();
         const hlt::Map map = hlt::in::get_map(metadata.map_width, metadata.map_height);
-        hlt::Log::log("got map");
-
-        hlt::Log::log("ships size: " + std::to_string(map.ships.size()));
-        for (const auto& ships : map.ships) {
-            hlt::Log::log("- " + std::to_string(ships.first) + " : " + std::to_string(ships.second.size()));
-        }
 
         hlt::Log::log("my ships size: " + std::to_string(map.ships.at(player_id).size()));
-        for (const auto& ship_pair : map.ships.at(player_id)) {
-            const auto ship_id = ship_pair.first;
-            const auto& ship = ship_pair.second;
+        for (const hlt::Ship& ship : map.ships.at(player_id)) {
 
-            hlt::Log::log("- looking at ship: " + std::to_string(ship_id));
+            hlt::Log::log("- looking at ship: " + std::to_string(ship.entity_id));
 
             if (ship.docking_status != hlt::ShipDockingStatus::Undocked) {
                 hlt::Log::log("- docked, passing");
@@ -29,16 +21,13 @@ int main() {
             }
 
             hlt::Log::log("- looking at planets: " + std::to_string(map.planets.size()));
-            for (const auto& planet_pair : map.planets) {
-                const auto planet_id = planet_pair.first;
-                const auto& planet = planet_pair.second;
-
+            for (const auto& planet : map.planets) {
                 if (planet.owned) {
                     continue;
                 }
 
                 if (ship.can_dock(planet)) {
-                    moves.push_back(hlt::Move::dock(ship_id, planet_id));
+                    moves.push_back(hlt::Move::dock(ship.entity_id, planet.entity_id));
                     break;
                 }
 
@@ -51,7 +40,7 @@ int main() {
                 break;
             }
 
-            hlt::Log::log("- done with ship: " + std::to_string(ship_id));
+            hlt::Log::log("- done with ship: " + std::to_string(ship.entity_id));
         }
 
         hlt::Log::log("have moves: " + std::to_string(moves.size()));

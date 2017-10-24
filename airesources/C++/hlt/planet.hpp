@@ -7,7 +7,6 @@
 
 namespace hlt {
     struct Planet : Entity {
-        PlayerId owner;
         bool owned;
 
         /// The remaining resources.

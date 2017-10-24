@@ -26,12 +26,12 @@ namespace hlt {
             std::vector<Entity *> entities_found;
 
             for (auto planet : map.planets) {
-                check_and_add_entity_between(entities_found, start, target, planet.second);
+                check_and_add_entity_between(entities_found, start, target, planet);
             }
 
             for (auto player_ship : map.ships) {
                 for (auto ship : player_ship.second) {
-                    check_and_add_entity_between(entities_found, start, target, ship.second);
+                    check_and_add_entity_between(entities_found, start, target, ship);
                 }
             }
 
