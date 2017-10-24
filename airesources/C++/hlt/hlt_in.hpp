@@ -10,11 +10,10 @@ namespace hlt {
             return result;
         }
 
-        static std::pair<EntityIndex, Ship> parse_ship(std::istream& iss) {
-            EntityIndex ship_id;
-            iss >> ship_id;
-
+        static std::pair<EntityIndex, Ship> parse_ship(std::stringstream& iss) {
             Ship ship;
+
+            iss >> ship.entity_index;
             iss >> ship.location.pos_x;
             iss >> ship.location.pos_y;
             iss >> ship.health;
@@ -34,14 +33,13 @@ namespace hlt {
 
             ship.radius = constants::SHIP_RADIUS;
 
-            return std::make_pair(ship_id, ship);
+            return std::make_pair(ship.entity_index, ship);
         }
 
         static std::pair<EntityIndex, Planet> parse_planet(std::istream& iss) {
-            Planet planet = {};
-            EntityIndex planet_id;
+            Planet planet;
 
-            iss >> planet_id;
+            iss >> planet.entity_index;
             iss >> planet.location.pos_x;
             iss >> planet.location.pos_y;
             iss >> planet.health;
@@ -61,6 +59,7 @@ namespace hlt {
                 planet.owned = false;
                 int false_owner;
                 iss >> false_owner;
+                planet.owner = -1;
             }
 
             int num_docked_ships;
@@ -73,7 +72,7 @@ namespace hlt {
                 planet.docked_ships.push_back(ship_id);
             }
 
-            return std::make_pair(planet_id, planet);
+            return std::make_pair(planet.entity_index, planet);
         }
 
         static Map parse_map(const std::string& input, const int map_width, const int map_height) {

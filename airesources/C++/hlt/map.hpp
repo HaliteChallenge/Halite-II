@@ -20,6 +20,7 @@
 #include "planet.hpp"
 #include "ship.hpp"
 #include "entity_id.hpp"
+#include "collision.hpp"
 
 namespace hlt {
     class Map {
@@ -31,6 +32,36 @@ namespace hlt {
         Map();
         Map(const Map& other_map);
         Map(int width, int height);
+
+        std::vector<Entity*> objects_between(const Location& start, const Location& target) const {
+            std::vector<Entity*> entities_found;
+
+            for (auto planet : planets) {
+                check_and_add_entity_between(entities_found, start, target, planet.second);
+            }
+
+            for (auto player_ship : ships) {
+                for (auto ship : player_ship.second) {
+                    check_and_add_entity_between(entities_found, start, target, ship.second);
+                }
+            }
+
+            return entities_found;
+        }
+
+        static void check_and_add_entity_between(
+                std::vector<Entity*> &entities_found,
+                const Location &start, const Location &target,
+                Entity &entity_to_check)
+        {
+            const Location& location = entity_to_check.location;
+            if (location == start || location == target) {
+                return;
+            }
+            if (segment_circle_intersect(start, target, entity_to_check, constants::FORECAST_FUDGE_FACTOR)) {
+                entities_found.push_back(&entity_to_check);
+            }
+        }
 
         bool is_valid(EntityId entity_id);
         bool within_bounds(const Location& location) const;

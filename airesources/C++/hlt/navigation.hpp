@@ -5,57 +5,57 @@
 #include "util.hpp"
 
 namespace hlt {
-/*    static possibly<Move> navigate_ship_towards_target(
-            const Map& gameMap,
+    static possibly<Move> navigate_ship_towards_target(
+            const Map& map,
             const Ship& ship,
-            const Location &targetPos,
-            const int maxThrust,
-            const bool avoidObstacles,
-            const int maxCorrections,
-            const double angularStepRad)
+            const Location& target,
+            const int max_thrust,
+            const bool avoid_obstacles,
+            const int max_corrections,
+            const double angular_step_rad)
     {
-        if (maxCorrections <= 0) {
-            return {Move{}, false};
+        if (max_corrections <= 0) {
+            return { Move{}, false };
         }
 
-        const double distance = ship.get_distance_to(targetPos);
-        const double angleRad = ship.orient_towards_in_rad(targetPos);
+        const double distance = ship.location.get_distance_to(target);
+        const double angle_rad = ship.location.orient_towards_in_rad(target);
 
-        if (avoidObstacles && !gameMap.objects_between(ship, targetPos).isEmpty()) {
-            const double newTargetDx = cos(angleRad + angularStepRad) * distance;
-            const double newTargetDy = sin(angleRad + angularStepRad) * distance;
+        if (avoid_obstacles && !map.objects_between(ship.location, target).empty()) {
+            const double newTargetDx = cos(angle_rad + angular_step_rad) * distance;
+            const double newTargetDy = sin(angle_rad + angular_step_rad) * distance;
             const Location newTarget = { ship.location.pos_x + newTargetDx, ship.location.pos_y + newTargetDy };
 
-            return navigate_ship_towards_target(gameMap, ship, newTarget, maxThrust, true, (maxCorrections - 1),
-                                                angularStepRad);
+            return navigate_ship_towards_target(
+                    map, ship, newTarget, max_thrust, true, (max_corrections - 1), angular_step_rad);
         }
 
         int thrust;
-        if (distance < maxThrust) {
+        if (distance < max_thrust) {
             // Do not round up, since overshooting might cause collision.
             thrust = (int) distance;
         }
         else {
-            thrust = maxThrust;
+            thrust = max_thrust;
         }
 
-        const int angleDeg = angle_rad_to_deg_clipped(angleRad);
+        const int angle_deg = angle_rad_to_deg_clipped(angle_rad);
 
-        return Move::thrust(ship, angleDeg, thrust);
-    }*/
+        return { Move::thrust(ship.entity_index, angle_deg, thrust), true };
+    }
 
-    /*static possibly<Move> navigate_ship_to_dock(
+    static possibly<Move> navigate_ship_to_dock(
             const Map& map,
             const Ship& ship,
             const Entity& dock_target,
             const int max_thrust)
     {
-        const int maxCorrections = constants::MAX_NAVIGATION_CORRECTIONS;
-        const bool avoidObstacles = true;
-        const double angularStepRad = M_PI/180.0;
-        const Location targetPos = ship.get_closest_point(dock_target);
+        const int max_corrections = constants::MAX_NAVIGATION_CORRECTIONS;
+        const bool avoid_obstacles = true;
+        const double angular_step_rad = M_PI/180.0;
+        const Location& target = ship.location.get_closest_point(dock_target.location, dock_target.radius);
 
         return navigate_ship_towards_target(
-                map, ship, targetPos, max_thrust, avoidObstacles, maxCorrections, angularStepRad);
-    }*/
+                map, ship, target, max_thrust, avoid_obstacles, max_corrections, angular_step_rad);
+    }
 }

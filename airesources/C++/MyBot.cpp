@@ -1,3 +1,4 @@
+#include <navigation.hpp>
 #include "hlt/hlt.hpp"
 
 int main() {
@@ -7,16 +8,16 @@ int main() {
     auto moves = std::vector<hlt::Move>();
     for (;;) {
         moves.clear();
-        const hlt::Map game_map = hlt::in::get_map(metadata.map_width, metadata.map_height);
+        const hlt::Map map = hlt::in::get_map(metadata.map_width, metadata.map_height);
         hlt::Log::log("got map");
 
-        hlt::Log::log("ships size: " + std::to_string(game_map.ships.size()));
-        for (const auto& ships : game_map.ships) {
+        hlt::Log::log("ships size: " + std::to_string(map.ships.size()));
+        for (const auto& ships : map.ships) {
             hlt::Log::log("- " + std::to_string(ships.first) + " : " + std::to_string(ships.second.size()));
         }
 
-        hlt::Log::log("my ships size: " + std::to_string(game_map.ships.at(player_id).size()));
-        for (const auto& ship_pair : game_map.ships.at(player_id)) {
+        hlt::Log::log("my ships size: " + std::to_string(map.ships.at(player_id).size()));
+        for (const auto& ship_pair : map.ships.at(player_id)) {
             const auto ship_id = ship_pair.first;
             const auto& ship = ship_pair.second;
 
@@ -27,8 +28,8 @@ int main() {
                 continue;
             }
 
-            hlt::Log::log("- looking at planets: " + std::to_string(game_map.planets.size()));
-            for (const auto& planet_pair : game_map.planets) {
+            hlt::Log::log("- looking at planets: " + std::to_string(map.planets.size()));
+            for (const auto& planet_pair : map.planets) {
                 const auto planet_id = planet_pair.first;
                 const auto& planet = planet_pair.second;
 
@@ -41,11 +42,11 @@ int main() {
                     break;
                 }
 
-                const auto angle = ship.angle_to(planet);
-                moves.push_back(hlt::Move::thrust(
-                    ship_id,
-                    game_map.adjust_for_collision(ship.location, angle, 2)
-                ));
+                const hlt::possibly<hlt::Move> move =
+                        hlt::navigate_ship_to_dock(map, ship, planet, hlt::constants::MAX_SPEED / 2);
+                if (move.second) {
+                    moves.push_back(move.first);
+                }
 
                 break;
             }

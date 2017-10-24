@@ -12,20 +12,13 @@
 
 namespace hlt {
     struct Entity {
+        EntityIndex entity_index;
         Location location;
-        unsigned short health;
+        int health;
         double radius;
 
         bool is_alive() const {
             return health > 0;
-        }
-
-        double angle_to(const Entity &target) const {
-            return this->location.angle_to(target.location);
-        }
-
-        double angle_to(const Location &target) const {
-            return this->location.angle_to(target);
         }
     };
 }

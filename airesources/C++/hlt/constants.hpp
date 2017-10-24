@@ -47,6 +47,13 @@ namespace hlt {
         ////////////////////////////////////////////////////////////////////////
         // Implementation-specific constants
 
+        constexpr double FORECAST_FUDGE_FACTOR = SHIP_RADIUS + 0.1;
         constexpr int MAX_NAVIGATION_CORRECTIONS = 90;
+
+        /**
+         * Used in Location::get_closest_point()
+         * Minimum distance specified from the object's outer radius.
+         */
+        constexpr int MIN_DISTANCE_FOR_CLOSEST_POINT = 3;
     }
 }
