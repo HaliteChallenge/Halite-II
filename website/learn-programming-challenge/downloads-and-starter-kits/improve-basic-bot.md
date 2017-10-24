@@ -25,7 +25,7 @@ We can sort the planets by distance before iterating over them. The faster we ca
 entities_by_distance = game_map.nearby_entities_by_distance(ship)
 nearest_planet = None
 for distance in sorted(entities_by_distance):
-  nearest_planet = next((nearest_entity for nearest_entity in entities_by_distance[distance] if isinstance(nearest_entity, entity.Planet)), None)
+  nearest_planet = next((nearest_entity for nearest_entity in entities_by_distance[distance] if isinstance(nearest_entity, hlt.entity.Planet)), None)
   if nearest_planet:
     break
 ```
