@@ -65,7 +65,7 @@ At the beginning of the game, bot is sent the following, finalized with a newlin
 - A single integer representing their own tag within the game.
 - Two integers representing the WIDTH and HEIGHT of the map.
 - The initial game map.
-- Every bot is expected to respond with a string representing their name (newline-terminated) within 30 seconds.
+- Every bot is expected to respond with a string representing their name (newline-terminated) within 1 minute.
 
 ### Turn
 Every turn, every bot is sent the the present game map (newline-terminated). Every bot is expected to respond with a set of moves (newline-terminated) within 2 seconds.

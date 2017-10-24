@@ -1,47 +1,43 @@
 #include "hlt/hlt.hpp"
+#include "hlt/navigation.hpp"
 
 int main() {
-    hlt::PlayerId my_tag;
+    const hlt::Metadata metadata = hlt::initialize("IvanTheTerrible");
+    const hlt::PlayerId player_id = metadata.player_id;
 
-    auto setup = hlt::initialize("Settler of C++");
-    my_tag = setup.first;
-
-    auto moves = std::vector<hlt::Move>();
-    while (true) {
-        auto game_map = hlt::get_map();
+    std::vector<hlt::Move> moves;
+    for (;;) {
         moves.clear();
+        const hlt::Map map = hlt::in::get_map(metadata.map_width, metadata.map_height);
 
-        for (const auto& ship_pair : game_map.ships[my_tag]) {
-            const auto ship_id = ship_pair.first;
-            const auto& ship = ship_pair.second;
-
-            if (ship.docking_status != hlt::DockingStatus::Undocked) {
+        for (const hlt::Ship& ship : map.ships.at(player_id)) {
+            if (ship.docking_status != hlt::ShipDockingStatus::Undocked) {
                 continue;
             }
 
-            for (const auto& planet_pair : game_map.planets) {
-                const auto planet_id = planet_pair.first;
-                const auto& planet = planet_pair.second;
-
+            for (const hlt::Planet& planet : map.planets) {
                 if (planet.owned) {
                     continue;
                 }
 
                 if (ship.can_dock(planet)) {
-                    moves.push_back(hlt::Move::dock(ship_id, planet_id));
+                    moves.push_back(hlt::Move::dock(ship.entity_id, planet.entity_id));
+                    break;
                 }
-                else {
-                    const auto angle = ship.angle_to(planet);
-                    moves.push_back(hlt::Move::thrust(
-                        ship_id,
-                        game_map.adjust_for_collision(ship.location, angle, 2)
-                    ));
+
+                const hlt::possibly<hlt::Move> move =
+                        hlt::navigation::navigate_ship_to_dock(map, ship, planet, hlt::constants::MAX_SPEED / 2);
+                if (move.second) {
+                    moves.push_back(move.first);
                 }
 
                 break;
             }
         }
 
-        hlt::send_moves(moves);
+        if (!hlt::out::send_moves(moves)) {
+            hlt::Log::log("send_moves failed; exiting");
+            break;
+        }
     }
 }

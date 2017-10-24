@@ -528,8 +528,12 @@ def update_user(intended_user_id, *, user_id):
     # Validate new country/region, if provided
     if update.get("country_code") or update.get("country_subdivision_code"):
         country_code = update.get("country_code", old_user["country_code"])
+        # Only fill in old country subdivision code as default if user
+        # didn't provide a new country code
         subdivision_code = update.get("country_subdivision_code",
-                                      old_user["country_subdivision_code"])
+                                      old_user["country_subdivision_code"]
+                                      if not update.get("country_code")
+                                      else None)
 
         if not web_util.validate_country(country_code, subdivision_code):
             raise util.APIError(

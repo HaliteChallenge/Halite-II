@@ -19,6 +19,25 @@ Before submitting a bot, make sure you adhere to our guidelines, or the upload o
 * Website: You can use the [play page](/play-programming-challenge) in the Halite website to submit your bot.
 * Halite Client: If you a command line experience, you can use the [Halite Client tool](/learn-programming-challenge//halite-cli-and-tools/halite-client-tools) to upload your bot.
 
+## Most common issue
+If you compress your .zip file by compressing the folder containing all the files, you will get a compilation error.
+
+### Wrong:
+``` 
+submission.zip
+- /Submission
+|- MyBot.py
+|- /hlt
+```
+As you can see, the submission.zip first has the folder then the files. Instead, put files in the root of the document - highlight all the files that you want to compress, not the file containing them.
+
+### Right:
+``` 
+submission.zip
+- MyBot.py
+- /hlt
+```
+
 ## Related Reading
  
  * [Customize your bot](customize-bot)

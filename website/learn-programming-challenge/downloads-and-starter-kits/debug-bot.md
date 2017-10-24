@@ -23,7 +23,7 @@ If you bot fails compilation, you will get an email to that effect. The most com
 Your bot will be killed if it exceeds the following time limits during game execution, and a timeout email will be sent with a link to the log. You can also access these logs if you go to your [user profile](/user/?me). We will disable bots that show an excessive number of timeout failures to make sure that other competitors play more challenging games. 
 
 * **Install Time:** Prior to game start you have `10 mins` to install any dependencies.
-* **Initialization Time:** Prior to the first turn, you have `30 secs` to do any game specific adjustments before the game starts.
+* **Initialization Time:** Prior to the first turn, you have `1 minute` to do any game specific adjustments before the game starts.
 * **Per Turn Time:** Each player has at `max 2 seconds` per turn to respond with a command to the engine, if your bot exceeds this time limit, your bot is killed.
 
 ### Timeouts in the Python Starter Bot

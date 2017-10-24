@@ -133,6 +133,7 @@ import {tierClass, countries_data} from '../utils'
 import vSelect from 'vue-select'
 import _ from 'lodash'
 import moment from 'moment'
+ import dateformat from 'dateformat'
 
 const DEFAULT_LIMIT = 25
 
@@ -631,8 +632,14 @@ export default {
         return countries.getName(name, 'en')
       },
       getFormattedDate: function (date) {
-        return moment(date).startOf('day').fromNow()
-      }
+        var cdate = moment(date)
+          if (cdate.isValid()) {
+            var dateFormat = require('dateformat')
+            return dateFormat(date, 'dd/mm/yy HH:MM')
+          } else {
+            return return_value_not_valid
+          }
+      },
     }
   }
 </script>
