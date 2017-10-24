@@ -30,6 +30,11 @@ namespace hlt {
 
         out::send_string(bot_name);
 
+        // halite sends full map as part of initialization, we can discard it since
+        // we'll get it as first map update anyway, but if you want, you can parse
+        // it using hlt::in::get_map
+        in::get_string();
+
         return { static_cast<PlayerId>(player_id), map_width, map_height };
     }
 }
