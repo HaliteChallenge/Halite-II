@@ -6,7 +6,7 @@
 
 namespace hlt {
     /// The states a ship can be in regarding docking.
-    enum class DockingStatus {
+    enum class ShipDockingStatus {
         Undocked = 0,
         Docking = 1,
         Docked = 2,
@@ -17,7 +17,7 @@ namespace hlt {
         /// The turns left before the ship can fire again.
         int weapon_cooldown;
 
-        DockingStatus docking_status;
+        ShipDockingStatus docking_status;
 
         /// The number of turns left to complete (un)docking.
         int docking_progress;

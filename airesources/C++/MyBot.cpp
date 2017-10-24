@@ -1,5 +1,5 @@
-#include <navigation.hpp>
 #include "hlt/hlt.hpp"
+#include "hlt/navigation.hpp"
 
 int main() {
     const hlt::Metadata metadata = hlt::initialize("IvanTheTerrible");
@@ -23,7 +23,7 @@ int main() {
 
             hlt::Log::log("- looking at ship: " + std::to_string(ship_id));
 
-            if (ship.docking_status != hlt::DockingStatus::Undocked) {
+            if (ship.docking_status != hlt::ShipDockingStatus::Undocked) {
                 hlt::Log::log("- docked, passing");
                 continue;
             }
@@ -43,7 +43,7 @@ int main() {
                 }
 
                 const hlt::possibly<hlt::Move> move =
-                        hlt::navigate_ship_to_dock(map, ship, planet, hlt::constants::MAX_SPEED / 2);
+                        hlt::navigation::navigate_ship_to_dock(map, ship, planet, hlt::constants::MAX_SPEED / 2);
                 if (move.second) {
                     moves.push_back(move.first);
                 }

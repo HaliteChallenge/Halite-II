@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cmath>
-
-#include "entity.hpp"
+#include "types.hpp"
 #include "util.hpp"
 
 namespace hlt {
@@ -29,7 +27,7 @@ namespace hlt {
         }
 
         static Move thrust(const EntityId ship_id, const double angle_rad, const int thrust) {
-            return { MoveType::Thrust, ship_id, thrust, angle_rad_to_deg_clipped(angle_rad), 0 };
+            return { MoveType::Thrust, ship_id, thrust, util::angle_rad_to_deg_clipped(angle_rad), 0 };
         }
 
         static Move thrust(const EntityId ship_id, const std::pair<double, int>& direction) {

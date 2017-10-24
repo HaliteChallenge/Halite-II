@@ -1,8 +1,9 @@
 #pragma once
 
 #include <ostream>
-#include "util.hpp"
+
 #include "constants.hpp"
+#include "util.hpp"
 
 namespace hlt {
     struct Location {
@@ -15,7 +16,7 @@ namespace hlt {
         }
 
         int orient_towards_in_deg(const Location& target) const {
-            return angle_rad_to_deg_clipped(orient_towards_in_rad(target));
+            return util::angle_rad_to_deg_clipped(orient_towards_in_rad(target));
         }
 
         double orient_towards_in_rad(const Location& target) const {

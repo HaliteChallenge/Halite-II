@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 #include "map.hpp"
 
 namespace hlt {
@@ -25,7 +27,7 @@ namespace hlt {
 
             int docking_status;
             iss >> docking_status;
-            ship.docking_status = static_cast<DockingStatus>(docking_status);
+            ship.docking_status = static_cast<ShipDockingStatus>(docking_status);
 
             iss >> ship.docked_planet;
             iss >> ship.docking_progress;

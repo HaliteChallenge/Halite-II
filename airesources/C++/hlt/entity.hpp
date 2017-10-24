@@ -1,14 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <utility>
-#include <vector>
-
-#include "constants.hpp"
-#include "types.hpp"
 #include "location.hpp"
+#include "types.hpp"
 
 namespace hlt {
     struct Entity {
