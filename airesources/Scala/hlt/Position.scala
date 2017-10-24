@@ -13,9 +13,9 @@ class Position(val xPos: Double, val yPos: Double) {
     val MIN_DISTANCE = 3
     val radius = target.radius + MIN_DISTANCE
     val angleRad = target.orientTowardsInRad(this)
-    val dx = target.getXPos + radius * Math.cos(angleRad)
-    val dy = target.getYPos + radius * Math.sin(angleRad)
-    new Position(dx, dy)
+    val x = target.getXPos + radius * Math.cos(angleRad)
+    val y = target.getYPos + radius * Math.sin(angleRad)
+    new Position(x, y)
   }
 
   def getYPos: Double = yPos
