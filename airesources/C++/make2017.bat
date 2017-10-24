@@ -7,6 +7,6 @@ CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary
 
 cl.exe /std:c++14 /O2 /MT /EHsc /I . /Fo.\obj\ ^
  /D_USE_MATH_DEFINES ^
- .\hlt\entity.cpp .\hlt\map.cpp .\hlt\move.cpp ^
+ .\hlt\location.cpp .\hlt\map.cpp ^
  .\MyBot.cpp ^
  /link /out:MyBot.exe
