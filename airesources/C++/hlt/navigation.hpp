@@ -8,10 +8,10 @@
 namespace hlt {
     namespace navigation {
         static void check_and_add_entity_between(
-                std::vector<Entity *>& entities_found,
+                std::vector<const Entity *>& entities_found,
                 const Location& start,
                 const Location& target,
-                Entity& entity_to_check)
+                const Entity& entity_to_check)
         {
             const Location &location = entity_to_check.location;
             if (location == start || location == target) {
@@ -22,15 +22,15 @@ namespace hlt {
             }
         }
 
-        static std::vector<Entity *> objects_between(const Map& map, const Location& start, const Location& target) {
-            std::vector<Entity *> entities_found;
+        static std::vector<const Entity *> objects_between(const Map& map, const Location& start, const Location& target) {
+            std::vector<const Entity *> entities_found;
 
-            for (auto planet : map.planets) {
+            for (const Planet& planet : map.planets) {
                 check_and_add_entity_between(entities_found, start, target, planet);
             }
 
-            for (auto player_ship : map.ships) {
-                for (auto ship : player_ship.second) {
+            for (const auto& player_ship : map.ships) {
+                for (const Ship& ship : player_ship.second) {
                     check_and_add_entity_between(entities_found, start, target, ship);
                 }
             }
@@ -73,7 +73,7 @@ namespace hlt {
 
             const int angle_deg = util::angle_rad_to_deg_clipped(angle_rad);
 
-            return { Move::thrust(ship.entity_id, angle_deg, thrust), true };
+            return { Move::thrust(ship.entity_id, thrust, angle_deg), true };
         }
 
         static possibly<Move> navigate_ship_to_dock(

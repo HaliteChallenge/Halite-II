@@ -26,12 +26,12 @@ namespace hlt {
             return { MoveType::Undock, ship_id, -1, -1, 0 };
         }
 
-        static Move thrust(const EntityId ship_id, const double angle_rad, const int thrust) {
-            return { MoveType::Thrust, ship_id, thrust, util::angle_rad_to_deg_clipped(angle_rad), 0 };
+        static Move thrust(const EntityId ship_id, const int thrust, const int angle_deg) {
+            return { MoveType::Thrust, ship_id, thrust, angle_deg, 0 };
         }
 
-        static Move thrust(const EntityId ship_id, const std::pair<double, int>& direction) {
-            return thrust(ship_id, direction.first, direction.second);
+        static Move thrust_rad(const EntityId ship_id, const int thrust, const double angle_rad) {
+            return { MoveType::Thrust, ship_id, thrust, util::angle_rad_to_deg_clipped(angle_rad), 0 };
         }
     };
 }

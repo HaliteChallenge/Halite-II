@@ -84,21 +84,17 @@ namespace hlt {
             int num_players;
             iss >> num_players;
 
-//            Log::log("mp3 - num_players: " + std::to_string(num_players));
-
             Map map = Map(map_width, map_height);
 
-            for (auto i = 0; i < num_players; ++i) {
+            for (int i = 0; i < num_players; ++i) {
                 PlayerId player_id;
                 int player_id_int;
                 iss >> player_id_int;
-//                Log::log("mp4.1 player_id_int: " + std::to_string(player_id_int));
 
                 player_id = static_cast<PlayerId>(player_id_int);
 
                 unsigned int num_ships;
                 iss >> num_ships;
-//                Log::log("mp4.2 num_ships: " + std::to_string(num_ships));
 
                 std::vector<Ship>& ship_vec = map.ships[player_id];
                 entity_map<unsigned int>& ship_map = map.ship_map[player_id];
@@ -114,8 +110,6 @@ namespace hlt {
             unsigned int num_planets;
             iss >> num_planets;
 
-//            Log::log("mp5.1 - num_planets: " + std::to_string(num_planets));
-
             map.planets.reserve(num_planets);
             for (unsigned int i = 0; i < num_planets; ++i) {
                 const auto& planet_pair = parse_planet(iss);
@@ -123,16 +117,12 @@ namespace hlt {
                 map.planet_map[planet_pair.first] = i;
             }
 
-//            Log::log("mp6: " + std::to_string(map.planets.size()));
-
             return map;
         }
 
         static const Map get_map(const int map_width, const int map_height) {
             Log::log("--- NEW TURN ---");
-            const auto input = get_string();
-//            Log::log("input size: " + std::to_string(input.size()));
-            Log::log("input: " + input);
+            const std::string input = get_string();
             return parse_map(input, map_width, map_height);
         }
     }

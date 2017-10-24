@@ -17,7 +17,7 @@ namespace hlt {
         /// Send all queued moves to the game engine.
         static bool send_moves(const std::vector<Move>& moves) {
             std::ostringstream oss;
-            for (const auto& move : moves) {
+            for (const Move& move : moves) {
                 switch (move.type) {
                     case MoveType::Noop:
                         continue;
@@ -35,7 +35,7 @@ namespace hlt {
                         break;
                 }
             }
-            Log::log(oss.str());
+
             return send_string(oss.str());
         }
     }
