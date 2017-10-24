@@ -184,8 +184,8 @@ export default {
       const getHackathonPromise = () => {
         if (this.hackathon_id) {
           return api.getHackathon(this.hackathon_id).then(hackathon => {
-            const beginDate = moment(hackathon.start_date).format('MMM Do, YYYY: HH:MM')
-            const endDate = moment(hackathon.end_date).format('MMM Do, YYYY: HH:MM')
+            const beginDate = moment(hackathon.start_date).format('MMM Do, YYYY: HH:mm')
+            const endDate = moment(hackathon.end_date).format('MMM Do, YYYY: HH:mm')
             this.hackathon = Object.assign(mockHackathon, {
               title: hackathon.title,
               date: `${beginDate} to ${endDate}`,
