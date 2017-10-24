@@ -17,12 +17,12 @@
                             <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
-                    <div v-if="is_my_page && bots && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
+                    <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
                         <p class="warning">
                             Your bot is disabled   <span title="Due to excessive timeouts or errors, you bot has been disabled, look at the game logs to debug the issue or try submitting it again." class="info-icon icon-info"></span>
                         </p>
                     </div>
-                     <div v-if="is_my_page && bots && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
+                     <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
                         <p class="warning">
                             Your bot failed to compile   <span title="Look at the compilation failure mail to debug the issue or try submitting it again." class="info-icon icon-info"></span>
                         </p>
@@ -167,8 +167,8 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <div class="info-icon-trophy">
-                                                        <span v-if="game.players[user.user_id].rank === 1" class="icon-trophy"></span>
+                                                    <div class="info-icon-trophy" v-if="game.players[user.user_id].rank === 1">
+                                                        <span class="icon-trophy"></span>
                                                     </div>
                                                     <a v-for="player in game.playerSorted"
                                                     :href="'/user?user_id=' + player.id"
@@ -584,8 +584,9 @@
             })
           }
           setTimeout(() => {
-            calcCol()
-          }, 500)
+            calcCol();
+            console.log('cal col');
+          }, 200)
         },
         fetch: function () {
           let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`
