@@ -6,8 +6,8 @@ public class Collision {
      *
      * @param start  The start of the segment.
      * @param end    The end of the segment.
-     * @param circle: The circle to test against.
-     * @param fudge  An additional safety zone to leave when looking for collisions. (Probably set it to ship radius 0.5)
+     * @param circle The circle to test against.
+     * @param fudge  An additional safety zone to leave when looking for collisions. Probably set it to ship radius.
      * @return true if the segment intersects, false otherwise
      */
     public static boolean segmentCircleIntersect(final Position start, final Position end, final Entity circle, final double fudge) {
