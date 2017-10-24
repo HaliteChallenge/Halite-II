@@ -42,13 +42,13 @@ namespace Halite2.hlt {
         }
 
         public Position GetClosestPoint(Position target) {
-            double radius = target.GetRadius() + Constants.MIN_DISTANCE;
+            double radius = target.GetRadius() + Constants.MIN_DISTANCE_FOR_CLOSEST_POINT;
             double angleRad = target.OrientTowardsInRad(this);
 
-            double dx = target.GetXPos() + radius * Math.Cos(angleRad);
-            double dy = target.GetYPos() + radius * Math.Sin(angleRad);
+            double x = target.GetXPos() + radius * Math.Cos(angleRad);
+            double y = target.GetYPos() + radius * Math.Sin(angleRad);
 
-            return new Position(dx, dy);
+            return new Position(x, y);
         }
 
         public override bool Equals(Object o) {
