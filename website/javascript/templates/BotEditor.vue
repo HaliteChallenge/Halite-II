@@ -2,15 +2,16 @@
     <div class="editorArea">
         <div v-if="editorViewer" class="language-options">
             <h3>CHECK OUT A STARTER BOT</h3>
+            <!-- <p class="tip-info"><i class="fa fa-info-circle"></i>This bot doesn't save locally.</p> -->
             <select class="form-control" placeholder="Select a language" v-model="selected_language" v-on:change="reset_language">
                 <option v-for="(_, lang) in all_bot_languages"
                         v-bind:value="lang">
                 {{ lang }}
                 </option>
             </select>
-            <span class="optGroup">
+            <!-- <span class="optGroup">
                 <button v-on:click="reset_code">Reset Code</button>
-            </span>
+            </span> -->
         </div>
         <div class="editorBody" id="embeddedEditor">
             <div class="editorTitle">
