@@ -41,7 +41,7 @@ namespace hlt {
 
         const int angle_deg = angle_rad_to_deg_clipped(angle_rad);
 
-        return { Move::thrust(ship.entity_index, angle_deg, thrust), true };
+        return { Move::thrust(ship.entity_id, angle_deg, thrust), true };
     }
 
     static possibly<Move> navigate_ship_to_dock(

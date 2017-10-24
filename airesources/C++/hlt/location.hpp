@@ -8,10 +8,6 @@ namespace hlt {
     struct Location {
         double pos_x, pos_y;
 
-        double distance(const Location& other) const;
-        double distance2(const Location& other) const;
-        double angle_to(const Location& target) const;
-
         double get_distance_to(const Location& target) const {
             const double dx = pos_x - target.pos_x;
             const double dy = pos_y - target.pos_y;

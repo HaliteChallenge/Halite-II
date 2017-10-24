@@ -12,7 +12,7 @@
 
 namespace hlt {
     struct Entity {
-        EntityIndex entity_index;
+        EntityId entity_id;
         Location location;
         int health;
         double radius;

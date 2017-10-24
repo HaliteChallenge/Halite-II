@@ -10,10 +10,10 @@ namespace hlt {
             return result;
         }
 
-        static std::pair<EntityIndex, Ship> parse_ship(std::stringstream& iss) {
+        static std::pair<EntityId, Ship> parse_ship(std::stringstream& iss) {
             Ship ship;
 
-            iss >> ship.entity_index;
+            iss >> ship.entity_id;
             iss >> ship.location.pos_x;
             iss >> ship.location.pos_y;
             iss >> ship.health;
@@ -33,13 +33,13 @@ namespace hlt {
 
             ship.radius = constants::SHIP_RADIUS;
 
-            return std::make_pair(ship.entity_index, ship);
+            return std::make_pair(ship.entity_id, ship);
         }
 
-        static std::pair<EntityIndex, Planet> parse_planet(std::istream& iss) {
+        static std::pair<EntityId, Planet> parse_planet(std::istream& iss) {
             Planet planet;
 
-            iss >> planet.entity_index;
+            iss >> planet.entity_id;
             iss >> planet.location.pos_x;
             iss >> planet.location.pos_y;
             iss >> planet.health;
@@ -67,12 +67,12 @@ namespace hlt {
 
             planet.docked_ships.reserve(num_docked_ships);
             for (auto i = 0; i < num_docked_ships; ++i) {
-                EntityIndex ship_id;
+                EntityId ship_id;
                 iss >> ship_id;
                 planet.docked_ships.push_back(ship_id);
             }
 
-            return std::make_pair(planet.entity_index, planet);
+            return std::make_pair(planet.entity_id, planet);
         }
 
         static Map parse_map(const std::string& input, const int map_width, const int map_height) {
@@ -81,7 +81,7 @@ namespace hlt {
             int num_players;
             iss >> num_players;
 
-            Log::log("mp3 - num_players: " + std::to_string(num_players));
+//            Log::log("mp3 - num_players: " + std::to_string(num_players));
 
             Map map = Map(map_width, map_height);
 
@@ -89,13 +89,13 @@ namespace hlt {
                 PlayerId player_id;
                 int player_id_int;
                 iss >> player_id_int;
-                Log::log("mp4.1 player_id_int: " + std::to_string(player_id_int));
+//                Log::log("mp4.1 player_id_int: " + std::to_string(player_id_int));
 
                 player_id = static_cast<PlayerId>(player_id_int);
 
                 int num_ships;
                 iss >> num_ships;
-                Log::log("mp4.2 num_ships: " + std::to_string(num_ships));
+//                Log::log("mp4.2 num_ships: " + std::to_string(num_ships));
 
                 map.ships[player_id] = {};
                 for (auto j = 0; j < num_ships; ++j) {
@@ -107,14 +107,14 @@ namespace hlt {
             int num_planets;
             iss >> num_planets;
 
-            Log::log("mp5.1 - num_planets: " + std::to_string(num_planets));
+//            Log::log("mp5.1 - num_planets: " + std::to_string(num_planets));
 
             for (auto i = 0; i < num_planets; i++) {
                 const auto& planet_pair = parse_planet(iss);
                 map.planets[planet_pair.first] = planet_pair.second;
             }
 
-            Log::log("mp6");
+//            Log::log("mp6");
 
             return map;
         }
@@ -122,7 +122,7 @@ namespace hlt {
         static const Map get_map(const int map_width, const int map_height) {
             Log::log("--- NEW TURN ---");
             const auto input = get_string();
-            Log::log("input size: " + std::to_string(input.size()));
+//            Log::log("input size: " + std::to_string(input.size()));
             Log::log("input: " + input);
             return parse_map(input, map_width, map_height);
         }
