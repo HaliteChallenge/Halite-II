@@ -24,6 +24,9 @@ body{
 
 a{
   color: #FFBE00;
+  &:hover{
+    color: $yellow;
+  }
 }
 .hl{
   color: #FFBE00; 
