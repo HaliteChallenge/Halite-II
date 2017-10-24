@@ -48,7 +48,7 @@ namespace hlt {
                 const double angular_step_rad)
         {
             if (max_corrections <= 0) {
-                return { Move{}, false };
+                return { Move::noop(), false };
             }
 
             const double distance = ship.location.get_distance_to(target);

@@ -18,6 +18,10 @@ namespace hlt {
         const int move_angle_deg;
         const EntityId dock_to;
 
+        static Move noop() {
+            return { MoveType::Noop, 0, -1, -1, 0 };
+        }
+
         static Move dock(EntityId ship_id, EntityId dock_to) {
             return { MoveType::Dock, ship_id, -1, -1, dock_to };
         }

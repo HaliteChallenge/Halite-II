@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "entity.hpp"
 #include "location.hpp"
 
