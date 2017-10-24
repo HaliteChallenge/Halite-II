@@ -1,74 +1,41 @@
-//
-// Created by David Li on 7/19/17.
-//
+#pragma once
 
-#ifndef AIRESOURCES_MOVE_HPP
-#define AIRESOURCES_MOVE_HPP
-
-#ifdef _WIN32
-#define _USE_MATH_DEFINES
-#endif
-
-#include <cmath>
-
-#include "entity.hpp"
+#include "types.hpp"
+#include "util.hpp"
 
 namespace hlt {
     enum class MoveType {
-        //! Noop is not user-specifiable - instead it's the default command,
-        //! used to mean that no command was issued
         Noop = 0,
         Thrust,
         Dock,
         Undock,
     };
 
-    /**
-     * Represents a command that may be issued to a ship.
-     */
     struct Move {
-        MoveType type;
-        EntityIndex ship_id;
+        const MoveType type;
+        const EntityId ship_id;
+        const int move_thrust;
+        const int move_angle_deg;
+        const EntityId dock_to;
 
-        union {
-            struct { unsigned short thrust; unsigned short angle; } thrust;
-            EntityIndex dock_to;
-        } move;
-
-        static auto dock(EntityIndex ship_id, EntityIndex dock_to) -> Move {
-            Move move;
-            move.type = MoveType::Dock;
-            move.ship_id = ship_id;
-            move.move.dock_to = dock_to;
-
-            return move;
+        static Move noop() {
+            return { MoveType::Noop, 0, -1, -1, 0 };
         }
 
-        static auto undock(EntityIndex ship_id) -> Move {
-            Move move;
-            move.type = MoveType::Undock;
-            return move;
+        static Move dock(EntityId ship_id, EntityId dock_to) {
+            return { MoveType::Dock, ship_id, -1, -1, dock_to };
         }
 
-        static auto thrust(EntityIndex ship_id, double angle,
-                           unsigned short thrust) -> Move {
-            Move move;
-            move.type = MoveType::Thrust;
-            move.ship_id = ship_id;
-            move.move.thrust.thrust = thrust;
-            auto angle_deg = static_cast<int>(angle * 180 / M_PI) % 360;
-            if (angle_deg < 0) angle_deg += 360;
-            move.move.thrust.angle =
-                static_cast<unsigned short>(angle_deg);
-
-            return move;
+        static Move undock(const EntityId ship_id) {
+            return { MoveType::Undock, ship_id, -1, -1, 0 };
         }
 
-        static auto thrust(EntityIndex ship_id,
-                           std::pair<double, unsigned short> direction) -> Move {
-            return thrust(ship_id, direction.first, direction.second);
+        static Move thrust(const EntityId ship_id, const int thrust, const int angle_deg) {
+            return { MoveType::Thrust, ship_id, thrust, angle_deg, 0 };
+        }
+
+        static Move thrust_rad(const EntityId ship_id, const int thrust, const double angle_rad) {
+            return { MoveType::Thrust, ship_id, thrust, util::angle_rad_to_deg_clipped(angle_rad), 0 };
         }
     };
 }
-
-#endif //AIRESOURCES_MOVE_HPP

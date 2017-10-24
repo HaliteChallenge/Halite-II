@@ -215,7 +215,7 @@ export default {
     },
     computed: {
       regions: function () {
-        if (!this.selected_country) return []
+        if (!this.selected_country || this.selected_country.value === 'NONE') return []
 
         const regions = Object.entries(iso3166.data[this.selected_country.code].sub)
 
@@ -289,7 +289,7 @@ export default {
           }
 
           request['country_code'] = this.country_code
-          if (this.country_region_code !== '') {
+          if (this.country_region_code !== '' && this.country_region_code !== 'NONE') {
             request['country_subdivision_code'] = this.country_region_code
           }
         }
