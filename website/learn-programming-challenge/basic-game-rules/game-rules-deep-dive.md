@@ -74,7 +74,7 @@ To take control of a planet, a player must dock a ship to the planet. Only one t
 
 If two ships from different teams both issue docking commands on an unoccupied planet during the same turn, they will battle. If they both continue to issue docking commands, they will continue to battle. During these turns, the ships are not yet docking and therefore maintain their defenses (described under docking section below) until they start to successfully dock.
 
-Once a planet has been docked by one ship, the owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is equal to the radius. E.g. a planet with a radius of 3 units may have up to 3 ships docked to it at once.
+Once a planet has been docked by one ship, the owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is a function of the radius. E.g. a planet with a __radius of 3 units may have up to 3 ships__ docked to it at once.
 
 If a ship attempts to dock on a full side of a planet (all spots full) the docking process will move them to the closest unoccupied spot on the planet until the planet is full. If the planet is full, the dock command does nothing.
 
