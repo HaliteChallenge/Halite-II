@@ -183,7 +183,7 @@
   }
 
   .hackathon-in-progress-container {
-    padding: 0 0 20px 0;
+    padding: 0 15px 20px 15px;
     position: relative;
   }
 
@@ -194,14 +194,23 @@
 
   .hackathon-progress-cards {
     display: flex;
-    justify-content: center;
+    overflow-x: auto;
+    > [class*="col"]{
+      margin: 20px 0;
+      &:first-child{
+        margin-left: auto;
+      }
+      &:last-child{
+        margin-right: auto;
+      }
+    }
   }
 
   .hackathon-progress-card {
     width: 80%;
     margin: 0 auto;
     cursor: pointer;
-
+    min-width: 252px;
     .hackathon-card-img {
       width: 100%;
     }
@@ -210,6 +219,9 @@
       text-align: left;
       border: 1px solid #889295;
       padding: 15px 20px;
+      >p{
+        height:42px;
+      }
     }
   }
 
