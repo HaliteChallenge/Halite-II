@@ -7,7 +7,7 @@ description: Learn the details of the rules of the game to win the Halite AI Pro
 ---
 
 ## Start of Game
-All games are played with either 2 or 4 players. At the beginning of the game, for their first turn, all bots receive the initial game state, as well as their player ID, and have 30 seconds to prepare and send back their bot name.
+All games are played with either 2 or 4 players. At the beginning of the game, for their first turn, all bots receive the initial game state, as well as their player ID, and have 1 minute to prepare and send back their bot name.
 
 ## Map
 Maps are rectangular grids with 3:2 aspect ratio (e.g. 288 x 192 units), using a 2D Cartesian continuous non-wrapping grid. The largest board is 384 x 256 units, the smallest is 240 x 160 units. The coordinates are treated as a real Cartesian plane, and game entities can have floating-point positions. All distances are Euclidean (sqrt(dx^2 + dy^2)), and are between the centers of entities. If a ship goes off the grid it is considered dead, since the grid does not wrap.
