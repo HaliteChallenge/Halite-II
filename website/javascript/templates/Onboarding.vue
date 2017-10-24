@@ -32,7 +32,7 @@
 							- If you want to make one edit to the bot, you can change the navigate speed to 7!
 						</div>
 						<div>
-							- We also support Scala, Rust, and other languages. <a @click="downloadCode">Download a starter kit.</a>
+							- We also support Scala, Rust, and other languages. <a class="link-in-dark" @click="downloadCode">Download a starter kit.</a>
 							<p class="tip-info"><i class="fa fa-info-circle"></i>This bot doesn't save locally.</p>
 						</div>
 					</div>
@@ -174,7 +174,7 @@ export default {
 			  let _timeout = setTimeout(() => {
 				clearTimeout(_timeout);
 					this.maxSectionHeight();
-			  }, 200);
+			  }, 0);
 			  if (this.step == 2){
 			  	this.$refs.botEditor.$forceUpdate();
 			  }
@@ -216,8 +216,8 @@ export default {
 			 const winHeight = $(window).height();
 			 const sectionHeight = $('.section-content').prop('scrollHeight');
 			 const headerHeight = 61;
-			 const marginTop = 40;
-			 const marginBottom = 10;
+			 const marginTop = 50;
+			 const marginBottom = 20;
 			 let maxHeight = winHeight - headerHeight - marginTop - marginBottom;
 			 let overflow = 'auto';
 			 if(maxHeight > sectionHeight){
@@ -226,9 +226,14 @@ export default {
 			 $('.section-content').css({'overflow':overflow, 'max-height': maxHeight + 'px'});
 	   };
 	   $(window).on('resize', _.throttle(this.maxSectionHeight, 150));
-	   this.maxSectionHeight();
 		 // Show popup only when new=1 in querystring
 	   this.show = (document.location.search.toLowerCase().replace('?', '').split('&').includes('new=1'));
+	   if(this.show == true){
+		   let _timeout = setTimeout(() => {
+				clearTimeout(_timeout);
+		   		this.maxSectionHeight();
+			}, 0);
+	   }
 	 },
 	 methods: {
 	  play_replay: function (files) {
