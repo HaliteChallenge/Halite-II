@@ -8,7 +8,7 @@ namespace Halite2
 
         public static void Main(string[] args)
         {
-            string name = args.Length > 0 ? args[0] : "Tamagocchi";
+            string name = args.Length > 0 ? args[0] : "Sharpie";
 
             Networking networking = new Networking();
             GameMap gameMap = networking.Initialize(name);
