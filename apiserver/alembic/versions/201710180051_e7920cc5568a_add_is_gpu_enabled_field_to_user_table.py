@@ -1,7 +1,7 @@
 """Add is_gpu_enabled field to user table.
 
 Revision ID: e7920cc5568a
-Revises: 33de9025cc63
+Revises: 7f0054256cf5
 Create Date: 2017-10-18 00:51:17.501319+00:00
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = 'e7920cc5568a'
-down_revision = '33de9025cc63'
+down_revision = '7f0054256cf5'
 branch_labels = None
 depends_on = None
 

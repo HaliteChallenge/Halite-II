@@ -1,7 +1,7 @@
 """Change game id type.
 
 Revision ID: 33de9025cc63
-Revises: 7f0054256cf5
+Revises: e7920cc5568a
 Create Date: 2017-10-17 11:43:45.380672+00:00
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = '33de9025cc63'
-down_revision = '7f0054256cf5'
+down_revision = 'e7920cc5568a'
 branch_labels = None
 depends_on = None
 
