@@ -14,7 +14,7 @@ import * as assets from "./assets";
 import * as animation from "./animation";
 
 export class HaliteVisualizer {
-    constructor(replay) {
+    constructor(replay, width = null) {
         this.replay = replay;
         this.stats = new statistics.Statistics(replay);
 
@@ -37,6 +37,14 @@ export class HaliteVisualizer {
                 else this.play();
             },
         });
+
+        if (width && !width.isNaN){
+            const ratio = assets.VISUALIZER_SIZE / assets.VISUALIZER_HEIGHT;
+            assets.VISUALIZER_SIZE = width;
+            assets.VISUALIZER_HEIGHT = assets.VISUALIZER_SIZE / ratio;
+            console.log('new width: ' + assets.VISUALIZER_SIZE);
+            console.log('new height: ' + assets.VISUALIZER_HEIGHT);
+        }
 
         this.application = new PIXI.Application(
             assets.VISUALIZER_SIZE,
