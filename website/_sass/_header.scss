@@ -1,3 +1,8 @@
+header.unloaded{
+  opacity: 0;
+  transition: 200ms opacity;
+}
+
 .navbar-brand{
   padding: 6px 15px 0 15px;
   img{

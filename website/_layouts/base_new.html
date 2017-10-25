@@ -113,7 +113,7 @@
 
   {% if page.no_header %}
   {% else %}
-    <header class="navbar navbar-inverse navbar-fixed-top">
+    <header class="navbar navbar-inverse navbar-fixed-top unloaded">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -255,6 +255,7 @@ twq('track','PageView');
 
     $(document).ready(function() {
       minHeightFn();
+      $('header').removeClass('unloaded');
       setTimeout(function() {
           $('.container-empty').addClass('container-loaded');
       }, 250);

@@ -21,7 +21,7 @@
       <div class="row play-upload-section">
         <div class="col-sm-6">
           <div class="upload-container" id="bot-upload-container">
-            <Upload :logged-in="loggedIn"></Upload>
+            <Upload :logged-in="loggedIn" :showMessage="showMessage"></Upload>
           </div>
           <div class="upload-note">
             <p class="text-center">You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
