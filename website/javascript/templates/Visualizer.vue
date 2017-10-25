@@ -410,7 +410,7 @@
         value: this.frame
       })
 
-      const visualizer = new HaliteVisualizer(this.replay, $('.game-replay-viewer').width())
+      const visualizer = new HaliteVisualizer(this.replay)
       const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
       if (storedSpeedIndex) {
         const speedIndex = parseInt(storedSpeedIndex)
