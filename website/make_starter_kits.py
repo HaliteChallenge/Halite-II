@@ -70,6 +70,8 @@ def scan_directory(full_path):
 def make_archive(output, environment, base_path, included_files):
     """Create the output ZIP archive."""
     platform, source, target = environment
+    # Get rid of duplicates
+    included_files = list(set(included_files))
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
         if source is not None:
             # source is None <=> platform-agnostic archive
@@ -82,15 +84,6 @@ def make_archive(output, environment, base_path, included_files):
         for file in included_files:
             target_path = os.path.relpath(file, base_path)
             archive.write(file, target_path)
-
-        if "Windows" in platform:
-            run_game = os.path.join(base_path, "run_game.bat")
-            if os.path.isfile(run_game):
-                archive.write(run_game, "run_game.bat")
-        else:
-            run_game = os.path.join(base_path, "run_game.sh")
-            if os.path.isfile(run_game):
-                archive.write(run_game, "run_game.sh")
 
 
 def make_source_download():

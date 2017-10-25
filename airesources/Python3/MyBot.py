@@ -55,7 +55,11 @@ while True:
                 # This will mean that you have a higher probability of crashing into ships, but it also means you will
                 # make move decisions much quicker. As your skill progresses and your moves turn more optimal you may
                 # wish to turn that option off.
-                navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=hlt.constants.MAX_SPEED/2, ignore_ships=True)
+                navigate_command = ship.navigate(
+                    ship.closest_point_to(planet),
+                    game_map,
+                    speed=int(hlt.constants.MAX_SPEED/2),
+                    ignore_ships=True)
                 # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
                 # or we are trapped (or we reached our destination!), navigate_command will return null;
                 # don't fret though, we can run the command again the next turn)
