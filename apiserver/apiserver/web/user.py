@@ -81,15 +81,16 @@ def verify_affiliation(org_id, email_to_verify, provided_code):
         if "@" not in email_to_verify:
             raise util.APIError(400, message="Email invalid.")
         domain = email_to_verify.split("@")[1].strip().lower()
-        # Only use the TLD to search
+        domain_filter = model.organization_email_domains.c.domain == domain
+        # Also use the TLD to search
         domain_tld = tld.get_tld(domain, fail_silently=True, fix_protocol=True)
         if domain_tld:
-            domain = domain_tld
+            domain_filter |= model.organization_email_domains.c.domain == domain_tld
         count = conn.execute(sqlalchemy.sql.select([
             sqlalchemy.sql.func.count()
         ]).select_from(model.organization_email_domains).where(
             (model.organization_email_domains.c.organization_id == org_id) &
-            (model.organization_email_domains.c.domain == domain)
+            domain_filter
         )).first()[0]
 
         can_verify_by_code = org["verification_code"] is not None
@@ -148,9 +149,11 @@ def guess_affiliation(email):
         if "@" not in email:
             return None, None
         domain = email.split("@")[1].strip().lower()
+        domain_filter = model.organization_email_domains.c.domain == domain
+        # Also use the TLD to search
         domain_tld = tld.get_tld(domain, fail_silently=True, fix_protocol=True)
         if domain_tld:
-            domain = domain_tld
+            domain_filter |= model.organization_email_domains.c.domain == domain_tld
 
         organization = conn.execute(sqlalchemy.sql.select([
             model.organizations.c.id,
@@ -159,7 +162,7 @@ def guess_affiliation(email):
             sqlalchemy.sql.exists(
                 model.organization_email_domains.select().where(
                     (model.organization_email_domains.c.organization_id == model.organizations.c.id) &
-                    (model.organization_email_domains.c.domain == domain)
+                    domain_filter
                 )
             )
         )).first()
