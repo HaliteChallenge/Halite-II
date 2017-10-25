@@ -336,9 +336,14 @@ std::string Networking::get_string(hlt::PlayerId player_tag,
 std::string Networking::read_trailing_input(hlt::PlayerId player_tag, long max_lines) {
     std::string error_string = "";
     for(int line = 0; line < max_lines; line++) {
-        try{
+        try {
             error_string += get_string(player_tag, 0);
-        } catch(BotInputError exc) {
+        } catch (const BotInputError& exc) {
+            break;
+        } catch (const std::string& s) {
+            error_string += s;
+            break;
+        } catch (...) {
             break;
         }
     }

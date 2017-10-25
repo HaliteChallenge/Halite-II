@@ -440,7 +440,7 @@ export class HaliteVisualizer {
                         this.replay.constants.WEAPON_RADIUS,
                         delayTime,
                         side,
-                        this.shipContainer,
+                        this.shipContainer
                     ));
                 }
                 else if (event.event === "spawned") {
