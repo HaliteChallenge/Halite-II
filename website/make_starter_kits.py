@@ -31,8 +31,8 @@ ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
-versions =  {"Python3" : "1.0", "C++" : "0.9.0-beta", "Java" : "0.9.0-beta", "CSharp" : "0.7.0-alpha" ,"JavaScript": "0.7.0-alpha",
-"ML-StarterBot-Python":"0.9.0-beta", "Rust" : "0.9.0-beta", "Scala" : "0.9.0-beta", "Go" : "0.9.0-beta" }
+versions =  {"Python3" : "1.0", "C++" : "0.9.0-beta", "Java" : "1.0", "CSharp" : "0.7.0-beta" ,"JavaScript": "1.0",
+"ML-StarterBot-Python":"1.0", "Rust" : "0.9.0-beta", "Scala" : "0.9.0-beta", "Go" : "0.9.0-beta" }
 
 
 def detect_environments(directory):
@@ -142,9 +142,6 @@ def main():
             continue
 
         if directory == "starterkitdocs":
-            continue
-
-        if directory == "CSharp":
             continue
 
         language = directory

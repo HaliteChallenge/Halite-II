@@ -2,9 +2,12 @@
   display: flex;
   > li{
     flex: 1;
+    display: flex;
     > a{
       display: flex;
+      flex: 1;
       justify-content: center;
+      align-items: center;
       padding: 17px 0;
       background-color: transparent;
       border: none;

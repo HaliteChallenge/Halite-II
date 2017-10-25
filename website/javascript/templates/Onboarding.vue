@@ -26,14 +26,13 @@
 					<h2>Submit your first bot</h2>
 					<div class="step-flex">
 						<div>
-							- Feel free to select one of our three main basic bots (Python, C++ or Java) and click submit below to see how starter bots play.
+						Feel free to select one of our three main basic bots (Python, C++ or Java) and click submit below to see how starter bots play.
 						</div>
 						<div>
-							- If you want to make one edit to the bot, you can change the navigate speed to 7!
+						If you want to make one edit to the bot, you can change the navigate speed to 7!
 						</div>
 						<div>
-							- We also support Scala, Rust, and other languages. <a class="link-in-dark" @click="downloadCode">Download a starter kit.</a>
-							<p class="tip-info"><i class="fa fa-info-circle"></i>This bot doesn't save locally.</p>
+						We also support Scala, Rust, and other languages.
 						</div>
 					</div>
 					<div class="step-language">
@@ -72,7 +71,7 @@
 						</select>
 						<div class="download-section-link"><a @click="downloadCode" class="link-in-dark">Download Code</a><img :src="`${baseUrl}/assets/images/temp/download.png`"/></div>
 					</div>
-					<p class="step-margin">Check out your <a class="link-in-dark" href="/user?me">user profile</a> to see your bot's game</p>
+					<!-- <p class="step-margin">Check out your <a class="link-in-dark" href="/user?me">user profile</a> to see your bot's game</p> -->
 					<div class="step-bottom">
 						<a class="link-in-dark" @click="step = 2">Back</a>
 						<div class="ha-button-container">
