@@ -1,26 +1,25 @@
 package hlt
 
 import (
-	"strconv"
-	"strings"
 	"math"
 	"sort"
-
+	"strconv"
+	"strings"
 )
 
 type Map struct {
 	MyId, Width, Height int
-	Planets             [] Planet /// preallocating for speed, assuming we cant have > 100 planets
-	Players             [4] Player
+	Planets             []Planet /// preallocating for speed, assuming we cant have > 100 planets
+	Players             [4]Player
 	Entities            []Entity
 }
 
 type Player struct {
 	Id    int
-	Ships [] Ship /// preallocating for speed, assuming we cant have > 10k ships.
+	Ships []Ship /// preallocating for speed, assuming we cant have > 10k ships.
 }
 
-func ParsePlayer(tokens []string) (Player, [] string) {
+func ParsePlayer(tokens []string) (Player, []string) {
 	playerId, _ := strconv.Atoi(tokens[0])
 	playerNumShips, _ := strconv.ParseFloat(tokens[1], 64)
 
@@ -86,8 +85,8 @@ func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
 		x0 := entity.X
 		y0 := entity.Y
 
-		closest_distance := end.CalculateDistanceTo(entity)
-		if closest_distance < entity.Radius+1 {
+		closestDistance := end.CalculateDistanceTo(entity)
+		if closestDistance < entity.Radius+1 {
 			return true
 		}
 
@@ -98,17 +97,17 @@ func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
 			continue
 		}
 
-		closest_x := start.X + dx*t
-		closest_y := start.Y + dy*t
-		closest_distance = math.Sqrt(math.Pow(closest_x-x0, 2) * + math.Pow(closest_y-y0, 2))
+		closestX := start.X + dx*t
+		closestY := start.Y + dy*t
+		closestDistance = math.Sqrt(math.Pow(closestX-x0, 2) * +math.Pow(closestY-y0, 2))
 
-		if closest_distance <= entity.Radius+start.Radius+1 {
+		if closestDistance <= entity.Radius+start.Radius+1 {
 			return true
 		}
 	}
 	return false
 }
-func (gameMap Map) NearestPlanetsByDistance(ship Ship) [] Planet {
+func (gameMap Map) NearestPlanetsByDistance(ship Ship) []Planet {
 	planets := gameMap.Planets
 
 	for i := 0; i < len(planets); i++ {
@@ -118,11 +117,10 @@ func (gameMap Map) NearestPlanetsByDistance(ship Ship) [] Planet {
 
 	sort.Sort(byDist(planets))
 
-
 	return planets
 }
 
-type byDist [] Planet
+type byDist []Planet
 
 func (a byDist) Len() int           { return len(a) }
 func (a byDist) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

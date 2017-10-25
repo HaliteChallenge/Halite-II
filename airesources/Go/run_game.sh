@@ -1,3 +1,4 @@
+#!/bin/sh
 
-go build mybot.go
-./halite -d "240 160" "MyBot.exe" "Mybot.exe"
+go build MyBot.go
+./halite -d "240 160" "./MyBot" "./Mybot"
