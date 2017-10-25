@@ -42,11 +42,8 @@ export default {
       methods: {
         upload_bot: function (files) {
           if (files.length > 0) {
-            if (files[0].type == 'application/zip'){
               this.$parent.botFile = files[0]
               this.$parent.currentView = 'botUpload'
-            } else {
-              this.showMessage("error", "Invalid file type! Only zip files are allowed!");
             }
           }
         }
