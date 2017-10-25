@@ -2,7 +2,7 @@
 	<div class="onboarding-container" v-if="show">
 		<div class="row">
 			<div v-if="step == 1" class="step-section-1 col-md-8 col-xm-10 col-md-offset-2 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 1/3</p>
 					<h2>Welcome to Halite</h2>
@@ -20,7 +20,7 @@
 				</div>
 			</div>
 			<div v-show="step == 2" class="step-section-2 col-md-8 col-xm-10 col-md-offset-2 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 2/3</p>
 					<h2>Submit your first bot</h2>
@@ -55,7 +55,7 @@
 				</div>
 			</div>
 			<div v-if="step == 3" class="step-section-3 col-md-6 col-xm-10 col-md-offset-3 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 3/3</p>
 					<h2>Select a starter kit to download</h2>
