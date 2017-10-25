@@ -45,7 +45,6 @@ export default {
               this.$parent.botFile = files[0]
               this.$parent.currentView = 'botUpload'
             }
-          }
         }
       }
     }
