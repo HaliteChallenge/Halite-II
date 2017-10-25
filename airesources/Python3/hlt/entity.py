@@ -1,3 +1,4 @@
+import logging
 import math
 
 from . import constants
@@ -245,7 +246,10 @@ class Ship(Entity):
         :return: The command string to be passed to the Halite engine.
         :rtype: str
         """
-        return "t {} {} {}".format(self.id, int(magnitude), int(angle))
+
+        # we want to round angle to nearest integer, but we want to round
+        # magnitude down to prevent overshooting and unintended collisions
+        return "t {} {} {}".format(self.id, int(magnitude), round(angle))
 
     def dock(self, planet):
         """
