@@ -410,7 +410,7 @@
         value: this.frame
       })
 
-      const visualizer = new HaliteVisualizer(this.replay, $('.game-replay-viewer').width())
+      const visualizer = new HaliteVisualizer(this.replay)
       const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
       if (storedSpeedIndex) {
         const speedIndex = parseInt(storedSpeedIndex)
@@ -513,6 +513,18 @@
 
       // disable text select on safari
       document.onselectstart = function(){ return false; };
+      this.scaleCanvas = () => {
+        const viewWidth = $('.game-replay-viewer').width()
+        const canvasWidth = 690
+        const canvasHeight = 460
+        let scale = viewWidth/canvasWidth
+        if(viewWidth >= canvasWidth){
+          scale = 1
+        }
+        $('.game-replay-viewer').find('>canvas').css('zoom', scale)
+      }
+      this.scaleCanvas();
+      $(window).on('resize', _.throttle(this.scaleCanvas, 150));
     },
     computed: {
       statistics: function () {
