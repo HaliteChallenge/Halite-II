@@ -3,7 +3,7 @@ layout: base_stats
 no_header: true
 no_footer: true
 title: Halite Game and Player Stats
-image: assets/images/sample-graph.svg
+image: assets/images/sample-graph.png
 content: website
 description: Fun Halite AI Programming Challenge Statistics| Games played per minute, Player actions and more...
 ---

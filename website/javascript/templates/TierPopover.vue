@@ -57,6 +57,7 @@ const percentages = ['0.2', '0.4', '0.8', '1.5', '97']
 <style lang="scss">
   .tier-clickable {
     cursor: pointer;
+    color: #E37222;
   }
   .tier-popover {
     background-color: rgb(36, 37, 44);
