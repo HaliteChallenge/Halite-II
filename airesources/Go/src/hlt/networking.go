@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Connection ...
 type Connection struct {
 	width, height int
 	PlayerTag     int
@@ -35,6 +36,7 @@ func (c *Connection) getInt() int {
 	return i
 }
 
+// NewConnection ...
 func NewConnection(botName string) Connection {
 	conn := Connection{
 		reader: bufio.NewReader(os.Stdin),
@@ -50,16 +52,17 @@ func NewConnection(botName string) Connection {
 	return conn
 }
 
+// UpdateMap ...
 func (c *Connection) UpdateMap() Map {
 	log.Printf("--- NEW TURN --- \n")
 	gameString := c.getString()
 
 	gameMap := Map{
-		MyId:     c.PlayerTag,
+		MyID:     c.PlayerTag,
 		Width:    c.width,
 		Height:   c.height,
 		Planets:  []Planet{},
-		Players:  [4]Player{},
+		Players:  []Player{},
 		Entities: []Entity{},
 	}
 	//log.Printf("%+v\n",gameMap)
@@ -68,6 +71,7 @@ func (c *Connection) UpdateMap() Map {
 	return gameMap
 }
 
+// SubmitCommands ...
 func (c *Connection) SubmitCommands(commandQueue []string) {
 	commandString := strings.Join(commandQueue, " ")
 	log.Printf("Final string : %+v\n", commandString)
