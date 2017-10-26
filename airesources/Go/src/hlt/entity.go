@@ -6,21 +6,15 @@ import (
 	"strconv"
 )
 
-// DockingStatus ...
 type DockingStatus int
 
 const (
-	// UNDOCKED ...
 	UNDOCKED DockingStatus = iota
-	// DOCKING ...
 	DOCKING
-	// DOCKED ...
 	DOCKED
-	// UNDOCKING ...
 	UNDOCKING
 )
 
-// Entity ...
 type Entity struct {
 	X      float64
 	Y      float64
@@ -30,12 +24,10 @@ type Entity struct {
 	ID     int
 }
 
-// Position ...
 type Position struct {
 	X, Y float64
 }
 
-// Planet ...
 type Planet struct {
 	Entity
 	NumDockingSpots    float64
@@ -48,7 +40,6 @@ type Planet struct {
 	Distance           float64
 }
 
-// Ship ...
 type Ship struct {
 	Entity
 	VelX float64
@@ -61,7 +52,6 @@ type Ship struct {
 	WeaponCooldown  float64
 }
 
-// CalculateDistanceTo ...
 func (entity Entity) CalculateDistanceTo(target Entity) float64 {
 	// returns euclidean distance to target
 	dx := target.X - entity.X
@@ -70,13 +60,11 @@ func (entity Entity) CalculateDistanceTo(target Entity) float64 {
 	return math.Sqrt(dx*dx + dy*dy)
 }
 
-// CalculateAngleTo ...
 func (entity Entity) CalculateAngleTo(target Entity) float64 {
 	// returns angle in degrees from self to target
 	return RadToDeg(entity.CalculateRadAngleTo(target))
 }
 
-// CalculateRadAngleTo ...
 func (entity Entity) CalculateRadAngleTo(target Entity) float64 {
 	// returns angle in radians from self to target
 	dx := target.X - entity.X
@@ -85,7 +73,6 @@ func (entity Entity) CalculateRadAngleTo(target Entity) float64 {
 	return math.Atan2(dy, dx)
 }
 
-// ClosestPointTo ...
 func (entity Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
 	// returns closest point to entity that is at least minDistance from target
 	dist := entity.CalculateDistanceTo(target) - target.Radius - minDistance
@@ -102,7 +89,6 @@ func (entity Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
 	}
 }
 
-// ParseShip ...
 func ParseShip(playerID int, tokens []string) (Ship, []string) {
 	shipID, _ := strconv.Atoi(tokens[0])
 	shipX, _ := strconv.ParseFloat(tokens[1], 64)
@@ -137,7 +123,6 @@ func ParseShip(playerID int, tokens []string) (Ship, []string) {
 	return ship, tokens[10:]
 }
 
-// ParsePlanet ...
 func ParsePlanet(tokens []string) (Planet, []string) {
 	planetID, _ := strconv.Atoi(tokens[0])
 	planetX, _ := strconv.ParseFloat(tokens[1], 64)
@@ -178,28 +163,23 @@ func ParsePlanet(tokens []string) (Planet, []string) {
 	return planet, tokens[11+int(planetNumDockedShips):]
 }
 
-// IntToDockingStatus ...
 func IntToDockingStatus(i int) DockingStatus {
 	statuses := [4]DockingStatus{UNDOCKED, DOCKING, DOCKED, UNDOCKING}
 	return statuses[i]
 }
 
-// Thrust ...
 func (ship Ship) Thrust(magnitude float64, angle float64) string {
 	return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.ID), strconv.Itoa(int(magnitude)), strconv.Itoa(int(angle)))
 }
 
-// Dock ...
 func (ship Ship) Dock(planet Planet) string {
 	return fmt.Sprintf("d %s %s", strconv.Itoa(ship.ID), strconv.Itoa(planet.ID))
 }
 
-// Undock ...
 func (ship Ship) Undock() string {
 	return fmt.Sprintf("u %s", strconv.Itoa(ship.ID))
 }
 
-// NavigateBasic ...
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	distance := ship.CalculateDistanceTo(target)
 
@@ -213,14 +193,12 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	return ship.Thrust(speed, angle)
 }
 
-// CanDock ...
 func (ship Ship) CanDock(planet Planet) bool {
 	dist := ship.CalculateDistanceTo(planet.Entity)
 
 	return dist <= (planet.Radius + 6)
 }
 
-// Navigate ...
 func (ship Ship) Navigate(target Entity, gameMap Map) string {
 	ob := gameMap.ObstaclesBetween(ship.Entity, target)
 

@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// Connection ...
 type Connection struct {
 	width, height int
 	PlayerTag     int
@@ -36,7 +35,6 @@ func (c *Connection) getInt() int {
 	return i
 }
 
-// NewConnection ...
 func NewConnection(botName string) Connection {
 	conn := Connection{
 		reader: bufio.NewReader(os.Stdin),
@@ -52,7 +50,6 @@ func NewConnection(botName string) Connection {
 	return conn
 }
 
-// UpdateMap ...
 func (c *Connection) UpdateMap() Map {
 	log.Printf("--- NEW TURN --- \n")
 	gameString := c.getString()
@@ -61,7 +58,6 @@ func (c *Connection) UpdateMap() Map {
 	return gameMap
 }
 
-// SubmitCommands ...
 func (c *Connection) SubmitCommands(commandQueue []string) {
 	commandString := strings.Join(commandQueue, " ")
 	log.Printf("Final string : %+v\n", commandString)

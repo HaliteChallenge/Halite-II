@@ -1,6 +1,5 @@
 package hlt
 
-// StrategyBasicBot ...
 func StrategyBasicBot(ship Ship, gameMap Map) string {
 	planets := gameMap.NearestPlanetsByDistance(ship)
 
