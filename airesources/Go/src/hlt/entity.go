@@ -6,15 +6,21 @@ import (
 	"strconv"
 )
 
+// DockingStatus represents possible ship.DockingStatus values
 type DockingStatus int
 
 const (
+	// UNDOCKED ship.DockingStatus value
 	UNDOCKED DockingStatus = iota
+	// DOCKING ship.DockingStatus value
 	DOCKING
+	// DOCKED ship.DockingStatus value
 	DOCKED
+	// UNDOCKING ship.DockingStatus value
 	UNDOCKING
 )
 
+// Entity captures spacial and ownership state for Planets and Ships
 type Entity struct {
 	X      float64
 	Y      float64
@@ -24,10 +30,12 @@ type Entity struct {
 	Id     int
 }
 
+// Position in 2D space
 type Position struct {
 	X, Y float64
 }
 
+// Planet object from which Halite is mined
 type Planet struct {
 	Entity
 	NumDockingSpots    float64
@@ -40,6 +48,7 @@ type Planet struct {
 	Distance           float64
 }
 
+// Ship is a player controlled Entity made for the purpose of doing combat and mining Halite
 type Ship struct {
 	Entity
 	VelX float64
@@ -52,29 +61,29 @@ type Ship struct {
 	WeaponCooldown  float64
 }
 
+// CalculateDistanceTo returns a euclidean distance to the target
 func (self Entity) CalculateDistanceTo(target Entity) float64 {
-	// returns euclidean distance to target
 	dx := target.X - self.X
 	dy := target.Y - self.Y
 
 	return math.Sqrt(dx*dx + dy*dy)
 }
 
+// CalculateAngleTo returns an angle in degrees to the target
 func (self Entity) CalculateAngleTo(target Entity) float64 {
-	// returns angle in degrees from self to target
 	return RadToDeg(self.CalculateRadAngleTo(target))
 }
 
+// CalculateRadAngleTo returns an angle in radians to the target
 func (self Entity) CalculateRadAngleTo(target Entity) float64 {
-	// returns angle in radians from self to target
 	dx := target.X - self.X
 	dy := target.Y - self.Y
 
 	return math.Atan2(dy, dx)
 }
 
+// ClosestPointTo returns the closest point that is at least minDistance from the target
 func (self Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
-	// returns closest point to self that is at least minDistance from target
 	dist := self.CalculateDistanceTo(target) - target.Radius - minDistance
 	angle := self.CalculateRadAngleTo(target)
 	x := self.X + dist*math.Cos(angle)
@@ -89,6 +98,7 @@ func (self Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
 	}
 }
 
+// ParseShip from a slice of game state tokens
 func ParseShip(playerId int, tokens []string) (Ship, []string) {
 
 	shipId, _ := strconv.Atoi(tokens[0])
@@ -124,6 +134,7 @@ func ParseShip(playerId int, tokens []string) (Ship, []string) {
 	return ship, tokens[10:]
 }
 
+// ParsePlanet from a slice of game state tokens
 func ParsePlanet(tokens []string) (Planet, []string) {
 
 	planetId, _ := strconv.Atoi(tokens[0])
@@ -165,24 +176,29 @@ func ParsePlanet(tokens []string) (Planet, []string) {
 	return planet, tokens[11+int(planetNumDockedShips):]
 }
 
+// IntToDockingStatus converts an int to a DockingStatus
 func IntToDockingStatus(i int) DockingStatus {
 	statuses := [4]DockingStatus{UNDOCKED, DOCKING, DOCKED, UNDOCKING}
 	return statuses[i]
 }
 
+// Thrust generates a string describing the ship's intension to move during the current turn
 func (ship Ship) Thrust(magnitude float64, angle float64) string {
 	//return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.Id), strconv.Itoa(int(magnitude)), strconv.Itoa(int(angle)))
 	return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.Id), strconv.Itoa(int(magnitude)), strconv.Itoa(int(angle)))
 }
 
+// Dock generates a string describing the ship's intension to dock during the current turn
 func (ship Ship) Dock(planet Planet) string {
 	return fmt.Sprintf("d %s %s", strconv.Itoa(ship.Id), strconv.Itoa(planet.Id))
 }
 
+// Undock generates a string describing the ship's intension to undock during the current turn
 func (ship Ship) Undock() string {
 	return fmt.Sprintf("u %s", strconv.Itoa(ship.Id))
 }
 
+// NavigateBasic demonstrates how the player might move ships through space
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 
 	distance := ship.CalculateDistanceTo(target)
@@ -197,12 +213,15 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	return ship.Thrust(speed, angle)
 }
 
+// CanDock indicates that a ship is close enough to a given planet to dock
 func (ship Ship) CanDock(planet Planet) bool {
 	dist := ship.CalculateDistanceTo(planet.Entity)
 
 	return dist <= (planet.Radius + 6)
 }
 
+// Navigate demonstrates how the player might negotiate obsticles between
+// a ship and its target
 func (ship Ship) Navigate(target Entity, gameMap Map) string {
 
 	ob := gameMap.ObstaclesBetween(ship.Entity, target)
