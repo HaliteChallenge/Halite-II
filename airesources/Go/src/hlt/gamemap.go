@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Map describes the current state of the game
 type Map struct {
 	MyId, Width, Height int
 	Planets             []Planet /// preallocating for speed, assuming we cant have > 100 planets
@@ -14,11 +15,13 @@ type Map struct {
 	Entities            []Entity
 }
 
+// Player has an ID for establishing ownership, and a number of ships
 type Player struct {
 	Id    int
 	Ships []Ship /// preallocating for speed, assuming we cant have > 10k ships.
 }
 
+// ParsePlayer from a slice of game state tokens
 func ParsePlayer(tokens []string) (Player, []string) {
 	playerId, _ := strconv.Atoi(tokens[0])
 	playerNumShips, _ := strconv.ParseFloat(tokens[1], 64)
@@ -38,6 +41,7 @@ func ParsePlayer(tokens []string) (Player, []string) {
 	return player, tokens
 }
 
+// ParseGameString from a slice of game state tokens
 func ParseGameString(gameString string, self Map) Map {
 	tokens := strings.Split(gameString, " ")
 	numPlayers, _ := strconv.Atoi(tokens[0])
@@ -65,6 +69,8 @@ func ParseGameString(gameString string, self Map) Map {
 	return self
 }
 
+// ObstaclesBetween demonstrates how the player might determine if the path
+// between two enitities is clear
 func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
 
 	x1 := start.X
@@ -107,6 +113,9 @@ func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
 	}
 	return false
 }
+
+// NearestPlanetsByDistance orders all planets based on their proximity
+// to a given ship from nearest for farthest
 func (gameMap Map) NearestPlanetsByDistance(ship Ship) []Planet {
 	planets := gameMap.Planets
 
