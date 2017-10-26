@@ -15,7 +15,7 @@ def cd(newdir):
     finally:
         os.chdir(prevdir)
 
-def compare(bot1, bot2, binary):
+def compare(bot1, bot2, binary, num_games):
 
     with TemporaryDirectory() as t:
         print("Running in tempdir {}".format(t))
@@ -34,11 +34,10 @@ def compare(bot1, bot2, binary):
             bot1_wins = 0
             bot2_wins = 0
 
-            n = 100
-            print("Starting tournament with {} games".format(n))
+            print("Starting tournament with {} games".format(num_games))
             print("If you visualize the games, Player 1 is purple and Player 2 is teal")
 
-            for i in range(n):
+            for i in range(num_games):
                 cmd = '{} -d "240 160" -t "python3 one/MyBot.py" "python3 two/MyBot.py"'.format(binary)
                 out = subprocess.check_output(cmd, shell=True).decode()
                 # print(out)
@@ -58,8 +57,13 @@ if __name__ == '__main__':
     parser.add_argument("bot1_zip", help="zipfile with the first bot")
     parser.add_argument("bot2_zip", help="zipfile with the second bot")
     parser.add_argument("halite_binary", help="location of halite binary")
+    parser.add_argument("-n", "--num_games", help="number of games to run", required=False, default=100, type=int)
 
     args = parser.parse_args()
 
-    compare(*(os.path.abspath(i) for i in (args.bot1_zip, args.bot2_zip, args.halite_binary)))
+    compare(
+        os.path.abspath(args.bot1_zip),
+        os.path.abspath(args.bot2_zip),
+        os.path.abspath(args.halite_binary),
+        args.num_games)
 
