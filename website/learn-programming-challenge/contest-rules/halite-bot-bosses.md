@@ -2,7 +2,7 @@
 layout: doc_page
 title: Bot Bosses
 description: Some Two Sigma bots to beat as you progress in the competition
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 1
 ---

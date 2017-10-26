@@ -24,12 +24,16 @@ body{
 
 a{
   color: #FFBE00;
+  &:hover{
+    color: $yellow;
+  }
 }
 .hl{
   color: #FFBE00; 
 }
 
 h1, h2, h3{
+  letter-spacing: 1px;
   font-family: $font-heading;
 }
 

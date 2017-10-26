@@ -2,7 +2,7 @@
 layout: doc_page
 title: System Requirements
 description: System requirements to play Halite
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 1
 ---

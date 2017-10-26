@@ -130,7 +130,14 @@
 .game-replay{
   padding: 15px 0;
   position: relative;
-
+  >.xline{
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: -30px;
+    @media (max-width: $screen-xs-max){
+      margin-top: -39px;
+    }
+  }
   .game-replay-viewer {
     text-align: center;
     padding: 20px 30px;

@@ -9,7 +9,6 @@ func StrategyBasicBot(ship Ship, gameMap Map) string {
 			if ship.CanDock(planet) {
 				return ship.Dock(planet)
 			} else {
-
 				return ship.Navigate(ship.ClosestPointTo(planet.Entity, 3), gameMap)
 			}
 		}

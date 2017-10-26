@@ -10,6 +10,7 @@
 # IntelliJ/CLion
 .idea/
 *.iml
+*.cbp
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

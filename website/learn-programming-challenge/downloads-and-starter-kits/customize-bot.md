@@ -2,7 +2,7 @@
 layout: doc_page
 title: Customize your Bot Submission
 description: Overview of how to customize your bot submission with dependencies, language names and more.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 3
 ---

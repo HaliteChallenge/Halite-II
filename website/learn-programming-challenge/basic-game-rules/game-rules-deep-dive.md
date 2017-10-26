@@ -7,7 +7,7 @@ description: Learn the details of the rules of the game to win the Halite AI Pro
 ---
 
 ## Start of Game
-All games are played with either 2 or 4 players. At the beginning of the game, for their first turn, all bots receive the initial game state, as well as their player ID, and have 30 seconds to prepare and send back their bot name.
+All games are played with either 2 or 4 players. At the beginning of the game, for their first turn, all bots receive the initial game state, as well as their player ID, and have 1 minute to prepare and send back their bot name.
 
 ## Map
 Maps are rectangular grids with 3:2 aspect ratio (e.g. 288 x 192 units), using a 2D Cartesian continuous non-wrapping grid. The largest board is 384 x 256 units, the smallest is 240 x 160 units. The coordinates are treated as a real Cartesian plane, and game entities can have floating-point positions. All distances are Euclidean (sqrt(dx^2 + dy^2)), and are between the centers of entities. If a ship goes off the grid it is considered dead, since the grid does not wrap.
@@ -74,7 +74,7 @@ To take control of a planet, a player must dock a ship to the planet. Only one t
 
 If two ships from different teams both issue docking commands on an unoccupied planet during the same turn, they will battle. If they both continue to issue docking commands, they will continue to battle. During these turns, the ships are not yet docking and therefore maintain their defenses (described under docking section below) until they start to successfully dock.
 
-Once a planet has been docked by one ship, the owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is equal to the radius. E.g. a planet with a radius of 3 units may have up to 3 ships docked to it at once.
+Once a planet has been docked by one ship, the owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is a function of the radius. E.g. a planet with a __radius of 3 units may have up to 3 ships__ docked to it at once.
 
 If a ship attempts to dock on a full side of a planet (all spots full) the docking process will move them to the closest unoccupied spot on the planet until the planet is full. If the planet is full, the dock command does nothing.
 

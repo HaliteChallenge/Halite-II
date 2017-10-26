@@ -1,16 +1,15 @@
 package hlt
 
 import (
+	"fmt"
 	"math"
 	"strconv"
-	"fmt"
-
 )
 
 type DockingStatus int
 
 const (
-	UNDOCKED  DockingStatus = iota
+	UNDOCKED DockingStatus = iota
 	DOCKING
 	DOCKED
 	UNDOCKING
@@ -35,8 +34,8 @@ type Planet struct {
 	NumDockedShips     float64
 	CurrentProduction  float64
 	RemainingResources float64
-	DockedShipIds      [] int
-	DockedShips        [] Ship
+	DockedShipIds      []int
+	DockedShips        []Ship
 	Owned              float64
 	Distance           float64
 }
@@ -90,7 +89,7 @@ func (self Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
 	}
 }
 
-func ParseShip(playerId int, tokens []string) (Ship, [] string) {
+func ParseShip(playerId int, tokens []string) (Ship, []string) {
 
 	shipId, _ := strconv.Atoi(tokens[0])
 	shipX, _ := strconv.ParseFloat(tokens[1], 64)
@@ -125,7 +124,7 @@ func ParseShip(playerId int, tokens []string) (Ship, [] string) {
 	return ship, tokens[10:]
 }
 
-func ParsePlanet(tokens []string) (Planet, [] string) {
+func ParsePlanet(tokens []string) (Planet, []string) {
 
 	planetId, _ := strconv.Atoi(tokens[0])
 	planetX, _ := strconv.ParseFloat(tokens[1], 64)
@@ -181,7 +180,7 @@ func (ship Ship) Dock(planet Planet) string {
 }
 
 func (ship Ship) Undock() string {
-	return fmt.Sprintf("u %s %s", strconv.Itoa(ship.Id))
+	return fmt.Sprintf("u %s", strconv.Itoa(ship.Id))
 }
 
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
@@ -189,11 +188,9 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	distance := ship.CalculateDistanceTo(target)
 
 	angle := ship.CalculateAngleTo(target)
-	speed:=7.0
-	if distance<10{
+	speed := 7.0
+	if distance < 10 {
 		speed = 3.0
-	} else {
-		speed =7.0
 	}
 
 	speed = math.Min(speed, distance)
@@ -207,7 +204,6 @@ func (ship Ship) CanDock(planet Planet) bool {
 }
 
 func (ship Ship) Navigate(target Entity, gameMap Map) string {
-
 
 	ob := gameMap.ObstaclesBetween(ship.Entity, target)
 
@@ -244,13 +240,11 @@ func (ship Ship) Navigate(target Entity, gameMap Map) string {
 							bestdist = totdist
 							bestTarget = intermediateTarget
 
-
 						}
 					}
 				}
 			}
 		}
-
 
 		return ship.NavigateBasic(bestTarget, gameMap)
 

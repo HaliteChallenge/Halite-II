@@ -2,7 +2,7 @@
 layout: doc_page
 title: Improve your Basic Bot
 description: Tutorial to learn how to improve a basic Halite AI bot with a few heuristics as an easy way to get started playing in the Halite AI competition.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 6
 ---
@@ -25,7 +25,7 @@ We can sort the planets by distance before iterating over them. The faster we ca
 entities_by_distance = game_map.nearby_entities_by_distance(ship)
 nearest_planet = None
 for distance in sorted(entities_by_distance):
-  nearest_planet = next((nearest_entity for nearest_entity in entities_by_distance[distance] if isinstance(nearest_entity, entity.Planet)), None)
+  nearest_planet = next((nearest_entity for nearest_entity in entities_by_distance[distance] if isinstance(nearest_entity, hlt.entity.Planet)), None)
   if nearest_planet:
     break
 ```

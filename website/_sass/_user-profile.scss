@@ -102,11 +102,16 @@
       color: $player-3;
       vertical-align: middle;
     }
+
+    .highest-rank{
+      color: #63CECA;
+    }
   }
 
   &-rank-stats{
     display: flex;
     justify-content: space-between;
+    text-align: center;
     .stats-item{
       margin-left: 15px;
       margin-right: 15px;
@@ -119,6 +124,8 @@
         font-size: 14px;
         color: #C2D1D0;
         letter-spacing: 0.5px;
+        font-family: $font-body;
+        text-align: center;
       }
       p{
         font-family: $font-heading;
@@ -182,6 +189,8 @@
 
   .game-participant{
     white-space: nowrap;
+    display: inline-block;
+    margin-right: 5px;
   }
 
   .timed-out{

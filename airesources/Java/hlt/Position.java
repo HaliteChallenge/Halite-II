@@ -36,13 +36,13 @@ public class Position {
     }
 
     public Position getClosestPoint(final Entity target) {
-        final double radius = target.getRadius() + Constants.MIN_DISTANCE;
+        final double radius = target.getRadius() + Constants.MIN_DISTANCE_FOR_CLOSEST_POINT;
         final double angleRad = target.orientTowardsInRad(this);
 
-        final double dx = target.getXPos() + radius * Math.cos(angleRad);
-        final double dy = target.getYPos() + radius * Math.sin(angleRad);
+        final double x = target.getXPos() + radius * Math.cos(angleRad);
+        final double y = target.getYPos() + radius * Math.sin(angleRad);
 
-        return new Position(dx, dy);
+        return new Position(x, y);
     }
 
     @Override

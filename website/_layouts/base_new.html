@@ -36,22 +36,22 @@
 
 <!-- Hotjar Tracking Code for halite.io -->
 <script>
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:633485,hjsv:5};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+  (function(h,o,t,j,a,r){
+      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+      h._hjSettings={hjid:629189,hjsv:6};
+      a=o.getElementsByTagName('head')[0];
+      r=o.createElement('script');r.async=1;
+      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+      a.appendChild(r);
+  })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
 
-function handleOutboundLinkClicks(category, action, label) {
-  ga('send', 'event', {
-    eventCategory: category,
-    eventAction: action,
-    eventLabel: label
-  });
-}
+  function handleOutboundLinkClicks(category, action, label) {
+    ga('send', 'event', {
+      eventCategory: category,
+      eventAction: action,
+      eventLabel: label
+    });
+  }
 
 </script>
 
@@ -113,7 +113,7 @@ function handleOutboundLinkClicks(category, action, label) {
 
   {% if page.no_header %}
   {% else %}
-    <header class="navbar navbar-inverse navbar-fixed-top">
+    <header class="navbar navbar-inverse navbar-fixed-top unloaded">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -255,6 +255,7 @@ twq('track','PageView');
 
     $(document).ready(function() {
       minHeightFn();
+      $('header').removeClass('unloaded');
       setTimeout(function() {
           $('.container-empty').addClass('container-loaded');
       }, 250);

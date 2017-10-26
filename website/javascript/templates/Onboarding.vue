@@ -2,7 +2,7 @@
 	<div class="onboarding-container" v-if="show">
 		<div class="row">
 			<div v-if="step == 1" class="step-section-1 col-md-8 col-xm-10 col-md-offset-2 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 1/3</p>
 					<h2>Welcome to Halite</h2>
@@ -20,20 +20,19 @@
 				</div>
 			</div>
 			<div v-show="step == 2" class="step-section-2 col-md-8 col-xm-10 col-md-offset-2 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 2/3</p>
 					<h2>Submit your first bot</h2>
 					<div class="step-flex">
 						<div>
-							- Feel free to select one of our three main basic bots (Python, C++ or Java) and click submit below to see how starter bots play.
+						Feel free to select one of our three main basic bots (Python, C++ or Java) and click submit below to see how starter bots play.
 						</div>
 						<div>
-							- If you want to make one edit to the bot, you can change the navigate speed to 7!
+						If you want to make one edit to the bot, you can change the navigate speed to 7!
 						</div>
 						<div>
-							- We also support Scala, Rust, and other languages. <a @click="downloadCode">Download a starter kit.</a>
-							<p class="tip-info"><i class="fa fa-info-circle"></i>This bot doesn't save locally.</p>
+						We also support Scala, Rust, and other languages.
 						</div>
 					</div>
 					<div class="step-language">
@@ -56,7 +55,7 @@
 				</div>
 			</div>
 			<div v-if="step == 3" class="step-section-3 col-md-6 col-xm-10 col-md-offset-3 col-xm-offset-1">
-				<span class="close-btn icon-remove" @click="show = false"></span>
+				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 3/3</p>
 					<h2>Select a starter kit to download</h2>
@@ -72,7 +71,7 @@
 						</select>
 						<div class="download-section-link"><a @click="downloadCode" class="link-in-dark">Download Code</a><img :src="`${baseUrl}/assets/images/temp/download.png`"/></div>
 					</div>
-					<p class="step-margin">Check out your <a class="link-in-dark" href="/user?me">user profile</a> to see your bot's game</p>
+					<!-- <p class="step-margin">Check out your <a class="link-in-dark" href="/user?me">user profile</a> to see your bot's game</p> -->
 					<div class="step-bottom">
 						<a class="link-in-dark" @click="step = 2">Back</a>
 						<div class="ha-button-container">
@@ -174,7 +173,7 @@ export default {
 			  let _timeout = setTimeout(() => {
 				clearTimeout(_timeout);
 					this.maxSectionHeight();
-			  }, 200);
+			  }, 0);
 			  if (this.step == 2){
 			  	this.$refs.botEditor.$forceUpdate();
 			  }
@@ -216,8 +215,8 @@ export default {
 			 const winHeight = $(window).height();
 			 const sectionHeight = $('.section-content').prop('scrollHeight');
 			 const headerHeight = 61;
-			 const marginTop = 40;
-			 const marginBottom = 10;
+			 const marginTop = 50;
+			 const marginBottom = 20;
 			 let maxHeight = winHeight - headerHeight - marginTop - marginBottom;
 			 let overflow = 'auto';
 			 if(maxHeight > sectionHeight){
@@ -226,9 +225,14 @@ export default {
 			 $('.section-content').css({'overflow':overflow, 'max-height': maxHeight + 'px'});
 	   };
 	   $(window).on('resize', _.throttle(this.maxSectionHeight, 150));
-	   this.maxSectionHeight();
 		 // Show popup only when new=1 in querystring
 	   this.show = (document.location.search.toLowerCase().replace('?', '').split('&').includes('new=1'));
+	   if(this.show == true){
+		   let _timeout = setTimeout(() => {
+				clearTimeout(_timeout);
+		   		this.maxSectionHeight();
+			}, 0);
+	   }
 	 },
 	 methods: {
 	  play_replay: function (files) {

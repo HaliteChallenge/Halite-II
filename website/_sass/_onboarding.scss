@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(19,19,27,0.6);
+  background-color: rgba(19,19,27,0.9);
   z-index: 1031;
   color: $foreground;
   a{
@@ -23,15 +23,12 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 5px;
-    border-radius: 2px;
-    border: #fff 2px solid;
     cursor: pointer;
   }
   [class^="step-section-"]{
     position: relative;
     padding:20px;
-    background-color: #1C1A27;
+    background-color: rgba(28, 26, 39, 0.95);
     border-radius: 5px;
     text-align: center;
   }
@@ -62,7 +59,7 @@
   }
   .download-section{
     display: flex;
-    margin: 30px 0;
+    margin: 40px 0;
     select{
       flex: 1;
       width:140px;
@@ -89,7 +86,7 @@
       color: $yellow;
     }
     &-margin{
-      margin: 20px 0;
+      margin: 40px 0;
     }
     &-sub-header{
       text-align: left;
@@ -111,9 +108,7 @@
     }
     &-flex{
       display: flex;
-      background-color: #FFFFFF;
       >div{
-        color: $font-color1;
         font-size: 13px;
         padding: 20px;
         flex: 1;

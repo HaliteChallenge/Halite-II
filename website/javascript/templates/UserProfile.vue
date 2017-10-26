@@ -17,12 +17,12 @@
                             <span v-if="lang.length > 0" class="hl"><a  :href="`/programming-competition-leaderboard?language=${lang}`">{{lang}}</a></span><span v-if="(index+1) < botLang.length">,</span>
                         </template>
                     </p>
-                    <div v-if="is_my_page && bots && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
+                    <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Disabled'" class="text-center" style="margin-top: 10px;">
                         <p class="warning">
                             Your bot is disabled   <span title="Due to excessive timeouts or errors, you bot has been disabled, look at the game logs to debug the issue or try submitting it again." class="info-icon icon-info"></span>
                         </p>
                     </div>
-                     <div v-if="is_my_page && bots && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
+                     <div v-if="is_my_page && bots && bots[0] && bots[0].compilation_status==='Failed'" class="text-center" style="margin-top: 10px;">
                         <p class="warning">
                             Your bot failed to compile   <span title="Look at the compilation failure mail to debug the issue or try submitting it again." class="info-icon icon-info"></span>
                         </p>
@@ -45,51 +45,51 @@
                             <p>{{ user.num_games }}</p>
                         </div>
                     </div>
-                    <h2 v-if="highestRank"> Highest Rank Acheived: {{highestRank}}</h2>
+                    <h2 class="highest-rank" v-if="highestRank"> Highest Rank Achieved: {{highestRank}}</h2>
                 </div>
-              </div>
                 <div class="game-replay-share text-center">
                     <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
                     <div class="popup-container" v-show="sharePopup">
-                    <div class="popup-share">
-                        <label>Share as a link</label>
-                        <div class="form-inline-button">
-                            <input ref="shareInput" type="text" :value="shareLink">
-                            <button class="btn" @click="copyToClipboard">
-                                <span>Copy</span>
-                            </button>
-                        </div>
-                        <div class="share-socials">
-                            <a onclick="FB.ui({method: 'share',href: 'https://developers.facebook.com/docs/',}, function(response){});return true;" target="_blank"><i class="fa fa-facebook-official"></i></a>
-                            <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
-                            <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
+                        <div class="popup-share">
+                            <label>Share as a link</label>
+                            <div class="form-inline-button">
+                                <input ref="shareInput" type="text" :value="shareLink">
+                                <button class="btn" @click="copyToClipboard">
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                            <div class="share-socials">
+                                <a onclick="FB.ui({method: 'share',href: 'https://developers.facebook.com/docs/',}, function(response){});return true;" target="_blank"><i class="fa fa-facebook-official"></i></a>
+                                <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
+                                <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <button class="btn" @click="toggleShare">
-                        <span>SHARE</span>
-                    </button>
-                    <!-- <div class="user-profile-badge">
-                        <i class="xline xline-top"></i>
-                        <h2>Badges</h2>
-                        <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
-                        <div class="user-profile-badge-content">
-                            <ul class="user-profile-badge-list">
-                                <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
-                                <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
-                                <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
-                                <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
-                                <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
-                            </ul>
-                        </div>
-                        <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
-                    </div> -->
-                    <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                    <div>
+                        <button class="btn" @click="toggleShare">
+                            <span>SHARE</span>
+                        </button>
+                        <!-- <div class="user-profile-badge">
+                            <i class="xline xline-top"></i>
+                            <h2>Badges</h2>
+                            <div class="user-profile-badge-page"><img v-on:click.stop.prevent="prev_badge" :src="`${baseUrl}/assets/images/page-prev.svg`"><img v-on:click.stop.prevent="next_badge" :src="`${baseUrl}/assets/images/page-next.svg`"></div>
+                            <div class="user-profile-badge-content">
+                                <ul class="user-profile-badge-list">
+                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_1.png`"></li>
+                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_2.png`"></li>
+                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_3.png`"></li>
+                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_4.png`"></li>
+                                    <li><img :src="`${baseUrl}/assets/images/temp/badge_5.png`"></li>
+                                </ul>
+                            </div>
+                            <a v-if="is_my_page" class="user-profile-badge-button"><img :src="`${baseUrl}/assets/images/temp/add_profile.png`"></a>
+                        </div> -->
+                        <p v-if="userHistory.length" style="margin-top: 20px;"><a :href="`/programming-competition-leaderboard?show_user=${user.user_id}`">View on leaderboard</a></p>
+                    </div>
                 </div>
                 <div class="stats-1-section">
                     <i class="xline xline-top"></i>
-                    <h3 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h3>
+                    <h2 v-if="season1stats && season1stats.num_submissions > 0">Halite 1 Stats</h2>
                     <div v-if="season1stats && season1stats.num_submissions > 0" class="user-profile-rank-stats">
                         <div class="stats-item">
                             <h3>Rank</h3>
@@ -104,8 +104,10 @@
                             <p>{{ season1stats.num_games }}</p>
                         </div>
                     </div>
+                    <p class="text-center">
+                        <a v-if="season1stats && season1stats.num_submissions > 0" class="user-name" target="_blank" :href="'https://2016.halite.io/user.php?userID=' + season1stats.userID">View Halite 1 Profile</a>
+                    </p>
                 </div>
-                <a v-if="season1stats && season1stats.num_submissions > 0" class="user-name" target="_blank" :href="'https://2016.halite.io/user.php?userID=' + season1stats.userID">View Halite 1 Profile</a>
             </div>
         </div>
         <div class="col-md-7">
@@ -167,8 +169,8 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <div class="info-icon-trophy">
-                                                        <span v-if="game.players[user.user_id].rank === 1" class="icon-trophy"></span>
+                                                    <div class="info-icon-trophy" v-if="game.players[user.user_id].rank === 1">
+                                                        <span class="icon-trophy"></span>
                                                     </div>
                                                     <a v-for="player in game.playerSorted"
                                                     :href="'/user?user_id=' + player.id"
@@ -344,7 +346,7 @@
                                 <h2>
                                     <i class="xline xline-bottom"></i>
                                     History
-                                    <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank acheived before the bot was retired." class="info-icon icon-info pull-right"></span>
+                                    <span title="Rank/Rating history of your bots, the rank/rating is the last rating or rank achieved before the bot was retired." class="info-icon icon-info pull-right"></span>
                                 </h2>
                                 <div v-if="!userHistory.length" class="section-empty">
                                     <img :src="`${baseUrl}/assets/images/leaderboard-zero-icon.png`" class="icon-"></img>
@@ -584,8 +586,9 @@
             })
           }
           setTimeout(() => {
-            calcCol()
-          }, 500)
+            calcCol();
+            console.log('cal col');
+          }, 200)
         },
         fetch: function () {
           let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`

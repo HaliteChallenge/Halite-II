@@ -3,7 +3,7 @@ layout: doc_page
 title: Unit Reference
 toc: false
 description: Reference guide for unit properties of Halite
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 0
 ---
@@ -151,6 +151,12 @@ The basic unit that generates Halite ships, you can conquer planets, fight other
             <td>On planet destruction, ships are destroyed if they are within this radius</td>
             <td>10 units</td>
             <td>10 units</td>
+        </tr>
+         <tr>
+            <td>Docking Sport</td>
+            <td>A function of the radius. Larger planets have more spots</td>
+            <td>Function of planet radius</td>
+            <td>Function of planet radius</td>
         </tr>
         <tr>
             <td>Production</td>

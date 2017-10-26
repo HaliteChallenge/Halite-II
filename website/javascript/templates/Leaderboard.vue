@@ -133,6 +133,7 @@ import {tierClass, countries_data} from '../utils'
 import vSelect from 'vue-select'
 import _ from 'lodash'
 import moment from 'moment'
+ import dateformat from 'dateformat'
 
 const DEFAULT_LIMIT = 25
 
@@ -223,7 +224,8 @@ export default {
           }
         ],
         filter_name: '',
-        selected_filter: null
+        selected_filter: null,
+        build_params_count: 0
       }
   },
     mounted: function () {
@@ -232,6 +234,10 @@ export default {
 
       // determine if the filter should be collapsed or not
       this.setupCollapseFilter()
+      $(window).on('popstate', () => {
+        this.build_params_count = -1
+        this.calculate_filters()
+      })
   },
     watch: {
       hackathonId: function () {
@@ -329,6 +335,7 @@ export default {
       build_filters_from_url: function () {
         let params = {}
         if (!window.location.search.slice(1)) {
+          this.page = 1
           return
         }
 
@@ -486,17 +493,23 @@ export default {
 
       build_params: function () {
         const params = this.params
-
+        let path_name = '';
         // build params
         if (Object.entries(params).length > 0) {
           let query_string = []
           _.forEach(params, function (items, key) {
             query_string.push(key + '=' + items.join())
           })
-          window.history.replaceState(null, null, '?' + query_string.join('&'))
+          path_name = window.location.pathname + '?' + query_string.join('&')
         } else {
-          window.history.replaceState(null, null, window.location.pathname)
+          path_name = window.location.pathname
         }
+        if(this.build_params_count === 0){
+          window.history.replaceState(null, null, path_name)
+        }else if(this.build_params_count !== -1){
+          window.history.pushState(null, null, path_name)
+        }
+        this.build_params_count = 1
       },
 
       setupCollapseFilter: function () {
@@ -631,8 +644,14 @@ export default {
         return countries.getName(name, 'en')
       },
       getFormattedDate: function (date) {
-        return moment(date).startOf('day').fromNow()
-      }
+        var cdate = moment(date)
+          if (cdate.isValid()) {
+            var dateFormat = require('dateformat')
+            return dateFormat(date, 'dd/mm/yy HH:MM')
+          } else {
+            return return_value_not_valid
+          }
+      },
     }
   }
 </script>

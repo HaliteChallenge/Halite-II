@@ -30,7 +30,7 @@ export default {
       components: {
         'halite-upload-zone': UploadZone
       },
-      props: ['loggedIn'],
+      props: ['loggedIn', 'showMessage'],
       data: function () {
         return {
           error: null,
@@ -42,9 +42,9 @@ export default {
       methods: {
         upload_bot: function (files) {
           if (files.length > 0) {
-            this.$parent.botFile = files[0]
-            this.$parent.currentView = 'botUpload'
-          }
+              this.$parent.botFile = files[0]
+              this.$parent.currentView = 'botUpload'
+            }
         }
       }
     }

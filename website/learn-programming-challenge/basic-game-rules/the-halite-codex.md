@@ -3,7 +3,7 @@ layout: doc_page
 title: The Halite Codex
 toc: false
 description: Background on the Halite game story from the Halatian general and lead scientist.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 sort_key: 3
 ---
@@ -28,11 +28,11 @@ In better news, I am happy to share that you have access to a personal computer 
  
 I am sure you are wondering how battles rage in this two-dimensional galaxy. All ships have equal destructive power and ships spread their fire equally between all enemies within range. Should be easy easy for a skilled captain like you. However, if you encounter two enemy ships simultaneously, your firing power will be split and you may be shot down. [See rules on collisions and battle](game-rules-deep-dive#ship-planet-collision). I would avoid these encounters if I were you.
 
-On to the best part, as you’re not travelling into unchartered territory for just the dog-fights (at least I hope not), but rather to mine the glorious Halite. To mine the Halite, you need to conquer and colonize a planet rich with the Halite. Our team of ship scientists have significantly simplified this matter: when in close reach of a planet, issue a command to dock, and your ship will know what to do. Docking takes time and turns off all ship systems unrelated to docking (yes, again due to the limitations of the salt processor), so be careful not to dock next to enemies who can shoot you down. Undocking is an equal but opposite reaction. [See rules on docking](game-rules-deep-dive/#docking-and-mining).
+On to the best part, as you’re not travelling into unchartered territory for just the dog-fights (at least I hope not), but rather to mine the glorious Halite. To mine the Halite, you need to conquer and mine a planet rich with the Halite. Our team of ship scientists have significantly simplified this matter: when in close reach of a planet, issue a command to dock, and your ship will know what to do. Docking takes time and turns off all ship systems unrelated to docking (yes, again due to the limitations of the salt processor), so be careful not to dock next to enemies who can shoot you down. Undocking is an equal but opposite reaction. [See rules on docking](game-rules-deep-dive/#docking-and-mining).
 
 Once docked and colonizing a planet, your ship will mine the Halite automatically. With our patented Replicatron 5000, you will automatically produce more ships from the Halite you mine. The larger the planet, the more ships you can dock; the more ships you have docked, the more Halite you produce.  [See rules on mining](game-rules-deep-dive/#docking-and-mining).
 
-You cannot colonize a planet that is already colonized: in such a case, you must destroy all docked enemy ships before proceeding to dock your own ships. However, should you feel vengeful, use this galaxy’s patented ‘wind of the gods’ technique: crash into the planet enough times to destroy it. [See rules on planet explosions]()
+You cannot dock to a planet that is already occupied: in such a case, you must destroy all docked enemy ships before proceeding to dock your own ships. However, should you feel vengeful, use this galaxy’s patented ‘wind of the gods’ technique: crash into the planet enough times to destroy it. [See rules on planet explosions]()
 
 This should be all the information you need for your mission, commander. The general should be waiting for you in the war room to give you his closing words.
  

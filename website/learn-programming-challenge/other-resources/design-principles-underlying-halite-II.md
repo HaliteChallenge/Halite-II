@@ -4,7 +4,7 @@ title: Design Principles Underlying Halite II
 toc: false
 sort_key: 1
 description: This is a paper written by Benjamin Spector and Michael Truell and the Halite II Team about the concepts used in the design of the Halite II game.
-image: assets/images/temp/bot_1.png
+image: assets/images/opengraph.png
 content: website
 ---
 
@@ -83,7 +83,7 @@ If even after this rule there is still a tie, a random winner will be chosen, bu
 
 *Figure 1: This figure shows a mature, four-player game with many ships docked on planets. Ships are triangles. The colored circles are planets and have assumed the color of the docked ship(s). One or more brackets on the planets indicate ship(s) are docked.*
 
-Even more detailed rules are available in the [Halite II Detailed Rules](/learn-programming-challenge/other-resources/game-rules-deep-dive).
+Even more detailed rules are available in the [Halite II Detailed Rules](/learn-programming-challenge/basic-game-rules/game-rules-deep-dive).
 
 ### 3.2 Influence of EPCoF
 
@@ -114,7 +114,7 @@ Benjamin Spector and Michael Truell are presently at the Horace Mann School in B
 
 [^1]: "About Halite." <https://2016.halite.io/about.php>, 2016.
 [^2]: “About Halite II." <https://2017.halite.io/about>, 2017.
-[^3]: B. Spector and M. Truell, “Considerations in the design of turn-based programming games.” arxiv.org preprint, October 2017.
+[^3]: B. Spector and M. Truell, “Considerations in the design of turn-based programming games.” <https://arxiv.org/pdf/1710.07738.pdf>, October 2017.
 [^4]: "Ants AI Competition." <http://ants.aichallenge.org>, 2011.
 [^5]: J. Togelius, “How to run a successful game-based AI competition," IEEE Transactions on Computational Intelligence and AI in Games, vol. 8, no. 1, pp. 95–100, 2016.
 [^6]: “Halite II Competition Repository." <https://github.com/HaliteChallenge/Halite-II>, 2017.
