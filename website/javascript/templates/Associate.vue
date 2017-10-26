@@ -13,16 +13,11 @@
                     <!-- profession -->
                     <div class="form-group">
                         <label for="country">Which of the following describes you best?<span class="text-danger">*</span></label>
-                        <!-- <select class="form-control" id="level" v-model="level">
+                        <select class="form-control" id="level" v-model="level">
                             <option>Professional</option>
                             <option value="University">University</option>
                             <option value="High School">High school</option>
-                        </select> -->
-                        <v-select
-                          placeholder="Professional"
-                          v-model="level"
-                          :options="['Professional', 'University', 'High School']">
-                        </v-select>
+                        </select>
                     </div>
 
                     <div v-if="level === 'Professional'">
