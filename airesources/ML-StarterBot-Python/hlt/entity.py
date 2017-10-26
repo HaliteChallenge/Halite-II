@@ -1,7 +1,6 @@
 import abc
 import math
 from enum import Enum
-from collections import OrderedDict
 from . import constants
 
 
@@ -104,7 +103,7 @@ class Planet(Entity):
         self.health = hp
         self.owner = owner if bool(int(owned)) else None
         self._docked_ship_ids = docked_ships
-        self._docked_ships = OrderedDict()
+        self._docked_ships = {}
 
     def get_docked_ship(self, ship_id):
         """
@@ -187,7 +186,7 @@ class Planet(Entity):
         """
         num_planets, *remainder = tokens
         num_planets = int(num_planets)
-        planets = OrderedDict()
+        planets = {}
 
         for _ in range(num_planets):
             plid, planet, remainder = Planet._parse_single(remainder)
@@ -344,7 +343,7 @@ class Ship(Entity):
         :return: The dict of Players and unused tokens.
         :rtype: (dict, list[str])
         """
-        ships = OrderedDict()
+        ships = {}
         num_ships, *remainder = tokens
         for _ in range(int(num_ships)):
             ship_id, ships[ship_id], remainder = Ship._parse_single(player_id, remainder)

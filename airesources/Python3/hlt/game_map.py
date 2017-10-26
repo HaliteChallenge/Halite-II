@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from . import collision, entity
 
 
@@ -20,8 +19,8 @@ class Map:
         self.my_id = my_id
         self.width = width
         self.height = height
-        self._players = OrderedDict()
-        self._planets = OrderedDict()
+        self._players = {}
+        self._planets = {}
 
     def get_me(self):
         """
@@ -66,7 +65,7 @@ class Map:
         :return: Dict containing all entities with their designated distances
         :rtype: dict
         """
-        result = OrderedDict()
+        result = {}
         for foreign_entity in self._all_ships() + self.all_planets():
             if entity == foreign_entity:
                 continue
@@ -150,7 +149,7 @@ class Player:
     """
     :ivar id: The player's unique id
     """
-    def __init__(self, player_id, ships=OrderedDict()):
+    def __init__(self, player_id, ships={}):
         """
         :param player_id: User's id
         :param ships: Ships user controls (optional)
@@ -199,7 +198,7 @@ class Player:
         """
         num_players, *remainder = tokens
         num_players = int(num_players)
-        players = OrderedDict()
+        players = {}
 
         for _ in range(num_players):
             player, players[player], remainder = Player._parse_single(remainder)
