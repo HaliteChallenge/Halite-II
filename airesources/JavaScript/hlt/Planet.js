@@ -94,7 +94,7 @@ class Planet extends Entity {
      * @returns {Ship[]}
      */
     get dockedShips() {
-        return this._gameMap.shipsById(this.dockedShipIds);
+        return this._gameMap.shipsByIds(this.dockedShipIds);
     }
 
     toString() {

@@ -34,7 +34,7 @@ class GameMapParser {
     _parsePlayers() {
         const numberOfPlayers = this._nextInt();
 
-        forEachRange(numberOfPlayers, () => {
+        forEachInRange(numberOfPlayers, () => {
             const playerId = this._nextInt();
             this.map.addPlayerId(playerId);
 
@@ -88,12 +88,7 @@ class GameMapParser {
 
     _nextDockedShipIds() {
         const numberOfShips = this._nextInt();
-        const shipIds = [];
-        for (let shipIdx = 0; shipIdx < numberOfShips; shipIdx++) {
-            shipIds.push(this._nextInt());
-        }
-
-        return shipIds;
+        return mapRange(numberOfShips, () => this._nextInt());
     }
 
     _nextInt() {
@@ -127,7 +122,7 @@ function mapRange(end, mapFunc) {
     return result;
 }
 
-function forEachRange(end, actionFunc) {
+function forEachInRange(end, actionFunc) {
     for (let idx = 0; idx < end; idx++) {
         actionFunc(idx);
     }
