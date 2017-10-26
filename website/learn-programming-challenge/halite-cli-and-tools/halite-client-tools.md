@@ -6,9 +6,17 @@ sort_key: 9
 ---
 
 
-# Download our CLI
+# Download or install our CLI
 
 [Download: Halite Client](https://storage.cloud.google.com/halite-content/HaliteClient.zip)
+
+or pip install it!
+
+```
+pip install hlt_client
+```
+*Note: if you choose to pip install, replace all references of `./client` below with `hlt`*
+
 
 ## Ready, Set, Authenticate
 

@@ -10,8 +10,6 @@ import upload_bot
 import download_game
 import compare_bots
 
-from json.decoder import JSONDecodeError
-
 """client.py: Client for interacting with the Halite II servers."""
 
 __author__ = "Two Sigma"
@@ -109,7 +107,7 @@ class Config:
             config_contents = file.read()
         try:
             return json.loads(config_contents)
-        except (TypeError, JSONDecodeError):
+        except (TypeError, ValueError):
             raise ValueError("Secret formatting has been mangled. Try re-authenticating (`client.py --auth`).")
 
     @staticmethod
@@ -224,7 +222,7 @@ def main():
             compare_bots.play_games(args.halite_binary,
                                     args.map_width, args.map_height,
                                     args.run_commands, args.iterations)
-    except (IndexError, TypeError, ValueError, IOError, FileNotFoundError) as err:
+    except (IndexError, TypeError, ValueError, IOError) as err:
         sys.stderr.write(str(err) + os.linesep)
         exit(-1)
 
