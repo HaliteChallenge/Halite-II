@@ -85,9 +85,9 @@ func (entity Entity) CalculateRadAngleTo(target Entity) float64 {
 // ClosestPointTo returns the closest point that is at least minDistance from the target
 func (entity Entity) ClosestPointTo(target Entity, minDistance float64) Entity {
 	dist := entity.CalculateDistanceTo(target) - target.Radius - minDistance
-	angle := entity.CalculateRadAngleTo(target)
-	x := entity.X + dist*math.Cos(angle)
-	y := entity.Y + dist*math.Sin(angle)
+	angle := target.CalculateRadAngleTo(entity)
+	x := target.X + dist*math.Cos(angle)
+	y := target.Y + dist*math.Sin(angle)
 	return Entity{
 		X:      x,
 		Y:      y,
@@ -182,7 +182,13 @@ func IntToDockingStatus(i int) DockingStatus {
 
 // Thrust generates a string describing the ship's intension to move during the current turn
 func (ship Ship) Thrust(magnitude float64, angle float64) string {
-	return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.ID), strconv.Itoa(int(magnitude)), strconv.Itoa(int(angle)))
+	boundedAngle := int(angle)
+	if boundedAngle < 0 {
+		boundedAngle += 360
+	} else if boundedAngle >= 360 {
+		boundedAngle -= 360
+	}
+	return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.ID), strconv.Itoa(int(magnitude)), strconv.Itoa(boundedAngle))
 }
 
 // Dock generates a string describing the ship's intension to dock during the current turn
@@ -198,6 +204,7 @@ func (ship Ship) Undock() string {
 // NavigateBasic demonstrates how the player might move ships through space
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	distance := ship.CalculateDistanceTo(target)
+	safeDistance := distance - ship.Entity.Radius - target.Entity.Radius - .1
 
 	angle := ship.CalculateAngleTo(target)
 	speed := 7.0
@@ -205,7 +212,7 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 		speed = 3.0
 	}
 
-	speed = math.Min(speed, distance)
+	speed = math.Min(speed, safeDistance)
 	return ship.Thrust(speed, angle)
 }
 
@@ -213,7 +220,7 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 func (ship Ship) CanDock(planet Planet) bool {
 	dist := ship.CalculateDistanceTo(planet.Entity)
 
-	return dist <= (planet.Radius + 6)
+	return dist <= (planet.Radius + 4)
 }
 
 // Navigate demonstrates how the player might negotiate obsticles between
