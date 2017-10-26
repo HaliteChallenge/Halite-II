@@ -224,6 +224,12 @@
 }
 .leaderboard-explore{
   text-align: center;
+  >p{
+    margin-bottom: 20px;
+  }
+  .img-responsive{
+    margin: 0 auto;
+  }
 }
 
 .leaderboard-nav-tabs{
