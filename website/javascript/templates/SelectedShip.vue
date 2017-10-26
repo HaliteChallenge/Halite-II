@@ -47,7 +47,7 @@ export default {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
           owner: owner,
           id: base.id,
-          velocity: `(${base.vel_x}, ${base.vel_y})`,
+          velocity: `(${base.vel_x.toFixed(2)}, ${base.vel_y.toFixed(2)})`,
           health: base.health
         }
       }
