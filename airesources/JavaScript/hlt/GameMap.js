@@ -112,11 +112,11 @@ class GameMap {
 
     /**
      * return ships instances by ids
-     * @param [shipIds] ship ids
+     * @param [ids] ids of ships
      * @returns {Ship[]}
      */
-    shipsById(shipIds) {
-        return shipsIds.map(id => this.shipById(id));
+    shipsByIds(ids) {
+        return ids.map(id => this.shipById(id));
     }
 
     /**
@@ -180,12 +180,6 @@ class GameMap {
     _obstaclesBetween(obstaclesList, ship, target) {
         return obstaclesList.filter(o => o.id !== ship.id && o.id !== target.id)
             .filter(o => Geometry.intersectSegmentCircle(ship, target, o, ship.radius + 0.2))
-    }
-
-    _shipsByIdFromIds(ids) {
-        const shipsById = {};
-        ids.forEach(id => shipsById[id] = this._shipById[id]);
-        return shipsById;
     }
 }
 

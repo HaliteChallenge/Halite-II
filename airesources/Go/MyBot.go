@@ -34,7 +34,7 @@ func main() {
 		gameMap = conn.UpdateMap()
 		commandQueue := []string{}
 
-		myPlayer := gameMap.Players[gameMap.MyId]
+		myPlayer := gameMap.Players[gameMap.MyID]
 		myShips := myPlayer.Ships
 
 		for i := 0; i < len(myShips); i++ {

@@ -219,13 +219,13 @@
                       <img :src="`https://github.com/${_player.name}.png`">
                     </div>
                     <div class="card-dashboard-info">
-                      <span style="display: block;" :class="`player`">
+                      <span style="display: block;" :class="`player color-${_pIndex + 1}`">
                         <TierPopover :tier="tierClass(_player.tier)"/>
                         RANK {{_player.rank}}
                       </span>
                       <p class="card-dashboard-name">
-                        <a v-if="_player.id" :class="`player-name-anchor color-${_pIndex + 1}`" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
-                        <span v-if="!_player.id" class="player-name-anchor color-${_pIndex + 1}">{{_player.name}}</span>
+                        <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                        <span v-if="!_player.id" class="player-name-anchor">{{_player.name}}</span>
                       </p>
                       <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
                       <p v-else class="card-dashboard-version-heading">Local bot</p>
@@ -641,7 +641,13 @@
           let state = frame.ships[this.selected.owner][this.selected.id]
 
           if (state) {
-            return state
+            const moves = this.replay.moves[this.frame][this.selected.owner][0];
+            if (moves && moves[this.selected.id] && moves[this.selected.id].type === "thrust") {
+              const move = moves[this.selected.id];
+              state.vel_x = move.magnitude * Math.cos(move.angle * Math.PI / 180);
+              state.vel_y = move.magnitude * Math.sin(move.angle * Math.PI / 180);
+            }
+            return state;
           }
         }
         return null
@@ -690,7 +696,6 @@
             ranks[id].id = player.id
             const user = await api.get_user(player.id)
             ranks[id].tier = user.tier
-            ranks[id].rank = user.rank
           } else {
             const version = ranks[id].botname.match(/v(\d+)$/, '$1')
             if (version) {
