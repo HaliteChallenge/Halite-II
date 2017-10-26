@@ -86,7 +86,7 @@ class Planet extends Entity {
      * @returns {number}
      */
     get numberOfDockedShips() {
-        return this._params.dockedShipIds.length;
+        return this.dockedShipIds.length;
     }
 
     /**
