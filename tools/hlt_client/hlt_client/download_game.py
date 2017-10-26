@@ -124,7 +124,8 @@ class DatedGameDownloader(GameDownloader):
 
 
 class UserGameDownloader(GameDownloader):
-    _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}'
+    _USER_BOT_URI = 'https://api.halite.io/v1/api/user/{}/match?limit={}&offset={}'
+    _FETCH_THRESHOLD = 250
     _BUCKETS = []
 
     def __init__(self, destination, user_id, limit):
@@ -135,7 +136,24 @@ class UserGameDownloader(GameDownloader):
         :param limit: How many replays to fetch (max)
         """
         self.destination = destination
-        self.objects = self._parse_user_metadata(requests.get(self._USER_BOT_URI.format(user_id, limit)).json())
+        self.objects = self._parse_user_metadata(self._fetch_metadata(user_id, limit))
+
+    def _fetch_metadata(self, user_id, limit):
+        """
+        Retrieves paginated game metadata from the halite servers for a specified user up to limit items
+        :param user_id: The id of the user to fetch
+        :param limit: The maximum number of items to fetch
+        :return: The full metadata of items
+        """
+        print('Fetching Metadata')
+        current = 0
+        result_set = []
+        while current <= limit:
+            current_limit = self._FETCH_THRESHOLD if ((limit - current) >= self._FETCH_THRESHOLD) else (limit - current)
+            result_set += requests.get(self._USER_BOT_URI.format(user_id, current_limit, current)).json()
+            current += self._FETCH_THRESHOLD
+        print('Finished metadata fetch. Found {} game files.'.format(len(result_set)))
+        return result_set
 
     @staticmethod
     def _parse_user_metadata(user_json):
