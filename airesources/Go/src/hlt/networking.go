@@ -58,17 +58,7 @@ func NewConnection(botName string) Connection {
 func (c *Connection) UpdateMap() Map {
 	log.Printf("--- NEW TURN --- \n")
 	gameString := c.getString()
-
-	gameMap := Map{
-		MyId:     c.PlayerTag,
-		Width:    c.width,
-		Height:   c.height,
-		Planets:  []Planet{},
-		Players:  [4]Player{},
-		Entities: []Entity{},
-	}
-	//log.Printf("%+v\n",gameMap)
-	gameMap = ParseGameString(gameString, gameMap)
+	gameMap := ParseGameString(c, gameString)
 	log.Printf("    Parsed map")
 	return gameMap
 }

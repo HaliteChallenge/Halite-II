@@ -9,31 +9,31 @@ import (
 
 // Map describes the current state of the game
 type Map struct {
-	MyId, Width, Height int
-	Planets             []Planet /// preallocating for speed, assuming we cant have > 100 planets
-	Players             [4]Player
+	MyID, Width, Height int
+	Planets             []Planet
+	Players             []Player
 	Entities            []Entity
 }
 
 // Player has an ID for establishing ownership, and a number of ships
 type Player struct {
-	Id    int
-	Ships []Ship /// preallocating for speed, assuming we cant have > 10k ships.
+	ID    int
+	Ships []Ship
 }
 
 // ParsePlayer from a slice of game state tokens
 func ParsePlayer(tokens []string) (Player, []string) {
-	playerId, _ := strconv.Atoi(tokens[0])
+	playerID, _ := strconv.Atoi(tokens[0])
 	playerNumShips, _ := strconv.ParseFloat(tokens[1], 64)
 
 	player := Player{
-		Id:    playerId,
+		ID:    playerID,
 		Ships: []Ship{},
 	}
 
 	tokens = tokens[2:]
 	for i := 0; float64(i) < playerNumShips; i++ {
-		ship, tokensnew := ParseShip(playerId, tokens)
+		ship, tokensnew := ParseShip(playerID, tokens)
 		tokens = tokensnew
 		player.Ships = append(player.Ships, ship)
 	}
@@ -42,17 +42,26 @@ func ParsePlayer(tokens []string) (Player, []string) {
 }
 
 // ParseGameString from a slice of game state tokens
-func ParseGameString(gameString string, self Map) Map {
+func ParseGameString(c *Connection, gameString string) Map {
 	tokens := strings.Split(gameString, " ")
 	numPlayers, _ := strconv.Atoi(tokens[0])
 	tokens = tokens[1:]
 
+	gameMap := Map{
+		MyID:     c.PlayerTag,
+		Width:    c.width,
+		Height:   c.height,
+		Planets:  make([]Planet, 0),
+		Players:  make([]Player, numPlayers),
+		Entities: make([]Entity, 0),
+	}
+
 	for i := 0; i < numPlayers; i++ {
 		player, tokensnew := ParsePlayer(tokens)
 		tokens = tokensnew
-		self.Players[player.Id] = player
+		gameMap.Players[player.ID] = player
 		for j := 0; j < len(player.Ships); j++ {
-			self.Entities = append(self.Entities, player.Ships[j].Entity)
+			gameMap.Entities = append(gameMap.Entities, player.Ships[j].Entity)
 		}
 	}
 
@@ -62,17 +71,16 @@ func ParseGameString(gameString string, self Map) Map {
 	for i := 0; i < numPlanets; i++ {
 		planet, tokensnew := ParsePlanet(tokens)
 		tokens = tokensnew
-		self.Planets = append(self.Planets, planet)
-		self.Entities = append(self.Entities, planet.Entity)
+		gameMap.Planets = append(gameMap.Planets, planet)
+		gameMap.Entities = append(gameMap.Entities, planet.Entity)
 	}
 
-	return self
+	return gameMap
 }
 
 // ObstaclesBetween demonstrates how the player might determine if the path
 // between two enitities is clear
 func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
-
 	x1 := start.X
 	y1 := start.Y
 	x2 := end.X
@@ -84,7 +92,7 @@ func (gameMap Map) ObstaclesBetween(start Entity, end Entity) bool {
 
 	for i := 0; i < len(gameMap.Entities); i++ {
 		entity := gameMap.Entities[i]
-		if entity.Id == start.Id || entity.Id == end.Id {
+		if entity.ID == start.ID || entity.ID == end.ID {
 			continue
 		}
 
