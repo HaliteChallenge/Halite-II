@@ -9,8 +9,8 @@ class Game {
     /**
      * starts a game with a specified bot name and a strategy
      * @param botName bot name
-     * @param {function(GameMap)} preProcessing optional function that will be called once with an inital map to prepare data. it must finish within a minute
-     * @param {function} strategy function with game map as a parameter that returns a list of moves to take
+     * @param {function(GameMap)} preProcessing optional function that will be called once with an initial map to prepare data. it must finish within a minute
+     * @param {function{GameMap)} strategy function with game map as a parameter that returns a list of moves to take
      */
     static start({botName, preProcessing, strategy}) {
         let turnNumber = 1;
