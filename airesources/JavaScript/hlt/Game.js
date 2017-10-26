@@ -9,11 +9,10 @@ class Game {
     /**
      * starts a game with a specified bot name and a strategy
      * @param botName bot name
-     * @param {function} strategy function with game map as a parameter that returns a list of moves to take
+     * @param {function(GameMap)} preProcessing optional function that will be called once with an initial map to prepare data. it must finish within a minute
+     * @param {function{GameMap)} strategy function with game map as a parameter that returns a list of moves to take
      */
-    static start(botName, strategy) {
-        Networking.writeLine(botName);
-
+    static start({botName, preProcessing, strategy}) {
         let turnNumber = 1;
         Networking.readNLines(2, lines => {
             const parsedGameMeta = parseGameMeta(lines);
@@ -26,6 +25,25 @@ class Game {
 
             mapParser = new GameMapParser(parsedGameMeta);
 
+            startPreProcessing();
+        });
+
+        function startPreProcessing() {
+            Networking.readLine(line => {
+                const map = mapParser.parse(line);
+                Log.log('initial map:');
+                Log.log(line);
+
+                if (preProcessing) {
+                    preProcessing(map);
+                }
+
+                Networking.writeLine(botName);
+                startGameLoop();
+            });
+        }
+
+        function startGameLoop() {
             Networking.forEachReadLine(line => {
                 Log.log(`turn #${turnNumber}, map:`);
                 Log.log(line);
@@ -39,7 +57,7 @@ class Game {
 
                 turnNumber++;
             })
-        });
+        }
     }
 }
 

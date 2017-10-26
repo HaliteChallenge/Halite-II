@@ -1,5 +1,7 @@
 package hlt
 
+// StrategyBasicBot demonstrates how the player might direct their ships
+// in achieving victory
 func StrategyBasicBot(ship Ship, gameMap Map) string {
 	planets := gameMap.NearestPlanetsByDistance(ship)
 

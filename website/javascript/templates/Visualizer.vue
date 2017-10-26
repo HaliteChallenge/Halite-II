@@ -641,7 +641,13 @@
           let state = frame.ships[this.selected.owner][this.selected.id]
 
           if (state) {
-            return state
+            const moves = this.replay.moves[this.frame][this.selected.owner][0];
+            if (moves && moves[this.selected.id] && moves[this.selected.id].type === "thrust") {
+              const move = moves[this.selected.id];
+              state.vel_x = move.magnitude * Math.cos(move.angle * Math.PI / 180);
+              state.vel_y = move.magnitude * Math.sin(move.angle * Math.PI / 180);
+            }
+            return state;
           }
         }
         return null

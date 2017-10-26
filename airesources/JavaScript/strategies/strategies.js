@@ -37,7 +37,7 @@ function defaultStrategy(gameMap) {
                  */
                 return ship.navigate({
                     target: chosenPlanet,
-                    keepDistanceToTarget: chosenPlanet.radius + constants.DOCK_RADIUS,
+                    keepDistanceToTarget: chosenPlanet.radius + 3,
                     speed: constants.MAX_SPEED / 2,
                     avoidObstacles: true,
                     ignoreShips: false

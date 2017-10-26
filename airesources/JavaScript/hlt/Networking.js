@@ -33,6 +33,10 @@ class Networking {
         }
     }
 
+    static readLine(onLine) {
+        Networking.readNLines(1, lines => onLine(lines[0]));
+    }
+
     static forEachReadLine(onLineCallback) {
         rl.on('line', (line) => {
             onLineCallback(line);

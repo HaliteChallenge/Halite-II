@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// Connection performs all of the IO operations required to communicate
+// game state and player movements with the Halite engine
 type Connection struct {
 	width, height int
 	PlayerTag     int
@@ -35,6 +37,8 @@ func (c *Connection) getInt() int {
 	return i
 }
 
+// NewConnection initializes a new connection for one of the bots
+// participating in a match
 func NewConnection(botName string) Connection {
 	conn := Connection{
 		reader: bufio.NewReader(os.Stdin),
@@ -50,6 +54,7 @@ func NewConnection(botName string) Connection {
 	return conn
 }
 
+// UpdateMap decodes the current turn's game state from a string
 func (c *Connection) UpdateMap() Map {
 	log.Printf("--- NEW TURN --- \n")
 	gameString := c.getString()
@@ -58,6 +63,7 @@ func (c *Connection) UpdateMap() Map {
 	return gameMap
 }
 
+// SubmitCommands encodes the player's commands into a string
 func (c *Connection) SubmitCommands(commandQueue []string) {
 	commandString := strings.Join(commandQueue, " ")
 	log.Printf("Final string : %+v\n", commandString)

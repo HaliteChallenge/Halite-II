@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git golang julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
@@ -59,6 +59,13 @@ sudo -iu bot_compilation rustup toolchain install nightly beta
 sudo sh -c 'echo "$(curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein)" > /usr/bin/lein'
 sudo chmod a+x /usr/bin/lein
 sudo -iu bot_compilation lein
+
+## Install Go, for the bot and compilation users.
+curl -O https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
+echo 'export PATH="$PATH:/usr/local/go/bin"' | sudo -iu bot_compilation tee -a /home/bot_compilation/.profile
+rm go1.9.2.linux-amd64.tar.gz
+# See below for where PATH of the bot users is edited.
 
 # Miniconda
 sudo -iu bot_compilation sh -c 'curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -sSf > miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda'
@@ -150,6 +157,7 @@ for i in $(seq 0 $((NUM_BOTS-1))); do
     ## Grant sudo access to the worker.
     sudo sh -c "echo \"worker ALL=(${USERNAME}) NOPASSWD: ALL\" > /etc/sudoers.d/worker_${USERNAME}"
     sudo chmod 0400 /etc/sudoers.d/worker_${USERNAME}
+    echo 'export PATH="$PATH:/usr/local/go/bin"' | sudo -iu ${USERNAME} tee -a /home/${USERNAME}/.profile
 done
 
 ## Make sure iptables rules persist
