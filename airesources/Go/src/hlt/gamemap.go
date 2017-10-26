@@ -42,17 +42,26 @@ func ParsePlayer(tokens []string) (Player, []string) {
 }
 
 // ParseGameString ...
-func ParseGameString(gameString string, self Map) Map {
+func ParseGameString(c *Connection, gameString string) Map {
 	tokens := strings.Split(gameString, " ")
 	numPlayers, _ := strconv.Atoi(tokens[0])
 	tokens = tokens[1:]
 
+	gameMap := Map{
+		MyID:     c.PlayerTag,
+		Width:    c.width,
+		Height:   c.height,
+		Planets:  make([]Planet, 0),
+		Players:  make([]Player, numPlayers),
+		Entities: make([]Entity, 0),
+	}
+
 	for i := 0; i < numPlayers; i++ {
 		player, tokensnew := ParsePlayer(tokens)
 		tokens = tokensnew
-		self.Players[player.ID] = player
+		gameMap.Players[player.ID] = player
 		for j := 0; j < len(player.Ships); j++ {
-			self.Entities = append(self.Entities, player.Ships[j].Entity)
+			gameMap.Entities = append(gameMap.Entities, player.Ships[j].Entity)
 		}
 	}
 
@@ -62,11 +71,11 @@ func ParseGameString(gameString string, self Map) Map {
 	for i := 0; i < numPlanets; i++ {
 		planet, tokensnew := ParsePlanet(tokens)
 		tokens = tokensnew
-		self.Planets = append(self.Planets, planet)
-		self.Entities = append(self.Entities, planet.Entity)
+		gameMap.Planets = append(gameMap.Planets, planet)
+		gameMap.Entities = append(gameMap.Entities, planet.Entity)
 	}
 
-	return self
+	return gameMap
 }
 
 // ObstaclesBetween ...
