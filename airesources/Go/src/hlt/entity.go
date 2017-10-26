@@ -182,10 +182,11 @@ func IntToDockingStatus(i int) DockingStatus {
 
 // Thrust generates a string describing the ship's intension to move during the current turn
 func (ship Ship) Thrust(magnitude float64, angle float64) string {
+	var boundedAngle int
 	if (angle > 0.0) {
-		boundedAngle := int(math.Floor(angle + .5))
+		boundedAngle = int(math.Floor(angle + .5))
 	} else {
-		boundedAngle := int(math.Ceil(angle - .5))
+		boundedAngle = int(math.Ceil(angle - .5))
 	}
 	boundedAngle = ((boundedAngle % 360) + 360) % 360
 	return fmt.Sprintf("t %s %s %s", strconv.Itoa(ship.ID), strconv.Itoa(int(magnitude)), strconv.Itoa(boundedAngle))
@@ -204,7 +205,7 @@ func (ship Ship) Undock() string {
 // NavigateBasic demonstrates how the player might move ships through space
 func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 	distance := ship.CalculateDistanceTo(target)
-	safeDistance := distance - ship.Entity.Radius - target.Entity.Radius - .1
+	safeDistance := distance - ship.Entity.Radius - target.Radius - .1
 
 	angle := ship.CalculateAngleTo(target)
 	speed := 7.0
