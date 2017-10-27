@@ -198,6 +198,7 @@
                                         <button
                                             type="button"
                                             class="btn"
+                                            :disabled="page >= lastPage - 1"
                                             v-on:click="next_page"><span>Next</span></button>
                                     </div>
                                 </div>
@@ -494,6 +495,7 @@
           usernames: {},
           page: 0,
           limit: 10,
+          lastPage: 0,
           offset: 0,
           nemesisLimit: 30,
           nemesisGameCount: 200,
@@ -535,6 +537,7 @@
           api.list_bots(user.user_id).then((bots) => {
             this.bots = bots
           })
+          this.fetchAllMatch()
           this.fetch()
           this.fetchHackathon()
           this.fetchErrorGames()
@@ -589,6 +592,16 @@
             calcCol();
             console.log('cal col');
           }, 200)
+        },
+        fetchAllMatch: function () {
+          let query = `order_by=desc,time_played&offset=0&limit=999999`
+          if (this.only_timed_out) {
+            query += `&filter=timed_out,=,${this.user.user_id}`
+          }
+          const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
+          return $.get(url).then((data) => {
+            this.lastPage = Math.ceil(data.length / this.limit)
+          })
         },
         fetch: function () {
           let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`
