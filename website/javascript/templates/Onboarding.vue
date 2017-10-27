@@ -2,7 +2,7 @@
 	<div class="onboarding-container" v-if="show">
 		<div class="row">
 			<div v-if="step == 1" class="step-section-1 col-md-8 col-xm-10 col-md-offset-2 col-xm-offset-1">
-				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
+				<a class="close-btn link-in-dark" @click="show = false">Close</a>
 				<div class="section-content">
 					<p class="step-rank">Step 1/3</p>
 					<h2>Welcome to Halite</h2>
