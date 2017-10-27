@@ -1,8 +1,7 @@
-import math
-
-from . import constants
 import abc
+import math
 from enum import Enum
+from . import constants
 
 
 class Entity:
