@@ -113,7 +113,7 @@ def executeCompileTask(user_id, bot_id, backend):
 
                     for filename in os.listdir(bufferFolder):
                         shutil.move(os.path.join(bufferFolder, filename), os.path.join(temp_dir, filename))
-                    os.rmdir(bufferFolder)
+                    # Context manager takes care of buffer folder
 
             # Delete any symlinks
             subprocess.call(["find", temp_dir, "-type", "l", "-delete"])
