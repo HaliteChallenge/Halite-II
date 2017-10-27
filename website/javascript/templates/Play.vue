@@ -223,7 +223,8 @@
             inst.currentView = 'replay'
             inst.replayFile = files[0].name
             window.location.hash = '/replay-bot'
-            inst.message = 'Parsing replay, please wait…'
+            // inst.message = 'Parsing replay, please wait…'
+            inst.message = 'Almost done...'
             showGame({
               game: null,
               replay: e.target.result
