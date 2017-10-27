@@ -221,7 +221,7 @@
                     <div class="card-dashboard-info">
                       <span style="display: block;" :class="`player color-${_pIndex + 1}`">
                         <TierPopover :tier="tierClass(_player.tier)"/>
-                        RANK {{_player.rank}}
+                        RANK {{_player.userRank}}
                       </span>
                       <p class="card-dashboard-name">
                         <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
@@ -696,6 +696,7 @@
             ranks[id].id = player.id
             const user = await api.get_user(player.id)
             ranks[id].tier = user.tier
+            ranks[id].userRank = user.rank
           } else {
             const version = ranks[id].botname.match(/v(\d+)$/, '$1')
             if (version) {
