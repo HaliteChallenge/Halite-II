@@ -120,10 +120,15 @@ namespace hlt {
             return map;
         }
 
-        static const Map get_map(const int map_width, const int map_height) {
+        static const possibly<Map> get_map(const int map_width, const int map_height) {
             Log::log("--- NEW TURN ---");
             const std::string input = get_string();
-            return parse_map(input, map_width, map_height);
+
+            if (std::cin.good()) {
+                return { parse_map(input, map_width, map_height), true };
+            } else {
+                return { Map(0, 0), false };
+            }
         }
     }
 }
