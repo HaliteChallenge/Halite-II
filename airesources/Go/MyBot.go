@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"./src/hlt"
 	"log"
 	"os"
 	"strconv"
+
+	"./src/hlt"
 )
+
 // golang starter kit with logging and basic pathfinding
 // Arjun Viswanathan 2017 / github arjunvis
 
@@ -21,7 +23,7 @@ func main() {
 		fname := strconv.Itoa(conn.PlayerTag) + "_gamelog.log"
 		f, err := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Println("error opening file: %v", err)
+			fmt.Printf("error opening file: %v\n", err)
 		}
 		defer f.Close()
 		log.SetOutput(f)
@@ -30,9 +32,9 @@ func main() {
 	gameturn := 1
 	for true {
 		gameMap = conn.UpdateMap()
-		commandQueue := [] string{}
+		commandQueue := []string{}
 
-		myPlayer := gameMap.Players[gameMap.MyId]
+		myPlayer := gameMap.Players[gameMap.MyID]
 		myShips := myPlayer.Ships
 
 		for i := 0; i < len(myShips); i++ {
@@ -41,7 +43,7 @@ func main() {
 				commandQueue = append(commandQueue, hlt.StrategyBasicBot(ship, gameMap))
 			}
 		}
-		log.Printf("Turn %v\n",gameturn)
+		log.Printf("Turn %v\n", gameturn)
 		conn.SubmitCommands(commandQueue)
 		gameturn++
 	}

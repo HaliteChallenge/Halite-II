@@ -63,7 +63,7 @@
                     <p class="t2 c-wht font-headline">MINING HALITE IN SPACE</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <p class="t5 c-gry">This year's game is a space story.</p>
-                    <p class="t5 c-gry">Your mission is to extract Halite. Bots control ships that colonize and mine planets, producing more ships to defeat opponents. To achieve victory, you will need optimal pathfinding and swarm control to move efficiently from planet to planet and destroy enemy ships.</p>
+                    <p class="t5 c-gry">Your mission is to extract Halite. Bots control ships that dock on and mine planets, producing more ships to defeat opponents. To achieve victory, you will need optimal pathfinding and swarm control to move efficiently from planet to planet and destroy enemy ships.</p>
                     <div class="line-container"><i class="xline xline-top"></i></div>
                     <div class="ha-button-container no-bg-button">
                         <div>
@@ -252,7 +252,7 @@
                             <i class="xline xline-right"></i>
                             <div class="content">
                                 <p class="t3 c-wht font-headline">CAREERS AT TWO SIGMA</p>
-                                <p class="t5 c-gry">Two Sigma, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interview for any Halite player who achieves Gold or above.</p>
+                                <p class="t5 c-gry">Two Sigma, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will consider waiving first round interview for any Halite player who achieves Gold or above.</p>
                                 <div class="clear"></div>
                                 <div class="ha-button-container no-bg-button">
                                     <div>

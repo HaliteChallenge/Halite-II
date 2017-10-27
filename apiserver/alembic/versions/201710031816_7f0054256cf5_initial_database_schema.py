@@ -455,7 +455,7 @@ def upgrade():
                   autoincrement=False, nullable=False),
         sa.Column('version_number', mysql.MEDIUMINT(display_width=8,
                   unsigned=True), autoincrement=False, nullable=False),
-        sa.Column('log_name', mysql.VARCHAR(length=64), nullable=True),
+        sa.Column('log_name', mysql.VARCHAR(length=256), nullable=True),
         sa.Column('rank', mysql.SMALLINT(display_width=5, unsigned=True),
                   autoincrement=False, nullable=False),
         sa.Column('player_index', mysql.SMALLINT(display_width=5,

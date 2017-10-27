@@ -31,8 +31,8 @@ ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
-versions =  {"Python3" : "1.0", "C++" : "0.9.0-beta", "Java" : "1.0", "CSharp" : "0.7.0-beta" ,"JavaScript": "1.0",
-"ML-StarterBot-Python":"1.0", "Rust" : "0.9.0-beta", "Scala" : "0.9.0-beta", "Go" : "0.9.0-beta" }
+versions =  {"Python3" : "1.0", "C++" : "1.0", "Java" : "1.0", "CSharp" : "0.9.0-beta" ,"JavaScript": "1.0",
+"ML-StarterBot-Python":"1.0", "Rust" : "0.9.0-beta", "Scala" : "0.9.0-beta", "Go" : "0.9.0-beta", "Ruby" : "0.9.0-beta"  }
 
 
 def detect_environments(directory):
@@ -70,6 +70,8 @@ def scan_directory(full_path):
 def make_archive(output, environment, base_path, included_files):
     """Create the output ZIP archive."""
     platform, source, target = environment
+    # Get rid of duplicates
+    included_files = list(set(included_files))
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
         if source is not None:
             # source is None <=> platform-agnostic archive
@@ -82,15 +84,6 @@ def make_archive(output, environment, base_path, included_files):
         for file in included_files:
             target_path = os.path.relpath(file, base_path)
             archive.write(file, target_path)
-
-        if "Windows" in platform:
-            run_game = os.path.join(base_path, "run_game.bat")
-            if os.path.isfile(run_game):
-                archive.write(run_game, "run_game.bat")
-        else:
-            run_game = os.path.join(base_path, "run_game.sh")
-            if os.path.isfile(run_game):
-                archive.write(run_game, "run_game.sh")
 
 
 def make_source_download():

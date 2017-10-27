@@ -2,14 +2,16 @@ package hlt
 
 import (
 	"bufio"
-	"io"
 	"fmt"
+	"io"
 	"log"
-	"strings"
 	"os"
 	"strconv"
+	"strings"
 )
 
+// Connection performs all of the IO operations required to communicate
+// game state and player movements with the Halite engine
 type Connection struct {
 	width, height int
 	PlayerTag     int
@@ -30,12 +32,14 @@ func (c *Connection) getString() string {
 func (c *Connection) getInt() int {
 	i, err := strconv.Atoi(c.getString())
 	if err != nil {
-		log.Printf("Errored on initial tag: ", err)
+		log.Printf("Errored on initial tag: %v", err)
 	}
 	return i
 }
 
-func NewConnection(botName string) (Connection) {
+// NewConnection initializes a new connection for one of the bots
+// participating in a match
+func NewConnection(botName string) Connection {
 	conn := Connection{
 		reader: bufio.NewReader(os.Stdin),
 		writer: os.Stdout,
@@ -50,25 +54,17 @@ func NewConnection(botName string) (Connection) {
 	return conn
 }
 
+// UpdateMap decodes the current turn's game state from a string
 func (c *Connection) UpdateMap() Map {
 	log.Printf("--- NEW TURN --- \n")
 	gameString := c.getString()
-
-	gameMap := Map{
-		MyId:     c.PlayerTag,
-		Width:    c.width,
-		Height:   c.height,
-		Planets:  []Planet{},
-		Players:  [4]Player{},
-		Entities: []Entity{},
-	}
-	//log.Printf("%+v\n",gameMap)
-	gameMap = ParseGameString(gameString, gameMap)
+	gameMap := ParseGameString(c, gameString)
 	log.Printf("    Parsed map")
 	return gameMap
 }
 
-func (c *Connection) SubmitCommands(commandQueue [] string) {
+// SubmitCommands encodes the player's commands into a string
+func (c *Connection) SubmitCommands(commandQueue []string) {
 	commandString := strings.Join(commandQueue, " ")
 	log.Printf("Final string : %+v\n", commandString)
 	c.sendString(commandString)

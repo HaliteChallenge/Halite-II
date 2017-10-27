@@ -6,7 +6,7 @@ description: Two Sigma is excited to meet the exceptionally talented players of 
 sort_key: 3
 ---
 
-[Two Sigma](https://www.twosigma.com){:target="_blank"}, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will waive first round interviews for any Halite player who achieves Gold or above, and they are also organizing hackathons on many college campuses this fall. 
+[Two Sigma](https://www.twosigma.com){:target="_blank"}, the creator of Halite, is excited to meet the exceptionally talented players of the Halite community. They will consider waiving first round interviews for any Halite player who achieves Gold or above, and they are also organizing hackathons on many college campuses this fall. 
 
 ## About Two Sigma
 
