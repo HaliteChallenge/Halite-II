@@ -299,7 +299,9 @@ export default {
         filters.language_options = language_options
         filters.country_codes = country_codes
         filters.country_options = country_options
-        filters.org_options = org_options
+        filters.org_options = org_options.sort(function(a, b) {
+          return a.label.localeCompare(b.label);
+        });
         filters.usernames_options = username_options
 
         return filters
