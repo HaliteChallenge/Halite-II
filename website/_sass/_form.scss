@@ -91,14 +91,6 @@ select.form-control::-ms-expand {
   /** input **/
   .form-control{
     margin-right: 0 !important;
-    background-image: url("/assets/images/chevron-down.svg");
-    background-position: calc(100% - 15px) center;
-    background-repeat: no-repeat;
-    &:focus, &:active{
-      background-image: url("/assets/images/chevron-down.svg");
-      background-position: calc(100% - 15px) center;
-      background-repeat: no-repeat;
-    }
   }
 
   /** dropdown **/
@@ -109,6 +101,15 @@ select.form-control::-ms-expand {
       border: 0;
       background-color: $yellow;
       color: #30242F;
+    }
+    
+    background-image: url("/assets/images/chevron-down.svg");
+    background-position: calc(100% - 15px) center;
+    background-repeat: no-repeat;
+    &:focus, &:active{
+      background-image: url("/assets/images/chevron-down.svg");
+      background-position: calc(100% - 15px) center;
+      background-repeat: no-repeat;
     }
   }
 
