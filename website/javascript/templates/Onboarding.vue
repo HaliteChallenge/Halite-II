@@ -264,8 +264,9 @@ export default {
 	  submitCode: function(){
 			this.$refs.botEditor.upload_bot().then(() => {
 				this.step = 3;
+				utils.Alert.show("You code has been submitted!", "success");
 			}).catch((message) => {
-				alert('Upload Failed: ' + message)
+				utils.Alert.show("Upload Failed: " + message, "error");
 			});
 	  },
 	  downloadCode: function(){

@@ -59,7 +59,7 @@
                                 </button>
                             </div>
                             <div class="share-socials">
-                                <a onclick="FB.ui({method: 'share',href: 'https://developers.facebook.com/docs/',}, function(response){});return true;" target="_blank"><i class="fa fa-facebook-official"></i></a>
+                                <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"><i class="fa fa-facebook-official"></i></a>
                                 <a :href="shareSocial('twitter')"><i class="fa fa-twitter"></i></a>
                                 <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;" target="_blank"><i class="fa fa-linkedin"></i></a>
                             </div>

@@ -185,16 +185,16 @@ input:focus{
   background-color: $player-4;
 }
 .color-1{
-  color: $player-1;
+  color: $player-1 !important;
 }
 .color-2{
-  color: $player-2;
+  color: $player-2 !important;
 }
 .color-3{
-  color: $player-3;
+  color: $player-3 !important;
 }
 .color-4{
-  color: $player-4;
+  color: $player-4 !important;
 }
 .dot{
   width: 8px;

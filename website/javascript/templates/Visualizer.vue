@@ -219,13 +219,13 @@
                       <img :src="`https://github.com/${_player.name}.png`">
                     </div>
                     <div class="card-dashboard-info">
-                      <span style="display: block;" :class="`player color-${_pIndex + 1}`">
+                      <span style="display: block;" :class="`player`">
                         <TierPopover :tier="tierClass(_player.tier)"/>
                         RANK {{_player.userRank}}
                       </span>
                       <p class="card-dashboard-name">
-                        <a v-if="_player.id" class="player-name-anchor" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
-                        <span v-if="!_player.id" class="player-name-anchor">{{_player.name}}</span>
+                        <a v-if="_player.id" :class="`player-name-anchor color-${_pIndex + 1}`" :href="`/user/?user_id=${_player.id}`">{{_player.name}}</a>
+                        <span v-if="!_player.id" :class="`player-name-anchor color-${_pIndex + 1}`">{{_player.name}}</span>
                       </p>
                       <p v-if="_player.version" class="card-dashboard-version-heading">Bot version:</p>
                       <p v-else class="card-dashboard-version-heading">Local bot</p>

@@ -86,7 +86,8 @@
     mounted: function () {
       const params = new URLSearchParams(window.location.search)
       const setupGame = (game) => {
-        this.message = 'Parsing replay, please wait…'
+        // this.message = 'Parsing replay, please wait…'
+        this.message = 'Almost done...'
         this.$parent.currentView = 'replay'
         showGame(game).then(() => {
           this.is_downloading = false
@@ -179,7 +180,8 @@
             this.$parent.currentView = 'replay'
             window.location.hash = '/replay-bot'
             this.$parent.replayFile = files[0].name
-            this.message = 'Parsing replay, please wait…'
+            // this.message = 'Parsing replay, please wait…'
+            this.message = 'Almost done...'
             showGame({
               game: null,
               replay: e.target.result
