@@ -7,6 +7,7 @@ setup(name='hlt_client',
       author_email='halite@halite.io',
       license='MIT',
       packages=['hlt_client'],
+      scripts=['bin/hlt'],
       install_requires=[
         'requests',
         'zstd',
