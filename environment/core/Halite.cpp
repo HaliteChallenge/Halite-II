@@ -738,10 +738,10 @@ auto Halite::process_events() -> void {
         auto update_damage = [&](hlt::EntityId src, hlt::EntityId target) -> void {
             auto& attacker = game_map.get_ship(src);
 
-            if (!attacker.is_alive() || attacker.weapon_cooldown > 0 ||
-                attacker.docking_status != hlt::DockingStatus::Undocked) {
-                return;
-            }
+            // This sets the cooldown too eagerly, but we don't check
+            // it again in this frame anyways. There's no need to
+            // validate any properties of the attacker - we've already
+            // verified them above.
             attacker.weapon_cooldown = hlt::GameConstants::get().WEAPON_COOLDOWN;
 
             auto prev_damage = 0.0;
@@ -749,21 +749,20 @@ auto Halite::process_events() -> void {
                 prev_damage = damage_map[target.player_id()][target.entity_index()];
             }
             const auto new_damage = hlt::GameConstants::get().WEAPON_DAMAGE / static_cast<double>(target_count[src]);
+            std::cout << " damage" << new_damage << ".\n";
             damage_map[target.player_id()][target.entity_index()] = prev_damage + new_damage;
         };
 
-        for (SimulationEvent ev : simultaneous_events) {
-            if (ev.type != SimulationEventType::Attack){
-                continue;
-            }
-
-            update_damage(ev.id1, ev.id2);
-            update_damage(ev.id2, ev.id1);
-        }
-
-        for (auto& pair : attackers) {
+        for (const auto& pair : attackers) {
             full_frame_events.back().push_back(
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
+            // Use the AttackEvents generated above to actually
+            // perform attack calculations. This way, we only perform
+            // damage calculations when we're sure there was actually
+            // an attack.
+            for (const auto& target: pair.second.targets) {
+                update_damage(pair.first, target);
+            }
         }
 
         process_damage(damage_map, simultaneous_events.back().time);
