@@ -8,12 +8,7 @@ int main() {
     std::vector<hlt::Move> moves;
     for (;;) {
         moves.clear();
-        const hlt::possibly<hlt::Map> possibly_map = hlt::in::get_map(metadata.map_width, metadata.map_height);
-        if (!possibly_map.second) {
-            hlt::Log::log("no more input; exiting");
-            break;
-        }
-        const hlt::Map map = possibly_map.first;
+        const hlt::Map map = hlt::in::get_map(metadata.map_width, metadata.map_height);
 
         for (const hlt::Ship& ship : map.ships.at(player_id)) {
             if (ship.docking_status != hlt::ShipDockingStatus::Undocked) {

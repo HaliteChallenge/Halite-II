@@ -120,15 +120,16 @@ namespace hlt {
             return map;
         }
 
-        static const possibly<Map> get_map(const int map_width, const int map_height) {
+        static const Map get_map(const int map_width, const int map_height) {
             Log::log("--- NEW TURN ---");
             const std::string input = get_string();
 
-            if (std::cin.good()) {
-                return { parse_map(input, map_width, map_height), true };
-            } else {
-                return { Map(0, 0), false };
+            if (!std::cin.good()) {
+                // This is needed on Windows to detect that game engine is done.
+                std::exit(0);
             }
+
+            return parse_map(input, map_width, map_height);
         }
     }
 }
