@@ -108,11 +108,11 @@ def executeCompileTask(user_id, bot_id, backend):
                     singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
 
                     for filename in os.listdir(singleFolder):
-                        shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
+                        shutil.move(os.path.join(singleFolder, filename), bufferFolder)
                     os.rmdir(singleFolder)
 
                     for filename in os.listdir(bufferFolder):
-                        shutil.move(os.path.join(bufferFolder, filename), os.path.join(temp_dir, filename))
+                        shutil.move(os.path.join(bufferFolder, filename), temp_dir)
                     # Context manager takes care of buffer folder
 
             # Delete any symlinks
