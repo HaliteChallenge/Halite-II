@@ -2,10 +2,10 @@ package hlt
 
 import java.io.{FileWriter, IOException}
 
-object DebugLog {
+object Log {
   private var writer: FileWriter = _
 
-  def addLog(message: String): Unit =
+  def log(message: String): Unit =
     try {
       writer.write(message)
       writer.write('\n')
