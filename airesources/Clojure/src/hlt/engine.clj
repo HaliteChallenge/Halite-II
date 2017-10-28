@@ -187,9 +187,28 @@
   Object
   (toString [this] (pr-str this)))
 
-(defn can-dock?
+(defn within-docking-range?
   "Returns whether a ship is within distance to dock on the provided
   planet."
   [ship planet]
   (<= (distance-between (:pos ship) (:pos planet))
       (+ dock-radius (:radius planet))))
+
+(defn remaining-docking-spots
+  "Returns the number of remaining docking spots for this planet"
+  [planet]
+  (- (-> planet :docking :spots)
+     (-> planet :docking :ships count)))
+
+(defn any-remaining-docking-spots?
+  "Returns whether there are any remaining docking spots on this planet"
+  [planet]
+  (pos? (remaining-docking-spots planet)))
+
+(defn entities-by-distance
+  "Returns a list of all entities sorted by distance to x. If x itself
+  is an entity, it is not included in the list."
+  [x]
+  (->> (concat (vals *planets*) (vals *ships*))
+       (remove #{x})
+       (sort-by #(distance-between x %))))

@@ -40,7 +40,7 @@
     (first
      (for [planet (vals *planets*)
            :when (nil? (:owner-id planet))]
-       (if (e/can-dock? ship planet)
+       (if (e/within-docking-range? ship planet)
          (e/dock-move ship planet)
          (e/navigate-to-dock ship planet))))))
 
