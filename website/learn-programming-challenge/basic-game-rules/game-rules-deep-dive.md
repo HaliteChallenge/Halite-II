@@ -56,7 +56,7 @@ Beyond basic thrust, the API provides some additional helper methods for pathfin
 5. closest_point_to: returns a point near a given entity closest to the source entity
 6. navigate: given a position, will navigate a user towards a given location using other pathfinding methods. Navigate is a stateless method, you must continue to call it each turn until you arrive at your destination, and can always choose not to call it, being able to easily change directions between turns. If avoid_obstacles is set to True (default) will avoid obstacles on the way, with up to max_corrections corrections
 
-See [API documentation](/learn-programming-challenge/halite-cli-and-tools/cli) for full details and tutorials for examples in practice. In order be successful at Halite II, players will need sophisticated pathfinding algorithms, but new players are encouraged to try out our navigate helper function as an easier starting point.
+In order be successful at Halite II, players will need sophisticated pathfinding algorithms, but new players are encouraged to try out our navigate helper function as an easier starting point.
 
 ### Planets
 Each planet occupies a perfectly circular area. Planets have:
