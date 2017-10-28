@@ -2,22 +2,22 @@
 
 namespace Halite2.hlt
 {
-    public class DebugLog
+    public class Log
     {
         private TextWriter file;
-        private static DebugLog instance;
+        private static Log instance;
 
-        private DebugLog(TextWriter f)
+        private Log(TextWriter f)
         {
             file = f;
         }
 
         public static void Initialize(TextWriter f)
         {
-            instance = new DebugLog(f);
+            instance = new Log(f);
         }
 
-        public static void AddLog(string message)
+        public static void Log(string message)
         {
             try
             {

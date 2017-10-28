@@ -44,10 +44,10 @@
   <ItemGroup>
     <Compile Include="hlt\Collision.cs" />
     <Compile Include="hlt\Constants.cs" />
-    <Compile Include="hlt\DebugLog.cs" />
     <Compile Include="hlt\DockMove.cs" />
     <Compile Include="hlt\Entity.cs" />
     <Compile Include="hlt\GameMap.cs" />
+    <Compile Include="hlt\Log.cs" />
     <Compile Include="hlt\Metadata.cs" />
     <Compile Include="hlt\MetadataParser.cs" />
     <Compile Include="hlt\Move.cs" />
