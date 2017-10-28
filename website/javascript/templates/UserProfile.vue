@@ -198,6 +198,7 @@
                                         <button
                                             type="button"
                                             class="btn"
+                                            :disabled="isLastPage"
                                             v-on:click="next_page"><span>Next</span></button>
                                     </div>
                                 </div>
@@ -505,7 +506,8 @@
           season1stats: null,
           messages: {
             hackathon: ''
-          }
+          },
+          isLastPage: false
         }
       },
       mounted: function () {
@@ -596,25 +598,36 @@
             query += `&filter=timed_out,=,${this.user.user_id}`
           }
           const url = `${api.API_SERVER_URL}/user/${this.user.user_id}/match?${query}`
-          return $.get(url).then((data) => {
-            this.games = data
-            for (let game of data) {
-              for (let participant of Object.keys(game.players)) {
-                let username = game.players[participant].username
-                game.players[participant].id = participant
-                this.profile_images[participant] = api.make_profile_image_url(username)
-                this.usernames[participant] = username
-              }
 
-              const players = Object.values(game.players).sort((r1, r2) => {
-                if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
-                if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
-                return r1.rank - r2.rank
+          return new Promise((resolve, reject) => {
+            $.get(url).then((data) => {
+                console.log(data);
+                console.log(data.length);
+                if ( data.length > 0 ){
+                    this.games = data
+                    for (let game of data) {
+                      for (let participant of Object.keys(game.players)) {
+                        let username = game.players[participant].username
+                        game.players[participant].id = participant
+                        this.profile_images[participant] = api.make_profile_image_url(username)
+                        this.usernames[participant] = username
+                      }
+
+                      const players = Object.values(game.players).sort((r1, r2) => {
+                        if (r1.id.toString() === this.user.user_id.toString()) { return -1 }
+                        if (r2.id.toString() === this.user.user_id.toString()) { return 1 }
+                        return r1.rank - r2.rank
+                      })
+
+                      game.playerSorted = players
+                    }
+
+                    resolve(data)
+                } else {
+                    reject("Last page reached")
+                }
               })
-
-              game.playerSorted = players
-            }
-          })
+          });
         },
         getLocation: function () {
           const user = this.user
@@ -726,8 +739,11 @@
         },
         next_page: function () {
           this.offset += 10
-          this.fetch().then(() => {
+          this.fetch().then((data) => {
             this.page += 1
+            this.isLastPage = false;
+          }).catch((message) => {
+            this.isLastPage = true;
           })
         },
         prev_page: function () {
