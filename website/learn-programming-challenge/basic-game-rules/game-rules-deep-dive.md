@@ -12,8 +12,10 @@ All games are played with either 2 or 4 players. At the beginning of the game, f
 ## Map
 Maps are rectangular grids with 3:2 aspect ratio (e.g. 288 x 192 units), using a 2D Cartesian continuous non-wrapping grid. The largest board is 384 x 256 units, the smallest is 240 x 160 units. The coordinates are treated as a real Cartesian plane, and game entities can have floating-point positions. All distances are Euclidean (sqrt(dx^2 + dy^2)), and are between the centers of entities. If a ship goes off the grid it is considered dead, since the grid does not wrap.
 
-Maps are generated with a random number of planets, distributed symmetrically across the board varying by game. Planets are perfectly circular, with a radius ranging from 3 to 8 units, dependent on the map size (planets on a given map range in size, but the average size is determined by map size). The map generation algorithm aims to place more planets for 4-person games than 2-person games.
- 
+Maps are generated with a random number of planets, distributed symmetrically across the board varying by game. Planets are perfectly circular, with a radius dependent on the map size (planets on a given map range in size, but the average size is determined by map size). The map generation algorithm aims to place more planets for 4-person games than 2-person games.
+
+Specifically, a cluster of 4 planets is first placed in the center, with radius between one-third and one-half the square root of the shorter map side length. Thus, on the smallest competition map (240 by 160), these planets range from about 4.2 to 6.3 units radius, while on the largest, they range from 5.3 to 8 units. Other planets range from one-fourth to 1x the square root of the shorter map side length, but the minimum radius is always at least 4 units, and the maximum radius is always at least 5 units. Thus, on the smallest map, the radius of other planets ranges from 4 to 12.6 units, and on the largest, 4 to 16 units.
+
 ## Teams at Start of Game
 Each player begins with three ships, arranged along the vertical axis with one unit of space between the centers of the ships, and no planets. In the four-player case, each player begins in the center of a quadrant of the map; in the two-player case, each player begins in the center of one of the halves of the map, mirrored either vertically or horizontally.
 

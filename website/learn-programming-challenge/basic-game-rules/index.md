@@ -61,7 +61,7 @@ Planets can be destroyed through ship collisions. Boom.
 
 ## Win conditions
 1. A player is the sole survivor.
-2. A player occupies all planets.
+2. A player occupies all planets. This means they must have a ship fully docked to all remaining planets; a ship that is in the process of docking does not count.
 3. If time runs out and neither of these conditions are met, tiebreaker rules apply:
     - First we check to see which surviving team has produced the most ships.
     - If still a tie, then we check to see which team has done the most battle damage (destroying ships with other ships through attacks or collision).
