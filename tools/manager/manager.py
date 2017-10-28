@@ -293,7 +293,10 @@ class Commandline:
     def run_matches(self, rounds):
         player_records = self.manager.db.retrieve("select * from players where active > 0")
         players = [util.parse_player_record(player) for player in player_records]
-        self.manager.total_players = len(players)
+        self.total_players = len(players)
+        if self.total_players > 3:
+            players_max = 4
+            self.manager.players_max = 4
         if len(players) < 2:
             print("Not enough players for a game. Need at least " + str(self.manager.players_min) + ", only have " + str(len(players)))
             print("use the -h flag to get help")
@@ -304,10 +307,7 @@ class Commandline:
 
     def act(self):
         print ('Using database %s' % self.cmds.db_filename)
-        players_max = 2
-        if self.total_players > 3:
-            players_max = 4
-        self.manager = Manager(halite_command, self.cmds.db_filename, None, -1, players_max)
+        self.manager = Manager(halite_command, self.cmds.db_filename, None, -1, 2)
 
         if self.cmds.deleteReplays:
             print("keep_replays = False")
