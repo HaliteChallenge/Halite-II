@@ -469,9 +469,9 @@
 
         this.gaData('visualizer', 'click-pause', 'gameplay')
       }
-      this.toggleSpeed = (e) => {
-        // set speed
-        this.speedIndex++
+
+      const changeSpeed = (speed) => {
+        this.speedIndex = speed
         if (this.speedIndex >= Object.keys(speedList).length) this.speedIndex = 0
 
         const value = Object.keys(speedList)[this.speedIndex]
@@ -486,6 +486,11 @@
 
         sessionStorage.setItem('halite-replaySpeed', this.speedIndex)
       }
+
+      this.toggleSpeed = (e) => {
+        changeSpeed(this.speedIndex + 1);
+      }
+
       this.prevFrame = () => {
         if (visualizer && this.frame > 0) {
           visualizer.scrub(this.frame + -1, 0)
@@ -510,6 +515,16 @@
 
         this.gaData('visualizer', 'click-slider', 'gameplay')
       }
+
+      // keybinding
+      document.addEventListener('keyup', (e) => {
+        // console.log(e.which);
+        const code = e.which;
+        let speed;
+        if (code >= 49 && code <= 53){
+          changeSpeed(code - 48); // subtract 48 from code to get the speed. for example, 49 => 1, 50 => 2 and so on
+        }
+      });
 
       // disable text select on safari
       document.onselectstart = function(){ return false; };
