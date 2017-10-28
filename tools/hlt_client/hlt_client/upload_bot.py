@@ -5,7 +5,7 @@ import requests
 import client
 
 _BOT_FILE_NAME_PREPEND = 'MyBot.'
-_RUST_BOT_FILE_NAME = 'cargo.toml'
+_LANGUGAGE_PROJECT_FILE_IDENTIFIERS = ['cargo.toml', 'project.clj']
 _HALITE_LIBRARY_FOLDER = 'hlt/'
 
 
@@ -49,7 +49,7 @@ def _zip_file_integrity_check(file_path):
     except FileNotFoundError:
         raise FileNotFoundError("Could not find the zip file provided")
     if not any((item.startswith(_BOT_FILE_NAME_PREPEND)
-                or item.lower() == _RUST_BOT_FILE_NAME) for item in zip.namelist()):
+                or item.lower() in _LANGUGAGE_PROJECT_FILE_IDENTIFIERS) for item in zip.namelist()):
         raise ValueError("MyBot.* file must be present in the zip's top directory (or cargo.toml in case of Rust).")
     if not any(item.lower().startswith(_HALITE_LIBRARY_FOLDER) for item in zip.namelist()):
         sys.stderr.write("WARNING: Could not find an hlt/ library folder. Proceeding with upload. {}".format(os.linesep))
