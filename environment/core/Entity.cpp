@@ -36,17 +36,15 @@ namespace hlt {
 
     auto Velocity::accelerate_by(double magnitude,
                                  double angle) -> void {
-        double new_vel_x = vel_x + magnitude * std::cos(angle);
-        double new_vel_y = vel_y + magnitude * std::sin(angle);
+        vel_x = vel_x + magnitude * std::cos(angle);
+        vel_y = vel_y + magnitude * std::sin(angle);
 
         const auto max_speed = GameConstants::get().MAX_SPEED;
         if (this->magnitude() > max_speed) {
             double scale = max_speed / this->magnitude();
-            new_vel_x *= scale;
-            new_vel_y *= scale;
+            vel_x *= scale;
+            vel_y *= scale;
         }
-        vel_x = new_vel_x;
-        vel_y = new_vel_y;
     }
 
     auto Velocity::magnitude() const -> double {
