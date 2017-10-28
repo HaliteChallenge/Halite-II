@@ -3,20 +3,20 @@ package hlt;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DebugLog {
+public class Log {
 
     private final FileWriter file;
-    private static DebugLog instance;
+    private static Log instance;
 
-    private DebugLog(final FileWriter f) {
+    private Log(final FileWriter f) {
         file = f;
     }
 
     static void initialize(final FileWriter f) {
-        instance = new DebugLog(f);
+        instance = new Log(f);
     }
 
-    public static void addLog(final String message) {
+    public static void log(final String message) {
         try {
             instance.file.write(message);
             instance.file.write('\n');
