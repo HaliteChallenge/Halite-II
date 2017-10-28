@@ -48,7 +48,7 @@ addEventListener("message", (e) => {
             heapBufferView.byteOffset, bufferBytes);
         if (decompressedSize > 0) {
             // Allocate the buffer to hold the decompressed data
-            const inflatedBuffer = libzstdInstance._malloc(decompressedSize);
+            const inflatedBuffer = libzstdInstance._malloc(decompressedSize + 2048);
             const inflatedBufferView = new Uint8Array(
                 libzstdInstance.HEAPU8.buffer,
                 inflatedBuffer, decompressedSize);
