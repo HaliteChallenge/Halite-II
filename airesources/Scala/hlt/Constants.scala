@@ -8,7 +8,7 @@ object Constants {
   val MAX_SPEED = 7
 
   /** Radius of a ship */
-  val double SHIP_RADIUS = 0.5
+  val SHIP_RADIUS = 0.5
 
   /** Starting health of ship, also its max */
   val MAX_SHIP_HEALTH = 255
@@ -44,4 +44,5 @@ object Constants {
   // Implementation-specific constants
 
   val FORECAST_FUDGE_FACTOR: Double = SHIP_RADIUS + 0.1
+  val MAX_CORRECTIONS = 90
 }
