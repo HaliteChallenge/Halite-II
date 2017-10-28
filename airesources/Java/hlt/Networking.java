@@ -75,7 +75,7 @@ public class Networking {
     public GameMap initialize(final String botName) {
         final int myId = Integer.parseInt(readLine());
         try {
-            Log.initialize(new FileWriter(String.format("%d - %s.log", myId, botName)));
+            Log.initialize(new FileWriter(String.format("%d_%s.log", myId, botName)));
         }
         catch (IOException e) {
             e.printStackTrace();
