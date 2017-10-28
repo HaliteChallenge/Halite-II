@@ -36,10 +36,10 @@ class Ship < Entity
 
   # Generate a command to accelerate this ship.
   # magnitude: The speed through which to move the ship
-  # angle: The angle to move the ship in
+  # angle: The angle to move the ship in. Should always be a positive number, but %360 fixes that.
   # return: The command string to be passed to the Halite engine.
   def thrust(magnitude, angle)
-    "t #{id} #{Integer(magnitude)} #{Integer(angle)}"
+    "t #{id} #{Integer(magnitude)} #{Integer(angle % 360)}"
   end
 
   # Generate a command to dock to a planet.
