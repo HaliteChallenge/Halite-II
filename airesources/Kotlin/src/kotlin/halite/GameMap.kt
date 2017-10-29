@@ -57,7 +57,7 @@ open class GameMap(val width: Int, val height: Int, val myPlayerId: Int) {
     }
 
     open fun updateMap(mapMetadata: Metadata): GameMap {
-        DebugLog.addLog("--- NEW TURN ---")
+        Log.log("--- NEW TURN ---")
         val numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata)
 
         players.clear()

@@ -8,7 +8,7 @@ class Networking {
     fun initialize(botName: String): GameMap {
         val myId = Integer.parseInt(readLine()!!)
         try {
-            DebugLog.initialize(FileWriter(String.format("%d - %s.log", myId, botName)))
+            Log.initialize(FileWriter(String.format("%d - %s.log", myId, botName)))
         } catch (e: IOException) {
             e.printStackTrace()
         }
