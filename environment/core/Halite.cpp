@@ -749,7 +749,6 @@ auto Halite::process_events() -> void {
                 prev_damage = damage_map[target.player_id()][target.entity_index()];
             }
             const auto new_damage = hlt::GameConstants::get().WEAPON_DAMAGE / static_cast<double>(target_count[src]);
-            std::cout << " damage" << new_damage << ".\n";
             damage_map[target.player_id()][target.entity_index()] = prev_damage + new_damage;
         };
 
