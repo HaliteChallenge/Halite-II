@@ -118,6 +118,7 @@ public:
     GameStatistics run_game(std::vector<std::string>* names_,
                             unsigned int id,
                             bool enable_replay,
+                            bool enable_compression,
                             std::string replay_directory);
     std::string get_name(hlt::PlayerId player_tag);
 

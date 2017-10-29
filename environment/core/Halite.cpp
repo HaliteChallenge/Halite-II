@@ -949,6 +949,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
                                 unsigned int id,
                                 bool enable_replay,
+                                bool enable_compression,
                                 std::string replay_directory) {
     // For rankings
     std::vector<bool> living_players(number_of_players, true);
@@ -1092,11 +1093,11 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             };
             stats.output_filename = replay_directory + "Replays/" + filename;
             try {
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             catch (std::runtime_error& e) {
                 stats.output_filename = replay_directory + filename;
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             if (!quiet_output) {
                 std::cout << "Map seed was " << seed << std::endl
