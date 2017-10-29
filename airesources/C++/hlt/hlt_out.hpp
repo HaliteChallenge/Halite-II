@@ -11,7 +11,7 @@ namespace hlt {
         static bool send_string(const std::string& text) {
             // note that std::endl flushes
             std::cout << text << std::endl;
-            return !std::cout.bad();
+            return std::cout.good();
         }
 
         /// Send all queued moves to the game engine.

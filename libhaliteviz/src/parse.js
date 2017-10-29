@@ -9,7 +9,13 @@ export function parseReplay(buffer) {
             worker.onmessage = function (e) {
                 const inflated = e.data;
                 const inflatedTime = Date.now();
-                const decoded = new TextDecoder("utf-8").decode(new Uint8Array(inflated));
+                const arr = new Uint8Array(inflated);
+                if (arr[0] === 0) {
+                    // Decompression failed
+                    reject();
+                    return;
+                }
+                const decoded = new TextDecoder("utf-8").decode(arr);
                 const replay = JSON.parse(decoded);
                 const finishTime = Date.now();
                 console.info(`Decoded compressed replay in ${finishTime - startTime}ms, inflating took ${inflatedTime - startTime}ms, decoding took ${finishTime - inflatedTime}ms.`);

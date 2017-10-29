@@ -51,7 +51,7 @@ object Networking {
 class Networking(botName: String) {
   var (width, height, myId) = {
     val myId = Networking.readLine.toShort
-    try DebugLog.initialize(new FileWriter(s"$myId - $botName.log"))
+    try Log.initialize(new FileWriter(s"${myId}_${botName}.log"))
     catch {
       case e: IOException =>
         e.printStackTrace()

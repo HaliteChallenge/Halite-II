@@ -110,7 +110,7 @@ public class GameMap {
     }
 
     public GameMap updateMap(final Metadata mapMetadata) {
-        DebugLog.addLog("--- NEW TURN ---");
+        Log.log("--- NEW TURN ---");
         final int numberOfPlayers = MetadataParser.parsePlayerNum(mapMetadata);
 
         players.clear();

@@ -15,7 +15,7 @@ class Entity:
     :ivar x: The entity x-coordinate.
     :ivar y: The entity y-coordinate.
     :ivar radius: The radius of the entity (may be 0)
-    :ivar health: The planet's health.
+    :ivar health: The entity's health.
     :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
     """
     __metaclass__ = abc.ABCMeta
