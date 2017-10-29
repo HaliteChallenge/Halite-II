@@ -104,17 +104,16 @@ def executeCompileTask(user_id, bot_id, backend):
                 name for name in os.listdir(temp_dir)
                 if os.path.isfile(os.path.join(temp_dir, name))
             ]) == 0 and len(glob.glob(os.path.join(temp_dir, "*"))) == 1:
-                singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
-                bufferFolder = os.path.join(temp_dir, backend.SECRET_FOLDER)
-                os.mkdir(bufferFolder)
+                with tempfile.TemporaryDirectory(dir=TEMP_DIR) as bufferFolder:
+                    singleFolder = glob.glob(os.path.join(temp_dir, "*"))[0]
 
-                for filename in os.listdir(singleFolder):
-                    shutil.move(os.path.join(singleFolder, filename), os.path.join(bufferFolder, filename))
-                os.rmdir(singleFolder)
+                    for filename in os.listdir(singleFolder):
+                        shutil.move(os.path.join(singleFolder, filename), bufferFolder)
+                    os.rmdir(singleFolder)
 
-                for filename in os.listdir(bufferFolder):
-                    shutil.move(os.path.join(bufferFolder, filename), os.path.join(temp_dir, filename))
-                os.rmdir(bufferFolder)
+                    for filename in os.listdir(bufferFolder):
+                        shutil.move(os.path.join(bufferFolder, filename), temp_dir)
+                    # Context manager takes care of buffer folder
 
             # Delete any symlinks
             subprocess.call(["find", temp_dir, "-type", "l", "-delete"])
