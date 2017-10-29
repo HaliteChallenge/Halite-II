@@ -420,7 +420,7 @@ languages = (
         (["*.class"], ExternalCompiler(comp_args["Groovy"][1]))]
     ),
     Language("Haskell", BOT, "MyBot.hs",
-        "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
+        "./MyBot",
         [BOT],
         [([""], ExternalCompiler(comp_args["Haskell"][0]))]
     ),
