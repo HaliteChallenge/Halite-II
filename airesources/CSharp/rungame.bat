@@ -1,2 +1,2 @@
-dotnet build
-./halite -d "240 160" "dotnet ./bin/Debug/netcoreapp1.1/csharp2.dll" "dotnet ./bin/Debug/netcoreapp1.1/csharp2.dll"
+dotnet build -c Release
+./halite -d "240 160" "dotnet ./bin/Release/netcoreapp2.0/Halite2.dll" "dotnet ./bin/Debug/Release/Halite2.dll"

@@ -53,8 +53,6 @@ namespace Halite2.hlt
 
         private static String ReadLine()
         {
-            try
-            {
                 StringBuilder builder = new StringBuilder();
                 int buffer;
 
@@ -71,12 +69,6 @@ namespace Halite2.hlt
                     builder = builder.Append((char)buffer);
                 }
                 return builder.ToString();
-            }
-            catch (Exception)
-            {
-                Environment.Exit(0);
-                return null;
-            }
         }
 
         public static Metadata ReadLineIntoMetadata()

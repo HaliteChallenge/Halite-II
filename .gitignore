@@ -427,9 +427,6 @@ git_pull.php
 *.gz
 !BasicJavaBot.zip
 
-# VS Code
-.vscode
-
 airesources/C++/MyBot
 airesources/C++/BasicBot
 airesources/*/halite
