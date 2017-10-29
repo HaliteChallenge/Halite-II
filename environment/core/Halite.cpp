@@ -1005,6 +1005,8 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
 
+    auto rng = std::mt19937(seed);
+
     try {
         while (!game_complete()) {
             turn_number++;
@@ -1021,6 +1023,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
                 }
             }
 
+            // Shuffle the rankings first, to ensure that in the case of a
+            // tie, a random winner is chosen.
+            std::shuffle(new_rankings.begin(), new_rankings.end(), rng);
             std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
             rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
@@ -1039,9 +1044,6 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (living_players[player_id]) new_rankings.push_back(player_id);
     }
-    // Shuffle the rankings first, to ensure that in the case of a
-    // tie, a random winner is chosen.
-    auto rng = std::mt19937(seed);
     std::shuffle(new_rankings.begin(), new_rankings.end(), rng);
     std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
     rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
