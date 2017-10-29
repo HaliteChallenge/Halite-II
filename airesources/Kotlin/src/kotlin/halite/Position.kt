@@ -23,10 +23,10 @@ open class Position(val xPos: Double, val yPos: Double) {
         val radius = target.radius + Constants.MIN_DISTANCE
         val angleRad = target.orientTowardsInRad(this)
 
-        val dx = target.xPos + radius * Math.cos(angleRad)
-        val dy = target.yPos + radius * Math.sin(angleRad)
+        val x = target.xPos + radius * Math.cos(angleRad)
+        val y = target.yPos + radius * Math.sin(angleRad)
 
-        return Position(dx, dy)
+        return Position(x, y)
     }
 
     override fun equals(other: Any?): Boolean {
