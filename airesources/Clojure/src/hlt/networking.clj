@@ -1,7 +1,8 @@
 (ns hlt.networking
   (:require [clojure.string :as str]
-            [hlt.engine :as e]
+            [hlt.entity :as e]
             [hlt.game-map :as gm]
+            [hlt.math :as math]
             [hlt.utils :as utils]))
 
 (def ^:private undock-key "u")
@@ -57,7 +58,7 @@
         docked-planet    (read stream)
         docking-progress (read stream)
         weapon-cooldown  (read stream)] ;; weapon cooldown seems unused as well
-    (e/->Ship ship-id (e/->Position x-loc y-loc) health e/ship-radius owner-id
+    (e/->Ship ship-id (math/->Position x-loc y-loc) health e/ship-radius owner-id
               {:status docking-status
                :planet docked-planet
                :progress docking-progress})))
@@ -102,7 +103,7 @@
         owner-candidate      (read stream)
         docked-ship-count    (read stream)
         docked-ships (vec (repeatedly docked-ship-count #(read stream)))]
-    (e/->Planet id (e/->Position x-loc y-loc) health radius
+    (e/->Planet id (math/->Position x-loc y-loc) health radius
                 (if (== has-owner 1)
                   owner-candidate
                   nil)

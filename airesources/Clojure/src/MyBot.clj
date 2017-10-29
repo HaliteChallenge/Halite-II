@@ -4,7 +4,8 @@
             [hlt.game-map :refer [*player-id* *map-size* *bot-name*
                                   *owner-ships* *ships* *planets*]]
             [hlt.utils :as utils]
-            [hlt.engine :as e])
+            [hlt.entity :as e]
+            [hlt.navigation :as navigation])
   (:import (java.io PrintWriter))
   (:gen-class))
 
@@ -42,7 +43,7 @@
            :when (nil? (:owner-id planet))]
        (if (e/within-docking-range? ship planet)
          (e/dock-move ship planet)
-         (e/navigate-to-dock ship planet))))))
+         (navigation/navigate-to-dock ship planet))))))
 
 (defn -main
   [& args]
