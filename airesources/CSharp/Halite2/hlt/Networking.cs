@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Halite2.hlt
 {
-    public class Networking
+    public static class Networking
     {
 
         private static char UNDOCK_KEY = 'u';
@@ -76,7 +76,7 @@ namespace Halite2.hlt
             return new Metadata(ReadLine().Trim().Split(' '));
         }
 
-        public GameMap Initialize(String botName)
+        public static GameMap Initialize(String botName)
         {
             int myId = int.Parse(ReadLine());
             Log.Initialize(new StreamWriter(String.Format("{0}_{1}.log", myId, botName)));

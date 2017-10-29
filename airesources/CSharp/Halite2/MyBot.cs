@@ -10,8 +10,7 @@ namespace Halite2
         {
             string name = args.Length > 0 ? args[0] : "Sharpie";
 
-            Networking networking = new Networking();
-            GameMap gameMap = networking.Initialize(name);
+            GameMap gameMap = Networking.Initialize(name);
 
             List<Move> moveList = new List<Move>();
             for (; ; )
