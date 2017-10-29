@@ -4,9 +4,8 @@
 (def ^:dynamic *logger* nil)
 
 (defn log
-  "Logs the arguments to the log file."
+  "Logs the arguments to the log file, as if printed by println.
+  Multiple arguments are separated by spaces."
   [& args]
-  (.write *logger* (str/join " " args))
-  (.write *logger* "\n")
-  (.flush *logger*))
-
+  (binding [*out* *logger*]
+    (apply println args)))

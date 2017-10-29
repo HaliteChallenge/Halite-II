@@ -16,9 +16,7 @@
 (defrecord Position [x y]
   Positionable
   (get-x [_] x)
-  (get-y [_] y)
-  Object
-  (toString [_] (format "<%s, %s>" x y)))
+  (get-y [_] y))
 
 (defn square [x]
   (* x x))

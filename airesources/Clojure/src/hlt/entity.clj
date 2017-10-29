@@ -18,9 +18,7 @@
 (defrecord Ship [id pos health radius owner-id docking]
   Positionable
   (get-x [_] (get-x pos))
-  (get-y [_] (get-y pos))
-  Object
-  (toString [this] (pr-str this)))
+  (get-y [_] (get-y pos)))
 
 (def dock-statuses
   "The different docking statuses a ship can have."
@@ -29,9 +27,7 @@
 (defrecord Planet [id pos health radius owner-id docking]
   Positionable
   (get-x [_] (get-x pos))
-  (get-y [_] (get-y pos))
-  Object
-  (toString [this] (pr-str this)))
+  (get-y [_] (get-y pos)))
 
 (defn within-docking-range?
   "Returns whether a ship is within distance to dock on the provided

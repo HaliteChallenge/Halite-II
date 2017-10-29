@@ -17,7 +17,8 @@ The implementation is split into several packages:
 - `hlt.navigation` runs very simple navigation algorithms to detect where to
   move ships.
 - `hlt.utils` contains a single logging function, which can be used for
-  debugging
+  debugging: It works just as `println`, except that it prints to a log file
+  instead.
 
 The functions should be fairly well documented, so you should be able to
 experiment and play around with the functions without too much trouble.
