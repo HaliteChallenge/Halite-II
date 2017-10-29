@@ -17,7 +17,8 @@
                *planets* (:planets m#)]
        ~@body)))
 
-(def my-bot-name "mybot") ;; Replace this with your bot name here.
+;; Here we set the bot name to Hickey.
+(def my-bot-name "Hickey")
 (defmacro initialize-game
   [& body]
   `(let [prelude# (io/read-prelude)
