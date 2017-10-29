@@ -17,7 +17,7 @@ namespace Halite2.hlt
             instance = new Log(f);
         }
 
-        public static void Log(string message)
+        public static void LogMessage(string message)
         {
             try
             {
