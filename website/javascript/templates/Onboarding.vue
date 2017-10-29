@@ -5,7 +5,7 @@
 				<a class="close-btn link-in-dark" @click="show = false">Close</a>
 				<div class="section-content">
 					<p class="step-rank">Step 1/3</p>
-					<h2>Welcome to Halite</h2>
+					<h2 style="color: white;">Welcome to Halite</h2>
 					<p class="step-des">
 						If you added a company or school email, make sure you<br/>check your email to complete verfication. Now, before you get<br/>started, check out a game video.
 					</p>
@@ -23,7 +23,7 @@
 				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 2/3</p>
-					<h2>Submit your first bot</h2>
+					<h2 style="color: white;">Submit your first bot</h2>
 					<div class="step-flex">
 						<div>
 						Feel free to select one of our three main basic bots (Python, C++ or Java) and click submit below to see how starter bots play.
@@ -58,7 +58,7 @@
 				<a class="close-btn link-in-dark" @click="show = false">Close Tutorial</a>
 				<div class="section-content">
 					<p class="step-rank">Step 3/3</p>
-					<h2>Select a starter kit to download</h2>
+					<h2 style="color: white;">Select a starter kit to download</h2>
 					<p class="step-des">
 						Now that you’ve submitted your first bot you’re<br/>ready to really start playing.
 					</p>
@@ -264,9 +264,9 @@ export default {
 	  submitCode: function(){
 			this.$refs.botEditor.upload_bot().then(() => {
 				this.step = 3;
-				utils.Alert.show("You code has been submitted!", "success");
+				utils.Alert.show("Your bot has been submitted and will start playing games within the next 15 mins.", "success");
 			}).catch((message) => {
-				utils.Alert.show("Upload Failed: " + message, "error");
+				utils.Alert.show("Bot submission failed: " + message, "error");
 			});
 	  },
 	  downloadCode: function(){
