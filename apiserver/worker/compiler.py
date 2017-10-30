@@ -307,7 +307,7 @@ comp_args = {
         ["jar", "cfe", BOT + ".jar", BOT],
     ],
     "Haskell": [
-        ["ghc", "--make", BOT + ".hs", "-O", "-v0"],
+        ["ghc", "--make", BOT + ".hs", "-O", "-v0", "-rtsopts"],
     ],
     "Java": [
         ["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)],
@@ -420,7 +420,7 @@ languages = (
         (["*.class"], ExternalCompiler(comp_args["Groovy"][1]))]
     ),
     Language("Haskell", BOT, "MyBot.hs",
-        "./MyBot",
+        "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
         [BOT],
         [([""], ExternalCompiler(comp_args["Haskell"][0]))]
     ),
