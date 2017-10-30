@@ -4,9 +4,9 @@ import scala.annotation.tailrec
 
 class Navigation(var ship: Ship, var target: Entity) {
   def navigateToDock(gameMap: GameMap, maxThrust: Int): Option[ThrustMove] = {
-    val maxCorrections = Constants.MAX_CORRECTIONS
+    val maxCorrections = Constants.MAX_NAVIGATION_CORRECTIONS
     val avoidObstacles = true
-    val angularStepRad = Math.PI / 180
+    val angularStepRad = Math.PI / 180.0
     val targetPos = ship.getClosestPoint(target)
     navigateTowards(gameMap, targetPos, maxThrust, avoidObstacles, maxCorrections, angularStepRad)
   }

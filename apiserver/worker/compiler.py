@@ -307,7 +307,7 @@ comp_args = {
         ["jar", "cfe", BOT + ".jar", BOT],
     ],
     "Haskell": [
-        ["ghc", "--make", BOT + ".hs", "-O", "-v0"],
+        ["ghc", "--make", BOT + ".hs", "-O", "-v0", "-rtsopts"],
     ],
     "Java": [
         ["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)],

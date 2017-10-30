@@ -44,5 +44,5 @@ object Constants {
   // Implementation-specific constants
 
   val FORECAST_FUDGE_FACTOR: Double = SHIP_RADIUS + 0.1
-  val MAX_CORRECTIONS = 90
+  val MAX_NAVIGATION_CORRECTIONS = 90
 }
