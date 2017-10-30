@@ -17,15 +17,13 @@ additional_css: ["built-codeEdit", "dark-codeEdit"]
 
 Welcome to the Halite II competition!  If you’re here, that means you’re excited to make your first bot and get on the Halite II beta leaderboard. Let's get you set up!
 
-## Getting started
+### 1) SIGN UP
 
-### 1) LOG IN
-
-First, you need to [log in via Github][login] and create a user profile.
+First, you need to [sign up via Github][login] and create a user profile.
 
 ### 2) WATCH A FEW GAMES
 
-Get a feel for how to play. Here's one of our favorites:
+Next, get a feel for how to play the game. Here's one of our favorite videos:
 
 <div class="static-container text-center">
   <img style="width: 80%;height: auto;" src="/assets/images/gifs/Oct-16-2017%2015-23-13%20intro.gif" alt="First Halite game video">
