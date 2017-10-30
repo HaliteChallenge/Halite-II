@@ -8,7 +8,7 @@
 namespace hlt {
     class Map {
     public:
-        const int map_width, map_height;
+        int map_width, map_height;
 
         std::unordered_map<PlayerId, std::vector<Ship>> ships;
         std::unordered_map<PlayerId, entity_map<unsigned int>> ship_map;

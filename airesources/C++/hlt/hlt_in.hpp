@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <iostream>
 
 #include "map.hpp"
 
@@ -120,16 +121,7 @@ namespace hlt {
             return map;
         }
 
-        static const Map get_map(const int map_width, const int map_height) {
-            Log::log("--- NEW TURN ---");
-            const std::string input = get_string();
-
-            if (!std::cin.good()) {
-                // This is needed on Windows to detect that game engine is done.
-                std::exit(0);
-            }
-
-            return parse_map(input, map_width, map_height);
-        }
+        void setup(const std::string& bot_name, int map_width, int map_height);
+        const Map get_map();
     }
 }
