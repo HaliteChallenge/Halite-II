@@ -48,7 +48,7 @@ Each ship occupies a perfectly circular area with radius 0.5 units. Ships have:
 * A weapon, with a reach of 5 units in all directions, dealing 64 damage/turn.
 
 ### Movement
-A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 7). Bots must be given a thrust command every turn to continue to move (stateless).
+A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 7). Ships must be given a thrust command every turn to continue to move (stateless).
 
 Beyond basic thrust, the API provides some additional helper methods for pathfinding.
 1. obstacles_between: determines whether there are obstacles between two designated entities (ships/planets/positions).
