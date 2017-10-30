@@ -3,15 +3,15 @@ package halite
 import java.io.FileWriter
 import java.io.IOException
 
-class DebugLog private constructor(private val file: FileWriter) {
+class Log private constructor(private val file: FileWriter) {
     companion object {
-        private var instance: DebugLog? = null
+        private var instance: Log? = null
 
         internal fun initialize(f: FileWriter) {
-            instance = DebugLog(f)
+            instance = Log(f)
         }
 
-        fun addLog(message: String) {
+        fun log(message: String) {
             try {
                 instance!!.file.write(message)
                 instance!!.file.write("\n")

@@ -20,7 +20,7 @@ class Entity:
     """
     __metaclass__ = abc.ABCMeta
 
-    def _init__(self, x, y, radius, health, player, entity_id):
+    def __init__(self, x, y, radius, health, player, entity_id):
         self.x = x
         self.y = y
         self.radius = radius

@@ -74,23 +74,27 @@ class Game:
 
         :param name: The name of the bot.
         """
+        self._name = name
+        self._send_name = False
         tag = int(self._get_string())
         Game._set_up_logging(tag, name)
         width, height = [int(x) for x in self._get_string().strip().split()]
-        self._send_string(name)
-        self._done_sending()
         self.map = game_map.Map(tag, width, height)
         self.update_map()
         self.initial_map = copy.deepcopy(self.map)
+        self._send_name = True
 
     def update_map(self):
         """
         Parse the map given by the engine.
-        
+
         :return: new parsed map
         :rtype: game_map.Map
         """
-        import logging
+        if self._send_name:
+            self._send_string(self._name)
+            self._done_sending()
+            self._send_name = False
         logging.info("---NEW TURN---")
         self.map._parse(self._get_string())
         return self.map

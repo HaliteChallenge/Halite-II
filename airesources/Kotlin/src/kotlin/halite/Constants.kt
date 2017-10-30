@@ -48,8 +48,11 @@ object Constants {
     // Implementation-specific constants
 
     val FORECAST_FUDGE_FACTOR = SHIP_RADIUS + 0.1
-    val MAX_CORRECTIONS = 90
+    val MAX_NAVIGATION_CORRECTIONS = 90
 
-    /** Used in Position.getClosestPoint()  */
+    /**
+     * Used in Position.getClosestPoint()
+     * Minimum distance specified from the object's outer radius.
+     */
     val MIN_DISTANCE = 3
 }
