@@ -8,7 +8,7 @@
                 <p class="d1 c-org font-headline">MAY THE BEST BOT WIN</p>
                 <div v-if="!me_in" class="not-me ha-button-container">
                     <div>
-                        <a class="ha-button" href="/play-programming-challenge"><span>PLAY NOW</span></a>
+                        <a class="ha-button" href="/learn-programming-challenge"><span>GET STARTED</span></a>
                     </div>
                 </div>
                 <div v-else class="me-in">
