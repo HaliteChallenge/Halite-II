@@ -326,10 +326,11 @@
       6: '3x',
       8: '4x',
       10: '5x',
-      12: '7x',
-      14: '8x',
-      16: '9x',
-      18: '10x',
+      12: '6x',
+      14: '7x',
+      16: '8x',
+      18: '9x',
+      20: '10x',
     }
 
   // libhaliteviz.setAssetRoot("/assets/js/");
@@ -545,11 +546,13 @@
 
       // keybinding
       document.addEventListener('keyup', (e) => {
-        // console.log(e.which);
+        console.log(e.which);
         const code = e.which;
         let speed;
-        if (code >= 49 && code <= 53){
+        if (code >= 49 && code <= 58){
           changeSpeed(code - 48); // subtract 48 from code to get the speed. for example, 49 => 1, 50 => 2 and so on
+        } else if (code == 48){
+          changeSpeed(10);
         }
       });
 
