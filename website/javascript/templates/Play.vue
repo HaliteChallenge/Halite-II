@@ -23,7 +23,7 @@
           <div class="upload-container" id="bot-upload-container">
             <div class="upload-desc">
               <h2>Submit a bot</h2>
-              <p>To play a Halite bot in the competition, submit a .zip file here (with bot file in root of zip folder, no replays). <a href="#">Learn more</a></p>
+              <p>To play a Halite bot in the competition, submit a .zip file here (with bot file in root of zip folder, no replays). <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
               <ul>
                 <li>.zip format</li>
                 <li>Bot file must be in root of zip folder</li>
@@ -42,7 +42,7 @@
           <div class="upload-container">
             <div class="upload-desc">
               <h2>replay a file</h2>
-              <p>When you run the Halite executable locally, it will add a .hlt file to your directory. Play that file here. <a href="#">Learn more</a></p>
+              <p>When you run the Halite executable locally, it will add a .hlt file to your directory. Play that file here. <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
             </div>
             <halite-upload-zone
               caption="Drop a replay file here to upload"
@@ -55,7 +55,7 @@
             </halite-upload-zone>
             <div class="upload-note">
               <h2>advanced replay options</h2>
-              <p>You can also replay via the <a href="#">Offline Game Visualizer</a>.</p>
+              <p>You can also replay via the <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Offline Game Visualizer</a>.</p>
             </div>
           </div>
         </div>
