@@ -8,10 +8,18 @@ public class MyBot {
         final Networking networking = new Networking();
         final GameMap gameMap = networking.initialize("Tamagocchi");
 
+        // We now have 1 full minute to analyse the initial map.
+        final String initialMapIntelligence =
+                "width: " + gameMap.getWidth() +
+                "; height: " + gameMap.getHeight() +
+                "; players: " + gameMap.getAllPlayers().size() +
+                "; planets: " + gameMap.getAllPlanets().size();
+        Log.log(initialMapIntelligence);
+
         final ArrayList<Move> moveList = new ArrayList<>();
         for (;;) {
             moveList.clear();
-            gameMap.updateMap(Networking.readLineIntoMetadata());
+            networking.updateMap(gameMap);
 
             for (final Ship ship : gameMap.getMyPlayer().getShips().values()) {
                 if (ship.getDockingStatus() != Ship.DockingStatus.Undocked) {
