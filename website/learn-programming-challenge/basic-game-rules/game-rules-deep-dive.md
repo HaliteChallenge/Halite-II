@@ -79,7 +79,7 @@ If two ships from different teams both issue docking commands on an unoccupied p
 
 Once a player starts to dock, that player is considered the owner of the planet. The owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is a function of the radius: larger planets have more docking spots.
 
-It takes 5 complete turns for the ship to dock. After these 5 turns the ship is considered fully docked. During this time, a docking ship may be attacked and the ship has no defenses (i.e. if attacked, the ship is dealt damage but does not fire). A docking ship cannot be commanded.  A docked ship and an undocking ship also have no defenses (see more below).
+It takes 5 complete turns for the ship to dock. After these 5 turns the ship is considered fully docked. During this time, a docking ship may be attacked and the ship has no defenses (i.e. if attacked, the ship is dealt damage but does not fire). A docking ship cannot be commanded.  A docked ship and an undocking ship also have no defenses (see more below). A planet is not considered owned untill the docking operation is complete.
  
 **Mining:** Once docked, a ship automatically starts mining a planet, and the planet starts producing new ships. The rate of production is dependent on the number of ships docked to a planet: each docked ship contributes 6 units per turn to ship production and it takes 72 units to produce a ship. E.g. a planet with 12 ships docked would make a ship every turn, with 6 ships docked every two turns.
 
