@@ -38,14 +38,16 @@ PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git julia ocaml 
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
 ## List Python packages to preinstall.
-PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely flask cython pandas"
+PYTHON_PACKAGES="numpy scipy scikit-learn pillow h5py tensorflow keras theano shapely flask cython pandas torchvision"
 ## List Ruby gems to preinstall.
 RUBY_PACKAGES="bundler"
 
 ## Install everything
 sudo apt-get -y --allow-unauthenticated install ${PACKAGES} ${WORKER_PACKAGES}
 
+sudo pip3 install http://download.pytorch.org/whl/cu75/torch-0.2.0.post3-cp35-cp35m-manylinux1_x86_64.whl
 sudo pip3 install ${PYTHON_PACKAGES}
+sudo python3.6 -m pip install http://download.pytorch.org/whl/cu75/torch-0.2.0.post3-cp36-cp36m-manylinux1_x86_64.whl
 sudo python3.6 -m pip install ${PYTHON_PACKAGES}
 
 sudo gem install ${RUBY_PACKAGES}
