@@ -9,6 +9,9 @@ public class Networking {
     private static final char DOCK_KEY = 'd';
     private static final char THRUST_KEY = 't';
 
+    private String botName;
+    private int turn = 0;
+
     public static void sendMoves(final Iterable<Move> moves) {
         final StringBuilder moveString = new StringBuilder();
 
@@ -61,18 +64,19 @@ public class Networking {
                 builder = builder.append((char)buffer);
             }
             return builder.toString();
-        }
-        catch(Exception e) {
+        } catch(final Exception e) {
             System.exit(1);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
-    public static Metadata readLineIntoMetadata() {
+    private static Metadata readLineIntoMetadata() {
         return new Metadata(readLine().trim().split(" "));
     }
-    
+
     public GameMap initialize(final String botName) {
+        this.botName = botName;
+
         final int myId = Integer.parseInt(readLine());
         try {
             Log.initialize(new FileWriter(String.format("%d_%s.log", myId, botName)));
@@ -84,14 +88,27 @@ public class Networking {
         final Metadata inputStringMapSize = readLineIntoMetadata();
         final int width = Integer.parseInt(inputStringMapSize.pop());
         final int height = Integer.parseInt(inputStringMapSize.pop());
+
         final GameMap gameMap = new GameMap(width, height, myId);
-
-        // Associate bot name
-        System.out.println(botName);
-
-        final Metadata inputStringMetadata = readLineIntoMetadata();
-        gameMap.updateMap(inputStringMetadata);
+        updateMap(gameMap);
 
         return gameMap;
+    }
+
+    public void updateMap(final GameMap map) {
+        if (turn == 1) {
+            System.out.println(botName);
+        }
+
+        final Metadata inputStringMetadata = readLineIntoMetadata();
+
+        if (turn == 0) {
+            Log.log("--- PRE-GAME ---");
+        } else {
+            Log.log("--- TURN " + turn + " ---");
+        }
+        ++turn;
+
+        map.updateMap(inputStringMetadata);
     }
 }
