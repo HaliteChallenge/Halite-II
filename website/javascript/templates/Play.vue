@@ -21,17 +21,13 @@
       <div class="row play-upload-section">
         <div class="col-sm-6">
           <div class="upload-container" id="bot-upload-container">
-            <div class="upload-desc">
+            <div class="upload-desc text-center">
               <h2>Submit a bot</h2>
-              <p>To play a Halite bot in the competition, submit a .zip file here (with bot file in root of zip folder, no replays). <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
-              <ul>
-                <li>.zip format</li>
-                <li>Bot file must be in root of zip folder</li>
-                <li>Include hlt language library but not replays</li>
-              </ul>
+              <p>To play a Halite bot in the competition, submit a .zip file here. Bot submissions need to adhere to specific guidelines</p>
+              <p><a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
             </div>
             <Upload :logged-in="loggedIn" :showMessage="showMessage"></Upload>
-            <div class="upload-note">
+            <div class="upload-note text-center">
               <h2>advanced submission options</h2>
               <p>You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
             </div>
@@ -40,9 +36,9 @@
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
-            <div class="upload-desc">
+            <div class="upload-desc text-center">
               <h2>replay a file</h2>
-              <p>When you run the Halite executable locally, it will add a .hlt file to your directory. Play that file here. <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
+              <p>When you run the Halite executable locally, it will add a .hlt file to your directory. Upload that file here to watch your game</p>
             </div>
             <halite-upload-zone
               caption="Drop a replay file here to upload"
@@ -53,9 +49,9 @@
               :progress="uploadProgress"
               :message="uploadMessage">
             </halite-upload-zone>
-            <div class="upload-note">
+            <div class="upload-note text-center">
               <h2>advanced replay options</h2>
-              <p>You can also replay via the <a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Offline Game Visualizer</a>.</p>
+              <p>You can also replay via the <a href="/learn-programming-challenge/downloads-and-starter-kits">Offline Game Visualizer</a>.</p>
             </div>
           </div>
         </div>
