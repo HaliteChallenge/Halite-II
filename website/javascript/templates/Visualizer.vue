@@ -101,6 +101,12 @@
               </div>
             </div>
           </div>
+          <div class="game-replay-controller">
+              <div class="game-replay-btn-table" style="width: 300px;">
+                  <label for="halloween">Enable Halloween Planets:</label> <input type="checkbox" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
+              </div>
+              <i class="xline xline-bottom"></i>
+          </div>
           <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
         </div>
       </div>
@@ -516,6 +522,20 @@
         this.gaData('visualizer', 'click-slider', 'gameplay')
       }
 
+      this.toggleHalloween = function() {
+        const playing = this.playing;
+        if (window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true') {
+          window.localStorage['halloween'] = "false";
+        }
+        else {
+          window.localStorage['halloween'] = "true";
+        }
+        visualizer.scrub(this.frame, 0)
+        if (playing) {
+          visualizer.play();
+        }
+      };
+
       // keybinding
       document.addEventListener('keyup', (e) => {
         // console.log(e.which);
@@ -679,6 +699,9 @@
         // const replay = this.game.game.replay;
         return window.location.href
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
+      },
+      isHalloween: function() {
+        return window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true';
       }
     },
     methods: {
