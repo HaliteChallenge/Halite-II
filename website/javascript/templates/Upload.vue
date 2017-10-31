@@ -1,8 +1,7 @@
 <template>
     <div class="upload-bot">
         <halite-upload-zone v-if="loggedIn"
-            title="Submit a bot"
-            description="Drop a .zip file here to upload"
+            caption="Drop a .zip file here to upload"
             buttonText = "Select a .zip file"
             :icon="`${baseUrl}/assets/images/icon-submit.svg`"
             :message="error"
