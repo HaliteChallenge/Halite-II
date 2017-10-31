@@ -195,6 +195,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
         if (alive[player_id]) {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
             frame_threads[player_id] = std::async(
+                std::launch::async,
                 [&, player_id]() -> int {
                     return networking.handle_frame_networking(
                         player_id, turn_number, game_map, ignore_timeout,
@@ -966,6 +967,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         initThreads[player_id] = std::async(
+            std::launch::async,
             &Networking::handle_init_networking,
             &networking,
             player_id, game_map, ignore_timeout, &player_names[player_id]);
