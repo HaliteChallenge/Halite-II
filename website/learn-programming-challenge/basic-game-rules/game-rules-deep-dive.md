@@ -10,7 +10,9 @@ description: Learn the details of the rules of the game to win the Halite AI Pro
 All games are played with either 2 or 4 players. At the beginning of the game, for their first turn, all bots receive the initial game state, as well as their player ID, and have 1 minute to prepare and send back their bot name.
 
 ## Map
-Maps are rectangular grids with 3:2 aspect ratio (e.g. 288 x 192 units), using a 2D Cartesian continuous non-wrapping grid. The largest board is 384 x 256 units, the smallest is 240 x 160 units. The coordinates are treated as a real Cartesian plane, and game entities can have floating-point positions. All distances are Euclidean (sqrt(dx^2 + dy^2)), and are between the centers of entities. If a ship goes off the grid it is considered dead, since the grid does not wrap.
+Maps are rectangular areas with 3:2 aspect ratio (e.g. 288 x 192 units), using 2D Cartesian, continuous, non-wrapping coordinates. Game entities can have floating-point positions.
+
+The largest board is 384 x 256 units, the smallest is 240 x 160 units.  All distances are Euclidean (sqrt(dx^2 + dy^2)), and are between the centers of entities. If a ship goes off the map it is considered dead, since the map does not wrap.
 
 Maps are generated with a random number of planets, distributed symmetrically across the board varying by game. Planets are perfectly circular, with a radius dependent on the map size (planets on a given map range in size, but the average size is determined by map size). The map generation algorithm aims to place more planets for 4-person games than 2-person games.
 
@@ -32,7 +34,6 @@ Turns are calculated using the following order of steps:
 3.    Movement, collisions, and attacks are resolved simultaneously.
 4.    Damage from combat is applied.
 5.    Planet resources/ship creation is updated.
-6.    Weapon cooldowns are updated.
 
 These steps may be referred to as ‘substeps’. There is no minimum time for a step, but times are rounded to four decimal places.
  
@@ -48,9 +49,9 @@ Each ship occupies a perfectly circular area with radius 0.5 units. Ships have:
 * A weapon, with a reach of 5 units in all directions, dealing 64 damage/turn.
 
 ### Movement
-A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 7). Ships must be given a thrust command every turn to continue to move (stateless).
+A thrust command will set a direction and a velocity for a ship by specifying an angle in degrees (integers) and a velocity (integer ranging 0 to 7). Ships must be given a thrust command every turn to continue to move (stateless, no inertia).
 
-Beyond basic thrust, the API provides some additional helper methods for pathfinding.
+Beyond basic thrust, the APIs available in the starting packages provide some additional helper methods for pathfinding.
 1. obstacles_between: determines whether there are obstacles between two designated entities (ships/planets/positions).
 2. nearby_entities_by_distance: a list of entities on the map with their distance to source object
 3. calculate_distance_between: given two entities, calculate distance between them
@@ -72,18 +73,17 @@ Each planet occupies a perfectly circular area. Planets have:
 ### Docking and Mining
 To take control of a planet, a player must dock a ship to the planet. Only one team can dock on a planet at a time.
 
-**Docking:** Once a ship moves within 4 units of a planet (ie. 4 + radius distance from center of planet), it can be commanded to dock, which will cause the ship to begin the docking process. The planet must be unoccupied or owned by player currently intending to dock. The ship must also be stationary. If the ship is too far away or not stationary or the planet is occupied, the dock command does nothing.
+**Docking:** Once a ship moves within 4 units of a planet (ie. 4 + radius distance from center of planet), it can be commanded to dock, which will cause the ship to begin the docking process. The planet must be unoccupied or owned by the player intending to dock. The ship must also be stationary. If the ship is too far away or not stationary or the planet is occupied, the dock command does nothing.
 
 If two ships from different teams both issue docking commands on an unoccupied planet during the same turn, they will battle. If they both continue to issue docking commands, they will continue to battle. During these turns, the ships are not yet docking and therefore maintain their defenses (described under docking section below) until they start to successfully dock.
 
-Once a planet has been docked by one ship, the owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is a function of the radius. E.g. a planet with a __radius of 3 units may have up to 3 ships__ docked to it at once.
+Once a player starts to dock, that player is considered the owner of the planet. The owning player may continue to dock ships to the planet until the limit of ships per that planet has been reached. The maximum number of ships that can be docked to a planet is a function of the radius: larger planets have more docking spots.
 
-If a ship attempts to dock on a full side of a planet (all spots full) the docking process will move them to the closest unoccupied spot on the planet until the planet is full. If the planet is full, the dock command does nothing.
-
-It takes 5 complete turns for the ship to dock. After these 5 turns the ship is considered fully docked. During this time, a docking ship may be attacked and the ship has no defenses. (i.e. if attacked, the ship is dealt damage but does not fire) A docking ship cannot be commanded.  A docked ship and an undocking ship also have no defenses (see more below).
+It takes 5 complete turns for the ship to dock. After these 5 turns the ship is considered fully docked. During this time, a docking ship may be attacked and the ship has no defenses (i.e. if attacked, the ship is dealt damage but does not fire). A docking ship cannot be commanded.  A docked ship and an undocking ship also have no defenses (see more below).
  
 **Mining:** Once docked, a ship automatically starts mining a planet, and the planet starts producing new ships. The rate of production is dependent on the number of ships docked to a planet: each docked ship contributes 6 units per turn to ship production and it takes 72 units to produce a ship. E.g. a planet with 12 ships docked would make a ship every turn, with 6 ships docked every two turns.
-Newly created ships will appear within 2 units from the surface of the planet (i.e. within 2 + radius units of the center of the planet), in the unoccupied grid square closest to the center of the map. The ship will start with full health and zero velocity.
+
+Newly created ships will appear within 2 units from the surface of the planet (i.e. within 2 + radius units of the center of the planet), in the unoccupied space closest to the center of the map. The ship will start with full health and zero velocity. If there is not adequate space anywhere near the planet, the ship will not spawn.
 
 **Undocking:** A fully docked ship may be undocked from the planet, by issuing another command to ‘undock’. The ship will begin the undocking process, which takes 5 complete turns, after which the player will have full control over the ship again. An undocking ship will remain defenseless as it was while docked or docking. A ship will not move while undocking, so once undocked the ship will be in the same location it was in while docked.
 
@@ -95,9 +95,9 @@ Like ships, planets also have health points. Planets start with a number of heal
 When a planet dies, it explodes, dealing damage to any ships or planets within 10 units of the planet surface. The damage scales linearly with distance from the surface, beginning at 255 damage when adjacent to the planet and ending at 51 damage if 5 units away.
 
 ### Ship-Ship Combat & Collision
-Ships automatically fight each other when they come into close distances. (5 units from the center of the ship, represented on the board by the aura around the ship) When ships come into contact, they do 64 units of damage per turn to each other.
+Ships automatically fight each other when they come into close distances. (5 units from the center of the ship, represented on the board by the aura around the ship) When ships come into combat, they do up to 64 units of damage per turn to each other (see below).
 
-Ships that try to occupy the same spot on the board will both explode. I.e. if the ships are moving at a high velocity towards each other, ships will start to fight but will collide before getting to zero strength. Ship collisions do no damage to any ships or planets other than the two ships themselves. (A very rare edge case is when two ships collide with each other at the same time that they collide with a planet. In this case, they would collide with the planet and destroy each other at the same time).
+Ships that touch each other will both explode. I.e. if the ships are moving at a high velocity towards each other, ships will start to fight but will collide before getting to zero strength. Ship collisions do no damage to any ships or planets other than the two ships themselves. (A very rare edge case is when two ships collide with each other at the same time that they collide with a planet. In this case, they would collide with the planet and destroy each other at the same time).
 
 If multiple enemy ships are within range simultaneously for a turn, the damage is evenly spread between all ships. (During processing, each ship accumulates damage in floating-point precision, which is then rounded down and applied at the end of each substep).  
 
