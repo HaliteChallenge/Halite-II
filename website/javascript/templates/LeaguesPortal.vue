@@ -63,7 +63,7 @@
   import _ from 'lodash'
 
   export default {
-    name: "LeaguesPortal.vue",
+    name: "LeaguesPortal",
     props: ['baseUrl'],
     components: {
       vSelect
