@@ -91,7 +91,7 @@ Issue the given list of commands.
 """
 function send_command_queue(command_queue::Vector{String})
     for command in command_queue
-        send_msg(command)
+        write(STDOUT, command)
     end
     done_msg()
 end
