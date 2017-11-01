@@ -102,12 +102,12 @@
             </div>
           </div>
           <div class="game-replay-controller">
-              <div class="game-replay-btn-table" style="width: 200px;">
-                  <label for="halloween">Halloween Theme:</label> 
-                  <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
+              <div class="game-replay-btn-table" style="width: 300px;">
+                  <label for="halloween">Enable Halloween Planets:</label> <input type="checkbox" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
               </div>
               <i class="xline xline-bottom"></i>
           </div>
+          <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
         </div>
       </div>
       <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
@@ -363,7 +363,6 @@
         speedLabel: '3x',
         stats: null,
         sharePopup: false,
-        isHalloween: true,
         isMobile: window.mobileAndTabletcheck(),
         // showChart: false,
         selected: {
@@ -371,7 +370,7 @@
           id: 0,
           owner: '',
           x: 0,
-          y: 0,
+          y: 0
         },
         sliderOptions: {
           min: 0,
@@ -417,13 +416,6 @@
         max: this.replay.num_frames - 1,
         value: this.frame
       })
-
-      if(window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true'){
-        this.isHalloween = true;
-      }
-      else{
-        this.isHalloween = false;
-      }
 
       const visualizer = new HaliteVisualizer(this.replay)
       const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
@@ -532,16 +524,17 @@
       }
 
       this.toggleHalloween = function() {
+        const playing = this.playing;
         if (window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true') {
           window.localStorage['halloween'] = "false";
-          this.isHalloween = false;
         }
         else {
           window.localStorage['halloween'] = "true";
-           this.isHalloween = true;
         }
-
-        this.$forceUpdate();
+        visualizer.scrub(this.frame, 0)
+        if (playing) {
+          visualizer.play();
+        }
       };
 
       // keybinding
@@ -710,6 +703,9 @@
         return window.location.href
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
       },
+      isHalloween: function() {
+        return window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true';
+      }
     },
     methods: {
       userlink: function (user_id) {
