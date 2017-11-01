@@ -20,8 +20,6 @@ export let SHIP_IMAGE = "";
 export let HALO_IMAGE = "";
 export let EXHAUST_IMAGE = "";
 
-export let HALLOWEEN_PLANET_IMAGE = null;
-
 export let PLANET_SHEET = null;
 export let PLANET_SHEET_SMALL = null;
 export let PLANET_EXPLOSION_SHEET = null;
@@ -84,8 +82,6 @@ export function setAssetRoot(path) {
             PLANET_HALO_IMAGE = PIXI.Texture.fromFrame("Ring.png");
         }
     );
-
-    HALLOWEEN_PLANET_IMAGE = ASSET_ROOT + require("../assets/halloween-obj.png");
 
     PLANET_SHEET_SMALL = loadSpritesheet(
         require("../assets/planet-small.json"),
