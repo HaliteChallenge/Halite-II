@@ -408,6 +408,7 @@ auto Halite::process_docking_move(
     if (!planet.owned) {
         planet.owned = true;
         planet.owner = player_id;
+        planet.current_production = 0;
     }
 
     if (planet.owner == player_id &&
