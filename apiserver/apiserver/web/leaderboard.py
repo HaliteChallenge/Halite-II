@@ -112,3 +112,25 @@ def leaderboard():
             result.append(user)
 
     return flask.jsonify(result)
+
+
+@web_api.route("/leagues")
+@util.cross_origin(methods=["GET"])
+def leagues():
+    result = []
+    with model.engine.connect() as conn:
+        query = conn.execute(
+            model.leagues.select())
+
+        for row in query.fetchall():
+            league = {
+                "id": row["id"],
+                "category": row["category"],
+                "name": row["name"],
+                "description": row["description"],
+                "query": row["query"],
+            }
+
+            result.append(league)
+
+    return flask.jsonify(result)
