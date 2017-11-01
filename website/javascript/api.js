@@ -347,7 +347,7 @@ export function subscribe (email) {
 /** leagues **/
 export function getLeaguesList(){
   return $.get({
-    url: `${API_SERVER_URL}/leagues`,
+    url: `${API_SERVER_URL}/leagues` ,
     xhrFields: {
     }
   });

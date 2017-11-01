@@ -1,10 +1,8 @@
 <template>
   <div class="leagues-container">
-    <div class="">
-      <div class="page-header">
-        <h1>LEAGUES</h1>
-        <i class="xline xline-bottom"></i>
-      </div>
+    <div class="page-header">
+      <h1>HALITE LEAGUES</h1>
+      <i class="xline xline-bottom"></i>
     </div>
     <div class="hackathon-events-container">
       <form class="filter-form" v-on:submit="onUpdateFilter">
@@ -41,6 +39,7 @@
           <thead>
             <tr>
               <th class="league-col-name">League name</th>
+              <th class="league-col-desc">Description</th>
               <th class="league-col-category">Category</th>
             </tr>
           </thead>
@@ -49,6 +48,7 @@
               <td>
                 <a :href="`/league?id=${league.id}`">{{league.name}}</a>
               </td>
+              <td>{{league.description}}</td>
               <td>{{league.category}}</td>
             </tr>
           </tbody>
