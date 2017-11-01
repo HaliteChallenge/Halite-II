@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Halite2.hlt {
     public class MetadataParser {
@@ -12,8 +13,8 @@ namespace Halite2.hlt {
 
         private static Ship NewShipFromMetadata(int owner, Metadata metadata) {
             int id = int.Parse(metadata.Pop());
-            double xPos = double.Parse(metadata.Pop());
-            double yPos = double.Parse(metadata.Pop());
+            double xPos = double.Parse(metadata.Pop(), CultureInfo.InvariantCulture);
+            double yPos = double.Parse(metadata.Pop(), CultureInfo.InvariantCulture);
             int health = int.Parse(metadata.Pop());
 
             // Ignoring velocity(x,y) which is always (0,0) in current version.
@@ -30,11 +31,11 @@ namespace Halite2.hlt {
 
         public static Planet NewPlanetFromMetadata(List<int> dockedShips, Metadata metadata) {
             int id = int.Parse(metadata.Pop());
-            double xPos = double.Parse(metadata.Pop());
-            double yPos = double.Parse(metadata.Pop());
+            double xPos = double.Parse(metadata.Pop(), CultureInfo.InvariantCulture);
+            double yPos = double.Parse(metadata.Pop(), CultureInfo.InvariantCulture);
             int health = int.Parse(metadata.Pop());
 
-            double radius = double.Parse(metadata.Pop());
+            double radius = double.Parse(metadata.Pop(), CultureInfo.InvariantCulture);
             int dockingSpots = int.Parse(metadata.Pop());
             int currentProduction = int.Parse(metadata.Pop());
             int remainingProduction = int.Parse(metadata.Pop());
