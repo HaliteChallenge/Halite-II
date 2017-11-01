@@ -408,6 +408,7 @@ auto Halite::process_docking_move(
     if (!planet.owned) {
         planet.owned = true;
         planet.owner = player_id;
+        planet.current_production = 0;
     }
 
     if (planet.owner == player_id &&
@@ -447,6 +448,10 @@ auto Halite::process_docking_move(
             // Accumulate damage
             simultaenous_docking[planet_id][player_id].push_back(ship_id);
         }
+    } else {
+        // Too many of the owner's ships are trying to dock. Add them to the
+        // simultaneous docking list in case a contention fight starts.
+        simultaenous_docking[planet_id][player_id].push_back(ship_id);
     }
 }
 
@@ -806,6 +811,12 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
 
         std::vector<hlt::EntityId> participants;
         std::vector<hlt::Location> participant_locations;
+
+        // If the planet owner was just trying to dock too many ships
+        // we can continue, there is no fight occurring.
+        if (planet_entry.second.size() == 1){
+            continue;
+        }
 
         auto damage_others = [&](hlt::PlayerId src_player, double split_damage) {
             for (auto& other_player : planet_entry.second) {
