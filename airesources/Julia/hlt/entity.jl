@@ -118,6 +118,7 @@ struct Ship <: Entity
 
         new(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, vel_x, vel_y, docked, docked_planet, progress, cooldown)
     end
+
 end
 
 """

@@ -16,7 +16,6 @@ struct Game
         botname = @sprintf("%s-%s", botname, id)
 
         width, height = map(x -> parse(Int, x), split(get_msg()))
-        send_msg(botname, true)
 
         initial_game_map = GameMap(id, width, height, get_msg())
         debug(logger, @sprintf("Width: %d, Height: %d", width, height))
@@ -28,6 +27,15 @@ struct Game
     end
 end
 GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
+
+"""
+    start_game(game)
+
+This function should be used after bot initialization and all preliminary checks and warmsup.
+"""
+function start_game(game::Game)
+    send_msg(game.botname, true)
+end
 
 """
     update_map(game::Game)
