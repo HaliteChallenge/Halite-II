@@ -28,7 +28,7 @@
                     <div v-if="level === 'Professional'">
                         <div class="form-group">
                             <label for="work-email">Please share your work email</label>
-                            <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
+                            <input type="email" class="form-control" id="work-email" placeholder="Work Email (Optional)" aria-describedby="work-email-help" v-model="email" />
                             <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                     <div v-if="level === 'University'">
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
-                            <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
+                            <input type="email" class="form-control" id="school-email" placeholder="School Email (Optional)" aria-describedby="school-email-help" v-model="email" />
                             <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>

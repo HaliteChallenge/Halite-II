@@ -38,7 +38,7 @@ Rather than having all your ships travel to the same single planet, you could di
 planets = game_map.all_planets()
 ships = game_map.get_me().all_ships()
 for current in range(0, len(ships)):
-  ships[current].navigate_to(ship.closest_point_to(planets[current%len(planets)]), game_map, speed=hlt.constants.MAX_SPEED/2))
+  ships[current].navigate(ship.closest_point_to(planets[current%len(planets)]), game_map, speed=hlt.constants.MAX_SPEED/2))
 ```
 
 ### Be Large and In Charge
