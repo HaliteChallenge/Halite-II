@@ -17,7 +17,11 @@ using Memento
 logger = get_logger("bot-logger")
 
 game = Game("Settler")
+
+# Here one can do all preliminary checks and warmups, using initial 60s timeout.
 turn = 1
+
+start_game(game)
 
 while true
     # TURN START

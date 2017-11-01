@@ -36,11 +36,9 @@ include("game_map.jl")
 include("game.jl")
 
 export Game, Constants, DockedStatus
-export thrust, dock, undock
+export start_game, thrust, dock, undock
 export update_map, all_players, all_planets, all_ships, all_docked_ships, get_player, get_me, get_planet, get_docked_ship
 export isdocked, isowned, isfull, can_dock
 export navigate, send_command_queue, closest_point_to, nearest_unoccupied_planet
-
-export logbot
 
 end
