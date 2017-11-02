@@ -149,7 +149,7 @@ auto collision_time(
         if(t1 >= 0.0 && t1 <= 1.0) {
             /// t1 is valid to pick, because it is in between 0 and 1
             return { true, t1 };
-        } else if (t1 < 0.0 && t2 >= 0.0) {
+        } else if (t1 <= 0.0 && t2 >= 0.0) {
             /// t1 is before 0 and t2 is after, but that means at t = 0.0 we are colliding
             return { true, 0.0 };
         } else {
