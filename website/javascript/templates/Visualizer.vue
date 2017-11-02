@@ -101,9 +101,9 @@
               </div>
             </div>
           </div>
-          <div class="game-replay-controller">
+          <div class="game-replay-controller" v-if="false">
               <div class="game-replay-btn-table" style="width: 200px;">
-                  <label for="halloween">Halloween Theme:</label> 
+                  <label for="halloween">Halloween Theme:</label>
                   <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
               </div>
               <i class="xline xline-bottom"></i>
