@@ -18,6 +18,25 @@ const ZSTD_isError = libzstdInstance.cwrap(
     "number",
     ["number"]
 );
+const ZSTD_getErrorName = libzstdInstance.cwrap(
+    "ZSTD_getErrorName",
+    "number",
+    ["string"]
+);
+const ZSTDshim_decompress = libzstdInstance.cwrap(
+    "ZSTDshim_decompress",
+    "number",
+    ["number", "number", "number"]
+);
+
+
+function malloc(size) {
+    const buffer = libzstdInstance._malloc(size);
+    const view = new Uint8Array(libzstdInstance.HEAPU8.buffer,
+                                buffer, size);
+    return [buffer, view];
+}
+
 
 addEventListener("message", (e) => {
     const buffer = e.data;
@@ -37,40 +56,21 @@ addEventListener("message", (e) => {
         // http://kapadia.github.io/emscripten/2013/09/13/emscripten-pointers-and-pointers.html
         const byteView = new Uint8Array(buffer);
         const bufferBytes = byteView.length * byteView.BYTES_PER_ELEMENT;
-        const heapBuffer = libzstdInstance._malloc(bufferBytes);
-        const heapBufferView = new Uint8Array(libzstdInstance.HEAPU8.buffer,
-            heapBuffer, bufferBytes);
+        const [heapBuffer, heapBufferView] = malloc(bufferBytes);
         heapBufferView.set(new Uint8Array(buffer));
 
-        // Determine what the decompressed size is so we can allocate enough
-        // memory
-        const decompressedSize = ZSTD_getFrameContentSize(
-            heapBufferView.byteOffset, bufferBytes);
-        if (decompressedSize > 0) {
-            // Allocate the buffer to hold the decompressed data
-            const inflatedBuffer = libzstdInstance._malloc(decompressedSize + 2048);
-            const inflatedBufferView = new Uint8Array(
-                libzstdInstance.HEAPU8.buffer,
-                inflatedBuffer, decompressedSize);
-            const result = ZSTD_decompress(
-                inflatedBufferView.byteOffset, decompressedSize,
-                heapBufferView.byteOffset, bufferBytes);
-            if (!ZSTD_isError(result)) {
-                console.log("Replay was zSTanDarded");
-                // Copy decompressed data into a new buffer and transfer it
-                const newBuffer = inflatedBufferView.buffer.slice(
-                    inflatedBufferView.byteOffset,
-                    inflatedBufferView.byteOffset + inflatedBufferView.byteLength);
-                self.postMessage(newBuffer, [newBuffer]);
-                return;
-            }
-            else {
-                console.debug("zSTD: Failed to decompress");
-            }
+        const [resultSize, resultSizeView] = malloc(4);
+        const result = ZSTDshim_decompress(heapBufferView.byteOffset, byteView.length, resultSizeView.byteOffset);
+        if (result === 0) {
+            // TODO: get error
+            console.error("Could not decompress replay.");
+            return;
         }
-        else {
-            console.debug("zSTD: failed to determine decompressed size.");
-        }
+        let size = 0;
+
+        const resultSizeInt = new Uint32Array(libzstdInstance.HEAPU8.buffer, resultSize, 1);
+        const newBuffer = libzstdInstance.HEAPU8.buffer.slice(result, result + resultSizeInt[0]);
+        self.postMessage(newBuffer, [newBuffer]);
     }
     catch (e) {
         console.debug("zSTD failed: ", e);
