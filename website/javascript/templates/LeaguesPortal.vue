@@ -44,7 +44,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="league in leagues" :key="league.id">
+            <tr v-for="league in finalLeagues" :key="league.id">
               <td>
                 <a :href="`/league?id=${league.id}`">{{league.name}}</a>
               </td>
@@ -71,8 +71,8 @@
     data: function () {
       return {
         leagues: [],
-        filter_name: null,
-        filter_cat: null,
+        filter_name: [],
+        filter_cat: [],
         catOptions: [],
         nameOptions: []
       }
@@ -99,13 +99,20 @@
       });
     },
     computed: {
+      finalLeagues: function(){
+        return _.filter(this.leagues, (item) => {
+          let nameIncluded = !this.filter_name.length || this.filter_name.indexOf(item.name) != -1;
+          let catIncluded = !this.filter_cat.length || this.filter_cat.indexOf(item.category) != -1;
+          return nameIncluded && catIncluded
+        });
+      }
     },
     methods: {
       onUpdateFilter: function(){
-        console.log('do nothing')
       },
       clearFilter: function(){
-
+        this.filter_name = [];
+        this.filter_cat = [];
       }
     }
   }
