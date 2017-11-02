@@ -19,6 +19,13 @@ logger = get_logger("bot-logger")
 game = Game("Settler")
 
 # Here one can do all preliminary checks and warmups, using initial 60s timeout.
+initial_map = game.initial_game_map
+debug(logger, @sprintf("width: %d; height: %d; players: %d; my ships: %d; planets: %d", 
+                       initial_map.width, initial_map.height,
+                       initial_map |> all_players |> length,
+                       initial_map |> get_me |> all_ships |> length,
+                       initial_map |> all_planets |> length))
+
 turn = 1
 
 start_game(game)

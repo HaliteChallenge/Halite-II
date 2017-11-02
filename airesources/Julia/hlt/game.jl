@@ -18,10 +18,6 @@ struct Game
         width, height = map(x -> parse(Int, x), split(get_msg()))
 
         initial_game_map = GameMap(id, width, height, get_msg())
-        debug(logger, @sprintf("Width: %d, Height: %d", width, height))
-        for planet in all_planets(initial_game_map)
-            debug(logger, @sprintf("Planet: %s, x: %d, y: %d", planet.id, planet.x, planet.y))
-        end
 
         new(id, botname, initial_game_map, width, height)
     end
