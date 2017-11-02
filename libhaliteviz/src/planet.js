@@ -2,13 +2,6 @@ import * as PIXI from "pixi.js";
 
 import * as assets from "./assets";
 
-
-function isHalloween() {
-    const savedValue = window.localStorage["halloween"];
-    return savedValue === undefined || savedValue === "true";
-}
-
-
 /**
  * Manages a planet on screen.
  */
@@ -29,7 +22,6 @@ export class Planet {
 
         const pixelsPerUnit = assets.CELL_SIZE * scale;
         // Switch planet sprite based on display size of planet.
-        this.halloween = PIXI.Sprite.from(assets.HALLOWEEN_PLANET_IMAGE);
         if (planetBase.r * pixelsPerUnit <= 20) {
             this.core = PIXI.Sprite.from(assets.PLANET_IMAGE_SMALL);
         }
@@ -77,25 +69,6 @@ export class Planet {
                 id: this.id,
             });
         });
-
-        this.halloween.width = this.core.width;
-        this.halloween.height = (161/204) * this.core.width;
-        this.halloween.position.x = scale * assets.CELL_SIZE * planetBase.x;
-        this.halloween.position.y = scale * assets.CELL_SIZE * planetBase.y;
-        this.halloween.anchor.x = 0.5;
-        this.halloween.anchor.y = 0.5;
-        this.halloween.interactive = true;
-        this.halloween.buttonMode = true;
-        this.halloween.on("pointerdown", (e) => {
-            // When clicked, notify the visualizer
-            onSelect("planet", {
-                id: this.id,
-            });
-        });
-        this.halloween.tint = assets.PLANET_COLOR;
-
-        this.halloween.visible = isHalloween();
-        this.core.visible = !this.halloween.visible;
     }
 
     /**
@@ -105,7 +78,6 @@ export class Planet {
      * @param overlay {PIXI.Graphics} A graphics object used to draw overlays.
      */
     attach(container, overlay) {
-        container.addChild(this.halloween);
         container.addChild(this.core, this.halo);
         this.container = container;
         this.overlay = overlay;
@@ -143,16 +115,14 @@ export class Planet {
         const health_bar = health_factor * 2 * radius;
 
         this.core.tint = this.halo.tint = color;
+        this.core.visible = this.halo.visible = true;
         this.core.interactive = true;
         this.core.buttonMode = true;
 
         if (planetStatus.health === 0) {
+            this.core.visible = this.halo.visible = false;
             this.core.interactive = false;
             this.core.buttonMode = false;
         }
-
-        this.core.visible = planetStatus.health > 0 && (!isHalloween() || planetStatus.owner !== null);
-        this.halo.visible = planetStatus.health > 0;
-        this.halloween.visible = isHalloween() && planetStatus.health > 0 && planetStatus.owner === null;
     }
 }
