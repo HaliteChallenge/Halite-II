@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unordered_set>
 #include <vector>
+#include <algorithm>
 
 #include "Entity.hpp"
 #include "hlt.hpp"

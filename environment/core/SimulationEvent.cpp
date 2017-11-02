@@ -143,8 +143,13 @@ auto collision_time(
         return { true, t };
     }
     else if (disc > 0) {
-        const auto t1 = (-b + std::sqrt(disc)) / (2 * a);
-        const auto t2 = (-b - std::sqrt(disc)) / (2 * a);
+        auto t1 = (-b + std::sqrt(disc)) / (2 * a);
+        auto t2 = (-b - std::sqrt(disc)) / (2 * a);
+
+        // Handle cases where t2 is lower than t1
+        if(t2 < t1) {
+            std::swap(t1, t2);
+        }
 
         if(t1 >= 0.0 && t1 <= 1.0) {
             /// t1 is valid to pick, because it is in between 0 and 1
