@@ -16,10 +16,8 @@ import VisualizerContainer from './templates/VisualizerContainer.vue'
 import Home from './templates/Home.vue'
 import HackathonPortal from './templates/HackathonPortal.vue'
 import HackathonIndividual from './templates/HackathonIndividual.vue'
-import Leagues from './templates/Leagues.vue'
 import LeaguesPortal from './templates/LeaguesPortal.vue'
 import LeagueIndividual from './templates/LeagueIndividual.vue'
-import LeagueBoard from './templates/LeagueBoard.vue'
 import Onboarding from './templates/Onboarding.vue'
 import Play from './templates/Play.vue'
 import Settings from './templates/Settings.vue'
@@ -117,18 +115,6 @@ window.views = {
     new Vue({
       el: '#play-container',
       render: (h) => h(Play, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  Leagues: function () {
-    new Vue({
-      el: '#leagues-container',
-      render: (h) => h(Leagues, { props: { baseUrl: _global.baseUrl } })
-    })
-  },
-  LeagueBoard: function () {
-    new Vue({
-      el: '#leaderboard-container',
-      render: (h) => h(LeagueBoard, { props: { baseUrl: _global.baseUrl } })
     })
   },
   LeaguesPortal: function(){

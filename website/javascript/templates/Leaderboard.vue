@@ -623,7 +623,6 @@ export default {
       },
       getCountryName: function (name) {
         var countries = require('i18n-iso-countries')
-
         return countries.getName(name, 'en')
       },
       clearFilter: function () {
@@ -638,12 +637,7 @@ export default {
           var countries = require('i18n-iso-countries')
           return '/assets/images/countries/' + countries.getAlpha2Code(countries.getName(name, 'en'), 'en').toLowerCase() + '.png'
         }
-
         return null
-      },
-      getCountryName: function (name) {
-        var countries = require('i18n-iso-countries')
-        return countries.getName(name, 'en')
       },
       getFormattedDate: function (date) {
         var cdate = moment(date)
