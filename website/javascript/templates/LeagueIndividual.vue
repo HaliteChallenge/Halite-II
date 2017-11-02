@@ -181,7 +181,7 @@
       },
 
       getFormattedDate: function (date) {
-        return moment(date).startOf('day').fromNow()
+        return moment(date).fromNow()
       },
       parentLink: function(){
         return encodeURI(`/leagues?category=${this.league.category}`)
