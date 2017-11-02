@@ -1,6 +1,6 @@
 <?php
 
-abstract class Entity
+class Entity
 {
     /**
      * @var Player|null
@@ -62,5 +62,26 @@ abstract class Entity
     public function getRadius(): int
     {
         return $this->radius;
+    }
+
+    public function getDistanceTo(Entity $target): float
+    {
+        return $this->getCoordinate()->getDistanceTo($target->getCoordinate());
+    }
+
+    public function getAngleTo(Entity $target): float
+    {
+        return $this->getCoordinate()->getAngleTo($target->getCoordinate());
+    }
+
+    public function getClosestCoordinateTo(Entity $target): Coordinate
+    {
+        $radius = $target->getRadius() + 3;
+        $angleRad = $this->getAngleTo($this);
+
+        $x = $target->getCoordinate()->getX() + $radius * cos($angleRad);
+        $y = $target->getCoordinate()->getY() + $radius * sin($angleRad);
+
+        return new Coordinate($x, $y);
     }
 }

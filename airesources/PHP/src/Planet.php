@@ -87,9 +87,29 @@ class Planet extends Entity
         return $this->isOwned;
     }
 
+    public function isDockable(Player $player): bool
+    {
+        return !$this->isFull() && (!$this->isOwned() || ($this->getOwner() === $player));
+    }
+
+    public function isFull(): bool
+    {
+        return $this->getFreeDockingSpots() > 0;
+    }
+
+    public function getFreeDockingSpots(): int
+    {
+        return $this->getDockingSpots() - count($this->ships);
+    }
+
     public function getDockedShips(): int
     {
         return $this->dockedShips;
+    }
+
+    public function getShip(int $shipId): Ship
+    {
+        return $this->ships[$shipId];
     }
 
     /**

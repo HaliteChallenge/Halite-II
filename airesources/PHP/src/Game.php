@@ -18,11 +18,6 @@ class Game
     private $connection;
 
     /**
-     * @var int
-     */
-    private $playerId;
-
-    /**
      * @var Map
      */
     private $map;
@@ -53,13 +48,13 @@ class Game
     private function initialize(): void
     {
         $this->logger->log('Initialize new Game for Bot '.$this->botName);
-        $this->playerId = (int) $this->connection->read();
-        $this->logger->log('Player Id '.$this->playerId.' received');
+        $playerId = (int) $this->connection->read();
+        $this->logger->log('Player Id '.$playerId.' received');
 
         $mapSize = $this->connection->read();
         list($width, $height) = explode(' ', $mapSize);
         $this->logger->log(sprintf('Map Size %dx%d initialized', $width, $height));
-        $this->map = new Map((int) $width, (int) $height);
+        $this->map = new Map($playerId, (int) $width, (int) $height);
 
         $this->logger->log('Send BotName '.$this->botName);
         $this->connection->send($this->botName);
@@ -148,7 +143,8 @@ class Game
 
         $ships = [];
         for ($i = 0; $i < $dockedShips; $i++) {
-            $ships[] = $this->ships[$tokenizer->nextInt()];
+            $shipId = $tokenizer->nextInt();
+            $ships[$shipId] = $this->ships[$shipId];
         }
 
         $planet = new Planet(

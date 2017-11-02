@@ -26,6 +26,11 @@ class Connection
         return $data;
     }
 
+    public function sendMove(string $move): void
+    {
+        $this->send(" $move ");
+    }
+
     public function send(string $message): void
     {
         $this->logger->log('Connection SEND: '.$message);

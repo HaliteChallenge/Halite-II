@@ -17,6 +17,11 @@ class Player
         $this->id = $id;
     }
 
+    public function getShip(int $shipId): Ship
+    {
+        return $this->ships[$shipId];
+    }
+
     public function getId(): int
     {
         return $this->id;
