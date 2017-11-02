@@ -4,8 +4,7 @@ import * as assets from "./assets";
 
 
 function isHalloween() {
-    const savedValue = window.localStorage["halloween"];
-    return savedValue === undefined || savedValue === "true";
+    return false;
 }
 
 
@@ -105,7 +104,7 @@ export class Planet {
      * @param overlay {PIXI.Graphics} A graphics object used to draw overlays.
      */
     attach(container, overlay) {
-        container.addChild(this.halloween);
+        // Don't add holiday sprite right now
         container.addChild(this.core, this.halo);
         this.container = container;
         this.overlay = overlay;
