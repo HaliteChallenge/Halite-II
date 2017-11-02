@@ -1,12 +1,16 @@
 <template>
   <div class="league-individual-container">
     <!-- breakcrumb -->
+    <section class="hackathon-breadcrumb breadcrumb-top">
+      <HaliteBreadcrumb :path="path" :baseUrl="baseUrl" />
+    </section>
     <div class="page-header">
       <h1>{{league.name}}</h1>
       <i class="xline xline-bottom"></i>
     </div>
     <div class="league-description">
       <p>{{league.description}}</p>
+      <p><a :href="parentLink()"> {{league.category}} </a></p>
   
       <div class="popup-share-container">
         <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
@@ -83,13 +87,21 @@
   import moment from 'moment'
   import countries from 'i18n-iso-countries'
   import {tierClass, countries_data} from '../utils'
+  import HaliteBreadcrumb from './Breadcrumb.vue'
   import _ from 'lodash'
 
   export default {
     name: "LeagueIndividual",
     props: ['baseUrl'],
+    components: { HaliteBreadcrumb },
     data: function(){
       return {
+        path: [
+          {
+            name: 'Leagues',
+            link: '/halite-leagues'
+          }
+        ],
         sharePopup: false,
         shareLink: window.location.href,
         leaderboard: [],
@@ -104,7 +116,6 @@
       // query league
       const id = params.get('id');
 
-      console.log('id = ' + id);
       api.getLeaguesList().then((leagues) => {
         this.league = _.find(leagues, (item) => item.id == id);
         // query
@@ -119,8 +130,7 @@
           filter = [`${category},=,${filterValue}`]
         }
 
-        console.log(filter)
-        console.log(limit)
+        this.path.push({name: this.league.name })
 
         api.leaderboard(filter, null, 0, limit).then((leaderboard) => {
           this.leaderboard = leaderboard
@@ -160,6 +170,9 @@
       getFormattedDate: function (date) {
         return moment(date).startOf('day').fromNow()
       },
+      parentLink: function(){
+        return encodeURI(`/leagues?category=${this.league.category}`)
+      }
     }
   }
 </script>
