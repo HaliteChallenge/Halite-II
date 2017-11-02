@@ -94,12 +94,12 @@ class Planet extends Entity
 
     public function isFull(): bool
     {
-        return $this->getFreeDockingSpots() > 0;
+        return $this->getFreeDockingSpots() <= 0;
     }
 
     public function getFreeDockingSpots(): int
     {
-        return $this->getDockingSpots() - count($this->ships);
+        return $this->getDockingSpots() - $this->getDockedShips();
     }
 
     public function getDockedShips(): int

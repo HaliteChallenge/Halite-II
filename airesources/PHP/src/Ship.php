@@ -131,15 +131,15 @@ class Ship extends Entity
             return $this->navigate($map, $newTarget, $thrust, $avoidObstacles, $maxCorrections - 1, $angularStepRad, $logger);
         }
 
-        $computedThrust = 7;
+        $computedThrust = $thrust;
         if ($distance < $thrust) {
             $computedThrust = (int) $distance;
         }
 
-        //$angleDeg = self::angleRadToDegClipped($angleRad);
-        $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleRad);
+        $angleDeg = self::angleRadToDegClipped($angleRad);
+        $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg);
 
-        return $this->thrust($computedThrust, $angleRad);
+        return $this->thrust($computedThrust, $angleDeg);
     }
 
     /**

@@ -38,9 +38,15 @@ class Coordinate
 
     public function getAngleTo(Coordinate $target): float
     {
-        $dx = $target->getX();
-        $dy = $target->getY();
+        $dx = $target->getX() - $this->getX();
+        $dy = $target->getY() - $this->getY();
 
-        return atan2($dy, $dx) + 2 * M_PI;
+        $result = atan2($dy, $dx);
+        if($result < 0 ){
+            $result += 2 * M_PI;
+        }
+        return $result;
     }
+
+
 }

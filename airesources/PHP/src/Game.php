@@ -39,6 +39,7 @@ class Game
 
     public function __construct(string $botName, Logger $logger, Connection $connection)
     {
+        $logger->log(phpversion());
         $this->botName = $botName;
         $this->logger = $logger;
         $this->connection = $connection;

@@ -28,7 +28,7 @@ class Connection
 
     public function sendMove(string $move): void
     {
-        $this->send(" $move ");
+        $this->send("$move ");
     }
 
     public function send(string $message): void
