@@ -368,7 +368,7 @@ export default {
         // get tier value
         if (params.tier && params.tier.length > 0) {
           let selected = this.tiers.filter((item) => {
-            return params.tier.indexOf(item.value + '') != -1
+            return params.tier.indexOf(item.label + '') != -1
           })
           this.tier_filter = selected
         }
@@ -433,14 +433,11 @@ export default {
 
         // adding the tier filter
         if (this.tier_filter.length > 0) {
-          let key = 'rank'
-          if (this.hackathonId) {
-            key = 'local_rank'
-          }
+          let key = 'tier'
           params['tier'] = []
           this.tier_filter.forEach(function (item) {
-            filters.push(key + ',=,' + item.value)
-            params['tier'].push(item.value)
+            filters.push(key + ',=,' + item.label)
+            params['tier'].push(item.label)
           })
         }
 
