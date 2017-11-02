@@ -78,6 +78,12 @@
       }
     },
     mounted: function(){
+      // get params 
+      const params = new URLSearchParams(window.location.search)
+      if (params.has('category')){
+        this.filter_cat.push(decodeURI(params.get('category')))
+      }
+
       api.getLeaguesList().then((leagues) => {
         console.log(leagues)
         this.leagues = leagues
