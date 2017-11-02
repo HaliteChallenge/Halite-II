@@ -259,6 +259,7 @@ export function leaderboard (filters, hackathon = null, offset = null, limit = n
     querystring.push(`offset=${offset}&limit=${limit}`)
   }
   if (filters && filters.length > 0) {
+    filters = filters.map(window.encodeURIComponent);
     querystring.push(`filter=${filters.join('&filter=')}`)
   }
   if (querystring.length > 0) {
