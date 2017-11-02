@@ -5,7 +5,7 @@
       <i class="xline xline-bottom"></i>
     </div>
     <div class="hackathon-events-container">
-      <form class="filter-form" v-on:submit="onUpdateFilter">
+      <div class="filter-form">
           <div class="form-header">
             <div class="filter-handler">
               <a href="#" class="handler-item" @click="clearFilter">
@@ -33,7 +33,7 @@
               </div> -->
             </div>
           </div>
-        </form>
+        </div>
       <div class="table-container">
         <table class="table table-leader leagues-table">
           <thead>
@@ -46,7 +46,7 @@
           <tbody>
             <tr v-for="league in finalLeagues" :key="league.id">
               <td>
-                <a :href="`/league?id=${league.id}`">{{league.name}}</a>
+                <a :href="getLink(league)">{{league.name}}</a>
               </td>
               <td>{{league.description}}</td>
               <td>{{league.category}}</td>
@@ -108,7 +108,11 @@
       }
     },
     methods: {
-      onUpdateFilter: function(){
+      getLink: function(league){
+        let link = `/league-board?id=${league.id}&leaguename=${league.name}`
+        
+        link += '&' + league.query;
+        return encodeURI(link);
       },
       clearFilter: function(){
         this.filter_name = [];

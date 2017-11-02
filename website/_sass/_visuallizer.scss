@@ -219,6 +219,62 @@
   }
 }
 
+.popup-share-container{
+  position: relative;
+  .popup-container{
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%);
+    z-index: 99;
+  }
+  .popup-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 98;
+  }
+  .popup-share{
+    text-align: left;
+    padding: 15px 25px 15px 15px;
+    background-color: #1c1927;
+    color: $foreground-2;
+    a{
+      color: $foreground-2;
+    }
+    .form-inline-button {
+      padding: 0px 0px 0px 10px;
+
+      input[type=text] {
+        padding-right: 15px;
+      }
+    }
+    label, .form-inline-button{
+      margin-bottom: 5px;
+    }
+    label{
+      font-size: 0.9em;
+      display: block;
+    }
+    .share-socials{
+      font-size: 1.5em;
+    }
+    .hr{
+      height: 1px;
+      background-color: $foreground-2;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    .btn{
+      margin-right: -10px;
+      color: #30242F;
+    }
+  }
+}
+
 .game-replay-share{
   position: relative;
   .btn{

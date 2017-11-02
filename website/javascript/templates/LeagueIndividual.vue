@@ -2,56 +2,75 @@
   <div class="league-individual-container">
     <!-- breakcrumb -->
     <div class="page-header">
-      <h1>HALITE LEAGUES</h1>
+      <h1>{{league.name}}</h1>
       <i class="xline xline-bottom"></i>
     </div>
     <div class="league-description">
-      <p>league décription goes here</p>
-
-      <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
-        <div class="popup-container" v-show="sharePopup">
-          <div class="popup-share">
-            <label>Share as a link</label>
-            <div class="form-inline-button">
-              <input ref="shareInput" type="text" :value="shareLink"> 
-              <button class="btn" @click="copyToClipboard">
-                <span>Copy</span>
-              </button>
+      <p>{{league.description}}</p>
+  
+      <div class="popup-share-container">
+        <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>
+          <div class="popup-container" v-show="sharePopup">
+            <div class="popup-share">
+              <label>Share as a link</label>
+              <div class="form-inline-button">
+                <input ref="shareInput" type="text" :value="shareLink"> 
+                <button class="btn" @click="copyToClipboard">
+                  <span>Copy</span>
+                </button>
+              </div>
+              <div class="share-socials">
+                <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+        target="_blank"><i class="fa fa-facebook-official"></i></a>
+                <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+        target="_blank"><i class="fa fa-twitter"></i></a>
+                <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+        target="_blank"><i class="fa fa-linkedin"></i></a>
+              </div>
+              <!-- <div class="hr"></div>
+              <label>Share as a video</label>
+              <a href="#" class="btn btn-block"><span>Create Video</span></a> -->
             </div>
-            <div class="share-socials">
-              <a :href="shareSocial('facebook')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-target="_blank"><i class="fa fa-facebook-official"></i></a>
-              <a :href="shareSocial('twitter')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-target="_blank"><i class="fa fa-twitter"></i></a>
-              <a :href="shareSocial('linkedin')" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-target="_blank"><i class="fa fa-linkedin"></i></a>
-            </div>
-            <!-- <div class="hr"></div>
-            <label>Share as a video</label>
-            <a href="#" class="btn btn-block"><span>Create Video</span></a> -->
           </div>
-        </div>
-        <button class="btn-ha" @click="toggleShare">
-          <span>SHARE</span>
-        </button>
-    </div>
+          <button class="btn-ha" @click="toggleShare">
+            <span>SHARE</span>
+          </button>
+            </div>
+      </div>
 
     <div class="table-container">
-      <table class="table table-leader leagues-table">
+      <table class="table table-leader">
         <thead>
           <tr>
-            <th class="league-col-name">League name</th>
-            <th class="league-col-desc">Description</th>
-            <th class="league-col-category">Category</th>
+            <th class="text-center">Rank</th>
+            <th>Player</th>
+            <th>Rating</th>
+            <th class="text-center">Tier</th>
+            <th>Academic Status</th>
+            <th class="text-center">Country</th>
+            <th>Organization</th>
+            <th>Language</th>
+            <th>Last Submission</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr v-for="(player, index) in leaderboard">
+            <td class="text-center">{{ index+1 }}</td>
             <td>
-              <a :href="`/league?id=`">xzx</a>
+              <a :href="'/user?user_id=' + player.user_id" class="leaderboard-name">
+                <img width="30" height="30" :src="`https://github.com/${player.username}.png`" alt="">
+                {{ player.username }}
+              </a>
             </td>
-            <td>abc</td>
-            <td>sss</td>
+            <td>{{ Math.round(100 * player.score) / 100 }}</td>
+            <td class="text-center">
+              <span :class="tierClass(player.tier || player.local_tier)"></span>
+            </td>
+            <td>{{ player.level }}</td>
+            <td class="text-center">{{ getCountryName(player.country) }}</td>
+            <td>{{ player.organization }}</td>
+            <td>{{ player.language }}</td>
+            <td>{{ getFormattedDate(player.update_time)  }}</td>
           </tr>
         </tbody>
       </table>
@@ -60,17 +79,54 @@ target="_blank"><i class="fa fa-linkedin"></i></a>
 </template>
 
 <script>
+  import * as api from '../api'
+  import moment from 'moment'
+  import countries from 'i18n-iso-countries'
+  import {tierClass, countries_data} from '../utils'
+  import _ from 'lodash'
+
   export default {
     name: "LeagueIndividual",
     props: ['baseUrl'],
     data: function(){
       return {
         sharePopup: false,
-        shareLink: '',
+        shareLink: window.location.href,
+        leaderboard: [],
+        tierClass: tierClass,
+        league: {}
       }
     },
     mounted: function(){
+      // get params
+      const params = new URLSearchParams(window.location.search)
 
+      // query league
+      const id = params.get('id');
+
+      console.log('id = ' + id);
+      api.getLeaguesList().then((leagues) => {
+        this.league = _.find(leagues, (item) => item.id == id);
+        // query
+        let category = this.league.query.match(/(level|language|country)=[^&]*/)[1]
+        let filterValue = this.league.query.match(/(level|language|country)=([^&]*)/)[2]
+        let limit = this.league.query.match(/(limit)=([^&]*)/)[2]
+        let filter = []
+
+        if (category == 'country'){
+          filter = [`country_code,=,${filterValue}`]
+        } else {
+          filter = [`${category},=,${filterValue}`]
+        }
+
+        console.log(filter)
+        console.log(limit)
+
+        api.leaderboard(filter, null, 0, limit).then((leaderboard) => {
+          this.leaderboard = leaderboard
+          console.log(leaderboard)
+        })
+      });
     },
     methods: {
       toggleShare: function(){
@@ -95,6 +151,14 @@ target="_blank"><i class="fa fa-linkedin"></i></a>
             return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}`
             break
         }
+      },
+
+      getCountryName: function (name) {
+        return countries.getName(name, 'en')
+      },
+
+      getFormattedDate: function (date) {
+        return moment(date).startOf('day').fromNow()
       },
     }
   }

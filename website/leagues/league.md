@@ -4,7 +4,7 @@ toc: false
 full_width: true
 menu: leagues
 mount_views: ["LeagueIndividual"]
-permalink: /league
+permalink: /league-board
 description: Fun competition leagues
 ---
 
