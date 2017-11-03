@@ -16,7 +16,7 @@ using Halite
 using Memento
 logger = get_logger("bot-logger")
 
-game = Game("Settler")
+game = Game("Julyax")
 
 # Here one can do all preliminary checks and warmups, using initial 60s timeout.
 initial_map = game.initial_game_map
