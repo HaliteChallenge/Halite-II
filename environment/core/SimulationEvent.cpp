@@ -149,7 +149,7 @@ auto collision_time(
         if (t1 >= 0.0 && t2 >= 0.0) {
             return { true, std::min(t1, t2) / (2 * a) };
         } else if (std::min(t1, t2) <= 0.0 && std::max(t1, t2) >= 0.0) {
-            return { true, 0.0}
+            return { true, 0.0 };
         } else {
             return { true, std::max(t1, t2) / (2 * a) };
         }
