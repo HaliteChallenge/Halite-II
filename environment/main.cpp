@@ -116,6 +116,14 @@ int main(int argc, char** argv) {
         false
     );
 
+    TCLAP::SwitchArg noCompressionSwitch(
+        "",
+        "no-compression",
+        "Disables compression for output files.",
+        cmd,
+        false
+    );
+
     //Remaining Args, be they start commands and/or override names. Description only includes start commands since it will only be seen on local testing.
     TCLAP::UnlabeledMultiArg<std::string> otherArgs("NonspecifiedArgs",
                                                     "Start commands for bots.",
@@ -288,6 +296,7 @@ int main(int argc, char** argv) {
     GameStatistics stats = my_game->run_game(names,
                                              id,
                                              !noReplaySwitch.getValue(),
+                                             !noCompressionSwitch.getValue(),
                                              outputFilename);
     if (names != NULL) delete names;
 

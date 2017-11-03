@@ -44,7 +44,7 @@ auto Replay::output_header(nlohmann::json& replay) -> void {
     replay["poi"] = points_of_interest;
 }
 
-auto Replay::output(std::string filename) -> void {
+auto Replay::output(std::string filename, bool enable_compression) -> void {
     std::ofstream gameFile;
     gameFile.open(filename, std::ios_base::binary);
     if (!gameFile.is_open())
@@ -150,22 +150,27 @@ auto Replay::output(std::string filename) -> void {
     auto bin_data = reinterpret_cast<const unsigned char*>(data.data());
 
     // Use zstd to further compress replay file
-    auto compressed_length = ZSTD_compressBound(data_size);
-    auto compressed_data = reinterpret_cast<uint8_t*>(std::malloc(compressed_length));
-    auto result = ZSTD_compress(compressed_data, compressed_length,
-                                bin_data, data_size, ZSTD_maxCLevel());
-    if (!ZSTD_isError(result)) {
-        gameFile.write(reinterpret_cast<const char*>(compressed_data),
-                       result * sizeof(uint8_t));
+    if (enable_compression) {
+        auto compressed_length = ZSTD_compressBound(data_size);
+        auto compressed_data = reinterpret_cast<uint8_t*>(std::malloc(compressed_length));
+        auto result = ZSTD_compress(compressed_data, compressed_length,
+                                    bin_data, data_size, ZSTD_maxCLevel());
+        if (!ZSTD_isError(result)) {
+            gameFile.write(reinterpret_cast<const char*>(compressed_data),
+                           result * sizeof(uint8_t));
+        }
+        else {
+            if (!quiet_output) {
+                std::cout << "Error: could not compress replay file!\n";
+            }
+            gameFile.write(reinterpret_cast<const char*>(data.data()), data_size);
+        }
+
+        std::free(compressed_data);
     }
     else {
-        if (!quiet_output) {
-            std::cout << "Error: could not compress replay file!\n";
-        }
         gameFile.write(reinterpret_cast<const char*>(data.data()), data_size);
     }
-
-    std::free(compressed_data);
 
     gameFile.flush();
     gameFile.close();

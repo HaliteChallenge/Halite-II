@@ -161,8 +161,8 @@ The basic unit that generates Halite ships, you can conquer planets, fight other
         <tr>
             <td>Production</td>
             <td>Rate at which ships can be mined from a planet</td>
-            <td>1 ship/6 turns</td>
-            <td>Per docked ship - (1 ship/6 turns)</td>
+            <td>1 ship/12 turns</td>
+            <td>Per docked ship - (1 ship/12 turns)</td>
         </tr>
         <tr>
             <td>Spawn Radius</td>
