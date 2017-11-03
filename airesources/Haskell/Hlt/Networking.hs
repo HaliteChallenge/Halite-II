@@ -2,83 +2,136 @@
 module Hlt.Networking where
 
 import qualified Data.Map as Map
+import Text.Read
 import System.IO
 import Hlt.Constants
 import Hlt.Entity
 import Hlt.GameMap
 
--- | Return first element and the rest of the list.
-splitAtOne :: [String] -> (Int, [String])
-splitAtOne (a:as) = (read a, as)
+instance Read PlayerId where
+    readPrec = do
+      a <- step readPrec :: ReadPrec Int
+      return $ PlayerId a
 
--- | Extract Planet from String List, prepend to List and return rest.
-extractPlanet :: [String] -> ((Int, Entity), [String])
-extractPlanet (i:j:k:h:r:d:p:_:c:o:s:rest) = (\(a, b) -> ((read i, Planet (read i) (read j) (read k) (read h) (read r) (read d) (read p) (if (read c :: Int) == 1 then (read o) else (-1)) (map read a)), b)) (splitAt (read s :: Int) rest)
+instance Read Player where
+    readPrec = do
+        i <- step readPrec :: ReadPrec PlayerId -- id
+        n <- step readPrec :: ReadPrec Int      -- number of ships
+        let next c = if c == 0 then
+                         return []
+                     else do
+                         s <- step readPrec :: ReadPrec Ship
+                         ss <- next (c-1)
+                         return $ (shipId s, s):ss
+        s <- next n                             -- list of ships
+        return $ Player i (Map.fromList s)
 
--- | Extract all Planets from String List.
-extractAllPlanets :: [(Int, Entity)] -> Int -> [String] -> ([(Int, Entity)], [String])
-extractAllPlanets p 0 r= (p, r)
-extractAllPlanets p n r = (\(a, b) -> (extractAllPlanets (a:p) (n - 1) b)) $ extractPlanet r
+instance Read ShipId where
+    readPrec = do
+        a <- step readPrec :: ReadPrec Int
+        return $ ShipId a
 
--- | Extract Ship from String List, prepend to List and return rest.
-extractShip :: [String] -> Int -> ((Int, Entity), [String])
-extractShip (i:j:k:h:_:_:s:p:d:c:r) o = ((read i :: Int, Ship (read i) (read j) (read k) (read h) shipRadius o (read s) (read p) (read d) (read c)), r)
+instance Read DockingStatus where
+    readPrec = do
+        a <- step readPrec :: ReadPrec Int
+        return $ case a of
+            0 -> Undocked
+            1 -> Docking
+            2 -> Docked
+            3 -> Undocking
 
--- | Extract all Ships from String List.
-extractAllShips :: [(Int, Entity)] -> Int -> [String] -> Int -> ([(Int, Entity)], [String])
-extractAllShips s 0 r _ = (s, r)
-extractAllShips s n r o =  (\(a, b) -> (extractAllShips (a:s) (n - 1) b o)) $ extractShip r o
+instance Read Ship where
+    readPrec = do
+        i <- step readPrec :: ReadPrec ShipId        -- id
+        j <- step readPrec :: ReadPrec Float         -- x
+        k <- step readPrec :: ReadPrec Float         -- y
+        h <- step readPrec :: ReadPrec Int           -- health
+        _ <- step readPrec :: ReadPrec Float         -- x velocity (deprecated)
+        _ <- step readPrec :: ReadPrec Float         -- y velocity (deprecated)
+        s <- step readPrec :: ReadPrec DockingStatus -- docking status
+        p <- step readPrec :: ReadPrec PlanetId      -- docked planet
+        d <- step readPrec :: ReadPrec Int           -- docking progress
+        c <- step readPrec :: ReadPrec Int           -- weapon cooldown
+        return $ Ship i j k h s (if s /= Undocked then Just p else Nothing) d c
 
--- | Extract Player from String List, prepend to List and return rest.
-extractPlayer :: [String] -> ((Int, Player), [String])
-extractPlayer (i:r) = (\(a, b) -> ((read i :: Int, Player (read i) (Map.fromList a)), b)) $ (\(c, d) -> extractAllShips [] c d (read i)) $ splitAtOne r
+instance Read PlanetId where
+    readPrec = do
+        a <- step readPrec :: ReadPrec Int
+        return $ PlanetId a
 
--- | Extract all Players from String List.
-extractAllPlayers :: [(Int, Player)] -> Int -> [String] -> ([(Int, Player)], [String])
-extractAllPlayers p 0 r = (p, r)
-extractAllPlayers p n r = (\(a, b) -> (extractAllPlayers (a:p) (n - 1) b)) $ extractPlayer r
+instance Read Planet where
+    readPrec = do
+        i <- step readPrec :: ReadPrec PlanetId -- id
+        j <- step readPrec :: ReadPrec Float    -- x
+        k <- step readPrec :: ReadPrec Float    -- y
+        h <- step readPrec :: ReadPrec Int      -- health
+        r <- step readPrec :: ReadPrec Float    -- radius
+        d <- step readPrec :: ReadPrec Int      -- docking spots
+        p <- step readPrec :: ReadPrec Int      -- production
+        _ <- step readPrec :: ReadPrec Int      -- remaining production (deprecated)
+        w <- step readPrec :: ReadPrec Int      -- whether it is owned
+        o <- step readPrec :: ReadPrec PlayerId -- the player id if it is owned
+        s <- step readPrec :: ReadPrec Int      -- number of docked ships
+        let next c = if c == 0 then return []
+                     else do
+                        s <- step readPrec :: ReadPrec ShipId
+                        ss <- next (c-1)
+                        return $ s:ss
+        l <- next s                             -- list if ship ids
+        return $ Planet i j k h r d p (if w == 1 then Just o else Nothing) l
 
--- | Read my ID from stdin.
-readId :: IO Int
-readId = do
-    line <- getLine
-    return $ read line
+-- | Read a list of Players and Ships from a string,
+readPlayers :: Int -> String -> (([(PlayerId, Player)], String))
+readPlayers 0 s = ([], s)
+readPlayers c s = do
+    let (a, r0) = head $ (reads :: ReadS Player) s
+        (b, r1) = readPlayers (c-1) r0
+    ((playerId a, a):b, r1)
 
--- | Read the width and height from stdin.
-readDimensions :: IO (Float, Float)
-readDimensions = do
-    line <- getLine
-    return $ (\[a, b] -> (a, b)) $ map read $ words line
+-- | Read a list of Planets from a string,
+readPlanets :: Int -> String -> (([(PlanetId, Planet)], String))
+readPlanets 0 s = ([], s)
+readPlanets c s = do
+    let (a, r0) = head $ (reads :: ReadS Planet) s
+        (b, r1) = readPlanets (c-1) r0
+    ((planetId a, a):b, r1)
 
--- | Read game map from stdin.
-readGameMap :: IO (Map.Map Int Player,  Map.Map Int Entity)
+-- | Get the next int and return the rest of the string.
+nextInt :: String -> (Int, String)
+nextInt s = head $ (reads :: ReadS Int) s
+
+-- | Read players and planets from stdin.
+readGameMap :: IO (Map.Map PlayerId Player,  Map.Map PlanetId Planet)
 readGameMap = do
-    raw <- getLine
-    let (players, rest) = (\(a, b) -> extractAllPlayers [] a b) $ splitAtOne $ words raw
-    let (planets, _) = (\(a, b) -> extractAllPlanets [] a b) $ splitAtOne rest
-    return (Map.fromList players, Map.fromList planets)
+    line <- getLine
+    let (c0, r0) = nextInt line
+        (p0, r1) = readPlayers c0 r0
+        (c1, r2) = nextInt r1
+        (p1, r3) = readPlanets c1 r2
+    return (Map.fromList p0, Map.fromList p1)
 
--- | Send a String to the game environment.
+-- | Send a string to the game environment.
 sendString :: String -> IO ()
 sendString s = do
     putStrLn s
     hFlush stdout
 
--- | Send a List of commands to the game environment.
+-- | Send a list of commands to the game environment.
 sendCommands :: [String] -> IO ()
 sendCommands = sendString . unwords
 
--- | Initialize bot.
-initialize :: String -> IO GameMap
-initialize n = do
-    i <- readId
-    (w, h) <- readDimensions
-    sendString n
-    (players, planets) <- readGameMap
-    return (GameMap i w h players planets)
+-- | Get the initial GameMap.
+initialGameMap :: IO GameMap
+initialGameMap = do
+    line0 <- getLine -- our player id
+    line1 <- getLine -- game dimensions
+    let i = read line0 :: PlayerId
+        (w, h) = (\[a, b] -> (a, b)) $ map read $ words line1
+    (p0, p1) <- readGameMap
+    return (GameMap i w h p0 p1)
 
--- | Get the new game frame.
+-- | Get the new GameMap.
 updateGameMap :: GameMap -> IO GameMap
 updateGameMap g = do
-    (players, planets) <- readGameMap
-    return (GameMap (myId g) (width g) (height g) players planets)
+    (p0, p1) <- readGameMap
+    return (GameMap (myId g) (width g) (height g) p0 p1)

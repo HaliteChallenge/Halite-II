@@ -37,7 +37,7 @@ weaponDamage = 64
 explosionRadius :: Float
 explosionRadius = 10.0
 
--- | Constant number of turns it takes to create a Ship per docked Ship.
+-- | Constant base productivity of a Planet.
 baseProductivity :: Int
 baseProductivity = 6
 
