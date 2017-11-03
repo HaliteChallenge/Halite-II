@@ -143,23 +143,15 @@ auto collision_time(
         return { true, t };
     }
     else if (disc > 0) {
-        auto t1 = (-b + std::sqrt(disc)) / (2 * a);
-        auto t2 = (-b - std::sqrt(disc)) / (2 * a);
+        const auto t1 = -b + std::sqrt(disc);
+        const auto t2 = -b - std::sqrt(disc);
 
-        // Handle cases where t2 is lower than t1
-        if(t2 < t1) {
-            std::swap(t1, t2);
-        }
-
-        if(t1 >= 0.0 && t1 <= 1.0) {
-            /// t1 is valid to pick, because it is in between 0 and 1
-            return { true, t1 };
-        } else if (t1 <= 0.0 && t2 >= 0.0) {
-            /// t1 is before 0 and t2 is after, but that means at t = 0.0 we are colliding
-            return { true, 0.0 };
+        if (t1 >= 0.0 && t2 >= 0.0) {
+            return { true, std::min(t1, t2) / (2 * a) };
+        } else if (std::min(t1, t2) <= 0.0 && std::max(t1, t2) >= 0.0) {
+            return { true, 0.0}
         } else {
-            /// The range [0, 1] does not intersect with [t1, t2]
-            return { false, 0.0 };
+            return { true, std::max(t1, t2) / (2 * a) };
         }
     }
     else {
