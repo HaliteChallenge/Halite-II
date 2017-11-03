@@ -27,7 +27,9 @@ calcMove g ps s = do
 
 -- | The primary function for controlling the game turns.
 run :: GameMap -> IO ()
-run g = do
+run i = do
+    -- Update map
+    g <- updateGameMap i
     info g "---NEW TURN---"
 
     let ss = filter isUndocked (listMyShips g)         -- all undocked Ships of mine
@@ -36,18 +38,16 @@ run g = do
     -- Send commands to move each Ship to the first empty Planet
     sendCommands (if length ps > 0 then map (\a -> calcMove g ps a) ss else [""])
 
-    -- Update map for next iteration
-    a <- updateGameMap g
-    run a
+    -- Go to next turn
+    run g
 
 -- | Main function where we initialize our bot and call the run function.
 main :: IO ()
 main = do
     i <- initialGameMap
 
-    -- You can pre analyse the initial map (i) here, 60 seconds time limit
+    -- You can analyse the initial map (i) here, 60 seconds time limit
 
     sendString botName
     info i ("Initialized bot " ++ botName)
-    g <- updateGameMap i
-    run g
+    run i
