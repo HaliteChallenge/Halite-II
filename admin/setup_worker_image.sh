@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git julia ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
@@ -80,6 +80,10 @@ export SDKMAN_DIR="/home/worker/.sdkman"
 [[ -s "/home/worker/.sdkman/bin/sdkman-init.sh" ]] && source "/home/bot_compilation/.sdkman/bin/sdkman-init.sh"
 EOF
 sudo -iu bot_compilation sdk install groovy
+
+# Julia
+wget -O julia.tgz https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6.1-linux-x86_64.tar.gz
+tar xvzf julia.tgz
 
 ## Create four cgroups to isolate bots.
 sudo touch /etc/cgconfig.conf
