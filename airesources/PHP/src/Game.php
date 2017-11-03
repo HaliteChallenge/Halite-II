@@ -57,7 +57,6 @@ class Game
         $this->logger->log(sprintf('Map Size %dx%d initialized', $width, $height));
         $this->map = new Map($playerId, (int) $width, (int) $height);
 
-        $this->logger->log('Send BotName '.$this->botName);
         $this->connection->send($this->botName);
     }
 
@@ -104,7 +103,7 @@ class Game
         }
 
         $player->setShips($ships);
-        $this->logger->log('Player: '.print_r($player, true));
+        $this->logger->log('Player: '.json_encode($player));
         $this->players[$playerId] = $player;
 
         return $player;
@@ -123,7 +122,7 @@ class Game
         $weaponCooldown = $tokenizer->nextFloat();
 
         $ship = new Ship($player, $shipId, $coordinate, $health, $velocity, $docked, $planetId, $dockingProgress, $weaponCooldown);
-        $this->logger->log('Ship: '.print_r($ship, true));
+        $this->logger->log('Ship: '.json_encode($ship));
         $this->ships[$shipId] = $ship;
 
         return $ship;
@@ -161,7 +160,7 @@ class Game
             $dockedShips,
             $ships
         );
-        $this->logger->log('Planet: '.print_r($planet, true));
+        $this->logger->log('Planet: '.json_encode($planet));
         $this->planets[$planetId] = $planet;
 
         return $planet;

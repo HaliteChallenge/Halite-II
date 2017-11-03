@@ -1,6 +1,6 @@
 <?php
 
-class Coordinate
+class Coordinate implements JsonSerializable
 {
     /**
      * @var float
@@ -42,11 +42,18 @@ class Coordinate
         $dy = $target->getY() - $this->getY();
 
         $result = atan2($dy, $dx);
-        if($result < 0 ){
+        if ($result < 0) {
             $result += 2 * M_PI;
         }
+
         return $result;
     }
 
-
+    public function jsonSerialize(): array
+    {
+        return [
+            'x' => $this->getX(),
+            'y' => $this->getY(),
+        ];
+    }
 }

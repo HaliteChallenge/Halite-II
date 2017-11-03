@@ -7,6 +7,11 @@ class Connection
      */
     private $logger;
 
+    /**
+     * @var string[]
+     */
+    private $stack = [];
+
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
@@ -26,9 +31,15 @@ class Connection
         return $data;
     }
 
-    public function sendMove(string $move): void
+    public function move(string $move): void
     {
-        $this->send("$move ");
+        $this->stack[] = $move;
+    }
+
+    public function flush(): void
+    {
+        $this->send(implode(' ', $this->stack));
+        $this->stack = [];
     }
 
     public function send(string $message): void

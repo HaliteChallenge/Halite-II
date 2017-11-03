@@ -27,4 +27,12 @@ class Velocity
     {
         return $this->y;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'x' => $this->getX(),
+            'y' => $this->getY(),
+        ];
+    }
 }

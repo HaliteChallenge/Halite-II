@@ -111,7 +111,7 @@ class Ship extends Entity
         Logger $logger
     ): string {
         $logger->log(
-            'Navigate from '.print_r($this->getCoordinate(), true).' to '.print_r($target, true).' / max corrections '.$maxCorrections
+            'Navigate from '.json_encode($this->getCoordinate()).' to '.json_encode($target).' / max corrections '.$maxCorrections
         );
 
         if ($maxCorrections <= 0) {
@@ -126,7 +126,7 @@ class Ship extends Entity
             $newTargetDy = sin($angleRad + $angularStepRad) * $distance;
             $newTarget = new Coordinate($this->getCoordinate()->getX() + $newTargetDx, $this->getCoordinate()->getY() + $newTargetDy);
 
-            $logger->log('Has Obstacles, correct position to: '.print_r($newTarget, true));
+            $logger->log('Has Obstacles, correct position to: '.json_encode($newTarget));
 
             return $this->navigate($map, $newTarget, $thrust, $avoidObstacles, $maxCorrections - 1, $angularStepRad, $logger);
         }
@@ -137,7 +137,7 @@ class Ship extends Entity
         }
 
         $angleDeg = self::angleRadToDegClipped($angleRad);
-        $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg);
+        $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
 
         return $this->thrust($computedThrust, $angleDeg);
     }
@@ -160,5 +160,19 @@ class Ship extends Entity
         $degUnclipped = round(rad2deg($angleRad));
 
         return (int) ((($degUnclipped % 360) + 360) % 360);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return array_merge(
+            parent::jsonSerialize(),
+            [
+                'velocity' => $this->getVelocity()->jsonSerialize(),
+                'docked' => $this->isDocked() ? 'yes' : 'no',
+                'planetId' => $this->getPlanetId(),
+                'dockingProgress' => $this->getDockingProgress(),
+                'weaponCooldown' => $this->getWeaponCooldown(),
+            ]
+        );
     }
 }

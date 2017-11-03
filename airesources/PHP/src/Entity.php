@@ -1,6 +1,6 @@
 <?php
 
-class Entity
+class Entity implements JsonSerializable
 {
     /**
      * @var Player|null
@@ -83,5 +83,15 @@ class Entity
         $y = $target->getCoordinate()->getY() + $radius * sin($angleRad);
 
         return new Coordinate($x, $y);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'coordinate' => $this->getCoordinate()->jsonSerialize(),
+            'health' => $this->getHealth(),
+            'radius' => $this->getRadius(),
+        ];
     }
 }

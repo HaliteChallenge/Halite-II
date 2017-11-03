@@ -42,4 +42,17 @@ class Player
     {
         $this->ships = $ships;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'ships' => array_map(
+                function (Ship $ship) {
+                    return $ship->jsonSerialize();
+                },
+                $this->getShips()
+            ),
+        ];
+    }
 }

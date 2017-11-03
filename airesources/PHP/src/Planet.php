@@ -119,4 +119,26 @@ class Planet extends Entity
     {
         return $this->ships;
     }
+
+    public function jsonSerialize(): array
+    {
+        return array_merge(
+            parent::jsonSerialize(),
+            [
+                'dockingSpots' => $this->getDockingSpots(),
+                'production' => $this->getProduction(),
+                'isOwned' => $this->isOwned() ? 'yes' : 'no',
+                'dockedShips' => $this->getDockedShips(),
+                'isFull' => $this->isFull() ? 'yes' : 'no',
+                'freeDockingSpots' => $this->getFreeDockingSpots(),
+                'isDockableForOwner' => $this->isDockable($this->getOwner()) ? 'yes' : 'no',
+                'ships' => array_map(
+                    function (Ship $ship) {
+                        return $ship->jsonSerialize();
+                    },
+                    $this->getShips()
+                ),
+            ]
+        );
+    }
 }
