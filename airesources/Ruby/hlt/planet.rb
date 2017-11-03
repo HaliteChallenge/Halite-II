@@ -86,7 +86,7 @@ class Planet < Entity
 
     # Fetch the ship ids from the tokens array
     Integer(ship_count).times do
-      docked_ships << tokens.shift
+      docked_ships << Integer(tokens.shift)
     end
 
     # (id, x, y, hp, radius, docking_spots, owner, docked_ship_ids)
