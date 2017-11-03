@@ -183,7 +183,7 @@ func IntToDockingStatus(i int) DockingStatus {
 // Thrust generates a string describing the ship's intension to move during the current turn
 func (ship Ship) Thrust(magnitude float64, angle float64) string {
 	var boundedAngle int
-	if (angle > 0.0) {
+	if angle > 0.0 {
 		boundedAngle = int(math.Floor(angle + .5))
 	} else {
 		boundedAngle = int(math.Ceil(angle - .5))
