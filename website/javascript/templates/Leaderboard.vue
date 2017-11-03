@@ -637,13 +637,7 @@ export default {
         return null
       },
       getFormattedDate: function (date) {
-        var cdate = moment(date)
-          if (cdate.isValid()) {
-            var dateFormat = require('dateformat')
-            return dateFormat(date, 'dd/mm/yy HH:MM')
-          } else {
-            return return_value_not_valid
-          }
+        return moment(date).fromNow();
       },
     }
   }
