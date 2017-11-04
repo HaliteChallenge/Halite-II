@@ -38,7 +38,7 @@ public class Constants {
     /** Number of turns it takes to dock a ship */
     public static final int DOCK_TURNS = 5;
 
-    /** Number of turns it takes to create a ship per docked ship */
+    /** Number of production units per turn contributed by each docked ship */
     public static final int BASE_PRODUCTIVITY = 6;
 
     /** Distance from the planets edge at which new ships are created */
