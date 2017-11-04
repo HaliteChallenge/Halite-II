@@ -35,7 +35,7 @@ let settler_moves state =
           in
           let point = Game.position_entity x y in
           begin match Game.navigate 
-            state ship point (Const.max_speed /. 2.) true 90 1. false false
+            state ship point (Const.max_speed / 2) true 90 1. false false
           with
           | None -> acc
           | Some command -> 

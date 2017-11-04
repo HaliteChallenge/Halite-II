@@ -1,6 +1,6 @@
 val ship_radius : float
 val dock_radius : float
-val max_speed : float
+val max_speed : int
 val max_ship_health : int
 val base_ship_health : int
 val weapon_cooldown : int

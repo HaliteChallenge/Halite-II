@@ -4,6 +4,12 @@
 
 open Td;;
 
+let pi = 3.14159265358979312;;
+
+let deg2rad v = (v *. pi) /. 180.
+
+let rad2deg v = (v /. pi) *. 180.
+
 let set_planets_docked_ships state =
   List.iter (fun planet ->
     planet.docked_ships <- List.filter (fun ship ->
@@ -84,10 +90,6 @@ let calculate_distance_between e1 e2 =
   sqrt ((e1.x -. e2.x) ** 2. +. (e1.y -. e2.y) ** 2.)
 ;;
 
-let deg2rad v = (v -. 180. ) *. 6.28318530717958623 /. 360.;;
-
-let rad2deg v = ((v /. 6.28318530717958623) *. 360.) +. 180.;;
-
 let calculate_radians_between e1 e2 =
   (atan2 (e2.y -. e1.y) (e2.x -. e1.x))
 ;;
@@ -134,14 +136,12 @@ let planet_is_full planet =
   List.length planet.docked_ship_ids >= planet.num_docking_spots
 ;;
 
-let rec positive_int_degrees a =
-  if a < 0 then positive_int_degrees (a + 360)
-  else a
+let positive_int_degrees a =
+  ((a mod 360) + 360) mod 360
 ;;
 
-let cmd_thrust ship m a =
-  let magnitude = int_of_float m in
-  let angle = positive_int_degrees ((int_of_float (floor (a +. 0.5))) mod 360) in
+let cmd_thrust ship magnitude a =
+  let angle = positive_int_degrees (int_of_float (floor (a +. 0.5))) in
     `Thrust (ship.s_entity.id, magnitude, angle)
 ;;
 
@@ -183,8 +183,6 @@ let intersect_segment_circle start eend circle fudge =
      start.y *. circle.y +. 
      eend.y *. circle.y) 
   in
-(* This variable seems to be unused. *)
-(*  let c = (start.x -. circle.x) ** 2. +. (start.y -. circle.y) ** 2. in *)
     if a = 0. then (
       calculate_distance_between start circle <= circle.radius +. fudge
     )
@@ -215,11 +213,8 @@ let obstacles_between e1 e2 obstacles =
 ;;
 
 let direct_navigate ship distance max_speed angle =
-  let speed = if distance >= max_speed then max_speed else distance in
-    (* Not sure why adding 180 is necessary here, but it is. *)
-    (* Perhaps a disagreement about how radians are converted to degrees? *)
-    (* Or where the zero point is? *)
-    cmd_thrust ship speed (angle +. 180.)
+  let speed = int_of_float (min (float_of_int max_speed) distance) in
+    cmd_thrust ship speed angle
 ;;
 
 let rec navigate state ship target speed avoid max_correct angular_step ignore_ships (ignore_planets:bool) =

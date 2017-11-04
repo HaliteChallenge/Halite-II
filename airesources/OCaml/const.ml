@@ -6,7 +6,7 @@ let ship_radius = 0.5;;
 
 let dock_radius = 4.;;
 
-let max_speed = 7.;;
+let max_speed = 7;;
 
 let max_ship_health = 255;;
 
