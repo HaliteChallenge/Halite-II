@@ -60,6 +60,7 @@ export class Planet {
         this.core.width = this.core.height = 2 * planetBase.r * pixelsPerUnit;
         this.core.anchor.x = 0.5;
         this.core.anchor.y = 0.5;
+        this.core.alpha = 0.5;
 
         this.core.position.x = scale * assets.CELL_SIZE * planetBase.x;
         this.core.position.y = scale * assets.CELL_SIZE * planetBase.y;
@@ -121,6 +122,7 @@ export class Planet {
      */
     update(planetStatus, dt) {
         if (planetStatus.owner !== null) {
+            this.core.alpha = 1.0;
             this.halo.rotation += dt / 400;
             if (this.halo.rotation > 2 * Math.PI) this.halo.rotation -= 2 * Math.PI;
 
@@ -130,6 +132,7 @@ export class Planet {
         }
         else {
             this.halo.alpha = this.baseHaloAlpha;
+            this.core.alpha = 0.5;
         }
 
         const side = assets.CELL_SIZE * this.scale;
