@@ -24,7 +24,7 @@ module Constants
     const DOCK_RADIUS = 4.0
     #: Number of turns it takes to dock a ship
     const DOCK_TURNS = 5
-    #: Number of turns it takes to create a ship per docked ship
+    #: Number of production units per turn contributed by each docked ship
     const BASE_PRODUCTIVITY = 6
     #: Distance from the planets edge at which new ships are created
     const SPAWN_RADIUS = 2.0
