@@ -1,4 +1,6 @@
 #!/bin/bash
-
+cd hlt
 scalac *.scala
-./halite -d "240 160" "scala MyBot" "scala MyBot"
+cd ..
+scalac -cp hlt *.scala
+./halite -d "240 160" "scala -cp .:hlt MyBot" "scala -cp .:hlt MyBot"
