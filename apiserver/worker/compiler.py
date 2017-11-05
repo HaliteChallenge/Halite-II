@@ -306,6 +306,12 @@ comp_args = {
         ["groovyc"],
         ["jar", "cfe", BOT + ".jar", BOT],
     ],
+    "Julia": [
+        ["JULIA_PKGDIR=$(pwd) julia -e 'Pkg.init(); Pkg.update()'"],
+        ["mv", "REQUIRE", "v0.6/"],
+        ["JULIA_PKGDIR=$(pwd) julia -e 'Pkg.resolve()'"],
+        ["chmod", "+x", BOT + ".jl"],
+    ],
     "Haskell": [
         ["ghc", "--make", BOT + ".hs", "-O", "-v0", "-rtsopts"],
     ],
@@ -440,9 +446,14 @@ languages = (
         [(["*.jar"], ChmodCompiler("JAR"))]
     ),
     Language("Julia", BOT +".jl", "MyBot.jl",
-        "julia MyBot.jl",
+        "JULIA_PKGDIR=$(pwd) julia MyBot.jl",
         [],
-        [(["*.jl"], ChmodCompiler("Julia"))]
+        [
+            ([], ErrorFilterCompiler(comp_args["Julia"][0])),
+            ([], ErrorFilterCompiler(comp_args["Julia"][1])),
+            ([], ErrorFilterCompiler(comp_args["Julia"][2])),
+            ([], ErrorFilterCompiler(comp_args["Julia"][3])),
+        ]
     ),
     Language("Lisp", BOT, "MyBot.lisp",
         "./MyBot --dynamic-space-size " + str(MEMORY_LIMIT),
@@ -612,14 +623,14 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
             print(run_filename)
             try:
                 with open(run_filename, 'wb') as f:
-                    f.write(bytes('#%s\n%s\n' % (name, run_cmd), 'UTF-8'))
+                    f.write(('#%s\n%s\n' % (name, run_cmd)).encode('utf-8'))
                 print("file:")
                 with open(run_filename, 'r') as f:
                     for line in f:
                         print(line)
             except Exception as e:
                 print("error")
-                print(e.strerror)
+                print(e)
 
             # allow LANGUAGE file to override language name
             override_name = detect_language_file(bot_dir)
