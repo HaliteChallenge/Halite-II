@@ -96,6 +96,10 @@ def leaderboard():
 
                     if op is operator.ne:
                         clause = ~clause
+                else:
+                    raise util.APIError(
+                        400,
+                        message="Comparison operator not supported for tier field.")
 
                 if tier_filter is None:
                     tier_filter = clause
