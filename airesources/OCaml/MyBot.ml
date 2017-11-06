@@ -17,7 +17,7 @@ let debug_show_command c =
 ;;
 
 let initial_bot_setup state =
-  (* Anything you want to do with your opening time *)
+  (* Anything you want to do with your 60 seconds of pre-game time *)
   ()
 ;;
 
