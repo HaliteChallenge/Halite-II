@@ -169,7 +169,12 @@ def parse_filter(filter_string):
     :param filter_string: Of the format field,operator,value.
     :return: (field_name, operator_func, value)
     """
-    field, cmp, value = filter_string.split(",")
+    try:
+        field, cmp, value = filter_string.split(",", 2)
+    except Exception as e:
+        raise util.APIError(
+            400,
+            message="Filter '{}' is ill-formed.".format(filter_string))
 
     operation = {
         "=": operator.eq,
