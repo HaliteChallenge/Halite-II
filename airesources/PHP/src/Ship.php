@@ -120,8 +120,8 @@ class Ship extends Entity
         $distance = $this->getCoordinate()->getDistanceTo($target);
         $angleRad = $this->getCoordinate()->getAngleTo($target);
 
-        $hasObstacles = (bool) $map->getEntitiesBetween($this, $target);
-        if ($avoidObstacles && $hasObstacles) {
+        $obstacles =  $map->getEntitiesBetween($this, $target);
+        if ($avoidObstacles && $obstacles->current()) {
             $newTargetDx = cos($angleRad + $angularStepRad) * $distance;
             $newTargetDy = sin($angleRad + $angularStepRad) * $distance;
             $newTarget = new Coordinate($this->getCoordinate()->getX() + $newTargetDx, $this->getCoordinate()->getY() + $newTargetDy);

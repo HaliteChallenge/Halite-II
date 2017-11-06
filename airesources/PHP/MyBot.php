@@ -16,15 +16,13 @@ while (true) {
         if ($ship->isDocked() || $ship->getDockingProgress() > 0) {
             continue;
         }
-        $planets = $map->getNearbyEntitiesByDistance($ship, true, false);
-        $planet = $planets->current();
-        /** @var $planet Planet */
+        $planet = $map->getNextDockablePlanet($ship);
         if ($ship->canDock($planet)) {
             $logger->log('Ship can dock planet -> send dock move');
             $connection->move($ship->dock($planet->getId()));
         } else {
             $target = $ship->getClosestCoordinateTo($planet);
-            $navigate = $ship->navigate($map, $target, 5, false, 10, 0.1, $logger);
+            $navigate = $ship->navigate($map, $target, 5, true, 10, 0.5, $logger);
             $logger->log('Cannot dock -> navigate to: '.$navigate);
             $connection->move($navigate);
         }

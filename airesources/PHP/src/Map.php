@@ -111,6 +111,17 @@ class Map
         }
     }
 
+    public function getNextDockablePlanet(Ship $ship): ?Planet
+    {
+        $planets = $this->getNearbyEntitiesByDistance($ship, true, false);
+        foreach ($planets as $planet) {
+            /** @var $planet Planet */
+            if ($planet->getFreeDockingSpots() > 0) {
+                return $planets->current();
+            }
+        }
+    }
+
     /**
      * @param Ship       $ship
      * @param Coordinate $coordinate
@@ -134,9 +145,9 @@ class Map
     }
 
     /**
-     * @param Ship   $ship
+     * @param Ship       $ship
      * @param Coordinate $target
-     * @param Entity $entity
+     * @param Entity     $entity
      *
      * @return bool
      */
