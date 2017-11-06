@@ -25,7 +25,7 @@ class Game
     DOCK_RADIUS = 4.0
     #: Number of turns it takes to dock a ship
     DOCK_TURNS = 5
-    #: Number of turns it takes to create a ship per docked ship
+    #: Number of production units per turn contributed by each docked ship
     BASE_PRODUCTIVITY = 6
     #: Distance from the planets edge at which new ships are created
     SPAWN_RADIUS = 2.0
@@ -41,9 +41,14 @@ class Game
     player_id = Integer(read_from_input)
     @logger = set_up_logging(player_id)
     width, height = read_ints_from_input
-    write_to_output(name)
     @map = Map.new(player_id, width, height)
     update_map
+    prepare_game
+    write_to_output(name)
+  end
+
+  def prepare_game
+    # We now have 1 full minute to analyse the initial map.
   end
 
   def update_map

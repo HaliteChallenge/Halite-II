@@ -19,7 +19,7 @@ pub const EXPLOSION_RADIUS: f64 = 10.0;
 pub const DOCK_RADIUS: f64 = 4.0;
 // Number of turns it takes to dock a ship
 pub const DOCK_TURNS: i32 = 5;
-// Number of turns it takes to create a ship per docked ship
+// Number of production units per turn contributed by each docked ship
 pub const BASE_PRODUCTIVITY: i32 = 6;
 // Distance from the planets edge at which new ships are created
 pub const SPAWN_RADIUS: f64 = 2.0;
