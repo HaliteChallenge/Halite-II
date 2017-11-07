@@ -32,25 +32,13 @@ class Planet extends Entity
      */
     private $ships;
 
-    /**
-     * @param Player|null $owner
-     * @param int         $id
-     * @param Coordinate  $coordinate
-     * @param int         $health
-     * @param int         $radius
-     * @param int         $dockingSpots
-     * @param int         $production
-     * @param int         $remainingProduction
-     * @param bool        $isOwned
-     * @param int         $dockedShips
-     * @param Ship[]      $ships
-     */
+
     public function __construct(
         ?Player $owner,
         int $id,
         Coordinate $coordinate,
         int $health,
-        int $radius,
+        float $radius,
         int $dockingSpots,
         int $production,
         int $remainingProduction,
