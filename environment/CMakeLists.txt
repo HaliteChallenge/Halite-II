@@ -32,7 +32,7 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 find_package(Git)
 if( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
 
-execute_process(COMMAND git describe --abbrev=3 HEAD
+execute_process(COMMAND git describe --abbrev=3 --tags HEAD
                 COMMAND sed -e "s/-/./g"
                 OUTPUT_VARIABLE HALITE_VERSION
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
