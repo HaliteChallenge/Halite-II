@@ -36,6 +36,12 @@ class Ship extends Entity
      */
     private $planet;
 
+    /**
+     * @var Coordinate
+     */
+    private $coordinateNextTurn;
+
+
     public function __construct(
         Player $owner,
         int $id,
@@ -121,7 +127,8 @@ class Ship extends Entity
         $angleRad = $this->getCoordinate()->getAngleTo($target);
 
         $obstacles =  $map->getEntitiesBetween($this, $target);
-        if ($avoidObstacles && $obstacles->current()) {
+        $obstacles = iterator_to_array($obstacles);
+        if ($avoidObstacles && $obstacles) {
             $newTargetDx = cos($angleRad + $angularStepRad) * $distance;
             $newTargetDy = sin($angleRad + $angularStepRad) * $distance;
             $newTarget = new Coordinate($this->getCoordinate()->getX() + $newTargetDx, $this->getCoordinate()->getY() + $newTargetDy);
@@ -138,14 +145,16 @@ class Ship extends Entity
 
         $angleDeg = self::angleRadToDegClipped($angleRad);
         $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
-
+        $this->coordinateNextTurn = $target->forecastMove($computedThrust, $angleDeg);
         return $this->thrust($computedThrust, $angleDeg);
     }
 
-    /**
-     * @return null|Planet
-     */
-    public function getPlanet()
+    public function getCoordinateNextTurn(): ?Coordinate
+    {
+        return $this->coordinateNextTurn;
+    }
+
+    public function getPlanet(): ?\Planet
     {
         return $this->planet;
     }
@@ -175,4 +184,6 @@ class Ship extends Entity
             ]
         );
     }
+
+
 }
