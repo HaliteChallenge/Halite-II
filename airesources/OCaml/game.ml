@@ -155,7 +155,7 @@ let cmd_undock ship =
 
 let can_dock ship planet =
   let distance = calculate_distance_between ship.s_entity planet.p_entity in
-    distance <= planet.p_entity.radius +. Const.dock_radius
+    distance <= planet.p_entity.radius +. Const.dock_radius +. Const.ship_radius
 ;;
 
 let position_entity x y =
