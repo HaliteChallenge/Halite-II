@@ -40,7 +40,7 @@
               <ul class="hackathon-info">
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">Bloomber Center @ Cornell Tech</p>
+                  <p class="hackathon-card-item-text">Bloomberg Center @ Cornell Tech</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
