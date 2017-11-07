@@ -104,6 +104,10 @@
       api.getLeaguesList().then((leagues) => {
         this.leagues = leagues
 
+      this.leagues.sort(function(a, b) {
+          return a.category.localeCompare(b.category);
+        });
+
         // update filter options
         let catOptions = [];
         let nameOptions = [];
