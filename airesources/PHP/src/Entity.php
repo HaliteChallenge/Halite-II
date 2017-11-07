@@ -23,11 +23,11 @@ class Entity implements JsonSerializable
     private $health;
 
     /**
-     * @var int
+     * @var float
      */
     private $radius;
 
-    public function __construct(?Player $owner, int $id, Coordinate $coordinate, int $health, int $radius)
+    public function __construct(?Player $owner, int $id, Coordinate $coordinate, int $health, float $radius)
     {
         $this->owner = $owner;
         $this->id = $id;
@@ -36,10 +36,7 @@ class Entity implements JsonSerializable
         $this->radius = $radius;
     }
 
-    /**
-     * @return null|Player
-     */
-    public function getOwner()
+    public function getOwner(): ?\Player
     {
         return $this->owner;
     }
@@ -59,7 +56,7 @@ class Entity implements JsonSerializable
         return $this->health;
     }
 
-    public function getRadius(): int
+    public function getRadius(): float
     {
         return $this->radius;
     }
@@ -74,9 +71,9 @@ class Entity implements JsonSerializable
         return $this->getCoordinate()->getAngleTo($target->getCoordinate());
     }
 
-    public function getClosestCoordinateTo(Entity $target): Coordinate
+    public function getClosestCoordinateTo(Entity $target, $space = 3): Coordinate
     {
-        $radius = $target->getRadius() + 3;
+        $radius = $target->getRadius() + $space;
         $angleRad = $this->getAngleTo($this);
 
         $x = $target->getCoordinate()->getX() + $radius * cos($angleRad);
