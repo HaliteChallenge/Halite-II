@@ -4,6 +4,7 @@
 #include <iostream>
 #include <list>
 
+#include "version.hpp"
 #include "core/Halite.hpp"
 
 inline std::istream& operator>>(std::istream& i,
@@ -47,7 +48,7 @@ int main(int argc, char** argv) {
     auto id = std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
-    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.2");
+    TCLAP::CmdLine cmd("Halite Game Environment", ' ', HALITE_VERSION);
 
     //Switch Args.
     TCLAP::SwitchArg quietSwitch("q",

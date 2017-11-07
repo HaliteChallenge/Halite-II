@@ -497,4 +497,5 @@ yarn.lock
 environment/cmake_install.cmake
 environment/CMakeCache.txt
 environment/Makefile
+environment/version.hpp
 tools/standalone_visualizer/release-builds/*
