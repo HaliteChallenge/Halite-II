@@ -120,6 +120,7 @@ class Map
                 return $planets->current();
             }
         }
+        return null;
     }
 
     /**
@@ -166,10 +167,10 @@ class Map
         $dx = $endX - $startX;
         $dy = $endY - $startY;
 
-        $a = sqrt($dx) + sqrt($dy);
-        $b = -2 * (sqrt($startX) - ($startX * $endX)
+        $a = $dx**2 + $dy**2 ;
+              $b = -2 * (($startX**2) - ($startX * $endX)
                 - ($startX * $centerX) + ($endX * $centerX)
-                + sqrt($startY) - ($startY * $endY)
+                + ($startY**2) - ($startY * $endY)
                 - ($startY * $centerY) + ($endY * $centerY));
 
         if ($a == 0.0) {
@@ -186,6 +187,7 @@ class Map
 
         $closestEntity = new Entity(null, 0, new Coordinate($closestX, $closestY), 0, 0);
         $closestDistance = $closestEntity->getDistanceTo($entity);
+
 
         return $closestDistance <= $circleRadius + $fudge;
     }
