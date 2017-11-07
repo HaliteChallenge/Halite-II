@@ -76,7 +76,7 @@ impl Ship {
     }
 
     pub fn can_dock(&self, planet: &Planet) -> bool {
-        self.calculate_distance_between(planet) <= (DOCK_RADIUS + planet.radius)
+        self.calculate_distance_between(planet) <= (DOCK_RADIUS + planet.radius + SHIP_RADIUS)
     }
 
     pub fn navigate<T: Entity>(&self, target: &T, game_map: &GameMap, max_corrections: i32) -> Option<Command> {

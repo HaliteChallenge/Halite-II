@@ -10,7 +10,7 @@ class Ship(owner: Int, id: Int, xPos: Double, yPos: Double,
            val dockingProgress: Int, val weaponCooldown: Int) : Entity(owner, id, xPos, yPos, health, Constants.SHIP_RADIUS) {
 
     fun canDock(planet: Planet): Boolean {
-        return getDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.radius
+        return getDistanceTo(planet) <= Constants.SHIP_RADIUS + Constants.DOCK_RADIUS + planet.radius
     }
 
     override fun toString(): String {

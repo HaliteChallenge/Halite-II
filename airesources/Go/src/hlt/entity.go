@@ -221,7 +221,7 @@ func (ship Ship) NavigateBasic(target Entity, gameMap Map) string {
 func (ship Ship) CanDock(planet Planet) bool {
 	dist := ship.CalculateDistanceTo(planet.Entity)
 
-	return dist <= (planet.Radius + 4)
+	return dist <= (ship.Radius + planet.Radius + 4)
 }
 
 // Navigate demonstrates how the player might negotiate obsticles between
