@@ -56,4 +56,19 @@ class Coordinate implements JsonSerializable
             'y' => $this->getY(),
         ];
     }
+
+    public function forecastMove(int $computedThrust, int $angleDeg)
+    {
+        $y = $computedThrust * sin(deg2rad($angleDeg));
+        $x = $computedThrust * cos(deg2rad($angleDeg));
+
+        return new Coordinate($this->x + $x, $this->y + $y);
+    }
+
+
+    public function hasCollision(float $myRadius, Coordinate $target, float $targetRadius, $padding = 0.3)
+    {
+        $distance = $this->getDistanceTo($target);
+        return ($myRadius + $targetRadius + $padding) > $distance;
+    }
 }
