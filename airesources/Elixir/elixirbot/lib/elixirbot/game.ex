@@ -24,19 +24,28 @@ defmodule Elixirbot.Game do
     [width, height] = read_ints_from_input
     Logger.info "game size: #{width} x #{height}"
     write_to_output(name)
-    %GameMap{player_id: parse_int(player_id), width: width, height: height}
+    {players, planets} = fetch_map_state
+    map = %GameMap{player_id: parse_int(player_id), width: width, height: height}
+    prepare_game(map, players, planets)
+    map
+  end
+
+  def prepare_game(map, players, planets) do
+    # We now have 1 full minute to analyse the initial map.
+    make_move(map, players, planets)
+      |> Enum.join(" ")
+      |> write_to_output
   end
 
   defp read_from_input() do
     input_line = IO.gets("") |> String.strip
-    Logger.debug input_line
+    Logger.debug "recieved: #{input_line}"
     input_line
   end
 
   defp set_up_logging(name, player_id) do
     Logger.add_backend {LoggerFileBackend, :debug}
-    Logger.configure_backend {LoggerFileBackend, :debug},
-      path: "#{player_id}_#{name}.log"
+    Logger.configure_backend {LoggerFileBackend, :debug}, path: "#{player_id}_#{name}.log"
     Logger.info "Starting new game for #{name}:#{player_id}"
     Logger.info "Setting up logger"
   end
@@ -53,10 +62,15 @@ defmodule Elixirbot.Game do
     IO.puts(message)
   end
 
-  def update_map(map) do
+  def fetch_map_state do
     tokens = read_from_input() |> String.split(" ")
     {tokens, players} = read_from_input() |> String.split(" ") |> parse_players
     {[], planets} = tokens |> parse_planets
+    {players, planets}
+  end
+
+  def update_map(map) do
+    {players, planets} = fetch_map_state
     make_move(map, players, planets)
       |> Enum.join(" ")
       |> write_to_output
