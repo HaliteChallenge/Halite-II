@@ -22,9 +22,21 @@ while (true) {
             $connection->move($ship->dock($planet->getId()));
         } else {
             $target = $ship->getClosestCoordinateTo($planet);
-            $navigate = $ship->navigate($map, $target, 5, true, 10, 0.5, $logger);
-            $logger->log('Cannot dock -> navigate to: '.$navigate);
-            $connection->move($navigate);
+            $navigate = $ship->navigate($map, $target, 7, true, 10, 0.5, $logger);
+            $willCollide = false;
+            foreach ($map->getMe()->getShips() as $otherShip) {
+                if ($ship->getId() === $otherShip->getId() || $otherShip->getCoordinateNextTurn() === null || $ship->getCoordinateNextTurn()  === null ) {
+                    continue;
+                }
+                $willCollide |= $ship->getCoordinateNextTurn()->hasCollision($ship->getRadius(),$otherShip->getCoordinateNextTurn(), $otherShip->getRadius());
+            }
+            if($willCollide){
+                $logger->log('will collide stay');
+            }else{
+                $logger->log('Cannot dock -> navigate to: '.$navigate);
+                $connection->move($navigate);
+            }
+
         }
     }
     $connection->flush();
