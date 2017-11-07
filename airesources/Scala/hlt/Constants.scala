@@ -34,7 +34,7 @@ object Constants {
   /** Number of turns it takes to dock a ship */
   val DOCK_TURNS = 5
 
-  /** Number of turns it takes to create a ship per docked ship */
+  /** Number of production units per turn contributed by each docked ship */
   val BASE_PRODUCTIVITY = 6
 
   /** Distance from the planets edge at which new ships are created */
@@ -44,5 +44,5 @@ object Constants {
   // Implementation-specific constants
 
   val FORECAST_FUDGE_FACTOR: Double = SHIP_RADIUS + 0.1
-  val MAX_CORRECTIONS = 90
+  val MAX_NAVIGATION_CORRECTIONS = 90
 }

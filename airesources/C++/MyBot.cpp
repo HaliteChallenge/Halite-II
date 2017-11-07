@@ -5,10 +5,22 @@ int main() {
     const hlt::Metadata metadata = hlt::initialize("IvanTheTerrible");
     const hlt::PlayerId player_id = metadata.player_id;
 
+    const hlt::Map& initial_map = metadata.initial_map;
+
+    // We now have 1 full minute to analyse the initial map.
+    std::ostringstream initial_map_intelligence;
+    initial_map_intelligence
+            << "width: " << initial_map.map_width
+            << "; height: " << initial_map.map_height
+            << "; players: " << initial_map.ship_map.size()
+            << "; my ships: " << initial_map.ship_map.at(player_id).size()
+            << "; planets: " << initial_map.planets.size();
+    hlt::Log::log(initial_map_intelligence.str());
+
     std::vector<hlt::Move> moves;
     for (;;) {
         moves.clear();
-        const hlt::Map map = hlt::in::get_map(metadata.map_width, metadata.map_height);
+        const hlt::Map map = hlt::in::get_map();
 
         for (const hlt::Ship& ship : map.ships.at(player_id)) {
             if (ship.docking_status != hlt::ShipDockingStatus::Undocked) {

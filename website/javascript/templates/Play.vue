@@ -14,24 +14,34 @@
     <div class="play-body" v-if="currentView == 'upload'">
       <div>
         <div class="page-header">
-          <h1>PLAY A HALITE AI BOT</h1>
+          <h1>SUBMIT OR REPLAY A HALITE AI BOT</h1>
           <i class="xline xline-bottom"></i>
         </div>
       </div>
       <div class="row play-upload-section">
         <div class="col-sm-6">
           <div class="upload-container" id="bot-upload-container">
+            <div class="upload-desc text-center">
+              <h2>Submit a bot</h2>
+              <p>To play a Halite bot in the competition, submit a .zip file here. Bot submissions need to adhere to specific guidelines</p>
+              <p><a href="/learn-programming-challenge/downloads-and-starter-kits/submit-bot">Learn more</a></p>
+            </div>
             <Upload :logged-in="loggedIn" :showMessage="showMessage"></Upload>
+            <div class="upload-note text-center">
+              <h2>advanced submission options</h2>
+              <p>You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
+            </div>
           </div>
-          <div class="upload-note">
-            <p class="text-center">You can also submit a bot using our <a href="/learn-programming-challenge/halite-cli-and-tools/halite-client-tools">Halite Client Tools</a></p>
-          </div>
+          
         </div>
         <div class="col-sm-6">
           <div class="upload-container">
+            <div class="upload-desc text-center">
+              <h2>replay a file</h2>
+              <p>When you run the Halite executable locally, it will add a .hlt file to your directory. Upload that file here to watch your game</p>
+            </div>
             <halite-upload-zone
-              title="Replay a File"
-              description="Drop a replay file here to upload"
+              caption="Drop a replay file here to upload"
               buttonText = "Select File"
               :icon="`${baseUrl}/assets/images/icon-replay.svg`"
               v-on:change="play_replay"
@@ -39,6 +49,10 @@
               :progress="uploadProgress"
               :message="uploadMessage">
             </halite-upload-zone>
+            <div class="upload-note text-center">
+              <h2>advanced replay options</h2>
+              <p>You can also replay via the <a href="/learn-programming-challenge/downloads-and-starter-kits">Offline Game Visualizer</a>.</p>
+            </div>
           </div>
         </div>
       </div>

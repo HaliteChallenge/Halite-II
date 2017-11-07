@@ -29,6 +29,8 @@ class Entity
   # return: Angle between entities in degrees (float)
   def calculate_angle_between(target)
     radians = Math.atan2(target.y - y, target.x - x)
+    radians = radians + 2 * Math::PI if radians < 0
+
     radians/Math::PI * 180
   end
 

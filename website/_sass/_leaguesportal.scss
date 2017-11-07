@@ -1,0 +1,51 @@
+.leagues-container{
+
+}
+.leagues-table{
+  .league-col-name{
+    width: 30%;
+  }
+  .league-col-category{
+
+  }
+  td, th{
+    text-align: left;
+  }
+}
+
+.filter-form{
+  margin-bottom: 20px;
+  .filter-handler{
+    text-align: right;
+    .handler-item{
+      display: inline-block;
+      background-color: #000;
+      padding: 0 15px;
+      line-height: 38px;
+      color: $foreground;
+    }
+  }
+  .filter-group{
+    padding: 10px 0;
+    .input-group{
+      @media (min-width: $screen-sm-min){
+        display: flex;
+        flex-wrap: no-wrap;
+      }
+      > * {
+        display: block;
+        &:last-child{
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+/** league individual **/
+.league-individual-container{
+  .league-description{
+    text-align: center;
+    margin-bottom: 30px;
+  }
+}

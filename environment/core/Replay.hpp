@@ -32,7 +32,7 @@ struct Replay {
     std::vector<std::vector<std::unique_ptr<Event>>>& full_frame_events;
     std::vector<hlt::MoveQueue>& full_player_moves;
 
-    auto output(std::string filename) -> void;
+    auto output(std::string filename, bool enable_compression) -> void;
 
 private:
     auto output_header(nlohmann::json& replay) -> void;

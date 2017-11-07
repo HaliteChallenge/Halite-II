@@ -361,8 +361,10 @@ def update_rankings(users):
     and the bot version number.
     """
     users.sort(key=lambda user: user["rank"])
-    # Set tau=0, based on discussion from Halite 1
-    trueskill.setup(tau=0)
+    # Set tau and draw_probability to more reasonable values than the defaults
+    # for the open competition. tau should be set to a much lower value or
+    # even 0 for finals
+    trueskill.setup(tau=0.008, draw_probability=0.001)
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
              for user in users]
     new_ratings = trueskill.rate(teams)

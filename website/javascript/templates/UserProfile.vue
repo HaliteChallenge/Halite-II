@@ -45,7 +45,7 @@
                             <p>{{ user.num_games }}</p>
                         </div>
                     </div>
-                    <h2 class="highest-rank" v-if="highestRank"> Highest Rank Achieved: {{highestRank}}</h2>
+                    <h2 class="highest-rank" v-if="highestRank" title="This is either your current (top rank) or highest rank any of your bots had achieved when retired"> Highest Rank Achieved: {{highestRank}}</h2>
                 </div>
                 <div class="game-replay-share text-center">
                     <div class="popup-overlay" v-show="sharePopup" @click="toggleShare"></div>

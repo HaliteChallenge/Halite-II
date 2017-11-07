@@ -134,7 +134,7 @@ namespace mapgen {
             const auto big_radius =
                 std::max(4.0, std::sqrt(std::min(map.map_width, map.map_height)) / 2);
             const auto small_radius =
-                std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 3));
+                std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height)) / 3);
             // Stick one planet in the center
             if (extra_planets == 1) {
                 map.planets.emplace_back(center_x, center_y, big_radius * 1.5);

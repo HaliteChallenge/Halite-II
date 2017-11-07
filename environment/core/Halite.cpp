@@ -195,6 +195,7 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
         if (alive[player_id]) {
             hlt::PlayerMoveQueue& moves = player_moves.at(player_id);
             frame_threads[player_id] = std::async(
+                std::launch::async,
                 [&, player_id]() -> int {
                     return networking.handle_frame_networking(
                         player_id, turn_number, game_map, ignore_timeout,
@@ -407,6 +408,7 @@ auto Halite::process_docking_move(
     if (!planet.owned) {
         planet.owned = true;
         planet.owner = player_id;
+        planet.current_production = 0;
     }
 
     if (planet.owner == player_id &&
@@ -446,6 +448,10 @@ auto Halite::process_docking_move(
             // Accumulate damage
             simultaenous_docking[planet_id][player_id].push_back(ship_id);
         }
+    } else {
+        // Too many of the owner's ships are trying to dock. Add them to the
+        // simultaneous docking list in case a contention fight starts.
+        simultaenous_docking[planet_id][player_id].push_back(ship_id);
     }
 }
 
@@ -806,6 +812,12 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
         std::vector<hlt::EntityId> participants;
         std::vector<hlt::Location> participant_locations;
 
+        // If the planet owner was just trying to dock too many ships
+        // we can continue, there is no fight occurring.
+        if (planet_entry.second.size() == 1){
+            continue;
+        }
+
         auto damage_others = [&](hlt::PlayerId src_player, double split_damage) {
             for (auto& other_player : planet_entry.second) {
                 if (other_player.first == src_player){
@@ -948,6 +960,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
                                 unsigned int id,
                                 bool enable_replay,
+                                bool enable_compression,
                                 std::string replay_directory) {
     // For rankings
     std::vector<bool> living_players(number_of_players, true);
@@ -966,6 +979,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::vector<std::future<int> > initThreads(number_of_players);
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         initThreads[player_id] = std::async(
+            std::launch::async,
             &Networking::handle_init_networking,
             &networking,
             player_id, game_map, ignore_timeout, &player_names[player_id]);
@@ -1004,6 +1018,8 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     std::function<bool(const hlt::PlayerId&, const hlt::PlayerId&)> comparator =
         std::bind(&Halite::compare_rankings, this, std::placeholders::_1, std::placeholders::_2);
 
+    auto rng = std::mt19937(seed);
+
     try {
         while (!game_complete()) {
             turn_number++;
@@ -1020,6 +1036,9 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
                 }
             }
 
+            // Shuffle the rankings first, to ensure that in the case of a
+            // tie, a random winner is chosen.
+            std::shuffle(new_rankings.begin(), new_rankings.end(), rng);
             std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
             rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
@@ -1038,6 +1057,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
     for (hlt::PlayerId player_id = 0; player_id < number_of_players; player_id++) {
         if (living_players[player_id]) new_rankings.push_back(player_id);
     }
+    std::shuffle(new_rankings.begin(), new_rankings.end(), rng);
     std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
     rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
@@ -1091,11 +1111,11 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             };
             stats.output_filename = replay_directory + "Replays/" + filename;
             try {
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             catch (std::runtime_error& e) {
                 stats.output_filename = replay_directory + filename;
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             if (!quiet_output) {
                 std::cout << "Map seed was " << seed << std::endl

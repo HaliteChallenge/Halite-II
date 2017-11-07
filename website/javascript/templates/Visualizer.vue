@@ -101,7 +101,13 @@
               </div>
             </div>
           </div>
-          <!-- <img class="game-replay-img img-responsive" :src="`${baseUrl}/assets/images/temp/display.png`" alt=""> -->
+          <div class="game-replay-controller" v-if="false">
+              <div class="game-replay-btn-table" style="width: 200px;">
+                  <label for="halloween">Halloween Theme:</label>
+                  <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
+              </div>
+              <i class="xline xline-bottom"></i>
+          </div>
         </div>
       </div>
       <div class="col-md-4 sidebar hidden-xs hidden-sm" v-if="!isMobile">
@@ -320,10 +326,11 @@
       6: '3x',
       8: '4x',
       10: '5x',
-      12: '7x',
-      14: '8x',
-      16: '9x',
-      18: '10x',
+      12: '6x',
+      14: '7x',
+      16: '8x',
+      18: '9x',
+      20: '10x',
     }
 
   // libhaliteviz.setAssetRoot("/assets/js/");
@@ -356,6 +363,7 @@
         speedLabel: '3x',
         stats: null,
         sharePopup: false,
+        isHalloween: true,
         isMobile: window.mobileAndTabletcheck(),
         // showChart: false,
         selected: {
@@ -363,7 +371,7 @@
           id: 0,
           owner: '',
           x: 0,
-          y: 0
+          y: 0,
         },
         sliderOptions: {
           min: 0,
@@ -409,6 +417,13 @@
         max: this.replay.num_frames - 1,
         value: this.frame
       })
+
+      if(window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true'){
+        this.isHalloween = true;
+      }
+      else{
+        this.isHalloween = false;
+      }
 
       const visualizer = new HaliteVisualizer(this.replay)
       const storedSpeedIndex = sessionStorage.getItem('halite-replaySpeed')
@@ -516,13 +531,28 @@
         this.gaData('visualizer', 'click-slider', 'gameplay')
       }
 
+      this.toggleHalloween = function() {
+        if (window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true') {
+          window.localStorage['halloween'] = "false";
+          this.isHalloween = false;
+        }
+        else {
+          window.localStorage['halloween'] = "true";
+           this.isHalloween = true;
+        }
+
+        this.$forceUpdate();
+      };
+
       // keybinding
       document.addEventListener('keyup', (e) => {
-        // console.log(e.which);
+        console.log(e.which);
         const code = e.which;
         let speed;
-        if (code >= 49 && code <= 53){
+        if (code >= 49 && code <= 58){
           changeSpeed(code - 48); // subtract 48 from code to get the speed. for example, 49 => 1, 50 => 2 and so on
+        } else if (code == 48){
+          changeSpeed(10);
         }
       });
 
@@ -679,7 +709,7 @@
         // const replay = this.game.game.replay;
         return window.location.href
       // return window.location `?game_id=${game_id}&replay_class=${replay_class}&replay_name=${encodeURIComponent(replay)}`
-      }
+      },
     },
     methods: {
       userlink: function (user_id) {

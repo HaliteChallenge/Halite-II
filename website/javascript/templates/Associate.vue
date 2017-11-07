@@ -13,17 +13,22 @@
                     <!-- profession -->
                     <div class="form-group">
                         <label for="country">Which of the following describes you best?<span class="text-danger">*</span></label>
-                        <select class="form-control" id="level" v-model="level">
+                        <!-- <select class="form-control" id="level" v-model="level">
                             <option>Professional</option>
                             <option value="University">University</option>
                             <option value="High School">High school</option>
-                        </select>
+                        </select> -->
+                        <v-select
+                          placeholder="Professional"
+                          v-model="level"
+                          :options="['Professional', 'University', 'High School']">
+                        </v-select>
                     </div>
 
                     <div v-if="level === 'Professional'">
                         <div class="form-group">
                             <label for="work-email">Please share your work email</label>
-                            <input type="email" class="form-control" id="work-email" placeholder="Work Email" aria-describedby="work-email-help" v-model="email" />
+                            <input type="email" class="form-control" id="work-email" placeholder="Work Email (Optional)" aria-describedby="work-email-help" v-model="email" />
                             <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>
@@ -31,7 +36,7 @@
                     <div v-if="level === 'University'">
                         <div class="form-group">
                             <label for="school-email">Please share your school email</label>
-                            <input type="email" class="form-control" id="school-email" placeholder="School Email" aria-describedby="school-email-help" v-model="email" />
+                            <input type="email" class="form-control" id="school-email" placeholder="School Email (Optional)" aria-describedby="school-email-help" v-model="email" />
                             <p style="margin-top: 10px;">We’ll use your email domain to affiliate you with your school or company, but we won’t share your email publicly.</p>
                         </div>
                     </div>

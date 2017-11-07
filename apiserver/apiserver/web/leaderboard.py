@@ -6,7 +6,7 @@ import operator
 import flask
 import sqlalchemy
 
-from .. import model, util
+from .. import config, model, util
 
 from . import util as api_util
 from .blueprint import web_api
@@ -62,17 +62,41 @@ def leaderboard():
         for (field, op, val) in manual_sort:
             if field == "tier":
                 column = model.ranked_bots_users.c.rank
+                tier = val
                 if val in tier_thresholds:
                     val = tier_thresholds[val]
                 else:
                     raise util.APIError(
                         400,
                         message="Tier " + str(val) + " is not recognized.")
-                clause = op(column, val)
+
+                next_tier_dict = {
+                    config.TIER_0_NAME: None,
+                    config.TIER_1_NAME: tier_thresholds[config.TIER_0_NAME],
+                    config.TIER_2_NAME: tier_thresholds[config.TIER_1_NAME],
+                    config.TIER_3_NAME: tier_thresholds[config.TIER_2_NAME],
+                    config.TIER_4_NAME: tier_thresholds[config.TIER_3_NAME],
+                }
                 # Negate the filter, since tier and rank are sorted
                 # opposite of each other
                 if op in (operator.gt, operator.lt, operator.ge, operator.le):
-                    clause = ~clause
+                    if op in (operator.gt, operator.le):
+                        val = next_tier_dict.get(tier, val)
+                    clause = {
+                        operator.gt: operator.le,
+                        operator.lt: operator.gt,
+                        operator.ge: operator.le,
+                        operator.le: operator.gt,
+                    }[op](column, val)
+                elif op is operator.eq or op is operator.ne:
+                    clause = column <= val
+                    next_tier = next_tier_dict.get(tier)
+                    if next_tier is not None:
+                        clause &= column > next_tier
+
+                    if op is operator.ne:
+                        clause = ~clause
+
                 if tier_filter is None:
                     tier_filter = clause
                 else:
@@ -110,5 +134,27 @@ def leaderboard():
                 user["tier"] = None
 
             result.append(user)
+
+    return flask.jsonify(result)
+
+
+@web_api.route("/leagues")
+@util.cross_origin(methods=["GET"])
+def leagues():
+    result = []
+    with model.engine.connect() as conn:
+        query = conn.execute(
+            model.leagues.select())
+
+        for row in query.fetchall():
+            league = {
+                "id": row["id"],
+                "category": row["category"],
+                "name": row["name"],
+                "description": row["description"],
+                "query": row["query"],
+            }
+
+            result.append(league)
 
     return flask.jsonify(result)

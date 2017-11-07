@@ -259,6 +259,7 @@ export function leaderboard (filters, hackathon = null, offset = null, limit = n
     querystring.push(`offset=${offset}&limit=${limit}`)
   }
   if (filters && filters.length > 0) {
+    filters = filters.map(window.encodeURIComponent);
     querystring.push(`filter=${filters.join('&filter=')}`)
   }
   if (querystring.length > 0) {
@@ -342,4 +343,13 @@ export function subscribe (email) {
   return $.post({
     url: `${API_SERVER_URL}/user/addsubscriber/` + email
   })
+}
+
+/** leagues **/
+export function getLeaguesList(){
+  return $.get({
+    url: `${API_SERVER_URL}/leagues` ,
+    xhrFields: {
+    }
+  });
 }

@@ -89,7 +89,7 @@ export default {
     methods: {
       tierClass: tierClass,
       getFormattedDate: function (date) {
-        return moment(date).startOf('day').fromNow()
+        return moment(date).fromNow()
       },
       on_update_filter: function (e) {
         if (e && e.preventDefault) e.preventDefault()
