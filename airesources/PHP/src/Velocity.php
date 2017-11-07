@@ -1,6 +1,6 @@
 <?php
 
-class Velocity
+class Velocity implements JsonSerializable
 {
     /**
      * @var float

@@ -126,7 +126,7 @@ class Ship extends Entity
         $distance = $this->getCoordinate()->getDistanceTo($target);
         $angleRad = $this->getCoordinate()->getAngleTo($target);
 
-        $obstacles =  $map->getEntitiesBetween($this, $target);
+        $obstacles = $map->getEntitiesBetween($this, $target);
         $obstacles = iterator_to_array($obstacles);
         if ($avoidObstacles && $obstacles) {
             $newTargetDx = cos($angleRad + $angularStepRad) * $distance;
@@ -140,12 +140,13 @@ class Ship extends Entity
 
         $computedThrust = $thrust;
         if ($distance < $thrust) {
-            $computedThrust = (int) $distance;
+            $computedThrust = floor($distance / 2);
         }
 
         $angleDeg = self::angleRadToDegClipped($angleRad);
         $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
         $this->coordinateNextTurn = $target->forecastMove($computedThrust, $angleDeg);
+
         return $this->thrust($computedThrust, $angleDeg);
     }
 
