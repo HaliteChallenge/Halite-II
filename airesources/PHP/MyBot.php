@@ -5,12 +5,20 @@ require_once __DIR__.'/src/bootstrap.php';
 $logger = new Logger();
 $connection = new Connection($logger);
 $game = new Game('Settler_'.uniqid(null, true), $logger, $connection);
-
+$turn = 0;
 while (true) {
+    $turn++;
     $logger->log('--------- NEW TURN ------------');
     $logger->log('');
     $logger->log('');
     $map = $game->updateMap();
+    if($turn % 2=== 0){
+        foreach ($map->getMe()->getShips() as $ship) {
+            $connection->move($ship->thrust(0,0));
+        }
+        $connection->flush();
+        continue;
+    }
     foreach ($map->getMe()->getShips() as $ship) {
         $logger->log('New Turn with ship '.json_encode($ship));
         if ($ship->isDocked() || $ship->getDockingProgress() > 0) {
