@@ -134,7 +134,7 @@ isdocked(ship::Ship) = ship.docked != UNDOCKED
 Determine whether a ship is close enough to planet so it can dock.
 """
 function can_dock(ship::Ship, planet::Planet)
-    calculate_distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS
+    calculate_distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS + Constants.SHIP_RADIUS
 end
 
 """
