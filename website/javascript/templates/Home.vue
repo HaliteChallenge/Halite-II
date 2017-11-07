@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <div class="notification font-headline">Welcome to the 2017-2018 season of Halite, running until January 22nd, 2018</div>
+        <div class="notification font-headline">Join one of our fall hackathons: <a href="/hackathon-and-events" style="text-transform:underline !important; color:#25242f; font-weight:bold;">See all Halite events.</a></div>
 
         <div class="row">
             <div class="col-md-12">
