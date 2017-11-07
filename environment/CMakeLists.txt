@@ -30,7 +30,7 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 # Use git describe as the version for the executable, based on code from
 # http://eatmyrandom.blogspot.com/2010/06/automate-version-numbering-using-git.html
 find_package(Git)
-if( NOT GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
+if( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
 
 execute_process(COMMAND git describe --abbrev=3 HEAD
                 COMMAND sed -e "s/-/./g"
@@ -41,14 +41,14 @@ string(REGEX REPLACE "^v(.*)" "\\1" HALITE_VERSION ${HALITE_VERSION})
 execute_process( COMMAND bash -c "echo \"${HALITE_VERSION}\" > ${CMAKE_SOURCE_DIR}/version" )
 
 
-else( NOT GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
+else( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
 
 execute_process(COMMAND cat ${CMAKE_SOURCE_DIR}/version
                 OUTPUT_VARIABLE HALITE_VERSION
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 string(CONCAT HALITE_VERSION ${HALITE_VERSION} ".src")
 
-endif( NOT GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
+endif( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
 message("Executable version ${HALITE_VERSION}")
 
 configure_file(
