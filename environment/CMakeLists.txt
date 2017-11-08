@@ -29,7 +29,7 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 
 add_custom_target(VERSION_CHECK
     ./set_version.sh
-    WORKING DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 foreach(dir ${dirs})
