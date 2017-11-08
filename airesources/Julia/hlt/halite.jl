@@ -3,32 +3,33 @@ module Halite
 
 @enum DockedStatus UNDOCKED=0 DOCKING=1 DOCKED=2 UNDOCKING=3
 
-module Constants
+struct CONST
     #: Max number of units of distance a ship can travel in a turn
-    const MAX_SPEED = 7
+    MAX_SPEED::Int
     #: Radius of a ship
-    const SHIP_RADIUS = 0.5
+    SHIP_RADIUS::Float64
     #: Starting health of ship, also its max
-    const MAX_SHIP_HEALTH = 255
+    MAX_SHIP_HEALTH::Int
     #: Starting health of ship, also its max
-    const BASE_SHIP_HEALTH = 255
+    BASE_SHIP_HEALTH::Int
     #: Weapon cooldown period
-    const WEAPON_COOLDOWN = 1
+    WEAPON_COOLDOWN::Int
     #: Weapon damage radius
-    const WEAPON_RADIUS = 5.0
+    WEAPON_RADIUS::Float64
     #: Weapon damage
-    const WEAPON_DAMAGE = 64
+    WEAPON_DAMAGE::Int
     #: Radius in which explosions affect other entities
-    const EXPLOSION_RADIUS = 10.0
+    EXPLOSION_RADIUS::Float64
     #: Distance from the edge of the planet at which ships can try to dock
-    const DOCK_RADIUS = 4.0
+    DOCK_RADIUS::Float64
     #: Number of turns it takes to dock a ship
-    const DOCK_TURNS = 5
-    #: Number of production units per turn contributed by each docked ship
-    const BASE_PRODUCTIVITY = 6
+    DOCK_TURNS::Int
+    #: Number of turns it takes to create a ship per docked ship
+    BASE_PRODUCTIVITY::Int
     #: Distance from the planets edge at which new ships are created
-    const SPAWN_RADIUS = 2.0
+    SPAWN_RADIUS::Float64
 end
+Constants = CONST(7, 0.5, 255, 255, 1, 5.0, 64, 10.0, 4.0, 4, 6, 2.0)
 
 include("entity.jl")
 include("player.jl")
