@@ -59,7 +59,7 @@ class Ship < Entity
   # planet: the Planet you are attempting to dock at
   # return: true if can dock, false if no
   def can_dock?(planet)
-    calculate_distance_between(planet) <= planet.radius + Game::Constants::DOCK_RADIUS
+    calculate_distance_between(planet) <= planet.radius + Game::Constants::DOCK_RADIUS + Game::Constants::SHIP_RADIUS
   end
 
   # Move a ship to a specific target position (Entity).

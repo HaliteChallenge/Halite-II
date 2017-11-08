@@ -28,7 +28,7 @@ class Ship(override val owner: Option[Short],
     extends Entity(owner, id, xPos, yPos, health, Constants.SHIP_RADIUS) {
 
   def canDock(planet: Planet): Boolean =
-    getDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.radius
+    getDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.radius + Constants.SHIP_RADIUS
 
   override def toString: String =
     "Ship[" + super.toString + ", dockingStatus=" + dockingStatus + ", dockedPlanet=" + dockedPlanet +

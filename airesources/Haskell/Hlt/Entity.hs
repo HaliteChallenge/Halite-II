@@ -136,7 +136,7 @@ isFull p = length (dockedShips p) == dockingSpots p
 
 -- | Checks if a Ship is within docking range of Planet.
 canDock :: Ship -> Planet -> Bool
-canDock s p = distance s p <= radius p + dockRadius
+canDock s p = distance s p <= radius p + dockRadius + shipRadius
 
 -- | Constant fudge value so that ships don't collide into to each other.
 collisionFudgeFactor :: Float
