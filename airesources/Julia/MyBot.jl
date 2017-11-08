@@ -10,7 +10,7 @@
 ### to log anything use the logging module.
 
 # Let's start by importing the Halite Starter Kit so we can interface with the Halite engine
-include("hlt/halite.jl")
+include("hlt/Halite.jl")
 using Halite
 
 using Memento

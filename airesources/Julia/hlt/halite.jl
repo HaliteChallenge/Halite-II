@@ -11,6 +11,7 @@ export Game, Constants, DockedStatus, start_game, thrust, dock, undock, update_m
 
 include("entity.jl")
 include("player.jl")
+include("utils.jl")
 include("game_map.jl")
 include("game.jl")
 
