@@ -7,13 +7,21 @@ class Logger
      */
     private $filename;
 
-    public function __construct()
+    /**
+     * @var bool
+     */
+    private $enabled;
+
+    public function __construct(bool $enabled)
     {
         $this->filename = __DIR__.'/../logs/'.date('Y_m_d_H_i_s').'_'.uniqid(null, true).'.log';
+        $this->enabled = $enabled;
     }
 
-    public function log(string $message): void
+    public function log(string $message)
     {
-        file_put_contents($this->filename, $message."\n", FILE_APPEND);
+        if ($this->enabled) {
+            file_put_contents($this->filename, $message."\n", FILE_APPEND);
+        }
     }
 }

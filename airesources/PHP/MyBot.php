@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/src/bootstrap.php';
 
-$logger = new Logger();
+$logger = new Logger(getenv('HALITE_PHP_ENV') === 'dev');
 $connection = new Connection($logger);
 $game = new Game(uniqid('Settler_'), $logger, $connection);
 $turn = 0;
@@ -21,7 +21,7 @@ while (true) {
 
         if (!$planet) {
             /** @var Ship[] $targets */
-            $targets = $map->getNearbyEntitiesByDistance($ship, false, true);
+            $targets = $map->getNearbyEntitiesByDistance($ship, false);
             foreach ($targets as $target) {
                 if ($target->getOwner() !== $map->getMe()) {
                     $navigate = $ship->navigate($map, $target->getCoordinate(), 7, true, 10, 0.5, $logger);

@@ -31,18 +31,18 @@ class Connection
         return $data;
     }
 
-    public function move(string $move): void
+    public function move(string $move)
     {
         $this->stack[] = $move;
     }
 
-    public function flush(): void
+    public function flush()
     {
         $this->send(implode(' ', $this->stack));
         $this->stack = [];
     }
 
-    public function send(string $message): void
+    public function send(string $message)
     {
         $this->logger->log('Connection SEND: '.$message);
         fwrite(STDOUT, $message."\n");

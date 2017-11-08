@@ -39,7 +39,7 @@ class Map
         $this->height = $height;
     }
 
-    public function update(array $players, array $ships, array $planets): void
+    public function update(array $players, array $ships, array $planets)
     {
         $this->players = $players;
         $this->ships = $ships;
@@ -111,7 +111,12 @@ class Map
         }
     }
 
-    public function getNextDockablePlanet(Ship $ship): ?Planet
+    /**
+     * @param Ship $ship
+     *
+     * @return Planet|null
+     */
+    public function getNextDockablePlanet(Ship $ship)
     {
         $planets = $this->getNearbyEntitiesByDistance($ship, true, false);
         foreach ($planets as $planet) {
@@ -120,6 +125,7 @@ class Map
                 return $planets->current();
             }
         }
+
         return null;
     }
 
@@ -132,8 +138,13 @@ class Map
      *
      * @return Generator
      */
-    public function getEntitiesBetween(Ship $ship, Coordinate $coordinate, Entity $target = null, bool $planets = true, bool $ships = true): \Generator
-    {
+    public function getEntitiesBetween(
+        Ship $ship,
+        Coordinate $coordinate,
+        Entity $target = null,
+        bool $planets = true,
+        bool $ships = true
+    ): \Generator {
         foreach ($this->getEntities($planets, $ships) as $entity) {
             if ($entity === $ship || $entity === $target) {
                 continue;
@@ -167,13 +178,13 @@ class Map
         $dx = $endX - $startX;
         $dy = $endY - $startY;
 
-        $a = $dx**2 + $dy**2 ;
-              $b = -2 * (($startX**2) - ($startX * $endX)
+        $a = $dx ** 2 + $dy ** 2;
+        $b = -2 * (($startX ** 2) - ($startX * $endX)
                 - ($startX * $centerX) + ($endX * $centerX)
-                + ($startY**2) - ($startY * $endY)
+                + ($startY ** 2) - ($startY * $endY)
                 - ($startY * $centerY) + ($endY * $centerY));
 
-        if ($a == 0.0) {
+        if ($a === 0.0) {
             return $ship->getDistanceTo($entity) <= $circleRadius + $fudge;
         }
 

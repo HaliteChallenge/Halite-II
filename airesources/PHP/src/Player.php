@@ -38,7 +38,7 @@ class Player
     /**
      * @param Ship[] $ships
      */
-    public function setShips(array $ships): void
+    public function setShips(array $ships)
     {
         $this->ships = $ships;
     }

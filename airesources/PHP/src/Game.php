@@ -39,14 +39,14 @@ class Game
 
     public function __construct(string $botName, Logger $logger, Connection $connection)
     {
-        $logger->log(phpversion());
+        $logger->log(PHP_VERSION);
         $this->botName = $botName;
         $this->logger = $logger;
         $this->connection = $connection;
         $this->initialize();
     }
 
-    private function initialize(): void
+    private function initialize()
     {
         $this->logger->log('Initialize new Game for Bot '.$this->botName);
         $playerId = (int) $this->connection->read();

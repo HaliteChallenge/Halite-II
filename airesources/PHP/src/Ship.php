@@ -37,10 +37,9 @@ class Ship extends Entity
     private $planet;
 
     /**
-     * @var Coordinate
+     * @var Coordinate|null
      */
     private $coordinateNextTurn;
-
 
     public function __construct(
         Player $owner,
@@ -150,17 +149,26 @@ class Ship extends Entity
         return $this->thrust($computedThrust, $angleDeg);
     }
 
-    public function getCoordinateNextTurn(): ?Coordinate
+    /**
+     * @return Coordinate|null
+     */
+    public function getCoordinateNextTurn()
     {
         return $this->coordinateNextTurn;
     }
 
-    public function getPlanet(): ?\Planet
+    /**
+     * @return null|Planet
+     */
+    public function getPlanet()
     {
         return $this->planet;
     }
 
-    public function setPlanet(?Planet $planet): void
+    /**
+     * @param Planet|null $planet
+     */
+    public function setPlanet($planet)
     {
         $this->planet = $planet;
     }

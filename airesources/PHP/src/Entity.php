@@ -27,7 +27,7 @@ class Entity implements JsonSerializable
      */
     private $radius;
 
-    public function __construct(?Player $owner, int $id, Coordinate $coordinate, int $health, float $radius)
+    public function __construct(Player $owner = null, int $id, Coordinate $coordinate, int $health, float $radius)
     {
         $this->owner = $owner;
         $this->id = $id;
@@ -36,7 +36,10 @@ class Entity implements JsonSerializable
         $this->radius = $radius;
     }
 
-    public function getOwner(): ?\Player
+    /**
+     * @return null|Player
+     */
+    public function getOwner()
     {
         return $this->owner;
     }

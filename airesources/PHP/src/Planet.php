@@ -34,7 +34,7 @@ class Planet extends Entity
 
 
     public function __construct(
-        ?Player $owner,
+        Player $owner = null,
         int $id,
         Coordinate $coordinate,
         int $health,
