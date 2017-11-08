@@ -128,6 +128,8 @@
 
         if (category == 'country'){
           filter = [`country_code,=,${filterValue}`]
+        } else if (filterValue == 'C#/.NET Core,C#/Mono') {
+          filter = [`${category},=,C#/.NET Core`, `${category},=,C#/Mono`]
         } else {
           filter = [`${category},=,${filterValue}`]
         }
