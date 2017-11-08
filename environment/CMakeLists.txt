@@ -27,33 +27,9 @@ include_directories(${CMAKE_SOURCE_DIR}/zstd-1.3.0/lib/legacy)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
-# Use git describe as the version for the executable, based on code from
-# http://eatmyrandom.blogspot.com/2010/06/automate-version-numbering-using-git.html
-find_package(Git)
-if( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
-
-execute_process(COMMAND git describe --abbrev=3 --tags HEAD
-                COMMAND sed -e "s/-/./g"
-                OUTPUT_VARIABLE HALITE_VERSION
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-# remove leading "v"
-string(REGEX REPLACE "^v(.*)" "\\1" HALITE_VERSION ${HALITE_VERSION})
-execute_process( COMMAND bash -c "echo \"${HALITE_VERSION}\" > ${CMAKE_SOURCE_DIR}/version" )
-
-
-else( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
-
-execute_process(COMMAND cat ${CMAKE_SOURCE_DIR}/version
-                OUTPUT_VARIABLE HALITE_VERSION
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(CONCAT HALITE_VERSION ${HALITE_VERSION} ".src")
-
-endif( GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/../.git" )
-message("Executable version ${HALITE_VERSION}")
-
-configure_file(
-    "${CMAKE_SOURCE_DIR}/version.hpp.in"
-    "${CMAKE_SOURCE_DIR}/version.hpp"
+add_custom_target(VERSION_CHECK
+    ./set_version.sh
+    WORKING DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 foreach(dir ${dirs})
@@ -65,6 +41,8 @@ include_directories(${CMAKE_SOURCE_DIR})
 set(SOURCE_FILES "${SOURCE_FILES}" main.cpp)
 
 add_executable(halite ${SOURCE_FILES})
+
+add_dependencies(halite VERSION_CHECK)
 
 if (APPLE)
     # No static linkage here - https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build

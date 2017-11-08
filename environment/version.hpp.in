@@ -1,2 +1,0 @@
-// Define the version of the executable
-#define HALITE_VERSION "@HALITE_VERSION@"
