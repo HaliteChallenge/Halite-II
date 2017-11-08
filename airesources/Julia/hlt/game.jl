@@ -16,6 +16,13 @@ function Game(botname::String)
     Game(id, botname, width, height, initial_game_map)
 end
 
+"""
+update_map(game::Game)
+
+Parse the map given by the engine.
+"""
+update_map(game::Game) = GameMap(game, readline())
+
 GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
 
 """
@@ -24,13 +31,6 @@ GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.heig
 This function should be used after bot initialization and all preliminary checks and warmup.
 """
 start_game(game::Game) = print(game.botname, "\n")
-
-"""
-    update_map(game::Game)
-
-Parse the map given by the engine.
-"""
-update_map(game::Game) = GameMap(game, readline())
 
 """
     setup_logger(name, id)
@@ -44,7 +44,7 @@ end
 
 """
     send_command_queue(command_queue::Vector{String})
-    
+
 Issue the given list of commands.
 """
 function send_command_queue(command_queue::Vector{String}) 
