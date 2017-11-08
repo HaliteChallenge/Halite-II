@@ -1,3 +1,4 @@
+import datetime
 import logging
 import random
 
@@ -22,6 +23,11 @@ def rand_map_size():
 
 def serve_game_task(conn, has_gpu=False):
     """Try to find a set of players to play a game together."""
+    if random.random() < 0.05:
+        result = find_challenge(conn, has_gpu)
+        if result:
+            return result
+
     # Only allow 2 or 4 player games
     player_count = 2 if random.random() > 0.5 else 4
 
@@ -129,7 +135,109 @@ def serve_game_task(conn, has_gpu=False):
             "width": map_width,
             "height": map_height,
             "users": players,
+            "challenge": None,
         })
+
+
+def reset_challenges(conn):
+    """Check ongoing challenges, and reset ones that are "stuck"."""
+    reset_stuck_challenges = model.challenges.update().where(
+        (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+        (model.challenges.c.most_recent_game_task <
+         datetime.datetime.now() - datetime.timedelta(
+             minutes=30))
+    ).values(
+        status=model.ChallengeStatus.CREATED.value,
+    )
+    conn.execute(reset_stuck_challenges)
+
+
+def find_challenge(conn, has_gpu=False):
+    """
+    Find a set of players in a challenge.
+    """
+    # Reset any stuck challenges
+    reset_challenges(conn)
+
+    challenge = conn.execute(
+        model.challenges.select(
+            model.challenges.c.status == model.ChallengeStatus.CREATED.value
+        ).order_by(
+            model.challenges.c.most_recent_game_task.asc()
+        )
+    ).first()
+    print(challenge)
+
+    if not challenge:
+        return None
+
+    player_filter = sqlalchemy.sql.expression.true()
+    if not has_gpu:
+        player_filter = (model.ranked_bots_users.c.is_gpu_enabled == False)
+
+    total_players = conn.execute(model.total_ranked_users).first()[0]
+    thresholds = util.tier_thresholds(total_players)
+    ranked_users = model.ranked_users_query()
+    bots_query = sqlalchemy.sql.select([
+        model.ranked_bots_users.c.user_id,
+        model.ranked_bots_users.c.bot_id,
+        model.ranked_bots_users.c.username,
+        model.ranked_bots_users.c.rank,
+        model.ranked_bots_users.c.num_submissions.label("version_number"),
+    ]).select_from(
+        model.ranked_bots_users.join(
+            model.bots,
+            (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
+            (model.ranked_bots_users.c.bot_id == model.bots.c.id)
+        )
+    ).where(
+        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
+        sqlalchemy.sql.exists(
+            model.challenge_participants.select(
+                (model.ranked_bots.c.user_id == model.challenge_participants.c.user_id) &
+                (model.challenge_participants.c.challenge_id == challenge["id"])
+            )
+        ) &
+        player_filter
+    )
+    bots = conn.execute(bots_query).fetchall()
+
+    # TODO: assumes one-bot-per-player
+    if len(bots) < 2:
+        return None
+
+    selected_bots = []
+    candidate_bots = []
+    for bot in bots:
+        if bot["user_id"] == challenge["issuer"]:
+            selected_bots.append(bot)
+        else:
+            candidate_bots.append(bot)
+
+    if random.random() < 0.5 and len(candidate_bots) == 3:
+        selected_bots.extend(candidate_bots)
+    else:
+        selected_bots.append(random.choice(candidate_bots))
+
+    map_width, map_height = rand_map_size()
+    players = [{
+        "user_id": player["user_id"],
+        "bot_id": player["bot_id"],
+        "username": player["username"],
+        "version_number": player["version_number"],
+        "rank": player["rank"],
+        "tier": util.tier(player["rank"], total_players),
+    } for player in selected_bots]
+
+    # TODO: update challenge most recent game time
+
+    return util.response_success({
+        "type": "game",
+        "width": map_width,
+        "height": map_height,
+        "users": players,
+        "challenge": challenge["id"],
+    })
 
 
 def find_idle_seed_player(conn, ranked_users, seed_filter, restrictions=False):

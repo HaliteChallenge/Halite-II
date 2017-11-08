@@ -58,6 +58,7 @@ def upload_game():
 
     game_output = json.loads(flask.request.values["game_output"])
     users = json.loads(flask.request.values["users"])
+    challenge = json.loads(flask.request.values.get("challenge", "null"))
 
     with model.engine.connect() as conn:
         total_users = conn.execute(model.total_ranked_users).first()[0]
@@ -121,12 +122,20 @@ def upload_game():
     replay_name = os.path.basename(game_output["replay"])
     replay_key, bucket_class = store_game_artifacts(replay_name, users)
 
+    stats = parse_replay(decode_replay(flask.request.files[replay_name]))
+    if stats is None:
+        raise util.APIError(
+            400, message="Replay file cannot be parsed.")
+
     # Store game results in database
-    game_id = store_game_results(game_output, replay_key, bucket_class, users)
+    game_id = store_game_results(game_output, stats,
+                                 replay_key, bucket_class,
+                                 users, challenge)
     # Store game stats in database
-    store_game_stats(game_output, game_id, users)
+    store_game_stats(game_output, stats, game_id, users)
     # Update rankings
-    update_rankings(users)
+    if not challenge:
+        update_rankings(users)
 
     # Clean up old games
     delete_old_games(users)
@@ -181,7 +190,7 @@ def store_game_artifacts(replay_name, users):
     return replay_key, bucket_class
 
 
-def store_game_results(game_output, replay_key, bucket_class, users):
+def store_game_results(game_output, stats, replay_key, bucket_class, users, challenge):
     """
     Store the outcome of a game in the database.
 
@@ -189,6 +198,7 @@ def store_game_results(game_output, replay_key, bucket_class, users):
     :param replay_key: The key of the replay file in object storage.
     :param bucket_class: Which bucket the replay was stored in.
     :param users: The list of user objects for this game.
+    :param challenge: The challenge ID for this game, or None.
     :return game_id: ID of the record in game table
     """
 
@@ -202,6 +212,7 @@ def store_game_results(game_output, replay_key, bucket_class, users):
             map_generator=game_output["map_generator"],
             time_played=sqlalchemy.sql.func.NOW(),
             replay_bucket=bucket_class,
+            challenge_id=challenge,
         )).inserted_primary_key[0]
 
         # Initialize the game view stats
@@ -237,10 +248,54 @@ def store_game_results(game_output, replay_key, bucket_class, users):
             if user["timed_out"]:
                 update_user_timeout(conn, game_id, user)
 
+        if challenge is not None:
+            conn.execute(model.challenges.update().values(
+                num_games=model.challenges.c.num_games + 1,
+                status=sqlalchemy.case(
+                    [
+                        (model.challenges.c.num_games >= 30,
+                         model.ChallengeStatus.FINISHED.value),
+                    ],
+                    else_=model.ChallengeStatus.CREATED.value,
+                ),
+            ).where(model.challenges.c.id == challenge))
+
+            for user in users:
+                # 4 points for 1st place, 3 for 2nd, etc.
+                points = 5 - user["rank"]
+                if user["player_tag"] in stats.players:
+                    ships_produced = stats.players[user["player_tag"]].ships_produced
+                    attacks_made = stats.players[user["player_tag"]].attacks_total
+                else:
+                    ships_produced = attacks_made = 0
+
+                conn.execute(model.challenge_participants.update().values(
+                    points=model.challenge_participants.c.points + points,
+                    ships_produced=model.challenge_participants.c.ships_produced + ships_produced,
+                    attacks_made=model.challenge_participants.c.attacks_made + attacks_made,
+                ))
+
+            challenge_row = conn.execute(
+                model.challenges.select(model.challenges.c.id == challenge)
+            ).first()
+
+            if challenge_row and \
+               challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
+                winner = conn.execute(model.challenge_participants.select().order_by(
+                    model.challenge_participants.c.points.desc(),
+                    model.challenge_participants.c.ships_produced.desc(),
+                    model.challenge_participants.c.attacks_made.desc(),
+                )).first()
+                conn.execute(model.challenges.update().values(
+                    finished=sqlalchemy.sql.func.now(),
+                    winner=winner,
+                ).where(model.challenges.c.id == challenge))
+
+
         return game_id
 
 
-def store_game_stats(game_output, game_id, users):
+def store_game_stats(game_output, stats, game_id, users):
     """
     Store additional game stats into database.
 
@@ -254,11 +309,6 @@ def store_game_stats(game_output, game_id, users):
     if replay_name not in flask.request.files:
         raise util.APIError(
             400, message="Replay file not found in uploaded files.")
-
-    stats = parse_replay(decode_replay(flask.request.files[replay_name]))
-    if stats is None:
-        raise util.APIError(
-            400, message="Replay file cannot be parsed.")
 
     # Store game stats in database
     with model.engine.connect() as conn:
