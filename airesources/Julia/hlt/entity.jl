@@ -103,22 +103,21 @@ struct Ship <: Entity
     docked_planet_id::String
     progress::Int
     cooldown::Int
-    
-    function Ship(owner_id::String, tokens::Vector{String})
-        id = shift!(tokens)
-        x = parse(Float64, shift!(tokens))
-        y = parse(Float64, shift!(tokens))
-        hp = parse(Int, shift!(tokens))
-        vel_x = parse(Float64, shift!(tokens))
-        vel_y = parse(Float64, shift!(tokens))
-        docked = DockedStatus(parse(Int, shift!(tokens)))
-        docked_planet = shift!(tokens)
-        progress = parse(Int, shift!(tokens))
-        cooldown = parse(Int, shift!(tokens))
+end
+function Ship(owner_id::String, tokens::Vector{String})
+    id = shift!(tokens)
+    x = parse(Float64, shift!(tokens))
+    y = parse(Float64, shift!(tokens))
+    hp = parse(Int, shift!(tokens))
+    vel_x = parse(Float64, shift!(tokens))
+    vel_y = parse(Float64, shift!(tokens))
+    docked = DockedStatus(parse(Int, shift!(tokens)))
+    docked_planet = shift!(tokens)
+    progress = parse(Int, shift!(tokens))
+    cooldown = parse(Int, shift!(tokens))
 
-        new(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, vel_x, vel_y, docked, docked_planet, progress, cooldown)
-    end
-
+    Ship(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, vel_x, vel_y, docked, 
+        docked_planet, progress, cooldown)
 end
 
 """

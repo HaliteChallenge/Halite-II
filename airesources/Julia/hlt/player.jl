@@ -1,11 +1,8 @@
 struct Player
     id::String
     ships::Dict{String, Ship}
-
-    function Player(id::String)
-        new(id, Dict{String, Ship}())
-    end
 end
+Player(id::String) = Player(id, Dict{String, Ship}())
 
 """
     get_ship(player, ship_id::String)

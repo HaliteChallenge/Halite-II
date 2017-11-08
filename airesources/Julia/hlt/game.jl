@@ -7,19 +7,19 @@ struct Game
     initial_game_map::GameMap
     width::Int
     height::Int
-
-    function Game(botname::String)
-        id = get_msg()
-        setup_logger(botname, id)
-        botname = @sprintf("%s-%s", botname, id)
-
-        width, height = map(x -> parse(Int, x), split(get_msg()))
-
-        initial_game_map = GameMap(id, width, height, get_msg())
-
-        new(id, botname, initial_game_map, width, height)
-    end
 end
+function Game(botname::String)
+    id = get_msg()
+    setup_logger(botname, id)
+    botname = @sprintf("%s-%s", botname, id)
+
+    width, height = map(x -> parse(Int, x), split(get_msg()))
+
+    initial_game_map = GameMap(id, width, height, get_msg())
+
+    Game(id, botname, initial_game_map, width, height)
+end
+
 GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
 
 """
