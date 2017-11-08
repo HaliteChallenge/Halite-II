@@ -142,7 +142,7 @@ namespace util {
     struct __log2_imp
     {
         static const std::size_t value = _Xp & ((unsigned long long)(1) << _Rp) ? _Rp
-                                                                      : __log2_imp<_Xp, _Rp - 1>::value;
+                                                                           : __log2_imp<_Xp, _Rp - 1>::value;
     };
 
     template <unsigned long long _Xp>
@@ -161,7 +161,7 @@ namespace util {
     struct __log2
     {
         static const std::size_t value = __log2_imp<_Xp,
-                                               sizeof(_UIntType) * __CHAR_BIT__ - 1>::value;
+                                                    sizeof(_UIntType) * __CHAR_BIT__ - 1>::value;
     };
 
     template<class _Engine, class _UIntType>
@@ -371,5 +371,104 @@ namespace util {
                 __u = __e();
             } while (__u >= _Rp);
         return static_cast<result_type>(__u + __p.a());
+    }
+
+    template<class _RealType, std::size_t __bits, class _URNG>
+    _RealType
+    generate_canonical(_URNG& __g)
+    {
+        const std::size_t _Dt = std::numeric_limits<_RealType>::digits;
+        const std::size_t __b = _Dt < __bits ? _Dt : __bits;
+#ifdef _LIBCPP_CXX03_LANG
+        const std::size_t __logR = __log2<uint64_t, _URNG::_Max - _URNG::_Min + uint64_t(1)>::value;
+#else
+        const std::size_t __logR = __log2<uint64_t, _URNG::max() - _URNG::min() + uint64_t(1)>::value;
+#endif
+        const std::size_t __k = __b / __logR + (__b % __logR != 0) + (__b == 0);
+        const _RealType _Rp = _URNG::max() - _URNG::min() + _RealType(1);
+        _RealType __base = _Rp;
+        _RealType _Sp = __g() - _URNG::min();
+        for (std::size_t __i = 1; __i < __k; ++__i, __base *= _Rp)
+            _Sp += (__g() - _URNG::min()) * __base;
+        return _Sp / __base;
+    }
+
+    template<class _RealType = double>
+    class uniform_real_distribution
+    {
+    public:
+        // types
+        typedef _RealType result_type;
+
+        class param_type
+        {
+            result_type __a_;
+            result_type __b_;
+        public:
+            typedef uniform_real_distribution distribution_type;
+
+            explicit param_type(result_type __a = 0,
+                                result_type __b = 1)
+                : __a_(__a), __b_(__b) {}
+
+            result_type a() const {return __a_;}
+            result_type b() const {return __b_;}
+
+            friend
+            bool operator==(const param_type& __x, const param_type& __y)
+            {return __x.__a_ == __y.__a_ && __x.__b_ == __y.__b_;}
+            friend
+            bool operator!=(const param_type& __x, const param_type& __y)
+            {return !(__x == __y);}
+        };
+
+    private:
+        param_type __p_;
+
+    public:
+        // constructors and reset functions
+        explicit uniform_real_distribution(result_type __a = 0, result_type __b = 1)
+            : __p_(param_type(__a, __b)) {}
+        explicit uniform_real_distribution(const param_type& __p) : __p_(__p) {}
+        void reset() {}
+
+        // generating functions
+        template<class _URNG>
+        result_type operator()(_URNG& __g)
+        {return (*this)(__g, __p_);}
+        template<class _URNG> result_type operator()(_URNG& __g, const param_type& __p);
+
+        // property functions
+        result_type a() const {return __p_.a();}
+        result_type b() const {return __p_.b();}
+
+        param_type param() const {return __p_;}
+
+        void param(const param_type& __p) {__p_ = __p;}
+
+
+        result_type min() const {return a();}
+
+        result_type max() const {return b();}
+
+        friend
+        bool operator==(const uniform_real_distribution& __x,
+                        const uniform_real_distribution& __y)
+        {return __x.__p_ == __y.__p_;}
+        friend
+        bool operator!=(const uniform_real_distribution& __x,
+                        const uniform_real_distribution& __y)
+        {return !(__x == __y);}
+    };
+
+    template<class _RealType>
+    template<class _URNG>
+    inline
+    typename uniform_real_distribution<_RealType>::result_type
+    uniform_real_distribution<_RealType>::operator()(_URNG& __g, const param_type& __p)
+    {
+        return (__p.b() - __p.a())
+            * ::util::generate_canonical<_RealType, std::numeric_limits<_RealType>::digits>(__g)
+            + __p.a();
     }
 }

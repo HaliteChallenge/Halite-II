@@ -87,9 +87,9 @@ namespace mapgen {
         auto rand_y_axis = std::bind(
             util::uniform_int_distribution<int>(1, map.map_height / 2 - 1), std::ref(rng));
         auto rand_angle = std::bind(
-            std::uniform_real_distribution<double>(0, 2 * M_PI), std::ref(rng));
+            util::uniform_real_distribution<double>(0, 2 * M_PI), std::ref(rng));
         auto rand_radius =
-            std::bind(std::uniform_real_distribution<double>(min_radius, max_radius), std::ref(rng));
+            std::bind(util::uniform_real_distribution<double>(min_radius, max_radius), std::ref(rng));
         auto rand_planets_generated =
             std::bind(util::uniform_int_distribution<>(2, std::max(2, planets_per_player / 2)), std::ref(rng));
 
@@ -144,7 +144,7 @@ namespace mapgen {
             // docking to a single center planet at the same time
             else if (extra_planets > 1) {
                 const auto radius =
-                    std::uniform_real_distribution<>(small_radius, big_radius)(rng);
+                    util::uniform_real_distribution<>(small_radius, big_radius)(rng);
                 const auto distance_from_center = 2 * radius +
                     2 * hlt::GameConstants::get().SHIP_RADIUS;
 
@@ -218,7 +218,7 @@ namespace mapgen {
             const auto choice = util::uniform_int_distribution<>(1, 2)(rng);
             if (choice == 1) {
                 // Line of planets down vertical axis
-                auto offset = std::uniform_real_distribution<>(max_radius, map.map_height / 2 - max_radius)(rng);
+                auto offset = util::uniform_real_distribution<>(max_radius, map.map_height / 2 - max_radius)(rng);
                 auto radius = rand_radius();
                 auto location1 = hlt::Location{center_x, center_y + offset};
                 auto location2 = hlt::Location{center_x, center_y - offset};
@@ -234,7 +234,7 @@ namespace mapgen {
             }
             else if (choice == 2) {
                 // Line of planets down horizontal axis
-                auto offset = std::uniform_real_distribution<>(max_radius, map.map_width / 2 - max_radius)(rng);
+                auto offset = util::uniform_real_distribution<>(max_radius, map.map_width / 2 - max_radius)(rng);
                 auto radius = rand_radius();
                 auto location1 = hlt::Location{center_x + offset, center_y};
                 auto location2 = hlt::Location{center_x - offset, center_y};
@@ -261,7 +261,7 @@ namespace mapgen {
             const auto small_radius =
                 std::max(2.0, std::sqrt(std::min(map.map_width, map.map_height) / 5));
             const auto radius =
-                std::uniform_real_distribution<>(small_radius, big_radius)(rng);
+                util::uniform_real_distribution<>(small_radius, big_radius)(rng);
             const auto distance_from_center = 2 * radius +
                 2 * hlt::GameConstants::get().SHIP_RADIUS;
 
