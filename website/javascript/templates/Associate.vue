@@ -276,5 +276,15 @@ export default {
   }
 </script>
 
+<!-- Reddit Conversion Pixel -->
+<script>
+  var i=new Image();i.src="https://alb.reddit.com/snoo.gif?q=CAAHAAABAAoACQAAAAn4rjRiAA==&s=5R25u9okLg159vapE7RlknmqSZqPgOjYeOmUTgsVT3Q=";
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+  src="https://alb.reddit.com/snoo.gif?q=CAAHAAABAAoACQAAAAn4rjRiAA==&s=5R25u9okLg159vapE7RlknmqSZqPgOjYeOmUTgsVT3Q="/>
+</noscript>
+<!-- DO NOT MODIFY -->
+<!-- End Reddit Conversion Pixel -->
 <style lang="scss" scoped>
 </style>
