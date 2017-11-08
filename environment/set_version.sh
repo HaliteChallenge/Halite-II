@@ -14,5 +14,5 @@ HEADER_VERSION=`sed -n 's/#define HALITE_VERSION "\([^"]*\)"/\1/p' version.hpp`
 
 # Only update the header if the version has changed.
 if [ "$VERSION" != "$HEADER_VERSION" ] ; then
-    sed -i '' "s/\(#define HALITE_VERSION \"\)[^\"]*\"/\1$VERSION\"/" version.hpp
+    sed -i.bak "s/\(#define HALITE_VERSION \"\)[^\"]*\"/\1$VERSION\"/" version.hpp
 fi
