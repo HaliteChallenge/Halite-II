@@ -1,4 +1,3 @@
-using Memento
 logger = get_logger("bot-logger")
 
 include("utils.jl")

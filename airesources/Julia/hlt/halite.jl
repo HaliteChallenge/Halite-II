@@ -1,5 +1,7 @@
 module Halite
 
+using Memento
+
 export Game, Constants, DockedStatus, start_game, thrust, dock, undock, update_map,
     all_players, all_planets, all_ships, all_docked_ships, get_player, get_me, get_planet,
     get_docked_ship, isdocked, isowned, isfull, can_dock, navigate, send_command_queue,

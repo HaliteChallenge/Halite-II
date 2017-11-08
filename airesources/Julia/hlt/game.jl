@@ -1,5 +1,3 @@
-using Memento
-
 logger = get_logger("bot-logger")
 set_level(logger, "debug")
 
