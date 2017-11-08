@@ -9,15 +9,11 @@ struct Game
     height::Int
 end
 function Game(botname::String)
-    id = get_msg()
-    setup_logger(botname, id)
-    botname = @sprintf("%s-%s", botname, id)
-
-    width, height = map(x -> parse(Int, x), split(get_msg()))
-
-    initial_game_map = GameMap(id, width, height, get_msg())
-
-    Game(id, botname, initial_game_map, width, height)
+    id = readline()
+    botname = "$botname-$id"
+    width, height = parse.(Int, split(readline()))
+    initial_game_map = GameMap(id, width, height, readline())
+    Game(id, botname, width, height, initial_game_map)
 end
 
 GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
@@ -25,20 +21,16 @@ GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.heig
 """
     start_game(game)
 
-This function should be used after bot initialization and all preliminary checks and warmsup.
+This function should be used after bot initialization and all preliminary checks and warmup.
 """
-function start_game(game::Game)
-    send_msg(game.botname, true)
-end
+start_game(game::Game) = print(game.botname, "\n")
 
 """
     update_map(game::Game)
 
 Parse the map given by the engine.
 """
-function update_map(game::Game)
-    GameMap(game, get_msg())
-end
+update_map(game::Game) = GameMap(game, readline())
 
 """
     setup_logger(name, id)
@@ -46,46 +38,16 @@ end
 Set up and truncate the log. Log name is "{name}-{id}.log".
 """
 function setup_logger(name, id)
-    add_handler(logger, DefaultHandler(open(@sprintf("%s-%s.log", name, id), "w"), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
+    add_handler(logger, DefaultHandler(open("$name-$id.log", "w"), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
     remove_handler(logger, "console")
 end
 
 """
-    get_msg()
-
-Read input from the game.
-"""
-get_msg() = readline(STDIN)
-
-"""
-    send_msg(s, done=false)
-
-Send data to the game. Call `done_msg` once finished or specify `done`=true.
-"""
-function send_msg(s::String, done::Bool=false)
-    if done
-        write(STDOUT, s*"\n")
-    else
-        write(STDOUT, s)
-    end
-    flush(STDOUT)
-end
-
-"""
-    done_msg()
-
-Finish sending commands to the game.
-"""
-done_msg() = send_msg("\n")
-
-"""
     send_command_queue(command_queue::Vector{String})
-
+    
 Issue the given list of commands.
 """
-function send_command_queue(command_queue::Vector{String})
-    for command in command_queue
-        write(STDOUT, command)
-    end
-    done_msg()
+function send_command_queue(command_queue::Vector{String}) 
+    print.(command_queue)
+    print("\n")
 end

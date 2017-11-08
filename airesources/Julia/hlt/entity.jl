@@ -121,13 +121,6 @@ function Ship(owner_id::String, tokens::Vector{String})
 end
 
 """
-    isdocked(ship)
-
-Test if current ship is undocked. Returns `true` if ship is `UNDOCKED`, `false` otherwise.
-"""
-isdocked(ship::Ship) = ship.docked != UNDOCKED
-
-"""
     can_dock(ship, planet)
 
 Determine whether a ship is close enough to planet so it can dock.
@@ -136,32 +129,12 @@ function can_dock(ship::Ship, planet::Planet)
     calculate_distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS + Constants.SHIP_RADIUS
 end
 
-"""
-    thrust(ship, speed, angle)
-    
-Generate a command to accelerate this ship.
-"""
-function thrust(ship::Ship, speed, angle)
-    @sprintf("t %s %s %s", ship.id, floor(Int, speed), round(Int, angle))
-end
 
-"""
-    dock(ship, planet)
+isdocked(ship::Ship) = ship.docked != UNDOCKED
+dock(ship::Ship, planet::Planet) = "d $(ship.id) $(planet.id)"
+undock(ship::Ship) = "u $(ship.id)"
 
-Generate a command to dock to a planet.
-"""
-function dock(ship::Ship, planet::Planet)
-    @sprintf("d %s %s", ship.id, planet.id)
-end
-
-"""
-    undock(ship)
-
-Generate a command to undock from the current planet.
-"""
-function undock(ship::Ship)
-    @sprintf("u %s", ship.id)
-end
+thrust(ship::Ship, speed, angle) = "t $(ship.id) $(floor(Int, speed)) $(round(Int, angle))"
 
 function nearest_unoccupied_planet(ship::Ship, planets)
     d = Inf
