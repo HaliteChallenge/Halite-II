@@ -7,18 +7,18 @@ radius(entity::Entity) = entity.radius
 id(entity::Entity) = entity.id
 
 """
-    calculate_distance_between(e1, e2)
+    distance_between(e1, e2)
 
 Calculates the eucledean distance between entities `e1` and `e2`.
 """
-calculate_distance_between(e1::Entity, e2::Entity) = sqrt((e1.x - e2.x)^2 + (e1.y - e2.y)^2)
+distance_between(e1::Entity, e2::Entity) = sqrt((e1.x - e2.x)^2 + (e1.y - e2.y)^2)
 
 """
-    calculate_angle_between(e1, e2)
+    angle_between(e1, e2)
 
 Calculates the angle between entities `e1` and `e2`.
 """
-calculate_angle_between(e1::Entity, e2::Entity) = rad2deg(atan2(e2.y - e1.y, e2.x - e1.x)) % 360
+angle_between(e1::Entity, e2::Entity) = rad2deg(atan2(e2.y - e1.y, e2.x - e1.x)) % 360
 
 """
     closest_point_to(e1, e2, min_distance = 3.0)
@@ -26,7 +26,7 @@ calculate_angle_between(e1::Entity, e2::Entity) = rad2deg(atan2(e2.y - e1.y, e2.
 Find the closest point to the given entity `e1` near the given target entity `e2`, outside its given radius, with an added fudge of min_distance.
 """
 function closest_point_to(e1::Entity, e2::Entity, min_distance::Float64 = 3.0)
-    angle = calculate_angle_between(e1, e2)
+    angle = angle_between(e1, e2)
     r = radius(e2) + min_distance
     x = e2.x + r * cos(deg2rad(angle))
     y = e2.y + r * sin(deg2rad(angle))
@@ -126,7 +126,7 @@ end
 Determine whether a ship is close enough to planet so it can dock.
 """
 function can_dock(ship::Ship, planet::Planet)
-    calculate_distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS + Constants.SHIP_RADIUS
+    distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS + Constants.SHIP_RADIUS
 end
 
 
@@ -145,7 +145,7 @@ function nearest_unoccupied_planet(ship::Ship, planets)
                 continue
             end
         end
-        dist = calculate_distance_between(ship, planet)
+        dist = distance_between(ship, planet)
         if dist < d
             p = planet
             d = dist

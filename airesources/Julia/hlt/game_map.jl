@@ -1,20 +1,16 @@
 logger = get_logger("bot-logger")
 
-include("utils.jl")
-
 struct GameMap
     id::String
     width::Int
     height::Int
     players::Dict{String, Player}
     planets::Dict{String, Planet}
-
-    function GameMap(id, width, height, map_string::String)
-        game_map = new(id, width, height, Dict{String, Player}(), Dict{String, Planet}())
-        map_parse!(game_map, map_string)
-
-        game_map
-    end
+end
+function GameMap(id, width, height, map_string::String)
+    game_map = GameMap(id, width, height, Dict{String, Player}(), Dict{String, Planet}())
+    map_parse!(game_map, map_string)
+    return game_map
 end
 
 """
@@ -33,7 +29,7 @@ function map_parse!(game_map::GameMap, map_string::String)
         for j in 1:num_ships
             ship = Ship(player.id, tokens)
             player.ships[ship.id] = ship
-            debug(logger, @sprintf("Owner: %s, Ship: %s, x: %d, y: %d", ship.owner_id, ship.id, ship.x, ship.y))
+            debug(logger, "Owner: $(ship.owner_id), Ship: $(ship.id), x: $(ship.x), y: $(ship.y)")
         end
         game_map.players[player_id] = player
     end
@@ -179,8 +175,8 @@ function navigate(game_map::GameMap, ship::Ship, target::Entity;
     if max_corrections <= 0
         return ""
     end
-    distance = calculate_distance_between(ship, target)
-    angle = calculate_angle_between(ship, target)
+    distance = distance_between(ship, target)
+    angle = angle_between(ship, target)
     if avoid_obstacles && !isempty(obstacles_between(game_map, ship, target, ignore_ships, ignore_planets))
         new_target_dx = cos(deg2rad(angle + angular_step)) * distance
         new_target_dy = sin(deg2rad(angle + angular_step)) * distance
