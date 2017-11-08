@@ -1,4 +1,5 @@
 #include "Replay.hpp"
+#include "../version.hpp"
 
 /**
  * Build up the in-memory representation of the header of the replay.
@@ -7,6 +8,7 @@
  */
 auto Replay::output_header(nlohmann::json& replay) -> void {
     replay["version"] = 31;
+    replay["engine_version"] = HALITE_VERSION;
     replay["seed"] = seed;
     replay["map_generator"] = map_generator;
 
