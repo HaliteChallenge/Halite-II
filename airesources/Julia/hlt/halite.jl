@@ -1,7 +1,16 @@
 module Halite
 
+export Game, Constants, DockedStatus, start_game, thrust, dock, undock, update_map,
+    all_players, all_planets, all_ships, all_docked_ships, get_player, get_me, get_planet,
+    get_docked_ship, isdocked, isowned, isfull, can_dock, navigate, send_command_queue,
+    closest_point_to, nearest_unoccupied_planet
 
 @enum DockedStatus UNDOCKED=0 DOCKING=1 DOCKED=2 UNDOCKING=3
+
+include("entity.jl")
+include("player.jl")
+include("game_map.jl")
+include("game.jl")
 
 struct CONST
     #: Max number of units of distance a ship can travel in a turn
@@ -31,15 +40,4 @@ struct CONST
 end
 Constants = CONST(7, 0.5, 255, 255, 1, 5.0, 64, 10.0, 4.0, 4, 6, 2.0)
 
-include("entity.jl")
-include("player.jl")
-include("game_map.jl")
-include("game.jl")
-
-export Game, Constants, DockedStatus
-export start_game, thrust, dock, undock
-export update_map, all_players, all_planets, all_ships, all_docked_ships, get_player, get_me, get_planet, get_docked_ship
-export isdocked, isowned, isfull, can_dock
-export navigate, send_command_queue, closest_point_to, nearest_unoccupied_planet
-
-end
+end #module
