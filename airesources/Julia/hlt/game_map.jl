@@ -21,7 +21,7 @@ Parse the map description from the game. Changes definition of game_map.players 
 function map_parse!(game_map::GameMap, map_string::String)
     tokens = Vector{String}(split(map_string))
     num_players = parse(Int, shift!(tokens))
-    debug(logger, @sprintf("Number of players: %s", num_players))
+    debug(logger, "Number of players: $num_players")
     for i in 1:num_players
         player_id = shift!(tokens)
         player = Player(player_id)

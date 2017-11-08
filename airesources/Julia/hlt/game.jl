@@ -4,9 +4,9 @@ set_level(logger, "debug")
 struct Game
     id::String
     botname::String
-    initial_game_map::GameMap
     width::Int
     height::Int
+    initial_game_map::GameMap
 end
 function Game(botname::String)
     id = readline()
