@@ -98,10 +98,10 @@ namespace util {
 #else
         static_assert(sizeof(unsigned) == sizeof(unsigned long), "");
         static_assert(sizeof(unsigned long) == 4, "");
-        unsigned long where;
+        unsigned long where = 0;
         // Search from LSB to MSB for first set bit.
         // Returns zero if no set bit is found.
-        if (_BitScanReverse(&where, mask))
+        if (_BitScanReverse(&where, __x))
             return 31 - where;
         return 32; // Undefined Behavior.
 #endif
@@ -120,18 +120,18 @@ namespace util {
 #ifndef _LIBCPP_COMPILER_MSVC
         return static_cast<unsigned long long>(__builtin_clzll(__x));
 #else
-        unsigned long where;
+        unsigned long where = 0;
         // BitScanReverse scans from MSB to LSB for first set bit.
         // Returns 0 if no set bit is found.
 #if defined(_LIBCPP_HAS_BITSCAN64)
-        if (_BitScanReverse64(&where, mask))
+        if (_BitScanReverse64(&where, __x))
             return static_cast<int>(63 - where);
 #else
         // Scan the high 32 bits.
-        if (_BitScanReverse(&where, static_cast<unsigned long>(mask >> 32)))
+        if (_BitScanReverse(&where, static_cast<unsigned long>(__x >> 32)))
             return 63 - (where + 32); // Create a bit offset from the MSB.
         // Scan the low 32 bits.
-        if (_BitScanReverse(&where, static_cast<unsigned long>(mask)))
+        if (_BitScanReverse(&where, static_cast<unsigned long>(__x)))
             return 63 - where;
 #endif
         return 64; // Undefined Behavior.
