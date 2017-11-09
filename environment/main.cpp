@@ -6,6 +6,7 @@
 
 #include "version.hpp"
 #include "core/Halite.hpp"
+#include "core/util/distributions.hpp"
 
 inline std::istream& operator>>(std::istream& i,
                                 std::pair<signed int, signed int>& p) {
@@ -193,7 +194,7 @@ int main(int argc, char** argv) {
         std::vector<unsigned short> mapSizeChoices =
             { 80, 80, 88, 88, 96, 96, 96, 104, 104, 104, 112, 112, 112, 120, 120, 128, 128 };
         std::mt19937 prg(seed);
-        std::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
+        util::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
         auto mapBase = mapSizeChoices[size_dist(prg)];
         mapWidth = 3 * mapBase;
         mapHeight = 2 * mapBase;

@@ -7,6 +7,7 @@ CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd6
 cl.exe /std:c++14 /O2 /MT /EHsc /W2 /Fo.\obj\ /Fehalite.exe ^
  ^
  /DZSTD_MULTITHREAD=1 ^
+ /D_LIBCPP_COMPILER_MSVC=1 ^
  /DNDEBUG ^
  ^
  /I . ^
