@@ -22,11 +22,11 @@ function map_parse!(game_map::GameMap, map_string::String)
     tokens = Vector{String}(split(map_string))
     num_players = parse(Int, shift!(tokens))
     debug(logger, "Number of players: $num_players")
-    for i in 1:num_players
+    for _ in 1:num_players
         player_id = shift!(tokens)
         player = Player(player_id)
         num_ships = parse(Int, shift!(tokens))
-        for j in 1:num_ships
+        for _ in 1:num_ships
             ship = Ship(player.id, tokens)
             player.ships[ship.id] = ship
             debug(logger, "Owner: $(ship.owner_id), Ship: $(ship.id), x: $(ship.x), y: $(ship.y)")
@@ -34,7 +34,7 @@ function map_parse!(game_map::GameMap, map_string::String)
         game_map.players[player_id] = player
     end
     num_planets = parse(Int, shift!(tokens))
-    for i in 1:num_planets
+    for _ in 1:num_planets
         planet = Planet(tokens)
         game_map.planets[planet.id] = planet
     end
@@ -87,11 +87,8 @@ get_planet(game_map::GameMap, ship::Ship) = get_planet(game_map, ship.docked_pla
 List of all docked ships, empty if planet is not owned.
 """
 function all_docked_ships(game_map::GameMap, planet::Planet)
-    if planet.owned
-        return map(x -> get_ship(get_player(game_map, planet), x), planet.docked_ships_ids)
-    else
-        return Vector{Ship}()
-    end
+    planet.owned && return get_ship.(get_player(game_map, planet), planet.docked_ships_ids)
+    return Vector{Ship}()
 end
 
 """
@@ -106,15 +103,6 @@ get_docked_ship(game_map::GameMap, planet::Planet, ship_id::String) = get_ship(g
 
 List of all ships in current game map.
 """
-# function all_ships(game_map::GameMap)
-#     all_ships = Vector{Ship}()
-#     for player in all_players(game_map)
-#         all_ships = vcat(all_ships, all_ships(player, true))
-#     end
-
-#     return all_ships
-# end
-
 all_ships(game_map::GameMap) = [all_ships(player) for player in all_players(game_map)]
 
 """
@@ -127,7 +115,6 @@ function obstacles_between(game_map::GameMap, e1::Entity, e2::Entity, ignore_shi
     if !ignore_ships
         for entity in all_ships(game_map)
             (e1 == entity || e2 == entity) && continue
-
             if intersect_segment_circle(e1, e2, entity, radius(e1) + 0.1)
                 push!(obstacles, entity)
             end
@@ -137,13 +124,11 @@ function obstacles_between(game_map::GameMap, e1::Entity, e2::Entity, ignore_shi
     if !ignore_planets
         for entity in all_planets(game_map)
             (e1 == entity || e2 == entity) && continue
-
             if intersect_segment_circle(e1, e2, entity, radius(e1) + 0.1)
                 push!(obstacles, entity)
             end
         end
     end
-
     return obstacles
 end
 
@@ -178,7 +163,6 @@ function navigate(game_map::GameMap, ship::Ship, target::Entity;
         new_target_dx = cos(deg2rad(angle + angular_step)) * distance
         new_target_dy = sin(deg2rad(angle + angular_step)) * distance
         new_target = Position(ship.x + new_target_dx, ship.y + new_target_dy)
-
         return navigate(game_map, ship, new_target,
                         speed = speed,
                         avoid_obstacles = avoid_obstacles,
@@ -187,7 +171,6 @@ function navigate(game_map::GameMap, ship::Ship, target::Entity;
                         ignore_ships = ignore_ships,
                         ignore_planets = ignore_planets)
     end
-
     speed = distance >= speed ? speed : floor(Int, distance)
     return thrust(ship, speed, angle)
 end

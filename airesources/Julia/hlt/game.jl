@@ -16,14 +16,14 @@ function Game(botname::String)
     Game(id, botname, width, height, initial_game_map)
 end
 
+GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
+
 """
 update_map(game::Game)
 
 Parse the map given by the engine.
 """
 update_map(game::Game) = GameMap(game, readline())
-
-GameMap(game::Game, map_string::String) = GameMap(game.id, game.width, game.height, map_string)
 
 """
     start_game(game)
@@ -35,10 +35,11 @@ start_game(game::Game) = print(game.botname, "\n")
 """
     setup_logger(name, id)
 
-Set up and truncate the log. Log name is "{name}-{id}.log".
+Set up and truncate the log. Log name is "{id}-{name}.log".
 """
 function setup_logger(name, id)
-    add_handler(logger, DefaultHandler(open("$id-$name.log", "w"), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
+    add_handler(logger, DefaultHandler(open("$id-$name.log", "w"), 
+                    DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
     remove_handler(logger, "console")
 end
 

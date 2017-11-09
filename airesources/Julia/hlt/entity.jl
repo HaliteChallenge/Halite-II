@@ -11,7 +11,7 @@ id(entity::Entity) = entity.id
 
 Calculates the eucledean distance between entities `e1` and `e2`.
 """
-distance_between(e1::Entity, e2::Entity) = sqrt((e1.x - e2.x)^2 + (e1.y - e2.y)^2)
+distance_between(e1::Entity, e2::Entity) = √((e1.x - e2.x)^2 + (e1.y - e2.y)^2)
 
 """
     angle_between(e1, e2)
@@ -37,7 +37,6 @@ end
 ###########################################################
 ## Planet
 ###########################################################
-
 struct Planet <: Entity
     id::String
     x::Float64
@@ -50,26 +49,24 @@ struct Planet <: Entity
     owned::Bool
     owner_id::String
     docked_ships_ids::Vector{String}
-
-    function Planet(tokens::Vector{String})
-        id = shift!(tokens)
-        x = parse(Float64, shift!(tokens))
-        y = parse(Float64, shift!(tokens))
-        hp = parse(Int, shift!(tokens))
-        r = parse(Float64, shift!(tokens))
-        docking = parse(Int, shift!(tokens))
-        current = parse(Int, shift!(tokens))
-        remaining = parse(Int, shift!(tokens))
-        owned = shift!(tokens) != "0"
-        owner_id = shift!(tokens)
-        num_docked_ships = parse(Int, shift!(tokens))
-        docked_ships_ids = Vector{String}(num_docked_ships)
-        for i in 1:num_docked_ships
-            docked_ships_ids[i] = shift!(tokens)
-        end
-
-        new(id, x, y, hp, r, docking, current, remaining, owned, owner_id, docked_ships_ids)
+end
+function Planet(tokens::Vector{String})
+    id = shift!(tokens)
+    x = parse(Float64, shift!(tokens))
+    y = parse(Float64, shift!(tokens))
+    hp = parse(Int, shift!(tokens))
+    r = parse(Float64, shift!(tokens))
+    docking = parse(Int, shift!(tokens))
+    current = parse(Int, shift!(tokens))
+    remaining = parse(Int, shift!(tokens))
+    owned = shift!(tokens) != "0"
+    owner_id = shift!(tokens)
+    num_docked_ships = parse(Int, shift!(tokens))
+    docked_ships_ids = Vector{String}(num_docked_ships)
+    for i in 1:num_docked_ships
+        docked_ships_ids[i] = shift!(tokens)
     end
+    Planet(id, x, y, hp, r, docking, current, remaining, owned, owner_id, docked_ships_ids)
 end
 
 """
@@ -89,7 +86,6 @@ isfull(planet::Planet) = length(planet.docked_ships_ids) >= planet.num_docking_s
 ###########################################################
 ## Ship
 ###########################################################
-
 struct Ship <: Entity
     owner_id::String
     id::String
@@ -113,9 +109,7 @@ function Ship(owner_id::String, tokens::Vector{String})
     docked_planet = shift!(tokens)
     progress = parse(Int, shift!(tokens))
     cooldown = parse(Int, shift!(tokens))
-
-    Ship(owner_id, id, x, y, hp, SHIP_RADIUS, docked, 
-        docked_planet, progress, cooldown)
+    Ship(owner_id, id, x, y, hp, SHIP_RADIUS, docked, docked_planet, progress, cooldown)
 end
 
 """
@@ -126,7 +120,6 @@ Determine whether a ship is close enough to planet so it can dock.
 function can_dock(ship::Ship, planet::Planet)
     distance_between(ship, planet) <= radius(planet) + DOCK_RADIUS + SHIP_RADIUS
 end
-
 
 isdocked(ship::Ship) = ship.docked != UNDOCKED
 dock(ship::Ship, planet::Planet) = "d $(ship.id) $(planet.id)"
@@ -149,14 +142,12 @@ function nearest_unoccupied_planet(ship::Ship, planets)
             d = dist
         end
     end
-
     return p
 end
 
 ###########################################################
 ## Position
 ###########################################################
-
 struct Position <: Entity
     x::Float64
     y::Float64
