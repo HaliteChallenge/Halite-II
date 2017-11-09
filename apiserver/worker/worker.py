@@ -123,6 +123,9 @@ def executeCompileTask(user_id, bot_id, backend):
             # User needs to be able to write to the directory
             give_ownership(temp_dir, "bots", 0o774)
 
+            # Reset cwd before compilation, in case it was in a
+            # deleted temporary folder
+            os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
             language, more_errors = compiler.compile_anything(temp_dir)
             didCompile = more_errors is None
             if more_errors:
