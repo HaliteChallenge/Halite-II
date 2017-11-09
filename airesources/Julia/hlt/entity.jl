@@ -97,8 +97,6 @@ struct Ship <: Entity
     y::Float64
     hp::Int
     radius::Float64
-    vel_x::Float64
-    vel_y::Float64
     docked::DockedStatus
     docked_planet_id::String
     progress::Int
@@ -109,14 +107,14 @@ function Ship(owner_id::String, tokens::Vector{String})
     x = parse(Float64, shift!(tokens))
     y = parse(Float64, shift!(tokens))
     hp = parse(Int, shift!(tokens))
-    vel_x = parse(Float64, shift!(tokens))
-    vel_y = parse(Float64, shift!(tokens))
+    _ = parse(Float64, shift!(tokens)) # deprecated vel_x
+    _ = parse(Float64, shift!(tokens)) # deprecated vel_y 
     docked = DockedStatus(parse(Int, shift!(tokens)))
     docked_planet = shift!(tokens)
     progress = parse(Int, shift!(tokens))
     cooldown = parse(Int, shift!(tokens))
 
-    Ship(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, vel_x, vel_y, docked, 
+    Ship(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, docked, 
         docked_planet, progress, cooldown)
 end
 
