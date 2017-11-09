@@ -379,11 +379,7 @@ namespace util {
     {
         const std::size_t _Dt = std::numeric_limits<_RealType>::digits;
         const std::size_t __b = _Dt < __bits ? _Dt : __bits;
-#ifdef _LIBCPP_CXX03_LANG
-        const std::size_t __logR = __log2<uint64_t, _URNG::_Max - _URNG::_Min + uint64_t(1)>::value;
-#else
         const std::size_t __logR = __log2<uint64_t, _URNG::max() - _URNG::min() + uint64_t(1)>::value;
-#endif
         const std::size_t __k = __b / __logR + (__b % __logR != 0) + (__b == 0);
         const _RealType _Rp = _URNG::max() - _URNG::min() + _RealType(1);
         _RealType __base = _Rp;
