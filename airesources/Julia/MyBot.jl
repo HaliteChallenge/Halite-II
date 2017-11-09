@@ -68,7 +68,7 @@ while true
                 navigate_command = navigate(game_map,
                     ship,
                     closest_point_to(ship, planet),
-                    speed = round(Int, Constants.MAX_SPEED/2),
+                    speed = round(Int, MAX_SPEED/2),
                     ignore_ships = true)
                 # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
                 # or we are trapped (or we reached our destination!), navigate_command will return empty string;
