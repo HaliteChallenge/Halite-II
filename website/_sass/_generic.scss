@@ -196,6 +196,35 @@ input:focus{
 .color-4{
   color: $player-4 !important;
 }
+
+.icon-tier-1, .icon-tier-2, .icon-tier-3, .icon-tier-4, .icon-tier-5{
+  width: 22px;
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  &:before{
+    display: none;
+  }
+}
+.icon-tier-1{
+  background-image: url("../images/level-5.svg");
+}
+.icon-tier-2{
+  background-image: url("../images/level-4.svg");
+}
+.icon-tier-3{
+  background-image: url("../images/level-3.svg");
+}
+.icon-tier-4{
+  background-image: url("../images/level-2.svg");
+}
+.icon-tier-5{
+  background-image: url("../images/level-1.svg");
+}
+
 .dot{
   width: 8px;
   height: 8px;

@@ -38,7 +38,7 @@ public class Ship extends Entity {
     }
 
     public boolean canDock(final Planet planet) {
-        return getDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.getRadius();
+        return getDistanceTo(planet) <= Constants.SHIP_RADIUS + Constants.DOCK_RADIUS + planet.getRadius();
     }
 
     @Override

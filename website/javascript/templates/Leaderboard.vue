@@ -368,7 +368,7 @@ export default {
         // get tier value
         if (params.tier && params.tier.length > 0) {
           let selected = this.tiers.filter((item) => {
-            return params.tier.indexOf(item.value + '') != -1
+            return params.tier.indexOf(item.label + '') != -1
           })
           this.tier_filter = selected
         }
@@ -433,14 +433,11 @@ export default {
 
         // adding the tier filter
         if (this.tier_filter.length > 0) {
-          let key = 'rank'
-          if (this.hackathonId) {
-            key = 'local_rank'
-          }
+          let key = 'tier'
           params['tier'] = []
           this.tier_filter.forEach(function (item) {
-            filters.push(key + ',=,' + item.value)
-            params['tier'].push(item.value)
+            filters.push(key + ',=,' + item.label)
+            params['tier'].push(item.label)
           })
         }
 
@@ -623,7 +620,6 @@ export default {
       },
       getCountryName: function (name) {
         var countries = require('i18n-iso-countries')
-
         return countries.getName(name, 'en')
       },
       clearFilter: function () {
@@ -638,21 +634,10 @@ export default {
           var countries = require('i18n-iso-countries')
           return '/assets/images/countries/' + countries.getAlpha2Code(countries.getName(name, 'en'), 'en').toLowerCase() + '.png'
         }
-
         return null
       },
-      getCountryName: function (name) {
-        var countries = require('i18n-iso-countries')
-        return countries.getName(name, 'en')
-      },
       getFormattedDate: function (date) {
-        var cdate = moment(date)
-          if (cdate.isValid()) {
-            var dateFormat = require('dateformat')
-            return dateFormat(date, 'dd/mm/yy HH:MM')
-          } else {
-            return return_value_not_valid
-          }
+        return moment(date).fromNow();
       },
     }
   }

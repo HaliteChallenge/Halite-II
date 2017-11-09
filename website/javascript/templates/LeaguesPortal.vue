@@ -28,6 +28,13 @@
                 v-model="filter_cat"
                 :options="catOptions">
               </v-select>
+              <v-select
+                v-if="isLoggedIn"
+                placeholder="Leagues"
+                :value.sync="filter_user_leagues"
+                :on-change="onChangeMyLeagues"
+                :options="leaguesOptions">
+              </v-select>
               <!-- <div>
                 <button class="btn"><span>APPLY FILTER</span></button>
               </div> -->
@@ -43,13 +50,18 @@
               <th class="league-col-category">Category</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody v-if="finalLeagues.length > 0">
             <tr v-for="league in finalLeagues" :key="league.id">
               <td>
                 <a :href="getLink(league)">{{league.name}}</a>
               </td>
               <td>{{league.description}}</td>
               <td>{{league.category}}</td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td colspan="3" style="text-align:center">There is no leagues found</td>
             </tr>
           </tbody>
         </table>
@@ -73,8 +85,13 @@
         leagues: [],
         filter_name: [],
         filter_cat: [],
+        filter_user_leagues: '',
         catOptions: [],
-        nameOptions: []
+        nameOptions: [],
+        leaguesOptions: ['All', 'Only my leagues'],
+        myLeagues: [],
+        filteredLeagues: [],
+        isLoggedIn: false,
       }
     },
     mounted: function(){
@@ -85,8 +102,11 @@
       }
 
       api.getLeaguesList().then((leagues) => {
-        console.log(leagues)
         this.leagues = leagues
+
+      this.leagues.sort(function(a, b) {
+          return a.category.localeCompare(b.category);
+        });
 
         // update filter options
         let catOptions = [];
@@ -103,10 +123,18 @@
         this.catOptions = catOptions
         this.nameOptions = nameOptions
       });
+
+      api.me().then((me) => {
+        if (me.user_id) {
+          this.isLoggedIn = true;
+        }
+      })
+      this.getMyLeagues(); // prefetch
     },
     computed: {
       finalLeagues: function(){
-        return _.filter(this.leagues, (item) => {
+        const leagues = this.filter_user_leagues == 'Only my leagues' ? this.myLeagues : this.leagues;
+        return _.filter(leagues, (item) => {
           let nameIncluded = !this.filter_name.length || this.filter_name.indexOf(item.name) != -1;
           let catIncluded = !this.filter_cat.length || this.filter_cat.indexOf(item.category) != -1;
           return nameIncluded && catIncluded
@@ -123,6 +151,41 @@
       clearFilter: function(){
         this.filter_name = [];
         this.filter_cat = [];
+      },
+      getMyLeagues: function(){
+        api.me().then((me) => {
+          if (me && me.user_id){
+            const user_id = me.user_id;
+
+            this.leagues.forEach((league) => {
+              let category = league.query.match(/(level|language|country)=[^&]*/)[1]
+              let filterValue = league.query.match(/(level|language|country)=([^&]*)/)[2]
+              let limit = league.query.match(/(limit)=([^&]*)/)[2]
+              let filter = []
+
+              if (category == 'country'){
+                filter = [`country_code,=,${filterValue}`]
+              } else {
+                filter = [`${category},=,${filterValue}`]
+              }
+
+              api.leaderboard(filter, null, 0, limit).then((leaderboard) => {
+                leaderboard.forEach((leader) => {
+                  if (leader.user_id == user_id){
+                    this.myLeagues.push(league);
+                    return false;
+                  }
+                });
+              });
+            });
+          }
+        });
+      },
+      onChangeMyLeagues: function(value){
+        this.filter_user_leagues = value;
+        if ( value == 'Only my leagues'){
+          this.filteredLeagues = this.myLeagues;
+        }
       }
     }
   }

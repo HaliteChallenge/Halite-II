@@ -10,13 +10,18 @@ sort_key: 9
 
 [Download: Halite Client](https://storage.cloud.google.com/halite-content/HaliteClient.zip)
 
+or use curl (Google auth not needed)
+
+```
+curl https://storage.googleapis.com/halite-content/HaliteClient.zip > HaliteClient.zip
+```
+
 or pip install it!
 
 ```
 pip install hlt_client
 ```
 *Note: if you choose to pip install, replace all references of `./client` below with `hlt`*
-
 
 ## Ready, Set, Authenticate
 

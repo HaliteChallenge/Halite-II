@@ -27,6 +27,11 @@ include_directories(${CMAKE_SOURCE_DIR}/zstd-1.3.0/lib/legacy)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
+add_custom_target(VERSION_CHECK
+    ./set_version.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
 foreach(dir ${dirs})
     file(GLOB_RECURSE SOURCE ${dir}/*.[ch]*)
     set(SOURCE_FILES "${SOURCE_FILES}" ${SOURCE})
@@ -36,6 +41,8 @@ include_directories(${CMAKE_SOURCE_DIR})
 set(SOURCE_FILES "${SOURCE_FILES}" main.cpp)
 
 add_executable(halite ${SOURCE_FILES})
+
+add_dependencies(halite VERSION_CHECK)
 
 if (APPLE)
     # No static linkage here - https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build

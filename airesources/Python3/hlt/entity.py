@@ -315,7 +315,7 @@ class Ship(Entity):
         :return: True if can dock, False otherwise
         :rtype: bool
         """
-        return self.calculate_distance_between(planet) <= planet.radius + constants.DOCK_RADIUS
+        return self.calculate_distance_between(planet) <= planet.radius + constants.DOCK_RADIUS + constants.SHIP_RADIUS
 
     def _link(self, players, planets):
         """

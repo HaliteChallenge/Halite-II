@@ -148,9 +148,10 @@ auto collision_time(
 
         if (t1 >= 0.0 && t2 >= 0.0) {
             return { true, std::min(t1, t2) / (2 * a) };
-        }
-        else {
+        } else if (t1 <= 0.0 && t2 <= 0.0) {
             return { true, std::max(t1, t2) / (2 * a) };
+        } else {
+            return { true, 0.0 };
         }
     }
     else {
@@ -172,6 +173,7 @@ auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& planet)
 
 auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
     return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude()
+        + ship1.radius + ship2.radius
         + hlt::GameConstants::get().WEAPON_RADIUS;
 }
 

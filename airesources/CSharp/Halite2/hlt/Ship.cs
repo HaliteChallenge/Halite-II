@@ -42,7 +42,7 @@ namespace Halite2.hlt
 
         public bool CanDock(Planet planet)
         {
-            return GetDistanceTo(planet) <= Constants.DOCK_RADIUS + planet.GetRadius();
+            return GetDistanceTo(planet) <= Constants.SHIP_RADIUS + Constants.DOCK_RADIUS + planet.GetRadius();
         }
 
         public override string ToString()

@@ -101,9 +101,9 @@
               </div>
             </div>
           </div>
-          <div class="game-replay-controller">
+          <div class="game-replay-controller" v-if="false">
               <div class="game-replay-btn-table" style="width: 200px;">
-                  <label for="halloween">Halloween Theme:</label> 
+                  <label for="halloween">Halloween Theme:</label>
                   <input type="checkbox" class="pull-left" style="margin-top: -5px;" id="halloween" v-bind:checked="isHalloween" v-on:click="toggleHalloween(this)">
               </div>
               <i class="xline xline-bottom"></i>
@@ -245,17 +245,8 @@
                 <i class="dot-tr"></i>
                 <i class="dot-bl"></i>
                 <i class="dot-br"></i>
-                <!-- <div class="dashboard-graph dashboard-graph-full">
-                  <h4 class="dashboard-graph-heading">
-                    <span class="icon-globe"></span>
-                    Territory Gained
-                  </h4>
-                  <PlayerLineChart ref="chart1" :selected-players="selectedPlayers" :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
-                </div> -->
               </div>
               <div class="dashboard-graph-container bb ">
-                <!-- <i class="dot-bl"></i>
-                <i class="dot-br"></i> -->
                 <div class="row">
                   <div class="dashboard-graph br col-md-6">
                     <i class="dot-tr"></i>

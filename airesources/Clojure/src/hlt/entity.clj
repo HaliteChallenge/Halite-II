@@ -34,7 +34,7 @@
   planet."
   [ship planet]
   (<= (math/distance-between ship planet)
-      (+ dock-radius (:radius planet))))
+      (+ dock-radius ship-radius (:radius planet))))
 
 (defn remaining-docking-spots
   "Returns the number of remaining docking spots for this planet"

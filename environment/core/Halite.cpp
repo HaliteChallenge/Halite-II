@@ -715,7 +715,6 @@ auto Halite::process_events() -> void {
             }
 
             target_count[src] = num_prev_targets + 1;
-            damage_dealt[src.player_id()] += hlt::GameConstants::get().WEAPON_DAMAGE;
         };
 
         for (SimulationEvent ev : simultaneous_events) {
@@ -761,6 +760,9 @@ auto Halite::process_events() -> void {
         for (const auto& pair : attackers) {
             full_frame_events.back().push_back(
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
+            // Track damage dealt here so each attacker's damage is only
+            // counted once.
+            damage_dealt[pair.first.player_id()] += hlt::GameConstants::get().WEAPON_DAMAGE;
             // Use the AttackEvents generated above to actually
             // perform attack calculations. This way, we only perform
             // damage calculations when we're sure there was actually
@@ -960,6 +962,7 @@ std::vector<bool> Halite::process_next_frame(std::vector<bool> alive) {
 GameStatistics Halite::run_game(std::vector<std::string>* names_,
                                 unsigned int id,
                                 bool enable_replay,
+                                bool enable_compression,
                                 std::string replay_directory) {
     // For rankings
     std::vector<bool> living_players(number_of_players, true);
@@ -1110,11 +1113,11 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
             };
             stats.output_filename = replay_directory + "Replays/" + filename;
             try {
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             catch (std::runtime_error& e) {
                 stats.output_filename = replay_directory + filename;
-                replay.output(stats.output_filename);
+                replay.output(stats.output_filename, enable_compression);
             }
             if (!quiet_output) {
                 std::cout << "Map seed was " << seed << std::endl

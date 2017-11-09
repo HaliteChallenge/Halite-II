@@ -12,8 +12,8 @@
       <div class="row hackathon-progress-cards">
         <!-- For new events just copy paste the below div and customize,
         you also need to modify the function to point to the righ link -->
-        <div class="col-md-3" @click="openHackathon(1)">
-          <div class="hackathon-progress-card">
+        <div class="col-md-3" >
+          <div class="hackathon-progress-card" @click="openHackathon(1)">
             <img class="hackathon-card-img" src="/assets/images/dalton.jpg" alt="New York High School Hackathon"/>
             <div class="hackathon-card-text">
               <p class="t3 c-wht">NYC High School Hackathon</p>
@@ -33,26 +33,26 @@
               </ul>
             </div>
           </div>
-          <!-- <div class="hackathon-progress-card">
+          <div class="hackathon-progress-card" @click="openHackathon(2)">
             <img class="hackathon-card-img" src="/assets/images/cornell-tech.jpg" alt="New York High School Hackathon"/>
             <div class="hackathon-card-text">
               <p class="t3 c-wht">NYC Cornell Tech Hackathon</p>
               <ul class="hackathon-info">
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-pin.svg`"/>
-                  <p class="hackathon-card-item-text">The Bridge @ Cornell Tech</p>
+                  <p class="hackathon-card-item-text">Bloomberg Center @ Cornell Tech</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-time.svg`"/>
-                  <p class="hackathon-card-item-text">TBD</p>
+                  <p class="hackathon-card-item-text">6-9pm</p>
                 </li>
                 <li>
                   <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
-                  <p class="hackathon-card-item-text">TBD</p>
+                  <p class="hackathon-card-item-text">November 15th, 2017</p>
                 </li>
               </ul>
             </div>
-          </div> -->
+          </div> 
         </div>
       </div>
     </div>
@@ -164,6 +164,9 @@ export default {
         if(id === 1)
         {
           var win = window.open("https://www.eventbrite.com/e/halite-nyc-high-school-hackathon-tickets-39020543496", '_blank');
+          win.focus();
+        } else if (id === 2){
+          var win = window.open("https://www.eventbrite.com/e/cornell-tech-halite-hackathon-tickets-39020908588", '_blank');
           win.focus();
         }
     },

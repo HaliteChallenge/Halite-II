@@ -4,7 +4,9 @@
 #include <iostream>
 #include <list>
 
+#include "version.hpp"
 #include "core/Halite.hpp"
+#include "core/util/distributions.hpp"
 
 inline std::istream& operator>>(std::istream& i,
                                 std::pair<signed int, signed int>& p) {
@@ -47,7 +49,7 @@ int main(int argc, char** argv) {
     auto id = std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::high_resolution_clock().now().time_since_epoch()).count();
 
-    TCLAP::CmdLine cmd("Halite Game Environment", ' ', "1.2");
+    TCLAP::CmdLine cmd("Halite Game Environment", ' ', HALITE_VERSION);
 
     //Switch Args.
     TCLAP::SwitchArg quietSwitch("q",
@@ -112,6 +114,14 @@ int main(int argc, char** argv) {
         "",
         "print-constants",
         "Print out the default constants and exit.",
+        cmd,
+        false
+    );
+
+    TCLAP::SwitchArg noCompressionSwitch(
+        "",
+        "no-compression",
+        "Disables compression for output files.",
         cmd,
         false
     );
@@ -184,7 +194,7 @@ int main(int argc, char** argv) {
         std::vector<unsigned short> mapSizeChoices =
             { 80, 80, 88, 88, 96, 96, 96, 104, 104, 104, 112, 112, 112, 120, 120, 128, 128 };
         std::mt19937 prg(seed);
-        std::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
+        util::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
         auto mapBase = mapSizeChoices[size_dist(prg)];
         mapWidth = 3 * mapBase;
         mapHeight = 2 * mapBase;
@@ -288,6 +298,7 @@ int main(int argc, char** argv) {
     GameStatistics stats = my_game->run_game(names,
                                              id,
                                              !noReplaySwitch.getValue(),
+                                             !noCompressionSwitch.getValue(),
                                              outputFilename);
     if (names != NULL) delete names;
 

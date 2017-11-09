@@ -28,7 +28,7 @@ namespace hlt {
 
         /// Check if this ship is close enough to dock to the given planet.
         bool can_dock(const Planet& planet) const {
-            return location.get_distance_to(planet.location) <= (constants::DOCK_RADIUS + planet.radius);
+            return location.get_distance_to(planet.location) <= (constants::SHIP_RADIUS + constants::DOCK_RADIUS + planet.radius);
         }
     };
 }

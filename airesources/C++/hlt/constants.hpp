@@ -38,7 +38,7 @@ namespace hlt {
         /** Number of turns it takes to dock a ship */
         constexpr unsigned int DOCK_TURNS = 5;
 
-        /** Number of turns it takes to create a ship per docked ship */
+        /** Number of production units per turn contributed by each docked ship */
         constexpr int BASE_PRODUCTIVITY = 6;
 
         /** Distance from the planets edge at which new ships are created */

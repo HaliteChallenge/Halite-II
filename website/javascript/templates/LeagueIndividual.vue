@@ -46,14 +46,13 @@
       <table class="table table-leader">
         <thead>
           <tr>
-            <th class="text-center">Rank</th>
+            <th class="text-center">League Rank</th>
             <th>Player</th>
             <th>Rating</th>
             <th class="text-center">Tier</th>
             <th>Academic Status</th>
             <th class="text-center">Country</th>
             <th>Organization</th>
-            <th>Language</th>
             <th>Last Submission</th>
           </tr>
         </thead>
@@ -71,9 +70,12 @@
               <span :class="tierClass(player.tier || player.local_tier)"></span>
             </td>
             <td>{{ player.level }}</td>
-            <td class="text-center">{{ getCountryName(player.country) }}</td>
+            <td class="text-center">
+              <div>
+                <img v-if="getCountry(player.country)" :title="`${getCountryName(player.country)}`" :src="`${getCountry(player.country)}`" class="country-img">
+              </div>
+            </td>
             <td>{{ player.organization }}</td>
-            <td>{{ player.language }}</td>
             <td>{{ getFormattedDate(player.update_time)  }}</td>
           </tr>
         </tbody>
@@ -99,7 +101,7 @@
         path: [
           {
             name: 'Leagues',
-            link: '/halite-leagues'
+            link: '/leagues'
           }
         ],
         sharePopup: false,
@@ -126,6 +128,8 @@
 
         if (category == 'country'){
           filter = [`country_code,=,${filterValue}`]
+        } else if (filterValue == 'C#/.NET Core,C#/Mono') {
+          filter = [`${category},=,C#/.NET Core`, `${category},=,C#/Mono`]
         } else {
           filter = [`${category},=,${filterValue}`]
         }
@@ -141,6 +145,17 @@
     methods: {
       toggleShare: function(){
         this.sharePopup = !this.sharePopup;
+      },
+      getCountry: function (name) {
+        if (name) {
+          var countries = require('i18n-iso-countries')
+          return '/assets/images/countries/' + countries.getAlpha2Code(countries.getName(name, 'en'), 'en').toLowerCase() + '.png'
+        }
+        return null
+      },
+      getCountryName: function (name) {
+        var countries = require('i18n-iso-countries')
+        return countries.getName(name, 'en')
       },
       copyToClipboard: function(){
         if (e) e.preventDefault()
@@ -168,7 +183,7 @@
       },
 
       getFormattedDate: function (date) {
-        return moment(date).startOf('day').fromNow()
+        return moment(date).fromNow()
       },
       parentLink: function(){
         return encodeURI(`/leagues?category=${this.league.category}`)
