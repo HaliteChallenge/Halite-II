@@ -33,7 +33,7 @@
               </ul>
             </div>
           </div>
-          <div class="hackathon-progress-card" @click="openHackathon(2)">
+          <!-- <div class="hackathon-progress-card" @click="openHackathon(2)">
             <img class="hackathon-card-img" src="/assets/images/cornell-tech.jpg" alt="New York High School Hackathon"/>
             <div class="hackathon-card-text">
               <p class="t3 c-wht">NYC Cornell Tech Hackathon</p>
@@ -52,7 +52,7 @@
                 </li>
               </ul>
             </div>
-          </div> 
+          </div>  -->
         </div>
       </div>
     </div>

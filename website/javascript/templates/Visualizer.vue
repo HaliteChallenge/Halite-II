@@ -245,8 +245,17 @@
                 <i class="dot-tr"></i>
                 <i class="dot-bl"></i>
                 <i class="dot-br"></i>
+                <!-- <div class="dashboard-graph dashboard-graph-full">
+                  <h4 class="dashboard-graph-heading">
+                    <span class="icon-globe"></span>
+                    Territory Gained
+                  </h4>
+                  <PlayerLineChart ref="chart1" :selected-players="selectedPlayers" :chart-data="chartData.production" :index="frame" :showChart="showChartPanel" @updateIndex="index => {frame = index}"/>
+                </div> -->
               </div>
               <div class="dashboard-graph-container bb ">
+                <!-- <i class="dot-bl"></i>
+                <i class="dot-br"></i> -->
                 <div class="row">
                   <div class="dashboard-graph br col-md-6">
                     <i class="dot-tr"></i>
