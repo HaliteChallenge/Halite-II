@@ -89,7 +89,7 @@ tar xvzf julia.tgz
 wget -O swift.tar.gz https://swift.org/builds/swift-4.0.2-release/ubuntu1610/swift-4.0.2-RELEASE/swift-4.0.2-RELEASE-ubuntu16.10.tar.gz
 sudo tar -C /usr/local -xzf swift.tar.gz
 echo 'export PATH="$PATH:/usr/local/swift-4.0.2-RELEASE-ubuntu16.10/usr/bin"' | sudo -iu bot_compilation tee -a /home/bot_compilation/.profile
-sudo chmod o+r /usr/local/swift-4.0.2-RELEASE-ubuntu16.10/usr/lib/swift/CoreFoundation/module.modulemap
+sudo chmod -R o+r /usr/local/swift-4.0.2-RELEASE-ubuntu16.10/usr/lib/swift/CoreFoundation/
 
 ## Create four cgroups to isolate bots.
 sudo touch /etc/cgconfig.conf
