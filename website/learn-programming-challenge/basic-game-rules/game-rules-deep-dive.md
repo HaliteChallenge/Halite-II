@@ -92,7 +92,7 @@ Ships can do combat with planets by crashing into them (occupying locations on t
 
 Like ships, planets also have health points. Planets start with a number of health points proportional to their radius: 255 points per unit of radius (thus, a radius 3 planet has 765 health). A ship can damage or destroy a planet by colliding with it; the planet takes 1 point of damage for each point of health the ship had. Since ships have up to 255 health, this means a planet can absorb one collision with a full-health ship per unit of radius it has. For instance, a radius 3 planet will explode if 3 full-health ships collide with it.
 
-When a planet dies, it explodes, dealing damage to any ships or planets within 10 units of the planet surface. The damage scales linearly with distance from the surface, beginning at 255 damage when adjacent to the planet and ending at 51 damage if 5 units away.
+When a planet dies, it explodes, dealing damage to any ships or planets within a distance from the planet surface equal to the planet's radius (or within 4 units of the surface if the planet radius is less than 4). The damage scales linearly with distance from the surface, beginning at 1275 damage when adjacent to the planet and ending at 127 damage if 5 units away.
 
 ### Ship-Ship Combat & Collision
 Ships automatically fight each other when they come into close distances. (5 units from the center of the ship, represented on the board by the aura around the ship) When ships come into combat, they do up to 64 units of damage per turn to each other (see below).
