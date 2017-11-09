@@ -138,7 +138,7 @@ class Ship extends Entity
 
         $computedThrust = $thrust;
         if ($distance < $thrust) {
-            $computedThrust = floor($distance / 2);
+            $computedThrust = (int) $distance;
         }
 
         $angleDeg = Coordinate::angleRadToDegClipped($angleRad);
