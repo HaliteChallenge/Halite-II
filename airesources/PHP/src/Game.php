@@ -8,11 +8,6 @@ class Game
     private $botName;
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @var Connection
      */
     private $connection;
@@ -37,24 +32,24 @@ class Game
      */
     private $planets;
 
-    public function __construct(string $botName, Logger $logger, Connection $connection)
+    public function __construct(string $botName, Connection $connection)
     {
-        $logger->log(PHP_VERSION);
         $this->botName = $botName;
-        $this->logger = $logger;
         $this->connection = $connection;
         $this->initialize();
     }
 
     private function initialize()
     {
-        $this->logger->log('Initialize new Game for Bot '.$this->botName);
         $playerId = (int) $this->connection->read();
-        $this->logger->log('Player Id '.$playerId.' received');
+        Logger::init($playerId, $this->botName);
+
+        Logger::log('PHP-Version: '.PHP_VERSION);
+        Logger::log('Initialize new Game for Bot '.$this->botName.' -> Player Id '.$playerId.' received');
 
         $mapSize = $this->connection->read();
         list($width, $height) = explode(' ', $mapSize);
-        $this->logger->log(sprintf('Map Size %dx%d initialized', $width, $height));
+        Logger::log(sprintf('Map Size %dx%d initialized', $width, $height));
         $this->map = new Map($playerId, (int) $width, (int) $height);
 
         $this->connection->send($this->botName);
@@ -69,13 +64,13 @@ class Game
         $tokenizer = new Tokenizer($this->connection->read());
         $numPlayers = $tokenizer->nextInt();
 
-        $this->logger->log('Number of Players: '.$numPlayers);
+        Logger::log('Number of Players: '.$numPlayers);
         for ($i = 0; $i < $numPlayers; $i++) {
             $this->parsePlayer($tokenizer);
         }
 
         $numPlanets = $tokenizer->nextInt();
-        $this->logger->log('Number of Planets: '.$numPlanets);
+        Logger::log('Number of Planets: '.$numPlanets);
         for ($i = 0; $i < $numPlanets; $i++) {
             $this->parsePlanet($tokenizer);
         }
@@ -96,14 +91,14 @@ class Game
 
         $numShips = $tokenizer->nextInt();
 
-        $this->logger->log('Parse Player '.$playerId.' with '.$numShips.' Ships');
+        Logger::log('Parse Player '.$playerId.' with '.$numShips.' Ships');
         $ships = [];
         for ($i = 0; $i < $numShips; $i++) {
             $ships[] = $this->parseShip($player, $tokenizer);
         }
 
         $player->setShips($ships);
-        $this->logger->log('Player: '.json_encode($player));
+        Logger::log('Player: '.json_encode($player));
         $this->players[$playerId] = $player;
 
         return $player;
@@ -122,7 +117,7 @@ class Game
         $weaponCooldown = $tokenizer->nextFloat();
 
         $ship = new Ship($player, $shipId, $coordinate, $health, $velocity, $docked, $planetId, $dockingProgress, $weaponCooldown);
-        $this->logger->log('Ship: '.json_encode($ship));
+        Logger::log('Ship: '.json_encode($ship));
         $this->ships[$shipId] = $ship;
 
         return $ship;
@@ -160,7 +155,7 @@ class Game
             $dockedShips,
             $ships
         );
-        $this->logger->log('Planet: '.json_encode($planet));
+        Logger::log('Planet: '.json_encode($planet));
         $this->planets[$planetId] = $planet;
 
         return $planet;

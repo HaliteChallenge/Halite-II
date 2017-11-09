@@ -112,10 +112,9 @@ class Ship extends Entity
         int $thrust,
         bool $avoidObstacles,
         int $maxCorrections,
-        float $angularStepRad,
-        Logger $logger
+        float $angularStepRad
     ): string {
-        $logger->log(
+        Logger::log(
             'Navigate from '.json_encode($this->getCoordinate()).' to '.json_encode($target).' / max corrections '.$maxCorrections
         );
 
@@ -132,9 +131,9 @@ class Ship extends Entity
             $newTargetDy = sin($angleRad + $angularStepRad) * $distance;
             $newTarget = new Coordinate($this->getCoordinate()->getX() + $newTargetDx, $this->getCoordinate()->getY() + $newTargetDy);
 
-            $logger->log('Has Obstacles, correct position to: '.json_encode($newTarget));
+            Logger::log('Has Obstacles, correct position to: '.json_encode($newTarget));
 
-            return $this->navigate($map, $newTarget, $thrust, $avoidObstacles, $maxCorrections - 1, $angularStepRad, $logger);
+            return $this->navigate($map, $newTarget, $thrust, $avoidObstacles, $maxCorrections - 1, $angularStepRad);
         }
 
         $computedThrust = $thrust;
@@ -143,7 +142,7 @@ class Ship extends Entity
         }
 
         $angleDeg = self::angleRadToDegClipped($angleRad);
-        $logger->log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
+        Logger::log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
         $this->coordinateNextTurn = $target->forecastMove($computedThrust, $angleDeg);
 
         return $this->thrust($computedThrust, $angleDeg);

@@ -5,23 +5,35 @@ class Logger
     /**
      * @var string
      */
-    private $filename;
+    private static $filename;
 
     /**
      * @var bool
      */
-    private $enabled;
+    private static $enabled;
 
-    public function __construct(bool $enabled)
+    public static function init(int $botId, string $botName)
     {
-        $this->filename = __DIR__.'/../logs/'.date('Y_m_d_H_i_s').'_'.uniqid(null, true).'.log';
-        $this->enabled = $enabled;
+        self::$enabled = getenv('HALITE_PHP_ENV') === 'dev';
+        if (!self::$enabled) {
+            return;
+        }
+
+        $dir = __DIR__.'/../logs';
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+
+        self::$filename = $dir.'/'.$botId.'-'.$botName.'.log';
+        if (file_exists(self::$filename)) {
+            unlink(self::$filename);
+        }
     }
 
-    public function log(string $message)
+    public static function log(string $message)
     {
-        if ($this->enabled) {
-            file_put_contents($this->filename, $message."\n", FILE_APPEND);
+        if (self::$enabled) {
+            file_put_contents(self::$filename, $message."\n", FILE_APPEND);
         }
     }
 }
