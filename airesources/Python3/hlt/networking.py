@@ -19,7 +19,6 @@ class Game:
         :return: nothing
         """
         sys.stdout.write(s)
-        sys.stdout.flush()
 
     @staticmethod
     def _done_sending():
