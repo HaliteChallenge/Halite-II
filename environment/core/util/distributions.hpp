@@ -90,6 +90,10 @@
 #include <limits>
 #include <type_traits>
 
+#ifndef __CHAR_BIT__
+#define __CHAR_BIT__ CHAR_BIT
+#endif
+
 namespace util {
     // Precondition:  __x != 0
     static unsigned __clz(unsigned __x) {
