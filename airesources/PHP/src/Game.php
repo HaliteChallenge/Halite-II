@@ -51,7 +51,10 @@ class Game
         list($width, $height) = explode(' ', $mapSize);
         Logger::log(sprintf('Map Size %dx%d initialized', $width, $height));
         $this->map = new Map($playerId, (int) $width, (int) $height);
+    }
 
+    public function sendBotName()
+    {
         $this->connection->send($this->botName);
     }
 

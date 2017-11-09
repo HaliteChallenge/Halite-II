@@ -5,6 +5,10 @@ require_once __DIR__.'/src/bootstrap.php';
 $connection = new Connection();
 $game = new Game('Terminator', $connection);
 $turn = 0;
+
+//60s time for game initialization;
+$game->sendBotName();
+
 while (true) {
     $turn++;
     Logger::log('--------- NEW TURN (#'.$turn.') ------------');
