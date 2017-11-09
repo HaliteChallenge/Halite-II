@@ -33,7 +33,7 @@ start_game(game)
 while true
     # TURN START
     # Update the map for the new turn and get the latest version
-    debug(logger, @sprintf("------ TURN %s ------", turn))
+    debug(logger, "------ TURN $turn ------")
     game_map = update_map(game)
     
     # Here we define the set of commands to be sent to the Halite engine at the end of the turn

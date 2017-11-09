@@ -38,7 +38,7 @@ start_game(game::Game) = print(game.botname, "\n")
 Set up and truncate the log. Log name is "{name}-{id}.log".
 """
 function setup_logger(name, id)
-    add_handler(logger, DefaultHandler(open("$name-$id.log", "w"), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
+    add_handler(logger, DefaultHandler(open("$id-$name.log", "w"), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))) 
     remove_handler(logger, "console")
 end
 
