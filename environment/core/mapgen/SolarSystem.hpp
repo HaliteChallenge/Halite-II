@@ -2,6 +2,7 @@
 #define HALITE_SOLARSYSTEM_H
 
 #include "Generator.hpp"
+#include "../util/distributions.hpp"
 
 namespace mapgen {
     constexpr auto MAX_TOTAL_ATTEMPTS = 75000;

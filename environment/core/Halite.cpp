@@ -715,7 +715,6 @@ auto Halite::process_events() -> void {
             }
 
             target_count[src] = num_prev_targets + 1;
-            damage_dealt[src.player_id()] += hlt::GameConstants::get().WEAPON_DAMAGE;
         };
 
         for (SimulationEvent ev : simultaneous_events) {
@@ -761,6 +760,9 @@ auto Halite::process_events() -> void {
         for (const auto& pair : attackers) {
             full_frame_events.back().push_back(
                 std::unique_ptr<Event>(new AttackEvent(pair.second)));
+            // Track damage dealt here so each attacker's damage is only
+            // counted once.
+            damage_dealt[pair.first.player_id()] += hlt::GameConstants::get().WEAPON_DAMAGE;
             // Use the AttackEvents generated above to actually
             // perform attack calculations. This way, we only perform
             // damage calculations when we're sure there was actually
