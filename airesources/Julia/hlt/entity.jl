@@ -114,7 +114,7 @@ function Ship(owner_id::String, tokens::Vector{String})
     progress = parse(Int, shift!(tokens))
     cooldown = parse(Int, shift!(tokens))
 
-    Ship(owner_id, id, x, y, hp, Constants.SHIP_RADIUS, docked, 
+    Ship(owner_id, id, x, y, hp, SHIP_RADIUS, docked, 
         docked_planet, progress, cooldown)
 end
 
@@ -124,7 +124,7 @@ end
 Determine whether a ship is close enough to planet so it can dock.
 """
 function can_dock(ship::Ship, planet::Planet)
-    distance_between(ship, planet) <= radius(planet) + Constants.DOCK_RADIUS + Constants.SHIP_RADIUS
+    distance_between(ship, planet) <= radius(planet) + DOCK_RADIUS + SHIP_RADIUS
 end
 
 

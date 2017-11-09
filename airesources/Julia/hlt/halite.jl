@@ -29,7 +29,7 @@ const MAX_SHIP_HEALTH = 255
 #: Starting health of ship, also its max
 const BASE_SHIP_HEALTH = 255
 #: Weapon cooldown period
-const WEAPON_COOLDOWN 1
+const WEAPON_COOLDOWN = 1
 #: Weapon damage radius
 const WEAPON_RADIUS = 5.0
 #: Weapon damage
