@@ -16,4 +16,4 @@ get_ship(player::Player, ship_id::String) = player.ships[ship_id]
 
     Returns either iterator over all ships which belong to the user (collect = false), or a list of all ships which belong to the user (collect = true).
 """
-all_ships(player::Player, coll::Bool=false) = values(player.ships)
+all_ships(player::Player) = values(player.ships)

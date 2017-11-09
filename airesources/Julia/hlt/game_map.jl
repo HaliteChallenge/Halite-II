@@ -106,14 +106,16 @@ get_docked_ship(game_map::GameMap, planet::Planet, ship_id::String) = get_ship(g
 
 List of all ships in current game map.
 """
-function all_ships(game_map::GameMap)
-    all_ships = Vector{Ship}()
-    for player in all_players(game_map)
-        all_ships = vcat(all_ships, all_ships(player, true))
-    end
+# function all_ships(game_map::GameMap)
+#     all_ships = Vector{Ship}()
+#     for player in all_players(game_map)
+#         all_ships = vcat(all_ships, all_ships(player, true))
+#     end
 
-    return all_ships
-end
+#     return all_ships
+# end
+
+all_ships(game_map::GameMap) = [all_ships(player) for player in all_players(game_map)]
 
 """
     obstacles_between(game_map, entity1, entity2, ignore_ships, ignore_planets)
@@ -123,23 +125,19 @@ Check whether there is a straight-line path between two entities, without planet
 function obstacles_between(game_map::GameMap, e1::Entity, e2::Entity, ignore_ships::Bool, ignore_planets::Bool)
     obstacles = Vector{Entity}()
     if !ignore_ships
-        for player in all_players(game_map)
-            for entity in all_ships(player)
-                if e1 == entity || e2 == entity
-                    continue
-                end
-                if intersect_segment_circle(e1, e2, entity, radius(e1) + 0.1)
-                    push!(obstacles, entity)
-                end
+        for entity in all_ships(game_map)
+            (e1 == entity || e2 == entity) && continue
+
+            if intersect_segment_circle(e1, e2, entity, radius(e1) + 0.1)
+                push!(obstacles, entity)
             end
         end
     end
 
     if !ignore_planets
         for entity in all_planets(game_map)
-            if e1 == entity || e2 == entity
-                continue
-            end
+            (e1 == entity || e2 == entity) && continue
+
             if intersect_segment_circle(e1, e2, entity, radius(e1) + 0.1)
                 push!(obstacles, entity)
             end
@@ -172,9 +170,8 @@ function navigate(game_map::GameMap, ship::Ship, target::Entity;
                  angular_step::Float64 = 1.0,
                  ignore_ships::Bool = false,
                  ignore_planets::Bool = false)
-    if max_corrections <= 0
-        return ""
-    end
+    max_corrections <= 0 && return ""
+
     distance = distance_between(ship, target)
     angle = angle_between(ship, target)
     if avoid_obstacles && !isempty(obstacles_between(game_map, ship, target, ignore_ships, ignore_planets))
