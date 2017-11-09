@@ -4,7 +4,7 @@ require_once __DIR__.'/src/bootstrap.php';
 
 $logger = new Logger(getenv('HALITE_PHP_ENV') === 'dev');
 $connection = new Connection($logger);
-$game = new Game(uniqid('Settler_'), $logger, $connection);
+$game = new Game(uniqid('PHPSettler_'), $logger, $connection);
 $turn = 0;
 while (true) {
     $turn++;
