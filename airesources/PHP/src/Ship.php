@@ -141,7 +141,7 @@ class Ship extends Entity
             $computedThrust = floor($distance / 2);
         }
 
-        $angleDeg = self::angleRadToDegClipped($angleRad);
+        $angleDeg = Coordinate::angleRadToDegClipped($angleRad);
         Logger::log('Distance: '.$distance.' / AngleRad: '.$angleRad.' / AngleDeg: '.$angleDeg.' / Thrust '.$computedThrust);
         $this->coordinateNextTurn = $target->forecastMove($computedThrust, $angleDeg);
 
@@ -170,13 +170,6 @@ class Ship extends Entity
     public function setPlanet($planet)
     {
         $this->planet = $planet;
-    }
-
-    private static function angleRadToDegClipped(float $angleRad): int
-    {
-        $degUnclipped = round(rad2deg($angleRad));
-
-        return (int) ((($degUnclipped % 360) + 360) % 360);
     }
 
     public function jsonSerialize(): array

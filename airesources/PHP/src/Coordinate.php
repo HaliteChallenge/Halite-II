@@ -65,10 +65,16 @@ class Coordinate implements JsonSerializable
         return new Coordinate($this->x + $x, $this->y + $y);
     }
 
-
     public function hasCollision(float $myRadius, Coordinate $target, float $targetRadius, $padding = 0.3)
     {
         $distance = $this->getDistanceTo($target);
         return ($myRadius + $targetRadius + $padding) > $distance;
+    }
+
+    public static function angleRadToDegClipped(float $angleRad): int
+    {
+        $degUnclipped = round(rad2deg($angleRad));
+
+        return (int) ((($degUnclipped % 360) + 360) % 360);
     }
 }
