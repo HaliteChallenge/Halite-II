@@ -78,8 +78,10 @@ auto planet_explosion_damage(hlt::Planet& planet, double distance,
     // Ranges linearly from 5x max ship health (at distance 0) to 0.5x
     // max ship health (at the maximum distance)
     const auto max_ship_hp = hlt::GameConstants::get().MAX_SHIP_HEALTH;
-    const auto damage = 5 * max_ship_hp -
-        (distance_from_crust / (2 * max_distance)) * max_ship_hp;
+    const auto min_damage = 0.5 * max_ship_hp;
+    const auto max_damage = 5 * max_ship_hp;
+    const auto damage = min_damage +
+        (distance_from_crust / max_distance) * (max_damage - min_damage);
     return static_cast<unsigned short>(damage);
 }
 
