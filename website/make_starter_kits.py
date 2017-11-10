@@ -31,7 +31,7 @@ ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
-versions =  {"Python3" : "1.0", "C++" : "1.0", "Java" : "1.0", "CSharp" : "0.9.0-beta" ,"JavaScript": "0.9-beta",
+versions =  {"Python3" : "1.0", "C++" : "1.0", "Java" : "1.0", "CSharp" : "1.0" ,"JavaScript": "0.9-beta",
 "ML-StarterBot-Python":"1.0", "Rust" : "1.0", "Scala" : "1.0-beta", "Go" : "1.0-beta", "Ruby" : "1.0-beta" , "Kotlin" : "0.9.0-beta", "Clojure" : "0.9.0-beta", "Julia" : "0.9.0-beta", "OCaml" : "0.9.0-beta", "Haskell" : "0.9.0-beta"  }
 
 
