@@ -31,7 +31,8 @@ extension Entity {
         return atan2f(dy, dx)
     }
     
-    func distance(to: Entity) -> Float {
+    /// Returns the distance to the target Entity
+    public func distance(to: Entity) -> Float {
         return distance(toX: to.x, y: to.y)
     }
     
