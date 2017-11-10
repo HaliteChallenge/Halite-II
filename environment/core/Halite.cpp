@@ -81,7 +81,7 @@ auto planet_explosion_damage(hlt::Planet& planet, double distance,
     const auto min_damage = 0.5 * max_ship_hp;
     const auto max_damage = 5 * max_ship_hp;
     const auto damage = min_damage +
-        (distance_from_crust / max_distance) * (max_damage - min_damage);
+        (1.0 - distance_from_crust / max_distance) * (max_damage - min_damage);
     return static_cast<unsigned short>(damage);
 }
 
