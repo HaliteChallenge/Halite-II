@@ -336,6 +336,10 @@ comp_args = {
     "Scala": [
         ["scalac"],
     ],
+    "Swift": [
+        ["swift", "build", "--configuration", "release"],
+        ["chmod", "-R", "777", ".build"],
+    ],
 }
 
 targets = {
@@ -527,6 +531,14 @@ languages = (
         "./MyBot",
         [],
         [(["*.ss"], ChmodCompiler("Scheme"))]
+    ),
+    Language("Swift", ".build/release/" + BOT, "Package.swift", 
+        ".build/release/" + BOT,
+        [],
+        [
+            ([""], ErrorFilterCompiler(comp_args["Swift"][0], filter_stderr="warning:")),
+            ([""], ExternalCompiler(comp_args["Swift"][1])),
+        ]
     ),
     Language("Tcl", BOT +".tcl", "MyBot.tcl",
         "tclsh8.5 MyBot.tcl",

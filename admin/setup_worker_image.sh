@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc erlang-base-hipe coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython clang libicu-dev"
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
 
@@ -84,6 +84,12 @@ sudo -iu bot_compilation sdk install groovy
 # Julia
 wget -O julia.tgz https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6.1-linux-x86_64.tar.gz
 tar xvzf julia.tgz
+
+# Swift
+wget -O swift.tar.gz https://swift.org/builds/swift-4.0.2-release/ubuntu1610/swift-4.0.2-RELEASE/swift-4.0.2-RELEASE-ubuntu16.10.tar.gz
+sudo tar -C /usr/local -xzf swift.tar.gz
+echo 'export PATH="$PATH:/usr/local/swift-4.0.2-RELEASE-ubuntu16.10/usr/bin"' | sudo -iu bot_compilation tee -a /home/bot_compilation/.profile
+sudo chmod -R o+r /usr/local/swift-4.0.2-RELEASE-ubuntu16.10/usr/lib/swift/CoreFoundation/
 
 ## Create four cgroups to isolate bots.
 sudo touch /etc/cgconfig.conf

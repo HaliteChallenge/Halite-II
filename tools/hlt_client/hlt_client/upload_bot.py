@@ -5,7 +5,7 @@ import requests
 import client
 
 _BOT_FILE_NAME_PREPEND = 'MyBot.'
-_LANGUGAGE_PROJECT_FILE_IDENTIFIERS = ['cargo.toml', 'project.clj']
+_LANGUGAGE_PROJECT_FILE_IDENTIFIERS = ['cargo.toml', 'project.clj', 'package.swift']
 _HALITE_LIBRARY_FOLDER = 'hlt/'
 
 
