@@ -18,24 +18,20 @@ function intersect_segment_circle(startl::Entity, endl::Entity, circle::Entity, 
     dy = endl.y - startl.y
 
     a = dx^2 + dy^2
+    # Start and end are the same point
+    a < 1e-6 && return distance_between(startl, circle) <= radius(circle) + fudge
+
     b = -2.0 * (startl.x^2 - startl.x*endl.x - startl.x*circle.x + endl.x*circle.x + 
                 startl.y^2 - startl.y*endl.y - startl.y*circle.y + endl.y*circle.y)
     c = (startl.x - circle.x)^2 + (startl.y - circle.y)^2
 
-    if a < 1e-6
-        # Start and end are the same point
-        return calculate_distance_between(startl, circle) <= radius(circle) + fudge
-    end
-
     # Time along segment when closest to the circle (vertex of the quadratic)
     t = min(-b / (2 * a), 1.0)
-    if t < 0
-        return false
-    end
+    t < 0 && return false
 
     closest_x = startl.x + dx * t
     closest_y = startl.y + dy * t
-    closest_distance = calculate_distance_between(Position(closest_x, closest_y), circle)
+    closest_distance = distance_between(Position(closest_x, closest_y), circle)
 
     return closest_distance <= radius(circle) + fudge
 end
