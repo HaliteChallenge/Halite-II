@@ -166,7 +166,6 @@ def find_challenge(conn, has_gpu=False):
             model.challenges.c.most_recent_game_task.asc()
         )
     ).first()
-    print(challenge)
 
     if not challenge:
         return None
@@ -195,7 +194,8 @@ def find_challenge(conn, has_gpu=False):
         sqlalchemy.sql.exists(
             model.challenge_participants.select(
                 (model.ranked_bots.c.user_id == model.challenge_participants.c.user_id) &
-                (model.challenge_participants.c.challenge_id == challenge["id"])
+                (model.challenge_participants.c.challenge_id == challenge["id"]) &
+                (model.challenge_participants.c.user_id == model.ranked_bots_users.c.user_id)
             )
         ) &
         player_filter
@@ -229,7 +229,10 @@ def find_challenge(conn, has_gpu=False):
         "tier": util.tier(player["rank"], total_players),
     } for player in selected_bots]
 
-    # TODO: update challenge most recent game time
+    conn.execute(model.challenges.update().values(
+        status=model.ChallengeStatus.PLAYING_GAME.value,
+        most_recent_game_task=sqlalchemy.sql.func.now(),
+    ).where(model.challenges.c.id == challenge["id"]))
 
     return util.response_success({
         "type": "game",

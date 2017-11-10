@@ -249,50 +249,58 @@ def store_game_results(game_output, stats, replay_key, bucket_class, users, chal
                 update_user_timeout(conn, game_id, user)
 
         if challenge is not None:
-            conn.execute(model.challenges.update().values(
-                num_games=model.challenges.c.num_games + 1,
-                status=sqlalchemy.case(
-                    [
-                        (model.challenges.c.num_games >= 30,
-                         model.ChallengeStatus.FINISHED.value),
-                    ],
-                    else_=model.ChallengeStatus.CREATED.value,
-                ),
-            ).where(model.challenges.c.id == challenge))
-
-            for user in users:
-                # 4 points for 1st place, 3 for 2nd, etc.
-                points = 5 - user["rank"]
-                if user["player_tag"] in stats.players:
-                    ships_produced = stats.players[user["player_tag"]].ships_produced
-                    attacks_made = stats.players[user["player_tag"]].attacks_total
-                else:
-                    ships_produced = attacks_made = 0
-
-                conn.execute(model.challenge_participants.update().values(
-                    points=model.challenge_participants.c.points + points,
-                    ships_produced=model.challenge_participants.c.ships_produced + ships_produced,
-                    attacks_made=model.challenge_participants.c.attacks_made + attacks_made,
-                ))
-
-            challenge_row = conn.execute(
-                model.challenges.select(model.challenges.c.id == challenge)
-            ).first()
-
-            if challenge_row and \
-               challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
-                winner = conn.execute(model.challenge_participants.select().order_by(
-                    model.challenge_participants.c.points.desc(),
-                    model.challenge_participants.c.ships_produced.desc(),
-                    model.challenge_participants.c.attacks_made.desc(),
-                )).first()
-                conn.execute(model.challenges.update().values(
-                    finished=sqlalchemy.sql.func.now(),
-                    winner=winner,
-                ).where(model.challenges.c.id == challenge))
-
+            store_challenge_results(users, challenge, stats)
 
         return game_id
+
+
+def store_challenge_results(users, challenge, stats):
+    with model.engine.connect() as conn:
+        conn.execute(model.challenges.update().values(
+            num_games=model.challenges.c.num_games + 1,
+            status=sqlalchemy.case(
+                [
+                    (model.challenges.c.num_games >= 30,
+                     model.ChallengeStatus.FINISHED.value),
+                ],
+                else_=model.ChallengeStatus.CREATED.value,
+            ),
+        ).where(model.challenges.c.id == challenge))
+
+        for user in users:
+            # 4 points for 1st place, 3 for 2nd, etc.
+            points = len(users) - user["rank"] + 1
+            if len(users) == 2:
+                points += 2
+
+            if user["player_tag"] in stats.players:
+                ships_produced = stats.players[user["player_tag"]].ships_produced
+                attacks_made = stats.players[user["player_tag"]].attacks_total
+            else:
+                ships_produced = attacks_made = 0
+
+            conn.execute(model.challenge_participants.update().values(
+                points=model.challenge_participants.c.points + points,
+                ships_produced=model.challenge_participants.c.ships_produced + ships_produced,
+                attacks_made=model.challenge_participants.c.attacks_made + attacks_made,
+            ).where((model.challenge_participants.c.challenge_id == challenge) &
+                    (model.challenge_participants.c.user_id == user["user_id"])))
+
+        challenge_row = conn.execute(
+            model.challenges.select(model.challenges.c.id == challenge)
+        ).first()
+
+        if challenge_row and \
+           challenge_row["status"] == model.ChallengeStatus.FINISHED.value:
+            winner = conn.execute(model.challenge_participants.select().order_by(
+                model.challenge_participants.c.points.desc(),
+                model.challenge_participants.c.ships_produced.desc(),
+                model.challenge_participants.c.attacks_made.desc(),
+            )).first()
+            conn.execute(model.challenges.update().values(
+                finished=sqlalchemy.sql.func.now(),
+                winner=winner["user_id"],
+            ).where(model.challenges.c.id == challenge))
 
 
 def store_game_stats(game_output, stats, game_id, users):
