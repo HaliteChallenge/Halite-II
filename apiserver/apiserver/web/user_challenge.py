@@ -131,6 +131,8 @@ def create_challenge(intended_user, *, user_id=0):
         raise util.APIError(400, message="Must provide array of opponent IDs.")
 
     opponents = challenge_body["opponents"]
+    if user_id in opponents:
+        raise util.APIError(400, message="You can't challenge yourself.")
     if len(opponents) not in (1, 3):
         raise util.APIError(400, message="Must provide 1 or 3 opponents.")
 
@@ -149,7 +151,7 @@ def create_challenge(intended_user, *, user_id=0):
 
         if len(opponents_exist) != len(opponents):
             raise util.APIError(400, message="Opponents {} do not exist.".format(
-                ", ".join(set(opponents) - set(opponents_exist))
+                ", ".join(map(str, set(opponents) - set(opponents_exist)))
             ))
 
         num_challenges = conn.execute(
