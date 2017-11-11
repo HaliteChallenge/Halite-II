@@ -329,9 +329,12 @@
       border-bottom: 0;
     }
   }
-  .table-scrollable-content{
+  .table-wrapper{
     overflow-y: auto;
+    overflow-x: auto;
     max-height: 500px;
+  }
+  .table-scrollable-content{
   }
 
   .table{

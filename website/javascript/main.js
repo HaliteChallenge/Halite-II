@@ -170,6 +170,27 @@ api.me().then((me) => {
   }
 });
 
+window.refreshStickyTable = function () {
+  const calcCol = () => {
+    const el = $('body').find('.table-sticky-container:visible').each(function () {
+      const heading = $(this).find('.table-sticky th')
+      const body = $(this).find('.table:not(.table-sticky) th')
+      const tableWidth = $(this).find('.table:not(.table-sticky)').width();
+
+      $(this).find('.table-sticky').width(tableWidth);
+      $(this).find('.table-wrapper').width(tableWidth);
+
+      heading.each(function (index) {
+        $(this).width($(body[index]).width())
+      })
+    })
+  }
+  setTimeout(() => {
+    calcCol();
+    console.log('cal col');
+  }, 500)
+},
+
 // auto scroll to the anchor position
 (function () {
   if (document.location.hash) {
