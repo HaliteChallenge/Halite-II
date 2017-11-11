@@ -302,6 +302,10 @@ comp_args = {
     "D": [
         ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
     ],
+    "Elixir": [
+        ["mix", "deps.get"]
+        ["mix", "escript.build"],
+    ],
     "Groovy": [
         ["groovyc"],
         ["jar", "cfe", BOT + ".jar", BOT],
