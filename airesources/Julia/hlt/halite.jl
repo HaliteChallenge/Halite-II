@@ -8,7 +8,6 @@ export Game, DockedStatus, start_game, thrust, dock, undock, update_map,
     closest_point_to, nearest_unoccupied_planet
 
 @enum DockedStatus UNDOCKED=0 DOCKING=1 DOCKED=2 UNDOCKING=3
-Base.convert(DockedStatus, n::Float64) = convert(DockedStatus, Int(n))
 
 include("constants.jl")
 include("types.jl")
