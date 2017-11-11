@@ -27,7 +27,7 @@ struct Position <: Entity
     y::Float64
 end
 radius(p::Position) = 0
-id(p::Position) = "p"
+id(p::Position) = -1
 
 ############################################################################################
 # mobile entities
