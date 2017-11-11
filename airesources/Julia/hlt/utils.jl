@@ -1,5 +1,51 @@
+function nearest_unoccupied_planet(ship::Ship, planets)
+    d = Inf
+    p = nothing
+    for planet in planets
+        if isowned(planet)
+            if planet.owner_id == ship.owner_id && isfull(planet)
+                continue
+            end
+        end
+        dist = distance_between(ship, planet)
+        if dist < d
+            p = planet
+            d = dist
+        end
+    end
+    return p
+end
+
+function closest_point_to(e1::Entity, e2::Entity, min_distance::Float64 = 3.0)
+    angle = angle_between(e1, e2)
+    r = radius(e2) + min_distance
+    x = e2.x + r * cos(deg2rad(angle))
+    y = e2.y + r * sin(deg2rad(angle))
+    return Position(x, y)
+end
+
 """
-    intersect_segment_circle(start, end, circle, fudge=0.5)
+    obstacles_between(game_map, entity1, entity2, ignore_ships, ignore_planets)
+Check whether there is a straight-line path between two entities, without planetary or ships obstacles in between. Returns list of obstacles, empty if there is no obstacles were found.
+"""
+function obstacles_between(game_map, self, other, ignore_ships, ignore_planets)
+    obstacles = Vector{Entity}()
+    !ignore_ships   && check_collisions!(obstacles, all_ships(game_map), self, other)
+    !ignore_planets && check_collisions!(obstacles, all_planets(game_map), self, other)
+    return obstacles
+end
+
+function check_collisions!(obstacles, entitylist, self, other)
+    for entity in entitylist
+        any([self, other] .== entity) && continue
+        if intersect_segment_circle(self, other, entity, radius(self) + 0.1)
+            push!(obstacles, entity)
+        end
+    end
+end
+
+"""
+intersect_segment_circle(start, end, circle, fudge=0.5)
 
 Test whether a line segment and circle intersect.
 
@@ -23,8 +69,7 @@ function intersect_segment_circle(startl::Entity, endl::Entity, circle::Entity, 
 
     b = -2.0 * (startl.x^2 - startl.x*endl.x - startl.x*circle.x + endl.x*circle.x + 
                 startl.y^2 - startl.y*endl.y - startl.y*circle.y + endl.y*circle.y)
-    c = (startl.x - circle.x)^2 + (startl.y - circle.y)^2
-
+                
     # Time along segment when closest to the circle (vertex of the quadratic)
     t = min(-b / (2 * a), 1.0)
     t < 0 && return false
