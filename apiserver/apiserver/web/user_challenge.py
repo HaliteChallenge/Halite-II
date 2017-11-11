@@ -8,6 +8,7 @@ import sqlalchemy
 
 from .. import model, util
 
+from . import match as match_api
 from . import util as api_util
 from .blueprint import web_api
 
@@ -28,6 +29,8 @@ def make_challenge_record(challenge, participants):
         result["players"][participant["user_id"]] = {
             "username": participant["username"],
             "points": participant["points"],
+            "ships_produced": participant["ships_produced"],
+            "attacks_made": participant["attacks_made"],
             "is_issuer": participant["user_id"] == result["issuer"],
         }
 
@@ -118,11 +121,32 @@ def get_user_challenge(intended_user, challenge_id):
         return flask.jsonify(make_challenge_record(challenge, participants))
 
 
+@web_api.route("/user/<int:intended_user>/challenge/<int:challenge_id>/match", methods=["GET"])
+@util.cross_origin(methods=["GET", "POST"])
+def list_user_challenge_matches(intended_user, challenge_id):
+    offset, limit = api_util.get_offset_limit()
+    where_clause, order_clause, manual_sort = api_util.get_sort_filter({
+        "game_id": model.games.c.id,
+        "time_played": model.games.c.time_played,
+    }, ["timed_out"])
+
+    participant_clause = model.game_participants.c.user_id == intended_user
+    where_clause &= model.games.c.challenge_id == challenge_id
+    for (field, _, _) in manual_sort:
+        if field == "timed_out":
+            participant_clause &= model.game_participants.c.timed_out
+
+    result = match_api.list_matches_helper(
+        offset, limit, participant_clause, where_clause, order_clause)
+
+    return flask.jsonify(result)
+
+
 @web_api.route("/user/<int:intended_user>/challenge", methods=["POST"])
 @util.cross_origin(methods=["GET", "POST"])
 @api_util.requires_login(accept_key=False)
 @api_util.requires_competition_open
-def create_challenge(intended_user, *, user_id=0):
+def create_challenge(intended_user, *, user_id):
     if user_id != intended_user:
         raise api_util.user_mismatch_error()
 
