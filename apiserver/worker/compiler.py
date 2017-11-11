@@ -303,7 +303,7 @@ comp_args = {
         ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
     ],
     "Elixir": [
-        ["mix", "deps.get"]
+        ["yes", "|", "mix", "deps.get"],
         ["mix", "escript.build"],
     ],
     "Groovy": [
@@ -418,10 +418,13 @@ languages = (
         "dart MyBot.dart",
         [], [(["*.dart"], ChmodCompiler("Dart"))]
     ),
-    Language("Elixir", BOT +".ex", "MyBot.ex",
+    Language("Elixir", BOT, "mix.exs",
         "./MyBot",
         [],
-        [(["*.ex"], ChmodCompiler("Elixir"))]
+        [
+            ([], ErrorFilterCompiler(comp_args["Elixir"][0])),
+            ([], ErrorFilterCompiler(comp_args["Elixir"][1])),
+        ]
     ),
     Language("Erlang", "my_bot.beam", "my_bot.erl",
         "erl -hms"+ str(MEMORY_LIMIT) +"m -smp disable -noshell -s my_bot start -s init stop",
