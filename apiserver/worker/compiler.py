@@ -130,7 +130,7 @@ class ChmodCompiler(Compiler):
         with CD(bot_dir):
             for f in safeglob_multi(globs):
                 try:
-                    os.chmod(f, 0o644)
+                    os.chmod(f, 0o755)
                 except Exception as e:
                     errors.append("Error chmoding %s - %s\n" % (f, e))
         return True
