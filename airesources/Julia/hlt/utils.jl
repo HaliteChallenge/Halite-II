@@ -69,7 +69,8 @@ function intersect_segment_circle(startl::Entity, endl::Entity, circle::Entity, 
 
     b = -2.0 * (startl.x^2 - startl.x*endl.x - startl.x*circle.x + endl.x*circle.x + 
                 startl.y^2 - startl.y*endl.y - startl.y*circle.y + endl.y*circle.y)
-                
+    c = (startl.x - circle.x)^2 + (startl.y - circle.y)^2
+
     # Time along segment when closest to the circle (vertex of the quadratic)
     t = min(-b / (2 * a), 1.0)
     t < 0 && return false
