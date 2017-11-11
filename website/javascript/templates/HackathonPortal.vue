@@ -14,7 +14,7 @@
         you also need to modify the function to point to the righ link -->
         <div class="col-md-3" >
           <div class="hackathon-progress-card" @click="openHackathon(1)">
-            <img class="hackathon-card-img" src="/assets/images/dalton.jpg" alt="New York High School Hackathon"/>
+            <div class="hackathon-card-img" style="background-image: url('/assets/images/dalton.jpg')"></div>
             <div class="hackathon-card-text">
               <p class="t3 c-wht">NYC High School Hackathon</p>
               <ul class="hackathon-info">
@@ -33,8 +33,10 @@
               </ul>
             </div>
           </div>
-          <!-- <div class="hackathon-progress-card" @click="openHackathon(2)">
-            <img class="hackathon-card-img" src="/assets/images/cornell-tech.jpg" alt="New York High School Hackathon"/>
+        </div>
+        <div class="col-md-3" >
+          <div class="hackathon-progress-card" @click="openHackathon(2)">
+            <div class="hackathon-card-img" style="background-image: url('/assets/images/cornell-tech.jpg')"></div>
             <div class="hackathon-card-text">
               <p class="t3 c-wht">NYC Cornell Tech Hackathon</p>
               <ul class="hackathon-info">
@@ -52,7 +54,7 @@
                 </li>
               </ul>
             </div>
-          </div>  -->
+          </div> 
         </div>
       </div>
     </div>
@@ -62,7 +64,49 @@
         <i class="xline xline-bottom"></i>
         <p class="t2 c-wht font-headline">ALL HACKATHONS</p>
       </div>
-      <div class="table-container">
+      <div class="table-container table-sticky-container visible-xs visible-sm">
+        <div class="table-wrapper">
+          <table class="table table-leader table-sticky">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+              </tr>
+            </thead>
+          </table>
+          <div class="table-scrollable-content">
+            <table class="table table-leader hackathon-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in events">
+                  <td>
+                    <a class="leaderboard-name" :href="'/hackathon-individual?hackathon_id=' + event.id">
+                      {{event.title}}
+                    </a>
+                  </td>
+                  <td>{{event.pin}}</td>
+                  <td>{{event.status.charAt(0).toUpperCase() + event.status.slice(1)}}</td>
+                  <td>{{event.start_date}}</td>
+                  <td>{{event.end_date}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container hidden-sm hidden-xs">
         <table class="table table-leader hackathon-table">
           <thead>
             <tr>
@@ -130,7 +174,7 @@ export default {
     })
 
     api.getHackathons().then(hackathons => {
-          this.populateHackathons(hackathons)
+      this.populateHackathons(hackathons)
     })
   },
   methods: {
@@ -156,6 +200,7 @@ export default {
       }
 
       this.showEvents = true
+      this.refreshStickyTable();
     },
     gaData: function (category, action, label) {
       utils.gaEvent(category, action, label)
@@ -170,6 +215,12 @@ export default {
           win.focus();
         }
     },
+    refreshStickyTable: function () {
+      window.refreshStickyTable();
+      setTimeout(() => {
+        $('table-wrapper').scrollTop(0);  
+      }, 300);
+    }
   }
 }
 </script>
