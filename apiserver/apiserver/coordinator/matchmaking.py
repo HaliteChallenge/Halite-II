@@ -161,7 +161,13 @@ def find_challenge(conn, has_gpu=False):
 
     challenge = conn.execute(
         model.challenges.select(
-            model.challenges.c.status == model.ChallengeStatus.CREATED.value
+            (model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
+            # Also pick up any stuck challenges
+            (
+                (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+                (model.challenges.c.most_recent_game_task <
+                 datetime.datetime.now() - datetime.timedelta(minutes=30))
+            )
         ).order_by(
             model.challenges.c.most_recent_game_task.asc()
         )
