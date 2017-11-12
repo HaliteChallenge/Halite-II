@@ -220,8 +220,9 @@ def find_challenge(conn, has_gpu=False):
         else:
             candidate_bots.append(bot)
 
-    if random.random() < 0.5 and len(candidate_bots) == 3:
-        selected_bots.extend(candidate_bots)
+    if random.random() < 0.5 and len(candidate_bots) >= 3:
+        random.shuffle(candidate_bots)
+        selected_bots.extend(candidate_bots[:3])
     else:
         selected_bots.append(random.choice(candidate_bots))
 
