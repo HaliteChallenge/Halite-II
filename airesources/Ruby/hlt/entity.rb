@@ -28,7 +28,7 @@ class Entity
 
   # Calculates the angle between this object and the target in degrees.
   # target: The target to get the angle between. Responds to x & y.
-  # return: Angle between entities in degrees (float)
+  # return: Angle between entities in degrees
   def calculate_angle_between(target)
     Math.atan2(target.y - y, target.x - x).angle_rad_to_deg_clipped
   end
