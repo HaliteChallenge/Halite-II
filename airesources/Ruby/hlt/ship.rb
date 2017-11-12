@@ -36,10 +36,10 @@ class Ship < Entity
 
   # Generate a command to accelerate this ship.
   # magnitude: The speed through which to move the ship
-  # angle: The angle to move the ship in. Should always be a positive number, but %360 fixes that.
+  # angle: The angle in degrees to move the ship in.
   # return: The command string to be passed to the Halite engine.
   def thrust(magnitude, angle)
-    "t #{id} #{Integer(magnitude)} #{Integer(angle % 360)}"
+    "t #{id} #{Integer(magnitude)} #{angle.round.modulo(360)}"
   end
 
   # Generate a command to dock to a planet.
@@ -97,7 +97,7 @@ class Ship < Entity
     ignore << :planets if ignore_planets
 
     if avoid_obstacles && map.obstacles_between(self, target, ignore).length > 0
-      delta_radians = (angle + angular_step)/180 * Math::PI
+      delta_radians = (angle + angular_step)/180.0 * Math::PI
       new_target_dx = Math.cos(delta_radians) * distance
       new_target_dy = Math.sin(delta_radians) * distance
       new_target = Position.new(x + new_target_dx, y + new_target_dy)

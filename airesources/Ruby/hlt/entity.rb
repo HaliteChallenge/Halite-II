@@ -1,3 +1,5 @@
+require 'util'
+
 # The entity abstract base-class represents all game entities possible. As a
 # base all entities possess a position, radius, an owner and an id. Note
 # that ease of interoperability, Position inherits from Entity.
@@ -28,10 +30,7 @@ class Entity
   # target: The target to get the angle between. Responds to x & y.
   # return: Angle between entities in degrees (float)
   def calculate_angle_between(target)
-    radians = Math.atan2(target.y - y, target.x - x)
-    radians = radians + 2 * Math::PI if radians < 0
-
-    radians/Math::PI * 180
+    Math.atan2(target.y - y, target.x - x).angle_rad_to_deg_clipped
   end
 
   # Find the closest point to the given ship near the given target, outside its
@@ -42,7 +41,7 @@ class Entity
   # return: The closest point's coordinates (Position)
   def closest_point_to(target, min_distance=3)
     angle = target.calculate_angle_between(self)
-    radians = angle/180 * Math::PI
+    radians = angle/180.0 * Math::PI
     radius = target.radius + min_distance
     x = target.x + radius * Math.cos(radians)
     y = target.y + radius * Math.sin(radians)
