@@ -6,7 +6,7 @@ import requests
 import multiprocessing
 from concurrent.futures.thread import ThreadPoolExecutor
 
-import client
+from . import client
 
 _ITEMS_KEY = 'items'
 _SELFLINK_KEY = 'selfLink'

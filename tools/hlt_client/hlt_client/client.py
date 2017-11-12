@@ -6,9 +6,9 @@ import sys
 import json
 import argparse
 
-import upload_bot
-import download_game
-import compare_bots
+from . import upload_bot
+from . import download_game
+from . import compare_bots
 
 """client.py: Client for interacting with the Halite II servers."""
 
