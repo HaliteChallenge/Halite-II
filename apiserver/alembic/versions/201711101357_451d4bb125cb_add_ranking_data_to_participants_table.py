@@ -31,7 +31,7 @@ def upgrade():
     )
     op.add_column(
         "game_participant",
-        sa.Column('rank',
+        sa.Column('leaderboard_rank',
                   mysql.SMALLINT(display_width=5),
                   autoincrement=False,
                   nullable=True),
@@ -41,4 +41,4 @@ def upgrade():
 def downgrade():
     op.drop_column("game_participant", "mu")
     op.drop_column("game_participant", "sigma")
-    op.drop_column("game_participant", "rank")
+    op.drop_column("game_participant", "leaderboard_rank")
