@@ -90,7 +90,7 @@ class Ship < Entity
               angular_step: 1, ignore_ships: false, ignore_planets: false)
     return if max_corrections <= 0
     distance = calculate_distance_between(target)
-    angle = calculate_angle_between(target)
+    angle = calculate_deg_angle_between(target)
 
     ignore = []
     ignore << :ships if ignore_ships
