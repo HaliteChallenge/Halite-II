@@ -216,18 +216,8 @@
                                 </div>
                                 <div>
                                     <div v-if="error_games.length > 0" class="table-sticky-container">
-                                        <table class="table table-leader table-sticky">
-                                            <thead>
-                                                <tr>
-                                                    <th>Id</th>
-                                                    <th class="hidden-xs">Date</th>
-                                                    <th>Log File</th>
-                                                    <th>Game</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                        <div class="table-scrollable-content">
-                                            <table class="table table-leader">
+                                        <div class="table-wrapper">
+                                            <table class="table table-leader table-sticky">
                                                 <thead>
                                                     <tr>
                                                         <th>Id</th>
@@ -236,19 +226,31 @@
                                                         <th>Game</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <tr v-for="game in error_games">
-                                                        <td>{{game.game_id}}</td>
-                                                        <td class="hidden-xs"><time :datetime="game.time_played"
-                                                                :title="game.time_played">
-                                                                {{ getFormattedDateForGames(game.time_played)}}
-                                                            </time>
-                                                        </td>
-                                                        <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
-                                                        <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
-                                                    </tr>
-                                                </tbody>
                                             </table>
+                                            <div class="table-scrollable-content">
+                                                <table class="table table-leader">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Id</th>
+                                                            <th class="hidden-xs">Date</th>
+                                                            <th>Log File</th>
+                                                            <th>Game</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="game in error_games">
+                                                            <td>{{game.game_id}}</td>
+                                                            <td class="hidden-xs"><time :datetime="game.time_played"
+                                                                    :title="game.time_played">
+                                                                    {{ getFormattedDateForGames(game.time_played)}}
+                                                                </time>
+                                                            </td>
+                                                            <td><a :href="error_log_link(game.game_id)" target="_blank">Download Log</a></td>
+                                                            <td><a :href="replay_link(game.game_id)" target="_blank">View</a> / <a :href="replay_download_link(game.game_id)" target="_blank">Download</a></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -296,18 +298,8 @@
                                 </div>
                                 <div v-if="nemesisList.length > 0">
                                     <div class="table-sticky-container">
-                                        <table class="table table-leader table-sticky">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nemesis</th>
-                                                    <th class="text-center hidden-xs">Games</th>
-                                                    <th class="text-center">Win %</th>
-                                                    <th class="text-center">Loss %</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                        <div class="table-scrollable-content">
-                                            <table class="table table-leader">
+                                        <div class="table-wrapper">
+                                            <table class="table table-leader table-sticky">
                                                 <thead>
                                                     <tr>
                                                         <th>Nemesis</th>
@@ -316,29 +308,41 @@
                                                         <th class="text-center">Loss %</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <tr v-for="nemesis in nemesisList">
-                                                        <td>
-                                                            <a :href="'/user?user_id=' + nemesis.id"
-                                                            class="game-participant">
-                                                                <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
-                                                                <span class="rank">
-                                                                    {{usernames[nemesis.id]}}
-                                                                </span>
-                                                            </a>
-                                                        </td>
-                                                        <td class="text-center hidden-xs">
-                                                            {{nemesis.total}}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            {{nemesis.wins}}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            {{nemesis.losses}}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
                                             </table>
+                                            <div class="table-scrollable-content">
+                                                <table class="table table-leader">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Nemesis</th>
+                                                            <th class="text-center hidden-xs">Games</th>
+                                                            <th class="text-center">Win %</th>
+                                                            <th class="text-center">Loss %</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="nemesis in nemesisList">
+                                                            <td>
+                                                                <a :href="'/user?user_id=' + nemesis.id"
+                                                                class="game-participant">
+                                                                    <img :src="profile_images[nemesis.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" />
+                                                                    <span class="rank">
+                                                                        {{usernames[nemesis.id]}}
+                                                                    </span>
+                                                                </a>
+                                                            </td>
+                                                            <td class="text-center hidden-xs">
+                                                                {{nemesis.total}}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                {{nemesis.wins}}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                {{nemesis.losses}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -356,19 +360,8 @@
                                 </div>
                                 <div v-if="userHistory.length > 0">
                                     <div class="table-sticky-container">
-                                        <table class="table table-leader table-sticky">
-                                            <thead>
-                                                <tr>
-                                                    <th>Bot Version</th>
-                                                    <th class="text-center">Rating</th>
-                                                    <th class="text-center">Rank</th>
-                                                    <th class="text-center hidden-xs">Games</th>
-                                                    <th class="hidden-xs">Retired On</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                        <div class="table-scrollable-content">
-                                            <table class="table table-leader">
+                                        <div class="table-wrapper">
+                                            <table class="table table-leader table-sticky">
                                                 <thead>
                                                     <tr>
                                                         <th>Bot Version</th>
@@ -378,26 +371,39 @@
                                                         <th class="hidden-xs">Retired On</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <tr v-for="historyItem in userHistory">
-                                                        <td>
-                                                            {{historyItem.bot_version}}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            {{ Math.round(100 * historyItem.last_score) / 100 }}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            {{historyItem.last_rank}}
-                                                        </td>
-                                                        <td class="text-center hidden-xs">
-                                                            {{historyItem.last_games_played}}
-                                                        </td>
-                                                        <td class="hidden-xs">
-                                                            {{getFormattedDateForGames(historyItem.when_retired, "Still Playing")}}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
                                             </table>
+                                            <div class="table-scrollable-content">
+                                                <table class="table table-leader">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Bot Version</th>
+                                                            <th class="text-center">Rating</th>
+                                                            <th class="text-center">Rank</th>
+                                                            <th class="text-center hidden-xs">Games</th>
+                                                            <th class="hidden-xs">Retired On</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="historyItem in userHistory">
+                                                            <td>
+                                                                {{historyItem.bot_version}}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                {{ Math.round(100 * historyItem.last_score) / 100 }}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                {{historyItem.last_rank}}
+                                                            </td>
+                                                            <td class="text-center hidden-xs">
+                                                                {{historyItem.last_games_played}}
+                                                            </td>
+                                                            <td class="hidden-xs">
+                                                                {{getFormattedDateForGames(historyItem.when_retired, "Still Playing")}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -425,17 +431,8 @@
                                 </div>
                                 <div v-if="hackathons.length > 0">
                                     <div class="table-sticky-container">
-                                        <table class="table table-leader table-sticky">
-                                            <thead>
-                                                <tr>
-                                                    <th>Hackathon</th>
-                                                    <th>Location</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                        <div class="table-scrollable-content">
-                                            <table class="table table-leader">
+                                        <div class="table-wrapper">
+                                            <table class="table table-leader table-sticky">
                                                 <thead>
                                                     <tr>
                                                         <th>Hackathon</th>
@@ -443,14 +440,25 @@
                                                         <th>Status</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <tr v-for="hackathon in hackathons">
-                                                        <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
-                                                        <td>{{hackathon.location}}</td>
-                                                        <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
-                                                    </tr>
-                                                </tbody>
                                             </table>
+                                            <div class="table-scrollable-content">
+                                                <table class="table table-leader">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Hackathon</th>
+                                                            <th>Location</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="hackathon in hackathons">
+                                                            <td><a :href="'/hackathon-individual?hackathon_id=' + hackathon.hackathon_id">{{hackathon.title}}</a></td>
+                                                            <td>{{hackathon.location}}</td>
+                                                            <td>{{hackathon.status.charAt(0).toUpperCase() + hackathon.status.slice(1)}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -578,19 +586,7 @@
           })
         },
         refreshStickyTable: function () {
-          const calcCol = () => {
-            const el = $(this.$el).find('.table-sticky-container:visible').each(function () {
-              const heading = $(this).find('.table-sticky th')
-              const body = $(this).find('.table:not(.table-sticky) th')
-              heading.each(function (index) {
-                $(this).width($(body[index]).width())
-              })
-            })
-          }
-          setTimeout(() => {
-            calcCol();
-            console.log('cal col');
-          }, 200)
+            window.refreshStickyTable();
         },
         fetch: function () {
           let query = `order_by=desc,time_played&offset=${this.offset}&limit=${this.limit}`

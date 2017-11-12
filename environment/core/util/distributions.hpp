@@ -90,6 +90,10 @@
 #include <limits>
 #include <type_traits>
 
+#ifdef _LIBCPP_COMPILER_MSVC
+#include <intrin.h>
+#endif
+
 #ifndef __CHAR_BIT__
 #define __CHAR_BIT__ CHAR_BIT
 #endif

@@ -14,7 +14,7 @@ class GameMap {
         this._planets = [];
         this._ships = [];
         this._shipById = {};
-        this._eneymyShips = [];
+        this._enemyShips = [];
         this._shipsByPlayerId = {};
     }
 
@@ -47,7 +47,7 @@ class GameMap {
 
         this._shipsByPlayerId[playerId] = existingShips.concat(newShips);
         if (playerId !== this.myPlayerId) {
-            this._eneymyShips = this._eneymyShips.concat(newShips);
+            this._enemyShips = this._enemyShips.concat(newShips);
         }
 
         this._ships = this._ships.concat(newShips);
@@ -89,7 +89,7 @@ class GameMap {
      * @returns {Ship[]}
      */
     get enemyShips() {
-        return this._eneymyShips;
+        return this._enemyShips;
     }
 
     /**
