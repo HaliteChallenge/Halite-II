@@ -79,6 +79,7 @@ get_player(game_map::GameMap, entity::Entity) = get_player(game_map, entity.owne
 get_me(game_map::GameMap) = get_player(game_map, game_map.id)
 all_players(game_map::GameMap) = values(game_map.players)
 all_planets(game_map::GameMap) = values(game_map.planets)
+
 get_planet(game_map::GameMap, planet_id::Int) = game_map.planets[planet_id]
 get_planet(game_map::GameMap, ship::Ship) = get_planet(game_map, ship.docked_planet_id)
 function all_docked_ships(game_map::GameMap, planet::Planet)
