@@ -45,8 +45,9 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
 
     switch (self_id.type) {
         case hlt::EntityType::PlanetEntity: {
+            const auto& self = game_map.get_planet(self_id);
             const auto& other = game_map.get_ship(other_id);
-            self_damage = other.health;
+            self_damage = std::min(self.health, other.health);
             other_damage = other.health;
             break;
         }
@@ -57,7 +58,8 @@ auto Halite::compute_damage(hlt::EntityId self_id, hlt::EntityId other_id)
                 other_damage = game_map.get_ship(other_id).health;
             }
             else {
-                other_damage = self.health;
+                const auto& other = game_map.get_entity(other_id);
+                other_damage = std::min(self.health, other.health);
             }
             break;
         }
@@ -591,7 +593,7 @@ auto Halite::process_events() -> void {
             // Possible ship-planet collisions
             for (hlt::EntityIndex planet_idx = 0; planet_idx < game_map.planets.size(); planet_idx++) {
                 const auto& planet = game_map.planets[planet_idx];
-                if (!planet.is_alive()){
+                if (!planet.is_alive()) {
                     continue;
                 }
 
@@ -719,10 +721,48 @@ auto Halite::process_events() -> void {
             target_count[src] = num_prev_targets + 1;
         };
 
+        auto credit_damage = [&](hlt::EntityId source,
+                                 hlt::EntityId target,
+                                 int damage) -> void {
+            hlt::PlayerId dealer = 0;
+            hlt::PlayerId receiver = 0;
+            switch (source.type) {
+            case hlt::EntityType::ShipEntity: {
+                dealer = source.player_id();
+                break;
+            }
+            default:
+                // Damage stemming from planets does not count
+                return;
+            }
+
+            switch (target.type) {
+            case hlt::EntityType::PlanetEntity: {
+                const auto& planet = game_map.get_planet(target);
+                if (!planet.owned) return;
+                receiver = planet.owner;
+                break;
+            }
+            case hlt::EntityType::ShipEntity: {
+                receiver = target.player_id();
+                break;
+            }
+            default: break;
+            }
+
+            if (dealer == receiver) {
+                return;
+            }
+
+            damage_dealt[dealer] += damage;
+        };
+
         for (SimulationEvent ev : simultaneous_events) {
             switch (ev.type) {
                 case SimulationEventType::Collision: {
                     const auto damage = compute_damage(ev.id1, ev.id2);
+                    credit_damage(ev.id2, ev.id1, damage.first);
+                    credit_damage(ev.id1, ev.id2, damage.second);
                     damage_entity(ev.id1, damage.first, ev.time);
                     damage_entity(ev.id2, damage.second, ev.time);
                     break;
