@@ -727,17 +727,12 @@ auto Halite::process_events() -> void {
             hlt::PlayerId dealer = 0;
             hlt::PlayerId receiver = 0;
             switch (source.type) {
-            case hlt::EntityType::PlanetEntity: {
-                const auto& planet = game_map.get_planet(source);
-                if (!planet.owned) return;
-                dealer = planet.owner;
-                break;
-            }
             case hlt::EntityType::ShipEntity: {
                 dealer = source.player_id();
                 break;
             }
             default:
+                // Damage stemming from planets does not count
                 return;
             }
 
