@@ -62,6 +62,15 @@ For our reference, here is the trace of the error:
 """
 
 
+UPLOAD_ERROR_MESSAGE = """
+We had some trouble uploading your bot; likely the final compiled bot
+was too large (> 100 MiB). If you cannot figure out why this happened,
+please email us at halite@halite.io. We can help.
+
+For our reference, here is the trace of the error:
+"""
+
+
 def makePath(path):
     """Deletes anything residing at path, creates path, and chmods the directory"""
     if os.path.exists(path):
@@ -138,8 +147,9 @@ def executeCompileTask(user_id, bot_id, backend):
         try:
             if didCompile:
                 logging.debug("Bot did compile\n")
-                archive.zipFolder(temp_dir, os.path.join(temp_dir, str(user_id)+".zip"))
-                backend.storeBotRemotely(user_id, bot_id, os.path.join(temp_dir, str(user_id)+".zip"))
+                archive_path = os.path.join(temp_dir, str(user_id)+".zip")
+                archive.zipFolder(temp_dir, archive_path)
+                backend.storeBotRemotely(user_id, bot_id, archive_path)
             else:
                 logging.debug("Bot did not compile\n")
                 logging.debug("Bot errors %s\n" % str(errors))
@@ -147,6 +157,12 @@ def executeCompileTask(user_id, bot_id, backend):
 
             backend.compileResult(user_id, bot_id, didCompile, language,
                                   errors=(None if didCompile else "\n".join(errors)))
+        except:
+            logging.debug("Bot did not upload\n")
+            traceback.print_exc()
+            errors.append(UPLOAD_ERROR_MESSAGE + traceback.format_exc())
+            backend.compileResult(user_id, bot_id, False, language,
+                                  errors="\n".join(errors))
         finally:
             # Remove files as bot user (Python will clean up tempdir, but we don't
             # necessarily have permissions to clean up files)

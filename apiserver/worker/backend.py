@@ -6,6 +6,9 @@ import os
 from time import gmtime, strftime
 
 
+MAX_BOT_UPLOAD_SIZE = 100 * 1024 * 1024
+
+
 with open("config.json") as configfile:
     config = json.load(configfile)
     MANAGER_URL = config["MANAGER_URL"]
@@ -84,6 +87,9 @@ def storeBotLocally(user_id, bot_id, storage_dir, is_compile=False):
 def storeBotRemotely(user_id, bot_id, zip_file_path):
     """Posts a bot file to the manager"""
     zip_contents = open(zip_file_path, "rb").read()
+    if len(zip_contents) > MAX_BOT_UPLOAD_SIZE:
+        raise RuntimeError("Bot archive exceeds maximum size of 100 MiB.")
+
     iterations = 0
     local_hash = md5(zip_contents).hexdigest()
 
@@ -95,6 +101,8 @@ def storeBotRemotely(user_id, bot_id, zip_file_path):
                           },
                           files={"bot.zip": zip_contents})
         print("Posting compiled bot archive %s\n" % r.text)
+        # We don't check the status code since we instaed check the
+        # bot hash.
 
         # Try again if local and remote hashes differ
         if local_hash != getBotHash(user_id, bot_id):
