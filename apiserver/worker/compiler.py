@@ -343,6 +343,7 @@ comp_args = {
     "Swift": [
         ["swift", "build", "--configuration", "release"],
         ["chmod", "-R", "777", ".build"],
+        ["mv", ".build/release/MyBot", "./MyBot"],
     ],
 }
 
@@ -545,12 +546,13 @@ languages = (
         [],
         [(["*.ss"], ChmodCompiler("Scheme"))]
     ),
-    Language("Swift", ".build/release/" + BOT, "Package.swift", 
-        ".build/release/" + BOT,
+    Language("Swift", BOT, "Package.swift",
+        "./MyBot",
         [],
         [
             ([""], ErrorFilterCompiler(comp_args["Swift"][0], filter_stderr="warning:")),
             ([""], ExternalCompiler(comp_args["Swift"][1])),
+            ([""], ExternalCompiler(comp_args["Swift"][2])),
         ]
     ),
     Language("Tcl", BOT +".tcl", "MyBot.tcl",
