@@ -1,3 +1,4 @@
+import collections
 import datetime
 import logging
 import random
@@ -208,23 +209,23 @@ def find_challenge(conn, has_gpu=False):
     )
     bots = conn.execute(bots_query).fetchall()
 
-    # TODO: assumes one-bot-per-player
-    if len(bots) < 2:
+    user_bots = collections.defaultdict(list)
+    for bot in bots:
+        user_bots[bot["user_id"]].append(bot)
+
+    if len(user_bots) < 2 or challenge["issuer"] not in user_bots:
         return None
 
-    selected_bots = []
-    candidate_bots = []
-    for bot in bots:
-        if bot["user_id"] == challenge["issuer"]:
-            selected_bots.append(bot)
-        else:
-            candidate_bots.append(bot)
+    selected_bots = [random.choice(user_bots[challenge["issuer"]])]
+    del user_bots[challenge["issuer"]]
 
-    if random.random() < 0.5 and len(candidate_bots) >= 3:
-        random.shuffle(candidate_bots)
-        selected_bots.extend(candidate_bots[:3])
+    candidate_users = list(user_bots.keys())
+    if random.random() < 0.5 and len(user_bots) >= 3:
+        random.shuffle(candidate_users)
+        selected_bots.extend([random.choice(user_bots[user_id])
+                              for user_id in candidate_users[:3]])
     else:
-        selected_bots.append(random.choice(candidate_bots))
+        selected_bots.append(random.choice(user_bots[random.choice(candidate_users)]))
 
     map_width, map_height = rand_map_size()
     players = [{
