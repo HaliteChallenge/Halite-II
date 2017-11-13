@@ -63,9 +63,8 @@ For our reference, here is the trace of the error:
 
 
 UPLOAD_ERROR_MESSAGE = """
-We had some trouble uploading your bot; likely the final compiled bot
-was too large (> 100 MiB). If you cannot figure out why this happened,
-please email us at halite@halite.io. We can help.
+We had some trouble uploading your bot. If you cannot figure out why
+this happened, please email us at halite@halite.io. We can help.
 
 For our reference, here is the trace of the error:
 """
