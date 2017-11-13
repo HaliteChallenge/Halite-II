@@ -23,7 +23,7 @@ def rand_map_size():
 
 def serve_game_task(conn, has_gpu=False):
     """Try to find a set of players to play a game together."""
-    if random.random() < 0.05:
+    if random.random() < 0.1:
         result = find_challenge(conn, has_gpu)
         if result:
             return result
