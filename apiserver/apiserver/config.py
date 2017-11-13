@@ -16,6 +16,7 @@ COMPILATION_STUCK_THRESHOLD = 30
 # Flask settings
 # Max size of an upload, in bytes
 MAX_BOT_UPLOAD_SIZE = 20 * 1024 * 1024
+# Needs to match corresponding value in apiserver/config.py
 MAX_COMPILED_BOT_UPLOAD_SIZE = 100 * 1024 * 1024
 # Secret key for Flask session cookies
 FLASK_SECRET_KEY = ""
