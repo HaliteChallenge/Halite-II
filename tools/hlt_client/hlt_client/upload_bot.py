@@ -2,7 +2,7 @@ import os
 import sys
 import zipfile
 import requests
-import client
+from . import client
 
 _BOT_FILE_NAME_PREPEND = 'MyBot.'
 _LANGUGAGE_PROJECT_FILE_IDENTIFIERS = ['cargo.toml', 'project.clj']
