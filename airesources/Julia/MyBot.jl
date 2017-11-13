@@ -10,7 +10,7 @@
 ### to log anything use the logging module.
 
 # Let's start by importing the Halite Starter Kit so we can interface with the Halite engine
-include("hlt/halite.jl")
+include("hlt/Halite.jl")
 using Halite
 
 using Memento
@@ -33,7 +33,7 @@ start_game(game)
 while true
     # TURN START
     # Update the map for the new turn and get the latest version
-    debug(logger, @sprintf("------ TURN %s ------", turn))
+    debug(logger, "------ TURN $turn ------")
     game_map = update_map(game)
     
     # Here we define the set of commands to be sent to the Halite engine at the end of the turn
@@ -68,7 +68,7 @@ while true
                 navigate_command = navigate(game_map,
                     ship,
                     closest_point_to(ship, planet),
-                    speed = round(Int, Constants.MAX_SPEED/2),
+                    speed = round(Int, MAX_SPEED/2),
                     ignore_ships = true)
                 # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
                 # or we are trapped (or we reached our destination!), navigate_command will return empty string;

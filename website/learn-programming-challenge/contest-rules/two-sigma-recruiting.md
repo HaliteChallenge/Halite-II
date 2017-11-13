@@ -19,6 +19,6 @@ Halite was created inside Two Sigma to teach players about AI and other advanced
 
 ## On-Campus Events and Recruiting
 
-In an effort to bring a little more coding fun to college and university campuses, Two Sigma will be holding a number of virtual hackathons across North America where students can battle against their school classmates to be the victor of a three-week competition. The winners of each virtual hackathon may be invited to compete in a final competition in New York (expenses paid) and will be invited to on-site interview days. 
+In an effort to bring a little more coding fun to college and university campuses, Two Sigma will be holding a number of virtual hackathons across North America where students can battle against their school classmates to be the victor of a three-week competition. The winners of each virtual hackathon may be invited to compete in a final competition in New York (expenses paid) and may be invited to on-site interview days. 
 
 Additionally, any player who submits bots that score higher than Two Sigma’s ["Captain Bot"](https://halite.io/user/?user_id=1155){:target="_blank"} may be eligible to interview with Two Sigma for college level roles (full time and internships), and scoring higher than the Captain may also allow bot code to serve in place of a coding test.

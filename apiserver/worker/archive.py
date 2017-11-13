@@ -24,13 +24,14 @@ def zipFolder(folderPath, destinationFilePath):
     zipFile = zipfile.ZipFile(destinationFilePath, "w", zipfile.ZIP_DEFLATED)
 
     originalDir = os.getcwd()
-    os.chdir(folderPath)
+    try:
+        os.chdir(folderPath)
 
-    for rootPath, dirs, files in os.walk("."):
-        for file in files:
-            if os.path.basename(file) != os.path.basename(destinationFilePath):
-                zipFile.write(os.path.join(rootPath, file))
+        for rootPath, dirs, files in os.walk("."):
+            for file in files:
+                if os.path.basename(file) != os.path.basename(destinationFilePath):
+                    zipFile.write(os.path.join(rootPath, file))
 
-    zipFile.close()
-
-    os.chdir(originalDir)
+        zipFile.close()
+    finally:
+        os.chdir(originalDir)

@@ -32,7 +32,7 @@ extern bool quiet_output;
 /**
  * How many digits of precision to send to the client.
  */
-constexpr auto SERIALIZATION_PRECISION = 4;
+constexpr auto SERIALIZATION_PRECISION = std::numeric_limits<double>::max_digits10;
 
 constexpr auto INIT_TIME_LIMIT = std::chrono::seconds{60};
 constexpr auto FRAME_TIME_LIMIT = std::chrono::milliseconds{2000};

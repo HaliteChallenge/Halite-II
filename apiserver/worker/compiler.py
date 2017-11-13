@@ -130,7 +130,7 @@ class ChmodCompiler(Compiler):
         with CD(bot_dir):
             for f in safeglob_multi(globs):
                 try:
-                    os.chmod(f, 0o644)
+                    os.chmod(f, 0o755)
                 except Exception as e:
                     errors.append("Error chmoding %s - %s\n" % (f, e))
         return True
@@ -302,6 +302,10 @@ comp_args = {
     "D": [
         ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
     ],
+    "Elixir": [
+        ["yes", "|", "mix", "deps.get"],
+        ["mix", "escript.build"],
+    ],
     "Groovy": [
         ["groovyc"],
         ["jar", "cfe", BOT + ".jar", BOT],
@@ -335,6 +339,10 @@ comp_args = {
     ],
     "Scala": [
         ["scalac"],
+    ],
+    "Swift": [
+        ["swift", "build", "--configuration", "release"],
+        ["chmod", "-R", "777", ".build"],
     ],
 }
 
@@ -408,7 +416,16 @@ languages = (
     ),
     Language("Dart", BOT +".dart", "MyBot.dart",
         "dart MyBot.dart",
-        [], [(["*.dart"], ChmodCompiler("Dart"))]),
+        [], [(["*.dart"], ChmodCompiler("Dart"))]
+    ),
+    Language("Elixir", BOT, "mix.exs",
+        "./MyBot",
+        [],
+        [
+            ([], ErrorFilterCompiler(comp_args["Elixir"][0])),
+            ([], ErrorFilterCompiler(comp_args["Elixir"][1])),
+        ]
+    ),
     Language("Erlang", "my_bot.beam", "my_bot.erl",
         "erl -hms"+ str(MEMORY_LIMIT) +"m -smp disable -noshell -s my_bot start -s init stop",
         ["*.beam"],
@@ -527,6 +544,14 @@ languages = (
         "./MyBot",
         [],
         [(["*.ss"], ChmodCompiler("Scheme"))]
+    ),
+    Language("Swift", ".build/release/" + BOT, "Package.swift", 
+        ".build/release/" + BOT,
+        [],
+        [
+            ([""], ErrorFilterCompiler(comp_args["Swift"][0], filter_stderr="warning:")),
+            ([""], ExternalCompiler(comp_args["Swift"][1])),
+        ]
     ),
     Language("Tcl", BOT +".tcl", "MyBot.tcl",
         "tclsh8.5 MyBot.tcl",

@@ -14,8 +14,8 @@ ENVIRONMENT_DIR_HELP = "Directory containing precompiled Halite environment " \
                        "executables, each named after their platform. "
 VERSION_HELP = "The version string to embed in the downloads page."
 IGNORED_EXTENSIONS = [".exe", ".class", ".pyc", ".obj"]
-INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp", ".cs", ".csproj", ".scala", ".js", ".sh", ".bat", ".toml", ".rs",".go",".txt",".rb", ".kt", ".clj",".jl", ".ml", ".hs"]
-INCLUDED_FILES = ["Makefile", "README", "REQUIRE"]
+INCLUDED_EXTENSIONS = [".py", ".java", ".cpp", ".hpp", ".cs", ".csproj", ".scala", ".js", ".sh", ".bat", ".toml", ".rs",".go",".txt",".rb", ".kt", ".clj",".jl", ".ml", ".hs", ".exs", ".ex", ".lock",]
+INCLUDED_FILES = ["Makefile", "README", "REQUIRE","LANGUAGE","build.gradle"]
 STARTER_KIT_DIR = "../airesources"
 DOWNLOAD_DATA = "_data/downloads.json"
 PLATFORM_AGNOSTIC = "None"
@@ -31,8 +31,8 @@ ENVIRONMENT_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_{platform}.zip"
 ALL_LANGUAGES_OUTPUT_FILE_FORMAT = "assets/downloads/Halite2_all_{platform}.zip"
 SOURCE_FILE = "assets/downloads/Halite2Source.zip"
 
-versions =  {"Python3" : "1.0", "C++" : "1.0", "Java" : "1.0", "CSharp" : "0.9.0-beta" ,"JavaScript": "0.9-beta",
-"ML-StarterBot-Python":"1.0", "Rust" : "1.0", "Scala" : "1.0-beta", "Go" : "1.0-beta", "Ruby" : "1.0-beta" , "Kotlin" : "0.9.0-beta", "Clojure" : "0.9.0-beta", "Julia" : "0.9.0-beta", "OCaml" : "0.9.0-beta", "Haskell" : "0.9.0-beta"  }
+versions =  {"Python3" : "1.0", "C++" : "1.0", "Java" : "1.0", "CSharp" : "1.0" ,"JavaScript": "0.9-beta",
+"ML-StarterBot-Python":"1.0", "Rust" : "1.0", "Scala" : "1.0-beta", "Go" : "1.0-beta", "Ruby" : "1.0-beta" , "Kotlin" : "0.9.0-beta", "Clojure" : "0.9.0-beta", "Julia" : "0.9.0-beta", "OCaml" : "0.9.0-beta", "Haskell" : "0.9.0-beta", "Elixir" : "0.9.0-beta" }
 
 
 def detect_environments(directory):

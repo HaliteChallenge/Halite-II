@@ -90,6 +90,10 @@
 #include <limits>
 #include <type_traits>
 
+#ifdef _LIBCPP_COMPILER_MSVC
+#include <intrin.h>
+#endif
+
 #ifndef __CHAR_BIT__
 #define __CHAR_BIT__ CHAR_BIT
 #endif
@@ -194,8 +198,16 @@ namespace util {
         _Engine_result_type __mask0_;
         _Engine_result_type __mask1_;
 
+#ifdef _LIBCPP_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4307) // integral constant overflow
+#endif
         static constexpr const _Working_result_type _Rp = _Engine::max() - _Engine::min()
             + _Working_result_type(1);
+#ifdef _LIBCPP_COMPILER_MSVC
+#pragma warning(pop)
+#endif
+
         static constexpr const std::size_t __m = __log2<_Working_result_type, _Rp>::value;
         static constexpr const std::size_t _WDt = std::numeric_limits<_Working_result_type>::digits;
         static constexpr const std::size_t _EDt = std::numeric_limits<_Engine_result_type>::digits;

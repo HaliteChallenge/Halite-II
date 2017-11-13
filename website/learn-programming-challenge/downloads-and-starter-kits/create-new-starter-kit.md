@@ -6,7 +6,7 @@ image: assets/images/opengraph.png
 content: website
 sort_key: 5
 ---
-Thank you for your interest in creating a new Halite starter kit! We've put together everything you should need to know to create a Halite bot in a new programming language, but if you have any questions feel free to reach out via our [Discord Chat][Discord]{:target="_blank"} or email us at <halite@halite.io>.
+Thank you for your interest in creating a new Halite starter kit! We've put together everything you should need to know to create a Halite bot in a new programming language, but if you have any questions feel free to reach out via our [Discord Chat](https://discordapp.com/invite/EqW8DCB){:target="_blank"} or email us at <halite@halite.io>.
 
 
 ## API Design

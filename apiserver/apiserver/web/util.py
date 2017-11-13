@@ -159,13 +159,22 @@ def get_offset_limit(*, default_limit=50, max_limit=250):
     return offset, limit
 
 
+def operator_like(field, value):
+    return field.like("%{}%".format(value))
+
+
 def parse_filter(filter_string):
     """
     Parse a filter string into a field name, comparator, and value.
     :param filter_string: Of the format field,operator,value.
     :return: (field_name, operator_func, value)
     """
-    field, cmp, value = filter_string.split(",")
+    try:
+        field, cmp, value = filter_string.split(",", 2)
+    except Exception as e:
+        raise util.APIError(
+            400,
+            message="Filter '{}' is ill-formed.".format(filter_string))
 
     operation = {
         "=": operator.eq,
@@ -174,6 +183,7 @@ def parse_filter(filter_string):
         ">": operator.gt,
         ">=": operator.ge,
         "!=": operator.ne,
+        "contains": operator_like,
     }.get(cmp, None)
     if operation is None:
         raise util.APIError(
@@ -222,9 +232,16 @@ def get_sort_filter(fields, false_fields=()):
         elif isinstance(column.type, sqlalchemy.types.String):
             conversion = lambda x: x
         else:
-            raise RuntimeError("Filtering on column is not supported yet: " + repr(column))
+            raise util.APIError(
+                501,
+                message="Filtering on column is not supported yet: " + repr(column))
 
-        value = conversion(value)
+        try:
+            value = conversion(value)
+        except Exception as e:
+            raise util.APIError(
+                401,
+                message="Could not convert value {} for filter on '{}'.".format(repr(value), field))
 
         clause = operation(column, value)
         if field in filter_clauses:
@@ -281,4 +298,3 @@ def get_value(query):
     :return: The value within
     """
     return query.first()[0]
-

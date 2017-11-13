@@ -358,7 +358,7 @@
         playing: false,
         showObjectPanel: sessionStorage.getItem('halite-showMapObjectPanel') !== 'false',
         showPlayerDetailPanel: sessionStorage.getItem('halite-showPlayerDetailPanel') === 'true',
-        showChartPanel: sessionStorage.getItem('halite-showChartPanel') === 'true',
+        showChartPanel: sessionStorage.getItem('halite-showChartPanel') ? sessionStorage.getItem('halite-showChartPanel') === 'true' : true,
         speedIndex: 3,
         speedLabel: '3x',
         stats: null,

@@ -48,7 +48,7 @@ export default {
           location: `${base.x.toFixed(4)}, ${base.y.toFixed(4)}`,
           owner: isUndefined(state.owner) || isNull(state.owner) ? 'Unconquered' : this.players[state.owner].name,
           planetId: base.id,
-          dockingSpots: base.docking_spots,
+          dockingSpots: state.docked_ships.length ? state.docked_ships.length + '/' + base.docking_spots : '0/' + base.docking_spots,
           health: state.health,
           radius: Math.round(base.r * 100) / 100
         }
