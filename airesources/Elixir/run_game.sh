@@ -1,3 +1,5 @@
 #!/bin/sh
 
-./halite -d "240 160" "./elixirbot/elixirbot" "./elixirbot/elixirbot"
+mix deps.get
+mix escript.build
+./halite -d "240 160" "./MyBot" "./MyBot"
