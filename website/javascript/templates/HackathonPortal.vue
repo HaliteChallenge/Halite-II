@@ -34,7 +34,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3" >
+        <div class="col-md-3">
           <div class="hackathon-progress-card" @click="openHackathon(2)">
             <div class="hackathon-card-img" style="background-image: url('/assets/images/cornell-tech.jpg')"></div>
             <div class="hackathon-card-text">

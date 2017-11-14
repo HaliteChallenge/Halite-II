@@ -59,6 +59,9 @@
                 <span class="replay-btn">
                   <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
+                <a class="btn" v-if="game && game.game_id && user" :href="replay_download_link(game.game_id)">
+                  <span>DOWNLOAD</span>
+                </a>
                 <!-- <span class="replay-btn">
                   <span class="icon-volumn"></span>
                 </span> -->
@@ -365,6 +368,7 @@
         sharePopup: false,
         isHalloween: true,
         isMobile: window.mobileAndTabletcheck(),
+        user: null,
         // showChart: false,
         selected: {
           kind: '',
@@ -417,6 +421,11 @@
         max: this.replay.num_frames - 1,
         value: this.frame
       })
+
+      // current user
+      api.me().then((user) => {
+        this.user = user;
+      });
 
       if(window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true'){
         this.isHalloween = true;
@@ -832,7 +841,14 @@
         this.$refs.chart2.refreshGraph()
         this.$refs.chart3.refreshGraph()
         this.$refs.chart4.refreshGraph()
-      }
+      },
+      /**
+       * Download link
+       */
+      replay_download_link: function (game_id) {
+        // return '';
+        return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`
+      },
     }
   }
 </script>
