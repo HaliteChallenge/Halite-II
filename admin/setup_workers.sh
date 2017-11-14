@@ -4,11 +4,12 @@ set -e
 
 source ./config.sh
 
+# Max upload size is 100 MiB
 gcloud compute --project "${GCLOUD_PROJECT}" \
     instance-templates create "worker-instance-template" \
     --machine-type "${MACHINE_TYPE}" \
     --network "default" \
-    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)" \
+    --metadata "^#&&#^halite-manager-url=${COORDINATOR_URL}#&&#halite-secret-folder=${SECRET_FOLDER}#&&#startup-script=$(cat setup_workers__startup_script.sh)#&&#halite-max-upload-size=104857600" \
     --no-restart-on-failure \
     --no-service-account --no-scopes \
     --maintenance-policy "TERMINATE" \
