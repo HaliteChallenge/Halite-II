@@ -9,6 +9,9 @@ from time import gmtime, strftime, sleep
 # Needs to match corresponding value in apiserver/config.py
 # Default value, 100 MiB
 MAX_BOT_UPLOAD_SIZE = 100 * 1024 * 1024
+# Maximum wait time in between compiled bot archive upload attempts,
+# in seconds
+MAX_UPLOAD_BACKOFF = 32
 
 
 with open("config.json") as configfile:
@@ -115,7 +118,7 @@ def storeBotRemotely(user_id, bot_id, zip_file_path):
             print("Hashes do not match! Redoing file upload...\n")
             iterations += 1
             sleep(backoff)
-            if backoff < 32:
+            if backoff < MAX_UPLOAD_BACKOFF:
                 backoff *= 2
 
             continue
