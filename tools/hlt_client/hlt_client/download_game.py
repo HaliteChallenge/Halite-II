@@ -62,7 +62,7 @@ class GameDownloader:
         :return: the file unzipped if possible
         """
         try:
-            return str(zstd.loads(game_binary))
+            return zstd.loads(game_binary).decode()
         except Exception:
             raise ValueError("Could not unzip file at: {}!".format(game_id))
 
