@@ -39,7 +39,7 @@ defmodule Elixirbot.Game do
 
   defp read_from_input() do
     input_line = IO.gets("") |> String.strip
-    Logger.debug "recieved: #{input_line}"
+    Logger.debug "received: #{input_line}"
     input_line
   end
 

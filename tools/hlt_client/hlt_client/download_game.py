@@ -199,4 +199,3 @@ def download(mode, destination, date, all_bots, default_user_id, user_id, limit)
             raise ValueError("Cannot run default mode without authenticating .Please run `client.py --auth` first.")
         UserGameDownloader(destination, default_user_id if not user_id else user_id, limit).get_objects()
     print('Finished writing files to desired location')
-
