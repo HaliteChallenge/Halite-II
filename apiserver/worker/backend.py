@@ -7,6 +7,7 @@ from time import gmtime, strftime, sleep
 
 
 # Needs to match corresponding value in apiserver/config.py
+# Default value, 100 MiB
 MAX_BOT_UPLOAD_SIZE = 100 * 1024 * 1024
 
 
@@ -15,6 +16,8 @@ with open("config.json") as configfile:
     MANAGER_URL = config["MANAGER_URL"]
     SECRET_FOLDER = config["SECRET_FOLDER"]
     CAPABILITIES = config.get("CAPABILITIES", [])
+    MAX_BOT_UPLOAD_SIZE = config.get("MAX_BOT_UPLOAD_SIZE",
+                                     MAX_BOT_UPLOAD_SIZE)
 
 
 def getTask():
