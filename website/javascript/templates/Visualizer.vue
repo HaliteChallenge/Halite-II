@@ -61,7 +61,7 @@
                 </span>
                 <span class="replay-btn">
                   <a style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id && user" :href="replay_download_link(game.game_id)">
-                    <img :src="`${baseUrl}/assets/images/temp/download.png`"/>
+                    <span class="icon-download"></span>
                   </a>
                 </span>
                 <!-- <span class="replay-btn">

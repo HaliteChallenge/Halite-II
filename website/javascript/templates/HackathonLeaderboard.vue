@@ -19,7 +19,7 @@
                     <td><a :href="'/user?user_id=' + player.user_id">{{ player.username }}</a></td>
                     <td>{{ Math.round(100 * player.score) / 100 }}</td>
                     <td class="text-center">
-                        <TierPopover :tier="tierClass(player.tier || player.local_tier)"/>
+                        <TierPopover :tier="player.tier_class"/>
                     </td>
                     <td>{{ player.organization }}</td>
                     <td>{{ player.language }}</td>
@@ -112,6 +112,15 @@ export default {
         }
 
         api.leaderboard(filters, this.hackathonId, (this.page - 1) * this.limit, this.limit).then((leaderboard) => {
+          leaderboard.map((user) => {
+            user.tier = 'Diamond';
+            user.tier_class = tierClass(user.tier);
+            api.get_user(user.user_id).then((u) => {
+              user.tier = u.tier;
+              user.tier_class = this.tierClass(user.tier);
+            });
+            return user;
+          });
           this.leaderboard = leaderboard
         })
       },
