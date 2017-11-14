@@ -59,9 +59,11 @@
                 <span class="replay-btn">
                   <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
-                <a class="replay-btn" style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id && user" :href="replay_download_link(game.game_id)">
-                  <img :src="`${baseUrl}/assets/images/temp/download.png`"/>
-                </a>
+                <span class="replay-btn">
+                  <a style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id && user" :href="replay_download_link(game.game_id)">
+                    <img :src="`${baseUrl}/assets/images/temp/download.png`"/>
+                  </a>
+                </span>
                 <!-- <span class="replay-btn">
                   <span class="icon-volumn"></span>
                 </span> -->
