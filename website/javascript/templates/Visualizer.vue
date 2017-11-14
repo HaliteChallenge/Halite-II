@@ -72,7 +72,7 @@
               <div class="game-replay-progress">
                 <div class="game-replay-progress-inner">
                   <div>0</div>
-                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
+                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" ref="slider" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
                   <div>{{sliderOptions.max}}</div>
                 </div>
               </div>
@@ -581,6 +581,11 @@
       }
       this.scaleCanvas();
       $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+
+      setTimeout(() => {
+        this.$refs.slider.refresh();
+      }, 2000);
+
     },
     computed: {
       statistics: function () {
