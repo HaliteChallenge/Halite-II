@@ -8,7 +8,7 @@ object Constants {
   val MAX_SPEED = 7
 
   /** Radius of a ship */
-  val SHIP_RADIUS = 0.5
+  val SHIP_RADIUS: Double = 0.5
 
   /** Starting health of ship, also its max */
   val MAX_SHIP_HEALTH = 255
@@ -34,15 +34,15 @@ object Constants {
   /** Number of turns it takes to dock a ship */
   val DOCK_TURNS = 5
 
-  /** Number of production units per turn contributed by each docked ship */
+  /** Number of turns it takes to create a ship per docked ship */
   val BASE_PRODUCTIVITY = 6
 
   /** Distance from the planets edge at which new ships are created */
   val SPAWN_RADIUS = 2.0
 
+  val MAX_CORRECTIONS = 10
   ////////////////////////////////////////////////////////////////////////
   // Implementation-specific constants
 
   val FORECAST_FUDGE_FACTOR: Double = SHIP_RADIUS + 0.1
-  val MAX_NAVIGATION_CORRECTIONS = 90
 }

@@ -16,7 +16,7 @@ class GameMap(val width: Short,
               val height: Short,
               val playerId: Short,
               val metadataIterator: Iterator[String]) {
-  Log.log("--- NEW TURN ---")
+  DebugLog.addLog("--- NEW TURN ---")
   var players: Seq[Player] = {
     val numberOfPlayers = MetadataParser.parsePlayerNum(metadataIterator)
 
@@ -29,7 +29,7 @@ class GameMap(val width: Short,
 
     for (counter <- 1 to numberOfPlayers) yield getPlayerFromMetadata
   }
-  Log.log("Players: " + players)
+  DebugLog.addLog("Players: " + players)
 
   var planets: Map[Long, Planet] = {
     val numberOfPlanets = metadataIterator.next.toLong
@@ -38,7 +38,7 @@ class GameMap(val width: Short,
       .map(planet => planet.id -> planet)
       .toMap
   }
-  Log.log("Planets: " + planets)
+  DebugLog.addLog("Planets: " + planets)
 
   if (!metadataIterator.isEmpty) {
     throw new IllegalStateException(
@@ -56,7 +56,7 @@ class GameMap(val width: Short,
 
     getShipsFromPlayers(players, Seq.empty)
   }
-  Log.log("All ships: " + allShips)
+  DebugLog.addLog("All ships: " + allShips)
 
   def getAllPlayers: Seq[Player] = players
 
