@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
     if (mapWidth == 0 && mapHeight == 0) {
         // Always generate a 3:2 aspect ratio
         std::vector<unsigned short> mapSizeChoices =
-            { 80, 80, 88, 88, 96, 96, 96, 104, 104, 104, 112, 112, 112, 120, 120, 128, 128 };
+            { 80, 80, 88, 88, 96, 96, 96, 104, 104, 104, 104, 112, 112, 112, 120, 120, 128, 128 };
         std::mt19937 prg(seed);
         util::uniform_int_distribution<unsigned long> size_dist(0, mapSizeChoices.size() - 1);
         auto mapBase = mapSizeChoices[size_dist(prg)];

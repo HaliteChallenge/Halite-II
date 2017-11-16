@@ -3,7 +3,15 @@ import requests
 from hashlib import md5
 import json
 import os
-from time import gmtime, strftime
+from time import gmtime, strftime, sleep
+
+
+# Needs to match corresponding value in apiserver/config.py
+# This is the default value, 100 MiB
+MAX_BOT_UPLOAD_SIZE = 100 * 1024 * 1024
+# Maximum wait time in between compiled bot archive upload attempts,
+# in seconds
+MAX_UPLOAD_BACKOFF = 32
 
 
 with open("config.json") as configfile:
@@ -11,6 +19,9 @@ with open("config.json") as configfile:
     MANAGER_URL = config["MANAGER_URL"]
     SECRET_FOLDER = config["SECRET_FOLDER"]
     CAPABILITIES = config.get("CAPABILITIES", [])
+    provided_size = config.get("MAX_BOT_UPLOAD_SIZE", MAX_BOT_UPLOAD_SIZE)
+    if provided_size:
+        MAX_BOT_UPLOAD_SIZE = provided_size
 
 
 def getTask():
@@ -84,10 +95,14 @@ def storeBotLocally(user_id, bot_id, storage_dir, is_compile=False):
 def storeBotRemotely(user_id, bot_id, zip_file_path):
     """Posts a bot file to the manager"""
     zip_contents = open(zip_file_path, "rb").read()
+    if len(zip_contents) > MAX_BOT_UPLOAD_SIZE:
+        raise RuntimeError("Bot archive exceeds maximum size of 100 MiB.")
+
     iterations = 0
     local_hash = md5(zip_contents).hexdigest()
+    backoff = 1
 
-    while iterations < 100:
+    while iterations < 10:
         r = requests.post(MANAGER_URL+"botFile",
                           data={
                               "user_id": str(user_id),
@@ -95,11 +110,18 @@ def storeBotRemotely(user_id, bot_id, zip_file_path):
                           },
                           files={"bot.zip": zip_contents})
         print("Posting compiled bot archive %s\n" % r.text)
+        if r.status_code >= 400 and r.status_code <= 499:
+            print("Got a 4xx status code")
+            r.raise_for_status()
 
         # Try again if local and remote hashes differ
         if local_hash != getBotHash(user_id, bot_id):
             print("Hashes do not match! Redoing file upload...\n")
             iterations += 1
+            sleep(backoff)
+            if backoff < MAX_UPLOAD_BACKOFF:
+                backoff *= 2
+
             continue
 
         return

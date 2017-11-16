@@ -2,7 +2,6 @@ import os
 import sys
 import zipfile
 import requests
-
 from . import client
 
 _BOT_FILE_NAME_PREPEND = 'MyBot.'

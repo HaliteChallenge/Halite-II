@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
-scalac *.scala
+scalac *.scala hlt/*.scala
 ./halite -d "240 160" "scala MyBot" "scala MyBot"

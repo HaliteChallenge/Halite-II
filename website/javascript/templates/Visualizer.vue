@@ -59,6 +59,11 @@
                 <span class="replay-btn">
                   <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
+                <span class="replay-btn">
+                  <a style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id" :href="replay_download_link(game.game_id)">
+                    <span class="icon-download"></span>
+                  </a>
+                </span>
                 <!-- <span class="replay-btn">
                   <span class="icon-volumn"></span>
                 </span> -->
@@ -67,7 +72,7 @@
               <div class="game-replay-progress">
                 <div class="game-replay-progress-inner">
                   <div>0</div>
-                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
+                  <div class="game-replay-progress-bar"><vue-slider v-model="frame" ref="slider" v-bind="sliderOptions" @callback="changeFrame"></vue-slider></div>
                   <div>{{sliderOptions.max}}</div>
                 </div>
               </div>
@@ -365,6 +370,7 @@
         sharePopup: false,
         isHalloween: true,
         isMobile: window.mobileAndTabletcheck(),
+        user: null,
         // showChart: false,
         selected: {
           kind: '',
@@ -417,6 +423,11 @@
         max: this.replay.num_frames - 1,
         value: this.frame
       })
+
+      // current user
+      api.me().then((user) => {
+        this.user = user;
+      });
 
       if(window.localStorage['halloween'] === undefined || window.localStorage['halloween'] === 'true'){
         this.isHalloween = true;
@@ -570,6 +581,11 @@
       }
       this.scaleCanvas();
       $(window).on('resize', _.throttle(this.scaleCanvas, 150));
+
+      setTimeout(() => {
+        this.$refs.slider.refresh();
+      }, 2000);
+
     },
     computed: {
       statistics: function () {
@@ -832,7 +848,14 @@
         this.$refs.chart2.refreshGraph()
         this.$refs.chart3.refreshGraph()
         this.$refs.chart4.refreshGraph()
-      }
+      },
+      /**
+       * Download link
+       */
+      replay_download_link: function (game_id) {
+        let user_id = this.user ? this.user.user_id : 0
+        return `${api.API_SERVER_URL}/user/${user_id}/match/${game_id}/replay`
+      },
     }
   }
 </script>

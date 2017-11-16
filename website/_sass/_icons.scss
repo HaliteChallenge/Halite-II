@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-download:before {
+  content: "\e924";
+}
 .icon-ships:before {
   content: "\e923";
 }

@@ -21,7 +21,7 @@ branches:
 # scripts that run after cloning repository
 build_script:
   - cd C:\Halite\environment
-  - call "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  - call "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
   - .\make.bat
 
 artifacts:

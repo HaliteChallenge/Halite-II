@@ -1,2 +1,2 @@
-scalac *.scala
-\halite.exe -d "240 160" "scala MyBot" "scala MyBot"
+call scalac *.scala hlt\*.scala
+halite -d "240 160" "scala MyBot" "scala MyBot"
