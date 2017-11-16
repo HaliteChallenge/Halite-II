@@ -56,7 +56,7 @@ Please try to generally adhere to the API used in [Python3 starter kit](https://
 
 Of course, if changes to this API will make the starter package fit more nicely into your language, feel free to make them. A Java API will not translate directly into Lisp nicely.
 
-## Networking Overview
+## Game Communication Overview
 Bots communicate with the environment via stdin and stdout using series of space separated integers. There are two stages of communication - initialization and turn formats, and these are detailed below.
 
 ### Initialization
