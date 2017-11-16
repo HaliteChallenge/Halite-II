@@ -5,14 +5,14 @@
         <h1>EVENTS &amp; HACKATHONS</h1>
         <i class="xline xline-bottom"></i>
       </div>
-      <i v-show="showEvents" class="xline xline-bottom"></i>
-      <div class="hackathon-title">
+    <!--  <i v-show="showEvents" class="xline xline-bottom"></i> -->
+    <!--  <div class="hackathon-title">
         <p class="t2 c-wht font-headline">FEATURED HACKATHONS AND EVENTS</p>
       </div>
-      <div class="row hackathon-progress-cards">
+      <div class="row hackathon-progress-cards"> -->
         <!-- For new events just copy paste the below div and customize,
-        you also need to modify the function to point to the righ link -->
-        <div class="col-md-3" >
+        you also need to modify the function to point to the right link -->
+   <!-- <div class="col-md-3" >
           <div class="hackathon-progress-card" @click="openHackathon(1)">
             <div class="hackathon-card-img" style="background-image: url('/assets/images/dalton.jpg')"></div>
             <div class="hackathon-card-text">
@@ -30,11 +30,11 @@
                   <img :src="`${baseUrl}/assets/images/halite-group.svg`"/>
                   <p class="hackathon-card-item-text">November 11, 2017</p>
                 </li>
-              </ul>
-            </div>
+              </ul> 
+            </div> 
           </div>
-        </div>
-        <div class="col-md-3" >
+        </div>-->
+       <!-- <div class="col-md-3" >
           <div class="hackathon-progress-card" @click="openHackathon(2)">
             <div class="hackathon-card-img" style="background-image: url('/assets/images/cornell-tech.jpg')"></div>
             <div class="hackathon-card-text">
@@ -55,9 +55,9 @@
               </ul>
             </div>
           </div> 
-        </div>
+        </div> 
       </div>
-    </div>
+    </div>-->
     <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
         <i class="xline xline-top"></i>
