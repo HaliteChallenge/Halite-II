@@ -32,3 +32,11 @@ jar {
     archiveName 'MyBot.jar'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
+
+task submission(type: Zip) {
+    from 'build/libs/MyBot.jar'
+    from 'LANGUAGE'
+    archiveName 'submission.zip'
+}
+
+submission.dependsOn jar
