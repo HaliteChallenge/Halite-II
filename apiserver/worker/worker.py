@@ -234,7 +234,7 @@ def runGame(width, height, users):
 
             # The processes won't necessarily be automatically cleaned up, so
             # let's do it ourselves
-            util.kill_processes_as(bot_user, "bash")
+            util.kill_processes_as(bot_user)
 
         return lines
 
