@@ -43,10 +43,8 @@ class CD(object):
 def safeglob(pattern):
     safepaths = []
     for root, dirs, files in os.walk("."):
-        # print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
         files = fnmatch.filter(files, pattern)
         for fname in files:
-            # print(fname + " -> " + os.path.splitext(fname)[0])
             if SAFEPATH.match(fname) and os.path.splitext(fname)[0] != "RandomBot":
                 safepaths.append(os.path.join(root, fname))
     return safepaths
