@@ -370,7 +370,7 @@ languages = (
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][1])),
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][2]))]
     ),
-    Language("CMake", BOT, "CMakeLists.txt",
+    Language("C++", BOT, "CMakeLists.txt",
         "./MyBot",
         ["*.o", BOT],
         [
@@ -607,8 +607,10 @@ def detect_language(bot_dir):
             lang for lang in languages if os.path.exists(lang.main_code_file)
         ]
 
-        if any(lang.name == "CMake" for lang in detected_langs):
-            detected_langs = [lang for lang in detected_langs if lang.name != "C" and lang.name != "C++"]
+        # if we have cmake-based compilation, then remove any other autodetected C and C++ compilers
+        if any(lang.main_code_file == "CMakeLists.txt" for lang in detected_langs):
+            detected_langs = [lang for lang in detected_langs if
+                              lang.main_code_file == "CMakeLists.txt" or (lang.name != "C" and lang.name != "C++")]
 
         if len(detected_langs) > 1:
             return None, ['Found multiple MyBot.* files: \n'+
@@ -674,10 +676,6 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
             except Exception as e:
                 print("error")
                 print(e)
-
-            # let's assume that anyone using cmake is using it for C++
-            if name == "CMake":
-                name = "C++"
 
             # allow LANGUAGE file to override language name
             override_name = detect_language_file(bot_dir)
