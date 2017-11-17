@@ -675,6 +675,10 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
                 print("error")
                 print(e)
 
+            # let's assume that anyone using cmake is using it for C++
+            if name == "CMake":
+                name = "C++"
+
             # allow LANGUAGE file to override language name
             override_name = detect_language_file(bot_dir)
             if override_name:
