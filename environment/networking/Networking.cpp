@@ -695,7 +695,7 @@ void Networking::kill_player(hlt::PlayerId player_tag) {
         } else break;
     }
 
-    kill(-processes[player_tag], SIGKILL);
+    kill(processes[player_tag], SIGKILL);
 
     processes[player_tag] = -1;
     connections[player_tag].read = -1;
