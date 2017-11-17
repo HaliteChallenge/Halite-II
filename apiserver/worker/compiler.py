@@ -92,7 +92,7 @@ def _run_cmd(cmd, working_dir, timelimit):
         errors = ["Compilation timed out with command %s" % (cmd,)]
 
     # Clean up any processes that didn't exit cleanly
-    util.kill_processes_as("bot_compilation", "bash")
+    util.kill_processes_as("bot_compilation")
 
     return out, errors
 
