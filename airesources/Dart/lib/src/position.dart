@@ -36,6 +36,4 @@ class Position {
 
 int toDegrees(double radians) => (radians * 180 / PI).round();
 
-int angleRadToDegClipped(double angleRad) {
-  return ((toDegrees(angleRad) % 360) + 360) % 360;
-}
+int angleRadToDegClipped(double angleRad) => toDegrees(angleRad) % 360;
