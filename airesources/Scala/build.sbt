@@ -38,7 +38,7 @@ uploadBot := {
 
 lazy val root = (project in file("."))
   .settings(
-    name := "My Bot",
+    name := "Halite II Scala Bot",
     inThisBuild(
       List(
         scalaVersion := "2.12.3",
