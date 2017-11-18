@@ -16,5 +16,5 @@ class Ship extends Entity {
   int get dockingProgress => _dockingProgress;
   int get weaponCooldown => _weaponCooldown;
 
-  bool canDock(Planet planet) => getDistanceTo(planet) <= DOCK_RADIUS + planet.radius;
+  bool canDock(Planet planet) => getDistanceTo(planet) <= SHIP_RADIUS + DOCK_RADIUS + planet.radius;
 }
