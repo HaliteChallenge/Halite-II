@@ -8,6 +8,6 @@ class Logger {
 
   void call(String log) {
     if (_fileName == null) return;
-    new File(_fileName).writeAsStringSync("$log\n", mode: FileMode.WRITE_ONLY_APPEND);
+    new File(_fileName).writeAsStringSync("$log\n", mode: FileMode.WRITE_ONLY);
   }
 }
