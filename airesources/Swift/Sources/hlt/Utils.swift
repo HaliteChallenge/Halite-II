@@ -10,4 +10,8 @@ public extension Double {
     public var radiansToDegrees: Double {
         return self * 180.0 / .pi
     }
+
+    public var radiansToDegreesClipped: Int {
+        return ((lround(radiansToDegrees) % 360) + 360) % 360
+    }
 }

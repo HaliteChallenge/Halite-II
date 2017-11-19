@@ -51,7 +51,7 @@ public func navigateShipTowardsTarget(map: Map,
         thrust = maxThrust
     }
     
-    let angleDeg = angleRad.radiansToDegrees.truncatingRemainder(dividingBy: 360)
+    let angleDeg = angleRad.radiansToDegreesClipped
     
-    return .thrust(ship, angleDeg: Int(angleDeg), thrust: thrust)
+    return .thrust(ship, angleDeg: angleDeg, thrust: thrust)
 }
