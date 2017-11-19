@@ -5,13 +5,13 @@ public protocol Entity {
     var id: Int { get }
     
     /// The x coordinate of the entity
-    var x: Float { get }
+    var x: Double { get }
     
     /// The y coordinate of the entity
-    var y: Float { get }
+    var y: Double { get }
     
     /// The radius of the entity
-    var radius: Float { get }
+    var radius: Double { get }
     
     /// The health of the entity
     var health: Int { get }
@@ -20,35 +20,35 @@ public protocol Entity {
 extension Entity {
     
     /// Calculates the angle to another entity in degrees
-    public func angle(to: Entity) -> Float {
+    public func angle(to: Entity) -> Double {
         return angleRadians(to: to).radiansToDegrees
     }
     
     /// Calculates the angle to another entity in radians
-    public func angleRadians(to: Entity) -> Float {
+    public func angleRadians(to: Entity) -> Double {
         let dx = to.x - self.x
         let dy = to.y - self.y
-        return atan2f(dy, dx)
+        return atan2(dy, dx)
     }
     
     /// Returns the distance to the target Entity
-    public func distance(to: Entity) -> Float {
+    public func distance(to: Entity) -> Double {
         return distance(toX: to.x, y: to.y)
     }
     
-    func distance(toX x: Float, y: Float) -> Float {
+    func distance(toX x: Double, y: Double) -> Double {
         let dx = x - self.x
         let dy = y - self.y
-        return sqrt(powf(dx, 2) + powf(dy, 2))
+        return sqrt(pow(dx, 2) + pow(dy, 2))
     }
     
-    func orientTowardsInRadians(x: Float, y: Float) -> Float {
+    func orientTowardsInRadians(x: Double, y: Double) -> Double {
         let dx = x - self.x
         let dy = y - self.y
-        return atan2f(dy, dx) + 2 * Float.pi
+        return atan2(dy, dx) + 2 * Double.pi
     }
     
-    func orientTowards(x: Float, y: Float) -> Float {
+    func orientTowards(x: Double, y: Double) -> Double {
         return orientTowardsInRadians(x: x, y: y).radiansToDegrees
     }
     
@@ -60,8 +60,8 @@ extension Entity {
         let radius = target.radius + Constants.MinDistanceForClosestPoint
         let angleRad = target.orientTowardsInRadians(x: self.x, y: self.y)
         
-        let x = target.x + radius * cosf(angleRad)
-        let y = target.y + radius * sinf(angleRad)
+        let x = target.x + radius * cos(angleRad)
+        let y = target.y + radius * sin(angleRad)
         
         return Position(x: x, y: y)
     }
@@ -74,12 +74,12 @@ public func ==(lhs: Entity, rhs: Entity) -> Bool {
 /// A structure to hold a simple position
 public struct Position: Entity {
     public let id: Int
-    public let x: Float
-    public let y: Float
-    public let radius: Float
+    public let x: Double
+    public let y: Double
+    public let radius: Double
     public let health: Int
     
-    init(x: Float, y: Float) {
+    init(x: Double, y: Double) {
         self.id = 0
         self.x = x
         self.y = y

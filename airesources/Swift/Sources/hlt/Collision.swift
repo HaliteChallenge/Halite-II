@@ -1,7 +1,7 @@
 import Foundation
 
 /// Returns true if the path given by start and end intersect with a given circle
-public func intersectSegmentCircle(start: Entity, end: Entity, circle: Entity, fudge: Float = 0.5) -> Bool {
+public func intersectSegmentCircle(start: Entity, end: Entity, circle: Entity, fudge: Double = 0.5) -> Bool {
     let dx = end.x - start.x
     let dy = end.y - start.y
     
@@ -27,6 +27,6 @@ public func intersectSegmentCircle(start: Entity, end: Entity, circle: Entity, f
     return closestDistance <= circle.radius + fudge
 }
 
-private func square(_ val: Float) -> Float {
+private func square(_ val: Double) -> Double {
     return val * val
 }

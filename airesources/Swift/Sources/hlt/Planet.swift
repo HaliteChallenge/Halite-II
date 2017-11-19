@@ -5,16 +5,16 @@ public struct Planet: Entity, HLTDeserializable {
     public let id: Int
     
     /// The x coordinate of the planet
-    public let x: Float
+    public let x: Double
     
     /// The y coordinate of the planet
-    public let y: Float
+    public let y: Double
     
     /// The health of the planet
     public let health: Int
     
     /// The radius of the planet
-    public let radius: Float
+    public let radius: Double
     
     /// The number of docking spots that the planet has
     public let dockingSpots: Int
@@ -39,10 +39,10 @@ public struct Planet: Entity, HLTDeserializable {
     
     static func deserialize(_ tokens: TokenStack) -> Planet {
         let id = Int(tokens.pop())!
-        let x = Float(tokens.pop())!
-        let y = Float(tokens.pop())!
+        let x = Double(tokens.pop())!
+        let y = Double(tokens.pop())!
         let health = Int(tokens.pop())!
-        let radius = Float(tokens.pop())!
+        let radius = Double(tokens.pop())!
         let dockingSpots = Int(tokens.pop())!
         let currentProduction = Int(tokens.pop())!
         let remainingProduction = Int(tokens.pop())!

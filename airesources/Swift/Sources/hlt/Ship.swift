@@ -12,13 +12,13 @@ public struct Ship: Entity, HLTDeserializable {
     public let id: Int
     
     /// The x coordinate of the ship
-    public let x: Float
+    public let x: Double
     
     /// The y coordinate of the ship
-    public let y: Float
+    public let y: Double
     
     /// The radius of the ship
-    public let radius: Float
+    public let radius: Double
     
     /// The health of the ship
     public let health: Int
@@ -37,11 +37,11 @@ public struct Ship: Entity, HLTDeserializable {
     
     static func deserialize(_ tokens: TokenStack) -> Ship {
         let id = Int(tokens.pop())!
-        let x = Float(tokens.pop())!
-        let y = Float(tokens.pop())!
+        let x = Double(tokens.pop())!
+        let y = Double(tokens.pop())!
         let health = Int(tokens.pop())!
-        _ = Float(tokens.pop())!                    // XVel - deprecated
-        _ = Float(tokens.pop())!                    // YVel - deprecated
+        _ = Double(tokens.pop())!                    // XVel - deprecated
+        _ = Double(tokens.pop())!                    // YVel - deprecated
         let dockingStatus = DockingStatus(rawValue: Int(tokens.pop())!)!
         let dockedPlanetId = Int(tokens.pop())!
         let dockingProgress = Int(tokens.pop())!
@@ -85,7 +85,7 @@ public struct Ship: Entity, HLTDeserializable {
                          map: Map,
                          maxThrust: Int,
                          avoidObstacles: Bool) -> Move {
-        let angularStepRad = Float.pi / 180
+        let angularStepRad = Double.pi / 180.0
         return navigateShipTowardsTarget(map: map,
                                          ship: self,
                                          target: target,

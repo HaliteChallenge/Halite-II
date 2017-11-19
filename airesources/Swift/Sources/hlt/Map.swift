@@ -85,12 +85,12 @@ public struct Map {
     }
     
     /// Returns an array of tuples of (distance, entity) with all entities sorted by their distance from the target
-    public func entitiesByDistance(toEntity target: Entity) -> [(distance: Float, entity: Entity)] {
+    public func entitiesByDistance(toEntity target: Entity) -> [(distance: Double, entity: Entity)] {
         let entities = allEntities().filter { $0.id != target.id }
-        let distances: [Float] = entities.map {
+        let distances: [Double] = entities.map {
             let dx = $0.x - target.x
             let dy = $0.y - target.y
-            return sqrtf(powf(dx, 2) + powf(dy, 2))
+            return sqrt(pow(dx, 2) + pow(dy, 2))
         }
         
         return zip(distances, entities).map {

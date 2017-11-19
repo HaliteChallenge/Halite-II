@@ -2,7 +2,7 @@ import Foundation
 
 /// Creates a move that navigates a ship to a given dock target
 public func navigateShipToDock(map: Map, ship: Ship, dockTarget: Entity, maxThrust: Int) -> Move {
-    let angularStepRad = Float.pi / 180
+    let angularStepRad = Double.pi / 180.0
     let targetPosition = ship.getClosestPoint(to: dockTarget)
     
     return navigateShipTowardsTarget(map: map,
@@ -21,7 +21,7 @@ public func navigateShipTowardsTarget(map: Map,
                                       maxThrust: Int,
                                       avoidObstacles: Bool,
                                       maxCorrections: Int,
-                                      angularStepRad: Float) -> Move {
+                                      angularStepRad: Double) -> Move {
     if maxCorrections <= 0 {
         return .noop
     }
@@ -30,8 +30,8 @@ public func navigateShipTowardsTarget(map: Map,
     let angleRad = ship.orientTowardsInRadians(x: target.x, y: target.y)
     
     if avoidObstacles && map.obstaclesBetween(start: ship, target: target).count > 0 {
-        let newTargetDx = cosf(angleRad + angularStepRad) * distance
-        let newTargetDy = sinf(angleRad + angularStepRad) * distance
+        let newTargetDx = cos(angleRad + angularStepRad) * distance
+        let newTargetDy = sin(angleRad + angularStepRad) * distance
         let newTarget = Position(x: ship.x + newTargetDx, y: ship.y + newTargetDy)
         
         return navigateShipTowardsTarget(map: map,
@@ -45,7 +45,7 @@ public func navigateShipTowardsTarget(map: Map,
     
     let thrust: Int
     
-    if distance < Float(maxThrust) {
+    if distance < Double(maxThrust) {
         thrust = Int(distance)
     } else {
         thrust = maxThrust
