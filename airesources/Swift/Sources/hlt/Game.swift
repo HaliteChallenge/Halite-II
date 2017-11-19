@@ -78,6 +78,6 @@ public class Game {
         print(cmd)
         
         // Need a flush here.
-        fflush(__stdoutp)
+        fflush(stdout)
     }
 }
