@@ -9,7 +9,6 @@ mod hlt;
 use hlt::entity::{Entity, DockingStatus};
 use hlt::game::Game;
 use hlt::logging::Logger;
-use hlt::command::Command;
 
 fn main() {
     // Initiailize the game
@@ -22,7 +21,7 @@ fn main() {
     loop {
         // Update the game state
         let game_map = game.update_map();
-        let mut command_queue: Vec<Command> = Vec::new();
+        let mut command_queue = Vec::new();
 
         // Loop over all of our player's ships
         for ship in game_map.get_me().all_ships() {

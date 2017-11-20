@@ -17,11 +17,11 @@ impl Decodable for Position {
 }
 
 impl Entity for Position {
-    fn get_position(&self) -> Position {
+    fn position(&self) -> Position {
         *self
     }
 
-    fn get_radius(&self) -> f64 {
+    fn radius(&self) -> f64 {
         0.0
     }
 }

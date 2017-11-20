@@ -25,7 +25,7 @@ impl<'a> GameMap<'a> {
 
     pub fn obstacles_between<T: Entity>(&self, ship: &Ship, target: &T) -> bool {
         for planet in self.all_planets() {
-            if intersect_segment_circle(ship, target, planet, ship.get_radius() + 0.1) {
+            if intersect_segment_circle(ship, target, planet, ship.radius() + 0.1) {
                 return true;
             }
         }

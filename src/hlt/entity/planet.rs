@@ -52,11 +52,11 @@ impl Decodable for Planet {
 }
 
 impl Entity for Planet {
-    fn get_position(&self) -> Position {
+    fn position(&self) -> Position {
         self.position
     }
 
-    fn get_radius(&self) -> f64 {
+    fn radius(&self) -> f64 {
         self.radius
     }
 }

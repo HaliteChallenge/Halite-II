@@ -34,7 +34,7 @@ impl Ship {
     }
 
     pub fn can_dock(&self, planet: &Planet) -> bool {
-        self.calculate_distance_between(planet) <= (DOCK_RADIUS + planet.radius + SHIP_RADIUS)
+        self.distance_with(planet) <= (DOCK_RADIUS + planet.radius + SHIP_RADIUS)
     }
 
     pub fn navigate<T: Entity>(&self, target: &T, game_map: &GameMap, max_corrections: i32) -> Option<Command> {
@@ -43,8 +43,8 @@ impl Ship {
         }
         let angular_step = 1.0;
         let speed = MAX_SPEED;
-        let distance = self.calculate_distance_between(target);
-        let angle = self.calculate_angle_between(target);
+        let distance = self.distance_with(target);
+        let angle = self.angle_with(target);
         if game_map.obstacles_between(self, target) {
             let new_target_dx = f64::cos((angle + angular_step).to_radians()) * distance;
             let new_target_dy = f64::sin((angle + angular_step).to_radians()) * distance;
@@ -91,11 +91,11 @@ impl Decodable for Ship {
 }
 
 impl Entity for Ship {
-    fn get_position(&self) -> Position {
+    fn position(&self) -> Position {
         self.position
     }
 
-    fn get_radius(&self) -> f64 {
+    fn radius(&self) -> f64 {
         SHIP_RADIUS
     }
 }
