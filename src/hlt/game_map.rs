@@ -14,7 +14,7 @@ impl<'a> GameMap<'a> {
         Self { game, state }
     }
 
-    pub fn all_planets(&self) -> &Vec<Planet> {
+    pub fn all_planets(&self) -> &[Planet] {
         &self.state.planets
     }
 

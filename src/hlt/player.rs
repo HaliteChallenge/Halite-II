@@ -8,7 +8,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn all_ships(&self) -> &Vec<Ship> {
+    pub fn all_ships(&self) -> &[Ship] {
         &self.ships
     }
 }
