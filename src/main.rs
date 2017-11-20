@@ -44,10 +44,10 @@ fn main() {
                 } else {
                     // If not, navigate towards the planet
                     let navigate_command = ship.navigate(&ship.closest_point_to(planet, 3.0), &game_map, 90);
-                    match navigate_command {
-                        Some(command) => command_queue.push(command),
-                        _ => {}
+                    if let Some(command) = navigate_command {
+                        command_queue.push(command)
                     }
+
                 }
                 break;
             }
