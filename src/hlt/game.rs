@@ -1,4 +1,3 @@
-
 use std::io::stdin;
 use hlt::parse::Decodable;
 use hlt::entity::GameState;
@@ -16,14 +15,14 @@ impl Game {
     fn read_line() -> String {
         let mut buffer = String::new();
         stdin().read_line(&mut buffer).expect("Read error");
-        return buffer;
+        buffer
     }
 
     fn read_id() -> usize {
         let line = Game::read_line();
         let parts = line.split_whitespace();
         let mut iter = parts.into_iter();
-        return usize::parse(&mut iter);
+        usize::parse(&mut iter)
     }
 
     fn read_size() -> (i32, i32) {
@@ -32,7 +31,7 @@ impl Game {
         let mut iter = parts.into_iter();
         let width = i32::parse(&mut iter);
         let height = i32::parse(&mut iter);
-        return (width, height);
+        (width, height)
     }
 
     pub fn new(name: &str) -> Game {
@@ -55,7 +54,7 @@ impl Game {
         let parts = line.split_whitespace();
         let mut iter = parts.into_iter();
         let game_state = GameState::parse(&mut iter);
-        return GameMap::new(self, game_state);
+        GameMap::new(self, game_state)
     }
 
     pub fn send_command_queue(&self, commands: Vec<Command>) {

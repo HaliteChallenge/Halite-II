@@ -1,4 +1,3 @@
-
 use hlt::game::Game;
 use hlt::entity::{GameState, Planet};
 use hlt::player::Player;
@@ -11,8 +10,8 @@ pub struct GameMap<'a> {
 }
 
 impl<'a> GameMap<'a> {
-    pub fn new(game: &Game, state: GameState) -> GameMap {
-        return GameMap { game, state };
+    pub fn new(game: &'a Game, state: GameState) -> Self {
+        Self { game, state }
     }
 
     pub fn all_planets(&self) -> &Vec<Planet> {
@@ -21,8 +20,7 @@ impl<'a> GameMap<'a> {
 
     pub fn get_me(&self) -> &Player {
         let my_id = self.game.my_id;
-        let player = &self.state.players[my_id];
-        return player;
+        &self.state.players[my_id]
     }
 
     pub fn obstacles_between<T: Entity>(&self, ship: &Ship, target: &T) -> bool {

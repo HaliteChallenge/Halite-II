@@ -1,4 +1,3 @@
-
 use hlt::entity::{Entity, Position};
 
 pub fn intersect_segment_circle<E: Entity, F: Entity, G: Entity>(start: &E, end: &F, circle: &G, fudge: f64) -> bool {
@@ -26,5 +25,5 @@ pub fn intersect_segment_circle<E: Entity, F: Entity, G: Entity>(start: &E, end:
     let closest_y = start_y + dy * t;
     let closest_distance = Position(closest_x, closest_y).calculate_distance_between(circle);
 
-    return closest_distance <= circle.get_radius() + fudge
+    closest_distance <= circle.get_radius() + fudge
 }

@@ -37,7 +37,7 @@ impl Decodable for Planet {
         let owner = Option::parse(tokens);
         let docked_ships = Vec::parse(tokens);
 
-        return Planet {
+        Self {
             id,
             position,
             hp,
@@ -47,7 +47,7 @@ impl Decodable for Planet {
             remaining_resources,
             owner,
             docked_ships,
-        };
+        }
     }
 }
 

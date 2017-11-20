@@ -62,7 +62,6 @@ impl Decodable for Ship {
     where
         I: Iterator<Item = &'a str>,
     {
-
         let id = i32::parse(tokens);
         let position = Position::parse(tokens);
         let hp = i32::parse(tokens);
@@ -77,7 +76,7 @@ impl Decodable for Ship {
         let progress = i32::parse(tokens);
         let cooldown = i32::parse(tokens);
 
-        return Ship {
+        Ship {
             id,
             position,
             hp,
@@ -87,7 +86,7 @@ impl Decodable for Ship {
             docked_planet,
             progress,
             cooldown,
-        };
+        }
     }
 }
 

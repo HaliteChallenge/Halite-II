@@ -22,6 +22,6 @@ impl Decodable for Player {
         let id = i32::parse(tokens);
         let ships = Vec::parse(tokens);
 
-        return Player { id, ships };
+        Self { id, ships }
     }
 }

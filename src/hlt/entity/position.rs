@@ -9,10 +9,10 @@ impl Decodable for Position {
     where
         I: Iterator<Item = &'a str>,
     {
-
         let x = f64::parse(tokens);
         let y = f64::parse(tokens);
-        return Position(x, y);
+
+        Position(x, y)
     }
 }
 
