@@ -40,10 +40,10 @@ namespace hlt {
     using possibly = std::pair<T, bool>;
 
     struct Velocity {
-        double vel_x, vel_y;
+        long double vel_x, vel_y;
 
         auto accelerate_by(double magnitude, double angle) -> void;
-        auto magnitude() const -> double;
+        auto magnitude() const -> long double;
         auto angle() const -> double;
     };
 
@@ -51,10 +51,10 @@ namespace hlt {
      * A location in Halatian space.
      */
     struct Location {
-        double pos_x, pos_y;
+        long double pos_x, pos_y;
 
-        auto distance(const Location& other) const -> double;
-        auto distance2(const Location& other) const -> double;
+        auto distance(const Location& other) const -> long double;
+        auto distance2(const Location& other) const -> long double;
 
         auto move_by(const Velocity& velocity, double time) -> void;
         auto angle_to(const Location& target) const -> double;

@@ -1,2 +1,2 @@
-call scalac *.scala hlt\*.scala
-halite -d "240 160" "scala MyBot" "scala MyBot"
+call sbt assembly
+halite -d "240 160" "java -jar target\scala-2.12\MyBot.jar" "java -jar target\scala-2.12\MyBot.jar"

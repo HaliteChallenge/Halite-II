@@ -43,10 +43,8 @@ class CD(object):
 def safeglob(pattern):
     safepaths = []
     for root, dirs, files in os.walk("."):
-        print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
         files = fnmatch.filter(files, pattern)
         for fname in files:
-            print(os.path.splitext(fname)[0])
             if SAFEPATH.match(fname) and os.path.splitext(fname)[0] != "RandomBot":
                 safepaths.append(os.path.join(root, fname))
     return safepaths
@@ -94,7 +92,7 @@ def _run_cmd(cmd, working_dir, timelimit):
         errors = ["Compilation timed out with command %s" % (cmd,)]
 
     # Clean up any processes that didn't exit cleanly
-    util.kill_processes_as("bot_compilation", "bash")
+    util.kill_processes_as("bot_compilation")
 
     return out, errors
 
@@ -278,6 +276,10 @@ comp_args = {
         ["gnatbind"],
         ["gnatlink", "-o", BOT],
     ],
+    "CMake": [
+        ["cmake", "."],
+        ["make", "-j2"],
+    ],
     "C": [
         ["gcc", "-O3", "-funroll-loops", "-c"],
         ["gcc", "-O2", "-lm", "-o", BOT],
@@ -348,8 +350,8 @@ comp_args = {
 }
 
 targets = {
-    "C"     : { ".c" : ".o" },
-    "C++" : { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
+    "C"  : { ".c" : ".o" },
+    "C++": { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
     }
 
 Language = collections.namedtuple(
@@ -365,6 +367,14 @@ languages = (
         [(["*.adb"], ExternalCompiler(comp_args["Ada"][0])),
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][1])),
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][2]))]
+    ),
+    Language("C++", BOT, "CMakeLists.txt",
+        "./MyBot",
+        ["*.o", BOT],
+        [
+            ([], ExternalCompiler(comp_args["CMake"][0])),
+            ([], ExternalCompiler(comp_args["CMake"][1])),
+        ]
     ),
     Language("C", BOT, "MyBot.c",
         "./MyBot",
@@ -565,9 +575,9 @@ languages = (
 
 def compile_function(language, bot_dir, timelimit):
     with CD(bot_dir):
-        print("cd")
+        print("cd " + bot_dir)
         for glob in language.nukeglobs:
-            print("nuke")
+            print("nuke " + glob)
             nukeglob(glob)
 
     errors = []
@@ -594,6 +604,12 @@ def detect_language(bot_dir):
         detected_langs = [
             lang for lang in languages if os.path.exists(lang.main_code_file)
         ]
+
+        # if we have cmake-based compilation, then remove any other autodetected C and C++ compilers
+        if any(lang.main_code_file == "CMakeLists.txt" for lang in detected_langs):
+            detected_langs = [lang for lang in detected_langs if
+                              lang.main_code_file == "CMakeLists.txt" or (lang.name != "C" and lang.name != "C++")]
+
         if len(detected_langs) > 1:
             return None, ['Found multiple MyBot.* files: \n'+
                           '\n'.join([l.main_code_file for l in detected_langs])]
@@ -637,7 +653,7 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
         _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
     detected_language, errors = detect_language(bot_dir)
-    print("detected language")
+    print("detected language " + str(detected_language))
     if detected_language:
         print("compiling")
         compiled, errors = compile_function(detected_language, bot_dir, timelimit)
