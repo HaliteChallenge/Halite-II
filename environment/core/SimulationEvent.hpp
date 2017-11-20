@@ -85,10 +85,10 @@ auto collision_time(
     const hlt::Location& loc1, const hlt::Location& loc2,
     const hlt::Velocity& vel1, const hlt::Velocity& vel2
 ) -> std::pair<bool, double>;
-auto collision_time(double r, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, double>;
-auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& ship2) -> std::pair<bool, double>;
-auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
-auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
+auto collision_time(long double r, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, long double>;
+auto collision_time(long double r, const hlt::Ship& ship1, const hlt::Planet& ship2) -> std::pair<bool, long double>;
+auto might_attack(long double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
+auto might_collide(long double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool;
 auto round_event_time(double t) -> double;
 
 auto find_events(
