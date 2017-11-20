@@ -9,13 +9,13 @@ pub struct GameState {
 }
 
 impl Decodable for GameState {
-    fn parse<'a, I>(tokens: &mut I) -> GameState
+    fn parse<'a, I>(tokens: &mut I) -> Self
     where
         I: Iterator<Item = &'a str>,
     {
         let players = Vec::parse(tokens);
         let planets = Vec::parse(tokens);
 
-        GameState { players, planets }
+        Self { players, planets }
     }
 }

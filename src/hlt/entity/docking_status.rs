@@ -9,7 +9,7 @@ pub enum DockingStatus {
 }
 
 impl Decodable for DockingStatus {
-    fn parse<'a, I>(tokens: &mut I) -> DockingStatus
+    fn parse<'a, I>(tokens: &mut I) -> Self
     where
         I: Iterator<Item = &'a str>,
     {

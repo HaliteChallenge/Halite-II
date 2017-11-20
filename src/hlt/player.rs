@@ -14,7 +14,7 @@ impl Player {
 }
 
 impl Decodable for Player {
-    fn parse<'a, I>(tokens: &mut I) -> Player
+    fn parse<'a, I>(tokens: &mut I) -> Self
     where
         I: Iterator<Item = &'a str>,
     {

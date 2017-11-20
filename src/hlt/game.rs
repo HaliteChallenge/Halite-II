@@ -59,8 +59,8 @@ impl Game {
 
     pub fn send_command_queue(&self, commands: Vec<Command>) {
         for command in commands {
-            print!("{}", command.encode());
+            print!("{}", command.encode())
         }
-        println!();
+        println!()
     }
 }

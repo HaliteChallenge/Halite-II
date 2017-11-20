@@ -22,7 +22,7 @@ impl Planet {
 }
 
 impl Decodable for Planet {
-    fn parse<'a, I>(tokens: &mut I) -> Planet
+    fn parse<'a, I>(tokens: &mut I) -> Self
     where
         I: Iterator<Item = &'a str>,
     {
