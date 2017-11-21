@@ -4,7 +4,7 @@ use hlt::parse::Decodable;
 #[derive(PartialEq, Debug)]
 pub struct Player {
     pub id: i32,
-    pub ships: Vec<Ship>,
+    pub ships: Box<[Ship]>,
 }
 
 impl Player {
@@ -20,7 +20,7 @@ impl Decodable for Player {
     {
 
         let id = i32::parse(tokens);
-        let ships = Vec::parse(tokens);
+        let ships = Box::parse(tokens);
 
         Self { id, ships }
     }

@@ -61,18 +61,18 @@ impl Decodable for bool {
     }
 }
 
-impl<T: Decodable> Decodable for Vec<T> {
-    fn parse<'a, I>(tokens: &mut I) -> Vec<T>
+impl<T: Decodable> Decodable for Box<[T]> {
+    fn parse<'a, I>(tokens: &mut I) -> Box<[T]>
     where
         I: Iterator<Item = &'a str>,
     {
-        let size = parse_next_primitive(tokens, "i64");
-        let mut result = Vec::with_capacity(size);
+        let size: i64 = parse_next_primitive(tokens, "i64");
+        let mut result = Vec::with_capacity(size as usize);
         for _ in 0..size {
             let p = T::parse(tokens);
             result.push(p);
         }
-        result
+        result.into_boxed_slice()
     }
 }
 

@@ -13,7 +13,7 @@ pub struct Planet {
     pub current_production: i32,
     pub remaining_resources: i32,
     pub owner: Option<i32>,
-    pub docked_ships: Vec<i32>,
+    pub docked_ships: Box<[i32]>,
 }
 
 impl Planet {
@@ -42,7 +42,7 @@ impl Decodable for Planet {
         let current_production = i32::parse(tokens);
         let remaining_resources = i32::parse(tokens);
         let owner = Option::parse(tokens);
-        let docked_ships = Vec::parse(tokens);
+        let docked_ships = Box::parse(tokens);
 
         Self {
             id,

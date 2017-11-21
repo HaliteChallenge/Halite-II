@@ -4,8 +4,8 @@ use hlt::parse::Decodable;
 
 #[derive(PartialEq, Debug)]
 pub struct GameState {
-    pub players: Vec<Player>,
-    pub planets: Vec<Planet>,
+    pub players: Box<[Player]>,
+    pub planets: Box<[Planet]>,
 }
 
 impl Decodable for GameState {
@@ -13,8 +13,8 @@ impl Decodable for GameState {
     where
         I: Iterator<Item = &'a str>,
     {
-        let players = Vec::parse(tokens);
-        let planets = Vec::parse(tokens);
+        let players = Box::parse(tokens);
+        let planets = Box::parse(tokens);
 
         Self { players, planets }
     }
