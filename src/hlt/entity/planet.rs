@@ -21,6 +21,11 @@ impl Planet {
     pub fn is_owned(&self) -> bool {
         self.owner.is_some()
     }
+
+    /// Determines if the planet has been fully occupied (all possible ships are docked).
+    pub fn is_full(&self) -> bool {
+        self.docked_ships.len() >= self.num_docking_spots
+    }
 }
 
 impl Decodable for Planet {
