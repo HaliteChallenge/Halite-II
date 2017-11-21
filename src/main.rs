@@ -26,7 +26,7 @@ fn main() {
         let game_map = game.update_map();
 
         // Loop over all of our player's ships
-        for ship in game_map.get_me().all_ships() {
+        for ship in game_map.me().all_ships() {
             // Ignore ships that are docked or in the process of docking
             if ship.docking_status != DockingStatus::UNDOCKED {
                 continue;

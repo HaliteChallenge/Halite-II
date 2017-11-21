@@ -15,6 +15,13 @@ impl<'a> GameMap<'a> {
         Self { game, state }
     }
 
+    /// Return your own player.
+    pub fn me(&self) -> &Player {
+        let my_id = self.game.my_id;
+        &self.state.players[my_id]
+    }
+
+    /// Returns all planets at the actual game state.
     pub fn all_planets(&self) -> &[Planet] {
         &self.state.planets
     }
