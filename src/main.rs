@@ -52,6 +52,6 @@ fn main() {
             }
         }
         // Send our commands to the game
-        game.send_command_queue(command_queue);
+        game.send_command_queue(&command_queue);
     }
 }

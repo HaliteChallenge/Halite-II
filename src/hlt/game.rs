@@ -58,7 +58,7 @@ impl Game {
         GameMap::new(self, game_state)
     }
 
-    pub fn send_command_queue(&self, commands: Vec<Command>) {
+    pub fn send_command_queue(&self, commands: &[Command]) {
         for command in commands {
             let encoded = command.encode();
             stdout().write(encoded.as_bytes()).unwrap();
