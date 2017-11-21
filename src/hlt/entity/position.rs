@@ -1,6 +1,8 @@
 use hlt::parse::Decodable;
 use hlt::entity::Entity;
 
+/// A simple wrapper for a coordinate.
+/// Intended to be passed to some functions in place of a ship or planet.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct Position(pub f64, pub f64);
 

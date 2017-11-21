@@ -2,6 +2,7 @@ use hlt::entity::Position;
 use hlt::parse::Decodable;
 use hlt::entity::Entity;
 
+/// A planet on the game map.
 #[derive(PartialEq, Debug)]
 pub struct Planet {
     pub id: i32,
@@ -16,6 +17,7 @@ pub struct Planet {
 }
 
 impl Planet {
+    /// Determines if the planet has an owner.
     pub fn is_owned(&self) -> bool {
         self.owner.is_some()
     }

@@ -6,6 +6,7 @@ use hlt::command::Command;
 use hlt::parse::Decodable;
 use hlt::entity::Entity;
 
+/// A ship in the game.
 #[derive(PartialEq, Debug)]
 pub struct Ship {
     pub id: i32,
@@ -20,15 +21,17 @@ pub struct Ship {
 }
 
 impl Ship {
+    /// Generate a command to accelerate this ship.
     pub fn thrust(&self, magnitude: i32, angle: i32) -> Command {
         Command::Thrust(self.id, magnitude, angle)
     }
 
+    /// Generate a command to dock to a planet.
     pub fn dock(&self, planet: &Planet) -> Command {
         Command::Dock(self.id, planet.id)
     }
 
-    #[allow(dead_code)]
+    /// Generate a command to undock from the current planet.
     pub fn undock(&self) -> Command {
         Command::Undock(self.id)
     }
@@ -37,6 +40,14 @@ impl Ship {
         self.distance_with(planet) <= (DOCK_RADIUS + planet.radius + SHIP_RADIUS)
     }
 
+    /// Move a ship to a specific target position. It is recommended to place the position
+    /// itself here, else navigate will crash into the target. This function will automatically
+    /// avoid obstacles on the way, with up to `max_corrections` corrections.
+    ///
+    /// Note that each correction accounts for 1 degree difference, meaning that
+    /// the algorithm will naively try `max_correction` degrees before giving
+    /// up (and returning `None`). The navigation will only consist of up to one command;
+    /// call this method again in the next turn to continue navigating to the position.
     pub fn navigate<T: Entity>(&self, target: &T, game_map: &GameMap, max_corrections: i32) -> Option<Command> {
         if max_corrections <= 0 {
             return None

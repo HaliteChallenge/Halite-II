@@ -1,5 +1,6 @@
 use hlt::entity::{Entity, Position};
 
+/// Test whether a line segment and circle intersect.
 pub fn intersect_segment_circle<E: Entity, F: Entity, G: Entity>(start: &E, end: &F, circle: &G, fudge: f64) -> bool {
     let Position(start_x, start_y) = start.position();
     let Position(end_x, end_y) = end.position();

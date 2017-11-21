@@ -4,6 +4,7 @@ use hlt::player::Player;
 use hlt::collision::intersect_segment_circle;
 use hlt::entity::{Entity, Ship};
 
+/// Map which houses the current game information/metadata.
 pub struct GameMap<'a> {
     game: &'a Game,
     state: GameState,
