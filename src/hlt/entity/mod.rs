@@ -17,12 +17,15 @@ pub trait Entity: Sized {
     fn distance_with<T: Entity>(&self, target: &T) -> f64 {
         let Position(x1, y1) = self.position();
         let Position(x2, y2) = target.position();
-        f64::sqrt((x2-x1).powi(2) + (y2-y1).powi(2))
+        let (x, y) = (x2-x1, y2-y1);
+
+        f64::sqrt(x*x + y*y)
     }
 
     fn angle_with<T: Entity>(&self, target: &T) -> f64 {
         let Position(x1, y1) = self.position();
         let Position(x2, y2) = target.position();
+
         (f64::atan2(y2-y1, x2-x1).to_degrees() + 360.0) % 360.0
     }
 

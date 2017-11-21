@@ -7,9 +7,9 @@ pub fn intersect_segment_circle<E: Entity, F: Entity, G: Entity>(start: &E, end:
     let dx = end_x - start_x;
     let dy = end_y - start_y;
 
-    let a = dx.powi(2) + dy.powi(2);
-    let b = -2.0 * (start_x.powi(2) - start_x*end_x - start_x*circle_x + end_x*circle_x +
-              start_y.powi(2) - start_y*end_y - start_y*circle_y + end_y*circle_y);
+    let a = dx*dx + dy*dy;
+    let b = -2.0 * (start_x*start_x - start_x*end_x - start_x*circle_x + end_x*circle_x +
+              start_y*start_y - start_y*end_y - start_y*circle_y + end_y*circle_y);
 
     if a == 0.0 {
         // Start and end are the same point.
