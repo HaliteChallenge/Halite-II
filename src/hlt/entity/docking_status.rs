@@ -14,13 +14,13 @@ impl Decodable for DockingStatus {
         I: Iterator<Item = &'a str>,
     {
 
-        let i = i32::parse(tokens);
-        return match i {
+        let raw = i32::parse(tokens);
+        match raw {
             0 => DockingStatus::UNDOCKED,
             1 => DockingStatus::DOCKING,
             2 => DockingStatus::DOCKED,
             3 => DockingStatus::UNDOCKING,
-            _ => panic!(format!("Not a valid docking status: {:?}", i)),
-        };
+            _ => panic!("Not a valid docking status: {:?}", raw),
+        }
     }
 }
