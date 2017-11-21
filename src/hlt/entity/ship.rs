@@ -36,7 +36,16 @@ impl Ship {
         Command::Undock(self.id)
     }
 
+    /// Determine wether a ship is already docked to a planet.
+    pub fn is_docked(&self) -> bool {
+        self.docking_status == DockingStatus::DOCKED || self.docking_status == DockingStatus::UNDOCKING
+    }
+
+    /// Determine whether a ship can dock to a planet.
     pub fn can_dock(&self, planet: &Planet) -> bool {
+        if self.is_docked() {
+            return false
+        }
         self.distance_with(planet) <= (DOCK_RADIUS + planet.radius + SHIP_RADIUS)
     }
 
