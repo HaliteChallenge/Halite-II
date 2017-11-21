@@ -1,4 +1,4 @@
-use std::io::stdin;
+use std::io::{stdin, stdout, Write};
 use hlt::parse::Decodable;
 use hlt::entity::GameState;
 use hlt::command::Command;
@@ -59,7 +59,8 @@ impl Game {
 
     pub fn send_command_queue(&self, commands: Vec<Command>) {
         for command in commands {
-            print!("{}", command.encode())
+            let encoded = command.encode();
+            stdout().write(encoded.as_bytes()).unwrap();
         }
         println!()
     }
