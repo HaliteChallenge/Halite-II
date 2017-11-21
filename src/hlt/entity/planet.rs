@@ -9,7 +9,7 @@ pub struct Planet {
     pub position: Position,
     pub hp: i32,
     pub radius: f64,
-    pub num_docking_spots: i32,
+    pub num_docking_spots: usize,
     pub current_production: i32,
     pub remaining_resources: i32,
     pub owner: Option<i32>,
@@ -33,7 +33,7 @@ impl Decodable for Planet {
         let position = Position::parse(tokens);
         let hp = i32::parse(tokens);
         let radius = f64::parse(tokens);
-        let num_docking_spots = i32::parse(tokens);
+        let num_docking_spots = i32::parse(tokens) as usize;
         let current_production = i32::parse(tokens);
         let remaining_resources = i32::parse(tokens);
         let owner = Option::parse(tokens);
