@@ -11,17 +11,19 @@ use hlt::game::Game;
 use hlt::logging::Logger;
 
 fn main() {
+    let name = "Kevina";
     // Initiailize the game
-    let game = Game::new("Settler");
+    let game = Game::new(name);
     // Initialize logging
     let mut logger = Logger::new(game.my_id);
-    logger.log("Starting my Settler bot!");
+    logger.log(&format!("Starting my {} bot!", name));
 
-    // For each turn
+    let mut command_queue = Vec::new();
+
     loop {
+
         // Update the game state
         let game_map = game.update_map();
-        let mut command_queue = Vec::new();
 
         // Loop over all of our player's ships
         for ship in game_map.get_me().all_ships() {
@@ -37,8 +39,8 @@ fn main() {
                     continue;
                 }
 
+                // If we are close enough to dock, do it!
                 if ship.can_dock(planet) {
-                    // If we are close enough to dock, do it!
                     command_queue.push(ship.dock(planet))
                 } else {
                     // If not, navigate towards the planet
@@ -53,5 +55,6 @@ fn main() {
         }
         // Send our commands to the game
         game.send_command_queue(&command_queue);
+        command_queue.clear();
     }
 }
