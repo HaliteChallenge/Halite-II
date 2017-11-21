@@ -26,9 +26,9 @@ impl<'a> GameMap<'a> {
         &self.state.planets
     }
 
-    pub fn get_me(&self) -> &Player {
-        let my_id = self.game.my_id;
-        &self.state.players[my_id]
+    /// Returns all players at the actual game state including yourself.
+    pub fn all_players(&self) -> &[Player] {
+        &self.state.players
     }
 
     pub fn obstacles_between<T: Entity>(&self, ship: &Ship, target: &T) -> bool {
