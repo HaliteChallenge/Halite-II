@@ -57,8 +57,8 @@ impl Ship {
     /// the algorithm will naively try `max_correction` degrees before giving
     /// up (and returning `None`). The navigation will only consist of up to one command;
     /// call this method again in the next turn to continue navigating to the position.
-    pub fn navigate<T: Entity>(&self, target: &T, game_map: &GameMap, max_corrections: i32) -> Option<Command> {
-        if max_corrections <= 0 {
+    pub fn navigate<T: Entity>(&self, target: &T, game_map: &GameMap, max_corrections: u32) -> Option<Command> {
+        if max_corrections == 0 {
             return None
         }
         let angular_step = 1.0;
