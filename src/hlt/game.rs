@@ -40,13 +40,14 @@ impl Game {
 
         println!("{}", name);
 
-        let game = Game {
+        // ignore first line
+        Game::read_line();
+
+        Game {
             my_id,
             map_width,
             map_height,
-        };
-        game.update_map();
-        game
+        }
     }
 
     pub fn update_map(&self) -> GameMap {
