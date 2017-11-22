@@ -11,7 +11,7 @@ use hlt::game::Game;
 use hlt::logging::Logger;
 
 fn main() {
-    let name = "Kevina";
+    let name = "Settler";
     // Initiailize the game
     let game = Game::new(name);
     // Initialize logging
