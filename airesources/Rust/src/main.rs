@@ -12,11 +12,22 @@ use hlt::logging::Logger;
 
 fn main() {
     let name = "Settler";
+
     // Initiailize the game
-    let game = Game::new(name);
+    let game = Game::new();
+
     // Initialize logging
     let mut logger = Logger::new(game.my_id);
     logger.log(&format!("Starting my {} bot!", name));
+
+    // Retrieve the first game map
+    let game_map = game.update_map();
+
+    // You can preprocess things here,
+    // you have 60 seconds...
+
+    // Once you are done, send a "ready to work"
+    game.send_ready(name);
 
     let mut command_queue = Vec::new();
 

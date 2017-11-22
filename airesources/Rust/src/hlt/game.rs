@@ -34,14 +34,9 @@ impl Game {
         (width, height)
     }
 
-    pub fn new(name: &str) -> Game {
+    pub fn new() -> Game {
         let my_id = Game::read_id();
         let (map_width, map_height) = Game::read_size();
-
-        println!("{}", name);
-
-        // ignore first line
-        Game::read_line();
 
         Game {
             my_id,
@@ -50,6 +45,13 @@ impl Game {
         }
     }
 
+    /// Send your bot name, terminating the preprocessing
+    /// time of 60 seconds allowed at the start of a game
+    pub fn send_ready(&self, name: &str) {
+        println!("{}", name)
+    }
+
+    /// Retrieve the new updated map
     pub fn update_map(&self) -> GameMap {
         let line = Game::read_line();
         let parts = line.split_whitespace();
@@ -58,6 +60,7 @@ impl Game {
         GameMap::new(self, game_state)
     }
 
+    /// Send all commands to the game
     pub fn send_command_queue(&self, commands: &[Command]) {
         for command in commands {
             let encoded = command.encode();
