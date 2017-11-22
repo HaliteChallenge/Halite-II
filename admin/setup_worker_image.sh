@@ -11,11 +11,13 @@ sudo useradd -m worker -U -G bots -s /bin/bash
 ## Add necessary repositories for Node.js.
 # https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-# http://www.mono-project.com/download/#download-lin
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 
 ## Add Mono repository.
+# http://www.mono-project.com/download/#download-lin
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 echo "deb http://download.mono-project.com/repo/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/mono-official.list
+
+## Add dotnet repo.
 # https://www.microsoft.com/net/core#linuxubuntu
 sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ yakkety main"  > /etc/apt/sources.list.d/dotnetdev.list'
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B02C46DF417A0893
