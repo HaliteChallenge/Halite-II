@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub enum Command {
     Dock(i32, i32),
@@ -8,13 +7,11 @@ pub enum Command {
 
 impl Command {
     pub fn encode(&self) -> String {
-        return match self {
-            &Command::Dock(ship, planet) => format!("d {} {}", ship, planet),
-            &Command::Undock(ship) => format!("u {}", ship),
-            &Command::Thrust(ship, magnitude, angle) => {
-                format!("t {} {} {}", ship, magnitude, angle)
-            }
-        };
+        match *self {
+            Command::Dock(s, p) => format!("d {} {}", s, p),
+            Command::Undock(s) => format!("u {}", s),
+            Command::Thrust(s, m, a) => format!("t {} {} {}", s, m, a),
+        }
     }
 }
 
