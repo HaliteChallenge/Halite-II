@@ -680,14 +680,30 @@ def get_run_lang(submission_dir):
                     if line[0] == '#':
                         return line[1:-1]
 
+
 def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
+    errors = []
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
-        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
-    detected_language, errors = detect_language(bot_dir)
+        install_stdout, install_errors = _run_cmd(
+            "chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
+        if install_errors:
+            errors.append("Possible errors running install.sh. stderr output as follows:\n")
+            errors.extend(install_errors)
+            errors.append("\nEnd of install.sh stderr. stdout as follows:\n")
+            errors.extend(install_stdout)
+            errors.append("\nEnd of install.sh stdout.\n")
+
+    detected_language, language_errors = detect_language(bot_dir)
+    if language_errors:
+        errors.extend(language_errors)
+
     print("detected language " + str(detected_language))
     if detected_language:
         print("compiling")
-        compiled, errors = compile_function(detected_language, bot_dir, timelimit)
+        compiled, compile_errors = compile_function(detected_language, bot_dir, timelimit)
+        if compile_errors:
+            errors.extend(compile_errors)
+
         print("done compiling")
         if compiled:
             name = detected_language.name
