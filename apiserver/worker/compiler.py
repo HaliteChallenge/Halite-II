@@ -134,6 +134,40 @@ class ChmodCompiler(Compiler):
         return True
 
 
+class CSharpMonoCompiler(Compiler):
+    def compile(self, bot_dir, globs, errors, timelimit):
+        with CD(bot_dir):
+            print("Looking for *.cs files:")
+            cs_files = safeglob("*.cs")
+            print(str(len(cs_files)) + " found")
+            if len(cs_files) == 0:
+                print("No *.cs files found, nothing to do, exiting successfully.")
+                return True
+
+            print("Looking for *.dll files:")
+            dll_files = safeglob("*.dll")
+            print(str(len(dll_files)) + " found")
+
+        try:
+            cmd_args = ["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:MyBot.exe"]
+            if len(dll_files) != 0:
+                cmd_args.append("-r:" + ",".join(dll_files))
+            cmd_args += cs_files
+
+            cmdline = " ".join(cmd_args)
+            cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
+            if not cmd_errors:
+                check_path(os.path.join(bot_dir, "MyBot.exe"), cmd_errors)
+                if cmd_errors:
+                    cmd_errors += cmd_out
+            if cmd_errors:
+                errors += cmd_errors
+                return False
+        except:
+            pass
+        return True
+
+
 class ExternalCompiler(Compiler):
     """
     A compiler that calls an external process.
@@ -152,7 +186,7 @@ class ExternalCompiler(Compiler):
         with CD(bot_dir):
             print("GLOBS: " + ", ".join(globs))
             files = safeglob_multi(globs)
-            if (len("".join(globs)) != 0 and len(files) == 0):
+            if len("".join(globs)) != 0 and len(files) == 0:
                 # no files to compile
                 return True
 
@@ -162,7 +196,7 @@ class ExternalCompiler(Compiler):
                     print("file: " + filename)
                     cmdline = " ".join(self.args + [filename])
                     cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
+                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors)
                     if not cmd_errors:
                         for ofile in self.out_files:
                             check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -178,7 +212,7 @@ class ExternalCompiler(Compiler):
                 cmdline = " ".join(self.args + files)
                 print("Files: " + " ".join(files))
                 cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
+                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors)
                 if not cmd_errors:
                     for ofile in self.out_files:
                         check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -284,9 +318,6 @@ comp_args = {
         ["gcc", "-O3", "-funroll-loops", "-c"],
         ["gcc", "-O2", "-lm", "-o", BOT],
     ],
-    "C#/Mono": [
-        ["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT],
-    ],
     "C#/.NET Core": [
         ["dotnet", "restore"],
         ["dotnet", "build", "-c", "Release", "-o", "."],
@@ -390,10 +421,10 @@ languages = (
                  ([], ExternalCompiler(comp_args["C#/.NET Core"][1])),
              ]
     ),
-    Language("C#/Mono", BOT +".exe", "MyBot.cs",
+    Language("C#/Mono", "MyBot.exe", "MyBot.cs",
         "mono MyBot.exe",
-        [BOT + ".exe"],
-        [(["*.cs"], ExternalCompiler(comp_args["C#/Mono"][0]))]
+        ["MyBot.exe"],
+        [([], CSharpMonoCompiler())]
     ),
     Language("VB/Mono", BOT +".exe", "MyBot.vb",
         "mono MyBot.exe",
