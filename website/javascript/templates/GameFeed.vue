@@ -28,7 +28,13 @@
                 :title="player.username + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
                     <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
                     <span class="username">
-                        {{ player.username }} v{{ player.version_number }}
+                      <template v-if="player.username.length <= 16">
+                        {{ player.username }}
+                      </template>
+                      <template v-else>
+                        {{ player.username.slice(0, 12) }}&hellip;
+                      </template>
+                      v{{ player.version_number }}
                     </span>
                 </a>
             </div></div>
