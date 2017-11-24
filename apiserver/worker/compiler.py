@@ -683,7 +683,7 @@ def get_run_lang(submission_dir):
 
 INSTALL_ERROR_START = "Possible errors running install.sh. stdout output as follows:"
 INSTALL_ERROR_MID = "End of install.sh stdout. stderr as follows:"
-INSTALL_ERROR_END = "End of install.sh stdout."
+INSTALL_ERROR_END = "End of install.sh output."
 
 
 def truncate_errors(install_stdout, install_errors, language_detection_errors,
