@@ -772,7 +772,7 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     detected_language, language_errors = detect_language(bot_dir)
 
     print("detected language " + str(detected_language))
-    if not detected_language or install_errors:
+    if not detected_language:
         return "Unknown", truncate_errors(install_stdout, install_errors,
                                           language_errors, [], max_error_len)
 
