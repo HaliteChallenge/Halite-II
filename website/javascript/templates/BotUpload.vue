@@ -98,7 +98,7 @@ export default{
         JSZip.loadAsync(this.botFile, () => {
         }).then((zip) => {
           zip.forEach(function (relativePath, zipEntry) {
-            const language_project_file_identifiers = ['cargo.toml', 'project.clj', 'package.swift', 'halite2.sln', 'mix.lock', 'build.gradle','build.sbt']
+            const language_project_file_identifiers = ['cargo.toml', 'project.clj', 'package.swift', 'halite2.sln', 'mix.lock', 'build.gradle', 'build.sbt', 'stack.yaml']
             if (zipEntry.name.toLowerCase().startsWith('mybot.') || language_project_file_identifiers.includes(zipEntry.name.toLowerCase())) {
               my_bot_present = true
             }
