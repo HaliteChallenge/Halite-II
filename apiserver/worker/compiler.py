@@ -681,78 +681,138 @@ def get_run_lang(submission_dir):
                         return line[1:-1]
 
 
-def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
-    errors = []
+INSTALL_ERROR_START = "Possible errors running install.sh. stdout output as follows:"
+INSTALL_ERROR_MID = "End of install.sh stdout. stderr as follows:"
+INSTALL_ERROR_END = "End of install.sh stdout."
+
+
+def truncate_errors(install_stdout, install_errors, language_detection_errors,
+                    compile_errors, max_error_len=10*1024):
+    """
+    Combine lists of errors into a single list under a maximum length.
+    """
+    install_stdout = install_stdout or []
+    install_errors = install_errors or []
+    language_detection_errors = language_detection_errors or []
+    compile_errors = compile_errors or []
+
+    all_errors = language_detection_errors + compile_errors
+    result = []
+    if install_errors:
+        all_errors = install_stdout + install_errors
+
+    if sum(len(line) for line in all_errors) <= max_error_len:
+        if install_errors:
+            result.append(INSTALL_ERROR_START)
+            result.extend(install_stdout)
+            result.append(INSTALL_ERROR_MID)
+            result.extend(install_errors)
+            result.append(INSTALL_ERROR_END)
+        result.extend(language_detection_errors)
+        result.extend(compile_errors)
+        return result
+
+    def bound_errors(source, bound):
+        total_length = sum(len(line) for line in source)
+        if total_length <= bound:
+            return total_length, source
+
+        length = 0
+        current = 0
+        result = []
+        # Take 1/3 from start of errors
+        while current < len(source) and (
+                length == 0 or
+                length + len(source[current]) < bound // 3):
+            result.append(source[current])
+            length += len(source[current])
+            current += 1
+
+        if current < len(source):
+            result.append("...(output truncated)...")
+
+            end_errors = []
+            end = current
+            current = -1
+            while current >= -(len(source) - end) and (
+                    len(end_errors) == 0 or
+                    length + len(source[current])) < bound:
+                end_errors.append(source[current])
+                length += len(source[current])
+                current -= 1
+            result.extend(reversed(end_errors))
+
+        return length, result
+
+
+    remaining_length = max_error_len
+    if install_errors:
+        result.append(INSTALL_ERROR_START)
+        used, lines = bound_errors(install_stdout, 0.2 * max_error_len)
+        remaining_length -= used
+        result.extend(lines)
+        result.append(INSTALL_ERROR_MID)
+        used, lines = bound_errors(install_errors,
+                                   max(0.3 * max_error_len,
+                                       0.5 * max_error_len - used))
+        remaining_length -= used
+        result.extend(lines)
+        result.append(INSTALL_ERROR_END)
+
+    _, lines = bound_errors(language_detection_errors + compile_errors, remaining_length)
+    result.extend(lines)
+    return result
+
+
+def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len=1024):
+    install_stdout = []
+    install_errors = []
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
         install_stdout, install_errors = _run_cmd(
             "chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
-        if install_errors:
-            errors.append("Possible errors running install.sh. stderr output as follows:\n")
-            errors.extend(install_errors)
-            errors.append("\nEnd of install.sh stderr. stdout as follows:\n")
-            errors.extend(install_stdout)
-            errors.append("\nEnd of install.sh stdout.\n")
 
     detected_language, language_errors = detect_language(bot_dir)
-    if language_errors:
-        errors.extend(language_errors)
 
     print("detected language " + str(detected_language))
-    if detected_language:
-        print("compiling")
-        compiled, compile_errors = compile_function(detected_language, bot_dir, timelimit)
-        if compile_errors:
-            errors.extend(compile_errors)
+    if not detected_language or install_errors:
+        return "Unknown", truncate_errors(install_stdout, install_errors,
+                                          language_errors, [], max_error_len)
 
-        print("done compiling")
-        if compiled:
-            name = detected_language.name
-            run_cmd = detected_language.command
-            run_filename = os.path.join(bot_dir, 'run.sh')
-            print("filename:")
-            print(run_filename)
-            try:
-                with open(run_filename, 'wb') as f:
-                    f.write(('#%s\n%s\n' % (name, run_cmd)).encode('utf-8'))
-                print("file:")
-                with open(run_filename, 'r') as f:
-                    for line in f:
-                        print(line)
-            except Exception as e:
-                print("error")
-                print(e)
+    print("compiling")
+    compiled, compile_errors = compile_function(detected_language, bot_dir, timelimit)
+    if not compiled:
+        return (detected_language.name,
+                truncate_errors(install_stdout, install_errors,
+                                language_errors, compile_errors, max_error_len))
 
-            # allow LANGUAGE file to override language name
-            override_name = detect_language_file(bot_dir)
-            if override_name:
-                name = override_name
-            return name, None
-        else:
-            # limit length of reported errors
-            if len(errors) > 0 and sum(map(len, errors)) > max_error_len:
-                first_errors = []
-                cur_error = 0
-                length = len(errors[0])
-                while length < (max_error_len / 3): # take 1/3 from start
-                    first_errors.append(errors[cur_error])
-                    cur_error += 1
-                    length += len(errors[cur_error])
-                first_errors.append("...")
-                length += 3
-                end_errors = []
-                cur_error = -1
-                while length <= max_error_len:
-                    end_errors.append(errors[cur_error])
-                    cur_error -= 1
-                    length += len(errors[cur_error])
-                end_errors.reverse()
-                errors = first_errors + end_errors
+    print("done compiling")
+    name = detected_language.name
+    run_cmd = detected_language.command
+    run_filename = os.path.join(bot_dir, 'run.sh')
+    print("filename:")
+    print(run_filename)
+    try:
+        with open(run_filename, 'wb') as f:
+            f.write(('#%s\n%s\n' % (name, run_cmd)).encode('utf-8'))
+        print("file:")
+        with open(run_filename, 'r') as f:
+            for line in f:
+                print(line)
+    except Exception as e:
+        print("error")
+        print(e)
 
-            return detected_language.name, errors
-    else:
-        return "Unknown", errors
+    # allow LANGUAGE file to override language name
+    override_name = detect_language_file(bot_dir)
+    if override_name:
+        name = override_name
+    return name, None
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         workingPath = sys.argv[1]
-        print(compile_anything(workingPath))
+        lang, errors = compile_anything(workingPath)
+        print("Language:", lang)
+        if errors:
+            print("--- Errors: ---")
+            print("\n".join(errors))
