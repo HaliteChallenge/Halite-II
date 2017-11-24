@@ -696,13 +696,11 @@ def truncate_errors(install_stdout, install_errors, language_detection_errors,
     language_detection_errors = language_detection_errors or []
     compile_errors = compile_errors or []
 
-    all_errors = language_detection_errors + compile_errors
+    all_errors = install_stdout + install_errors + language_detection_errors + compile_errors
     result = []
-    if install_errors:
-        all_errors = install_stdout + install_errors
 
     if sum(len(line) for line in all_errors) <= max_error_len:
-        if install_errors:
+        if install_stdout or install_errors:
             result.append(INSTALL_ERROR_START)
             result.extend(install_stdout)
             result.append(INSTALL_ERROR_MID)
@@ -746,7 +744,7 @@ def truncate_errors(install_stdout, install_errors, language_detection_errors,
 
 
     remaining_length = max_error_len
-    if install_errors:
+    if install_stdout or install_errors:
         result.append(INSTALL_ERROR_START)
         used, lines = bound_errors(install_stdout, 0.2 * max_error_len)
         remaining_length -= used
