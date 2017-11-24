@@ -224,7 +224,7 @@ export default {
             width: 20px;
         }
         .username {
-            font-size: 1rem;
+            font-size: 1.3rem;
         }
     }
     .game-table-enter-active, .game-table-leave-active {
