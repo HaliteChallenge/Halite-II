@@ -352,6 +352,10 @@ comp_args = {
     "Haskell": [
         ["ghc", "--make", BOT + ".hs", "-O", "-v0", "-rtsopts"],
     ],
+    "Haskell/Stack": [
+        ["stack", "build", "--allow-different-user"],
+        ["stack", "install", "--local-bin-path", "."],
+    ],
     "Java": [
         ["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)],
     ],
@@ -488,6 +492,14 @@ languages = (
         "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
         [BOT],
         [([""], ExternalCompiler(comp_args["Haskell"][0]))]
+    ),
+    Language("Haskell/Stack", BOT, "stack.yaml",
+        "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
+        [BOT],
+        [
+            ([""], ErrorFilterCompiler(comp_args["Haskell/Stack"][0], filter_stderr="error:")),
+            ([""], ErrorFilterCompiler(comp_args["Haskell/Stack"][1], filter_stderr="error:", skip_stdout=1)),
+        ]
     ),
     Language("Java", BOT +".java", "MyBot.java",
         "java MyBot",
