@@ -764,7 +764,7 @@ def truncate_errors(install_stdout, install_errors, language_detection_errors,
     return result
 
 
-def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len=1024):
+def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len=10*1024):
     install_stdout = []
     install_errors = []
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
