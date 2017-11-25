@@ -269,6 +269,43 @@ class ErrorFilterCompiler(ExternalCompiler):
         return cmd_errors
 
 
+class ErrorSearchCompiler(ExternalCompiler):
+    """
+    A compiler that returns an error if stderr matches a certain regex.
+    """
+    def __init__(self, args, separate=False, out_files=[], out_ext=None,
+                 # Default regex matches nothing
+                 error_re="a^"):
+        ExternalCompiler.__init__(self, args, separate, out_files, out_ext)
+        self.error_re = re.compile(error_re)
+
+    def __str__(self):
+        return "ErrorSearchCompiler: %s" % (' '.join(self.args),)
+
+    def cmd_error_filter(self, cmd_out, cmd_errors):
+        result = [
+            "Error compiling with command {}".format(''.join(self.args)),
+            "stdout was:",
+        ]
+        result.extend(line for line in (cmd_out or []) if line is not None)
+        result.append("stderr was:")
+
+        found_error = False
+        for line in cmd_errors:
+            if line is None:
+                continue
+
+            if self.error_re.search(line):
+                found_error = True
+
+            result.append(line)
+
+        if found_error:
+            return result
+
+        return []
+
+
 class TargetCompiler(Compiler):
     def __init__(self, args, replacements, outflag="-o"):
         self.args = args
@@ -497,8 +534,8 @@ languages = (
         "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
         [BOT],
         [
-            ([""], ErrorFilterCompiler(comp_args["Haskell/Stack"][0], filter_stderr="error:")),
-            ([""], ErrorFilterCompiler(comp_args["Haskell/Stack"][1], filter_stderr="error:", skip_stdout=1)),
+            ([""], ErrorSearchCompiler(comp_args["Haskell/Stack"][0], error_re="Process exited with code: ExitFailure 1")),
+            ([""], ErrorSearchCompiler(comp_args["Haskell/Stack"][1], error_re="Process exited with code: ExitFailure 1")),
         ]
     ),
     Language("Java", BOT +".java", "MyBot.java",
