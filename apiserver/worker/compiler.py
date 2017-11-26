@@ -271,7 +271,7 @@ class ErrorFilterCompiler(ExternalCompiler):
 
 class ReturncodeCompiler(ExternalCompiler):
     """
-    A compiler that returns an error if stderr matches a certain regex.
+    A compiler that returns an error if the return code is not 0.
     """
     def __init__(self, args, separate=False, out_files=[], out_ext=None):
         ExternalCompiler.__init__(self, args, separate, out_files, out_ext)
