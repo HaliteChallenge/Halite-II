@@ -94,7 +94,7 @@ def _run_cmd(cmd, working_dir, timelimit):
     # Clean up any processes that didn't exit cleanly
     util.kill_processes_as("bot_compilation")
 
-    return out, errors
+    return out, errors, process.returncode
 
 
 def check_path(path, errors):
@@ -155,7 +155,7 @@ class CSharpMonoCompiler(Compiler):
             cmd_args += cs_files
 
             cmdline = " ".join(cmd_args)
-            cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
+            cmd_out, cmd_errors, _ = _run_cmd(cmdline, bot_dir, timelimit)
             if not cmd_errors:
                 check_path(os.path.join(bot_dir, "MyBot.exe"), cmd_errors)
                 if cmd_errors:
@@ -195,8 +195,8 @@ class ExternalCompiler(Compiler):
                 for filename in files:
                     print("file: " + filename)
                     cmdline = " ".join(self.args + [filename])
-                    cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors)
+                    cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
+                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
                     if not cmd_errors:
                         for ofile in self.out_files:
                             check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -211,8 +211,8 @@ class ExternalCompiler(Compiler):
             else:
                 cmdline = " ".join(self.args + files)
                 print("Files: " + " ".join(files))
-                cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors)
+                cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
+                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
                 if not cmd_errors:
                     for ofile in self.out_files:
                         check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -229,7 +229,7 @@ class ExternalCompiler(Compiler):
             pass
         return True
 
-    def cmd_error_filter(self, cmd_out, cmd_errors):
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
         cmd_errors = [line for line in cmd_errors if line is None or self.stderr_re.search(line) is None]
         return cmd_errors
 
@@ -251,7 +251,7 @@ class ErrorFilterCompiler(ExternalCompiler):
     def __str__(self):
         return "ErrorFilterCompiler: %s" % (' '.join(self.args),)
 
-    def cmd_error_filter(self, cmd_out, cmd_errors):
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
         cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors)
 
         if self.skip_stdout > 0:
@@ -269,41 +269,29 @@ class ErrorFilterCompiler(ExternalCompiler):
         return cmd_errors
 
 
-class ErrorSearchCompiler(ExternalCompiler):
+class ReturncodeCompiler(ExternalCompiler):
     """
     A compiler that returns an error if stderr matches a certain regex.
     """
-    def __init__(self, args, separate=False, out_files=[], out_ext=None,
-                 # Default regex matches nothing
-                 error_re="a^"):
+    def __init__(self, args, separate=False, out_files=[], out_ext=None):
         ExternalCompiler.__init__(self, args, separate, out_files, out_ext)
-        self.error_re = re.compile(error_re)
 
     def __str__(self):
-        return "ErrorSearchCompiler: %s" % (' '.join(self.args),)
+        return "ReturncodeCompiler: %s" % (' '.join(self.args),)
 
-    def cmd_error_filter(self, cmd_out, cmd_errors):
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
+        if returncode == 0:
+            return []
+
         result = [
             "Error compiling with command {}".format(''.join(self.args)),
+            "Process exited with return code {}".format(returncode),
             "stdout was:",
         ]
         result.extend(line for line in (cmd_out or []) if line is not None)
         result.append("stderr was:")
-
-        found_error = False
-        for line in cmd_errors:
-            if line is None:
-                continue
-
-            if self.error_re.search(line):
-                found_error = True
-
-            result.append(line)
-
-        if found_error:
-            return result
-
-        return []
+        result.extend(line for line in (cmd_errors or []) if line is not None)
+        return result
 
 
 class TargetCompiler(Compiler):
@@ -328,7 +316,7 @@ class TargetCompiler(Compiler):
                     errors.append("Could not determine target for source file %s." % source)
                     return False
                 cmdline = " ".join(self.args + [self.outflag, target, source])
-                cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
+                cmd_out, cmd_errors, _ = _run_cmd(cmdline, bot_dir, timelimit)
                 if cmd_errors:
                     errors += cmd_errors
                     return False
@@ -534,8 +522,8 @@ languages = (
         "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
         [BOT],
         [
-            ([""], ErrorSearchCompiler(comp_args["Haskell/Stack"][0], error_re="Process exited with code: ExitFailure 1")),
-            ([""], ErrorSearchCompiler(comp_args["Haskell/Stack"][1], error_re="Process exited with code: ExitFailure 1")),
+            ([""], ReturncodeCompiler(comp_args["Haskell/Stack"][0])),
+            ([""], ReturncodeCompiler(comp_args["Haskell/Stack"][1])),
         ]
     ),
     Language("Java", BOT +".java", "MyBot.java",
@@ -815,7 +803,7 @@ def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len
     install_stdout = []
     install_errors = []
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
-        install_stdout, install_errors = _run_cmd(
+        install_stdout, install_errors, _ = _run_cmd(
             "chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
 
     detected_language, language_errors = detect_language(bot_dir)
