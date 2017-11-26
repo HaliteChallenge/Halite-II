@@ -284,7 +284,7 @@ class ReturncodeCompiler(ExternalCompiler):
             return []
 
         result = [
-            "Error compiling with command {}".format(''.join(self.args)),
+            "Error compiling with command {}".format(' '.join(self.args)),
             "Process exited with return code {}".format(returncode),
             "stdout was:",
         ]
