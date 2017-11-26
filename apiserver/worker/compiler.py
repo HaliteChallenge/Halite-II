@@ -252,7 +252,7 @@ class ErrorFilterCompiler(ExternalCompiler):
         return "ErrorFilterCompiler: %s" % (' '.join(self.args),)
 
     def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
-        cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors)
+        cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors, returncode)
 
         if self.skip_stdout > 0:
             del cmd_out[:self.skip_stdout]
