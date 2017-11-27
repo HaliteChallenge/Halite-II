@@ -25,9 +25,12 @@
                 <a v-for="player in game.playerSorted"
                 :href="'/user?user_id=' + player.id"
                 class="game-participant"
-                :title="player.username + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
+                :title="player.rating_info + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
                     <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
                     <span class="username">
+                      <template v-if="player.leaderboard_rank">
+                        ({{ player.leaderboard_rank }})
+                      </template>
                       <template v-if="player.username.length <= 16">
                         {{ player.username }}
                       </template>
@@ -109,6 +112,13 @@ export default {
                   let player = game.players[participant]
                   player.id = participant
                   this.profile_images[participant] = api.make_profile_image_url(player.username)
+                  if (player.mu) {
+                    let mu = Math.round(player.mu * 100) / 100
+                    let sigma = Math.round(player.sigma * 1000) / 1000
+                    player.rating_info = `mu=${mu} sigma=${sigma}`
+                  } else {
+                    player.rating_info = ""
+                  }
                 }
 
                 const players = Object.values(game.players).sort((r1, r2) => {
