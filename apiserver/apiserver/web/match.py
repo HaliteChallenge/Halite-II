@@ -158,6 +158,7 @@ def list_matches_helper(offset, limit, participant_clause,
 
 
 @web_api.route("/match")
+@util.cross_origin(methods=["GET"])
 def list_matches():
     offset, limit = api_util.get_offset_limit()
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({
