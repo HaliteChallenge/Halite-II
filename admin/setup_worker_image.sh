@@ -18,9 +18,10 @@ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328
 echo "deb http://download.mono-project.com/repo/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/mono-official.list
 
 ## Add dotnet repo.
-# https://www.microsoft.com/net/core#linuxubuntu
-sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ yakkety main"  > /etc/apt/sources.list.d/dotnetdev.list'
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B02C46DF417A0893
+# https://www.microsoft.com/net/learn/get-started/linuxubuntu
+curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-zesty-prod zesty main" > /etc/apt/sources.list.d/dotnetdev.list'
 
 ## Add Dart repository.
 # https://www.dartlang.org/install/linux
@@ -38,7 +39,7 @@ sudo apt-get update
 sudo apt-get -y upgrade
 
 ## List the packages to install for running bots.
-PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-dev-1.1.0 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc esl-erlang coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython clang libicu-dev elixir"
+PACKAGES="build-essential gcc g++ python3 python3.6 python3-pip git ocaml openjdk-8-jdk php ruby scala nodejs mono-complete dotnet-sdk-2.0.3 libgeos-dev tcl8.5 mit-scheme racket octave luajit lua5.2 ghc esl-erlang coffeescript dart fp-compiler sbcl dmd-bin mono-vbnc gnat-6 cmake python3.6-dev python-numpy cython clang libicu-dev elixir"
 
 ## List the packages to install for the worker itself.
 WORKER_PACKAGES="virtualenv cgroup-tools unzip iptables-persistent"
@@ -89,7 +90,9 @@ sudo -iu bot_compilation sdk install groovy
 
 # Julia
 wget -O julia.tgz https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6.1-linux-x86_64.tar.gz
-tar xvzf julia.tgz
+sudo tar -C /usr/local -xzf julia.tgz
+rm julia.tgz
+sudo ln -s /usr/local/julia-0d7248e2ff/bin/julia /usr/local/bin/julia
 
 # Swift
 wget -O swift.tar.gz https://swift.org/builds/swift-4.0.2-release/ubuntu1610/swift-4.0.2-RELEASE/swift-4.0.2-RELEASE-ubuntu16.10.tar.gz

@@ -260,7 +260,7 @@ def parseGameOutput(output, users):
     return users, result
 
 
-def executeGameTask(width, height, users, backend):
+def executeGameTask(width, height, users, challenge, backend):
     """Downloads compiled bots, runs a game, and posts the results of the game"""
     logging.debug("Running game with width %d, height %d\n" % (width, height))
     logging.debug("Users objects %s\n" % (str(users)))
@@ -268,7 +268,7 @@ def executeGameTask(width, height, users, backend):
     raw_output = '\n'.join(runGame(width, height, users))
     users, parsed_output = parseGameOutput(raw_output, users)
 
-    backend.gameResult(users, parsed_output)
+    backend.gameResult(users, parsed_output, challenge)
 
     # Clean up game logs and replays
     filelist = glob.glob("*.log")
@@ -329,7 +329,8 @@ def main():
                     executeCompileTask(task["user"], task["bot"], backend)
                 else:
                     logging.debug("Running a game task...\n")
-                    executeGameTask(int(task["width"]), int(task["height"]), task["users"], backend)
+                    executeGameTask(int(task["width"]), int(task["height"]),
+                                    task["users"], task["challenge"], backend)
             else:
                 logging.debug("No task available at time %s (GMT). Sleeping...\n" % str(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
         except Exception as e:

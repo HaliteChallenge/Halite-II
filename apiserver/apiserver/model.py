@@ -15,6 +15,13 @@ class CompileStatus(enum.Enum):
     DISABLED = "Disabled"
 
 
+class ChallengeStatus(enum.Enum):
+    """The status of a challenge."""
+    CREATED = "created"
+    PLAYING_GAME = "playing_game"
+    FINISHED = "finished"
+
+
 # Database setup
 engine = sqlalchemy.create_engine(config.DATABASE_URL)
 metadata = sqlalchemy.MetaData(bind=engine)
@@ -36,6 +43,8 @@ game_participants = sqlalchemy.Table("game_participant", metadata, autoload=True
 hackathons = sqlalchemy.Table("hackathon", metadata, autoload=True)
 hackathon_participants = sqlalchemy.Table("hackathon_participant", metadata, autoload=True)
 hackathon_snapshot = sqlalchemy.Table("hackathon_snapshot", metadata, autoload=True)
+challenges = sqlalchemy.Table("challenge", metadata, autoload=True)
+challenge_participants = sqlalchemy.Table("challenge_participant", metadata, autoload=True)
 
 def ranked_bots_query(variable="rank", alias="ranked_bots"):
     """

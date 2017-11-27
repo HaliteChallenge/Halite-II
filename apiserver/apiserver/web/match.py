@@ -39,6 +39,7 @@ def get_match_helper(match_id):
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
+            model.games.c.challenge_id,
         ]).where(
             model.games.c.id == match_id
         )).first()
@@ -52,6 +53,7 @@ def get_match_helper(match_id):
             "replay": match["replay_name"],
             "replay_class": match["replay_bucket"],
             "time_played": match["time_played"],
+            "challenge_id": match["challenge_id"],
             "players": {}
         }
         for row in query.fetchall():
@@ -98,6 +100,7 @@ def list_matches_helper(offset, limit, participant_clause,
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
+            model.games.c.challenge_id,
             model.game_stats.c.turns_total,
             model.game_stats.c.planets_destroyed,
             model.game_stats.c.ships_produced,
@@ -139,6 +142,7 @@ def list_matches_helper(offset, limit, participant_clause,
                 "planets_destroyed": match["planets_destroyed"],
                 "ships_produced": match["ships_produced"],
                 "ships_destroyed": match["ships_destroyed"],
+                "challenge_id": match["challenge_id"],
                 "players": {},
             }
 
@@ -158,6 +162,7 @@ def list_matches_helper(offset, limit, participant_clause,
 
 
 @web_api.route("/match")
+@util.cross_origin(methods=["GET"])
 def list_matches():
     offset, limit = api_util.get_offset_limit()
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({
