@@ -7,6 +7,8 @@ from . import client
 _BOT_FILE_NAME_PREPEND = 'MyBot.'
 _LANGUGAGE_PROJECT_FILE_IDENTIFIERS = ['cargo.toml', 'project.clj', 'package.swift', 'stack.yaml']
 _HALITE_LIBRARY_FOLDER = 'hlt/'
+_FIRST_BOT_INDEX = 0
+_VERSION_NUMBER_KEY = 'version_number'
 
 
 def _bot_exists(user_id):
@@ -16,6 +18,15 @@ def _bot_exists(user_id):
     :return: True if created, False otherwise
     """
     return requests.get(client.URI_API_EXISTING_BOT.format(user_id, client.FIRST_BOT_ID)).status_code == client.SUCCESS
+
+
+def _get_bot_version(user_id):
+    """
+    Determined the version of the latest bot for a user
+    :param user_id: The id of the user making the request
+    :return: The bot id
+    """
+    return requests.get(client.URI_API_CREATE_BOT.format(user_id)).json()[_FIRST_BOT_INDEX][_VERSION_NUMBER_KEY]
 
 
 def _upload_bot(user_id, api_key, bot_path):
@@ -69,4 +80,4 @@ def upload(bot_path):
     result = _upload_bot(config.user_id, config.api_key, bot_path)
     if result.status_code != client.SUCCESS:
         raise IOError("Unable to upload bot: {}".format(result.text))
-    print("Successfully uploaded bot")
+    print("Successfully uploaded bot with version {}".format(_get_bot_version(config.user_id)))
