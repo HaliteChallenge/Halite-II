@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 5.7.20, for Linux (x86_64)
 --
--- Host: halite    Database: halite2
+-- Host: 127.0.0.1    Database: halite2
 -- ------------------------------------------------------
--- Server version	5.7.20-0ubuntu0.17.04.1
+-- Server version	5.7.14-google-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +14,14 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED='397d1add-5cc9-11e7-9997-42010a8e0fdd:1-62888918';
 
 --
 -- Table structure for table `alembic_version`
@@ -25,7 +33,7 @@ DROP TABLE IF EXISTS `alembic_version`;
 CREATE TABLE `alembic_version` (
   `version_num` varchar(32) NOT NULL,
   PRIMARY KEY (`version_num`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,6 +101,50 @@ CREATE TABLE `bot_history` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `challenge`
+--
+
+DROP TABLE IF EXISTS `challenge`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `challenge` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `finished` datetime DEFAULT NULL,
+  `num_games` int(11) NOT NULL,
+  `status` enum('created','playing_game','finished') NOT NULL,
+  `most_recent_game_task` datetime DEFAULT NULL,
+  `issuer` mediumint(8) unsigned NOT NULL,
+  `winner` mediumint(8) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `challenge_issuer_fk` (`issuer`),
+  KEY `challenge_winner_fk` (`winner`),
+  CONSTRAINT `challenge_issuer_fk` FOREIGN KEY (`issuer`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `challenge_winner_fk` FOREIGN KEY (`winner`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `challenge_participant`
+--
+
+DROP TABLE IF EXISTS `challenge_participant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `challenge_participant` (
+  `challenge_id` int(11) NOT NULL,
+  `user_id` mediumint(8) unsigned NOT NULL,
+  `points` int(11) NOT NULL,
+  `ships_produced` int(11) NOT NULL,
+  `attacks_made` int(11) NOT NULL,
+  PRIMARY KEY (`challenge_id`,`user_id`),
+  KEY `challenge_participant_ibfk_2` (`user_id`),
+  CONSTRAINT `challenge_participant_fk` FOREIGN KEY (`challenge_id`) REFERENCES `challenge` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `challenge_participant_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `game`
 --
 
@@ -108,9 +160,12 @@ CREATE TABLE `game` (
   `map_generator` varchar(128) NOT NULL,
   `time_played` datetime DEFAULT CURRENT_TIMESTAMP,
   `replay_bucket` smallint(5) NOT NULL DEFAULT '0',
+  `challenge_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `game_time_played` (`time_played`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `game_time_played` (`time_played`),
+  KEY `game_challenge_fk` (`challenge_id`),
+  CONSTRAINT `game_challenge_fk` FOREIGN KEY (`challenge_id`) REFERENCES `challenge` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3492600 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,6 +210,9 @@ CREATE TABLE `game_participant` (
   `rank` smallint(5) unsigned NOT NULL,
   `player_index` smallint(5) unsigned NOT NULL,
   `timed_out` tinyint(1) NOT NULL,
+  `mu` float DEFAULT NULL,
+  `sigma` float unsigned DEFAULT NULL,
+  `leaderboard_rank` smallint(5) DEFAULT NULL,
   PRIMARY KEY (`game_id`,`user_id`,`bot_id`),
   KEY `user_id` (`user_id`,`bot_id`),
   CONSTRAINT `game_participant_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
@@ -218,7 +276,7 @@ CREATE TABLE `hackathon` (
   UNIQUE KEY `verification_code` (`verification_code`),
   KEY `organization_id` (`organization_id`),
   CONSTRAINT `hackathon_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -327,7 +385,7 @@ CREATE TABLE `organization` (
   `verification_code` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `verification_code` (`verification_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=26472 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -375,7 +433,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   KEY `organization_id` (`organization_id`),
   CONSTRAINT `user_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4380 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -434,6 +492,7 @@ CREATE TABLE `user_tier_history` (
   CONSTRAINT `user_tier_history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -444,12 +503,12 @@ CREATE TABLE `user_tier_history` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-11-12  1:05:23
+-- Dump completed on 2017-11-27 16:36:28
 -- MySQL dump 10.13  Distrib 5.7.20, for Linux (x86_64)
 --
--- Host: halite    Database: halite2
+-- Host: 127.0.0.1    Database: halite2
 -- ------------------------------------------------------
--- Server version	5.7.20-0ubuntu0.17.04.1
+-- Server version	5.7.14-google-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -461,6 +520,14 @@ CREATE TABLE `user_tier_history` (
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED='397d1add-5cc9-11e7-9997-42010a8e0fdd:1-62888958';
 
 --
 -- Dumping data for table `alembic_version`
@@ -468,9 +535,10 @@ CREATE TABLE `user_tier_history` (
 
 LOCK TABLES `alembic_version` WRITE;
 /*!40000 ALTER TABLE `alembic_version` DISABLE KEYS */;
-INSERT INTO `alembic_version` VALUES ('cfaf0d9a46cc');
+INSERT INTO `alembic_version` VALUES ('451d4bb125cb');
 /*!40000 ALTER TABLE `alembic_version` ENABLE KEYS */;
 UNLOCK TABLES;
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -481,4 +549,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-11-12  1:05:23
+-- Dump completed on 2017-11-27 16:36:30

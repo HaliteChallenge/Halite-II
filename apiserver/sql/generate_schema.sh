@@ -24,6 +24,5 @@ else
     PASS_OPT="--password=$DB_PASS"
 fi
 
-mysqldump --host=$DB_HOST --user=$DB_USER $PASS_OPT --no-data $DB_NAME
-mysqldump --host=$DB_HOST --user=$DB_USER $PASS_OPT $DB_NAME --no-create-info alembic_version
-
+mysqldump --host=$DB_HOST --port=$DB_PORT --user=$DB_USER $PASS_OPT --no-data $DB_NAME
+mysqldump --host=$DB_HOST --port=$DB_PORT --user=$DB_USER $PASS_OPT $DB_NAME --no-create-info alembic_version
