@@ -333,7 +333,7 @@ comp_args = {
         ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT],
     ],
     "D": [
-        ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
+        ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-version=StdLoggerDisableLogging", "-of" + BOT],
     ],
     "Elixir": [
         ["yes", "|", "mix", "deps.get"],
