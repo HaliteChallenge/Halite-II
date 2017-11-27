@@ -41,7 +41,7 @@
             </td>
             <td class="text-center hidden-xs">
               <div class="td-wrapper"><div class="text-center">
-                {{ game.ships_destroyed }} of {{ game.ships_produced }}
+                {{ game.ships_destroyed }} of {{ game.total_ships }}
                 <span v-if="game.planets_destroyed">
                   ({{ game.planets_destroyed }}p)
                 </span>
@@ -114,8 +114,10 @@ export default {
                 const players = Object.values(game.players).sort((r1, r2) => {
                   return r1.rank - r2.rank
                 })
-
                 game.playerSorted = players
+
+                // include the initial 3 ships of each player
+                game.total_ships = game.ships_produced + (players.length * 3);
               }
 
               let start_display = !this.incoming_games.length
