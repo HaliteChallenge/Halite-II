@@ -54,8 +54,8 @@
             </div>
           </div> 
         </div> 
-      </div>
-    </div>-->
+      </div> -->
+    </div>
     <div class="hackathon-events-container" v-show="showEvents">
       <div class="hackathon-title">
         <i class="xline xline-top"></i>
