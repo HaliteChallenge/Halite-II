@@ -27,6 +27,8 @@ URI_API_EXISTING_BOT = URI_HALITE_API + "/user/{}/bot/{}"
 URI_HALITE_WEB_PAGE = 'http://halite.io'
 URI_WEB_API_KEY = "{}/user/settings".format(URI_HALITE_WEB_PAGE)
 
+CONFIG_DIR = 'HALITE_CONFIG_DIR'
+
 SUCCESS = 200
 FIRST_BOT_ID = 0
 BOT_FILE_KEY = 'botFile'
@@ -65,11 +67,19 @@ class Config:
     @staticmethod
     def _get_config_folder_path():
         """
-        Returns system specific folder for config
+        Returns the folder for config.
+
         :return:  %LOCALAPPDATA%/Halite if windows ~/.config/hlt otherwise
+                  The HALITE_CONFIG_DIR environment variable overrides
+                  these defaults. If set, returns its value.
         """
-        return "{}/Halite".format(os.getenv('LOCALAPPDATA')) if sys.platform == 'win32' \
-            else "{}/.config/hlt".format(os.path.expanduser("~"))
+        if os.getenv(CONFIG_DIR):
+            return os.getenv(CONFIG_DIR)
+
+        if sys.platform == 'win32':
+            return "{}/Halite".format(os.getenv('LOCALAPPDATA'))
+
+        return "{}/.config/hlt".format(os.path.expanduser("~"))
 
     @staticmethod
     def _get_auth_file_path():
