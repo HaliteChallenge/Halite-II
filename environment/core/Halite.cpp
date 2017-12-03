@@ -1125,7 +1125,7 @@ GameStatistics Halite::run_game(std::vector<std::string>* names_,
         p.init_response_time = init_response_times[player_id];
         p.average_frame_response_time = total_frame_response_times[player_id]
             / double(alive_frame_count[player_id]); //In milliseconds.
-        p.max_frame_response_time = 
+        p.max_frame_response_time = max_frame_response_times[player_id];
         p.total_ship_count = total_ship_count[player_id];
         p.damage_dealt = damage_dealt[player_id];
         stats.player_statistics.push_back(p);
