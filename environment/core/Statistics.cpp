@@ -11,6 +11,7 @@ auto to_json(nlohmann::json& json, const GameStatistics& stats) -> void {
             { "damage_dealt", player_stats.damage_dealt },
             { "init_response_time", player_stats.init_response_time },
             { "average_frame_response_time", player_stats.average_frame_response_time },
+            { "max_frame_response_time", player_stats.max_frame_response_time },
         };
     }
 }
