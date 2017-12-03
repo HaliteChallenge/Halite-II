@@ -218,6 +218,7 @@ void Networking::send_string(hlt::PlayerId player_tag,
     }
 #else
     UniConnection connection = connections[player_tag];
+
     ssize_t charsWritten =
         write(connection.write, sendString.c_str(), sendString.length());
     if (charsWritten == -1) {
@@ -235,8 +236,11 @@ void Networking::send_string(hlt::PlayerId player_tag,
         throw BotInputError(player_tag, "", error_msg.str(), 0);
     }
     else if (charsWritten < sendString.length()) {
-        if (!quiet_output) std::cout << "Problem writing to pipe\n";
-        throw 1;
+        std::stringstream error_msg;
+        error_msg << "Could not send map to bot: could not fit map in pipe buffer.\n"
+                  << "This usually happens if the bot is not reading STDIN,\n"
+                  << "or we could not increase the pipe buffer size appropriately.";
+        throw BotInputError(player_tag, "", error_msg.str(), 0);
     }
 #endif
 }
@@ -444,6 +448,24 @@ void Networking::launch_bot(std::string command) {
         setpgid(getpid(), getpid());
 
 #ifdef __linux__
+        // Increase the size of the write pipe buffer, so that we do not
+        // terminate the bot if the serialized game state is too large.
+        std::ifstream pipeMaxSize;
+        pipeMaxSize.open("/proc/sys/fs/pipe-max-size");
+        if (!pipeMaxSize) {
+            if (!quiet_output) std::cout << "Error opening pipe buffer max size file\n";
+        }
+        else {
+            int maxSize;
+            pipeMaxSize >> maxSize;
+            if (pipeMaxSize.fail()) {
+                if (!quiet_output) std::cout << "Error reading pipe buffer max size\n";
+            }
+            else {
+                fcntl(writePipe[1], F_SETPIPE_SZ, maxSize);
+            }
+        }
+
         // install a parent death signal
         // http://stackoverflow.com/a/36945270
         int r = prctl(PR_SET_PDEATHSIG, SIGTERM);
