@@ -218,6 +218,9 @@ auto Halite::retrieve_moves(std::vector<bool> alive) -> void {
             }
             else {
                 total_frame_response_times[player_id] += time;
+                if (time > max_frame_response_times[player_id]) {
+                    max_frame_response_times[player_id] = time;
+                }
             }
         }
     }
