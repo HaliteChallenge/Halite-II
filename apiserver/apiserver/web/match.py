@@ -29,6 +29,9 @@ def get_match_helper(match_id):
             model.game_participants.c.version_number,
             model.game_participants.c.player_index,
             model.game_participants.c.timed_out,
+            model.game_participants.c.leaderboard_rank,
+            model.game_participants.c.mu,
+            model.game_participants.c.sigma,
         ]).where(
             model.game_participants.c.game_id == match_id
         ))
@@ -64,6 +67,9 @@ def get_match_helper(match_id):
                 "player_index": row["player_index"],
                 "rank": row["rank"],
                 "timed_out": bool(row["timed_out"]),
+                "leaderboard_rank": row["leaderboard_rank"],
+                "mu": row["mu"],
+                "sigma": row["sigma"],
             }
 
         # Update game_view_stat table
@@ -154,6 +160,9 @@ def list_matches_helper(offset, limit, participant_clause,
                     "player_index": participant["player_index"],
                     "rank": participant["rank"],
                     "timed_out": bool(participant["timed_out"]),
+                    "leaderboard_rank": participant["leaderboard_rank"],
+                    "mu": participant["mu"],
+                    "sigma": participant["sigma"],
                 }
 
             result.append(match)
