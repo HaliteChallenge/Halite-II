@@ -153,8 +153,8 @@ The basic unit that generates Halite ships, you can conquer planets, fight other
             <td>10 units</td>
         </tr>
          <tr>
-            <td>Docking Sport</td>
-            <td>A function of the radius. Larger planets have more spots</td>
+            <td>Docking Spots</td>
+            <td>A function of the radius. Larger planets have more docking spots</td>
             <td>Function of planet radius</td>
             <td>Function of planet radius</td>
         </tr>
