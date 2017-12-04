@@ -343,7 +343,13 @@ def find_newbie_seed_player(conn, ranked_users, seed_filter):
     :return:
     """
     sqlfunc = sqlalchemy.sql.func
-    ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
+    game_curve = 1 / (model.bots.c.games_played + 1)
+    # weight the curve between half and full weight
+    rand_factor = 0.5 + (sqlfunc.rand() * 0.5)
+    # Since the curve is cut in half every doubling of games, this means a bot
+    # will always be chosen ahead of any bots that have more than twice the
+    # number of games
+    ordering = rand_factor * -game_curve
     query = sqlalchemy.sql.select([
         ranked_users.c.user_id,
         model.bots.c.id.label("bot_id"),
@@ -363,9 +369,9 @@ def find_newbie_seed_player(conn, ranked_users, seed_filter):
         )
     ).where(
         (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
-        (model.bots.c.games_played < 400) &
         seed_filter
-    ).order_by(ordering).limit(1).reduce_columns()
+    ).order_by(ordering).limit(20).reduce_columns().alias("seed_query").select(
+    ).order_by(sqlfunc.rand())
 
     return conn.execute(query).first()
 
@@ -383,13 +389,14 @@ def find_seed_player(conn, ranked_users, seed_filter):
 
         if rand_value > 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
-                         " with under 400 games played")
+                         " with fewest games played")
             result = find_newbie_seed_player(conn, ranked_users, seed_filter)
             if result:
                 return result
         elif 0.25 < rand_value <= 0.5:
             logging.info("Matchmaking: seed player: looking for random bot"
-                         " from recent game with under 400 games played")
+                         " with under 400 games played that hasn't played"
+                         " recently")
             result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                              restrictions=True)
             if result:
@@ -399,7 +406,7 @@ def find_seed_player(conn, ranked_users, seed_filter):
         # Same as the previous case, but we do not restrict how many
         # games the user can have played, and we do not sort randomly.
         logging.info("Matchmaking: seed player: looking for random bot"
-                     " from recent game")
+                     " that hasn't played recently")
         result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                          restrictions=False)
         if result:
