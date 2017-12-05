@@ -42,7 +42,7 @@
                 :href="'/user?user_id=' + player.id"
                 class="game-participant"
                 :title="player.rating_info + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
-                    <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
+                    <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out, 'seed-player': player.player_index == 0 }"/>
                     <span class="username">
                       <template v-if="player.leaderboard_rank">
                         ({{ player.leaderboard_rank }})
@@ -257,81 +257,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-    .btn-group {
-      display: block;
-      button {
-        margin: 0.5rem;
-      }
-      .hide-btn {
-        visibility: hidden;
-      }
-    }
-    .table-leader {
-        table-layout: fixed;
-        white-space: nowrap;
-    }
-    .timed-out{
-      border-bottom-style: solid;
-      border-bottom-width: 1px;
-      border-color: red;
-    }
-    .watch {
-        width: 17rem;
-    }
-    .destroyed {
-        width: 15rem;
-    }
-    .map-size {
-        width: 12rem;
-    }
-    .turns {
-        width: 7rem;
-    }
-    .table-leader .td-wrapper {
-        height: 2.5rem;
-        max-height: 3rem;
-        overflow: hidden;
-        position: relative;
-    }
-    .table-leader .td-wrapper > div {
-        white-space: nowrap;
-        width: 100%;
-        position: absolute;
-        bottom: 0;
-    }
-    .game-participant {
-        img {
-            height: 20px;
-            width: 20px;
-        }
-        .username {
-            font-size: 1.3rem;
-        }
-    }
-    .game-table-enter-active, .game-table-leave-active {
-        transition: all 1s ease;
-    }
-    .game-table-enter, .game-table-leave-to {
-        height: 0;
-        padding: 0;
-        margin: 0;
-    }
-    .game-table-enter-active td, .game-table-leave-active td {
-        transition: all 0.3s;
-    }
-    .game-table-enter td, .game-table-leave-to td {
-        padding-top: 0;
-        padding-bottom: 0;
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-    .game-table-enter-active .td-wrapper, .game-table-leave-active .td-wrapper {
-        transition: all 1s ease;
-    }
-    .game-table-enter .td-wrapper, .game-table-leave-to .td-wrapper {
-        height: 0;
-        max-height: 0;
-    }
-</style>
