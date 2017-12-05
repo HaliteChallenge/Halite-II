@@ -14,6 +14,7 @@ struct PlayerStatistics {
     int last_frame_alive;
     int init_response_time;
     double average_frame_response_time;
+    int max_frame_response_time;
     int total_ship_count;
     int damage_dealt;
 };

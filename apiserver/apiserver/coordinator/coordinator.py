@@ -114,8 +114,10 @@ def upload_game():
             user.update(dict(stored_user))
             user.update(dict(stored_bot))
             if stored_rank:
+                user["leaderboard_rank"] = stored_rank["rank"]
                 user["tier"] = util.tier(stored_rank["rank"], total_users)
             else:
+                user["leaderboard_rank"] = total_users
                 user["tier"] = util.tier(total_users, total_users)
 
     # Store the replay and any error logs
@@ -234,6 +236,9 @@ def store_game_results(game_output, stats, replay_key, bucket_class, users, chal
                 # this user?
                 player_index=user["player_tag"],
                 timed_out=user["timed_out"],
+                leaderboard_rank=user["leaderboard_rank"],
+                mu=user["mu"],
+                sigma=user["sigma"]
             ))
 
             # Increment number of games played
