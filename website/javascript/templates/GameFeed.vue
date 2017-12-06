@@ -1,5 +1,21 @@
 <template>
   <div class="game-feed">
+    <div class="btn-group text-center">
+      <button
+          type="button"
+          class="btn"
+          v-on:click="pause_toggle">
+        <span v-if="this.display_paused">Resume</span>
+        <span v-else>Pause</span>
+      </button>
+      <button
+          type="button"
+          class="btn"
+          v-bind:class="{ 'hide-btn': !this.is_behind }"
+          v-on:click="skip_forward">
+        <span>Skip to Current</span>
+      </button>
+    </div>
     <div v-if="display_games.length > 0" class="table-container">
       <table class="table table-leader">
         <thead>
@@ -26,7 +42,7 @@
                 :href="'/user?user_id=' + player.id"
                 class="game-participant"
                 :title="player.rating_info + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
-                    <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
+                    <img :alt="player.username" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out, 'seed-player': player.player_index == 0 }"/>
                     <span class="username">
                       <template v-if="player.leaderboard_rank">
                         ({{ player.leaderboard_rank }})
@@ -82,7 +98,10 @@ export default {
       display_games: [],
       incoming_games: [],
       profile_images: {},
-      fetch_tries: 0
+      fetch_tries: 0,
+      display_timer: null,
+      display_paused: false,
+      is_behind: false,
     }
   },
   mounted: function () {
@@ -141,14 +160,11 @@ export default {
                   this.incoming_games.push(data.shift())
                 }
                 this.display_games = data.slice(0, 50)
+                this.last_display = moment()
               }
 
               if (start_display) {
-                let next_game = this.incoming_games[this.incoming_games.length - 1]
-                let next_time = moment(next_game.time_played)
-                let cur_time = moment(this.display_games[0].time_played)
-                let delay = Math.min(4000, next_time - cur_time)
-                setTimeout(this.display_next, delay)
+                this.schedule_display()
               }
 
               this.fetch_tries = 0
@@ -176,10 +192,13 @@ export default {
         return return_value_not_valid
       }
     },
-    display_next: function() {
+    display_next: function () {
+      this.display_timer = null
+      if (this.display_paused) return
       if (this.incoming_games.length) {
         this.display_games.unshift(this.incoming_games.pop())
         if (this.display_games.length > 50) this.display_games.pop()
+        this.last_display = moment()
       }
       let cur_time = moment(this.display_games[0].time_played)
       let since_update = moment() - this.last_received
@@ -188,79 +207,53 @@ export default {
         this.fetch_tries += 1
         this.fetch()
       }
-      if (this.incoming_games.length) {
-        let next_game = this.incoming_games[this.incoming_games.length - 1]
-        let till_next = moment(next_game.time_played) - cur_time
-        let qtime = since_update + this.most_recent - cur_time
-        let speed = qtime / 60000
-        let delay = Math.max(500, till_next / speed)
-        setTimeout(this.display_next, delay)
+      this.schedule_display()
+    },
+    schedule_display: function () {
+      if (this.display_timer) return
+      if (!this.incoming_games.length) return
+      let next_game = this.incoming_games[this.incoming_games.length - 1]
+      let next_played = moment(next_game.time_played)
+      let since_update = moment() - this.last_received
+      let queue_point = since_update + this.most_recent - 60000
+      let delay = Math.max(500, next_played - queue_point)
+      this.display_timer = setTimeout(this.display_next, delay)
+      let backlog = since_update + this.most_recent - next_played + delay
+      console.log("game delay "+ delay +" backlog "+ backlog)
+      if (backlog > 120000) {
+        this.is_behind = true
+      } else if (backlog < 70000) {
+        this.is_behind = false
       }
+    },
+    pause_toggle: function () {
+      this.display_paused = !this.display_paused
+      if (this.display_paused) {
+        clearTimeout(this.display_timer)
+        this.display_timer = null
+      } else {
+        this.schedule_display()
+      }
+    },
+    skip_forward: function () {
+      console.log("Skippy")
+      let cutoff = moment() - this.last_received + this.most_recent - 60000
+      let cut_ix = 0;
+      while (cut_ix < this.incoming_games.length &&
+             moment(this.incoming_games[cut_ix].time_played) > cutoff) {
+        cut_ix += 1
+      }
+      let skipped_games = this.incoming_games.slice(cut_ix)
+      this.display_games = skipped_games.concat(this.display_games).slice(0, 50)
+      this.incoming_games = this.incoming_games.slice(0, cut_ix)
+      if (this.incoming_games.length == 0 && this.fetch_tries == 0) {
+        this.fetch_tries += 1
+        this.fetch()
+      }
+      clearTimeout(this.display_timer)
+      this.display_timer = null
+      this.schedule_display()
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-    .table-leader {
-        table-layout: fixed;
-        white-space: nowrap;
-    }
-    .watch {
-        width: 17rem;
-    }
-    .destroyed {
-        width: 15rem;
-    }
-    .map-size {
-        width: 12rem;
-    }
-    .turns {
-        width: 7rem;
-    }
-    .table-leader .td-wrapper {
-        height: 2.5rem;
-        max-height: 3rem;
-        overflow: hidden;
-        position: relative;
-    }
-    .table-leader .td-wrapper > div {
-        white-space: nowrap;
-        width: 100%;
-        position: absolute;
-        bottom: 0;
-    }
-    .game-participant {
-        img {
-            height: 20px;
-            width: 20px;
-        }
-        .username {
-            font-size: 1.3rem;
-        }
-    }
-    .game-table-enter-active, .game-table-leave-active {
-        transition: all 1s ease;
-    }
-    .game-table-enter, .game-table-leave-to {
-        height: 0;
-        padding: 0;
-        margin: 0;
-    }
-    .game-table-enter-active td, .game-table-leave-active td {
-        transition: all 0.3s;
-    }
-    .game-table-enter td, .game-table-leave-to td {
-        padding-top: 0;
-        padding-bottom: 0;
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-    .game-table-enter-active .td-wrapper, .game-table-leave-active .td-wrapper {
-        transition: all 1s ease;
-    }
-    .game-table-enter .td-wrapper, .game-table-leave-to .td-wrapper {
-        height: 0;
-        max-height: 0;
-    }
-</style>
