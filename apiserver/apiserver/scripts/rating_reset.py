@@ -36,7 +36,7 @@ def main(args=sys.argv[1:]):
                         model.ranked_bots.c.version_number,
                         sqlalchemy.sql.text("ranked_bots.bot_rank"),
                         model.ranked_bots.c.score,
-                        sqlalchemy.sql.text("total_ranked"),
+                        sqlalchemy.sql.text("tr.*"),
                         model.ranked_bots.c.games_played,
                         model.ranked_bots.c.language,
                 ]).select_from(model.ranked_bots
