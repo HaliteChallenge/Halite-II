@@ -425,9 +425,10 @@ def update_rankings(users):
     """
     users.sort(key=lambda user: user["rank"])
     # Set tau and draw_probability to more reasonable values than the defaults
-    # for the open competition. tau should be set to a much lower value or
-    # even 0 for finals
-    trueskill.setup(tau=0.008, draw_probability=0.001)
+    if config.COMPETITION_FINALS_PAIRING:
+        trueskill.setup(tau=0.0, draw_probability=0.001)
+    else:
+        trueskill.setup(tau=0.008, draw_probability=0.001)
     teams = [[trueskill.Rating(mu=user["mu"], sigma=user["sigma"])]
              for user in users]
     new_ratings = trueskill.rate(teams)
