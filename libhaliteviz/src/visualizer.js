@@ -5,13 +5,15 @@ const GlowFilter = extraFilters.GlowFilter;
 const pako = require("pako");
 
 import {Ship} from "./ship";
-import {Planet} from "./planet";
+import {Planet, holidaySprite} from "./planet";
 import * as statistics from "./statistics";
 import * as keyboard from "./keyboardControls";
 
 import * as assets from "./assets";
 
 import * as animation from "./animation";
+
+export const isHoliday = holidaySprite;
 
 export class HaliteVisualizer {
     constructor(replay) {

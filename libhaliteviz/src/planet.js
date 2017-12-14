@@ -3,8 +3,21 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 
 
-function isHalloween() {
-    return false;
+export function holidaySprite() {
+    const date = new Date();
+    if (date.getMonth() === 11) {
+        return assets.WINTER_PLANET_IMAGE;
+    }
+    else if (date.getMonth() === 0) {
+        return assets.NEWYEAR_PLANET_IMAGE;
+    }
+    return null;
+}
+
+function useHolidaySprite() {
+    if (window.localStorage["holiday"] === "false") return false;
+    // Cast result of holidaySprite to Boolean
+    return !!holidaySprite();
 }
 
 
@@ -28,7 +41,13 @@ export class Planet {
 
         const pixelsPerUnit = assets.CELL_SIZE * scale;
         // Switch planet sprite based on display size of planet.
-        this.halloween = PIXI.Sprite.from(assets.HALLOWEEN_PLANET_IMAGE);
+        const holiday = holidaySprite();
+        if (holiday) {
+            this.holidayCore = PIXI.Sprite.from(holiday);
+        }
+        else {
+            this.holidayCore = null;
+        }
         if (planetBase.r * pixelsPerUnit <= 20) {
             this.core = PIXI.Sprite.from(assets.PLANET_IMAGE_SMALL);
         }
@@ -78,24 +97,26 @@ export class Planet {
             });
         });
 
-        this.halloween.width = this.core.width;
-        this.halloween.height = (161/204) * this.core.width;
-        this.halloween.position.x = scale * assets.CELL_SIZE * planetBase.x;
-        this.halloween.position.y = scale * assets.CELL_SIZE * planetBase.y;
-        this.halloween.anchor.x = 0.5;
-        this.halloween.anchor.y = 0.5;
-        this.halloween.interactive = true;
-        this.halloween.buttonMode = true;
-        this.halloween.on("pointerdown", (e) => {
-            // When clicked, notify the visualizer
-            onSelect("planet", {
-                id: this.id,
+        if (this.holidayCore) {
+            const ratio = this.holidayCore.height / this.holidayCore.width;
+            this.holidayCore.width = this.core.width;
+            this.holidayCore.height = ratio * this.core.width;
+            this.holidayCore.position.x = this.core.position.x;
+            this.holidayCore.position.y = this.core.position.y;
+            this.holidayCore.anchor.x = 0.5;
+            this.holidayCore.anchor.y = 0.5;
+            this.holidayCore.interactive = true;
+            this.holidayCore.buttonMode = true;
+            this.holidayCore.alpha = 0.5;
+            this.holidayCore.on("pointerdown", (e) => {
+                // When clicked, notify the visualizer
+                onSelect("planet", {
+                    id: this.id,
+                });
             });
-        });
-        this.halloween.tint = assets.PLANET_COLOR;
-
-        this.halloween.visible = isHalloween();
-        this.core.visible = !this.halloween.visible;
+            this.holidayCore.tint = assets.PLANET_COLOR;
+            this.core.visible = false;
+        }
     }
 
     /**
@@ -105,8 +126,12 @@ export class Planet {
      * @param overlay {PIXI.Graphics} A graphics object used to draw overlays.
      */
     attach(container, overlay) {
-        // Don't add holiday sprite right now
-        container.addChild(this.core, this.halo);
+        if (this.holidayCore) {
+            container.addChild(this.holidayCore, this.core, this.halo);
+        }
+        else {
+            container.addChild(this.core, this.halo);
+        }
         this.container = container;
         this.overlay = overlay;
     }
@@ -153,8 +178,14 @@ export class Planet {
             this.core.buttonMode = false;
         }
 
-        this.core.visible = planetStatus.health > 0 && (!isHalloween() || planetStatus.owner !== null);
         this.halo.visible = planetStatus.health > 0;
-        this.halloween.visible = isHalloween() && planetStatus.health > 0 && planetStatus.owner === null;
+        if (useHolidaySprite()) {
+            this.holidayCore.visible = planetStatus.health > 0 && planetStatus.owner === null;
+            this.core.visible = planetStatus.health > 0 && planetStatus.owner !== null;
+        }
+        else {
+            this.holidayCore.visible = false;
+            this.core.visible = planetStatus.health > 0;
+        }
     }
 }
