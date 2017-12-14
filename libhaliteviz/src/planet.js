@@ -3,12 +3,16 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 
 
+const WINTER_START = new Date(2017, 11, 23);
+const NEW_YEAR_START = new Date(2017, 11, 30);
+const NEW_YEAR_END = new Date(2018, 0, 2);
+
 export function holidaySprite() {
     const date = new Date();
-    if (date.getMonth() === 11) {
+    if (date.getTime() >= WINTER_START.getTime() && date.getTime() < NEW_YEAR_START.getTime()) {
         return assets.WINTER_PLANET_IMAGE;
     }
-    else if (date.getMonth() === 0) {
+    else if (date.getTime() >= NEW_YEAR_START.getTime() && date.getTime() < NEW_YEAR_END.getTime()) {
         return assets.NEWYEAR_PLANET_IMAGE;
     }
     return null;
@@ -184,7 +188,7 @@ export class Planet {
             this.core.visible = planetStatus.health > 0 && planetStatus.owner !== null;
         }
         else {
-            this.holidayCore.visible = false;
+            if (this.holidayCore) this.holidayCore.visible = false;
             this.core.visible = planetStatus.health > 0;
         }
     }
