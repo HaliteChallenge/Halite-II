@@ -43,6 +43,9 @@ header.unloaded{
     }
   }
 }
+.navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse{
+  max-height: 540px;
+}
 .navbar-inverse{
   $g-color: #b9b8b8;
   background-color: $gray-bg;
