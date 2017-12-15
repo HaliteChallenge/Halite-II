@@ -175,7 +175,7 @@
                                                     <a v-for="player in game.playerSorted"
                                                     :href="'/user?user_id=' + player.id"
                                                     class="game-participant"
-                                                    :title="usernames[player.id] + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
+                                                    :title="player.name_rank + (player.timed_out ? ' timed out or errored in this game. See the log for details.' : '')">
                                                         <img :alt="player" :src="profile_images[player.id]" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Placeholder_no_text.svg/2000px-Placeholder_no_text.svg.png'" v-bind:class="{ 'timed-out': player.timed_out }"/>
                                                         <span class="rank">
                                                             {{ player.rank }}
@@ -602,11 +602,20 @@
                 if ( data.length > 0 ){
                     this.games = data
                     for (let game of data) {
-                      for (let participant of Object.keys(game.players)) {
-                        let username = game.players[participant].username
-                        game.players[participant].id = participant
-                        this.profile_images[participant] = api.make_profile_image_url(username)
-                        this.usernames[participant] = username
+                      for (let player_id in game.players) {
+                        let player = game.players[player_id]
+                        let username = player.username
+                        let rating = player.mu - (player.sigma * 3)
+                        player.rating = rating
+                        rating = Math.round(rating * 100) / 100
+                        let mu = Math.round(player.mu * 100) / 100
+                        let sigma = Math.round(player.sigma * 1000) / 1000
+
+                        player.id = player_id
+                        player.name_rank = `(${player.leaderboard_rank}) ${username} [${rating}=${mu}μ${sigma}σ]`
+
+                        this.profile_images[player_id] = api.make_profile_image_url(username)
+                        this.usernames[player_id] = username
                       }
 
                       const players = Object.values(game.players).sort((r1, r2) => {

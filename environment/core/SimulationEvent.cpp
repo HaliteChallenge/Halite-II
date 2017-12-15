@@ -98,7 +98,7 @@ auto CollisionMap::test(const hlt::Location& location, double radius,
 }
 
 auto collision_time(
-    double r,
+    long double r,
     const hlt::Location& loc1, const hlt::Location& loc2,
     const hlt::Velocity& vel1, const hlt::Velocity& vel2
 ) -> std::pair<bool, double> {
@@ -159,25 +159,25 @@ auto collision_time(
     }
 }
 
-auto collision_time(double r, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, double> {
+auto collision_time(long double r, const hlt::Ship& ship1, const hlt::Ship& ship2) -> std::pair<bool, long double> {
     return collision_time(r,
                           ship1.location, ship2.location,
                           ship1.velocity, ship2.velocity);
 }
 
-auto collision_time(double r, const hlt::Ship& ship1, const hlt::Planet& planet) -> std::pair<bool, double> {
+auto collision_time(long double r, const hlt::Ship& ship1, const hlt::Planet& planet) -> std::pair<bool, long double> {
     return collision_time(r,
                           ship1.location, planet.location,
                           ship1.velocity, { 0, 0 });
 }
 
-auto might_attack(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
+auto might_attack(long double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
     return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude()
         + ship1.radius + ship2.radius
         + hlt::GameConstants::get().WEAPON_RADIUS;
 }
 
-auto might_collide(double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
+auto might_collide(long double distance, const hlt::Ship& ship1, const hlt::Ship& ship2) -> bool {
     return distance <= ship1.velocity.magnitude() + ship2.velocity.magnitude() +
         ship1.radius + ship2.radius;
 }

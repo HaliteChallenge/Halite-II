@@ -43,10 +43,8 @@ class CD(object):
 def safeglob(pattern):
     safepaths = []
     for root, dirs, files in os.walk("."):
-        print("Walking: " + root + " " + ", ".join(dirs) + " " + ", ".join(files))
         files = fnmatch.filter(files, pattern)
         for fname in files:
-            print(os.path.splitext(fname)[0])
             if SAFEPATH.match(fname) and os.path.splitext(fname)[0] != "RandomBot":
                 safepaths.append(os.path.join(root, fname))
     return safepaths
@@ -94,9 +92,9 @@ def _run_cmd(cmd, working_dir, timelimit):
         errors = ["Compilation timed out with command %s" % (cmd,)]
 
     # Clean up any processes that didn't exit cleanly
-    util.kill_processes_as("bot_compilation", "bash")
+    util.kill_processes_as("bot_compilation")
 
-    return out, errors
+    return out, errors, process.returncode
 
 
 def check_path(path, errors):
@@ -136,6 +134,40 @@ class ChmodCompiler(Compiler):
         return True
 
 
+class CSharpMonoCompiler(Compiler):
+    def compile(self, bot_dir, globs, errors, timelimit):
+        with CD(bot_dir):
+            print("Looking for *.cs files:")
+            cs_files = safeglob("*.cs")
+            print(str(len(cs_files)) + " found")
+            if len(cs_files) == 0:
+                print("No *.cs files found, nothing to do, exiting successfully.")
+                return True
+
+            print("Looking for *.dll files:")
+            dll_files = safeglob("*.dll")
+            print(str(len(dll_files)) + " found")
+
+        try:
+            cmd_args = ["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:MyBot.exe"]
+            if len(dll_files) != 0:
+                cmd_args.append("-r:" + ",".join(dll_files))
+            cmd_args += cs_files
+
+            cmdline = " ".join(cmd_args)
+            cmd_out, cmd_errors, _ = _run_cmd(cmdline, bot_dir, timelimit)
+            if not cmd_errors:
+                check_path(os.path.join(bot_dir, "MyBot.exe"), cmd_errors)
+                if cmd_errors:
+                    cmd_errors += cmd_out
+            if cmd_errors:
+                errors += cmd_errors
+                return False
+        except:
+            pass
+        return True
+
+
 class ExternalCompiler(Compiler):
     """
     A compiler that calls an external process.
@@ -154,7 +186,7 @@ class ExternalCompiler(Compiler):
         with CD(bot_dir):
             print("GLOBS: " + ", ".join(globs))
             files = safeglob_multi(globs)
-            if (len("".join(globs)) != 0 and len(files) == 0):
+            if len("".join(globs)) != 0 and len(files) == 0:
                 # no files to compile
                 return True
 
@@ -163,8 +195,8 @@ class ExternalCompiler(Compiler):
                 for filename in files:
                     print("file: " + filename)
                     cmdline = " ".join(self.args + [filename])
-                    cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
+                    cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
+                    cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
                     if not cmd_errors:
                         for ofile in self.out_files:
                             check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -179,8 +211,8 @@ class ExternalCompiler(Compiler):
             else:
                 cmdline = " ".join(self.args + files)
                 print("Files: " + " ".join(files))
-                cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
-                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors);
+                cmd_out, cmd_errors, returncode = _run_cmd(cmdline, bot_dir, timelimit)
+                cmd_errors = self.cmd_error_filter(cmd_out, cmd_errors, returncode)
                 if not cmd_errors:
                     for ofile in self.out_files:
                         check_path(os.path.join(bot_dir, ofile), cmd_errors)
@@ -197,7 +229,7 @@ class ExternalCompiler(Compiler):
             pass
         return True
 
-    def cmd_error_filter(self, cmd_out, cmd_errors):
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
         cmd_errors = [line for line in cmd_errors if line is None or self.stderr_re.search(line) is None]
         return cmd_errors
 
@@ -219,8 +251,8 @@ class ErrorFilterCompiler(ExternalCompiler):
     def __str__(self):
         return "ErrorFilterCompiler: %s" % (' '.join(self.args),)
 
-    def cmd_error_filter(self, cmd_out, cmd_errors):
-        cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors)
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
+        cmd_errors = ExternalCompiler.cmd_error_filter(self, cmd_out, cmd_errors, returncode)
 
         if self.skip_stdout > 0:
             del cmd_out[:self.skip_stdout]
@@ -235,6 +267,31 @@ class ErrorFilterCompiler(ExternalCompiler):
             return [line for line in cmd_out if line is not None] + cmd_errors
 
         return cmd_errors
+
+
+class ReturncodeCompiler(ExternalCompiler):
+    """
+    A compiler that returns an error if the return code is not 0.
+    """
+    def __init__(self, args, separate=False, out_files=[], out_ext=None):
+        ExternalCompiler.__init__(self, args, separate, out_files, out_ext)
+
+    def __str__(self):
+        return "ReturncodeCompiler: %s" % (' '.join(self.args),)
+
+    def cmd_error_filter(self, cmd_out, cmd_errors, returncode):
+        if returncode == 0:
+            return []
+
+        result = [
+            "Error compiling with command {}".format(' '.join(self.args)),
+            "Process exited with return code {}".format(returncode),
+            "stdout was:",
+        ]
+        result.extend(line for line in (cmd_out or []) if line is not None)
+        result.append("stderr was:")
+        result.extend(line for line in (cmd_errors or []) if line is not None)
+        return result
 
 
 class TargetCompiler(Compiler):
@@ -259,7 +316,7 @@ class TargetCompiler(Compiler):
                     errors.append("Could not determine target for source file %s." % source)
                     return False
                 cmdline = " ".join(self.args + [self.outflag, target, source])
-                cmd_out, cmd_errors = _run_cmd(cmdline, bot_dir, timelimit)
+                cmd_out, cmd_errors, _ = _run_cmd(cmdline, bot_dir, timelimit)
                 if cmd_errors:
                     errors += cmd_errors
                     return False
@@ -278,12 +335,13 @@ comp_args = {
         ["gnatbind"],
         ["gnatlink", "-o", BOT],
     ],
+    "CMake": [
+        ["cmake", "."],
+        ["make", "-j2"],
+    ],
     "C": [
         ["gcc", "-O3", "-funroll-loops", "-c"],
         ["gcc", "-O2", "-lm", "-o", BOT],
-    ],
-    "C#/Mono": [
-        ["mcs", "-warn:0", "-optimize+", "-pkg:dotnet", "-out:%s.exe" % BOT],
     ],
     "C#/.NET Core": [
         ["dotnet", "restore"],
@@ -300,7 +358,7 @@ comp_args = {
         ["g++", "-O2", "-lm", "-std=c++11", "-o", BOT],
     ],
     "D": [
-        ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-of" + BOT],
+        ["dmd", "-O", "-inline", "-release", "-noboundscheck", "-version=StdLoggerDisableLogging", "-of" + BOT],
     ],
     "Elixir": [
         ["yes", "|", "mix", "deps.get"],
@@ -318,6 +376,10 @@ comp_args = {
     ],
     "Haskell": [
         ["ghc", "--make", BOT + ".hs", "-O", "-v0", "-rtsopts"],
+    ],
+    "Haskell/Stack": [
+        ["stack", "build", "--allow-different-user"],
+        ["stack", "install", "--local-bin-path", "."],
     ],
     "Java": [
         ["javac", "-encoding", "UTF-8", "-J-Xmx%sm" % (MEMORY_LIMIT)],
@@ -348,8 +410,8 @@ comp_args = {
 }
 
 targets = {
-    "C"     : { ".c" : ".o" },
-    "C++" : { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
+    "C"  : { ".c" : ".o" },
+    "C++": { ".c" : ".o", ".cpp" : ".o", ".cc" : ".o" },
     }
 
 Language = collections.namedtuple(
@@ -366,6 +428,14 @@ languages = (
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][1])),
             (["MyBot.ali"], ExternalCompiler(comp_args["Ada"][2]))]
     ),
+    Language("C++", BOT, "CMakeLists.txt",
+        "./MyBot",
+        ["*.o", BOT],
+        [
+            ([], ExternalCompiler(comp_args["CMake"][0])),
+            ([], ExternalCompiler(comp_args["CMake"][1])),
+        ]
+    ),
     Language("C", BOT, "MyBot.c",
         "./MyBot",
         ["*.o", BOT],
@@ -380,10 +450,10 @@ languages = (
                  ([], ExternalCompiler(comp_args["C#/.NET Core"][1])),
              ]
     ),
-    Language("C#/Mono", BOT +".exe", "MyBot.cs",
+    Language("C#/Mono", "MyBot.exe", "MyBot.cs",
         "mono MyBot.exe",
-        [BOT + ".exe"],
-        [(["*.cs"], ExternalCompiler(comp_args["C#/Mono"][0]))]
+        ["MyBot.exe"],
+        [([], CSharpMonoCompiler())]
     ),
     Language("VB/Mono", BOT +".exe", "MyBot.vb",
         "mono MyBot.exe",
@@ -447,6 +517,14 @@ languages = (
         "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
         [BOT],
         [([""], ExternalCompiler(comp_args["Haskell"][0]))]
+    ),
+    Language("Haskell/Stack", BOT, "stack.yaml",
+        "./MyBot +RTS -M" + str(MEMORY_LIMIT) + "m",
+        [BOT],
+        [
+            ([""], ReturncodeCompiler(comp_args["Haskell/Stack"][0])),
+            ([""], ReturncodeCompiler(comp_args["Haskell/Stack"][1])),
+        ]
     ),
     Language("Java", BOT +".java", "MyBot.java",
         "java MyBot",
@@ -565,9 +643,9 @@ languages = (
 
 def compile_function(language, bot_dir, timelimit):
     with CD(bot_dir):
-        print("cd")
+        print("cd " + bot_dir)
         for glob in language.nukeglobs:
-            print("nuke")
+            print("nuke " + glob)
             nukeglob(glob)
 
     errors = []
@@ -594,6 +672,12 @@ def detect_language(bot_dir):
         detected_langs = [
             lang for lang in languages if os.path.exists(lang.main_code_file)
         ]
+
+        # if we have cmake-based compilation, then remove any other autodetected C and C++ compilers
+        if any(lang.main_code_file == "CMakeLists.txt" for lang in detected_langs):
+            detected_langs = [lang for lang in detected_langs if
+                              lang.main_code_file == "CMakeLists.txt" or (lang.name != "C" and lang.name != "C++")]
+
         if len(detected_langs) > 1:
             return None, ['Found multiple MyBot.* files: \n'+
                           '\n'.join([l.main_code_file for l in detected_langs])]
@@ -633,63 +717,137 @@ def get_run_lang(submission_dir):
                     if line[0] == '#':
                         return line[1:-1]
 
-def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len = 3072):
+
+INSTALL_ERROR_START = "Possible errors running install.sh. stdout output as follows:"
+INSTALL_ERROR_MID = "End of install.sh stdout. stderr as follows:"
+INSTALL_ERROR_END = "End of install.sh output."
+
+
+def truncate_errors(install_stdout, install_errors, language_detection_errors,
+                    compile_errors, max_error_len=10*1024):
+    """
+    Combine lists of errors into a single list under a maximum length.
+    """
+    install_stdout = install_stdout or []
+    install_errors = install_errors or []
+    language_detection_errors = language_detection_errors or []
+    compile_errors = compile_errors or []
+
+    all_errors = install_stdout + install_errors + language_detection_errors + compile_errors
+    result = []
+
+    if sum(len(line) for line in all_errors) <= max_error_len:
+        if install_stdout or install_errors:
+            result.append(INSTALL_ERROR_START)
+            result.extend(install_stdout)
+            result.append(INSTALL_ERROR_MID)
+            result.extend(install_errors)
+            result.append(INSTALL_ERROR_END)
+        result.extend(language_detection_errors)
+        result.extend(compile_errors)
+        return result
+
+    def bound_errors(source, bound):
+        total_length = sum(len(line) for line in source)
+        if total_length <= bound:
+            return total_length, source
+
+        length = 0
+        current = 0
+        result = []
+        # Take 1/3 from start of errors
+        while current < len(source) and (
+                length == 0 or
+                length + len(source[current]) < bound // 3):
+            result.append(source[current])
+            length += len(source[current])
+            current += 1
+
+        if current < len(source):
+            result.append("...(output truncated)...")
+
+            end_errors = []
+            end = current
+            current = -1
+            while current >= -(len(source) - end) and (
+                    len(end_errors) == 0 or
+                    length + len(source[current])) < bound:
+                end_errors.append(source[current])
+                length += len(source[current])
+                current -= 1
+            result.extend(reversed(end_errors))
+
+        return length, result
+
+
+    remaining_length = max_error_len
+    if install_stdout or install_errors:
+        result.append(INSTALL_ERROR_START)
+        used, lines = bound_errors(install_stdout, 0.2 * max_error_len)
+        remaining_length -= used
+        result.extend(lines)
+        result.append(INSTALL_ERROR_MID)
+        used, lines = bound_errors(install_errors,
+                                   max(0.3 * max_error_len,
+                                       0.5 * max_error_len - used))
+        remaining_length -= used
+        result.extend(lines)
+        result.append(INSTALL_ERROR_END)
+
+    _, lines = bound_errors(language_detection_errors + compile_errors, remaining_length)
+    result.extend(lines)
+    return result
+
+
+def compile_anything(bot_dir, installTimeLimit=600, timelimit=600, max_error_len=10*1024):
+    install_stdout = []
+    install_errors = []
     if os.path.exists(os.path.join(bot_dir, "install.sh")):
-        _, errors = _run_cmd("chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
-    detected_language, errors = detect_language(bot_dir)
-    print("detected language")
-    if detected_language:
-        print("compiling")
-        compiled, errors = compile_function(detected_language, bot_dir, timelimit)
-        print("done compiling")
-        if compiled:
-            name = detected_language.name
-            run_cmd = detected_language.command
-            run_filename = os.path.join(bot_dir, 'run.sh')
-            print("filename:")
-            print(run_filename)
-            try:
-                with open(run_filename, 'wb') as f:
-                    f.write(('#%s\n%s\n' % (name, run_cmd)).encode('utf-8'))
-                print("file:")
-                with open(run_filename, 'r') as f:
-                    for line in f:
-                        print(line)
-            except Exception as e:
-                print("error")
-                print(e)
+        install_stdout, install_errors, _ = _run_cmd(
+            "chmod +x install.sh; ./install.sh", bot_dir, installTimeLimit)
 
-            # allow LANGUAGE file to override language name
-            override_name = detect_language_file(bot_dir)
-            if override_name:
-                name = override_name
-            return name, None
-        else:
-            # limit length of reported errors
-            if len(errors) > 0 and sum(map(len, errors)) > max_error_len:
-                first_errors = []
-                cur_error = 0
-                length = len(errors[0])
-                while length < (max_error_len / 3): # take 1/3 from start
-                    first_errors.append(errors[cur_error])
-                    cur_error += 1
-                    length += len(errors[cur_error])
-                first_errors.append("...")
-                length += 3
-                end_errors = []
-                cur_error = -1
-                while length <= max_error_len:
-                    end_errors.append(errors[cur_error])
-                    cur_error -= 1
-                    length += len(errors[cur_error])
-                end_errors.reverse()
-                errors = first_errors + end_errors
+    detected_language, language_errors = detect_language(bot_dir)
 
-            return detected_language.name, errors
-    else:
-        return "Unknown", errors
+    print("detected language " + str(detected_language))
+    if not detected_language:
+        return "Unknown", truncate_errors(install_stdout, install_errors,
+                                          language_errors, [], max_error_len)
+
+    print("compiling")
+    compiled, compile_errors = compile_function(detected_language, bot_dir, timelimit)
+    if not compiled:
+        return (detected_language.name,
+                truncate_errors(install_stdout, install_errors,
+                                language_errors, compile_errors, max_error_len))
+
+    print("done compiling")
+    name = detected_language.name
+    run_cmd = detected_language.command
+    run_filename = os.path.join(bot_dir, 'run.sh')
+    print("filename:")
+    print(run_filename)
+    try:
+        with open(run_filename, 'wb') as f:
+            f.write(('#%s\n%s\n' % (name, run_cmd)).encode('utf-8'))
+        print("file:")
+        with open(run_filename, 'r') as f:
+            for line in f:
+                print(line)
+    except Exception as e:
+        print("error")
+        print(e)
+
+    # allow LANGUAGE file to override language name
+    override_name = detect_language_file(bot_dir)
+    if override_name:
+        name = override_name
+    return name, None
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         workingPath = sys.argv[1]
-        print(compile_anything(workingPath))
+        lang, errors = compile_anything(workingPath)
+        print("Language:", lang)
+        if errors:
+            print("--- Errors: ---")
+            print("\n".join(errors))

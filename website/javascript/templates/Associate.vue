@@ -19,7 +19,7 @@
                             <option value="High School">High school</option>
                         </select> -->
                         <v-select
-                          placeholder="Professional"
+                          placeholder="Select your Level"
                           v-model="level"
                           :options="['Professional', 'University', 'High School']">
                         </v-select>

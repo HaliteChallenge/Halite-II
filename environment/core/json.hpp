@@ -8328,7 +8328,7 @@ class basic_json
             }
 
             // get number of digits for a text -> float -> text round-trip
-            static constexpr auto d = std::numeric_limits<NumberType>::digits10;
+            static constexpr auto d = std::numeric_limits<NumberType>::max_digits10;
 
             // the actual conversion
             const auto written_bytes = snprintf(m_buf.data(), m_buf.size(), "%.*g", d, x);

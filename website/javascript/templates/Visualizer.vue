@@ -60,7 +60,7 @@
                   <a href="javascript:;" @click="nextFrame"><span class="icon-next"></span></a>
                 </span>
                 <span class="replay-btn">
-                  <a style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id && user" :href="replay_download_link(game.game_id)">
+                  <a style="text-align: center; margin-bottom: 4px;" v-if="game && game.game_id" :href="replay_download_link(game.game_id)">
                     <span class="icon-download"></span>
                   </a>
                 </span>
@@ -853,8 +853,8 @@
        * Download link
        */
       replay_download_link: function (game_id) {
-        // return '';
-        return `${api.API_SERVER_URL}/user/${this.user.user_id}/match/${game_id}/replay`
+        let user_id = this.user ? this.user.user_id : 0
+        return `${api.API_SERVER_URL}/user/${user_id}/match/${game_id}/replay`
       },
     }
   }

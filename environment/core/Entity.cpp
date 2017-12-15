@@ -2,11 +2,11 @@
 #include "hlt.hpp"
 
 namespace hlt {
-    auto Location::distance(const Location &other) const -> double {
+    auto Location::distance(const Location &other) const -> long double {
         return sqrt(distance2(other));
     }
 
-    auto Location::distance2(const Location &other) const -> double {
+    auto Location::distance2(const Location &other) const -> long double {
         return std::pow(other.pos_x - pos_x, 2) +
             std::pow(other.pos_y - pos_y, 2);
     }
@@ -47,7 +47,7 @@ namespace hlt {
         }
     }
 
-    auto Velocity::magnitude() const -> double {
+    auto Velocity::magnitude() const -> long double {
         return sqrt(vel_x * vel_x + vel_y * vel_y);
     }
 

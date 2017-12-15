@@ -9,7 +9,7 @@ sort_key: 7
 
 ## Bot in action
 
-This bot is playing under [tscaptain-ml](/user/?user_id=1154) in the global leaderboard, You can check out some of its games [here](/user/?user_id=1154) or see below for a quick preview.
+This bot is playing under [tscommander-ml](/user/?user_id=1205) in the global leaderboard, You can check out some of its games [here](/user/?user_id=1205) or see below for a quick preview.
 
 Download the bot [here](/learn-programming-challenge/downloads-and-starter-kits/)
 

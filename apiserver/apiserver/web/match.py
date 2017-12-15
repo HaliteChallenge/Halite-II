@@ -29,6 +29,9 @@ def get_match_helper(match_id):
             model.game_participants.c.version_number,
             model.game_participants.c.player_index,
             model.game_participants.c.timed_out,
+            model.game_participants.c.leaderboard_rank,
+            model.game_participants.c.mu,
+            model.game_participants.c.sigma,
         ]).where(
             model.game_participants.c.game_id == match_id
         ))
@@ -39,6 +42,7 @@ def get_match_helper(match_id):
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
+            model.games.c.challenge_id,
         ]).where(
             model.games.c.id == match_id
         )).first()
@@ -52,6 +56,7 @@ def get_match_helper(match_id):
             "replay": match["replay_name"],
             "replay_class": match["replay_bucket"],
             "time_played": match["time_played"],
+            "challenge_id": match["challenge_id"],
             "players": {}
         }
         for row in query.fetchall():
@@ -62,6 +67,9 @@ def get_match_helper(match_id):
                 "player_index": row["player_index"],
                 "rank": row["rank"],
                 "timed_out": bool(row["timed_out"]),
+                "leaderboard_rank": row["leaderboard_rank"],
+                "mu": row["mu"],
+                "sigma": row["sigma"],
             }
 
         # Update game_view_stat table
@@ -98,6 +106,7 @@ def list_matches_helper(offset, limit, participant_clause,
             model.games.c.map_width,
             model.games.c.map_height,
             model.games.c.time_played,
+            model.games.c.challenge_id,
             model.game_stats.c.turns_total,
             model.game_stats.c.planets_destroyed,
             model.game_stats.c.ships_produced,
@@ -139,6 +148,7 @@ def list_matches_helper(offset, limit, participant_clause,
                 "planets_destroyed": match["planets_destroyed"],
                 "ships_produced": match["ships_produced"],
                 "ships_destroyed": match["ships_destroyed"],
+                "challenge_id": match["challenge_id"],
                 "players": {},
             }
 
@@ -150,6 +160,9 @@ def list_matches_helper(offset, limit, participant_clause,
                     "player_index": participant["player_index"],
                     "rank": participant["rank"],
                     "timed_out": bool(participant["timed_out"]),
+                    "leaderboard_rank": participant["leaderboard_rank"],
+                    "mu": participant["mu"],
+                    "sigma": participant["sigma"],
                 }
 
             result.append(match)
@@ -158,6 +171,7 @@ def list_matches_helper(offset, limit, participant_clause,
 
 
 @web_api.route("/match")
+@util.cross_origin(methods=["GET"])
 def list_matches():
     offset, limit = api_util.get_offset_limit()
     where_clause, order_clause, manual_sort = api_util.get_sort_filter({

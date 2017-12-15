@@ -1,3 +1,5 @@
+import collections
+import datetime
 import logging
 import random
 
@@ -22,6 +24,11 @@ def rand_map_size():
 
 def serve_game_task(conn, has_gpu=False):
     """Try to find a set of players to play a game together."""
+    if random.random() < 0.1:
+        result = find_challenge(conn, has_gpu)
+        if result:
+            return result
+
     # Only allow 2 or 4 player games
     player_count = 2 if random.random() > 0.5 else 4
 
@@ -129,7 +136,119 @@ def serve_game_task(conn, has_gpu=False):
             "width": map_width,
             "height": map_height,
             "users": players,
+            "challenge": None,
         })
+
+
+def reset_challenges(conn):
+    """Check ongoing challenges, and reset ones that are "stuck"."""
+    reset_stuck_challenges = model.challenges.update().where(
+        (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+        (model.challenges.c.most_recent_game_task <
+         datetime.datetime.now() - datetime.timedelta(
+             minutes=30))
+    ).values(
+        status=model.ChallengeStatus.CREATED.value,
+    )
+    conn.execute(reset_stuck_challenges)
+
+
+def find_challenge(conn, has_gpu=False):
+    """
+    Find a set of players in a challenge.
+    """
+    # Reset any stuck challenges
+    reset_challenges(conn)
+
+    challenge = conn.execute(
+        model.challenges.select(
+            (model.challenges.c.status == model.ChallengeStatus.CREATED.value) |
+            # Also pick up any stuck challenges
+            (
+                (model.challenges.c.status == model.ChallengeStatus.PLAYING_GAME.value) &
+                (model.challenges.c.most_recent_game_task <
+                 datetime.datetime.now() - datetime.timedelta(minutes=30))
+            )
+        ).order_by(
+            model.challenges.c.most_recent_game_task.asc()
+        )
+    ).first()
+
+    if not challenge:
+        return None
+
+    player_filter = sqlalchemy.sql.expression.true()
+    if not has_gpu:
+        player_filter = (model.ranked_bots_users.c.is_gpu_enabled == False)
+
+    total_players = conn.execute(model.total_ranked_users).first()[0]
+    thresholds = util.tier_thresholds(total_players)
+    ranked_users = model.ranked_users_query()
+    bots_query = sqlalchemy.sql.select([
+        model.ranked_bots_users.c.user_id,
+        model.ranked_bots_users.c.bot_id,
+        model.ranked_bots_users.c.username,
+        model.ranked_bots_users.c.rank,
+        model.ranked_bots_users.c.num_submissions.label("version_number"),
+    ]).select_from(
+        model.ranked_bots_users.join(
+            model.bots,
+            (model.ranked_bots_users.c.user_id == model.bots.c.user_id) &
+            (model.ranked_bots_users.c.bot_id == model.bots.c.id)
+        )
+    ).where(
+        (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
+        sqlalchemy.sql.exists(
+            model.challenge_participants.select(
+                (model.ranked_bots.c.user_id == model.challenge_participants.c.user_id) &
+                (model.challenge_participants.c.challenge_id == challenge["id"]) &
+                (model.challenge_participants.c.user_id == model.ranked_bots_users.c.user_id)
+            )
+        ) &
+        player_filter
+    )
+    bots = conn.execute(bots_query).fetchall()
+
+    user_bots = collections.defaultdict(list)
+    for bot in bots:
+        user_bots[bot["user_id"]].append(bot)
+
+    if len(user_bots) < 2 or challenge["issuer"] not in user_bots:
+        return None
+
+    selected_bots = [random.choice(user_bots[challenge["issuer"]])]
+    del user_bots[challenge["issuer"]]
+
+    candidate_users = list(user_bots.keys())
+    if random.random() < 0.5 and len(user_bots) >= 3:
+        random.shuffle(candidate_users)
+        selected_bots.extend([random.choice(user_bots[user_id])
+                              for user_id in candidate_users[:3]])
+    else:
+        selected_bots.append(random.choice(user_bots[random.choice(candidate_users)]))
+
+    map_width, map_height = rand_map_size()
+    players = [{
+        "user_id": player["user_id"],
+        "bot_id": player["bot_id"],
+        "username": player["username"],
+        "version_number": player["version_number"],
+        "rank": player["rank"],
+        "tier": util.tier(player["rank"], total_players),
+    } for player in selected_bots]
+
+    conn.execute(model.challenges.update().values(
+        status=model.ChallengeStatus.PLAYING_GAME.value,
+        most_recent_game_task=sqlalchemy.sql.func.now(),
+    ).where(model.challenges.c.id == challenge["id"]))
+
+    return util.response_success({
+        "type": "game",
+        "width": map_width,
+        "height": map_height,
+        "users": players,
+        "challenge": challenge["id"],
+    })
 
 
 def find_idle_seed_player(conn, ranked_users, seed_filter, restrictions=False):
@@ -224,7 +343,13 @@ def find_newbie_seed_player(conn, ranked_users, seed_filter):
     :return:
     """
     sqlfunc = sqlalchemy.sql.func
-    ordering = sqlfunc.rand() * -sqlfunc.pow(model.bots.c.sigma, 2)
+    game_curve = 1 / (model.bots.c.games_played + 1)
+    # weight the curve between half and full weight
+    rand_factor = 0.5 + (sqlfunc.rand() * 0.5)
+    # Since the curve is cut in half every doubling of games, this means a bot
+    # will always be chosen ahead of any bots that have more than twice the
+    # number of games
+    ordering = rand_factor * -game_curve
     query = sqlalchemy.sql.select([
         ranked_users.c.user_id,
         model.bots.c.id.label("bot_id"),
@@ -244,9 +369,9 @@ def find_newbie_seed_player(conn, ranked_users, seed_filter):
         )
     ).where(
         (model.bots.c.compile_status == model.CompileStatus.SUCCESSFUL.value) &
-        (model.bots.c.games_played < 400) &
         seed_filter
-    ).order_by(ordering).limit(1).reduce_columns()
+    ).order_by(ordering).limit(20).reduce_columns().alias("seed_query").select(
+    ).order_by(sqlfunc.rand())
 
     return conn.execute(query).first()
 
@@ -262,25 +387,28 @@ def find_seed_player(conn, ranked_users, seed_filter):
     if not config.COMPETITION_FINALS_PAIRING:
         rand_value = random.random()
 
-        if rand_value > 0.5:
+        # Give 25% of games to least recently played new players
+        if rand_value > 0.75:
             logging.info("Matchmaking: seed player: looking for random bot"
-                         " with under 400 games played")
-            result = find_newbie_seed_player(conn, ranked_users, seed_filter)
-            if result:
-                return result
-        elif 0.25 < rand_value <= 0.5:
-            logging.info("Matchmaking: seed player: looking for random bot"
-                         " from recent game with under 400 games played")
+                         " with under 400 games played that hasn't played"
+                         " recently")
             result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                              restrictions=True)
             if result:
                 return result
+        # Give 65% of games to lowest games played
+        # (also take any games where a seed isn't found above, almost certainly
+        #  because everyone is over 400 games)
+        if rand_value > 0.1:
+            logging.info("Matchmaking: seed player: looking for random bot"
+                         " with fewest games played")
+            result = find_newbie_seed_player(conn, ranked_users, seed_filter)
+            if result:
+                return result
 
-        # Fallback case
-        # Same as the previous case, but we do not restrict how many
-        # games the user can have played, and we do not sort randomly.
+        # Give 10% of games to overall user who has least recently played
         logging.info("Matchmaking: seed player: looking for random bot"
-                     " from recent game")
+                     " that hasn't played recently")
         result = find_idle_seed_player(conn, ranked_users, seed_filter,
                                          restrictions=False)
         if result:

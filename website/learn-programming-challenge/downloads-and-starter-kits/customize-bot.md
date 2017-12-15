@@ -74,10 +74,3 @@ See the [Game Server Reference](/learn-programming-challenge/other-resources/gam
 
 For JVM languages, you can submit a jar file inside of your zip file instead of source files. The jar will be executed `java -jar MyBot.jar` so you need to define a Main-Class header in the manifest.
 
-## Custom run script
-
-You may supply a `run.sh` script to control how your bot is run. Many languages will be properly auto detected and run without the need for an `run.sh` script. You should only include a custom `run.sh` script if you have a real need for one.
-
-You could use a `run.sh` file to use a custom runtime such as `PyPy` instead of the default `Python 3`.
-
-
