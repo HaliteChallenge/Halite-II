@@ -61,6 +61,10 @@ def upload_game():
     challenge = json.loads(flask.request.values.get("challenge", "null"))
 
     replay_name = os.path.basename(game_output["replay"])
+    if replay_name not in flask.request.files:
+        raise util.APIError(
+            400, message="Replay file not found in uploaded files.")
+
     stats = parse_replay(decode_replay(flask.request.files[replay_name]))
     if stats is None:
         raise util.APIError(
@@ -157,9 +161,6 @@ def store_game_artifacts(replay_name, users):
     were saved in.
     """
     replay_key, _ = os.path.splitext(replay_name)
-    if replay_name not in flask.request.files:
-        raise util.APIError(
-            400, message="Replay file not found in uploaded files.")
 
     # Store replay in separate bucket if user is Gold/Plat/Diamond
     bucket_class = 0
@@ -317,12 +318,6 @@ def store_game_stats(conn, game_output, stats, game_id, users):
     :param users: The list of user objects for this game.
     :return:
     """
-    replay_name = os.path.basename(game_output["replay"])
-    replay_key, _ = os.path.splitext(replay_name)
-    if replay_name not in flask.request.files:
-        raise util.APIError(
-            400, message="Replay file not found in uploaded files.")
-
     # Store game stats in database
     conn.execute(model.game_stats.insert().values(
         game_id=game_id,
