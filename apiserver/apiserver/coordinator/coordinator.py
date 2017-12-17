@@ -71,7 +71,8 @@ def upload_game():
 
     with model.engine.begin() as conn:
         total_users = conn.execute(model.total_ranked_users).first()[0]
-        for user in users:
+        # Sort the users to prevent deadlock in the stored_bot for update lock
+        for user in sorted(users, key=lambda x: x['user_id']):
             stored_user = conn.execute(
                 sqlalchemy.sql.select([
                     model.users.c.id.label("user_id"),
@@ -94,7 +95,7 @@ def upload_game():
                     model.bots.c.language,
                     model.bots.c.mu,
                     model.bots.c.sigma,
-                ]).where(
+                ], for_update=True).where(
                     (model.bots.c.id == user["bot_id"]) &
                     (model.bots.c.user_id == user["user_id"])
                 )
