@@ -60,6 +60,15 @@ def upload_game():
     users = json.loads(flask.request.values["users"])
     challenge = json.loads(flask.request.values.get("challenge", "null"))
 
+    replay_name = os.path.basename(game_output["replay"])
+    stats = parse_replay(decode_replay(flask.request.files[replay_name]))
+    if stats is None:
+        raise util.APIError(
+            400, message="Replay file cannot be parsed.")
+
+    # Store the replay and any error logs
+    replay_key, bucket_class = store_game_artifacts(replay_name, users)
+
     with model.engine.connect() as conn:
         total_users = conn.execute(model.total_ranked_users).first()[0]
         for user in users:
@@ -119,15 +128,6 @@ def upload_game():
             else:
                 user["leaderboard_rank"] = total_users
                 user["tier"] = util.tier(total_users, total_users)
-
-    # Store the replay and any error logs
-    replay_name = os.path.basename(game_output["replay"])
-    replay_key, bucket_class = store_game_artifacts(replay_name, users)
-
-    stats = parse_replay(decode_replay(flask.request.files[replay_name]))
-    if stats is None:
-        raise util.APIError(
-            400, message="Replay file cannot be parsed.")
 
     # Store game results in database
     game_id = store_game_results(game_output, stats,
